@@ -1101,6 +1101,9 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       int height = rect->bottom - rect->top;
       window->config.width = width;
       window->config.height = height;
+      if (window->ui_tree && window->ui_tree->layout) {
+        cmp_layout_calculate(window->ui_tree->layout, (float)width, (float)height);
+      }
       if (window->resize_cb) {
         window->resize_cb(width, height, window->resize_user_data);
       }
@@ -1117,6 +1120,10 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
       window->config.width = LOWORD(lParam);
       window->config.height = HIWORD(lParam);
+
+      if (window->ui_tree && window->ui_tree->layout) {
+        cmp_layout_calculate(window->ui_tree->layout, (float)window->config.width, (float)window->config.height);
+      }
 
       if (window->resize_cb) {
         window->resize_cb(window->config.width, window->config.height,

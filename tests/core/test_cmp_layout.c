@@ -56,7 +56,7 @@ TEST test_layout_column_calculation(void) {
 
   cmp_layout_node_add_child(root, child1);
   cmp_layout_node_add_child(root, child2);
-  res = cmp_layout_calculate(root, 100.0f, 100.0f);
+  res = cmp_layout_calculate(root, 400.0f, 100.0f);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
   /* Root should be width 100, height 50 (auto size children) */
@@ -94,7 +94,7 @@ TEST test_layout_row_calculation(void) {
 
   cmp_layout_node_add_child(root, child1);
   cmp_layout_node_add_child(root, child2);
-  res = cmp_layout_calculate(root, 200.0f, 100.0f);
+  res = cmp_layout_calculate(root, 400.0f, 100.0f);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
   /* Root should be width 100, height 100 */
@@ -191,7 +191,7 @@ TEST test_layout_rtl_calculation(void) {
 
   cmp_layout_node_add_child(root, child1);
   cmp_layout_node_add_child(root, child2);
-  res = cmp_layout_calculate(root, 100.0f, 100.0f);
+  res = cmp_layout_calculate(root, 400.0f, 100.0f);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
   /* Root is 100x100 */
@@ -216,6 +216,233 @@ TEST test_layout_rtl_calculation(void) {
                 "%f"); /* child2 X = 50 - 40 = 10. */
 
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_LTR);
+  cmp_layout_node_destroy(root);
+  PASS();
+}
+
+TEST test_layout_bounds_checking(void) {
+  cmp_layout_node_t *root = NULL, *child = NULL;
+  int res;
+
+  cmp_layout_node_create(&root);
+  root->width = 800.0f;
+  root->height = 600.0f;
+
+  cmp_layout_node_create(&child);
+  child->width = 5000.0f;
+  child->height = 5000.0f;
+  /* Make sure flex shrink kicks in or min/max width on child */
+  child->max_width = 800.0f;
+  child->max_height = 600.0f;
+
+  cmp_layout_node_add_child(root, child);
+  res = cmp_layout_calculate(root, 800.0f, 600.0f);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  /* The child's computed rect should be strictly clamped to the constraints */
+  ASSERT_EQ_FMT(800.0f, child->computed_rect.width, "%f");
+  ASSERT_EQ_FMT(600.0f, child->computed_rect.height, "%f");
+
+  cmp_layout_node_destroy(root);
+  PASS();
+}
+
+TEST test_layout_flex_shrink(void) {
+  cmp_layout_node_t *root = NULL, *child1 = NULL, *child2 = NULL,
+                    *child3 = NULL;
+  int res;
+
+  cmp_layout_node_create(&root);
+  root->direction = CMP_FLEX_ROW;
+  root->width = 800.0f;
+
+  /* 3 children requesting 400px each = 1200px. Available = 800px. Shrink =
+   * 400px / 3 = 133.33px. Each child should be 266.66px */
+  cmp_layout_node_create(&child1);
+  child1->width = 400.0f;
+  child1->flex_shrink = 1.0f;
+
+  cmp_layout_node_create(&child2);
+  child2->width = 400.0f;
+  child2->flex_shrink = 1.0f;
+
+  cmp_layout_node_create(&child3);
+  child3->width = 400.0f;
+  child3->flex_shrink = 1.0f;
+
+  cmp_layout_node_add_child(root, child1);
+  cmp_layout_node_add_child(root, child2);
+  cmp_layout_node_add_child(root, child3);
+  res = cmp_layout_calculate(root, 800.0f, 600.0f);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  ASSERT_IN_RANGE(266.6f, 266.7f, child1->computed_rect.width);
+  ASSERT_IN_RANGE(266.6f, 266.7f, child2->computed_rect.width);
+  ASSERT_IN_RANGE(266.6f, 266.7f, child3->computed_rect.width);
+
+  cmp_layout_node_destroy(root);
+  PASS();
+}
+
+TEST test_layout_flex_wrap_responsive(void) {
+  cmp_layout_node_t *root = NULL, *child1 = NULL, *child2 = NULL,
+                    *child3 = NULL, *child4 = NULL;
+  int res;
+
+  cmp_layout_node_create(&root);
+  root->direction = CMP_FLEX_ROW;
+  root->flex_wrap = CMP_FLEX_WRAP;
+
+  cmp_layout_node_create(&child1);
+  child1->width = 200.0f;
+  child1->height = 100.0f;
+  cmp_layout_node_create(&child2);
+  child2->width = 200.0f;
+  child2->height = 100.0f;
+  cmp_layout_node_create(&child3);
+  child3->width = 200.0f;
+  child3->height = 100.0f;
+  cmp_layout_node_create(&child4);
+  child4->width = 200.0f;
+  child4->height = 100.0f;
+
+  cmp_layout_node_add_child(root, child1);
+  cmp_layout_node_add_child(root, child2);
+  cmp_layout_node_add_child(root, child3);
+  cmp_layout_node_add_child(root, child4);
+
+  /* Simulate Phone (400px width). Expect 2 rows of 2 (or if exactly 400, wait,
+   * 200+200=400, so exactly 2 per line) */
+  root->width = 400.0f;
+  res = cmp_layout_calculate(root, 400.0f, 600.0f);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  /* child1 and child2 on line 1 */
+  ASSERT_EQ_FMT(0.0f, child1->computed_rect.y, "%f");
+  ASSERT_EQ_FMT(0.0f, child2->computed_rect.y, "%f");
+  /* child3 and child4 on line 2 */
+  ASSERT_EQ_FMT(100.0f, child3->computed_rect.y, "%f");
+  ASSERT_EQ_FMT(100.0f, child4->computed_rect.y, "%f");
+  ASSERT_EQ_FMT(200.0f, root->computed_rect.height, "%f");
+
+  /* Simulate Tablet (1024px width). Expect 1 row of 4 */
+  root->width = 1024.0f;
+  res = cmp_layout_calculate(root, 1024.0f, 600.0f);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  /* All on line 1 */
+  ASSERT_EQ_FMT(0.0f, child1->computed_rect.y, "%f");
+  ASSERT_EQ_FMT(0.0f, child2->computed_rect.y, "%f");
+  ASSERT_EQ_FMT(0.0f, child3->computed_rect.y, "%f");
+  ASSERT_EQ_FMT(0.0f, child4->computed_rect.y, "%f");
+  ASSERT_EQ_FMT(100.0f, root->computed_rect.height, "%f");
+
+  cmp_layout_node_destroy(root);
+  PASS();
+}
+
+TEST test_layout_w3c_flex_factor_sums(void) {
+  cmp_layout_node_t *root = NULL, *child1 = NULL, *child2 = NULL;
+  int res;
+
+  cmp_layout_node_create(&root);
+  root->direction = CMP_FLEX_ROW;
+  root->width = 1000.0f;
+
+  /* child1: 200px basis + 1 grow */
+  cmp_layout_node_create(&child1);
+  child1->width = 200.0f;
+  child1->flex_grow = 1.0f;
+
+  /* child2: 200px basis + 3 grow */
+  cmp_layout_node_create(&child2);
+  child2->width = 200.0f;
+  child2->flex_grow = 3.0f;
+
+  cmp_layout_node_add_child(root, child1);
+  cmp_layout_node_add_child(root, child2);
+  res = cmp_layout_calculate(root, 1000.0f, 600.0f);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  /* Total width = 1000. Sum of basis = 400. Remaining = 600.
+     Total grow = 4.
+     child1 = 200 + (1/4 * 600) = 200 + 150 = 350.
+     child2 = 200 + (3/4 * 600) = 200 + 450 = 650. */
+  ASSERT_EQ_FMT(350.0f, child1->computed_rect.width, "%f");
+  ASSERT_EQ_FMT(650.0f, child2->computed_rect.width, "%f");
+
+  cmp_layout_node_destroy(root);
+  PASS();
+}
+
+TEST test_layout_w3c_min_height_auto(void) {
+  cmp_layout_node_t *root = NULL, *child = NULL, *grandchild = NULL;
+  int res;
+
+  cmp_layout_node_create(&root);
+  root->direction = CMP_FLEX_COLUMN;
+  root->width = 500.0f;
+  root->height = 500.0f;
+
+  cmp_layout_node_create(&child);
+  child->width = 500.0f;
+  /* height = auto */
+  child->flex_shrink = 1.0f;
+  /* Scrollable items have min-height: 0 instead of min-height: auto (intrinsic
+   * size) */
+  child->overflow_y = 1; /* CMP_OVERFLOW_SCROLL */
+
+  cmp_layout_node_create(&grandchild);
+  grandchild->width = 500.0f;
+  grandchild->height = 2000.0f; /* huge content */
+
+  cmp_layout_node_add_child(child, grandchild);
+  cmp_layout_node_add_child(root, child);
+  res = cmp_layout_calculate(root, 500.0f, 500.0f);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  /* Child height should be clamped by flex shrink / parent constraints to 500
+   */
+  if (!(child->computed_rect.height >= 499.0f &&
+        child->computed_rect.height <= 501.0f)) {
+    printf("Expected ~500.0f, Got: %f\n", child->computed_rect.height);
+  }
+  ASSERT(child->computed_rect.height >= 499.0f &&
+         child->computed_rect.height <= 501.0f);
+  /* But its scroll content size should reflect the grandchild */
+  ASSERT_EQ_FMT(2000.0f, child->scroll_content_size.height, "%f");
+
+  cmp_layout_node_destroy(root);
+  PASS();
+}
+
+TEST test_layout_w3c_absolute_positioning(void) {
+  cmp_layout_node_t *root = NULL, *abs_child = NULL;
+  int res;
+
+  cmp_layout_node_create(&root);
+  root->width = 800.0f;
+  root->height = 600.0f;
+  root->padding[0] = 20.0f; /* top */
+  root->padding[3] = 30.0f; /* left */
+
+  cmp_layout_node_create(&abs_child);
+  abs_child->position_type = CMP_POSITION_ABSOLUTE;
+  abs_child->position[0] = 50.0f;  /* top */
+  abs_child->position[3] = 100.0f; /* left */
+  abs_child->width = 200.0f;
+  abs_child->height = 200.0f;
+
+  cmp_layout_node_add_child(root, abs_child);
+  res = cmp_layout_calculate(root, 800.0f, 600.0f);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+
+  /* Absolute position should be relative to parent's padding box:
+     parent_x = 0, padding_left = 30, abs_left = 100 -> 130
+     parent_y = 0, padding_top = 20, abs_top = 50 -> 70 */
+  ASSERT_EQ_FMT(130.0f, abs_child->computed_rect.x, "%f");
+  ASSERT_EQ_FMT(70.0f, abs_child->computed_rect.y, "%f");
+
   cmp_layout_node_destroy(root);
   PASS();
 }
@@ -277,6 +504,12 @@ SUITE(layout_suite) {
   RUN_TEST(test_layout_row_calculation);
   RUN_TEST(test_layout_advanced_features);
   RUN_TEST(test_layout_rtl_calculation);
+  RUN_TEST(test_layout_bounds_checking);
+  RUN_TEST(test_layout_flex_shrink);
+  RUN_TEST(test_layout_flex_wrap_responsive);
+  RUN_TEST(test_layout_w3c_flex_factor_sums);
+  RUN_TEST(test_layout_w3c_min_height_auto);
+  RUN_TEST(test_layout_w3c_absolute_positioning);
   RUN_TEST(test_layout_debug_print);
 }
 

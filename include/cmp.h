@@ -3506,7 +3506,9 @@ typedef enum cmp_flex_align {
  */
 typedef enum cmp_flex_direction {
   CMP_FLEX_ROW = 0,
-  CMP_FLEX_COLUMN = 1
+  CMP_FLEX_COLUMN = 1,
+  CMP_FLEX_ROW_REVERSE = 2,
+  CMP_FLEX_COLUMN_REVERSE = 3
 } cmp_flex_direction_t;
 
 /**
@@ -3529,16 +3531,39 @@ typedef enum cmp_position_type {
 } cmp_position_type_t;
 
 /**
+ * @brief Display Options
+ */
+typedef enum cmp_display {
+  CMP_DISPLAY_FLEX = 0,
+  CMP_DISPLAY_INLINE_FLEX = 1,
+  CMP_DISPLAY_NONE = 2
+} cmp_display_t;
+
+/**
+ * @brief Layout bounds and constraints
+ */
+typedef struct cmp_layout_constraints {
+  float min_width;
+  float max_width;
+  float min_height;
+  float max_height;
+} cmp_layout_constraints_t;
+
+/**
  * @brief Node definition for the generic UI Tree layout engine
  */
 typedef struct cmp_layout_node {
   int id;
+  cmp_display_t display;
   cmp_flex_direction_t direction;
   cmp_flex_wrap_t flex_wrap;
   cmp_flex_align_t justify_content;
   cmp_flex_align_t align_items;
+  cmp_flex_align_t align_content;
   cmp_flex_align_t align_self;
   cmp_position_type_t position_type;
+
+  int order;
 
   /* Style constraints */
   float width;
@@ -3550,10 +3575,16 @@ typedef struct cmp_layout_node {
   float aspect_ratio; /* Width / Height ratio for locking, <=0 to disable */
   float flex_grow;
   float flex_shrink;
+  float flex_basis;
   float margin[4];   /* Top, Right, Bottom, Left */
   float padding[4];  /* Top, Right, Bottom, Left */
   float position[4]; /* Top, Right, Bottom, Left (for absolute positioning) */
   int z_index;
+
+  /* Engine states */
+  float measured_width;
+  float measured_height;
+  int dirty;
 
   /* Multi-column layout */
   int column_count;
@@ -3720,11 +3751,11 @@ struct cmp_ui_node {
 
   struct cmp_event_listener_node *event_listeners;
 
-  unsigned int design_language_override
-      : 3; /* 0=Inherit, 1=Material3,
-          2=Fluent2, 3=Cupertino, 4=Unstyled */
-  unsigned int density_override
-      : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
+  unsigned int
+      design_language_override : 3; /* 0=Inherit, 1=Material3,
+                                   2=Fluent2, 3=Cupertino, 4=Unstyled */
+  unsigned int
+      density_override : 2; /* 0=Inherit, 1=Compact, 2=Standard, 3=Relaxed */
   unsigned int is_rtl_mirrored : 1; /* 1=Mirror SVG/Rendering for RTL */
 };
 /**
@@ -5170,6 +5201,8 @@ struct cmp_layer {
   uint32_t bg_color;
   uint32_t text_color;
   float font_size;
+  int scissor_enable;
+  cmp_rect_t scissor_rect;
 };
 typedef struct cmp_layer cmp_layer_t;
 
