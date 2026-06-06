@@ -46,6 +46,9 @@ int cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
   }
 
   bar->node_track->bg_color = track_color;
+  bar->node_track->type = 10; /* Progress */
+  bar->node_track->layout->measure_ctx = bar->node_track;
+  bar->node_track->layout->measure_cb = cmp_ui_layout_measure_dispatch;
 
   err = cmp_ui_box_create(&bar->node_fill);
   if (err != 0) {

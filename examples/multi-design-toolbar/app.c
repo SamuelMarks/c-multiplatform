@@ -322,6 +322,7 @@ static int build_ui(void) {
     title->text_color = g_is_dark ? 0xFFE6E0E9 : 0xFF1D1B20;
     title->font_size = -1.0f; /* Let system scale font */
     title->layout->width = -1.0f;
+    title->layout->height = -1.0f;
   }
 
   rc = create_simple_button(&btn_lang, "EN", "Switch Language", on_lang_click);
@@ -332,12 +333,25 @@ static int build_ui(void) {
   rc = create_simple_button(&btn_design, "DSG", "Change design system",
                             on_design_click);
 
-  if (btn_theme)
+  if (btn_lang) {
+    btn_lang->layout->width = -1.0f;
+    btn_lang->layout->height = -1.0f;
+  }
+  if (btn_theme) {
+    btn_theme->layout->width = -1.0f;
+    btn_theme->layout->height = -1.0f;
     btn_theme->layout->margin[3] = 1.0f * REM;
-  if (btn_palette)
+  }
+  if (btn_palette) {
+    btn_palette->layout->width = -1.0f;
+    btn_palette->layout->height = -1.0f;
     btn_palette->layout->margin[3] = 1.0f * REM;
-  if (btn_design)
+  }
+  if (btn_design) {
+    btn_design->layout->width = -1.0f;
+    btn_design->layout->height = -1.0f;
     btn_design->layout->margin[3] = 1.0f * REM;
+  }
 
   if (btn_lang)
     (void)cmp_ui_app_bar_add_action(app_bar_obj, btn_lang);

@@ -453,6 +453,54 @@ static void my_click_cb(cmp_event_t *evt, cmp_ui_node_t *node, void *ctx) {
          evt->action);
 }
 
+static int mock_measure_success_cb(void *ctx, float max_width, float *out_w,
+                                   float *out_h) {
+  (void)ctx;
+  (void)max_width;
+  *out_w = 42.0f;
+  *out_h = 24.0f;
+  return CMP_SUCCESS;
+}
+
+static int mock_measure_fail_cb(void *ctx, float max_width, float *out_w,
+                                float *out_h) {
+  (void)ctx;
+  (void)max_width;
+  *out_w = 0.0f;
+  *out_h = 0.0f;
+  return CMP_ERROR_GENERAL;
+}
+
+TEST test_layout_multipass(void) {
+  cmp_layout_node_t *root = NULL;
+  cmp_layout_node_t *child_success = NULL;
+  cmp_layout_node_t *child_fail = NULL;
+  int res;
+
+  cmp_layout_node_create(&root);
+  root->direction = CMP_FLEX_ROW;
+  root->align_items = CMP_FLEX_ALIGN_START;
+
+  cmp_layout_node_create(&child_success);
+  child_success->measure_cb = mock_measure_success_cb;
+  cmp_layout_node_add_child(root, child_success);
+
+  res = cmp_layout_calculate(root, 400.0f, 100.0f);
+  ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
+  ASSERT_EQ_FMT(42.0f, child_success->computed_rect.width, "%f");
+  ASSERT_EQ_FMT(24.0f, child_success->computed_rect.height, "%f");
+
+  cmp_layout_node_create(&child_fail);
+  child_fail->measure_cb = mock_measure_fail_cb;
+  cmp_layout_node_add_child(root, child_fail);
+
+  res = cmp_layout_calculate(root, 400.0f, 100.0f);
+  ASSERT_EQ_FMT(CMP_ERROR_GENERAL, res, "%d");
+
+  cmp_layout_node_destroy(root);
+  PASS();
+}
+
 TEST test_layout_debug_print(void) {
   cmp_ui_node_t *root = NULL;
   cmp_ui_node_t *btn = NULL;
@@ -510,6 +558,7 @@ SUITE(layout_suite) {
   RUN_TEST(test_layout_w3c_flex_factor_sums);
   RUN_TEST(test_layout_w3c_min_height_auto);
   RUN_TEST(test_layout_w3c_absolute_positioning);
+  RUN_TEST(test_layout_multipass);
   RUN_TEST(test_layout_debug_print);
 }
 

@@ -59,6 +59,10 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
 
   sw->is_on = 0; /* Default OFF */
 
+  sw->node_root->type = 9; /* Toggle */
+  sw->node_root->layout->measure_ctx = sw->node_root;
+  sw->node_root->layout->measure_cb = cmp_ui_layout_measure_dispatch;
+
   sw->node_root->bg_color = 0xFFCCCCCC;  /* Track off color */
   sw->node_thumb->bg_color = 0xFFFFFFFF; /* Thumb color */
 

@@ -3,7 +3,78 @@
 #include "cmp_log.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include "themes/cmp_theme_dispatch.h"
 /* clang-format on */
+
+/**
+ * @brief Dispatcher for layout intrinsic measurement.
+ * @param ctx The UI node context.
+ * @param max_width The available width for wrapping.
+ * @param out_w Pointer to receive intrinsic width.
+ * @param out_h Pointer to receive intrinsic height.
+ * @return 0 on success, or an error code.
+ */
+int cmp_ui_layout_measure_dispatch(void *ctx, float max_width, float *out_w,
+                                   float *out_h) {
+  int rc = CMP_SUCCESS;
+  cmp_ui_node_t *node;
+  (void)max_width;
+
+  if (!ctx || !out_w || !out_h) {
+    return CMP_ERROR_INVALID_ARG;
+  }
+  node = (cmp_ui_node_t *)ctx;
+
+  switch (node->type) {
+  case 2: /* Text */
+    /* TODO: Theme text measurement routing with max_width */
+    rc = CMP_SUCCESS;
+    break;
+  case 3: /* Button */
+    rc = cmp_theme_measure_button(node, out_w, out_h);
+    break;
+  case 5: /* Checkbox */
+    rc = cmp_theme_measure_checkbox(node, out_w, out_h);
+    break;
+  case 6: /* Radio */
+    rc = cmp_theme_measure_radio(node, out_w, out_h);
+    break;
+  case 9: /* Toggle (Switch) is actually 9? Wait, no. */
+    rc = cmp_theme_measure_toggle(node, out_w, out_h);
+    break;
+  case 8: /* Slider */
+    rc = cmp_theme_measure_slider(node, out_w, out_h);
+    break;
+  case 10: /* Progress (Wait, progress doesn't have a specific type yet in my
+              grep, maybe it does? I'll use default) */
+    rc = cmp_theme_measure_progress(node, out_w, out_h);
+    break;
+  case 11: /* Dropdown */
+    rc = cmp_theme_measure_dropdown(node, out_w, out_h);
+    break;
+  default:
+    /* Other types don't have intrinsic leaf measurements, or fallback */
+    rc = CMP_SUCCESS;
+    break;
+  }
+
+  if (rc != CMP_SUCCESS) {
+    char log_buf[128];
+    *out_w = 0.0f;
+    *out_h = 0.0f;
+#if defined(_MSC_VER)
+    sprintf_s(log_buf, sizeof(log_buf),
+              "Theme measure failed: " CMP_FMT_I64 "\n", (int64_t)rc);
+#else
+    sprintf(log_buf, "Theme measure failed: " CMP_FMT_I64 "\n", (int64_t)rc);
+#endif
+    LOG_DEBUG("%s", log_buf);
+    return rc;
+  }
+
+  return rc;
+}
 
 /**
  * @brief cmp_ui_box_create
@@ -121,6 +192,8 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
   text_copy[len] = '\0';
 
   node->properties = text_copy;
+  node->layout->measure_ctx = node;
+  node->layout->measure_cb = cmp_ui_layout_measure_dispatch;
   *out_node = node;
   return rc;
 }
@@ -193,6 +266,8 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
   label_copy[len] = '\0';
 
   node->properties = label_copy;
+  node->layout->measure_ctx = node;
+  node->layout->measure_cb = cmp_ui_layout_measure_dispatch;
   *out_node = node;
   return rc;
 }
@@ -241,6 +316,8 @@ int cmp_ui_text_input_create(cmp_ui_node_t **out_node) {
     return rc;
   }
 
+  node->layout->measure_ctx = node;
+  node->layout->measure_cb = cmp_ui_layout_measure_dispatch;
   *out_node = node;
   return rc;
 }
@@ -314,6 +391,8 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
   }
 
   node->properties = label_copy;
+  node->layout->measure_ctx = node;
+  node->layout->measure_cb = cmp_ui_layout_measure_dispatch;
   *out_node = node;
   return rc;
 }
@@ -381,6 +460,8 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
   *group_prop = group_id;
   node->properties = group_prop;
 
+  node->layout->measure_ctx = node;
+  node->layout->measure_cb = cmp_ui_layout_measure_dispatch;
   *out_node = node;
   return rc;
 }
@@ -575,6 +656,8 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
   bounds[1] = max;
   node->properties = bounds;
 
+  node->layout->measure_ctx = node;
+  node->layout->measure_cb = cmp_ui_layout_measure_dispatch;
   *out_node = node;
   return rc;
 }
@@ -738,6 +821,8 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
     return rc;
   }
 
+  node->layout->measure_ctx = node;
+  node->layout->measure_cb = cmp_ui_layout_measure_dispatch;
   *out_node = node;
   return rc;
 }

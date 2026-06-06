@@ -3531,6 +3531,18 @@ typedef enum cmp_position_type {
 } cmp_position_type_t;
 
 /**
+ * @brief Measurement units for layout and typography
+ */
+typedef enum cmp_unit {
+  CMP_UNIT_PIXELS = 0,
+  CMP_UNIT_PERCENT = 1,
+  CMP_UNIT_VW = 2,
+  CMP_UNIT_VH = 3,
+  CMP_UNIT_EM = 4,
+  CMP_UNIT_REM = 5
+} cmp_unit_t;
+
+/**
  * @brief Display Options
  */
 typedef enum cmp_display {
@@ -3550,6 +3562,17 @@ typedef struct cmp_layout_constraints {
 } cmp_layout_constraints_t;
 
 /**
+ * @brief Callback to measure a layout node's intrinsic dimensions.
+ * @param context Opaque pointer to the UI node or related context.
+ * @param max_width The maximum available horizontal space for wrapping.
+ * @param out_width Pointer to receive the calculated intrinsic width.
+ * @param out_height Pointer to receive the calculated intrinsic height.
+ * @return 0 (CMP_SUCCESS) on success, or a non-zero error code.
+ */
+typedef int (*cmp_layout_measure_cb_t)(void *context, float max_width,
+                                       float *out_width, float *out_height);
+
+/**
  * @brief Node definition for the generic UI Tree layout engine
  */
 typedef struct cmp_layout_node {
@@ -3565,13 +3588,25 @@ typedef struct cmp_layout_node {
 
   int order;
 
+  /* Intrinsic Measurement */
+  /* Callback to measure node dimensions */
+  cmp_layout_measure_cb_t measure_cb;
+  /* Context for the measurement callback */
+  void *measure_ctx;
+
   /* Style constraints */
   float width;
+  cmp_unit_t width_unit;
   float height;
+  cmp_unit_t height_unit;
   float min_width;
+  cmp_unit_t min_width_unit;
   float min_height;
+  cmp_unit_t min_height_unit;
   float max_width;
+  cmp_unit_t max_width_unit;
   float max_height;
+  cmp_unit_t max_height_unit;
   float aspect_ratio; /* Width / Height ratio for locking, <=0 to disable */
   float flex_grow;
   float flex_shrink;
@@ -3610,6 +3645,7 @@ typedef struct cmp_layout_node {
   uint32_t bg_color;
   uint32_t text_color;
   float font_size;
+  cmp_unit_t font_size_unit;
 } cmp_layout_node_t;
 
 /**
@@ -3721,6 +3757,7 @@ struct cmp_ui_node {
   const uint32_t *text_color_ref;
   /** Font size in logical pixels */
   float font_size;
+  cmp_unit_t font_size_unit;
 
   /** Border radius for rounded corners in logical pixels */
   float border_radius;
@@ -3886,6 +3923,17 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node);
  * @return 0 on success, or an error code.
  */
 int cmp_ui_node_add_child(cmp_ui_node_t *parent, cmp_ui_node_t *child);
+
+/**
+ * @brief Dispatcher for layout intrinsic measurement.
+ * @param ctx The UI node context.
+ * @param max_width The available width for wrapping.
+ * @param out_w Pointer to receive intrinsic width.
+ * @param out_h Pointer to receive intrinsic height.
+ * @return 0 on success, or an error code.
+ */
+int cmp_ui_layout_measure_dispatch(void *ctx, float max_width, float *out_w,
+                                   float *out_h);
 
 /**
  * @brief Destroy a UI node and its children

@@ -294,8 +294,7 @@ static int build_cu_buttons(cmp_ui_node_t *parent) {
   (void)cmp_ui_node_add_child(card_box, row);
   (void)cmp_ui_button_create(&btn_node, "Plain Button", 0);
   {
-    size_t len = strlen("Plain Button");
-    btn_node->layout->width = (float)len * 7.0f + 32.0f;
+    btn_node->layout->width = -1.0f;
     btn_node->layout->height = -1.0f;
     btn_node->layout->flex_grow = 1.0f;
     btn_node->bg_color = 0x00000000;
@@ -310,8 +309,7 @@ static int build_cu_buttons(cmp_ui_node_t *parent) {
   (void)cmp_ui_node_add_child(row, btn_node);
   (void)cmp_ui_button_create(&btn_node, "Tinted Button", 0);
   {
-    size_t len = strlen("Tinted Button");
-    btn_node->layout->width = (float)len * 7.0f + 32.0f;
+    btn_node->layout->width = -1.0f;
     btn_node->layout->height = -1.0f;
     btn_node->layout->flex_grow = 1.0f;
     btn_node->bg_color = 0x33007AFF;

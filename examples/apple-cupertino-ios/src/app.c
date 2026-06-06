@@ -68,7 +68,7 @@ static int build_header(cmp_ui_node_t *parent, const char *title) {
     btn_back->layout->id = 100;
     btn_back->layout->width = -1.0f; /* auto stretch */
                                      /* flex layout adjusted */
-    btn_back->layout->height = 40.0f;
+    btn_back->layout->height = 2.5f * REM;
     btn_back->layout->margin[1] = 1.0f * REM;
     (void)cmp_ui_node_add_child(header, btn_back);
   }
@@ -80,7 +80,7 @@ static int build_header(cmp_ui_node_t *parent, const char *title) {
   btn_theme->layout->id = 101;
   btn_theme->layout->width = -1.0f; /* auto stretch */
   /* flex layout adjusted */
-  btn_theme->layout->height = 40.0f;
+  btn_theme->layout->height = 2.5f * REM;
   btn_theme->layout->margin[1] = 1.0f * REM;
   (void)cmp_ui_node_add_child(header, btn_theme);
   (void)cmp_ui_node_add_child(parent, header);
@@ -147,14 +147,14 @@ static int build_buttons_screen(cmp_ui_node_t *main_box) {
   btn1->type = 3;
   btn1->layout->width = -1.0f; /* auto stretch */
   /* flex layout adjusted */
-  btn1->layout->height = 44.0f;
+  btn1->layout->height = 2.8f * REM;
   btn1->layout->margin[2] = 1.0f * REM;
 
   (void)cmp_ui_box_create(&btn2);
   btn2->type = 3;
   btn2->layout->width = -1.0f; /* auto stretch */
   /* flex layout adjusted */
-  btn2->layout->height = 44.0f;
+  btn2->layout->height = 2.8f * REM;
   btn2->layout->margin[2] = 1.0f * REM;
 
   (void)cmp_ui_node_add_child(main_box, btn1);
@@ -180,7 +180,7 @@ static int build_inputs_screen(cmp_ui_node_t *main_box) {
   tg->type = 5;
   tg->layout->width = -1.0f; /* auto stretch */
   /* flex layout adjusted */
-  tg->layout->height = 31.0f;
+  tg->layout->height = 1.9f * REM;
   tg->layout->margin[2] = 1.0f * REM;
 
   (void)cmp_ui_box_create(&sl);
@@ -194,7 +194,7 @@ static int build_inputs_screen(cmp_ui_node_t *main_box) {
   ti->type = 4;
   ti->layout->width = -1.0f; /* auto stretch */
   /* flex layout adjusted */
-  ti->layout->height = 36.0f;
+  ti->layout->height = 2.2f * REM;
   ti->layout->margin[2] = 1.0f * REM;
 
   (void)cmp_ui_node_add_child(main_box, cb);

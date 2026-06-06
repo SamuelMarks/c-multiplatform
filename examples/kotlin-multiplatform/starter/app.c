@@ -177,7 +177,7 @@ static int build_ui(void) {
     if (res == CMP_SUCCESS) {
       img->layout->margin[0] = 60.0f; /* top margin */
       img->layout->width = -1.0f;     /* auto stretch */
-      img->layout->height = 240.0f;
+      img->layout->height = 15.0f * REM;
       (void)cmp_ui_node_add_child(g_ui_tree, img);
     }
 
@@ -195,7 +195,7 @@ static int build_ui(void) {
     if (res == CMP_SUCCESS) {
       txt->layout->margin[0] = 60.0f; /* top margin */
       txt->layout->width = -1.0f;     /* auto stretch */
-      txt->layout->height = 80.0f;
+      txt->layout->height = 5.0f * REM;
       (void)cmp_ui_node_add_child(g_ui_tree, txt);
     }
   }

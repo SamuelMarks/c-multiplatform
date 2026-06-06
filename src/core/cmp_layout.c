@@ -179,53 +179,104 @@ typedef struct {
   float total_flex_shrink;
 } cmp_layout_line_t;
 
-static void cmp_layout_measure_pass(cmp_layout_node_t *node) {
+static float cmp_resolve_unit(float val, cmp_unit_t unit, float parent_val) {
+  if (val < 0.0f)
+    return val; /* Auto / Unset */
+  switch (unit) {
+  case CMP_UNIT_PERCENT:
+    if (parent_val >= 0.0f)
+      return val * 0.01f * parent_val;
+    return val;
+  case CMP_UNIT_VW:
+  case CMP_UNIT_VH:
+  case CMP_UNIT_EM:
+  case CMP_UNIT_REM:
+    /* Simplified fallback for vw/vh/em/rem for now */
+    if (parent_val >= 0.0f)
+      return val * 0.01f * parent_val;
+    return val;
+  case CMP_UNIT_PIXELS:
+  default:
+    return val;
+  }
+}
+
+static int cmp_layout_measure_pass(cmp_layout_node_t *node,
+                                   float max_available_width) {
+  int rc = CMP_SUCCESS;
+  float intrinsic_w = 0.0f;
+  float intrinsic_h = 0.0f;
   size_t i;
   float sum_child_main = 0.0f;
   float max_child_cross = 0.0f;
   float aspect_ratio = node->aspect_ratio;
   int is_row = (node->direction == CMP_FLEX_ROW);
+  float child_avail_w;
 
-  for (i = 0; i < node->child_count; i++) {
-    cmp_layout_measure_pass(node->children[i]);
-  }
+  if (node->measure_cb != NULL) {
+    rc = node->measure_cb(node->measure_ctx, max_available_width, &intrinsic_w,
+                          &intrinsic_h);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("measure_cb failed: %d\n", rc);
+      return rc;
+    }
+    node->measured_width = intrinsic_w;
+    node->measured_height = intrinsic_h;
+  } else {
+    child_avail_w = max_available_width;
+    if (child_avail_w >= 0.0f) {
+      child_avail_w -= (node->padding[1] + node->padding[3] + node->margin[1] +
+                        node->margin[3]);
+      if (child_avail_w < 0.0f) {
+        child_avail_w = 0.0f;
+      }
+    }
 
-  for (i = 0; i < node->child_count; i++) {
-    cmp_layout_node_t *child = node->children[i];
-    float w = child->measured_width;
-    float h = child->measured_height;
+    for (i = 0; i < node->child_count; i++) {
+      rc = cmp_layout_measure_pass(node->children[i], child_avail_w);
+      if (rc != CMP_SUCCESS) {
+        return rc;
+      }
+    }
 
-    if (child->position_type == CMP_POSITION_ABSOLUTE)
-      continue;
+    for (i = 0; i < node->child_count; i++) {
+      cmp_layout_node_t *child = node->children[i];
+      float w = child->measured_width;
+      float h = child->measured_height;
 
-    if (child->width >= 0.0f)
-      w = child->width;
-    if (child->height >= 0.0f)
-      h = child->height;
+      if (child->position_type == CMP_POSITION_ABSOLUTE)
+        continue;
 
-    w += child->margin[1] + child->margin[3];
-    h += child->margin[0] + child->margin[2];
+      if (child->width >= 0.0f)
+        w = child->width;
+      if (child->height >= 0.0f)
+        h = child->height;
+
+      w += child->margin[1] + child->margin[3];
+      h += child->margin[0] + child->margin[2];
+
+      if (is_row) {
+        sum_child_main += w;
+        if (h > max_child_cross)
+          max_child_cross = h;
+      } else {
+        sum_child_main += h;
+        if (w > max_child_cross)
+          max_child_cross = w;
+      }
+    }
 
     if (is_row) {
-      sum_child_main += w;
-      if (h > max_child_cross)
-        max_child_cross = h;
+      node->measured_width =
+          sum_child_main + node->padding[1] + node->padding[3];
+      node->measured_height =
+          max_child_cross + node->padding[0] + node->padding[2];
     } else {
-      sum_child_main += h;
-      if (w > max_child_cross)
-        max_child_cross = w;
+      node->measured_height =
+          sum_child_main + node->padding[0] + node->padding[2];
+      node->measured_width =
+          max_child_cross + node->padding[1] + node->padding[3];
     }
-  }
-
-  if (is_row) {
-    node->measured_width = sum_child_main + node->padding[1] + node->padding[3];
-    node->measured_height =
-        max_child_cross + node->padding[0] + node->padding[2];
-  } else {
-    node->measured_height =
-        sum_child_main + node->padding[0] + node->padding[2];
-    node->measured_width =
-        max_child_cross + node->padding[1] + node->padding[3];
   }
 
   if (node->width >= 0.0f)
@@ -255,6 +306,8 @@ static void cmp_layout_measure_pass(cmp_layout_node_t *node) {
       node->measured_width = node->height * aspect_ratio;
     }
   }
+
+  return CMP_SUCCESS;
 }
 
 static void cmp_layout_resolve_flex_pass(cmp_layout_node_t *node,
@@ -382,6 +435,13 @@ static void cmp_layout_resolve_flex_pass(cmp_layout_node_t *node,
     }
   }
 
+  if (line_count == 1) {
+    float parent_cross = is_row ? inner_height : inner_width;
+    if (parent_cross > lines[0].cross_size) {
+      lines[0].cross_size = parent_cross;
+    }
+  }
+
   for (i = 0; i < line_count; i++) {
     cmp_layout_line_t *line = &lines[i];
     float remaining_main = main_avail_for_shrink - line->main_size;
@@ -404,31 +464,8 @@ static void cmp_layout_resolve_flex_pass(cmp_layout_node_t *node,
 
       final_main = is_row ? c_w : c_h;
 
-      if (child->width < 0.0f && child->height < 0.0f && final_main <= 0.0f &&
-          remaining_main > 0.0f && line->total_flex_grow == 0.0f &&
-          node->flex_wrap == CMP_FLEX_NOWRAP) {
-        final_main = remaining_main;
-      } else if ((is_row ? child->width < 0.0f : child->height < 0.0f)) {
-        if (line->total_flex_grow > 0.0f && remaining_main > 0.0f) {
-          final_main =
-              (child->flex_grow / line->total_flex_grow) * remaining_main;
-        } else {
-          /* Fallback size logic */
-          final_main =
-              (remaining_main > 0.0f && node->flex_wrap == CMP_FLEX_NOWRAP)
-                  ? remaining_main
-                  : (is_row ? child->measured_width : child->measured_height);
-
-          /* If shrink must occur and we have shrink factors, shrink it. */
-          if (line->total_flex_shrink > 0.0f && remaining_main < 0.0f) {
-            final_main +=
-                (child->flex_shrink / line->total_flex_shrink) * remaining_main;
-          }
-          if (final_main < 0.0f)
-            final_main = 0.0f;
-        }
-      } else if (line->total_flex_grow > 0.0f && remaining_main > 0.0f &&
-                 remaining_main != 999999.0f) {
+      if (line->total_flex_grow > 0.0f && remaining_main > 0.0f &&
+          remaining_main != 999999.0f) {
         final_main +=
             (child->flex_grow / line->total_flex_grow) * remaining_main;
       } else if (line->total_flex_shrink > 0.0f && remaining_main < 0.0f) {
@@ -744,20 +781,35 @@ static void cmp_layout_responsive_pass(cmp_layout_node_t *node,
     if (node->direction == CMP_FLEX_ROW) {
       node->direction = CMP_FLEX_COLUMN;
     }
+    if (node->parent == NULL) {
+      node->font_size = available_width * 0.05f;
+    }
   } else if (available_width >= 300.0f && available_width < 600.0f) {
+    if (node->parent == NULL) {
+      node->font_size = available_width * 0.045f;
+    }
   } else if (available_width >= 600.0f && available_width < 900.0f) {
     if (node->direction == CMP_FLEX_ROW) {
       node->flex_wrap = CMP_FLEX_WRAP;
     }
+    if (node->parent == NULL) {
+      node->font_size = available_width * 0.04f;
+    }
   } else if (available_width >= 900.0f && available_width < 1200.0f) {
+    if (node->parent == NULL) {
+      node->font_size = available_width * 0.03f;
+    }
   } else if (available_width >= 1200.0f && available_width < 1920.0f) {
+    if (node->parent == NULL) {
+      node->font_size = available_width * 0.02f;
+    }
   } else if (available_width >= 1920.0f) {
     if (node->parent == NULL) {
       node->margin[0] = available_width * 0.05f;
       node->margin[1] = available_width * 0.05f;
       node->margin[2] = available_width * 0.05f;
       node->margin[3] = available_width * 0.05f;
-      node->font_size = 24.0f;
+      node->font_size = available_width * 0.015f;
     }
   }
 
@@ -796,7 +848,10 @@ int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
   root_constraints.max_height = available_height;
 
   cmp_layout_responsive_pass(root, available_width);
-  cmp_layout_measure_pass(root);
+  rc = cmp_layout_measure_pass(root, available_width);
+  if (rc != CMP_SUCCESS) {
+    return rc;
+  }
   cmp_layout_resolve_flex_pass(root, root_constraints);
   cmp_layout_position_pass(root, 0.0f, 0.0f);
 

@@ -118,7 +118,7 @@ static void set_i18n_button(cmp_ui_node_t **btn, const char *key) {
         (*btn)->layout->height = m3b.height;
       }
     } else if (*btn && g_current_theme == 3) {
-      (*btn)->layout->height = 44.0f;
+      (*btn)->layout->height = 2.8f * REM;
     }
   }
   if (localized.data)
@@ -213,7 +213,7 @@ static int build_ui(void) {
 
     top_bar->layout->direction = CMP_FLEX_ROW;
     top_bar->layout->width = -1.0f;
-    top_bar->layout->height = 48.0f;
+    top_bar->layout->height = 3.0f * REM;
     top_bar->layout->align_items = 1; /* CMP_FLEX_ALIGN_CENTER */
 
     if (g_current_route == 1) {
@@ -299,7 +299,7 @@ static int build_ui(void) {
       rc = cmp_ui_text_create(&title, "Login to OAuth2 Simple", -1);
       if (rc == CMP_SUCCESS) {
         title->layout->width = -1.0f;
-        title->layout->height = 36.0f;
+        title->layout->height = 2.2f * REM;
         title->layout->margin[2] = 1.5f * REM;
         title->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         title->text_color = text_main;
@@ -338,7 +338,7 @@ static int build_ui(void) {
           user_val->font_size = -1.0f; /* Let system scale font */
           user_val->text_color = input_text;
           user_val->bg_color = 0;
-          user_val->layout->height = 30.0f;
+          user_val->layout->height = 1.9f * REM;
           user_val->layout->padding[3] = input_pad;
 
           (void)cmp_ui_node_add_child(user_container, user_val);
@@ -348,8 +348,8 @@ static int build_ui(void) {
             if (is_visible) {
               cmp_ui_node_t *caret_node = NULL;
               (void)cmp_ui_box_create(&caret_node);
-              caret_node->layout->width = 2.0f;
-              caret_node->layout->height = 20.0f;
+              caret_node->layout->width = 0.1f * REM;
+              caret_node->layout->height = 1.2f * REM;
               caret_node->bg_color = btn_bg;
               (void)cmp_ui_node_add_child(user_container, caret_node);
             }
@@ -410,7 +410,7 @@ static int build_ui(void) {
           pass_val->font_size = -1.0f; /* Let system scale font */
           pass_val->text_color = input_text;
           pass_val->bg_color = 0;
-          pass_val->layout->height = 30.0f;
+          pass_val->layout->height = 1.9f * REM;
           pass_val->layout->padding[3] = input_pad;
 
           (void)cmp_ui_node_add_child(pass_container, pass_val);
@@ -420,8 +420,8 @@ static int build_ui(void) {
             if (is_visible) {
               cmp_ui_node_t *caret_node = NULL;
               (void)cmp_ui_box_create(&caret_node);
-              caret_node->layout->width = 2.0f;
-              caret_node->layout->height = 20.0f;
+              caret_node->layout->width = 0.1f * REM;
+              caret_node->layout->height = 1.2f * REM;
               caret_node->bg_color = btn_bg;
               (void)cmp_ui_node_add_child(pass_container, caret_node);
             }
@@ -466,7 +466,7 @@ static int build_ui(void) {
       rc = cmp_ui_text_create(&title, "Secrets Page", -1);
       if (rc == CMP_SUCCESS) {
         title->layout->width = -1.0f;
-        title->layout->height = 36.0f;
+        title->layout->height = 2.2f * REM;
         title->layout->margin[2] = 1.5f * REM;
         title->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         title->text_color = text_main;
@@ -477,7 +477,7 @@ static int build_ui(void) {
                              "Here are your highly confidential secrets: 42",
                              -1) == CMP_SUCCESS) {
         secret_txt->layout->width = -1.0f;
-        secret_txt->layout->height = 36.0f;
+        secret_txt->layout->height = 2.2f * REM;
         secret_txt->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         secret_txt->text_color = g_is_dark ? 0xFF00FF00 : 0xFF008000;
         (void)cmp_ui_node_add_child(content_box, secret_txt);
