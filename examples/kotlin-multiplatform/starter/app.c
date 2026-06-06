@@ -4,10 +4,14 @@
 #include <stdio.h>
 /* clang-format on */
 
+#define REM ((g_window_w < g_window_h ? g_window_w : g_window_h) / 50.0f)
+
 /**
  * @brief Global pointer to the application window.
  */
 static cmp_window_t *g_window = NULL;
+static float g_window_w = 800.0f;
+static float g_window_h = 600.0f;
 
 /**
  * @brief Global pointer to the application UI tree.
@@ -245,17 +249,15 @@ int app_run(void) {
   cmp_event_t evt;
   int running = 1;
 
-  float current_w = 1024.0f;
-  float current_h = 1024.0f;
-
   while (running) {
     (void)cmp_window_poll_events(g_window);
     while (cmp_event_pop(&evt) == CMP_SUCCESS) {
       if (evt.type == 4) { /* CMP_EVENT_TYPE_RESIZE */
-        current_w = (float)evt.x;
-        current_h = (float)evt.y;
+        g_window_w = (float)evt.x;
+        g_window_h = (float)evt.y;
+        build_ui();
         if (g_ui_tree) {
-          (void)cmp_layout_calculate(g_ui_tree->layout, current_w, current_h);
+          (void)cmp_layout_calculate(g_ui_tree->layout, g_window_w, g_window_h);
         }
       }
       if (evt.action == CMP_ACTION_DOWN && (evt.type == 1 || evt.type == 2)) {
@@ -264,7 +266,8 @@ int app_run(void) {
           g_show_content = !g_show_content;
           build_ui();
           if (g_ui_tree) {
-            (void)cmp_layout_calculate(g_ui_tree->layout, current_w, current_h);
+            (void)cmp_layout_calculate(g_ui_tree->layout, g_window_w,
+                                       g_window_h);
           }
           (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         }

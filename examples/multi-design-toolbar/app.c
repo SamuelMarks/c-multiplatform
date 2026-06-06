@@ -7,6 +7,10 @@
 #include <stdio.h>
 /* clang-format on */
 
+#define REM                                                                    \
+  ((g_window_width < g_window_height ? g_window_width : g_window_height) /     \
+   50.0f)
+
 typedef enum app_language {
   APP_LANG_EN = 0,
   APP_LANG_HE = 1,
@@ -329,11 +333,11 @@ static int build_ui(void) {
                             on_design_click);
 
   if (btn_theme)
-    btn_theme->layout->margin[3] = 16.0f;
+    btn_theme->layout->margin[3] = 1.0f * REM;
   if (btn_palette)
-    btn_palette->layout->margin[3] = 16.0f;
+    btn_palette->layout->margin[3] = 1.0f * REM;
   if (btn_design)
-    btn_design->layout->margin[3] = 16.0f;
+    btn_design->layout->margin[3] = 1.0f * REM;
 
   if (btn_lang)
     (void)cmp_ui_app_bar_add_action(app_bar_obj, btn_lang);

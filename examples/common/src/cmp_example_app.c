@@ -10,6 +10,10 @@
 #include <string.h>
 /* clang-format on */
 
+#define REM                                                                    \
+  ((g_window_width < g_window_height ? g_window_width : g_window_height) /     \
+   50.0f)
+
 /**
  * \file cmp_example_app.c
  * \brief Implementation of the modular, ejectable application shell.
@@ -218,8 +222,8 @@ static int build_ui(void) {
       app_bar_node->layout->flex_shrink = 0.0f;
       app_bar_node->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
       app_bar_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-      app_bar_node->layout->padding[1] = 16.0f;
-      app_bar_node->layout->padding[3] = 16.0f;
+      app_bar_node->layout->padding[1] = 1.0f * REM;
+      app_bar_node->layout->padding[3] = 1.0f * REM;
       app_bar_node->bg_color = 0xFF4A4458;
       app_bar_node->text_color = 0xFFFFFFFF;
       rc = cmp_ui_node_add_child(g_ui_tree, app_bar_node);
@@ -281,7 +285,7 @@ static int build_ui(void) {
       btn_lang_node->layout->flex_grow = 1.0f;
       btn_lang_node->layout->flex_shrink = 0.0f;
       btn_lang_node->bg_color = 0xFF2B2930;
-      btn_lang_node->border_radius = 8.0f;
+      btn_lang_node->border_radius = 0.5f * REM;
       btn_lang_node->border_width = 1.0f;
       btn_lang_node->border_color = 0xFFFFFFFF;
       btn_lang_node->layout->margin[1] = 4.0f;
@@ -301,7 +305,7 @@ static int build_ui(void) {
       (void)cmp_ui_icon_button_get_node(btn_theme, &btn_theme_node);
       btn_theme_node->text_color = 0xFFFFFFFF;
       btn_theme_node->bg_color = 0xFF2B2930;
-      btn_theme_node->border_radius = 8.0f;
+      btn_theme_node->border_radius = 0.5f * REM;
       btn_theme_node->layout->margin[1] = 4.0f;
       btn_theme_node->layout->margin[3] = 4.0f;
       btn_theme_node->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
@@ -334,7 +338,7 @@ static int build_ui(void) {
       (void)cmp_ui_icon_button_get_node(btn_palette, &btn_palette_node);
       btn_palette_node->text_color = 0xFFFFFFFF;
       btn_palette_node->bg_color = 0xFF2B2930;
-      btn_palette_node->border_radius = 8.0f;
+      btn_palette_node->border_radius = 0.5f * REM;
       btn_palette_node->layout->margin[1] = 4.0f;
       btn_palette_node->layout->margin[3] = 4.0f;
       for (c = 0; c < btn_palette_node->child_count; c++) {
@@ -365,7 +369,7 @@ static int build_ui(void) {
       (void)cmp_ui_icon_button_get_node(btn_design, &btn_design_node);
       btn_design_node->text_color = 0xFFFFFFFF;
       btn_design_node->bg_color = 0xFF2B2930;
-      btn_design_node->border_radius = 8.0f;
+      btn_design_node->border_radius = 0.5f * REM;
       btn_design_node->layout->margin[1] = 4.0f;
       btn_design_node->layout->margin[3] = 4.0f;
       for (c = 0; c < btn_design_node->child_count; c++) {

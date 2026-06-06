@@ -1395,6 +1395,8 @@ int cmp_window_create(const cmp_window_config_t *config,
 
   if (config->root_layout == NULL ||
       config->root_layout->display != CMP_DISPLAY_FLEX) {
+    fprintf(stderr, "ERROR: Window creation requires a flex layout! "
+                    "config->root_layout->display MUST be CMP_DISPLAY_FLEX.\n");
     rc = CMP_ERROR_INVALID_ARG;
     LOG_DEBUG("cmp_window_create: failed (must provide a flex root_layout)\n");
     return rc;

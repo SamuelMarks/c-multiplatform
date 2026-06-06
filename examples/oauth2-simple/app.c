@@ -17,6 +17,10 @@ extern int __stdcall GetSystemMetrics(int nIndex);
 #endif
 /* clang-format on */
 
+#define REM                                                                    \
+  ((g_window_width < g_window_height ? g_window_width : g_window_height) /     \
+   50.0f)
+
 static cmp_window_t *g_window = NULL;
 static cmp_ui_node_t *g_ui_tree = NULL;
 static cmp_theme_t *g_theme = NULL;
@@ -163,8 +167,8 @@ static int build_ui(void) {
     btn_text = g_is_dark ? 0xFF381E72 : 0xFFFFFFFF;
     input_h = 56.0f;
     btn_h = 40.0f;
-    input_pad = 16.0f;
-    btn_pad = 24.0f;
+    input_pad = 1.0f * REM;
+    btn_pad = 1.5f * REM;
   } else if (g_current_theme == 2) { /* Fluent 2 */
     bg_main = g_is_dark ? 0xFF202020 : 0xFFF3F3F3;
     text_main = g_is_dark ? 0xFFFFFFFF : 0xFF000000;
@@ -174,8 +178,8 @@ static int build_ui(void) {
     btn_bg = g_is_dark ? 0xFF0078D4 : 0xFF005FB8;
     btn_text = 0xFFFFFFFF;
     input_h = 56.0f; /* Matched to M3 height for layout consistency here */
-    btn_h = 32.0f;
-    input_pad = 8.0f;
+    btn_h = 2.0f * REM;
+    input_pad = 0.5f * REM;
     btn_pad = 12.0f;
   } else { /* Cupertino */
     bg_main = g_is_dark ? 0xFF000000 : 0xFFFFFFFF;
@@ -197,10 +201,10 @@ static int build_ui(void) {
   g_ui_tree->layout->direction = CMP_FLEX_COLUMN;
   g_ui_tree->layout->width = -1.0f;
   g_ui_tree->layout->height = g_window_height;
-  g_ui_tree->layout->padding[0] = 16.0f;
-  g_ui_tree->layout->padding[1] = 16.0f;
-  g_ui_tree->layout->padding[2] = 16.0f;
-  g_ui_tree->layout->padding[3] = 16.0f;
+  g_ui_tree->layout->padding[0] = 1.0f * REM;
+  g_ui_tree->layout->padding[1] = 1.0f * REM;
+  g_ui_tree->layout->padding[2] = 1.0f * REM;
+  g_ui_tree->layout->padding[3] = 1.0f * REM;
 
   /* Top Bar */
   rc = cmp_ui_box_create(&top_bar);
@@ -251,7 +255,7 @@ static int build_ui(void) {
       theme_btn->layout->id = ID_THEME_BTN;
       theme_btn->layout->width = -1.0f; /* auto stretch */
       theme_btn->layout->height = btn_h;
-      theme_btn->layout->margin[1] = 8.0f;
+      theme_btn->layout->margin[1] = 0.5f * REM;
       theme_btn->bg_color = input_bg;
       theme_btn->text_color = input_text;
       (void)cmp_ui_node_add_child(top_bar, theme_btn);
@@ -296,7 +300,7 @@ static int build_ui(void) {
       if (rc == CMP_SUCCESS) {
         title->layout->width = -1.0f;
         title->layout->height = 36.0f;
-        title->layout->margin[2] = 24.0f;
+        title->layout->margin[2] = 1.5f * REM;
         title->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         title->text_color = text_main;
         (void)cmp_ui_node_add_child(content_box, title);
@@ -316,7 +320,7 @@ static int build_ui(void) {
         user_container->layout->id = ID_USER_IN;
         user_container->layout->width = -1.0f;
         user_container->layout->height = input_h;
-        user_container->layout->margin[2] = 16.0f;
+        user_container->layout->margin[2] = 1.0f * REM;
         user_container->bg_color = input_bg;
         user_container->layout->direction = CMP_FLEX_COLUMN;
 
@@ -326,7 +330,7 @@ static int build_ui(void) {
         if (user_active) {
           user_lbl->font_size = -1.0f; /* Let system scale font */
           user_lbl->text_color = is_user_focused ? btn_bg : lbl_color;
-          user_lbl->layout->height = 24.0f;
+          user_lbl->layout->height = 1.5f * REM;
           user_lbl->layout->padding[3] = input_pad;
           user_lbl->layout->padding[0] = 6.0f;
           (void)cmp_ui_node_add_child(user_container, user_lbl);
@@ -382,7 +386,7 @@ static int build_ui(void) {
         pass_container->layout->id = ID_PASS_IN;
         pass_container->layout->width = -1.0f;
         pass_container->layout->height = input_h;
-        pass_container->layout->margin[2] = 32.0f;
+        pass_container->layout->margin[2] = 2.0f * REM;
         pass_container->bg_color = input_bg;
         pass_container->layout->direction = CMP_FLEX_COLUMN;
 
@@ -398,7 +402,7 @@ static int build_ui(void) {
 
           pass_lbl->font_size = -1.0f; /* Let system scale font */
           pass_lbl->text_color = is_pass_focused ? btn_bg : lbl_color;
-          pass_lbl->layout->height = 24.0f;
+          pass_lbl->layout->height = 1.5f * REM;
           pass_lbl->layout->padding[3] = input_pad;
           pass_lbl->layout->padding[0] = 6.0f;
           (void)cmp_ui_node_add_child(pass_container, pass_lbl);
@@ -463,7 +467,7 @@ static int build_ui(void) {
       if (rc == CMP_SUCCESS) {
         title->layout->width = -1.0f;
         title->layout->height = 36.0f;
-        title->layout->margin[2] = 24.0f;
+        title->layout->margin[2] = 1.5f * REM;
         title->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         title->text_color = text_main;
         (void)cmp_ui_node_add_child(content_box, title);
