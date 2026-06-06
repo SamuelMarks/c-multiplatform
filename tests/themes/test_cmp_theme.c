@@ -137,6 +137,7 @@ TEST test_per_widget_override_scene(void) {
   PASS();
 }
 TEST test_global_enum_switch(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   cmp_window_t *window = NULL;
   cmp_theme_t *theme_material = NULL;
   cmp_theme_t *theme_fluent = NULL;
@@ -149,7 +150,9 @@ TEST test_global_enum_switch(void) {
   config.title = "Test";
   cmp_window_system_init();
   /* Mock window and themes */
-  rc = cmp_window_create(&config, &window);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, config.root_layout = dummy_flex,
+        cmp_window_create(&config, &window));
   if (rc != CMP_SUCCESS) {
     window = NULL;
   }
@@ -170,7 +173,9 @@ TEST test_global_enum_switch(void) {
   /* Clean up */
   cmp_theme_destroy(theme_material);
   cmp_theme_destroy(theme_fluent);
-  cmp_window_destroy(window);
+  (cmp_window_destroy(window),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }

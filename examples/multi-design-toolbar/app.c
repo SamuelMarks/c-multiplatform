@@ -316,8 +316,8 @@ static int build_ui(void) {
       (void)cmp_ui_node_bind_generic(title, g_title_binding, "text");
     }
     title->text_color = g_is_dark ? 0xFFE6E0E9 : 0xFF1D1B20;
-    title->font_size = 22.0f;
-    title->layout->width = 300.0f;
+    title->font_size = -1.0f; /* Let system scale font */
+    title->layout->width = -1.0f;
   }
 
   rc = create_simple_button(&btn_lang, "EN", "Switch Language", on_lang_click);
@@ -391,6 +391,8 @@ int app_init(void) {
   config.title = "Multi-Design System Toolbar Example";
   config.width = (int)g_window_width;
   config.height = (int)g_window_height;
+  g_ui_tree->layout->display = CMP_DISPLAY_FLEX;
+  config.root_layout = g_ui_tree->layout;
   config.x = -1;
   config.y = -1;
   config.hidden = 0;

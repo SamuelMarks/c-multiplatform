@@ -195,7 +195,7 @@ static int build_ui(void) {
   g_ui_tree->text_color = text_main;
 
   g_ui_tree->layout->direction = CMP_FLEX_COLUMN;
-  g_ui_tree->layout->width = g_window_width;
+  g_ui_tree->layout->width = -1.0f;
   g_ui_tree->layout->height = g_window_height;
   g_ui_tree->layout->padding[0] = 16.0f;
   g_ui_tree->layout->padding[1] = 16.0f;
@@ -208,7 +208,7 @@ static int build_ui(void) {
     cmp_ui_node_t *spacer = NULL;
 
     top_bar->layout->direction = CMP_FLEX_ROW;
-    top_bar->layout->width = g_window_width - 32.0f;
+    top_bar->layout->width = -1.0f;
     top_bar->layout->height = 48.0f;
     top_bar->layout->align_items = 1; /* CMP_FLEX_ALIGN_CENTER */
 
@@ -217,7 +217,7 @@ static int build_ui(void) {
       set_i18n_button(&logout_btn, "Logout");
       if (logout_btn) {
         logout_btn->layout->id = ID_LOGOUT_BTN;
-        logout_btn->layout->width = 120.0f;
+        logout_btn->layout->width = -1.0f; /* auto stretch */
         logout_btn->layout->height = btn_h;
         logout_btn->bg_color = g_is_dark ? 0xFF880000 : 0xFFCC0000;
         logout_btn->text_color = 0xFFFFFFFF;
@@ -249,7 +249,7 @@ static int build_ui(void) {
     set_i18n_button(&theme_btn, theme_name);
     if (theme_btn) {
       theme_btn->layout->id = ID_THEME_BTN;
-      theme_btn->layout->width = 200.0f;
+      theme_btn->layout->width = -1.0f; /* auto stretch */
       theme_btn->layout->height = btn_h;
       theme_btn->layout->margin[1] = 8.0f;
       theme_btn->bg_color = input_bg;
@@ -260,7 +260,7 @@ static int build_ui(void) {
     if (cmp_ui_button_create(&dark_btn, g_is_dark ? "Light Mode" : "Dark Mode",
                              -1) == CMP_SUCCESS) {
       dark_btn->layout->id = ID_DARK_BTN;
-      dark_btn->layout->width = 120.0f;
+      dark_btn->layout->width = -1.0f; /* auto stretch */
       dark_btn->layout->height = btn_h;
       dark_btn->bg_color = input_bg;
       dark_btn->text_color = input_text;
@@ -273,7 +273,7 @@ static int build_ui(void) {
   /* Content */
   rc = cmp_ui_box_create(&content_box);
   if (rc == CMP_SUCCESS) {
-    content_box->layout->width = g_window_width - 32.0f;
+    content_box->layout->width = -1.0f;
     content_box->layout->direction = CMP_FLEX_COLUMN;
     content_box->layout->align_items = 1;     /* CMP_FLEX_ALIGN_CENTER */
     content_box->layout->justify_content = 1; /* CMP_FLEX_ALIGN_CENTER */
@@ -294,7 +294,7 @@ static int build_ui(void) {
 
       rc = cmp_ui_text_create(&title, "Login to OAuth2 Simple", -1);
       if (rc == CMP_SUCCESS) {
-        title->layout->width = g_window_width - 64.0f;
+        title->layout->width = -1.0f;
         title->layout->height = 36.0f;
         title->layout->margin[2] = 24.0f;
         title->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
@@ -314,7 +314,7 @@ static int build_ui(void) {
       if (user_container) {
 
         user_container->layout->id = ID_USER_IN;
-        user_container->layout->width = g_window_width - 64.0f;
+        user_container->layout->width = -1.0f;
         user_container->layout->height = input_h;
         user_container->layout->margin[2] = 16.0f;
         user_container->bg_color = input_bg;
@@ -324,14 +324,14 @@ static int build_ui(void) {
         user_lbl->bg_color = 0;
 
         if (user_active) {
-          user_lbl->font_size = 12.0f;
+          user_lbl->font_size = -1.0f; /* Let system scale font */
           user_lbl->text_color = is_user_focused ? btn_bg : lbl_color;
           user_lbl->layout->height = 24.0f;
           user_lbl->layout->padding[3] = input_pad;
           user_lbl->layout->padding[0] = 6.0f;
           (void)cmp_ui_node_add_child(user_container, user_lbl);
           (void)cmp_ui_text_create(&user_val, g_user_text, -1);
-          user_val->font_size = 16.0f;
+          user_val->font_size = -1.0f; /* Let system scale font */
           user_val->text_color = input_text;
           user_val->bg_color = 0;
           user_val->layout->height = 30.0f;
@@ -352,7 +352,7 @@ static int build_ui(void) {
           }
 
         } else {
-          user_lbl->font_size = 16.0f;
+          user_lbl->font_size = -1.0f; /* Let system scale font */
           user_lbl->text_color = lbl_color;
           user_lbl->layout->height = input_h - 2.0f;
           user_lbl->layout->padding[3] = input_pad;
@@ -361,7 +361,7 @@ static int build_ui(void) {
 
         if (g_current_theme == 1 || g_current_theme == 2) {
           (void)cmp_ui_box_create(&user_border);
-          user_border->layout->width = g_window_width - 64.0f;
+          user_border->layout->width = -1.0f;
           user_border->layout->height = is_user_focused ? 2.0f : 1.0f;
           user_border->bg_color = is_user_focused ? btn_bg : lbl_color;
           (void)cmp_ui_node_add_child(user_container, user_border);
@@ -380,7 +380,7 @@ static int build_ui(void) {
       if (pass_container) {
 
         pass_container->layout->id = ID_PASS_IN;
-        pass_container->layout->width = g_window_width - 64.0f;
+        pass_container->layout->width = -1.0f;
         pass_container->layout->height = input_h;
         pass_container->layout->margin[2] = 32.0f;
         pass_container->bg_color = input_bg;
@@ -396,14 +396,14 @@ static int build_ui(void) {
             g_pass_display[i] = '*';
           g_pass_display[p_len] = '\0';
 
-          pass_lbl->font_size = 12.0f;
+          pass_lbl->font_size = -1.0f; /* Let system scale font */
           pass_lbl->text_color = is_pass_focused ? btn_bg : lbl_color;
           pass_lbl->layout->height = 24.0f;
           pass_lbl->layout->padding[3] = input_pad;
           pass_lbl->layout->padding[0] = 6.0f;
           (void)cmp_ui_node_add_child(pass_container, pass_lbl);
           (void)cmp_ui_text_create(&pass_val, g_pass_display, -1);
-          pass_val->font_size = 16.0f;
+          pass_val->font_size = -1.0f; /* Let system scale font */
           pass_val->text_color = input_text;
           pass_val->bg_color = 0;
           pass_val->layout->height = 30.0f;
@@ -424,7 +424,7 @@ static int build_ui(void) {
           }
 
         } else {
-          pass_lbl->font_size = 16.0f;
+          pass_lbl->font_size = -1.0f; /* Let system scale font */
           pass_lbl->text_color = lbl_color;
           pass_lbl->layout->height = input_h - 2.0f;
           pass_lbl->layout->padding[3] = input_pad;
@@ -433,7 +433,7 @@ static int build_ui(void) {
 
         if (g_current_theme == 1 || g_current_theme == 2) {
           (void)cmp_ui_box_create(&pass_border);
-          pass_border->layout->width = g_window_width - 64.0f;
+          pass_border->layout->width = -1.0f;
           pass_border->layout->height = is_pass_focused ? 2.0f : 1.0f;
           pass_border->bg_color = is_pass_focused ? btn_bg : lbl_color;
           (void)cmp_ui_node_add_child(pass_container, pass_border);
@@ -444,7 +444,7 @@ static int build_ui(void) {
       set_i18n_button(&login_btn, "Login");
       if (login_btn) {
         login_btn->layout->id = ID_LOGIN_BTN;
-        login_btn->layout->width = g_window_width - 64.0f;
+        login_btn->layout->width = -1.0f;
         login_btn->layout->height = btn_h;
         login_btn->layout->padding[1] = btn_pad;
         login_btn->layout->padding[3] = btn_pad;
@@ -461,7 +461,7 @@ static int build_ui(void) {
 
       rc = cmp_ui_text_create(&title, "Secrets Page", -1);
       if (rc == CMP_SUCCESS) {
-        title->layout->width = g_window_width - 64.0f;
+        title->layout->width = -1.0f;
         title->layout->height = 36.0f;
         title->layout->margin[2] = 24.0f;
         title->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
@@ -472,7 +472,7 @@ static int build_ui(void) {
       if (cmp_ui_text_create(&secret_txt,
                              "Here are your highly confidential secrets: 42",
                              -1) == CMP_SUCCESS) {
-        secret_txt->layout->width = g_window_width - 64.0f;
+        secret_txt->layout->width = -1.0f;
         secret_txt->layout->height = 36.0f;
         secret_txt->layout->align_self = 1; /* CMP_FLEX_ALIGN_CENTER */
         secret_txt->text_color = g_is_dark ? 0xFF00FF00 : 0xFF008000;
@@ -524,6 +524,8 @@ int app_init(void) {
   config.title = "OAuth2 Simple";
   config.width = (int)(g_window_width * g_dpi_scale);
   config.height = (int)(g_window_height * g_dpi_scale);
+  g_ui_tree->layout->display = CMP_DISPLAY_FLEX;
+  config.root_layout = g_ui_tree->layout;
   config.x = -1;
   config.y = -1;
   config.hidden = 0;
@@ -559,10 +561,18 @@ int app_run(void) {
   int rc = 0;
   cmp_event_t evt;
   int running = 1;
+  float current_w = 800.0f;
+  float current_h = 600.0f;
 
   while (running) {
     (void)cmp_window_poll_events(g_window);
     while (cmp_event_pop(&evt) == CMP_SUCCESS) {
+      if (evt.type == 4) { /* CMP_EVENT_TYPE_RESIZE */
+        current_w = (float)evt.x;
+        current_h = (float)evt.y;
+        if (g_ui_tree)
+          cmp_layout_calculate(g_ui_tree->layout, current_w, current_h);
+      }
       if (evt.type == 4) { /* CMP_EVENT_TYPE_RESIZE */
         g_window_width = (float)evt.x;
         g_window_height = (float)evt.y;

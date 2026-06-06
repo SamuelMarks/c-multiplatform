@@ -213,7 +213,8 @@ static int build_ui(void) {
     rc = cmp_ui_app_bar_get_node(app_bar_cmp, &app_bar_node);
     if (rc == CMP_SUCCESS) {
       app_bar_node->layout->width = -1.0f;
-      app_bar_node->layout->height = 64.0f;
+      app_bar_node->layout->height = -1.0f;
+      app_bar_node->layout->flex_grow = 1.0f;
       app_bar_node->layout->flex_shrink = 0.0f;
       app_bar_node->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
       app_bar_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
@@ -234,9 +235,11 @@ static int build_ui(void) {
       app_bar_node->children[0]->text_color = 0xFFFFFFFF;
       app_bar_node->children[0]->layout->flex_grow = 0.0f;
       app_bar_node->children[0]->layout->flex_shrink = 0.0f;
-      app_bar_node->children[0]->layout->width = 300.0f;
-      app_bar_node->children[0]->layout->height = 32.0f;
-      app_bar_node->children[0]->font_size = 20.0f;
+      app_bar_node->children[0]->layout->width = -1.0f; /* auto stretch */
+      /* flex layout adjusted */
+      app_bar_node->children[0]->layout->height = -1.0f;
+      app_bar_node->children[0]->layout->flex_grow = 1.0f;
+      app_bar_node->children[0]->font_size = -1.0f; /* Let system scale font */
 
       if (app_bar_node->child_count > 1) {
         app_bar_node->children[1]->layout->flex_shrink = 0.0f;
@@ -250,8 +253,10 @@ static int build_ui(void) {
   (void)cmp_ui_box_create(&actions_row);
   actions_row->layout->direction = CMP_FLEX_ROW;
   actions_row->layout->flex_shrink = 0.0f;
-  actions_row->layout->width = 300.0f;
-  actions_row->layout->height = 48.0f;
+  actions_row->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
+  actions_row->layout->height = -1.0f;
+  actions_row->layout->flex_grow = 1.0f;
   actions_row->layout->justify_content = CMP_FLEX_ALIGN_END;
 
   {
@@ -264,12 +269,16 @@ static int build_ui(void) {
       btn_lang_node->text_color = 0xFFFFFFFF;
       for (c = 0; c < btn_lang_node->child_count; c++) {
         btn_lang_node->children[c]->text_color = 0xFFFFFFFF;
-        btn_lang_node->children[c]->font_size = 14.0f;
+        btn_lang_node->children[c]->font_size =
+            -1.0f; /* Let system scale font */
         btn_lang_node->children[c]->layout->flex_shrink = 0.0f;
-        btn_lang_node->children[c]->layout->width = 40.0f;
+        btn_lang_node->children[c]->layout->width = -1.0f; /* auto stretch */
+        /* flex layout adjusted */
       }
-      btn_lang_node->layout->width = 48.0f;
-      btn_lang_node->layout->height = 48.0f;
+      btn_lang_node->layout->width = -1.0f; /* auto stretch */
+                                            /* flex layout adjusted */
+      btn_lang_node->layout->height = -1.0f;
+      btn_lang_node->layout->flex_grow = 1.0f;
       btn_lang_node->layout->flex_shrink = 0.0f;
       btn_lang_node->bg_color = 0xFF2B2930;
       btn_lang_node->border_radius = 8.0f;
@@ -299,11 +308,14 @@ static int build_ui(void) {
       btn_theme_node->layout->align_items = CMP_FLEX_ALIGN_CENTER;
       for (c = 0; c < btn_theme_node->child_count; c++) {
         btn_theme_node->children[c]->text_color = 0xFFFFFFFF;
-        btn_theme_node->children[c]->font_size = 14.0f;
+        btn_theme_node->children[c]->font_size =
+            -1.0f; /* Let system scale font */
         btn_theme_node->children[c]->layout->flex_shrink = 0.0f;
       }
-      btn_theme_node->layout->width = 48.0f;
-      btn_theme_node->layout->height = 48.0f;
+      btn_theme_node->layout->width = -1.0f; /* auto stretch */
+                                             /* flex layout adjusted */
+      btn_theme_node->layout->height = -1.0f;
+      btn_theme_node->layout->flex_grow = 1.0f;
       btn_theme_node->layout->flex_shrink = 0.0f;
       cmp_ui_node_add_event_listener(btn_theme_node, CMP_EVENT_TYPE_MOUSE, 0,
                                      on_theme_click, NULL);
@@ -327,11 +339,14 @@ static int build_ui(void) {
       btn_palette_node->layout->margin[3] = 4.0f;
       for (c = 0; c < btn_palette_node->child_count; c++) {
         btn_palette_node->children[c]->text_color = 0xFFFFFFFF;
-        btn_palette_node->children[c]->font_size = 14.0f;
+        btn_palette_node->children[c]->font_size =
+            -1.0f; /* Let system scale font */
         btn_palette_node->children[c]->layout->flex_shrink = 0.0f;
       }
-      btn_palette_node->layout->width = 48.0f;
-      btn_palette_node->layout->height = 48.0f;
+      btn_palette_node->layout->width = -1.0f; /* auto stretch */
+                                               /* flex layout adjusted */
+      btn_palette_node->layout->height = -1.0f;
+      btn_palette_node->layout->flex_grow = 1.0f;
       btn_palette_node->layout->flex_shrink = 0.0f;
       cmp_ui_node_add_event_listener(btn_palette_node, CMP_EVENT_TYPE_MOUSE, 0,
                                      on_palette_click, NULL);
@@ -355,11 +370,14 @@ static int build_ui(void) {
       btn_design_node->layout->margin[3] = 4.0f;
       for (c = 0; c < btn_design_node->child_count; c++) {
         btn_design_node->children[c]->text_color = 0xFFFFFFFF;
-        btn_design_node->children[c]->font_size = 14.0f;
+        btn_design_node->children[c]->font_size =
+            -1.0f; /* Let system scale font */
         btn_design_node->children[c]->layout->flex_shrink = 0.0f;
       }
-      btn_design_node->layout->width = 48.0f;
-      btn_design_node->layout->height = 48.0f;
+      btn_design_node->layout->width = -1.0f; /* auto stretch */
+                                              /* flex layout adjusted */
+      btn_design_node->layout->height = -1.0f;
+      btn_design_node->layout->flex_grow = 1.0f;
       btn_design_node->layout->flex_shrink = 0.0f;
       cmp_ui_node_add_event_listener(btn_design_node, CMP_EVENT_TYPE_MOUSE, 0,
                                      on_design_click, NULL);
@@ -445,6 +463,8 @@ int cmp_example_app_run(const char *title,
   config.title = title ? title : "Example App";
   config.width = (int)g_window_width;
   config.height = (int)g_window_height;
+  g_ui_tree->layout->display = CMP_DISPLAY_FLEX;
+  config.root_layout = g_ui_tree->layout;
   config.x = -1;
   config.y = -1;
 

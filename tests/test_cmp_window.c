@@ -4,6 +4,7 @@
 /* clang-format on */
 
 TEST test_window_lifecycle(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -32,7 +33,9 @@ TEST test_window_lifecycle(void) {
   config.frameless = 0;
   config.use_legacy_backend = 0;
 
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -48,7 +51,9 @@ TEST test_window_lifecycle(void) {
 
   /* Spin briefly to let the paint message dispatch */
   cmp_window_poll_events(window);
-  res = cmp_window_destroy(window);
+  res = (cmp_window_destroy(window),
+         (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+         (dummy_flex = NULL, 0));
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 #else
   /* UNIX not yet implemented in Phase 6 */
@@ -68,6 +73,7 @@ static void dummy_drop_callback(const char *path, void *user_data) {
 #endif
 
 TEST test_window_drop_callback(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -96,7 +102,9 @@ TEST test_window_drop_callback(void) {
   config.frameless = 0;
   config.use_legacy_backend = 0;
 
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -107,7 +115,9 @@ TEST test_window_drop_callback(void) {
   res = cmp_window_set_drop_callback(window, dummy_drop_callback, &triggered);
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
-  res = cmp_window_destroy(window);
+  res = (cmp_window_destroy(window),
+         (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+         (dummy_flex = NULL, 0));
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 #else
   /* UNIX not yet implemented in Phase 6 */
@@ -135,6 +145,7 @@ TEST test_mac_menu_bar(void) {
 }
 
 TEST test_apple_display_link(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -160,7 +171,9 @@ TEST test_apple_display_link(void) {
   config.hidden = 1;
   config.frameless = 0;
   config.use_legacy_backend = 0;
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -184,12 +197,15 @@ TEST test_apple_display_link(void) {
 #endif
 
   if (window)
-    cmp_window_destroy(window);
+    (cmp_window_destroy(window),
+     (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+     (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }
 
 TEST test_apple_gestures(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -215,7 +231,9 @@ TEST test_apple_gestures(void) {
   config.hidden = 1;
   config.frameless = 0;
   config.use_legacy_backend = 0;
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -230,12 +248,15 @@ TEST test_apple_gestures(void) {
   ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, res, "%d");
 #endif
 
-  cmp_window_destroy(window);
+  (cmp_window_destroy(window),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }
 
 TEST test_linux_apis(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -261,7 +282,9 @@ TEST test_linux_apis(void) {
   config.hidden = 1;
   config.frameless = 0;
   config.use_legacy_backend = 0;
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -301,12 +324,15 @@ TEST test_linux_apis(void) {
   ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, res, "%d");
 #endif
 
-  cmp_window_destroy(window);
+  (cmp_window_destroy(window),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }
 
 TEST test_android_apis(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -332,7 +358,9 @@ TEST test_android_apis(void) {
   config.hidden = 1;
   config.frameless = 0;
   config.use_legacy_backend = 0;
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -357,7 +385,9 @@ TEST test_android_apis(void) {
   ASSERT_EQ_FMT(CMP_ERROR_NOT_FOUND, res, "%d");
 #endif
 
-  cmp_window_destroy(window);
+  (cmp_window_destroy(window),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }
@@ -431,6 +461,7 @@ TEST test_scripting_apis(void) {
 }
 
 TEST test_theme_and_visual_regression_apis(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -459,7 +490,9 @@ TEST test_theme_and_visual_regression_apis(void) {
   config.frameless = 0;
   config.use_legacy_backend = 0;
 
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -487,7 +520,9 @@ TEST test_theme_and_visual_regression_apis(void) {
   res = cmp_theme_shutdown();
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 
-  res = cmp_window_destroy(window);
+  res = (cmp_window_destroy(window),
+         (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+         (dummy_flex = NULL, 0));
   ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
 #endif
 
@@ -497,6 +532,7 @@ TEST test_theme_and_visual_regression_apis(void) {
 }
 
 TEST test_pointer_lock(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int res;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -520,7 +556,9 @@ TEST test_pointer_lock(void) {
   config.width = 800;
   config.height = 600;
 
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     window = NULL;
   }
@@ -574,7 +612,9 @@ TEST test_pointer_lock(void) {
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, res, "%d");
 
   if (window) {
-    res = cmp_window_destroy(window);
+    res = (cmp_window_destroy(window),
+           (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+           (dummy_flex = NULL, 0));
     ASSERT_EQ_FMT(CMP_SUCCESS, res, "%d");
   }
 
@@ -584,6 +624,7 @@ TEST test_pointer_lock(void) {
 }
 
 TEST test_window_null_args(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
   int triggered = 0;
@@ -601,7 +642,12 @@ TEST test_window_null_args(void) {
 
   cmp_window_system_init();
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_create(NULL, &window), "%d");
-  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_create(&config, NULL), "%d");
+  ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG,
+                (cmp_layout_node_create(&dummy_flex),
+                 dummy_flex->display = CMP_DISPLAY_FLEX,
+                 config.root_layout = dummy_flex,
+                 cmp_window_create(&config, NULL)),
+                "%d");
 
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_show(NULL), "%d");
   ASSERT_EQ_FMT(CMP_ERROR_INVALID_ARG, cmp_window_destroy(NULL), "%d");

@@ -24,6 +24,7 @@
   } while (0)
 
 int main(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   cmp_wayland_protocols_t *protocols = NULL;
   cmp_window_t *window = NULL;
   cmp_window_config_t config;
@@ -35,7 +36,9 @@ int main(void) {
   config.height = 600;
 
   /* Since window is required for binding, mock a basic window handle */
-  rc = cmp_window_create(&config, &window);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, config.root_layout = dummy_flex,
+        cmp_window_create(&config, &window));
   if (rc != CMP_SUCCESS) {
     /* In some environments, window creation might fail if there's no display
      * server. If that's the case, we can mock or safely skip the rest of the
@@ -74,7 +77,9 @@ int main(void) {
   ASSERT_EQ(CMP_SUCCESS, rc);
 
   if (window) {
-    cmp_window_destroy(window);
+    (cmp_window_destroy(window),
+     (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+     (dummy_flex = NULL, 0));
   }
 
   printf("test_cmp_wayland_protocols passed.\n");

@@ -60,22 +60,23 @@ static int build_m3_buttons(cmp_ui_node_t *parent) {
   card_node->layout->padding[1] = 16.0f;
   card_node->layout->padding[2] = 16.0f;
   card_node->layout->padding[3] = 16.0f;
-  card_node->layout->width = 800.0f;
+  card_node->layout->width = -1.0f; /* auto stretch */
   card_node->layout->flex_shrink = 0.0f;
 
   (void)cmp_ui_box_create(&card_box);
   card_box->layout->direction = CMP_FLEX_COLUMN;
   card_box->layout->row_gap = 16.0f;
-  card_box->layout->width = 768.0f;
+  card_box->layout->width = -1.0f; /* auto stretch */
   (void)cmp_ui_node_add_child(card_node, card_box);
   /* Title */
   {
     cmp_ui_node_t *title = NULL;
     (void)cmp_ui_text_create(&title, "Material 3 Buttons", -1);
-    title->font_size = 20.0f;
+    title->font_size = -1.0f; /* Let system scale font */
     title->text_color = 0xFF000000;
-    title->layout->width = 300.0f;
-    title->layout->height = 24.0f;
+    title->layout->width = -1.0f; /* auto stretch */
+    title->layout->height = -1.0f;
+    title->layout->flex_grow = 1.0f;
     title->layout->flex_shrink = 0.0f;
     (void)cmp_ui_node_add_child(card_box, title);
   }
@@ -85,8 +86,9 @@ static int build_m3_buttons(cmp_ui_node_t *parent) {
   (void)cmp_ui_box_create(&row);
   row->layout->direction = CMP_FLEX_ROW;
   row->layout->column_gap = 16.0f;
-  row->layout->width = 768.0f;
-  row->layout->height = 48.0f;
+  row->layout->width = -1.0f; /* auto stretch */
+  row->layout->height = -1.0f;
+  row->layout->flex_grow = 1.0f;
   row->layout->flex_shrink = 0.0f;
   (void)cmp_ui_node_add_child(card_box, row);
   cmp_ui_action_button_create(&ab, "Elevated",
@@ -119,8 +121,9 @@ static int build_m3_buttons(cmp_ui_node_t *parent) {
   (void)cmp_ui_box_create(&row);
   row->layout->direction = CMP_FLEX_ROW;
   row->layout->column_gap = 16.0f;
-  row->layout->width = 768.0f;
-  row->layout->height = 48.0f;
+  row->layout->width = -1.0f; /* auto stretch */
+  row->layout->height = -1.0f;
+  row->layout->flex_grow = 1.0f;
   row->layout->flex_shrink = 0.0f;
   (void)cmp_ui_node_add_child(card_box, row);
   cmp_ui_action_button_create(&ab, "Outlined",
@@ -159,24 +162,27 @@ static int build_f2_buttons(cmp_ui_node_t *parent) {
   card_node->layout->padding[1] = 16.0f;
   card_node->layout->padding[2] = 16.0f;
   card_node->layout->padding[3] = 16.0f;
-  card_node->layout->width = 800.0f;
-  card_node->layout->height = 200.0f;
+  card_node->layout->width = -1.0f; /* auto stretch */
+  card_node->layout->height = -1.0f;
   card_node->layout->flex_shrink = 0.0f;
+  card_node->layout->flex_grow = 1.0f;
 
   (void)cmp_ui_box_create(&card_box);
   card_box->layout->direction = CMP_FLEX_COLUMN;
   card_box->layout->row_gap = 16.0f;
-  card_box->layout->width = 768.0f;
-  card_box->layout->height = 168.0f;
+  card_box->layout->width = -1.0f;
+  card_box->layout->height = -1.0f;
+  card_box->layout->flex_grow = 1.0f;
   card_box->layout->align_items = CMP_FLEX_ALIGN_START;
   (void)cmp_ui_node_add_child(card_node, card_box);
   {
     cmp_ui_node_t *title = NULL;
     (void)cmp_ui_text_create(&title, "Fluent 2 Buttons", -1);
-    title->font_size = 20.0f;
+    title->font_size = -1.0f; /* Let system scale font */
     title->text_color = 0xFF000000;
     title->layout->width = -1.0f;
-    title->layout->height = 24.0f;
+    title->layout->height = -1.0f;
+    title->layout->flex_grow = 1.0f;
     title->layout->flex_shrink = 1.0f;
     (void)cmp_ui_node_add_child(card_box, title);
   }
@@ -184,10 +190,13 @@ static int build_f2_buttons(cmp_ui_node_t *parent) {
   /* Row */
   (void)cmp_ui_box_create(&row);
   row->layout->direction = CMP_FLEX_ROW;
+  row->layout->flex_wrap = CMP_FLEX_WRAP;
   row->layout->column_gap = 16.0f;
-  row->layout->width = 768.0f;
-  row->layout->height = 48.0f;
+  row->layout->row_gap = 16.0f;
+  row->layout->width = -1.0f;
+  row->layout->height = -1.0f;
   row->layout->flex_shrink = 0.0f;
+  row->layout->flex_grow = 1.0f;
   (void)cmp_ui_node_add_child(card_box, row);
   (void)cmp_f2_button_create(&btn_node, "Secondary", NULL);
   (void)cmp_f2_button_set_variant(btn_node, CMP_F2_BUTTON_VARIANT_SECONDARY);
@@ -208,8 +217,9 @@ static int build_f2_buttons(cmp_ui_node_t *parent) {
   (void)cmp_ui_box_create(&row);
   row->layout->direction = CMP_FLEX_ROW;
   row->layout->column_gap = 16.0f;
-  row->layout->width = 768.0f;
-  row->layout->height = 48.0f;
+  row->layout->width = -1.0f; /* auto stretch */
+  row->layout->height = -1.0f;
+  row->layout->flex_grow = 1.0f;
   row->layout->flex_shrink = 0.0f;
   (void)cmp_ui_node_add_child(card_box, row);
   (void)cmp_f2_button_create(&btn_node, "Outline", NULL);
@@ -246,24 +256,27 @@ static int build_cu_buttons(cmp_ui_node_t *parent) {
   card_node->layout->padding[1] = 16.0f;
   card_node->layout->padding[2] = 16.0f;
   card_node->layout->padding[3] = 16.0f;
-  card_node->layout->width = 800.0f;
-  card_node->layout->height = 200.0f;
+  card_node->layout->width = -1.0f; /* auto stretch */
+  card_node->layout->height = -1.0f;
   card_node->layout->flex_shrink = 0.0f;
+  card_node->layout->flex_grow = 1.0f;
 
   (void)cmp_ui_box_create(&card_box);
   card_box->layout->direction = CMP_FLEX_COLUMN;
   card_box->layout->row_gap = 16.0f;
-  card_box->layout->width = 768.0f;
-  card_box->layout->height = 168.0f;
+  card_box->layout->width = -1.0f;
+  card_box->layout->height = -1.0f;
+  card_box->layout->flex_grow = 1.0f;
   card_box->layout->align_items = CMP_FLEX_ALIGN_START;
   (void)cmp_ui_node_add_child(card_node, card_box);
   {
     cmp_ui_node_t *title = NULL;
     (void)cmp_ui_text_create(&title, "Cupertino Buttons (Generic)", -1);
-    title->font_size = 20.0f;
+    title->font_size = -1.0f; /* Let system scale font */
     title->text_color = 0xFF000000;
     title->layout->width = -1.0f;
-    title->layout->height = 24.0f;
+    title->layout->height = -1.0f;
+    title->layout->flex_grow = 1.0f;
     title->layout->flex_shrink = 0.0f;
     (void)cmp_ui_node_add_child(card_box, title);
   }
@@ -271,16 +284,20 @@ static int build_cu_buttons(cmp_ui_node_t *parent) {
   /* Row */
   (void)cmp_ui_box_create(&row);
   row->layout->direction = CMP_FLEX_ROW;
+  row->layout->flex_wrap = CMP_FLEX_WRAP;
   row->layout->column_gap = 16.0f;
-  row->layout->width = 768.0f;
-  row->layout->height = 48.0f;
+  row->layout->row_gap = 16.0f;
+  row->layout->width = -1.0f;
+  row->layout->height = -1.0f;
   row->layout->flex_shrink = 0.0f;
+  row->layout->flex_grow = 1.0f;
   (void)cmp_ui_node_add_child(card_box, row);
   (void)cmp_ui_button_create(&btn_node, "Plain Button", 0);
   {
     size_t len = strlen("Plain Button");
     btn_node->layout->width = (float)len * 7.0f + 32.0f;
-    btn_node->layout->height = 40.0f;
+    btn_node->layout->height = -1.0f;
+    btn_node->layout->flex_grow = 1.0f;
     btn_node->bg_color = 0x00000000;
     btn_node->text_color = 0xFF007AFF;
     btn_node->border_radius = 8.0f;
@@ -295,7 +312,8 @@ static int build_cu_buttons(cmp_ui_node_t *parent) {
   {
     size_t len = strlen("Tinted Button");
     btn_node->layout->width = (float)len * 7.0f + 32.0f;
-    btn_node->layout->height = 40.0f;
+    btn_node->layout->height = -1.0f;
+    btn_node->layout->flex_grow = 1.0f;
     btn_node->bg_color = 0x33007AFF;
     btn_node->text_color = 0xFF007AFF;
     btn_node->border_radius = 8.0f;

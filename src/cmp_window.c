@@ -1102,7 +1102,8 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       window->config.width = width;
       window->config.height = height;
       if (window->ui_tree && window->ui_tree->layout) {
-        cmp_layout_calculate(window->ui_tree->layout, (float)width, (float)height);
+        cmp_layout_calculate(window->ui_tree->layout, (float)width,
+                             (float)height);
       }
       if (window->resize_cb) {
         window->resize_cb(width, height, window->resize_user_data);
@@ -1122,7 +1123,9 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       window->config.height = HIWORD(lParam);
 
       if (window->ui_tree && window->ui_tree->layout) {
-        cmp_layout_calculate(window->ui_tree->layout, (float)window->config.width, (float)window->config.height);
+        cmp_layout_calculate(window->ui_tree->layout,
+                             (float)window->config.width,
+                             (float)window->config.height);
       }
 
       if (window->resize_cb) {
@@ -1386,7 +1389,14 @@ int cmp_window_create(const cmp_window_config_t *config,
 
   if (config == NULL || out_window == NULL || !g_window_initialized) {
     rc = CMP_ERROR_INVALID_ARG;
-    LOG_DEBUG("cmp_window_create: failed\n");
+    LOG_DEBUG("cmp_window_create: failed (invalid args)\n");
+    return rc;
+  }
+
+  if (config->root_layout == NULL ||
+      config->root_layout->display != CMP_DISPLAY_FLEX) {
+    rc = CMP_ERROR_INVALID_ARG;
+    LOG_DEBUG("cmp_window_create: failed (must provide a flex root_layout)\n");
     return rc;
   }
 

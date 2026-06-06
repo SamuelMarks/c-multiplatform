@@ -15,6 +15,7 @@ TEST test_overdraw_create_destroy(void) {
 }
 
 TEST test_overdraw_set_enabled(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int rc;
   cmp_overdraw_t *overdraw = NULL;
   cmp_renderer_t *renderer = NULL;
@@ -22,7 +23,9 @@ TEST test_overdraw_set_enabled(void) {
   cmp_window_t *win = NULL;
 
   cmp_window_system_init();
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc != CMP_SUCCESS) {
     win = NULL;
   }
@@ -41,12 +44,15 @@ TEST test_overdraw_set_enabled(void) {
 
   ASSERT_EQ(CMP_SUCCESS, cmp_overdraw_destroy(overdraw));
   cmp_renderer_destroy(renderer);
-  cmp_window_destroy(win);
+  (cmp_window_destroy(win),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }
 
 TEST test_overdraw_edge_cases(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int rc;
   cmp_overdraw_t *overdraw = NULL;
   cmp_renderer_t *renderer = NULL;
@@ -54,7 +60,9 @@ TEST test_overdraw_edge_cases(void) {
   cmp_window_t *win = NULL;
 
   cmp_window_system_init();
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc != CMP_SUCCESS) {
     win = NULL;
   }
@@ -70,7 +78,9 @@ TEST test_overdraw_edge_cases(void) {
 
   ASSERT_EQ(CMP_SUCCESS, cmp_overdraw_destroy(overdraw));
   cmp_renderer_destroy(renderer);
-  cmp_window_destroy(win);
+  (cmp_window_destroy(win),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }

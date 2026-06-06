@@ -272,22 +272,26 @@ static void cmp_layout_resolve_flex_pass(cmp_layout_node_t *node,
   node->computed_rect.width = node->measured_width;
   node->computed_rect.height = node->measured_height;
 
-  /* Block-level flex containers (default) stretch to fill available width if auto */
+  /* Block-level flex containers (default) stretch to fill available width if
+   * auto */
   if (node->display == CMP_DISPLAY_FLEX && node->width < 0.0f) {
-    if (constraints.max_width >= 0.0f && node->computed_rect.width < constraints.max_width) {
-       /* If parent is row and we are not grow, we shouldn't stretch unless align-items stretch, 
-          but if we have no parent (root), we stretch to screen. */
-       if (node->parent == NULL) {
-           node->computed_rect.width = constraints.max_width;
-           if (node->height < 0.0f && constraints.max_height >= 0.0f) {
-               node->computed_rect.height = constraints.max_height;
-           }
-       } else {
-           /* If parent is column, stretch to parent width */
-           if (node->parent->direction == CMP_FLEX_COLUMN && node->parent->align_items == CMP_FLEX_ALIGN_STRETCH) {
-               node->computed_rect.width = constraints.max_width;
-           }
-       }
+    if (constraints.max_width >= 0.0f &&
+        node->computed_rect.width < constraints.max_width) {
+      /* If parent is row and we are not grow, we shouldn't stretch unless
+         align-items stretch, but if we have no parent (root), we stretch to
+         screen. */
+      if (node->parent == NULL) {
+        node->computed_rect.width = constraints.max_width;
+        if (node->height < 0.0f && constraints.max_height >= 0.0f) {
+          node->computed_rect.height = constraints.max_height;
+        }
+      } else {
+        /* If parent is column, stretch to parent width */
+        if (node->parent->direction == CMP_FLEX_COLUMN &&
+            node->parent->align_items == CMP_FLEX_ALIGN_STRETCH) {
+          node->computed_rect.width = constraints.max_width;
+        }
+      }
     }
   }
 
@@ -488,10 +492,10 @@ static void cmp_layout_resolve_flex_pass(cmp_layout_node_t *node,
         if (child->position_type == CMP_POSITION_ABSOLUTE)
           continue;
         processed_c++;
-        c_size = is_row ? (child->computed_rect.height +
-                                 child->margin[0] + child->margin[2])
-                              : (child->computed_rect.width + child->margin[1] +
-                                 child->margin[3]);
+        c_size = is_row ? (child->computed_rect.height + child->margin[0] +
+                           child->margin[2])
+                        : (child->computed_rect.width + child->margin[1] +
+                           child->margin[3]);
         if (c_size > max_c)
           max_c = c_size;
       }
@@ -730,9 +734,11 @@ static void cmp_layout_position_pass(cmp_layout_node_t *node, float parent_x,
   }
 }
 
-static void cmp_layout_responsive_pass(cmp_layout_node_t *node, float available_width) {
+static void cmp_layout_responsive_pass(cmp_layout_node_t *node,
+                                       float available_width) {
   size_t i;
-  if (!node) return;
+  if (!node)
+    return;
 
   if (available_width < 300.0f) {
     if (node->direction == CMP_FLEX_ROW) {
@@ -751,7 +757,7 @@ static void cmp_layout_responsive_pass(cmp_layout_node_t *node, float available_
       node->margin[1] = available_width * 0.05f;
       node->margin[2] = available_width * 0.05f;
       node->margin[3] = available_width * 0.05f;
-      node->font_size = 24.0f; 
+      node->font_size = 24.0f;
     }
   }
 
@@ -761,7 +767,8 @@ static void cmp_layout_responsive_pass(cmp_layout_node_t *node, float available_
 }
 
 static void apply_rtl_mirroring(cmp_layout_node_t *node);
-static void cmp_layout_responsive_pass(cmp_layout_node_t *node, float available_width);
+static void cmp_layout_responsive_pass(cmp_layout_node_t *node,
+                                       float available_width);
 
 int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
                          float available_height) {
@@ -773,12 +780,13 @@ int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  /* Dirty flag optimization: only recalculate if size changed or explicitly dirty */
+  /* Dirty flag optimization: only recalculate if size changed or explicitly
+   * dirty */
   if (!root->dirty && root->computed_rect.width == available_width &&
       root->computed_rect.height == available_height) {
     return CMP_SUCCESS;
   }
-  
+
   /* Reset dirty flag as we are about to calculate */
   root->dirty = 0;
 

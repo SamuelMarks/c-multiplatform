@@ -4,16 +4,21 @@
 /* clang-format on */
 
 TEST test_os_integration_clipboard(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
   cmp_window_t *win = NULL;
   int rc;
 
   cmp_window_system_init();
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc == CMP_SUCCESS) {
     rc = cmp_os_copy_to_clipboard(win, "hello world");
     ASSERT(rc == CMP_SUCCESS || rc == CMP_ERROR_NOT_FOUND);
-    cmp_window_destroy(win);
+    (cmp_window_destroy(win),
+     (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+     (dummy_flex = NULL, 0));
   }
 
   cmp_window_system_shutdown();
@@ -21,15 +26,20 @@ TEST test_os_integration_clipboard(void) {
 }
 
 TEST test_os_integration_drag_drop(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int rc;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
   cmp_window_t *win = NULL;
 
   cmp_window_system_init();
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc == CMP_SUCCESS) {
     ASSERT_EQ(CMP_SUCCESS, cmp_os_enable_file_drag_drop(win));
-    cmp_window_destroy(win);
+    (cmp_window_destroy(win),
+     (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+     (dummy_flex = NULL, 0));
   }
 
   cmp_window_system_shutdown();
@@ -45,6 +55,7 @@ TEST test_os_integration_voice(void) {
 }
 
 TEST test_os_integration_null(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int rc;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
   cmp_window_t *win = NULL;
@@ -54,10 +65,14 @@ TEST test_os_integration_null(void) {
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_os_is_voice_dictation_supported(NULL));
 
   cmp_window_system_init();
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc == CMP_SUCCESS) {
     ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_os_copy_to_clipboard(win, NULL));
-    cmp_window_destroy(win);
+    (cmp_window_destroy(win),
+     (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+     (dummy_flex = NULL, 0));
   }
   cmp_window_system_shutdown();
   PASS();

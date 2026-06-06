@@ -44,6 +44,7 @@ TEST test_cmp_dpi_set_get_scale(void) {
 }
 
 TEST test_cmp_dpi_update_window_scale(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   cmp_dpi_t *dpi = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 0};
   cmp_window_t *win = NULL;
@@ -51,7 +52,9 @@ TEST test_cmp_dpi_update_window_scale(void) {
   int rc;
   ASSERT_EQ(CMP_SUCCESS, cmp_window_system_init());
 
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc != CMP_SUCCESS) {
     win = NULL;
   }
@@ -80,6 +83,10 @@ TEST test_cmp_dpi_update_window_scale(void) {
   ASSERT_EQ(CMP_SUCCESS, cmp_dpi_destroy(dpi));
   if (win) {
     ASSERT_EQ(CMP_SUCCESS, cmp_window_destroy(win));
+    if (dummy_flex) {
+      cmp_layout_node_destroy(dummy_flex);
+      dummy_flex = NULL;
+    }
   }
   ASSERT_EQ(CMP_SUCCESS, cmp_window_system_shutdown());
 

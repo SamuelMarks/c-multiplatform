@@ -138,8 +138,9 @@ static int build_ui(void) {
   g_ui_tree->layout->direction = CMP_FLEX_COLUMN;
   g_ui_tree->layout->justify_content = CMP_FLEX_ALIGN_CENTER;
   g_ui_tree->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-  g_ui_tree->layout->width = 1024.0f;
-  g_ui_tree->layout->height = 1024.0f;
+  g_ui_tree->layout->width = -1.0f;
+  g_ui_tree->layout->height = -1.0f;
+  g_ui_tree->layout->flex_grow = 1.0f;
 
   g_ui_tree->layout->padding[0] = 0.0f;
 
@@ -158,8 +159,9 @@ static int build_ui(void) {
   }
 
   btn->layout->id = 100;
-  btn->layout->width = 320.0f;
-  btn->layout->height = 80.0f;
+  btn->layout->width = -1.0f;
+  btn->layout->height = -1.0f;
+  btn->layout->flex_grow = 1.0f;
   (void)cmp_ui_node_add_child(g_ui_tree, btn);
   if (g_show_content) {
     cmp_ui_node_t *img;
@@ -170,7 +172,7 @@ static int build_ui(void) {
     res = cmp_ui_image_view_create(&img, "virt:/assets/compose.svg");
     if (res == CMP_SUCCESS) {
       img->layout->margin[0] = 60.0f; /* top margin */
-      img->layout->width = 240.0f;
+      img->layout->width = -1.0f;     /* auto stretch */
       img->layout->height = 240.0f;
       (void)cmp_ui_node_add_child(g_ui_tree, img);
     }
@@ -188,7 +190,7 @@ static int build_ui(void) {
     res = cmp_ui_text_create(&txt, text_buf, -1);
     if (res == CMP_SUCCESS) {
       txt->layout->margin[0] = 60.0f; /* top margin */
-      txt->layout->width = 600.0f;
+      txt->layout->width = -1.0f;     /* auto stretch */
       txt->layout->height = 80.0f;
       (void)cmp_ui_node_add_child(g_ui_tree, txt);
     }
@@ -210,6 +212,8 @@ int app_init(void) {
   config.title = "Compose Multiplatform Starter";
   config.width = 1024;
   config.height = 1024;
+  g_ui_tree->layout->display = CMP_DISPLAY_FLEX;
+  config.root_layout = g_ui_tree->layout;
   config.x = -1;
   config.y = -1;
   config.hidden = 0;
@@ -241,16 +245,26 @@ int app_run(void) {
   cmp_event_t evt;
   int running = 1;
 
+  float current_w = 1024.0f;
+  float current_h = 1024.0f;
+
   while (running) {
     (void)cmp_window_poll_events(g_window);
     while (cmp_event_pop(&evt) == CMP_SUCCESS) {
+      if (evt.type == 4) { /* CMP_EVENT_TYPE_RESIZE */
+        current_w = (float)evt.x;
+        current_h = (float)evt.y;
+        if (g_ui_tree) {
+          (void)cmp_layout_calculate(g_ui_tree->layout, current_w, current_h);
+        }
+      }
       if (evt.action == CMP_ACTION_DOWN && (evt.type == 1 || evt.type == 2)) {
         int hit_node = manual_hit_test(g_ui_tree, (float)evt.x, (float)evt.y);
         if (hit_node == 100) {
           g_show_content = !g_show_content;
           build_ui();
           if (g_ui_tree) {
-            (void)cmp_layout_calculate(g_ui_tree->layout, 1024.0f, 1024.0f);
+            (void)cmp_layout_calculate(g_ui_tree->layout, current_w, current_h);
           }
           (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         }

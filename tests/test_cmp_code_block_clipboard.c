@@ -18,6 +18,7 @@ TEST test_code_block_clipboard_lifecycle(void) {
 }
 
 TEST test_code_block_clipboard_null_args(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   cmp_clipboard_overlay_t *overlay = NULL;
   cmp_code_block_t *block = NULL;
   cmp_window_t *window = NULL;
@@ -41,7 +42,9 @@ TEST test_code_block_clipboard_null_args(void) {
   config.width = 100;
   config.height = 100;
   ASSERT_EQ(CMP_SUCCESS, cmp_window_system_init());
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     ASSERT_EQ(CMP_SUCCESS, cmp_code_block_destroy(block));
     ASSERT_EQ(CMP_SUCCESS, cmp_clipboard_overlay_destroy(overlay));
@@ -63,7 +66,9 @@ TEST test_code_block_clipboard_null_args(void) {
   res = cmp_clipboard_overlay_copy(overlay, window, NULL);
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
 
-  res = cmp_window_destroy(window);
+  res = (cmp_window_destroy(window),
+         (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+         (dummy_flex = NULL, 0));
   ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_code_block_destroy(block);
@@ -75,6 +80,7 @@ TEST test_code_block_clipboard_null_args(void) {
 }
 
 TEST test_code_block_clipboard_operations(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   cmp_clipboard_overlay_t *overlay = NULL;
   cmp_code_block_t *block = NULL;
   cmp_window_t *window = NULL;
@@ -92,7 +98,9 @@ TEST test_code_block_clipboard_operations(void) {
   config.width = 100;
   config.height = 100;
   ASSERT_EQ(CMP_SUCCESS, cmp_window_system_init());
-  res = cmp_window_create(&config, &window);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &window));
   if (res != CMP_SUCCESS) {
     ASSERT_EQ(CMP_SUCCESS, cmp_code_block_destroy(block));
     ASSERT_EQ(CMP_SUCCESS, cmp_clipboard_overlay_destroy(overlay));
@@ -112,7 +120,9 @@ TEST test_code_block_clipboard_operations(void) {
     ASSERT_EQ(CMP_SUCCESS, res); /* Force failure if it's an unexpected error */
   }
 
-  res = cmp_window_destroy(window);
+  res = (cmp_window_destroy(window),
+         (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+         (dummy_flex = NULL, 0));
   ASSERT_EQ(CMP_SUCCESS, res);
 
   res = cmp_code_block_destroy(block);

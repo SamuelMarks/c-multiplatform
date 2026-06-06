@@ -5,6 +5,7 @@
 /* clang-format on */
 
 TEST test_swapchain_create_destroy(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int rc;
   cmp_swapchain_t *swapchain = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
@@ -15,7 +16,9 @@ TEST test_swapchain_create_destroy(void) {
   cmp_window_system_init();
   /* Since the window abstraction exists, we can mock it here for the parameter
    */
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc != CMP_SUCCESS) {
     win = NULL;
   }
@@ -37,12 +40,15 @@ TEST test_swapchain_create_destroy(void) {
     ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_destroy(swapchain));
   }
 
-  cmp_window_destroy(win);
+  (cmp_window_destroy(win),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }
 
 TEST test_swapchain_acquire_present(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int rc;
   cmp_swapchain_t *swapchain = NULL;
   cmp_texture_t *frame_texture = NULL;
@@ -52,7 +58,9 @@ TEST test_swapchain_acquire_present(void) {
   cmp_window_t *win = NULL;
 
   cmp_window_system_init();
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc != CMP_SUCCESS) {
     win = NULL;
   }
@@ -96,12 +104,15 @@ TEST test_swapchain_acquire_present(void) {
   if (swapchain) {
     ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_destroy(swapchain));
   }
-  cmp_window_destroy(win);
+  (cmp_window_destroy(win),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }
 
 TEST test_swapchain_edge_cases(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int rc;
   cmp_swapchain_t *swapchain = NULL;
   cmp_window_config_t cfg = {"Test", 800, 600, 0, 0, 1, 0, 1};
@@ -109,7 +120,9 @@ TEST test_swapchain_edge_cases(void) {
   cmp_texture_t *tex = NULL;
 
   cmp_window_system_init();
-  rc = cmp_window_create(&cfg, &win);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &win));
   if (rc != CMP_SUCCESS) {
     win = NULL;
   }
@@ -138,12 +151,15 @@ TEST test_swapchain_edge_cases(void) {
   if (swapchain) {
     ASSERT_EQ(CMP_SUCCESS, cmp_swapchain_destroy(swapchain));
   }
-  cmp_window_destroy(win);
+  (cmp_window_destroy(win),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   PASS();
 }
 
 TEST test_cmp_swapchain_set_msaa(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   int rc;
   cmp_swapchain_t *swapchain = NULL;
   cmp_window_t *window = NULL;
@@ -154,7 +170,9 @@ TEST test_cmp_swapchain_set_msaa(void) {
   cfg.height = 600;
   cfg.title = "Test";
 
-  rc = cmp_window_create(&cfg, &window);
+  rc = (cmp_layout_node_create(&dummy_flex),
+        dummy_flex->display = CMP_DISPLAY_FLEX, cfg.root_layout = dummy_flex,
+        cmp_window_create(&cfg, &window));
   if (rc != CMP_SUCCESS) {
     window = NULL;
   }
@@ -170,7 +188,9 @@ TEST test_cmp_swapchain_set_msaa(void) {
     cmp_swapchain_destroy(swapchain);
   }
 
-  cmp_window_destroy(window);
+  (cmp_window_destroy(window),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   PASS();
 }
 

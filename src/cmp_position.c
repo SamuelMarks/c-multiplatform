@@ -396,7 +396,8 @@ int cmp_layer_tree_build(cmp_layout_node_t *root_node,
   layer->node = root_node;
 
   /* Implement clipping overflow mapping */
-  if (root_node->overflow_x == 2 || root_node->overflow_y == 2) { /* 2 = Hidden */
+  if (root_node->overflow_x == 2 ||
+      root_node->overflow_y == 2) { /* 2 = Hidden */
     layer->scissor_enable = 1;
     layer->scissor_rect = root_node->computed_rect;
   } else if (root_node->parent) {

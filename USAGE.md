@@ -14,7 +14,11 @@ This guide demonstrates how to build a basic LibCMPC application, initialize the
 
 int main(int argc, char **argv) {
     cmp_window_t *window = NULL;
+    cmp_layout_node_t *root_layout = NULL;
+    cmp_layout_node_create(&root_layout);
+    root_layout->display = CMP_DISPLAY_FLEX;
     cmp_window_config_t config = {0};
+    config.root_layout = root_layout;
     cmp_modality_t modality;
     cmp_ui_node_t *root_box = NULL;
     cmp_ui_node_t *button = NULL;

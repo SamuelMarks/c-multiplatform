@@ -55,14 +55,15 @@ static int build_header(cmp_ui_node_t *parent, const char *title) {
   (void)cmp_ui_box_create(&header);
   header->layout->direction = CMP_FLEX_ROW;
   header->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-  header->layout->width = 800.0f;
+  header->layout->width = -1.0f; /* auto stretch */
   header->layout->padding[3] = 24.0f;
 
   if (g_current_screen != SCREEN_HOME) {
     (void)cmp_ui_box_create(&btn_back);
     btn_back->type = 3;
     btn_back->layout->id = 100;
-    btn_back->layout->width = 80.0f;
+    btn_back->layout->width = -1.0f; /* auto stretch */
+                                     /* flex layout adjusted */
     btn_back->layout->height = 40.0f;
     btn_back->layout->margin[1] = 16.0f;
     (void)cmp_ui_node_add_child(header, btn_back);
@@ -73,7 +74,8 @@ static int build_header(cmp_ui_node_t *parent, const char *title) {
   (void)cmp_ui_box_create(&btn_theme);
   btn_theme->type = 3;
   btn_theme->layout->id = 101;
-  btn_theme->layout->width = 120.0f;
+  btn_theme->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
   btn_theme->layout->height = 40.0f;
   btn_theme->layout->margin[1] = 16.0f;
   (void)cmp_ui_node_add_child(header, btn_theme);
@@ -98,8 +100,10 @@ static int build_home_screen(cmp_ui_node_t *main_box) {
   (void)cmp_ui_box_create(&card1);
   card1->type = 1;
   card1->layout->id = 201;
-  card1->layout->width = 200.0f;
-  card1->layout->height = 150.0f;
+  card1->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
+  card1->layout->height = -1.0f;
+  card1->layout->flex_grow = 1.0f;
   card1->layout->margin[1] = 16.0f;
   card1->layout->margin[2] = 16.0f;
   (void)cmp_ui_node_add_child(grid, card1);
@@ -107,8 +111,10 @@ static int build_home_screen(cmp_ui_node_t *main_box) {
   (void)cmp_ui_box_create(&card2);
   card2->type = 1;
   card2->layout->id = 202;
-  card2->layout->width = 200.0f;
-  card2->layout->height = 150.0f;
+  card2->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
+  card2->layout->height = -1.0f;
+  card2->layout->flex_grow = 1.0f;
   card2->layout->margin[1] = 16.0f;
   card2->layout->margin[2] = 16.0f;
   (void)cmp_ui_node_add_child(grid, card2);
@@ -116,8 +122,10 @@ static int build_home_screen(cmp_ui_node_t *main_box) {
   (void)cmp_ui_box_create(&card3);
   card3->type = 1;
   card3->layout->id = 203;
-  card3->layout->width = 200.0f;
-  card3->layout->height = 150.0f;
+  card3->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
+  card3->layout->height = -1.0f;
+  card3->layout->flex_grow = 1.0f;
   card3->layout->margin[1] = 16.0f;
   card3->layout->margin[2] = 16.0f;
   (void)cmp_ui_node_add_child(grid, card3);
@@ -133,13 +141,15 @@ static int build_buttons_screen(cmp_ui_node_t *main_box) {
   cmp_ui_node_t *btn1 = NULL, *btn2 = NULL;
   (void)cmp_ui_box_create(&btn1);
   btn1->type = 3;
-  btn1->layout->width = 150.0f;
+  btn1->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
   btn1->layout->height = 40.0f;
   btn1->layout->margin[2] = 16.0f;
 
   (void)cmp_ui_box_create(&btn2);
   btn2->type = 3;
-  btn2->layout->width = 150.0f;
+  btn2->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
   btn2->layout->height = 40.0f;
   btn2->layout->margin[2] = 16.0f;
 
@@ -157,25 +167,29 @@ static int build_inputs_screen(cmp_ui_node_t *main_box) {
 
   (void)cmp_ui_box_create(&cb);
   cb->type = 5;
-  cb->layout->width = 24.0f;
+  cb->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
   cb->layout->height = 24.0f;
   cb->layout->margin[2] = 16.0f;
 
   (void)cmp_ui_box_create(&tg);
   tg->type = 5;
-  tg->layout->width = 52.0f;
+  tg->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
   tg->layout->height = 32.0f;
   tg->layout->margin[2] = 16.0f;
 
   (void)cmp_ui_box_create(&sl);
   sl->type = 7;
-  sl->layout->width = 200.0f;
+  sl->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
   sl->layout->height = 24.0f;
   sl->layout->margin[2] = 16.0f;
 
   (void)cmp_ui_box_create(&ti);
   ti->type = 4;
-  ti->layout->width = 200.0f;
+  ti->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
   ti->layout->height = 56.0f; /* M3 text field height */
   ti->layout->margin[2] = 16.0f;
 
@@ -194,8 +208,10 @@ static int build_data_display_screen(cmp_ui_node_t *main_box) {
   cmp_ui_node_t *card = NULL;
   (void)cmp_ui_box_create(&card);
   card->type = 1;
-  card->layout->width = 300.0f;
-  card->layout->height = 200.0f;
+  card->layout->width = -1.0f; /* auto stretch */
+  /* flex layout adjusted */
+  card->layout->height = -1.0f;
+  card->layout->flex_grow = 1.0f;
   card->layout->margin[2] = 16.0f;
   (void)cmp_ui_node_add_child(main_box, card);
   if (rc != 0) {
@@ -219,8 +235,9 @@ static int build_ui(void) {
   g_ui_tree->layout->padding[1] = 24.0f;
   g_ui_tree->layout->padding[2] = 24.0f;
   g_ui_tree->layout->padding[3] = 24.0f;
-  g_ui_tree->layout->width = 800.0f;
-  g_ui_tree->layout->height = 600.0f;
+  g_ui_tree->layout->width = -1.0f; /* auto stretch */
+  g_ui_tree->layout->height = -1.0f;
+  g_ui_tree->layout->flex_grow = 1.0f;
 
   (void)cmp_ui_box_create(&main_box);
   main_box->layout->direction = CMP_FLEX_COLUMN;
@@ -260,6 +277,8 @@ int app_init(void) {
   config.title = "Google Material Android Component Gallery";
   config.width = 800;
   config.height = 600;
+  build_ui();
+  if (g_ui_tree && g_ui_tree->layout) { g_ui_tree->layout->display = CMP_DISPLAY_FLEX; config.root_layout = g_ui_tree->layout; }
   config.x = -1;
   config.y = -1;
   config.hidden = 0;
@@ -287,10 +306,18 @@ int app_run(void) {
   int rc = 0;
   cmp_event_t evt;
   int running = 1;
+  float current_w = 800.0f;
+  float current_h = 600.0f;
 
   while (running) {
     (void)cmp_window_poll_events(g_window);
     while (cmp_event_pop(&evt) == CMP_SUCCESS) {
+      if (evt.type == 4) { /* CMP_EVENT_TYPE_RESIZE */
+        current_w = (float)evt.x;
+        current_h = (float)evt.y;
+        if (g_ui_tree)
+          cmp_layout_calculate(g_ui_tree->layout, current_w, current_h);
+      }
       if (evt.action == CMP_ACTION_DOWN && (evt.type == 1 || evt.type == 2)) {
         int hit_node = manual_hit_test(g_ui_tree, (float)evt.x, (float)evt.y);
         int changed = 0;
@@ -315,7 +342,7 @@ int app_run(void) {
         if (changed) {
           build_ui();
           if (g_ui_tree) {
-            (void)cmp_layout_calculate(g_ui_tree->layout, 800.0f, 600.0f);
+            (void)cmp_layout_calculate(g_ui_tree->layout, current_w, current_h);
           }
           (void)cmp_window_set_ui_tree(g_window, g_ui_tree);
         }

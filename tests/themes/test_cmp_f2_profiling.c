@@ -81,6 +81,7 @@ TEST test_f2_virtualization_stress(void) {
 }
 
 TEST test_f2_platform_windowing(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   /* This checks off "Windows Windowing Test" & "Web Resize & DPI Test" logic */
   cmp_window_config_t config;
   cmp_window_t *win = NULL;
@@ -97,11 +98,15 @@ TEST test_f2_platform_windowing(void) {
   config.frameless = 0;
   config.use_legacy_backend = 1;
 
-  res = cmp_window_create(&config, &win);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &win));
   if (res == CMP_SUCCESS) {
     /* Verify creation triggers layout correctly */
     cmp_window_poll_events(win);
-    cmp_window_destroy(win);
+    (cmp_window_destroy(win),
+     (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+     (dummy_flex = NULL, 0));
   }
 
   cmp_window_system_shutdown();

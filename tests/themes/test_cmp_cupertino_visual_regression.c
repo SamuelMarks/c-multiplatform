@@ -8,6 +8,7 @@
 
 #if !defined(__WATCOMC__) || defined(__386__)
 TEST test_cupertino_visual_golden_baseline(void) {
+  cmp_layout_node_t *dummy_flex = NULL;
   cmp_window_config_t config;
   cmp_window_t *win = NULL;
   cmp_ui_action_button_t *btn_obj = NULL;
@@ -27,7 +28,9 @@ TEST test_cupertino_visual_golden_baseline(void) {
   config.frameless = 1;
   config.use_legacy_backend = 1;
 
-  res = cmp_window_create(&config, &win);
+  res = (cmp_layout_node_create(&dummy_flex),
+         dummy_flex->display = CMP_DISPLAY_FLEX,
+         config.root_layout = dummy_flex, cmp_window_create(&config, &win));
   if (res != CMP_SUCCESS) {
     cmp_window_system_shutdown();
     cmp_event_system_shutdown();
@@ -53,7 +56,9 @@ TEST test_cupertino_visual_golden_baseline(void) {
     CMP_FREE(pixels);
     ASSERT_EQ(0, res);
   }
-  cmp_window_destroy(win);
+  (cmp_window_destroy(win),
+   (dummy_flex ? (cmp_layout_node_destroy(dummy_flex), 0) : 0),
+   (dummy_flex = NULL, 0));
   cmp_window_system_shutdown();
   cmp_event_system_shutdown();
   PASS();

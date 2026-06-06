@@ -3910,6 +3910,8 @@ typedef struct cmp_window_config {
   int hidden;
   int frameless;
   int use_legacy_backend;
+  struct cmp_layout_node
+      *root_layout; /* Must be provided and set to CMP_DISPLAY_FLEX */
 } cmp_window_config_t;
 
 /**
