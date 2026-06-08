@@ -141,12 +141,24 @@ typedef unsigned __int64 uint64_t;
 #include <c_abstract_http/http_ws.h>
 #include <c_abstract_http/http_sse.h>
 #ifndef CMP_OMIT_ORM
+#ifdef C_ORM_API
 #include <c_orm_api.h>
 #include <c_orm_sqlite.h>
+#else
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wlong-long"
+#endif
+#include <c_orm_api.h>
+#include <c_orm_sqlite.h>
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
+#endif
 #endif
 /* clang-format on */
 
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__)
 #define CMP_FMT_I64 "%I64d"
 #define CMP_FMT_U64 "%I64u"
 #else
@@ -3492,6 +3504,7 @@ struct cmp_rect {
  * @brief Flexbox Alignment Options
  */
 typedef enum cmp_flex_align {
+  CMP_FLEX_ALIGN_AUTO = -1,
   CMP_FLEX_ALIGN_START = 0,
   CMP_FLEX_ALIGN_CENTER = 1,
   CMP_FLEX_ALIGN_END = 2,
@@ -3527,7 +3540,8 @@ typedef enum cmp_position_type {
   CMP_POSITION_RELATIVE = 0,
   CMP_POSITION_ABSOLUTE = 1,
   CMP_POSITION_FIXED = 2,
-  CMP_POSITION_STICKY = 3
+  CMP_POSITION_STICKY = 3,
+  CMP_POSITION_STATIC = 4
 } cmp_position_type_t;
 
 /**
@@ -3539,7 +3553,9 @@ typedef enum cmp_unit {
   CMP_UNIT_VW = 2,
   CMP_UNIT_VH = 3,
   CMP_UNIT_EM = 4,
-  CMP_UNIT_REM = 5
+  CMP_UNIT_REM = 5,
+  CMP_UNIT_VMIN = 6,
+  CMP_UNIT_VMAX = 7
 } cmp_unit_t;
 
 /**
@@ -3548,8 +3564,29 @@ typedef enum cmp_unit {
 typedef enum cmp_display {
   CMP_DISPLAY_FLEX = 0,
   CMP_DISPLAY_INLINE_FLEX = 1,
-  CMP_DISPLAY_NONE = 2
+  CMP_DISPLAY_NONE = 2,
+  CMP_DISPLAY_BLOCK = 3,
+  CMP_DISPLAY_INLINE = 4,
+  CMP_DISPLAY_INLINE_BLOCK = 5,
+  CMP_DISPLAY_GRID = 6
 } cmp_display_t;
+
+/**
+ * @brief Box Sizing Options
+ */
+typedef enum cmp_box_sizing {
+  CMP_BOX_SIZING_CONTENT_BOX = 0,
+  CMP_BOX_SIZING_BORDER_BOX = 1
+} cmp_box_sizing_t;
+
+/** @brief Automatic sizing */
+#define CMP_LAYOUT_AUTO (-1.0f)
+/** @brief Intrinsic minimum content width/height */
+#define CMP_LAYOUT_MIN_CONTENT (-2.0f)
+/** @brief Intrinsic maximum content width/height */
+#define CMP_LAYOUT_MAX_CONTENT (-3.0f)
+/** @brief Intrinsic fit content width/height */
+#define CMP_LAYOUT_FIT_CONTENT (-4.0f)
 
 /**
  * @brief Layout bounds and constraints
@@ -3573,6 +3610,52 @@ typedef int (*cmp_layout_measure_cb_t)(void *context, float max_width,
                                        float *out_width, float *out_height);
 
 /**
+ * @brief Flexbox Line Data
+ */
+typedef struct cmp_layout_line {
+  /** @brief Index of the first child in this line */
+  size_t start_index;
+  /** @brief Number of children in this line */
+  size_t count;
+  /** @brief Total size of items in the main axis */
+  float main_size;
+  /** @brief Maximum size of items in the cross axis */
+  float cross_size;
+  /** @brief Sum of flex-grow factors */
+  float total_flex_grow;
+  /** @brief Sum of flex-shrink factors */
+  float total_flex_shrink;
+} cmp_layout_line_t;
+
+/**
+ * @brief Collection of Flexbox Lines
+ */
+typedef struct cmp_layout_lines {
+  /** @brief Array of lines */
+  cmp_layout_line_t *lines;
+  /** @brief Number of active lines */
+  size_t count;
+  /** @brief Allocated capacity of lines */
+  size_t capacity;
+} cmp_layout_lines_t;
+
+typedef enum cmp_layout_calc_op {
+  CMP_CALC_OP_NONE = 0,
+  CMP_CALC_OP_ADD = 1,
+  CMP_CALC_OP_SUB = 2,
+  CMP_CALC_OP_MUL = 3,
+  CMP_CALC_OP_DIV = 4
+} cmp_layout_calc_op_t;
+
+typedef struct cmp_layout_calc_expr {
+  float val1;
+  cmp_unit_t unit1;
+  cmp_layout_calc_op_t op;
+  float val2;
+  cmp_unit_t unit2;
+} cmp_layout_calc_expr_t;
+
+/**
  * @brief Node definition for the generic UI Tree layout engine
  */
 typedef struct cmp_layout_node {
@@ -3585,6 +3668,8 @@ typedef struct cmp_layout_node {
   cmp_flex_align_t align_content;
   cmp_flex_align_t align_self;
   cmp_position_type_t position_type;
+  /** @brief Box sizing model */
+  cmp_box_sizing_t box_sizing;
 
   int order;
 
@@ -3597,8 +3682,12 @@ typedef struct cmp_layout_node {
   /* Style constraints */
   float width;
   cmp_unit_t width_unit;
+  cmp_layout_calc_expr_t *width_calc;
+
   float height;
   cmp_unit_t height_unit;
+  cmp_layout_calc_expr_t *height_calc;
+
   float min_width;
   cmp_unit_t min_width_unit;
   float min_height;
@@ -3611,15 +3700,22 @@ typedef struct cmp_layout_node {
   float flex_grow;
   float flex_shrink;
   float flex_basis;
-  float margin[4];   /* Top, Right, Bottom, Left */
-  float padding[4];  /* Top, Right, Bottom, Left */
+  float margin[4]; /* Top, Right, Bottom, Left */
+  cmp_unit_t margin_unit[4];
+  float padding[4]; /* Top, Right, Bottom, Left */
+  cmp_unit_t padding_unit[4];
   float position[4]; /* Top, Right, Bottom, Left (for absolute positioning) */
+  cmp_unit_t position_unit[4];
   int z_index;
+  /** @brief True if this node establishes a new Stacking Context */
+  int is_stacking_context;
 
   /* Engine states */
   float measured_width;
   float measured_height;
   int dirty;
+  /** @brief True if flex main-size is frozen */
+  int is_frozen;
 
   /* Multi-column layout */
   int column_count;
@@ -3636,6 +3732,17 @@ typedef struct cmp_layout_node {
 
   /* Computed layout */
   cmp_rect_t computed_rect;
+  /** @brief Persistent flex lines for layout rendering */
+  cmp_layout_lines_t *flex_lines;
+
+  /** @brief CSS Grid properties (when display == CMP_DISPLAY_GRID) */
+  struct cmp_grid_ctx *grid_ctx;
+
+  /* Grid item placement (when parent display == CMP_DISPLAY_GRID) */
+  int grid_column_start;
+  int grid_column_end;
+  int grid_row_start;
+  int grid_row_end;
 
   /* Hierarchy */
   struct cmp_layout_node *parent;
@@ -3680,6 +3787,72 @@ int cmp_layout_node_add_child(cmp_layout_node_t *parent,
  */
 int cmp_layout_calculate(cmp_layout_node_t *root, float available_width,
                          float available_height);
+
+/**
+ * @brief Block Formatting Context (BFC) algorithm
+ * @param node Node to calculate
+ * @param constraints Layout constraints
+ * @return 0 on success, or an error code.
+ */
+int cmp_layout_bfc(cmp_layout_node_t *node,
+                   const cmp_layout_constraints_t *constraints);
+
+/**
+ * @brief Inline Formatting Context (IFC) algorithm
+ * @param node Node to calculate
+ * @param constraints Layout constraints
+ * @return 0 on success, or an error code.
+ */
+int cmp_layout_ifc(cmp_layout_node_t *node,
+                   const cmp_layout_constraints_t *constraints);
+
+/**
+ * @brief Flex Formatting Context (FFC) algorithm
+ * @param node Node to calculate
+ * @param constraints Layout constraints
+ * @return 0 on success, or an error code.
+ */
+int cmp_layout_ffc(cmp_layout_node_t *node,
+                   const cmp_layout_constraints_t *constraints);
+
+/**
+ * @brief Grid Formatting Context (GFC) algorithm
+ * @param node Node to calculate
+ * @param constraints Layout constraints
+ * @return 0 on success, or an error code.
+ */
+int cmp_layout_gfc(cmp_layout_node_t *node,
+                   const cmp_layout_constraints_t *constraints);
+
+/**
+ * @brief Calculates layout recursively for a specific node according to its
+ * formatting context.
+ *
+ * Dispatches to BFC, IFC, FFC, or GFC depending on the node's `display`
+ * property.
+ *
+ * @param node Node to calculate
+ * @param constraints Layout constraints provided by parent
+ * @return 0 on success, or an error code.
+ */
+int cmp_layout_calculate_node(cmp_layout_node_t *node,
+                              const cmp_layout_constraints_t *constraints);
+
+/**
+ * @brief Calculate the intrinsic min-content size of a node.
+ * @param node Node to calculate
+ * @param out_width Pointer to receive the resulting min-content width
+ * @return 0 on success, or an error code.
+ */
+int cmp_layout_get_min_content(cmp_layout_node_t *node, float *out_width);
+
+/**
+ * @brief Calculate the intrinsic max-content size of a node.
+ * @param node Node to calculate
+ * @param out_width Pointer to receive the resulting max-content width
+ * @return 0 on success, or an error code.
+ */
+int cmp_layout_get_max_content(cmp_layout_node_t *node, float *out_width);
 
 /**
  * @brief Calculate the Block Formatting Context for a node.

@@ -180,7 +180,7 @@ if(MSVC)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS=0)
 elseif(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     # GCC/Clang
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -Wno-missing-braces -Wno-long-long")
 endif()
 
 include(FetchContent)

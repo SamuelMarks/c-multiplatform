@@ -15,10 +15,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #if defined(_WIN32)
+#if defined(_MSC_VER)
 long _InterlockedCompareExchange(long volatile *Destination, long Exchange, long Comperand);
 #pragma intrinsic(_InterlockedCompareExchange)
-#define CMP_MEM_LOCK() do { while (_InterlockedCompareExchange(&g_mem_lock, 1, 0) != 0) { } } while (0)   
+#define CMP_MEM_LOCK() do { while (_InterlockedCompareExchange(&g_mem_lock, 1, 0) != 0) { } } while (0)
 #define CMP_MEM_UNLOCK() do { g_mem_lock = 0; } while (0)
+#else
+/* MinGW / GCC on Windows fallback */
+#define CMP_MEM_LOCK() do { while (__sync_val_compare_and_swap(&g_mem_lock, 0, 1) != 0) { } } while (0)
+#define CMP_MEM_UNLOCK() do { g_mem_lock = 0; } while (0)
+#endif
 #else
 #include <unistd.h>
 #if defined(CMP_OS_DOS) || defined(__WATCOMC__) || defined(__DOS__)
