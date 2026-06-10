@@ -183,8 +183,11 @@ int cmp_ui_tabs_bind_a11y(cmp_ui_tabs_t *widget, cmp_a11y_tree_t *tree) {
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "tablist",
+  rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "tablist",
                          "Tabs");
+  if (rc != 0) {
+    return rc;
+  }
 
   return rc;
 }

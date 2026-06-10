@@ -262,8 +262,11 @@ int cmp_ui_modal_drawer_bind_a11y(cmp_ui_modal_drawer_t *widget,
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "dialog",
+  rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "dialog",
                          "Modal Drawer");
+  if (rc != 0) {
+    return rc;
+  }
 
   return rc;
 }

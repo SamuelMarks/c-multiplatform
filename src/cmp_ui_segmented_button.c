@@ -234,8 +234,11 @@ int cmp_ui_segmented_button_bind_a11y(cmp_ui_segmented_button_t *widget,
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "group",
+  rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "group",
                          "Segmented Button");
+  if (rc != 0) {
+    return rc;
+  }
 
   return rc;
 }

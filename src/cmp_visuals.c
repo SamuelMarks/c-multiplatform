@@ -190,7 +190,7 @@ int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
-                  cmp_color_space_t space, cmp_color_t *out_color) {
+                  cmp_color_space_type_t space, cmp_color_t *out_color) {
   int rc = CMP_SUCCESS;
   if (!c1 || !c2 || !out_color)
     return CMP_ERROR_INVALID_ARG;

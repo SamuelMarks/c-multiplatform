@@ -157,8 +157,11 @@ int cmp_ui_text_field_bind_a11y(cmp_ui_text_field_t *widget,
   if (!widget || !tree) {
     return CMP_ERROR_INVALID_ARG;
   }
-  cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "textbox",
+  rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "textbox",
                          "Text Field");
+  if (rc != 0) {
+    return rc;
+  }
 
   return rc;
 }

@@ -1102,7 +1102,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       window->config.width = width;
       window->config.height = height;
       if (window->ui_tree && window->ui_tree->layout) {
-        cmp_layout_calculate(window->ui_tree->layout, (float)width,
+        (void)cmp_layout_calculate(window->ui_tree->layout, (float)width,
                              (float)height);
       }
       if (window->resize_cb) {
@@ -1123,7 +1123,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       window->config.height = HIWORD(lParam);
 
       if (window->ui_tree && window->ui_tree->layout) {
-        cmp_layout_calculate(window->ui_tree->layout,
+        (void)cmp_layout_calculate(window->ui_tree->layout,
                              (float)window->config.width,
                              (float)window->config.height);
       }

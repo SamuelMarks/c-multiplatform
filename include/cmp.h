@@ -138,6 +138,40 @@ typedef unsigned __int64 uint64_t;
 
 #include <cfs/cfs.h>
 #include <c_abstract_http/c_abstract_http.h>
+
+#include "cmp_css_anchor_positioning.h"
+#include "cmp_css_animations.h"
+#include "cmp_css_at_rules.h"
+#include "cmp_css_backgrounds_borders.h"
+#include "cmp_css_box_alignment.h"
+#include "cmp_css_box_model.h"
+#include "cmp_css_cascade.h"
+#include "cmp_css_color.h"
+#include "cmp_css_containment.h"
+#include "cmp_css_device_adaptation.h"
+#include "cmp_css_display.h"
+#include "cmp_css_flexbox.h"
+#include "cmp_css_fonts.h"
+#include "cmp_css_grid.h"
+#include "cmp_css_images_shapes.h"
+#include "cmp_css_lists_content.h"
+#include "cmp_css_logical.h"
+#include "cmp_css_masking.h"
+#include "cmp_css_multi_column.h"
+#include "cmp_css_overflow.h"
+#include "cmp_css_positioning.h"
+#include "cmp_css_ruby.h"
+#include "cmp_css_scroll_animations.h"
+#include "cmp_css_selectors.h"
+#include "cmp_css_speech.h"
+#include "cmp_css_svg.h"
+#include "cmp_css_tables.h"
+#include "cmp_css_transforms.h"
+#include "cmp_css_typography.h"
+#include "cmp_css_ui.h"
+#include "cmp_css_values.h"
+#include "cmp_css_writing_modes.h"
+#include "cmp_cssom.h"
 #include <c_abstract_http/http_ws.h>
 #include <c_abstract_http/http_sse.h>
 #ifndef CMP_OMIT_ORM
@@ -2133,16 +2167,6 @@ int cmp_scroll_smooth_step(cmp_scroll_smooth_t *smooth, float dt_ms,
                            float *out_current_position, int *out_is_complete);
 
 /**
- * @brief Represents the `scroll-snap-stop` CSS property behavior
- */
-typedef enum cmp_scroll_snap_stop {
-  CMP_SCROLL_SNAP_STOP_NORMAL =
-      0, /**< Allows scrolling past multiple snap points if velocity is high */
-  CMP_SCROLL_SNAP_STOP_ALWAYS = 1 /**< Forces stopping at the very next snap
-                                     point regardless of velocity */
-} cmp_scroll_snap_stop_t;
-
-/**
  * @brief Evaluate if a fast kinetic scroll should be hard-stopped at the next
  * snap boundary
  * @param mode The `scroll-snap-stop` mode of the approaching snap point
@@ -2179,15 +2203,6 @@ int cmp_scroll_padding_apply(const cmp_rect_t *element_bounds,
                              const cmp_scroll_padding_t *padding,
                              const cmp_scroll_padding_t *margin,
                              float *out_target_scroll_y);
-
-/**
- * @brief Scrollbar Gutter Property
- */
-typedef enum cmp_scrollbar_gutter {
-  CMP_SCROLLBAR_GUTTER_AUTO = 0,
-  CMP_SCROLLBAR_GUTTER_STABLE = 1,
-  CMP_SCROLLBAR_GUTTER_STABLE_BOTH_EDGES = 2
-} cmp_scrollbar_gutter_t;
 
 /**
  * @brief Calculate the reserved space for the scrollbar gutter
@@ -2439,14 +2454,6 @@ int CMP_API cmp_compositor_start_crossfade(
 typedef struct cmp_transition cmp_transition_t;
 
 /**
- * @brief CSS Transition Behavior
- */
-typedef enum cmp_transition_behavior {
-  CMP_TRANSITION_BEHAVIOR_NORMAL = 0,
-  CMP_TRANSITION_BEHAVIOR_ALLOW_DISCRETE = 1
-} cmp_transition_behavior_t;
-
-/**
  * @brief Initialize a new implicit CSS transition
  *
  * @param duration_ms The duration of the transition
@@ -2477,24 +2484,6 @@ int cmp_transition_step(cmp_transition_t *transition, double dt_ms,
  * @brief Opaque Keyframe Animation Context
  */
 typedef struct cmp_keyframe cmp_keyframe_t;
-
-/**
- * @brief CSS Animation Play State
- */
-typedef enum cmp_animation_play_state {
-  CMP_ANIMATION_PLAY_STATE_RUNNING = 0,
-  CMP_ANIMATION_PLAY_STATE_PAUSED = 1
-} cmp_animation_play_state_t;
-
-/**
- * @brief CSS Animation Fill Mode
- */
-typedef enum cmp_animation_fill_mode {
-  CMP_ANIMATION_FILL_MODE_NONE = 0,
-  CMP_ANIMATION_FILL_MODE_FORWARDS = 1,
-  CMP_ANIMATION_FILL_MODE_BACKWARDS = 2,
-  CMP_ANIMATION_FILL_MODE_BOTH = 3
-} cmp_animation_fill_mode_t;
 
 /**
  * @brief Create a keyframe animation context
@@ -3515,34 +3504,28 @@ typedef enum cmp_flex_align {
 } cmp_flex_align_t;
 
 /**
- * @brief Flexbox Direction
+ * @brief Flexbox Direction (Mapped to CSS Engine)
  */
-typedef enum cmp_flex_direction {
-  CMP_FLEX_ROW = 0,
-  CMP_FLEX_COLUMN = 1,
-  CMP_FLEX_ROW_REVERSE = 2,
-  CMP_FLEX_COLUMN_REVERSE = 3
-} cmp_flex_direction_t;
+typedef cmp_flex_direction_t cmp_layout_flex_direction_t; /* To avoid name conflict, just use the new one directly but cmp_flex_direction_t is same. Wait, cmp_css_flexbox.h has cmp_flex_direction_t */
+#define CMP_FLEX_ROW CMP_FLEX_DIRECTION_ROW
+#define CMP_FLEX_COLUMN CMP_FLEX_DIRECTION_COLUMN
+#define CMP_FLEX_ROW_REVERSE CMP_FLEX_DIRECTION_ROW_REVERSE
+#define CMP_FLEX_COLUMN_REVERSE CMP_FLEX_DIRECTION_COLUMN_REVERSE
 
 /**
- * @brief Flexbox Wrap Options
+ * @brief Flexbox Wrap Options (Mapped to CSS Engine)
  */
-typedef enum cmp_flex_wrap {
-  CMP_FLEX_NOWRAP = 0,
-  CMP_FLEX_WRAP = 1,
-  CMP_FLEX_WRAP_REVERSE = 2
-} cmp_flex_wrap_t;
+/* cmp_flex_wrap_t is defined in cmp_css_flexbox.h */
+#define CMP_FLEX_NOWRAP CMP_FLEX_WRAP_NOWRAP
+#define CMP_FLEX_WRAP_REVERSE CMP_FLEX_WRAP_WRAP_REVERSE
+/* CMP_FLEX_WRAP is tricky since the enum has CMP_FLEX_WRAP_WRAP, we'll map it. */
+#define CMP_FLEX_WRAP CMP_FLEX_WRAP_WRAP
 
 /**
- * @brief Positioning Mode
+ * @brief Positioning Mode (Mapped to CSS Engine)
  */
-typedef enum cmp_position_type {
-  CMP_POSITION_RELATIVE = 0,
-  CMP_POSITION_ABSOLUTE = 1,
-  CMP_POSITION_FIXED = 2,
-  CMP_POSITION_STICKY = 3,
-  CMP_POSITION_STATIC = 4
-} cmp_position_type_t;
+typedef cmp_prop_position_t cmp_position_type_t;
+/* CMP_POSITION_* enumerators match the CSS engine perfectly */
 
 /**
  * @brief Measurement units for layout and typography
@@ -3559,25 +3542,16 @@ typedef enum cmp_unit {
 } cmp_unit_t;
 
 /**
- * @brief Display Options
+ * @brief Display Options (Mapped to CSS Engine)
  */
-typedef enum cmp_display {
-  CMP_DISPLAY_FLEX = 0,
-  CMP_DISPLAY_INLINE_FLEX = 1,
-  CMP_DISPLAY_NONE = 2,
-  CMP_DISPLAY_BLOCK = 3,
-  CMP_DISPLAY_INLINE = 4,
-  CMP_DISPLAY_INLINE_BLOCK = 5,
-  CMP_DISPLAY_GRID = 6
-} cmp_display_t;
+typedef cmp_prop_display_t cmp_display_t;
+/* CMP_DISPLAY_* enumerators match perfectly */
 
 /**
- * @brief Box Sizing Options
+ * @brief Box Sizing Options (Mapped to CSS Engine)
  */
-typedef enum cmp_box_sizing {
-  CMP_BOX_SIZING_CONTENT_BOX = 0,
-  CMP_BOX_SIZING_BORDER_BOX = 1
-} cmp_box_sizing_t;
+typedef cmp_prop_box_sizing_t cmp_box_sizing_t;
+/* CMP_BOX_SIZING_* enumerators match perfectly */
 
 /** @brief Automatic sizing */
 #define CMP_LAYOUT_AUTO (-1.0f)
@@ -4274,22 +4248,16 @@ int cmp_font_destroy(cmp_font_t *font);
 int cmp_text_shape(cmp_font_t *font, const char *text, float *out_width,
                    float *out_height);
 
-typedef enum cmp_color_space {
-  CMP_COLOR_SPACE_SRGB = 0,
-  CMP_COLOR_SPACE_DISPLAY_P3 = 1,
-  CMP_COLOR_SPACE_OKLCH = 2
-} cmp_color_space_t;
-
-/**
- * @brief Color structure (RGBA)
- */
 typedef struct cmp_color {
   float r;
   float g;
   float b;
   float a;
-  cmp_color_space_t space;
+  cmp_color_space_type_t space;
 } cmp_color_t;
+
+/** @brief Legacy OKLCH color space enum mapping */
+#define CMP_COLOR_SPACE_OKLCH ((cmp_color_space_type_t)99)
 
 /**
  * @brief Dynamic Color Palette (Material You / Fluent equivalent)
@@ -5778,26 +5746,9 @@ typedef enum cmp_grid_align {
   CMP_GRID_ALIGN_STRETCH = 3
 } cmp_grid_align_t;
 
-typedef enum cmp_column_fill {
-  CMP_COLUMN_FILL_BALANCE = 0,
-  CMP_COLUMN_FILL_AUTO = 1
-} cmp_column_fill_t;
+typedef cmp_prop_container_type_t cmp_container_type_t;
 
-typedef enum cmp_container_type {
-  CMP_CONTAINER_TYPE_NORMAL = 0,
-  CMP_CONTAINER_TYPE_SIZE = 1,
-  CMP_CONTAINER_TYPE_INLINE_SIZE = 2
-} cmp_container_type_t;
-
-typedef enum cmp_contain {
-  CMP_CONTAIN_NONE = 0,
-  CMP_CONTAIN_STRICT = 1,
-  CMP_CONTAIN_CONTENT = 2,
-  CMP_CONTAIN_SIZE = 4,
-  CMP_CONTAIN_LAYOUT = 8,
-  CMP_CONTAIN_STYLE = 16,
-  CMP_CONTAIN_PAINT = 32
-} cmp_contain_t;
+typedef cmp_contain_flag_t cmp_contain_t;
 
 /**
  * @brief Evaluate CSS containment effects.
@@ -5859,7 +5810,7 @@ int cmp_color_oklch_to_srgb(const cmp_color_t *in_color,
  * @brief Mix two colors in a specified color space.
  */
 int cmp_color_mix(const cmp_color_t *c1, const cmp_color_t *c2, float weight,
-                  cmp_color_space_t space, cmp_color_t *out_color);
+                  cmp_color_space_type_t space, cmp_color_t *out_color);
 
 /**
  * @brief Calculate relative luminance of a color.
@@ -6102,12 +6053,6 @@ typedef struct cmp_style_query {
 int CMP_API cmp_style_query_evaluate(const cmp_style_query_t *query,
                                      const cmp_style_query_t *container_styles,
                                      int num_styles, int *out_matches);
-
-typedef enum cmp_content_visibility {
-  CMP_CONTENT_VISIBILITY_VISIBLE = 0,
-  CMP_CONTENT_VISIBILITY_HIDDEN = 1,
-  CMP_CONTENT_VISIBILITY_AUTO = 2
-} cmp_content_visibility_t;
 
 /**
  * @brief Evaluate content visibility for a node.
@@ -7581,12 +7526,9 @@ int cmp_titlebar_env_get_area(const cmp_titlebar_env_t *env, float *out_x,
                               float *out_height);
 
 /**
- * @brief Prefers Color Scheme
+ * @brief Prefers Color Scheme (Mapped to CSS Engine)
  */
-typedef enum {
-  CMP_COLOR_SCHEME_LIGHT,
-  CMP_COLOR_SCHEME_DARK
-} cmp_color_scheme_t;
+typedef cmp_prop_color_scheme_t cmp_color_scheme_t;
 #ifndef CMP_PREFERS_COLOR_SCHEME_T_DEFINED
 #define CMP_PREFERS_COLOR_SCHEME_T_DEFINED
 typedef struct cmp_prefers_color_scheme cmp_prefers_color_scheme_t;
@@ -12937,10 +12879,7 @@ int CMP_API cmp_svg_filter_fe_displacement_map(
     struct cmp_texture *source, cmp_svg_fe_displacement_map_t *map,
     struct cmp_texture **out_result);
 
-typedef enum {
-  CMP_BLEND_MODE_NORMAL = 0,
-  CMP_BLEND_MODE_MULTIPLY = 1
-} cmp_mix_blend_mode_t;
+typedef cmp_blend_mode_t cmp_mix_blend_mode_t;
 
 typedef struct cmp_isolation_context {
   int is_isolated;
