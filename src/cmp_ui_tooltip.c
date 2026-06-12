@@ -49,6 +49,8 @@ int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
     rc = CMP_MALLOC(len + 1, (void **)&(tooltip->text));
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("OOM\n");
+      if (translated.data) (void)cmp_string_destroy(&translated);
+      CMP_FREE(tooltip);
       return CMP_ERROR_OOM;
     }
     if (tooltip->text) {
@@ -63,41 +65,33 @@ int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
   err = cmp_ui_box_create(&tooltip->node_root);
   if (err != 0) {
     if (tooltip->text) {
-      rc = CMP_FREE(tooltip->text);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_tooltip_create: Free failed\n");
-      }
+      CMP_FREE(tooltip->text);
     }
-    rc = CMP_FREE(tooltip);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_tooltip_create: Free failed\n");
-    }
+    CMP_FREE(tooltip);
     return err;
   }
 
   err = CMP_MALLOC(sizeof(cmp_layout_node_t),
                    (void **)&tooltip->node_root->layout);
-  if (err == CMP_SUCCESS) {
-    memset(tooltip->node_root->layout, 0, sizeof(cmp_layout_node_t));
-    tooltip->node_root->layout->id = 1;
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(tooltip->node_root);
+    if (tooltip->text) CMP_FREE(tooltip->text);
+    CMP_FREE(tooltip);
+    return err;
   }
+  memset(tooltip->node_root->layout, 0, sizeof(cmp_layout_node_t));
+  tooltip->node_root->layout->id = 1;
 
   tooltip->node_root->bg_color = bg_color;
 
   err = cmp_ui_text_create(&tooltip->node_text,
                            tooltip->text ? tooltip->text : "", -1);
   if (err != 0) {
-    (void)cmp_ui_node_destroy(tooltip->node_root);
+    cmp_ui_node_destroy(tooltip->node_root);
     if (tooltip->text) {
-      rc = CMP_FREE(tooltip->text);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_tooltip_create: Free failed\n");
-      }
+      CMP_FREE(tooltip->text);
     }
-    rc = CMP_FREE(tooltip);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_tooltip_create: Free failed\n");
-    }
+    CMP_FREE(tooltip);
     return err;
   }
 
@@ -106,10 +100,15 @@ int cmp_ui_tooltip_create(cmp_ui_tooltip_t **out_tooltip, const char *text,
   err = cmp_ui_node_add_child(tooltip->node_root, tooltip->node_text);
   if (err != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_tooltip_create: cmp_ui_node_add_child failed\n");
+    cmp_ui_node_destroy(tooltip->node_text);
+    cmp_ui_node_destroy(tooltip->node_root);
+    if (tooltip->text) CMP_FREE(tooltip->text);
+    CMP_FREE(tooltip);
+    return err;
   }
 
   *out_tooltip = tooltip;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

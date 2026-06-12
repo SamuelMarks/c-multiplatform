@@ -43,17 +43,14 @@ int cmp_ui_breadcrumbs_create(cmp_ui_breadcrumbs_t **out_breadcrumbs,
   rc = cmp_ui_box_create(&breadcrumbs->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_breadcrumbs_create: cmp_ui_box_create failed\n");
-    rc = CMP_FREE(breadcrumbs);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_breadcrumbs_create: CMP_FREE failed\n");
-    }
+    CMP_FREE(breadcrumbs);
     return CMP_ERROR_GENERAL;
   }
 
   breadcrumbs->node_root->bg_color = bg_color;
 
   *out_breadcrumbs = breadcrumbs;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

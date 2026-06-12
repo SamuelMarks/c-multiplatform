@@ -42,10 +42,10 @@ TEST test_permissions_lifecycle(void) {
 
 TEST test_privacy_indicators(void) {
   cmp_privacy_indicators_t *inds = NULL;
-  cmp_rect_t safe_ui = {0.0f, 100.0f, 200.0f,
-                        50.0f}; /* Below the dynamic island */
-  cmp_rect_t bad_ui = {290.0f, 0.0f, 50.0f,
-                       50.0f}; /* Obscuring the system mic dot (300x10) */
+  cmp_rect_f_t safe_ui = {0.0f, 100.0f, 200.0f,
+                          50.0f}; /* Below the dynamic island */
+  cmp_rect_f_t bad_ui = {290.0f, 0.0f, 50.0f,
+                         50.0f}; /* Obscuring the system mic dot (300x10) */
   int is_obscured;
   int res;
 

@@ -36,6 +36,7 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
     LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
+  memset(md, 0, sizeof(cmp_ui_markdown_t));
 
   md->text = NULL;
   if (text) {
@@ -43,46 +44,42 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
     rc = CMP_MALLOC(len + 1, (void **)&(md->text));
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("OOM\n");
+      CMP_FREE(md);
       return CMP_ERROR_OOM;
     }
-    if (md->text) {
-      memcpy(md->text, text, len + 1);
-    }
+    memcpy(md->text, text, len + 1);
   }
 
   err = cmp_ui_box_create(&md->node_root);
-  if (err != 0) {
-    rc = CMP_FREE(md->text);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
-    rc = CMP_FREE(md);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
+  if (err != CMP_SUCCESS) {
+    if (md->text) CMP_FREE(md->text);
+    CMP_FREE(md);
     return err;
   }
 
   md->node_root->bg_color = bg_color;
 
   err = cmp_ui_text_create(&md->node_text, md->text ? md->text : "", -1);
-  if (err != 0) {
-    rc = CMP_FREE(md->text);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
-    rc = CMP_FREE(md);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(md->node_root);
+    if (md->text) CMP_FREE(md->text);
+    CMP_FREE(md);
     return err;
   }
 
   md->node_text->text_color = text_color;
 
-  (void)cmp_ui_node_add_child(md->node_root, md->node_text);
+  err = cmp_ui_node_add_child(md->node_root, md->node_text);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(md->node_text);
+    cmp_ui_node_destroy(md->node_root);
+    if (md->text) CMP_FREE(md->text);
+    CMP_FREE(md);
+    return err;
+  }
+  
   *out_md = md;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

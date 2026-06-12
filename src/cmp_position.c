@@ -13,7 +13,7 @@
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pos_absolute_relative(cmp_layout_node_t *node,
-                              const cmp_rect_t *parent_rect) {
+                              const cmp_rect_f_t *parent_rect) {
   int rc = CMP_SUCCESS;
 
   if (!node || !parent_rect) {
@@ -39,7 +39,7 @@ int cmp_pos_absolute_relative(cmp_layout_node_t *node,
  * @param viewport_rect Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_t *viewport_rect) {
+int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_f_t *viewport_rect) {
   int rc = CMP_SUCCESS;
 
   if (!node || !viewport_rect) {
@@ -62,7 +62,7 @@ int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_t *viewport_rect) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_pos_sticky(cmp_layout_node_t *node, float scroll_offset,
-                   const cmp_rect_t *container_rect) {
+                   const cmp_rect_f_t *container_rect) {
   int rc = CMP_SUCCESS;
 
   if (!node || !container_rect) {
@@ -87,7 +87,7 @@ int cmp_pos_sticky(cmp_layout_node_t *node, float scroll_offset,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_anchor_position(cmp_layout_node_t *floating_node,
-                        const cmp_rect_t *anchor_rect) {
+                        const cmp_rect_f_t *anchor_rect) {
   int rc = CMP_SUCCESS;
 
   if (!floating_node || !anchor_rect) {
@@ -109,8 +109,8 @@ int cmp_anchor_position(cmp_layout_node_t *floating_node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_anchor_fallback(cmp_layout_node_t *floating_node,
-                        const cmp_rect_t *anchor_rect,
-                        const cmp_rect_t *viewport_rect) {
+                        const cmp_rect_f_t *anchor_rect,
+                        const cmp_rect_f_t *viewport_rect) {
   int rc = CMP_SUCCESS;
 
   if (!floating_node || !anchor_rect || !viewport_rect) {
@@ -138,7 +138,7 @@ int cmp_anchor_fallback(cmp_layout_node_t *floating_node,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_anchor_size(cmp_layout_node_t *floating_node,
-                    const cmp_rect_t *anchor_rect) {
+                    const cmp_rect_f_t *anchor_rect) {
   int rc = CMP_SUCCESS;
 
   if (!floating_node || !anchor_rect) {

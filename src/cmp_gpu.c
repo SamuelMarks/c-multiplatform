@@ -2014,8 +2014,8 @@ int cmp_tex_compression_decode_bc7(const void *data, size_t size,
  * @param out_is_visible Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_frustum_culling_test(const cmp_rect_t *node_rect,
-                             const cmp_rect_t *viewport_rect,
+int cmp_frustum_culling_test(const cmp_rect_f_t *node_rect,
+                             const cmp_rect_f_t *viewport_rect,
                              int *out_is_visible) {
   int rc = CMP_SUCCESS;
   int err_rc;

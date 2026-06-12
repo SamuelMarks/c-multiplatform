@@ -39,7 +39,7 @@ TEST test_tiling_calculate(void) {
 TEST test_tiling_edge_cases(void) {
   cmp_layer_tiling_t *tiling = NULL;
   uint32_t count = 0;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
 
   /* Null pointers */
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_layer_tiling_create(512, NULL));

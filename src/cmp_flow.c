@@ -98,7 +98,7 @@ int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
  * @param margin Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
+int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_f_t float_rect,
                                float shape_radius, float margin) {
   int rc = CMP_SUCCESS;
   float content_top;

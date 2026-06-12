@@ -31,27 +31,24 @@ int cmp_ui_spinner_create(cmp_ui_spinner_t **out_spinner, float size,
   rc = CMP_MALLOC(sizeof(cmp_ui_spinner_t), (void **)&spinner);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_spinner_create: OOM\n");
-
-    return rc;
+    return CMP_ERROR_OOM;
   }
+  memset(spinner, 0, sizeof(cmp_ui_spinner_t));
 
-  spinner->rotation_angle = 0.0f;
+  spinner->rotation_angle = CMP_MATH_ZERO;
   spinner->size = size;
 
   rc = cmp_ui_box_create(&spinner->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_spinner_create: cmp_ui_box_create failed\n");
-    if (CMP_FREE(spinner) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_spinner_create: CMP_FREE failed\n");
-    }
-
-    return rc;
+    CMP_FREE(spinner);
+    return CMP_ERROR_GENERAL;
   }
 
   spinner->node_root->bg_color = color;
 
   *out_spinner = spinner;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -116,9 +113,9 @@ int cmp_ui_spinner_update(cmp_ui_spinner_t *spinner, float dt_ms) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  spinner->rotation_angle += (dt_ms / 1000.0f) * 360.0f;
-  if (spinner->rotation_angle >= 360.0f) {
-    spinner->rotation_angle -= 360.0f;
+  spinner->rotation_angle += (dt_ms / CMP_MS_PER_SEC_F) * CMP_MATH_CIRCLE_DEG;
+  if (spinner->rotation_angle >= CMP_MATH_CIRCLE_DEG) {
+    spinner->rotation_angle -= CMP_MATH_CIRCLE_DEG;
   }
 
   return rc;

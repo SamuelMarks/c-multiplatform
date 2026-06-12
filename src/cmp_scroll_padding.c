@@ -15,7 +15,7 @@
  * @param out_target_scroll_y Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_scroll_padding_apply(const cmp_rect_t *element_bounds,
+int cmp_scroll_padding_apply(const cmp_rect_f_t *element_bounds,
                              const cmp_scroll_padding_t *padding,
                              const cmp_scroll_padding_t *margin,
                              float *out_target_scroll_y) {

@@ -132,7 +132,7 @@ TEST test_scroll_snap_stop(void) {
 }
 
 TEST test_scroll_padding(void) {
-  cmp_rect_t el = {0, 500.0f, 100.0f, 100.0f};
+  cmp_rect_f_t el = {0, 500.0f, 100.0f, 100.0f};
   cmp_scroll_padding_t pad = {50.0f, 0, 0, 0};
   cmp_scroll_padding_t mar = {25.0f, 0, 0, 0};
   float out_y = 0.0f;

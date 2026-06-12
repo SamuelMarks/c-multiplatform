@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
+/* Modal Drawer Colors */
+#ifndef CMP_UI_MODAL_DRAWER_SCRIM_COLOR
+#define CMP_UI_MODAL_DRAWER_SCRIM_COLOR 0x80000000
+#define CMP_UI_MODAL_DRAWER_BG_COLOR    0xFFFFFFFF
+#endif
+
 
 typedef struct cmp_ui_modal_drawer_item {
   cmp_ui_node_t *node;
@@ -27,7 +33,6 @@ struct cmp_ui_modal_drawer {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
-  int rc = CMP_SUCCESS;
   cmp_ui_modal_drawer_t *drawer;
   int err;
 
@@ -41,71 +46,74 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
   }
   memset(drawer, 0, sizeof(cmp_ui_modal_drawer_t));
 
-  drawer->item_capacity = 8;
+  drawer->item_capacity = CMP_LARGE_CAPACITY;
   err = CMP_MALLOC(sizeof(cmp_ui_modal_drawer_item_t) * drawer->item_capacity,
                    (void **)&drawer->items);
   if (err != CMP_SUCCESS) {
-    if (CMP_FREE(drawer) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE drawer failed\n");
-    }
+    CMP_FREE(drawer);
     return err;
   }
 
   err = cmp_ui_box_create(&drawer->node_root);
   if (err != CMP_SUCCESS) {
-    if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE items failed\n");
-    }
-    if (CMP_FREE(drawer) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE drawer failed\n");
-    }
+    CMP_FREE(drawer->items);
+    CMP_FREE(drawer);
     return err;
   }
 
   err = cmp_ui_box_create(&drawer->node_drawer);
   if (err != CMP_SUCCESS) {
-    (void)cmp_ui_node_destroy(drawer->node_root);
-    if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE items failed\n");
-    }
-    if (CMP_FREE(drawer) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE drawer failed\n");
-    }
+    cmp_ui_node_destroy(drawer->node_root);
+    CMP_FREE(drawer->items);
+    CMP_FREE(drawer);
     return err;
   }
 
   err = cmp_ui_box_create(&drawer->node_items);
   if (err != CMP_SUCCESS) {
-    (void)cmp_ui_node_destroy(drawer->node_drawer);
-    (void)cmp_ui_node_destroy(drawer->node_root);
-    if (CMP_FREE(drawer->items) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE items failed\n");
-    }
-    if (CMP_FREE(drawer) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_modal_drawer_create: CMP_FREE drawer failed\n");
-    }
+    cmp_ui_node_destroy(drawer->node_drawer);
+    cmp_ui_node_destroy(drawer->node_root);
+    CMP_FREE(drawer->items);
+    CMP_FREE(drawer);
     return err;
   }
 
   /* Scrim properties */
   drawer->node_root->layout->position_type = CMP_POSITION_ABSOLUTE;
-  drawer->node_root->bg_color = 0x80000000; /* Semi-transparent black */
+  drawer->node_root->bg_color = CMP_UI_MODAL_DRAWER_SCRIM_COLOR; /* Semi-transparent black */
 
   /* Drawer properties */
   drawer->node_drawer->layout->position_type = CMP_POSITION_ABSOLUTE;
   drawer->node_drawer->layout->direction = CMP_FLEX_COLUMN;
-  drawer->node_drawer->bg_color = 0xFFFFFFFF; /* Solid white */
+  drawer->node_drawer->bg_color = CMP_UI_MODAL_DRAWER_BG_COLOR; /* Solid white */
 
   drawer->node_items->layout->direction = CMP_FLEX_COLUMN;
 
-  (void)cmp_ui_node_add_child(drawer->node_drawer, drawer->node_items);
-  (void)cmp_ui_node_add_child(drawer->node_root, drawer->node_drawer);
+  err = cmp_ui_node_add_child(drawer->node_drawer, drawer->node_items);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(drawer->node_items);
+    cmp_ui_node_destroy(drawer->node_drawer);
+    cmp_ui_node_destroy(drawer->node_root);
+    CMP_FREE(drawer->items);
+    CMP_FREE(drawer);
+    return err;
+  }
+  
+  err = cmp_ui_node_add_child(drawer->node_root, drawer->node_drawer);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(drawer->node_drawer);
+    cmp_ui_node_destroy(drawer->node_root);
+    CMP_FREE(drawer->items);
+    CMP_FREE(drawer);
+    return err;
+  }
+  
   drawer->selected_index = -1;
   drawer->is_open = 0;
 
   *out_drawer = drawer;
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -189,7 +197,7 @@ int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
   }
 
   if (drawer->item_count >= drawer->item_capacity) {
-    int new_cap = drawer->item_capacity * 2;
+    int new_cap = drawer->item_capacity * CMP_CAPACITY_MULTIPLIER;
     cmp_ui_modal_drawer_item_t *new_items;
     err = CMP_MALLOC(sizeof(cmp_ui_modal_drawer_item_t) * new_cap,
                      (void **)&new_items);
@@ -210,7 +218,7 @@ int cmp_ui_modal_drawer_add_item(cmp_ui_modal_drawer_t *drawer,
     return err;
   }
 
-  item_node->type = 3; /* Button / List Item */
+  item_node->type = CMP_UI_NODE_TYPE_BUTTON;
   (void)icon_name;
 
   (void)cmp_ui_node_add_child(drawer->node_items, item_node);
@@ -263,7 +271,7 @@ int cmp_ui_modal_drawer_bind_a11y(cmp_ui_modal_drawer_t *widget,
     return CMP_ERROR_INVALID_ARG;
   }
   rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "dialog",
-                         "Modal Drawer");
+                              "Modal Drawer");
   if (rc != 0) {
     return rc;
   }

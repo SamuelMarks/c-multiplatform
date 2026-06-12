@@ -16,9 +16,9 @@ TEST test_vt_shared_lifecycle(void) {
 
 TEST test_vt_shared_null_args(void) {
   int res = cmp_vt_shared_create(NULL);
-  cmp_rect_t o = {0, 0, 10, 10};
-  cmp_rect_t n = {10, 10, 20, 20};
-  cmp_rect_t r;
+  cmp_rect_f_t o = {0, 0, 10, 10};
+  cmp_rect_f_t n = {10, 10, 20, 20};
+  cmp_rect_f_t r;
   cmp_vt_shared_t *shared = NULL;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, res);
@@ -48,9 +48,9 @@ TEST test_vt_shared_null_args(void) {
 
 TEST test_vt_shared_calculate_morph(void) {
   cmp_vt_shared_t *shared = NULL;
-  cmp_rect_t o = {0.0f, 0.0f, 100.0f, 100.0f};
-  cmp_rect_t n = {50.0f, 50.0f, 200.0f, 200.0f};
-  cmp_rect_t r;
+  cmp_rect_f_t o = {0.0f, 0.0f, 100.0f, 100.0f};
+  cmp_rect_f_t n = {50.0f, 50.0f, 200.0f, 200.0f};
+  cmp_rect_f_t r;
   int res;
 
   cmp_vt_shared_create(&shared);

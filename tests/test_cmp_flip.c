@@ -16,7 +16,7 @@ TEST test_flip_lifecycle(void) {
 
 TEST test_flip_null_args(void) {
   int res = cmp_flip_create(NULL);
-  cmp_rect_t rect = {0, 0, 10, 10};
+  cmp_rect_f_t rect = {0, 0, 10, 10};
   cmp_flip_t *flip = NULL;
   float tx, ty, sx, sy;
 
@@ -44,7 +44,7 @@ TEST test_flip_null_args(void) {
 
 TEST test_flip_uninitialized(void) {
   cmp_flip_t *flip = NULL;
-  cmp_rect_t rect = {0, 0, 10, 10};
+  cmp_rect_f_t rect = {0, 0, 10, 10};
   float tx, ty, sx, sy;
   int res;
 
@@ -60,8 +60,8 @@ TEST test_flip_uninitialized(void) {
 
 TEST test_flip_calculate(void) {
   cmp_flip_t *flip = NULL;
-  cmp_rect_t first_rect = {10.0f, 10.0f, 100.0f, 100.0f};
-  cmp_rect_t last_rect = {50.0f, 60.0f, 200.0f, 50.0f};
+  cmp_rect_f_t first_rect = {10.0f, 10.0f, 100.0f, 100.0f};
+  cmp_rect_f_t last_rect = {50.0f, 60.0f, 200.0f, 50.0f};
   float tx, ty, sx, sy;
   int res;
 

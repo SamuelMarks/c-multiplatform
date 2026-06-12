@@ -5,6 +5,11 @@
 #include <string.h>
 /* clang-format on */
 
+/* Card Colors */
+#define CMP_UI_CARD_COLOR_ELEVATED 0xFFFFFFFFU
+#define CMP_UI_CARD_COLOR_FILLED 0xFFE0E0E0U
+#define CMP_UI_CARD_COLOR_OUTLINED 0x00000000U
+
 /**
  * @brief Opaque internal structure for UI Card widget.
  */
@@ -51,21 +56,23 @@ int cmp_ui_card_create(cmp_ui_card_t **out_card, cmp_ui_card_style_t style) {
   }
 
   rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&card->node_root->layout);
-  if (rc == CMP_SUCCESS) {
+  if (rc != CMP_SUCCESS) {
+    cmp_ui_card_destroy(card);
+    return rc;
+  }
     memset(card->node_root->layout, 0, sizeof(cmp_layout_node_t));
     card->node_root->layout->id = 1;
     card->node_root->layout->direction = CMP_FLEX_COLUMN;
-  }
 
   if (style == CMP_UI_CARD_STYLE_ELEVATED) {
     if (card->node_root)
-      card->node_root->bg_color = 0xFFFFFFFF;
+      card->node_root->bg_color = CMP_UI_CARD_COLOR_ELEVATED;
   } else if (style == CMP_UI_CARD_STYLE_FILLED) {
     if (card->node_root)
-      card->node_root->bg_color = 0xFFE0E0E0;
+      card->node_root->bg_color = CMP_UI_CARD_COLOR_FILLED;
   } else if (style == CMP_UI_CARD_STYLE_OUTLINED) {
     if (card->node_root)
-      card->node_root->bg_color = 0x00000000;
+      card->node_root->bg_color = CMP_UI_CARD_COLOR_OUTLINED;
   }
 
   *out_card = card;

@@ -186,7 +186,8 @@ int cmp_tree_set_screen_recording_prevention(cmp_a11y_tree_t *tree, int node_id,
 }
 
 struct cmp_privacy_indicators {
-  cmp_rect_t system_indicator_bounds; /* Where OS draws the orange/green dots */
+  cmp_rect_f_t
+      system_indicator_bounds; /* Where OS draws the orange/green dots */
 };
 
 /**
@@ -253,7 +254,7 @@ int cmp_privacy_indicators_destroy(cmp_privacy_indicators_t *indicators) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_privacy_indicators_verify_layout(cmp_privacy_indicators_t *indicators,
-                                         const cmp_rect_t *ui_bounds,
+                                         const cmp_rect_f_t *ui_bounds,
                                          int *out_is_obscured) {
   int rc = CMP_SUCCESS;
   struct cmp_privacy_indicators *inds =

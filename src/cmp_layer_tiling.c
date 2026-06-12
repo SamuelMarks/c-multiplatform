@@ -120,7 +120,7 @@ int cmp_layer_tiling_calculate(cmp_layer_tiling_t *tiling, uint32_t width,
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_layer_tiling_get_bounds(cmp_layer_tiling_t *tiling, uint32_t tile_index,
-                                cmp_rect_t *out_rect) {
+                                cmp_rect_f_t *out_rect) {
   int rc = CMP_SUCCESS;
   struct cmp_layer_tiling *ctx = (struct cmp_layer_tiling *)tiling;
   /* Without width passed in, we can't reliably do 2D math from an index.

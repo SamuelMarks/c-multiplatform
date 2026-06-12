@@ -28,7 +28,50 @@ int cmp_ui_layout_measure_dispatch(void *ctx, float max_width, float *out_w,
 
   switch (node->type) {
   case 2: /* Text */
-    /* TODO: Theme text measurement routing with max_width */
+    if (node->properties) {
+      const char *str = (const char *)node->properties;
+      size_t len = strlen(str);
+      float char_w = 8.0f;
+      float line_h = 16.0f;
+      float total_w = (float)len * char_w;
+
+      if (node->layout && node->layout->white_space == CMP_WHITE_SPACE_NOWRAP) {
+        /* No word wrapping allowed */
+        *out_w = total_w;
+        *out_h = line_h;
+      } else if (max_width == 0.0f) {
+        /* Min-content request: find the longest word */
+        const char *p = str;
+        size_t max_word_len = 0;
+        size_t cur_word_len = 0;
+        while (*p) {
+          if (*p == ' ' || *p == '\n') {
+            if (cur_word_len > max_word_len)
+              max_word_len = cur_word_len;
+            cur_word_len = 0;
+          } else {
+            cur_word_len++;
+          }
+          p++;
+        }
+        if (cur_word_len > max_word_len)
+          max_word_len = cur_word_len;
+        *out_w = (float)max_word_len * char_w;
+        *out_h = line_h;
+      } else if (max_width > 0.0f && total_w > max_width) {
+        /* Wrapped content */
+        int lines = (int)((total_w + max_width - 1.0f) / max_width);
+        *out_w = max_width;
+        *out_h = line_h * (float)lines;
+      } else {
+        /* Max-content request (-1.0f) or fits within max_width */
+        *out_w = total_w;
+        *out_h = line_h;
+      }
+    } else {
+      *out_w = 0.0f;
+      *out_h = 16.0f;
+    }
     rc = CMP_SUCCESS;
     break;
   case 3: /* Button */
@@ -102,7 +145,7 @@ int cmp_ui_box_create(cmp_ui_node_t **out_node) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 1; /* Box */
+  node->type = CMP_UI_NODE_TYPE_BOX;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -155,7 +198,7 @@ int cmp_ui_text_create(cmp_ui_node_t **out_node, const char *text,
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 2; /* Text */
+  node->type = CMP_UI_NODE_TYPE_TEXT;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -229,7 +272,7 @@ int cmp_ui_button_create(cmp_ui_node_t **out_node, const char *label,
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 3; /* Button */
+  node->type = CMP_UI_NODE_TYPE_BUTTON;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -350,7 +393,7 @@ int cmp_ui_checkbox_create(cmp_ui_node_t **out_node, const char *label) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 5; /* Checkbox */
+  node->type = CMP_UI_NODE_TYPE_CHECKBOX;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -425,7 +468,7 @@ int cmp_ui_radio_create(cmp_ui_node_t **out_node, int group_id) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 6; /* Radio */
+  node->type = CMP_UI_NODE_TYPE_RADIO;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -497,7 +540,7 @@ int cmp_ui_image_view_create(cmp_ui_node_t **out_node, const char *image_path) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 7; /* ImageView */
+  node->type = CMP_UI_NODE_TYPE_IMAGE_VIEW;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -620,7 +663,7 @@ int cmp_ui_slider_create(cmp_ui_node_t **out_node, float min, float max) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 8; /* Slider */
+  node->type = CMP_UI_NODE_TYPE_SLIDER;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -688,7 +731,7 @@ int cmp_ui_list_view_create(cmp_ui_node_t **out_node) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 9; /* ListView */
+  node->type = CMP_UI_NODE_TYPE_LIST_VIEW;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -738,7 +781,7 @@ int cmp_ui_grid_view_create(cmp_ui_node_t **out_node, int columns) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 10; /* GridView */
+  node->type = CMP_UI_NODE_TYPE_GRID_VIEW;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -803,7 +846,7 @@ int cmp_ui_dropdown_create(cmp_ui_node_t **out_node) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 11; /* Dropdown */
+  node->type = CMP_UI_NODE_TYPE_DROPDOWN;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -853,7 +896,7 @@ int cmp_ui_modal_create(cmp_ui_node_t **out_node) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 12; /* Modal */
+  node->type = CMP_UI_NODE_TYPE_MODAL;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -901,7 +944,7 @@ int cmp_ui_canvas_create(cmp_ui_node_t **out_node) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 13; /* Canvas */
+  node->type = CMP_UI_NODE_TYPE_CANVAS;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -949,7 +992,7 @@ int cmp_ui_rich_text_create(cmp_ui_node_t **out_node) {
   }
 
   memset(node, 0, sizeof(cmp_ui_node_t));
-  node->type = 14; /* Rich Text */
+  node->type = CMP_UI_NODE_TYPE_RICH_TEXT;
 
   rc = cmp_layout_node_create(&node->layout);
   if (rc != CMP_SUCCESS) {
@@ -1180,7 +1223,7 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
     (void)cmp_layout_node_destroy(node->layout);
   }
 
-  if (node->type == 2 && node->properties != NULL) {
+  if (node->type == CMP_UI_NODE_TYPE_TEXT && node->properties != NULL) {
     /* Free text string */
     {
 
@@ -1191,7 +1234,7 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
         return rc;
       }
     }
-  } else if (node->type == 7 && node->properties != NULL) {
+  } else if (node->type == CMP_UI_NODE_TYPE_IMAGE_VIEW && node->properties != NULL) {
     void **props = (void **)node->properties;
     if (props[0]) {
 

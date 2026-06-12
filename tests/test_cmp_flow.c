@@ -54,7 +54,7 @@ TEST test_float_evaluate(void) {
 
 TEST test_shape_outside_evaluate(void) {
   cmp_layout_node_t *node = NULL;
-  cmp_rect_t float_rect = {0.0f, 0.0f, 50.0f, 50.0f};
+  cmp_rect_f_t float_rect = {0.0f, 0.0f, 50.0f, 50.0f};
   ASSERT_EQ(CMP_SUCCESS, cmp_layout_node_create(&node));
 
   /* Test 1: Rectangular wrapping */

@@ -33,26 +33,25 @@ int cmp_ui_skeleton_create(cmp_ui_skeleton_t **out_skeleton, float width,
   rc = CMP_MALLOC(sizeof(cmp_ui_skeleton_t), (void **)&skeleton);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_skeleton_create: OOM\n");
-
-    return rc;
+    return CMP_ERROR_OOM;
   }
+  memset(skeleton, 0, sizeof(cmp_ui_skeleton_t));
 
   skeleton->width = width;
   skeleton->height = height;
-  skeleton->shimmer_phase = 0.0f;
+  skeleton->shimmer_phase = CMP_MATH_ZERO;
 
   rc = cmp_ui_box_create(&skeleton->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_skeleton_create: cmp_ui_box_create failed\n");
     CMP_FREE(skeleton);
-
-    return rc;
+    return CMP_ERROR_GENERAL;
   }
 
   skeleton->node_root->bg_color = base_color;
 
   *out_skeleton = skeleton;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -119,9 +118,9 @@ int cmp_ui_skeleton_update(cmp_ui_skeleton_t *skeleton, float dt_ms) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  skeleton->shimmer_phase += (dt_ms / 1000.0f);
-  if (skeleton->shimmer_phase >= 1.0f) {
-    skeleton->shimmer_phase -= 1.0f;
+  skeleton->shimmer_phase += (dt_ms / CMP_MS_PER_SEC_F);
+  if (skeleton->shimmer_phase >= CMP_MATH_ONE) {
+    skeleton->shimmer_phase -= CMP_MATH_ONE;
   }
 
   return rc;

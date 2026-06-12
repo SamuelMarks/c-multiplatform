@@ -6,7 +6,7 @@
 /* clang-format on */
 
 struct cmp_flip {
-  cmp_rect_t initial_bounds;
+  cmp_rect_f_t initial_bounds;
   int has_first;
 };
 
@@ -92,7 +92,7 @@ int cmp_flip_destroy(cmp_flip_t *flip) {
  * @param initial_bounds Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds) {
+int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_f_t *initial_bounds) {
   int rc = CMP_SUCCESS;
   int err_rc;
   const char *err_str;
@@ -128,7 +128,7 @@ int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds) {
  * @param out_scale_y Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
-int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_t *final_bounds,
+int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_f_t *final_bounds,
                              float *out_translate_x, float *out_translate_y,
                              float *out_scale_x, float *out_scale_y) {
   int rc = CMP_SUCCESS;

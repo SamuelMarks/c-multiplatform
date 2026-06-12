@@ -134,6 +134,7 @@ if(MINGW OR CYGWIN)
 endif()
 
 if(MSVC)
+    set(CMAKE_VS_GLOBALS "VcpkgEnabled=false")
     # Windows & MSVC Optimizations
     # We remove default /MD or /MT to set them manually
     set(variables
@@ -949,6 +950,10 @@ target_link_libraries(cmp_router_test PRIVATE cmp greatest)
 
 add_executable(cmp_layout_test tests/core/test_cmp_layout.c)
 target_link_libraries(cmp_layout_test PRIVATE cmp greatest)
+
+add_executable(cmp_layout_geometry_test tests/test_cmp_layout_geometry.c)
+target_link_libraries(cmp_layout_geometry_test PRIVATE cmp)
+add_test(NAME cmp_layout_geometry_test COMMAND cmp_layout_geometry_test)
 
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
     add_executable(cmp_ui_test tests/test_cmp_ui.c)

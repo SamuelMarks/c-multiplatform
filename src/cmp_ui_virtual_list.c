@@ -33,20 +33,19 @@ int cmp_ui_virtual_list_create(cmp_ui_virtual_list_t **out_list,
     LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
+  memset(list, 0, sizeof(cmp_ui_virtual_list_t));
 
   list->item_count = item_count;
   list->item_height = item_height;
 
   err = cmp_ui_box_create(&list->node_root);
   if (err != CMP_SUCCESS) {
-    if (CMP_FREE(list) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_virtual_list_create: CMP_FREE failed\n");
-    }
+    CMP_FREE(list);
     return err;
   }
 
   *out_list = list;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

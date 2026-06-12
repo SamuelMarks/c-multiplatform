@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
+/* Progress Indicator Colors */
+#ifndef CMP_UI_PROGRESS_INDICATOR_TRACK_COLOR
+#define CMP_UI_PROGRESS_INDICATOR_TRACK_COLOR 0xFFE0E0E0
+#define CMP_UI_PROGRESS_INDICATOR_FILL_COLOR  0xFF2196F3
+#endif
+
 
 struct cmp_ui_progress_indicator {
   cmp_ui_node_t *node_root;
@@ -22,7 +28,6 @@ struct cmp_ui_progress_indicator {
 int cmp_ui_progress_indicator_create(
     cmp_ui_progress_indicator_t **out_indicator,
     cmp_ui_progress_indicator_type_t type) {
-  int rc = CMP_SUCCESS;
   cmp_ui_progress_indicator_t *ind;
   int err;
 
@@ -37,45 +42,50 @@ int cmp_ui_progress_indicator_create(
   memset(ind, 0, sizeof(cmp_ui_progress_indicator_t));
 
   ind->current_type = type;
-  ind->progress = 0.0f;
+  ind->progress = CMP_MATH_ZERO;
 
   err = cmp_ui_box_create(&ind->node_root);
   if (err != CMP_SUCCESS) {
-    if (CMP_FREE(ind) != CMP_SUCCESS)
-      LOG_DEBUG("cmp_ui_progress_indicator_create: CMP_FREE ind failed\n");
+    CMP_FREE(ind);
     return err;
   }
 
   err = cmp_ui_box_create(&ind->node_fill);
   if (err != CMP_SUCCESS) {
-    (void)cmp_ui_node_destroy(ind->node_root);
-    if (CMP_FREE(ind) != CMP_SUCCESS)
-      LOG_DEBUG("cmp_ui_progress_indicator_create: CMP_FREE ind failed\n");
+    cmp_ui_node_destroy(ind->node_root);
+    CMP_FREE(ind);
     return err;
   }
 
   err = cmp_ui_node_add_child(ind->node_root, ind->node_fill);
   if (err != CMP_SUCCESS) {
-    LOG_DEBUG(
-        "cmp_ui_progress_indicator_create: cmp_ui_node_add_child failed\n");
+    LOG_DEBUG("cmp_ui_progress_indicator_create: cmp_ui_node_add_child failed\n");
+    cmp_ui_node_destroy(ind->node_fill);
+    cmp_ui_node_destroy(ind->node_root);
+    CMP_FREE(ind);
+    return err;
   }
 
   err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&ind->node_root->layout);
-  if (err == CMP_SUCCESS) {
-    memset(ind->node_root->layout, 0, sizeof(cmp_layout_node_t));
-    ind->node_root->layout->id = 1;
+  if (err != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_progress_indicator_create: OOM layout\n");
+    cmp_ui_node_destroy(ind->node_root);
+    CMP_FREE(ind);
+    return err;
   }
+  memset(ind->node_root->layout, 0, sizeof(cmp_layout_node_t));
+  ind->node_root->layout->id = 1;
 
   /* Configure root and fill style properties */
-  ind->node_root->bg_color = 0xFFE0E0E0; /* Default track color */
-  ind->node_fill->bg_color = 0xFF2196F3; /* Default fill color */
+  ind->node_root->bg_color = CMP_UI_PROGRESS_INDICATOR_TRACK_COLOR; /* Default track color */
+  ind->node_fill->bg_color = CMP_UI_PROGRESS_INDICATOR_FILL_COLOR; /* Default fill color */
 
   /* In a real scenario, this would apply CSS transformations to achieve
    * morphing. */
 
   *out_indicator = ind;
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -131,10 +141,10 @@ int cmp_ui_progress_indicator_set_progress(
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (progress < 0.0f)
-    progress = 0.0f;
-  if (progress > 1.0f)
-    progress = 1.0f;
+  if (progress < CMP_MATH_ZERO)
+    progress = CMP_MATH_ZERO;
+  if (progress > CMP_MATH_ONE)
+    progress = CMP_MATH_ONE;
 
   indicator->progress = progress;
 

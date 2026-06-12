@@ -61,7 +61,8 @@ TEST test_svg_geom_init(void) {
 }
 
 TEST test_svg_vector_effect_enums(void) {
-  cmp_prop_svg_vector_effect_t effect = CMP_SVG_VECTOR_EFFECT_NON_SCALING_STROKE;
+  cmp_prop_svg_vector_effect_t effect =
+      CMP_SVG_VECTOR_EFFECT_NON_SCALING_STROKE;
   ASSERT_EQ(CMP_SVG_VECTOR_EFFECT_NON_SCALING_STROKE, effect);
   PASS();
 }

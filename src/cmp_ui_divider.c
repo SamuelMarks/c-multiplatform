@@ -5,6 +5,9 @@
 #include <string.h>
 /* clang-format on */
 
+/* Divider Colors */
+#define CMP_UI_DIVIDER_COLOR 0xFFCCCCCCU
+
 /**
  * @brief Opaque internal structure for UI Divider widget.
  */
@@ -53,7 +56,7 @@ int cmp_ui_divider_create(cmp_ui_divider_t **out_divider) {
   }
 
   if (divider->node_root) {
-    divider->node_root->bg_color = 0xFFCCCCCC;
+    divider->node_root->bg_color = CMP_UI_DIVIDER_COLOR;
   }
 
   *out_divider = divider;

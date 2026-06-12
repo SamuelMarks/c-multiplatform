@@ -176,6 +176,7 @@ TEST test_layout_rtl_calculation(void) {
   cmp_i18n_set_bidi_direction(CMP_TEXT_DIR_RTL);
   cmp_layout_node_create(&root);
   root->direction = CMP_FLEX_ROW;
+  root->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
   root->width = 100.0f;
   root->height = 100.0f;
   root->padding[1] = 10.0f; /* Right padding */

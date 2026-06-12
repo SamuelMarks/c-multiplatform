@@ -6,6 +6,20 @@
 #include <string.h>
 /* clang-format on */
 
+/* Action Button Metrics */
+#define CMP_UI_ACTION_BUTTON_HEIGHT 40.0f
+#define CMP_UI_ACTION_BUTTON_PADDING_H 24.0f
+#define CMP_UI_ACTION_BUTTON_PADDING_V 10.0f
+#define CMP_UI_ACTION_BUTTON_PADDING_TEXT_BTN_H 12.0f
+#define CMP_UI_ACTION_BUTTON_BORDER_RADIUS 20.0f
+#define CMP_UI_ACTION_BUTTON_FONT_SIZE 14.0f
+#define CMP_UI_ACTION_BUTTON_TEXT_HEIGHT 20.0f
+#define CMP_UI_ACTION_BUTTON_MIN_WIDTH 64.0f
+#define CMP_UI_ACTION_BUTTON_HOVER_OPACITY 0.08f
+#define CMP_UI_ACTION_BUTTON_PRESS_OPACITY 0.10f
+#define CMP_UI_ACTION_BUTTON_ELEVATION CMP_MATH_ONE
+#define CMP_UI_ACTION_BUTTON_BORDER_WIDTH CMP_MATH_ONE
+
 /**
  * @brief Opaque internal structure for UI Action Button widget.
  */
@@ -95,12 +109,14 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
   }
 
   rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&btn->node_root->layout);
-  if (rc == CMP_SUCCESS) {
+  if (rc != CMP_SUCCESS) {
+    cmp_ui_action_button_destroy(btn);
+    return rc;
+  }
     memset(btn->node_root->layout, 0, sizeof(cmp_layout_node_t));
     btn->node_root->layout->id = 1;
-  }
 
-  btn->node_root->type = 3; /* Button */
+  btn->node_root->type = CMP_UI_NODE_TYPE_BUTTON;
 
   rc = cmp_ui_text_create(&btn->node_text, btn->label ? btn->label : "", -1);
   if (rc != CMP_SUCCESS) {
@@ -134,95 +150,105 @@ int cmp_ui_action_button_create(cmp_ui_action_button_t **out_btn,
   rc = cmp_ui_node_add_child(btn->node_root, btn->node_text);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_action_button_create: cmp_ui_node_add_child failed\n");
-    /* Handle but continue */
+    cmp_ui_node_destroy(btn->node_text);
+    cmp_ui_node_destroy(btn->node_root);
+    CMP_FREE(btn->label);
+    CMP_FREE(btn);
+    return rc;
   }
 
   {
     cmp_m3_sys_colors_t colors;
     cmp_color_t seed;
-    seed.r = 0x67 / 255.0f;
-    seed.g = 0x50 / 255.0f;
-    seed.b = 0xA4 / 255.0f;
-    seed.a = 1.0f;
+    seed.r = 0x67 / CMP_COLOR_MAX_F;
+    seed.g = 0x50 / CMP_COLOR_MAX_F;
+    seed.b = 0xA4 / CMP_COLOR_MAX_F;
+    seed.a = CMP_MATH_ONE;
     seed.space = CMP_COLOR_SPACE_SRGB;
 
     if (cmp_m3_sys_colors_generate(seed, 0, CMP_M3_CONTRAST_STANDARD,
                                    &colors) == CMP_SUCCESS) {
-      btn->node_root->layout->height = 40.0f;
-      btn->node_root->layout->padding[0] = 24.0f;
-      btn->node_root->layout->padding[1] = 10.0f;
-      btn->node_root->layout->padding[2] = 24.0f;
-      btn->node_root->layout->padding[3] = 10.0f;
-      btn->node_root->border_radius = 20.0f;
+      btn->node_root->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+btn->node_root->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+btn->node_root->layout->height = CMP_UI_ACTION_BUTTON_HEIGHT;
+      btn->node_root->layout->padding[0] = CMP_UI_ACTION_BUTTON_PADDING_H;
+      btn->node_root->layout->padding[1] = CMP_UI_ACTION_BUTTON_PADDING_V;
+      btn->node_root->layout->padding[2] = CMP_UI_ACTION_BUTTON_PADDING_H;
+      btn->node_root->layout->padding[3] = CMP_UI_ACTION_BUTTON_PADDING_V;
+      btn->node_root->border_radius = CMP_UI_ACTION_BUTTON_BORDER_RADIUS;
       {
         len = label ? strlen(label) : 0;
-        btn->node_root->layout->width = (float)len * (14.0f * 0.5f) + 48.0f;
+        btn->node_root->layout->width = (float)len * (CMP_UI_ACTION_BUTTON_FONT_SIZE * CMP_MATH_HALF) + (CMP_UI_ACTION_BUTTON_PADDING_H * CMP_MATH_DOUBLE);
       }
 
-      btn->node_root->hover_opacity = 0.08f;
-      btn->node_root->press_opacity = 0.10f;
+      btn->node_root->hover_opacity = CMP_UI_ACTION_BUTTON_HOVER_OPACITY;
+      btn->node_root->press_opacity = CMP_UI_ACTION_BUTTON_PRESS_OPACITY;
 
       switch (style) {
       case CMP_UI_ACTION_BUTTON_STYLE_ELEVATED:
-        btn->node_root->elevation = 1.0f;
+        btn->node_root->elevation = CMP_UI_ACTION_BUTTON_ELEVATION;
         btn->node_root->bg_color =
-            0xFF000000 |
-            ((uint32_t)(colors.surface_container_low.r * 255) << 16) |
-            ((uint32_t)(colors.surface_container_low.g * 255) << 8) |
-            (uint32_t)(colors.surface_container_low.b * 255);
+            CMP_COLOR_OPAQUE_MASK |
+            ((uint32_t)(colors.surface_container_low.r * CMP_COLOR_MAX) << 16) |
+            ((uint32_t)(colors.surface_container_low.g * CMP_COLOR_MAX) << 8) |
+            (uint32_t)(colors.surface_container_low.b * CMP_COLOR_MAX);
         btn->node_text->text_color =
-            0xFF000000 | ((uint32_t)(colors.primary.r * 255) << 16) |
-            ((uint32_t)(colors.primary.g * 255) << 8) |
-            (uint32_t)(colors.primary.b * 255);
+            CMP_COLOR_OPAQUE_MASK | ((uint32_t)(colors.primary.r * CMP_COLOR_MAX) << 16) |
+            ((uint32_t)(colors.primary.g * CMP_COLOR_MAX) << 8) |
+            (uint32_t)(colors.primary.b * CMP_COLOR_MAX);
         break;
       case CMP_UI_ACTION_BUTTON_STYLE_FILLED:
-        btn->node_root->bg_color = 0xFF000000 |
-                                   ((uint32_t)(colors.primary.r * 255) << 16) |
-                                   ((uint32_t)(colors.primary.g * 255) << 8) |
-                                   (uint32_t)(colors.primary.b * 255);
+        btn->node_root->bg_color = CMP_COLOR_OPAQUE_MASK |
+                                   ((uint32_t)(colors.primary.r * CMP_COLOR_MAX) << 16) |
+                                   ((uint32_t)(colors.primary.g * CMP_COLOR_MAX) << 8) |
+                                   (uint32_t)(colors.primary.b * CMP_COLOR_MAX);
         btn->node_text->text_color =
-            0xFF000000 | ((uint32_t)(colors.on_primary.r * 255) << 16) |
-            ((uint32_t)(colors.on_primary.g * 255) << 8) |
-            (uint32_t)(colors.on_primary.b * 255);
+            CMP_COLOR_OPAQUE_MASK | ((uint32_t)(colors.on_primary.r * CMP_COLOR_MAX) << 16) |
+            ((uint32_t)(colors.on_primary.g * CMP_COLOR_MAX) << 8) |
+            (uint32_t)(colors.on_primary.b * CMP_COLOR_MAX);
         break;
       case CMP_UI_ACTION_BUTTON_STYLE_TONAL:
         btn->node_root->bg_color =
-            0xFF000000 |
-            ((uint32_t)(colors.secondary_container.r * 255) << 16) |
-            ((uint32_t)(colors.secondary_container.g * 255) << 8) |
-            (uint32_t)(colors.secondary_container.b * 255);
+            CMP_COLOR_OPAQUE_MASK |
+            ((uint32_t)(colors.secondary_container.r * CMP_COLOR_MAX) << 16) |
+            ((uint32_t)(colors.secondary_container.g * CMP_COLOR_MAX) << 8) |
+            (uint32_t)(colors.secondary_container.b * CMP_COLOR_MAX);
         btn->node_text->text_color =
-            0xFF000000 |
-            ((uint32_t)(colors.on_secondary_container.r * 255) << 16) |
-            ((uint32_t)(colors.on_secondary_container.g * 255) << 8) |
-            (uint32_t)(colors.on_secondary_container.b * 255);
+            CMP_COLOR_OPAQUE_MASK |
+            ((uint32_t)(colors.on_secondary_container.r * CMP_COLOR_MAX) << 16) |
+            ((uint32_t)(colors.on_secondary_container.g * CMP_COLOR_MAX) << 8) |
+            (uint32_t)(colors.on_secondary_container.b * CMP_COLOR_MAX);
         break;
       case CMP_UI_ACTION_BUTTON_STYLE_OUTLINED:
-        btn->node_root->bg_color = 0x00000000;
+        btn->node_root->bg_color = CMP_COLOR_TRANSPARENT;
         btn->node_root->border_color =
-            0xFF000000 | ((uint32_t)(colors.outline.r * 255) << 16) |
-            ((uint32_t)(colors.outline.g * 255) << 8) |
-            (uint32_t)(colors.outline.b * 255);
-        btn->node_root->border_width = 1.0f;
+            CMP_COLOR_OPAQUE_MASK | ((uint32_t)(colors.outline.r * CMP_COLOR_MAX) << 16) |
+            ((uint32_t)(colors.outline.g * CMP_COLOR_MAX) << 8) |
+            (uint32_t)(colors.outline.b * CMP_COLOR_MAX);
+        btn->node_root->border_width = CMP_UI_ACTION_BUTTON_BORDER_WIDTH;
         btn->node_text->text_color =
-            0xFF000000 | ((uint32_t)(colors.primary.r * 255) << 16) |
-            ((uint32_t)(colors.primary.g * 255) << 8) |
-            (uint32_t)(colors.primary.b * 255);
+            CMP_COLOR_OPAQUE_MASK | ((uint32_t)(colors.primary.r * CMP_COLOR_MAX) << 16) |
+            ((uint32_t)(colors.primary.g * CMP_COLOR_MAX) << 8) |
+            (uint32_t)(colors.primary.b * CMP_COLOR_MAX);
         break;
       case CMP_UI_ACTION_BUTTON_STYLE_TEXT:
-        btn->node_root->bg_color = 0x00000000;
-        btn->node_root->layout->padding[0] = 12.0f;
-        btn->node_root->layout->padding[2] = 12.0f;
+        btn->node_root->bg_color = CMP_COLOR_TRANSPARENT;
+        btn->node_root->layout->padding[0] = CMP_UI_ACTION_BUTTON_PADDING_TEXT_BTN_H;
+        btn->node_root->layout->padding[2] = CMP_UI_ACTION_BUTTON_PADDING_TEXT_BTN_H;
         btn->node_text->text_color =
-            0xFF000000 | ((uint32_t)(colors.primary.r * 255) << 16) |
-            ((uint32_t)(colors.primary.g * 255) << 8) |
-            (uint32_t)(colors.primary.b * 255);
+            CMP_COLOR_OPAQUE_MASK | ((uint32_t)(colors.primary.r * CMP_COLOR_MAX) << 16) |
+            ((uint32_t)(colors.primary.g * CMP_COLOR_MAX) << 8) |
+            (uint32_t)(colors.primary.b * CMP_COLOR_MAX);
         break;
       }
-      btn->node_text->font_size = 14.0f;
-      btn->node_text->layout->height = 20.0f;
-      btn->node_text->layout->flex_grow = 1.0f;
-      btn->node_text->layout->flex_shrink = 0.0f;
+      btn->node_text->font_size = CMP_UI_ACTION_BUTTON_FONT_SIZE;
+      btn->node_text->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+btn->node_text->layout->height = CMP_UI_ACTION_BUTTON_TEXT_HEIGHT;
+      btn->node_text->layout->flex_grow = CMP_MATH_ONE;
+      btn->node_text->layout->flex_shrink = CMP_MATH_ONE;
+      btn->node_text->layout->text_overflow = CMP_TEXT_OVERFLOW_ELLIPSIS;
+      btn->node_text->layout->white_space = CMP_WHITE_SPACE_NOWRAP;
+      btn->node_root->layout->min_width = CMP_UI_ACTION_BUTTON_MIN_WIDTH;
     }
   }
 

@@ -408,7 +408,9 @@ int CMP_API cmp_f2_divider_set_orientation(
   data->orientation = orientation;
 
   if (orientation == CMP_F2_DIVIDER_HORIZONTAL) {
-    node->layout->height = 1.0f;
+    node->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->layout->height = 1.0f;
     /* Reset width if needed, usually mapped dynamically via flex */
   } else {
     node->layout->width = 1.0f;

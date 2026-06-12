@@ -80,6 +80,8 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
     rc = cmp_string_destroy(&translated);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_chip_create: cmp_string_destroy failed\n");
+      cmp_ui_chip_destroy(chip);
+      return rc;
     }
   }
 
@@ -97,11 +99,13 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   }
 
   rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&chip->node_root->layout);
-  if (rc == CMP_SUCCESS) {
+  if (rc != CMP_SUCCESS) {
+    cmp_ui_chip_destroy(chip);
+    return rc;
+  }
     memset(chip->node_root->layout, 0, sizeof(cmp_layout_node_t));
     chip->node_root->layout->id = 1;
     chip->node_root->layout->direction = CMP_FLEX_ROW;
-  }
 
   chip->node_root->bg_color = bg_color;
 
@@ -127,10 +131,12 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
   rc = cmp_ui_node_add_child(chip->node_root, chip->node_text);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_chip_create: cmp_ui_node_add_child failed\n");
+    cmp_ui_chip_destroy(chip);
+    return rc;
   }
 
   *out_chip = chip;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -268,6 +274,7 @@ int cmp_ui_chip_set_text(cmp_ui_chip_t *chip, const char *text) {
     rc = cmp_string_destroy(&translated);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_chip_set_text: cmp_string_destroy failed\n");
+      return rc;
     }
   }
 

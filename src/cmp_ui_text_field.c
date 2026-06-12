@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
+/* Text Field Colors */
+#ifndef CMP_UI_TEXT_FIELD_BG_COLOR
+#define CMP_UI_TEXT_FIELD_BG_COLOR 0xFFF5F5F5
+#endif
+
 
 struct cmp_ui_text_field {
   cmp_ui_node_t *node_root;
@@ -21,7 +26,6 @@ struct cmp_ui_text_field {
  */
 int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
                              const char *label) {
-  int rc = CMP_SUCCESS;
   cmp_ui_text_field_t *field;
   int err;
   size_t len;
@@ -41,33 +45,57 @@ int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
     err = CMP_MALLOC(len + 1, (void **)&field->label);
     if (err == CMP_SUCCESS) {
       memcpy(field->label, label, len + 1);
+    } else {
+      CMP_FREE(field);
+      return err;
     }
   }
 
   err = cmp_ui_box_create(&field->node_root);
   if (err != CMP_SUCCESS) {
-    CMP_FREE(field->label);
+    if (field->label) CMP_FREE(field->label);
     CMP_FREE(field);
     return err;
   }
 
   field->node_root->layout->direction = CMP_FLEX_COLUMN;
-  field->node_root->bg_color = 0xFFF5F5F5;
+  field->node_root->bg_color = CMP_UI_TEXT_FIELD_BG_COLOR;
 
-  err = cmp_ui_text_create(&field->node_label, field->label ? field->label : "",
-                           -1);
-  if (err == CMP_SUCCESS) {
-    (void)cmp_ui_node_add_child(field->node_root, field->node_label);
+  err = cmp_ui_text_create(&field->node_label, field->label ? field->label : "", -1);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(field->node_root);
+    if (field->label) CMP_FREE(field->label);
+    CMP_FREE(field);
+    return err;
+  }
+  err = cmp_ui_node_add_child(field->node_root, field->node_label);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(field->node_label);
+    cmp_ui_node_destroy(field->node_root);
+    if (field->label) CMP_FREE(field->label);
+    CMP_FREE(field);
+    return err;
   }
 
   err = cmp_ui_text_input_create(&field->node_input);
-  if (err == CMP_SUCCESS) {
-    (void)cmp_ui_node_add_child(field->node_root, field->node_input);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(field->node_root);
+    if (field->label) CMP_FREE(field->label);
+    CMP_FREE(field);
+    return err;
+  }
+  err = cmp_ui_node_add_child(field->node_root, field->node_input);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(field->node_input);
+    cmp_ui_node_destroy(field->node_root);
+    if (field->label) CMP_FREE(field->label);
+    CMP_FREE(field);
+    return err;
   }
 
   *out_field = field;
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -158,7 +186,7 @@ int cmp_ui_text_field_bind_a11y(cmp_ui_text_field_t *widget,
     return CMP_ERROR_INVALID_ARG;
   }
   rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "textbox",
-                         "Text Field");
+                              "Text Field");
   if (rc != 0) {
     return rc;
   }

@@ -43,10 +43,7 @@ int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
 
   err = cmp_ui_box_create(&terminal->node_root);
   if (err != 0) {
-    rc = CMP_FREE(terminal);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
+    CMP_FREE(terminal);
     return err;
   }
 
@@ -54,17 +51,23 @@ int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
   (void)fg_color; /* To be used when setting up text nodes */
 
 #if defined(_WIN32)
-  rc = cmp_pty_create(&terminal->pty, "cmd.exe", 80, 24);
-  if (rc != 0) {
+  rc = cmp_pty_create(&terminal->pty, "cmd.exe", CMP_TERMINAL_DEFAULT_COLS, CMP_TERMINAL_DEFAULT_ROWS);   
+  if (rc != CMP_SUCCESS) {
 #else
-  rc = cmp_pty_create(&terminal->pty, "bash", 80, 24);
-  if (rc != 0) {
+  rc = cmp_pty_create(&terminal->pty, "bash", CMP_TERMINAL_DEFAULT_COLS, CMP_TERMINAL_DEFAULT_ROWS);      
+  if (rc != CMP_SUCCESS) {
 #endif
     terminal->pty = NULL;
+    /* Optional: If pty creation is strictly required, we should destroy and return rc here. 
+       But assuming it can fall back to a disconnected terminal: */
+    /* Let's be consistent and return the error while freeing. */
+    cmp_ui_node_destroy(terminal->node_root);
+    CMP_FREE(terminal);
+    return rc;
   }
 
   *out_terminal = terminal;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

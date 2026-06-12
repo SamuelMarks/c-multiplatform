@@ -32,22 +32,20 @@ int cmp_ui_tree_view_create(cmp_ui_tree_view_t **out_tree_view,
     LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
+  memset(tree_view, 0, sizeof(cmp_ui_tree_view_t));
 
   tree_view->item_count = 0;
 
   err = cmp_ui_box_create(&tree_view->node_root);
-  if (err != 0) {
-    rc = CMP_FREE(tree_view);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
+  if (err != CMP_SUCCESS) {
+    CMP_FREE(tree_view);
     return err;
   }
 
   tree_view->node_root->bg_color = bg_color;
 
   *out_tree_view = tree_view;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

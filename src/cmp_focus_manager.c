@@ -9,7 +9,7 @@
 typedef struct cmp_focus_node {
   int node_id;
   int has_focus;
-  cmp_rect_t rect; /* Used for spatial navigation */
+  cmp_rect_f_t rect; /* Used for spatial navigation */
 } cmp_focus_node_t;
 
 struct cmp_focus_manager {

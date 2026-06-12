@@ -59,9 +59,9 @@ int cmp_vt_shared_destroy(cmp_vt_shared_t *shared) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_vt_shared_calculate_morph(cmp_vt_shared_t *shared,
-                                  const cmp_rect_t *old_rect,
-                                  const cmp_rect_t *new_rect, float progress,
-                                  cmp_rect_t *out_rect) {
+                                  const cmp_rect_f_t *old_rect,
+                                  const cmp_rect_f_t *new_rect, float progress,
+                                  cmp_rect_f_t *out_rect) {
   int rc = CMP_SUCCESS;
   struct cmp_vt_shared *internal_shared = (struct cmp_vt_shared *)shared;
 

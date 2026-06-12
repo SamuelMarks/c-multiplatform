@@ -31,27 +31,24 @@ int cmp_ui_splitter_create(cmp_ui_splitter_t **out_splitter, int is_vertical,
   rc = CMP_MALLOC(sizeof(cmp_ui_splitter_t), (void **)&splitter);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_splitter_create: OOM\n");
-
-    return rc;
+    return CMP_ERROR_OOM;
   }
+  memset(splitter, 0, sizeof(cmp_ui_splitter_t));
 
   splitter->is_vertical = is_vertical;
-  splitter->position = 0.5f;
+  splitter->position = CMP_MATH_HALF;
 
   rc = cmp_ui_box_create(&splitter->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_splitter_create: cmp_ui_box_create failed\n");
-    if (CMP_FREE(splitter) != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_splitter_create: CMP_FREE failed\n");
-    }
-
-    return rc;
+    CMP_FREE(splitter);
+    return CMP_ERROR_GENERAL;
   }
 
   splitter->node_root->bg_color = color;
 
   *out_splitter = splitter;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -117,10 +114,10 @@ int cmp_ui_splitter_set_position(cmp_ui_splitter_t *splitter, float position) {
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (position < 0.0f) {
-    position = 0.0f;
-  } else if (position > 1.0f) {
-    position = 1.0f;
+  if (position < CMP_MATH_ZERO) {
+    position = CMP_MATH_ZERO;
+  } else if (position > CMP_MATH_ONE) {
+    position = CMP_MATH_ONE;
   }
 
   splitter->position = position;

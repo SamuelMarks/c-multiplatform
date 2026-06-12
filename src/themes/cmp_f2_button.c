@@ -301,11 +301,12 @@ int CMP_API cmp_f2_button_set_variant(cmp_ui_node_t *node,
 
   {
     cmp_f2_theme_t theme;
-    rc = cmp_f2_theme_generate(0x0078D4, 0, &theme);
+    rc = cmp_f2_theme_generate(CMP_F2_COLOR_BLUE, 0, &theme);
     if (rc == CMP_SUCCESS) {
       if (node->child_count > 0 && node->children[0]) {
         node->children[0]->font_size = theme.font_size_body_1;
-        node->children[0]->layout->height = 20.0f;
+        node->children[0]->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->children[0]->layout->height = 20.0f;
         node->children[0]->layout->flex_shrink = 0.0f;
         node->children[0]->layout->flex_grow = 1.0f;
       }
@@ -404,19 +405,25 @@ int CMP_API cmp_f2_button_set_size(cmp_ui_node_t *node,
   btn_data->size = size;
 
   if (size == CMP_F2_BUTTON_SIZE_SMALL) {
-    node->layout->height = 24.0f;
+    node->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->layout->height = 24.0f;
     node->layout->padding[0] = 8.0f;
     node->layout->padding[1] = 2.0f;
     node->layout->padding[2] = 8.0f;
     node->layout->padding[3] = 2.0f;
   } else if (size == CMP_F2_BUTTON_SIZE_LARGE) {
-    node->layout->height = 40.0f;
+    node->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->layout->height = 40.0f;
     node->layout->padding[0] = 20.0f;
     node->layout->padding[1] = 10.0f;
     node->layout->padding[2] = 20.0f;
     node->layout->padding[3] = 10.0f;
   } else {
-    node->layout->height = 32.0f;
+    node->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+node->layout->height = 32.0f;
     node->layout->padding[0] = 16.0f;
     node->layout->padding[1] = 6.0f;
     node->layout->padding[2] = 16.0f;

@@ -1,6 +1,46 @@
 #ifndef CMP_H
 #define CMP_H
 
+/**
+ * @brief Common list and memory metrics
+ */
+#define CMP_DEFAULT_CAPACITY 4
+#define CMP_LARGE_CAPACITY 8
+#define CMP_CAPACITY_MULTIPLIER 2
+
+/**
+ * @brief Terminal Default Metrics
+ */
+#define CMP_TERMINAL_DEFAULT_COLS 80
+#define CMP_TERMINAL_DEFAULT_ROWS 24
+
+/**
+ * @brief Color conversion constants
+ */
+#define CMP_COLOR_MAX 255
+#define CMP_COLOR_MAX_F 255.0f
+
+/**
+ * @brief Layout specific math constants
+ */
+#define CMP_MATH_DOUBLE 2.0f
+#define CMP_MATH_ZERO 0.0f
+#define CMP_MATH_ONE  1.0f
+#define CMP_MATH_HALF 0.5f
+#define CMP_MATH_CIRCLE_DEG 360.0f
+#define CMP_MS_PER_SEC_F 1000.0f
+
+
+
+/**
+ * @brief Common Color Masks and Constants
+ */
+#define CMP_COLOR_TRANSPARENT 0x00000000U
+#define CMP_COLOR_OPAQUE_MASK 0xFF000000U
+#define CMP_COLOR_WHITE       0xFFFFFFFFU
+#define CMP_COLOR_BLACK       0xFF000000U
+
+
 /* Restoring wiped missing types from previous agents */
 typedef struct cmp_icc_profile cmp_icc_profile_t;
 typedef struct cmp_hw_video_decoder cmp_hw_video_decoder_t;
@@ -2188,6 +2228,21 @@ typedef struct cmp_scroll_padding {
 #ifndef CMP_RECT_T_DEFINED
 #define CMP_RECT_T_DEFINED
 typedef struct cmp_rect cmp_rect_t;
+typedef struct cmp_rect_f cmp_rect_f_t;
+struct cmp_rect {
+  int32_t x;
+  int32_t y;
+  int32_t width;
+  int32_t height;
+};
+
+struct cmp_rect_f {
+  float x;
+  float y;
+  float width;
+  float height;
+};
+
 #endif
 
 /**
@@ -2199,7 +2254,7 @@ typedef struct cmp_rect cmp_rect_t;
  * @param out_target_scroll_y Receives the final calculated Y scroll offset
  * @return 0 on success, or an error code.
  */
-int cmp_scroll_padding_apply(const cmp_rect_t *element_bounds,
+int cmp_scroll_padding_apply(const cmp_rect_f_t *element_bounds,
                              const cmp_scroll_padding_t *padding,
                              const cmp_scroll_padding_t *margin,
                              float *out_target_scroll_y);
@@ -2751,9 +2806,9 @@ int cmp_vt_shared_destroy(cmp_vt_shared_t *shared);
  * @brief Calculate transform matrix to morph from old rect to new rect
  */
 int cmp_vt_shared_calculate_morph(cmp_vt_shared_t *shared,
-                                  const cmp_rect_t *old_rect,
-                                  const cmp_rect_t *new_rect, float progress,
-                                  cmp_rect_t *out_rect);
+                                  const cmp_rect_f_t *old_rect,
+                                  const cmp_rect_f_t *new_rect, float progress,
+                                  cmp_rect_f_t *out_rect);
 
 /**
  * @brief Opaque Discrete Property Transition Context
@@ -2794,13 +2849,13 @@ int cmp_flip_destroy(cmp_flip_t *flip);
 /**
  * @brief Perform the 'First' step of FLIP (record initial bounds)
  */
-int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_t *initial_bounds);
+int cmp_flip_first(cmp_flip_t *flip, const cmp_rect_f_t *initial_bounds);
 
 /**
  * @brief Perform the 'Last' and 'Invert' steps of FLIP (record final bounds,
  * calculate inverse transform)
  */
-int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_t *final_bounds,
+int cmp_flip_last_and_invert(cmp_flip_t *flip, const cmp_rect_f_t *final_bounds,
                              float *out_translate_x, float *out_translate_y,
                              float *out_scale_x, float *out_scale_y);
 
@@ -3482,12 +3537,6 @@ int cmp_os_register_uri_scheme(const char *scheme);
 /**
  * @brief Core layout dimensions and bounds
  */
-struct cmp_rect {
-  float x;
-  float y;
-  float width;
-  float height;
-};
 
 /**
  * @brief Flexbox Alignment Options
@@ -3506,7 +3555,11 @@ typedef enum cmp_flex_align {
 /**
  * @brief Flexbox Direction (Mapped to CSS Engine)
  */
-typedef cmp_flex_direction_t cmp_layout_flex_direction_t; /* To avoid name conflict, just use the new one directly but cmp_flex_direction_t is same. Wait, cmp_css_flexbox.h has cmp_flex_direction_t */
+typedef cmp_flex_direction_t
+    cmp_layout_flex_direction_t; /* To avoid name conflict, just use the new one
+                                    directly but cmp_flex_direction_t is same.
+                                    Wait, cmp_css_flexbox.h has
+                                    cmp_flex_direction_t */
 #define CMP_FLEX_ROW CMP_FLEX_DIRECTION_ROW
 #define CMP_FLEX_COLUMN CMP_FLEX_DIRECTION_COLUMN
 #define CMP_FLEX_ROW_REVERSE CMP_FLEX_DIRECTION_ROW_REVERSE
@@ -3518,7 +3571,8 @@ typedef cmp_flex_direction_t cmp_layout_flex_direction_t; /* To avoid name confl
 /* cmp_flex_wrap_t is defined in cmp_css_flexbox.h */
 #define CMP_FLEX_NOWRAP CMP_FLEX_WRAP_NOWRAP
 #define CMP_FLEX_WRAP_REVERSE CMP_FLEX_WRAP_WRAP_REVERSE
-/* CMP_FLEX_WRAP is tricky since the enum has CMP_FLEX_WRAP_WRAP, we'll map it. */
+/* CMP_FLEX_WRAP is tricky since the enum has CMP_FLEX_WRAP_WRAP, we'll map it.
+ */
 #define CMP_FLEX_WRAP CMP_FLEX_WRAP_WRAP
 
 /**
@@ -3629,6 +3683,11 @@ typedef struct cmp_layout_calc_expr {
   cmp_unit_t unit2;
 } cmp_layout_calc_expr_t;
 
+typedef enum cmp_text_overflow {
+  CMP_TEXT_OVERFLOW_CLIP = 0,
+  CMP_TEXT_OVERFLOW_ELLIPSIS = 1
+} cmp_text_overflow_t;
+
 /**
  * @brief Node definition for the generic UI Tree layout engine
  */
@@ -3652,6 +3711,10 @@ typedef struct cmp_layout_node {
   cmp_layout_measure_cb_t measure_cb;
   /* Context for the measurement callback */
   void *measure_ctx;
+
+  /* Text layout options */
+  cmp_text_overflow_t text_overflow;
+  cmp_white_space_t white_space;
 
   /* Style constraints */
   float width;
@@ -3698,14 +3761,15 @@ typedef struct cmp_layout_node {
   float column_width;
 
   /* Scroll View Constraints */
-  int overflow_x; /* 0=Visible, 1=Scroll, 2=Hidden */
-  int overflow_y; /* 0=Visible, 1=Scroll, 2=Hidden */
+  cmp_overflow_value_t overflow_x;
+  cmp_overflow_value_t overflow_y;
   float scroll_offset_x;
   float scroll_offset_y;
-  cmp_rect_t scroll_content_size;
+  cmp_rect_f_t scroll_content_size;
 
   /* Computed layout */
-  cmp_rect_t computed_rect;
+  cmp_rect_f_t computed_rect;
+  float baseline_y;
   /** @brief Persistent flex lines for layout rendering */
   cmp_layout_lines_t *flex_lines;
 
@@ -3864,7 +3928,7 @@ int cmp_float_evaluate(cmp_layout_node_t *node, int is_float, int clear,
  * @param margin The margin to apply around the shape.
  * @return 0 on success, or an error code.
  */
-int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_t float_rect,
+int cmp_shape_outside_evaluate(cmp_layout_node_t *node, cmp_rect_f_t float_rect,
                                float shape_radius, float margin);
 
 int cmp_table_evaluate(cmp_layout_node_t *node, int is_fixed);
@@ -3876,14 +3940,33 @@ int cmp_table_evaluate(cmp_layout_node_t *node, int is_fixed);
  */
 int cmp_table_border_collapse(cmp_layout_node_t *table);
 
+typedef enum cmp_ui_node_type {
+  CMP_UI_NODE_TYPE_NONE = 0,
+  CMP_UI_NODE_TYPE_BOX = 1,
+  CMP_UI_NODE_TYPE_TEXT = 2,
+  CMP_UI_NODE_TYPE_BUTTON = 3,
+  CMP_UI_NODE_TYPE_TEXT_INPUT = 4,
+  CMP_UI_NODE_TYPE_CHECKBOX = 5,
+  CMP_UI_NODE_TYPE_RADIO = 6,
+  CMP_UI_NODE_TYPE_IMAGE_VIEW = 7,
+  CMP_UI_NODE_TYPE_SLIDER = 8,
+  CMP_UI_NODE_TYPE_LIST_VIEW = 9,
+  CMP_UI_NODE_TYPE_GRID_VIEW = 10,
+  CMP_UI_NODE_TYPE_DROPDOWN = 11,
+  CMP_UI_NODE_TYPE_MODAL = 12,
+  CMP_UI_NODE_TYPE_CANVAS = 13,
+  CMP_UI_NODE_TYPE_RICH_TEXT = 14,
+  CMP_UI_NODE_TYPE_TOGGLE = 15,
+  CMP_UI_NODE_TYPE_PROGRESS = 16
+} cmp_ui_node_type_t;
+
 /**
  * @brief Abstract representation of a UI component node mapped to the layout
  * engine
  */
 struct cmp_ui_node {
   cmp_layout_node_t *layout;
-  int type; /* 1=Box, 2=Text, 3=Button, 4=TextInput, 5=Checkbox, 6=ImageView,
-               7=Slider */
+  cmp_ui_node_type_t type;
 
   /* Specific properties depending on type */
   void *properties;
@@ -4927,7 +5010,7 @@ int cmp_layer_tiling_calculate(cmp_layer_tiling_t *tiling, uint32_t width,
  * @return 0 on success, or an error code.
  */
 int cmp_layer_tiling_get_bounds(cmp_layer_tiling_t *tiling, uint32_t tile_index,
-                                cmp_rect_t *out_rect);
+                                cmp_rect_f_t *out_rect);
 
 /**
  * @brief Opaque Hit-Testing Context
@@ -5003,7 +5086,7 @@ int cmp_renderer_end_frame(cmp_renderer_t *renderer);
  * @return 0 on success, or an error code.
  */
 int cmp_renderer_draw_sprite(cmp_renderer_t *renderer, cmp_texture_t *texture,
-                             cmp_rect_t dest, cmp_rect_t *src,
+                             cmp_rect_f_t dest, cmp_rect_f_t *src,
                              cmp_color_t color);
 
 /**
@@ -5393,7 +5476,7 @@ struct cmp_layer {
   uint32_t text_color;
   float font_size;
   int scissor_enable;
-  cmp_rect_t scissor_rect;
+  cmp_rect_f_t scissor_rect;
 };
 typedef struct cmp_layer cmp_layer_t;
 
@@ -5404,7 +5487,7 @@ typedef struct cmp_layer cmp_layer_t;
  * @return 0 on success, or an error code.
  */
 int cmp_pos_absolute_relative(cmp_layout_node_t *node,
-                              const cmp_rect_t *parent_rect);
+                              const cmp_rect_f_t *parent_rect);
 
 /**
  * @brief Evaluate fixed positioning for a node.
@@ -5412,7 +5495,7 @@ int cmp_pos_absolute_relative(cmp_layout_node_t *node,
  * @param viewport_rect The bounding box of the viewport.
  * @return 0 on success, or an error code.
  */
-int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_t *viewport_rect);
+int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_f_t *viewport_rect);
 
 /**
  * @brief Evaluate sticky positioning for a node.
@@ -5422,7 +5505,7 @@ int cmp_pos_fixed(cmp_layout_node_t *node, const cmp_rect_t *viewport_rect);
  * @return 0 on success, or an error code.
  */
 int cmp_pos_sticky(cmp_layout_node_t *node, float scroll_offset,
-                   const cmp_rect_t *container_rect);
+                   const cmp_rect_f_t *container_rect);
 
 /**
  * @brief Position a floating node relative to an anchor element.
@@ -5431,7 +5514,7 @@ int cmp_pos_sticky(cmp_layout_node_t *node, float scroll_offset,
  * @return 0 on success, or an error code.
  */
 int cmp_anchor_position(cmp_layout_node_t *floating_node,
-                        const cmp_rect_t *anchor_rect);
+                        const cmp_rect_f_t *anchor_rect);
 
 /**
  * @brief Handle fallback positioning for anchored elements.
@@ -5441,8 +5524,8 @@ int cmp_anchor_position(cmp_layout_node_t *floating_node,
  * @return 0 on success, or an error code.
  */
 int cmp_anchor_fallback(cmp_layout_node_t *floating_node,
-                        const cmp_rect_t *anchor_rect,
-                        const cmp_rect_t *viewport_rect);
+                        const cmp_rect_f_t *anchor_rect,
+                        const cmp_rect_f_t *viewport_rect);
 
 /**
  * @brief Calculate the size of a floating node based on its anchor.
@@ -5451,7 +5534,7 @@ int cmp_anchor_fallback(cmp_layout_node_t *floating_node,
  * @return 0 on success, or an error code.
  */
 int cmp_anchor_size(cmp_layout_node_t *floating_node,
-                    const cmp_rect_t *anchor_rect);
+                    const cmp_rect_f_t *anchor_rect);
 
 /**
  * @brief Create a new stacking context.
@@ -6063,8 +6146,8 @@ int CMP_API cmp_style_query_evaluate(const cmp_style_query_t *query,
  * @return 0 on success, or an error code.
  */
 int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
-                                    const cmp_rect_t *viewport,
-                                    const cmp_rect_t *node_rect,
+                                    const cmp_rect_f_t *viewport,
+                                    const cmp_rect_f_t *node_rect,
                                     int *out_is_visible);
 
 struct cmp_resize_observer {
@@ -6322,8 +6405,8 @@ struct cmp_ubo {
  * @param out_is_visible Pointer to receive 1 if visible, 0 if completely culled
  * @return 0 on success, or an error code.
  */
-int cmp_frustum_culling_test(const cmp_rect_t *node_rect,
-                             const cmp_rect_t *viewport_rect,
+int cmp_frustum_culling_test(const cmp_rect_f_t *node_rect,
+                             const cmp_rect_f_t *viewport_rect,
                              int *out_is_visible);
 
 typedef struct cmp_draw_call {
@@ -6334,7 +6417,7 @@ typedef struct cmp_draw_call {
   size_t vertex_count;
   /* Scissor / Clipping */
   int scissor_enable;
-  cmp_rect_t scissor_rect;
+  cmp_rect_f_t scissor_rect;
 } cmp_draw_call_t;
 
 typedef struct cmp_draw_call_optimizer {
@@ -8058,7 +8141,7 @@ int cmp_privacy_indicators_destroy(cmp_privacy_indicators_t *indicators);
  * (returns error if it does)
  */
 int cmp_privacy_indicators_verify_layout(cmp_privacy_indicators_t *indicators,
-                                         const cmp_rect_t *ui_bounds,
+                                         const cmp_rect_f_t *ui_bounds,
                                          int *out_is_obscured);
 
 /* Phase 23 (Continued): Authentication & Security Types */
@@ -8565,7 +8648,7 @@ int cmp_system_geometry_destroy(cmp_system_geometry_t *geom);
  * indicators)
  */
 int cmp_system_geometry_get_safe_area(cmp_system_geometry_t *geom, int is_tvos,
-                                      cmp_rect_t *out_safe_insets);
+                                      cmp_rect_f_t *out_safe_insets);
 
 /**
  * @brief Retrieve standard OS-level leading/trailing layout margins (16pt
@@ -12966,3 +13049,69 @@ int CMP_API cmp_strtok_r(char *str, const char *delim, char **saveptr,
 #define pipe(x) (-1)
 #endif
 #endif /* CMP_H */
+
+/**
+ * @brief Fetch outer layout bounds (margin box).
+ */
+int cmp_layout_node_get_margin_box(cmp_layout_node_t *node,
+                                   cmp_rect_f_t *out_rect);
+
+/**
+ * @brief Fetch standard layout bounds (border box).
+ */
+int cmp_layout_node_get_border_box(cmp_layout_node_t *node,
+                                   cmp_rect_f_t *out_rect);
+
+/**
+ * @brief Fetch inner padding bounds.
+ */
+int cmp_layout_node_get_padding_box(cmp_layout_node_t *node,
+                                    cmp_rect_f_t *out_rect);
+
+/**
+ * @brief Fetch innermost content bounds.
+ */
+int cmp_layout_node_get_content_box(cmp_layout_node_t *node,
+                                    cmp_rect_f_t *out_rect);
+
+/**
+ * @brief Fetch the total scrollable overflow dimensions.
+ */
+int cmp_layout_node_get_scroll_bounds(cmp_layout_node_t *node,
+                                      cmp_rect_f_t *out_rect);
+
+/**
+ * @brief Expose the primary text baseline for typography alignment.
+ */
+int cmp_layout_node_get_baseline_y(cmp_layout_node_t *node, float *out_y);
+
+/**
+ * @brief Expose 2D/3D transformed geometry states.
+ */
+int cmp_layout_node_get_transform_matrix(cmp_layout_node_t *node,
+                                         float out_matrix[16]);
+
+/**
+ * @brief Expose stacking context IDs for depth sorting validation.
+ */
+int cmp_layout_node_get_z_index(cmp_layout_node_t *node, int32_t *out_z);
+
+/**
+ * @brief Set global mock environment DPI scale.
+ */
+int cmp_env_set_dpi_scale(float scale);
+
+/**
+ * @brief Set global mock environment safe areas.
+ */
+int cmp_env_set_safe_areas(float top, float right, float bottom, float left);
+
+/**
+ * @brief Hook for layout pass start
+ */
+int cmp_on_layout_pass_start(void);
+
+/**
+ * @brief Hook for layout pass complete
+ */
+int cmp_on_layout_pass_complete(void);

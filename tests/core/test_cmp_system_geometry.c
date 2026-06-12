@@ -5,7 +5,7 @@
 
 TEST test_system_geometry(void) {
   cmp_system_geometry_t *ctx = NULL;
-  cmp_rect_t safe_area;
+  cmp_rect_f_t safe_area;
   float leading, trailing, max_w;
 
   ASSERT_EQ(CMP_SUCCESS, cmp_system_geometry_create(&ctx));
@@ -56,7 +56,7 @@ TEST test_layout_flags(void) {
 
 TEST test_null_args(void) {
   cmp_system_geometry_t *ctx = NULL;
-  cmp_rect_t r;
+  cmp_rect_f_t r;
   float f;
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG, cmp_system_geometry_create(NULL));

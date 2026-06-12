@@ -47,7 +47,8 @@ TEST test_container_group(void) {
   cmp_prop_container_group_t group;
   int rc;
 
-  rc = cmp_prop_container_group_init(&group, CMP_CONTAINER_TYPE_SIZE, "my-container");
+  rc = cmp_prop_container_group_init(&group, CMP_CONTAINER_TYPE_SIZE,
+                                     "my-container");
   ASSERT_EQ(0, rc);
   ASSERT_EQ(CMP_CONTAINER_TYPE_SIZE, group.type);
   ASSERT_STR_EQ("my-container", group.name);

@@ -3,6 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
+/* Tabs Capacities */
+#ifndef CMP_UI_TABS_INITIAL_CAPACITY
+#define CMP_UI_TABS_INITIAL_CAPACITY 4
+#endif
+/* Tabs Colors */
+#ifndef CMP_UI_TABS_BG_COLOR
+#define CMP_UI_TABS_BG_COLOR 0xFFFFFFFF
+#endif
+
 
 typedef struct cmp_ui_tab_item {
   cmp_ui_node_t *node;
@@ -24,7 +33,6 @@ struct cmp_ui_tabs {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
-  int rc = CMP_SUCCESS;
   cmp_ui_tabs_t *tabs;
   int err;
 
@@ -38,7 +46,7 @@ int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
   }
   memset(tabs, 0, sizeof(cmp_ui_tabs_t));
 
-  tabs->tab_capacity = 4;
+  tabs->tab_capacity = CMP_UI_TABS_INITIAL_CAPACITY;
   err = CMP_MALLOC(sizeof(cmp_ui_tab_item_t) * tabs->tab_capacity,
                    (void **)&tabs->tabs);
   if (err != CMP_SUCCESS) {
@@ -53,13 +61,23 @@ int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
     return err;
   }
 
+  err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&tabs->node_root->layout);
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(tabs->node_root);
+    CMP_FREE(tabs->tabs);
+    CMP_FREE(tabs);
+    return err;
+  }
+  memset(tabs->node_root->layout, 0, sizeof(cmp_layout_node_t));
+  tabs->node_root->layout->id = 1;
   tabs->node_root->layout->direction = CMP_FLEX_ROW;
-  tabs->node_root->bg_color = 0xFFFFFFFF;
+
+  tabs->node_root->bg_color = CMP_UI_TABS_BG_COLOR;
   tabs->selected_index = -1;
 
   *out_tabs = tabs;
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -117,7 +135,7 @@ int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
   }
 
   if (tabs->tab_count >= tabs->tab_capacity) {
-    int new_cap = tabs->tab_capacity * 2;
+    int new_cap = tabs->tab_capacity * CMP_CAPACITY_MULTIPLIER;
     cmp_ui_tab_item_t *new_tabs;
     err = CMP_MALLOC(sizeof(cmp_ui_tab_item_t) * new_cap, (void **)&new_tabs);
     if (err != CMP_SUCCESS) {
@@ -134,7 +152,7 @@ int cmp_ui_tabs_add_tab(cmp_ui_tabs_t *tabs, const char *title,
     return err;
   }
 
-  tab_node->type = 3; /* Button structure for click events */
+  tab_node->type = CMP_UI_NODE_TYPE_BUTTON;
   (void)cmp_ui_node_add_child(tabs->node_root, tab_node);
   tabs->tabs[tabs->tab_count].node = tab_node;
   tabs->tabs[tabs->tab_count].is_selected = 0;
@@ -184,7 +202,7 @@ int cmp_ui_tabs_bind_a11y(cmp_ui_tabs_t *widget, cmp_a11y_tree_t *tree) {
     return CMP_ERROR_INVALID_ARG;
   }
   rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "tablist",
-                         "Tabs");
+                              "Tabs");
   if (rc != 0) {
     return rc;
   }

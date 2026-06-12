@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "cmp.h"
+#include "themes/cmp_cupertino.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -415,7 +416,7 @@ int cmp_semantic_colors_create(cmp_semantic_colors_t **out_ctx) {
   if (CMP_MALLOC(sizeof(struct cmp_semantic_colors), (void **)&ctx) !=
       CMP_SUCCESS)
     return CMP_ERROR_OOM;
-  ctx->tint_color = 0x007AFFFF; /* Default Apple systemBlue */
+  ctx->tint_color = CMP_APPLE_COLOR_BLUE_LIGHT; /* Default Apple systemBlue */
   *out_ctx = (cmp_semantic_colors_t *)ctx;
 
   return rc;
@@ -490,14 +491,14 @@ int cmp_semantic_colors_resolve(cmp_semantic_colors_t *ctx,
 
   /* Simulated lookup tables for iOS 13+ semantic colors */
   if (strcmp(semantic_name, "systemBlue") == 0) {
-    *out_rgba = is_dark_mode ? 0x0A84FFFF : 0x007AFFFF;
+    *out_rgba = is_dark_mode ? CMP_APPLE_COLOR_BLUE_DARK : CMP_APPLE_COLOR_BLUE_LIGHT;
   } else if (strcmp(semantic_name, "label") == 0) {
-    *out_rgba = is_dark_mode ? 0xFFFFFFFF : 0x000000FF;
+    *out_rgba = is_dark_mode ? CMP_APPLE_COLOR_WHITE : CMP_APPLE_COLOR_BLACK;
   } else if (strcmp(semantic_name, "secondarySystemBackground") == 0) {
-    *out_rgba = is_dark_mode ? 0x1C1C1EFF : 0xF2F2F7FF;
+    *out_rgba = is_dark_mode ? CMP_APPLE_COLOR_SYS_GRAY_6_DARK : CMP_APPLE_COLOR_SYS_GRAY_6_LIGHT;
   } else if (strcmp(semantic_name, "systemBackground") == 0) {
     *out_rgba =
-        is_dark_mode ? 0x000000FF : 0xFFFFFFFF; /* True Black for OLED */
+        is_dark_mode ? CMP_APPLE_COLOR_BLACK : CMP_APPLE_COLOR_WHITE; /* True Black for OLED */
   } else {
     return CMP_ERROR_NOT_FOUND;
   }
@@ -525,7 +526,7 @@ int cmp_semantic_colors_resolve_elevation(cmp_semantic_colors_t *ctx,
   if (!is_dark_mode) {
     /* Light mode always uses the standard background, shadow casting handles
      * depth */
-    *out_rgba = 0xFFFFFFFF;
+    *out_rgba = CMP_APPLE_COLOR_WHITE;
     return rc;
   }
 
@@ -533,16 +534,16 @@ int cmp_semantic_colors_resolve_elevation(cmp_semantic_colors_t *ctx,
    */
   switch (elevation_level) {
   case 0:
-    *out_rgba = 0x000000FF;
+    *out_rgba = CMP_APPLE_COLOR_BLACK;
     break; /* Base */
   case 1:
-    *out_rgba = 0x1C1C1EFF;
+    *out_rgba = CMP_APPLE_COLOR_SYS_GRAY_6_DARK;
     break; /* Secondary */
   case 2:
-    *out_rgba = 0x2C2C2EFF;
+    *out_rgba = CMP_APPLE_COLOR_SYS_GRAY_5_DARK;
     break; /* Tertiary */
   default:
-    *out_rgba = 0x3A3A3CFF;
+    *out_rgba = CMP_APPLE_COLOR_SYS_GRAY_4_DARK;
     break;
   }
 

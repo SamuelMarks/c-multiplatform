@@ -121,10 +121,12 @@ int cmp_ui_code_block_create(cmp_ui_code_block_t **out_block, const char *code,
   rc = cmp_ui_node_add_child(block->node_root, block->node_text);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_code_block_create: cmp_ui_node_add_child failed\n");
+    cmp_ui_code_block_destroy(block);
+    return rc;
   }
 
   *out_block = block;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

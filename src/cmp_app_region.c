@@ -7,7 +7,7 @@
 /* clang-format on */
 
 typedef struct cmp_app_region_rect {
-  cmp_rect_t rect;
+  cmp_rect_f_t rect;
   cmp_app_region_type_t type;
 } cmp_app_region_rect_t;
 

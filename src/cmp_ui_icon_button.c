@@ -78,12 +78,14 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
   }
 
   rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&btn->node_root->layout);
-  if (rc == CMP_SUCCESS) {
+  if (rc != CMP_SUCCESS) {
+    cmp_ui_icon_button_destroy(btn);
+    return rc;
+  }
     memset(btn->node_root->layout, 0, sizeof(cmp_layout_node_t));
     btn->node_root->layout->id = 1;
-  }
 
-  btn->node_root->type = 3; /* Button */
+  btn->node_root->type = CMP_UI_NODE_TYPE_BUTTON;
 
   rc = cmp_ui_text_create(&btn->node_icon, btn->icon_name ? btn->icon_name : "",
                           -1);
@@ -105,10 +107,12 @@ int cmp_ui_icon_button_create(cmp_ui_icon_button_t **out_btn,
   rc = cmp_ui_node_add_child(btn->node_root, btn->node_icon);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_icon_button_create: cmp_ui_node_add_child failed\n");
+    cmp_ui_icon_button_destroy(btn);
+    return rc;
   }
 
   *out_btn = btn;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

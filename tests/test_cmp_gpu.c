@@ -77,10 +77,10 @@ TEST test_draw_call_optimizer(void) {
 }
 
 TEST test_frustum_culling(void) {
-  cmp_rect_t vp = {0, 0, 1920, 1080};
-  cmp_rect_t inside = {100, 100, 200, 200};
-  cmp_rect_t outside = {-500, -500, 100, 100};
-  cmp_rect_t partial = {-50, -50, 100, 100};
+  cmp_rect_f_t vp = {0, 0, 1920, 1080};
+  cmp_rect_f_t inside = {100, 100, 200, 200};
+  cmp_rect_f_t outside = {-500, -500, 100, 100};
+  cmp_rect_f_t partial = {-50, -50, 100, 100};
   int visible = 0;
   ASSERT_EQ(CMP_SUCCESS, cmp_frustum_culling_test(&inside, &vp, &visible));
   ASSERT_EQ(1, visible);

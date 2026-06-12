@@ -49,10 +49,7 @@ int cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
     rc = CMP_MALLOC(len + 1, (void **)&diff->old_text);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_diff_create: OOM old_text\n");
-      rc = CMP_FREE(diff);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_diff_create: CMP_FREE diff failed\n");
-      }
+      CMP_FREE(diff);
       return CMP_ERROR_OOM;
     }
     memcpy(diff->old_text, old_text, len + 1);
@@ -65,13 +62,9 @@ int cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_diff_create: OOM new_text\n");
       if (diff->old_text) {
-        if (CMP_FREE(diff->old_text) != CMP_SUCCESS)
-          LOG_DEBUG("cmp_ui_diff_create: CMP_FREE old_text failed\n");
+        CMP_FREE(diff->old_text);
       }
-      rc = CMP_FREE(diff);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_diff_create: CMP_FREE diff failed\n");
-      }
+      CMP_FREE(diff);
       return CMP_ERROR_OOM;
     }
     memcpy(diff->new_text, new_text, len + 1);
@@ -81,22 +74,17 @@ int cmp_ui_diff_create(cmp_ui_diff_t **out_diff, const char *old_text,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_diff_create: cmp_ui_box_create failed\n");
     if (diff->old_text) {
-      if (CMP_FREE(diff->old_text) != CMP_SUCCESS)
-        LOG_DEBUG("cmp_ui_diff_create: CMP_FREE old_text failed\n");
+      CMP_FREE(diff->old_text);
     }
     if (diff->new_text) {
-      if (CMP_FREE(diff->new_text) != CMP_SUCCESS)
-        LOG_DEBUG("cmp_ui_diff_create: CMP_FREE new_text failed\n");
+      CMP_FREE(diff->new_text);
     }
-    rc = CMP_FREE(diff);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_diff_create: CMP_FREE diff failed\n");
-    }
+    CMP_FREE(diff);
     return CMP_ERROR_GENERAL;
   }
 
   *out_diff = diff;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

@@ -286,6 +286,8 @@ static int build_ui(void) {
   g_ui_tree->layout->height = -1.0f;
   g_ui_tree->layout->justify_content = CMP_FLEX_ALIGN_START;
   g_ui_tree->layout->align_items = CMP_FLEX_ALIGN_STRETCH;
+  g_ui_tree->layout->overflow_x = 2; /* Hidden */
+  g_ui_tree->layout->overflow_y = 1; /* Scroll */
   g_ui_tree->bg_color = g_is_dark ? 0xFF000000 : 0xFFF0F0F0;
 
   g_ui_tree->design_language_override = g_design_lang;
@@ -321,8 +323,6 @@ static int build_ui(void) {
     }
     title->text_color = g_is_dark ? 0xFFE6E0E9 : 0xFF1D1B20;
     title->font_size = -1.0f; /* Let system scale font */
-    title->layout->width = -1.0f;
-    title->layout->height = -1.0f;
   }
 
   rc = create_simple_button(&btn_lang, "EN", "Switch Language", on_lang_click);

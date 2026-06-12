@@ -87,6 +87,8 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
     rc = cmp_string_destroy(&translated);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_create: cmp_string_destroy failed\n");
+      cmp_ui_badge_destroy(badge);
+      return rc;
     }
   }
 
@@ -152,10 +154,12 @@ int cmp_ui_badge_create(cmp_ui_badge_t **out_badge, const char *text,
   rc = cmp_ui_node_add_child(badge->node_root, badge->node_text);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_badge_create: cmp_ui_node_add_child failed\n");
+    cmp_ui_badge_destroy(badge);
+    return rc;
   }
 
   *out_badge = badge;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -262,8 +266,8 @@ int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_set_text: OOM\n");
       if (translated.data) {
-        rc = cmp_string_destroy(&translated);
-        if (rc != CMP_SUCCESS) {
+      int clean_rc = cmp_string_destroy(&translated);
+      if (clean_rc != CMP_SUCCESS) {
           LOG_DEBUG("cmp_ui_badge_set_text: cmp_string_destroy failed\n");
         }
       }
@@ -276,6 +280,7 @@ int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
     rc = cmp_string_destroy(&translated);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_set_text: cmp_string_destroy failed\n");
+      return rc;
     }
   }
 

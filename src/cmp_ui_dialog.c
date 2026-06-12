@@ -47,10 +47,7 @@ int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog, const char *title,
   rc = cmp_ui_box_create(&dialog->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_dialog_create: cmp_ui_box_create failed\n");
-    rc = CMP_FREE(dialog);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_dialog_create: CMP_FREE failed\n");
-    }
+    CMP_FREE(dialog);
     return CMP_ERROR_GENERAL;
   }
 
@@ -62,31 +59,42 @@ int cmp_ui_dialog_create(cmp_ui_dialog_t **out_dialog, const char *title,
 
   if (title) {
     rc = cmp_ui_text_create(&dialog->node_title, title, -1);
-    if (rc == CMP_SUCCESS) {
-      rc = cmp_ui_node_add_child(dialog->node_root, dialog->node_title);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_dialog_create: cmp_ui_node_add_child title failed\n");
-      }
-    } else {
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_dialog_create: cmp_ui_text_create title failed\n");
+      cmp_ui_node_destroy(dialog->node_root);
+      CMP_FREE(dialog);
+      return rc;
+    }
+    rc = cmp_ui_node_add_child(dialog->node_root, dialog->node_title);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_dialog_create: cmp_ui_node_add_child title failed\n");
+      cmp_ui_node_destroy(dialog->node_title);
+      cmp_ui_node_destroy(dialog->node_root);
+      CMP_FREE(dialog);
+      return rc;
     }
   }
 
   if (content) {
     rc = cmp_ui_text_create(&dialog->node_content, content, -1);
-    if (rc == CMP_SUCCESS) {
-      rc = cmp_ui_node_add_child(dialog->node_root, dialog->node_content);
-      if (rc != CMP_SUCCESS) {
-        LOG_DEBUG(
-            "cmp_ui_dialog_create: cmp_ui_node_add_child content failed\n");
-      }
-    } else {
+    if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_dialog_create: cmp_ui_text_create content failed\n");
+      cmp_ui_node_destroy(dialog->node_root);
+      CMP_FREE(dialog);
+      return rc;
+    }
+    rc = cmp_ui_node_add_child(dialog->node_root, dialog->node_content);
+    if (rc != CMP_SUCCESS) {
+      LOG_DEBUG("cmp_ui_dialog_create: cmp_ui_node_add_child content failed\n");
+      cmp_ui_node_destroy(dialog->node_content);
+      cmp_ui_node_destroy(dialog->node_root);
+      CMP_FREE(dialog);
+      return rc;
     }
   }
 
   *out_dialog = dialog;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

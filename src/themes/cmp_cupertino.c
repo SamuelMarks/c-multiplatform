@@ -270,7 +270,7 @@ int cmp_cupertino_layout_sidebar(cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_button(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer;
   if (!node || !node->layout)
@@ -303,7 +303,7 @@ int cmp_cupertino_draw_button(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_text_input(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -334,7 +334,7 @@ int cmp_cupertino_draw_text_input(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_slider(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -365,7 +365,7 @@ int cmp_cupertino_draw_slider(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_toggle(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -396,7 +396,7 @@ int cmp_cupertino_draw_toggle(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_checkbox(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -427,7 +427,7 @@ int cmp_cupertino_draw_checkbox(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_radio(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -458,7 +458,7 @@ int cmp_cupertino_draw_radio(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_progress(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -489,7 +489,7 @@ int cmp_cupertino_draw_progress(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_card(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -520,7 +520,7 @@ int cmp_cupertino_draw_card(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_tooltip(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -551,7 +551,7 @@ int cmp_cupertino_draw_tooltip(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_menu(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)
@@ -582,7 +582,7 @@ int cmp_cupertino_draw_menu(const cmp_ui_node_t *node) {
  */
 int cmp_cupertino_draw_focus_ring(const cmp_ui_node_t *node) {
   int rc = CMP_SUCCESS;
-  cmp_rect_t bounds;
+  cmp_rect_f_t bounds;
   cmp_color_t color;
   cmp_renderer_t *renderer = NULL;
   if (!node || !node->layout)

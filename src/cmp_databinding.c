@@ -377,7 +377,7 @@ static void node_binding_cb(cmp_databinding_t *binding, void *user_data) {
       const char *val;
       rc = cmp_databinding_get_string(binding, &val);
       if (rc == CMP_SUCCESS) {
-        if (ctx->node->type == 2) { /* Text */
+        if (ctx->node->type == CMP_UI_NODE_TYPE_TEXT) { /* Text */
           if (ctx->node->properties) {
             rc = CMP_FREE(ctx->node->properties);
             if (rc != CMP_SUCCESS) {

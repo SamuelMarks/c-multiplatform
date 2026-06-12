@@ -26,7 +26,6 @@ struct cmp_ui_segmented_button {
  */
 int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
                                    int multi_select) {
-  int rc = CMP_SUCCESS;
   cmp_ui_segmented_button_t *btn;
   int err;
 
@@ -41,7 +40,7 @@ int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
   memset(btn, 0, sizeof(cmp_ui_segmented_button_t));
 
   btn->multi_select = multi_select;
-  btn->segment_capacity = 4;
+  btn->segment_capacity = CMP_DEFAULT_CAPACITY;
   err = CMP_MALLOC(sizeof(cmp_ui_segment_t) * btn->segment_capacity,
                    (void **)&btn->segments);
   if (err != CMP_SUCCESS) {
@@ -52,23 +51,26 @@ int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
   /* Create a container box for the segments */
   err = cmp_ui_box_create(&btn->node_root);
   if (err != CMP_SUCCESS) {
-    if (CMP_FREE(btn->segments) != CMP_SUCCESS)
-      LOG_DEBUG("cmp_ui_segmented_button_create: CMP_FREE failed\n");
-    if (CMP_FREE(btn) != CMP_SUCCESS)
-      LOG_DEBUG("cmp_ui_segmented_button_create: CMP_FREE failed\n");
+    CMP_FREE(btn->segments);
+    CMP_FREE(btn);
     return err;
   }
 
   err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&btn->node_root->layout);
-  if (err == CMP_SUCCESS) {
-    memset(btn->node_root->layout, 0, sizeof(cmp_layout_node_t));
-    btn->node_root->layout->id = 1;
-    btn->node_root->layout->direction = CMP_FLEX_ROW;
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(btn->node_root);
+    CMP_FREE(btn->segments);
+    CMP_FREE(btn);
+    return err;
   }
+  
+  memset(btn->node_root->layout, 0, sizeof(cmp_layout_node_t));
+  btn->node_root->layout->id = 1;
+  btn->node_root->layout->direction = CMP_FLEX_ROW;
 
   *out_btn = btn;
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -135,7 +137,7 @@ int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
   }
 
   if (btn->segment_count >= btn->segment_capacity) {
-    int new_cap = btn->segment_capacity * 2;
+    int new_cap = btn->segment_capacity * CMP_CAPACITY_MULTIPLIER;
     cmp_ui_segment_t *new_segs;
     err = CMP_MALLOC(sizeof(cmp_ui_segment_t) * new_cap, (void **)&new_segs);
     if (err != CMP_SUCCESS) {
@@ -155,7 +157,7 @@ int cmp_ui_segmented_button_add_segment(cmp_ui_segmented_button_t *btn,
     return err;
   }
 
-  seg_node->type = 3; /* Button */
+  seg_node->type = CMP_UI_NODE_TYPE_BUTTON;
 
   /* If icon exists, it would be added here as a child or property based on the
    * button implementation */
@@ -235,7 +237,7 @@ int cmp_ui_segmented_button_bind_a11y(cmp_ui_segmented_button_t *widget,
     return CMP_ERROR_INVALID_ARG;
   }
   rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "group",
-                         "Segmented Button");
+                              "Segmented Button");
   if (rc != 0) {
     return rc;
   }

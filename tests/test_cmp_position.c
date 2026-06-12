@@ -8,7 +8,7 @@ SUITE(cmp_position_suite);
 
 TEST test_absolute_relative(void) {
   cmp_layout_node_t *node = NULL;
-  cmp_rect_t parent = {10.0f, 20.0f, 100.0f, 100.0f};
+  cmp_rect_f_t parent = {10.0f, 20.0f, 100.0f, 100.0f};
   cmp_layout_node_create(&node);
   node->position_type = CMP_POSITION_ABSOLUTE;
   node->position[0] = 5.0f;  /* Top */
@@ -31,8 +31,8 @@ TEST test_absolute_relative(void) {
 
 TEST test_fixed_sticky(void) {
   cmp_layout_node_t *node = NULL;
-  cmp_rect_t viewport = {0.0f, 0.0f, 1920.0f, 1080.0f};
-  cmp_rect_t container = {0.0f, 0.0f, 500.0f, 500.0f};
+  cmp_rect_f_t viewport = {0.0f, 0.0f, 1920.0f, 1080.0f};
+  cmp_rect_f_t container = {0.0f, 0.0f, 500.0f, 500.0f};
   cmp_layout_node_create(&node);
   node->position_type = CMP_POSITION_FIXED;
   node->position[0] = 100.0f; /* Top */
@@ -60,8 +60,8 @@ TEST test_fixed_sticky(void) {
 
 TEST test_anchor_positioning(void) {
   cmp_layout_node_t *node = NULL;
-  cmp_rect_t anchor = {100.0f, 100.0f, 200.0f, 50.0f};
-  cmp_rect_t viewport = {0.0f, 0.0f, 1920.0f, 1080.0f};
+  cmp_rect_f_t anchor = {100.0f, 100.0f, 200.0f, 50.0f};
+  cmp_rect_f_t viewport = {0.0f, 0.0f, 1920.0f, 1080.0f};
   cmp_layout_node_create(&node);
   /* Default drop below */
   ASSERT_EQ(CMP_SUCCESS, cmp_anchor_position(node, &anchor));

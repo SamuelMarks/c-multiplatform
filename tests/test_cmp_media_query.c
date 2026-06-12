@@ -153,8 +153,8 @@ TEST test_style_query_evaluate(void) {
 }
 
 TEST test_content_visibility_evaluate(void) {
-  cmp_rect_t viewport = {0.0f, 0.0f, 1920.0f, 1080.0f};
-  cmp_rect_t node_rect = {100.0f, 100.0f, 200.0f, 200.0f};
+  cmp_rect_f_t viewport = {0.0f, 0.0f, 1920.0f, 1080.0f};
+  cmp_rect_f_t node_rect = {100.0f, 100.0f, 200.0f, 200.0f};
   int is_visible;
 
   ASSERT_EQ(CMP_SUCCESS, cmp_content_visibility_evaluate(
@@ -230,7 +230,7 @@ TEST test_null_args(void) {
   cmp_container_ctx_t *ctx = NULL;
   cmp_container_query_t cq = {0};
   cmp_style_query_t sq = {0};
-  cmp_rect_t rect = {0};
+  cmp_rect_f_t rect = {0};
 
   ASSERT_EQ(CMP_ERROR_INVALID_ARG,
             cmp_media_query_evaluate(NULL, &env, &matches));

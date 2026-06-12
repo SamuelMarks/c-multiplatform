@@ -42,6 +42,9 @@ struct cmp_window {
   void *resize_user_data;
   cmp_ui_node_t *ui_tree;
   float scale_factor;
+  int devtools_enabled;
+  int last_mouse_x;
+  int last_mouse_y;
 };
 
 /**
@@ -399,13 +402,368 @@ static void win32_box_blur_alpha(uint8_t *pixels, int width, int height,
  * @param inherited_theme Parameter description.
  * @return Returns 0 on success, or an error code on failure.
  */
+
+static void render_debug_overlay_gdi(HDC hdc, cmp_ui_node_t *node,
+                                     float scale_factor, int mouse_x,
+                                     int mouse_y) {
+  size_t i;
+  cmp_rect_f_t content_box, padding_box, border_box, margin_box;
+  HPEN blue_pen, green_pen, yellow_pen, orange_pen, old_pen;
+  HBRUSH old_brush;
+  int old_rop2;
+  int old_bkmode;
+
+  if (!node || !node->layout)
+    return;
+
+  old_brush = (HBRUSH)SelectObject(hdc, GetStockObject(NULL_BRUSH));
+  old_rop2 = SetROP2(hdc, R2_COPYPEN);
+  old_bkmode = SetBkMode(hdc, TRANSPARENT);
+
+  cmp_layout_node_get_content_box(node->layout, &content_box);
+  cmp_layout_node_get_padding_box(node->layout, &padding_box);
+  cmp_layout_node_get_border_box(node->layout, &border_box);
+  cmp_layout_node_get_margin_box(node->layout, &margin_box);
+
+  content_box.x *= scale_factor;
+  content_box.y *= scale_factor;
+  content_box.width *= scale_factor;
+  content_box.height *= scale_factor;
+
+  padding_box.x *= scale_factor;
+  padding_box.y *= scale_factor;
+  padding_box.width *= scale_factor;
+  padding_box.height *= scale_factor;
+
+  border_box.x *= scale_factor;
+  border_box.y *= scale_factor;
+  border_box.width *= scale_factor;
+  border_box.height *= scale_factor;
+
+  margin_box.x *= scale_factor;
+  margin_box.y *= scale_factor;
+  margin_box.width *= scale_factor;
+  margin_box.height *= scale_factor;
+
+  blue_pen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+  green_pen = CreatePen(PS_DOT, 1, RGB(0, 255, 0));
+  yellow_pen = CreatePen(PS_DOT, 1, RGB(255, 255, 0));
+  orange_pen = CreatePen(PS_DOT, 1, RGB(255, 165, 0));
+
+  old_pen = (HPEN)SelectObject(hdc, orange_pen);
+  Rectangle(hdc, (int)margin_box.x, (int)margin_box.y,
+            (int)(margin_box.x + margin_box.width),
+            (int)(margin_box.y + margin_box.height));
+
+  SelectObject(hdc, yellow_pen);
+  Rectangle(hdc, (int)border_box.x, (int)border_box.y,
+            (int)(border_box.x + border_box.width),
+            (int)(border_box.y + border_box.height));
+
+  SelectObject(hdc, green_pen);
+  Rectangle(hdc, (int)padding_box.x, (int)padding_box.y,
+            (int)(padding_box.x + padding_box.width),
+            (int)(padding_box.y + padding_box.height));
+
+  SelectObject(hdc, blue_pen);
+  Rectangle(hdc, (int)content_box.x, (int)content_box.y,
+            (int)(content_box.x + content_box.width),
+            (int)(content_box.y + content_box.height));
+
+  if (node->type == CMP_UI_NODE_TYPE_BUTTON || node->type == CMP_UI_NODE_TYPE_TEXT_INPUT || node->type == CMP_UI_NODE_TYPE_CHECKBOX ||
+      node->type == CMP_UI_NODE_TYPE_IMAGE_VIEW || node->type == CMP_UI_NODE_TYPE_SLIDER || node->type == CMP_UI_NODE_TYPE_LIST_VIEW ||
+      node->type == CMP_UI_NODE_TYPE_MODAL || node->type == CMP_UI_NODE_TYPE_CANVAS || node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
+    if ((content_box.width / scale_factor) < 44.0f ||
+        (content_box.height / scale_factor) < 44.0f) {
+      HPEN red_pen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
+      old_pen = (HPEN)SelectObject(hdc, red_pen);
+      old_brush = (HBRUSH)SelectObject(hdc, GetStockObject(NULL_BRUSH));
+
+      Rectangle(hdc, (int)(border_box.x - 2), (int)(border_box.y - 2),
+                (int)(border_box.x + border_box.width + 2),
+                (int)(border_box.y + border_box.height + 2));
+
+      SelectObject(hdc, old_pen);
+      SelectObject(hdc, old_brush);
+      DeleteObject(red_pen);
+    }
+  }
+
+  if (node->child_count > 1) {
+    size_t j;
+    for (i = 0; i < node->child_count; i++) {
+      cmp_layout_node_t *a = node->children[i]->layout;
+      if (!a || a->position_type == 2 || a->position_type == 3)
+        continue;
+      for (j = i + 1; j < node->child_count; j++) {
+        cmp_layout_node_t *b = node->children[j]->layout;
+        if (!b || b->position_type == 2 || b->position_type == 3)
+          continue;
+        if (a->z_index != b->z_index)
+          continue;
+
+        if (a->computed_rect.x < b->computed_rect.x + b->computed_rect.width &&
+            a->computed_rect.x + a->computed_rect.width > b->computed_rect.x &&
+            a->computed_rect.y < b->computed_rect.y + b->computed_rect.height &&
+            a->computed_rect.y + a->computed_rect.height > b->computed_rect.y) {
+
+          float ox = a->computed_rect.x > b->computed_rect.x
+                         ? a->computed_rect.x
+                         : b->computed_rect.x;
+          float oy = a->computed_rect.y > b->computed_rect.y
+                         ? a->computed_rect.y
+                         : b->computed_rect.y;
+          float ox2 = (a->computed_rect.x + a->computed_rect.width) <
+                              (b->computed_rect.x + b->computed_rect.width)
+                          ? (a->computed_rect.x + a->computed_rect.width)
+                          : (b->computed_rect.x + b->computed_rect.width);
+          float oy2 = (a->computed_rect.y + a->computed_rect.height) <
+                              (b->computed_rect.y + b->computed_rect.height)
+                          ? (a->computed_rect.y + a->computed_rect.height)
+                          : (b->computed_rect.y + b->computed_rect.height);
+
+          HPEN red_pen = CreatePen(PS_NULL, 0, RGB(0, 0, 0));
+          HBRUSH hatch_brush = CreateHatchBrush(HS_BDIAGONAL, RGB(255, 0, 0));
+          HPEN old_pen_err = (HPEN)SelectObject(hdc, red_pen);
+          HBRUSH old_brush_err = (HBRUSH)SelectObject(hdc, hatch_brush);
+
+          Rectangle(hdc, (int)(ox * scale_factor), (int)(oy * scale_factor),
+                    (int)(ox2 * scale_factor), (int)(oy2 * scale_factor));
+
+          SelectObject(hdc, old_pen_err);
+          SelectObject(hdc, old_brush_err);
+          DeleteObject(red_pen);
+          DeleteObject(hatch_brush);
+        }
+      }
+    }
+  }
+
+  if (node->layout &&
+      (node->layout->display == 4 || node->layout->display == 5)) {
+    if (node->layout->flex_lines && node->layout->flex_lines->count > 0) {
+      HPEN flex_pen = CreatePen(PS_DASH, 1, RGB(128, 0, 128));
+      HPEN flex_old = (HPEN)SelectObject(hdc, flex_pen);
+      size_t line_idx;
+      for (line_idx = 0; line_idx < node->layout->flex_lines->count;
+           line_idx++) {
+        cmp_layout_line_t *line = &node->layout->flex_lines->lines[line_idx];
+        if (line->count > 0) {
+          cmp_layout_node_t *first_child =
+              node->children[line->start_index]->layout;
+          cmp_layout_node_t *last_child =
+              node->children[line->start_index + line->count - 1]->layout;
+          if (first_child && last_child) {
+            float lx1 = (content_box.x);
+            float ly1 = (first_child->computed_rect.y * scale_factor);
+            float lx2 = (content_box.x + content_box.width);
+            float ly2 = (first_child->computed_rect.y * scale_factor);
+            MoveToEx(hdc, (int)lx1, (int)ly1, NULL);
+            LineTo(hdc, (int)lx2, (int)ly2);
+          }
+        }
+      }
+      SelectObject(hdc, flex_old);
+      DeleteObject(flex_pen);
+    }
+  }
+
+  if (node->layout &&
+      (node->layout->display == 6 || node->layout->display == 7)) {
+    if (node->layout->grid_ctx) {
+      cmp_grid_ctx_t *gctx = node->layout->grid_ctx;
+      HPEN grid_pen = CreatePen(PS_DASH, 1, RGB(0, 128, 128));
+      HPEN grid_old = (HPEN)SelectObject(hdc, grid_pen);
+      size_t col_idx, row_idx;
+      float cur_x = content_box.x;
+      float cur_y = content_box.y;
+
+      for (col_idx = 0; col_idx < gctx->computed_col_count; col_idx++) {
+        cur_x += (gctx->computed_col_sizes[col_idx] * scale_factor);
+        MoveToEx(hdc, (int)cur_x, (int)content_box.y, NULL);
+        LineTo(hdc, (int)cur_x, (int)(content_box.y + content_box.height));
+      }
+      for (row_idx = 0; row_idx < gctx->computed_row_count; row_idx++) {
+        cur_y += (gctx->computed_row_sizes[row_idx] * scale_factor);
+        MoveToEx(hdc, (int)content_box.x, (int)cur_y, NULL);
+        LineTo(hdc, (int)(content_box.x + content_box.width), (int)cur_y);
+      }
+
+      if (gctx->template_areas_count > 0) {
+        int old_bg = SetBkMode(hdc, TRANSPARENT);
+        COLORREF old_txt = SetTextColor(hdc, RGB(0, 128, 128));
+        size_t a_idx;
+        for (a_idx = 0; a_idx < gctx->template_areas_count; a_idx++) {
+          cmp_grid_area_t *area = &gctx->template_areas[a_idx];
+          if (area->name) {
+            float ax = content_box.x;
+            float ay = content_box.y;
+            float aw = 0, ah = 0;
+            size_t a_loop_i;
+            for (a_loop_i = 0; a_loop_i < (size_t)area->col_start &&
+                               a_loop_i < gctx->computed_col_count;
+                 a_loop_i++)
+              ax += (gctx->computed_col_sizes[a_loop_i] * scale_factor);
+            for (a_loop_i = 0; a_loop_i < (size_t)area->row_start &&
+                               a_loop_i < gctx->computed_row_count;
+                 a_loop_i++)
+              ay += (gctx->computed_row_sizes[a_loop_i] * scale_factor);
+            for (a_loop_i = (size_t)area->col_start;
+                 a_loop_i < (size_t)area->col_end &&
+                 a_loop_i < gctx->computed_col_count;
+                 a_loop_i++)
+              aw += (gctx->computed_col_sizes[a_loop_i] * scale_factor);
+            for (a_loop_i = (size_t)area->row_start;
+                 a_loop_i < (size_t)area->row_end &&
+                 a_loop_i < gctx->computed_row_count;
+                 a_loop_i++)
+              ah += (gctx->computed_row_sizes[a_loop_i] * scale_factor);
+            TextOutA(hdc, (int)(ax + 2), (int)(ay + 2), area->name,
+                     (int)strlen(area->name));
+          }
+        }
+        SetTextColor(hdc, old_txt);
+        SetBkMode(hdc, old_bg);
+      }
+      SelectObject(hdc, grid_old);
+      DeleteObject(grid_pen);
+    }
+  }
+
+  if (node->layout &&
+      (node->layout->overflow_x == 2 || node->layout->overflow_y == 2)) {
+    HPEN clip_pen = CreatePen(PS_SOLID, 2, RGB(100, 100, 100));
+    HPEN clip_old = (HPEN)SelectObject(hdc, clip_pen);
+    HBRUSH null_brush_clip =
+        (HBRUSH)SelectObject(hdc, GetStockObject(NULL_BRUSH));
+    Rectangle(hdc, (int)padding_box.x, (int)padding_box.y,
+              (int)(padding_box.x + padding_box.width),
+              (int)(padding_box.y + padding_box.height));
+    SelectObject(hdc, null_brush_clip);
+    SelectObject(hdc, clip_old);
+    DeleteObject(clip_pen);
+  }
+
+  if (node->type == CMP_UI_NODE_TYPE_TEXT || node->type == CMP_UI_NODE_TYPE_BUTTON || node->type == CMP_UI_NODE_TYPE_TEXT_INPUT ||
+      node->type == CMP_UI_NODE_TYPE_DROPDOWN || node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
+    float baseline_y;
+    if (cmp_layout_node_get_baseline_y(node->layout, &baseline_y) ==
+            CMP_SUCCESS &&
+        baseline_y > 0.0f) {
+      float fsize = node->font_size > 0.0f ? node->font_size : 16.0f;
+      float cap_height_y = baseline_y - (fsize * 0.7f);
+      float x_height_y = baseline_y - (fsize * 0.5f);
+      HPEN pink_pen = CreatePen(PS_DASH, 1, RGB(255, 105, 180));
+      HPEN cyan_pen = CreatePen(PS_DOT, 1, RGB(0, 255, 255));
+      HPEN purple_pen = CreatePen(PS_DOT, 1, RGB(128, 0, 128));
+
+      SelectObject(hdc, pink_pen);
+      MoveToEx(hdc, (int)border_box.x,
+               (int)((border_box.y + baseline_y) * scale_factor), NULL);
+      LineTo(hdc, (int)(border_box.x + border_box.width),
+             (int)((border_box.y + baseline_y) * scale_factor));
+
+      if (cap_height_y > 0) {
+        SelectObject(hdc, cyan_pen);
+        MoveToEx(hdc, (int)border_box.x,
+                 (int)((border_box.y + cap_height_y) * scale_factor), NULL);
+        LineTo(hdc, (int)(border_box.x + border_box.width),
+               (int)((border_box.y + cap_height_y) * scale_factor));
+      }
+
+      if (x_height_y > 0) {
+        SelectObject(hdc, purple_pen);
+        MoveToEx(hdc, (int)border_box.x,
+                 (int)((border_box.y + x_height_y) * scale_factor), NULL);
+        LineTo(hdc, (int)(border_box.x + border_box.width),
+               (int)((border_box.y + x_height_y) * scale_factor));
+      }
+
+      SelectObject(hdc, blue_pen);
+      DeleteObject(pink_pen);
+      DeleteObject(cyan_pen);
+      DeleteObject(purple_pen);
+    }
+  }
+
+  SelectObject(hdc, old_pen);
+  SelectObject(hdc, old_brush);
+  SetROP2(hdc, old_rop2);
+  SetBkMode(hdc, old_bkmode);
+
+  DeleteObject(blue_pen);
+  DeleteObject(green_pen);
+  DeleteObject(yellow_pen);
+  DeleteObject(orange_pen);
+
+  for (i = 0; i < node->child_count; i++) {
+    render_debug_overlay_gdi(hdc, node->children[i], scale_factor, mouse_x,
+                             mouse_y);
+  }
+
+  if (mouse_x >= border_box.x && mouse_x <= border_box.x + border_box.width &&
+      mouse_y >= border_box.y && mouse_y <= border_box.y + border_box.height) {
+
+    char tooltip_buf[256];
+    int len;
+    SIZE txt_size;
+    int tw, th;
+    HBRUSH tt_bg;
+    RECT tt_rect;
+    HFONT font;
+    HFONT old_font;
+
+    len = snprintf(
+        tooltip_buf, sizeof(tooltip_buf),
+        "Node %d | Type: %d\nPos: %d | Z: %d\nW: %.1f H: %.1f\nLoc: %.1f, %.1f",
+        node->layout ? node->layout->id : -1, node->type,
+        node->layout ? node->layout->position_type : 0,
+        node->layout ? node->layout->z_index : 0,
+        border_box.width / scale_factor, border_box.height / scale_factor,
+        border_box.x / scale_factor, border_box.y / scale_factor);
+
+    font =
+        CreateFontA(14, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                    DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                    DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Consolas");
+
+    old_font = (HFONT)SelectObject(hdc, font);
+
+    GetTextExtentPoint32A(hdc, tooltip_buf, len, &txt_size);
+    tw = 150;
+    th = 70;
+
+    tt_rect.left = (int)(mouse_x * scale_factor) + 15;
+    tt_rect.top = (int)(mouse_y * scale_factor) + 15;
+    tt_rect.right = tt_rect.left + tw;
+    tt_rect.bottom = tt_rect.top + th;
+
+    tt_bg = CreateSolidBrush(RGB(30, 30, 30));
+    FillRect(hdc, &tt_rect, tt_bg);
+    DeleteObject(tt_bg);
+
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(220, 220, 220));
+
+    {
+      RECT text_rect = tt_rect;
+      text_rect.left += 5;
+      text_rect.top += 5;
+      DrawTextA(hdc, tooltip_buf, -1, &text_rect, DT_LEFT | DT_TOP);
+    }
+
+    SelectObject(hdc, old_font);
+    DeleteObject(font);
+  }
+}
+
 static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
                             int inherited_theme) {
   int current_theme = node->design_language_override
                           ? node->design_language_override
                           : inherited_theme;
   size_t i;
-  cmp_rect_t rect;
+  cmp_rect_f_t rect;
   uint32_t box_color;
   float opacity;
   uint32_t bg_color_val;
@@ -569,7 +927,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         }
         old_br = (HBRUSH)SelectObject(hdc, br);
         old_pen = (HPEN)SelectObject(hdc, pen);
-        if (node->border_radius > 0.0f || node->type == 8) {
+        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           RoundRect(hdc, ix, iy, ix + iw + 1, iy + ih + 1, radius, radius);
         } else {
@@ -599,7 +957,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         FillRect(memDC, &rct, br);
         DeleteObject(br);
 
-        if (node->border_radius > 0.0f || node->type == 8) {
+        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           rgn = CreateRoundRectRgn(ix, iy, ix + iw + 1, iy + ih + 1, radius,
                                    radius);
@@ -656,7 +1014,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         FillRect(memDC, &rct, br);
         DeleteObject(br);
 
-        if (node->border_radius > 0.0f || node->type == 8) {
+        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           rgn = CreateRoundRectRgn(ix, iy, ix + iw + 1, iy + ih + 1, radius,
                                    radius);
@@ -703,7 +1061,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         rct.bottom = ih;
         FillRect(memDC, &rct, (HBRUSH)GetStockObject(BLACK_BRUSH));
 
-        if (node->border_radius > 0.0f || node->type == 8) {
+        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           rgn = CreateRoundRectRgn(ix, iy, ix + iw + 1, iy + ih + 1, radius,
                                    radius);
@@ -771,7 +1129,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         HPEN old_pen = (HPEN)SelectObject(hdc, pen);
         HBRUSH old_brush = (HBRUSH)SelectObject(hdc, brush);
 
-        if (node->border_radius > 0.0f || node->type == 8) {
+        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           RoundRect(hdc, ix, iy, ix + iw, iy + ih, radius, radius);
         } else {
@@ -786,14 +1144,14 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
   }
 
   {
-    if (node->type == 2 || node->type == 3 || node->type == 4 ||
-        node->type == 11 || node->type == 14) {
+    if (node->type == CMP_UI_NODE_TYPE_TEXT || node->type == CMP_UI_NODE_TYPE_BUTTON || node->type == CMP_UI_NODE_TYPE_TEXT_INPUT ||
+        node->type == CMP_UI_NODE_TYPE_DROPDOWN || node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
       const char *text = (const char *)node->properties;
-      if (node->type == 4 && text == NULL)
+      if (node->type == CMP_UI_NODE_TYPE_TEXT_INPUT && text == NULL)
         text = "Ask anything";
-      if (node->type == 11 && text == NULL)
+      if (node->type == CMP_UI_NODE_TYPE_DROPDOWN && text == NULL)
         text = "GPT-4o (Default) \xE2\x96\xBE";
-      if (node->type == 14 && text == NULL)
+      if (node->type == CMP_UI_NODE_TYPE_RICH_TEXT && text == NULL)
         text = "Let's build";
 
       if (text) {
@@ -811,11 +1169,11 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
           size = (int)(node->font_size * scale_factor);
         } else {
           size = (int)(32 * scale_factor);
-          if (node->type == 14)
+          if (node->type == CMP_UI_NODE_TYPE_RICH_TEXT)
             size = (int)(48 * scale_factor);
-          if (node->type == 4 || node->type == 11)
+          if (node->type == CMP_UI_NODE_TYPE_TEXT_INPUT || node->type == CMP_UI_NODE_TYPE_DROPDOWN)
             size = (int)(20 * scale_factor);
-          if (node->type == 3)
+          if (node->type == CMP_UI_NODE_TYPE_BUTTON)
             size = (int)(24 * scale_factor);
         }
 
@@ -848,17 +1206,17 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
             SetTextColor(hdc, tc);
             SetBkMode(hdc, TRANSPARENT);
 
-            if (node->type == 14) {
+            if (node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
               SetTextAlign(hdc, TA_CENTER | TA_TOP);
               TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
                        wlen - 1);
-            } else if (node->type == 3 || node->type == 4) {
+            } else if (node->type == CMP_UI_NODE_TYPE_BUTTON || node->type == CMP_UI_NODE_TYPE_TEXT_INPUT) {
               SetTextAlign(hdc, TA_CENTER | TA_TOP);
               TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
                        wlen - 1);
-            } else if (node->type == 2) {
+            } else if (node->type == CMP_UI_NODE_TYPE_TEXT) {
               SetTextAlign(hdc, TA_CENTER | TA_TOP);
               TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
@@ -877,7 +1235,7 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
     }
   }
 
-  if (node->type == 7 && node->properties) {
+  if (node->type == CMP_UI_NODE_TYPE_IMAGE_VIEW && node->properties) {
     void **props = (void **)node->properties;
     cmp_svg_renderer_t *svg = (cmp_svg_renderer_t *)props[1];
 
@@ -1103,7 +1461,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
       window->config.height = height;
       if (window->ui_tree && window->ui_tree->layout) {
         (void)cmp_layout_calculate(window->ui_tree->layout, (float)width,
-                             (float)height);
+                                   (float)height);
       }
       if (window->resize_cb) {
         window->resize_cb(width, height, window->resize_user_data);
@@ -1124,8 +1482,8 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
       if (window->ui_tree && window->ui_tree->layout) {
         (void)cmp_layout_calculate(window->ui_tree->layout,
-                             (float)window->config.width,
-                             (float)window->config.height);
+                                   (float)window->config.width,
+                                   (float)window->config.height);
       }
 
       if (window->resize_cb) {
@@ -1191,6 +1549,16 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
   case WM_KEYDOWN:
   case WM_KEYUP:
   case WM_CHAR: {
+    if (uMsg == WM_KEYDOWN && wParam == 'D') {
+      if ((GetKeyState(VK_CONTROL) & 0x8000) &&
+          (GetKeyState(VK_SHIFT) & 0x8000)) {
+        if (window) {
+          window->devtools_enabled = !window->devtools_enabled;
+          InvalidateRect(hwnd, NULL, FALSE);
+        }
+        return 0;
+      }
+    }
     cmp_event_t evt;
     memset(&evt, 0, sizeof(evt));
     evt.type = 3; /* Keyboard */
@@ -1277,6 +1645,11 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
         if (window->ui_tree) {
           render_node_gdi(memDC, window->ui_tree, window->scale_factor, 0);
+          if (window->devtools_enabled) {
+            render_debug_overlay_gdi(memDC, window->ui_tree,
+                                     window->scale_factor, window->last_mouse_x,
+                                     window->last_mouse_y);
+          }
         } else {
           SetTextAlign(memDC, TA_CENTER);
           SetTextColor(memDC, RGB(240, 240, 240));
@@ -2509,7 +2882,7 @@ int cmp_renderer_end_frame(cmp_renderer_t *renderer) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_renderer_draw_sprite(cmp_renderer_t *renderer, cmp_texture_t *texture,
-                             cmp_rect_t dest, cmp_rect_t *src,
+                             cmp_rect_f_t dest, cmp_rect_f_t *src,
                              cmp_color_t color) {
   int rc = CMP_SUCCESS;
   (void)rc;

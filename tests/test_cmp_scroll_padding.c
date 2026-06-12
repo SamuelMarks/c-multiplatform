@@ -4,7 +4,7 @@
 /* clang-format on */
 
 TEST test_scroll_padding_apply(void) {
-  cmp_rect_t element_bounds = {0, 100, 50, 50};
+  cmp_rect_f_t element_bounds = {0, 100, 50, 50};
   cmp_scroll_padding_t padding = {10, 10, 10, 10};
   cmp_scroll_padding_t margin = {5, 5, 5, 5};
   float out_target_scroll_y;
@@ -29,7 +29,7 @@ TEST test_scroll_padding_apply(void) {
 }
 
 TEST test_scroll_padding_null_args(void) {
-  cmp_rect_t element_bounds = {0, 100, 50, 50};
+  cmp_rect_f_t element_bounds = {0, 100, 50, 50};
   cmp_scroll_padding_t padding = {10, 10, 10, 10};
   cmp_scroll_padding_t margin = {5, 5, 5, 5};
   float out_target_scroll_y;

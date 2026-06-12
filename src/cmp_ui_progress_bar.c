@@ -33,29 +33,25 @@ int cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
     LOG_DEBUG("OOM\n");
     return CMP_ERROR_OOM;
   }
+  memset(bar, 0, sizeof(cmp_ui_progress_bar_t));
 
-  bar->progress = 0.0f;
+  bar->progress = CMP_MATH_ZERO;
 
   err = cmp_ui_box_create(&bar->node_track);
-  if (err != 0) {
-    rc = CMP_FREE(bar);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
+  if (err != CMP_SUCCESS) {
+    CMP_FREE(bar);
     return err;
   }
 
   bar->node_track->bg_color = track_color;
-  bar->node_track->type = 10; /* Progress */
+  bar->node_track->type = CMP_UI_NODE_TYPE_PROGRESS; /* Progress */
   bar->node_track->layout->measure_ctx = bar->node_track;
   bar->node_track->layout->measure_cb = cmp_ui_layout_measure_dispatch;
 
   err = cmp_ui_box_create(&bar->node_fill);
-  if (err != 0) {
-    rc = CMP_FREE(bar);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("Free failed\n");
-    }
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(bar->node_track);
+    CMP_FREE(bar);
     return err;
   }
 
@@ -64,10 +60,14 @@ int cmp_ui_progress_bar_create(cmp_ui_progress_bar_t **out_bar,
   err = cmp_ui_node_add_child(bar->node_track, bar->node_fill);
   if (err != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_progress_bar_create: cmp_ui_node_add_child failed\n");
+    cmp_ui_node_destroy(bar->node_fill);
+    cmp_ui_node_destroy(bar->node_track);
+    CMP_FREE(bar);
+    return err;
   }
 
   *out_bar = bar;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -120,10 +120,10 @@ int cmp_ui_progress_bar_set_progress(cmp_ui_progress_bar_t *bar,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  if (progress < 0.0f) {
-    progress = 0.0f;
-  } else if (progress > 1.0f) {
-    progress = 1.0f;
+  if (progress < CMP_MATH_ZERO) {
+    progress = CMP_MATH_ZERO;
+  } else if (progress > CMP_MATH_ONE) {
+    progress = CMP_MATH_ONE;
   }
 
   bar->progress = progress;

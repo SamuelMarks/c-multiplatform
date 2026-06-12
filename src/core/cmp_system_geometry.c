@@ -101,7 +101,7 @@ int cmp_system_geometry_destroy(cmp_system_geometry_t *geom) {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_system_geometry_get_safe_area(cmp_system_geometry_t *geom, int is_tvos,
-                                      cmp_rect_t *out_safe_insets) {
+                                      cmp_rect_f_t *out_safe_insets) {
   int rc = CMP_SUCCESS;
   if (!geom || !out_safe_insets)
     return CMP_ERROR_INVALID_ARG;

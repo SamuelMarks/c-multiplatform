@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
+/* Navigation Rail Colors */
+#ifndef CMP_UI_NAVIGATION_RAIL_BG_COLOR
+#define CMP_UI_NAVIGATION_RAIL_BG_COLOR 0xFFF5F5F5
+#endif
+
 
 typedef struct cmp_ui_navigation_rail_dest {
   cmp_ui_node_t *node;
@@ -24,7 +29,6 @@ struct cmp_ui_navigation_rail {
  * @return Returns 0 on success, or an error code on failure.
  */
 int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
-  int rc = CMP_SUCCESS;
   cmp_ui_navigation_rail_t *rail;
   int err;
 
@@ -38,7 +42,7 @@ int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
   }
   memset(rail, 0, sizeof(cmp_ui_navigation_rail_t));
 
-  rail->dest_capacity = 4;
+  rail->dest_capacity = CMP_DEFAULT_CAPACITY;
   err = CMP_MALLOC(sizeof(cmp_ui_navigation_rail_dest_t) * rail->dest_capacity,
                    (void **)&rail->destinations);
   if (err != CMP_SUCCESS) {
@@ -48,27 +52,29 @@ int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
 
   err = cmp_ui_box_create(&rail->node_root);
   if (err != CMP_SUCCESS) {
-    if (CMP_FREE(rail->destinations) != CMP_SUCCESS)
-      LOG_DEBUG(
-          "cmp_ui_navigation_rail_create: CMP_FREE destinations failed\n");
-    if (CMP_FREE(rail) != CMP_SUCCESS)
-      LOG_DEBUG("cmp_ui_navigation_rail_create: CMP_FREE rail failed\n");
+    CMP_FREE(rail->destinations);
+    CMP_FREE(rail);
     return err;
   }
 
   err =
       CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&rail->node_root->layout);
-  if (err == CMP_SUCCESS) {
-    memset(rail->node_root->layout, 0, sizeof(cmp_layout_node_t));
-    rail->node_root->layout->id = 1;
-    rail->node_root->layout->direction = CMP_FLEX_COLUMN;
+  if (err != CMP_SUCCESS) {
+    cmp_ui_node_destroy(rail->node_root);
+    CMP_FREE(rail->destinations);
+    CMP_FREE(rail);
+    return err;
   }
-  rail->node_root->bg_color = 0xFFF5F5F5;
+  memset(rail->node_root->layout, 0, sizeof(cmp_layout_node_t));
+  rail->node_root->layout->id = 1;
+  rail->node_root->layout->direction = CMP_FLEX_COLUMN;
+  
+  rail->node_root->bg_color = CMP_UI_NAVIGATION_RAIL_BG_COLOR;
   rail->selected_index = -1;
 
   *out_rail = rail;
 
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**
@@ -134,7 +140,7 @@ int cmp_ui_navigation_rail_add_destination(cmp_ui_navigation_rail_t *rail,
   }
 
   if (rail->dest_count >= rail->dest_capacity) {
-    int new_cap = rail->dest_capacity * 2;
+    int new_cap = rail->dest_capacity * CMP_CAPACITY_MULTIPLIER;
     cmp_ui_navigation_rail_dest_t *new_dests;
     err = CMP_MALLOC(sizeof(cmp_ui_navigation_rail_dest_t) * new_cap,
                      (void **)&new_dests);
@@ -218,7 +224,7 @@ int cmp_ui_navigation_rail_bind_a11y(cmp_ui_navigation_rail_t *widget,
     return CMP_ERROR_INVALID_ARG;
   }
   rc = cmp_a11y_tree_add_node(tree, widget->node_root->layout->id, "navigation",
-                         "Navigation Rail");
+                              "Navigation Rail");
   if (rc != 0) {
     return rc;
   }

@@ -66,7 +66,8 @@ int cmp_anchor_func_init(cmp_anchor_funcs_t *func, const char *name,
   func->func.anchor.side = side;
   {
     int rc = cmp_prop_size_init_auto(&func->func.anchor.fallback);
-    if (rc != 0) return rc;
+    if (rc != 0)
+      return rc;
   }
   return cmp_strdup_safe(name, &func->func.anchor.anchor_name);
 }
@@ -79,7 +80,8 @@ int cmp_anchor_size_func_init(cmp_anchor_funcs_t *func, const char *name,
   func->func.anchor_size.dimension = dim;
   {
     int rc = cmp_prop_size_init_auto(&func->func.anchor_size.fallback);
-    if (rc != 0) return rc;
+    if (rc != 0)
+      return rc;
   }
   return cmp_strdup_safe(name, &func->func.anchor_size.anchor_name);
 }

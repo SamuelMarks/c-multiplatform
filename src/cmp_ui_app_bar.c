@@ -5,6 +5,10 @@
 #include <string.h>
 /* clang-format on */
 
+/* App Bar Metrics */
+#define CMP_UI_APP_BAR_HEIGHT 64.0f
+#define CMP_UI_APP_BAR_PADDING_H 16.0f
+
 /**
  * @brief Opaque internal structure for UI App Bar widget.
  */
@@ -50,15 +54,7 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
   rc = cmp_ui_box_create(&bar->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_box_create failed\n");
-    {
-
-      int free_rc_1 = CMP_FREE(bar);
-
-      if (free_rc_1 != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_app_bar_create: CMP_FREE failed\n");
-      }
-    }
-
+    CMP_FREE(bar);
     return rc;
   }
 
@@ -66,53 +62,65 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
     bar->node_root->layout->id = 1;
     bar->node_root->layout->direction = CMP_FLEX_ROW;
     bar->node_root->bg_color = 0xFFF5F5F5;
-    bar->node_root->layout->width = -1.0f;
-    bar->node_root->layout->height = 64.0f;
-    bar->node_root->layout->padding[1] = 16.0f;
-    bar->node_root->layout->padding[3] = 16.0f;
+    bar->node_root->layout->width = -CMP_MATH_ONE;
+    bar->node_root->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+bar->node_root->layout->height = CMP_UI_APP_BAR_HEIGHT;
+    bar->node_root->layout->padding[1] = CMP_UI_APP_BAR_PADDING_H;
+    bar->node_root->layout->padding[3] = CMP_UI_APP_BAR_PADDING_H;
     bar->node_root->layout->align_items = CMP_FLEX_ALIGN_CENTER;
     bar->node_root->layout->justify_content = CMP_FLEX_ALIGN_SPACE_BETWEEN;
+    bar->node_root->layout->overflow_x = CMP_OVERFLOW_HIDDEN; /* Hidden */
   }
 
   rc = cmp_ui_text_create(&bar->node_title, "", 0);
-  if (rc == CMP_SUCCESS) {
-    bar->node_title->layout->flex_shrink = 1.0f;
-    rc = cmp_ui_node_add_child(bar->node_root, bar->node_title);
-  }
-
-  if (rc == CMP_SUCCESS) {
-    rc = cmp_ui_box_create(&bar->node_actions);
-    if (rc == CMP_SUCCESS) {
-      bar->node_actions->layout->direction = CMP_FLEX_ROW;
-      bar->node_actions->layout->justify_content = CMP_FLEX_ALIGN_END;
-      bar->node_actions->layout->align_items = CMP_FLEX_ALIGN_CENTER;
-      bar->node_actions->layout->height = 64.0f;
-      bar->node_actions->layout->width = -1.0f;
-      bar->node_actions->layout->flex_shrink = 0.0f;
-      bar->node_actions->layout->flex_grow = 1.0f;
-      rc = cmp_ui_node_add_child(bar->node_root, bar->node_actions);
-      if (rc != CMP_SUCCESS)
-        return rc;
-    }
-  } else {
+  if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_text_create failed\n");
-    rc = cmp_ui_node_destroy(bar->node_root);
-    if (rc != CMP_SUCCESS) {
-      LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_node_destroy failed\n");
-    }
-    {
-
-      int free_rc_2 = CMP_FREE(bar);
-
-      if (free_rc_2 != CMP_SUCCESS) {
-        LOG_DEBUG("cmp_ui_app_bar_create: CMP_FREE failed\n");
-      }
-    }
+    cmp_ui_node_destroy(bar->node_root);
+    CMP_FREE(bar);
     return CMP_ERROR_GENERAL;
   }
 
+  bar->node_title->layout->flex_shrink = CMP_MATH_ONE;
+  bar->node_title->layout->flex_grow = CMP_MATH_ONE;
+  bar->node_title->layout->min_width = CMP_MATH_ZERO;
+  bar->node_title->layout->text_overflow = CMP_TEXT_OVERFLOW_ELLIPSIS;
+  bar->node_title->layout->white_space = CMP_WHITE_SPACE_NOWRAP;
+  rc = cmp_ui_node_add_child(bar->node_root, bar->node_title);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_node_add_child title failed\n");
+    cmp_ui_node_destroy(bar->node_title);
+    cmp_ui_node_destroy(bar->node_root);
+    CMP_FREE(bar);
+    return rc;
+  }
+
+  rc = cmp_ui_box_create(&bar->node_actions);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_box_create actions failed\n");
+    cmp_ui_node_destroy(bar->node_root);
+    CMP_FREE(bar);
+    return rc;
+  }
+
+  bar->node_actions->layout->direction = CMP_FLEX_ROW;
+  bar->node_actions->layout->justify_content = CMP_FLEX_ALIGN_END;
+  bar->node_actions->layout->align_items = CMP_FLEX_ALIGN_CENTER;
+  bar->node_actions->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
+bar->node_actions->layout->height = CMP_UI_APP_BAR_HEIGHT;
+  bar->node_actions->layout->flex_shrink = CMP_MATH_ZERO;
+  bar->node_actions->layout->flex_grow = CMP_MATH_ZERO;
+  
+  rc = cmp_ui_node_add_child(bar->node_root, bar->node_actions);
+  if (rc != CMP_SUCCESS) {
+    LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_node_add_child actions failed\n");
+    cmp_ui_node_destroy(bar->node_actions);
+    cmp_ui_node_destroy(bar->node_root);
+    CMP_FREE(bar);
+    return rc;
+  }
+
   *out_bar = bar;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

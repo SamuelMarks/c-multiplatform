@@ -1,5 +1,37 @@
 /* clang-format off */
 #include "themes/cmp_f2_theme.h"
+
+
+/* Fluent 2 Mix Constants */
+#define CMP_F2_MIX_10 0.20f
+#define CMP_F2_MIX_20 0.30f
+#define CMP_F2_MIX_30 0.40f
+#define CMP_F2_MIX_40 0.50f
+#define CMP_F2_MIX_50 0.60f
+#define CMP_F2_MIX_60 0.70f
+#define CMP_F2_MIX_70 0.85f
+#define CMP_F2_MIX_90 0.15f
+#define CMP_F2_MIX_100 0.30f
+#define CMP_F2_MIX_110 0.40f
+#define CMP_F2_MIX_120 0.50f
+#define CMP_F2_MIX_130 0.60f
+#define CMP_F2_MIX_140 0.70f
+#define CMP_F2_MIX_150 0.80f
+#define CMP_F2_MIX_160 0.90f
+
+/* Fluent 2 Shadow Colors */
+#define CMP_F2_SHADOW_5_PERCENT  0x0D000000U
+#define CMP_F2_SHADOW_10_PERCENT 0x1A000000U
+#define CMP_F2_SHADOW_12_PERCENT 0x1F000000U
+#define CMP_F2_SHADOW_14_PERCENT 0x24000000U
+#define CMP_F2_SHADOW_15_PERCENT 0x26000000U
+#define CMP_F2_SHADOW_20_PERCENT 0x33000000U
+#define CMP_F2_SHADOW_24_PERCENT 0x3D000000U
+
+/* Fluent 2 Alpha Constants */
+#define CMP_F2_ALPHA_50_PERCENT 0x80U
+#define CMP_F2_ALPHA_100_PERCENT 0xFFU
+
 /* clang-format on */
 
 /**
@@ -45,22 +77,22 @@ static uint32_t cmp_math_f2_mix(uint32_t color1, uint32_t color2, float t) {
  */
 static void cmp_f2_generate_ramp(uint32_t base_color,
                                  cmp_f2_color_ramp_t *out_ramp) {
-  out_ramp->step_10 = cmp_math_f2_mix(0x000000, base_color, 0.20f);
-  out_ramp->step_20 = cmp_math_f2_mix(0x000000, base_color, 0.30f);
-  out_ramp->step_30 = cmp_math_f2_mix(0x000000, base_color, 0.40f);
-  out_ramp->step_40 = cmp_math_f2_mix(0x000000, base_color, 0.50f);
-  out_ramp->step_50 = cmp_math_f2_mix(0x000000, base_color, 0.60f);
-  out_ramp->step_60 = cmp_math_f2_mix(0x000000, base_color, 0.70f);
-  out_ramp->step_70 = cmp_math_f2_mix(0x000000, base_color, 0.85f);
+  out_ramp->step_10 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_10);
+  out_ramp->step_20 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_100);
+  out_ramp->step_30 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_110);
+  out_ramp->step_40 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_120);
+  out_ramp->step_50 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_130);
+  out_ramp->step_60 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_140);
+  out_ramp->step_70 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_70);
   out_ramp->step_80 = base_color;
-  out_ramp->step_90 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.15f);
-  out_ramp->step_100 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.30f);
-  out_ramp->step_110 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.40f);
-  out_ramp->step_120 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.50f);
-  out_ramp->step_130 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.60f);
-  out_ramp->step_140 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.70f);
-  out_ramp->step_150 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.80f);
-  out_ramp->step_160 = cmp_math_f2_mix(base_color, 0xFFFFFF, 0.90f);
+  out_ramp->step_90 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_90);
+  out_ramp->step_100 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_100);
+  out_ramp->step_110 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_110);
+  out_ramp->step_120 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_120);
+  out_ramp->step_130 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_130);
+  out_ramp->step_140 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_140);
+  out_ramp->step_150 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_150);
+  out_ramp->step_160 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_160);
 }
 
 /**
@@ -115,33 +147,33 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
   /* Global Brand Palette */
   (void)cmp_f2_generate_ramp(brand_color, &out_theme->brand);
   /* Global Shared Palettes */
-  (void)cmp_f2_generate_ramp(0xD13438, &out_theme->red);
-  (void)cmp_f2_generate_ramp(0x59000B, &out_theme->dark_red);
-  (void)cmp_f2_generate_ramp(0xC50F1F, &out_theme->cranberry);
-  (void)cmp_f2_generate_ramp(0xCA5010, &out_theme->pumpkin);
-  (void)cmp_f2_generate_ramp(0xFF8C00, &out_theme->peach);
-  (void)cmp_f2_generate_ramp(0xEAA300, &out_theme->marigold);
-  (void)cmp_f2_generate_ramp(0xFFE000, &out_theme->yellow);
-  (void)cmp_f2_generate_ramp(0xFFB900, &out_theme->gold);
-  (void)cmp_f2_generate_ramp(0x986F0B, &out_theme->brass);
-  (void)cmp_f2_generate_ramp(0x8E562E, &out_theme->brown);
-  (void)cmp_f2_generate_ramp(0x498205, &out_theme->forest);
-  (void)cmp_f2_generate_ramp(0x00CC6A, &out_theme->seafoam);
-  (void)cmp_f2_generate_ramp(0x0B6A0B, &out_theme->dark_green);
-  (void)cmp_f2_generate_ramp(0x00B7C3, &out_theme->light_teal);
-  (void)cmp_f2_generate_ramp(0x038387, &out_theme->teal);
-  (void)cmp_f2_generate_ramp(0x005B70, &out_theme->steel);
-  (void)cmp_f2_generate_ramp(0x0078D4, &out_theme->blue);
-  (void)cmp_f2_generate_ramp(0x004E8C, &out_theme->royal_blue);
-  (void)cmp_f2_generate_ramp(0x4F6BED, &out_theme->cornflower);
-  (void)cmp_f2_generate_ramp(0x00275B, &out_theme->navy);
-  (void)cmp_f2_generate_ramp(0x7160E8, &out_theme->lavender);
-  (void)cmp_f2_generate_ramp(0x5C2E91, &out_theme->purple);
-  (void)cmp_f2_generate_ramp(0x881798, &out_theme->grape);
-  (void)cmp_f2_generate_ramp(0xC239B3, &out_theme->berry);
-  (void)cmp_f2_generate_ramp(0xE43BA6, &out_theme->pink);
-  (void)cmp_f2_generate_ramp(0xBF0077, &out_theme->magenta);
-  (void)cmp_f2_generate_ramp(0x770039, &out_theme->plum);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_RED, &out_theme->red);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_DARK_RED, &out_theme->dark_red);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_CRANBERRY, &out_theme->cranberry);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_PUMPKIN, &out_theme->pumpkin);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_PEACH, &out_theme->peach);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_MARIGOLD, &out_theme->marigold);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_YELLOW, &out_theme->yellow);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_GOLD, &out_theme->gold);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_BRASS, &out_theme->brass);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_BROWN, &out_theme->brown);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_FOREST, &out_theme->forest);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_SEAFOAM, &out_theme->seafoam);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_DARK_GREEN, &out_theme->dark_green);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_LIGHT_TEAL, &out_theme->light_teal);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_TEAL, &out_theme->teal);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_STEEL, &out_theme->steel);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_BLUE, &out_theme->blue);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_ROYAL_BLUE, &out_theme->royal_blue);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_CORNFLOWER, &out_theme->cornflower);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_NAVY, &out_theme->navy);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_LAVENDER, &out_theme->lavender);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_PURPLE, &out_theme->purple);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_GRAPE, &out_theme->grape);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_BERRY, &out_theme->berry);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_PINK, &out_theme->pink);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_MAGENTA, &out_theme->magenta);
+  (void)cmp_f2_generate_ramp(CMP_F2_COLOR_PLUM, &out_theme->plum);
   /* Semantic Token Mapping */
   if (is_dark) {
     /* Layering Tokens - Dark Mode */
@@ -174,7 +206,7 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
 
     /* Surface Tokens - Dark Mode */
     out_theme->color_transparent_background =
-        0x000000; /* Transparent technically, simulated as 0 */
+        CMP_COLOR_BLACK; /* Transparent technically, simulated as 0 */
     out_theme->color_transparent_background_hover = out_theme->neutral_14;
     out_theme->color_transparent_background_pressed = out_theme->neutral_12;
     out_theme->color_transparent_background_selected = out_theme->neutral_16;
@@ -200,7 +232,7 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
     out_theme->color_neutral_stroke_accessible = out_theme->neutral_60;
 
     /* Focus Tokens - Dark Mode */
-    out_theme->color_stroke_focus_1 = 0x000000;
+    out_theme->color_stroke_focus_1 = CMP_COLOR_BLACK;
     out_theme->color_stroke_focus_2 = out_theme->neutral_100;
 
     /* Status Tokens - Dark Mode */
@@ -254,7 +286,7 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
 
     /* Surface Tokens - Light Mode */
     out_theme->color_transparent_background =
-        0xFFFFFF; /* Transparent technically */
+        CMP_COLOR_WHITE; /* Transparent technically */
     out_theme->color_transparent_background_hover = out_theme->neutral_90;
     out_theme->color_transparent_background_pressed = out_theme->neutral_80;
     out_theme->color_transparent_background_selected = out_theme->neutral_90;
@@ -282,7 +314,7 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
 
     /* Focus Tokens - Light Mode */
     out_theme->color_stroke_focus_1 = out_theme->neutral_100;
-    out_theme->color_stroke_focus_2 = 0x000000;
+    out_theme->color_stroke_focus_2 = CMP_COLOR_BLACK;
 
     /* Status Tokens - Light Mode */
     out_theme->color_success_background = out_theme->dark_green.step_160;
@@ -310,14 +342,14 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
   /* E.g., 50% opacity neutral background */
   if (is_dark) {
     out_theme->color_neutral_background_alpha =
-        (0x80U << 24) | out_theme->neutral_12;
+        (CMP_F2_ALPHA_50_PERCENT << 24) | out_theme->neutral_12;
     out_theme->color_brand_background_alpha =
-        (0x80U << 24) | out_theme->brand.step_100;
+        (CMP_F2_ALPHA_50_PERCENT << 24) | out_theme->brand.step_100;
   } else {
     out_theme->color_neutral_background_alpha =
-        (0x80U << 24) | out_theme->neutral_90;
+        (CMP_F2_ALPHA_50_PERCENT << 24) | out_theme->neutral_90;
     out_theme->color_brand_background_alpha =
-        (0x80U << 24) | out_theme->brand.step_80;
+        (CMP_F2_ALPHA_50_PERCENT << 24) | out_theme->brand.step_80;
   }
 
 /* Typography Tokens */
@@ -489,52 +521,52 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
        structural parity. */
     out_theme->shadow_2.y1 = 1.0f;
     out_theme->shadow_2.blur1 = 2.0f;
-    out_theme->shadow_2.color1 = 0x1A000000; /* 10% black */
+    out_theme->shadow_2.color1 = CMP_F2_SHADOW_10_PERCENT; /* 10% black */
     out_theme->shadow_2.y2 = 0.0f;
     out_theme->shadow_2.blur2 = 2.0f;
-    out_theme->shadow_2.color2 = 0x0D000000; /* 5% black */
+    out_theme->shadow_2.color2 = CMP_F2_SHADOW_5_PERCENT; /* 5% black */
 
     out_theme->shadow_4.y1 = 2.0f;
     out_theme->shadow_4.blur1 = 4.0f;
-    out_theme->shadow_4.color1 = 0x26000000;
+    out_theme->shadow_4.color1 = CMP_F2_SHADOW_15_PERCENT;
     out_theme->shadow_4.y2 = 0.0f;
     out_theme->shadow_4.blur2 = 2.0f;
-    out_theme->shadow_4.color2 = 0x1A000000;
+    out_theme->shadow_4.color2 = CMP_F2_SHADOW_10_PERCENT;
 
     out_theme->shadow_8.y1 = 4.0f;
     out_theme->shadow_8.blur1 = 8.0f;
-    out_theme->shadow_8.color1 = 0x26000000;
+    out_theme->shadow_8.color1 = CMP_F2_SHADOW_15_PERCENT;
     out_theme->shadow_8.y2 = 0.0f;
     out_theme->shadow_8.blur2 = 2.0f;
-    out_theme->shadow_8.color2 = 0x1A000000;
+    out_theme->shadow_8.color2 = CMP_F2_SHADOW_10_PERCENT;
 
     out_theme->shadow_16.y1 = 8.0f;
     out_theme->shadow_16.blur1 = 16.0f;
-    out_theme->shadow_16.color1 = 0x26000000;
+    out_theme->shadow_16.color1 = CMP_F2_SHADOW_15_PERCENT;
     out_theme->shadow_16.y2 = 0.0f;
     out_theme->shadow_16.blur2 = 2.0f;
-    out_theme->shadow_16.color2 = 0x1A000000;
+    out_theme->shadow_16.color2 = CMP_F2_SHADOW_10_PERCENT;
 
     out_theme->shadow_28.y1 = 14.0f;
     out_theme->shadow_28.blur1 = 28.0f;
-    out_theme->shadow_28.color1 = 0x33000000;
+    out_theme->shadow_28.color1 = CMP_F2_SHADOW_20_PERCENT;
     out_theme->shadow_28.y2 = 0.0f;
     out_theme->shadow_28.blur2 = 8.0f;
-    out_theme->shadow_28.color2 = 0x1A000000;
+    out_theme->shadow_28.color2 = CMP_F2_SHADOW_10_PERCENT;
 
     out_theme->shadow_64.y1 = 32.0f;
     out_theme->shadow_64.blur1 = 64.0f;
-    out_theme->shadow_64.color1 = 0x33000000;
+    out_theme->shadow_64.color1 = CMP_F2_SHADOW_20_PERCENT;
     out_theme->shadow_64.y2 = 0.0f;
     out_theme->shadow_64.blur2 = 16.0f;
-    out_theme->shadow_64.color2 = 0x1A000000;
+    out_theme->shadow_64.color2 = CMP_F2_SHADOW_10_PERCENT;
 
     /* Materials */
-    out_theme->material_mica_background = (0xFFU << 24) | out_theme->neutral_10;
+    out_theme->material_mica_background = (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_10;
     out_theme->material_mica_alt_background =
-        (0xFFU << 24) | out_theme->neutral_12;
+        (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_12;
     out_theme->material_acrylic_background =
-        (0x80U << 24) | out_theme->neutral_10;
+        (CMP_F2_ALPHA_50_PERCENT << 24) | out_theme->neutral_10;
     out_theme->material_acrylic_blur = 30.0f;
     out_theme->material_acrylic_fallback = out_theme->neutral_14;
 
@@ -542,52 +574,52 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
     /* Light mode shadows */
     out_theme->shadow_2.y1 = 1.0f;
     out_theme->shadow_2.blur1 = 2.0f;
-    out_theme->shadow_2.color1 = 0x24000000; /* 14% */
+    out_theme->shadow_2.color1 = CMP_F2_SHADOW_14_PERCENT; /* 14% */
     out_theme->shadow_2.y2 = 0.0f;
     out_theme->shadow_2.blur2 = 2.0f;
-    out_theme->shadow_2.color2 = 0x1F000000; /* 12% */
+    out_theme->shadow_2.color2 = CMP_F2_SHADOW_12_PERCENT; /* 12% */
 
     out_theme->shadow_4.y1 = 2.0f;
     out_theme->shadow_4.blur1 = 4.0f;
-    out_theme->shadow_4.color1 = 0x24000000;
+    out_theme->shadow_4.color1 = CMP_F2_SHADOW_14_PERCENT;
     out_theme->shadow_4.y2 = 0.0f;
     out_theme->shadow_4.blur2 = 2.0f;
-    out_theme->shadow_4.color2 = 0x24000000;
+    out_theme->shadow_4.color2 = CMP_F2_SHADOW_14_PERCENT;
 
     out_theme->shadow_8.y1 = 4.0f;
     out_theme->shadow_8.blur1 = 8.0f;
-    out_theme->shadow_8.color1 = 0x24000000;
+    out_theme->shadow_8.color1 = CMP_F2_SHADOW_14_PERCENT;
     out_theme->shadow_8.y2 = 0.0f;
     out_theme->shadow_8.blur2 = 2.0f;
-    out_theme->shadow_8.color2 = 0x1F000000;
+    out_theme->shadow_8.color2 = CMP_F2_SHADOW_12_PERCENT;
 
     out_theme->shadow_16.y1 = 8.0f;
     out_theme->shadow_16.blur1 = 16.0f;
-    out_theme->shadow_16.color1 = 0x24000000;
+    out_theme->shadow_16.color1 = CMP_F2_SHADOW_14_PERCENT;
     out_theme->shadow_16.y2 = 0.0f;
     out_theme->shadow_16.blur2 = 2.0f;
-    out_theme->shadow_16.color2 = 0x1F000000;
+    out_theme->shadow_16.color2 = CMP_F2_SHADOW_12_PERCENT;
 
     out_theme->shadow_28.y1 = 14.0f;
     out_theme->shadow_28.blur1 = 28.0f;
-    out_theme->shadow_28.color1 = 0x3D000000; /* 24% */
+    out_theme->shadow_28.color1 = CMP_F2_SHADOW_24_PERCENT; /* 24% */
     out_theme->shadow_28.y2 = 0.0f;
     out_theme->shadow_28.blur2 = 8.0f;
-    out_theme->shadow_28.color2 = 0x33000000; /* 20% */
+    out_theme->shadow_28.color2 = CMP_F2_SHADOW_20_PERCENT; /* 20% */
 
     out_theme->shadow_64.y1 = 32.0f;
     out_theme->shadow_64.blur1 = 64.0f;
-    out_theme->shadow_64.color1 = 0x3D000000;
+    out_theme->shadow_64.color1 = CMP_F2_SHADOW_24_PERCENT;
     out_theme->shadow_64.y2 = 0.0f;
     out_theme->shadow_64.blur2 = 16.0f;
-    out_theme->shadow_64.color2 = 0x33000000;
+    out_theme->shadow_64.color2 = CMP_F2_SHADOW_20_PERCENT;
 
     /* Materials */
-    out_theme->material_mica_background = (0xFFU << 24) | out_theme->neutral_90;
+    out_theme->material_mica_background = (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_90;
     out_theme->material_mica_alt_background =
-        (0xFFU << 24) | out_theme->neutral_100;
+        (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_100;
     out_theme->material_acrylic_background =
-        (0x80U << 24) | out_theme->neutral_90;
+        (CMP_F2_ALPHA_50_PERCENT << 24) | out_theme->neutral_90;
     out_theme->material_acrylic_blur = 30.0f;
     out_theme->material_acrylic_fallback = out_theme->neutral_80;
   }
@@ -705,8 +737,8 @@ int CMP_API cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
   out_theme->color_info_stroke = window_text;
 
   /* Alphas remain completely opaque in HC mode for accessibility */
-  out_theme->color_neutral_background_alpha = (0xFFU << 24) | window;
-  out_theme->color_brand_background_alpha = (0xFFU << 24) | highlight;
+  out_theme->color_neutral_background_alpha = (CMP_F2_ALPHA_100_PERCENT << 24) | window;
+  out_theme->color_brand_background_alpha = (CMP_F2_ALPHA_100_PERCENT << 24) | highlight;
 
   /* Spacing Tokens (Same as standard) */
   out_theme->spacing_none = 0.0f;
@@ -744,10 +776,10 @@ int CMP_API cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
   /* Shadows - effectively suppressed in HC mode */
   out_theme->shadow_2.y1 = 0.0f;
   out_theme->shadow_2.blur1 = 0.0f;
-  out_theme->shadow_2.color1 = 0x00000000;
+  out_theme->shadow_2.color1 = CMP_COLOR_TRANSPARENT;
   out_theme->shadow_2.y2 = 0.0f;
   out_theme->shadow_2.blur2 = 0.0f;
-  out_theme->shadow_2.color2 = 0x00000000;
+  out_theme->shadow_2.color2 = CMP_COLOR_TRANSPARENT;
 
   out_theme->shadow_4 = out_theme->shadow_2;
   out_theme->shadow_8 = out_theme->shadow_2;
@@ -756,9 +788,9 @@ int CMP_API cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
   out_theme->shadow_64 = out_theme->shadow_2;
 
   /* Materials */
-  out_theme->material_mica_background = (0xFFU << 24) | window;
-  out_theme->material_mica_alt_background = (0xFFU << 24) | window;
-  out_theme->material_acrylic_background = (0xFFU << 24) | window;
+  out_theme->material_mica_background = (CMP_F2_ALPHA_100_PERCENT << 24) | window;
+  out_theme->material_mica_alt_background = (CMP_F2_ALPHA_100_PERCENT << 24) | window;
+  out_theme->material_acrylic_background = (CMP_F2_ALPHA_100_PERCENT << 24) | window;
   out_theme->material_acrylic_blur = 0.0f;
   out_theme->material_acrylic_fallback = window;
 

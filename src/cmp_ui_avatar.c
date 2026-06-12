@@ -125,10 +125,12 @@ int cmp_ui_avatar_create(cmp_ui_avatar_t **out_avatar, const char *initials,
   rc = cmp_ui_node_add_child(avatar->node_root, avatar->node_text);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_avatar_create: cmp_ui_node_add_child failed\n");
+    cmp_ui_avatar_destroy(avatar);
+    return rc;
   }
 
   *out_avatar = avatar;
-  return rc;
+  return CMP_SUCCESS;
 }
 
 /**

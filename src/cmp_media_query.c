@@ -299,8 +299,8 @@ int cmp_style_query_evaluate(const cmp_style_query_t *query,
  * @return Returns CMP_SUCCESS on success, or an error code on failure.
  */
 int cmp_content_visibility_evaluate(cmp_content_visibility_t visibility,
-                                    const cmp_rect_t *viewport,
-                                    const cmp_rect_t *node_rect,
+                                    const cmp_rect_f_t *viewport,
+                                    const cmp_rect_f_t *node_rect,
                                     int *out_is_visible) {
   int rc = CMP_SUCCESS;
   int x_overlap;
