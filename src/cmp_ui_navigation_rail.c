@@ -8,7 +8,6 @@
 #define CMP_UI_NAVIGATION_RAIL_BG_COLOR 0xFFF5F5F5
 #endif
 
-
 typedef struct cmp_ui_navigation_rail_dest {
   cmp_ui_node_t *node;
   int is_selected;
@@ -57,18 +56,8 @@ int cmp_ui_navigation_rail_create(cmp_ui_navigation_rail_t **out_rail) {
     return err;
   }
 
-  err =
-      CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&rail->node_root->layout);
-  if (err != CMP_SUCCESS) {
-    cmp_ui_node_destroy(rail->node_root);
-    CMP_FREE(rail->destinations);
-    CMP_FREE(rail);
-    return err;
-  }
-  memset(rail->node_root->layout, 0, sizeof(cmp_layout_node_t));
-  rail->node_root->layout->id = 1;
   rail->node_root->layout->direction = CMP_FLEX_COLUMN;
-  
+
   rail->node_root->bg_color = CMP_UI_NAVIGATION_RAIL_BG_COLOR;
   rail->selected_index = -1;
 

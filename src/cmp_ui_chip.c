@@ -98,14 +98,7 @@ int cmp_ui_chip_create(cmp_ui_chip_t **out_chip, const char *text,
     return CMP_ERROR_GENERAL;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&chip->node_root->layout);
-  if (rc != CMP_SUCCESS) {
-    cmp_ui_chip_destroy(chip);
-    return rc;
-  }
-    memset(chip->node_root->layout, 0, sizeof(cmp_layout_node_t));
-    chip->node_root->layout->id = 1;
-    chip->node_root->layout->direction = CMP_FLEX_ROW;
+  chip->node_root->layout->direction = CMP_FLEX_ROW;
 
   chip->node_root->bg_color = bg_color;
 

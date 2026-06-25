@@ -8,7 +8,6 @@
 #define CMP_UI_TEXT_FIELD_BG_COLOR 0xFFF5F5F5
 #endif
 
-
 struct cmp_ui_text_field {
   cmp_ui_node_t *node_root;
   cmp_ui_node_t *node_label;
@@ -53,7 +52,8 @@ int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
 
   err = cmp_ui_box_create(&field->node_root);
   if (err != CMP_SUCCESS) {
-    if (field->label) CMP_FREE(field->label);
+    if (field->label)
+      CMP_FREE(field->label);
     CMP_FREE(field);
     return err;
   }
@@ -61,10 +61,12 @@ int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
   field->node_root->layout->direction = CMP_FLEX_COLUMN;
   field->node_root->bg_color = CMP_UI_TEXT_FIELD_BG_COLOR;
 
-  err = cmp_ui_text_create(&field->node_label, field->label ? field->label : "", -1);
+  err = cmp_ui_text_create(&field->node_label, field->label ? field->label : "",
+                           -1);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(field->node_root);
-    if (field->label) CMP_FREE(field->label);
+    if (field->label)
+      CMP_FREE(field->label);
     CMP_FREE(field);
     return err;
   }
@@ -72,7 +74,8 @@ int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(field->node_label);
     cmp_ui_node_destroy(field->node_root);
-    if (field->label) CMP_FREE(field->label);
+    if (field->label)
+      CMP_FREE(field->label);
     CMP_FREE(field);
     return err;
   }
@@ -80,7 +83,8 @@ int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
   err = cmp_ui_text_input_create(&field->node_input);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(field->node_root);
-    if (field->label) CMP_FREE(field->label);
+    if (field->label)
+      CMP_FREE(field->label);
     CMP_FREE(field);
     return err;
   }
@@ -88,7 +92,8 @@ int cmp_ui_text_field_create(cmp_ui_text_field_t **out_field,
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(field->node_input);
     cmp_ui_node_destroy(field->node_root);
-    if (field->label) CMP_FREE(field->label);
+    if (field->label)
+      CMP_FREE(field->label);
     CMP_FREE(field);
     return err;
   }

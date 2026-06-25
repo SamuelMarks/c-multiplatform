@@ -470,9 +470,15 @@ static void render_debug_overlay_gdi(HDC hdc, cmp_ui_node_t *node,
             (int)(content_box.x + content_box.width),
             (int)(content_box.y + content_box.height));
 
-  if (node->type == CMP_UI_NODE_TYPE_BUTTON || node->type == CMP_UI_NODE_TYPE_TEXT_INPUT || node->type == CMP_UI_NODE_TYPE_CHECKBOX ||
-      node->type == CMP_UI_NODE_TYPE_IMAGE_VIEW || node->type == CMP_UI_NODE_TYPE_SLIDER || node->type == CMP_UI_NODE_TYPE_LIST_VIEW ||
-      node->type == CMP_UI_NODE_TYPE_MODAL || node->type == CMP_UI_NODE_TYPE_CANVAS || node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
+  if (node->type == CMP_UI_NODE_TYPE_BUTTON ||
+      node->type == CMP_UI_NODE_TYPE_TEXT_INPUT ||
+      node->type == CMP_UI_NODE_TYPE_CHECKBOX ||
+      node->type == CMP_UI_NODE_TYPE_IMAGE_VIEW ||
+      node->type == CMP_UI_NODE_TYPE_SLIDER ||
+      node->type == CMP_UI_NODE_TYPE_LIST_VIEW ||
+      node->type == CMP_UI_NODE_TYPE_MODAL ||
+      node->type == CMP_UI_NODE_TYPE_CANVAS ||
+      node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
     if ((content_box.width / scale_factor) < 44.0f ||
         (content_box.height / scale_factor) < 44.0f) {
       HPEN red_pen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
@@ -644,8 +650,11 @@ static void render_debug_overlay_gdi(HDC hdc, cmp_ui_node_t *node,
     DeleteObject(clip_pen);
   }
 
-  if (node->type == CMP_UI_NODE_TYPE_TEXT || node->type == CMP_UI_NODE_TYPE_BUTTON || node->type == CMP_UI_NODE_TYPE_TEXT_INPUT ||
-      node->type == CMP_UI_NODE_TYPE_DROPDOWN || node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
+  if (node->type == CMP_UI_NODE_TYPE_TEXT ||
+      node->type == CMP_UI_NODE_TYPE_BUTTON ||
+      node->type == CMP_UI_NODE_TYPE_TEXT_INPUT ||
+      node->type == CMP_UI_NODE_TYPE_DROPDOWN ||
+      node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
     float baseline_y;
     if (cmp_layout_node_get_baseline_y(node->layout, &baseline_y) ==
             CMP_SUCCESS &&
@@ -927,7 +936,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         }
         old_br = (HBRUSH)SelectObject(hdc, br);
         old_pen = (HPEN)SelectObject(hdc, pen);
-        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
+        if (node->border_radius > 0.0f ||
+            node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           RoundRect(hdc, ix, iy, ix + iw + 1, iy + ih + 1, radius, radius);
         } else {
@@ -957,7 +967,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         FillRect(memDC, &rct, br);
         DeleteObject(br);
 
-        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
+        if (node->border_radius > 0.0f ||
+            node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           rgn = CreateRoundRectRgn(ix, iy, ix + iw + 1, iy + ih + 1, radius,
                                    radius);
@@ -1014,7 +1025,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         FillRect(memDC, &rct, br);
         DeleteObject(br);
 
-        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
+        if (node->border_radius > 0.0f ||
+            node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           rgn = CreateRoundRectRgn(ix, iy, ix + iw + 1, iy + ih + 1, radius,
                                    radius);
@@ -1061,7 +1073,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         rct.bottom = ih;
         FillRect(memDC, &rct, (HBRUSH)GetStockObject(BLACK_BRUSH));
 
-        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
+        if (node->border_radius > 0.0f ||
+            node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           rgn = CreateRoundRectRgn(ix, iy, ix + iw + 1, iy + ih + 1, radius,
                                    radius);
@@ -1129,7 +1142,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
         HPEN old_pen = (HPEN)SelectObject(hdc, pen);
         HBRUSH old_brush = (HBRUSH)SelectObject(hdc, brush);
 
-        if (node->border_radius > 0.0f || node->type == CMP_UI_NODE_TYPE_SLIDER) {
+        if (node->border_radius > 0.0f ||
+            node->type == CMP_UI_NODE_TYPE_SLIDER) {
           int radius = ir > 0 ? ir : (int)(12.0f * scale_factor * 2.0f);
           RoundRect(hdc, ix, iy, ix + iw, iy + ih, radius, radius);
         } else {
@@ -1144,8 +1158,11 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
   }
 
   {
-    if (node->type == CMP_UI_NODE_TYPE_TEXT || node->type == CMP_UI_NODE_TYPE_BUTTON || node->type == CMP_UI_NODE_TYPE_TEXT_INPUT ||
-        node->type == CMP_UI_NODE_TYPE_DROPDOWN || node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
+    if (node->type == CMP_UI_NODE_TYPE_TEXT ||
+        node->type == CMP_UI_NODE_TYPE_BUTTON ||
+        node->type == CMP_UI_NODE_TYPE_TEXT_INPUT ||
+        node->type == CMP_UI_NODE_TYPE_DROPDOWN ||
+        node->type == CMP_UI_NODE_TYPE_RICH_TEXT) {
       const char *text = (const char *)node->properties;
       if (node->type == CMP_UI_NODE_TYPE_TEXT_INPUT && text == NULL)
         text = "Ask anything";
@@ -1171,7 +1188,8 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
           size = (int)(32 * scale_factor);
           if (node->type == CMP_UI_NODE_TYPE_RICH_TEXT)
             size = (int)(48 * scale_factor);
-          if (node->type == CMP_UI_NODE_TYPE_TEXT_INPUT || node->type == CMP_UI_NODE_TYPE_DROPDOWN)
+          if (node->type == CMP_UI_NODE_TYPE_TEXT_INPUT ||
+              node->type == CMP_UI_NODE_TYPE_DROPDOWN)
             size = (int)(20 * scale_factor);
           if (node->type == CMP_UI_NODE_TYPE_BUTTON)
             size = (int)(24 * scale_factor);
@@ -1211,14 +1229,15 @@ static void render_node_gdi(HDC hdc, cmp_ui_node_t *node, float scale_factor,
               TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
                        wlen - 1);
-            } else if (node->type == CMP_UI_NODE_TYPE_BUTTON || node->type == CMP_UI_NODE_TYPE_TEXT_INPUT) {
+            } else if (node->type == CMP_UI_NODE_TYPE_BUTTON ||
+                       node->type == CMP_UI_NODE_TYPE_TEXT_INPUT) {
               SetTextAlign(hdc, TA_CENTER | TA_TOP);
               TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
                        wlen - 1);
             } else if (node->type == CMP_UI_NODE_TYPE_TEXT) {
-              SetTextAlign(hdc, TA_CENTER | TA_TOP);
-              TextOutW(hdc, (int)(rect.x + rect.width / 2.0f),
+              SetTextAlign(hdc, TA_LEFT | TA_TOP);
+              TextOutW(hdc, (int)rect.x,
                        (int)(rect.y + (rect.height - size) / 2.0f), wtext,
                        wlen - 1);
             } else {

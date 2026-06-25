@@ -89,8 +89,10 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
   rc = cmp_ui_box_create(&snackbar->node_root);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_snackbar_create: cmp_ui_box_create failed\n");
-    if (snackbar->message) CMP_FREE(snackbar->message);
-    if (snackbar->action_label) CMP_FREE(snackbar->action_label);
+    if (snackbar->message)
+      CMP_FREE(snackbar->message);
+    if (snackbar->action_label)
+      CMP_FREE(snackbar->action_label);
     CMP_FREE(snackbar);
     return rc;
   }
@@ -103,8 +105,10 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_snackbar_create: cmp_ui_text_create failed\n");
     cmp_ui_node_destroy(snackbar->node_root);
-    if (snackbar->message) CMP_FREE(snackbar->message);
-    if (snackbar->action_label) CMP_FREE(snackbar->action_label);
+    if (snackbar->message)
+      CMP_FREE(snackbar->message);
+    if (snackbar->action_label)
+      CMP_FREE(snackbar->action_label);
     CMP_FREE(snackbar);
     return rc;
   }
@@ -114,8 +118,10 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
     LOG_DEBUG("cmp_ui_snackbar_create: cmp_ui_node_add_child failed\n");
     cmp_ui_node_destroy(snackbar->node_message);
     cmp_ui_node_destroy(snackbar->node_root);
-    if (snackbar->message) CMP_FREE(snackbar->message);
-    if (snackbar->action_label) CMP_FREE(snackbar->action_label);
+    if (snackbar->message)
+      CMP_FREE(snackbar->message);
+    if (snackbar->action_label)
+      CMP_FREE(snackbar->action_label);
     CMP_FREE(snackbar);
     return rc;
   }
@@ -126,42 +132,50 @@ int cmp_ui_snackbar_create(cmp_ui_snackbar_t **out_snackbar,
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_snackbar_create: cmp_ui_button_create failed\n");
       cmp_ui_node_destroy(snackbar->node_root);
-      if (snackbar->message) CMP_FREE(snackbar->message);
-      if (snackbar->action_label) CMP_FREE(snackbar->action_label);
+      if (snackbar->message)
+        CMP_FREE(snackbar->message);
+      if (snackbar->action_label)
+        CMP_FREE(snackbar->action_label);
       CMP_FREE(snackbar);
       return rc;
     }
-    
+
     rc = cmp_ui_text_create(&btn_text, snackbar->action_label, -1);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_snackbar_create: cmp_ui_text_create btn_text failed\n");
       cmp_ui_node_destroy(snackbar->node_action);
       cmp_ui_node_destroy(snackbar->node_root);
-      if (snackbar->message) CMP_FREE(snackbar->message);
-      if (snackbar->action_label) CMP_FREE(snackbar->action_label);
+      if (snackbar->message)
+        CMP_FREE(snackbar->message);
+      if (snackbar->action_label)
+        CMP_FREE(snackbar->action_label);
       CMP_FREE(snackbar);
       return rc;
     }
-    
+
     rc = cmp_ui_node_add_child(snackbar->node_action, btn_text);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_snackbar_create: cmp_ui_node_add_child failed\n");
       cmp_ui_node_destroy(btn_text);
       cmp_ui_node_destroy(snackbar->node_action);
       cmp_ui_node_destroy(snackbar->node_root);
-      if (snackbar->message) CMP_FREE(snackbar->message);
-      if (snackbar->action_label) CMP_FREE(snackbar->action_label);
+      if (snackbar->message)
+        CMP_FREE(snackbar->message);
+      if (snackbar->action_label)
+        CMP_FREE(snackbar->action_label);
       CMP_FREE(snackbar);
       return rc;
     }
-    
+
     rc = cmp_ui_node_add_child(snackbar->node_root, snackbar->node_action);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_snackbar_create: cmp_ui_node_add_child failed\n");
       cmp_ui_node_destroy(snackbar->node_action);
       cmp_ui_node_destroy(snackbar->node_root);
-      if (snackbar->message) CMP_FREE(snackbar->message);
-      if (snackbar->action_label) CMP_FREE(snackbar->action_label);
+      if (snackbar->message)
+        CMP_FREE(snackbar->message);
+      if (snackbar->action_label)
+        CMP_FREE(snackbar->action_label);
       CMP_FREE(snackbar);
       return rc;
     }

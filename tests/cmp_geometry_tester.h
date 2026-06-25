@@ -62,14 +62,14 @@ static void _cmp_print_ascii_art(cmp_layout_node_t *node) {
       fflush(stdout);                                                          \
     }                                                                          \
   } while (0)
-  #ifndef CMP_TEST_ABORT
-  #define CMP_TEST_ABORT(dump_node)                                              \
-    do {                                                                         \
-      fflush(stdout);                                                            \
-      CMP_TEST_FAILURE_DUMP(dump_node);                                          \
-      return 1;                                                                  \
-    } while (0)
-  #endif
+#ifndef CMP_TEST_ABORT
+#define CMP_TEST_ABORT(dump_node)                                              \
+  do {                                                                         \
+    fflush(stdout);                                                            \
+    CMP_TEST_FAILURE_DUMP(dump_node);                                          \
+    return 1;                                                                  \
+  } while (0)
+#endif
 
 #define ASSERT_GEOMETRY_EQ(node, ex, ey, ew, eh)                               \
   do {                                                                         \

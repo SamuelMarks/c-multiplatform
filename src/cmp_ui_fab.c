@@ -69,14 +69,6 @@ int cmp_ui_fab_create(cmp_ui_fab_t **out_fab, const char *icon_name) {
     return CMP_ERROR_GENERAL;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&fab->node_root->layout);
-  if (rc != CMP_SUCCESS) {
-    cmp_ui_fab_destroy(fab);
-    return rc;
-  }
-    memset(fab->node_root->layout, 0, sizeof(cmp_layout_node_t));
-    fab->node_root->layout->id = 1;
-
   if (fab->node_root) {
     fab->node_root->type = CMP_UI_NODE_TYPE_BUTTON;
   }

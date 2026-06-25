@@ -6,10 +6,9 @@
 /* Switch Colors */
 #ifndef CMP_UI_SWITCH_COLOR_TRACK_OFF
 #define CMP_UI_SWITCH_COLOR_TRACK_OFF 0xFFCCCCCC
-#define CMP_UI_SWITCH_COLOR_THUMB     0xFFFFFFFF
-#define CMP_UI_SWITCH_COLOR_TRACK_ON  0xFF2196F3
+#define CMP_UI_SWITCH_COLOR_THUMB 0xFFFFFFFF
+#define CMP_UI_SWITCH_COLOR_TRACK_ON 0xFF2196F3
 #endif
-
 
 struct cmp_ui_switch {
   cmp_ui_node_t *node_root;
@@ -44,14 +43,6 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
     return err;
   }
 
-  err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&sw->node_root->layout);
-  if (err != CMP_SUCCESS) {
-    cmp_ui_node_destroy(sw->node_root);
-    CMP_FREE(sw);
-    return err;
-  }
-  memset(sw->node_root->layout, 0, sizeof(cmp_layout_node_t));
-  sw->node_root->layout->id = 1;
   sw->node_root->layout->direction = CMP_FLEX_ROW;
 
   /* Create the thumb */
@@ -68,8 +59,8 @@ int cmp_ui_switch_create(cmp_ui_switch_t **out_switch) {
   sw->node_root->layout->measure_ctx = sw->node_root;
   sw->node_root->layout->measure_cb = cmp_ui_layout_measure_dispatch;
 
-  sw->node_root->bg_color = CMP_UI_SWITCH_COLOR_TRACK_OFF;  /* Track off color */
-  sw->node_thumb->bg_color = CMP_UI_SWITCH_COLOR_THUMB; /* Thumb color */
+  sw->node_root->bg_color = CMP_UI_SWITCH_COLOR_TRACK_OFF; /* Track off color */
+  sw->node_thumb->bg_color = CMP_UI_SWITCH_COLOR_THUMB;    /* Thumb color */
 
   err = cmp_ui_node_add_child(sw->node_root, sw->node_thumb);
   if (err != CMP_SUCCESS) {
@@ -136,9 +127,11 @@ int cmp_ui_switch_set_on(cmp_ui_switch_t *sw, int is_on) {
   /* Visual changes would be handled by updating layout padding /
    * justify_content to push the thumb, and altering track background colors */
   if (is_on) {
-    sw->node_root->bg_color = CMP_UI_SWITCH_COLOR_TRACK_ON; /* Active track color */
+    sw->node_root->bg_color =
+        CMP_UI_SWITCH_COLOR_TRACK_ON; /* Active track color */
   } else {
-    sw->node_root->bg_color = CMP_UI_SWITCH_COLOR_TRACK_OFF; /* Inactive track color */
+    sw->node_root->bg_color =
+        CMP_UI_SWITCH_COLOR_TRACK_OFF; /* Inactive track color */
   }
 
   return rc;

@@ -55,14 +55,7 @@ int cmp_ui_card_create(cmp_ui_card_t **out_card, cmp_ui_card_style_t style) {
     return CMP_ERROR_GENERAL;
   }
 
-  rc = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&card->node_root->layout);
-  if (rc != CMP_SUCCESS) {
-    cmp_ui_card_destroy(card);
-    return rc;
-  }
-    memset(card->node_root->layout, 0, sizeof(cmp_layout_node_t));
-    card->node_root->layout->id = 1;
-    card->node_root->layout->direction = CMP_FLEX_COLUMN;
+  card->node_root->layout->direction = CMP_FLEX_COLUMN;
 
   if (style == CMP_UI_CARD_STYLE_ELEVATED) {
     if (card->node_root)

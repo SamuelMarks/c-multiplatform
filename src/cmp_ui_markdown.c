@@ -52,7 +52,8 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
 
   err = cmp_ui_box_create(&md->node_root);
   if (err != CMP_SUCCESS) {
-    if (md->text) CMP_FREE(md->text);
+    if (md->text)
+      CMP_FREE(md->text);
     CMP_FREE(md);
     return err;
   }
@@ -62,7 +63,8 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
   err = cmp_ui_text_create(&md->node_text, md->text ? md->text : "", -1);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(md->node_root);
-    if (md->text) CMP_FREE(md->text);
+    if (md->text)
+      CMP_FREE(md->text);
     CMP_FREE(md);
     return err;
   }
@@ -73,11 +75,12 @@ int cmp_ui_markdown_create(cmp_ui_markdown_t **out_md, const char *text,
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(md->node_text);
     cmp_ui_node_destroy(md->node_root);
-    if (md->text) CMP_FREE(md->text);
+    if (md->text)
+      CMP_FREE(md->text);
     CMP_FREE(md);
     return err;
   }
-  
+
   *out_md = md;
   return CMP_SUCCESS;
 }

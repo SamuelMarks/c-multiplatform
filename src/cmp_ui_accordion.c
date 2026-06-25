@@ -85,8 +85,8 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
           }
         }
         if (translated.data) {
-    int clean_rc = cmp_string_destroy(&translated);
-    if (clean_rc != CMP_SUCCESS) {
+          int clean_rc = cmp_string_destroy(&translated);
+          if (clean_rc != CMP_SUCCESS) {
             LOG_DEBUG("cmp_ui_accordion_create: cmp_string_destroy failed\n");
           }
         }
@@ -106,8 +106,8 @@ int cmp_ui_accordion_create(cmp_ui_accordion_t **out_accordion,
         }
       }
       if (translated.data) {
-    int clean_rc = cmp_string_destroy(&translated);
-    if (clean_rc != CMP_SUCCESS) {
+        int clean_rc = cmp_string_destroy(&translated);
+        if (clean_rc != CMP_SUCCESS) {
           LOG_DEBUG("cmp_ui_accordion_create: cmp_string_destroy failed\n");
         }
       }

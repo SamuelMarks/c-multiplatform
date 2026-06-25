@@ -266,8 +266,8 @@ int cmp_ui_badge_set_text(cmp_ui_badge_t *badge, const char *text) {
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_ui_badge_set_text: OOM\n");
       if (translated.data) {
-      int clean_rc = cmp_string_destroy(&translated);
-      if (clean_rc != CMP_SUCCESS) {
+        int clean_rc = cmp_string_destroy(&translated);
+        if (clean_rc != CMP_SUCCESS) {
           LOG_DEBUG("cmp_ui_badge_set_text: cmp_string_destroy failed\n");
         }
       }

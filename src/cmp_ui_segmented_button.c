@@ -56,16 +56,6 @@ int cmp_ui_segmented_button_create(cmp_ui_segmented_button_t **out_btn,
     return err;
   }
 
-  err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&btn->node_root->layout);
-  if (err != CMP_SUCCESS) {
-    cmp_ui_node_destroy(btn->node_root);
-    CMP_FREE(btn->segments);
-    CMP_FREE(btn);
-    return err;
-  }
-  
-  memset(btn->node_root->layout, 0, sizeof(cmp_layout_node_t));
-  btn->node_root->layout->id = 1;
   btn->node_root->layout->direction = CMP_FLEX_ROW;
 
   *out_btn = btn;

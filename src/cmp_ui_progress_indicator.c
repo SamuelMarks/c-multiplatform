@@ -6,9 +6,8 @@
 /* Progress Indicator Colors */
 #ifndef CMP_UI_PROGRESS_INDICATOR_TRACK_COLOR
 #define CMP_UI_PROGRESS_INDICATOR_TRACK_COLOR 0xFFE0E0E0
-#define CMP_UI_PROGRESS_INDICATOR_FILL_COLOR  0xFF2196F3
+#define CMP_UI_PROGRESS_INDICATOR_FILL_COLOR 0xFF2196F3
 #endif
-
 
 struct cmp_ui_progress_indicator {
   cmp_ui_node_t *node_root;
@@ -59,26 +58,19 @@ int cmp_ui_progress_indicator_create(
 
   err = cmp_ui_node_add_child(ind->node_root, ind->node_fill);
   if (err != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_progress_indicator_create: cmp_ui_node_add_child failed\n");
+    LOG_DEBUG(
+        "cmp_ui_progress_indicator_create: cmp_ui_node_add_child failed\n");
     cmp_ui_node_destroy(ind->node_fill);
     cmp_ui_node_destroy(ind->node_root);
     CMP_FREE(ind);
     return err;
   }
 
-  err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&ind->node_root->layout);
-  if (err != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_progress_indicator_create: OOM layout\n");
-    cmp_ui_node_destroy(ind->node_root);
-    CMP_FREE(ind);
-    return err;
-  }
-  memset(ind->node_root->layout, 0, sizeof(cmp_layout_node_t));
-  ind->node_root->layout->id = 1;
-
   /* Configure root and fill style properties */
-  ind->node_root->bg_color = CMP_UI_PROGRESS_INDICATOR_TRACK_COLOR; /* Default track color */
-  ind->node_fill->bg_color = CMP_UI_PROGRESS_INDICATOR_FILL_COLOR; /* Default fill color */
+  ind->node_root->bg_color =
+      CMP_UI_PROGRESS_INDICATOR_TRACK_COLOR; /* Default track color */
+  ind->node_fill->bg_color =
+      CMP_UI_PROGRESS_INDICATOR_FILL_COLOR; /* Default fill color */
 
   /* In a real scenario, this would apply CSS transformations to achieve
    * morphing. */

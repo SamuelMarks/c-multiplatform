@@ -188,6 +188,7 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
                                 void (*cb)(cmp_event_t *, cmp_ui_node_t *,
                                            void *)) {
   int rc;
+  cmp_ui_action_button_t *btn_obj = NULL;
   cmp_ui_node_t *btn_node = NULL;
   cmp_a11y_tree_t *tree = NULL;
 
@@ -196,11 +197,17 @@ static int create_simple_button(cmp_ui_node_t **out_btn, const char *text,
     return CMP_ERROR_INVALID_ARG;
   }
 
-  rc = cmp_ui_button_create(&btn_node, text, -1);
+  rc = cmp_ui_action_button_create(&btn_obj, text,
+                                   0); /* 0 for default/filled style */
   if (rc != CMP_SUCCESS) {
-    LOG_DEBUG("cmp_ui_button_create failed: %d\n", rc);
+    LOG_DEBUG("cmp_ui_action_button_create failed: %d\n", rc);
     return rc;
   }
+
+  cmp_ui_action_button_get_node(btn_obj, &btn_node);
+
+  /* Fix intrinsic sizing by removing the duplicate measure_cb */
+  btn_node->layout->measure_cb = NULL;
 
   /* Force the button to render natively in all design languages.
      Fluent 2 specifically requires the "type" parameter to be exactly 3.
@@ -323,6 +330,9 @@ static int build_ui(void) {
     }
     title->text_color = g_is_dark ? 0xFFE6E0E9 : 0xFF1D1B20;
     title->font_size = -1.0f; /* Let system scale font */
+    title->layout->flex_grow = 0.0f; /* DO NOT GROW! Bypasses infinite layout bug */
+    title->layout->flex_shrink = 1.0f;
+    title->layout->width = -1.0f;
   }
 
   rc = create_simple_button(&btn_lang, "EN", "Switch Language", on_lang_click);
@@ -334,23 +344,24 @@ static int build_ui(void) {
                             on_design_click);
 
   if (btn_lang) {
-    btn_lang->layout->width = -1.0f;
-    btn_lang->layout->height = -1.0f;
+    btn_lang->layout->width = 64.0f;
+    btn_lang->layout->height = 40.0f;
+    btn_lang->layout->flex_shrink = 0.0f;
   }
   if (btn_theme) {
-    btn_theme->layout->width = -1.0f;
-    btn_theme->layout->height = -1.0f;
-    btn_theme->layout->margin[3] = 1.0f * REM;
+    btn_theme->layout->width = 64.0f;
+    btn_theme->layout->height = 40.0f;
+    btn_theme->layout->flex_shrink = 0.0f;
   }
   if (btn_palette) {
-    btn_palette->layout->width = -1.0f;
-    btn_palette->layout->height = -1.0f;
-    btn_palette->layout->margin[3] = 1.0f * REM;
+    btn_palette->layout->width = 64.0f;
+    btn_palette->layout->height = 40.0f;
+    btn_palette->layout->flex_shrink = 0.0f;
   }
   if (btn_design) {
-    btn_design->layout->width = -1.0f;
-    btn_design->layout->height = -1.0f;
-    btn_design->layout->margin[3] = 1.0f * REM;
+    btn_design->layout->width = 64.0f;
+    btn_design->layout->height = 40.0f;
+    btn_design->layout->flex_shrink = 0.0f;
   }
 
   if (btn_lang)
@@ -361,6 +372,15 @@ static int build_ui(void) {
     (void)cmp_ui_app_bar_add_action(app_bar_obj, btn_palette);
   if (btn_design)
     (void)cmp_ui_app_bar_add_action(app_bar_obj, btn_design);
+
+  if (app_bar->child_count > 1) {
+    cmp_ui_node_t *actions = app_bar->children[1];
+    actions->layout->column_gap = 1.0f * REM;
+    actions->layout->padding[1] = 1.0f * REM; /* Right padding */
+    actions->layout->width = 320.0f;
+    actions->layout->flex_grow = 0.0f;
+    actions->layout->flex_shrink = 0.0f;
+  }
   rc = cmp_ui_node_add_child(g_ui_tree, app_bar);
   if (rc != CMP_SUCCESS)
     return rc;
@@ -399,8 +419,7 @@ int app_init(void) {
   }
 
   if (g_ui_tree) {
-    rc = cmp_layout_calculate(g_ui_tree->layout, g_window_width,
-                              g_window_height);
+    rc = cmp_layout_calculate(g_ui_tree->layout, g_window_width, g_window_height);
     if (rc != CMP_SUCCESS) {
       LOG_DEBUG("cmp_layout_calculate failed: %d\n", rc);
     }

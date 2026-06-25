@@ -6,9 +6,8 @@
 /* Modal Drawer Colors */
 #ifndef CMP_UI_MODAL_DRAWER_SCRIM_COLOR
 #define CMP_UI_MODAL_DRAWER_SCRIM_COLOR 0x80000000
-#define CMP_UI_MODAL_DRAWER_BG_COLOR    0xFFFFFFFF
+#define CMP_UI_MODAL_DRAWER_BG_COLOR 0xFFFFFFFF
 #endif
-
 
 typedef struct cmp_ui_modal_drawer_item {
   cmp_ui_node_t *node;
@@ -80,12 +79,14 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
 
   /* Scrim properties */
   drawer->node_root->layout->position_type = CMP_POSITION_ABSOLUTE;
-  drawer->node_root->bg_color = CMP_UI_MODAL_DRAWER_SCRIM_COLOR; /* Semi-transparent black */
+  drawer->node_root->bg_color =
+      CMP_UI_MODAL_DRAWER_SCRIM_COLOR; /* Semi-transparent black */
 
   /* Drawer properties */
   drawer->node_drawer->layout->position_type = CMP_POSITION_ABSOLUTE;
   drawer->node_drawer->layout->direction = CMP_FLEX_COLUMN;
-  drawer->node_drawer->bg_color = CMP_UI_MODAL_DRAWER_BG_COLOR; /* Solid white */
+  drawer->node_drawer->bg_color =
+      CMP_UI_MODAL_DRAWER_BG_COLOR; /* Solid white */
 
   drawer->node_items->layout->direction = CMP_FLEX_COLUMN;
 
@@ -98,7 +99,7 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
     CMP_FREE(drawer);
     return err;
   }
-  
+
   err = cmp_ui_node_add_child(drawer->node_root, drawer->node_drawer);
   if (err != CMP_SUCCESS) {
     cmp_ui_node_destroy(drawer->node_drawer);
@@ -107,7 +108,7 @@ int cmp_ui_modal_drawer_create(cmp_ui_modal_drawer_t **out_drawer) {
     CMP_FREE(drawer);
     return err;
   }
-  
+
   drawer->selected_index = -1;
   drawer->is_open = 0;
 

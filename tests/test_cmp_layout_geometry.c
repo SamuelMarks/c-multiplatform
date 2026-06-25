@@ -598,20 +598,62 @@ static int test_fluent2_compliance(void) {
 }
 
 int main(void) {
-  if (test_margin_box() != 0) { printf("fail test_margin_box\n"); return 1; }
-  if (test_border_box() != 0) { printf("fail test_border_box\n"); return 1; }
-  if (test_padding_box() != 0) { printf("fail test_padding_box\n"); return 1; }
-  if (test_content_box() != 0) { printf("fail test_content_box\n"); return 1; }
-  if (test_misc() != 0) { printf("fail test_misc\n"); return 1; }
-  if (test_geometry_assertions() != 0) { printf("fail test_geometry_assertions\n"); return 1; }
-  if (test_flex_wrap_flow() != 0) { printf("fail test_flex_wrap_flow\n"); return 1; }
-  if (test_flex_alignment() != 0) { printf("fail test_flex_alignment\n"); return 1; }
-  if (test_grid_responsiveness() != 0) { printf("fail test_grid_responsiveness\n"); return 1; }
-  if (test_positioning_constraints() != 0) { printf("fail test_positioning_constraints\n"); return 1; }
-  if (test_text_and_transforms() != 0) { printf("fail test_text_and_transforms\n"); return 1; }
-  if (test_apple_hig_compliance() != 0) { printf("fail test_apple_hig_compliance\n"); return 1; }
-  if (test_material3_compliance() != 0) { printf("fail test_material3_compliance\n"); return 1; }
-  if (test_fluent2_compliance() != 0) { printf("fail test_fluent2_compliance\n"); return 1; }
+  if (test_margin_box() != 0) {
+    printf("fail test_margin_box\n");
+    return 1;
+  }
+  if (test_border_box() != 0) {
+    printf("fail test_border_box\n");
+    return 1;
+  }
+  if (test_padding_box() != 0) {
+    printf("fail test_padding_box\n");
+    return 1;
+  }
+  if (test_content_box() != 0) {
+    printf("fail test_content_box\n");
+    return 1;
+  }
+  if (test_misc() != 0) {
+    printf("fail test_misc\n");
+    return 1;
+  }
+  if (test_geometry_assertions() != 0) {
+    printf("fail test_geometry_assertions\n");
+    return 1;
+  }
+  if (test_flex_wrap_flow() != 0) {
+    printf("fail test_flex_wrap_flow\n");
+    return 1;
+  }
+  if (test_flex_alignment() != 0) {
+    printf("fail test_flex_alignment\n");
+    return 1;
+  }
+  if (test_grid_responsiveness() != 0) {
+    printf("fail test_grid_responsiveness\n");
+    return 1;
+  }
+  if (test_positioning_constraints() != 0) {
+    printf("fail test_positioning_constraints\n");
+    return 1;
+  }
+  if (test_text_and_transforms() != 0) {
+    printf("fail test_text_and_transforms\n");
+    return 1;
+  }
+  if (test_apple_hig_compliance() != 0) {
+    printf("fail test_apple_hig_compliance\n");
+    return 1;
+  }
+  if (test_material3_compliance() != 0) {
+    printf("fail test_material3_compliance\n");
+    return 1;
+  }
+  if (test_fluent2_compliance() != 0) {
+    printf("fail test_fluent2_compliance\n");
+    return 1;
+  }
   printf("All tests passed.\n");
   return 0;
 }

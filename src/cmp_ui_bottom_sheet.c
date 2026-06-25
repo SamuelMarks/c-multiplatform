@@ -43,15 +43,6 @@ int cmp_ui_bottom_sheet_create(cmp_ui_bottom_sheet_t **out_sheet) {
     return rc;
   }
 
-  rc =
-      CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&sheet->node_root->layout);
-  if (rc != CMP_SUCCESS) {
-    cmp_ui_node_destroy(sheet->node_root);
-    CMP_FREE(sheet);
-    return rc;
-  }
-  memset(sheet->node_root->layout, 0, sizeof(cmp_layout_node_t));
-  sheet->node_root->layout->id = 1;
   sheet->node_root->layout->direction = CMP_FLEX_COLUMN;
 
   sheet->is_visible = 0; /* Initially hidden */

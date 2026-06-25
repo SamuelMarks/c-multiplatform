@@ -1234,7 +1234,8 @@ int cmp_ui_node_destroy(cmp_ui_node_t *node) {
         return rc;
       }
     }
-  } else if (node->type == CMP_UI_NODE_TYPE_IMAGE_VIEW && node->properties != NULL) {
+  } else if (node->type == CMP_UI_NODE_TYPE_IMAGE_VIEW &&
+             node->properties != NULL) {
     void **props = (void **)node->properties;
     if (props[0]) {
 

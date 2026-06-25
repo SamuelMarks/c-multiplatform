@@ -25,21 +25,18 @@
  */
 #define CMP_MATH_DOUBLE 2.0f
 #define CMP_MATH_ZERO 0.0f
-#define CMP_MATH_ONE  1.0f
+#define CMP_MATH_ONE 1.0f
 #define CMP_MATH_HALF 0.5f
 #define CMP_MATH_CIRCLE_DEG 360.0f
 #define CMP_MS_PER_SEC_F 1000.0f
-
-
 
 /**
  * @brief Common Color Masks and Constants
  */
 #define CMP_COLOR_TRANSPARENT 0x00000000U
 #define CMP_COLOR_OPAQUE_MASK 0xFF000000U
-#define CMP_COLOR_WHITE       0xFFFFFFFFU
-#define CMP_COLOR_BLACK       0xFF000000U
-
+#define CMP_COLOR_WHITE 0xFFFFFFFFU
+#define CMP_COLOR_BLACK 0xFF000000U
 
 /* Restoring wiped missing types from previous agents */
 typedef struct cmp_icc_profile cmp_icc_profile_t;

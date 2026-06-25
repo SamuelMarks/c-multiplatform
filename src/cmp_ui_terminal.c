@@ -51,15 +51,18 @@ int cmp_ui_terminal_create(cmp_ui_terminal_t **out_terminal, uint32_t bg_color,
   (void)fg_color; /* To be used when setting up text nodes */
 
 #if defined(_WIN32)
-  rc = cmp_pty_create(&terminal->pty, "cmd.exe", CMP_TERMINAL_DEFAULT_COLS, CMP_TERMINAL_DEFAULT_ROWS);   
+  rc = cmp_pty_create(&terminal->pty, "cmd.exe", CMP_TERMINAL_DEFAULT_COLS,
+                      CMP_TERMINAL_DEFAULT_ROWS);
   if (rc != CMP_SUCCESS) {
 #else
-  rc = cmp_pty_create(&terminal->pty, "bash", CMP_TERMINAL_DEFAULT_COLS, CMP_TERMINAL_DEFAULT_ROWS);      
+  rc = cmp_pty_create(&terminal->pty, "bash", CMP_TERMINAL_DEFAULT_COLS,
+                      CMP_TERMINAL_DEFAULT_ROWS);
   if (rc != CMP_SUCCESS) {
 #endif
     terminal->pty = NULL;
-    /* Optional: If pty creation is strictly required, we should destroy and return rc here. 
-       But assuming it can fall back to a disconnected terminal: */
+    /* Optional: If pty creation is strictly required, we should destroy and
+       return rc here. But assuming it can fall back to a disconnected terminal:
+     */
     /* Let's be consistent and return the error while freeing. */
     cmp_ui_node_destroy(terminal->node_root);
     CMP_FREE(terminal);

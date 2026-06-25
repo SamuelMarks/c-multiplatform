@@ -77,22 +77,37 @@ static uint32_t cmp_math_f2_mix(uint32_t color1, uint32_t color2, float t) {
  */
 static void cmp_f2_generate_ramp(uint32_t base_color,
                                  cmp_f2_color_ramp_t *out_ramp) {
-  out_ramp->step_10 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_10);
-  out_ramp->step_20 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_100);
-  out_ramp->step_30 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_110);
-  out_ramp->step_40 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_120);
-  out_ramp->step_50 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_130);
-  out_ramp->step_60 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_140);
-  out_ramp->step_70 = cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_70);
+  out_ramp->step_10 =
+      cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_10);
+  out_ramp->step_20 =
+      cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_100);
+  out_ramp->step_30 =
+      cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_110);
+  out_ramp->step_40 =
+      cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_120);
+  out_ramp->step_50 =
+      cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_130);
+  out_ramp->step_60 =
+      cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_140);
+  out_ramp->step_70 =
+      cmp_math_f2_mix(CMP_COLOR_BLACK, base_color, CMP_F2_MIX_70);
   out_ramp->step_80 = base_color;
-  out_ramp->step_90 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_90);
-  out_ramp->step_100 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_100);
-  out_ramp->step_110 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_110);
-  out_ramp->step_120 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_120);
-  out_ramp->step_130 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_130);
-  out_ramp->step_140 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_140);
-  out_ramp->step_150 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_150);
-  out_ramp->step_160 = cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_160);
+  out_ramp->step_90 =
+      cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_90);
+  out_ramp->step_100 =
+      cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_100);
+  out_ramp->step_110 =
+      cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_110);
+  out_ramp->step_120 =
+      cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_120);
+  out_ramp->step_130 =
+      cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_130);
+  out_ramp->step_140 =
+      cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_140);
+  out_ramp->step_150 =
+      cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_150);
+  out_ramp->step_160 =
+      cmp_math_f2_mix(base_color, CMP_COLOR_WHITE, CMP_F2_MIX_160);
 }
 
 /**
@@ -562,7 +577,8 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
     out_theme->shadow_64.color2 = CMP_F2_SHADOW_10_PERCENT;
 
     /* Materials */
-    out_theme->material_mica_background = (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_10;
+    out_theme->material_mica_background =
+        (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_10;
     out_theme->material_mica_alt_background =
         (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_12;
     out_theme->material_acrylic_background =
@@ -615,7 +631,8 @@ int CMP_API cmp_f2_theme_generate(uint32_t brand_color, int is_dark,
     out_theme->shadow_64.color2 = CMP_F2_SHADOW_20_PERCENT;
 
     /* Materials */
-    out_theme->material_mica_background = (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_90;
+    out_theme->material_mica_background =
+        (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_90;
     out_theme->material_mica_alt_background =
         (CMP_F2_ALPHA_100_PERCENT << 24) | out_theme->neutral_100;
     out_theme->material_acrylic_background =
@@ -737,8 +754,10 @@ int CMP_API cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
   out_theme->color_info_stroke = window_text;
 
   /* Alphas remain completely opaque in HC mode for accessibility */
-  out_theme->color_neutral_background_alpha = (CMP_F2_ALPHA_100_PERCENT << 24) | window;
-  out_theme->color_brand_background_alpha = (CMP_F2_ALPHA_100_PERCENT << 24) | highlight;
+  out_theme->color_neutral_background_alpha =
+      (CMP_F2_ALPHA_100_PERCENT << 24) | window;
+  out_theme->color_brand_background_alpha =
+      (CMP_F2_ALPHA_100_PERCENT << 24) | highlight;
 
   /* Spacing Tokens (Same as standard) */
   out_theme->spacing_none = 0.0f;
@@ -788,9 +807,12 @@ int CMP_API cmp_f2_theme_generate_hc(uint32_t window, uint32_t window_text,
   out_theme->shadow_64 = out_theme->shadow_2;
 
   /* Materials */
-  out_theme->material_mica_background = (CMP_F2_ALPHA_100_PERCENT << 24) | window;
-  out_theme->material_mica_alt_background = (CMP_F2_ALPHA_100_PERCENT << 24) | window;
-  out_theme->material_acrylic_background = (CMP_F2_ALPHA_100_PERCENT << 24) | window;
+  out_theme->material_mica_background =
+      (CMP_F2_ALPHA_100_PERCENT << 24) | window;
+  out_theme->material_mica_alt_background =
+      (CMP_F2_ALPHA_100_PERCENT << 24) | window;
+  out_theme->material_acrylic_background =
+      (CMP_F2_ALPHA_100_PERCENT << 24) | window;
   out_theme->material_acrylic_blur = 0.0f;
   out_theme->material_acrylic_fallback = window;
 

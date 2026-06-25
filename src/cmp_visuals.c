@@ -491,14 +491,16 @@ int cmp_semantic_colors_resolve(cmp_semantic_colors_t *ctx,
 
   /* Simulated lookup tables for iOS 13+ semantic colors */
   if (strcmp(semantic_name, "systemBlue") == 0) {
-    *out_rgba = is_dark_mode ? CMP_APPLE_COLOR_BLUE_DARK : CMP_APPLE_COLOR_BLUE_LIGHT;
+    *out_rgba =
+        is_dark_mode ? CMP_APPLE_COLOR_BLUE_DARK : CMP_APPLE_COLOR_BLUE_LIGHT;
   } else if (strcmp(semantic_name, "label") == 0) {
     *out_rgba = is_dark_mode ? CMP_APPLE_COLOR_WHITE : CMP_APPLE_COLOR_BLACK;
   } else if (strcmp(semantic_name, "secondarySystemBackground") == 0) {
-    *out_rgba = is_dark_mode ? CMP_APPLE_COLOR_SYS_GRAY_6_DARK : CMP_APPLE_COLOR_SYS_GRAY_6_LIGHT;
+    *out_rgba = is_dark_mode ? CMP_APPLE_COLOR_SYS_GRAY_6_DARK
+                             : CMP_APPLE_COLOR_SYS_GRAY_6_LIGHT;
   } else if (strcmp(semantic_name, "systemBackground") == 0) {
-    *out_rgba =
-        is_dark_mode ? CMP_APPLE_COLOR_BLACK : CMP_APPLE_COLOR_WHITE; /* True Black for OLED */
+    *out_rgba = is_dark_mode ? CMP_APPLE_COLOR_BLACK
+                             : CMP_APPLE_COLOR_WHITE; /* True Black for OLED */
   } else {
     return CMP_ERROR_NOT_FOUND;
   }

@@ -64,7 +64,7 @@ int cmp_ui_app_bar_create(cmp_ui_app_bar_t **out_bar,
     bar->node_root->bg_color = 0xFFF5F5F5;
     bar->node_root->layout->width = -CMP_MATH_ONE;
     bar->node_root->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
-bar->node_root->layout->height = CMP_UI_APP_BAR_HEIGHT;
+    bar->node_root->layout->height = CMP_UI_APP_BAR_HEIGHT;
     bar->node_root->layout->padding[1] = CMP_UI_APP_BAR_PADDING_H;
     bar->node_root->layout->padding[3] = CMP_UI_APP_BAR_PADDING_H;
     bar->node_root->layout->align_items = CMP_FLEX_ALIGN_CENTER;
@@ -106,10 +106,10 @@ bar->node_root->layout->height = CMP_UI_APP_BAR_HEIGHT;
   bar->node_actions->layout->justify_content = CMP_FLEX_ALIGN_END;
   bar->node_actions->layout->align_items = CMP_FLEX_ALIGN_CENTER;
   bar->node_actions->layout->box_sizing = CMP_BOX_SIZING_BORDER_BOX;
-bar->node_actions->layout->height = CMP_UI_APP_BAR_HEIGHT;
+  bar->node_actions->layout->height = CMP_UI_APP_BAR_HEIGHT;
   bar->node_actions->layout->flex_shrink = CMP_MATH_ZERO;
   bar->node_actions->layout->flex_grow = CMP_MATH_ZERO;
-  
+
   rc = cmp_ui_node_add_child(bar->node_root, bar->node_actions);
   if (rc != CMP_SUCCESS) {
     LOG_DEBUG("cmp_ui_app_bar_create: cmp_ui_node_add_child actions failed\n");

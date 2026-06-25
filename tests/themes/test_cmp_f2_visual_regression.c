@@ -78,7 +78,7 @@ TEST test_f2_cross_os_parity(void) {
 
   cmp_layout_calculate(btn->layout, 400.0f, 300.0f);
   /* Ensure cross-OS deterministic layout sizing regardless of backend */
-printf("Height: %f\n", btn->layout->height);
+  printf("Height: %f\n", btn->layout->height);
   ASSERT_EQ(32.0f, btn->layout->height); /* Medium button is 32px high */
 
   cmp_ui_node_destroy(btn);

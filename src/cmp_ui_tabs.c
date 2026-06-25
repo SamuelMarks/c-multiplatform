@@ -12,7 +12,6 @@
 #define CMP_UI_TABS_BG_COLOR 0xFFFFFFFF
 #endif
 
-
 typedef struct cmp_ui_tab_item {
   cmp_ui_node_t *node;
   int is_selected;
@@ -61,15 +60,6 @@ int cmp_ui_tabs_create(cmp_ui_tabs_t **out_tabs) {
     return err;
   }
 
-  err = CMP_MALLOC(sizeof(cmp_layout_node_t), (void **)&tabs->node_root->layout);
-  if (err != CMP_SUCCESS) {
-    cmp_ui_node_destroy(tabs->node_root);
-    CMP_FREE(tabs->tabs);
-    CMP_FREE(tabs);
-    return err;
-  }
-  memset(tabs->node_root->layout, 0, sizeof(cmp_layout_node_t));
-  tabs->node_root->layout->id = 1;
   tabs->node_root->layout->direction = CMP_FLEX_ROW;
 
   tabs->node_root->bg_color = CMP_UI_TABS_BG_COLOR;
