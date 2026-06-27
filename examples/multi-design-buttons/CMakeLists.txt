@@ -6,8 +6,7 @@ set(CMAKE_C_STANDARD 90)
 if(NOT TARGET cmp)
     include(FetchContent)
     FetchContent_Declare(cmp
-        GIT_REPOSITORY https://github.com/SamuelMarks/c-multiplatform.git
-        GIT_TAG master
+        URL https://github.com/SamuelMarks/c-multiplatform/archive/master.zip
     )
     FetchContent_MakeAvailable(cmp)
 endif()
