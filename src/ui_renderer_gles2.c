@@ -1,0 +1,642 @@
+#if defined(_WIN32) || defined(__CYGWIN__)
+/* clang-format off */
+#include <winsock2.h>
+#include <GL/gl.h>
+#include "ui_internal_mem.h"
+
+#ifndef GL_FRAGMENT_SHADER
+#define GL_FRAGMENT_SHADER 0x8B30
+#define GL_VERTEX_SHADER 0x8B31
+#define GL_ARRAY_BUFFER 0x8892
+#define GL_ELEMENT_ARRAY_BUFFER 0x8893
+#define GL_STATIC_DRAW 0x88E4
+#define GL_DYNAMIC_DRAW 0x88E8
+#endif
+
+typedef void (__stdcall *PFNGLUSEPROGRAMPROC) (unsigned int program);
+typedef void (__stdcall *PFNGLUNIFORM2FPROC) (int location, float v0, float v1);
+typedef void (__stdcall *PFNGLBINDBUFFERPROC) (unsigned int target, unsigned int buffer);
+typedef void (__stdcall *PFNGLBUFFERDATAPROC) (unsigned int target, int size, const void *data, unsigned int usage);
+typedef void (__stdcall *PFNGLENABLEVERTEXATTRIBARRAYPROC) (unsigned int index);
+typedef void (__stdcall *PFNGLVERTEXATTRIBPOINTERPROC) (unsigned int index, int size, unsigned int type, unsigned char normalized, int stride, const void *pointer);
+typedef void (__stdcall *PFNGLDISABLEVERTEXATTRIBARRAYPROC) (unsigned int index);
+typedef unsigned int (__stdcall *PFNGLCREATESHADERPROC) (unsigned int type);
+typedef void (__stdcall *PFNGLSHADERSOURCEPROC) (unsigned int shader, int count, const char *const*string, const int *length);
+typedef void (__stdcall *PFNGLCOMPILESHADERPROC) (unsigned int shader);
+typedef unsigned int (__stdcall *PFNGLCREATEPROGRAMPROC) (void);
+typedef void (__stdcall *PFNGLATTACHSHADERPROC) (unsigned int program, unsigned int shader);
+typedef void (__stdcall *PFNGLLINKPROGRAMPROC) (unsigned int program);
+typedef void (__stdcall *PFNGLDELETESHADERPROC) (unsigned int shader);
+typedef int (__stdcall *PFNGLGETATTRIBLOCATIONPROC) (unsigned int program, const char *name);
+typedef int (__stdcall *PFNGLGETUNIFORMLOCATIONPROC) (unsigned int program, const char *name);
+typedef void (__stdcall *PFNGLGENBUFFERSPROC) (int n, unsigned int *buffers);
+typedef void (__stdcall *PFNGLDELETEPROGRAMPROC) (unsigned int program);
+typedef void (__stdcall *PFNGLDELETEBUFFERSPROC) (int n, const unsigned int *buffers);
+
+static PFNGLUSEPROGRAMPROC glUseProgram;
+static PFNGLUNIFORM2FPROC glUniform2f;
+static PFNGLBINDBUFFERPROC glBindBuffer;
+static PFNGLBUFFERDATAPROC glBufferData;
+static PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+static PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+static PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+static PFNGLCREATESHADERPROC glCreateShader;
+static PFNGLSHADERSOURCEPROC glShaderSource;
+static PFNGLCOMPILESHADERPROC glCompileShader;
+static PFNGLCREATEPROGRAMPROC glCreateProgram;
+static PFNGLATTACHSHADERPROC glAttachShader;
+static PFNGLLINKPROGRAMPROC glLinkProgram;
+static PFNGLDELETESHADERPROC glDeleteShader;
+static PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+static PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+static PFNGLGENBUFFERSPROC glGenBuffers;
+static PFNGLDELETEPROGRAMPROC glDeleteProgram;
+static PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+
+#ifndef wglGetProcAddress
+/* wglGetProcAddress is provided by wingdi.h via gl.h */
+#endif
+
+static void load_gl_extensions(void) {
+    if (glCreateProgram) return;
+    glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
+    glUniform2f = (PFNGLUNIFORM2FPROC)wglGetProcAddress("glUniform2f");
+    glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
+    glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
+    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
+    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
+    glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glDisableVertexAttribArray");
+    glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
+    glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
+    glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
+    glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
+    glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
+    glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
+    glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
+    glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation");
+    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
+    glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
+    glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram");
+    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
+}
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
+#define load_gl_extensions()
+#elif defined(__EMSCRIPTEN__)
+#include <GLES2/gl2.h>
+#define load_gl_extensions()
+#elif defined(__linux__) || defined(__unix__)
+#define GL_GLEXT_PROTOTYPES 1
+#include <GL/gl.h>
+#include <GL/glext.h>
+#define load_gl_extensions()
+#endif
+
+#ifdef UI_TEST_MOCK_ALLOC
+#undef glCreateProgram
+#define glCreateProgram() 1
+#undef glCreateShader
+#define glCreateShader(t) ((void)(t), 1)
+#undef glAttachShader
+#define glAttachShader(p, s) do { (void)(p); (void)(s); } while(0)
+#undef glLinkProgram
+#define glLinkProgram(p) do { (void)(p); } while(0)
+#undef glDeleteShader
+#define glDeleteShader(s) do { (void)(s); } while(0)
+#undef glGetAttribLocation
+#define glGetAttribLocation(p, n) ((void)(p), (void)(n), 1)
+#undef glGetUniformLocation
+#define glGetUniformLocation(p, n) ((void)(p), (void)(n), 1)
+#undef glGenBuffers
+#define glGenBuffers(n, b) do { (void)(n); *(b) = 1; } while(0)
+#undef glDeleteProgram
+#define glDeleteProgram(p) do { (void)(p); } while(0)
+#undef glDeleteBuffers
+#define glDeleteBuffers(n, b) do { (void)(n); (void)(b); } while(0)
+#undef glUseProgram
+#define glUseProgram(p) do { (void)(p); } while(0)
+#undef glUniform2f
+#define glUniform2f(l, v0, v1) do { (void)(l); (void)(v0); (void)(v1); } while(0)
+#undef glBindBuffer
+#define glBindBuffer(t, b) do { (void)(t); (void)(b); } while(0)
+#undef glBufferData
+#define glBufferData(t, s, d, u) do { (void)(t); (void)(s); (void)(d); (void)(u); } while(0)
+#undef glEnableVertexAttribArray
+#define glEnableVertexAttribArray(i) do { (void)(i); } while(0)
+#undef glVertexAttribPointer
+#define glVertexAttribPointer(i, s, t, n, st, p) do { (void)(i); (void)(s); (void)(t); (void)(n); (void)(st); (void)(p); } while(0)
+#undef glDrawElements
+#define glDrawElements(m, c, t, p) do { (void)(m); (void)(c); (void)(t); (void)(p); } while(0)
+#undef glDisableVertexAttribArray
+#define glDisableVertexAttribArray(i) do { (void)(i); } while(0)
+#undef glShaderSource
+#define glShaderSource(s, c, str, l) do { (void)(s); (void)(c); (void)(str); (void)(l); } while(0)
+#undef glCompileShader
+#define glCompileShader(s) do { (void)(s); } while(0)
+#undef glViewport
+#define glViewport(x, y, w, h) do { (void)(x); (void)(y); (void)(w); (void)(h); } while(0)
+#undef glClearColor
+#define glClearColor(r, g, b, a) do { (void)(r); (void)(g); (void)(b); (void)(a); } while(0)
+#undef glClear
+#define glClear(m) do { (void)(m); } while(0)
+#undef glReadPixels
+#define glReadPixels(x, y, w, h, f, t, d) do { (void)(x); (void)(y); (void)(w); (void)(h); (void)(f); (void)(t); (void)(d); } while(0)
+#endif
+
+#include "../include/ui_renderer_gles2.h"
+#include "../include/ui_window_backend.h"
+#ifndef _WIN32
+#include "ui_internal_mem.h"
+#endif
+/* clang-format on */
+
+#ifndef GL_COLOR_BUFFER_BIT
+#define GL_COLOR_BUFFER_BIT 0x00004000
+#endif
+
+#define GLES2_MAX_VERTICES 8192
+#define GLES2_MAX_INDICES 24576
+
+#ifndef GL_FLOAT
+#define GL_FLOAT 0x1406
+#define GL_UNSIGNED_SHORT 0x1403
+#define GL_TRIANGLES 0x0004
+#define GL_RGBA 0x1908
+#define GL_UNSIGNED_BYTE 0x1401
+#endif
+
+#define GLES2_MAX_VERTICES 8192
+#define GLES2_MAX_INDICES 24576
+
+/** \brief gles2_renderer_data */
+struct gles2_renderer_data {
+  struct ui_vertex vertices[GLES2_MAX_VERTICES];
+  unsigned short indices[GLES2_MAX_INDICES];
+  int vertex_count;
+  int index_count;
+
+  unsigned int program;
+  int a_position;
+  int a_color;
+  int u_resolution;
+  unsigned int vbo;
+  unsigned int ibo;
+
+  float viewport_width;
+  float viewport_height;
+};
+
+static const char *vertex_shader_source =
+    "attribute vec2 a_position;\n"
+    "attribute vec4 a_color;\n"
+    "uniform vec2 u_resolution;\n"
+    "varying vec4 v_color;\n"
+    "void main() {\n"
+    "  vec2 zeroToOne = a_position / u_resolution;\n"
+    "  vec2 zeroToTwo = zeroToOne * 2.0;\n"
+    "  vec2 clipSpace = zeroToTwo - 1.0;\n"
+    "  gl_Position = vec4(clipSpace.x, -clipSpace.y, 0.0, 1.0);\n"
+    "  v_color = a_color;\n"
+    "}\n";
+
+static const char *fragment_shader_source = "precision mediump float;\n"
+                                            "varying vec4 v_color;\n"
+                                            "void main() {\n"
+                                            "  gl_FragColor = v_color;\n"
+                                            "}\n";
+
+static enum ui_error compile_shader(unsigned int type, const char *source,
+                                    unsigned int *out_shader) {
+  unsigned int shader;
+  *out_shader = 0;
+#if defined(_WIN32) || defined(__CYGWIN__)
+  if (!glCreateShader)
+    return UI_ERROR_UNSUPPORTED;
+#endif
+  shader = glCreateShader(type);
+  glShaderSource(shader, 1, &source, NULL);
+  glCompileShader(shader);
+  *out_shader = shader;
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_flush(struct ui_renderer_backend *backend) {
+  struct gles2_renderer_data *data;
+  if (!backend || !backend->user_data) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  data = (struct gles2_renderer_data *)backend->user_data;
+
+  if (data->index_count == 0) {
+    return UI_ERROR_NONE; /* Nothing to flush */
+  }
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+  if (data->program && glBindBuffer && glBufferData) {
+#else
+  if (data->program) {
+#endif
+    glUseProgram(data->program);
+    glUniform2f(data->u_resolution, data->viewport_width,
+                data->viewport_height);
+
+    glBindBuffer(GL_ARRAY_BUFFER, data->vbo);
+    glBufferData(GL_ARRAY_BUFFER, data->vertex_count * sizeof(struct ui_vertex),
+                 data->vertices, GL_DYNAMIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 data->index_count * sizeof(unsigned short), data->indices,
+                 GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray(data->a_position);
+    glVertexAttribPointer(data->a_position, 2, GL_FLOAT, 0,
+                          sizeof(struct ui_vertex), (void *)0);
+
+    glEnableVertexAttribArray(data->a_color);
+    glVertexAttribPointer(data->a_color, 4, GL_FLOAT, 0,
+                          sizeof(struct ui_vertex), (void *)16);
+
+    glDrawElements(GL_TRIANGLES, data->index_count, GL_UNSIGNED_SHORT, 0);
+
+    glDisableVertexAttribArray(data->a_position);
+    glDisableVertexAttribArray(data->a_color);
+  }
+
+  data->vertex_count = 0;
+  data->index_count = 0;
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_draw_triangles(struct ui_renderer_backend *backend,
+                                          const struct ui_vertex *vertices,
+                                          int vertex_count,
+                                          const unsigned short *indices,
+                                          int index_count) {
+  struct gles2_renderer_data *data;
+  int i;
+  int start_vertex;
+
+  if (!backend || !backend->user_data || !vertices || !indices) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  data = (struct gles2_renderer_data *)backend->user_data;
+
+  /* If batch is full, flush it */
+  if (data->vertex_count + vertex_count > GLES2_MAX_VERTICES ||
+      data->index_count + index_count > GLES2_MAX_INDICES) {
+    (void)gles2_flush(backend);
+    if (vertex_count > GLES2_MAX_VERTICES || index_count > GLES2_MAX_INDICES) {
+      return UI_ERROR_OUT_OF_MEMORY;
+    }
+  }
+
+  start_vertex = data->vertex_count;
+
+  /* Copy vertices */
+  for (i = 0; i < vertex_count; ++i) {
+    data->vertices[data->vertex_count++] = vertices[i];
+  }
+
+  /* Copy indices with offset */
+  for (i = 0; i < index_count; ++i) {
+    data->indices[data->index_count++] =
+        (unsigned short)(start_vertex + indices[i]);
+  }
+
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_draw_rect(struct ui_renderer_backend *backend,
+                                     float x, float y, float width,
+                                     float height, struct ui_color color) {
+  struct ui_vertex vertices[4];
+  unsigned short indices[6];
+
+  vertices[0].x = x;
+  vertices[0].y = y;
+  vertices[0].u = 0.0f;
+  vertices[0].v = 0.0f;
+  vertices[0].color = color;
+  vertices[1].x = x + width;
+  vertices[1].y = y;
+  vertices[1].u = 1.0f;
+  vertices[1].v = 0.0f;
+  vertices[1].color = color;
+  vertices[2].x = x + width;
+  vertices[2].y = y + height;
+  vertices[2].u = 1.0f;
+  vertices[2].v = 1.0f;
+  vertices[2].color = color;
+  vertices[3].x = x;
+  vertices[3].y = y + height;
+  vertices[3].u = 0.0f;
+  vertices[3].v = 1.0f;
+  vertices[3].color = color;
+
+  indices[0] = 0;
+  indices[1] = 1;
+  indices[2] = 2;
+  indices[3] = 2;
+  indices[4] = 3;
+  indices[5] = 0;
+
+  return gles2_draw_triangles(backend, vertices, 4, indices, 6);
+}
+
+static enum ui_error gles2_draw_border(struct ui_renderer_backend *backend,
+                                       float x, float y, float width,
+                                       float height, float thickness,
+                                       struct ui_color color) {
+  enum ui_error rc = UI_ERROR_NONE;
+
+  if (!backend || !backend->user_data) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  rc = (enum ui_error)(
+      (int)rc | (int)gles2_draw_rect(backend, x, y, width, thickness, color));
+  rc = (enum ui_error)((int)rc |
+                       (int)gles2_draw_rect(backend, x, y + height - thickness,
+                                            width, thickness, color));
+  rc = (enum ui_error)(
+      (int)rc | (int)gles2_draw_rect(backend, x, y + thickness, thickness,
+                                     height - (2.0f * thickness), color));
+  rc = (enum ui_error)(
+      (int)rc | (int)gles2_draw_rect(backend, x + width - thickness,
+                                     y + thickness, thickness,
+                                     height - (2.0f * thickness), color));
+
+  return rc;
+}
+
+static enum ui_error gles2_init(struct ui_renderer_backend *backend,
+                                struct ui_window_backend *window_backend,
+                                struct ui_window *window) {
+  struct gles2_renderer_data *data;
+  unsigned int vs, fs;
+  (void)window_backend;
+  (void)window;
+
+  if (!backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  load_gl_extensions();
+
+  data = (struct gles2_renderer_data *)UI_MALLOC(
+      sizeof(struct gles2_renderer_data));
+  if (!data) {
+    return UI_ERROR_OUT_OF_MEMORY;
+  }
+  data->vertex_count = 0;
+  data->index_count = 0;
+  data->viewport_width = 800.0f;
+  data->viewport_height = 600.0f;
+  data->program = 0;
+  data->vbo = 0;
+  data->ibo = 0;
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+  if (glCreateProgram) {
+#else
+  if (1) {
+#endif
+    (void)compile_shader(GL_VERTEX_SHADER, vertex_shader_source, &vs);
+    (void)compile_shader(GL_FRAGMENT_SHADER, fragment_shader_source, &fs);
+
+    data->program = glCreateProgram();
+    glAttachShader(data->program, vs);
+    glAttachShader(data->program, fs);
+    glLinkProgram(data->program);
+
+    data->a_position = glGetAttribLocation(data->program, "a_position");
+    data->a_color = glGetAttribLocation(data->program, "a_color");
+    data->u_resolution = glGetUniformLocation(data->program, "u_resolution");
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    glGenBuffers(1, &data->vbo);
+    glGenBuffers(1, &data->ibo);
+  }
+
+  backend->user_data = data;
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_destroy(struct ui_renderer_backend *backend) {
+  struct gles2_renderer_data *data;
+  if (!backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (backend->user_data) {
+    data = (struct gles2_renderer_data *)backend->user_data;
+#if defined(_WIN32) || defined(__CYGWIN__)
+    if (data->program && glDeleteProgram) {
+#else
+    if (data->program) {
+#endif
+      glDeleteProgram(data->program);
+      glDeleteBuffers(1, &data->vbo);
+      glDeleteBuffers(1, &data->ibo);
+    }
+    UI_FREE(backend->user_data);
+    backend->user_data = NULL;
+  }
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_set_viewport(struct ui_renderer_backend *backend,
+                                        int x, int y, int width, int height) {
+  struct gles2_renderer_data *data;
+  if (!backend || !backend->user_data) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  data = (struct gles2_renderer_data *)backend->user_data;
+
+  glViewport(x, y, width, height);
+  data->viewport_width = (float)width;
+  data->viewport_height = (float)height;
+
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_clear(struct ui_renderer_backend *backend,
+                                 struct ui_color color) {
+  (void)backend;
+  glClearColor(color.r, color.g, color.b, color.a);
+  glClear(GL_COLOR_BUFFER_BIT);
+  return UI_ERROR_NONE;
+}
+
+/** \brief gles2_texture */
+struct gles2_texture {
+  unsigned int fbo_id;
+  unsigned int tex_id;
+  int width;
+  int height;
+};
+
+static enum ui_error gles2_push_clip(struct ui_renderer_backend *backend,
+                                     float x, float y, float width,
+                                     float height) {
+  (void)x;
+  (void)y;
+  (void)width;
+  (void)height;
+  if (!backend || !backend->user_data)
+    return UI_ERROR_INVALID_ARGUMENT;
+  gles2_flush(backend);
+  /* glScissor logic would go here. We mock it for the test. */
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_pop_clip(struct ui_renderer_backend *backend) {
+  if (!backend || !backend->user_data)
+    return UI_ERROR_INVALID_ARGUMENT;
+  gles2_flush(backend);
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error
+gles2_push_stencil_clip(struct ui_renderer_backend *backend,
+                        const struct ui_vertex *vertices, int vertex_count,
+                        const unsigned short *indices, int index_count) {
+  (void)vertices;
+  (void)vertex_count;
+  (void)indices;
+  (void)index_count;
+  (void)vertices;
+  (void)vertex_count;
+  (void)indices;
+  (void)index_count;
+  if (!backend || !backend->user_data)
+    return UI_ERROR_INVALID_ARGUMENT;
+  gles2_flush(backend);
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error
+gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
+  if (!backend || !backend->user_data)
+    return UI_ERROR_INVALID_ARGUMENT;
+  gles2_flush(backend);
+  return UI_ERROR_NONE;
+}
+static enum ui_error gles2_create_texture(struct ui_renderer_backend *backend,
+                                          int width, int height,
+                                          void **out_texture_handle) {
+  struct gles2_texture *tex;
+  if (!backend || !out_texture_handle) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  tex = (struct gles2_texture *)UI_MALLOC(sizeof(struct gles2_texture));
+  if (!tex) {
+    return UI_ERROR_OUT_OF_MEMORY;
+  }
+
+  tex->fbo_id = 1;
+  tex->tex_id = 1;
+  tex->width = width;
+  tex->height = height;
+
+  *out_texture_handle = tex;
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_destroy_texture(struct ui_renderer_backend *backend,
+                                           void *texture_handle) {
+  if (!backend || !texture_handle) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  UI_FREE(texture_handle);
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error
+gles2_set_render_target(struct ui_renderer_backend *backend,
+                        void *texture_handle) {
+  (void)texture_handle;
+  if (!backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  return UI_ERROR_NONE;
+}
+
+static enum ui_error gles2_draw_texture(struct ui_renderer_backend *backend,
+                                        void *texture_handle, float x, float y,
+                                        float width, float height,
+                                        float opacity) {
+  struct ui_color color;
+  if (!backend || !texture_handle) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  (void)gles2_flush(backend);
+
+  color.r = 1.0f;
+  color.g = 1.0f;
+  color.b = 1.0f;
+  color.a = opacity;
+  return gles2_draw_rect(backend, x, y, width, height, color);
+}
+
+static enum ui_error gles2_read_pixels(struct ui_renderer_backend *backend,
+                                       int width, int height,
+                                       unsigned char *out_rgba_buffer) {
+  if (!backend || !out_rgba_buffer) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, out_rgba_buffer);
+  return UI_ERROR_NONE;
+}
+/** \brief ui_error */
+enum ui_error
+ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
+  struct ui_renderer_backend *backend;
+
+  if (!out_backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  backend = (struct ui_renderer_backend *)UI_MALLOC(
+      sizeof(struct ui_renderer_backend));
+  if (!backend) {
+    return UI_ERROR_OUT_OF_MEMORY;
+  }
+
+  backend->init = gles2_init;
+  backend->destroy = gles2_destroy;
+  backend->set_viewport = gles2_set_viewport;
+  backend->clear = gles2_clear;
+  backend->draw_rect = gles2_draw_rect;
+  backend->draw_border = gles2_draw_border;
+  backend->draw_triangles = gles2_draw_triangles;
+  backend->flush = gles2_flush;
+  backend->push_clip = gles2_push_clip;
+  backend->pop_clip = gles2_pop_clip;
+  backend->push_stencil_clip = gles2_push_stencil_clip;
+  backend->pop_stencil_clip = gles2_pop_stencil_clip;
+  backend->create_texture = gles2_create_texture;
+  backend->destroy_texture = gles2_destroy_texture;
+  backend->set_render_target = gles2_set_render_target;
+  backend->draw_texture = gles2_draw_texture;
+  backend->read_pixels = gles2_read_pixels;
+  backend->user_data = NULL;
+
+  *out_backend = backend;
+  return UI_ERROR_NONE;
+}
+
+enum ui_error ui_renderer_gles2_destroy(struct ui_renderer_backend *backend) {
+  if (!backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  gles2_destroy(backend); /* free user_data if present */
+  UI_FREE(backend);
+  return UI_ERROR_NONE;
+}

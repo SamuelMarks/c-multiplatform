@@ -1,2008 +1,1276 @@
-cmake_minimum_required(VERSION 3.14)
-project(c-multiplatform C)
+cmake_minimum_required(VERSION 3.15)
+project(c-multiplatform-engine C)
 
-set(CMAKE_FIND_USE_PACKAGE_REGISTRY OFF)
-set(CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY OFF)
-set(CMAKE_EXPORT_NO_PACKAGE_REGISTRY ON)
-
-if(NOT MSVC AND NOT MINGW)
-    add_compile_definitions(_vsnprintf=vsnprintf _snprintf=snprintf)
-endif()
-
-if(NOT CMAKE_C_COMPILER_ID MATCHES "OpenWatcom")
-    set(CMAKE_C_STANDARD 90)
-else()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mh")
-    macro(target_compile_features)
-    endmacro()
-    add_compile_definitions(__inline__=__inline inline=__inline)
-endif()
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+# Set C89 standard strictly
+set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_EXTENSIONS OFF)
-if(BUILD_SHARED_LIBS)
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Toggles for Support Matrix
+option(UI_CRT_STATIC "Use Static CRT linkage (/MT, /MTd)" OFF)
+option(UI_ENABLE_UNICODE "Enable UNICODE charset" ON)
+option(UI_SINGLE_THREADED "Disable Multi-threading" OFF)
+option(UI_ENABLE_LTO "Enable Link-Time Optimization" OFF)
+option(UI_ENABLE_WAYLAND "Enable Wayland Support on Linux" ON)
+option(UI_USE_HARFBUZZ "Enable HarfBuzz integration for complex text shaping" OFF)
+
+if(UI_USE_HARFBUZZ)
+    message(STATUS "Fetching harfbuzz via FetchContent")
+    FetchContent_Declare(
+      harfbuzz
+      GIT_REPOSITORY https://github.com/harfbuzz/harfbuzz.git
+      GIT_TAG        8.3.0
+    )
+    set(HB_HAVE_FREETYPE OFF CACHE BOOL "Disable FreeType dependency in HarfBuzz for now" FORCE)
+    set(HB_BUILD_TESTS OFF CACHE BOOL "Disable HarfBuzz tests" FORCE)
+    set(HB_BUILD_SUBDIR_ALREADY_CONFIGURED ON)
+    FetchContent_MakeAvailable(harfbuzz)
+endif()
+option(UI_SHARED_LIB "Build as Shared Library" OFF)
+option(UI_MSVC_RUNTIME_CHECKS "Enable MSVC /RTC1, /RTCs, /RTCu" OFF)
+option(UI_BUILD_TESTS "Build the test suite" ON)
+option(BUILD_VISUAL_TESTS "Build and run visual fuzzy-match tests" ON)
+
+option(UI_ENABLE_ASAN "Enable AddressSanitizer (ASAN)" OFF)
+
+if(UI_ENABLE_ASAN)
+    if(MSVC)
+        add_compile_options(/fsanitize=address)
+    else()
+        add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+        add_link_options(-fsanitize=address)
+    endif()
 endif()
 
-option(CMP_THEME_MODE_SINGLE_STATIC "Compile c-multiplatform with a single static theme (LTO zero overhead mode)" OFF)
-set(CMP_STATIC_THEME_PREFIX "cmp_cupertino" CACHE STRING "The name of the static theme to compile")
-
-if(CMP_THEME_MODE_SINGLE_STATIC)
-    add_compile_definitions(CMP_THEME_MODE_SINGLE_STATIC=1 CMP_STATIC_THEME_PREFIX=${CMP_STATIC_THEME_PREFIX})
+if(UI_CRT_STATIC AND MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-# vcpkg integration
-if(DEFINED CMAKE_TOOLCHAIN_FILE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake")
-    set(VCPKG_PREFER_SYSTEM_LIBS ON CACHE BOOL "" FORCE)
+if(CMAKE_MSVC_RUNTIME_LIBRARY MATCHES "DLL")
+    set(UI_CRT_STATIC OFF)
+elseif(CMAKE_MSVC_RUNTIME_LIBRARY MATCHES "MultiThreaded")
+    set(UI_CRT_STATIC ON)
 endif()
 
-# Toggles
-option(CMP_SHARED_LIBS "Build shared library" OFF)
-option(CMP_UNICODE "Use Unicode charset (Windows)" OFF)
-option(CMP_MULTI_THREADED "Multi-threaded linkage" ON)
-option(CMP_ENABLE_ASAN "Enable Address Sanitizer for automated leak scanning" OFF)
-
-if(PROJECT_IS_TOP_LEVEL)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE PATH "" FORCE)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "" FORCE)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE PATH "" FORCE)
-    
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Debug")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Release")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/MinSizeRel")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/RelWithDebInfo")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib/Debug")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib/Release")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib/MinSizeRel")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib/RelWithDebInfo")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Debug")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Release")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/cfs-build/Debug")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/cfs-build/Release")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/c89stringutils-build/Debug")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/c89stringutils-build/Release")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/c_str_span-build/Debug")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/_deps/c_str_span-build/Release")
-endif()
-
-
-if(CMP_ENABLE_ASAN AND CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
-    add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
-    add_link_options(-fsanitize=address)
-endif()
-
-if(ANDROID)
-    # Expose variables for Gradle build integration
-    set(CMP_ANDROID_AAB_DIR "${CMAKE_BINARY_DIR}/android/app/build/outputs/bundle/release")
-    message(STATUS "Android AAB/APK outputs will be generated by Gradle wrapper.")
-endif()
-option(CMP_LTO "Link-Time Optimization" OFF)
-option(CMP_STATIC_CRT "Use static CRT on MSVC" OFF)
-if(CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    set(CMP_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+# Pass down CRT static options to dependencies
+set(C_CDD_STATIC_CRT ${UI_CRT_STATIC} CACHE BOOL "" FORCE)
+set(CDD_USE_STATIC_CRT ${UI_CRT_STATIC} CACHE BOOL "" FORCE)
+set(C_ABSTRACT_HTTP_STATIC_CRT ${UI_CRT_STATIC} CACHE BOOL "" FORCE)
+if(UI_CRT_STATIC)
+    set(C_ABSTRACT_HTTP_SHARED_CRT OFF CACHE BOOL "" FORCE)
 else()
-    option(CMP_BUILD_EXAMPLES "Build standalone examples" ON)
+    set(C_ABSTRACT_HTTP_SHARED_CRT ON CACHE BOOL "" FORCE)
 endif()
 
-# Theme Toggles
-option(CMP_THEME_CUPERTINO "Enable Apple Cupertino (HIG) design system" ON)
-option(CMP_THEME_FLUENT2 "Enable Microsoft Fluent 2 design system" ON)
-option(CMP_THEME_MATERIAL3 "Enable Google Material 3 design system" ON)
-option(CMP_THEME_UNSTYLED "Enable Base unstyled design system" ON)
-set(CMP_THEME_MODE "RUNTIME" CACHE STRING "Theme dispatch mode")
-set_property(CACHE CMP_THEME_MODE PROPERTY STRINGS "RUNTIME" "COMPILE_ENUM" "SINGLE_STATIC")
-
-option(CMP_BUILD_SHARED_LIB "Build dynamic library for FFI consumption" ON)
-option(CMP_GENERATE_BINDINGS "Auto-generate SWIG/cbindgen bindings if tools exist" OFF)
-
-if(CMP_THEME_MODE STREQUAL "SINGLE_STATIC")
-    set(theme_count 0)
-    if(CMP_THEME_CUPERTINO)
-        math(EXPR theme_count "${theme_count} + 1")
-        set(CMP_STATIC_THEME_PREFIX "cmp_cupertino")
-    endif()
-    if(CMP_THEME_FLUENT2)
-        math(EXPR theme_count "${theme_count} + 1")
-        set(CMP_STATIC_THEME_PREFIX "cmp_fluent2")
-    endif()
-    if(CMP_THEME_MATERIAL3)
-        math(EXPR theme_count "${theme_count} + 1")
-        set(CMP_STATIC_THEME_PREFIX "cmp_material3")
-    endif()
-    if(CMP_THEME_UNSTYLED)
-        math(EXPR theme_count "${theme_count} + 1")
-        set(CMP_STATIC_THEME_PREFIX "cmp_unstyled")
-    endif()
-    if(NOT theme_count EQUAL 1)
-        message(FATAL_ERROR "SINGLE_STATIC mode requires exactly one theme toggle to be ON")
-    endif()
-    add_compile_definitions(CMP_THEME_MODE_SINGLE_STATIC=1 CMP_STATIC_THEME_PREFIX=${CMP_STATIC_THEME_PREFIX})
+if(UI_SINGLE_THREADED)
+    add_compile_definitions(UI_SINGLE_THREADED)
+else()
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
 endif()
 
+if(UI_ENABLE_UNICODE)
+    add_compile_definitions(UNICODE _UNICODE)
+endif()
 
-if(CMP_LTO OR CMP_THEME_MODE STREQUAL "SINGLE_STATIC")
+if(UI_MSVC_RUNTIME_CHECKS AND MSVC)
+    add_compile_options(/RTC1 /RTCs /RTCu)
+endif()
+
+if(UI_ENABLE_LTO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT lto_supported)
     if(lto_supported)
-        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
     endif()
 endif()
 
-# set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-if(MINGW OR CYGWIN)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLLONG_MAX=9223372036854775807LL -DLLONG_MIN=\"(-LLONG_MAX-1LL)\"")
+if(EMSCRIPTEN)
+    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+
+    # Exported functions and methods
+    set(UI_WASM_EXPORTED_FUNCS "_main,_malloc,_free,_ui_engine_tick,_ui_web_bridge_dispatch_event,_ui_web_bridge_dispatch_resize,_ui_web_bridge_dispatch_key")
+    set(UI_WASM_RUNTIME_METHODS "ccall,cwrap,UTF8ToString,stringToUTF8,setValue,getValue")
+
+    if(CMAKE_BUILD_TYPE MATCHES "Debug")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -gsource-map -Wno-c99-extensions -Wno-missing-prototypes")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O0 -gsource-map --source-map-base http://localhost:8080/")
+    else()
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -flto -Wno-c99-extensions -Wno-missing-prototypes")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O3 -flto")
+    endif()
+
+    if(NOT UI_SINGLE_THREADED)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_PTHREADS=1")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4")
+    endif()
+
+    # Linker specific flags
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ALLOW_MEMORY_GROWTH=1 -s MAXIMUM_MEMORY=4GB")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s EXPORTED_FUNCTIONS=${UI_WASM_EXPORTED_FUNCS} -s EXPORTED_RUNTIME_METHODS=${UI_WASM_RUNTIME_METHODS}")
+endif()
+
+
+if(MSVC)
+    # Target-specific warnings will be added later
+
+else()
+    # Target-specific warnings will be added later
+endif()
+
+if(UNIX AND NOT APPLE AND NOT CYGWIN AND NOT EMSCRIPTEN)
+    if(UI_ENABLE_WAYLAND)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(WAYLAND REQUIRED wayland-client wayland-egl egl wayland-cursor xkbcommon)
+
+        find_program(WAYLAND_SCANNER wayland-scanner REQUIRED)
+        execute_process(
+            COMMAND ${WAYLAND_SCANNER} client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-client-protocol.h
+        )
+        execute_process(
+            COMMAND ${WAYLAND_SCANNER} private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c
+        )
+        include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+        set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_wayland.c ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c)
+        set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c PROPERTIES COMPILE_FLAGS "-Wno-pedantic -Wno-missing-prototypes -Wno-strict-prototypes -Wno-unused-parameter -Dinline=__inline__")
+        set_source_files_properties(src/ui_window_backend_linux_wayland.c PROPERTIES COMPILE_FLAGS "-Wno-pedantic -Wno-missing-prototypes -Wno-strict-prototypes -Wno-unused-parameter -Dinline=__inline__")
+
+    else()
+        set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_x11.c)
+    endif()
+else()
+    set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_x11.c)
+endif()
+
+include(cmake/PlatformLinkages.cmake)
+
+# Library Target
+if(UI_SHARED_LIB)
+    add_library(ui_engine SHARED src/ui_execution_context.c src/ui_tick_engine.c src/ui_thread_pool.c src/ui_reactor.c src/ui_promise.c src/ui_atomic.c src/ui_ring_buffer.c src/ui_timer.c src/ui_arena.c src/ui_pool.c src/ui_engine_core.c src/ui_event.c src/ui_signal.c src/ui_reactive_graph.c src/ui_computed.c src/ui_effect.c src/ui_color_space.c src/ui_color_quantization.c src/ui_design_tokens.c src/ui_tonal_palette.c src/ui_theme_provider.c src/ui_theme_manager.c src/ui_safe_area_manager.c src/ui_shape_family.c src/ui_typography_scale.c src/ui_state_layer.c src/ui_elevation.c src/ui_focus_ring.c src/ui_handle_manager.c src/ui_window_backend_win32.c src/ui_window_backend_macos.c src/ui_window_backend_ios.c src/ui_window_backend_android.c ${UI_WINDOW_BACKEND_LINUX_SRC} src/ui_window_backend_web.c src/ui_dom_node.c
+    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_audio_alsa.c src/ui_audio_coreaudio.c src/ui_audio_opensles.c src/ui_audio_wasapi.c src/ui_audio_webaudio.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_jpeg.c src/ui_image_png.c src/ui_image_webp.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_video_avfoundation.c src/ui_video_ffmpeg.c src/ui_video_mediacodec.c src/ui_video_mf.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c)
+else()
+    add_library(ui_engine STATIC src/ui_execution_context.c src/ui_tick_engine.c src/ui_thread_pool.c src/ui_reactor.c src/ui_promise.c src/ui_atomic.c src/ui_ring_buffer.c src/ui_timer.c src/ui_arena.c src/ui_pool.c src/ui_engine_core.c src/ui_event.c src/ui_signal.c src/ui_reactive_graph.c src/ui_computed.c src/ui_effect.c src/ui_color_space.c src/ui_color_quantization.c src/ui_design_tokens.c src/ui_tonal_palette.c src/ui_theme_provider.c src/ui_theme_manager.c src/ui_safe_area_manager.c src/ui_shape_family.c src/ui_typography_scale.c src/ui_state_layer.c src/ui_elevation.c src/ui_focus_ring.c src/ui_handle_manager.c src/ui_window_backend_win32.c src/ui_window_backend_macos.c src/ui_window_backend_ios.c src/ui_window_backend_android.c ${UI_WINDOW_BACKEND_LINUX_SRC} src/ui_window_backend_web.c src/ui_dom_node.c
+    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_audio_alsa.c src/ui_audio_coreaudio.c src/ui_audio_opensles.c src/ui_audio_wasapi.c src/ui_audio_webaudio.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_jpeg.c src/ui_image_png.c src/ui_image_webp.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_video_avfoundation.c src/ui_video_ffmpeg.c src/ui_video_mediacodec.c src/ui_video_mf.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c)
+endif()
+
+target_link_platform_libraries(ui_engine PUBLIC)
+
+if(NOT UI_SINGLE_THREADED)
+    target_link_libraries(ui_engine PRIVATE Threads::Threads)
 endif()
 
 if(MSVC)
-    set(CMAKE_VS_GLOBALS "VcpkgEnabled=false")
-    # Windows & MSVC Optimizations
-    # We remove default /MD or /MT to set them manually
-    set(variables
-      CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
-      CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
-    )
-    foreach(variable ${variables})
-        if(${variable} MATCHES "/MDd")
-            string(REGEX REPLACE "/MDd" "" ${variable} "${${variable}}")
-        endif()
-        if(${variable} MATCHES "/MD")
-            string(REGEX REPLACE "/MD" "" ${variable} "${${variable}}")
-        endif()
-        if(${variable} MATCHES "/MTd")
-            string(REGEX REPLACE "/MTd" "" ${variable} "${${variable}}")
-        endif()
-        if(${variable} MATCHES "/MT")
-            string(REGEX REPLACE "/MT" "" ${variable} "${${variable}}")
-        endif()
-        if(${variable} MATCHES "/RTC1")
-            string(REGEX REPLACE "/RTC1" "" ${variable} "${${variable}}")
-        endif()
-    endforeach()
-
-    if(CMP_STATIC_CRT)
-        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT /wd4706")
-        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd /wd4706")
-    else()
-        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MD /wd4706")
-        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MDd /wd4706")
+    target_compile_options(ui_engine PRIVATE /W4 /WX /wd4702 /wd4716 /wd4098 /wd4033 /wd4133 /wd4024 /wd4047 /wd4715 /wd4113)
+else()
+    target_compile_options(ui_engine PRIVATE -pedantic -Wall -Werror)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
     endif()
-
-    if(CMP_RTC)
-        set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /RTC1 /RTCs /RTCu")
-    endif()
-
-    add_compile_options(/wd4706 /wd4232 /WX-)
-
-    if(CMP_UNICODE)
-        add_definitions(-DUNICODE -D_UNICODE)
-    endif()
-    
-    # Enforce safe CRT and no windows.h warnings if we happen to include it (which we shouldn't)
-    add_compile_definitions(_CRT_SECURE_NO_WARNINGS=0)
-elseif(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-    # GCC/Clang
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -Wno-missing-braces -Wno-long-long")
 endif()
 
+
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 include(FetchContent)
 
-# greatest test framework
-FetchContent_Declare(greatest URL https://raw.githubusercontent.com/SamuelMarks/greatest/refs/heads/cmake-and-msvc/greatest.h DOWNLOAD_NO_EXTRACT TRUE)
-FetchContent_MakeAvailable(greatest)
+macro(UI_FetchDependencyLocalOrArchive NAME LOCAL_DIR GITHUB_REPO)
+    if(EXISTS "$ENV{HOME}/repos/${LOCAL_DIR}")
+        message(STATUS "Using local ${NAME} from $ENV{HOME}/repos/${LOCAL_DIR}")
+        FetchContent_Declare(
+            ${NAME}
+            SOURCE_DIR "$ENV{HOME}/repos/${LOCAL_DIR}"
+        )
+    else()
+        FetchContent_Declare(
+            ${NAME}
+            GIT_REPOSITORY "https://github.com/${GITHUB_REPO}.git"
+            GIT_TAG "master"
+        )
+    endif()
+    FetchContent_MakeAvailable(${NAME})
+endmacro()
 
-add_library(greatest INTERFACE)
-target_include_directories(greatest INTERFACE ${greatest_SOURCE_DIR})
-
-# cfs
-if(CDD_DEPS STREQUAL "SYSTEM")
-    find_package(cfs QUIET NO_CMAKE_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
-endif()
 if(NOT TARGET cfs)
-    FetchContent_Declare(cfs URL https://github.com/SamuelMarks/c-fs/archive/master.zip
-        )
-    FetchContent_MakeAvailable(cfs)
+    UI_FetchDependencyLocalOrArchive(cfs "c-fs" "SamuelMarks/c-fs")
 endif()
 
-# c89stringutils (Not from vcpkg to allow target_compile_definitions)
-set(C89STRINGUTILS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(c89stringutils URL https://github.com/offscale/c89stringutils/archive/master.zip
-    )
-FetchContent_MakeAvailable(c89stringutils)
+UI_FetchDependencyLocalOrArchive(parson "parson" "SamuelMarks/parson")
+UI_FetchDependencyLocalOrArchive(c_cdd "cdd-c" "SamuelMarks/cdd-c")
+UI_FetchDependencyLocalOrArchive(c-abstract-http "c-abstract-http" "SamuelMarks/c-abstract-http")
+UI_FetchDependencyLocalOrArchive(c_orm "c-orm" "SamuelMarks/c-orm")
 
 
-# c_str_span (Not in vcpkg)
-set(C_STR_SPAN_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-FetchContent_Declare(c_str_span URL https://github.com/SamuelMarks/c-str-span/archive/master.zip
-    )
-FetchContent_MakeAvailable(c_str_span)
-
-# parson (Not in vcpkg)
-FetchContent_Declare(parson URL https://github.com/SamuelMarks/parson/archive/master.zip
-    )
-set(PARSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(PARSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(parson)
-file(WRITE "${parson_SOURCE_DIR}/tests/tests.c" "int main(void){return 0;}\n")
-if(NOT TARGET parson_tests)
-    add_executable(parson_tests ${parson_SOURCE_DIR}/tests/tests.c)
-endif()
-include_directories(SYSTEM ${parson_SOURCE_DIR})
-if(TARGET parson AND NOT TARGET parson::parson)
-    add_library(parson::parson ALIAS parson)
-endif()
-
-# curl dependency
-find_package(CURL CONFIG QUIET)
-if(NOT CURL_FOUND)
-    find_package(CURL QUIET)
-endif()
-if(NOT CURL_FOUND)
-    find_package(PkgConfig QUIET)
-    if(PKG_CONFIG_FOUND)
-        pkg_check_modules(CURL QUIET libcurl)
-        if(CURL_FOUND)
-            # Map PkgConfig variables to find_package names
-            set(CURL_LIBRARIES ${CURL_LINK_LIBRARIES})
-            set(CURL_INCLUDE_DIRS ${CURL_INCLUDE_DIRS})
-            set(CURL_VERSION ${CURL_VERSION})
-        endif()
+# Strip coverage flags that bleed from dependencies in Debug mode
+foreach(DEP_TARGET c_cdd c-abstract-http cfs c-orm c-orm-async c_str_span c89stringutils parson)
+    if(TARGET ${DEP_TARGET})
+        set_target_properties(${DEP_TARGET} PROPERTIES INTERFACE_COMPILE_OPTIONS "")
+        set_target_properties(${DEP_TARGET} PROPERTIES INTERFACE_LINK_OPTIONS "")
     endif()
-endif()
-
-if(NOT CURL_FOUND)
-    # Manual system path fallback
-    find_path(CURL_INCLUDE_DIR NAMES curl/curl.h PATHS /usr/local/include /usr/include /opt/homebrew/include /usr/local/opt/curl/include /opt/homebrew/opt/curl/include)
-    find_library(CURL_LIBRARY NAMES curl libcurl PATHS /usr/local/lib /usr/lib /opt/homebrew/lib /usr/local/opt/curl/lib /opt/homebrew/opt/curl/lib)
-    if(CURL_INCLUDE_DIR AND CURL_LIBRARY)
-        set(CURL_FOUND TRUE)
-        set(CURL_INCLUDE_DIRS ${CURL_INCLUDE_DIR})
-        set(CURL_LIBRARIES ${CURL_LIBRARY})
-        message(STATUS "Found CURL manually: ${CURL_LIBRARIES}")
-    endif()
-endif()
-
-if(CURL_FOUND)
-    set(CURL_ROOT_DIR "${CURL_INCLUDE_DIRS}/..")
-endif()
-
-if(NOT APPLE AND NOT WIN32 AND NOT MINGW AND NOT CYGWIN AND NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    if(CURL_FOUND)
-        set(C_ABSTRACT_HTTP_USE_LIBCURL ON CACHE BOOL "Use libcurl backend for abstract-http" FORCE)
-    else()
-        message(FATAL_ERROR "curl not found")
-    endif()
-endif()
-
-# openssl dependency
-find_package(OpenSSL CONFIG QUIET)
-if(NOT OPENSSL_FOUND)
-    find_package(OpenSSL QUIET)
-endif()
-if(NOT OPENSSL_FOUND)
-    find_package(PkgConfig QUIET)
-    if(PKG_CONFIG_FOUND)
-        pkg_check_modules(OPENSSL QUIET openssl)
-        if(OPENSSL_FOUND)
-            # Map PkgConfig variables to find_package names
-            set(OPENSSL_LIBRARIES ${OPENSSL_LINK_LIBRARIES})
-            set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIRS})
-            set(OPENSSL_VERSION ${OPENSSL_VERSION})
-        endif()
-    endif()
-endif()
-
-if(NOT OPENSSL_FOUND)
-    # Manual system path fallback
-    find_path(OPENSSL_INCLUDE_DIR NAMES openssl/ssl.h PATHS /usr/local/include /usr/include /opt/homebrew/include /usr/local/opt/openssl/include /opt/homebrew/opt/openssl/include)
-    find_library(OPENSSL_SSL_LIBRARY NAMES ssl libssl PATHS /usr/local/lib /usr/lib /opt/homebrew/lib /usr/local/opt/openssl/lib /opt/homebrew/opt/openssl/lib)
-    find_library(OPENSSL_CRYPTO_LIBRARY NAMES crypto libcrypto PATHS /usr/local/lib /usr/lib /opt/homebrew/lib /usr/local/opt/openssl/lib /opt/homebrew/opt/openssl/lib)
-    if(OPENSSL_INCLUDE_DIR AND OPENSSL_SSL_LIBRARY AND OPENSSL_CRYPTO_LIBRARY)
-        set(OPENSSL_FOUND TRUE)
-        set(OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
-        set(OPENSSL_LIBRARIES ${OPENSSL_SSL_LIBRARY} ${OPENSSL_CRYPTO_LIBRARY})
-        message(STATUS "Found OpenSSL manually: ${OPENSSL_LIBRARIES}")
-    endif()
-endif()
-
-if(OPENSSL_FOUND)
-    if(OPENSSL_INCLUDE_DIRS)
-        set(OPENSSL_ROOT_DIR "${OPENSSL_INCLUDE_DIRS}/..")
-        set(OpenSSL_DIR "${OPENSSL_ROOT_DIR}")
-    endif()
-    if(NOT WIN32 AND NOT MINGW AND NOT CYGWIN)
-        set(C_ABSTRACT_HTTP_USE_OPENSSL ON CACHE BOOL "Use OpenSSL for cryptography" FORCE)
-    endif()
-endif()
-
-if(NOT APPLE AND NOT WIN32 AND NOT MINGW AND NOT CYGWIN AND NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    if(NOT OPENSSL_FOUND)
-        message(FATAL_ERROR "openssl not found")
-    endif()
-endif()
-
-# c-abstract-http
-set(C_ABSTRACT_HTTP_ENABLE_WEBSOCKETS ON CACHE BOOL "" FORCE)
-set(C_ABSTRACT_HTTP_ENABLE_SSE ON CACHE BOOL "" FORCE)
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../c-abstract-http/CMakeLists.txt")
-    message(STATUS "Using local c-abstract-http for c_abstract_http")
-    FetchContent_Declare(c_abstract_http SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../c-abstract-http")
-else()
-    FetchContent_Declare(c_abstract_http URL https://github.com/SamuelMarks/c-abstract-http/archive/master.zip
-        )
-endif()
-if(CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    add_compile_definitions(CMP_OS_DOS=1)
-    set(HTTP_ONLY ON CACHE BOOL "" FORCE)
-endif()
-
-FetchContent_Declare(cdd_c URL https://github.com/SamuelMarks/cdd-c/archive/master.zip
-    )
-FetchContent_MakeAvailable(cdd_c)
-if(EXISTS "${cdd_c_SOURCE_DIR}/src/functions/emit/codegen.c")
-    file(READ "${cdd_c_SOURCE_DIR}/src/functions/emit/codegen.c" CODEGEN_SRC)
-    string(REGEX REPLACE "([ \t]*)char \\*_ast_get_type_from_ref_3 = NULL;\n([ \t]*)char \\*_ast_get_type_from_ref_4 = NULL;\n([ \t]*)char \\*_ast_get_type_from_ref_5 = NULL;\n([ \t]*)size_t i;\n" "" CODEGEN_SRC "${CODEGEN_SRC}")
-    string(REGEX REPLACE "int write_struct_declaration_h\\(FILE \\*hfile, const char \\*struct_name,\n([ \t]*)const struct StructFields \\*sf,\n([ \t]*)const struct CodegenConfig \\*config\\) \\{\n" "int write_struct_declaration_h(FILE *hfile, const char *struct_name,\n                               const struct StructFields *sf,\n                               const struct CodegenConfig *config) {\n  char *_ast_get_type_from_ref_3 = NULL;\n  char *_ast_get_type_from_ref_4 = NULL;\n  char *_ast_get_type_from_ref_5 = NULL;\n  size_t i;\n" CODEGEN_SRC "${CODEGEN_SRC}")
-    file(WRITE "${cdd_c_SOURCE_DIR}/src/functions/emit/codegen.c" "${CODEGEN_SRC}")
-endif()
-FetchContent_MakeAvailable(c_abstract_http)
-
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/cdd_dummy.c" "void LOG_DEBUG(const char* fmt, ...) { (void)fmt; }\nvoid C_CDD_LOG_DEBUG(const char* fmt, ...) { (void)fmt; }\n")
-
-if(TARGET c_cdd)
-  target_sources(c_cdd PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/cdd_dummy.c")
-endif()
-if(TARGET c_orm)
-  target_sources(c_orm PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/cdd_dummy.c")
-endif()
-if(TARGET cdd-c)
-  target_sources(cdd-c PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/cdd_dummy.c")
-endif()
-
-if(TARGET c_cdd)
-    target_compile_definitions(c_cdd PRIVATE CDD_TOKEN_KEYWORD_CHAR=CDD_TOKEN_CHAR CDD_TOKEN_KEYWORD_FLOAT=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_DOUBLE=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_VOID=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_UNION=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_ENUM=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_UNSIGNED=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_SIGNED=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_LONG=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_SHORT=CDD_TOKEN_OTHER CDD_TOKEN_STRING_LITERAL=CDD_TOKEN_STRING CDD_TOKEN_KEYWORD_CONST=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_VOLATILE=CDD_TOKEN_OTHER CDD_TOKEN_KEYWORD_RESTRICT=CDD_TOKEN_OTHER)
-    target_include_directories(c_cdd PUBLIC "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/cdd_c-src/src>")
-    if(CMAKE_C_COMPILER_ID MATCHES "OpenWatcom")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mh")
-        target_compile_options(c_cdd PRIVATE -za99)
-    elseif(MSVC)
-        target_compile_options(c_cdd PRIVATE /WX- /wd4013 /wd4101 /wd4456 /wd4267 /wd4047 /wd4024 /wd4701 /wd4703 /wd4189 /wd4715 /wd4702 /wd4018 /wd4129)
-    if(TARGET cdd-c)
-    target_compile_options(cdd-c PRIVATE /WX- /wd4013 /wd4101 /wd4456 /wd4267 /wd4047 /wd4024 /wd4701 /wd4703 /wd4189 /wd4715 /wd4702 /wd4018 /wd4129)
-    endif()
-    endif()
-endif()
-if(CMAKE_SYSTEM_NAME STREQUAL "DOS" AND TARGET c-abstract-http AND TARGET c_cdd)
-    target_include_directories(c-abstract-http PUBLIC "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/_deps/cdd_c-src/src>")
-    target_include_directories(c-abstract-http PUBLIC "$<TARGET_PROPERTY:c_cdd,INTERFACE_INCLUDE_DIRECTORIES>")
-endif()
-
-# c-orm
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    set(CMAKE_DISABLE_FIND_PACKAGE_SQLite3 ON CACHE BOOL "" FORCE)
-    FetchContent_Declare(c_orm URL https://github.com/SamuelMarks/c-orm/archive/master.zip
-        )
-    FetchContent_MakeAvailable(c_orm)
-endif()
-
-if(TARGET sqlite3 AND CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    target_compile_definitions(sqlite3 PRIVATE SQLITE_THREADSAFE=0 SQLITE_OS_OTHER=1)
-endif()
-
-foreach(tgt c_str_span c89stringutils parson cfs c_cdd c-abstract-http c-orm c-orm-async sqlite3)
-  if(TARGET ${tgt})
-    if(MSVC)
-      target_compile_options(${tgt} PRIVATE /W0)
-    else()
-      target_compile_options(${tgt} PRIVATE -w)
-    endif()
-  endif()
 endforeach()
 
-if(TARGET c-abstract-http)
-  target_compile_definitions(c-abstract-http PUBLIC CDD_STRDUP=c_cdd_strdup)
+if(TARGET c_cdd AND MSVC)
+    target_compile_options(c_cdd PRIVATE "/wd4005")
 endif()
 
-set(CMP_SOURCES
-    src/core/cmp_memory.c
-    src/cmp_css_selectors.c
-    src/cmp_css_values.c
-    src/cmp_css_cascade.c
-    src/cmp_css_box_model.c
-    src/cmp_css_backgrounds_borders.c
-    src/cmp_css_color.c
-    src/cmp_css_display.c
-    src/cmp_css_positioning.c
-    src/cmp_css_anchor_positioning.c
-    src/cmp_css_grid.c
-    src/cmp_css_flexbox.c
-    src/cmp_css_box_alignment.c
-    src/cmp_css_multi_column.c
-    src/cmp_css_transforms.c
-    src/cmp_css_animations.c
-    src/cmp_css_scroll_animations.c
-    src/cmp_css_masking.c
-    src/cmp_css_typography.c
-    src/cmp_css_fonts.c
-    src/cmp_css_writing_modes.c
-    src/cmp_css_logical.c
-    src/cmp_css_lists_content.c
-    src/cmp_css_images_shapes.c
-    src/cmp_css_ruby.c
-    src/cmp_css_overflow.c
-    src/cmp_css_containment.c
-    src/cmp_css_speech.c
-    src/cmp_css_ui.c
-    src/cmp_css_tables.c
-    src/cmp_css_svg.c
-    src/cmp_css_at_rules.c
-    src/cmp_cssom.c
-    src/cmp_css_device_adaptation.c
-    src/cmp_waapi.c
-    src/cmp_error.c
-    src/cmp_string.c
-    src/cmp_tls.c
-    src/cmp_ring_buffer.c
-    src/cmp_modality.c
-    src/cmp_sync.c
-    src/cmp_coroutine.c
-    src/cmp_timer.c
-    src/core/cmp_vfs.c
-    src/cmp_http.c
-)
+target_link_libraries(ui_engine PRIVATE c-abstract-http cfs c-orm)
+target_include_directories(ui_engine PUBLIC include)
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    list(APPEND CMP_SOURCES src/cmp_orm.c)
-endif()
+# Tests
+if(UI_BUILD_TESTS)
+    include(CTest)
+    enable_testing()
+    add_compile_options(-UNDEBUG)
+    remove_definitions(-DNDEBUG)
 
-list(APPEND CMP_SOURCES
-    src/cmp_window.c
-    src/cmp_dpi.c
-    src/core/cmp_event.c
-    src/cmp_router.c
-    src/core/cmp_layout.c
-    src/cmp_ui.c
-    src/cmp_databinding.c
-    src/cmp_flex_align.c
-    src/cmp_media_query.c
-    src/cmp_grid.c
-    src/cmp_flow.c
-    src/cmp_position.c
-    src/themes/cmp_theme_dispatch.c
-    src/cmp_visuals.c
-    src/cmp_borders.c
-    src/cmp_svg.c
-    src/cmp_gpu.c
-    src/cmp_shader.c
-    src/cmp_shader_cache.c
-    src/cmp_msaa.c
-    src/cmp_linear_blend.c
-    src/cmp_mipmap.c
-    src/cmp_swapchain.c
-    src/cmp_overdraw.c
-    src/cmp_layer_tiling.c
-    src/cmp_hit_test.c
-    src/core/cmp_event_bubbling.c
-    src/cmp_passive_event.c
-    src/cmp_gesture.c
-    src/cmp_touch_action.c
-    src/cmp_context_menu.c
-    src/cmp_hover_intent.c
-    src/cmp_scroll_ctx.c
-    src/cmp_overscroll.c
-    src/cmp_rubber_band.c
-    src/cmp_scroll_smooth.c
-    src/cmp_scroll_anchor.c
-    src/cmp_ptr.c
-    src/cmp_tick.c
-    src/cmp_dt.c
-    src/cmp_transition.c
-    src/cmp_keyframe.c
-    src/cmp_anim_compose.c
-    src/cmp_spring_ease.c
-    src/cmp_bezier_ease.c
-    src/cmp_step_ease.c
-    src/cmp_motion_path.c
-    src/cmp_vt_shared.c
-    src/cmp_flip.c
-    src/cmp_form_controls.c
-    src/cmp_validation.c
-    src/cmp_input_mask.c
-    src/cmp_indeterminate.c
-    src/widgets/cmp_select_ui.c
-    src/cmp_datalist.c
-    src/widgets/cmp_range_slider.c
-    src/cmp_color_picker.c
-    src/cmp_date_picker.c
-    src/cmp_caret.c
-    src/cmp_selection.c
-    src/widgets/cmp_editable.c
-    src/cmp_ime.c
-    src/cmp_spellcheck.c
-    src/cmp_undo_redo.c
-        src/cmp_a11y_tree.c
-    src/cmp_screen_reader.c
-    src/cmp_aria.c
-    src/cmp_aria_live.c
-    src/cmp_focus_manager.c
-    src/cmp_focus_ring.c
-    src/cmp_a11y_rotor.c
-    src/cmp_a11y_action.c
-    src/cmp_auth_sec.c
-    src/cmp_permissions.c
-    src/core/cmp_system_geometry.c
-    src/cmp_symbols.c
-    src/cmp_gamepad_hig.c
-    src/cmp_stylus.c
-    src/cmp_keyboard_hig.c
-    src/cmp_collections.c
-    src/cmp_scroll_view.c
-    src/cmp_lists.c
-    src/widgets/cmp_text_fields.c
-    src/cmp_inputs.c
-    src/widgets/cmp_menu.c
-    src/widgets/cmp_system_button.c
-    src/cmp_deep_link.c
-    src/widgets/cmp_search_bar.c
-    src/widgets/cmp_tab_bar.c
-    src/widgets/cmp_nav_bar.c
-    src/cmp_materials.c
-    src/cmp_system_fonts.c
-    src/cmp_dynamic_type.c
-    src/cmp_forced_colors.c
-    src/cmp_sys_colors.c
-    src/cmp_app_region.c
-    src/cmp_clipboard.c
-    src/cmp_csp.c
-    src/core/cmp_resource_manager.c
-    src/cmp_interop_swift.c
-    src/cmp_tvos_specific.c
-    src/cmp_ios_specific.c
-    src/cmp_media_avkit.c
-    src/cmp_ipc.c
-    src/cmp_ink_ripple.c
-    src/cmp_lottie.c
-    src/cmp_fluent.c
-    src/cmp_apz.c
-    src/cmp_extensions.c
-    src/cmp_dnd.c
-    src/cmp_haptics.c
-    src/cmp_i18n.c
-    src/cmp_native_dialog.c
-    src/cmp_network.c
-    src/cmp_pip.c
-    src/cmp_print_ctx.c
-    src/cmp_safe_areas.c
-    src/cmp_system_menu.c
-    src/cmp_titlebar_env.c
-    src/cmp_window_blur.c
-)
+    # Recompile library with mock allocator injected for OOM tests
+    add_library(ui_engine_test STATIC src/ui_execution_context.c src/ui_tick_engine.c src/ui_thread_pool.c src/ui_reactor.c src/ui_promise.c src/ui_atomic.c src/ui_ring_buffer.c src/ui_timer.c src/ui_arena.c src/ui_pool.c src/ui_engine_core.c src/ui_event.c src/ui_signal.c src/ui_reactive_graph.c src/ui_computed.c src/ui_effect.c src/ui_color_space.c src/ui_color_quantization.c src/ui_design_tokens.c src/ui_tonal_palette.c src/ui_theme_provider.c src/ui_theme_manager.c src/ui_safe_area_manager.c src/ui_shape_family.c src/ui_typography_scale.c src/ui_state_layer.c src/ui_elevation.c src/ui_focus_ring.c src/ui_handle_manager.c src/ui_window_backend_win32.c src/ui_window_backend_macos.c src/ui_window_backend_ios.c src/ui_window_backend_android.c ${UI_WINDOW_BACKEND_LINUX_SRC} src/ui_window_backend_web.c src/ui_dom_node.c
+    src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_audio_wasapi.c src/ui_audio_coreaudio.c src/ui_audio_alsa.c src/ui_audio_opensles.c src/ui_audio_webaudio.c src/ui_video_mf.c src/ui_video_avfoundation.c src/ui_video_mediacodec.c src/ui_video_ffmpeg.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_png.c src/ui_image_jpeg.c src/ui_image_webp.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c)
+    target_include_directories(ui_engine_test PUBLIC include)
+    target_compile_definitions(ui_engine_test PUBLIC UI_TEST_MOCK_ALLOC=1)
+    add_dependencies(ui_engine_test ui_engine)
+    target_link_platform_libraries(ui_engine_test PUBLIC)
+    if(NOT UI_SINGLE_THREADED)
+        target_link_libraries(ui_engine_test PRIVATE Threads::Threads)
+    endif()
 
-if(APPLE)
-    list(APPEND CMP_SOURCES src/cmp_system_theme_darwin.m)
-endif()
+    target_link_libraries(ui_engine_test PRIVATE c-abstract-http cfs c-orm)
 
-if(CMP_THEME_CUPERTINO)
-    add_compile_definitions(CMP_THEME_CUPERTINO=1)
-endif()
-if(CMP_THEME_FLUENT2)
-    add_compile_definitions(CMP_THEME_FLUENT2=1)
-endif()
-if(CMP_THEME_MATERIAL3)
-    add_compile_definitions(CMP_THEME_MATERIAL3=1)
-endif()
-
-if(CMP_THEME_MODE STREQUAL "RUNTIME")
-    add_compile_definitions(CMP_THEME_MODE_RUNTIME=1)
-elseif(CMP_THEME_MODE STREQUAL "COMPILE_ENUM")
-    add_compile_definitions(CMP_THEME_MODE_COMPILE_ENUM=1)
-elseif(CMP_THEME_MODE STREQUAL "SINGLE_STATIC")
-    add_compile_definitions(CMP_THEME_MODE_SINGLE_STATIC=1)
-endif()
-
-set(CMP_THEME_SOURCES "")
-if(CMP_THEME_CUPERTINO)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_cupertino.c)
-endif()
-if(CMP_THEME_FLUENT2)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_fluent2.c
-        src/themes/cmp_f2_button.c
-        src/themes/cmp_f2_data_display.c
-        src/themes/cmp_f2_dropdowns.c
-        src/themes/cmp_f2_icons.c
-        src/themes/cmp_f2_inputs.c
-        src/themes/cmp_f2_layout.c
-        src/themes/cmp_f2_menus.c
-        src/themes/cmp_f2_overlays.c
-        src/themes/cmp_f2_surfaces.c
-        src/themes/cmp_f2_text_inputs.c
-        src/themes/cmp_f2_theme.c)
-endif()
-if(CMP_THEME_MATERIAL3)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3.c src/themes/cmp_material3_typography.c src/themes/cmp_theme_dispatch.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_color.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_sys.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_layout.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_components.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_communication.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_containment.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_navigation.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_selection_controls.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_text_inputs.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_information.c)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_material3_pickers_menus.c)
-endif()
-if(CMP_THEME_UNSTYLED)
-    list(APPEND CMP_THEME_SOURCES src/themes/cmp_unstyled.c)
-endif()
-
-
-list(APPEND CMP_SOURCES src/cmp_window_manager.c src/cmp_tex_compression.c src/cmp_pointer_events.c src/cmp_pointer_capture.c src/cmp_complex_gesture.c src/cmp_pointer_pressure.c src/cmp_scroll_velocity.c src/cmp_scroll_momentum.c src/cmp_scroll_snap_stop.c src/cmp_scroll_padding.c src/cmp_scrollbar_gutter.c src/cmp_scroll_timeline.c src/cmp_view_transition.c src/cmp_discrete_transition.c src/cmp_aria_relations.c src/cmp_promotion_link.c src/cmp_spring_animator.c src/cmp_complex_gesture_hig.c src/cmp_prefers_reduced_motion.c src/cmp_a11y_transparency.c src/cmp_compositor_anim.c src/cmp_app_store_compliance.c src/cmp_resilience_handling.c src/cmp_documentation_dx.c src/cmp_developer_experience.c src/cmp_profiling_telemetry.c src/cmp_testing_automation.c src/cmp_carplay_specific.c src/cmp_visionos_specific.c src/cmp_watchos_specific.c src/cmp_macos_specific.c src/cmp_ipados_specific.c src/cmp_transactions_hig.c src/cmp_compositor_thread.c src/cmp_os_communications.c src/cmp_i18n_formatting.c src/cmp_prefers_color_scheme.c src/cmp_system_theme_win32.c src/cmp_system_theme_linux.c src/cmp_system_theme_android_web.c src/cmp_android_ndk_bridge.c src/cmp_android_scoped_storage.c src/cmp_android_vulkan_gles.c src/cmp_apple_gestures.c src/cmp_background_blur.c src/cmp_code_block_clipboard.c src/cmp_command_palette.c src/cmp_docking_framework.c src/cmp_emscripten_indexeddb_vfs.c src/cmp_focus_navigation.c src/cmp_hardware_accel.c src/cmp_ios_background_refresh.c src/cmp_ipados_multitasking.c src/cmp_markdown_parser.c src/cmp_mermaid_renderer.c src/cmp_os_integration.c src/cmp_os_media_notifications.c src/cmp_power_awareness.c src/cmp_safe_area_handler.c src/cmp_secure_network.c src/cmp_syntax_highlight.c src/cmp_tab_navigation.c src/cmp_toast_notifications.c src/cmp_wayland_protocols.c src/cmp_workspace_layout.c src/cmp_credential_manager.c src/cmp_screen_capture.c src/cmp_state_layers.c    src/cmp_tree_sitter.c src/cmp_ui_action_button.c src/cmp_ui_app_bar.c    src/cmp_ui_fab.c src/cmp_ui_icon_button.c src/cmp_ui_segmented_button.c src/cmp_ui_breadcrumbs.c src/cmp_ui_bottom_sheet.c src/cmp_ui_modal_drawer.c src/cmp_ui_navigation_rail.c    src/cmp_ui_progress_bar.c src/cmp_ui_progress_indicator.c src/cmp_ui_virtual_list.c)
-add_library(cmp ${CMP_SOURCES} ${CMP_THEME_SOURCES}      src/cmp_a11y_theme.c
-      src/cmp_breadcrumbs.c
-      src/cmp_code_block.c
-      src/cmp_custom_chrome.c
-      src/cmp_dpi_awareness.c
-      src/cmp_embedded_pty.c
-      src/cmp_file_watcher.c
-      src/cmp_image_preview.c
-      src/cmp_input_layout.c
-      src/cmp_kbd_avoid.c
-      src/cmp_math_renderer.c
-      src/cmp_minimap.c
-      src/cmp_multi_window.c
-      src/cmp_os_scrollbars.c
-      src/cmp_sandbox_exec.c
-      src/cmp_status_bar.c
-      src/cmp_typography.c
-      src/cmp_webgl_canvas.c
-      src/cmp_win32_input.c
-      src/cmp_win32_window.c
-    src/cmp_audio_capture.c
-    src/cmp_global_hotkey.c
-    src/cmp_mmap.c
-    src/cmp_plugin_loader.c
-    src/cmp_pty.c
-    src/cmp_regex.c
-    src/cmp_sse_parser.c
-    src/cmp_ui_accordion.c
-    src/cmp_ui_avatar.c
-    src/cmp_ui_badge.c
-    src/cmp_ui_card.c
-    src/cmp_ui_chip.c
-    src/cmp_ui_code_block.c
-    src/cmp_ui_dialog.c
-    src/cmp_ui_divider.c
-    src/cmp_ui_diff.c
-    src/cmp_ui_markdown.c
-    src/cmp_ui_skeleton.c
-    src/cmp_ui_snackbar.c
-    src/cmp_ui_spinner.c
-    src/cmp_ui_splitter.c
-    src/cmp_ui_switch.c
-    src/cmp_ui_tabs.c
-    src/cmp_ui_terminal.c
-    src/cmp_ui_text_field.c
-    src/cmp_ui_tooltip.c
-    src/cmp_ui_tree_view.c
-  )
-if(CMP_SHARED_LIBS)
-    set_target_properties(cmp PROPERTIES POSITION_INDEPENDENT_CODE ON)
-    target_compile_definitions(cmp PRIVATE CMP_BUILD_SHARED)
-endif()
-
-if(MINGW)
-    target_link_options(cmp PRIVATE "-Wl,--export-all-symbols")
-endif()
-
-target_include_directories(cmp PUBLIC include)
-if(CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    target_link_libraries(cmp PUBLIC cfs c-abstract-http c_cdd)
-    target_compile_definitions(cmp PUBLIC CMP_OMIT_ORM)
-else()
-    target_link_libraries(cmp PUBLIC cfs c-abstract-http c-orm c_cdd)
-endif()
-if(WIN32)
-    if(MSVC AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15.0)
-        # MSVC 2005 (v8.0) does not have dwmapi.lib by default
-        target_link_libraries(cmp PRIVATE msimg32)
+    if(MSVC)
+        target_compile_options(ui_engine_test PRIVATE /W4 /WX /wd4702 /wd4716 /wd4098 /wd4033 /wd4133 /wd4024 /wd4047 /wd4715 /wd4113)
     else()
-        target_link_libraries(cmp PRIVATE dwmapi msimg32)
+        target_compile_options(ui_engine_test PRIVATE -pedantic -Wall -Werror)
+        if(ENABLE_COVERAGE)
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
+        endif()
+    endif()
+
+    add_executable(test_ui_execution_context tests/test_ui_execution_context.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_execution_context ui_engine_test)
+    add_test(NAME test_ui_execution_context COMMAND test_ui_execution_context)
+
+    add_executable(test_ui_tick_engine tests/test_ui_tick_engine.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_tick_engine ui_engine_test)
+    add_test(NAME test_ui_tick_engine COMMAND test_ui_tick_engine)
+
+    add_executable(test_ui_thread_pool tests/test_ui_thread_pool.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_thread_pool ui_engine_test)
+    add_test(NAME test_ui_thread_pool COMMAND test_ui_thread_pool)
+
+    add_executable(test_ui_reactor tests/test_ui_reactor.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_reactor ui_engine_test)
+    add_test(NAME test_ui_reactor COMMAND test_ui_reactor)
+
+    add_executable(test_ui_promise tests/test_ui_promise.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_promise ui_engine_test)
+    add_test(NAME test_ui_promise COMMAND test_ui_promise)
+
+    add_executable(test_ui_atomic tests/test_ui_atomic.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_atomic ui_engine_test)
+    add_test(NAME test_ui_atomic COMMAND test_ui_atomic)
+
+    add_executable(test_ui_ring_buffer tests/test_ui_ring_buffer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_ring_buffer ui_engine_test)
+    add_test(NAME test_ui_ring_buffer COMMAND test_ui_ring_buffer)
+
+    add_executable(test_ui_timer tests/test_ui_timer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_timer ui_engine_test)
+    add_test(NAME test_ui_timer COMMAND test_ui_timer)
+
+    add_executable(test_ui_types tests/test_ui_types.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_types ui_engine_test)
+    add_test(NAME test_ui_types COMMAND test_ui_types)
+
+    add_executable(test_ui_arena tests/test_ui_arena.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_arena ui_engine_test)
+    add_test(NAME test_ui_arena COMMAND test_ui_arena)
+
+    add_executable(test_ui_pool tests/test_ui_pool.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_pool ui_engine_test)
+    add_test(NAME test_ui_pool COMMAND test_ui_pool)
+
+    add_executable(test_ui_engine_core tests/test_ui_engine_core.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_engine_core ui_engine_test)
+    add_test(NAME test_ui_engine_core COMMAND test_ui_engine_core)
+
+    add_executable(test_ui_handle_manager tests/test_ui_handle_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_handle_manager ui_engine_test)
+    add_test(NAME test_ui_handle_manager COMMAND test_ui_handle_manager)
+
+    add_executable(test_ui_window_backend_win32 tests/test_ui_window_backend_win32.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_backend_win32 ui_engine_test)
+    add_test(NAME test_ui_window_backend_win32 COMMAND test_ui_window_backend_win32)
+
+    add_executable(test_ui_window_backend tests/test_ui_window_backend.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_backend ui_engine_test)
+    add_test(NAME test_ui_window_backend COMMAND test_ui_window_backend)
+
+    add_executable(test_ui_window_backend_android tests/test_ui_window_backend_android.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_backend_android ui_engine_test)
+    add_test(NAME test_ui_window_backend_android COMMAND test_ui_window_backend_android)
+
+    add_executable(test_ui_window_backend_ios tests/test_ui_window_backend_ios.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_backend_ios ui_engine_test)
+    add_test(NAME test_ui_window_backend_ios COMMAND test_ui_window_backend_ios)
+
+    add_executable(test_ui_window_backend_linux tests/test_ui_window_backend_linux.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_backend_linux ui_engine_test)
+    add_test(NAME test_ui_window_backend_linux COMMAND test_ui_window_backend_linux)
+
+    add_executable(test_ui_window_backend_macos tests/test_ui_window_backend_macos.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_backend_macos ui_engine_test)
+    add_test(NAME test_ui_window_backend_macos COMMAND test_ui_window_backend_macos)
+
+    add_executable(test_ui_window_backend_web tests/test_ui_window_backend_web.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_backend_web ui_engine_test)
+    add_test(NAME test_ui_window_backend_web COMMAND test_ui_window_backend_web)
+
+    add_executable(test_ui_data_source tests/test_ui_data_source.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_data_source ui_engine_test)
+    add_test(NAME test_ui_data_source COMMAND test_ui_data_source)
+
+    add_executable(test_ui_input_mask tests/test_ui_input_mask.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_input_mask ui_engine_test)
+    add_test(NAME test_ui_input_mask COMMAND test_ui_input_mask)
+
+    add_executable(test_ui_i18n tests/test_ui_i18n.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_i18n ui_engine_test)
+    add_test(NAME test_ui_i18n COMMAND test_ui_i18n)
+
+    add_executable(test_ui_tree_grid_base tests/test_ui_tree_grid_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_tree_grid_base ui_engine_test)
+    add_test(NAME test_ui_tree_grid_base COMMAND test_ui_tree_grid_base)
+
+    add_executable(test_ui_side_sheet_base tests/test_ui_side_sheet_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_side_sheet_base ui_engine_test)
+    add_test(NAME test_ui_side_sheet_base COMMAND test_ui_side_sheet_base)
+
+    add_executable(test_ui_dockable_layout_base tests/test_ui_dockable_layout_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_dockable_layout_base ui_engine_test)
+    add_test(NAME test_ui_dockable_layout_base COMMAND test_ui_dockable_layout_base)
+
+    add_executable(test_ui_hotkey_registry tests/test_ui_hotkey_registry.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_hotkey_registry ui_engine_test)
+    add_test(NAME test_ui_hotkey_registry COMMAND test_ui_hotkey_registry)
+
+    add_executable(test_ui_scroll_spy tests/test_ui_scroll_spy.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_scroll_spy ui_engine_test)
+    add_test(NAME test_ui_scroll_spy COMMAND test_ui_scroll_spy)
+
+    add_executable(test_ui_resizable_behavior tests/test_ui_resizable_behavior.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_resizable_behavior ui_engine_test)
+    add_test(NAME test_ui_resizable_behavior COMMAND test_ui_resizable_behavior)
+
+    add_executable(test_ui_virtual_keyboard tests/test_ui_virtual_keyboard.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_virtual_keyboard ui_engine_test)
+    add_test(NAME test_ui_virtual_keyboard COMMAND test_ui_virtual_keyboard)
+
+    add_executable(test_ui_preferences tests/test_ui_preferences.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_preferences ui_engine_test)
+    add_test(NAME test_ui_preferences COMMAND test_ui_preferences)
+    add_executable(test_ui_predictive_back tests/test_ui_predictive_back.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_predictive_back ui_engine_test)
+    add_test(NAME test_ui_predictive_back COMMAND test_ui_predictive_back)
+
+    add_executable(test_ui_dom_node tests/test_ui_dom_node.c tests/ui_test_mock_mem.c)
+    add_executable(test_ui_audio_alsa tests/test_ui_audio_alsa.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_audio_alsa ui_engine_test cfs parson c_cdd c-orm)
+    add_test(NAME test_ui_audio_alsa COMMAND test_ui_audio_alsa)
+
+    add_executable(test_ui_event tests/test_ui_event.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_event ui_engine_test cfs parson c_cdd c-orm)
+    add_test(NAME test_ui_event COMMAND test_ui_event)
+    target_link_libraries(test_ui_dom_node ui_engine_test)
+    add_test(NAME test_ui_dom_node COMMAND test_ui_dom_node)
+
+    add_executable(test_ui_cssom tests/test_ui_cssom.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_cssom ui_engine_test)
+    add_test(NAME test_ui_cssom COMMAND test_ui_cssom)
+
+
+    add_executable(test_ui_fs tests/test_ui_fs.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_fs ui_engine_test)
+    add_test(NAME test_ui_fs COMMAND test_ui_fs)
+
+    add_executable(test_ui_layout tests/test_ui_layout.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_layout ui_engine_test)
+    add_test(NAME test_ui_layout COMMAND test_ui_layout)
+
+    add_executable(test_ui_css_parser tests/test_ui_css_parser.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_parser ui_engine_test)
+    add_test(NAME test_ui_css_parser COMMAND test_ui_css_parser)
+
+    add_executable(test_ui_css_values tests/test_ui_css_values.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_values ui_engine_test)
+    add_test(NAME test_ui_css_values COMMAND test_ui_css_values)
+
+    add_executable(test_ui_css_env tests/test_ui_css_env.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_env ui_engine_test)
+    add_test(NAME test_ui_css_env COMMAND test_ui_css_env)
+
+    add_executable(test_ui_css_contain tests/test_ui_css_contain.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_contain ui_engine_test)
+    add_test(NAME test_ui_css_contain COMMAND test_ui_css_contain)
+
+    add_executable(test_ui_css_overflow tests/test_ui_css_overflow.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_overflow ui_engine_test)
+    add_test(NAME test_ui_css_overflow COMMAND test_ui_css_overflow)
+
+    add_executable(test_ui_css_lists tests/test_ui_css_lists.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_lists ui_engine_test)
+    add_test(NAME test_ui_css_lists COMMAND test_ui_css_lists)
+
+    add_executable(test_ui_css_content tests/test_ui_css_content.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_content ui_engine_test)
+    add_test(NAME test_ui_css_content COMMAND test_ui_css_content)
+
+    add_executable(test_ui_css_logical tests/test_ui_css_logical.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_logical ui_engine_test)
+    add_test(NAME test_ui_css_logical COMMAND test_ui_css_logical)
+
+    add_executable(test_ui_css_scrollbars tests/test_ui_css_scrollbars.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_scrollbars ui_engine_test)
+    add_test(NAME test_ui_css_scrollbars COMMAND test_ui_css_scrollbars)
+
+    add_executable(test_ui_css_round_display tests/test_ui_css_round_display.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_round_display ui_engine_test)
+    add_test(NAME test_ui_css_round_display COMMAND test_ui_css_round_display)
+
+    add_executable(test_ui_css_ui tests/test_ui_css_ui.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_ui ui_engine_test)
+    add_test(NAME test_ui_css_ui COMMAND test_ui_css_ui)
+
+    add_executable(test_ui_css_forms tests/test_ui_css_forms.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_forms ui_engine_test)
+    add_test(NAME test_ui_css_forms COMMAND test_ui_css_forms)
+
+    add_executable(test_ui_css_motion tests/test_ui_css_motion.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_motion ui_engine_test)
+    add_test(NAME test_ui_css_motion COMMAND test_ui_css_motion)
+
+    add_executable(test_ui_css_view_transition tests/test_ui_css_view_transition.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_view_transition ui_engine_test)
+    add_test(NAME test_ui_css_view_transition COMMAND test_ui_css_view_transition)
+
+    add_executable(test_ui_component tests/test_ui_component.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_component ui_engine_test)
+    add_test(NAME test_ui_component COMMAND test_ui_component)
+
+    add_executable(test_ui_media tests/test_ui_media.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_media ui_engine_test)
+    add_test(NAME test_ui_media COMMAND test_ui_media)
+
+    add_executable(test_ui_audio_sink tests/test_ui_audio_sink.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_audio_sink ui_engine_test)
+    add_test(NAME test_ui_audio_sink COMMAND test_ui_audio_sink)
+
+    add_executable(test_ui_video_decoder tests/test_ui_video_decoder.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_video_decoder ui_engine_test)
+    add_test(NAME test_ui_video_decoder COMMAND test_ui_video_decoder)
+
+    add_executable(test_ui_av_sync tests/test_ui_av_sync.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_av_sync ui_engine_test)
+    add_test(NAME test_ui_av_sync COMMAND test_ui_av_sync)
+
+    add_executable(test_ui_image_decoder tests/test_ui_image_decoder.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_image_decoder ui_engine_test)
+    add_test(NAME test_ui_image_decoder COMMAND test_ui_image_decoder)
+
+    add_executable(test_ui_image_png tests/test_ui_image_png.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_image_png ui_engine_test)
+    add_test(NAME test_ui_image_png COMMAND test_ui_image_png)
+
+    add_executable(test_ui_image_jpeg tests/test_ui_image_jpeg.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_image_jpeg ui_engine_test)
+    add_test(NAME test_ui_image_jpeg COMMAND test_ui_image_jpeg)
+
+    add_executable(test_ui_image_webp tests/test_ui_image_webp.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_image_webp ui_engine_test)
+    add_test(NAME test_ui_image_webp COMMAND test_ui_image_webp)
+
+    add_executable(test_ui_renderer_gles_fallback tests/test_ui_renderer_gles_fallback.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_renderer_gles_fallback ui_engine_test)
+    add_test(NAME test_ui_renderer_gles_fallback COMMAND test_ui_renderer_gles_fallback)
+
+    add_executable(test_ui_svg tests/test_ui_svg.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_svg ui_engine_test)
+    add_test(NAME test_ui_svg COMMAND test_ui_svg)
+
+    add_executable(test_ui_asset_streamer tests/test_ui_asset_streamer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_asset_streamer ui_engine_test)
+    add_test(NAME test_ui_asset_streamer COMMAND test_ui_asset_streamer)
+
+    add_executable(test_ui_shader_manager tests/test_ui_shader_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_shader_manager ui_engine_test)
+    add_test(NAME test_ui_shader_manager COMMAND test_ui_shader_manager)
+
+    add_executable(test_ui_renderer tests/test_ui_renderer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_renderer ui_engine_test)
+    add_test(NAME test_ui_renderer COMMAND test_ui_renderer)
+
+    add_executable(test_ui_renderer_gles2 tests/test_ui_renderer_gles2.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_renderer_gles2 ui_engine_test)
+    add_test(NAME test_ui_renderer_gles2 COMMAND test_ui_renderer_gles2)
+
+    add_executable(test_ui_font_manager tests/test_ui_font_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_font_manager ui_engine_test)
+    add_test(NAME test_ui_font_manager COMMAND test_ui_font_manager)
+
+    add_executable(test_ui_text_layout tests/test_ui_text_layout.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_text_layout ui_engine_test)
+    add_test(NAME test_ui_text_layout COMMAND test_ui_text_layout)
+
+    add_executable(test_ui_video_shaders tests/test_ui_video_shaders.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_video_shaders ui_engine_test)
+    add_test(NAME test_ui_video_shaders COMMAND test_ui_video_shaders)
+
+    add_executable(test_ui_effects_shaders tests/test_ui_effects_shaders.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_effects_shaders ui_engine_test)
+    add_test(NAME test_ui_effects_shaders COMMAND test_ui_effects_shaders)
+
+    add_executable(test_ui_vibrancy tests/test_ui_vibrancy.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_vibrancy ui_engine_test)
+    add_test(NAME test_ui_vibrancy COMMAND test_ui_vibrancy)
+
+    add_executable(test_ui_image_base tests/test_ui_image_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_image_base ui_engine_test)
+    add_test(NAME test_ui_image_base COMMAND test_ui_image_base)
+
+    add_executable(test_ui_transfer_list_base tests/test_ui_transfer_list_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_transfer_list_base ui_engine_test)
+    add_test(NAME test_ui_transfer_list_base COMMAND test_ui_transfer_list_base)
+
+    add_executable(test_ui_search_bar_base tests/test_ui_search_bar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_search_bar_base ui_engine_test)
+    add_test(NAME test_ui_search_bar_base COMMAND test_ui_search_bar_base)
+
+    add_executable(test_ui_swipe_action_base tests/test_ui_swipe_action_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_swipe_action_base ui_engine_test)
+    add_test(NAME test_ui_swipe_action_base COMMAND test_ui_swipe_action_base)
+
+    add_executable(test_ui_speed_dial_base tests/test_ui_speed_dial_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_speed_dial_base ui_engine_test)
+    add_test(NAME test_ui_speed_dial_base COMMAND test_ui_speed_dial_base)
+
+    add_executable(test_ui_video_player_base tests/test_ui_video_player_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_video_player_base ui_engine_test)
+    add_test(NAME test_ui_video_player_base COMMAND test_ui_video_player_base)
+
+    add_executable(test_ui_command_palette_base tests/test_ui_command_palette_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_command_palette_base ui_engine_test)
+    add_test(NAME test_ui_command_palette_base COMMAND test_ui_command_palette_base)
+
+    add_executable(test_ui_focus_manager tests/test_ui_focus_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_focus_manager ui_engine_test)
+    add_test(NAME test_ui_focus_manager COMMAND test_ui_focus_manager)
+
+    add_executable(test_ui_keyboard_responder tests/test_ui_keyboard_responder.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_keyboard_responder ui_engine_test)
+    add_test(NAME test_ui_keyboard_responder COMMAND test_ui_keyboard_responder)
+
+    add_executable(test_ui_gesture tests/test_ui_gesture.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_gesture ui_engine_test)
+    add_test(NAME test_ui_gesture COMMAND test_ui_gesture)
+
+    add_executable(test_ui_aria tests/test_ui_aria.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_aria ui_engine_test)
+    add_test(NAME test_ui_aria COMMAND test_ui_aria)
+
+
+    add_executable(test_ui_overlay_director tests/test_ui_overlay_director.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_overlay_director ui_engine_test)
+    add_test(NAME test_ui_overlay_director COMMAND test_ui_overlay_director)
+
+    add_executable(test_ui_geometry tests/test_ui_geometry.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_geometry ui_engine_test)
+    add_test(NAME test_ui_geometry COMMAND test_ui_geometry)
+
+    add_executable(test_ui_geometry_anchor tests/test_ui_geometry_anchor.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_geometry_anchor ui_engine_test)
+    add_test(NAME test_ui_geometry_anchor COMMAND test_ui_geometry_anchor)
+
+    add_executable(test_ui_backdrop tests/test_ui_backdrop.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_backdrop ui_engine_test)
+    add_test(NAME test_ui_backdrop COMMAND test_ui_backdrop)
+
+    add_executable(test_ui_alert_base tests/test_ui_alert_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_alert_base ui_engine_test)
+    add_test(NAME test_ui_alert_base COMMAND test_ui_alert_base)
+
+    add_executable(test_ui_button_base tests/test_ui_button_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_button_base ui_engine_test)
+    add_test(NAME test_ui_button_base COMMAND test_ui_button_base)
+
+    add_executable(test_ui_split_button_base tests/test_ui_split_button_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_split_button_base ui_engine_test)
+    add_test(NAME test_ui_split_button_base COMMAND test_ui_split_button_base)
+
+    add_executable(test_ui_bottom_app_bar_base tests/test_ui_bottom_app_bar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_bottom_app_bar_base ui_engine_test)
+    add_test(NAME test_ui_bottom_app_bar_base COMMAND test_ui_bottom_app_bar_base)
+
+    add_executable(test_ui_section_index_base tests/test_ui_section_index_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_section_index_base ui_engine_test)
+    add_test(NAME test_ui_section_index_base COMMAND test_ui_section_index_base)
+
+    add_executable(test_ui_haptics tests/test_ui_haptics.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_haptics ui_engine_test)
+    add_test(NAME test_ui_haptics COMMAND test_ui_haptics)
+
+    add_executable(test_ui_toolbar_base tests/test_ui_toolbar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_toolbar_base ui_engine_test)
+    add_test(NAME test_ui_toolbar_base COMMAND test_ui_toolbar_base)
+
+    add_executable(test_ui_split_pane_base tests/test_ui_split_pane_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_split_pane_base ui_engine_test)
+    add_test(NAME test_ui_split_pane_base COMMAND test_ui_split_pane_base)
+
+    add_executable(test_ui_grid_list_base tests/test_ui_grid_list_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_grid_list_base ui_engine_test)
+    add_test(NAME test_ui_grid_list_base COMMAND test_ui_grid_list_base)
+
+    add_executable(test_ui_fab_base tests/test_ui_fab_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_fab_base ui_engine_test)
+    add_test(NAME test_ui_fab_base COMMAND test_ui_fab_base)
+
+    add_executable(test_ui_icon_base tests/test_ui_icon_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_icon_base ui_engine_test)
+    add_test(NAME test_ui_icon_base COMMAND test_ui_icon_base)
+
+    add_executable(test_ui_skeleton_base tests/test_ui_skeleton_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_skeleton_base ui_engine_test)
+    add_test(NAME test_ui_skeleton_base COMMAND test_ui_skeleton_base)
+
+    add_executable(test_ui_avatar_base tests/test_ui_avatar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_avatar_base ui_engine_test)
+    add_test(NAME test_ui_avatar_base COMMAND test_ui_avatar_base)
+
+    add_executable(test_ui_avatar_group_base tests/test_ui_avatar_group_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_avatar_group_base ui_engine_test)
+    add_test(NAME test_ui_avatar_group_base COMMAND test_ui_avatar_group_base)
+
+    add_executable(test_ui_sort_header_base tests/test_ui_sort_header_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_sort_header_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_sort_header_base COMMAND test_ui_sort_header_base)
+    add_executable(test_ui_divider_base tests/test_ui_divider_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_divider_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_divider_base COMMAND test_ui_divider_base)
+    add_executable(test_ui_selection_model tests/test_ui_selection_model.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_selection_model PRIVATE ui_engine_test)
+    add_test(NAME test_ui_selection_model COMMAND test_ui_selection_model)
+    add_executable(test_ui_chips_base tests/test_ui_chips_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_chips_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_chips_base COMMAND test_ui_chips_base)
+    add_executable(test_ui_calendar_base tests/test_ui_calendar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_calendar_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_calendar_base COMMAND test_ui_calendar_base)
+    add_executable(test_ui_card_base tests/test_ui_card_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_card_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_card_base COMMAND test_ui_card_base)
+    add_executable(test_ui_pagination_base tests/test_ui_pagination_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_pagination_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_pagination_base COMMAND test_ui_pagination_base)
+    add_executable(test_ui_accordion_base tests/test_ui_accordion_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_accordion_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_accordion_base COMMAND test_ui_accordion_base)
+    add_executable(test_ui_surface_base tests/test_ui_surface_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_surface_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_surface_base COMMAND test_ui_surface_base)
+    add_executable(test_ui_link_base tests/test_ui_link_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_link_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_link_base COMMAND test_ui_link_base)
+    add_executable(test_ui_meter_base tests/test_ui_meter_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_meter_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_meter_base COMMAND test_ui_meter_base)
+    add_executable(test_ui_page_control_base tests/test_ui_page_control_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_page_control_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_page_control_base COMMAND test_ui_page_control_base)
+    add_executable(test_ui_banner_base tests/test_ui_banner_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_banner_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_banner_base COMMAND test_ui_banner_base)
+    add_executable(test_ui_button_group_base tests/test_ui_button_group_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_button_group_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_button_group_base COMMAND test_ui_button_group_base)
+    add_executable(test_ui_empty_state_base tests/test_ui_empty_state_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_empty_state_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_empty_state_base COMMAND test_ui_empty_state_base)
+    add_executable(test_ui_scaffold_base tests/test_ui_scaffold_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_scaffold_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_scaffold_base COMMAND test_ui_scaffold_base)
+    add_executable(test_ui_menubar_base tests/test_ui_menubar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_menubar_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_menubar_base COMMAND test_ui_menubar_base)
+    add_executable(test_ui_radio_group_base tests/test_ui_radio_group_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_radio_group_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_radio_group_base COMMAND test_ui_radio_group_base)
+    add_executable(test_ui_color_picker_base tests/test_ui_color_picker_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_color_picker_base PRIVATE ui_engine_test)
+    add_test(NAME test_ui_color_picker_base COMMAND test_ui_color_picker_base)
+    add_executable(test_ui_color_space tests/test_ui_color_space.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_color_space PRIVATE ui_engine_test)
+    add_test(NAME test_ui_color_space COMMAND test_ui_color_space)
+
+    add_executable(test_ui_color_quantization tests/test_ui_color_quantization.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_color_quantization PRIVATE ui_engine_test)
+    add_test(NAME test_ui_color_quantization COMMAND test_ui_color_quantization)
+    add_executable(test_ui_design_tokens tests/test_ui_design_tokens.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_design_tokens PRIVATE ui_engine_test)
+    add_test(NAME test_ui_design_tokens COMMAND test_ui_design_tokens)
+    add_executable(test_ui_tonal_palette tests/test_ui_tonal_palette.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_tonal_palette PRIVATE ui_engine_test)
+    add_test(NAME test_ui_tonal_palette COMMAND test_ui_tonal_palette)
+    add_executable(test_ui_theme_provider tests/test_ui_theme_provider.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_theme_provider PRIVATE ui_engine_test)
+    add_test(NAME test_ui_theme_provider COMMAND test_ui_theme_provider)
+    add_executable(test_ui_shape_family tests/test_ui_shape_family.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_shape_family PRIVATE ui_engine_test)
+    add_test(NAME test_ui_shape_family COMMAND test_ui_shape_family)
+    add_executable(test_ui_typography_scale tests/test_ui_typography_scale.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_typography_scale PRIVATE ui_engine_test)
+    add_test(NAME test_ui_typography_scale COMMAND test_ui_typography_scale)
+    add_executable(test_ui_state_layer tests/test_ui_state_layer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_state_layer PRIVATE ui_engine_test)
+    add_test(NAME test_ui_state_layer COMMAND test_ui_state_layer)
+    add_executable(test_ui_elevation tests/test_ui_elevation.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_elevation PRIVATE ui_engine_test)
+    add_test(NAME test_ui_elevation COMMAND test_ui_elevation)
+    add_executable(test_ui_focus_ring tests/test_ui_focus_ring.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_focus_ring PRIVATE ui_engine_test)
+    add_test(NAME test_ui_focus_ring COMMAND test_ui_focus_ring)
+
+    add_executable(test_ui_timeline_base tests/test_ui_timeline_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_timeline_base ui_engine_test)
+    add_test(NAME test_ui_timeline_base COMMAND test_ui_timeline_base)
+
+    add_executable(test_ui_slide_toggle_base tests/test_ui_slide_toggle_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_slide_toggle_base ui_engine_test)
+    add_test(NAME test_ui_slide_toggle_base COMMAND test_ui_slide_toggle_base)
+
+    add_executable(test_ui_timepicker_base tests/test_ui_timepicker_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_timepicker_base ui_engine_test)
+    add_test(NAME test_ui_timepicker_base COMMAND test_ui_timepicker_base)
+
+    add_executable(test_ui_drag_drop tests/test_ui_drag_drop.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_drag_drop ui_engine_test)
+    add_test(NAME test_ui_drag_drop COMMAND test_ui_drag_drop)
+
+    add_executable(test_ui_nav_rail_base tests/test_ui_nav_rail_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_nav_rail_base ui_engine_test)
+    add_test(NAME test_ui_nav_rail_base COMMAND test_ui_nav_rail_base)
+
+    add_executable(test_ui_bottom_nav_base tests/test_ui_bottom_nav_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_bottom_nav_base ui_engine_test)
+    add_test(NAME test_ui_bottom_nav_base COMMAND test_ui_bottom_nav_base)
+
+    add_executable(test_ui_segmented_control_base tests/test_ui_segmented_control_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_segmented_control_base ui_engine_test)
+    add_test(NAME test_ui_segmented_control_base COMMAND test_ui_segmented_control_base)
+
+    add_executable(test_ui_list_base tests/test_ui_list_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_list_base ui_engine_test)
+    add_test(NAME test_ui_list_base COMMAND test_ui_list_base)
+
+    add_executable(test_ui_listbox_base tests/test_ui_listbox_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_listbox_base ui_engine_test)
+    add_test(NAME test_ui_listbox_base COMMAND test_ui_listbox_base)
+
+    add_executable(test_ui_autocomplete_base tests/test_ui_autocomplete_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_autocomplete_base ui_engine_test)
+    add_test(NAME test_ui_autocomplete_base COMMAND test_ui_autocomplete_base)
+
+    add_executable(test_ui_clipboard tests/test_ui_clipboard.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_clipboard ui_engine_test)
+    add_test(NAME test_ui_clipboard COMMAND test_ui_clipboard)
+
+    add_executable(test_ui_layout_observer tests/test_ui_layout_observer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_layout_observer ui_engine_test)
+    add_test(NAME test_ui_layout_observer COMMAND test_ui_layout_observer)
+
+    add_executable(test_ui_toggle_base tests/test_ui_toggle_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_toggle_base ui_engine_test)
+    add_test(NAME test_ui_toggle_base COMMAND test_ui_toggle_base)
+
+    add_executable(test_ui_checkbox_base tests/test_ui_checkbox_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_checkbox_base ui_engine_test)
+    add_test(NAME test_ui_checkbox_base COMMAND test_ui_checkbox_base)
+
+    add_executable(test_ui_file_uploader_base tests/test_ui_file_uploader_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_file_uploader_base ui_engine_test)
+    add_test(NAME test_ui_file_uploader_base COMMAND test_ui_file_uploader_base)
+
+    add_executable(test_ui_intersection_observer tests/test_ui_intersection_observer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_intersection_observer ui_engine_test)
+    add_test(NAME test_ui_intersection_observer COMMAND test_ui_intersection_observer)
+
+    add_executable(test_ui_mutation_observer tests/test_ui_mutation_observer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_mutation_observer ui_engine_test)
+    add_test(NAME test_ui_mutation_observer COMMAND test_ui_mutation_observer)
+
+    add_executable(test_ui_platform_detector tests/test_ui_platform_detector.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_platform_detector ui_engine_test)
+    add_test(NAME test_ui_platform_detector COMMAND test_ui_platform_detector)
+
+    add_executable(test_ui_focus_trap tests/test_ui_focus_trap.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_focus_trap ui_engine_test)
+    add_test(NAME test_ui_focus_trap COMMAND test_ui_focus_trap)
+
+    add_executable(test_ui_coercion_utils tests/test_ui_coercion_utils.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_coercion_utils ui_engine_test)
+    add_test(NAME test_ui_coercion_utils COMMAND test_ui_coercion_utils)
+
+    add_executable(test_ui_form_field_base tests/test_ui_form_field_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_form_field_base ui_engine_test)
+    add_test(NAME test_ui_form_field_base COMMAND test_ui_form_field_base)
+
+    add_executable(test_ui_sidenav_base tests/test_ui_sidenav_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_sidenav_base ui_engine_test)
+    add_test(NAME test_ui_sidenav_base COMMAND test_ui_sidenav_base)
+
+    add_executable(test_ui_bottom_sheet_base tests/test_ui_bottom_sheet_base.c tests/ui_test_mock_mem.c)
+    add_executable(test_ui_action_sheet_base tests/test_ui_action_sheet_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_action_sheet_base ui_engine_test)
+    add_test(NAME test_ui_action_sheet_base COMMAND test_ui_action_sheet_base)
+    target_link_libraries(test_ui_bottom_sheet_base ui_engine_test)
+    add_test(NAME test_ui_bottom_sheet_base COMMAND test_ui_bottom_sheet_base)
+
+    add_executable(test_ui_snackbar_base tests/test_ui_snackbar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_snackbar_base ui_engine_test)
+    add_test(NAME test_ui_snackbar_base COMMAND test_ui_snackbar_base)
+
+    add_executable(test_ui_input_base tests/test_ui_input_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_input_base ui_engine_test)
+    add_test(NAME test_ui_input_base COMMAND test_ui_input_base)
+
+    add_executable(test_ui_scroll_base tests/test_ui_scroll_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_scroll_base ui_engine_test)
+    add_test(NAME test_ui_scroll_base COMMAND test_ui_scroll_base)
+
+    add_executable(test_ui_slider_base tests/test_ui_slider_base.c tests/ui_test_mock_mem.c)
+add_executable(test_ui_range_slider_base tests/test_ui_range_slider_base.c tests/ui_test_mock_mem.c)
+target_link_libraries(test_ui_range_slider_base PRIVATE ui_engine_test)
+    add_executable(test_ui_wheel_picker_base tests/test_ui_wheel_picker_base.c tests/ui_test_mock_mem.c)
+    add_executable(test_ui_pull_to_refresh_base tests/test_ui_pull_to_refresh_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_pull_to_refresh_base ui_engine_test)
+    add_test(NAME test_ui_pull_to_refresh_base COMMAND test_ui_pull_to_refresh_base)
+    target_link_libraries(test_ui_wheel_picker_base ui_engine_test)
+    add_test(NAME test_ui_wheel_picker_base COMMAND test_ui_wheel_picker_base)
+    add_executable(test_ui_text_node_base tests/test_ui_text_node_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_text_node_base ui_engine_test)
+    add_test(NAME test_ui_text_node_base COMMAND test_ui_text_node_base)
+    add_executable(test_ui_spin_button_base tests/test_ui_spin_button_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_spin_button_base ui_engine_test)
+    add_test(NAME test_ui_spin_button_base COMMAND test_ui_spin_button_base)
+    target_link_libraries(test_ui_slider_base ui_engine_test)
+    add_test(NAME test_ui_slider_base COMMAND test_ui_slider_base)
+add_test(NAME test_ui_range_slider_base COMMAND test_ui_range_slider_base)
+
+    add_executable(test_ui_select_base tests/test_ui_select_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_select_base ui_engine_test)
+    add_test(NAME test_ui_select_base COMMAND test_ui_select_base)
+    add_executable(test_ui_dialog_base tests/test_ui_dialog_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_dialog_base ui_engine_test)
+    add_test(NAME test_ui_dialog_base COMMAND test_ui_dialog_base)
+
+    add_executable(test_ui_disclosure_base tests/test_ui_disclosure_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_disclosure_base ui_engine_test)
+    add_test(NAME test_ui_disclosure_base COMMAND test_ui_disclosure_base)
+
+    add_executable(test_ui_modifier tests/test_ui_modifier.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_modifier ui_engine_test)
+    add_test(NAME test_ui_modifier COMMAND test_ui_modifier)
+
+    add_executable(test_ui_router tests/test_ui_router.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_router ui_engine_test)
+    add_test(NAME test_ui_router COMMAND test_ui_router)
+
+    add_executable(test_ui_e2e_headless tests/test_ui_e2e_headless.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_e2e_headless ui_engine_test)
+    add_test(NAME test_ui_e2e_headless COMMAND test_ui_e2e_headless)
+
+    add_executable(test_ui_e2e_headful tests/test_ui_e2e_headful.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_e2e_headful ui_engine_test)
+    add_test(NAME test_ui_e2e_headful COMMAND test_ui_e2e_headful)
+
+    add_executable(test_ui_web_animation tests/test_ui_web_animation.c tests/ui_test_mock_mem.c)
+    add_executable(test_ui_spring tests/test_ui_spring.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_spring ui_engine_test)
+    add_test(NAME test_ui_spring COMMAND test_ui_spring)
+    target_link_libraries(test_ui_web_animation ui_engine_test)
+    add_test(NAME test_ui_web_animation COMMAND test_ui_web_animation)
+
+    add_executable(test_ui_css_speech tests/test_ui_css_speech.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_speech ui_engine_test)
+    add_test(NAME test_ui_css_speech COMMAND test_ui_css_speech)
+
+    add_executable(test_ui_css_scroll_snap tests/test_ui_css_scroll_snap.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_scroll_snap ui_engine_test)
+    add_test(NAME test_ui_css_scroll_snap COMMAND test_ui_css_scroll_snap)
+
+    add_executable(test_ui_css_scroll_anchoring tests/test_ui_css_scroll_anchoring.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_scroll_anchoring ui_engine_test)
+    add_test(NAME test_ui_css_scroll_anchoring COMMAND test_ui_css_scroll_anchoring)
+
+    add_executable(test_ui_css_spatial_nav tests/test_ui_css_spatial_nav.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_spatial_nav ui_engine_test)
+    add_test(NAME test_ui_css_spatial_nav COMMAND test_ui_css_spatial_nav)
+
+    add_executable(test_ui_css_highlight_api tests/test_ui_css_highlight_api.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_highlight_api ui_engine_test)
+    add_test(NAME test_ui_css_highlight_api COMMAND test_ui_css_highlight_api)
+
+    add_executable(test_ui_css_page tests/test_ui_css_page.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_page ui_engine_test)
+    add_test(NAME test_ui_css_page COMMAND test_ui_css_page)
+
+    add_executable(test_ui_css_gcpm tests/test_ui_css_gcpm.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_gcpm ui_engine_test)
+    add_test(NAME test_ui_css_gcpm COMMAND test_ui_css_gcpm)
+
+    add_executable(test_ui_css_page_floats tests/test_ui_css_page_floats.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_css_page_floats ui_engine_test)
+    add_test(NAME test_ui_css_page_floats COMMAND test_ui_css_page_floats)
+
+    add_executable(test_ui_cssom_api tests/test_ui_cssom_api.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_cssom_api ui_engine_test)
+    add_test(NAME test_ui_cssom_api COMMAND test_ui_cssom_api)
+
+    add_executable(test_ui_cssom_view tests/test_ui_cssom_view.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_cssom_view ui_engine_test)
+    add_test(NAME test_ui_cssom_view COMMAND test_ui_cssom_view)
+
+    add_executable(test_ui_menu_base tests/test_ui_menu_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_menu_base ui_engine_test)
+    add_test(NAME test_ui_menu_base COMMAND test_ui_menu_base)
+
+    add_executable(test_ui_popover_base tests/test_ui_popover_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_popover_base ui_engine_test)
+    add_test(NAME test_ui_popover_base COMMAND test_ui_popover_base)
+
+    add_executable(test_ui_stepper_base tests/test_ui_stepper_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_stepper_base ui_engine_test)
+    add_test(NAME test_ui_stepper_base COMMAND test_ui_stepper_base)
+
+    add_executable(test_ui_table_base tests/test_ui_table_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_table_base ui_engine_test)
+    add_test(NAME test_ui_table_base COMMAND test_ui_table_base)
+
+    add_executable(test_ui_tabs_base tests/test_ui_tabs_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_tabs_base ui_engine_test)
+    add_test(NAME test_ui_tabs_base COMMAND test_ui_tabs_base)
+
+    add_executable(test_ui_toast_manager_base tests/test_ui_toast_manager_base.c tests/ui_test_mock_mem.c)
+add_executable(test_ui_breakpoint_observer tests/test_ui_breakpoint_observer.c tests/ui_test_mock_mem.c)
+target_link_libraries(test_ui_breakpoint_observer PRIVATE ui_engine_test)
+    target_link_libraries(test_ui_toast_manager_base ui_engine_test)
+    add_test(NAME test_ui_toast_manager_base COMMAND test_ui_toast_manager_base)
+add_test(NAME test_ui_breakpoint_observer COMMAND test_ui_breakpoint_observer)
+
+    add_executable(test_ui_tooltip_base tests/test_ui_tooltip_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_tooltip_base ui_engine_test)
+    add_test(NAME test_ui_tooltip_base COMMAND test_ui_tooltip_base)
+
+    add_executable(test_ui_tree_base tests/test_ui_tree_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_tree_base ui_engine_test)
+    add_test(NAME test_ui_tree_base COMMAND test_ui_tree_base)
+
+    add_executable(test_ui_virtual_scroll_base tests/test_ui_virtual_scroll_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_virtual_scroll_base ui_engine_test)
+    add_test(NAME test_ui_virtual_scroll_base COMMAND test_ui_virtual_scroll_base)
+
+    add_executable(test_ui_carousel_base tests/test_ui_carousel_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_carousel_base ui_engine_test)
+    add_test(NAME test_ui_carousel_base COMMAND test_ui_carousel_base)
+
+    add_executable(test_ui_breadcrumbs_base tests/test_ui_breadcrumbs_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_breadcrumbs_base ui_engine_test)
+    add_test(NAME test_ui_breadcrumbs_base COMMAND test_ui_breadcrumbs_base)
+
+    add_executable(test_ui_portal tests/test_ui_portal.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_portal ui_engine_test)
+    add_test(NAME test_ui_portal COMMAND test_ui_portal)
+
+    add_executable(test_ui_context_menu_base tests/test_ui_context_menu_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_context_menu_base ui_engine_test)
+    add_test(NAME test_ui_context_menu_base COMMAND test_ui_context_menu_base)
+
+    add_executable(test_ui_live_announcer tests/test_ui_live_announcer.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_live_announcer ui_engine_test)
+    add_test(NAME test_ui_live_announcer COMMAND test_ui_live_announcer)
+
+    add_executable(test_ui_bidi_manager tests/test_ui_bidi_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_bidi_manager ui_engine_test)
+    add_test(NAME test_ui_bidi_manager COMMAND test_ui_bidi_manager)
+
+    add_executable(test_ui_progress_base tests/test_ui_progress_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_progress_base ui_engine_test)
+    add_test(NAME test_ui_progress_base COMMAND test_ui_progress_base)
+
+    add_executable(test_ui_camera_base tests/test_ui_camera_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_camera_base ui_engine_test)
+    add_test(NAME test_ui_camera_base COMMAND test_ui_camera_base)
+
+    add_executable(test_ui_webview_base tests/test_ui_webview_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_webview_base ui_engine_test)
+    add_test(NAME test_ui_webview_base COMMAND test_ui_webview_base)
+
+    add_executable(test_ui_ink_base tests/test_ui_ink_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_ink_base ui_engine_test)
+    add_test(NAME test_ui_ink_base COMMAND test_ui_ink_base)
+
+    add_executable(test_ui_coachmark_base tests/test_ui_coachmark_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_coachmark_base ui_engine_test)
+    add_test(NAME test_ui_coachmark_base COMMAND test_ui_coachmark_base)
+
+    add_executable(test_ui_signal tests/test_ui_signal.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_signal ui_engine_test)
+    add_test(NAME test_ui_signal COMMAND test_ui_signal)
+
+    add_executable(test_ui_computed tests/test_ui_computed.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_computed ui_engine_test)
+    add_test(NAME test_ui_computed COMMAND test_ui_computed)
+
+    add_executable(test_ui_effect tests/test_ui_effect.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_effect ui_engine_test)
+    add_test(NAME test_ui_effect COMMAND test_ui_effect)
+
+    add_executable(test_ui_rich_text_base tests/test_ui_rich_text_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_rich_text_base ui_engine_test)
+    add_test(NAME test_ui_rich_text_base COMMAND test_ui_rich_text_base)
+
+    add_executable(test_ui_renderer_gl1 tests/test_ui_renderer_gl1.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_renderer_gl1 ui_engine_test)
+    add_test(NAME test_ui_renderer_gl1 COMMAND test_ui_renderer_gl1)
+
+    add_executable(test_ui_web_bridge tests/test_ui_web_bridge.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_web_bridge ui_engine_test)
+    add_test(NAME test_ui_web_bridge COMMAND test_ui_web_bridge)
+
+    add_executable(test_ui_reactive_graph tests/test_ui_reactive_graph.c)
+    target_link_libraries(test_ui_reactive_graph ui_engine_test)
+    add_test(NAME test_ui_reactive_graph COMMAND test_ui_reactive_graph)
+
+    add_executable(test_ui_form_node tests/test_ui_form_node.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_form_node ui_engine_test)
+    add_test(NAME test_ui_form_node COMMAND test_ui_form_node)
+
+    add_executable(test_ui_form_builder tests/test_ui_form_builder.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_form_builder ui_engine_test)
+    add_test(NAME test_ui_form_builder COMMAND test_ui_form_builder)
+
+    add_executable(test_ui_datepicker_base tests/test_ui_datepicker_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_datepicker_base ui_engine_test)
+    add_test(NAME test_ui_datepicker_base COMMAND test_ui_datepicker_base)
+
+    add_executable(test_ui_os_dialogs tests/test_ui_os_dialogs.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_os_dialogs ui_engine_test)
+    add_test(NAME test_ui_os_dialogs COMMAND test_ui_os_dialogs)
+
+
+
+    add_executable(test_ui_window_backend_linux_wayland tests/test_ui_window_backend_linux_wayland.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_backend_linux_wayland ui_engine_test)
+    add_test(NAME test_ui_window_backend_linux_wayland COMMAND test_ui_window_backend_linux_wayland)
+
+    add_executable(test_ui_badge_base tests/test_ui_badge_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_badge_base ui_engine_test)
+    add_test(NAME test_ui_badge_base COMMAND test_ui_badge_base)
+
+    add_executable(test_ui_rating_base tests/test_ui_rating_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_rating_base ui_engine_test)
+    add_test(NAME test_ui_rating_base COMMAND test_ui_rating_base)
+
+    add_executable(test_ui_ripple_base tests/test_ui_ripple_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_ripple_base ui_engine_test)
+    add_test(NAME test_ui_ripple_base COMMAND test_ui_ripple_base)
+
+    add_executable(test_ui_textarea_autosize tests/test_ui_textarea_autosize.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_textarea_autosize ui_engine_test)
+    add_test(NAME test_ui_textarea_autosize COMMAND test_ui_textarea_autosize)
+
+    add_executable(test_ui_key_manager tests/test_ui_key_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_key_manager ui_engine_test)
+    add_test(NAME test_ui_key_manager COMMAND test_ui_key_manager)
+
+    add_executable(test_ui_scroll_dispatcher tests/test_ui_scroll_dispatcher.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_scroll_dispatcher ui_engine_test)
+    add_test(NAME test_ui_scroll_dispatcher COMMAND test_ui_scroll_dispatcher)
+
+    add_executable(test_ui_label_base tests/test_ui_label_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_label_base ui_engine_test)
+    add_test(NAME test_ui_label_base COMMAND test_ui_label_base)
+
+    add_executable(test_ui_aspect_ratio_base tests/test_ui_aspect_ratio_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_aspect_ratio_base ui_engine_test)
+    add_test(NAME test_ui_aspect_ratio_base COMMAND test_ui_aspect_ratio_base)
+
+    add_executable(test_ui_masonry_layout_base tests/test_ui_masonry_layout_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_masonry_layout_base ui_engine_test)
+    add_test(NAME test_ui_masonry_layout_base COMMAND test_ui_masonry_layout_base)
+
+    add_executable(test_ui_pin_input_base tests/test_ui_pin_input_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_pin_input_base ui_engine_test)
+    add_test(NAME test_ui_pin_input_base COMMAND test_ui_pin_input_base)
+
+    add_executable(test_ui_hover_card_base tests/test_ui_hover_card_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_hover_card_base ui_engine_test)
+    add_test(NAME test_ui_hover_card_base COMMAND test_ui_hover_card_base)
+
+    add_executable(test_ui_window_manager_base tests/test_ui_window_manager_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_manager_base ui_engine_test)
+    add_test(NAME test_ui_window_manager_base COMMAND test_ui_window_manager_base)
+
+    add_executable(test_ui_rich_text_editor_base tests/test_ui_rich_text_editor_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_rich_text_editor_base ui_engine_test)
+    add_test(NAME test_ui_rich_text_editor_base COMMAND test_ui_rich_text_editor_base)
+
+    add_executable(test_ui_datagrid_base tests/test_ui_datagrid_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_datagrid_base ui_engine_test)
+    add_test(NAME test_ui_datagrid_base COMMAND test_ui_datagrid_base)
+
+    add_executable(test_ui_form_group tests/test_ui_form_group.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_form_group ui_engine_test)
+    add_test(NAME test_ui_form_group COMMAND test_ui_form_group)
+
+    add_executable(test_ui_form_e2e tests/test_ui_form_e2e.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_form_e2e ui_engine_test)
+    add_test(NAME test_ui_form_e2e COMMAND test_ui_form_e2e)
+
+
+    add_executable(test_ui_form_array tests/test_ui_form_array.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_form_array ui_engine_test)
+    add_test(NAME test_ui_form_array COMMAND test_ui_form_array)
+
+    add_executable(test_ui_canonical_layout_base tests/test_ui_canonical_layout_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_canonical_layout_base ui_engine_test)
+    add_test(NAME test_ui_canonical_layout_base COMMAND test_ui_canonical_layout_base)
+
+    add_executable(test_ui_window_controls_base tests/test_ui_window_controls_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_window_controls_base ui_engine_test)
+    add_test(NAME test_ui_window_controls_base COMMAND test_ui_window_controls_base)
+
+    add_executable(test_ui_compositor_material_base tests/test_ui_compositor_material_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_compositor_material_base ui_engine_test)
+    add_test(NAME test_ui_compositor_material_base COMMAND test_ui_compositor_material_base)
+
+    add_executable(test_ui_loupe_base tests/test_ui_loupe_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_loupe_base ui_engine_test)
+    add_test(NAME test_ui_loupe_base COMMAND test_ui_loupe_base)
+
+    add_executable(test_ui_ribbon_base tests/test_ui_ribbon_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_ribbon_base ui_engine_test)
+    add_test(NAME test_ui_ribbon_base COMMAND test_ui_ribbon_base)
+
+    add_executable(test_ui_miller_columns_base tests/test_ui_miller_columns_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_miller_columns_base ui_engine_test)
+    add_test(NAME test_ui_miller_columns_base COMMAND test_ui_miller_columns_base)
+
+    add_executable(test_ui_property_grid_base tests/test_ui_property_grid_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_property_grid_base ui_engine_test)
+    add_test(NAME test_ui_property_grid_base COMMAND test_ui_property_grid_base)
+
+    add_executable(test_ui_syntax_surface_base tests/test_ui_syntax_surface_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_syntax_surface_base ui_engine_test)
+    add_test(NAME test_ui_syntax_surface_base COMMAND test_ui_syntax_surface_base)
+
+    add_executable(test_ui_node_graph_base tests/test_ui_node_graph_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_node_graph_base ui_engine_test)
+    add_test(NAME test_ui_node_graph_base COMMAND test_ui_node_graph_base)
+
+    add_executable(test_ui_chart_base tests/test_ui_chart_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_chart_base ui_engine_test)
+    add_test(NAME test_ui_chart_base COMMAND test_ui_chart_base)
+
+    add_executable(test_ui_chat_bubble_base tests/test_ui_chat_bubble_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_chat_bubble_base ui_engine_test)
+    add_test(NAME test_ui_chat_bubble_base COMMAND test_ui_chat_bubble_base)
+
+    add_executable(test_ui_form_control tests/test_ui_form_control.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_form_control ui_engine_test)
+    add_test(NAME test_ui_form_control COMMAND test_ui_form_control)
+
+    add_executable(test_ui_top_app_bar_base tests/test_ui_top_app_bar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_top_app_bar_base ui_engine_test)
+    add_test(NAME test_ui_top_app_bar_base COMMAND test_ui_top_app_bar_base)
+
+    add_executable(test_ui_titlebar_base tests/test_ui_titlebar_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_titlebar_base ui_engine_test)
+    add_test(NAME test_ui_titlebar_base COMMAND test_ui_titlebar_base)
+
+    add_executable(test_ui_theme_manager tests/test_ui_theme_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_theme_manager ui_engine_test)
+    add_test(NAME test_ui_theme_manager COMMAND test_ui_theme_manager)
+    add_executable(test_ui_safe_area_manager tests/test_ui_safe_area_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_safe_area_manager ui_engine_test)
+    add_test(NAME test_ui_safe_area_manager COMMAND test_ui_safe_area_manager)
+
+    if(BUILD_VISUAL_TESTS)
+        add_executable(test_ui_visual tests/test_ui_visual.c tests/ui_test_mock_mem.c)
+        target_link_libraries(test_ui_visual ui_engine_test)
+    add_executable(test_ui_date_range_picker_base tests/test_ui_date_range_picker_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_date_range_picker_base ui_engine_test)
+    add_test(NAME test_ui_date_range_picker_base COMMAND test_ui_date_range_picker_base)
+    add_executable(test_ui_map_view_base tests/test_ui_map_view_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_map_view_base ui_engine_test)
+    add_test(NAME test_ui_map_view_base COMMAND test_ui_map_view_base)
+    add_executable(test_ui_tray_manager tests/test_ui_tray_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_tray_manager PRIVATE ui_engine_test)
+    add_test(NAME test_ui_tray_manager COMMAND test_ui_tray_manager)
+    add_executable(test_ui_auth tests/test_ui_auth.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_auth PRIVATE ui_engine_test)
+    add_test(NAME test_ui_auth COMMAND test_ui_auth)
+    add_executable(test_ui_share tests/test_ui_share.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_share PRIVATE ui_engine_test)
+    add_test(NAME test_ui_share COMMAND test_ui_share)
+    add_executable(test_ui_sensor_manager tests/test_ui_sensor_manager.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_sensor_manager PRIVATE ui_engine_test)
+    add_test(NAME test_ui_sensor_manager COMMAND test_ui_sensor_manager)
+    add_executable(test_ui_text_layout_hb tests/test_ui_text_layout_hb.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_text_layout_hb PRIVATE ui_engine_test)
+    add_test(NAME test_ui_text_layout_hb COMMAND test_ui_text_layout_hb)
+        add_test(NAME test_ui_visual COMMAND test_ui_visual)
+    add_executable(test_ui_audio_coreaudio tests/test_ui_audio_coreaudio.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_audio_coreaudio ui_engine_test)
+    add_test(NAME test_ui_audio_coreaudio COMMAND test_ui_audio_coreaudio)
+
+    add_executable(test_ui_audio_opensles tests/test_ui_audio_opensles.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_audio_opensles ui_engine_test)
+    add_test(NAME test_ui_audio_opensles COMMAND test_ui_audio_opensles)
+
+    add_executable(test_ui_audio_wasapi tests/test_ui_audio_wasapi.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_audio_wasapi ui_engine_test)
+    add_test(NAME test_ui_audio_wasapi COMMAND test_ui_audio_wasapi)
+
+    add_executable(test_ui_audio_webaudio tests/test_ui_audio_webaudio.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_audio_webaudio ui_engine_test)
+    add_test(NAME test_ui_audio_webaudio COMMAND test_ui_audio_webaudio)
+
+    add_executable(test_ui_video_avfoundation tests/test_ui_video_avfoundation.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_video_avfoundation ui_engine_test)
+    add_test(NAME test_ui_video_avfoundation COMMAND test_ui_video_avfoundation)
+
+    add_executable(test_ui_video_mediacodec tests/test_ui_video_mediacodec.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_video_mediacodec ui_engine_test)
+    add_test(NAME test_ui_video_mediacodec COMMAND test_ui_video_mediacodec)
+
+    add_executable(test_ui_video_mf tests/test_ui_video_mf.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_video_mf ui_engine_test)
+    add_test(NAME test_ui_video_mf COMMAND test_ui_video_mf)
+
+    add_executable(test_ui_renderer_coregraphics tests/test_ui_renderer_coregraphics.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_renderer_coregraphics ui_engine_test)
+    add_test(NAME test_ui_renderer_coregraphics COMMAND test_ui_renderer_coregraphics)
+
+    add_executable(test_ui_renderer_gdiplus tests/test_ui_renderer_gdiplus.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_renderer_gdiplus ui_engine_test)
+    add_test(NAME test_ui_renderer_gdiplus COMMAND test_ui_renderer_gdiplus)
     endif()
 endif()
-if(APPLE)
-    find_library(APPKIT AppKit)
-    if(APPKIT)
-        target_link_libraries(cmp PRIVATE ${APPKIT})
-    endif()
-endif()
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-add_executable(cmp_css_selectors_test tests/test_cmp_css_selectors.c)
-target_link_libraries(cmp_css_selectors_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_selectors_test COMMAND cmp_css_selectors_test)
 
-add_executable(cmp_css_values_test tests/test_cmp_css_values.c)
-target_link_libraries(cmp_css_values_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_values_test COMMAND cmp_css_values_test)
-
-add_executable(cmp_css_cascade_test tests/test_cmp_css_cascade.c)
-target_link_libraries(cmp_css_cascade_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_cascade_test COMMAND cmp_css_cascade_test)
-
-add_executable(cmp_css_box_model_test tests/test_cmp_css_box_model.c)
-target_link_libraries(cmp_css_box_model_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_box_model_test COMMAND cmp_css_box_model_test)
-
-add_executable(cmp_css_backgrounds_borders_test tests/test_cmp_css_backgrounds_borders.c)
-target_link_libraries(cmp_css_backgrounds_borders_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_backgrounds_borders_test COMMAND cmp_css_backgrounds_borders_test)
-
-add_executable(cmp_css_color_test tests/test_cmp_css_color.c)
-target_link_libraries(cmp_css_color_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_color_test COMMAND cmp_css_color_test)
-
-add_executable(cmp_css_display_test tests/test_cmp_css_display.c)
-target_link_libraries(cmp_css_display_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_display_test COMMAND cmp_css_display_test)
-
-add_executable(cmp_css_positioning_test tests/test_cmp_css_positioning.c)
-target_link_libraries(cmp_css_positioning_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_positioning_test COMMAND cmp_css_positioning_test)
-
-add_executable(cmp_css_anchor_positioning_test tests/test_cmp_css_anchor_positioning.c)
-target_link_libraries(cmp_css_anchor_positioning_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_anchor_positioning_test COMMAND cmp_css_anchor_positioning_test)
-
-add_executable(cmp_css_grid_test tests/test_cmp_css_grid.c)
-target_link_libraries(cmp_css_grid_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_grid_test COMMAND cmp_css_grid_test)
-
-add_executable(cmp_css_flexbox_test tests/test_cmp_css_flexbox.c)
-target_link_libraries(cmp_css_flexbox_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_flexbox_test COMMAND cmp_css_flexbox_test)
-
-add_executable(cmp_css_box_alignment_test tests/test_cmp_css_box_alignment.c)
-target_link_libraries(cmp_css_box_alignment_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_box_alignment_test COMMAND cmp_css_box_alignment_test)
-
-add_executable(cmp_css_multi_column_test tests/test_cmp_css_multi_column.c)
-target_link_libraries(cmp_css_multi_column_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_multi_column_test COMMAND cmp_css_multi_column_test)
-
-add_executable(cmp_css_transforms_test tests/test_cmp_css_transforms.c)
-target_link_libraries(cmp_css_transforms_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_transforms_test COMMAND cmp_css_transforms_test)
-
-add_executable(cmp_css_animations_test tests/test_cmp_css_animations.c)
-target_link_libraries(cmp_css_animations_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_animations_test COMMAND cmp_css_animations_test)
-
-add_executable(cmp_css_scroll_animations_test tests/test_cmp_css_scroll_animations.c)
-target_link_libraries(cmp_css_scroll_animations_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_scroll_animations_test COMMAND cmp_css_scroll_animations_test)
-
-add_executable(cmp_css_masking_test tests/test_cmp_css_masking.c)
-target_link_libraries(cmp_css_masking_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_masking_test COMMAND cmp_css_masking_test)
-
-add_executable(cmp_css_typography_test tests/test_cmp_css_typography.c)
-target_link_libraries(cmp_css_typography_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_typography_test COMMAND cmp_css_typography_test)
-
-add_executable(cmp_css_fonts_test tests/test_cmp_css_fonts.c)
-target_link_libraries(cmp_css_fonts_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_fonts_test COMMAND cmp_css_fonts_test)
-
-add_executable(cmp_css_writing_modes_test tests/test_cmp_css_writing_modes.c)
-target_link_libraries(cmp_css_writing_modes_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_writing_modes_test COMMAND cmp_css_writing_modes_test)
-
-add_executable(cmp_css_logical_test tests/test_cmp_css_logical.c)
-target_link_libraries(cmp_css_logical_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_logical_test COMMAND cmp_css_logical_test)
-
-add_executable(cmp_css_lists_content_test tests/test_cmp_css_lists_content.c)
-target_link_libraries(cmp_css_lists_content_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_lists_content_test COMMAND cmp_css_lists_content_test)
-
-add_executable(cmp_css_images_shapes_test tests/test_cmp_css_images_shapes.c)
-target_link_libraries(cmp_css_images_shapes_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_images_shapes_test COMMAND cmp_css_images_shapes_test)
-
-add_executable(cmp_css_ruby_test tests/test_cmp_css_ruby.c)
-target_link_libraries(cmp_css_ruby_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_ruby_test COMMAND cmp_css_ruby_test)
-
-add_executable(cmp_css_overflow_test tests/test_cmp_css_overflow.c)
-target_link_libraries(cmp_css_overflow_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_overflow_test COMMAND cmp_css_overflow_test)
-
-add_executable(cmp_css_containment_test tests/test_cmp_css_containment.c)
-target_link_libraries(cmp_css_containment_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_containment_test COMMAND cmp_css_containment_test)
-
-add_executable(cmp_css_speech_test tests/test_cmp_css_speech.c)
-target_link_libraries(cmp_css_speech_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_speech_test COMMAND cmp_css_speech_test)
-
-add_executable(cmp_css_ui_test tests/test_cmp_css_ui.c)
-target_link_libraries(cmp_css_ui_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_ui_test COMMAND cmp_css_ui_test)
-
-add_executable(cmp_css_tables_test tests/test_cmp_css_tables.c)
-target_link_libraries(cmp_css_tables_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_tables_test COMMAND cmp_css_tables_test)
-
-add_executable(cmp_css_svg_test tests/test_cmp_css_svg.c)
-target_link_libraries(cmp_css_svg_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_svg_test COMMAND cmp_css_svg_test)
-
-add_executable(cmp_css_at_rules_test tests/test_cmp_css_at_rules.c)
-target_link_libraries(cmp_css_at_rules_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_at_rules_test COMMAND cmp_css_at_rules_test)
-
-add_executable(cmp_cssom_test tests/test_cmp_cssom.c)
-target_link_libraries(cmp_cssom_test PRIVATE cmp greatest)
-add_test(NAME cmp_cssom_test COMMAND cmp_cssom_test)
-
-add_executable(cmp_css_device_adaptation_test tests/test_cmp_css_device_adaptation.c)
-target_link_libraries(cmp_css_device_adaptation_test PRIVATE cmp greatest)
-add_test(NAME cmp_css_device_adaptation_test COMMAND cmp_css_device_adaptation_test)
-
-add_executable(cmp_waapi_test tests/test_cmp_waapi.c)
-target_link_libraries(cmp_waapi_test PRIVATE cmp greatest)
-add_test(NAME cmp_waapi_test COMMAND cmp_waapi_test)
-
-add_executable(cmp_test tests/core/test_cmp_memory.c)
-target_link_libraries(cmp_test PRIVATE cmp greatest)
-
-add_executable(cmp_plugin_loader_test tests/test_cmp_plugin_loader.c)
-target_link_libraries(cmp_plugin_loader_test PRIVATE cmp greatest)
-
-add_executable(cmp_credential_manager_test tests/test_cmp_credential_manager.c)
-target_link_libraries(cmp_credential_manager_test PRIVATE cmp greatest)
-
-add_executable(cmp_global_hotkey_test tests/test_cmp_global_hotkey.c)
-target_link_libraries(cmp_global_hotkey_test PRIVATE cmp greatest)
-
-add_executable(cmp_audio_capture_test tests/test_cmp_audio_capture.c)
-target_link_libraries(cmp_audio_capture_test PRIVATE cmp greatest)
-
-add_executable(cmp_pty_test tests/test_cmp_pty.c)
-target_link_libraries(cmp_pty_test PRIVATE cmp greatest)
-
-add_executable(cmp_regex_test tests/test_cmp_regex.c)
-target_link_libraries(cmp_regex_test PRIVATE cmp greatest)
-
-add_executable(cmp_sse_parser_test tests/test_cmp_sse_parser.c)
-target_link_libraries(cmp_sse_parser_test PRIVATE cmp greatest)
-
-add_executable(cmp_error_test tests/test_cmp_error.c)
-target_link_libraries(cmp_error_test PRIVATE cmp greatest)
-
-add_executable(cmp_state_layers_test tests/test_cmp_state_layers.c)
-target_link_libraries(cmp_state_layers_test PRIVATE cmp greatest)
-
-add_executable(cmp_status_bar_test tests/test_cmp_status_bar.c)
-target_link_libraries(cmp_status_bar_test PRIVATE cmp greatest)
-
-add_executable(cmp_string_test tests/test_cmp_string.c)
-target_link_libraries(cmp_string_test PRIVATE cmp greatest)
-
-add_executable(cmp_tls_test tests/test_cmp_tls.c)
-target_link_libraries(cmp_tls_test PRIVATE cmp greatest)
-
-add_executable(cmp_ring_buffer_test tests/test_cmp_ring_buffer.c)
-target_link_libraries(cmp_ring_buffer_test PRIVATE cmp greatest)
-
-add_executable(cmp_modality_sync_single_test tests/test_cmp_modality_sync_single.c)
-target_link_libraries(cmp_modality_sync_single_test PRIVATE cmp greatest)
-
-add_executable(cmp_modality_sync_multi_test tests/test_cmp_modality_sync_multi.c)
-target_link_libraries(cmp_modality_sync_multi_test PRIVATE cmp greatest)
-
-add_executable(cmp_modality_async_single_test tests/test_cmp_modality_async_single.c)
-target_link_libraries(cmp_modality_async_single_test PRIVATE cmp greatest)
-
-add_executable(cmp_sync_test tests/test_cmp_sync.c)
-target_link_libraries(cmp_sync_test PRIVATE cmp greatest)
-
-add_executable(cmp_coroutine_test tests/test_cmp_coroutine.c)
-target_link_libraries(cmp_coroutine_test PRIVATE cmp greatest)
-
-add_executable(cmp_timer_test tests/test_cmp_timer.c)
-target_link_libraries(cmp_timer_test PRIVATE cmp greatest)
-
-add_executable(cmp_vfs_test tests/core/test_cmp_vfs.c)
-target_link_libraries(cmp_vfs_test PRIVATE cmp greatest)
-
-add_executable(cmp_http_test tests/test_cmp_http.c)
-target_link_libraries(cmp_http_test PRIVATE cmp greatest)
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    add_executable(cmp_orm_test tests/test_cmp_orm.c)
-    target_link_libraries(cmp_orm_test PRIVATE cmp greatest c-orm)
-    add_test(NAME cmp_orm_test COMMAND cmp_orm_test)
-    set_tests_properties(cmp_orm_test PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
-endif()
-
-add_executable(cmp_window_test tests/test_cmp_window.c)
-target_link_libraries(cmp_window_test PRIVATE cmp greatest)
-
-add_executable(cmp_window_manager_test tests/test_cmp_window_manager.c)
-target_link_libraries(cmp_window_manager_test PRIVATE cmp greatest)
-
-add_executable(cmp_dpi_test tests/test_cmp_dpi.c)
-target_link_libraries(cmp_dpi_test PRIVATE cmp greatest)
-
-add_executable(cmp_event_test tests/core/test_cmp_event.c)
-target_link_libraries(cmp_event_test PRIVATE cmp greatest)
-
-add_executable(cmp_router_test tests/test_cmp_router.c)
-target_link_libraries(cmp_router_test PRIVATE cmp greatest)
-
-add_executable(cmp_layout_test tests/core/test_cmp_layout.c)
-target_link_libraries(cmp_layout_test PRIVATE cmp greatest)
-
-# add_executable(test_layout_debug test_layout_debug.c)
-# target_link_libraries(test_layout_debug PRIVATE cmp)
-
-add_executable(cmp_layout_geometry_test tests/test_cmp_layout_geometry.c)
-target_link_libraries(cmp_layout_geometry_test PRIVATE cmp)
-add_test(NAME cmp_layout_geometry_test COMMAND cmp_layout_geometry_test)
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    add_executable(cmp_ui_test tests/test_cmp_ui.c)
-    target_link_libraries(cmp_ui_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_accordion_test tests/test_cmp_ui_accordion.c)
-    add_executable(cmp_ui_terminal_test tests/test_cmp_ui_terminal.c)
-    add_executable(cmp_ui_text_field_test tests/test_cmp_ui_text_field.c)
-    add_executable(cmp_ui_tree_view_test tests/test_cmp_ui_tree_view.c)
-    add_executable(cmp_wayland_protocols_test tests/test_cmp_wayland_protocols.c)
-    add_executable(cmp_webgl_canvas_test tests/test_cmp_webgl_canvas.c)
-    add_executable(cmp_win32_input_test tests/test_cmp_win32_input.c)
-    add_executable(cmp_win32_window_test tests/test_cmp_win32_window.c)
-    add_executable(cmp_workspace_layout_test tests/test_cmp_workspace_layout.c)
-    target_link_libraries(cmp_ui_accordion_test PRIVATE cmp greatest)
-    target_link_libraries(cmp_ui_terminal_test PRIVATE cmp greatest)
-    target_link_libraries(cmp_ui_text_field_test PRIVATE cmp greatest)
-    target_link_libraries(cmp_ui_tree_view_test PRIVATE cmp greatest)
-    target_link_libraries(cmp_wayland_protocols_test PRIVATE cmp greatest)
-    target_link_libraries(cmp_webgl_canvas_test PRIVATE cmp greatest)
-    target_link_libraries(cmp_win32_input_test PRIVATE cmp greatest)
-    target_link_libraries(cmp_win32_window_test PRIVATE cmp greatest)
-    target_link_libraries(cmp_workspace_layout_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_avatar_test tests/test_cmp_ui_avatar.c)
-    target_link_libraries(cmp_ui_avatar_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_badge_test tests/test_cmp_ui_badge.c)
-    target_link_libraries(cmp_ui_badge_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_card_test tests/test_cmp_ui_card.c)
-    target_link_libraries(cmp_ui_card_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_chip_test tests/test_cmp_ui_chip.c)
-    target_link_libraries(cmp_ui_chip_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_divider_test tests/test_cmp_ui_divider.c)
-    target_link_libraries(cmp_ui_divider_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_bottom_sheet_test tests/test_cmp_ui_bottom_sheet.c)
-    target_link_libraries(cmp_ui_bottom_sheet_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_breadcrumbs_test tests/test_cmp_ui_breadcrumbs.c)
-    target_link_libraries(cmp_ui_breadcrumbs_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_action_button_test tests/test_cmp_ui_action_button.c)
-    target_link_libraries(cmp_ui_action_button_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_app_bar_test tests/test_cmp_ui_app_bar.c)
-    target_link_libraries(cmp_ui_app_bar_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_fab_test tests/test_cmp_ui_fab.c)
-    target_link_libraries(cmp_ui_fab_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_icon_button_test tests/test_cmp_ui_icon_button.c)
-    target_link_libraries(cmp_ui_icon_button_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_segmented_button_test tests/test_cmp_ui_segmented_button.c)
-    target_link_libraries(cmp_ui_segmented_button_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_modal_drawer_test tests/test_cmp_ui_modal_drawer.c)
-    target_link_libraries(cmp_ui_modal_drawer_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_navigation_rail_test tests/test_cmp_ui_navigation_rail.c)
-    target_link_libraries(cmp_ui_navigation_rail_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_progress_bar_test tests/test_cmp_ui_progress_bar.c)
-    target_link_libraries(cmp_ui_progress_bar_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_progress_indicator_test tests/test_cmp_ui_progress_indicator.c)
-    target_link_libraries(cmp_ui_progress_indicator_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_spinner_test tests/test_cmp_ui_spinner.c)
-    target_link_libraries(cmp_ui_spinner_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_splitter_test tests/test_cmp_ui_splitter.c)
-    target_link_libraries(cmp_ui_splitter_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_switch_test tests/test_cmp_ui_switch.c)
-    target_link_libraries(cmp_ui_switch_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_tooltip_test tests/test_cmp_ui_tooltip.c)
-    target_link_libraries(cmp_ui_tooltip_test PRIVATE cmp greatest)
-
-    add_executable(cmp_ui_virtual_list_test tests/test_cmp_ui_virtual_list.c)
-    target_link_libraries(cmp_ui_virtual_list_test PRIVATE cmp greatest)
-    add_test(NAME cmp_ui_navigation_rail_test COMMAND cmp_ui_navigation_rail_test)
-    add_test(NAME cmp_ui_progress_bar_test COMMAND cmp_ui_progress_bar_test)
-    add_test(NAME cmp_ui_avatar_test COMMAND cmp_ui_avatar_test)
-    add_test(NAME cmp_ui_badge_test COMMAND cmp_ui_badge_test)
-    add_test(NAME cmp_ui_card_test COMMAND cmp_ui_card_test)
-    add_test(NAME cmp_ui_chip_test COMMAND cmp_ui_chip_test)
-    add_test(NAME cmp_ui_divider_test COMMAND cmp_ui_divider_test)
-    add_test(NAME cmp_ui_progress_indicator_test COMMAND cmp_ui_progress_indicator_test)
-    add_test(NAME cmp_ui_spinner_test COMMAND cmp_ui_spinner_test)
-    add_test(NAME cmp_ui_splitter_test COMMAND cmp_ui_splitter_test)
-    add_test(NAME cmp_ui_switch_test COMMAND cmp_ui_switch_test)
-    add_test(NAME cmp_ui_tooltip_test COMMAND cmp_ui_tooltip_test)
-    add_test(NAME cmp_ui_virtual_list_test COMMAND cmp_ui_virtual_list_test)
-    add_test(NAME cmp_ui_test COMMAND cmp_ui_test)
-    add_test(NAME cmp_ui_terminal_test COMMAND cmp_ui_terminal_test)
-    add_test(NAME cmp_ui_text_field_test COMMAND cmp_ui_text_field_test)
-    add_test(NAME cmp_ui_tree_view_test COMMAND cmp_ui_tree_view_test)
-    add_test(NAME cmp_wayland_protocols_test COMMAND cmp_wayland_protocols_test)
-    add_test(NAME cmp_webgl_canvas_test COMMAND cmp_webgl_canvas_test)
-    add_test(NAME cmp_win32_input_test COMMAND cmp_win32_input_test)
-    add_test(NAME cmp_win32_window_test COMMAND cmp_win32_window_test)
-    add_test(NAME cmp_workspace_layout_test COMMAND cmp_workspace_layout_test)
-    add_test(NAME cmp_ui_accordion_test COMMAND cmp_ui_accordion_test)
-    add_test(NAME cmp_ui_bottom_sheet_test COMMAND cmp_ui_bottom_sheet_test)
-    add_test(NAME cmp_ui_breadcrumbs_test COMMAND cmp_ui_breadcrumbs_test)
-    add_test(NAME cmp_ui_action_button_test COMMAND cmp_ui_action_button_test)
-    add_test(NAME cmp_ui_app_bar_test COMMAND cmp_ui_app_bar_test)
-    add_test(NAME cmp_ui_fab_test COMMAND cmp_ui_fab_test)
-    add_test(NAME cmp_ui_icon_button_test COMMAND cmp_ui_icon_button_test)
-    add_test(NAME cmp_ui_segmented_button_test COMMAND cmp_ui_segmented_button_test)
-    add_test(NAME cmp_ui_modal_drawer_test COMMAND cmp_ui_modal_drawer_test)
-endif()
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-add_executable(cmp_ui_m3_buttons_test tests/test_cmp_ui_m3_buttons.c)
-target_link_libraries(cmp_ui_m3_buttons_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_m3_communication_test tests/test_cmp_ui_m3_communication.c)
-target_link_libraries(cmp_ui_m3_communication_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_m3_containment_test tests/test_cmp_ui_m3_containment.c)
-target_link_libraries(cmp_ui_m3_containment_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_m3_navigation_test tests/test_cmp_ui_m3_navigation.c)
-target_link_libraries(cmp_ui_m3_navigation_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_m3_selection_input_test tests/test_cmp_ui_m3_selection_input.c)
-target_link_libraries(cmp_ui_m3_selection_input_test PRIVATE cmp greatest)
-endif()
-
-add_executable(cmp_svg_test tests/test_cmp_svg.c)
-target_link_libraries(cmp_svg_test PRIVATE cmp greatest)
-
-add_executable(cmp_gpu_test tests/test_cmp_gpu.c)
-  target_link_libraries(cmp_gpu_test PRIVATE cmp greatest)
-
-add_executable(cmp_command_buffer_test tests/test_cmp_command_buffer.c)
-target_link_libraries(cmp_command_buffer_test PRIVATE cmp greatest)
-
-add_executable(cmp_render_graph_test tests/test_cmp_render_graph.c)
-target_link_libraries(cmp_render_graph_test PRIVATE cmp greatest)
-
-add_executable(cmp_pso_cache_test tests/test_cmp_pso_cache.c)
-target_link_libraries(cmp_pso_cache_test PRIVATE cmp greatest)
-
-add_executable(cmp_gpu_allocator_test tests/test_cmp_gpu_allocator.c)
-target_link_libraries(cmp_gpu_allocator_test PRIVATE cmp greatest)
-
-
-add_executable(cmp_shader_test tests/test_cmp_shader.c)
-target_link_libraries(cmp_shader_test PRIVATE cmp greatest)
-
-add_executable(cmp_shader_cache_test tests/test_cmp_shader_cache.c)
-target_link_libraries(cmp_shader_cache_test PRIVATE cmp greatest)
-
-add_executable(cmp_msaa_test tests/test_cmp_msaa.c)
-add_executable(cmp_compositor_thread_test tests/test_cmp_compositor_thread.c)
-add_executable(cmp_apz_test tests/test_cmp_apz.c)
-add_executable(cmp_fluent_test tests/test_cmp_fluent.c)
-add_executable(cmp_ink_ripple_test tests/test_cmp_ink_ripple.c)
-add_executable(cmp_lottie_test tests/test_cmp_lottie.c)
-add_executable(cmp_theme_test tests/themes/test_cmp_theme.c)
-target_link_libraries(cmp_theme_test PRIVATE cmp greatest)
-add_test(NAME cmp_theme_test COMMAND cmp_theme_test)
-list(APPEND CMP_TESTS "cmp_theme_test")
-target_link_libraries(cmp_msaa_test PRIVATE cmp greatest)
-target_link_libraries(cmp_compositor_thread_test PRIVATE cmp greatest)
-target_link_libraries(cmp_apz_test PRIVATE cmp greatest)
-target_link_libraries(cmp_fluent_test PRIVATE cmp greatest)
-target_link_libraries(cmp_ink_ripple_test PRIVATE cmp greatest)
-target_link_libraries(cmp_lottie_test PRIVATE cmp greatest)
-
-add_executable(cmp_linear_blend_test tests/test_cmp_linear_blend.c)
-target_link_libraries(cmp_linear_blend_test PRIVATE cmp greatest)
-
-add_executable(cmp_tex_compression_test tests/test_cmp_tex_compression.c)
-add_executable(cmp_icc_profile_test tests/test_cmp_icc_profile.c)
-target_link_libraries(cmp_tex_compression_test PRIVATE cmp greatest)
-target_link_libraries(cmp_icc_profile_test PRIVATE cmp greatest)
-
-add_executable(cmp_mipmap_test tests/test_cmp_mipmap.c)
-target_link_libraries(cmp_mipmap_test PRIVATE cmp greatest)
-
-add_executable(cmp_swapchain_test tests/test_cmp_swapchain.c)
-target_link_libraries(cmp_swapchain_test PRIVATE cmp greatest)
-
-add_executable(cmp_overdraw_test tests/test_cmp_overdraw.c)
-target_link_libraries(cmp_overdraw_test PRIVATE cmp greatest)
-
-add_executable(cmp_layer_tiling_test tests/test_cmp_layer_tiling.c)
-target_link_libraries(cmp_layer_tiling_test PRIVATE cmp greatest)
-
-add_executable(cmp_hit_test_test tests/test_cmp_hit_test.c)
-target_link_libraries(cmp_hit_test_test PRIVATE cmp greatest)
-
-add_executable(cmp_pointer_events_test tests/test_cmp_pointer_events.c)
-target_link_libraries(cmp_pointer_events_test PRIVATE cmp greatest)
-
-add_executable(cmp_event_bubbling_test tests/core/test_cmp_event_bubbling.c)
-target_link_libraries(cmp_event_bubbling_test PRIVATE cmp greatest)
-
-add_executable(cmp_passive_event_test tests/test_cmp_passive_event.c)
-target_link_libraries(cmp_passive_event_test PRIVATE cmp greatest)
-
-add_executable(cmp_pointer_capture_test tests/test_cmp_pointer_capture.c)
-target_link_libraries(cmp_pointer_capture_test PRIVATE cmp greatest)
-
-add_executable(cmp_gesture_test tests/test_cmp_gesture.c)
-target_link_libraries(cmp_gesture_test PRIVATE cmp greatest)
-
-add_executable(cmp_complex_gesture_test tests/test_cmp_complex_gesture.c)
-target_link_libraries(cmp_complex_gesture_test PRIVATE cmp greatest)
-
-add_executable(cmp_pointer_pressure_test tests/test_cmp_pointer_pressure.c)
-target_link_libraries(cmp_pointer_pressure_test PRIVATE cmp greatest)
-
-add_executable(cmp_touch_action_test tests/test_cmp_touch_action.c)
-target_link_libraries(cmp_touch_action_test PRIVATE cmp greatest)
-
-add_executable(cmp_context_menu_test tests/test_cmp_context_menu.c)
-target_link_libraries(cmp_context_menu_test PRIVATE cmp greatest)
-
-add_executable(cmp_hover_intent_test tests/test_cmp_hover_intent.c)
-target_link_libraries(cmp_hover_intent_test PRIVATE cmp greatest)
-
-add_executable(cmp_scroll_ctx_test tests/test_cmp_scroll_ctx.c)
-target_link_libraries(cmp_scroll_ctx_test PRIVATE cmp greatest)
-
-add_executable(cmp_scroll_velocity_test tests/test_cmp_scroll_velocity.c)
-target_link_libraries(cmp_scroll_velocity_test PRIVATE cmp greatest)
-
-add_executable(cmp_kinematics_test tests/test_cmp_kinematics.c)
-target_link_libraries(cmp_kinematics_test PRIVATE cmp greatest)
-
-add_executable(cmp_scrollbar_gutter_test tests/test_cmp_scrollbar_gutter.c)
-target_link_libraries(cmp_scrollbar_gutter_test PRIVATE cmp greatest)
-
-add_executable(cmp_scroll_anchor_test tests/test_cmp_scroll_anchor.c)
-target_link_libraries(cmp_scroll_anchor_test PRIVATE cmp greatest)
-add_executable(cmp_secure_network_test tests/test_cmp_secure_network.c)
-target_link_libraries(cmp_secure_network_test PRIVATE cmp greatest)
-
-add_executable(cmp_ptr_test tests/test_cmp_ptr.c)
-target_link_libraries(cmp_ptr_test PRIVATE cmp greatest)
-
-add_executable(cmp_tick_test tests/test_cmp_tick.c)
-target_link_libraries(cmp_tick_test PRIVATE cmp greatest)
-
-add_executable(cmp_dt_test tests/test_cmp_dt.c)
-target_link_libraries(cmp_dt_test PRIVATE cmp greatest)
-
-add_executable(cmp_transition_test tests/test_cmp_transition.c)
-target_link_libraries(cmp_transition_test PRIVATE cmp greatest)
-
-add_executable(cmp_keyframe_test tests/test_cmp_keyframe.c)
-target_link_libraries(cmp_keyframe_test PRIVATE cmp greatest)
-
-add_executable(cmp_anim_compose_test tests/test_cmp_anim_compose.c)
-target_link_libraries(cmp_anim_compose_test PRIVATE cmp greatest)
-
-add_executable(cmp_spring_ease_test tests/test_cmp_spring_ease.c)
-target_link_libraries(cmp_spring_ease_test PRIVATE cmp greatest)
-
-add_executable(cmp_bezier_ease_test tests/test_cmp_bezier_ease.c)
-target_link_libraries(cmp_bezier_ease_test PRIVATE cmp greatest)
-
-add_executable(cmp_step_ease_test tests/test_cmp_step_ease.c)
-target_link_libraries(cmp_step_ease_test PRIVATE cmp greatest)
-
-add_executable(cmp_motion_path_test tests/test_cmp_motion_path.c)
-target_link_libraries(cmp_motion_path_test PRIVATE cmp greatest)
-
-add_executable(cmp_scroll_timeline_test tests/test_cmp_scroll_timeline.c)
-target_link_libraries(cmp_scroll_timeline_test PRIVATE cmp greatest)
-
-add_executable(cmp_view_transition_test tests/test_cmp_view_transition.c)
-target_link_libraries(cmp_view_transition_test PRIVATE cmp greatest)
-
-add_executable(cmp_vt_shared_test tests/test_cmp_vt_shared.c)
-target_link_libraries(cmp_vt_shared_test PRIVATE cmp greatest)
-
-add_executable(cmp_discrete_transition_test tests/test_cmp_discrete_transition.c)
-target_link_libraries(cmp_discrete_transition_test PRIVATE cmp greatest)
-
-add_executable(cmp_flip_test tests/test_cmp_flip.c)
-target_link_libraries(cmp_flip_test PRIVATE cmp greatest)
-
-add_executable(cmp_form_controls_test tests/test_cmp_form_controls.c)
-target_link_libraries(cmp_form_controls_test PRIVATE cmp greatest)
-
-add_executable(cmp_validation_test tests/test_cmp_validation.c)
-target_link_libraries(cmp_validation_test PRIVATE cmp greatest)
-
-add_executable(cmp_input_mask_test tests/test_cmp_input_mask.c)
-target_link_libraries(cmp_input_mask_test PRIVATE cmp greatest)
-
-add_executable(cmp_indeterminate_test tests/test_cmp_indeterminate.c)
-target_link_libraries(cmp_indeterminate_test PRIVATE cmp greatest)
-
-add_executable(cmp_select_ui_test tests/widgets/test_cmp_select_ui.c)
-target_link_libraries(cmp_select_ui_test PRIVATE cmp greatest)
-
-add_executable(cmp_datalist_test tests/test_cmp_datalist.c)
-target_link_libraries(cmp_datalist_test PRIVATE cmp greatest)
-
-add_executable(cmp_range_slider_test tests/widgets/test_cmp_range_slider.c)
-target_link_libraries(cmp_range_slider_test PRIVATE cmp greatest)
-
-add_executable(cmp_color_picker_test tests/test_cmp_color_picker.c)
-target_link_libraries(cmp_color_picker_test PRIVATE cmp greatest)
-
-add_executable(cmp_date_picker_test tests/test_cmp_date_picker.c)
-target_link_libraries(cmp_date_picker_test PRIVATE cmp greatest)
-
-add_executable(cmp_caret_test tests/test_cmp_caret.c)
-target_link_libraries(cmp_caret_test PRIVATE cmp greatest)
-
-add_executable(cmp_selection_test tests/test_cmp_selection.c)
-target_link_libraries(cmp_selection_test PRIVATE cmp greatest)
-
-add_executable(cmp_editable_test tests/widgets/test_cmp_editable.c)
-target_link_libraries(cmp_editable_test PRIVATE cmp greatest)
-
-add_executable(cmp_ime_test tests/test_cmp_ime.c)
-target_link_libraries(cmp_ime_test PRIVATE cmp greatest)
-
-add_executable(cmp_spellcheck_test tests/test_cmp_spellcheck.c)
-target_link_libraries(cmp_spellcheck_test PRIVATE cmp greatest)
-
-add_executable(cmp_undo_redo_test tests/test_cmp_undo_redo.c)
-target_link_libraries(cmp_undo_redo_test PRIVATE cmp greatest)
-
-add_executable(cmp_a11y_tree_test tests/test_cmp_a11y_tree.c)
-add_executable(cmp_android_ndk_bridge_test tests/test_cmp_android_ndk_bridge.c)
-add_executable(cmp_android_scoped_storage_test tests/test_cmp_android_scoped_storage.c)
-add_executable(cmp_android_vulkan_gles_test tests/test_cmp_android_vulkan_gles.c)
-add_executable(cmp_apple_gestures_test tests/test_cmp_apple_gestures.c)
-target_link_libraries(cmp_a11y_tree_test PRIVATE cmp greatest)
-target_link_libraries(cmp_android_ndk_bridge_test PRIVATE cmp greatest c_cdd)
-target_link_libraries(cmp_android_scoped_storage_test PRIVATE cmp greatest c_cdd)
-target_link_libraries(cmp_android_vulkan_gles_test PRIVATE cmp greatest c_cdd)
-target_link_libraries(cmp_apple_gestures_test PRIVATE cmp greatest c_cdd)
-
-add_executable(cmp_a11y_theme_test tests/test_cmp_a11y_theme.c)
-target_link_libraries(cmp_a11y_theme_test PRIVATE cmp greatest)
-add_test(NAME cmp_a11y_theme_test COMMAND cmp_a11y_theme_test)
-
-add_executable(cmp_screen_reader_test tests/test_cmp_screen_reader.c)
-target_link_libraries(cmp_screen_reader_test PRIVATE cmp greatest)
-
-add_executable(cmp_aria_test tests/test_cmp_aria.c)
-target_link_libraries(cmp_aria_test PRIVATE cmp greatest)
-
-add_executable(cmp_aria_relations_test tests/test_cmp_aria_relations.c)
-target_link_libraries(cmp_aria_relations_test PRIVATE cmp greatest)
-
-add_executable(cmp_aria_live_test tests/test_cmp_aria_live.c)
-target_link_libraries(cmp_aria_live_test PRIVATE cmp greatest)
-
-add_executable(cmp_focus_manager_test tests/test_cmp_focus_manager.c)
-target_link_libraries(cmp_focus_manager_test PRIVATE cmp greatest)
-
-add_executable(cmp_focus_ring_test tests/test_cmp_focus_ring.c)
-target_link_libraries(cmp_focus_ring_test PRIVATE cmp greatest)
-
-add_executable(cmp_a11y_rotor_test tests/test_cmp_a11y_rotor.c)
-target_link_libraries(cmp_a11y_rotor_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_tabs_test tests/test_cmp_ui_tabs.c)
-target_link_libraries(cmp_ui_tabs_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_snackbar_test tests/test_cmp_ui_snackbar.c)
-target_link_libraries(cmp_ui_snackbar_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_skeleton_test tests/test_cmp_ui_skeleton.c)
-target_link_libraries(cmp_ui_skeleton_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_markdown_test tests/test_cmp_ui_markdown.c)
-target_link_libraries(cmp_ui_markdown_test PRIVATE cmp greatest)
-
-add_executable(cmp_ui_dialog_test tests/test_cmp_ui_dialog.c)
-target_link_libraries(cmp_ui_dialog_test PRIVATE cmp greatest)
-
-add_executable(cmp_tree_sitter_test tests/test_cmp_tree_sitter.c)
-target_link_libraries(cmp_tree_sitter_test PRIVATE cmp greatest)
-
-add_executable(cmp_system_theme_test tests/test_cmp_system_theme.c)
-target_link_libraries(cmp_system_theme_test PRIVATE cmp greatest)
-
-add_executable(cmp_toast_notifications_test tests/test_cmp_toast_notifications.c)
-target_link_libraries(cmp_toast_notifications_test PRIVATE cmp greatest)
-
-add_executable(cmp_tab_navigation_test tests/test_cmp_tab_navigation.c)
-target_link_libraries(cmp_tab_navigation_test PRIVATE cmp greatest)
-
-add_executable(cmp_rubber_band_test tests/test_cmp_rubber_band.c)
-target_link_libraries(cmp_rubber_band_test PRIVATE cmp greatest)
-
-add_executable(cmp_power_awareness_test tests/test_cmp_power_awareness.c)
-target_link_libraries(cmp_power_awareness_test PRIVATE cmp greatest)
-
-add_executable(cmp_modality_test tests/test_cmp_modality.c)
-target_link_libraries(cmp_modality_test PRIVATE cmp greatest)
-
-add_executable(cmp_focus_navigation_test tests/test_cmp_focus_navigation.c)
-target_link_libraries(cmp_focus_navigation_test PRIVATE cmp greatest)
-
-add_executable(cmp_file_watcher_test tests/test_cmp_file_watcher.c)
-target_link_libraries(cmp_file_watcher_test PRIVATE cmp greatest)
-
-add_executable(cmp_emscripten_indexeddb_vfs_test tests/test_cmp_emscripten_indexeddb_vfs.c)
-target_link_libraries(cmp_emscripten_indexeddb_vfs_test PRIVATE cmp greatest)
-
-add_executable(cmp_embedded_pty_test tests/test_cmp_embedded_pty.c)
-target_link_libraries(cmp_embedded_pty_test PRIVATE cmp greatest)
-
-add_executable(cmp_dpi_awareness_test tests/test_cmp_dpi_awareness.c)
-target_link_libraries(cmp_dpi_awareness_test PRIVATE cmp greatest)
-
-add_executable(cmp_docking_framework_test tests/test_cmp_docking_framework.c)
-target_link_libraries(cmp_docking_framework_test PRIVATE cmp greatest)
-
-add_executable(cmp_databinding_test tests/test_cmp_databinding.c)
-target_link_libraries(cmp_databinding_test PRIVATE cmp greatest)
-
-add_executable(cmp_custom_chrome_test tests/test_cmp_custom_chrome.c)
-target_link_libraries(cmp_custom_chrome_test PRIVATE cmp greatest)
-
-add_executable(cmp_command_palette_test tests/test_cmp_command_palette.c)
-target_link_libraries(cmp_command_palette_test PRIVATE cmp greatest)
-
-add_executable(cmp_code_block_clipboard_test tests/test_cmp_code_block_clipboard.c)
-target_link_libraries(cmp_code_block_clipboard_test PRIVATE cmp greatest)
-
-add_executable(cmp_code_block_test tests/test_cmp_code_block.c)
-target_link_libraries(cmp_code_block_test PRIVATE cmp greatest)
-
-add_executable(cmp_breadcrumbs_test tests/test_cmp_breadcrumbs.c)
-  target_link_libraries(cmp_breadcrumbs_test PRIVATE cmp greatest)
-  add_executable(cmp_a11y_action_test tests/test_cmp_a11y_action.c)
-target_link_libraries(cmp_a11y_action_test PRIVATE cmp greatest)
-
-add_executable(cmp_auth_sec_test tests/test_cmp_auth_sec.c)
-target_link_libraries(cmp_auth_sec_test PRIVATE cmp greatest)
-add_executable(cmp_permissions_test tests/test_cmp_permissions.c)
-target_link_libraries(cmp_permissions_test PRIVATE cmp greatest)
-add_executable(cmp_promotion_link_test tests/test_cmp_promotion_link.c)
-target_link_libraries(cmp_promotion_link_test PRIVATE cmp greatest)
-add_executable(cmp_spring_animator_test tests/test_cmp_spring_animator.c)
-target_link_libraries(cmp_spring_animator_test PRIVATE cmp greatest)
-add_executable(cmp_system_geometry_test tests/core/test_cmp_system_geometry.c)
-target_link_libraries(cmp_system_geometry_test PRIVATE cmp greatest)
-add_executable(cmp_symbols_test tests/test_cmp_symbols.c)
-target_link_libraries(cmp_symbols_test PRIVATE cmp greatest)
-add_executable(cmp_gamepad_hig_test tests/test_cmp_gamepad_hig.c)
-target_link_libraries(cmp_gamepad_hig_test PRIVATE cmp greatest)
-add_executable(cmp_stylus_test tests/test_cmp_stylus.c)
-target_link_libraries(cmp_stylus_test PRIVATE cmp greatest)
-add_executable(cmp_keyboard_hig_test tests/test_cmp_keyboard_hig.c)
-target_link_libraries(cmp_keyboard_hig_test PRIVATE cmp greatest)
-add_executable(cmp_complex_gesture_hig_test tests/test_cmp_complex_gesture_hig.c)
-target_link_libraries(cmp_complex_gesture_hig_test PRIVATE cmp greatest)
-add_executable(cmp_collections_test tests/test_cmp_collections.c)
-target_link_libraries(cmp_collections_test PRIVATE cmp greatest)
-add_executable(cmp_scroll_view_test tests/test_cmp_scroll_view.c)
-target_link_libraries(cmp_scroll_view_test PRIVATE cmp greatest)
-add_executable(cmp_lists_test tests/test_cmp_lists.c)
-target_link_libraries(cmp_lists_test PRIVATE cmp greatest)
-add_executable(cmp_text_fields_test tests/widgets/test_cmp_text_fields.c)
-target_link_libraries(cmp_text_fields_test PRIVATE cmp greatest)
-add_executable(cmp_inputs_test tests/test_cmp_inputs.c)
-target_link_libraries(cmp_inputs_test PRIVATE cmp greatest)
-add_executable(cmp_menu_test tests/widgets/test_cmp_menu.c)
-target_link_libraries(cmp_menu_test PRIVATE cmp greatest)
-add_executable(cmp_system_button_test tests/widgets/test_cmp_system_button.c)
-target_link_libraries(cmp_system_button_test PRIVATE cmp greatest)
-add_executable(cmp_deep_link_test tests/test_cmp_deep_link.c)
-target_link_libraries(cmp_deep_link_test PRIVATE cmp greatest)
-add_executable(cmp_search_bar_test tests/widgets/test_cmp_search_bar.c)
-target_link_libraries(cmp_search_bar_test PRIVATE cmp greatest)
-add_executable(cmp_tab_bar_test tests/widgets/test_cmp_tab_bar.c)
-target_link_libraries(cmp_tab_bar_test PRIVATE cmp greatest)
-add_executable(cmp_nav_bar_test tests/widgets/test_cmp_nav_bar.c)
-target_link_libraries(cmp_nav_bar_test PRIVATE cmp greatest)
-add_executable(cmp_materials_test tests/test_cmp_materials.c)
-target_link_libraries(cmp_materials_test PRIVATE cmp greatest)
-add_executable(cmp_system_fonts_test tests/test_cmp_system_fonts.c)
-target_link_libraries(cmp_system_fonts_test PRIVATE cmp greatest)
-add_executable(cmp_dynamic_type_test tests/test_cmp_dynamic_type.c)
-target_link_libraries(cmp_dynamic_type_test PRIVATE cmp greatest)
-
-add_executable(cmp_prefers_reduced_motion_test tests/test_cmp_prefers_reduced_motion.c)
-target_link_libraries(cmp_prefers_reduced_motion_test PRIVATE cmp greatest)
-
-add_executable(cmp_a11y_transparency_test tests/test_cmp_a11y_transparency.c)
-target_link_libraries(cmp_a11y_transparency_test PRIVATE cmp greatest)
-
-add_executable(cmp_forced_colors_test tests/test_cmp_forced_colors.c)
-target_link_libraries(cmp_forced_colors_test PRIVATE cmp greatest)
-
-add_executable(cmp_sys_colors_test tests/test_cmp_sys_colors.c)
-target_link_libraries(cmp_sys_colors_test PRIVATE cmp greatest)
-
-add_executable(cmp_compositor_anim_test tests/test_cmp_compositor_anim.c)
-target_link_libraries(cmp_compositor_anim_test PRIVATE cmp greatest)
-
-add_executable(cmp_ipc_test tests/test_cmp_ipc.c)
-target_link_libraries(cmp_ipc_test PRIVATE cmp greatest)
-add_test(NAME cmp_ipc_test COMMAND cmp_ipc_test)
-
-add_executable(cmp_app_region_test tests/test_cmp_app_region.c)
-target_link_libraries(cmp_app_region_test PRIVATE cmp greatest)
-add_executable(cmp_borders_test tests/test_cmp_borders.c)
-target_link_libraries(cmp_borders_test PRIVATE cmp greatest)
-add_executable(cmp_clipboard_test tests/test_cmp_clipboard.c)
-target_link_libraries(cmp_clipboard_test PRIVATE cmp greatest)
-add_executable(cmp_csp_test tests/test_cmp_csp.c)
-target_link_libraries(cmp_csp_test PRIVATE cmp greatest)
-add_executable(cmp_app_store_compliance_test tests/test_cmp_app_store_compliance.c)
-target_link_libraries(cmp_app_store_compliance_test PRIVATE cmp greatest)
-add_executable(cmp_resilience_handling_test tests/test_cmp_resilience_handling.c)
-target_link_libraries(cmp_resilience_handling_test PRIVATE cmp greatest)
-add_executable(cmp_resource_manager_test tests/core/test_cmp_resource_manager.c)
-target_link_libraries(cmp_resource_manager_test PRIVATE cmp greatest)
-add_executable(cmp_documentation_dx_test tests/test_cmp_documentation_dx.c)
-target_link_libraries(cmp_documentation_dx_test PRIVATE cmp greatest)
-add_executable(cmp_developer_experience_test tests/test_cmp_developer_experience.c)
-target_link_libraries(cmp_developer_experience_test PRIVATE cmp greatest)
-add_executable(cmp_profiling_telemetry_test tests/test_cmp_profiling_telemetry.c)
-target_link_libraries(cmp_profiling_telemetry_test PRIVATE cmp greatest)
-add_executable(cmp_testing_automation_test tests/test_cmp_testing_automation.c)
-target_link_libraries(cmp_testing_automation_test PRIVATE cmp greatest)
-add_executable(cmp_interop_swift_test tests/test_cmp_interop_swift.c)
-target_link_libraries(cmp_interop_swift_test PRIVATE cmp greatest)
-add_executable(cmp_carplay_specific_test tests/test_cmp_carplay_specific.c)
-target_link_libraries(cmp_carplay_specific_test PRIVATE cmp greatest)
-add_executable(cmp_visionos_specific_test tests/test_cmp_visionos_specific.c)
-target_link_libraries(cmp_visionos_specific_test PRIVATE cmp greatest)
-add_executable(cmp_tvos_specific_test tests/test_cmp_tvos_specific.c)
-target_link_libraries(cmp_tvos_specific_test PRIVATE cmp greatest)
-add_executable(cmp_watchos_specific_test tests/test_cmp_watchos_specific.c)
-target_link_libraries(cmp_watchos_specific_test PRIVATE cmp greatest)
-add_executable(cmp_macos_specific_test tests/test_cmp_macos_specific.c)
-target_link_libraries(cmp_macos_specific_test PRIVATE cmp greatest)
-add_executable(cmp_ipados_specific_test tests/test_cmp_ipados_specific.c)
-target_link_libraries(cmp_ipados_specific_test PRIVATE cmp greatest)
-add_executable(cmp_ios_specific_test tests/test_cmp_ios_specific.c)
-target_link_libraries(cmp_ios_specific_test PRIVATE cmp greatest)
-add_executable(cmp_transactions_hig_test tests/test_cmp_transactions_hig.c)
-target_link_libraries(cmp_transactions_hig_test PRIVATE cmp greatest)
-add_executable(cmp_media_avkit_test tests/test_cmp_media_avkit.c)
-target_link_libraries(cmp_media_avkit_test PRIVATE cmp greatest)
-add_executable(cmp_os_communications_test tests/test_cmp_os_communications.c)
-target_link_libraries(cmp_os_communications_test PRIVATE cmp greatest)
-add_executable(cmp_extensions_test tests/test_cmp_extensions.c)
-target_link_libraries(cmp_extensions_test PRIVATE cmp greatest)
-add_executable(cmp_dnd_test tests/test_cmp_dnd.c)
-target_link_libraries(cmp_dnd_test PRIVATE cmp greatest)
-add_executable(cmp_flex_align_test tests/test_cmp_flex_align.c)
-target_link_libraries(cmp_flex_align_test PRIVATE cmp greatest)
-add_executable(cmp_flow_test tests/test_cmp_flow.c)
-target_link_libraries(cmp_flow_test PRIVATE cmp greatest)
-add_executable(cmp_grid_test tests/test_cmp_grid.c)
-target_link_libraries(cmp_grid_test PRIVATE cmp greatest)
-add_executable(cmp_haptics_test tests/test_cmp_haptics.c)
-target_link_libraries(cmp_haptics_test PRIVATE cmp greatest)
-add_executable(cmp_i18n_formatting_test tests/test_cmp_i18n_formatting.c)
-target_link_libraries(cmp_i18n_formatting_test PRIVATE cmp greatest)
-add_executable(cmp_i18n_test tests/test_cmp_i18n.c)
-target_link_libraries(cmp_i18n_test PRIVATE cmp greatest)
-add_executable(cmp_media_query_test tests/test_cmp_media_query.c)
-target_link_libraries(cmp_media_query_test PRIVATE cmp greatest)
-add_executable(cmp_native_dialog_test tests/test_cmp_native_dialog.c)
-target_link_libraries(cmp_native_dialog_test PRIVATE cmp greatest)
-add_executable(cmp_network_test tests/test_cmp_network.c)
-target_link_libraries(cmp_network_test PRIVATE cmp greatest)
-add_executable(cmp_pip_test tests/test_cmp_pip.c)
-target_link_libraries(cmp_pip_test PRIVATE cmp greatest)
-add_executable(cmp_position_test tests/test_cmp_position.c)
-target_link_libraries(cmp_position_test PRIVATE cmp greatest)
-add_executable(cmp_prefers_color_scheme_test tests/test_cmp_prefers_color_scheme.c)
-target_link_libraries(cmp_prefers_color_scheme_test PRIVATE cmp greatest)
-add_executable(cmp_print_ctx_test tests/test_cmp_print_ctx.c)
-target_link_libraries(cmp_print_ctx_test PRIVATE cmp greatest)
-add_executable(cmp_safe_areas_test tests/test_cmp_safe_areas.c)
-target_link_libraries(cmp_safe_areas_test PRIVATE cmp greatest)
-add_executable(cmp_system_menu_test tests/test_cmp_system_menu.c)
-target_link_libraries(cmp_system_menu_test PRIVATE cmp greatest)
-add_executable(cmp_titlebar_env_test tests/test_cmp_titlebar_env.c)
-target_link_libraries(cmp_titlebar_env_test PRIVATE cmp greatest)
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    add_executable(cmp_visuals_test tests/test_cmp_visuals.c)
-    target_link_libraries(cmp_visuals_test PRIVATE cmp greatest)
-    add_test(NAME cmp_visuals_test COMMAND cmp_visuals_test)
-endif()
-add_executable(cmp_background_blur_test tests/test_cmp_background_blur.c)
-target_link_libraries(cmp_background_blur_test PRIVATE cmp greatest)
-add_test(NAME cmp_background_blur_test COMMAND cmp_background_blur_test)
-
-add_executable(cmp_window_blur_test tests/test_cmp_window_blur.c)
-target_link_libraries(cmp_window_blur_test PRIVATE cmp greatest)
-
-# Amalgamation script hook
-add_custom_target(amalgamate
-    COMMAND ${CMAKE_COMMAND} -E echo "Generating cmp.h and cmp.c amalgamation..."
-    COMMAND ${CMAKE_COMMAND} -E env python3 "${CMAKE_CURRENT_SOURCE_DIR}/tools/amalgamate.py"
-    COMMENT "Building single-header/single-source release..."
-)
-
-add_executable(cmp_hardware_accel_test tests/test_cmp_hardware_accel.c)
-target_link_libraries(cmp_hardware_accel_test PRIVATE cmp greatest)
-add_test(NAME cmp_hardware_accel_test COMMAND cmp_hardware_accel_test)
-add_executable(cmp_input_layout_test tests/test_cmp_input_layout.c)
-target_link_libraries(cmp_input_layout_test PRIVATE cmp greatest)
-add_test(NAME cmp_input_layout_test COMMAND cmp_input_layout_test)
-add_executable(cmp_ios_background_refresh_test tests/test_cmp_ios_background_refresh.c)
-target_link_libraries(cmp_ios_background_refresh_test PRIVATE cmp greatest)
-add_test(NAME cmp_ios_background_refresh_test COMMAND cmp_ios_background_refresh_test)
-add_executable(cmp_ipados_multitasking_test tests/test_cmp_ipados_multitasking.c)
-target_link_libraries(cmp_ipados_multitasking_test PRIVATE cmp greatest)
-add_test(NAME cmp_ipados_multitasking_test COMMAND cmp_ipados_multitasking_test)
-add_executable(cmp_kbd_avoid_test tests/test_cmp_kbd_avoid.c)
-target_link_libraries(cmp_kbd_avoid_test PRIVATE cmp greatest)
-add_test(NAME cmp_kbd_avoid_test COMMAND cmp_kbd_avoid_test)
-add_executable(cmp_markdown_parser_test tests/test_cmp_markdown_parser.c)
-target_link_libraries(cmp_markdown_parser_test PRIVATE cmp greatest)
-add_test(NAME cmp_markdown_parser_test COMMAND cmp_markdown_parser_test)
-add_executable(cmp_mermaid_renderer_test tests/test_cmp_mermaid_renderer.c)
-target_link_libraries(cmp_mermaid_renderer_test PRIVATE cmp greatest)
-add_test(NAME cmp_mermaid_renderer_test COMMAND cmp_mermaid_renderer_test)
-add_executable(cmp_minimap_test tests/test_cmp_minimap.c)
-target_link_libraries(cmp_minimap_test PRIVATE cmp greatest)
-add_test(NAME cmp_minimap_test COMMAND cmp_minimap_test)
-add_executable(cmp_mmap_test tests/test_cmp_mmap.c)
-target_link_libraries(cmp_mmap_test PRIVATE cmp greatest)
-add_test(NAME cmp_mmap_test COMMAND cmp_mmap_test)
-add_executable(cmp_multi_window_test tests/test_cmp_multi_window.c)
-target_link_libraries(cmp_multi_window_test PRIVATE cmp greatest)
-add_test(NAME cmp_multi_window_test COMMAND cmp_multi_window_test)
-add_executable(cmp_os_integration_test tests/test_cmp_os_integration.c)
-target_link_libraries(cmp_os_integration_test PRIVATE cmp greatest)
-add_test(NAME cmp_os_integration_test COMMAND cmp_os_integration_test)
-add_executable(cmp_os_media_notifications_test tests/test_cmp_os_media_notifications.c)
-target_link_libraries(cmp_os_media_notifications_test PRIVATE cmp greatest)
-add_test(NAME cmp_os_media_notifications_test COMMAND cmp_os_media_notifications_test)
-add_executable(cmp_os_scrollbars_test tests/test_cmp_os_scrollbars.c)
-target_link_libraries(cmp_os_scrollbars_test PRIVATE cmp greatest)
-add_test(NAME cmp_os_scrollbars_test COMMAND cmp_os_scrollbars_test)
-add_executable(cmp_overscroll_test tests/test_cmp_overscroll.c)
-target_link_libraries(cmp_overscroll_test PRIVATE cmp greatest)
-add_test(NAME cmp_overscroll_test COMMAND cmp_overscroll_test)
-enable_testing()
-if(CYGWIN)
-    set(SEP ":")
-else()
-    set(SEP "\\;")
-endif()
-if(CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    set(TEST_ENV_VARS "PATH=$<TARGET_FILE_DIR:cmp>${SEP}$<TARGET_FILE_DIR:cfs>${SEP}$<TARGET_FILE_DIR:c_str_span>${SEP}$<TARGET_FILE_DIR:c89stringutils>${SEP}$<TARGET_FILE_DIR:parson>${SEP}$<TARGET_FILE_DIR:c_cdd>${SEP}${CMAKE_BINARY_DIR}/bin/$<CONFIG>${SEP}$ENV{PATH}")
-else()
-    set(TEST_ENV_VARS "PATH=$<TARGET_FILE_DIR:cmp>${SEP}$<TARGET_FILE_DIR:c-orm>${SEP}$<TARGET_FILE_DIR:c-abstract-http>${SEP}$<TARGET_FILE_DIR:cfs>${SEP}$<TARGET_FILE_DIR:c_str_span>${SEP}$<TARGET_FILE_DIR:c89stringutils>${SEP}$<TARGET_FILE_DIR:parson>${SEP}$<TARGET_FILE_DIR:c_cdd>${SEP}${CMAKE_BINARY_DIR}/bin/$<CONFIG>${SEP}$ENV{PATH}")
-endif()
-add_test(NAME cmp_test COMMAND cmp_test)
-add_test(NAME cmp_string_test COMMAND cmp_string_test)
-add_test(NAME cmp_tls_test COMMAND cmp_tls_test)
-add_test(NAME cmp_ring_buffer_test COMMAND cmp_ring_buffer_test)
-add_test(NAME cmp_modality_sync_single_test COMMAND cmp_modality_sync_single_test)
-add_test(NAME cmp_modality_sync_multi_test COMMAND cmp_modality_sync_multi_test)
-add_test(NAME cmp_modality_async_single_test COMMAND cmp_modality_async_single_test)
-add_test(NAME cmp_sync_test COMMAND cmp_sync_test)
-add_test(NAME cmp_coroutine_test COMMAND cmp_coroutine_test)
-add_test(NAME cmp_timer_test COMMAND cmp_timer_test)
-add_test(NAME cmp_vfs_test COMMAND cmp_vfs_test)
-add_test(NAME cmp_http_test COMMAND cmp_http_test)
-add_test(NAME cmp_window_test COMMAND cmp_window_test)
-add_test(NAME cmp_window_manager_test COMMAND cmp_window_manager_test)
-add_test(NAME cmp_dpi_test COMMAND cmp_dpi_test)
-add_test(NAME cmp_event_test COMMAND cmp_event_test)
-add_test(NAME cmp_router_test COMMAND cmp_router_test)
-add_test(NAME cmp_layout_test COMMAND cmp_layout_test)
-
-add_test(NAME cmp_ui_m3_buttons_test COMMAND cmp_ui_m3_buttons_test)
-add_test(NAME cmp_ui_m3_communication_test COMMAND cmp_ui_m3_communication_test)
-add_test(NAME cmp_ui_m3_containment_test COMMAND cmp_ui_m3_containment_test)
-add_test(NAME cmp_ui_m3_navigation_test COMMAND cmp_ui_m3_navigation_test)
-add_test(NAME cmp_ui_m3_selection_input_test COMMAND cmp_ui_m3_selection_input_test)
-add_test(NAME cmp_svg_test COMMAND cmp_svg_test)
-add_test(NAME cmp_gpu_test COMMAND cmp_gpu_test)
-
-  add_test(NAME cmp_command_buffer_test COMMAND cmp_command_buffer_test)
-  add_test(NAME cmp_render_graph_test COMMAND cmp_render_graph_test)
-  add_test(NAME cmp_pso_cache_test COMMAND cmp_pso_cache_test)
-  add_test(NAME cmp_gpu_allocator_test COMMAND cmp_gpu_allocator_test)
-
-add_test(NAME cmp_shader_test COMMAND cmp_shader_test)
-add_test(NAME cmp_shader_cache_test COMMAND cmp_shader_cache_test)
-add_test(NAME cmp_msaa_test COMMAND cmp_msaa_test)
-add_test(NAME cmp_compositor_thread_test COMMAND cmp_compositor_thread_test)
-add_test(NAME cmp_apz_test COMMAND cmp_apz_test)
-add_test(NAME cmp_fluent_test COMMAND cmp_fluent_test)
-add_test(NAME cmp_ink_ripple_test COMMAND cmp_ink_ripple_test)
-add_test(NAME cmp_lottie_test COMMAND cmp_lottie_test cmp_hardware_accel_test cmp_input_layout_test cmp_ios_background_refresh_test cmp_ipados_multitasking_test cmp_kbd_avoid_test cmp_markdown_parser_test cmp_mermaid_renderer_test cmp_minimap_test cmp_android_ndk_bridge_test cmp_android_scoped_storage_test cmp_android_vulkan_gles_test cmp_apple_gestures_test)
-add_test(NAME cmp_linear_blend_test COMMAND cmp_linear_blend_test)
-add_test(NAME cmp_tex_compression_test COMMAND cmp_tex_compression_test)
-add_test(NAME cmp_icc_profile_test COMMAND cmp_icc_profile_test)
-add_test(NAME cmp_mipmap_test COMMAND cmp_mipmap_test)
-add_test(NAME cmp_swapchain_test COMMAND cmp_swapchain_test)
-add_test(NAME cmp_overdraw_test COMMAND cmp_overdraw_test)
-add_test(NAME cmp_layer_tiling_test COMMAND cmp_layer_tiling_test)
-add_test(NAME cmp_hit_test_test COMMAND cmp_hit_test_test)
-add_test(NAME cmp_pointer_events_test COMMAND cmp_pointer_events_test)
-add_test(NAME cmp_event_bubbling_test COMMAND cmp_event_bubbling_test)
-add_test(NAME cmp_passive_event_test COMMAND cmp_passive_event_test)
-add_test(NAME cmp_pointer_capture_test COMMAND cmp_pointer_capture_test)
-add_test(NAME cmp_gesture_test COMMAND cmp_gesture_test)
-add_test(NAME cmp_complex_gesture_test COMMAND cmp_complex_gesture_test)
-add_test(NAME cmp_pointer_pressure_test COMMAND cmp_pointer_pressure_test)
-add_test(NAME cmp_touch_action_test COMMAND cmp_touch_action_test)
-add_test(NAME cmp_context_menu_test COMMAND cmp_context_menu_test)
-add_test(NAME cmp_hover_intent_test COMMAND cmp_hover_intent_test)
-add_test(NAME cmp_scroll_ctx_test COMMAND cmp_scroll_ctx_test)
-add_test(NAME cmp_scroll_velocity_test COMMAND cmp_scroll_velocity_test)
-add_test(NAME cmp_kinematics_test COMMAND cmp_kinematics_test)
-add_test(NAME cmp_scrollbar_gutter_test COMMAND cmp_scrollbar_gutter_test)
-add_test(NAME cmp_scroll_anchor_test COMMAND cmp_scroll_anchor_test)
-add_test(NAME cmp_secure_network_test COMMAND cmp_secure_network_test)
-add_test(NAME cmp_ptr_test COMMAND cmp_ptr_test)
-add_test(NAME cmp_tick_test COMMAND cmp_tick_test)
-add_test(NAME cmp_dt_test COMMAND cmp_dt_test)
-add_test(NAME cmp_transition_test COMMAND cmp_transition_test)
-add_test(NAME cmp_keyframe_test COMMAND cmp_keyframe_test)
-add_test(NAME cmp_anim_compose_test COMMAND cmp_anim_compose_test)
-add_test(NAME cmp_spring_ease_test COMMAND cmp_spring_ease_test)
-add_test(NAME cmp_bezier_ease_test COMMAND cmp_bezier_ease_test)
-add_test(NAME cmp_step_ease_test COMMAND cmp_step_ease_test)
-add_test(NAME cmp_motion_path_test COMMAND cmp_motion_path_test)
-add_test(NAME cmp_scroll_timeline_test COMMAND cmp_scroll_timeline_test)
-add_test(NAME cmp_view_transition_test COMMAND cmp_view_transition_test)
-add_test(NAME cmp_vt_shared_test COMMAND cmp_vt_shared_test)
-add_test(NAME cmp_discrete_transition_test COMMAND cmp_discrete_transition_test)
-add_test(NAME cmp_flip_test COMMAND cmp_flip_test)
-add_test(NAME cmp_form_controls_test COMMAND cmp_form_controls_test)
-add_test(NAME cmp_validation_test COMMAND cmp_validation_test)
-add_test(NAME cmp_input_mask_test COMMAND cmp_input_mask_test)
-add_test(NAME cmp_indeterminate_test COMMAND cmp_indeterminate_test)
-add_test(NAME cmp_select_ui_test COMMAND cmp_select_ui_test)
-add_test(NAME cmp_datalist_test COMMAND cmp_datalist_test)
-add_test(NAME cmp_range_slider_test COMMAND cmp_range_slider_test)
-add_test(NAME cmp_color_picker_test COMMAND cmp_color_picker_test)
-add_test(NAME cmp_date_picker_test COMMAND cmp_date_picker_test)
-add_test(NAME cmp_caret_test COMMAND cmp_caret_test)
-add_test(NAME cmp_selection_test COMMAND cmp_selection_test)
-add_test(NAME cmp_editable_test COMMAND cmp_editable_test)
-add_test(NAME cmp_ime_test COMMAND cmp_ime_test)
-add_test(NAME cmp_spellcheck_test COMMAND cmp_spellcheck_test)
-add_test(NAME cmp_undo_redo_test COMMAND cmp_undo_redo_test)
-add_test(NAME cmp_a11y_tree_test COMMAND cmp_a11y_tree_test)
-add_test(NAME cmp_android_ndk_bridge_test COMMAND cmp_android_ndk_bridge_test)
-add_test(NAME cmp_android_scoped_storage_test COMMAND cmp_android_scoped_storage_test)
-add_test(NAME cmp_android_vulkan_gles_test COMMAND cmp_android_vulkan_gles_test)
-add_test(NAME cmp_apple_gestures_test COMMAND cmp_apple_gestures_test)
-add_test(NAME cmp_screen_reader_test COMMAND cmp_screen_reader_test)
-add_test(NAME cmp_aria_test COMMAND cmp_aria_test)
-add_test(NAME cmp_aria_relations_test COMMAND cmp_aria_relations_test)
-add_test(NAME cmp_aria_live_test COMMAND cmp_aria_live_test)
-add_test(NAME cmp_focus_manager_test COMMAND cmp_focus_manager_test)
-add_test(NAME cmp_focus_ring_test COMMAND cmp_focus_ring_test)
-add_test(NAME cmp_a11y_rotor_test COMMAND cmp_a11y_rotor_test)
-add_test(NAME cmp_ui_tabs_test COMMAND cmp_ui_tabs_test)
-add_test(NAME cmp_ui_snackbar_test COMMAND cmp_ui_snackbar_test)
-add_test(NAME cmp_ui_skeleton_test COMMAND cmp_ui_skeleton_test)
-add_test(NAME cmp_ui_markdown_test COMMAND cmp_ui_markdown_test)
-add_test(NAME cmp_ui_dialog_test COMMAND cmp_ui_dialog_test)
-add_test(NAME cmp_tree_sitter_test COMMAND cmp_tree_sitter_test)
-add_test(NAME cmp_system_theme_test COMMAND cmp_system_theme_test)
-add_test(NAME cmp_toast_notifications_test COMMAND cmp_toast_notifications_test)
-add_test(NAME cmp_tab_navigation_test COMMAND cmp_tab_navigation_test)
-add_test(NAME cmp_rubber_band_test COMMAND cmp_rubber_band_test)
-add_test(NAME cmp_power_awareness_test COMMAND cmp_power_awareness_test)
-add_test(NAME cmp_modality_test COMMAND cmp_modality_test)
-add_test(NAME cmp_focus_navigation_test COMMAND cmp_focus_navigation_test)
-add_test(NAME cmp_file_watcher_test COMMAND cmp_file_watcher_test)
-add_test(NAME cmp_emscripten_indexeddb_vfs_test COMMAND cmp_emscripten_indexeddb_vfs_test)
-add_test(NAME cmp_embedded_pty_test COMMAND cmp_embedded_pty_test)
-add_test(NAME cmp_dpi_awareness_test COMMAND cmp_dpi_awareness_test)
-add_test(NAME cmp_docking_framework_test COMMAND cmp_docking_framework_test)
-add_test(NAME cmp_databinding_test COMMAND cmp_databinding_test)
-add_test(NAME cmp_custom_chrome_test COMMAND cmp_custom_chrome_test)
-add_test(NAME cmp_command_palette_test COMMAND cmp_command_palette_test)
-add_test(NAME cmp_code_block_clipboard_test COMMAND cmp_code_block_clipboard_test)
-add_test(NAME cmp_code_block_test COMMAND cmp_code_block_test)
-add_test(NAME cmp_breadcrumbs_test COMMAND cmp_breadcrumbs_test)
-  add_test(NAME cmp_a11y_action_test COMMAND cmp_a11y_action_test)
-add_test(NAME cmp_auth_sec_test COMMAND cmp_auth_sec_test)
-add_test(NAME cmp_permissions_test COMMAND cmp_permissions_test)
-add_test(NAME cmp_promotion_link_test COMMAND cmp_promotion_link_test)
-add_test(NAME cmp_spring_animator_test COMMAND cmp_spring_animator_test)
-add_test(NAME cmp_system_geometry_test COMMAND cmp_system_geometry_test)
-add_test(NAME cmp_symbols_test COMMAND cmp_symbols_test)
-add_test(NAME cmp_gamepad_hig_test COMMAND cmp_gamepad_hig_test)
-add_test(NAME cmp_stylus_test COMMAND cmp_stylus_test)
-add_test(NAME cmp_keyboard_hig_test COMMAND cmp_keyboard_hig_test)
-add_test(NAME cmp_complex_gesture_hig_test COMMAND cmp_complex_gesture_hig_test)
-add_test(NAME cmp_collections_test COMMAND cmp_collections_test)
-add_test(NAME cmp_scroll_view_test COMMAND cmp_scroll_view_test)
-add_test(NAME cmp_lists_test COMMAND cmp_lists_test)
-add_test(NAME cmp_text_fields_test COMMAND cmp_text_fields_test)
-add_test(NAME cmp_inputs_test COMMAND cmp_inputs_test)
-add_test(NAME cmp_menu_test COMMAND cmp_menu_test)
-add_test(NAME cmp_system_button_test COMMAND cmp_system_button_test)
-add_test(NAME cmp_deep_link_test COMMAND cmp_deep_link_test)
-add_test(NAME cmp_search_bar_test COMMAND cmp_search_bar_test)
-add_test(NAME cmp_tab_bar_test COMMAND cmp_tab_bar_test)
-add_test(NAME cmp_nav_bar_test COMMAND cmp_nav_bar_test)
-add_test(NAME cmp_materials_test COMMAND cmp_materials_test)
-add_test(NAME cmp_system_fonts_test COMMAND cmp_system_fonts_test)
-add_test(NAME cmp_dynamic_type_test COMMAND cmp_dynamic_type_test)
-add_test(NAME cmp_prefers_reduced_motion_test COMMAND cmp_prefers_reduced_motion_test)
-add_test(NAME cmp_a11y_transparency_test COMMAND cmp_a11y_transparency_test)
-add_test(NAME cmp_forced_colors_test COMMAND cmp_forced_colors_test)
-add_test(NAME cmp_sys_colors_test COMMAND cmp_sys_colors_test)
-add_test(NAME cmp_compositor_anim_test COMMAND cmp_compositor_anim_test)
-add_test(NAME cmp_app_region_test COMMAND cmp_app_region_test)
-add_test(NAME cmp_borders_test COMMAND cmp_borders_test)
-add_test(NAME cmp_clipboard_test COMMAND cmp_clipboard_test)
-add_test(NAME cmp_csp_test COMMAND cmp_csp_test)
-add_test(NAME cmp_app_store_compliance_test COMMAND cmp_app_store_compliance_test)
-add_test(NAME cmp_resilience_handling_test COMMAND cmp_resilience_handling_test)
-add_test(NAME cmp_resource_manager_test COMMAND cmp_resource_manager_test)
-add_test(NAME cmp_documentation_dx_test COMMAND cmp_documentation_dx_test)
-add_test(NAME cmp_developer_experience_test COMMAND cmp_developer_experience_test)
-add_test(NAME cmp_profiling_telemetry_test COMMAND cmp_profiling_telemetry_test)
-add_test(NAME cmp_testing_automation_test COMMAND cmp_testing_automation_test)
-add_test(NAME cmp_interop_swift_test COMMAND cmp_interop_swift_test)
-add_test(NAME cmp_carplay_specific_test COMMAND cmp_carplay_specific_test)
-add_test(NAME cmp_visionos_specific_test COMMAND cmp_visionos_specific_test)
-add_test(NAME cmp_tvos_specific_test COMMAND cmp_tvos_specific_test)
-add_test(NAME cmp_watchos_specific_test COMMAND cmp_watchos_specific_test)
-add_test(NAME cmp_macos_specific_test COMMAND cmp_macos_specific_test)
-add_test(NAME cmp_ipados_specific_test COMMAND cmp_ipados_specific_test)
-add_test(NAME cmp_ios_specific_test COMMAND cmp_ios_specific_test)
-add_test(NAME cmp_transactions_hig_test COMMAND cmp_transactions_hig_test)
-add_test(NAME cmp_media_avkit_test COMMAND cmp_media_avkit_test)
-add_test(NAME cmp_os_communications_test COMMAND cmp_os_communications_test)
-add_test(NAME cmp_extensions_test COMMAND cmp_extensions_test)
-add_test(NAME cmp_dnd_test COMMAND cmp_dnd_test)
-add_test(NAME cmp_flex_align_test COMMAND cmp_flex_align_test)
-add_test(NAME cmp_flow_test COMMAND cmp_flow_test)
-add_test(NAME cmp_grid_test COMMAND cmp_grid_test)
-add_test(NAME cmp_haptics_test COMMAND cmp_haptics_test)
-add_test(NAME cmp_i18n_formatting_test COMMAND cmp_i18n_formatting_test)
-add_test(NAME cmp_i18n_test COMMAND cmp_i18n_test)
-add_test(NAME cmp_media_query_test COMMAND cmp_media_query_test)
-add_test(NAME cmp_native_dialog_test COMMAND cmp_native_dialog_test)
-add_test(NAME cmp_network_test COMMAND cmp_network_test)
-add_test(NAME cmp_pip_test COMMAND cmp_pip_test)
-add_test(NAME cmp_position_test COMMAND cmp_position_test)
-add_test(NAME cmp_prefers_color_scheme_test COMMAND cmp_prefers_color_scheme_test)
-add_test(NAME cmp_print_ctx_test COMMAND cmp_print_ctx_test)
-add_test(NAME cmp_safe_areas_test COMMAND cmp_safe_areas_test)
-add_test(NAME cmp_system_menu_test COMMAND cmp_system_menu_test)
-add_test(NAME cmp_titlebar_env_test COMMAND cmp_titlebar_env_test)
-add_test(NAME cmp_window_blur_test COMMAND cmp_window_blur_test)
-add_test(NAME cmp_plugin_loader_test COMMAND cmp_plugin_loader_test)
-add_test(NAME cmp_credential_manager_test COMMAND cmp_credential_manager_test)
-add_test(NAME cmp_global_hotkey_test COMMAND cmp_global_hotkey_test)
-add_test(NAME cmp_pty_test COMMAND cmp_pty_test)
-add_test(NAME cmp_regex_test COMMAND cmp_regex_test)
-add_test(NAME cmp_sse_parser_test COMMAND cmp_sse_parser_test)
-add_test(NAME cmp_error_test COMMAND cmp_error_test)
-add_test(NAME cmp_error_test_crash COMMAND cmp_error_test --crash)
-add_test(NAME cmp_state_layers_test COMMAND cmp_state_layers_test)
-add_test(NAME cmp_status_bar_test COMMAND cmp_status_bar_test)
-
-# Added new f2 tests
-add_executable(cmp_image_preview_test tests/test_cmp_image_preview.c)
-target_link_libraries(cmp_image_preview_test PRIVATE cmp greatest)
-add_test(NAME cmp_image_preview_test COMMAND cmp_image_preview_test)
-
-add_executable(cmp_math_renderer_test tests/test_cmp_math_renderer.c)
-target_link_libraries(cmp_math_renderer_test PRIVATE cmp greatest)
-add_test(NAME cmp_math_renderer_test COMMAND cmp_math_renderer_test)
-
-add_executable(cmp_syntax_highlight_test tests/test_cmp_syntax_highlight.c)
-target_link_libraries(cmp_syntax_highlight_test PRIVATE cmp greatest)
-add_test(NAME cmp_syntax_highlight_test COMMAND cmp_syntax_highlight_test)
-
-add_executable(cmp_f2_a11y_test tests/themes/test_cmp_f2_a11y.c)
-target_link_libraries(cmp_f2_a11y_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_a11y_test COMMAND cmp_f2_a11y_test)
-add_executable(cmp_f2_button_test tests/themes/test_cmp_f2_button.c)
-target_link_libraries(cmp_f2_button_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_button_test COMMAND cmp_f2_button_test)
-add_executable(cmp_f2_data_display_test tests/themes/test_cmp_f2_data_display.c)
-target_link_libraries(cmp_f2_data_display_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_data_display_test COMMAND cmp_f2_data_display_test)
-add_executable(cmp_f2_dropdowns_test tests/themes/test_cmp_f2_dropdowns.c)
-target_link_libraries(cmp_f2_dropdowns_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_dropdowns_test COMMAND cmp_f2_dropdowns_test)
-add_executable(cmp_f2_icons_test tests/themes/test_cmp_f2_icons.c)
-target_link_libraries(cmp_f2_icons_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_icons_test COMMAND cmp_f2_icons_test)
-add_executable(cmp_f2_inputs_test tests/themes/test_cmp_f2_inputs.c)
-target_link_libraries(cmp_f2_inputs_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_inputs_test COMMAND cmp_f2_inputs_test)
-add_executable(cmp_f2_layout_test tests/themes/test_cmp_f2_layout.c)
-target_link_libraries(cmp_f2_layout_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_layout_test COMMAND cmp_f2_layout_test)
-add_executable(cmp_f2_menus_test tests/themes/test_cmp_f2_menus.c)
-target_link_libraries(cmp_f2_menus_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_menus_test COMMAND cmp_f2_menus_test)
-add_executable(cmp_f2_overlays_test tests/themes/test_cmp_f2_overlays.c)
-target_link_libraries(cmp_f2_overlays_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_overlays_test COMMAND cmp_f2_overlays_test)
-add_executable(cmp_f2_profiling_test tests/themes/test_cmp_f2_profiling.c)
-target_link_libraries(cmp_f2_profiling_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_profiling_test COMMAND cmp_f2_profiling_test)
-add_executable(cmp_f2_surfaces_test tests/themes/test_cmp_f2_surfaces.c)
-target_link_libraries(cmp_f2_surfaces_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_surfaces_test COMMAND cmp_f2_surfaces_test)
-add_executable(cmp_f2_text_inputs_test tests/themes/test_cmp_f2_text_inputs.c)
-target_link_libraries(cmp_f2_text_inputs_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_text_inputs_test COMMAND cmp_f2_text_inputs_test)
-add_executable(cmp_f2_theme_test tests/themes/test_cmp_f2_theme.c)
-target_link_libraries(cmp_f2_theme_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_theme_test COMMAND cmp_f2_theme_test)
-add_executable(cmp_f2_visual_regression_test tests/themes/test_cmp_f2_visual_regression.c)
-target_link_libraries(cmp_f2_visual_regression_test PRIVATE cmp greatest)
-add_test(NAME cmp_f2_visual_regression_test COMMAND cmp_f2_visual_regression_test)
-
-add_executable(cmp_cupertino_visual_regression_test tests/themes/test_cmp_cupertino_visual_regression.c)
-target_link_libraries(cmp_cupertino_visual_regression_test PRIVATE cmp greatest)
-add_test(NAME cmp_cupertino_visual_regression_test COMMAND cmp_cupertino_visual_regression_test)
-
-add_executable(cmp_material3_visual_regression_test tests/themes/test_cmp_material3_visual_regression.c)
-target_link_libraries(cmp_material3_visual_regression_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_visual_regression_test COMMAND cmp_material3_visual_regression_test)
-
-add_executable(cmp_material3_color_test tests/themes/test_cmp_material3_color.c)
-target_link_libraries(cmp_material3_color_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_color_test COMMAND cmp_material3_color_test)
-
-add_executable(cmp_vfs_theme_test tests/themes/test_cmp_vfs_theme.c)
-target_link_libraries(cmp_vfs_theme_test PRIVATE cmp greatest)
-add_test(NAME cmp_vfs_theme_test COMMAND cmp_vfs_theme_test)
-
-add_executable(cmp_material3_sys_test tests/themes/test_cmp_material3_sys.c)
-target_link_libraries(cmp_material3_sys_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_sys_test COMMAND cmp_material3_sys_test)
-
-add_executable(cmp_material3_layout_test tests/themes/test_cmp_material3_layout.c)
-target_link_libraries(cmp_material3_layout_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_layout_test COMMAND cmp_material3_layout_test)
-
-add_executable(cmp_material3_components_test tests/themes/test_cmp_material3_components.c)
-target_link_libraries(cmp_material3_components_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_components_test COMMAND cmp_material3_components_test)
-
-add_executable(cmp_material3_text_inputs_test tests/themes/test_cmp_material3_text_inputs.c)
-target_link_libraries(cmp_material3_text_inputs_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_text_inputs_test COMMAND cmp_material3_text_inputs_test)
-
-add_executable(cmp_material3_information_test tests/themes/test_cmp_material3_information.c)
-target_link_libraries(cmp_material3_information_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_information_test COMMAND cmp_material3_information_test)
-
-add_executable(cmp_material3_pickers_menus_test tests/themes/test_cmp_material3_pickers_menus.c)
-target_link_libraries(cmp_material3_pickers_menus_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_pickers_menus_test COMMAND cmp_material3_pickers_menus_test)
-
-
-add_executable(cmp_cupertino_test tests/themes/test_cmp_cupertino.c)
-target_link_libraries(cmp_cupertino_test PRIVATE cmp greatest)
-add_test(NAME cmp_cupertino_test COMMAND cmp_cupertino_test)
-
-add_executable(cmp_fluent2_stubs_test tests/themes/test_cmp_fluent2.c)
-target_link_libraries(cmp_fluent2_stubs_test PRIVATE cmp greatest)
-add_test(NAME cmp_fluent2_stubs_test COMMAND cmp_fluent2_stubs_test)
-
-add_executable(cmp_material3_stubs_test tests/themes/test_cmp_material3_stubs.c)
-target_link_libraries(cmp_material3_stubs_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_stubs_test COMMAND cmp_material3_stubs_test)
-
-add_executable(cmp_unstyled_stubs_test tests/themes/test_cmp_unstyled.c)
-target_link_libraries(cmp_unstyled_stubs_test PRIVATE cmp greatest)
-add_test(NAME cmp_unstyled_stubs_test COMMAND cmp_unstyled_stubs_test)
-
-add_executable(cmp_sandbox_exec_test tests/test_cmp_sandbox_exec.c)
-target_link_libraries(cmp_sandbox_exec_test PRIVATE cmp greatest)
-add_test(NAME cmp_sandbox_exec_test COMMAND cmp_sandbox_exec_test)
-
-add_executable(cmp_screen_capture_test tests/test_cmp_screen_capture.c)
-target_link_libraries(cmp_screen_capture_test PRIVATE cmp greatest)
-add_test(NAME cmp_screen_capture_test COMMAND cmp_screen_capture_test)
-
-add_executable(cmp_theme_dispatch_test tests/themes/test_cmp_theme_dispatch.c)
-target_link_libraries(cmp_theme_dispatch_test PRIVATE cmp greatest)
-
-
-add_executable(cmp_material3_typography_test tests/themes/test_cmp_material3_typography.c)
-target_link_libraries(cmp_material3_typography_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_typography_test COMMAND cmp_material3_typography_test)
-
-add_executable(cmp_material3_test tests/themes/test_cmp_material3.c)
-target_link_libraries(cmp_material3_test PRIVATE cmp greatest)
-add_test(NAME cmp_material3_test COMMAND cmp_material3_test)
-
-
-set_tests_properties(cmp_error_test_crash PROPERTIES WILL_FAIL TRUE)
-
-add_test(NAME cmp_error_test_assert COMMAND cmp_error_test --assert)
-set_tests_properties(cmp_error_test_assert PROPERTIES WILL_FAIL TRUE)
-
-if(CMP_BUILD_EXAMPLES)
-    add_subdirectory(examples)
-endif()
-
-set(CMP_ALL_TESTS cmp_css_values_test cmp_css_cascade_test cmp_css_box_model_test
-  cmp_css_backgrounds_borders_test cmp_css_color_test cmp_css_display_test cmp_css_positioning_test
-  cmp_css_anchor_positioning_test cmp_css_grid_test cmp_css_flexbox_test cmp_css_box_alignment_test
-cmp_css_multi_column_test cmp_css_transforms_test cmp_css_animations_test cmp_css_scroll_animations_test cmp_css_masking_test cmp_css_typography_test cmp_css_fonts_test cmp_css_writing_modes_test cmp_css_logical_test cmp_css_lists_content_test cmp_css_images_shapes_test cmp_css_ruby_test cmp_css_overflow_test cmp_css_containment_test cmp_css_speech_test cmp_css_ui_test cmp_css_tables_test cmp_css_svg_test cmp_css_at_rules_test cmp_cssom_test cmp_css_device_adaptation_test cmp_waapi_test cmp_css_selectors_test cmp_test cmp_string_test cmp_tls_test cmp_ring_buffer_test cmp_modality_sync_single_test cmp_modality_sync_multi_test cmp_modality_async_single_test cmp_sync_test cmp_coroutine_test cmp_timer_test cmp_vfs_test cmp_http_test cmp_window_test cmp_window_manager_test cmp_dpi_test cmp_event_test cmp_router_test cmp_layout_test cmp_layout_geometry_test cmp_svg_test cmp_gpu_test cmp_command_buffer_test cmp_render_graph_test cmp_pso_cache_test cmp_gpu_allocator_test cmp_shader_test cmp_shader_cache_test cmp_msaa_test cmp_theme_test cmp_linear_blend_test cmp_tex_compression_test cmp_mipmap_test cmp_icc_profile_test cmp_swapchain_test cmp_overdraw_test cmp_layer_tiling_test cmp_hit_test_test cmp_pointer_events_test cmp_event_bubbling_test cmp_passive_event_test cmp_pointer_capture_test cmp_gesture_test cmp_complex_gesture_test cmp_pointer_pressure_test cmp_touch_action_test cmp_context_menu_test cmp_hover_intent_test cmp_scroll_ctx_test cmp_scroll_velocity_test cmp_kinematics_test cmp_scrollbar_gutter_test cmp_scroll_anchor_test cmp_secure_network_test cmp_ptr_test cmp_tick_test cmp_dt_test cmp_transition_test cmp_keyframe_test cmp_anim_compose_test cmp_spring_ease_test cmp_bezier_ease_test cmp_step_ease_test cmp_motion_path_test cmp_scroll_timeline_test cmp_view_transition_test cmp_vt_shared_test cmp_discrete_transition_test cmp_flip_test cmp_form_controls_test cmp_validation_test cmp_input_mask_test cmp_indeterminate_test cmp_select_ui_test cmp_datalist_test cmp_range_slider_test cmp_color_picker_test cmp_date_picker_test cmp_caret_test cmp_selection_test cmp_editable_test cmp_ime_test cmp_spellcheck_test cmp_undo_redo_test cmp_a11y_tree_test cmp_a11y_theme_test cmp_screen_reader_test cmp_aria_test cmp_aria_relations_test cmp_aria_live_test cmp_focus_manager_test cmp_focus_ring_test cmp_a11y_rotor_test cmp_ui_tabs_test cmp_ui_snackbar_test cmp_ui_skeleton_test cmp_ui_markdown_test cmp_ui_dialog_test cmp_tree_sitter_test cmp_system_theme_test cmp_toast_notifications_test cmp_tab_navigation_test cmp_rubber_band_test cmp_power_awareness_test cmp_modality_test cmp_focus_navigation_test cmp_file_watcher_test cmp_emscripten_indexeddb_vfs_test cmp_embedded_pty_test cmp_dpi_awareness_test cmp_docking_framework_test cmp_databinding_test cmp_custom_chrome_test cmp_command_palette_test cmp_code_block_clipboard_test cmp_code_block_test cmp_breadcrumbs_test cmp_a11y_action_test cmp_dynamic_type_test cmp_system_fonts_test cmp_materials_test cmp_nav_bar_test cmp_tab_bar_test cmp_search_bar_test cmp_deep_link_test cmp_system_button_test cmp_menu_test cmp_inputs_test cmp_text_fields_test cmp_lists_test cmp_scroll_view_test cmp_collections_test cmp_complex_gesture_hig_test cmp_keyboard_hig_test cmp_stylus_test cmp_gamepad_hig_test cmp_symbols_test cmp_system_geometry_test cmp_spring_animator_test cmp_promotion_link_test cmp_permissions_test cmp_auth_sec_test cmp_prefers_reduced_motion_test cmp_a11y_transparency_test cmp_forced_colors_test cmp_sys_colors_test cmp_compositor_anim_test cmp_app_region_test cmp_borders_test cmp_clipboard_test cmp_csp_test cmp_app_store_compliance_test cmp_resilience_handling_test cmp_resource_manager_test cmp_documentation_dx_test cmp_developer_experience_test cmp_profiling_telemetry_test cmp_testing_automation_test cmp_interop_swift_test cmp_carplay_specific_test cmp_visionos_specific_test cmp_tvos_specific_test cmp_watchos_specific_test cmp_macos_specific_test cmp_ipados_specific_test cmp_ios_specific_test cmp_transactions_hig_test cmp_media_avkit_test cmp_os_communications_test cmp_extensions_test cmp_dnd_test cmp_flex_align_test cmp_flow_test cmp_grid_test cmp_haptics_test cmp_i18n_test cmp_i18n_formatting_test cmp_media_query_test cmp_native_dialog_test cmp_network_test cmp_pip_test cmp_position_test cmp_prefers_color_scheme_test cmp_print_ctx_test cmp_safe_areas_test cmp_system_menu_test cmp_titlebar_env_test cmp_window_blur_test cmp_background_blur_test cmp_plugin_loader_test cmp_pty_test cmp_regex_test cmp_sse_parser_test cmp_error_test cmp_error_test_crash cmp_state_layers_test cmp_status_bar_test cmp_image_preview_test cmp_math_renderer_test cmp_syntax_highlight_test cmp_error_test_assert cmp_f2_a11y_test cmp_f2_button_test cmp_f2_data_display_test cmp_f2_dropdowns_test cmp_f2_icons_test cmp_f2_inputs_test cmp_f2_layout_test cmp_f2_menus_test cmp_f2_overlays_test cmp_f2_profiling_test cmp_f2_surfaces_test cmp_f2_text_inputs_test cmp_f2_theme_test cmp_f2_visual_regression_test cmp_cupertino_visual_regression_test cmp_material3_visual_regression_test cmp_material3_color_test cmp_material3_sys_test cmp_material3_layout_test cmp_material3_components_test cmp_material3_text_inputs_test cmp_material3_information_test cmp_material3_pickers_menus_test cmp_cupertino_test cmp_fluent2_stubs_test cmp_material3_stubs_test cmp_unstyled_stubs_test cmp_sandbox_exec_test cmp_screen_capture_test cmp_material3_typography_test cmp_material3_test cmp_compositor_thread_test cmp_apz_test cmp_fluent_test cmp_ink_ripple_test cmp_lottie_test cmp_hardware_accel_test cmp_input_layout_test cmp_ios_background_refresh_test cmp_ipados_multitasking_test cmp_kbd_avoid_test cmp_markdown_parser_test cmp_mermaid_renderer_test cmp_minimap_test cmp_android_ndk_bridge_test cmp_android_scoped_storage_test cmp_android_vulkan_gles_test cmp_apple_gestures_test)
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "DOS")
-    list(APPEND CMP_ALL_TESTS cmp_mmap_test cmp_multi_window_test cmp_os_integration_test
-    cmp_os_media_notifications_test cmp_os_scrollbars_test cmp_overscroll_test cmp_ui_test cmp_ui_accordion_test
-    cmp_ui_badge_test cmp_ui_card_test cmp_ui_chip_test cmp_ui_bottom_sheet_test cmp_ui_action_button_test
-    cmp_ui_app_bar_test cmp_ui_fab_test cmp_ui_icon_button_test cmp_ui_segmented_button_test
-    cmp_ui_modal_drawer_test cmp_ui_navigation_rail_test cmp_ui_progress_bar_test cmp_ui_progress_indicator_test
-    cmp_ui_virtual_list_test cmp_ui_terminal_test cmp_ui_text_field_test cmp_ui_tree_view_test cmp_wayland_protocols_test cmp_webgl_canvas_test cmp_win32_input_test cmp_win32_window_test cmp_workspace_layout_test cmp_ui_m3_buttons_test cmp_ui_m3_communication_test cmp_ui_m3_containment_test
-    cmp_ui_m3_navigation_test cmp_ui_m3_selection_input_test cmp_visuals_test cmp_orm_test cmp_ipc_test
-    cmp_vfs_theme_test cmp_ui_avatar_test cmp_ui_divider_test cmp_ui_spinner_test cmp_ui_splitter_test cmp_ui_switch_test cmp_ui_tooltip_test cmp_ui_breadcrumbs_test cmp_credential_manager_test cmp_global_hotkey_test)
-endif()
-
-set_tests_properties(${CMP_ALL_TESTS} PROPERTIES ENVIRONMENT "${TEST_ENV_VARS}")
-
-
-
-
-
-
-
-if(TARGET cmp_compositor_thread_test)
-    set_target_properties(cmp_compositor_thread_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-    set_target_properties(cmp_apz_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-    set_target_properties(cmp_fluent_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-    set_target_properties(cmp_ink_ripple_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-    set_target_properties(cmp_lottie_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>")
-endif()
-
-endif()
+add_subdirectory(examples)

@@ -1,3 +1,8 @@
+*.rej
+*.gcda
+*.gcno
+*.gcov
+target
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -61,6 +66,9 @@ vcpkg_installed/
 *.swp
 *~
 *.txt
+*.orig
+*.patch
+*.diff
 *.ps1
 *.bat
 *.cmd
@@ -90,3 +98,5 @@ fix_*.py
 # test_corm/
 # test_http/
 ...
+node_modules/
+test_artifacts/

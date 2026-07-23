@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>C UI Framework</title>
+</head>
+<body>
+    <canvas id="canvas" style="width: 100vw; height: 100vh; display: block;" tabindex="-1"></canvas>
+    <div id="app-root" role="application" dir="ltr" aria-label="UI Application"></div>
+    <div id="wasm-unsupported-error" style="display:none; color: red;">
+        WebAssembly is not supported in your browser.
+    </div>
+    <noscript>
+        <div style="color: red;">JavaScript is strictly required to run this application.</div>
+    </noscript>
+    <script>
+        if (!window.WebAssembly) {
+            document.getElementById('wasm-unsupported-error').style.display = 'block';
+        }
+
+        window.uiVerifyMemoryLeaks = function() {
+            let leaks = false;
+            if (window.uiNodeMap && window.uiNodeMap.size > 0) {
+                console.error("Memory Leak detected: uiNodeMap has " + window.uiNodeMap.size + " hanging nodes.");
+                leaks = true;
+            }
+            if (window._ui_promises && window._ui_promises.size > 0) {
+                console.error("Memory Leak detected: _ui_promises has " + window._ui_promises.size + " unresolved promises.");
+                leaks = true;
+            }
+            if (window._ui_audio_contexts && window._ui_audio_contexts.size > 0) {
+                console.error("Memory Leak detected: _ui_audio_contexts has " + window._ui_audio_contexts.size + " unclosed audio contexts.");
+                leaks = true;
+            }
+            if (!leaks) {
+                console.log("No JS-side bridge memory leaks detected.");
+            }
+            return !leaks;
+        };
+    </script>
+    {{{ SCRIPT }}}
+</body>
+</html>

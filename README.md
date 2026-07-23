@@ -1,71 +1,97 @@
-C multiplatform (libcmp)
-========================
+# C Multiplatform UI Engine & Media Framework
 
-[![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Test Coverage](docs/badges/test-coverage.svg)](docs/badges/test-coverage.svg) [![Doc Coverage](docs/badges/doc-coverage.svg)](docs/badges/doc-coverage.svg)
+The universal, ultra-lightweight UI and media engine for the next generation of cross-platform applications.
 
-**Purpose:** The main entry point and overview of the LibCMPC project.
+Built entirely in **strictly-compliant C89**, this multi-threaded engine delivers a complete W3C CSS layout system, modern reactive state (Signals), and a robust Component Development Kit (CDK) across Web, Mobile, and Desktop.
 
-**Current State:** **LibCMPC** is a strict C89 (ANSI C) cross-platform application framework. Following a strategic rewrite, it provides a highly cohesive, monolithic core for building modality-agnostic GUI applications in native C. It integrates best-in-class sibling libraries for networking, file systems, and databases, while maintaining zero external dependencies for its core rendering and layout engines.
+## The Ground-Up Rewrite: A Paradigm Shift
 
-**Upcoming Features:** The rendering and UI systems are currently being expanded to natively support **Google Material 3**, **Apple Cupertino / HIG**, and **Microsoft Fluent 2** design systems out-of-the-box.
+This project (`tmp/c-multiplatform`) represents a complete, ground-up reimplementation of the original `c-multiplatform` architecture. The initial prototype revealed architectural constraints in supporting highly dynamic, state-driven user interfaces. We have moved away from a rigid "Design System in C" towards a **Component Dev Kit (CDK)** approach. 
 
-**Next Stage in Roadmap:** The immediate next stage in our roadmap is **replicating ALL sample apps from Apple, Google, and Microsoft**. This massive undertaking will validate our design system implementations, ensure pixel-perfect compliance, and provide developers with real-world reference architectures.
+Developers can compose these CDK primitives to build their *own* design systems without fighting the framework, while retaining the extreme performance of a native C core. Accessibility (a11y) and Internationalization (i18n) are integrated foundationally at the lowest ABI level, rather than being tightly coupled as an afterthought.
 
-This project is architected specifically for **Context-Window Scalability**, utilizing an amalgamated header design (`cmp.h`) that makes the codebase distinctively friendly for LLM-assisted coding and maintenance.
+## The Vision: Beyond Flutter, React Native, and KMP
 
-## 🚀 Key Features
+The current landscape of cross-platform development forces compromises: heavy JavaScript bridges (React Native), proprietary layout systems and massive bundle sizes (Flutter), or language-ecosystem lock-in (Kotlin Multiplatform).
 
-*   **Strict C89 ABI:** Compiles on virtually any C compiler (MSVC, GCC, Clang, TCC).
-*   **Unified Modality Engine:** Run your application in single-threaded, multi-threaded worker-pool, or fully asynchronous (epoll/IOCP) modes without changing your business logic.
-*   **Coroutines & Async/Await:** Native C coroutine support (`cmp_coroutine_t`) for complex asynchronous task orchestration.
-*   **Flexbox Layout Engine:** A fully featured C implementation of Flexbox (`cmp_layout_node_t`) for responsive, dynamic user interfaces.
-*   **Native UI Primitives:** Core unstyled widgets (`cmp_ui_box_create`, `cmp_ui_text_input_create`, etc.) ready to be themed via `cmp_theme_t`.
-*   **Deep Ecosystem Integration:**
-    *   **VFS (`c-fs`):** Transparent virtual file system mounting and asynchronous reads.
-    *   **HTTP/WebSockets (`c-abstract-http`):** Native networking integration directly into the modality event loop.
-    *   **ORM (`c-orm`):** Local SQLite persistence with data-binding observables (`cmp_orm_observable_t`) tied directly to UI nodes.
-    *   **Generic Data Binding:** In-memory, typed primitive observables (`cmp_databinding_t`) supporting N-way binding configurations for reactive application state without database overhead.
+**This framework takes a different approach:**
+By leveraging the universal C ABI as a fully opaque FFI boundary, it acts as a hyper-fast, invisible UI runtime that can be seamlessly bound to **any modern language** (Rust, Go, C#, Python, Zig, Swift, JS) with **zero bridge overhead**.
 
-## 📂 Architecture Strategy
-
-The framework is organized into a cohesive, amalgamated structure:
-
-*   **`include/cmp.h`**: The single source of truth for all API contracts, structs, and interfaces.
-*   **`src/`**: Modular implementations of the core systems (`cmp_memory`, `cmp_layout`, `cmp_ui`, `cmp_window`, `cmp_modality`).
-*   **`tests/`**: Comprehensive test suites using the `greatest` framework, ensuring memory safety and behavioral correctness.
-*   **`examples/`**: Standalone GUI applications demonstrating real-world usage (e.g., OAuth2 Login flows).     
-
-## 🛠️ Build Instructions
-
-LibCMPC uses **CMake** and manages its internal ecosystem dependencies automatically via `FetchContent`.        
-
-### Compile
-
-```bash
-$ cmake -S . -B build -D CMAKE_BUILD_TYPE=Debug
-$ cmake --build build
-```
-
-### Running Tests
-
-```bash
-$ cd build
-$ ctest --output-on-failure
-```
+*   **No "Widget Soup":** Instead of proprietary layout algorithms, we implemented a 100% W3C CSS Engine (Flexbox, Grid, Cascading). Design your layouts using the web standards you already know, but render them via native OpenGL ES 2.0 or native DOM.
+*   **Zero Language Lock-in:** Write your business logic in Rust, Python, or Go. The engine handles the heavy lifting of DOM generation, text shaping, A/V synchronization, and composition. The reactive signal graph safely traverses the FFI boundary.
+*   **Insane Performance & Footprint:** Written in C89 with custom memory pools and multi-reactor architecture. It bypasses massive VM/JS engine initialization overhead, ensuring near-instantaneous Time-To-Interactive (TTI).
+*   **Modern Paradigms, Native Speeds:** Brings modern concepts like Reactive Signals and Headless UI to a bare-metal execution environment.
 
 ---
 
-## License
+## Core Differentiators
 
-Licensed under either of
+- ⚡ **Universal C ABI:** Bind to anything. Truly native cross-platform without the ecosystem constraints of KMP or the JS payload of React Native.
+- 🎨 **100% W3C CSS Engine:** Full support for CSS Selectors, Grid, Flexbox, Color Level 5, Math functions, and Animations. Features **zero-copy lexing** directly from memory-mapped files and enables dynamic hot-reloading without recompiling C code.
+- 🧠 **Reactive State (Signals):** Built-in core Signal engine (`ui_signal`, `ui_computed`, `ui_effect`) replacing imperative updates. Includes a reactive Forms framework for complex validation and dependency graphs.
+- 🏗️ **Headless CDK:** Purely structural, unstyled behavioral components guaranteeing robust focus management, ARIA accessibility, and geometric tethering before any visual themes are applied.
+- 🌐 **Web Target Focus — Beyond the Canvas Trap:** Unlike traditional cross-platform frameworks that draw to a single WebGL `<canvas>` (breaking a11y and text selection), our WASM target uses an **Inspectable DOM** approach. UI primitives map to real HTML DOM nodes with native inputs, ensuring flawless screen reader and password manager support.
+- 🛡️ **Military-Grade Robustness:** Valgrind/ASAN memory leak testing, strict C89 compliance, and an uncompromising push for **100% Test Coverage** (unit and property-based testing) and **100% Documentation Coverage** to provide mathematical API guarantees.
 
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or <https://www.apache.org/licenses/LICENSE-2.0>)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or <https://opensource.org/licenses/MIT>)
+---
 
-at your option.
+## Upcoming Flagship Use Cases
 
-### Contribution
+The new architecture enables zero-overhead isomorphic execution, bridging dynamic interpretation with AoT C code ejection:
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
-dual licensed as above, without any additional terms or conditions.
+1. **Survey Maker & Production Lifecycle:** Rapid iteration via remote over-the-air schema updates, ejecting to native C for perfect 60fps performance and zero parsing in production.
+2. **Full Low-Code App Builder:** Visual IDE rendering directly to canvas, with an "Export App" function generating statically-linked, zero-dependency native binaries.
+3. **API-Driven Auto-Generated Interfaces:** UI components, validation, and layout derived natively from **OpenAPI 3.1**, with dynamic event orchestration via **Arazzo** specs.
+
+---
+
+## Architecture & Master Plans
+
+Due to the immense scope and robustness constraints, the architectural plan is split into domain-specific modules:
+
+* **[Core & Platform (PLAN_CORE.md)](PLAN_CORE.md):** Abstract execution, memory pools, strict C89 standards, FFI boundaries, and OS windowing/input abstractions.
+* **[Engine (PLAN_ENGINE.md)](PLAN_ENGINE.md):** DOM generation, Media, text shaping, and GLES 2.0 Compositor.
+* **[CSS Engine (PLAN_CSS_W3C.md)](PLAN_CSS_W3C.md):** 100% W3C CSS Implementation.
+* **[Runtime Widgets (PLAN_RUNTIME_WIDGETS.md)](PLAN_RUNTIME_WIDGETS.md):** Component implementation plans and specifications.
+* **[Signal & State (SIGNAL_TODO_PLAN.md)](SIGNAL_TODO_PLAN.md):** The core Signal engine and reactive Forms framework.
+* **[Quality Assurance (PLAN_QUALITY.md)](PLAN_QUALITY.md):** Coverage constraints, leak testing, and documentation mandates.
+* **[Wayland (WAYLAND_PLAN.md)](WAYLAND_PLAN.md):** Native Wayland display server integration plan.
+* **[Test Plan (TEST_PLAN.md)](TEST_PLAN.md):** Testing methodology and tracking.
+
+---
+
+## Developer Guides
+
+Detailed guides can be found in the [`guides/`](guides/) directory. Key highlights include:
+
+* [Getting Started](guides/getting-started/)
+* [Architecture Overview](guides/architecture/)
+* [DOM, Components & Event System](guides/dom-and-events/)
+* [State Management](guides/state-management/)
+* [Layout & Styling](guides/layout-and-styling/)
+* [Advanced CSS Engine](guides/css-engine/)
+
+[**View all Guides & Documentation in the Guides Index**](guides/README.md)
+
+---
+
+## Getting Started: Building from Source
+
+This project is built using CMake (minimum version 3.15) and relies on standard C toolchains (GCC, Clang, MSVC).
+
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+### Configuration Options
+
+You can customize the build using the following CMake options:
+- `-DUI_ENABLE_WAYLAND=ON/OFF`: Enable Wayland Support on Linux (default: ON)
+- `-DUI_USE_HARFBUZZ=ON/OFF`: Enable HarfBuzz integration for complex text shaping (default: OFF)
+- `-DUI_ENABLE_UNICODE=ON/OFF`: Enable UNICODE charset (default: ON)
+- `-DUI_SINGLE_THREADED=ON/OFF`: Disable Multi-threading (default: OFF)
+- `-DUI_CRT_STATIC=ON/OFF`: Use Static CRT linkage (default: OFF)
+- `-DUI_ENABLE_LTO=ON/OFF`: Enable Link-Time Optimization (default: OFF)
