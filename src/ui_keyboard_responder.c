@@ -9,7 +9,7 @@
 struct ui_keyboard_binding {
   char *role_or_tag;
   enum ui_key_code key_code;
-  enum ui_error (*callback)(struct ui_dom_node *node, void *user_data);
+  ui_error_t (*callback)(struct ui_dom_node *node, void *user_data);
   void *user_data;
 };
 
@@ -21,7 +21,7 @@ struct ui_keyboard_responder {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder) {
   struct ui_keyboard_responder *responder;
 
@@ -29,7 +29,7 @@ ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  responder = (struct ui_keyboard_responder *)UI_MALLOC(
+  responder = (struct ui_keyboard_responder *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_keyboard_responder));
   if (!responder) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -43,26 +43,28 @@ ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder) {
   return UI_ERROR_NONE;
 }
 
-void ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder) {
+ui_error_t
+ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder) {
   size_t i;
   if (!responder) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (responder->bindings) {
     for (i = 0; i < responder->bindings_count; ++i) {
-      UI_FREE(responder->bindings[i].role_or_tag);
+      C_MULTIPLATFORM_FREE(responder->bindings[i].role_or_tag);
     }
-    UI_FREE(responder->bindings);
+    C_MULTIPLATFORM_FREE(responder->bindings);
   }
-  UI_FREE(responder);
+  C_MULTIPLATFORM_FREE(responder);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_keyboard_responder_bind_key */
-enum ui_error ui_keyboard_responder_bind_key(
+ui_error_t ui_keyboard_responder_bind_key(
     struct ui_keyboard_responder *responder, const char *role_or_tag,
     enum ui_key_code key_code,
-    enum ui_error (*callback)(struct ui_dom_node *node, void *user_data),
+    ui_error_t (*callback)(struct ui_dom_node *node, void *user_data),
     void *user_data) {
   char *role_copy;
 
@@ -75,7 +77,7 @@ enum ui_error ui_keyboard_responder_bind_key(
                               ? 8
                               : responder->bindings_capacity * 2;
     struct ui_keyboard_binding *new_bindings =
-        (struct ui_keyboard_binding *)UI_REALLOC(
+        (struct ui_keyboard_binding *)C_MULTIPLATFORM_REALLOC(
             responder->bindings,
             new_capacity * sizeof(struct ui_keyboard_binding));
     if (!new_bindings) {
@@ -87,7 +89,7 @@ enum ui_error ui_keyboard_responder_bind_key(
 
   {
     size_t len = strlen(role_or_tag);
-    role_copy = (char *)UI_MALLOC(len + 1);
+    role_copy = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
     if (role_copy) {
 #if defined(_MSC_VER)
       strcpy_s(role_copy, len + 1, role_or_tag);
@@ -110,7 +112,7 @@ enum ui_error ui_keyboard_responder_bind_key(
 }
 
 /** \brief ui_keyboard_responder_handle_event */
-enum ui_error ui_keyboard_responder_handle_event(
+ui_error_t ui_keyboard_responder_handle_event(
     struct ui_keyboard_responder *responder, struct ui_dom_node *focused_node,
     const struct ui_event *event, int *out_handled) {
   size_t i;
@@ -138,9 +140,18 @@ enum ui_error ui_keyboard_responder_handle_event(
   }
 
   key = (enum ui_key_code)event->event_data.keyboard.key_code;
-  ui_bidi_normalize_horizontal_key(key, &key);
+  {
+    ui_error_t norm_rc = ui_bidi_normalize_horizontal_key(key, &key);
+    if (norm_rc != UI_ERROR_NONE)
+      return norm_rc;
+  }
 
-  ui_dom_node_get_attribute(focused_node, "role", &role_val);
+  {
+    ui_error_t role_rc =
+        ui_dom_node_get_attribute(focused_node, "role", &role_val);
+    if (role_rc != UI_ERROR_NONE && role_rc != UI_ERROR_NOT_FOUND)
+      return role_rc;
+  }
 
   for (i = 0; i < responder->bindings_count; ++i) {
     struct ui_keyboard_binding *binding = &responder->bindings[i];

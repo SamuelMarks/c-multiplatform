@@ -31,10 +31,10 @@ enum ui_elevation_level {
  * @param out_color The resulting tinted color.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_elevation_get_tinted_surface(ui_color_t surface_color,
-                                              ui_color_t tint_color,
-                                              enum ui_elevation_level level,
-                                              ui_color_t *out_color);
+ui_error_t ui_elevation_get_tinted_surface(ui_color_t surface_color,
+                                           ui_color_t tint_color,
+                                           enum ui_elevation_level level,
+                                           ui_color_t *out_color);
 
 /**
  * @brief Represents drop shadow properties.
@@ -56,10 +56,10 @@ struct ui_drop_shadow {
  * @param out_shadow2 Pointer to store the directional shadow (e.g. penumbra).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_elevation_get_shadows(enum ui_elevation_level level,
-                                       ui_color_t shadow_color,
-                                       struct ui_drop_shadow *out_shadow1,
-                                       struct ui_drop_shadow *out_shadow2);
+ui_error_t ui_elevation_get_shadows(enum ui_elevation_level level,
+                                    ui_color_t shadow_color,
+                                    struct ui_drop_shadow *out_shadow1,
+                                    struct ui_drop_shadow *out_shadow2);
 
 #ifdef __cplusplus
 }

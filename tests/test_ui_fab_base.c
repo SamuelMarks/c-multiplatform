@@ -1,10 +1,18 @@
 /* clang-format off */
 #include "ui_fab_base.h"
+
+#include "../include/ui_ripple_base.h"
+extern int g_mock_ripple_fail;
+#define ui_ripple_config_init(cfg) (g_mock_ripple_fail ? UI_ERROR_INVALID_ARGUMENT : (ui_ripple_config_init)(cfg))
+#include "../src/ui_fab_base.c"
+#undef ui_ripple_config_init
+
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+int g_mock_ripple_fail = 0;
 
 static int run_normal_tests(void) {
   struct ui_fab_base *fab = NULL;
@@ -15,7 +23,7 @@ static int run_normal_tests(void) {
   enum ui_fab_state state;
   float progress;
   size_t count;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing ui_fab_base_create...\n");
   if (ui_fab_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -187,20 +195,26 @@ static int run_normal_tests(void) {
   if (rstate->active)
     return 1; /* Should be completed */
 
-  ui_fab_base_destroy(fab);
-  ui_fab_base_destroy(NULL);
+  (void)ui_fab_base_destroy(fab);
+  (void)ui_fab_base_destroy(NULL);
   return 0;
 }
 
 static int run_oom_tests(void) {
   struct ui_fab_base *fab = NULL;
   struct ui_button_base *action_btn = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing OOM on create...\n");
   g_malloc_fail_countdown = 0;
   rc = ui_fab_base_create(&fab);
   g_malloc_fail_countdown = -1;
+
+  g_mock_ripple_fail = 1;
+  if (ui_fab_base_create(&fab) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  g_mock_ripple_fail = 0;
+
   if (rc != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 
@@ -214,15 +228,15 @@ static int run_oom_tests(void) {
   rc = ui_fab_base_add_action(fab, action_btn);
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_button_base_destroy(action_btn);
-    ui_fab_base_destroy(fab);
+    (void)ui_button_base_destroy(action_btn);
+    (void)ui_fab_base_destroy(fab);
     return 1;
   }
 
   /* Since we failed to add it, we must destroy it ourselves if not adopted */
-  ui_button_base_destroy(action_btn);
+  (void)ui_button_base_destroy(action_btn);
 
-  ui_fab_base_destroy(fab);
+  (void)ui_fab_base_destroy(fab);
   return 0;
 }
 
@@ -293,6 +307,6 @@ static int run_coverage_tests(void) {
     return 1;
   }
 
-  ui_fab_base_destroy(fab);
+  (void)ui_fab_base_destroy(fab);
   return 0;
 }

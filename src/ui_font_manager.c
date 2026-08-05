@@ -24,8 +24,8 @@
 #endif
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#define STBTT_malloc(x,u)  ((void)(u),UI_MALLOC(x))
-#define STBTT_free(x,u)    ((void)(u),UI_FREE(x))
+#define STBTT_malloc(x,u)  ((void)(u),C_MULTIPLATFORM_MALLOC(x))
+#define STBTT_free(x,u)    ((void)(u),C_MULTIPLATFORM_FREE(x))
 #include "../include/stb_truetype.h"
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -55,14 +55,15 @@ struct ui_font_manager {
   struct ui_font *head;
 };
 
-enum ui_error ui_font_manager_create(struct ui_font_manager **out_manager) {
+ui_error_t ui_font_manager_create(struct ui_font_manager **out_manager) {
   struct ui_font_manager *manager;
 
   if (!out_manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  manager = (struct ui_font_manager *)UI_MALLOC(sizeof(struct ui_font_manager));
+  manager = (struct ui_font_manager *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_font_manager));
   if (!manager) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -73,7 +74,7 @@ enum ui_error ui_font_manager_create(struct ui_font_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_manager_destroy(struct ui_font_manager *manager) {
+ui_error_t ui_font_manager_destroy(struct ui_font_manager *manager) {
   struct ui_font *current;
   struct ui_font *next;
 
@@ -84,39 +85,39 @@ enum ui_error ui_font_manager_destroy(struct ui_font_manager *manager) {
   current = manager->head;
   while (current) {
     next = current->next;
-    if (current->data) {
-      UI_FREE(current->data);
-    }
+    C_MULTIPLATFORM_FREE(current->data);
     if (current->axes) {
-      UI_FREE(current->axes);
+      C_MULTIPLATFORM_FREE(current->axes);
     }
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
-  UI_FREE(manager);
+  C_MULTIPLATFORM_FREE(manager);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_manager_load_font_memory(struct ui_font_manager *manager,
-                                               const unsigned char *font_data,
-                                               size_t data_size,
-                                               struct ui_font **out_font) {
+ui_error_t ui_font_manager_load_font_memory(struct ui_font_manager *manager,
+                                            const unsigned char *font_data,
+                                            size_t data_size,
+                                            struct ui_font **out_font) {
   struct ui_font *font;
   size_t i;
+  int offset;
 
   if (!manager || !font_data || data_size == 0 || !out_font) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  font = (struct ui_font *)UI_MALLOC(sizeof(struct ui_font));
+  font = (struct ui_font *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_font));
   if (!font) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
+  memset(font, 0, sizeof(struct ui_font));
 
-  font->data = (unsigned char *)UI_MALLOC(data_size);
+  font->data = (unsigned char *)C_MULTIPLATFORM_MALLOC(data_size);
   if (!font->data) {
-    UI_FREE(font);
+    C_MULTIPLATFORM_FREE(font);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -127,10 +128,10 @@ enum ui_error ui_font_manager_load_font_memory(struct ui_font_manager *manager,
   font->axes = NULL;
   font->axis_count = 0;
 
-  if (!stbtt_InitFont(&font->info, font->data,
-                      stbtt_GetFontOffsetForIndex(font->data, 0))) {
-    UI_FREE(font->data);
-    UI_FREE(font);
+  offset = stbtt_GetFontOffsetForIndex(font->data, 0);
+  if (offset < 0 || !stbtt_InitFont(&font->info, font->data, offset)) {
+    C_MULTIPLATFORM_FREE(font->data);
+    C_MULTIPLATFORM_FREE(font);
     return UI_ERROR_UNKNOWN;
   }
 
@@ -141,9 +142,9 @@ enum ui_error ui_font_manager_load_font_memory(struct ui_font_manager *manager,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
-                                        float font_size,
-                                        struct ui_glyph_metrics *out_metrics) {
+ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
+                                     float font_size,
+                                     struct ui_glyph_metrics *out_metrics) {
   float scale;
   int advance, lsb;
   int x0, y0, x1, y1;
@@ -166,9 +167,9 @@ enum ui_error ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_get_vmetrics(struct ui_font *font, float font_size,
-                                   float *out_ascent, float *out_descent,
-                                   float *out_line_gap) {
+ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
+                                float *out_ascent, float *out_descent,
+                                float *out_line_gap) {
   float scale;
   int ascent, descent, line_gap;
 
@@ -186,9 +187,9 @@ enum ui_error ui_font_get_vmetrics(struct ui_font *font, float font_size,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_get_kerning(struct ui_font *font, int codepoint1,
-                                  int codepoint2, float font_size,
-                                  float *out_kerning) {
+ui_error_t ui_font_get_kerning(struct ui_font *font, int codepoint1,
+                               int codepoint2, float font_size,
+                               float *out_kerning) {
   float scale;
   int kern;
 
@@ -203,9 +204,8 @@ enum ui_error ui_font_get_kerning(struct ui_font *font, int codepoint1,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_get_data(struct ui_font *font,
-                               const unsigned char **out_data,
-                               size_t *out_size) {
+ui_error_t ui_font_get_data(struct ui_font *font,
+                            const unsigned char **out_data, size_t *out_size) {
   if (!font || !out_data || !out_size) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -214,10 +214,10 @@ enum ui_error ui_font_get_data(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_generate_atlas(struct ui_font *font, float font_size,
-                                     const int *codepoints, int codepoint_count,
-                                     unsigned char **out_atlas_rgba,
-                                     int *out_width, int *out_height) {
+ui_error_t ui_font_generate_atlas(struct ui_font *font, float font_size,
+                                  const int *codepoints, int codepoint_count,
+                                  unsigned char **out_atlas_rgba,
+                                  int *out_width, int *out_height) {
   int atlas_width = 512;
   int atlas_height = 512;
   unsigned char *alpha_pixels;
@@ -225,7 +225,7 @@ enum ui_error ui_font_generate_atlas(struct ui_font *font, float font_size,
   stbtt_pack_context spc;
   stbtt_packedchar *chardata;
   int i;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   int pack_success;
 
   if (!font || !codepoints || codepoint_count <= 0 || !out_atlas_rgba ||
@@ -235,16 +235,16 @@ enum ui_error ui_font_generate_atlas(struct ui_font *font, float font_size,
 
   /* Start with a fixed guess for atlas size. A true system would dynamically
    * resize. */
-  alpha_pixels =
-      (unsigned char *)UI_MALLOC((size_t)(atlas_width * atlas_height));
+  alpha_pixels = (unsigned char *)C_MULTIPLATFORM_MALLOC(
+      (size_t)(atlas_width * atlas_height));
   if (!alpha_pixels) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
-  chardata = (stbtt_packedchar *)UI_MALLOC(sizeof(stbtt_packedchar) *
-                                           (size_t)codepoint_count);
+  chardata = (stbtt_packedchar *)C_MULTIPLATFORM_MALLOC(
+      sizeof(stbtt_packedchar) * (size_t)codepoint_count);
   if (!chardata) {
-    UI_FREE(alpha_pixels);
+    C_MULTIPLATFORM_FREE(alpha_pixels);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -281,8 +281,8 @@ enum ui_error ui_font_generate_atlas(struct ui_font *font, float font_size,
   stbtt_PackEnd(&spc);
 
   /* Convert single-channel alpha to RGBA */
-  rgba_pixels =
-      (unsigned char *)UI_MALLOC((size_t)(atlas_width * atlas_height * 4));
+  rgba_pixels = (unsigned char *)C_MULTIPLATFORM_MALLOC(
+      (size_t)(atlas_width * atlas_height * 4));
   if (!rgba_pixels) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -300,24 +300,20 @@ enum ui_error ui_font_generate_atlas(struct ui_font *font, float font_size,
   *out_height = atlas_height;
 
 cleanup:
-  if (alpha_pixels) {
-    UI_FREE(alpha_pixels);
-  }
-  if (chardata) {
-    UI_FREE(chardata);
-  }
+  C_MULTIPLATFORM_FREE(alpha_pixels);
+  C_MULTIPLATFORM_FREE(chardata);
   return rc;
 }
 
-enum ui_error ui_font_free_atlas(unsigned char *atlas_rgba) {
+ui_error_t ui_font_free_atlas(unsigned char *atlas_rgba) {
   if (!atlas_rgba) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(atlas_rgba);
+  C_MULTIPLATFORM_FREE(atlas_rgba);
   return UI_ERROR_NONE;
 }
-enum ui_error ui_font_set_metadata(struct ui_font *font, const char *family,
-                                   int weight, int is_italic) {
+ui_error_t ui_font_set_metadata(struct ui_font *font, const char *family,
+                                int weight, int is_italic) {
   if (!font || !family)
     return UI_ERROR_INVALID_ARGUMENT;
   UI_STRNCPY(font->family, sizeof(font->family), family,
@@ -328,26 +324,25 @@ enum ui_error ui_font_set_metadata(struct ui_font *font, const char *family,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_get_status(struct ui_font *font,
-                                 enum ui_font_status *out_status) {
+ui_error_t ui_font_get_status(struct ui_font *font,
+                              enum ui_font_status *out_status) {
   if (!font || !out_status)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_status = font->status;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_set_status(struct ui_font *font,
-                                 enum ui_font_status status) {
+ui_error_t ui_font_set_status(struct ui_font *font,
+                              enum ui_font_status status) {
   if (!font)
     return UI_ERROR_INVALID_ARGUMENT;
   font->status = status;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_manager_find_font(struct ui_font_manager *manager,
-                                        const char *family, int weight,
-                                        int is_italic,
-                                        struct ui_font **out_font) {
+ui_error_t ui_font_manager_find_font(struct ui_font_manager *manager,
+                                     const char *family, int weight,
+                                     int is_italic, struct ui_font **out_font) {
   struct ui_font *curr;
   if (!manager || !family || !out_font)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -366,9 +361,9 @@ enum ui_error ui_font_manager_find_font(struct ui_font_manager *manager,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_font_set_variations(struct ui_font *font,
-                                     const struct ui_font_axis *axes,
-                                     int axis_count) {
+ui_error_t ui_font_set_variations(struct ui_font *font,
+                                  const struct ui_font_axis *axes,
+                                  int axis_count) {
   int i;
 
   if (!font) {
@@ -379,14 +374,14 @@ enum ui_error ui_font_set_variations(struct ui_font *font,
   }
 
   if (font->axes) {
-    UI_FREE(font->axes);
+    C_MULTIPLATFORM_FREE(font->axes);
     font->axes = NULL;
   }
   font->axis_count = 0;
 
   if (axis_count > 0) {
-    font->axes = (struct ui_font_axis *)UI_MALLOC(sizeof(struct ui_font_axis) *
-                                                  (size_t)axis_count);
+    font->axes = (struct ui_font_axis *)C_MULTIPLATFORM_MALLOC(
+        sizeof(struct ui_font_axis) * (size_t)axis_count);
     if (!font->axes) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -399,9 +394,9 @@ enum ui_error ui_font_set_variations(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_get_variations(struct ui_font *font,
-                                     struct ui_font_axis **out_axes,
-                                     int *out_axis_count) {
+ui_error_t ui_font_get_variations(struct ui_font *font,
+                                  struct ui_font_axis **out_axes,
+                                  int *out_axis_count) {
   if (!font || !out_axes || !out_axis_count) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -412,11 +407,11 @@ enum ui_error ui_font_get_variations(struct ui_font *font,
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
-void run_font_methods_coverage(void);
+ui_error_t ui_test_font_manager_coverage_in_src(void);
 
-void run_font_methods_coverage(void) {
+ui_error_t ui_test_font_manager_coverage_in_src(void) {
   struct ui_font_manager *manager = NULL;
-  struct ui_font *font;
+  struct ui_font *font = NULL;
   struct ui_font *found;
   struct ui_font_axis axes[2];
   enum ui_font_status status;
@@ -430,43 +425,104 @@ void run_font_methods_coverage(void) {
 
   ui_font_manager_create(&manager);
 
-  font = (struct ui_font *)UI_MALLOC(sizeof(struct ui_font));
-  if (font) {
-    memset(font, 0, sizeof(*font));
-    font->next = manager->head;
-    manager->head = font;
-
-    ui_font_set_metadata(font, "MyFont", 400, 1);
-    ui_font_manager_find_font(manager, "MyFont", 400, 1, &found);
-
-    axes[0].tag = 1;
-    axes[0].value = 1.0f;
-    axes[1].tag = 2;
-    axes[1].value = 2.0f;
-    ui_font_set_variations(font, axes, 2);
-    ui_font_set_variations(font, axes, 1);
-
-    ui_font_set_status(font, UI_FONT_STATUS_LOADED);
-    ui_font_get_status(font, &status);
-
-    ui_font_get_variations(font, &out_axes, &count);
-
-    ui_font_get_data(font, &d, &s);
-
-    ui_font_get_vmetrics(font, 16.0f, &a, &d_met, &g_met);
-
-    ui_font_get_kerning(font, 'A', 'B', 16.0f, &kern);
-
-    ui_font_get_glyph_metrics(font, 'A', 16.0f, &metrics);
-
-    /* Skipping generate_atlas */
-
-    /* OOM branches for variations */
-    g_malloc_fail_countdown = 0;
-    ui_font_set_variations(font, axes, 2);
-    g_malloc_fail_countdown = -1;
+  /* Trigger stbtt_InitFont failure branch */
+  {
+    unsigned char bad_ttf[128];
+    struct ui_font *bad_font = NULL;
+    memset(bad_ttf, 0, 128);
+    ui_font_manager_load_font_memory(manager, bad_ttf, sizeof(bad_ttf),
+                                     &bad_font);
   }
 
-  ui_font_manager_destroy(manager);
+  {
+    static const unsigned char dummy_ttf[] = {
+        0x00, 0x01, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x63, 0x6d, 0x61, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7c,
+        0x00, 0x00, 0x00, 0x14, 0x68, 0x65, 0x61, 0x64, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x90, 0x00, 0x00, 0x00, 0x36, 0x68, 0x68, 0x65, 0x61,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc6, 0x00, 0x00, 0x00, 0x24,
+        0x68, 0x6d, 0x74, 0x78, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xea,
+        0x00, 0x00, 0x00, 0x08, 0x67, 0x6c, 0x79, 0x66, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0xf2, 0x00, 0x00, 0x00, 0x01, 0x6c, 0x6f, 0x63, 0x61,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf3, 0x00, 0x00, 0x00, 0x04,
+        0x6d, 0x61, 0x78, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf7,
+        0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x01, 0x00, 0x03, 0x00, 0x01,
+        0x00, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00};
+    ui_font_manager_load_font_memory(manager, dummy_ttf, sizeof(dummy_ttf),
+                                     &font);
+  }
+
+  ui_font_set_metadata(font, "MyFont", 400, 1);
+  ui_font_manager_find_font(manager, "MyFont", 400, 1, &found);
+
+  axes[0].tag = 1;
+  axes[0].value = 1.0f;
+  axes[1].tag = 2;
+  axes[1].value = 2.0f;
+  ui_font_set_variations(font, axes, 2);
+  ui_font_set_variations(font, NULL, 0);
+  ui_font_set_variations(font, axes, 1);
+
+  ui_font_set_status(font, UI_FONT_STATUS_LOADED);
+  ui_font_get_status(font, &status);
+
+  ui_font_get_variations(font, &out_axes, &count);
+
+  ui_font_get_data(font, &d, &s);
+
+  ui_font_get_vmetrics(font, 16.0f, &a, &d_met, &g_met);
+
+  ui_font_get_kerning(font, 'A', 'B', 16.0f, &kern);
+
+  ui_font_get_glyph_metrics(font, 'A', 16.0f, &metrics);
+
+  /* Skipping generate_atlas */
+
+  /* OOM branches for variations */
+  g_malloc_fail_countdown = 0;
+  ui_font_set_variations(font, axes, 2);
+  g_malloc_fail_countdown = -1;
+
+  /* Re-set variations so we can test destroying a font with variations */
+  ui_font_set_variations(font, axes, 2);
+
+  {
+    int cp[] = {'A'};
+    unsigned char *atlas = NULL;
+    int w, h;
+    g_malloc_fail_countdown = 0;
+    ui_font_generate_atlas(font, 16.0f, cp, 1, &atlas, &w, &h);
+    g_malloc_fail_countdown = 1;
+    ui_font_generate_atlas(font, 16.0f, cp, 1, &atlas, &w, &h);
+    g_malloc_fail_countdown = 2;
+    ui_font_generate_atlas(font, 16.0f, cp, 1, &atlas, &w, &h);
+    g_malloc_fail_countdown = 3;
+    ui_font_generate_atlas(font, 16.0f, cp, 1, &atlas, &w, &h);
+    g_malloc_fail_countdown = 4;
+    ui_font_generate_atlas(font, 16.0f, cp, 1, &atlas, &w, &h);
+    g_malloc_fail_countdown = 5;
+    ui_font_generate_atlas(font, 16.0f, cp, 1, &atlas, &w, &h);
+
+    /* Fail PackFontRanges */
+    g_malloc_fail_countdown = -1;
+    ui_font_generate_atlas(font, 600.0f, cp, 1, &atlas, &w, &h);
+    ui_font_generate_atlas(font, 16.0f, cp, 1, &atlas, &w, &h);
+    ui_font_free_atlas(atlas);
+  }
+
+  (void)ui_font_manager_destroy(manager);
+  return UI_ERROR_NONE;
 }
 #endif

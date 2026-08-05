@@ -10,7 +10,7 @@
 extern int g_malloc_fail_countdown;
 #endif
 
-static enum ui_error failing_notify_fn(void *user_data) {
+static ui_error_t failing_notify_fn(void *user_data) {
   (void)user_data;
   return UI_ERROR_OUT_OF_BOUNDS;
 }
@@ -18,7 +18,7 @@ static enum ui_error failing_notify_fn(void *user_data) {
 int main(void) {
   struct ui_arena *arena;
   struct ui_window_controls_base *controls = NULL;
-  enum ui_error err;
+  ui_error_t err;
   ui_signal_t *state_signal = NULL;
   enum ui_window_control_hit_region region;
   int failed = 0;
@@ -66,7 +66,7 @@ int main(void) {
         printf("Failed at line %d\n", __LINE__);
       }
       g_malloc_fail_countdown = -1;
-      ui_arena_destroy(tight_arena);
+      (void)ui_arena_destroy(tight_arena);
     }
   }
 #endif
@@ -269,6 +269,6 @@ int main(void) {
     printf("Failed at line %d\n", __LINE__);
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return failed;
 }

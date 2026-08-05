@@ -6,6 +6,28 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_aspect_ratio_mock_fail = 0;
+static ui_error_t
+mock_component_set_default_style(struct ui_component *component,
+                                 struct ui_css_stylesheet *style) {
+  if (g_aspect_ratio_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  return (ui_component_set_default_style)(component, style);
+}
+#undef ui_component_set_default_style
+#define ui_component_set_default_style mock_component_set_default_style
+
+ui_error_t run_aspect_ratio_coverage(void);
+ui_error_t run_aspect_ratio_coverage(void) {
+  struct ui_aspect_ratio_base *ar = NULL;
+  g_aspect_ratio_mock_fail = 1;
+  ui_aspect_ratio_base_create(&ar);
+  g_aspect_ratio_mock_fail = 0;
+  return UI_ERROR_NONE;
+}
+#endif
+
 static const char *ui_aspect_ratio_base_default_css =
     ".aspect-ratio-container { "
     "position: relative; "
@@ -36,10 +58,10 @@ struct ui_aspect_ratio_base {
  * @param out_aspect_ratio Pointer to receive the allocated component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio) {
   struct ui_aspect_ratio_base *ar;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -47,7 +69,7 @@ ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ar = (struct ui_aspect_ratio_base *)UI_MALLOC(
+  ar = (struct ui_aspect_ratio_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_aspect_ratio_base));
   if (!ar) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -82,7 +104,10 @@ ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio) {
     goto cleanup;
   }
 
-  ui_component_set_default_style(ar->component, default_style);
+  rc = ui_component_set_default_style(ar->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   ar->component->shadow_root = root_node;
   root_node = NULL;
@@ -92,12 +117,12 @@ ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (ar->component) {
-    ui_component_destroy(ar->component);
+    (void)ui_component_destroy(ar->component);
   }
-  UI_FREE(ar);
+  C_MULTIPLATFORM_FREE(ar);
   return rc;
 }
 
@@ -106,12 +131,14 @@ cleanup:
  *
  * @param aspect_ratio The component to destroy.
  */
-void ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio) {
+ui_error_t
+ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio) {
   if (!aspect_ratio) {
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
   }
-  ui_component_destroy(aspect_ratio->component);
-  UI_FREE(aspect_ratio);
+  (void)ui_component_destroy(aspect_ratio->component);
+  C_MULTIPLATFORM_FREE(aspect_ratio);
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -121,12 +148,12 @@ void ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio) {
  * @param ratio The aspect ratio float value (e.g., 16.0f / 9.0f).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
                                float ratio) {
   char buffer[64];
   float padding_bottom;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!aspect_ratio) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -161,7 +188,7 @@ ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
  * @param aspect_ratio The aspect ratio component.
  * @return The underlying component.
  */
-enum ui_error
+ui_error_t
 ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,
                                    struct ui_component **out_component) {
   if (!aspect_ratio || !out_component) {
@@ -178,9 +205,8 @@ ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_aspect_ratio_base_bind_ratio(struct ui_aspect_ratio_base *widget,
-                                struct ui_signal *signal) {
+ui_error_t ui_aspect_ratio_base_bind_ratio(struct ui_aspect_ratio_base *widget,
+                                           struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

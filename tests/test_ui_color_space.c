@@ -5,11 +5,11 @@
 #include <stdlib.h>
 /* clang-format on */
 
-static enum ui_error test_argb_to_hct(void) {
+static ui_error_t test_argb_to_hct(void) {
   ui_color_t red = UI_COLOR_ARGB(255, 255, 0, 0);
   struct ui_color_hct hct;
   ui_color_t back;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_color_argb_to_hct(red, &hct);
   if (err != UI_ERROR_NONE) {
@@ -36,11 +36,11 @@ static enum ui_error test_argb_to_hct(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_argb_to_cam16(void) {
+static ui_error_t test_argb_to_cam16(void) {
   ui_color_t green = UI_COLOR_ARGB(255, 0, 255, 0);
   struct ui_color_cam16 cam16;
   ui_color_t back;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_color_argb_to_cam16(green, &cam16);
   if (err != UI_ERROR_NONE) {
@@ -64,7 +64,7 @@ static enum ui_error test_argb_to_cam16(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_edge_cases(void) {
+static ui_error_t test_edge_cases(void) {
   ui_color_t black =
       UI_COLOR_ARGB(255, 1, 1, 1); /* Near black to hit low value branches */
   struct ui_color_hct hct;

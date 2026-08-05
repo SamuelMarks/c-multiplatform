@@ -14,8 +14,8 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error mock_on_close(struct ui_dialog_base *dialog,
-                                   void *user_data) {
+static ui_error_t mock_on_close(struct ui_dialog_base *dialog,
+                                void *user_data) {
   int *called = (int *)user_data;
   (void)dialog;
   *called = 1;
@@ -24,13 +24,13 @@ static enum ui_error mock_on_close(struct ui_dialog_base *dialog,
 
 static int test_create_destroy(void) {
   struct ui_dialog_base *dialog = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_dialog_base_create(&dialog);
   if (rc != UI_ERROR_NONE || !dialog)
     return 1;
 
-  ui_dialog_base_destroy(dialog);
+  (void)ui_dialog_base_destroy(dialog);
   return 0;
 }
 
@@ -46,7 +46,7 @@ static int test_errors(void) {
 
   if (ui_dialog_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_dialog_base_destroy(NULL);
+  (void)ui_dialog_base_destroy(NULL);
 
   if (ui_dialog_base_set_content(NULL, comp) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -91,7 +91,7 @@ static int test_errors(void) {
     g_malloc_fail_countdown = i;
     if (ui_dialog_base_create(&dialog) == UI_ERROR_NONE) {
       g_malloc_fail_countdown = -1;
-      ui_dialog_base_destroy(dialog);
+      (void)ui_dialog_base_destroy(dialog);
     }
   }
   g_malloc_fail_countdown = -1;
@@ -109,7 +109,7 @@ static int test_getters_and_setters(void) {
   struct ui_signal *signal = (struct ui_signal *)4;
   struct ui_computed *computed = NULL;
   int is_open = -1;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_event event = {0};
 
   ui_dialog_base_create(&dialog);
@@ -241,11 +241,11 @@ static int test_getters_and_setters(void) {
   ui_dialog_base_set_open(dialog, 1);
 
   /* Leave it open to test destroy while open */
-  ui_dialog_base_destroy(dialog);
-  ui_component_destroy(content);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root_node);
-  ui_focus_manager_destroy(focus_manager);
+  (void)ui_dialog_base_destroy(dialog);
+  (void)ui_component_destroy(content);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root_node);
+  (void)ui_focus_manager_destroy(focus_manager);
   return 0;
 }
 
@@ -268,8 +268,8 @@ static int test_open_without_director_and_focus(void) {
   ui_dialog_base_set_open(dialog, 1);
   ui_dialog_base_set_open(dialog, 0);
   ui_dialog_base_set_open(dialog, 1);
-  ui_dialog_base_destroy(dialog);
-  ui_overlay_director_destroy(director);
+  (void)ui_dialog_base_destroy(dialog);
+  (void)ui_overlay_director_destroy(director);
 
   /* Set only focus */
   ui_dialog_base_create(&dialog);
@@ -289,13 +289,13 @@ static int test_open_without_director_and_focus(void) {
   ui_dialog_base_set_open(dialog, 1);
   ui_dialog_base_set_open(dialog, 0);
   ui_dialog_base_set_open(dialog, 1);
-  ui_dialog_base_destroy(dialog);
-  ui_focus_manager_destroy(focus_manager);
+  (void)ui_dialog_base_destroy(dialog);
+  (void)ui_focus_manager_destroy(focus_manager);
   ui_dialog_base_create(&dialog);
   ui_overlay_director_create(NULL, &director);
   ui_dialog_base_set_overlay_director(dialog, director);
-  ui_dialog_base_destroy(dialog);
-  ui_overlay_director_destroy(director);
+  (void)ui_dialog_base_destroy(dialog);
+  (void)ui_overlay_director_destroy(director);
 
   return 0;
 }
@@ -305,7 +305,7 @@ static int test_oom_open(void) {
   struct ui_overlay_director *director = NULL;
   struct ui_focus_manager *focus_manager = NULL;
   struct ui_dom_node *root_node = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   for (i = 0; i < 20; i++) {
@@ -321,10 +321,10 @@ static int test_oom_open(void) {
     rc = ui_dialog_base_set_open(dialog, 1);
     g_malloc_fail_countdown = -1;
 
-    ui_dialog_base_destroy(dialog);
-    ui_focus_manager_destroy(focus_manager);
-    ui_overlay_director_destroy(director);
-    ui_dom_node_destroy(root_node);
+    (void)ui_dialog_base_destroy(dialog);
+    (void)ui_focus_manager_destroy(focus_manager);
+    (void)ui_overlay_director_destroy(director);
+    (void)ui_dom_node_destroy(root_node);
   }
 
   for (i = 0; i < 5; i++) {
@@ -334,8 +334,8 @@ static int test_oom_open(void) {
     g_malloc_fail_countdown = i;
     rc = ui_dialog_base_set_open(dialog, 1);
     g_malloc_fail_countdown = -1;
-    ui_dialog_base_destroy(dialog);
-    ui_focus_manager_destroy(focus_manager);
+    (void)ui_dialog_base_destroy(dialog);
+    (void)ui_focus_manager_destroy(focus_manager);
   }
   return 0;
 }

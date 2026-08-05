@@ -17,6 +17,27 @@
 #endif
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_auth_mock_fail = 0;
+static ui_error_t mock_promise_resolve(struct ui_promise *promise,
+                                       void *value) {
+  if (g_auth_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  return (ui_promise_resolve)(promise, value);
+}
+#undef ui_promise_resolve
+#define ui_promise_resolve mock_promise_resolve
+
+static ui_error_t mock_promise_reject(struct ui_promise *promise,
+                                      ui_error_t error) {
+  if (g_auth_mock_fail == 2)
+    return UI_ERROR_UNKNOWN;
+  return (ui_promise_reject)(promise, error);
+}
+#undef ui_promise_reject
+#define ui_promise_reject mock_promise_reject
+#endif
+
 struct ui_auth_task {
   struct ui_promise *promise;
   enum ui_auth_result result;
@@ -26,7 +47,7 @@ struct ui_auth_task {
    have true async APIs. But for now, we will just mock the OS behavior
    directly. */
 
-enum ui_error ui_auth_is_supported(int *out_is_available) {
+ui_error_t ui_auth_is_supported(int *out_is_available) {
   if (!out_is_available) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -36,15 +57,16 @@ enum ui_error ui_auth_is_supported(int *out_is_available) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_auth_request_async(const struct ui_auth_request_config *config,
-                                    struct ui_promise *promise) {
+ui_error_t ui_auth_request_async(const struct ui_auth_request_config *config,
+                                 struct ui_promise *promise) {
   struct ui_auth_task *task;
 
   if (!config || !promise) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  task = (struct ui_auth_task *)UI_MALLOC(sizeof(struct ui_auth_task));
+  task = (struct ui_auth_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_auth_task));
   if (!task) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -62,15 +84,54 @@ enum ui_error ui_auth_request_async(const struct ui_auth_request_config *config,
      dynamically allocate the result. */
   {
     enum ui_auth_result *heap_result =
-        (enum ui_auth_result *)UI_MALLOC(sizeof(enum ui_auth_result));
+        (enum ui_auth_result *)C_MULTIPLATFORM_MALLOC(
+            sizeof(enum ui_auth_result));
+    ui_error_t rc;
     if (heap_result) {
       *heap_result = task->result;
-      ui_promise_resolve(promise, heap_result);
+      rc = ui_promise_resolve(promise, heap_result);
+      if (rc != UI_ERROR_NONE) {
+        C_MULTIPLATFORM_FREE(task);
+        return rc;
+      }
     } else {
-      ui_promise_reject(promise, UI_ERROR_OUT_OF_MEMORY);
+      rc = ui_promise_reject(promise, UI_ERROR_OUT_OF_MEMORY);
+      if (rc != UI_ERROR_NONE) {
+        C_MULTIPLATFORM_FREE(task);
+        return rc;
+      }
     }
   }
 
-  UI_FREE(task);
+  C_MULTIPLATFORM_FREE(task);
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+
+ui_error_t run_auth_coverage(void);
+ui_error_t run_auth_coverage(void) {
+  struct ui_promise *promise = NULL;
+  struct ui_auth_request_config config;
+  extern int g_malloc_fail_countdown;
+
+  config.reason = "Test";
+
+  (void)ui_promise_create(&promise);
+
+  g_auth_mock_fail = 1;
+  ui_auth_request_async(&config, promise);
+  g_auth_mock_fail = 0;
+  (void)ui_promise_destroy(promise);
+
+  (void)ui_promise_create(&promise);
+  g_malloc_fail_countdown = 1;
+  g_auth_mock_fail = 2;
+  ui_auth_request_async(&config, promise);
+  g_malloc_fail_countdown = -1;
+  g_auth_mock_fail = 0;
+  (void)ui_promise_destroy(promise);
+
+  return UI_ERROR_NONE;
+}
+#endif

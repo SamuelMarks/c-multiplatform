@@ -4,11 +4,11 @@
 #include <stdlib.h>
 /* clang-format on */
 
-static enum ui_error test_state_layer(void) {
+static ui_error_t test_state_layer(void) {
   ui_color_t surface = UI_COLOR_ARGB(255, 255, 255, 255); /* White */
   ui_color_t on_surface = UI_COLOR_ARGB(255, 0, 0, 0);    /* Black */
   ui_color_t result;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_state_layer_get_color(surface, on_surface, UI_STATE_LAYER_HOVER,
                                  &result);

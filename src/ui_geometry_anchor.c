@@ -3,12 +3,12 @@
 #include <stddef.h>
 /* clang-format on */
 
-enum ui_error ui_geometry_anchor_compute(const struct ui_layout_node *target,
-                                         const struct ui_layout_node *overlay,
-                                         const struct ui_anchor_config *config,
-                                         float viewport_width,
-                                         float viewport_height, float *out_x,
-                                         float *out_y) {
+ui_error_t ui_geometry_anchor_compute(const struct ui_layout_node *target,
+                                      const struct ui_layout_node *overlay,
+                                      const struct ui_anchor_config *config,
+                                      float viewport_width,
+                                      float viewport_height, float *out_x,
+                                      float *out_y) {
   float target_point_x;
   float target_point_y;
   float overlay_offset_x;

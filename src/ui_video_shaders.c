@@ -29,9 +29,8 @@ static const char *yuv_fragment_source =
     "}\n";
 
 /** \brief ui_error */
-enum ui_error
-ui_video_shaders_get_yuv_program(struct ui_shader_manager *manager,
-                                 unsigned int *out_program_id) {
+ui_error_t ui_video_shaders_get_yuv_program(struct ui_shader_manager *manager,
+                                            unsigned int *out_program_id) {
   if (!manager || !out_program_id) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

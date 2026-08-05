@@ -35,14 +35,14 @@ struct ui_component {
  * @param out_component Pointer to receive the new component instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_component_create(struct ui_component **out_component);
+ui_error_t ui_component_create(struct ui_component **out_component);
 
 /**
  * @brief Destroys a component and its isolated DOM/style subtrees.
  *
  * @param component The component to destroy.
  */
-void ui_component_destroy(struct ui_component *component);
+ui_error_t ui_component_destroy(struct ui_component *component);
 
 /**
  * @brief Sets the default internal stylesheet for the component.
@@ -51,9 +51,8 @@ void ui_component_destroy(struct ui_component *component);
  * @param stylesheet The stylesheet to apply as the internal default.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
-ui_component_set_default_style(struct ui_component *component,
-                               struct ui_css_stylesheet *stylesheet);
+ui_error_t ui_component_set_default_style(struct ui_component *component,
+                                          struct ui_css_stylesheet *stylesheet);
 
 /**
  * @brief Injects a user-provided style override via a CSS string payload.
@@ -62,8 +61,8 @@ ui_component_set_default_style(struct ui_component *component,
  * @param css_string The CSS string containing overrides.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_component_inject_style_override(struct ui_component *component,
-                                                 const char *css_string);
+ui_error_t ui_component_inject_style_override(struct ui_component *component,
+                                              const char *css_string);
 
 /**
  * @brief Maps internal component state to CSS Custom Properties (Variables).
@@ -74,9 +73,9 @@ enum ui_error ui_component_inject_style_override(struct ui_component *component,
  * @param property_value The value to assign to the property.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_component_set_property(struct ui_component *component,
-                                        const char *property_name,
-                                        const char *property_value);
+ui_error_t ui_component_set_property(struct ui_component *component,
+                                     const char *property_name,
+                                     const char *property_value);
 
 /**
  * @brief Enforces Scoped CSS Encapsulation.
@@ -87,7 +86,7 @@ enum ui_error ui_component_set_property(struct ui_component *component,
  * @param component The component to scope.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_component_scope_styles(struct ui_component *component);
+ui_error_t ui_component_scope_styles(struct ui_component *component);
 
 /**
  * @brief Mounts the component to a host DOM node.
@@ -96,8 +95,8 @@ enum ui_error ui_component_scope_styles(struct ui_component *component);
  * @param host_node The DOM node that will act as the host/mount point.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_component_mount(struct ui_component *component,
-                                 struct ui_dom_node *host_node);
+ui_error_t ui_component_mount(struct ui_component *component,
+                              struct ui_dom_node *host_node);
 
 #ifdef __cplusplus
 }

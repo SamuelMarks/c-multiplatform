@@ -6,14 +6,14 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error mock_cva_on_change(union ui_signal_payload new_value,
-                                        void *user_data) {
+static ui_error_t mock_cva_on_change(union ui_signal_payload new_value,
+                                     void *user_data) {
   int *called = (int *)user_data;
   *called = new_value.bool_val;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mock_cva_on_touched(void *user_data) {
+static ui_error_t mock_cva_on_touched(void *user_data) {
   int *called = (int *)user_data;
   *called = 1;
   return UI_ERROR_NONE;
@@ -22,7 +22,7 @@ static enum ui_error mock_cva_on_touched(void *user_data) {
 static int run_normal_tests(void) {
   struct ui_slide_toggle_base *toggle = NULL;
   struct ui_control_value_accessor cva;
-  enum ui_error rc;
+  ui_error_t rc;
   int state;
   float offset;
   struct ui_event ev;
@@ -278,7 +278,42 @@ static int run_normal_tests(void) {
   /* Simulate track transition tracking mapped onto UI_TOGGLE_STATE CSS classes
    * natively */
   printf("Track color transition CSS targets map verified.\n");
-  ui_slide_toggle_base_destroy(toggle);
+
+  /* Test cancel state */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.x = 0;
+  ev.event_data.mouse.y = 0;
+  ui_slide_toggle_base_process_event(toggle, &ev, 1900.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 25;
+  ui_slide_toggle_base_process_event(toggle, &ev, 1950.0); /* Pan start */
+  ev.type = UI_EVENT_TOUCH_CANCEL;
+  ui_slide_toggle_base_process_event(toggle, &ev, 2000.0); /* Pan cancel */
+
+  /* Test NULL callbacks */
+  cva.register_on_change(toggle, NULL, NULL);
+  cva.register_on_touched(toggle, NULL, NULL);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_slide_toggle_base_process_event(toggle, &ev, 2100.0);
+  ev.type = UI_EVENT_MOUSE_UP;
+  ui_slide_toggle_base_process_event(
+      toggle, &ev,
+      2110.0); /* Will trigger toggling and call NULL CVA functions */
+
+  /* Test ui_gesture_recognizer_process_event failing */
+  {
+    struct ui_slide_toggle_base_internal {
+      int checked;
+      int disabled;
+      void *recognizer;
+    } *internal = (struct ui_slide_toggle_base_internal *)toggle;
+    void *old_recognizer = internal->recognizer;
+    internal->recognizer = NULL;
+    ui_slide_toggle_base_process_event(toggle, &ev, 2200.0);
+    internal->recognizer = old_recognizer;
+  }
+
+  (void)ui_slide_toggle_base_destroy(toggle);
   ui_slide_toggle_base_destroy(NULL); /* Safe */
 
   return 0;
@@ -286,7 +321,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_slide_toggle_base *toggle = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing OOM on create...\n");
   g_malloc_fail_countdown = 0;
@@ -299,7 +334,7 @@ static int run_oom_tests(void) {
   rc = ui_slide_toggle_base_create(&toggle, NULL);
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_slide_toggle_base_destroy(toggle);
+    (void)ui_slide_toggle_base_destroy(toggle);
     return 1;
   }
 
@@ -307,7 +342,7 @@ static int run_oom_tests(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_slide_toggle_base_destroy(toggle);
+  (void)ui_slide_toggle_base_destroy(toggle);
   return 0;
 }
 

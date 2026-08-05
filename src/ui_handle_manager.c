@@ -25,12 +25,26 @@ struct ui_handle_manager {
   ui_atomic_t lock;
 };
 
-static enum ui_error spin_lock(ui_atomic_t *lock) {
+static ui_error_t spin_lock(ui_atomic_t *lock) {
 #ifndef UI_SINGLE_THREADED
   int is_swapped = 0;
-  while (ui_atomic_cas(lock, 0, 1, &is_swapped) == UI_ERROR_NONE &&
-         is_swapped == 0) {
-    /* busy wait */
+  do {
+    {
+      ui_error_t cas_rc = ui_atomic_cas(lock, 0, 1, &is_swapped);
+      (void)cas_rc;
+    }
+  } while (is_swapped != 0);
+#else
+  (void)lock;
+#endif
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t spin_unlock(ui_atomic_t *lock) {
+#ifndef UI_SINGLE_THREADED
+  {
+    ui_error_t store_rc = ui_atomic_store(lock, 0);
+    (void)store_rc;
   }
 #else
   (void)lock;
@@ -38,18 +52,9 @@ static enum ui_error spin_lock(ui_atomic_t *lock) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error spin_unlock(ui_atomic_t *lock) {
-#ifndef UI_SINGLE_THREADED
-  ui_atomic_store(lock, 0);
-#else
-  (void)lock;
-#endif
-  return UI_ERROR_NONE;
-}
-
-enum ui_error ui_handle_manager_create(ui_uint32 capacity,
-                                       struct ui_handle_manager **out_manager) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_handle_manager_create(ui_uint32 capacity,
+                                    struct ui_handle_manager **out_manager) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_handle_manager *manager = NULL;
   ui_uint32 i;
 
@@ -58,14 +63,14 @@ enum ui_error ui_handle_manager_create(ui_uint32 capacity,
     goto cleanup;
   }
 
-  manager =
-      (struct ui_handle_manager *)UI_MALLOC(sizeof(struct ui_handle_manager));
+  manager = (struct ui_handle_manager *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_handle_manager));
   if (!manager) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
 
-  manager->entries = (struct ui_handle_entry *)UI_MALLOC(
+  manager->entries = (struct ui_handle_entry *)C_MULTIPLATFORM_MALLOC(
       capacity * sizeof(struct ui_handle_entry));
   if (!manager->entries) {
     rc = UI_ERROR_OUT_OF_MEMORY;
@@ -75,7 +80,10 @@ enum ui_error ui_handle_manager_create(ui_uint32 capacity,
   manager->capacity = capacity;
   manager->active_count = 0;
   manager->first_free = 0;
-  ui_atomic_store(&manager->lock, 0);
+  {
+    ui_error_t st_rc = ui_atomic_store(&manager->lock, 0);
+    (void)st_rc;
+  }
 
   for (i = 0; i < capacity; ++i) {
     manager->entries[i].data = NULL;
@@ -88,25 +96,26 @@ enum ui_error ui_handle_manager_create(ui_uint32 capacity,
 
 cleanup:
   if (manager) {
-    ui_handle_manager_destroy(manager);
+    C_MULTIPLATFORM_FREE(manager->entries);
+    C_MULTIPLATFORM_FREE(manager);
   }
   return rc;
 }
 
-enum ui_error ui_handle_manager_destroy(struct ui_handle_manager *manager) {
+ui_error_t ui_handle_manager_destroy(struct ui_handle_manager *manager) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (manager->entries) {
-    UI_FREE(manager->entries);
+    C_MULTIPLATFORM_FREE(manager->entries);
   }
-  UI_FREE(manager);
+  C_MULTIPLATFORM_FREE(manager);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_handle_manager_alloc(struct ui_handle_manager *manager,
-                                      void *data, ui_uint64 *out_handle) {
+ui_error_t ui_handle_manager_alloc(struct ui_handle_manager *manager,
+                                   void *data, ui_uint64 *out_handle) {
   ui_uint32 index;
   ui_uint32 generation;
 
@@ -114,10 +123,16 @@ enum ui_error ui_handle_manager_alloc(struct ui_handle_manager *manager,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)spin_lock(&manager->lock);
+  {
+    ui_error_t sl_rc = spin_lock(&manager->lock);
+    (void)sl_rc;
+  }
 
   if (manager->active_count >= manager->capacity) {
-    (void)spin_unlock(&manager->lock);
+    {
+      ui_error_t sul_rc = spin_unlock(&manager->lock);
+      (void)sul_rc;
+    }
     return UI_ERROR_QUEUE_FULL;
   }
 
@@ -128,14 +143,17 @@ enum ui_error ui_handle_manager_alloc(struct ui_handle_manager *manager,
   manager->entries[index].data = data;
   generation = manager->entries[index].generation;
 
-  (void)spin_unlock(&manager->lock);
+  {
+    ui_error_t sul_rc = spin_unlock(&manager->lock);
+    (void)sul_rc;
+  }
 
   *out_handle = MAKE_HANDLE(index, generation);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_handle_manager_get(struct ui_handle_manager *manager,
-                                    ui_uint64 handle, void **out_data) {
+ui_error_t ui_handle_manager_get(struct ui_handle_manager *manager,
+                                 ui_uint64 handle, void **out_data) {
   ui_uint32 index;
   ui_uint32 generation;
 
@@ -150,22 +168,31 @@ enum ui_error ui_handle_manager_get(struct ui_handle_manager *manager,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)spin_lock(&manager->lock);
+  {
+    ui_error_t sl_rc = spin_lock(&manager->lock);
+    (void)sl_rc;
+  }
 
   if (manager->entries[index].generation != generation ||
       manager->entries[index].data == NULL) {
-    (void)spin_unlock(&manager->lock);
+    {
+      ui_error_t sul_rc = spin_unlock(&manager->lock);
+      (void)sul_rc;
+    }
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   *out_data = manager->entries[index].data;
 
-  (void)spin_unlock(&manager->lock);
+  {
+    ui_error_t sul_rc = spin_unlock(&manager->lock);
+    (void)sul_rc;
+  }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_handle_manager_free(struct ui_handle_manager *manager,
-                                     ui_uint64 handle) {
+ui_error_t ui_handle_manager_free(struct ui_handle_manager *manager,
+                                  ui_uint64 handle) {
   ui_uint32 index;
   ui_uint32 generation;
 
@@ -180,11 +207,17 @@ enum ui_error ui_handle_manager_free(struct ui_handle_manager *manager,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)spin_lock(&manager->lock);
+  {
+    ui_error_t sl_rc = spin_lock(&manager->lock);
+    (void)sl_rc;
+  }
 
   if (manager->entries[index].generation != generation ||
       manager->entries[index].data == NULL) {
-    (void)spin_unlock(&manager->lock);
+    {
+      ui_error_t sul_rc = spin_unlock(&manager->lock);
+      (void)sul_rc;
+    }
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
@@ -194,6 +227,9 @@ enum ui_error ui_handle_manager_free(struct ui_handle_manager *manager,
   manager->first_free = index;
   manager->active_count--;
 
-  (void)spin_unlock(&manager->lock);
+  {
+    ui_error_t sul_rc = spin_unlock(&manager->lock);
+    (void)sul_rc;
+  }
   return UI_ERROR_NONE;
 }

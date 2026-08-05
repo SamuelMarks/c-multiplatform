@@ -84,8 +84,8 @@ EM_JS(int, fs_write_file_js,
       })
 #endif
 
-enum ui_error ui_fs_read_file(const char *path, void **out_data,
-                              size_t *out_size) {
+ui_error_t ui_fs_read_file(const char *path, void **out_data,
+                           size_t *out_size) {
   if (!path || !out_data || !out_size)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -123,7 +123,7 @@ enum ui_error ui_fs_read_file(const char *path, void **out_data,
       return UI_ERROR_IO_FAILED;
     }
 
-    if (sz < 0 || (unsigned long)sz >= (unsigned long)(-2)) {
+    if (sz < 0) {
       fclose(f);
       return UI_ERROR_IO_FAILED;
     }
@@ -134,7 +134,7 @@ enum ui_error ui_fs_read_file(const char *path, void **out_data,
       return UI_ERROR_IO_FAILED;
     }
 
-    *out_data = UI_MALLOC((size_t)sz + 1);
+    *out_data = C_MULTIPLATFORM_MALLOC((size_t)sz + 1);
     if (!*out_data) {
       fclose(f);
       return UI_ERROR_OUT_OF_MEMORY;
@@ -144,7 +144,7 @@ enum ui_error ui_fs_read_file(const char *path, void **out_data,
     fclose(f);
 
     if (read_bytes != (size_t)sz) {
-      UI_FREE(*out_data);
+      C_MULTIPLATFORM_FREE(*out_data);
       *out_data = NULL;
       return UI_ERROR_IO_FAILED;
     }
@@ -157,8 +157,7 @@ enum ui_error ui_fs_read_file(const char *path, void **out_data,
 #endif
 }
 
-enum ui_error ui_fs_write_file(const char *path, const void *data,
-                               size_t size) {
+ui_error_t ui_fs_write_file(const char *path, const void *data, size_t size) {
   if (!path || !data)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -214,8 +213,8 @@ EM_JS(int, fs_opfs_write_sync_js,
       })
 #endif
 
-enum ui_error ui_fs_write_file_opfs_sync(const char *path, const void *data,
-                                         size_t size) {
+ui_error_t ui_fs_write_file_opfs_sync(const char *path, const void *data,
+                                      size_t size) {
   if (!path || !data)
     return UI_ERROR_INVALID_ARGUMENT;
 

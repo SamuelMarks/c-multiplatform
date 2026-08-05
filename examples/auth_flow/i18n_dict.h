@@ -22,8 +22,8 @@ extern "C" {
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if out_str is
  * NULL, UI_ERROR_NOT_FOUND if the key doesn't exist.
  */
-enum ui_error get_translated_string(const char *locale, const char *key,
-                                    const char **out_str);
+ui_error_t get_translated_string(const char *locale, const char *key,
+                                 const char **out_str);
 
 #ifdef __cplusplus
 }

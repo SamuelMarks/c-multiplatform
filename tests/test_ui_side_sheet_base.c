@@ -5,8 +5,8 @@
 #include <stdio.h>
 /* clang-format on */
 
-static enum ui_error mock_on_close(struct ui_side_sheet_base *sheet,
-                                   void *user_data) {
+static ui_error_t mock_on_close(struct ui_side_sheet_base *sheet,
+                                void *user_data) {
   int *called = (int *)user_data;
   (void)sheet;
   *called = 1;
@@ -15,7 +15,7 @@ static enum ui_error mock_on_close(struct ui_side_sheet_base *sheet,
 
 #define ASSERT_SUCCESS(expr)                                                   \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
+    ui_error_t err = (expr);                                                   \
     if (err != UI_ERROR_NONE) {                                                \
       printf("Failed at line %d: %d\n", __LINE__, err);                        \
       return 1;                                                                \
@@ -23,13 +23,15 @@ static enum ui_error mock_on_close(struct ui_side_sheet_base *sheet,
   } while (0)
 #define ASSERT_EQ(expr, expected)                                              \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
+    ui_error_t err = (expr);                                                   \
     if (err != (expected)) {                                                   \
       printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
              err);                                                             \
       return 1;                                                                \
     }                                                                          \
   } while (0)
+
+extern int g_malloc_fail_countdown;
 
 int main(void) {
   struct ui_side_sheet_base *sheet = NULL;
@@ -38,12 +40,22 @@ int main(void) {
   int is_open;
   int close_called = 0;
   ui_signal_t *signal = NULL;
+  int i;
+
+  for (i = 0; i < 2; i++) {
+    g_malloc_fail_countdown = i;
+    if (ui_side_sheet_base_create(&sheet) == UI_ERROR_NONE) {
+      (void)ui_side_sheet_base_destroy(sheet);
+      return 1;
+    }
+  }
+  g_malloc_fail_countdown = -1;
 
   /* Null checks */
   ASSERT_EQ(ui_side_sheet_base_create(NULL), UI_ERROR_INVALID_ARGUMENT);
 
   /* Destroy null */
-  ui_side_sheet_base_destroy(NULL);
+  (void)ui_side_sheet_base_destroy(NULL);
 
   ASSERT_EQ(ui_side_sheet_base_set_content(NULL, NULL),
             UI_ERROR_INVALID_ARGUMENT);
@@ -119,7 +131,7 @@ int main(void) {
   ASSERT_SUCCESS(ui_side_sheet_base_set_open(sheet, 0));
   ASSERT_SUCCESS(ui_side_sheet_base_process_event(sheet, &ev, 0.0));
 
-  ui_side_sheet_base_destroy(sheet);
+  (void)ui_side_sheet_base_destroy(sheet);
 
   printf("All tests passed.\n");
   return 0;

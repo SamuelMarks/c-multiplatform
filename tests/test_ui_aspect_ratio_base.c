@@ -7,19 +7,19 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error test_aspect_ratio_creation(void) {
+static ui_error_t test_aspect_ratio_creation(void) {
   struct ui_aspect_ratio_base *ar = NULL;
-  enum ui_error rc = ui_aspect_ratio_base_create(&ar);
+  ui_error_t rc = ui_aspect_ratio_base_create(&ar);
   assert(rc == UI_ERROR_NONE);
   assert(ar != NULL);
-  ui_aspect_ratio_base_destroy(ar);
+  (void)ui_aspect_ratio_base_destroy(ar);
   printf("test_aspect_ratio_creation passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_aspect_ratio_set(void) {
+static ui_error_t test_aspect_ratio_set(void) {
   struct ui_aspect_ratio_base *ar = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_aspect_ratio_base_create(&ar);
   assert(rc == UI_ERROR_NONE);
@@ -27,7 +27,7 @@ static enum ui_error test_aspect_ratio_set(void) {
   rc = ui_aspect_ratio_base_set_ratio(ar, 16.0f / 9.0f);
   assert(rc == UI_ERROR_NONE);
 
-  ui_aspect_ratio_base_destroy(ar);
+  (void)ui_aspect_ratio_base_destroy(ar);
   printf("test_aspect_ratio_set passed\n");
   return UI_ERROR_NONE;
 }
@@ -36,7 +36,7 @@ static void test_aspect_ratio_edge_cases(void) {
   struct ui_aspect_ratio_base *ar = NULL;
   struct ui_component *comp = NULL;
   int i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* NULL pointers */
   assert(ui_aspect_ratio_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
@@ -67,14 +67,14 @@ static void test_aspect_ratio_edge_cases(void) {
   assert(ui_aspect_ratio_base_set_ratio(ar, 1.5f) == UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
-  ui_aspect_ratio_base_destroy(ar);
+  (void)ui_aspect_ratio_base_destroy(ar);
 
   /* OOM loop */
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_aspect_ratio_base_create(&ar);
     if (rc == UI_ERROR_NONE) {
-      ui_aspect_ratio_base_destroy(ar);
+      (void)ui_aspect_ratio_base_destroy(ar);
       break;
     }
   }
@@ -86,5 +86,10 @@ int main(void) {
   test_aspect_ratio_creation();
   test_aspect_ratio_set();
   test_aspect_ratio_edge_cases();
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_aspect_ratio_coverage(void);
+  run_aspect_ratio_coverage();
+#endif
   return 0;
 }

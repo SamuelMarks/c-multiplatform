@@ -12,15 +12,23 @@ struct ui_chat_bubble_base {
   ui_signal_t *config_signal;
 };
 
-static enum ui_error int_equality(union ui_signal_payload a,
-                                  union ui_signal_payload b,
-                                  ui_bool_t *out_equal) {
+static ui_error_t int_equality(union ui_signal_payload a,
+                               union ui_signal_payload b,
+                               ui_bool_t *out_equal) {
   *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error pack_config(const struct ui_chat_bubble_config *config,
-                                 ui_int32 *out_val) {
+static ui_error_t pack_config(const struct ui_chat_bubble_config *config,
+                              ui_int32 *out_val) {
+  if ((int)config->tail_placement > (int)UI_CHAT_BUBBLE_TAIL_TOP_RIGHT ||
+      (int)config->tail_placement < (int)UI_CHAT_BUBBLE_TAIL_NONE)
+    return UI_ERROR_INVALID_ARGUMENT;
+
+  if ((int)config->group_position > (int)UI_CHAT_BUBBLE_GROUP_LAST ||
+      (int)config->group_position < (int)UI_CHAT_BUBBLE_GROUP_SINGLE)
+    return UI_ERROR_INVALID_ARGUMENT;
+
   /* Pack tail placement and group position into a single 32-bit int */
   *out_val = ((ui_int32)config->tail_placement << 16) |
              (ui_int32)config->group_position;
@@ -28,11 +36,11 @@ static enum ui_error pack_config(const struct ui_chat_bubble_config *config,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_chat_bubble_base_create(struct ui_arena *arena,
                            const struct ui_chat_bubble_config *config,
                            struct ui_chat_bubble_base **out_bubble) {
-  enum ui_error err;
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -43,11 +51,11 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
   err = ui_arena_alloc(arena, sizeof(struct ui_chat_bubble_base), 8, &ptr);
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    void *dummy = UI_MALLOC(1);
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
     if (!dummy) {
       err = UI_ERROR_OUT_OF_MEMORY;
     } else {
-      UI_FREE(dummy);
+      C_MULTIPLATFORM_FREE(dummy);
     }
   }
 #endif
@@ -60,7 +68,9 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
 
   {
     ui_int32 packed = 0;
-    (void)pack_config(config, &packed);
+    err = pack_config(config, &packed);
+    if (err != UI_ERROR_NONE)
+      return err;
     initial_payload.int_val = packed;
   }
   err = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_INT32,
@@ -68,11 +78,11 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
                          &(*out_bubble)->config_signal);
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    void *dummy = UI_MALLOC(1);
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
     if (!dummy) {
       err = UI_ERROR_OUT_OF_MEMORY;
     } else {
-      UI_FREE(dummy);
+      C_MULTIPLATFORM_FREE(dummy);
     }
   }
 #endif
@@ -82,15 +92,15 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble) {
+ui_error_t ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble) {
   if (!bubble)
     return UI_ERROR_INVALID_ARGUMENT;
-  ui_signal_destroy(bubble->config_signal);
+  (void)ui_signal_destroy(bubble->config_signal);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_chat_bubble_base_set_config(struct ui_chat_bubble_base *bubble,
                                const struct ui_chat_bubble_config *config) {
   union ui_signal_payload payload;
@@ -102,14 +112,16 @@ ui_chat_bubble_base_set_config(struct ui_chat_bubble_base *bubble,
 
   {
     ui_int32 packed = 0;
-    (void)pack_config(config, &packed);
+    ui_error_t err = pack_config(config, &packed);
+    if (err != UI_ERROR_NONE)
+      return err;
     payload.int_val = packed;
   }
   return ui_signal_set(bubble->config_signal, payload);
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_chat_bubble_base_get_config_signal(struct ui_chat_bubble_base *bubble,
                                       ui_signal_t **out_signal) {
   if (!bubble || !out_signal)
@@ -119,7 +131,7 @@ ui_chat_bubble_base_get_config_signal(struct ui_chat_bubble_base *bubble,
 }
 
 /** \brief ui_chat_bubble_base_calculate_text_bounds */
-enum ui_error ui_chat_bubble_base_calculate_text_bounds(
+ui_error_t ui_chat_bubble_base_calculate_text_bounds(
     const struct ui_chat_bubble_base *bubble,
     const struct ui_dom_rect *raw_bounds, struct ui_dom_rect *out_text_bounds) {
 

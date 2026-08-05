@@ -6,7 +6,7 @@
 
 struct ui_cluster {
   int r, g, b;
-  long long sum_r, sum_g, sum_b;
+  int64_t sum_r, sum_g, sum_b;
   int count;
 };
 
@@ -18,7 +18,7 @@ static int calc_color_distance(int r1, int g1, int b1, int r2, int g2, int b2) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
                          size_t height, int channels,
                          const struct ui_color_quantization_options *options,
@@ -29,7 +29,7 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
   int num_clusters = 0;
   size_t x, y;
   struct ui_cluster *clusters = NULL;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   int has_changed;
 
   if (!pixels || !options || !out_colors || !out_color_count) {
@@ -51,7 +51,8 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
     step = 1;
   }
 
-  clusters = (struct ui_cluster *)UI_MALLOC(sizeof(struct ui_cluster) * k);
+  clusters = (struct ui_cluster *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_cluster) * k);
   if (!clusters) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -114,7 +115,7 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
     }
     if (num_clusters == 0) {
       /* All transparent or empty */
-      UI_FREE(clusters);
+      C_MULTIPLATFORM_FREE(clusters);
       *out_color_count = 0;
       return UI_ERROR_NONE;
     }
@@ -212,6 +213,6 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
     *out_color_count = (size_t)num_clusters;
   }
 
-  UI_FREE(clusters);
+  C_MULTIPLATFORM_FREE(clusters);
   return rc;
 }

@@ -30,8 +30,8 @@ BUILDING:
 function for PNG compression (instead of the builtin one), it must have the
 following signature: unsigned char * my_compress(unsigned char *data, int
 data_len, int *out_len, int quality); The returned data will be freed with
-STBIW_FREE() (UI_FREE() by default), so it must be heap allocated with
-STBIW_MALLOC() (UI_MALLOC() by default),
+STBIW_FREE() (C_MULTIPLATFORM_FREE() by default), so it must be heap allocated
+with STBIW_MALLOC() (C_MULTIPLATFORM_MALLOC() by default),
 
 UNICODE:
 
@@ -249,9 +249,9 @@ STBIWDEF void stbi_flip_vertically_on_write(int flip_boolean);
 #endif
 
 #ifndef STBIW_MALLOC
-#define STBIW_MALLOC(sz) UI_MALLOC(sz)
-#define STBIW_REALLOC(p, newsz) UI_REALLOC(p, newsz)
-#define STBIW_FREE(p) UI_FREE(p)
+#define STBIW_MALLOC(sz) C_MULTIPLATFORM_MALLOC(sz)
+#define STBIW_REALLOC(p, newsz) C_MULTIPLATFORM_REALLOC(p, newsz)
+#define STBIW_FREE(p) C_MULTIPLATFORM_FREE(p)
 #endif
 
 #ifndef STBIW_REALLOC_SIZED

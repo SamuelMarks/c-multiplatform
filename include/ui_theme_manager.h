@@ -30,38 +30,38 @@ struct ui_arena;
  *
  * @param arena The memory arena to use for allocation.
  * @param out_manager Output pointer for the created manager.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_theme_manager_create(struct ui_arena *arena,
-                                      struct ui_theme_manager **out_manager);
+ui_error_t ui_theme_manager_create(struct ui_arena *arena,
+                                   struct ui_theme_manager **out_manager);
 
 /**
  * @brief Destroys a theme manager.
  *
  * @param manager The theme manager.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_theme_manager_destroy(struct ui_theme_manager *manager);
+ui_error_t ui_theme_manager_destroy(struct ui_theme_manager *manager);
 
 /**
  * @brief Sets the current theme mode.
  *
  * @param manager The theme manager.
  * @param mode The desired mode.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_theme_manager_set_mode(struct ui_theme_manager *manager,
-                                        enum ui_theme_mode mode);
+ui_error_t ui_theme_manager_set_mode(struct ui_theme_manager *manager,
+                                     enum ui_theme_mode mode);
 
 /**
  * @brief Gets the current theme mode.
  *
  * @param manager The theme manager.
  * @param out_mode Output pointer for the current mode.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_theme_manager_get_mode(struct ui_theme_manager *manager,
-                                        enum ui_theme_mode *out_mode);
+ui_error_t ui_theme_manager_get_mode(struct ui_theme_manager *manager,
+                                     enum ui_theme_mode *out_mode);
 
 /**
  * @brief Gets the signal emitted when the theme mode changes.
@@ -69,11 +69,10 @@ enum ui_error ui_theme_manager_get_mode(struct ui_theme_manager *manager,
  *
  * @param manager The theme manager.
  * @param out_signal Output pointer for the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
-ui_theme_manager_get_change_signal(struct ui_theme_manager *manager,
-                                   ui_signal_t **out_signal);
+ui_error_t ui_theme_manager_get_change_signal(struct ui_theme_manager *manager,
+                                              ui_signal_t **out_signal);
 
 #ifdef __cplusplus
 }

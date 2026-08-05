@@ -12,6 +12,7 @@ static void test_anonymous_box_cleanup(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_inline1);
   ui_dom_node_set_tag_name(child_inline1, "span");
@@ -43,6 +44,9 @@ static void test_anonymous_box_cleanup(void) {
   rule_inline->next = sheet->rules;
   sheet->rules = rule_inline;
 
+  ui_layout_tree_generate(root, sheet, &lroot);
+  if (lroot)
+    ui_layout_tree_destroy(lroot);
   g_malloc_fail_countdown = 2; /* Target the anonymous node alloc */
   ui_layout_tree_generate(root, sheet, &lroot);
   g_malloc_fail_countdown = -1;
@@ -64,6 +68,7 @@ static void test_more_layout_coverage6(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
@@ -94,6 +99,7 @@ static void test_more_layout_coverage5(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   const char *displays[] = {"run-in",      "grid",         "table", "flow-root",
@@ -124,6 +130,7 @@ static void test_css_parsers2(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   ui_css_stylesheet_create(&sheet);
@@ -237,6 +244,7 @@ static void test_css_parsers(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   ui_css_stylesheet_create(&sheet);
@@ -3069,6 +3077,7 @@ static void test_layout_flex_and_shorthands(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "flex-container");
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
@@ -3170,6 +3179,7 @@ static void test_null_parsers(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-null");
 
   ui_css_stylesheet_create(&sheet);
@@ -3231,6 +3241,7 @@ static void test_border_image(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   ui_css_stylesheet_create(&sheet);
@@ -3266,6 +3277,7 @@ static void test_numeric_parsers(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   ui_css_stylesheet_create(&sheet);
@@ -3297,6 +3309,7 @@ static void test_more_aspect_ratios(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   ui_css_stylesheet_create(&sheet);
@@ -3331,6 +3344,7 @@ static void test_margin_3(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   ui_css_stylesheet_create(&sheet);
@@ -3354,6 +3368,7 @@ static void test_lengths(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "test-class");
 
   const char *lengths[] = {"1em", "1rem", "50vw", "50vh", "50vmin", "50vmax",
@@ -3393,6 +3408,7 @@ static void test_flex_coverage(void) {
   for (i = 0; i < 4; i++) {
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
     ui_dom_node_set_tag_name(root, "div");
+    ui_dom_node_set_attribute(root, "class", "blk");
     ui_dom_node_set_attribute(root, "class", "flex-container");
 
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
@@ -3471,6 +3487,7 @@ static void test_anonymous_box(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_inline1);
   ui_dom_node_set_tag_name(child_inline1, "span");
@@ -3526,6 +3543,7 @@ static void test_display_none(void) {
   struct ui_css_rule *rule = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_css_stylesheet_create(&sheet);
   ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
   ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
@@ -3550,6 +3568,7 @@ static void test_anonymous_box_oom(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child_inline1);
   ui_dom_node_set_tag_name(child_inline1, "span");
@@ -3677,6 +3696,7 @@ static void test_flex_shrink(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "flex-container-s");
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
@@ -3748,6 +3768,7 @@ static void test_flex_grow(void) {
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "blk");
   ui_dom_node_set_attribute(root, "class", "flex-container-g");
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);

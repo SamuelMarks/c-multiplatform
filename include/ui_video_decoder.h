@@ -50,9 +50,9 @@ struct ui_video_decoder_backend {
    * @param out_decoder Pointer to receive the allocated decoder handle.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*create_decoder)(struct ui_video_decoder_backend *backend,
-                                  const struct ui_video_decoder_config *config,
-                                  struct ui_video_decoder **out_decoder);
+  ui_error_t (*create_decoder)(struct ui_video_decoder_backend *backend,
+                               const struct ui_video_decoder_config *config,
+                               struct ui_video_decoder **out_decoder);
 
   /**
    * @brief Destroys a video decoder.
@@ -61,8 +61,8 @@ struct ui_video_decoder_backend {
    * @param decoder The decoder to destroy.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*destroy_decoder)(struct ui_video_decoder_backend *backend,
-                                   struct ui_video_decoder *decoder);
+  ui_error_t (*destroy_decoder)(struct ui_video_decoder_backend *backend,
+                                struct ui_video_decoder *decoder);
 
   /**
    * @brief Submits a compressed packet to the decoder.
@@ -74,10 +74,10 @@ struct ui_video_decoder_backend {
    * @param pts Presentation timestamp in microseconds.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*decode_packet)(struct ui_video_decoder_backend *backend,
-                                 struct ui_video_decoder *decoder,
-                                 const void *packet_data, size_t packet_size,
-                                 ui_int64 pts);
+  ui_error_t (*decode_packet)(struct ui_video_decoder_backend *backend,
+                              struct ui_video_decoder *decoder,
+                              const void *packet_data, size_t packet_size,
+                              ui_int64 pts);
 
   /**
    * @brief Retrieves the next decoded frame from the decoder, if available.
@@ -88,9 +88,9 @@ struct ui_video_decoder_backend {
    * later.
    * @return UI_ERROR_NONE on success, or an error if no frame is ready yet.
    */
-  enum ui_error (*get_frame)(struct ui_video_decoder_backend *backend,
-                             struct ui_video_decoder *decoder,
-                             struct ui_video_frame *out_frame);
+  ui_error_t (*get_frame)(struct ui_video_decoder_backend *backend,
+                          struct ui_video_decoder *decoder,
+                          struct ui_video_frame *out_frame);
 
   /**
    * @brief Releases a decoded frame obtained via get_frame.
@@ -100,9 +100,9 @@ struct ui_video_decoder_backend {
    * @param frame The frame to release.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*release_frame)(struct ui_video_decoder_backend *backend,
-                                 struct ui_video_decoder *decoder,
-                                 struct ui_video_frame *frame);
+  ui_error_t (*release_frame)(struct ui_video_decoder_backend *backend,
+                              struct ui_video_decoder *decoder,
+                              struct ui_video_frame *frame);
 
   /**
    * @brief Opaque user data for the specific backend implementation.
@@ -116,7 +116,7 @@ struct ui_video_decoder_backend {
  * @param out_backend Pointer to receive the backend struct.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_video_decoder_get_default_backend(
+ui_error_t ui_video_decoder_get_default_backend(
     struct ui_video_decoder_backend *out_backend);
 
 #ifdef __cplusplus

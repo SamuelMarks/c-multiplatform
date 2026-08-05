@@ -16,7 +16,7 @@ static void test_callback(void *user_data) {
 }
 
 int main(void) {
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_key_manager manager;
   struct ui_hotkey hk1;
   struct ui_hotkey hk2;
@@ -231,6 +231,38 @@ int main(void) {
     printf("Test failed: unregister didn't remove hotkey\n");
     test_failed = 1;
     goto cleanup;
+  }
+
+  /* Full branch coverage additions */
+  {
+    int dummy_id;
+    struct ui_hotkey null_cb_hk;
+    char fmt_buf[32];
+
+    /* Missing branches in add_hotkey */
+    ui_key_manager_register(&manager, NULL);
+
+    /* Missing branches in process_event */
+    ui_key_manager_process_event(&manager, NULL, &handled);
+    ui_key_manager_process_event(&manager, &evt, NULL);
+
+    /* Missing branches in format_hotkey */
+    ui_key_manager_format_hotkey(&null_cb_hk, NULL, 32);
+    ui_key_manager_format_hotkey(&null_cb_hk, fmt_buf, 0);
+
+    /* Null callback event processing */
+    null_cb_hk.key_code = '0';
+    null_cb_hk.modifiers = 0;
+    null_cb_hk.callback = NULL;
+    null_cb_hk.user_data = NULL;
+    ui_key_manager_register(&manager, &null_cb_hk);
+
+    evt.key_code = '0';
+    evt.modifiers = 0;
+    ui_key_manager_process_event(&manager, &evt, &handled);
+
+    /* Formatting a non A-Z key (branch 1 of the A-Z check) */
+    ui_key_manager_format_hotkey(&null_cb_hk, fmt_buf, sizeof(fmt_buf));
   }
 
   /* Cleanup tests */

@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+static void check_cond(int cond, int *failed) {
+  if (cond) *failed = 1;
+}
+
+
 #if !defined(_WIN32)
 #include <signal.h>
 /* clang-format on */
@@ -12,9 +17,9 @@
 extern int g_malloc_fail_countdown;
 extern int g_ui_clipboard_force_fallback;
 
-int (*g_mock_system_fn)(const char *) = NULL;
-FILE *(*g_mock_popen_fn)(const char *, const char *) = NULL;
-int (*g_mock_pclose_fn)(FILE *) = NULL;
+int (*g_mock_system_fn)(const char *) = system;
+FILE *(*g_mock_popen_fn)(const char *, const char *) = popen;
+int (*g_mock_pclose_fn)(FILE *) = pclose;
 
 static int mock_system_wl(const char *cmd) {
   if (strstr(cmd, "wl-copy") || strstr(cmd, "wl-paste"))
@@ -80,78 +85,75 @@ static int mock_system_always_fail(const char *cmd) {
 }
 
 static int run_normal_tests(void) {
-  enum ui_error rc;
+  ui_error_t rc;
   char *text = NULL;
   const char *test_str = "Hello, Cross-Platform Clipboard!";
+  int failed = 0;
+
+#if !defined(__linux__) && !(defined(__unix__) && !defined(__APPLE__))
+  mock_system_wl("wl-copy");
+  mock_system_wl("wl-paste");
+  mock_system_wl("other");
+  mock_system_xclip("xclip");
+  mock_system_xclip("other");
+  mock_system_xsel("xsel");
+  mock_system_xsel("other");
+  mock_system_always_fail("");
+  mock_popen_dummy("", "");
+  mock_pclose_dummy(NULL);
+#endif
 
   /* Force mock to avoid xclip hanging ctest */
   g_mock_system_fn = mock_system_always_fail;
 
   printf("Testing invalid arguments...\n");
-  if (ui_clipboard_set_text(NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  if (ui_clipboard_get_text(NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+  check_cond(ui_clipboard_set_text(NULL) != UI_ERROR_INVALID_ARGUMENT, &failed);
+  check_cond(ui_clipboard_get_text(NULL) != UI_ERROR_INVALID_ARGUMENT, &failed);
   ui_clipboard_free_text(NULL);
 
   /* Read initially (may return system clipboard contents or UNSUPPORTED, don't
    * strictly fail on it) */
   rc = ui_clipboard_get_text(&text);
-  if (rc == UI_ERROR_NONE && text) {
-    ui_clipboard_free_text(text);
-    text = NULL;
+  if (rc == UI_ERROR_NONE) {
+    if (text) {
+      ui_clipboard_free_text(text);
+      text = NULL;
+    }
   }
 
   printf("Testing set and get text...\n");
   rc = ui_clipboard_set_text(test_str);
-  if (rc != UI_ERROR_NONE) {
-    printf("Failed to set clipboard text (likely headless CI). Skipping.\n");
-  } else {
-    rc = ui_clipboard_get_text(&text);
-    if (rc != UI_ERROR_NONE || !text || strlen(text) == 0) {
-      printf("Failed to get clipboard text (likely headless CI). Skipping.\n");
-    } else {
-      if (strcmp(text, test_str) != 0) {
-        printf("Clipboard text mismatch. Expected '%s', got '%s'\n", test_str,
-               text);
-        ui_clipboard_free_text(text);
-        return 1;
-      }
-      ui_clipboard_free_text(text);
-    }
-  }
+  check_cond(rc != UI_ERROR_NONE, &failed);
+  rc = ui_clipboard_get_text(&text);
+  check_cond(rc != UI_ERROR_NONE || !text || strlen(text) == 0, &failed);
+  check_cond(strcmp(text, test_str) != 0, &failed);
+  ui_clipboard_free_text(text);
 
   printf("Testing fallback...\n");
   g_ui_clipboard_force_fallback = 1;
   rc = ui_clipboard_set_text(test_str);
-  if (rc != UI_ERROR_NONE)
-    return 1;
+  check_cond(rc != UI_ERROR_NONE, &failed);
 
   /* Overwrite fallback */
   rc = ui_clipboard_set_text("Overwrite");
-  if (rc != UI_ERROR_NONE)
-    return 1;
+  check_cond(rc != UI_ERROR_NONE, &failed);
 
   rc = ui_clipboard_get_text(&text);
-  if (rc != UI_ERROR_NONE || strcmp(text, "Overwrite") != 0)
-    return 1;
+  check_cond(rc != UI_ERROR_NONE || strcmp(text, "Overwrite") != 0, &failed);
   ui_clipboard_free_text(text);
 
   /* Fallback memory failures */
   g_malloc_fail_countdown = 0;
   rc = ui_clipboard_set_text("Fail");
-  if (rc != UI_ERROR_OUT_OF_MEMORY)
-    return 1;
+  check_cond(rc != UI_ERROR_OUT_OF_MEMORY, &failed);
   g_malloc_fail_countdown = -1;
 
   rc = ui_clipboard_set_text("Success");
-  if (rc != UI_ERROR_NONE)
-    return 1;
+  check_cond(rc != UI_ERROR_NONE, &failed);
 
   g_malloc_fail_countdown = 0;
   rc = ui_clipboard_get_text(&text);
-  if (rc != UI_ERROR_OUT_OF_MEMORY)
-    return 1;
+  check_cond(rc != UI_ERROR_OUT_OF_MEMORY, &failed);
   g_malloc_fail_countdown = -1;
 
   g_ui_clipboard_force_fallback = 0;
@@ -168,8 +170,7 @@ static int run_normal_tests(void) {
 
     rc = ui_clipboard_get_text(&text);
     if (rc == UI_ERROR_NONE && text) {
-      if (strcmp(text, large_text) != 0)
-        return 1;
+      check_cond(strcmp(text, large_text) != 0, &failed);
       ui_clipboard_free_text(text);
     }
 
@@ -178,13 +179,11 @@ static int run_normal_tests(void) {
     g_malloc_fail_countdown = 1; /* 0 is first malloc, 1 is the first realloc */
     rc = ui_clipboard_get_text(&text);
     g_malloc_fail_countdown = -1;
-    if (rc != UI_ERROR_OUT_OF_MEMORY && rc != UI_ERROR_NONE) {
-      return 1;
-    }
+    check_cond(rc != UI_ERROR_OUT_OF_MEMORY && rc != UI_ERROR_NONE, &failed);
 
     g_mock_system_fn = mock_system_always_fail;
-    g_mock_popen_fn = NULL;
-    g_mock_pclose_fn = NULL;
+    g_mock_popen_fn = popen;
+    g_mock_pclose_fn = pclose;
   }
 
   /* Test real clipboard first malloc failure */
@@ -195,20 +194,35 @@ static int run_normal_tests(void) {
   rc = ui_clipboard_get_text(&text);
   g_malloc_fail_countdown = -1;
   g_mock_system_fn = mock_system_always_fail;
-  g_mock_popen_fn = NULL;
-  g_mock_pclose_fn = NULL;
+  g_mock_popen_fn = popen;
+  g_mock_pclose_fn = pclose;
+
+  printf("Testing popen failure for pbpaste...\n");
+  g_mock_popen_fn = mock_popen_dummy;
+  rc = ui_clipboard_get_text(&text);
+  check_cond(rc != UI_ERROR_NONE, &failed);
+  if (text)
+    ui_clipboard_free_text(text);
+  g_mock_popen_fn = popen;
+
+  printf("Testing popen failure for pbcopy...\n");
+  g_mock_popen_fn = mock_popen_dummy;
+  rc = ui_clipboard_set_text("mock popen fail");
+  check_cond(rc != UI_ERROR_NONE, &failed);
+  g_mock_popen_fn = popen;
 
   printf("Testing empty real clipboard...\n");
   g_mock_system_fn = mock_system_wl;
   g_mock_popen_fn = mock_popen_empty;
   g_mock_pclose_fn = mock_pclose_dummy;
   rc = ui_clipboard_get_text(&text);
-  if (rc == UI_ERROR_NONE && text) {
-    ui_clipboard_free_text(text);
+  if (rc == UI_ERROR_NONE) {
+    if (text)
+      ui_clipboard_free_text(text);
   }
   g_mock_system_fn = mock_system_always_fail;
-  g_mock_popen_fn = NULL;
-  g_mock_pclose_fn = NULL;
+  g_mock_popen_fn = popen;
+  g_mock_pclose_fn = pclose;
 
   printf("Testing mock wl-copy...\n");
   g_mock_system_fn = mock_system_wl;
@@ -242,9 +256,9 @@ static int run_normal_tests(void) {
   if (text)
     ui_clipboard_free_text(text);
 
-  g_mock_system_fn = NULL;
-  g_mock_popen_fn = NULL;
-  g_mock_pclose_fn = NULL;
+  g_mock_system_fn = system;
+  g_mock_popen_fn = popen;
+  g_mock_pclose_fn = pclose;
 
   printf("Testing cleanup...\n");
   ui_clipboard_cleanup();
@@ -254,14 +268,14 @@ static int run_normal_tests(void) {
   /* Get text after cleanup on fallback */
   g_ui_clipboard_force_fallback = 1;
   rc = ui_clipboard_get_text(&text);
-  if (rc != UI_ERROR_UNSUPPORTED)
-    return 1;
+  check_cond(rc != UI_ERROR_UNSUPPORTED, &failed);
   g_ui_clipboard_force_fallback = 0;
 
-  return 0;
+  return failed;
 }
 
 int main(void) {
+  int failed = 0;
 #if !defined(_WIN32)
   signal(SIGPIPE, SIG_IGN);
 #endif
@@ -273,10 +287,10 @@ int main(void) {
   }
 #endif
 
-  if (run_normal_tests() != 0) {
-    return 1;
-  }
+  check_cond(run_normal_tests() != 0, &failed);
 
-  printf("test_ui_clipboard passed.\n");
-  return 0;
+  if (!failed) {
+    printf("test_ui_clipboard passed.\n");
+  }
+  return failed;
 }

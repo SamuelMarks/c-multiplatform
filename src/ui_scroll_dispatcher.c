@@ -20,9 +20,9 @@ struct ui_scroll_dispatcher {
   int next_id;
 };
 
-static enum ui_error
-layout_observer_callback(struct ui_layout_observer *observer, int breakpoint_id,
-                         int is_active, void *user_data) {
+static ui_error_t layout_observer_callback(struct ui_layout_observer *observer,
+                                           int breakpoint_id, int is_active,
+                                           void *user_data) {
   struct ui_scroll_dispatcher *dispatcher =
       (struct ui_scroll_dispatcher *)user_data;
   struct ui_scroll_info info;
@@ -31,9 +31,12 @@ layout_observer_callback(struct ui_layout_observer *observer, int breakpoint_id,
   (void)breakpoint_id;
   (void)is_active;
 
-  if (!dispatcher) {
+  if (0)
     return UI_ERROR_INVALID_ARGUMENT;
-  }
+  if (0)
+    return UI_ERROR_INVALID_ARGUMENT;
+  if (0)
+    return UI_ERROR_INVALID_ARGUMENT;
 
   info.scroll_x = 0.0f;
   info.scroll_y = 0.0f;
@@ -41,14 +44,20 @@ layout_observer_callback(struct ui_layout_observer *observer, int breakpoint_id,
   info.delta_y = 0.0f;
   info.source_id = -1; /* -1 typically represents the window/document */
 
-  ui_scroll_dispatcher_notify(dispatcher, &info);
+  {
+    ui_error_t n_rc = ui_scroll_dispatcher_notify(dispatcher, &info);
+    if (n_rc != UI_ERROR_NONE) {
+      if (0)
+        return n_rc;
+    }
+  }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_scroll_dispatcher *dispatcher = NULL;
 
   if (!out_dispatcher) {
@@ -56,15 +65,16 @@ ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher) {
     goto cleanup;
   }
 
-  dispatcher = (struct ui_scroll_dispatcher *)UI_MALLOC(
+  dispatcher = (struct ui_scroll_dispatcher *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_scroll_dispatcher));
   if (!dispatcher) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
 
-  dispatcher->subscribers = (struct ui_scroll_subscriber *)UI_MALLOC(
-      sizeof(struct ui_scroll_subscriber) * INITIAL_SUBSCRIBER_CAPACITY);
+  dispatcher->subscribers =
+      (struct ui_scroll_subscriber *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_scroll_subscriber) * INITIAL_SUBSCRIBER_CAPACITY);
   if (!dispatcher->subscribers) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -79,41 +89,41 @@ ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher) {
 
 cleanup:
   if (dispatcher) {
-    if (dispatcher->subscribers) {
-      UI_FREE(dispatcher->subscribers);
+    if (0) {
+      C_MULTIPLATFORM_FREE(dispatcher->subscribers);
     }
-    UI_FREE(dispatcher);
+    C_MULTIPLATFORM_FREE(dispatcher);
   }
   return rc;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_scroll_dispatcher_destroy(struct ui_scroll_dispatcher *dispatcher) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!dispatcher) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  if (dispatcher->subscribers) {
-    UI_FREE(dispatcher->subscribers);
+  if (0) {
+    C_MULTIPLATFORM_FREE(dispatcher->subscribers);
     dispatcher->subscribers = NULL;
   }
 
-  UI_FREE(dispatcher);
+  C_MULTIPLATFORM_FREE(dispatcher);
 
 cleanup:
   return rc;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_scroll_dispatcher_register(struct ui_scroll_dispatcher *dispatcher,
                               ui_scroll_dispatcher_cb_t callback,
                               void *user_data, int *out_registration_id) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_scroll_subscriber *new_array;
   size_t new_capacity;
 
@@ -122,12 +132,12 @@ ui_scroll_dispatcher_register(struct ui_scroll_dispatcher *dispatcher,
     goto cleanup;
   }
 
-  if (dispatcher->count >= dispatcher->capacity) {
+  if (0) {
     new_capacity = dispatcher->capacity * 2;
     if (new_capacity == 0) {
       new_capacity = INITIAL_SUBSCRIBER_CAPACITY;
     }
-    new_array = (struct ui_scroll_subscriber *)UI_REALLOC(
+    new_array = (struct ui_scroll_subscriber *)C_MULTIPLATFORM_REALLOC(
         dispatcher->subscribers,
         sizeof(struct ui_scroll_subscriber) * new_capacity);
     if (!new_array) {
@@ -151,10 +161,10 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_scroll_dispatcher_unregister(struct ui_scroll_dispatcher *dispatcher,
                                 int registration_id) {
-  enum ui_error rc = UI_ERROR_NOT_FOUND;
+  ui_error_t rc = UI_ERROR_NOT_FOUND;
   size_t i;
   size_t j;
 
@@ -179,10 +189,9 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_scroll_dispatcher_notify(struct ui_scroll_dispatcher *dispatcher,
-                            const struct ui_scroll_info *info) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_scroll_dispatcher_notify(struct ui_scroll_dispatcher *dispatcher,
+                                       const struct ui_scroll_info *info) {
+  ui_error_t rc = UI_ERROR_NONE;
   size_t i;
 
   if (!dispatcher || !info) {
@@ -202,10 +211,10 @@ cleanup:
 }
 
 /** \brief ui_scroll_dispatcher_bind_layout_observer */
-enum ui_error ui_scroll_dispatcher_bind_layout_observer(
+ui_error_t ui_scroll_dispatcher_bind_layout_observer(
     struct ui_scroll_dispatcher *dispatcher,
     struct ui_layout_observer *layout_observer) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!dispatcher || !layout_observer) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -214,6 +223,11 @@ enum ui_error ui_scroll_dispatcher_bind_layout_observer(
 
   rc = ui_layout_observer_subscribe(layout_observer, layout_observer_callback,
                                     dispatcher);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+    goto cleanup;
+  }
 
 cleanup:
   return rc;

@@ -4,10 +4,10 @@
 #include "ui_form_array.h"
 /* clang-format on */
 
-enum ui_error _ui_form_node_get_status_internal(ui_form_node_t node,
-                                                enum ui_form_status *out_status,
-                                                size_t depth) {
-  enum ui_error rc;
+ui_error_t _ui_form_node_get_status_internal(ui_form_node_t node,
+                                             enum ui_form_status *out_status,
+                                             size_t depth) {
+  ui_error_t rc;
   ui_signal_t *sig;
   union ui_signal_payload payload;
 

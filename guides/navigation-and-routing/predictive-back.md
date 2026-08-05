@@ -53,7 +53,7 @@ Sometimes, a screen shouldn't be swipe-dismissible (e.g., a form with unsaved ch
 
 ```c
 // Intercept the back gesture to show an alert instead
-enum ui_error on_before_back(struct ui_component *screen, int *out_prevented) {
+ui_error_t on_before_back(struct ui_component *screen, int *out_prevented) {
     if (form_is_dirty(my_form)) {
         show_unsaved_changes_dialog();
         *out_prevented = 1; // Prevent the back gesture

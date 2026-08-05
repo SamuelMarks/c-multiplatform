@@ -48,7 +48,7 @@ struct ui_window_controls_base;
  * @param out_controls Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_window_controls_base_create(struct ui_arena *arena,
                                struct ui_window_controls_base **out_controls);
 
@@ -58,7 +58,7 @@ ui_window_controls_base_create(struct ui_arena *arena,
  * @param controls The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_window_controls_base_destroy(struct ui_window_controls_base *controls);
 
 /**
@@ -68,7 +68,7 @@ ui_window_controls_base_destroy(struct ui_window_controls_base *controls);
  * @param state The new state.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
                                   enum ui_window_state state);
 
@@ -80,7 +80,7 @@ ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_window_controls_base_get_state_signal(
+ui_error_t ui_window_controls_base_get_state_signal(
     struct ui_window_controls_base *controls, ui_signal_t **out_signal);
 
 /**
@@ -94,7 +94,7 @@ enum ui_error ui_window_controls_base_get_state_signal(
  * @param out_region Pointer to receive the hit region.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_window_controls_base_hit_test(struct ui_window_controls_base *controls,
                                  int x, int y,
                                  enum ui_window_control_hit_region *out_region);
@@ -110,7 +110,7 @@ ui_window_controls_base_hit_test(struct ui_window_controls_base *controls,
  * @param height The height of the region.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_window_controls_base_set_region_rect(
+ui_error_t ui_window_controls_base_set_region_rect(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region, int x, int y, int width,
     int height);
@@ -123,7 +123,7 @@ enum ui_error ui_window_controls_base_set_region_rect(
  * @param region The region being hovered.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_window_controls_base_trigger_hover_intent(
+ui_error_t ui_window_controls_base_trigger_hover_intent(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region);
 

@@ -22,14 +22,15 @@ struct ui_progress_base;
  * @param out_progress Pointer to receive the allocated progress component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_progress_base_create(struct ui_progress_base **out_progress);
+ui_error_t ui_progress_base_create(struct ui_progress_base **out_progress);
 
 /**
  * @brief Destroys a progress component.
  *
  * @param progress The progress component.
+ * @return UI_ERROR_NONE on success.
  */
-void ui_progress_base_destroy(struct ui_progress_base *progress);
+ui_error_t ui_progress_base_destroy(struct ui_progress_base *progress);
 
 /**
  * @brief Sets the component to determinate mode and updates the value.
@@ -40,9 +41,8 @@ void ui_progress_base_destroy(struct ui_progress_base *progress);
  * @param max The maximum possible value (e.g., 100.0f).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_progress_base_set_determinate(struct ui_progress_base *progress, float value,
-                                 float min, float max);
+ui_error_t ui_progress_base_set_determinate(struct ui_progress_base *progress,
+                                            float value, float min, float max);
 
 /**
  * @brief Sets the component to indeterminate mode.
@@ -50,7 +50,7 @@ ui_progress_base_set_determinate(struct ui_progress_base *progress, float value,
  * @param progress The progress component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_progress_base_set_indeterminate(struct ui_progress_base *progress);
 
 /**
@@ -59,9 +59,8 @@ ui_progress_base_set_indeterminate(struct ui_progress_base *progress);
  * @param progress The progress component.
  * @return The underlying component, or NULL if invalid.
  */
-enum ui_error
-ui_progress_base_get_component(struct ui_progress_base *progress,
-                               struct ui_component **out_component);
+ui_error_t ui_progress_base_get_component(struct ui_progress_base *progress,
+                                          struct ui_component **out_component);
 
 /**
  * @brief Gets the current normalized percentage [0.0, 1.0].
@@ -70,7 +69,7 @@ ui_progress_base_get_component(struct ui_progress_base *progress,
  * @param progress The progress component.
  * @return The normalized percentage.
  */
-enum ui_error ui_progress_base_get_normalized_percentage(
+ui_error_t ui_progress_base_get_normalized_percentage(
     const struct ui_progress_base *progress, float *out_percentage);
 
 /**
@@ -79,7 +78,7 @@ enum ui_error ui_progress_base_get_normalized_percentage(
  * @param progress The progress component.
  * @return 1 if indeterminate, 0 if determinate.
  */
-enum ui_error
+ui_error_t
 ui_progress_base_is_indeterminate(const struct ui_progress_base *progress,
                                   int *out_is_indeterminate);
 
@@ -90,8 +89,8 @@ ui_progress_base_is_indeterminate(const struct ui_progress_base *progress,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_progress_base_bind_value(struct ui_progress_base *widget,
-                                          struct ui_signal *signal);
+ui_error_t ui_progress_base_bind_value(struct ui_progress_base *widget,
+                                       struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

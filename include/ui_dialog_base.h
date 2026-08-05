@@ -25,8 +25,8 @@ struct ui_dialog_base;
  * @param dialog The dialog component.
  * @param user_data Opaque user data.
  */
-typedef enum ui_error (*ui_dialog_on_close_t)(struct ui_dialog_base *dialog,
-                                              void *user_data);
+typedef ui_error_t (*ui_dialog_on_close_t)(struct ui_dialog_base *dialog,
+                                           void *user_data);
 
 /**
  * @brief Creates a new unstyled dialog base component.
@@ -41,14 +41,14 @@ typedef enum ui_error (*ui_dialog_on_close_t)(struct ui_dialog_base *dialog,
  * @param out_dialog Pointer to receive the allocated dialog base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_dialog_base_create(struct ui_dialog_base **out_dialog);
+ui_error_t ui_dialog_base_create(struct ui_dialog_base **out_dialog);
 
 /**
  * @brief Destroys a dialog base component.
  *
  * @param dialog The dialog to destroy.
  */
-void ui_dialog_base_destroy(struct ui_dialog_base *dialog);
+ui_error_t ui_dialog_base_destroy(struct ui_dialog_base *dialog);
 
 /**
  * @brief Sets the content component that will be displayed inside the dialog.
@@ -57,8 +57,8 @@ void ui_dialog_base_destroy(struct ui_dialog_base *dialog);
  * @param content The component to set as the inner content of the dialog.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_dialog_base_set_content(struct ui_dialog_base *dialog,
-                                         struct ui_component *content);
+ui_error_t ui_dialog_base_set_content(struct ui_dialog_base *dialog,
+                                      struct ui_component *content);
 
 /**
  * @brief Sets the overlay director to use when mounting the dialog.
@@ -67,7 +67,7 @@ enum ui_error ui_dialog_base_set_content(struct ui_dialog_base *dialog,
  * @param director The overlay director.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
                                     struct ui_overlay_director *director);
 
@@ -78,7 +78,7 @@ ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
  * @param focus_manager The focus manager.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_dialog_base_set_focus_manager(struct ui_dialog_base *dialog,
                                  struct ui_focus_manager *focus_manager);
 
@@ -91,8 +91,7 @@ ui_dialog_base_set_focus_manager(struct ui_dialog_base *dialog,
  * @param is_open 1 to open, 0 to close.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_dialog_base_set_open(struct ui_dialog_base *dialog,
-                                      int is_open);
+ui_error_t ui_dialog_base_set_open(struct ui_dialog_base *dialog, int is_open);
 
 /**
  * @brief Checks if the dialog is currently open.
@@ -100,8 +99,8 @@ enum ui_error ui_dialog_base_set_open(struct ui_dialog_base *dialog,
  * @param dialog The dialog component.
  * @return 1 if open, 0 if closed.
  */
-enum ui_error ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
-                                     int *out_is_open);
+ui_error_t ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
+                                  int *out_is_open);
 
 /**
  * @brief Sets the callback invoked when the dialog is dismissed.
@@ -111,9 +110,9 @@ enum ui_error ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
-                                          ui_dialog_on_close_t on_close,
-                                          void *user_data);
+ui_error_t ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
+                                       ui_dialog_on_close_t on_close,
+                                       void *user_data);
 
 /**
  * @brief Processes an incoming input event to handle backdrop clicks and escape
@@ -124,9 +123,9 @@ enum ui_error ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_dialog_base_process_event(struct ui_dialog_base *dialog,
-                                           const struct ui_event *event,
-                                           double timestamp_ms);
+ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
+                                        const struct ui_event *event,
+                                        double timestamp_ms);
 
 /**
  * @brief Gets the underlying wrapper component of the dialog.
@@ -134,8 +133,8 @@ enum ui_error ui_dialog_base_process_event(struct ui_dialog_base *dialog,
  * @param dialog The dialog component.
  * @return The underlying component.
  */
-enum ui_error ui_dialog_base_get_component(struct ui_dialog_base *dialog,
-                                           struct ui_component **out_component);
+ui_error_t ui_dialog_base_get_component(struct ui_dialog_base *dialog,
+                                        struct ui_component **out_component);
 
 /**
  * @brief Binds the open state to a signal.
@@ -144,8 +143,8 @@ enum ui_error ui_dialog_base_get_component(struct ui_dialog_base *dialog,
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_dialog_base_bind_open(struct ui_dialog_base *widget,
-                                       struct ui_signal *open_signal);
+ui_error_t ui_dialog_base_bind_open(struct ui_dialog_base *widget,
+                                    struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the widget is animating.
@@ -154,7 +153,7 @@ enum ui_error ui_dialog_base_bind_open(struct ui_dialog_base *widget,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_dialog_base_get_animating_signal(struct ui_dialog_base *widget,
                                     struct ui_computed **out_animating);
 

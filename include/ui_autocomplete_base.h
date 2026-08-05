@@ -27,7 +27,7 @@ struct ui_focus_manager;
  * @param index The selected item index.
  * @param user_data Opaque user data.
  */
-typedef enum ui_error (*ui_autocomplete_on_selection_t)(
+typedef ui_error_t (*ui_autocomplete_on_selection_t)(
     struct ui_autocomplete_base *autocomplete, int index, void *user_data);
 
 /**
@@ -38,7 +38,7 @@ typedef enum ui_error (*ui_autocomplete_on_selection_t)(
  * @param text The new text string.
  * @param user_data Opaque user data.
  */
-typedef enum ui_error (*ui_autocomplete_on_text_change_t)(
+typedef ui_error_t (*ui_autocomplete_on_text_change_t)(
     struct ui_autocomplete_base *autocomplete, const char *text,
     void *user_data);
 
@@ -49,7 +49,7 @@ typedef enum ui_error (*ui_autocomplete_on_text_change_t)(
  * @param out_cva Optional pointer to receive the control value accessor.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_autocomplete_base_create(struct ui_autocomplete_base **out_autocomplete,
                             struct ui_control_value_accessor *out_cva);
 
@@ -58,7 +58,8 @@ ui_autocomplete_base_create(struct ui_autocomplete_base **out_autocomplete,
  *
  * @param autocomplete The autocomplete to destroy.
  */
-void ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete);
+ui_error_t
+ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete);
 
 /**
  * @brief Retrieves the root UI component (which wraps the input).
@@ -66,7 +67,7 @@ void ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete);
  * @param autocomplete The autocomplete.
  * @return The component, or NULL.
  */
-enum ui_error
+ui_error_t
 ui_autocomplete_base_get_component(struct ui_autocomplete_base *autocomplete,
                                    struct ui_component **out_component);
 
@@ -76,7 +77,7 @@ ui_autocomplete_base_get_component(struct ui_autocomplete_base *autocomplete,
  * @param autocomplete The autocomplete.
  * @return The input base, or NULL.
  */
-enum ui_error
+ui_error_t
 ui_autocomplete_base_get_input(struct ui_autocomplete_base *autocomplete,
                                struct ui_input_base **out_input);
 
@@ -86,7 +87,7 @@ ui_autocomplete_base_get_input(struct ui_autocomplete_base *autocomplete,
  * @param autocomplete The autocomplete.
  * @return The listbox base, or NULL.
  */
-enum ui_error
+ui_error_t
 ui_autocomplete_base_get_listbox(struct ui_autocomplete_base *autocomplete,
                                  struct ui_listbox_base **out_listbox);
 
@@ -98,7 +99,7 @@ ui_autocomplete_base_get_listbox(struct ui_autocomplete_base *autocomplete,
  * @param focus_mgr The global focus manager.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_autocomplete_base_set_overlay_dependencies(
+ui_error_t ui_autocomplete_base_set_overlay_dependencies(
     struct ui_autocomplete_base *autocomplete,
     struct ui_overlay_director *director, struct ui_focus_manager *focus_mgr);
 
@@ -110,7 +111,7 @@ enum ui_error ui_autocomplete_base_set_overlay_dependencies(
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_autocomplete_base_set_on_text_change(
+ui_error_t ui_autocomplete_base_set_on_text_change(
     struct ui_autocomplete_base *autocomplete,
     ui_autocomplete_on_text_change_t on_text_change, void *user_data);
 
@@ -122,7 +123,7 @@ enum ui_error ui_autocomplete_base_set_on_text_change(
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_autocomplete_base_set_on_selection(
+ui_error_t ui_autocomplete_base_set_on_selection(
     struct ui_autocomplete_base *autocomplete,
     ui_autocomplete_on_selection_t on_selection, void *user_data);
 
@@ -135,7 +136,7 @@ enum ui_error ui_autocomplete_base_set_on_selection(
  * @param viewport_height Total viewport height.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_autocomplete_base_open(struct ui_autocomplete_base *autocomplete,
                           const struct ui_layout_node *trigger_layout,
                           float viewport_width, float viewport_height);
@@ -146,7 +147,7 @@ ui_autocomplete_base_open(struct ui_autocomplete_base *autocomplete,
  * @param autocomplete The autocomplete.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_autocomplete_base_close(struct ui_autocomplete_base *autocomplete);
 
 /**
@@ -158,7 +159,7 @@ ui_autocomplete_base_close(struct ui_autocomplete_base *autocomplete);
  * @param timestamp_ms Current time in ms.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_autocomplete_base_process_event(struct ui_autocomplete_base *autocomplete,
                                    const struct ui_event *event,
                                    double timestamp_ms);

@@ -14,8 +14,8 @@ extern int g_malloc_fail_countdown;
 
 static int refresh_count = 0;
 
-static enum ui_error on_refresh(struct ui_pull_to_refresh_base *ptr,
-                                void *user_data) {
+static ui_error_t on_refresh(struct ui_pull_to_refresh_base *ptr,
+                             void *user_data) {
   (void)ptr;
   (void)user_data;
   refresh_count++;
@@ -25,7 +25,7 @@ static enum ui_error on_refresh(struct ui_pull_to_refresh_base *ptr,
 static void test_ptr_basic(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
   struct ui_component *spinner = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   refresh_count = 0;
 
@@ -105,10 +105,10 @@ static void test_ptr_basic(void) {
   ui_pull_to_refresh_base_on_tick(ptr, 150.0);
   assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_RESTING);
 
-  ui_pull_to_refresh_base_destroy(ptr);
+  (void)ui_pull_to_refresh_base_destroy(ptr);
 
   spinner->shadow_root = NULL;
-  ui_component_destroy(spinner);
+  (void)ui_component_destroy(spinner);
 }
 
 static void test_ptr_spring_back(void) {
@@ -147,7 +147,7 @@ static void test_ptr_spring_back(void) {
   }
 
   assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_RESTING);
-  ui_pull_to_refresh_base_destroy(ptr);
+  (void)ui_pull_to_refresh_base_destroy(ptr);
 }
 
 static void test_ptr_push_up(void) {
@@ -176,7 +176,7 @@ static void test_ptr_push_up(void) {
   ev.event_data.mouse.y = 1100;
   ui_pull_to_refresh_base_process_event(ptr, &ev, 1400.0);
 
-  ui_pull_to_refresh_base_destroy(ptr);
+  (void)ui_pull_to_refresh_base_destroy(ptr);
 }
 
 static void test_ptr_cancel(void) {
@@ -204,7 +204,7 @@ static void test_ptr_cancel(void) {
   assert(ui_pull_to_refresh_base_get_state(ptr) ==
          UI_PULL_TO_REFRESH_REFRESHING);
 
-  ui_pull_to_refresh_base_destroy(ptr);
+  (void)ui_pull_to_refresh_base_destroy(ptr);
 }
 
 static void test_ptr_nulls(void) {
@@ -261,7 +261,7 @@ static void test_ptr_nulls(void) {
   assert(ui_pull_to_refresh_base_get_refreshing_signal(ptr, &comp_sig) ==
          UI_ERROR_NONE);
 
-  ui_pull_to_refresh_base_destroy(ptr);
+  (void)ui_pull_to_refresh_base_destroy(ptr);
 }
 
 static void test_ptr_oom(void) {
@@ -270,7 +270,7 @@ static void test_ptr_oom(void) {
   for (i = 0; i < 10; i++) {
     g_malloc_fail_countdown = i;
     if (ui_pull_to_refresh_base_create(&ptr) == UI_ERROR_NONE) {
-      ui_pull_to_refresh_base_destroy(ptr);
+      (void)ui_pull_to_refresh_base_destroy(ptr);
       break;
     }
   }

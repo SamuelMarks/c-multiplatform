@@ -13,7 +13,7 @@ struct ui_font {
 
 static int run_normal_tests(void) {
   struct ui_icon_base *icon = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   enum ui_icon_type type;
   const char *data = NULL;
   struct ui_font dummy_font;
@@ -103,14 +103,14 @@ static int run_normal_tests(void) {
   if (ui_icon_base_bind_name(icon, (struct ui_signal *)1) != UI_ERROR_NONE)
     return 1;
 
-  ui_icon_base_destroy(icon);
+  (void)ui_icon_base_destroy(icon);
   ui_icon_base_destroy(NULL); /* Should be safe */
 
   /* Test destroy with NULL data */
   {
     struct ui_icon_base *fresh_icon = NULL;
     ui_icon_base_create(&fresh_icon);
-    ui_icon_base_destroy(fresh_icon);
+    (void)ui_icon_base_destroy(fresh_icon);
   }
 
   /* Test set_svg_path with NULL data */
@@ -118,7 +118,7 @@ static int run_normal_tests(void) {
     struct ui_icon_base *fresh_icon2 = NULL;
     ui_icon_base_create(&fresh_icon2);
     ui_icon_base_set_svg_path(fresh_icon2, "M10 10");
-    ui_icon_base_destroy(fresh_icon2);
+    (void)ui_icon_base_destroy(fresh_icon2);
   }
 
   return 0;
@@ -126,7 +126,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_icon_base *icon = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_font dummy_font;
 
   printf("Testing OOM on create...\n");
@@ -145,7 +145,7 @@ static int run_oom_tests(void) {
   rc = ui_icon_base_set_font_glyph(icon, &dummy_font, "star");
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_icon_base_destroy(icon);
+    (void)ui_icon_base_destroy(icon);
     return 1;
   }
 
@@ -168,11 +168,11 @@ static int run_oom_tests(void) {
   rc = ui_icon_base_set_svg_path(icon, "M1 1");
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_icon_base_destroy(icon);
+    (void)ui_icon_base_destroy(icon);
     return 1;
   }
 
-  ui_icon_base_destroy(icon);
+  (void)ui_icon_base_destroy(icon);
   return 0;
 }
 

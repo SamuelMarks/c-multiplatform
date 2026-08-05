@@ -19,16 +19,17 @@ struct ui_timeline_base {
   struct ui_computed *data_signal;
 };
 
-enum ui_error ui_timeline_base_create(struct ui_timeline_base **out_timeline) {
+ui_error_t ui_timeline_base_create(struct ui_timeline_base **out_timeline) {
   struct ui_timeline_base *tb;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_timeline) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  tb = (struct ui_timeline_base *)UI_MALLOC(sizeof(struct ui_timeline_base));
+  tb = (struct ui_timeline_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_timeline_base));
   if (!tb) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -45,30 +46,31 @@ cleanup:
   return rc;
 }
 
-void ui_timeline_base_destroy(struct ui_timeline_base *timeline) {
+ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline) {
   size_t i;
 
   if (!timeline) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (timeline->nodes) {
     for (i = 0; i < timeline->node_count; i++) {
       if (timeline->nodes[i].title) {
-        UI_FREE(timeline->nodes[i].title);
+        C_MULTIPLATFORM_FREE(timeline->nodes[i].title);
       }
       if (timeline->nodes[i].description) {
-        UI_FREE(timeline->nodes[i].description);
+        C_MULTIPLATFORM_FREE(timeline->nodes[i].description);
       }
     }
-    UI_FREE(timeline->nodes);
+    C_MULTIPLATFORM_FREE(timeline->nodes);
   }
 
-  UI_FREE(timeline);
+  C_MULTIPLATFORM_FREE(timeline);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
                                enum ui_timeline_alignment alignment) {
   if (!timeline) {
@@ -79,7 +81,7 @@ ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
                                enum ui_timeline_alignment *out_alignment) {
   if (!timeline || !out_alignment) {
@@ -89,10 +91,10 @@ ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_timeline_base_add_node(struct ui_timeline_base *timeline,
-                                        const char *title,
-                                        const char *description) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_timeline_base_add_node(struct ui_timeline_base *timeline,
+                                     const char *title,
+                                     const char *description) {
+  ui_error_t rc = UI_ERROR_NONE;
   size_t new_cap;
   struct ui_timeline_node *new_nodes;
   size_t i;
@@ -107,7 +109,7 @@ enum ui_error ui_timeline_base_add_node(struct ui_timeline_base *timeline,
   }
 
   len_title = strlen(title);
-  new_title = (char *)UI_MALLOC(len_title + 1);
+  new_title = (char *)C_MULTIPLATFORM_MALLOC(len_title + 1);
   if (!new_title) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -118,7 +120,7 @@ enum ui_error ui_timeline_base_add_node(struct ui_timeline_base *timeline,
   }
 
   len_desc = strlen(description);
-  new_desc = (char *)UI_MALLOC(len_desc + 1);
+  new_desc = (char *)C_MULTIPLATFORM_MALLOC(len_desc + 1);
   if (!new_desc) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -130,7 +132,7 @@ enum ui_error ui_timeline_base_add_node(struct ui_timeline_base *timeline,
 
   if (timeline->node_count == timeline->node_capacity) {
     new_cap = timeline->node_capacity == 0 ? 4 : timeline->node_capacity * 2;
-    new_nodes = (struct ui_timeline_node *)UI_MALLOC(
+    new_nodes = (struct ui_timeline_node *)C_MULTIPLATFORM_MALLOC(
         new_cap * sizeof(struct ui_timeline_node));
     if (!new_nodes) {
       rc = UI_ERROR_OUT_OF_MEMORY;
@@ -141,7 +143,7 @@ enum ui_error ui_timeline_base_add_node(struct ui_timeline_base *timeline,
       for (i = 0; i < timeline->node_count; i++) {
         new_nodes[i] = timeline->nodes[i];
       }
-      UI_FREE(timeline->nodes);
+      C_MULTIPLATFORM_FREE(timeline->nodes);
     }
 
     timeline->nodes = new_nodes;
@@ -158,16 +160,16 @@ enum ui_error ui_timeline_base_add_node(struct ui_timeline_base *timeline,
 
 cleanup:
   if (new_title) {
-    UI_FREE(new_title);
+    C_MULTIPLATFORM_FREE(new_title);
   }
   if (new_desc) {
-    UI_FREE(new_desc);
+    C_MULTIPLATFORM_FREE(new_desc);
   }
   return rc;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
                                 size_t *out_count) {
   if (!timeline || !out_count) {
@@ -177,9 +179,9 @@ ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
-                                        size_t index, const char **out_title,
-                                        const char **out_description) {
+ui_error_t ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
+                                     size_t index, const char **out_title,
+                                     const char **out_description) {
   if (!timeline || !out_title || !out_description) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -194,7 +196,7 @@ enum ui_error ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_timeline_base_render(struct ui_timeline_base *timeline) {
+ui_error_t ui_timeline_base_render(struct ui_timeline_base *timeline) {
   if (!timeline) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -204,8 +206,8 @@ enum ui_error ui_timeline_base_render(struct ui_timeline_base *timeline) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_timeline_base_bind_data(struct ui_timeline_base *widget,
-                                         struct ui_computed *signal) {
+ui_error_t ui_timeline_base_bind_data(struct ui_timeline_base *widget,
+                                      struct ui_computed *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

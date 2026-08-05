@@ -10,7 +10,7 @@
 extern int g_malloc_fail_countdown;
 
 int main(void) {
-  enum ui_error err;
+  ui_error_t err;
 
   printf("Testing Wasm error paths (bridge failures)...\n");
 
@@ -46,8 +46,8 @@ int main(void) {
     }
 
     g_malloc_fail_countdown = -1;
-    ui_asset_streamer_destroy(streamer);
-    ui_execution_context_destroy(ctx);
+    (void)ui_asset_streamer_destroy(streamer);
+    (void)ui_execution_context_destroy(ctx);
     ui_thread_pool_destroy(pool);
   }
 

@@ -51,7 +51,7 @@ enum ui_timer_type { UI_TIMER_CUSTOM, UI_TIMER_MONOTONIC };
 /** \brief ui_timer */
 struct ui_timer {
   enum ui_timer_type type;
-  enum ui_error (*custom_time_source)(void *, double *);
+  ui_error_t (*custom_time_source)(void *, double *);
   void *custom_user_data;
 
 #if defined(_WIN32)
@@ -59,15 +59,15 @@ struct ui_timer {
 #endif
 };
 
-enum ui_error ui_timer_create_custom(const struct ui_timer_config *config,
-                                     struct ui_timer **out_timer) {
+ui_error_t ui_timer_create_custom(const struct ui_timer_config *config,
+                                  struct ui_timer **out_timer) {
   struct ui_timer *timer = NULL;
 
   if (!config || !out_timer || !config->time_source) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  timer = (struct ui_timer *)UI_MALLOC(sizeof(struct ui_timer));
+  timer = (struct ui_timer *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_timer));
   if (!timer) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -83,14 +83,14 @@ enum ui_error ui_timer_create_custom(const struct ui_timer_config *config,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_timer_create_monotonic(struct ui_timer **out_timer) {
+ui_error_t ui_timer_create_monotonic(struct ui_timer **out_timer) {
   struct ui_timer *timer = NULL;
 
   if (!out_timer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  timer = (struct ui_timer *)UI_MALLOC(sizeof(struct ui_timer));
+  timer = (struct ui_timer *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_timer));
   if (!timer) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -101,7 +101,7 @@ enum ui_error ui_timer_create_monotonic(struct ui_timer **out_timer) {
 
 #if defined(_WIN32)
   if (!QueryPerformanceFrequency(&timer->qpf) || timer->qpf == 0) {
-    UI_FREE(timer);
+    C_MULTIPLATFORM_FREE(timer);
     return UI_ERROR_UNKNOWN;
   }
 #endif
@@ -110,16 +110,16 @@ enum ui_error ui_timer_create_monotonic(struct ui_timer **out_timer) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_timer_destroy(struct ui_timer *timer) {
+ui_error_t ui_timer_destroy(struct ui_timer *timer) {
   if (!timer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  UI_FREE(timer);
+  C_MULTIPLATFORM_FREE(timer);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_timer_now(struct ui_timer *timer, double *out_time_secs) {
+ui_error_t ui_timer_now(struct ui_timer *timer, double *out_time_secs) {
   if (!timer || !out_time_secs) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

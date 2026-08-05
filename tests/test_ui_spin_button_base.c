@@ -15,8 +15,8 @@ static int g_cva_change_called = 0;
 static float g_cva_last_val = 0.0f;
 static int g_cva_touched_called = 0;
 
-static enum ui_error on_change(struct ui_spin_button_base *sb, double val,
-                               void *user) {
+static ui_error_t on_change(struct ui_spin_button_base *sb, double val,
+                            void *user) {
   (void)sb;
   (void)user;
   g_change_called++;
@@ -24,14 +24,14 @@ static enum ui_error on_change(struct ui_spin_button_base *sb, double val,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_cva_change(union ui_signal_payload val, void *user) {
+static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
   (void)user;
   g_cva_change_called++;
   g_cva_last_val = val.float_val;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_cva_touched(void *user) {
+static ui_error_t on_cva_touched(void *user) {
   (void)user;
   g_cva_touched_called++;
   return UI_ERROR_NONE;
@@ -39,7 +39,7 @@ static enum ui_error on_cva_touched(void *user) {
 
 #define ASSERT_SUCCESS(expr)                                                   \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
+    ui_error_t err = (expr);                                                   \
     if (err != UI_ERROR_NONE) {                                                \
       printf("Failed at line %d: %d\n", __LINE__, err);                        \
       {                                                                        \
@@ -50,7 +50,7 @@ static enum ui_error on_cva_touched(void *user) {
   } while (0)
 #define ASSERT_EQ(expr, expected)                                              \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
+    ui_error_t err = (expr);                                                   \
     if (err != (expected)) {                                                   \
       printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
              err);                                                             \
@@ -70,7 +70,7 @@ static int run_normal_tests(void) {
 
   /* Null checks */
   ASSERT_EQ(ui_spin_button_base_create(NULL, NULL), UI_ERROR_INVALID_ARGUMENT);
-  ui_spin_button_base_destroy(NULL);
+  (void)ui_spin_button_base_destroy(NULL);
 
   ASSERT_EQ(ui_spin_button_base_set_min(NULL, 0.0), UI_ERROR_INVALID_ARGUMENT);
   ASSERT_EQ(ui_spin_button_base_set_max(NULL, 100.0),
@@ -284,7 +284,7 @@ static int run_normal_tests(void) {
   ASSERT_SUCCESS(ui_spin_button_base_set_min(sb, 14.0));
   ASSERT_SUCCESS(ui_spin_button_base_set_max(sb, 22.0));
 
-  ui_spin_button_base_destroy(sb);
+  (void)ui_spin_button_base_destroy(sb);
   return 0;
 }
 
@@ -348,7 +348,7 @@ static int run_edge_cases(void) {
   ui_spin_button_base_get_component(sb, &comp);
 
   if (comp && comp->shadow_root) {
-    ui_dom_node_destroy(comp->shadow_root);
+    (void)ui_dom_node_destroy(comp->shadow_root);
     comp->shadow_root = NULL;
   }
 
@@ -358,7 +358,7 @@ static int run_edge_cases(void) {
     return 1;
   }
 
-  ui_spin_button_base_destroy(sb);
+  (void)ui_spin_button_base_destroy(sb);
   return 0;
 }
 /* Add mock failure */

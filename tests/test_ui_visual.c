@@ -7,14 +7,17 @@
 #include "../include/ui_test_visual.h"
 /* clang-format on */
 
-static enum ui_error render_scene(struct ui_renderer *renderer) {
+static ui_error_t test_render_scene(struct ui_renderer *renderer) {
   struct ui_rect r;
   struct ui_color c;
+  ui_error_t rc;
 
   if (!renderer || !renderer->vtable)
     return UI_ERROR_NONE;
 
-  renderer->vtable->begin_frame(renderer->ctx, 100, 100);
+  rc = renderer->vtable->begin_frame(renderer->ctx, 100, 100);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Draw a red rectangle */
   r.x = 10.0f;
@@ -25,7 +28,9 @@ static enum ui_error render_scene(struct ui_renderer *renderer) {
   c.g = 0.0f;
   c.b = 0.0f;
   c.a = 1.0f;
-  renderer->vtable->draw_rect(renderer->ctx, &r, &c);
+  rc = renderer->vtable->draw_rect(renderer->ctx, &r, &c);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Draw a green rectangle inside */
   r.x = 30.0f;
@@ -36,10 +41,11 @@ static enum ui_error render_scene(struct ui_renderer *renderer) {
   c.g = 1.0f;
   c.b = 0.0f;
   c.a = 1.0f;
-  renderer->vtable->draw_rect(renderer->ctx, &r, &c);
+  rc = renderer->vtable->draw_rect(renderer->ctx, &r, &c);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  renderer->vtable->end_frame(renderer->ctx);
-  return UI_ERROR_NONE;
+  return renderer->vtable->end_frame(renderer->ctx);
 }
 
 int main(void) {
@@ -69,14 +75,14 @@ int main(void) {
   failed |= (gles_renderer == NULL);
 
   if (gles_renderer) {
-    extern enum ui_error ui_renderer_gles_fallback_init(struct ui_renderer *);
+    extern ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *);
     rc = ui_renderer_gles_fallback_init(gles_renderer);
     failed |= (rc != 0);
   }
 
-  render_scene(NULL); /* Coverage */
-  render_scene(native_renderer);
-  render_scene(gles_renderer);
+  test_render_scene(NULL); /* Coverage */
+  test_render_scene(native_renderer);
+  test_render_scene(gles_renderer);
 
   native_pixels = (unsigned char *)malloc(width * height * 4);
   gles_pixels = (unsigned char *)malloc(width * height * 4);

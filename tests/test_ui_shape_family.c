@@ -4,9 +4,9 @@
 #include <stdlib.h>
 /* clang-format on */
 
-static enum ui_error test_shape_family(void) {
+static ui_error_t test_shape_family(void) {
   float radius;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_shape_family_get_radius(UI_SHAPE_FAMILY_NONE, NULL);
   if (err != UI_ERROR_INVALID_ARGUMENT) {

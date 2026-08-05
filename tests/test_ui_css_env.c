@@ -13,7 +13,7 @@ static int test_env_manager(void) {
   struct ui_css_value_ext *value2 = NULL;
   struct ui_css_value_ext *val_ptr = NULL;
   const struct ui_css_value_ext *retrieved = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_css_env_manager_create(NULL);
   if (rc != UI_ERROR_INVALID_ARGUMENT)
@@ -114,7 +114,7 @@ static int test_env_manager(void) {
 
 static int test_env_parser(void) {
   struct ui_css_value_ext *ext = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_css_parse_value_ext("env(safe-area-inset-top, 20px)", &ext);
   if (rc != UI_ERROR_NONE || !ext)

@@ -22,7 +22,7 @@ struct ui_aspect_ratio_base;
  * @param out_aspect_ratio Pointer to receive the allocated component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio);
 
 /**
@@ -30,7 +30,8 @@ ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio);
  *
  * @param aspect_ratio The component to destroy.
  */
-void ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio);
+ui_error_t
+ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio);
 
 /**
  * @brief Sets the aspect ratio (width / height).
@@ -39,7 +40,7 @@ void ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio);
  * @param ratio The aspect ratio float value (e.g., 16.0f / 9.0f).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
                                float ratio);
 
@@ -50,7 +51,7 @@ ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
  * @param aspect_ratio The aspect ratio component.
  * @return The underlying component.
  */
-enum ui_error
+ui_error_t
 ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,
                                    struct ui_component **out_component);
 
@@ -61,9 +62,8 @@ ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_aspect_ratio_base_bind_ratio(struct ui_aspect_ratio_base *widget,
-                                struct ui_signal *signal);
+ui_error_t ui_aspect_ratio_base_bind_ratio(struct ui_aspect_ratio_base *widget,
+                                           struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

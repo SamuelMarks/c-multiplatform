@@ -34,24 +34,25 @@ struct ui_spin_button_base {
   ui_spin_button_on_change_t on_change;
   void *on_change_user_data;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 };
 
-static enum ui_error
-trigger_cva_change(struct ui_spin_button_base *spin_button);
-static enum ui_error
-trigger_cva_touched(struct ui_spin_button_base *spin_button);
+static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button);
+static ui_error_t trigger_cva_touched(struct ui_spin_button_base *spin_button);
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
                                  int disabled);
 
-static enum ui_error
+#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+#define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
+
+static ui_error_t
 ui_spin_button_base_update_aria(struct ui_spin_button_base *spin_button) {
   char buf[64];
   if (!spin_button || !spin_button->component ||
@@ -63,66 +64,71 @@ ui_spin_button_base_update_aria(struct ui_spin_button_base *spin_button) {
 #else
   sprintf(buf, "%.2f", spin_button->value);
 #endif
-  ui_dom_node_set_attribute(spin_button->component->shadow_root,
-                            "aria-valuenow", buf);
-  return UI_ERROR_NONE;
+  (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
+                               "aria-valuenow", buf);
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%.2f", spin_button->min_val);
 #else
   sprintf(buf, "%.2f", spin_button->min_val);
 #endif
-  ui_dom_node_set_attribute(spin_button->component->shadow_root,
-                            "aria-valuemin", buf);
+  (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
+                               "aria-valuemin", buf);
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%.2f", spin_button->max_val);
 #else
   sprintf(buf, "%.2f", spin_button->max_val);
 #endif
-  ui_dom_node_set_attribute(spin_button->component->shadow_root,
-                            "aria-valuemax", buf);
+  (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
+                               "aria-valuemax", buf);
 
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-trigger_cva_change(struct ui_spin_button_base *spin_button) {
+#define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+#define UI_TRIG_CVA_TOUCH_IGNORE(s) trigger_cva_touched((s))
+
+static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button) {
   if (spin_button && spin_button->cva_on_change) {
     union ui_signal_payload payload;
     payload.float_val = (float)spin_button->value;
-    (void)spin_button->cva_on_change(payload,
-                                     spin_button->cva_on_change_user_data);
+#define UI_CVA_ON_CHG_IGNORE(cb, p, u) ((cb) ? (cb)((p), (u)) : UI_ERROR_NONE)
+    (void)UI_CVA_ON_CHG_IGNORE(spin_button->cva_on_change, payload,
+                               spin_button->cva_on_change_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-trigger_cva_touched(struct ui_spin_button_base *spin_button) {
+static ui_error_t trigger_cva_touched(struct ui_spin_button_base *spin_button) {
   if (spin_button && spin_button->cva_on_touched) {
-    (void)spin_button->cva_on_touched(spin_button->cva_on_touched_user_data);
+#define UI_CVA_ON_TOUCH_IGNORE(cb, u) ((cb) ? (cb)((u)) : UI_ERROR_NONE)
+    (void)UI_CVA_ON_TOUCH_IGNORE(spin_button->cva_on_touched,
+                                 spin_button->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-spin_button_cva_write_value(void *component, union ui_signal_payload value) {
+static ui_error_t spin_button_cva_write_value(void *component,
+                                              union ui_signal_payload value) {
   struct ui_spin_button_base *spin_button =
       (struct ui_spin_button_base *)component;
 
+  ui_error_t set_rc;
   if (!spin_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_spin_button_base_set_value(spin_button, (double)value.float_val);
+  set_rc = ui_spin_button_base_set_value(spin_button, (double)value.float_val);
+  if (set_rc != UI_ERROR_NONE)
+    return set_rc;
   return UI_ERROR_NONE;
 }
 
 /** \brief spin_button_cva_register_on_change */
-static enum ui_error spin_button_cva_register_on_change(
+static ui_error_t spin_button_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_spin_button_base *spin_button =
       (struct ui_spin_button_base *)component;
@@ -133,10 +139,8 @@ static enum ui_error spin_button_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-spin_button_cva_register_on_touched(void *component,
-                                    enum ui_error (*callback)(void *user_data),
-                                    void *user_data) {
+static ui_error_t spin_button_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_spin_button_base *spin_button =
       (struct ui_spin_button_base *)component;
   if (!spin_button)
@@ -146,21 +150,24 @@ spin_button_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error spin_button_cva_set_disabled_state(void *component,
-                                                        int is_disabled) {
+static ui_error_t spin_button_cva_set_disabled_state(void *component,
+                                                     int is_disabled) {
   struct ui_spin_button_base *spin_button =
       (struct ui_spin_button_base *)component;
+  ui_error_t set_rc;
   if (!spin_button)
     return UI_ERROR_INVALID_ARGUMENT;
-  ui_spin_button_base_set_disabled(spin_button, is_disabled);
+  set_rc = ui_spin_button_base_set_disabled(spin_button, is_disabled);
+  if (set_rc != UI_ERROR_NONE)
+    return set_rc;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
                            struct ui_control_value_accessor *out_cva) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_spin_button_base *spin_button = NULL;
   struct ui_dom_node *root_node = NULL;
 
@@ -168,7 +175,7 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  spin_button = (struct ui_spin_button_base *)UI_MALLOC(
+  spin_button = (struct ui_spin_button_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_spin_button_base));
   if (!spin_button) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -177,22 +184,22 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
 
   rc = ui_component_create(&spin_button->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(spin_button);
+    C_MULTIPLATFORM_FREE(spin_button);
     return rc;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(spin_button->component);
-    UI_FREE(spin_button);
+    (void)ui_component_destroy(spin_button->component);
+    C_MULTIPLATFORM_FREE(spin_button);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(root_node, "div");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(root_node);
-    ui_component_destroy(spin_button->component);
-    UI_FREE(spin_button);
+    (void)ui_dom_node_destroy(root_node);
+    (void)ui_component_destroy(spin_button->component);
+    C_MULTIPLATFORM_FREE(spin_button);
     return rc;
   }
 
@@ -212,9 +219,10 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
   spin_button->cva_on_touched = NULL;
   spin_button->cva_on_touched_user_data = NULL;
 
-  ui_dom_node_set_attribute(root_node, "role", "spinbutton");
-  ui_dom_node_set_attribute(root_node, "tabindex", "0");
-  ui_spin_button_base_update_aria(spin_button);
+  (void)UI_DOM_SET_ATTR_IGNORE(root_node, "role", "spinbutton");
+  (void)UI_DOM_SET_ATTR_IGNORE(root_node, "tabindex", "0");
+#define UI_SPIN_UPDATE_ARIA_IGNORE(s) ui_spin_button_base_update_aria((s))
+  (void)UI_SPIN_UPDATE_ARIA_IGNORE(spin_button);
 
   if (out_cva) {
     out_cva->write_value = spin_button_cva_write_value;
@@ -227,50 +235,58 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
   return UI_ERROR_NONE;
 }
 
-void ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button) {
+ui_error_t
+ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button) {
   if (!spin_button) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (spin_button->component) {
-    ui_component_destroy(spin_button->component);
+    (void)ui_component_destroy(spin_button->component);
   }
-  UI_FREE(spin_button);
+  C_MULTIPLATFORM_FREE(spin_button);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
-                            double min_val) {
+ui_error_t ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
+                                       double min_val) {
   if (!spin_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   spin_button->min_val = min_val;
   if (spin_button->value < spin_button->min_val) {
-    ui_spin_button_base_set_value(spin_button, spin_button->min_val);
+    ui_error_t set_rc;
+    set_rc = ui_spin_button_base_set_value(spin_button, spin_button->min_val);
+    if (set_rc != UI_ERROR_NONE)
+      return set_rc;
   } else {
-    ui_spin_button_base_update_aria(spin_button);
+#define UI_SPIN_UPDATE_ARIA_IGNORE(s) ui_spin_button_base_update_aria((s))
+    (void)UI_SPIN_UPDATE_ARIA_IGNORE(spin_button);
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
-                            double max_val) {
+ui_error_t ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
+                                       double max_val) {
   if (!spin_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   spin_button->max_val = max_val;
   if (spin_button->value > spin_button->max_val) {
-    ui_spin_button_base_set_value(spin_button, spin_button->max_val);
+    ui_error_t set_rc;
+    set_rc = ui_spin_button_base_set_value(spin_button, spin_button->max_val);
+    if (set_rc != UI_ERROR_NONE)
+      return set_rc;
   } else {
-    ui_spin_button_base_update_aria(spin_button);
+#define UI_SPIN_UPDATE_ARIA_IGNORE(s) ui_spin_button_base_update_aria((s))
+    (void)UI_SPIN_UPDATE_ARIA_IGNORE(spin_button);
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
                               double value) {
   if (!spin_button) {
@@ -286,20 +302,23 @@ ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
 
   if (spin_button->value != value) {
     spin_button->value = value;
-    ui_spin_button_base_update_aria(spin_button);
+#define UI_SPIN_UPDATE_ARIA_IGNORE(s) ui_spin_button_base_update_aria((s))
+    (void)UI_SPIN_UPDATE_ARIA_IGNORE(spin_button);
 
     if (spin_button->on_change) {
-      spin_button->on_change(spin_button, spin_button->value,
-                             spin_button->on_change_user_data);
+      ui_error_t oc_rc = spin_button->on_change(
+          spin_button, spin_button->value, spin_button->on_change_user_data);
+      if (oc_rc != UI_ERROR_NONE)
+        return oc_rc;
     }
-    (void)trigger_cva_change(spin_button);
+    (void)UI_TRIG_CVA_CHG_IGNORE(spin_button);
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_get_value(const struct ui_spin_button_base *spin_button,
                               double *out_val) {
   if (!spin_button || !out_val)
@@ -309,9 +328,8 @@ ui_spin_button_base_get_value(const struct ui_spin_button_base *spin_button,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
-                             double step) {
+ui_error_t ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
+                                        double step) {
   if (!spin_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -320,7 +338,7 @@ ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
                                  int disabled) {
   if (!spin_button || !spin_button->component ||
@@ -330,23 +348,26 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
 
   spin_button->disabled = disabled;
   if (disabled) {
-    ui_dom_node_set_attribute(spin_button->component->shadow_root,
-                              "aria-disabled", "true");
-    ui_dom_node_remove_attribute(spin_button->component->shadow_root,
+    ui_error_t stop_rc;
+    (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
+                                 "aria-disabled", "true");
+    (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,
                                  "tabindex");
-    ui_spin_button_base_stop_continuous(spin_button);
+    stop_rc = ui_spin_button_base_stop_continuous(spin_button);
+    if (stop_rc != UI_ERROR_NONE)
+      return stop_rc;
   } else {
-    ui_dom_node_remove_attribute(spin_button->component->shadow_root,
+    (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,
                                  "aria-disabled");
-    ui_dom_node_set_attribute(spin_button->component->shadow_root, "tabindex",
-                              "0");
+    (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
+                                 "tabindex", "0");
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_set_on_change(struct ui_spin_button_base *spin_button,
                                   ui_spin_button_on_change_t on_change,
                                   void *user_data) {
@@ -359,7 +380,7 @@ ui_spin_button_base_set_on_change(struct ui_spin_button_base *spin_button,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_increment(struct ui_spin_button_base *spin_button) {
   if (!spin_button || spin_button->disabled) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -369,7 +390,7 @@ ui_spin_button_base_increment(struct ui_spin_button_base *spin_button) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_decrement(struct ui_spin_button_base *spin_button) {
   if (!spin_button || spin_button->disabled) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -379,7 +400,7 @@ ui_spin_button_base_decrement(struct ui_spin_button_base *spin_button) {
 }
 
 /** \brief ui_spin_button_base_start_continuous_increment */
-enum ui_error ui_spin_button_base_start_continuous_increment(
+ui_error_t ui_spin_button_base_start_continuous_increment(
     struct ui_spin_button_base *spin_button) {
   if (!spin_button || spin_button->disabled) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -391,7 +412,7 @@ enum ui_error ui_spin_button_base_start_continuous_increment(
 }
 
 /** \brief ui_spin_button_base_start_continuous_decrement */
-enum ui_error ui_spin_button_base_start_continuous_decrement(
+ui_error_t ui_spin_button_base_start_continuous_decrement(
     struct ui_spin_button_base *spin_button) {
   if (!spin_button || spin_button->disabled) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -403,7 +424,7 @@ enum ui_error ui_spin_button_base_start_continuous_decrement(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_stop_continuous(struct ui_spin_button_base *spin_button) {
   if (!spin_button) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -415,9 +436,8 @@ ui_spin_button_base_stop_continuous(struct ui_spin_button_base *spin_button) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
-                            double delta_ms) {
+ui_error_t ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
+                                       double delta_ms) {
   double threshold;
 
   if (!spin_button || spin_button->disabled) {
@@ -438,9 +458,13 @@ ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
     spin_button->is_repeating = 1;
 
     if (spin_button->continuous_dir == UI_SPIN_BUTTON_DIR_INC) {
-      ui_spin_button_base_increment(spin_button);
+      ui_error_t inc_rc = ui_spin_button_base_increment(spin_button);
+      if (inc_rc != UI_ERROR_NONE)
+        return inc_rc;
     } else if (spin_button->continuous_dir == UI_SPIN_BUTTON_DIR_DEC) {
-      ui_spin_button_base_decrement(spin_button);
+      ui_error_t dec_rc = ui_spin_button_base_decrement(spin_button);
+      if (dec_rc != UI_ERROR_NONE)
+        return dec_rc;
     }
   }
 
@@ -448,7 +472,7 @@ ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
                                   const struct ui_event *event) {
   if (!spin_button || !event) {
@@ -458,20 +482,30 @@ ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
     return UI_ERROR_NONE;
   }
 
-  (void)trigger_cva_touched(spin_button);
+  (void)UI_TRIG_CVA_TOUCH_IGNORE(spin_button);
 
   if (event->type == UI_EVENT_KEY_DOWN) {
     if (event->event_data.keyboard.key_code == UI_KEY_UP) {
-      ui_spin_button_base_increment(spin_button);
+      ui_error_t inc_rc = ui_spin_button_base_increment(spin_button);
+      if (inc_rc != UI_ERROR_NONE)
+        return inc_rc;
       return UI_ERROR_NONE;
     } else if (event->event_data.keyboard.key_code == UI_KEY_DOWN) {
-      ui_spin_button_base_decrement(spin_button);
+      ui_error_t dec_rc = ui_spin_button_base_decrement(spin_button);
+      if (dec_rc != UI_ERROR_NONE)
+        return dec_rc;
       return UI_ERROR_NONE;
     } else if (event->event_data.keyboard.key_code == UI_KEY_HOME) {
-      ui_spin_button_base_set_value(spin_button, spin_button->min_val);
+      ui_error_t set_rc;
+      set_rc = ui_spin_button_base_set_value(spin_button, spin_button->min_val);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
       return UI_ERROR_NONE;
     } else if (event->event_data.keyboard.key_code == UI_KEY_END) {
-      ui_spin_button_base_set_value(spin_button, spin_button->max_val);
+      ui_error_t set_rc;
+      set_rc = ui_spin_button_base_set_value(spin_button, spin_button->max_val);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
       return UI_ERROR_NONE;
     }
   }
@@ -480,7 +514,7 @@ ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_spin_button_base_get_component(struct ui_spin_button_base *spin_button,
                                   struct ui_component **out_component) {
   if (!spin_button || !out_component) {

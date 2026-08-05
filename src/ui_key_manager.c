@@ -5,16 +5,16 @@
 
 #define INITIAL_CAPACITY 8
 
-enum ui_error ui_key_manager_init(struct ui_key_manager *manager) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_key_manager_init(struct ui_key_manager *manager) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!manager) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  manager->hotkeys = (struct ui_hotkey *)UI_MALLOC(sizeof(struct ui_hotkey) *
-                                                   INITIAL_CAPACITY);
+  manager->hotkeys = (struct ui_hotkey *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_hotkey) * INITIAL_CAPACITY);
   if (!manager->hotkeys) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -27,8 +27,8 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_key_manager_cleanup(struct ui_key_manager *manager) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_key_manager_cleanup(struct ui_key_manager *manager) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!manager) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -36,7 +36,7 @@ enum ui_error ui_key_manager_cleanup(struct ui_key_manager *manager) {
   }
 
   if (manager->hotkeys) {
-    UI_FREE(manager->hotkeys);
+    C_MULTIPLATFORM_FREE(manager->hotkeys);
     manager->hotkeys = NULL;
   }
   manager->count = 0;
@@ -46,9 +46,9 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_key_manager_register(struct ui_key_manager *manager,
-                                      const struct ui_hotkey *hotkey) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_key_manager_register(struct ui_key_manager *manager,
+                                   const struct ui_hotkey *hotkey) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_hotkey *new_array;
   size_t new_capacity;
 
@@ -65,7 +65,7 @@ enum ui_error ui_key_manager_register(struct ui_key_manager *manager,
     if (new_capacity <= manager->count) {
       new_capacity = manager->count + 1;
     }
-    new_array = (struct ui_hotkey *)UI_REALLOC(
+    new_array = (struct ui_hotkey *)C_MULTIPLATFORM_REALLOC(
         manager->hotkeys, sizeof(struct ui_hotkey) * new_capacity);
     if (!new_array) {
       rc = UI_ERROR_OUT_OF_MEMORY;
@@ -82,9 +82,8 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_key_manager_unregister(struct ui_key_manager *manager,
-                                        int id) {
-  enum ui_error rc = UI_ERROR_NOT_FOUND;
+ui_error_t ui_key_manager_unregister(struct ui_key_manager *manager, int id) {
+  ui_error_t rc = UI_ERROR_NOT_FOUND;
   size_t i;
   size_t j;
 
@@ -109,11 +108,10 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_key_manager_process_event(const struct ui_key_manager *manager,
-                             const struct ui_keyboard_event *event,
-                             int *out_handled) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_key_manager_process_event(const struct ui_key_manager *manager,
+                                        const struct ui_keyboard_event *event,
+                                        int *out_handled) {
+  ui_error_t rc = UI_ERROR_NONE;
   size_t i;
   int handled = 0;
 
@@ -139,10 +137,9 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_key_manager_format_hotkey(const struct ui_hotkey *hotkey,
-                                           char *out_buffer,
-                                           size_t buffer_size) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_key_manager_format_hotkey(const struct ui_hotkey *hotkey,
+                                        char *out_buffer, size_t buffer_size) {
+  ui_error_t rc = UI_ERROR_NONE;
   char key_str[2];
 
   if (!hotkey || !out_buffer || buffer_size == 0) {

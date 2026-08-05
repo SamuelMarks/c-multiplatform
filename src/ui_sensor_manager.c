@@ -12,14 +12,15 @@ struct ui_sensor_manager {
   struct ui_sensor_quaternion current_quat;
 };
 
-enum ui_error ui_sensor_manager_create(struct ui_sensor_manager **out_manager) {
+ui_error_t ui_sensor_manager_create(struct ui_sensor_manager **out_manager) {
   struct ui_sensor_manager *mgr = NULL;
 
   if (!out_manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  mgr = (struct ui_sensor_manager *)UI_MALLOC(sizeof(struct ui_sensor_manager));
+  mgr = (struct ui_sensor_manager *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_sensor_manager));
   if (!mgr) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -36,22 +37,26 @@ enum ui_error ui_sensor_manager_create(struct ui_sensor_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
+ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (manager->is_running) {
-    ui_sensor_manager_stop(manager);
+    ui_error_t rc = ui_sensor_manager_stop(manager);
+    if (rc != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(manager);
+      return rc;
+    }
   }
 
   /* Unbind from signals if necessary */
 
-  UI_FREE(manager);
+  C_MULTIPLATFORM_FREE(manager);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sensor_manager_start(struct ui_sensor_manager *manager) {
+ui_error_t ui_sensor_manager_start(struct ui_sensor_manager *manager) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -69,7 +74,7 @@ enum ui_error ui_sensor_manager_start(struct ui_sensor_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sensor_manager_stop(struct ui_sensor_manager *manager) {
+ui_error_t ui_sensor_manager_stop(struct ui_sensor_manager *manager) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -86,9 +91,8 @@ enum ui_error ui_sensor_manager_stop(struct ui_sensor_manager *manager) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
-                                   struct ui_signal *signal) {
+ui_error_t ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
+                                              struct ui_signal *signal) {
   if (!manager || !signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -98,7 +102,7 @@ ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
                                     struct ui_sensor_vector3 *out_accel) {
   if (!manager || !out_accel) {
@@ -110,9 +114,8 @@ ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
-                                struct ui_sensor_vector3 *out_gyro) {
+ui_error_t ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
+                                           struct ui_sensor_vector3 *out_gyro) {
   if (!manager || !out_gyro) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -122,10 +125,10 @@ ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
 }
 
 /* Forward declarations */
-enum ui_error ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager);
+ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager);
 
 /* Mock function to simulate a sensor tick, pushing data to signals */
-enum ui_error ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
+ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
   if (!manager || !manager->is_running) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -138,9 +141,13 @@ enum ui_error ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
 
   if (manager->orientation_signal) {
     union ui_signal_payload payload;
+    ui_error_t rc;
     payload.ptr_val = &manager->current_quat;
     /* Send the pointer to current quat into the reactive graph */
-    ui_signal_set(manager->orientation_signal, payload);
+    rc = ui_signal_set(manager->orientation_signal, payload);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
 
   return UI_ERROR_NONE;

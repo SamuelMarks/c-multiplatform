@@ -9,10 +9,10 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error dummy_validate_fail2(struct ui_form_control *control,
-                                          union ui_signal_payload value,
-                                          void *user_data,
-                                          ui_bool_t *out_is_valid) {
+static ui_error_t dummy_validate_fail2(struct ui_form_control *control,
+                                       union ui_signal_payload value,
+                                       void *user_data,
+                                       ui_bool_t *out_is_valid) {
   *out_is_valid = 0;
   return UI_ERROR_NONE;
 }
@@ -37,7 +37,7 @@ static int test_form_builder_oom(void) {
     ui_form_builder_group_start(dummy_builder, "nested");
     g_malloc_fail_countdown = -1;
 
-    ui_form_builder_destroy(dummy_builder);
+    (void)ui_form_builder_destroy(dummy_builder);
   }
 
   /* Test group_start nested group add_node fail */
@@ -50,7 +50,7 @@ static int test_form_builder_oom(void) {
     ui_form_builder_group_start(dummy_builder, "nested");
     g_malloc_fail_countdown = -1;
 
-    ui_form_builder_destroy(dummy_builder);
+    (void)ui_form_builder_destroy(dummy_builder);
   }
 
   /* Test array_start fail */
@@ -62,7 +62,7 @@ static int test_form_builder_oom(void) {
     ui_form_builder_array_start(dummy_builder, "arr");
     g_malloc_fail_countdown = -1;
 
-    ui_form_builder_destroy(dummy_builder);
+    (void)ui_form_builder_destroy(dummy_builder);
   }
 
   /* Test array_start nested array push fail */
@@ -75,7 +75,7 @@ static int test_form_builder_oom(void) {
     ui_form_builder_array_start(dummy_builder, "arr2");
     g_malloc_fail_countdown = -1;
 
-    ui_form_builder_destroy(dummy_builder);
+    (void)ui_form_builder_destroy(dummy_builder);
   }
 
   /* Test control_create fail and add_validator fail and array_push fail */
@@ -89,7 +89,7 @@ static int test_form_builder_oom(void) {
                             dummy_validate_fail2, NULL);
     g_malloc_fail_countdown = -1;
 
-    ui_form_builder_destroy(dummy_builder);
+    (void)ui_form_builder_destroy(dummy_builder);
   }
 
   /* Build without root */
@@ -97,10 +97,10 @@ static int test_form_builder_oom(void) {
     ui_form_group_t *root = NULL;
     ui_form_builder_create(tiny_arena, &dummy_builder);
     ui_form_builder_build(dummy_builder, &root);
-    ui_form_builder_destroy(dummy_builder);
+    (void)ui_form_builder_destroy(dummy_builder);
   }
 
-  ui_arena_destroy(tiny_arena);
+  (void)ui_arena_destroy(tiny_arena);
   return 0;
 }
 
@@ -148,7 +148,7 @@ static int test_form_builder(void) {
   if (ui_form_builder_build(builder, &root) != UI_ERROR_NONE)
     return 1;
 
-  ui_form_builder_destroy(builder);
+  (void)ui_form_builder_destroy(builder);
 
   /* Null checks */
   ui_form_builder_create(NULL, NULL);
@@ -159,7 +159,7 @@ static int test_form_builder(void) {
   ui_form_builder_array_end(NULL);
   ui_form_builder_control(NULL, NULL, dummy, 0, NULL, NULL);
   ui_form_builder_build(NULL, NULL);
-  ui_form_builder_destroy(NULL);
+  (void)ui_form_builder_destroy(NULL);
 
   /* Error states */
   ui_form_builder_create(arena, &builder);
@@ -179,7 +179,7 @@ static int test_form_builder(void) {
   }
   ui_form_builder_group_start(builder, "nested");     /* 32nd should fail */
   ui_form_builder_array_start(builder, "nested_arr"); /* should fail */
-  ui_form_builder_destroy(builder);
+  (void)ui_form_builder_destroy(builder);
 
   /* Test Extra builder errors */
   ui_form_builder_create(arena, &builder);
@@ -194,7 +194,7 @@ static int test_form_builder(void) {
   ui_form_builder_build(
       builder, (ui_form_group_t **)&dummy.ptr_val); /* error depth!=0 */
 
-  ui_form_builder_destroy(builder);
+  (void)ui_form_builder_destroy(builder);
 
   ui_form_builder_create(arena, &builder);
   ui_form_builder_build(builder,
@@ -205,13 +205,13 @@ static int test_form_builder(void) {
                           dummy_validate_fail2, NULL);
   ui_form_builder_group_end(builder);
   ui_form_builder_build(builder, &root);
-  ui_form_builder_destroy(builder);
+  (void)ui_form_builder_destroy(builder);
 
   {
     ui_form_node_t n;
     ui_form_group_get_node(root, "ctrl", &n);
     ui_form_control_set_value(n.node.control, dummy); /* triggers equality */
-    ui_form_control_destroy(n.node.control);
+    (void)ui_form_control_destroy(n.node.control);
   }
 
   g_malloc_fail_countdown = 0;
@@ -219,7 +219,7 @@ static int test_form_builder(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 
   return 0;
 }
@@ -242,6 +242,6 @@ static void force_depth_error(void) {
   ui_form_builder_group_start(builder, "root");
   ui_form_builder_group_start(builder, "child");
   ui_form_builder_build(builder, &root); /* triggers depth!=0 error */
-  ui_form_builder_destroy(builder);
-  ui_arena_destroy(arena);
+  (void)ui_form_builder_destroy(builder);
+  (void)ui_arena_destroy(arena);
 }

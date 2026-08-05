@@ -32,7 +32,7 @@ enum ui_haptic_feedback_type {
  * @return UI_ERROR_NONE on success, UI_ERROR_UNSUPPORTED if the platform does
  * not support haptics, or another appropriate error code.
  */
-enum ui_error ui_haptics_trigger(enum ui_haptic_feedback_type type);
+ui_error_t ui_haptics_trigger(enum ui_haptic_feedback_type type);
 
 #ifdef __cplusplus
 }

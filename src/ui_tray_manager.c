@@ -28,14 +28,15 @@ struct ui_tray_manager {
 #endif
 };
 
-enum ui_error ui_tray_manager_create(struct ui_tray_manager **out_tray) {
+ui_error_t ui_tray_manager_create(struct ui_tray_manager **out_tray) {
   struct ui_tray_manager *tray = NULL;
 
   if (!out_tray) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  tray = (struct ui_tray_manager *)UI_MALLOC(sizeof(struct ui_tray_manager));
+  tray = (struct ui_tray_manager *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_tray_manager));
   if (!tray) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -48,21 +49,25 @@ enum ui_error ui_tray_manager_create(struct ui_tray_manager **out_tray) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tray_manager_destroy(struct ui_tray_manager *tray) {
+ui_error_t ui_tray_manager_destroy(struct ui_tray_manager *tray) {
   if (!tray) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (tray->is_visible) {
-    ui_tray_manager_hide(tray);
+    ui_error_t rc = ui_tray_manager_hide(tray);
+    if (rc != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(tray);
+      return rc;
+    }
   }
 
-  UI_FREE(tray);
+  C_MULTIPLATFORM_FREE(tray);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tray_manager_set_icon(struct ui_tray_manager *tray,
-                                       struct ui_image_base *image) {
+ui_error_t ui_tray_manager_set_icon(struct ui_tray_manager *tray,
+                                    struct ui_image_base *image) {
   if (!tray || !image) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -72,8 +77,8 @@ enum ui_error ui_tray_manager_set_icon(struct ui_tray_manager *tray,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tray_manager_set_tooltip(struct ui_tray_manager *tray,
-                                          const char *tooltip) {
+ui_error_t ui_tray_manager_set_tooltip(struct ui_tray_manager *tray,
+                                       const char *tooltip) {
   if (!tray || !tooltip) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -89,8 +94,8 @@ enum ui_error ui_tray_manager_set_tooltip(struct ui_tray_manager *tray,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tray_manager_set_context_menu(struct ui_tray_manager *tray,
-                                               struct ui_menu_base *menu) {
+ui_error_t ui_tray_manager_set_context_menu(struct ui_tray_manager *tray,
+                                            struct ui_menu_base *menu) {
   if (!tray || !menu) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -100,7 +105,7 @@ enum ui_error ui_tray_manager_set_context_menu(struct ui_tray_manager *tray,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tray_manager_show(struct ui_tray_manager *tray) {
+ui_error_t ui_tray_manager_show(struct ui_tray_manager *tray) {
   if (!tray) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -117,7 +122,7 @@ enum ui_error ui_tray_manager_show(struct ui_tray_manager *tray) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tray_manager_hide(struct ui_tray_manager *tray) {
+ui_error_t ui_tray_manager_hide(struct ui_tray_manager *tray) {
   if (!tray) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

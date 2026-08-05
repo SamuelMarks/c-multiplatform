@@ -20,9 +20,9 @@ struct ui_titlebar_base {
   struct ui_titlebar_btn_rect *buttons;
 };
 
-enum ui_error ui_titlebar_base_create(struct ui_arena *arena,
-                                      const struct ui_titlebar_config *config,
-                                      struct ui_titlebar_base **out_titlebar) {
+ui_error_t ui_titlebar_base_create(struct ui_arena *arena,
+                                   const struct ui_titlebar_config *config,
+                                   struct ui_titlebar_base **out_titlebar) {
   void *ptr;
 
   if (!arena || !config || !out_titlebar) {
@@ -39,14 +39,14 @@ enum ui_error ui_titlebar_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar) {
+ui_error_t ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar) {
   if (!titlebar)
     return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_titlebar_base_add_button_rect(struct ui_titlebar_base *titlebar,
                                  enum ui_titlebar_hit_test_result btn_type,
                                  float x, float y, float w, float h) {
@@ -72,7 +72,7 @@ ui_titlebar_base_add_button_rect(struct ui_titlebar_base *titlebar,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_titlebar_base_hit_test(struct ui_titlebar_base *titlebar, float x, float y,
                           enum ui_titlebar_hit_test_result *out_result) {
   struct ui_titlebar_btn_rect *curr;

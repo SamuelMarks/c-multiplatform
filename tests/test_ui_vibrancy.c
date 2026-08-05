@@ -8,7 +8,7 @@
 
 static int test_vibrancy_init(void) {
   struct ui_vibrancy_params params;
-  enum ui_error err;
+  ui_error_t err;
   int failed = 0;
 
   err = ui_vibrancy_params_init(NULL, UI_VIBRANCY_MATERIAL_ACRYLIC);

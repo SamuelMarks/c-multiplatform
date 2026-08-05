@@ -45,7 +45,7 @@ struct ui_color_picker_base;
  * @param out_cva Optional pointer to receive the control value accessor.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
                             struct ui_control_value_accessor *out_cva);
 
@@ -54,7 +54,7 @@ ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
  *
  * @param picker The color picker manager to destroy.
  */
-enum ui_error ui_color_picker_base_destroy(struct ui_color_picker_base *picker);
+ui_error_t ui_color_picker_base_destroy(struct ui_color_picker_base *picker);
 
 /**
  * @brief Converts an HSV color to RGB.
@@ -63,8 +63,8 @@ enum ui_error ui_color_picker_base_destroy(struct ui_color_picker_base *picker);
  * @param out_rgb Pointer to receive the output RGB color.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_color_picker_hsv_to_rgb(const struct ui_color_hsv *hsv,
-                                         struct ui_color_rgb *out_rgb);
+ui_error_t ui_color_picker_hsv_to_rgb(const struct ui_color_hsv *hsv,
+                                      struct ui_color_rgb *out_rgb);
 
 /**
  * @brief Converts an RGB color to HSV.
@@ -73,8 +73,8 @@ enum ui_error ui_color_picker_hsv_to_rgb(const struct ui_color_hsv *hsv,
  * @param out_hsv Pointer to receive the output HSV color.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_color_picker_rgb_to_hsv(const struct ui_color_rgb *rgb,
-                                         struct ui_color_hsv *out_hsv);
+ui_error_t ui_color_picker_rgb_to_hsv(const struct ui_color_rgb *rgb,
+                                      struct ui_color_hsv *out_hsv);
 
 /**
  * @brief Converts an RGB color to a HEX string (e.g., "#FF0000").
@@ -84,8 +84,8 @@ enum ui_error ui_color_picker_rgb_to_hsv(const struct ui_color_rgb *rgb,
  * @param hex_size Size of the out_hex buffer.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_color_picker_rgb_to_hex(const struct ui_color_rgb *rgb,
-                                         char *out_hex, size_t hex_size);
+ui_error_t ui_color_picker_rgb_to_hex(const struct ui_color_rgb *rgb,
+                                      char *out_hex, size_t hex_size);
 
 /**
  * @brief Converts a HEX string (e.g., "#FF0000" or "FF0000") to an RGB color.
@@ -95,8 +95,8 @@ enum ui_error ui_color_picker_rgb_to_hex(const struct ui_color_rgb *rgb,
  * @return UI_ERROR_NONE on success, or UI_ERROR_PARSE_FAILED if the string is
  * invalid.
  */
-enum ui_error ui_color_picker_hex_to_rgb(const char *hex,
-                                         struct ui_color_rgb *out_rgb);
+ui_error_t ui_color_picker_hex_to_rgb(const char *hex,
+                                      struct ui_color_rgb *out_rgb);
 
 /**
  * @brief Calculates HSV values from a 2D coordinate on a saturation/value
@@ -111,9 +111,9 @@ enum ui_error ui_color_picker_hex_to_rgb(const char *hex,
  * @param out_hsv Pointer to receive the calculated HSV color.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
-                                               double width, double height,
-                                               struct ui_color_hsv *out_hsv);
+ui_error_t ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
+                                            double width, double height,
+                                            struct ui_color_hsv *out_hsv);
 
 /**
  * @brief Gets the current selected RGB color.
@@ -122,7 +122,7 @@ enum ui_error ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
  * @param out_rgb Pointer to receive the current RGB color.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_color_picker_base_get_rgb(const struct ui_color_picker_base *picker,
                              struct ui_color_rgb *out_rgb);
 
@@ -133,8 +133,8 @@ ui_color_picker_base_get_rgb(const struct ui_color_picker_base *picker,
  * @param rgb The new RGB color to set.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
-                                           const struct ui_color_rgb *rgb);
+ui_error_t ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
+                                        const struct ui_color_rgb *rgb);
 
 /**
  * @brief Sets the current selected HSV color.
@@ -143,8 +143,8 @@ enum ui_error ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
  * @param hsv The new HSV color to set.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_color_picker_base_set_hsv(struct ui_color_picker_base *picker,
-                                           const struct ui_color_hsv *hsv);
+ui_error_t ui_color_picker_base_set_hsv(struct ui_color_picker_base *picker,
+                                        const struct ui_color_hsv *hsv);
 
 #ifdef __cplusplus
 }

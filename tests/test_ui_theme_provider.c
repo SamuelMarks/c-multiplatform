@@ -20,7 +20,7 @@ static int test_theme_provider(void) {
   struct ui_theme_provider *provider;
   struct ui_dom_node *root, *child, *grandchild;
   struct ui_design_token_dict *resolved_dict;
-  enum ui_error err;
+  ui_error_t err;
   int failed = 0;
 
   err = ui_arena_create(4096, &arena);
@@ -58,7 +58,7 @@ static int test_theme_provider(void) {
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &unmounted_node);
     err = ui_theme_provider_get(unmounted_node, &unmounted_dict);
     FAIL_CHECK(__LINE__, err != UI_ERROR_NOT_FOUND);
-    ui_dom_node_destroy(unmounted_node);
+    (void)ui_dom_node_destroy(unmounted_node);
   }
 
   /* Test invalid argument branches */
@@ -89,11 +89,11 @@ static int test_theme_provider(void) {
     err = ui_theme_provider_create(small_arena, &dict, &oom_provider);
     FAIL_CHECK(__LINE__, err != UI_ERROR_OUT_OF_MEMORY);
     g_malloc_fail_countdown = -1;
-    ui_arena_destroy(small_arena);
+    (void)ui_arena_destroy(small_arena);
   }
 
-  ui_dom_node_destroy(root);
-  ui_arena_destroy(arena);
+  (void)ui_dom_node_destroy(root);
+  (void)ui_arena_destroy(arena);
 
   return failed;
 }

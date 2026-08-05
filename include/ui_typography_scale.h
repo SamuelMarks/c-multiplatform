@@ -49,7 +49,7 @@ struct ui_typography_metrics {
  * @param out_metrics Pointer to store the resulting metrics.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
+ui_error_t
 ui_typography_scale_get_metrics(enum ui_typography_scale scale,
                                 struct ui_typography_metrics *out_metrics);
 

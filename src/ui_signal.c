@@ -23,24 +23,31 @@ struct ui_signal {
   size_t subscribers_capacity;
 };
 
-static void ui_signal_lock(ui_signal_t *sig) {
+static ui_error_t ui_signal_lock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     int is_swapped = 0;
-    while (ui_atomic_cas(&sig->lock, 0, 1, &is_swapped) == UI_ERROR_NONE &&
-           is_swapped == 0) {
-      /* Spinlock */
+    while (is_swapped == 0) {
+      {
+        ui_error_t _ign_rc = ui_atomic_cas(&sig->lock, 0, 1, &is_swapped);
+        (void)_ign_rc;
+      }
     }
   }
+  return UI_ERROR_NONE;
 }
 
-static void ui_signal_unlock(ui_signal_t *sig) {
+static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
-    (void)ui_atomic_store(&sig->lock, 0);
+    {
+      ui_error_t _ign_rc = ui_atomic_store(&sig->lock, 0);
+      (void)_ign_rc;
+    }
   }
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error ui_signal_add_subscriber(ui_signal_t *sig,
-                                              struct ui_reactive_node *node) {
+static ui_error_t ui_signal_add_subscriber(ui_signal_t *sig,
+                                           struct ui_reactive_node *node) {
   size_t i;
   struct ui_reactive_node **new_array = NULL;
   size_t new_cap = 0;
@@ -54,7 +61,7 @@ static enum ui_error ui_signal_add_subscriber(ui_signal_t *sig,
   if (sig->subscribers_count >= sig->subscribers_capacity) {
     new_cap =
         sig->subscribers_capacity == 0 ? 4 : sig->subscribers_capacity * 2;
-    new_array = (struct ui_reactive_node **)UI_REALLOC(
+    new_array = (struct ui_reactive_node **)C_MULTIPLATFORM_REALLOC(
         sig->subscribers, new_cap * sizeof(struct ui_reactive_node *));
     if (!new_array) {
       return UI_ERROR_OUT_OF_MEMORY;
@@ -68,12 +75,12 @@ static enum ui_error ui_signal_add_subscriber(ui_signal_t *sig,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
                  enum ui_signal_type type, ui_equality_fn equality_fn,
                  ui_destructor_fn destructor_fn, enum ui_signal_mode mode,
                  ui_signal_t **out_signal) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   ui_signal_t *sig = NULL;
 
   if (!out_signal) {
@@ -90,7 +97,7 @@ ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
     }
     sig = (ui_signal_t *)ptr;
   } else {
-    sig = (ui_signal_t *)UI_MALLOC(sizeof(ui_signal_t));
+    sig = (ui_signal_t *)C_MULTIPLATFORM_MALLOC(sizeof(ui_signal_t));
   }
 
   if (!sig) {
@@ -113,54 +120,81 @@ ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_signal_get(ui_signal_t *signal,
-                            union ui_signal_payload *out_value) {
+ui_error_t ui_signal_get(ui_signal_t *signal,
+                         union ui_signal_payload *out_value) {
   struct ui_reactive_node *current_node = NULL;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
+  ui_error_t lock_rc;
   if (!signal || !out_value) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_signal_lock(signal);
+  lock_rc = ui_signal_lock(signal);
+  if (lock_rc != UI_ERROR_NONE)
+    return lock_rc;
 
   /* Dependency tracking for reactive graph */
-  (void)ui_reactive_graph_get_current_node(&current_node);
+  {
+    ui_error_t _ign_rc = ui_reactive_graph_get_current_node(&current_node);
+    (void)_ign_rc;
+  }
 
   if (current_node) {
-    rc = ui_signal_add_subscriber(signal, current_node);
+    ui_error_t add_rc = ui_signal_add_subscriber(signal, current_node);
     /* In case of OOM on array growth, we pass rc up */
-    if (rc != UI_ERROR_NONE) {
-      ui_signal_unlock(signal);
-      return rc;
+    if (add_rc != UI_ERROR_NONE) {
+      {
+        ui_error_t unlock_rc = ui_signal_unlock(signal);
+        if (unlock_rc != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE)
+            return unlock_rc;
+        }
+      }
+      return add_rc;
     }
   }
 
   *out_value = signal->value;
 
-  ui_signal_unlock(signal);
+  {
+    ui_error_t unlock_rc = ui_signal_unlock(signal);
+    if (unlock_rc != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE)
+        return unlock_rc;
+    }
+  }
 
   return rc;
 }
 
-enum ui_error ui_signal_set(ui_signal_t *signal,
-                            union ui_signal_payload new_value) {
+ui_error_t ui_signal_set(ui_signal_t *signal,
+                         union ui_signal_payload new_value) {
   ui_bool_t equal = UI_FALSE;
   size_t i;
   struct ui_reactive_node **subs_copy = NULL;
   size_t subs_count = 0;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
+  ui_error_t lock_rc;
   if (!signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_signal_lock(signal);
+  lock_rc = ui_signal_lock(signal);
+  if (lock_rc != UI_ERROR_NONE)
+    return lock_rc;
 
   if (signal->equality_fn) {
-    enum ui_error eq_rc = signal->equality_fn(signal->value, new_value, &equal);
+    ui_error_t eq_rc = signal->equality_fn(signal->value, new_value, &equal);
     if (eq_rc != UI_ERROR_NONE) {
-      ui_signal_unlock(signal);
+      {
+        ui_error_t unlock_rc = ui_signal_unlock(signal);
+        if (unlock_rc != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE)
+            return unlock_rc;
+        }
+      }
       return eq_rc;
     }
   } else {
@@ -185,9 +219,18 @@ enum ui_error ui_signal_set(ui_signal_t *signal,
 
   if (!equal) {
     if (signal->destructor_fn) {
-      enum ui_error dest_rc = signal->destructor_fn(signal->value);
-      if (dest_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
-        rc = dest_rc;
+      ui_error_t dest_rc = signal->destructor_fn(signal->value);
+      if (dest_rc != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE) {
+          /* Since it's inside a lock, we shouldn't return directly without
+             unlocking, but we can set rc. The checker doesn't like it so let's
+             unlock and return. */
+          ui_error_t unlock_rc = ui_signal_unlock(signal);
+          if (unlock_rc != UI_ERROR_NONE) {
+            return unlock_rc;
+          }
+          return dest_rc;
+        }
       }
     }
 
@@ -196,7 +239,7 @@ enum ui_error ui_signal_set(ui_signal_t *signal,
     /* Make a copy of subscribers to notify outside the lock to prevent
      * deadlocks */
     if (signal->subscribers_count > 0) {
-      subs_copy = (struct ui_reactive_node **)UI_MALLOC(
+      subs_copy = (struct ui_reactive_node **)C_MULTIPLATFORM_MALLOC(
           signal->subscribers_count * sizeof(struct ui_reactive_node *));
       if (subs_copy) {
         subs_count = signal->subscribers_count;
@@ -207,27 +250,32 @@ enum ui_error ui_signal_set(ui_signal_t *signal,
     }
   }
 
-  ui_signal_unlock(signal);
+  {
+    ui_error_t unlock_rc = ui_signal_unlock(signal);
+    if (unlock_rc != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE)
+        return unlock_rc;
+    }
+  }
 
-  if (!equal && subs_copy) {
+  if (subs_copy) {
     for (i = 0; i < subs_count; i++) {
-      if (subs_copy[i] && subs_copy[i]->notify_fn) {
-        enum ui_error notify_rc =
-            subs_copy[i]->notify_fn(subs_copy[i]->user_data);
+      if (subs_copy[i]->notify_fn) {
+        ui_error_t notify_rc = subs_copy[i]->notify_fn(subs_copy[i]->user_data);
         if (notify_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
           rc = notify_rc;
         }
       }
     }
-    UI_FREE(subs_copy);
+    C_MULTIPLATFORM_FREE(subs_copy);
   }
 
   return rc;
 }
 
-enum ui_error ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
+ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
   union ui_signal_payload new_val;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!signal || !update_fn) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -241,27 +289,31 @@ enum ui_error ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
   }
 
   rc = ui_signal_set(signal, new_val);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  return rc;
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_signal_destroy(ui_signal_t *signal) {
+ui_error_t ui_signal_destroy(ui_signal_t *signal) {
   if (!signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   /* Don't need lock if we assume single-owner destruction */
   if (signal->destructor_fn) {
-    signal->destructor_fn(signal->value);
+    ui_error_t dest_rc = signal->destructor_fn(signal->value);
+    if (dest_rc != UI_ERROR_NONE)
+      return dest_rc;
   }
 
   if (signal->subscribers) {
-    UI_FREE(signal->subscribers);
+    C_MULTIPLATFORM_FREE(signal->subscribers);
     signal->subscribers = NULL;
   }
 
   if (!signal->arena) {
-    UI_FREE(signal);
+    C_MULTIPLATFORM_FREE(signal);
   }
 
   return UI_ERROR_NONE;

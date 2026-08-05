@@ -9,9 +9,9 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error test_label_creation(void) {
+static ui_error_t test_label_creation(void) {
   struct ui_label_base *lbl = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_label_base_create(NULL);
   assert(rc == UI_ERROR_INVALID_ARGUMENT);
@@ -40,16 +40,16 @@ static enum ui_error test_label_creation(void) {
   assert(rc == UI_ERROR_NONE);
   assert(lbl != NULL);
 
-  ui_label_base_destroy(NULL);
+  (void)ui_label_base_destroy(NULL);
 
-  ui_label_base_destroy(lbl);
+  (void)ui_label_base_destroy(lbl);
   printf("test_label_creation passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_label_set_for(void) {
+static ui_error_t test_label_set_for(void) {
   struct ui_label_base *lbl = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_label_base_set_for(NULL, "target-id");
   assert(rc == UI_ERROR_INVALID_ARGUMENT);
@@ -70,7 +70,7 @@ static enum ui_error test_label_set_for(void) {
   assert(rc == UI_ERROR_NONE);
 
   /* Destroy label while it has a target_id */
-  ui_label_base_destroy(lbl);
+  (void)ui_label_base_destroy(lbl);
 
   rc = ui_label_base_create(&lbl);
   assert(rc == UI_ERROR_NONE);
@@ -79,31 +79,34 @@ static enum ui_error test_label_set_for(void) {
   rc = ui_label_base_set_for(lbl, NULL);
   assert(rc == UI_ERROR_NONE);
 
-  ui_label_base_destroy(lbl);
+  (void)ui_label_base_destroy(lbl);
 
   /* Test with broken shadow_root to hit paths */
   rc = ui_label_base_create(&lbl);
   if (rc == UI_ERROR_NONE) {
     struct ui_component *comp;
     ui_label_base_get_component(lbl, &comp);
-    ui_dom_node_destroy(comp->shadow_root);
+    (void)ui_dom_node_destroy(comp->shadow_root);
     comp->shadow_root = NULL;
     ui_label_base_set_for(lbl, "fail-target");
     ui_label_base_set_for(lbl, NULL);
-    ui_label_base_destroy(lbl);
+    (void)ui_label_base_destroy(lbl);
   }
+
+  extern ui_error_t ui_test_label_base_set_for_no_component(void);
+  ui_test_label_base_set_for_no_component();
 
   printf("test_label_set_for passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_label_misc(void) {
+static ui_error_t test_label_misc(void) {
   struct ui_label_base *lbl = NULL;
   struct ui_component *comp = NULL;
   struct ui_dom_node *node = (struct ui_dom_node *)1;
   struct ui_signal *sig = (struct ui_signal *)1;
   struct ui_event ev;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_label_base_create(&lbl);
   assert(rc == UI_ERROR_NONE);
@@ -132,7 +135,7 @@ static enum ui_error test_label_misc(void) {
   rc = ui_label_base_process_event(lbl, &ev, 0.0);
   assert(rc == UI_ERROR_NONE);
 
-  ui_label_base_destroy(lbl);
+  (void)ui_label_base_destroy(lbl);
   printf("test_label_misc passed\n");
   return UI_ERROR_NONE;
 }

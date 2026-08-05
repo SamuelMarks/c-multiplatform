@@ -18,7 +18,7 @@ struct ui_theme_manager {
 static int test_theme_manager_lifecycle(void) {
   struct ui_arena *arena;
   struct ui_theme_manager *manager;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   rc = ui_arena_create(1024 * 1024, &arena);
@@ -30,14 +30,14 @@ static int test_theme_manager_lifecycle(void) {
   rc = ui_theme_manager_destroy(manager);
   failed |= (rc != UI_ERROR_NONE);
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return failed;
 }
 
 static int test_theme_manager_mode(void) {
   struct ui_arena *arena;
   struct ui_theme_manager *manager;
-  enum ui_error rc;
+  ui_error_t rc;
   enum ui_theme_mode mode;
   ui_signal_t *signal;
   union ui_signal_payload payload;
@@ -68,7 +68,7 @@ static int test_theme_manager_mode(void) {
   rc = ui_theme_manager_destroy(manager);
   failed |= (rc != UI_ERROR_NONE);
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return failed;
 }
 
@@ -121,7 +121,7 @@ static int test_theme_manager_nulls(void) {
     manager->change_signal = old_signal;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 
   return failed;
 }

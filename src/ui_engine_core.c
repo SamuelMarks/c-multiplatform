@@ -19,9 +19,9 @@ struct ui_engine {
   struct ui_timer *timer;
 };
 
-enum ui_error ui_engine_create(const struct ui_engine_config *config,
-                               struct ui_engine **out_engine) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_engine_create(const struct ui_engine_config *config,
+                            struct ui_engine **out_engine) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_engine *engine = NULL;
 
   if (!config || !out_engine) {
@@ -29,7 +29,7 @@ enum ui_error ui_engine_create(const struct ui_engine_config *config,
     goto cleanup;
   }
 
-  engine = (struct ui_engine *)UI_MALLOC(sizeof(struct ui_engine));
+  engine = (struct ui_engine *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_engine));
   if (!engine) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -72,47 +72,47 @@ cleanup:
   if (engine) {
 
     if (engine->reactor) {
-      ui_reactor_destroy(engine->reactor);
+      (void)(void)ui_reactor_destroy(engine->reactor);
     }
     if (engine->thread_pool) {
 #ifndef UI_SINGLE_THREADED
-      ui_thread_pool_destroy(engine->thread_pool);
+      (void)(void)ui_thread_pool_destroy(engine->thread_pool);
 #endif
     }
     if (engine->tick_engine) {
-      ui_tick_engine_destroy(engine->tick_engine);
+      (void)(void)ui_tick_engine_destroy(engine->tick_engine);
     }
-    UI_FREE(engine);
+    C_MULTIPLATFORM_FREE(engine);
   }
   return rc;
 }
 
-enum ui_error ui_engine_destroy(struct ui_engine *engine) {
+ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   if (!engine) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (engine->timer) {
-    ui_timer_destroy(engine->timer);
+    (void)(void)ui_timer_destroy(engine->timer);
   }
   if (engine->reactor) {
-    ui_reactor_destroy(engine->reactor);
+    (void)(void)ui_reactor_destroy(engine->reactor);
   }
 #ifndef UI_SINGLE_THREADED
   if (engine->thread_pool) {
-    ui_thread_pool_destroy(engine->thread_pool);
+    (void)(void)ui_thread_pool_destroy(engine->thread_pool);
   }
 #endif
   if (engine->tick_engine) {
-    ui_tick_engine_destroy(engine->tick_engine);
+    (void)(void)ui_tick_engine_destroy(engine->tick_engine);
   }
 
-  UI_FREE(engine);
+  C_MULTIPLATFORM_FREE(engine);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_engine_tick(struct ui_engine *engine) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_engine_tick(struct ui_engine *engine) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!engine) {
     return UI_ERROR_INVALID_ARGUMENT;

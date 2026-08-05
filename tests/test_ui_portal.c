@@ -11,7 +11,7 @@ static int test_portal_lifecycle(void) {
   struct ui_dom_node *content_node = NULL;
   struct ui_dom_node *out_content = NULL;
   struct ui_portal *portal = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &physical_target);
   if (rc != UI_ERROR_NONE)
@@ -33,8 +33,8 @@ static int test_portal_lifecycle(void) {
   if (rc != UI_ERROR_NONE || out_content != content_node)
     return 1;
 
-  ui_portal_destroy(portal);
-  ui_dom_node_destroy(physical_target);
+  (void)ui_portal_destroy(portal);
+  (void)ui_dom_node_destroy(physical_target);
 
   return 0;
 }
@@ -55,7 +55,7 @@ static int test_portal_replacement(void) {
   ui_portal_set_content(portal, content2); /* Should destroy content1 */
 
   ui_portal_destroy(portal); /* Should destroy content2 */
-  ui_dom_node_destroy(physical_target);
+  (void)ui_dom_node_destroy(physical_target);
 
   return 0;
 }
@@ -72,7 +72,7 @@ static int test_portal_nulls(void) {
   if (ui_portal_create(&portal, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_portal_destroy(NULL);
+  (void)ui_portal_destroy(NULL);
 
   ui_portal_create(&portal, node);
 
@@ -86,8 +86,8 @@ static int test_portal_nulls(void) {
   if (ui_portal_get_content(portal, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_portal_destroy(portal);
-  ui_dom_node_destroy(node);
+  (void)ui_portal_destroy(portal);
+  (void)ui_dom_node_destroy(node);
 
   return 0;
 }
@@ -103,7 +103,7 @@ static int test_portal_oom(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   return 0;
 }
 
@@ -130,9 +130,9 @@ static int test_portal_content_moved(void) {
   ui_dom_node_remove_child(target, content2);
 
   /* Destroy, content2 is already detached */
-  ui_portal_destroy(portal);
+  (void)ui_portal_destroy(portal);
 
-  ui_dom_node_destroy(target);
+  (void)ui_dom_node_destroy(target);
 
   return 0;
 }
@@ -154,8 +154,8 @@ static int test_portal_append_fail(void) {
   if (ui_portal_set_content(portal, content) == UI_ERROR_NONE)
     return 1;
 
-  ui_portal_destroy(portal);
-  ui_dom_node_destroy(node);
+  (void)ui_portal_destroy(portal);
+  (void)ui_dom_node_destroy(node);
   ui_dom_node_destroy(dummy_parent); /* also destroys content */
 
   return 0;

@@ -24,15 +24,15 @@ struct ui_rating_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_rating_base_create(struct ui_rating_base **out_rating,
-                                    struct ui_control_value_accessor *out_cva);
+ui_error_t ui_rating_base_create(struct ui_rating_base **out_rating,
+                                 struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Destroys a rating component and frees all resources.
  *
  * @param rating The rating component to destroy.
  */
-void ui_rating_base_destroy(struct ui_rating_base *rating);
+ui_error_t ui_rating_base_destroy(struct ui_rating_base *rating);
 
 /**
  * @brief Sets the maximum rating bound (number of items/stars).
@@ -42,8 +42,8 @@ void ui_rating_base_destroy(struct ui_rating_base *rating);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * parameters.
  */
-enum ui_error ui_rating_base_set_max(struct ui_rating_base *rating,
-                                     unsigned int max_rating);
+ui_error_t ui_rating_base_set_max(struct ui_rating_base *rating,
+                                  unsigned int max_rating);
 
 /**
  * @brief Gets the maximum rating bound.
@@ -53,8 +53,8 @@ enum ui_error ui_rating_base_set_max(struct ui_rating_base *rating,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * parameters.
  */
-enum ui_error ui_rating_base_get_max(const struct ui_rating_base *rating,
-                                     unsigned int *out_max);
+ui_error_t ui_rating_base_get_max(const struct ui_rating_base *rating,
+                                  unsigned int *out_max);
 
 /**
  * @brief Sets the current fractional rating value.
@@ -66,8 +66,7 @@ enum ui_error ui_rating_base_get_max(const struct ui_rating_base *rating,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * parameters.
  */
-enum ui_error ui_rating_base_set_value(struct ui_rating_base *rating,
-                                       float value);
+ui_error_t ui_rating_base_set_value(struct ui_rating_base *rating, float value);
 
 /**
  * @brief Gets the current fractional rating value.
@@ -77,8 +76,8 @@ enum ui_error ui_rating_base_set_value(struct ui_rating_base *rating,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * parameters.
  */
-enum ui_error ui_rating_base_get_value(const struct ui_rating_base *rating,
-                                       float *out_value);
+ui_error_t ui_rating_base_get_value(const struct ui_rating_base *rating,
+                                    float *out_value);
 
 /**
  * @brief Gets the fraction to render for a given item index based on the
@@ -93,9 +92,9 @@ enum ui_error ui_rating_base_get_value(const struct ui_rating_base *rating,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * parameters or index out of bounds.
  */
-enum ui_error
-ui_rating_base_get_item_fraction(const struct ui_rating_base *rating,
-                                 unsigned int index, float *out_fraction);
+ui_error_t ui_rating_base_get_item_fraction(const struct ui_rating_base *rating,
+                                            unsigned int index,
+                                            float *out_fraction);
 
 /**
  * @brief Retrieves the icon component used to represent a fully filled rating
@@ -109,8 +108,8 @@ ui_rating_base_get_item_fraction(const struct ui_rating_base *rating,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * parameters.
  */
-enum ui_error ui_rating_base_get_full_icon(struct ui_rating_base *rating,
-                                           struct ui_icon_base **out_icon);
+ui_error_t ui_rating_base_get_full_icon(struct ui_rating_base *rating,
+                                        struct ui_icon_base **out_icon);
 
 /**
  * @brief Retrieves the icon component used to represent a partially filled
@@ -124,8 +123,8 @@ enum ui_error ui_rating_base_get_full_icon(struct ui_rating_base *rating,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * parameters.
  */
-enum ui_error ui_rating_base_get_half_icon(struct ui_rating_base *rating,
-                                           struct ui_icon_base **out_icon);
+ui_error_t ui_rating_base_get_half_icon(struct ui_rating_base *rating,
+                                        struct ui_icon_base **out_icon);
 
 /**
  * @brief Retrieves the icon component used to represent an empty rating item.
@@ -138,8 +137,8 @@ enum ui_error ui_rating_base_get_half_icon(struct ui_rating_base *rating,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * parameters.
  */
-enum ui_error ui_rating_base_get_empty_icon(struct ui_rating_base *rating,
-                                            struct ui_icon_base **out_icon);
+ui_error_t ui_rating_base_get_empty_icon(struct ui_rating_base *rating,
+                                         struct ui_icon_base **out_icon);
 
 #ifdef __cplusplus
 }

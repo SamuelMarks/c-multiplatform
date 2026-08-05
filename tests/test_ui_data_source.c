@@ -6,36 +6,53 @@
 #include <stdio.h>
 /* clang-format on */
 
-static enum ui_error dummy_fetch_page(struct ui_data_source *ds,
-                                      ui_uint32 offset, ui_uint32 limit,
-                                      void *user_data) {
+static ui_error_t dummy_fetch_page(struct ui_data_source *ds, ui_uint32 offset,
+                                   ui_uint32 limit, void *user_data) {
   int *called = (int *)user_data;
   *called = 1;
   return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_apply_sort(struct ui_data_source *ds,
-                                      const struct ui_sort_descriptor *sorts,
-                                      ui_uint32 num_sorts, void *user_data) {
+static ui_error_t dummy_apply_sort(struct ui_data_source *ds,
+                                   const struct ui_sort_descriptor *sorts,
+                                   ui_uint32 num_sorts, void *user_data) {
   int *called = (int *)user_data;
   *called = 1;
   return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-dummy_apply_filter(struct ui_data_source *ds,
-                   const struct ui_filter_descriptor *filters,
-                   ui_uint32 num_filters, void *user_data) {
+static ui_error_t dummy_apply_filter(struct ui_data_source *ds,
+                                     const struct ui_filter_descriptor *filters,
+                                     ui_uint32 num_filters, void *user_data) {
   int *called = (int *)user_data;
   *called = 1;
   return UI_ERROR_NONE;
+}
+
+static ui_error_t dummy_fetch_page_err(struct ui_data_source *ds,
+                                       ui_uint32 offset, ui_uint32 limit,
+                                       void *user_data) {
+  return UI_ERROR_OUT_OF_MEMORY;
+}
+
+static ui_error_t dummy_apply_sort_err(struct ui_data_source *ds,
+                                       const struct ui_sort_descriptor *sorts,
+                                       ui_uint32 num_sorts, void *user_data) {
+  return UI_ERROR_OUT_OF_MEMORY;
+}
+
+static ui_error_t
+dummy_apply_filter_err(struct ui_data_source *ds,
+                       const struct ui_filter_descriptor *filters,
+                       ui_uint32 num_filters, void *user_data) {
+  return UI_ERROR_OUT_OF_MEMORY;
 }
 
 static int test_data_source_lifecycle(void) {
   struct ui_data_source *ds = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_data_source_create(&ds);
   if (rc != UI_ERROR_NONE || ds == NULL)
@@ -50,7 +67,7 @@ static int test_data_source_lifecycle(void) {
 
 static int test_data_source_callbacks(void) {
   struct ui_data_source *ds = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int fetch_called = 0;
   int sort_called = 0;
   int filter_called = 0;
@@ -86,7 +103,8 @@ static int test_data_source_callbacks(void) {
   if (rc != UI_ERROR_NONE || filter_called != 1)
     return 1;
 
-  ui_data_source_destroy(ds);
+  if (ui_data_source_destroy(ds) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
@@ -95,7 +113,7 @@ static int test_data_source_signals(void) {
   struct ui_signal *state_sig =
       (struct ui_signal *)0x1234; /* Mock signal ptr */
   struct ui_signal *data_sig = (struct ui_signal *)0x5678;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_data_source_create(&ds);
   if (rc != UI_ERROR_NONE)
@@ -109,7 +127,8 @@ static int test_data_source_signals(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_data_source_destroy(ds);
+  if (ui_data_source_destroy(ds) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
@@ -149,13 +168,26 @@ static int test_data_source_errors(void) {
   if (ui_data_source_apply_filter(NULL, NULL, 0) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_data_source_create(&ds);
+  if (ui_data_source_create(&ds) != UI_ERROR_NONE)
+    return 1;
 
   if (ui_data_source_fetch_page(ds, 0, 10) != UI_ERROR_UNSUPPORTED)
     return 1;
   if (ui_data_source_apply_sort(ds, NULL, 0) != UI_ERROR_UNSUPPORTED)
     return 1;
   if (ui_data_source_apply_filter(ds, NULL, 0) != UI_ERROR_UNSUPPORTED)
+    return 1;
+
+  ui_data_source_set_fetch_page_callback(ds, dummy_fetch_page_err, NULL);
+  if (ui_data_source_fetch_page(ds, 0, 10) != UI_ERROR_OUT_OF_MEMORY)
+    return 1;
+
+  ui_data_source_set_apply_sort_callback(ds, dummy_apply_sort_err, NULL);
+  if (ui_data_source_apply_sort(ds, NULL, 0) != UI_ERROR_OUT_OF_MEMORY)
+    return 1;
+
+  ui_data_source_set_apply_filter_callback(ds, dummy_apply_filter_err, NULL);
+  if (ui_data_source_apply_filter(ds, NULL, 0) != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 
   if (ui_data_source_bind_state(NULL, sig) != UI_ERROR_INVALID_ARGUMENT)
@@ -168,7 +200,8 @@ static int test_data_source_errors(void) {
   if (ui_data_source_bind_data(ds, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_data_source_destroy(ds);
+  if (ui_data_source_destroy(ds) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 

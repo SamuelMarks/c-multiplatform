@@ -4,7 +4,7 @@
 /* clang-format on */
 
 int main(void) {
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_textarea_autosize_config config;
   struct ui_textarea_autosize_state state;
   int failed = 0;

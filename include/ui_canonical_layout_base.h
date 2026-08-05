@@ -44,7 +44,7 @@ struct ui_canonical_layout_config {
  * @param out_layout Pointer to receive the created layout handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_canonical_layout_base_create(struct ui_arena *arena,
                                 const struct ui_canonical_layout_config *config,
                                 struct ui_canonical_layout_base **out_layout);
@@ -55,7 +55,7 @@ ui_canonical_layout_base_create(struct ui_arena *arena,
  * @param layout The layout to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout);
 
 /**
@@ -66,7 +66,7 @@ ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout);
  * @param size_class The new size class.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_canonical_layout_base_set_size_class(struct ui_canonical_layout_base *layout,
                                         enum ui_window_size_class size_class);
 
@@ -77,7 +77,7 @@ ui_canonical_layout_base_set_size_class(struct ui_canonical_layout_base *layout,
  * @param out_size_class Pointer to receive the size class.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_canonical_layout_base_get_size_class(
+ui_error_t ui_canonical_layout_base_get_size_class(
     const struct ui_canonical_layout_base *layout,
     enum ui_window_size_class *out_size_class);
 
@@ -88,7 +88,7 @@ enum ui_error ui_canonical_layout_base_get_size_class(
  * @param body The component to place in the body region.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_canonical_layout_base_set_body(struct ui_canonical_layout_base *layout,
                                   struct ui_component *body);
 
@@ -99,7 +99,7 @@ ui_canonical_layout_base_set_body(struct ui_canonical_layout_base *layout,
  * @param leading_pane The component to place in the leading pane.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_canonical_layout_base_set_leading_pane(
+ui_error_t ui_canonical_layout_base_set_leading_pane(
     struct ui_canonical_layout_base *layout, struct ui_component *leading_pane);
 
 /**
@@ -109,7 +109,7 @@ enum ui_error ui_canonical_layout_base_set_leading_pane(
  * @param trailing_pane The component to place in the trailing pane.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_canonical_layout_base_set_trailing_pane(
+ui_error_t ui_canonical_layout_base_set_trailing_pane(
     struct ui_canonical_layout_base *layout,
     struct ui_component *trailing_pane);
 
@@ -120,7 +120,7 @@ enum ui_error ui_canonical_layout_base_set_trailing_pane(
  * @param bottom_bar The component to place in the bottom bar.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_canonical_layout_base_set_bottom_bar(struct ui_canonical_layout_base *layout,
                                         struct ui_component *bottom_bar);
 
@@ -133,7 +133,7 @@ ui_canonical_layout_base_set_bottom_bar(struct ui_canonical_layout_base *layout,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_canonical_layout_base_get_layout_changed_signal(
+ui_error_t ui_canonical_layout_base_get_layout_changed_signal(
     struct ui_canonical_layout_base *layout, ui_signal_t **out_signal);
 
 #ifdef __cplusplus

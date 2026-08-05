@@ -16,8 +16,8 @@ static int g_change_called = 0;
 static int g_change_val = -1;
 static int g_touched_called = 0;
 
-static enum ui_error on_change(struct ui_toggle_base *toggle, int checked,
-                               void *user) {
+static ui_error_t on_change(struct ui_toggle_base *toggle, int checked,
+                            void *user) {
   (void)toggle;
   (void)user;
   g_change_called++;
@@ -25,14 +25,14 @@ static enum ui_error on_change(struct ui_toggle_base *toggle, int checked,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_cva_change(union ui_signal_payload val, void *user) {
+static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
   (void)user;
   g_change_called++;
   g_change_val = val.int_val;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_cva_touched(void *user) {
+static ui_error_t on_cva_touched(void *user) {
   (void)user;
   g_touched_called++;
   return UI_ERROR_NONE;
@@ -52,7 +52,7 @@ static int test_normal(void) {
   /* Null checks */
   failed |= (ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, NULL) !=
              UI_ERROR_INVALID_ARGUMENT);
-  ui_toggle_base_destroy(NULL);
+  (void)ui_toggle_base_destroy(NULL);
 
   failed |= (ui_toggle_base_set_disabled(NULL, 1) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_toggle_base_is_checked(NULL, &is_checked) !=
@@ -178,10 +178,10 @@ static int test_normal(void) {
   ui_toggle_base_process_event(chk1, &ev, 5.0);
 
   /* Clean up */
-  ui_toggle_base_destroy(chk1);
-  ui_toggle_base_destroy(rad1);
-  ui_toggle_base_destroy(rad2);
-  ui_toggle_base_destroy(rad3);
+  (void)ui_toggle_base_destroy(chk1);
+  (void)ui_toggle_base_destroy(rad1);
+  (void)ui_toggle_base_destroy(rad2);
+  (void)ui_toggle_base_destroy(rad3);
 
   return failed;
 }
@@ -192,26 +192,78 @@ static int test_oom(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   struct ui_toggle_base *toggle;
   int i;
-  enum ui_error err;
+  ui_error_t err;
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
     err = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
-    if (err != UI_ERROR_NONE) {
-      /* Do nothing, create cleans up partially if component etc fails, wait
-         does it? Yes ui_toggle_base_create handles its own cleanup. */
+    g_malloc_fail_countdown = -1;
+    if (err == UI_ERROR_NONE) {
+      (void)ui_toggle_base_destroy(toggle);
+    }
+  }
+  for (i = 0; i < 20; i++) {
+    g_malloc_fail_countdown = i;
+    err = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &toggle);
+    g_malloc_fail_countdown = -1;
+    if (err == UI_ERROR_NONE) {
+      (void)ui_toggle_base_destroy(toggle);
     }
   }
   g_malloc_fail_countdown = -1;
 
   ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
-  g_malloc_fail_countdown = 0;
-  err = ui_toggle_base_set_group_name(toggle, "grp");
-  failed |= (err != UI_ERROR_OUT_OF_MEMORY);
+  for (i = 0; i < 3; i++) {
+    g_malloc_fail_countdown = i;
+    err = ui_toggle_base_set_group_name(toggle, "grp");
+    if (err == UI_ERROR_NONE) {
+      ui_toggle_base_set_group_name(toggle, NULL);
+    }
+  }
   g_malloc_fail_countdown = -1;
 
-  ui_toggle_base_destroy(toggle);
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    ui_toggle_base_set_disabled(toggle, 1);
+  }
+  g_malloc_fail_countdown = -1;
+
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    ui_toggle_base_set_disabled(toggle, 0);
+  }
+  g_malloc_fail_countdown = -1;
+
+  ui_toggle_base_set_group_name(toggle, "grp");
+  g_malloc_fail_countdown = 0;
+  ui_toggle_base_set_group_name(toggle, NULL);
+  g_malloc_fail_countdown = -1;
+
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    ui_toggle_base_set_checked(toggle, 1);
+  }
+  g_malloc_fail_countdown = -1;
+
+  (void)ui_toggle_base_destroy(toggle);
 #endif
+
+  ui_toggle_base_set_disabled(NULL, 1);
+  ui_toggle_base_set_checked(NULL, 1);
+  ui_toggle_base_set_group_name(NULL, "grp");
+  ui_toggle_base_set_on_change(NULL, NULL, NULL);
+
+  {
+    struct ui_toggle_base *r1, *r2, *r3;
+    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r1);
+    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r2);
+    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r3);
+
+    (void)ui_toggle_base_destroy(r2);
+    (void)ui_toggle_base_destroy(r3);
+    (void)ui_toggle_base_destroy(r1);
+  }
+
   return failed;
 }
 

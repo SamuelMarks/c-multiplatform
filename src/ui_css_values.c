@@ -1,6 +1,14 @@
 /* clang-format off */
 #include "../include/ui_css_values.h"
+
 #include "ui_internal_mem.h"
+#undef UI_STRNCPY
+#if defined(_MSC_VER)
+#define UI_STRNCPY(dest, destsz, src, count) strncpy_s((dest), (destsz), (src), (count))
+#else
+#define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
+#endif
+
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
@@ -14,8 +22,8 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
-static void parse_css_unit(const char *str, size_t *out_len,
-                           enum ui_css_unit *out_unit) {
+static ui_error_t parse_css_unit(const char *str, size_t *out_len,
+                                 enum ui_css_unit *out_unit) {
   size_t i, j;
   static const struct {
     const char *name;
@@ -52,16 +60,15 @@ static void parse_css_unit(const char *str, size_t *out_len,
     if (match && !isalpha((unsigned char)str[j])) {
       *out_len = j;
       *out_unit = units[i].unit;
-      return;
+      return UI_ERROR_NONE;
     }
   }
 
-  return;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error
-ui_css_parse_value_internal(const char **p_str,
-                            struct ui_css_value *out_value) {
+static ui_error_t ui_css_parse_value_internal(const char **p_str,
+                                              struct ui_css_value *out_value) {
   const char *str = *p_str;
   char *endptr;
   double val;
@@ -102,9 +109,8 @@ ui_css_parse_value_internal(const char **p_str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_value(const char *str,
-                                 struct ui_css_value *out_value) {
-  enum ui_error rc;
+ui_error_t ui_css_parse_value(const char *str, struct ui_css_value *out_value) {
+  ui_error_t rc;
 
   if (!str || !out_value) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -128,14 +134,13 @@ enum ui_error ui_css_parse_value(const char *str,
 
 /* Recursive Descent Parser for Math Expressions */
 
-static enum ui_error parse_expression(const char **p_str,
-                                      struct ui_css_value_ext **out_expr);
+static ui_error_t parse_expression(const char **p_str,
+                                   struct ui_css_value_ext **out_expr);
 
 static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
-  return;
 }
 
 static void match_keyword(const char **p_str, const char *kw,
@@ -150,10 +155,11 @@ static void match_keyword(const char **p_str, const char *kw,
   return;
 }
 
-static enum ui_error create_math_node(enum ui_css_math_op op,
-                                      struct ui_css_math_expr **out_node) {
+static ui_error_t create_math_node(enum ui_css_math_op op,
+                                   struct ui_css_math_expr **out_node) {
   struct ui_css_math_expr *node =
-      (struct ui_css_math_expr *)UI_MALLOC(sizeof(struct ui_css_math_expr));
+      (struct ui_css_math_expr *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_css_math_expr));
   if (node) {
     node->op = op;
     node->left = NULL;
@@ -166,10 +172,11 @@ static enum ui_error create_math_node(enum ui_css_math_op op,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
-static enum ui_error create_value_ext_math(struct ui_css_math_expr *math,
-                                           struct ui_css_value_ext **out_ext) {
+static ui_error_t create_value_ext_math(struct ui_css_math_expr *math,
+                                        struct ui_css_value_ext **out_ext) {
   struct ui_css_value_ext *ext =
-      (struct ui_css_value_ext *)UI_MALLOC(sizeof(struct ui_css_value_ext));
+      (struct ui_css_value_ext *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_css_value_ext));
   if (ext) {
     ext->type = UI_CSS_VALUE_TYPE_MATH;
     ext->value.math = math;
@@ -179,11 +186,11 @@ static enum ui_error create_value_ext_math(struct ui_css_math_expr *math,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
-static enum ui_error
-create_value_ext_scalar(const struct ui_css_value *scalar,
-                        struct ui_css_value_ext **out_ext) {
+static ui_error_t create_value_ext_scalar(const struct ui_css_value *scalar,
+                                          struct ui_css_value_ext **out_ext) {
   struct ui_css_value_ext *ext =
-      (struct ui_css_value_ext *)UI_MALLOC(sizeof(struct ui_css_value_ext));
+      (struct ui_css_value_ext *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_css_value_ext));
   if (ext) {
     ext->type = UI_CSS_VALUE_TYPE_SCALAR;
     ext->value.scalar = *scalar;
@@ -193,15 +200,18 @@ create_value_ext_scalar(const struct ui_css_value *scalar,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
-static enum ui_error create_value_ext_env(const char *name,
-                                          struct ui_css_value_ext *fallback,
-                                          struct ui_css_value_ext **out_ext) {
+static ui_error_t create_value_ext_env(const char *name,
+                                       struct ui_css_value_ext *fallback,
+                                       struct ui_css_value_ext **out_ext) {
   struct ui_css_env_ref *env_ref =
-      (struct ui_css_env_ref *)UI_MALLOC(sizeof(struct ui_css_env_ref));
+      (struct ui_css_env_ref *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_css_env_ref));
   struct ui_css_value_ext *ext;
 
   if (!env_ref) {
-    ui_css_value_ext_destroy(fallback);
+    {
+      ui_css_value_ext_destroy(fallback);
+    }
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -210,10 +220,13 @@ static enum ui_error create_value_ext_env(const char *name,
   env_ref->name[sizeof(env_ref->name) - 1] = '\0';
   env_ref->fallback = fallback;
 
-  ext = (struct ui_css_value_ext *)UI_MALLOC(sizeof(struct ui_css_value_ext));
+  ext = (struct ui_css_value_ext *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_css_value_ext));
   if (!ext) {
-    ui_css_value_ext_destroy(fallback);
-    UI_FREE(env_ref);
+    {
+      ui_css_value_ext_destroy(fallback);
+    }
+    C_MULTIPLATFORM_FREE(env_ref);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -226,37 +239,40 @@ static enum ui_error create_value_ext_env(const char *name,
 static void destroy_math_node(struct ui_css_math_expr *math) {
   if (!math)
     return;
-  ui_css_value_ext_destroy(math->left);
-  ui_css_value_ext_destroy(math->right);
-  ui_css_value_ext_destroy(math->ext);
+
+  { ui_css_value_ext_destroy(math->left); }
+  { ui_css_value_ext_destroy(math->right); }
+  { ui_css_value_ext_destroy(math->ext); }
 
   while (math->next) {
     struct ui_css_math_expr *next = math->next;
     math->next = next->next;
-    ui_css_value_ext_destroy(next->left);
-    UI_FREE(next);
+    { ui_css_value_ext_destroy(next->left); }
+    C_MULTIPLATFORM_FREE(next);
   }
-  UI_FREE(math);
+  C_MULTIPLATFORM_FREE(math);
 }
 
-enum ui_error ui_css_value_ext_destroy(struct ui_css_value_ext *val) {
+void ui_css_value_ext_destroy(struct ui_css_value_ext *val) {
   if (!val)
-    return UI_ERROR_NONE;
-
-  if (val->type == UI_CSS_VALUE_TYPE_MATH && val->value.math) {
-    destroy_math_node(val->value.math);
-  } else if (val->type == UI_CSS_VALUE_TYPE_ENV && val->value.env) {
-    ui_css_value_ext_destroy(val->value.env->fallback);
-    UI_FREE(val->value.env);
+    return;
+  if (val->type == UI_CSS_VALUE_TYPE_MATH) {
+    {
+      destroy_math_node(val->value.math);
+    }
+  } else {
+    if (val->type == UI_CSS_VALUE_TYPE_ENV && val->value.env) {
+      ui_css_value_ext_destroy(val->value.env->fallback);
+      C_MULTIPLATFORM_FREE(val->value.env);
+    }
   }
-  UI_FREE(val);
-  return UI_ERROR_NONE;
+  C_MULTIPLATFORM_FREE(val);
 }
 
 /* We need to properly handle min(), max(), clamp() */
-static enum ui_error parse_function(const char **p_str,
-                                    struct ui_css_value_ext **out_expr) {
-  enum ui_error rc = UI_ERROR_NONE;
+static ui_error_t parse_function(const char **p_str,
+                                 struct ui_css_value_ext **out_expr) {
+  ui_error_t rc = UI_ERROR_NONE;
   int is_calc = 0, is_min = 0, is_max = 0, is_clamp = 0, is_atan2 = 0,
       is_env = 0;
 
@@ -266,9 +282,11 @@ static enum ui_error parse_function(const char **p_str,
     if (rc != UI_ERROR_NONE)
       return rc;
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
-      ui_css_value_ext_destroy(*out_expr);
+      {
+        ui_css_value_ext_destroy(*out_expr);
+      }
       *out_expr = NULL;
       return UI_ERROR_PARSE_FAILED;
     }
@@ -282,9 +300,11 @@ static enum ui_error parse_function(const char **p_str,
     if (rc != UI_ERROR_NONE)
       return rc;
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
-      ui_css_value_ext_destroy(*out_expr);
+      {
+        ui_css_value_ext_destroy(*out_expr);
+      }
       *out_expr = NULL;
       return UI_ERROR_PARSE_FAILED;
     }
@@ -303,11 +323,11 @@ static enum ui_error parse_function(const char **p_str,
 
     rc = parse_expression(p_str, &node->left);
     if (rc != UI_ERROR_NONE) {
-      UI_FREE(node);
+      C_MULTIPLATFORM_FREE(node);
       return rc;
     }
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     while (**p_str == ',') {
       struct ui_css_math_expr *next_arg = NULL;
       (*p_str)++;
@@ -318,13 +338,13 @@ static enum ui_error parse_function(const char **p_str,
 
       rc = parse_expression(p_str, &next_arg->left);
       if (rc != UI_ERROR_NONE) {
-        UI_FREE(next_arg);
+        C_MULTIPLATFORM_FREE(next_arg);
         goto cleanup_min;
       }
 
       tail->next = next_arg;
       tail = next_arg;
-      skip_whitespace(p_str);
+      { skip_whitespace(p_str); }
     }
 
     if (**p_str != ')') {
@@ -339,7 +359,7 @@ static enum ui_error parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_min: {
-    destroy_math_node(node);
+    { destroy_math_node(node); }
     return rc;
   }
   }
@@ -355,11 +375,11 @@ static enum ui_error parse_function(const char **p_str,
 
     rc = parse_expression(p_str, &node->left);
     if (rc != UI_ERROR_NONE) {
-      UI_FREE(node);
+      C_MULTIPLATFORM_FREE(node);
       return rc;
     }
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     while (**p_str == ',') {
       struct ui_css_math_expr *next_arg = NULL;
       (*p_str)++;
@@ -370,13 +390,13 @@ static enum ui_error parse_function(const char **p_str,
 
       rc = parse_expression(p_str, &next_arg->left);
       if (rc != UI_ERROR_NONE) {
-        UI_FREE(next_arg);
+        C_MULTIPLATFORM_FREE(next_arg);
         goto cleanup_max;
       }
 
       tail->next = next_arg;
       tail = next_arg;
-      skip_whitespace(p_str);
+      { skip_whitespace(p_str); }
     }
 
     if (**p_str != ')') {
@@ -391,7 +411,7 @@ static enum ui_error parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_max: {
-    destroy_math_node(node);
+    { destroy_math_node(node); }
     return rc;
   }
   }
@@ -405,11 +425,11 @@ static enum ui_error parse_function(const char **p_str,
 
     rc = parse_expression(p_str, &node->left);
     if (rc != UI_ERROR_NONE) {
-      UI_FREE(node);
+      C_MULTIPLATFORM_FREE(node);
       return rc;
     }
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -421,7 +441,7 @@ static enum ui_error parse_function(const char **p_str,
       goto cleanup_clamp;
     }
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -433,7 +453,7 @@ static enum ui_error parse_function(const char **p_str,
       goto cleanup_clamp;
     }
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -446,7 +466,7 @@ static enum ui_error parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_clamp: {
-    destroy_math_node(node);
+    { destroy_math_node(node); }
     return rc;
   }
   }
@@ -460,11 +480,11 @@ static enum ui_error parse_function(const char **p_str,
 
     rc = parse_expression(p_str, &node->left);
     if (rc != UI_ERROR_NONE) {
-      UI_FREE(node);
+      C_MULTIPLATFORM_FREE(node);
       return rc;
     }
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_atan2;
@@ -476,7 +496,7 @@ static enum ui_error parse_function(const char **p_str,
       goto cleanup_atan2;
     }
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_atan2;
@@ -489,7 +509,7 @@ static enum ui_error parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_atan2: {
-    destroy_math_node(node);
+    { destroy_math_node(node); }
     return rc;
   }
   }
@@ -499,7 +519,7 @@ static enum ui_error parse_function(const char **p_str,
     char name[64];
     struct ui_css_value_ext *fallback = NULL;
     size_t n = 0;
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
 
     while (**p_str && **p_str != ',' && **p_str != ')' &&
            !isspace((unsigned char)**p_str)) {
@@ -510,19 +530,21 @@ static enum ui_error parse_function(const char **p_str,
     }
     name[n] = '\0';
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str == ',') {
       (*p_str)++;
-      skip_whitespace(p_str);
+      { skip_whitespace(p_str); }
       rc = parse_expression(p_str, &fallback);
       if (rc != UI_ERROR_NONE) {
         return rc;
       }
     }
 
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
-      ui_css_value_ext_destroy(fallback);
+      {
+        ui_css_value_ext_destroy(fallback);
+      }
       return UI_ERROR_PARSE_FAILED;
     }
     (*p_str)++;
@@ -559,20 +581,24 @@ static enum ui_error parse_function(const char **p_str,
 
       rc = parse_expression(p_str, &node->left);
       if (rc != UI_ERROR_NONE) {
-        UI_FREE(node);
+        C_MULTIPLATFORM_FREE(node);
         return rc;
       }
 
-      skip_whitespace(p_str);
+      { skip_whitespace(p_str); }
       if (**p_str != ')') {
-        destroy_math_node(node);
+        {
+          destroy_math_node(node);
+        }
         return UI_ERROR_PARSE_FAILED;
       }
       (*p_str)++;
 
       rc = create_value_ext_math(node, out_expr);
       if (rc != UI_ERROR_NONE) {
-        destroy_math_node(node);
+        {
+          destroy_math_node(node);
+        }
         return rc;
       }
       return UI_ERROR_NONE;
@@ -582,25 +608,29 @@ static enum ui_error parse_function(const char **p_str,
   {
     struct ui_css_value scalar;
     rc = ui_css_parse_value_internal(p_str, &scalar);
-    if (rc == UI_ERROR_NONE) {
-      rc = create_value_ext_scalar(&scalar, out_expr);
-      if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
+      if (0)
         return rc;
+      return rc;
+    }
+    {
+      ui_error_t ext_rc = create_value_ext_scalar(&scalar, out_expr);
+      if (ext_rc != UI_ERROR_NONE)
+        return ext_rc;
       return UI_ERROR_NONE;
     }
-    return rc;
   }
 }
-static enum ui_error parse_term(const char **p_str,
-                                struct ui_css_value_ext **out_expr) {
+static ui_error_t parse_term(const char **p_str,
+                             struct ui_css_value_ext **out_expr) {
   struct ui_css_value_ext *left = NULL;
-  enum ui_error rc = parse_function(p_str, &left);
+  ui_error_t rc = parse_function(p_str, &left);
   if (rc != UI_ERROR_NONE)
     return rc;
 
   for (;;) {
     const char *saved = *p_str;
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
     if (**p_str == '*' || **p_str == '/') {
       char op_char = **p_str;
       struct ui_css_value_ext *right = NULL;
@@ -609,7 +639,9 @@ static enum ui_error parse_term(const char **p_str,
       (*p_str)++;
       rc = parse_function(p_str, &right);
       if (rc != UI_ERROR_NONE) {
-        ui_css_value_ext_destroy(left);
+        {
+          ui_css_value_ext_destroy(left);
+        }
         return rc;
       }
 
@@ -618,15 +650,17 @@ static enum ui_error parse_term(const char **p_str,
       if (rc != UI_ERROR_NONE) {
         ui_css_value_ext_destroy(left);
         ui_css_value_ext_destroy(right);
-        return UI_ERROR_OUT_OF_MEMORY;
+        return rc;
       }
       node->left = left;
       node->right = right;
 
       rc = create_value_ext_math(node, &left);
       if (rc != UI_ERROR_NONE) {
-        destroy_math_node(node);
-        return UI_ERROR_OUT_OF_MEMORY;
+        {
+          destroy_math_node(node);
+        }
+        return rc;
       }
     } else {
       *p_str = saved;
@@ -638,17 +672,17 @@ static enum ui_error parse_term(const char **p_str,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error parse_expression(const char **p_str,
-                                      struct ui_css_value_ext **out_expr) {
+static ui_error_t parse_expression(const char **p_str,
+                                   struct ui_css_value_ext **out_expr) {
   struct ui_css_value_ext *left = NULL;
-  enum ui_error rc = parse_term(p_str, &left);
+  ui_error_t rc = parse_term(p_str, &left);
   if (rc != UI_ERROR_NONE)
     return rc;
 
   for (;;) {
     const char *saved = *p_str;
     int has_leading_space = isspace((unsigned char)**p_str);
-    skip_whitespace(p_str);
+    { skip_whitespace(p_str); }
 
     if (**p_str == '+' || **p_str == '-') {
       char op_char = **p_str;
@@ -670,7 +704,9 @@ static enum ui_error parse_expression(const char **p_str,
 
       rc = parse_term(p_str, &right);
       if (rc != UI_ERROR_NONE) {
-        ui_css_value_ext_destroy(left);
+        {
+          ui_css_value_ext_destroy(left);
+        }
         return rc;
       }
 
@@ -679,15 +715,17 @@ static enum ui_error parse_expression(const char **p_str,
       if (rc != UI_ERROR_NONE) {
         ui_css_value_ext_destroy(left);
         ui_css_value_ext_destroy(right);
-        return UI_ERROR_OUT_OF_MEMORY;
+        return rc;
       }
       node->left = left;
       node->right = right;
 
       rc = create_value_ext_math(node, &left);
       if (rc != UI_ERROR_NONE) {
-        destroy_math_node(node);
-        return UI_ERROR_OUT_OF_MEMORY;
+        {
+          destroy_math_node(node);
+        }
+        return rc;
       }
     } else {
       *p_str = saved;
@@ -699,9 +737,9 @@ static enum ui_error parse_expression(const char **p_str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_value_ext(const char *str,
-                                     struct ui_css_value_ext **out_value) {
-  enum ui_error rc;
+ui_error_t ui_css_parse_value_ext(const char *str,
+                                  struct ui_css_value_ext **out_value) {
+  ui_error_t rc;
 
   if (!str || !out_value) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -714,9 +752,11 @@ enum ui_error ui_css_parse_value_ext(const char *str,
     return rc;
   }
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   if (*str != '\0') {
-    ui_css_value_ext_destroy(*out_value);
+    {
+      ui_css_value_ext_destroy(*out_value);
+    }
     *out_value = NULL;
     return UI_ERROR_PARSE_FAILED;
   }
@@ -724,8 +764,8 @@ enum ui_error ui_css_parse_value_ext(const char *str,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error parse_hex_color(const char *str,
-                                     struct ui_css_color *out_color) {
+static ui_error_t parse_hex_color(const char *str,
+                                  struct ui_css_color *out_color) {
   size_t len = strlen(str);
   out_color->space = UI_CSS_COLOR_SPACE_SRGB;
   out_color->components[3] = 1.0f; /* alpha */
@@ -764,8 +804,7 @@ static enum ui_error parse_hex_color(const char *str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_color(const char *str,
-                                 struct ui_css_color *out_color) {
+ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   if (!str || !out_color)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -776,7 +815,7 @@ enum ui_error ui_css_parse_color(const char *str,
   out_color->components[2] = 0.0f;
   out_color->components[3] = 1.0f;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
 
   if (str[0] == '#') {
     return parse_hex_color(str, out_color);
@@ -938,18 +977,27 @@ enum ui_error ui_css_parse_color(const char *str,
     out_color->components[1] = 0.0f;
     out_color->components[2] = 1.0f;
     return UI_ERROR_NONE;
+  } else if (strcmp(str, "black") == 0) {
+    out_color->components[0] = 0.0f;
+    out_color->components[1] = 0.0f;
+    out_color->components[2] = 0.0f;
+    return UI_ERROR_NONE;
+  } else if (strcmp(str, "white") == 0) {
+    out_color->components[0] = 1.0f;
+    out_color->components[1] = 1.0f;
+    out_color->components[2] = 1.0f;
+    return UI_ERROR_NONE;
   }
 
   /* For unknown, fallback to opaque black (or we can return an error) */
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_parse_image(const char *str,
-                                 struct ui_css_image *out_image) {
+ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image) {
   if (!str || !out_image)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   out_image->type = UI_CSS_IMAGE_NONE;
 
   if (strcmp(str, "none") == 0) {
@@ -962,10 +1010,14 @@ enum ui_error ui_css_parse_image(const char *str,
     if (end) {
       size_t len = end - start;
       /* Strip quotes if present */
-      if (len >= 2 && ((start[0] == '"' && start[len - 1] == '"') ||
-                       (start[0] == '\'' && start[len - 1] == '\''))) {
-        start++;
-        len -= 2;
+      if (len >= 2) {
+        if (start[0] == '"' && start[len - 1] == '"') {
+          start++;
+          len -= 2;
+        } else if (start[0] == '\'' && start[len - 1] == '\'') {
+          start++;
+          len -= 2;
+        }
       }
       if (len < sizeof(out_image->data.url)) {
         UI_STRNCPY(out_image->data.url, len + 1, start, len);
@@ -979,27 +1031,47 @@ enum ui_error ui_css_parse_image(const char *str,
     out_image->type = UI_CSS_IMAGE_LINEAR_GRADIENT;
     out_image->data.linear_gradient.angle = 180.0f; /* default to bottom */
     out_image->data.linear_gradient.stop_count = 2; /* mock 2 stops */
-    ui_css_parse_color("black",
-                       &out_image->data.linear_gradient.stops[0].color);
-    ui_css_parse_color("white",
-                       &out_image->data.linear_gradient.stops[1].color);
+    {
+      ui_error_t image_color_rc = ui_css_parse_color(
+          "black", &out_image->data.linear_gradient.stops[0].color);
+      (void)image_color_rc;
+    }
+    {
+      ui_error_t image_color_rc = ui_css_parse_color(
+          "white", &out_image->data.linear_gradient.stops[1].color);
+      (void)image_color_rc;
+    }
     return UI_ERROR_NONE;
   } else if (strncmp(str, "radial-gradient(", 16) == 0 ||
              strncmp(str, "repeating-radial-gradient(", 26) == 0) {
     out_image->type = UI_CSS_IMAGE_RADIAL_GRADIENT;
     out_image->data.radial_gradient.stop_count = 2;
-    ui_css_parse_color("black",
-                       &out_image->data.radial_gradient.stops[0].color);
-    ui_css_parse_color("white",
-                       &out_image->data.radial_gradient.stops[1].color);
+    {
+      ui_error_t image_color_rc = ui_css_parse_color(
+          "black", &out_image->data.radial_gradient.stops[0].color);
+      (void)image_color_rc;
+    }
+    {
+      ui_error_t image_color_rc = ui_css_parse_color(
+          "white", &out_image->data.radial_gradient.stops[1].color);
+      (void)image_color_rc;
+    }
     return UI_ERROR_NONE;
   } else if (strncmp(str, "conic-gradient(", 15) == 0 ||
              strncmp(str, "repeating-conic-gradient(", 25) == 0) {
     out_image->type = UI_CSS_IMAGE_CONIC_GRADIENT;
     out_image->data.conic_gradient.angle = 0.0f;
     out_image->data.conic_gradient.stop_count = 2;
-    ui_css_parse_color("black", &out_image->data.conic_gradient.stops[0].color);
-    ui_css_parse_color("white", &out_image->data.conic_gradient.stops[1].color);
+    {
+      ui_error_t image_color_rc = ui_css_parse_color(
+          "black", &out_image->data.conic_gradient.stops[0].color);
+      (void)image_color_rc;
+    }
+    {
+      ui_error_t image_color_rc = ui_css_parse_color(
+          "white", &out_image->data.conic_gradient.stops[1].color);
+      (void)image_color_rc;
+    }
     return UI_ERROR_NONE;
   } else if (strncmp(str, "image-set(", 10) == 0 ||
              strncmp(str, "-webkit-image-set(", 18) == 0) {
@@ -1014,30 +1086,33 @@ enum ui_error ui_css_parse_image(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-static enum ui_css_geometry_box parse_geometry_box(const char *str) {
+static void parse_geometry_box(const char *str,
+                               enum ui_css_geometry_box *out_box) {
+
   if (strstr(str, "margin-box"))
-    return UI_CSS_GEOMETRY_BOX_MARGIN_BOX;
-  if (strstr(str, "border-box"))
-    return UI_CSS_GEOMETRY_BOX_BORDER_BOX;
-  if (strstr(str, "padding-box"))
-    return UI_CSS_GEOMETRY_BOX_PADDING_BOX;
-  if (strstr(str, "content-box"))
-    return UI_CSS_GEOMETRY_BOX_CONTENT_BOX;
-  if (strstr(str, "fill-box"))
-    return UI_CSS_GEOMETRY_BOX_FILL_BOX;
-  if (strstr(str, "stroke-box"))
-    return UI_CSS_GEOMETRY_BOX_STROKE_BOX;
-  if (strstr(str, "view-box"))
-    return UI_CSS_GEOMETRY_BOX_VIEW_BOX;
-  return UI_CSS_GEOMETRY_BOX_NONE;
+    *out_box = UI_CSS_GEOMETRY_BOX_MARGIN_BOX;
+  else if (strstr(str, "border-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_BORDER_BOX;
+  else if (strstr(str, "padding-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_PADDING_BOX;
+  else if (strstr(str, "content-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_CONTENT_BOX;
+  else if (strstr(str, "fill-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_FILL_BOX;
+  else if (strstr(str, "stroke-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_STROKE_BOX;
+  else if (strstr(str, "view-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_VIEW_BOX;
+  else
+    *out_box = UI_CSS_GEOMETRY_BOX_NONE;
 }
 
-enum ui_error ui_css_parse_clip_path(const char *str,
-                                     struct ui_css_clip_path *out_clip_path) {
+ui_error_t ui_css_parse_clip_path(const char *str,
+                                  struct ui_css_clip_path *out_clip_path) {
   if (!str || !out_clip_path)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   out_clip_path->geometry_box = UI_CSS_GEOMETRY_BOX_NONE;
   out_clip_path->shape.type = UI_CSS_BASIC_SHAPE_NONE;
   out_clip_path->shape.arguments[0] = '\0';
@@ -1052,10 +1127,14 @@ enum ui_error ui_css_parse_clip_path(const char *str,
     const char *end = strchr(start, ')');
     if (end) {
       size_t len = end - start;
-      if (len >= 2 && ((start[0] == '"' && start[len - 1] == '"') ||
-                       (start[0] == '\'' && start[len - 1] == '\''))) {
-        start++;
-        len -= 2;
+      if (len >= 2) {
+        if (start[0] == '"' && start[len - 1] == '"') {
+          start++;
+          len -= 2;
+        } else if (start[0] == '\'' && start[len - 1] == '\'') {
+          start++;
+          len -= 2;
+        }
       }
       if (len < sizeof(out_clip_path->url)) {
         UI_STRNCPY(out_clip_path->url, len + 1, start, len);
@@ -1066,7 +1145,7 @@ enum ui_error ui_css_parse_clip_path(const char *str,
     return UI_ERROR_PARSE_FAILED;
   }
 
-  out_clip_path->geometry_box = parse_geometry_box(str);
+  { parse_geometry_box(str, &out_clip_path->geometry_box); }
 
   if (strstr(str, "inset(")) {
     out_clip_path->shape.type = UI_CSS_BASIC_SHAPE_INSET;
@@ -1083,7 +1162,7 @@ enum ui_error ui_css_parse_clip_path(const char *str,
   if (out_clip_path->shape.type != UI_CSS_BASIC_SHAPE_NONE) {
     const char *paren_start = strchr(str, '(');
     const char *paren_end = strrchr(str, ')');
-    if (paren_start && paren_end && paren_start < paren_end) {
+    if (paren_end) {
       size_t len = paren_end - paren_start - 1;
       if (len < sizeof(out_clip_path->shape.arguments)) {
         UI_STRNCPY(out_clip_path->shape.arguments, len + 1, paren_start + 1,
@@ -1101,12 +1180,12 @@ enum ui_error ui_css_parse_clip_path(const char *str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_mask(const char *str,
-                                struct ui_css_mask_layer *out_mask) {
+ui_error_t ui_css_parse_mask(const char *str,
+                             struct ui_css_mask_layer *out_mask) {
   if (!str || !out_mask)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
 
   /* Initialize with defaults */
   out_mask->image.type = UI_CSS_IMAGE_NONE;
@@ -1136,7 +1215,7 @@ enum ui_error ui_css_parse_mask(const char *str,
   else
     out_mask->composite = UI_CSS_MASK_COMPOSITE_ADD;
 
-  out_mask->clip = parse_geometry_box(str);
+  { parse_geometry_box(str, &out_mask->clip); }
   out_mask->origin = out_mask->clip; /* In real parsing they are separate */
 
   /* Try parsing an image */
@@ -1158,14 +1237,18 @@ enum ui_error ui_css_parse_mask(const char *str,
 
     if (img_start) {
       /* We will just try parsing the substring */
-      ui_css_parse_image(img_start, &out_mask->image);
+      {
+        ui_error_t mask_img_rc =
+            ui_css_parse_image(img_start, &out_mask->image);
+        (void)mask_img_rc;
+      }
     }
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_transform_destroy(struct ui_css_transform *transform) {
+ui_error_t ui_css_transform_destroy(struct ui_css_transform *transform) {
   if (!transform)
     return UI_ERROR_NONE;
 
@@ -1173,16 +1256,16 @@ enum ui_error ui_css_transform_destroy(struct ui_css_transform *transform) {
     struct ui_css_transform_function *current = transform->functions;
     while (current) {
       struct ui_css_transform_function *next = current->next;
-      UI_FREE(current);
+      C_MULTIPLATFORM_FREE(current);
       current = next;
     }
   }
-  UI_FREE(transform);
+  C_MULTIPLATFORM_FREE(transform);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_transform(const char *str,
-                                     struct ui_css_transform **out_transform) {
+ui_error_t ui_css_parse_transform(const char *str,
+                                  struct ui_css_transform **out_transform) {
   struct ui_css_transform *transform;
   struct ui_css_transform_function *tail = NULL;
 
@@ -1191,13 +1274,13 @@ enum ui_error ui_css_parse_transform(const char *str,
 
   *out_transform = NULL;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;
   }
 
-  transform =
-      (struct ui_css_transform *)UI_MALLOC(sizeof(struct ui_css_transform));
+  transform = (struct ui_css_transform *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_css_transform));
   if (!transform) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -1211,7 +1294,7 @@ enum ui_error ui_css_parse_transform(const char *str,
     const char *paren_end;
     const char *arg_str;
 
-    skip_whitespace(&str);
+    { skip_whitespace(&str); }
     if (*str == '\0')
       break;
 
@@ -1273,10 +1356,12 @@ enum ui_error ui_css_parse_transform(const char *str,
       goto cleanup_fail;
     }
 
-    func = (struct ui_css_transform_function *)UI_MALLOC(
+    func = (struct ui_css_transform_function *)C_MULTIPLATFORM_MALLOC(
         sizeof(struct ui_css_transform_function));
     if (!func) {
-      ui_css_transform_destroy(transform);
+      {
+        ui_css_transform_destroy(transform);
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
 
@@ -1286,20 +1371,21 @@ enum ui_error ui_css_parse_transform(const char *str,
 
     arg_str = paren_start + 1;
     while (arg_str < paren_end && func->value_count < 16) {
-      enum ui_error rc;
-      skip_whitespace(&arg_str);
+      ui_error_t rc;
+      { skip_whitespace(&arg_str); }
       if (arg_str >= paren_end)
         break;
 
       rc = ui_css_parse_value_internal(&arg_str,
                                        &func->values[func->value_count]);
       if (rc != UI_ERROR_NONE) {
-        UI_FREE(func);
-        goto cleanup_fail;
+        C_MULTIPLATFORM_FREE(func);
+        { ui_css_transform_destroy(transform); }
+        return rc;
       }
       func->value_count++;
 
-      skip_whitespace(&arg_str);
+      { skip_whitespace(&arg_str); }
       if (*arg_str == ',') {
         arg_str++;
       }
@@ -1322,20 +1408,18 @@ enum ui_error ui_css_parse_transform(const char *str,
   *out_transform = transform;
   return UI_ERROR_NONE;
 
-cleanup_fail:
-  ui_css_transform_destroy(transform);
+cleanup_fail: { ui_css_transform_destroy(transform); }
   return UI_ERROR_PARSE_FAILED;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_css_parse_shape_outside(const char *str,
-                           struct ui_css_shape_outside *out_shape) {
+ui_error_t ui_css_parse_shape_outside(const char *str,
+                                      struct ui_css_shape_outside *out_shape) {
   const char *p;
   if (!str || !out_shape)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   out_shape->box = UI_CSS_GEOMETRY_BOX_NONE;
   out_shape->shape.type = UI_CSS_BASIC_SHAPE_NONE;
   out_shape->shape.arguments[0] = '\0';
@@ -1370,7 +1454,7 @@ ui_css_parse_shape_outside(const char *str,
   }
 
   /* Try parsing geometry box or basic shape */
-  out_shape->box = parse_geometry_box(p);
+  { parse_geometry_box(p, &out_shape->box); }
 
   if (strstr(p, "inset(")) {
     out_shape->shape.type = UI_CSS_BASIC_SHAPE_INSET;
@@ -1387,7 +1471,7 @@ ui_css_parse_shape_outside(const char *str,
   if (out_shape->shape.type != UI_CSS_BASIC_SHAPE_NONE) {
     const char *paren_start = strchr(p, '(');
     const char *paren_end = strrchr(p, ')');
-    if (paren_start && paren_end && paren_start < paren_end) {
+    if (paren_end) {
       size_t len = paren_end - paren_start - 1;
       if (len < sizeof(out_shape->shape.arguments)) {
         UI_STRNCPY(out_shape->shape.arguments, len + 1, paren_start + 1, len);
@@ -1398,7 +1482,7 @@ ui_css_parse_shape_outside(const char *str,
     /* Check if geometry box is appended after shape */
     if (out_shape->box == UI_CSS_GEOMETRY_BOX_NONE && paren_end) {
       const char *after_paren = paren_end + 1;
-      out_shape->box = parse_geometry_box(after_paren);
+      { parse_geometry_box(after_paren, &out_shape->box); }
     }
   }
 
@@ -1410,7 +1494,7 @@ ui_css_parse_shape_outside(const char *str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_filter_destroy(struct ui_css_filter *filter) {
+ui_error_t ui_css_filter_destroy(struct ui_css_filter *filter) {
   if (!filter)
     return UI_ERROR_NONE;
 
@@ -1418,16 +1502,16 @@ enum ui_error ui_css_filter_destroy(struct ui_css_filter *filter) {
     struct ui_css_filter_function *current = filter->functions;
     while (current) {
       struct ui_css_filter_function *next = current->next;
-      UI_FREE(current);
+      C_MULTIPLATFORM_FREE(current);
       current = next;
     }
   }
-  UI_FREE(filter);
+  C_MULTIPLATFORM_FREE(filter);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_filter(const char *str,
-                                  struct ui_css_filter **out_filter) {
+ui_error_t ui_css_parse_filter(const char *str,
+                               struct ui_css_filter **out_filter) {
   struct ui_css_filter *filter;
   struct ui_css_filter_function *tail = NULL;
 
@@ -1436,12 +1520,13 @@ enum ui_error ui_css_parse_filter(const char *str,
 
   *out_filter = NULL;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;
   }
 
-  filter = (struct ui_css_filter *)UI_MALLOC(sizeof(struct ui_css_filter));
+  filter = (struct ui_css_filter *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_css_filter));
   if (!filter) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -1455,7 +1540,7 @@ enum ui_error ui_css_parse_filter(const char *str,
     const char *paren_end;
     const char *arg_str;
 
-    skip_whitespace(&str);
+    { skip_whitespace(&str); }
     if (*str == '\0')
       break;
 
@@ -1498,10 +1583,12 @@ enum ui_error ui_css_parse_filter(const char *str,
     if (!paren_end)
       goto cleanup_fail;
 
-    func = (struct ui_css_filter_function *)UI_MALLOC(
+    func = (struct ui_css_filter_function *)C_MULTIPLATFORM_MALLOC(
         sizeof(struct ui_css_filter_function));
     if (!func) {
-      ui_css_filter_destroy(filter);
+      {
+        ui_css_filter_destroy(filter);
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
     func->type = type;
@@ -1517,7 +1604,7 @@ enum ui_error ui_css_parse_filter(const char *str,
       func->data.url[len] = '\0';
     } else if (type == UI_CSS_FILTER_DROP_SHADOW) {
       /* Basic parse: offset-x offset-y blur-radius color */
-      enum ui_error rc;
+      ui_error_t rc;
       char shadow_str[256];
       size_t len = paren_end - arg_str;
       char *token;
@@ -1544,27 +1631,43 @@ enum ui_error ui_css_parse_filter(const char *str,
       while (token && part_idx < 4) {
         if (part_idx == 0) {
           rc = ui_css_parse_value(token, &func->data.drop_shadow.offset_x);
-          if (rc != UI_ERROR_NONE)
-            break;
+          if (rc != UI_ERROR_NONE) {
+            C_MULTIPLATFORM_FREE(func);
+            { ui_css_filter_destroy(filter); }
+            return rc;
+          }
         } else if (part_idx == 1) {
           rc = ui_css_parse_value(token, &func->data.drop_shadow.offset_y);
-          if (rc != UI_ERROR_NONE)
-            break;
+          if (rc != UI_ERROR_NONE) {
+            C_MULTIPLATFORM_FREE(func);
+            { ui_css_filter_destroy(filter); }
+            return rc;
+          }
         } else if (part_idx == 2) {
           rc = ui_css_parse_value(token, &func->data.drop_shadow.blur_radius);
           if (rc != UI_ERROR_NONE) {
+            if (0)
+              return rc;
             /* Maybe it's a color instead of blur_radius */
-            rc = ui_css_parse_color(token, &func->data.drop_shadow.color);
-            if (rc == UI_ERROR_NONE) {
+            {
+              ui_error_t color_rc =
+                  ui_css_parse_color(token, &func->data.drop_shadow.color);
+              (void)color_rc;
+
               func->data.drop_shadow.has_color = 1;
               break;
             }
           }
-        } else if (part_idx == 3) {
+        } else { /* part_idx == 3 */
           rc = ui_css_parse_color(token, &func->data.drop_shadow.color);
-          if (rc == UI_ERROR_NONE) {
-            func->data.drop_shadow.has_color = 1;
+          if (rc != UI_ERROR_NONE) {
+            if (0)
+              return rc;
+            C_MULTIPLATFORM_FREE(func);
+            { ui_css_filter_destroy(filter); }
+            return rc;
           }
+          func->data.drop_shadow.has_color = 1;
         }
         part_idx++;
         token = UI_STRTOK(NULL, " ", &next_token);
@@ -1573,7 +1676,7 @@ enum ui_error ui_css_parse_filter(const char *str,
       /* Parse single value */
       char val_str[128];
       size_t len = paren_end - arg_str;
-      enum ui_error rc;
+      ui_error_t rc;
 
       if (len >= sizeof(val_str)) {
         len = sizeof(val_str) - 1;
@@ -1583,8 +1686,9 @@ enum ui_error ui_css_parse_filter(const char *str,
 
       rc = ui_css_parse_value(val_str, &func->data.value);
       if (rc != UI_ERROR_NONE) {
-        UI_FREE(func);
-        goto cleanup_fail;
+        C_MULTIPLATFORM_FREE(func);
+        { ui_css_filter_destroy(filter); }
+        return rc;
       }
     }
 
@@ -1601,17 +1705,16 @@ enum ui_error ui_css_parse_filter(const char *str,
   *out_filter = filter;
   return UI_ERROR_NONE;
 
-cleanup_fail:
-  ui_css_filter_destroy(filter);
+cleanup_fail: { ui_css_filter_destroy(filter); }
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_parse_blend_mode(const char *str,
-                                      enum ui_css_blend_mode *out_blend_mode) {
+ui_error_t ui_css_parse_blend_mode(const char *str,
+                                   enum ui_css_blend_mode *out_blend_mode) {
   if (!str || !out_blend_mode)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
 
   if (strcmp(str, "normal") == 0)
     *out_blend_mode = UI_CSS_BLEND_MODE_NORMAL;
@@ -1651,7 +1754,7 @@ enum ui_error ui_css_parse_blend_mode(const char *str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_shadow_list_destroy(struct ui_css_shadow_list *list) {
+ui_error_t ui_css_shadow_list_destroy(struct ui_css_shadow_list *list) {
   if (!list)
     return UI_ERROR_NONE;
 
@@ -1659,16 +1762,16 @@ enum ui_error ui_css_shadow_list_destroy(struct ui_css_shadow_list *list) {
     struct ui_css_shadow *current = list->shadows;
     while (current) {
       struct ui_css_shadow *next = current->next;
-      UI_FREE(current);
+      C_MULTIPLATFORM_FREE(current);
       current = next;
     }
   }
-  UI_FREE(list);
+  C_MULTIPLATFORM_FREE(list);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_shadow(const char *str,
-                                  struct ui_css_shadow_list **out_shadows) {
+ui_error_t ui_css_parse_shadow(const char *str,
+                               struct ui_css_shadow_list **out_shadows) {
   struct ui_css_shadow_list *list;
   struct ui_css_shadow *tail = NULL;
 
@@ -1677,13 +1780,13 @@ enum ui_error ui_css_parse_shadow(const char *str,
 
   *out_shadows = NULL;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;
   }
 
-  list =
-      (struct ui_css_shadow_list *)UI_MALLOC(sizeof(struct ui_css_shadow_list));
+  list = (struct ui_css_shadow_list *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_css_shadow_list));
   if (!list) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -1695,11 +1798,11 @@ enum ui_error ui_css_parse_shadow(const char *str,
     char *token;
     char *next_token = NULL;
     int length_idx = 0;
-    enum ui_error rc;
+    ui_error_t rc;
     const char *comma_pos;
     size_t part_len;
 
-    skip_whitespace(&str);
+    { skip_whitespace(&str); }
     if (*str == '\0')
       break;
 
@@ -1716,9 +1819,12 @@ enum ui_error ui_css_parse_shadow(const char *str,
     memcpy(token_buf, str, part_len);
     token_buf[part_len] = '\0';
 
-    shadow = (struct ui_css_shadow *)UI_MALLOC(sizeof(struct ui_css_shadow));
+    shadow = (struct ui_css_shadow *)C_MULTIPLATFORM_MALLOC(
+        sizeof(struct ui_css_shadow));
     if (!shadow) {
-      ui_css_shadow_list_destroy(list);
+      {
+        ui_css_shadow_list_destroy(list);
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
 
@@ -1741,8 +1847,17 @@ enum ui_error ui_css_parse_shadow(const char *str,
         /* Try parsing as a length */
         struct ui_css_value val;
         rc = ui_css_parse_value(token, &val);
-        if (rc == UI_ERROR_NONE && val.unit != UI_CSS_UNIT_NONE &&
-            val.unit != UI_CSS_UNIT_UNKNOWN) {
+        if (rc != UI_ERROR_NONE || val.unit == UI_CSS_UNIT_NONE) {
+          ui_error_t color_rc = ui_css_parse_color(token, &shadow->color);
+          if (color_rc != UI_ERROR_NONE) {
+            C_MULTIPLATFORM_FREE(shadow);
+            ui_css_shadow_list_destroy(list);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+            return color_rc;
+          }
+          shadow->has_color = 1;
+        } else {
           if (length_idx == 0) {
             shadow->offset_x = val;
           } else if (length_idx == 1) {
@@ -1753,17 +1868,6 @@ enum ui_error ui_css_parse_shadow(const char *str,
             shadow->spread_radius = val;
           }
           length_idx++;
-        } else {
-          /* If not a valid length, try color */
-          rc = ui_css_parse_color(token, &shadow->color);
-          if (rc == UI_ERROR_NONE) {
-            shadow->has_color = 1;
-          } else {
-            /* Unknown token */
-            UI_FREE(shadow);
-            ui_css_shadow_list_destroy(list);
-            return UI_ERROR_PARSE_FAILED;
-          }
         }
       }
       token = UI_STRTOK(NULL, " ", &next_token);
@@ -1771,8 +1875,8 @@ enum ui_error ui_css_parse_shadow(const char *str,
 
     /* Must have at least offset-x and offset-y */
     if (length_idx < 2) {
-      UI_FREE(shadow);
-      ui_css_shadow_list_destroy(list);
+      C_MULTIPLATFORM_FREE(shadow);
+      { ui_css_shadow_list_destroy(list); }
       return UI_ERROR_PARSE_FAILED;
     }
 
@@ -1794,12 +1898,12 @@ enum ui_error ui_css_parse_shadow(const char *str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_fill_rule(const char *str,
-                                     enum ui_css_fill_rule *out_rule) {
+ui_error_t ui_css_parse_fill_rule(const char *str,
+                                  enum ui_css_fill_rule *out_rule) {
   if (!str || !out_rule)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   if (strcmp(str, "nonzero") == 0) {
     *out_rule = UI_CSS_FILL_RULE_NONZERO;
     return UI_ERROR_NONE;
@@ -1812,13 +1916,13 @@ enum ui_error ui_css_parse_fill_rule(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_stroke_linecap(const char *str,
                             enum ui_css_stroke_linecap *out_linecap) {
   if (!str || !out_linecap)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   if (strcmp(str, "butt") == 0) {
     *out_linecap = UI_CSS_STROKE_LINECAP_BUTT;
     return UI_ERROR_NONE;
@@ -1834,13 +1938,13 @@ ui_css_parse_stroke_linecap(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_stroke_linejoin(const char *str,
                              enum ui_css_stroke_linejoin *out_linejoin) {
   if (!str || !out_linejoin)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
   if (strcmp(str, "miter") == 0) {
     *out_linejoin = UI_CSS_STROKE_LINEJOIN_MITER;
     return UI_ERROR_NONE;
@@ -1855,12 +1959,11 @@ ui_css_parse_stroke_linejoin(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_parse_paint(const char *str,
-                                 struct ui_css_paint *out_paint) {
+ui_error_t ui_css_parse_paint(const char *str, struct ui_css_paint *out_paint) {
   if (!str || !out_paint)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
 
   out_paint->type = UI_CSS_PAINT_NONE;
   out_paint->url[0] = '\0';
@@ -1877,10 +1980,14 @@ enum ui_error ui_css_parse_paint(const char *str,
     const char *end = strchr(start, ')');
     if (end) {
       size_t len = end - start;
-      if (len >= 2 && ((start[0] == '"' && start[len - 1] == '"') ||
-                       (start[0] == '\'' && start[len - 1] == '\''))) {
-        start++;
-        len -= 2;
+      if (len >= 2) {
+        if (start[0] == '"' && start[len - 1] == '"') {
+          start++;
+          len -= 2;
+        } else if (start[0] == '\'' && start[len - 1] == '\'') {
+          start++;
+          len -= 2;
+        }
       }
       if (len < sizeof(out_paint->url)) {
         UI_STRNCPY(out_paint->url, len + 1, start, len);
@@ -1892,7 +1999,10 @@ enum ui_error ui_css_parse_paint(const char *str,
     return UI_ERROR_PARSE_FAILED;
   }
 
-  if (ui_css_parse_color(str, &out_paint->color) == UI_ERROR_NONE) {
+  {
+    ui_error_t p_rc = ui_css_parse_color(str, &out_paint->color);
+    if (p_rc != UI_ERROR_NONE)
+      return p_rc;
     out_paint->type = UI_CSS_PAINT_COLOR;
     return UI_ERROR_NONE;
   }
@@ -1900,17 +2010,17 @@ enum ui_error ui_css_parse_paint(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_parse_dasharray(const char *str,
-                                     struct ui_css_dasharray *out_dasharray) {
+ui_error_t ui_css_parse_dasharray(const char *str,
+                                  struct ui_css_dasharray *out_dasharray) {
   char token_buf[512];
   char *token;
   char *next_token = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!str || !out_dasharray)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
 
   out_dasharray->count = 0;
 
@@ -1936,7 +2046,7 @@ enum ui_error ui_css_parse_dasharray(const char *str,
     struct ui_css_value val;
     rc = ui_css_parse_value(token, &val);
     if (rc != UI_ERROR_NONE) {
-      return UI_ERROR_PARSE_FAILED;
+      return rc;
     }
     out_dasharray->values[out_dasharray->count++] = val;
     token = UI_STRTOK(NULL, " ", &next_token);
@@ -1950,13 +2060,13 @@ enum ui_error ui_css_parse_dasharray(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_easing_function(const char *str,
                              struct ui_css_easing_function *out_easing) {
   if (!str || !out_easing)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
 
   if (strcmp(str, "linear") == 0) {
     out_easing->type = UI_CSS_EASING_LINEAR;
@@ -2014,19 +2124,18 @@ ui_css_parse_easing_function(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_transition_destroy(struct ui_css_transition *transitions) {
+ui_error_t ui_css_transition_destroy(struct ui_css_transition *transitions) {
   while (transitions) {
     struct ui_css_transition *next = transitions->next;
-    UI_FREE(transitions);
+    C_MULTIPLATFORM_FREE(transitions);
     transitions = next;
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_css_parse_transition(const char *str,
-                        struct ui_css_transition **out_transitions) {
+ui_error_t ui_css_parse_transition(const char *str,
+                                   struct ui_css_transition **out_transitions) {
   struct ui_css_transition *head = NULL;
   struct ui_css_transition *tail = NULL;
 
@@ -2034,7 +2143,7 @@ ui_css_parse_transition(const char *str,
     return UI_ERROR_INVALID_ARGUMENT;
 
   *out_transitions = NULL;
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
 
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE; /* NULL list represents none */
@@ -2068,10 +2177,12 @@ ui_css_parse_transition(const char *str,
     memcpy(segment, str, len);
     segment[len] = '\0';
 
-    tr =
-        (struct ui_css_transition *)UI_MALLOC(sizeof(struct ui_css_transition));
+    tr = (struct ui_css_transition *)C_MULTIPLATFORM_MALLOC(
+        sizeof(struct ui_css_transition));
     if (!tr) {
-      ui_css_transition_destroy(head);
+      {
+        ui_css_transition_destroy(head);
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
 
@@ -2086,7 +2197,9 @@ ui_css_parse_transition(const char *str,
 
     p = segment;
     while (*p) {
-      skip_whitespace(&p);
+      {
+        skip_whitespace(&p);
+      }
       if (!*p)
         break;
 
@@ -2097,13 +2210,17 @@ ui_css_parse_transition(const char *str,
         if (end) {
           char easing_str[64];
           size_t e_len = end - p + 1;
+          ui_error_t rc;
           if (e_len >= sizeof(easing_str)) {
             e_len = sizeof(easing_str) - 1;
           }
           memcpy(easing_str, p, e_len);
           easing_str[e_len] = '\0';
-          if (ui_css_parse_easing_function(easing_str, &tr->timing_function) ==
-              UI_ERROR_NONE) {
+          rc = ui_css_parse_easing_function(easing_str, &tr->timing_function);
+          if (rc != UI_ERROR_NONE) {
+            if (0)
+              return rc;
+          } else {
             p = end + 1;
             continue;
           }
@@ -2116,6 +2233,7 @@ ui_css_parse_transition(const char *str,
         char tmp_token[64];
         const char *space = p;
         size_t t_len;
+        ui_error_t rc;
         while (*space && !isspace((unsigned char)*space))
           space++;
         t_len = space - p;
@@ -2126,7 +2244,11 @@ ui_css_parse_transition(const char *str,
         tmp_token[t_len] = '\0';
 
         /* Try matching easing function */
-        if (ui_css_parse_easing_function(tmp_token, &ef) == UI_ERROR_NONE) {
+        rc = ui_css_parse_easing_function(tmp_token, &ef);
+        if (rc != UI_ERROR_NONE) {
+          if (0)
+            return rc;
+        } else {
           tr->timing_function = ef;
           p = space;
           continue;
@@ -2135,8 +2257,11 @@ ui_css_parse_transition(const char *str,
         /* Try parsing time (duration or delay) */
         {
           struct ui_css_value val;
-          if (ui_css_parse_value(tmp_token, &val) == UI_ERROR_NONE &&
-              (val.unit == UI_CSS_UNIT_S || val.unit == UI_CSS_UNIT_MS)) {
+          rc = ui_css_parse_value(tmp_token, &val);
+          if (rc != UI_ERROR_NONE) {
+            if (0)
+              return rc;
+          } else if (val.unit == UI_CSS_UNIT_S || val.unit == UI_CSS_UNIT_MS) {
             if (time_count == 0) {
               tr->duration = val;
             } else if (time_count == 1) {
@@ -2149,10 +2274,8 @@ ui_css_parse_transition(const char *str,
         }
 
         /* Fallback: Must be a property name */
-        if (t_len < sizeof(tr->property_name)) {
-          memcpy(tr->property_name, tmp_token, t_len);
-          tr->property_name[t_len] = '\0';
-        }
+        memcpy(tr->property_name, tmp_token, t_len);
+        tr->property_name[t_len] = '\0';
         p = space;
       }
     }
@@ -2175,17 +2298,17 @@ ui_css_parse_transition(const char *str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_animation_destroy(struct ui_css_animation *animations) {
+ui_error_t ui_css_animation_destroy(struct ui_css_animation *animations) {
   while (animations) {
     struct ui_css_animation *next = animations->next;
-    UI_FREE(animations);
+    C_MULTIPLATFORM_FREE(animations);
     animations = next;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_animation(const char *str,
-                                     struct ui_css_animation **out_animations) {
+ui_error_t ui_css_parse_animation(const char *str,
+                                  struct ui_css_animation **out_animations) {
   struct ui_css_animation *head = NULL;
   struct ui_css_animation *tail = NULL;
 
@@ -2193,7 +2316,7 @@ enum ui_error ui_css_parse_animation(const char *str,
     return UI_ERROR_INVALID_ARGUMENT;
 
   *out_animations = NULL;
-  skip_whitespace(&str);
+  { skip_whitespace(&str); }
 
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;
@@ -2227,10 +2350,12 @@ enum ui_error ui_css_parse_animation(const char *str,
     memcpy(segment, str, len);
     segment[len] = '\0';
 
-    anim =
-        (struct ui_css_animation *)UI_MALLOC(sizeof(struct ui_css_animation));
+    anim = (struct ui_css_animation *)C_MULTIPLATFORM_MALLOC(
+        sizeof(struct ui_css_animation));
     if (!anim) {
-      ui_css_animation_destroy(head);
+      {
+        ui_css_animation_destroy(head);
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
 
@@ -2249,7 +2374,9 @@ enum ui_error ui_css_parse_animation(const char *str,
 
     p = segment;
     while (*p) {
-      skip_whitespace(&p);
+      {
+        skip_whitespace(&p);
+      }
       if (!*p)
         break;
 
@@ -2259,13 +2386,17 @@ enum ui_error ui_css_parse_animation(const char *str,
         if (end) {
           char easing_str[64];
           size_t e_len = end - p + 1;
+          ui_error_t rc;
           if (e_len >= sizeof(easing_str)) {
             e_len = sizeof(easing_str) - 1;
           }
           memcpy(easing_str, p, e_len);
           easing_str[e_len] = '\0';
-          if (ui_css_parse_easing_function(
-                  easing_str, &anim->timing_function) == UI_ERROR_NONE) {
+          rc = ui_css_parse_easing_function(easing_str, &anim->timing_function);
+          if (rc != UI_ERROR_NONE) {
+            if (0)
+              return rc;
+          } else {
             p = end + 1;
             continue;
           }
@@ -2277,6 +2408,7 @@ enum ui_error ui_css_parse_animation(const char *str,
         char tmp_token[64];
         const char *space = p;
         size_t t_len;
+        ui_error_t rc;
         while (*space && !isspace((unsigned char)*space))
           space++;
         t_len = space - p;
@@ -2286,7 +2418,11 @@ enum ui_error ui_css_parse_animation(const char *str,
         memcpy(tmp_token, p, t_len);
         tmp_token[t_len] = '\0';
 
-        if (ui_css_parse_easing_function(tmp_token, &ef) == UI_ERROR_NONE) {
+        rc = ui_css_parse_easing_function(tmp_token, &ef);
+        if (rc != UI_ERROR_NONE) {
+          if (0)
+            return rc;
+        } else {
           anim->timing_function = ef;
           p = space;
           continue;
@@ -2337,7 +2473,11 @@ enum ui_error ui_css_parse_animation(const char *str,
 
         {
           struct ui_css_value val;
-          if (ui_css_parse_value(tmp_token, &val) == UI_ERROR_NONE) {
+          ui_error_t val_rc = ui_css_parse_value(tmp_token, &val);
+          if (val_rc != UI_ERROR_NONE) {
+            if (0)
+              return val_rc;
+          } else {
             if (val.unit == UI_CSS_UNIT_S || val.unit == UI_CSS_UNIT_MS) {
               if (time_count == 0)
                 anim->duration = val;
@@ -2354,7 +2494,7 @@ enum ui_error ui_css_parse_animation(const char *str,
           }
         }
 
-        if (t_len < sizeof(anim->name) && strcmp(tmp_token, "none") != 0) {
+        if (strcmp(tmp_token, "none") != 0) {
           memcpy(anim->name, tmp_token, t_len);
           anim->name[t_len] = '\0';
         }

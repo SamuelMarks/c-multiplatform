@@ -15,7 +15,7 @@ int main(void) {
   struct ui_window_backend *backend = NULL;
   struct ui_window *window = NULL;
   struct ui_window_backend dummy_backend;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* For tests, we use a mock window backend or the real one if we can easily
    * instantiate it. We'll try to just check the create/destroy flow and if
@@ -28,6 +28,16 @@ int main(void) {
   rc = ui_e2e_headful_create(NULL, NULL, &ctx);
   if (rc != UI_ERROR_INVALID_ARGUMENT) {
     printf("ui_e2e_headful_create should fail with NULLs\n");
+    return 1;
+  }
+
+  rc = ui_e2e_headful_create(&dummy_backend, NULL, &ctx);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    return 1;
+  }
+
+  rc = ui_e2e_headful_create(&dummy_backend, (struct ui_window *)1, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
     return 1;
   }
 

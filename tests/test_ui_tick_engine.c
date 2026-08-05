@@ -8,10 +8,10 @@
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
 
-void *ui_mock_malloc(size_t size);
-void ui_mock_free(void *ptr);
+void *C_MULTIPLATFORM_MALLOC(size_t size);
+void C_MULTIPLATFORM_FREE(void *ptr);
 
-static enum ui_error test_callback(void *user_data) {
+static ui_error_t test_callback(void *user_data) {
   int *val = (int *)user_data;
   (*val)++;
   return UI_ERROR_NONE;
@@ -20,7 +20,7 @@ static enum ui_error test_callback(void *user_data) {
 
 static int run_normal_tests(void) {
   struct ui_tick_engine *engine = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int test_val1 = 0;
   int test_val2 = 0;
 
@@ -114,7 +114,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_tick_engine *engine = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int test_val = 0;
 
   printf("Running tick engine OOM tests...\n");

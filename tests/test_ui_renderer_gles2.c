@@ -7,7 +7,7 @@
 
 int main(void) {
   struct ui_renderer_backend *backend = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_color clear_color = {1.0f, 0.0f, 0.0f, 1.0f};
   void *tex_handle = NULL;
 

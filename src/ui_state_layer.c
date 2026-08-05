@@ -2,10 +2,9 @@
 #include "ui_state_layer.h"
 /* clang-format on */
 
-enum ui_error ui_state_layer_get_color(ui_color_t base_color,
-                                       ui_color_t on_color,
-                                       enum ui_state_layer_type state,
-                                       ui_color_t *out_color) {
+ui_error_t ui_state_layer_get_color(ui_color_t base_color, ui_color_t on_color,
+                                    enum ui_state_layer_type state,
+                                    ui_color_t *out_color) {
   float opacity = 0.0f;
   ui_uint8 r_base, g_base, b_base;
   ui_uint8 r_on, g_on, b_on;

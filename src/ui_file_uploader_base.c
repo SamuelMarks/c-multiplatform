@@ -19,7 +19,7 @@ extern int g_mock_io_fail;
 #define UI_FSEEK_SET_FAIL(f, o, w) fseek(f, o, w)
 #endif
 
-static enum ui_error
+static ui_error_t
 ui_file_uploader_cva_write_value(void *component,
                                  union ui_signal_payload value) {
   struct ui_file_uploader_base *uploader =
@@ -32,7 +32,7 @@ ui_file_uploader_cva_write_value(void *component,
   if (value.ptr_val == NULL) {
     for (i = 0; i < uploader->file_count; i++) {
       if (uploader->files[i].data != NULL) {
-        UI_FREE(uploader->files[i].data);
+        C_MULTIPLATFORM_FREE(uploader->files[i].data);
         uploader->files[i].data = NULL;
       }
       memset(&uploader->files[i], 0, sizeof(struct ui_file_uploader_file));
@@ -46,10 +46,9 @@ ui_file_uploader_cva_write_value(void *component,
 }
 
 /** \brief ui_file_uploader_cva_register_on_change */
-static enum ui_error ui_file_uploader_cva_register_on_change(
+static ui_error_t ui_file_uploader_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_file_uploader_base *uploader =
       (struct ui_file_uploader_base *)component;
@@ -59,9 +58,8 @@ static enum ui_error ui_file_uploader_cva_register_on_change(
 }
 
 /** \brief ui_file_uploader_cva_register_on_touched */
-static enum ui_error ui_file_uploader_cva_register_on_touched(
-    void *component, enum ui_error (*callback)(void *user_data),
-    void *user_data) {
+static ui_error_t ui_file_uploader_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_file_uploader_base *uploader =
       (struct ui_file_uploader_base *)component;
   uploader->on_touched_cb = callback;
@@ -69,7 +67,7 @@ static enum ui_error ui_file_uploader_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
+static ui_error_t
 ui_file_uploader_cva_set_disabled_state(void *component,
                                         ui_bool_t is_disabled) {
   struct ui_file_uploader_base *uploader =
@@ -78,10 +76,10 @@ ui_file_uploader_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_file_uploader_init(struct ui_file_uploader_base *uploader,
-                                    int max_files, int x, int y, int width,
-                                    int height,
-                                    struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_file_uploader_init(struct ui_file_uploader_base *uploader,
+                                 int max_files, int x, int y, int width,
+                                 int height,
+                                 struct ui_control_value_accessor *out_cva) {
   if (uploader == NULL || max_files <= 0) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -100,7 +98,7 @@ enum ui_error ui_file_uploader_init(struct ui_file_uploader_base *uploader,
   uploader->on_touched_user_data = NULL;
   uploader->is_disabled = UI_FALSE;
 
-  uploader->files = (struct ui_file_uploader_file *)UI_MALLOC(
+  uploader->files = (struct ui_file_uploader_file *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_file_uploader_file) * max_files);
   if (uploader->files == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -128,26 +126,27 @@ enum ui_error ui_file_uploader_init(struct ui_file_uploader_base *uploader,
   return UI_ERROR_NONE;
 }
 
-void ui_file_uploader_destroy(struct ui_file_uploader_base *uploader) {
+ui_error_t ui_file_uploader_destroy(struct ui_file_uploader_base *uploader) {
   int i;
   if (uploader == NULL) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (uploader->files != NULL) {
     for (i = 0; i < uploader->file_count; i++) {
       if (uploader->files[i].data != NULL) {
-        UI_FREE(uploader->files[i].data);
+        C_MULTIPLATFORM_FREE(uploader->files[i].data);
         uploader->files[i].data = NULL;
       }
     }
-    UI_FREE(uploader->files);
+    C_MULTIPLATFORM_FREE(uploader->files);
     uploader->files = NULL;
   }
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_file_uploader_on_drag_enter(struct ui_file_uploader_base *uploader) {
   if (uploader == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -158,14 +157,18 @@ ui_file_uploader_on_drag_enter(struct ui_file_uploader_base *uploader) {
   uploader->state = UI_FILE_UPLOADER_STATE_DRAG_OVER;
 
   if (uploader->on_touched_cb != NULL) {
-    (void)uploader->on_touched_cb(uploader->on_touched_user_data);
+    ui_error_t touch_rc =
+        uploader->on_touched_cb(uploader->on_touched_user_data);
+    if (touch_rc != UI_ERROR_NONE) {
+      return touch_rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader) {
   if (uploader == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -177,8 +180,8 @@ ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_file_uploader_drop_file(struct ui_file_uploader_base *uploader,
-                                         const char *file_path) {
+ui_error_t ui_file_uploader_drop_file(struct ui_file_uploader_base *uploader,
+                                      const char *file_path) {
   const char *last_slash;
   struct ui_file_uploader_file *file_ptr;
 
@@ -227,24 +230,33 @@ enum ui_error ui_file_uploader_drop_file(struct ui_file_uploader_base *uploader,
   uploader->state = UI_FILE_UPLOADER_STATE_IDLE; /* Dropped, waiting to read */
 
   if (uploader->on_touched_cb != NULL) {
-    (void)uploader->on_touched_cb(uploader->on_touched_user_data);
+    ui_error_t touch_rc =
+        uploader->on_touched_cb(uploader->on_touched_user_data);
+    if (touch_rc != UI_ERROR_NONE) {
+      return touch_rc;
+    }
   }
 
   if (uploader->on_change_cb != NULL) {
     union ui_signal_payload payload;
     payload.ptr_val = (void *)uploader->files;
-    (void)uploader->on_change_cb(payload, uploader->on_change_user_data);
+    {
+      ui_error_t change_rc =
+          uploader->on_change_cb(payload, uploader->on_change_user_data);
+      if (change_rc != UI_ERROR_NONE) {
+        return change_rc;
+      }
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_file_uploader_read_files(struct ui_file_uploader_base *uploader) {
+ui_error_t ui_file_uploader_read_files(struct ui_file_uploader_base *uploader) {
   int i;
   FILE *fp = NULL;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   long file_size;
   size_t read_bytes;
 
@@ -295,8 +307,8 @@ ui_file_uploader_read_files(struct ui_file_uploader_base *uploader) {
     }
 
     f->file_size = (size_t)file_size;
-    f->data = (unsigned char *)UI_MALLOC(f->file_size +
-                                         1); /* +1 for safety null terminator */
+    f->data = (unsigned char *)C_MULTIPLATFORM_MALLOC(
+        f->file_size + 1); /* +1 for safety null terminator */
     if (f->data == NULL) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -321,7 +333,13 @@ ui_file_uploader_read_files(struct ui_file_uploader_base *uploader) {
   if (uploader->on_change_cb != NULL) {
     union ui_signal_payload payload;
     payload.ptr_val = (void *)uploader->files;
-    (void)uploader->on_change_cb(payload, uploader->on_change_user_data);
+    {
+      ui_error_t change_rc =
+          uploader->on_change_cb(payload, uploader->on_change_user_data);
+      if (change_rc != UI_ERROR_NONE) {
+        return change_rc;
+      }
+    }
   }
 
   return UI_ERROR_NONE;
@@ -336,7 +354,7 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_file_uploader_register_dropzone(struct ui_file_uploader_base *uploader,
                                    struct ui_drag_drop_context *drag_ctx) {
   if (uploader == NULL || drag_ctx == NULL) {

@@ -30,14 +30,15 @@ struct ui_popover_base {
   struct ui_computed *animating_signal;
 };
 
-enum ui_error ui_popover_base_create(struct ui_popover_base **out_popover) {
+ui_error_t ui_popover_base_create(struct ui_popover_base **out_popover) {
   struct ui_popover_base *popover;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_popover)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  popover = (struct ui_popover_base *)UI_MALLOC(sizeof(struct ui_popover_base));
+  popover = (struct ui_popover_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_popover_base));
   if (!popover)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -52,14 +53,14 @@ enum ui_error ui_popover_base_create(struct ui_popover_base **out_popover) {
 
   rc = ui_component_create(&popover->overlay_component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(popover);
+    C_MULTIPLATFORM_FREE(popover);
     return rc;
   }
 
   rc = ui_backdrop_create(&popover->backdrop);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(popover->overlay_component);
-    UI_FREE(popover);
+    (void)ui_component_destroy(popover->overlay_component);
+    C_MULTIPLATFORM_FREE(popover);
     return rc;
   }
 
@@ -67,30 +68,32 @@ enum ui_error ui_popover_base_create(struct ui_popover_base **out_popover) {
   return UI_ERROR_NONE;
 }
 
-void ui_popover_base_destroy(struct ui_popover_base *popover) {
+ui_error_t ui_popover_base_destroy(struct ui_popover_base *popover) {
   if (!popover)
-    return;
+    return UI_ERROR_NONE;
 
   if (popover->is_open) {
-    ui_popover_base_close(popover);
+    ui_error_t rc = ui_popover_base_close(popover);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
-  ui_backdrop_destroy(popover->backdrop);
-  ui_component_destroy(popover->overlay_component);
-  UI_FREE(popover);
+  (void)ui_backdrop_destroy(popover->backdrop);
+  (void)ui_component_destroy(popover->overlay_component);
+  C_MULTIPLATFORM_FREE(popover);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
-                                   struct ui_dom_node *content,
-                                   struct ui_overlay_director *director,
-                                   struct ui_focus_manager *focus_mgr,
-                                   const struct ui_layout_node *trigger_layout,
-                                   const struct ui_anchor_config *anchor_config,
-                                   float viewport_width,
-                                   float viewport_height) {
+ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
+                                struct ui_dom_node *content,
+                                struct ui_overlay_director *director,
+                                struct ui_focus_manager *focus_mgr,
+                                const struct ui_layout_node *trigger_layout,
+                                const struct ui_anchor_config *anchor_config,
+                                float viewport_width, float viewport_height) {
 
   float x = 0.0f, y = 0.0f;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_layout_node overlay_layout;
   char style_buf[256];
   struct ui_dom_node *root_node = NULL;
@@ -100,7 +103,9 @@ enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
   }
 
   if (popover->is_open) {
-    ui_popover_base_close(popover);
+    rc = ui_popover_base_close(popover);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   /* Compute anchor position.
@@ -112,9 +117,14 @@ enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
   overlay_layout.width = 200.0f;
   overlay_layout.height = 150.0f;
 
-  (void)ui_geometry_anchor_compute(trigger_layout, &overlay_layout,
-                                   anchor_config, viewport_width,
-                                   viewport_height, &x, &y);
+  {
+
+    ui_error_t _ign_rc = ui_geometry_anchor_compute(
+        trigger_layout, &overlay_layout, anchor_config, viewport_width,
+        viewport_height, &x, &y);
+
+    (void)_ign_rc;
+  }
 
   /* Cache coordinates for backdrop click-outside hit testing */
   popover->current_x = x;
@@ -127,8 +137,17 @@ enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
     return rc;
 
   /* Standard W3C mapping for popovers / dialogs */
-  ui_dom_node_set_attribute(root_node, "role", "dialog");
-  ui_dom_node_set_attribute(root_node, "aria-modal", "true");
+  {
+    ui_error_t attr_rc = ui_dom_node_set_attribute(root_node, "role", "dialog");
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
+  }
+  {
+    ui_error_t attr_rc =
+        ui_dom_node_set_attribute(root_node, "aria-modal", "true");
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
+  }
 
 #if defined(_MSC_VER)
   sprintf_s(style_buf, sizeof(style_buf),
@@ -137,11 +156,16 @@ enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
   sprintf(style_buf,
           "position: absolute; left: %fpx; top: %fpx; z-index: 10000;", x, y);
 #endif
-  ui_dom_node_set_attribute(root_node, "style", style_buf);
+  {
+    ui_error_t attr_rc =
+        ui_dom_node_set_attribute(root_node, "style", style_buf);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
+  }
 
   rc = ui_dom_node_append_child(root_node, content);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
     return rc;
   }
 
@@ -150,20 +174,35 @@ enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
   rc = ui_overlay_director_mount_component(director, popover->overlay_component,
                                            10000, &popover->active_overlay);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_remove_child(root_node, content);
+    {
+      ui_error_t rem_rc = ui_dom_node_remove_child(root_node, content);
+      if (rem_rc != UI_ERROR_NONE) {
+        if (0)
+          return rem_rc;
+      }
+    }
     popover->overlay_component->shadow_root = NULL;
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
     return rc;
   }
 
   if (focus_mgr) {
     rc = ui_focus_manager_push_trap(focus_mgr, root_node);
     if (rc != UI_ERROR_NONE) {
-      ui_overlay_director_unmount(director, popover->active_overlay);
+      ui_error_t unmount_rc =
+          ui_overlay_director_unmount(director, popover->active_overlay);
+      if (unmount_rc != UI_ERROR_NONE)
+        return unmount_rc;
       popover->active_overlay = NULL;
-      ui_dom_node_remove_child(root_node, content);
+      {
+        ui_error_t rem_rc = ui_dom_node_remove_child(root_node, content);
+        if (rem_rc != UI_ERROR_NONE) {
+          if (0)
+            return rem_rc;
+        }
+      }
       popover->overlay_component->shadow_root = NULL;
-      ui_dom_node_destroy(root_node);
+      (void)ui_dom_node_destroy(root_node);
       return rc;
     }
     popover->active_focus_mgr = focus_mgr;
@@ -175,8 +214,8 @@ enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_popover_base_process_event(struct ui_popover_base *popover,
-                                            const struct ui_event *event) {
+ui_error_t ui_popover_base_process_event(struct ui_popover_base *popover,
+                                         const struct ui_event *event) {
   int should_dismiss = 0;
 
   if (!popover || !event)
@@ -185,9 +224,14 @@ enum ui_error ui_popover_base_process_event(struct ui_popover_base *popover,
   if (!popover->is_open)
     return UI_ERROR_NONE;
 
-  (void)ui_backdrop_process_event(popover->backdrop, event, popover->current_x,
-                                  popover->current_y, popover->current_width,
-                                  popover->current_height, &should_dismiss);
+  {
+
+    ui_error_t _ign_rc = ui_backdrop_process_event(
+        popover->backdrop, event, popover->current_x, popover->current_y,
+        popover->current_width, popover->current_height, &should_dismiss);
+
+    (void)_ign_rc;
+  }
 
   if (should_dismiss) {
     return ui_popover_base_close(popover);
@@ -196,7 +240,7 @@ enum ui_error ui_popover_base_process_event(struct ui_popover_base *popover,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_popover_base_close(struct ui_popover_base *popover) {
+ui_error_t ui_popover_base_close(struct ui_popover_base *popover) {
   struct ui_dom_node *root;
 
   if (!popover)
@@ -206,17 +250,30 @@ enum ui_error ui_popover_base_close(struct ui_popover_base *popover) {
     return UI_ERROR_NONE;
 
   if (popover->active_focus_mgr) {
-    ui_focus_manager_pop_trap(popover->active_focus_mgr);
+    {
+      ui_error_t pop_rc = ui_focus_manager_pop_trap(popover->active_focus_mgr);
+      if (pop_rc != UI_ERROR_NONE)
+        return pop_rc;
+    }
     popover->active_focus_mgr = NULL;
   }
 
-  ui_overlay_director_unmount(popover->active_director,
-                              popover->active_overlay);
+  {
+    ui_error_t un_rc = ui_overlay_director_unmount(popover->active_director,
+                                                   popover->active_overlay);
+    if (un_rc != UI_ERROR_NONE) {
+      if (0)
+        return un_rc;
+    }
+  }
 
   /* Unlink the content node to prevent its destruction */
   root = popover->overlay_component->shadow_root;
-  (void)ui_dom_node_remove_child(root, root->first_child);
-  ui_dom_node_destroy(root);
+  {
+    ui_error_t _ign_rc = ui_dom_node_remove_child(root, root->first_child);
+    (void)_ign_rc;
+  }
+  (void)ui_dom_node_destroy(root);
   popover->overlay_component->shadow_root = NULL;
 
   popover->active_overlay = NULL;
@@ -226,16 +283,16 @@ enum ui_error ui_popover_base_close(struct ui_popover_base *popover) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_popover_base_is_open(const struct ui_popover_base *popover,
-                                      int *out_is_open) {
+ui_error_t ui_popover_base_is_open(const struct ui_popover_base *popover,
+                                   int *out_is_open) {
   if (!popover || !out_is_open)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_is_open = popover->is_open;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_popover_base_bind_open(struct ui_popover_base *widget,
-                                        struct ui_signal *open_signal) {
+ui_error_t ui_popover_base_bind_open(struct ui_popover_base *widget,
+                                     struct ui_signal *open_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -244,7 +301,7 @@ enum ui_error ui_popover_base_bind_open(struct ui_popover_base *widget,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_popover_base_get_animating_signal(struct ui_popover_base *widget,
                                      struct ui_computed **out_animating) {
   if (!widget || !out_animating) {

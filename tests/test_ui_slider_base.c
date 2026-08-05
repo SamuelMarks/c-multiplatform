@@ -11,8 +11,8 @@ extern int g_malloc_fail_countdown;
 static int g_change_count = 0;
 static float g_last_value = 0.0f;
 
-static enum ui_error on_slider_change(struct ui_slider_base *slider,
-                                      float value, void *user_data) {
+static ui_error_t on_slider_change(struct ui_slider_base *slider, float value,
+                                   void *user_data) {
   (void)slider;
   (void)user_data;
   g_change_count++;
@@ -21,21 +21,21 @@ static enum ui_error on_slider_change(struct ui_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_on_change(union ui_signal_payload new_value,
-                                     void *user_data) {
+static ui_error_t dummy_on_change(union ui_signal_payload new_value,
+                                  void *user_data) {
   (void)new_value;
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_on_touched(void *user_data) {
+static ui_error_t dummy_on_touched(void *user_data) {
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
 static int run_normal_tests(void) {
   struct ui_slider_base *slider = NULL;
-  enum ui_error err;
+  ui_error_t err;
   struct ui_event ev;
   struct ui_control_value_accessor cva;
 
@@ -49,10 +49,10 @@ static int run_normal_tests(void) {
     struct ui_component *c;
     ui_slider_base_create(&s, NULL);
     ui_slider_base_get_component(s, &c);
-    ui_component_destroy(c);
+    (void)ui_component_destroy(c);
     ((void **)s)[0] = NULL;
     ui_slider_base_set_value(s, 10.0f); /* Test update_dom_state silent abort */
-    ui_slider_base_destroy(s);
+    (void)ui_slider_base_destroy(s);
   }
   if (ui_slider_base_set_min(NULL, 0.0f) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -431,13 +431,13 @@ static int run_normal_tests(void) {
   /* Re-assigning to mock gesture lack would require internal access.
      Instead we rely on the create/OOM checks to hit branches */
 
-  ui_slider_base_destroy(slider);
+  (void)ui_slider_base_destroy(slider);
   return 0;
 }
 
 static int run_oom_tests(void) {
   struct ui_slider_base *slider = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
 
   printf("Running slider base OOM tests...\n");
@@ -450,7 +450,7 @@ static int run_oom_tests(void) {
     if (err == UI_ERROR_OUT_OF_MEMORY) {
       continue;
     } else if (err == UI_ERROR_NONE) {
-      ui_slider_base_destroy(slider);
+      (void)ui_slider_base_destroy(slider);
       break;
     } else {
       printf("OOM failed with err %d at i %d\n", err, i);

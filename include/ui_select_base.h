@@ -22,9 +22,9 @@ struct ui_select_base;
  * @param selected_index The currently selected item index (-1 if none).
  * @param user_data Opaque user data.
  */
-typedef enum ui_error (*ui_select_on_change_t)(struct ui_select_base *select,
-                                               int selected_index,
-                                               void *user_data);
+typedef ui_error_t (*ui_select_on_change_t)(struct ui_select_base *select,
+                                            int selected_index,
+                                            void *user_data);
 
 /**
  * @brief Callback invoked when the select dropdown is opened or closed.
@@ -33,8 +33,8 @@ typedef enum ui_error (*ui_select_on_change_t)(struct ui_select_base *select,
  * @param is_open 1 if opened, 0 if closed.
  * @param user_data Opaque user data.
  */
-typedef enum ui_error (*ui_select_on_open_change_t)(
-    struct ui_select_base *select, int is_open, void *user_data);
+typedef ui_error_t (*ui_select_on_open_change_t)(struct ui_select_base *select,
+                                                 int is_open, void *user_data);
 
 /**
  * @brief Creates a new unstyled select/dropdown base component.
@@ -54,14 +54,14 @@ typedef enum ui_error (*ui_select_on_open_change_t)(
  * @param out_select Pointer to receive the allocated select base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_select_base_create(struct ui_select_base **out_select);
+ui_error_t ui_select_base_create(struct ui_select_base **out_select);
 
 /**
  * @brief Destroys a select base component.
  *
  * @param select The select component to destroy.
  */
-void ui_select_base_destroy(struct ui_select_base *select);
+ui_error_t ui_select_base_destroy(struct ui_select_base *select);
 
 /**
  * @brief Sets the disabled state of the select component.
@@ -71,8 +71,8 @@ void ui_select_base_destroy(struct ui_select_base *select);
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_select_base_set_disabled(struct ui_select_base *select,
-                                          int disabled);
+ui_error_t ui_select_base_set_disabled(struct ui_select_base *select,
+                                       int disabled);
 
 /**
  * @brief Adds an option to the select dropdown.
@@ -83,8 +83,8 @@ enum ui_error ui_select_base_set_disabled(struct ui_select_base *select,
  * @param value The underlying value of the option.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_select_base_add_option(struct ui_select_base *select,
-                                        const char *label, const char *value);
+ui_error_t ui_select_base_add_option(struct ui_select_base *select,
+                                     const char *label, const char *value);
 
 /**
  * @brief Sets the number of items managed by the select base (for keyboard
@@ -94,8 +94,8 @@ enum ui_error ui_select_base_add_option(struct ui_select_base *select,
  * @param num_items The total number of selectable items.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_select_base_set_item_count(struct ui_select_base *select,
-                                            int num_items);
+ui_error_t ui_select_base_set_item_count(struct ui_select_base *select,
+                                         int num_items);
 
 /**
  * @brief Opens or closes the select dropdown state.
@@ -104,8 +104,7 @@ enum ui_error ui_select_base_set_item_count(struct ui_select_base *select,
  * @param is_open 1 to open, 0 to close.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_select_base_set_open(struct ui_select_base *select,
-                                      int is_open);
+ui_error_t ui_select_base_set_open(struct ui_select_base *select, int is_open);
 
 /**
  * @brief Checks if the select dropdown is open.
@@ -113,8 +112,8 @@ enum ui_error ui_select_base_set_open(struct ui_select_base *select,
  * @param select The select component.
  * @return 1 if open, 0 if closed.
  */
-enum ui_error ui_select_base_is_open(const struct ui_select_base *select,
-                                     int *out_is_open);
+ui_error_t ui_select_base_is_open(const struct ui_select_base *select,
+                                  int *out_is_open);
 
 /**
  * @brief Sets the currently highlighted index (used during keyboard
@@ -124,8 +123,8 @@ enum ui_error ui_select_base_is_open(const struct ui_select_base *select,
  * @param index The item index to highlight, or -1 for none.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_select_base_set_highlighted_index(struct ui_select_base *select, int index);
+ui_error_t ui_select_base_set_highlighted_index(struct ui_select_base *select,
+                                                int index);
 
 /**
  * @brief Gets the currently highlighted index.
@@ -133,7 +132,7 @@ ui_select_base_set_highlighted_index(struct ui_select_base *select, int index);
  * @param select The select component.
  * @return The highlighted index, or -1 if none.
  */
-enum ui_error
+ui_error_t
 ui_select_base_get_highlighted_index(const struct ui_select_base *select,
                                      int *out_index);
 
@@ -144,8 +143,8 @@ ui_select_base_get_highlighted_index(const struct ui_select_base *select,
  * @param index The selected index, or -1 for none.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_select_base_set_selected_index(struct ui_select_base *select,
-                                                int index);
+ui_error_t ui_select_base_set_selected_index(struct ui_select_base *select,
+                                             int index);
 
 /**
  * @brief Gets the currently selected index.
@@ -153,7 +152,7 @@ enum ui_error ui_select_base_set_selected_index(struct ui_select_base *select,
  * @param select The select component.
  * @return The selected index, or -1 if none.
  */
-enum ui_error
+ui_error_t
 ui_select_base_get_selected_index(const struct ui_select_base *select,
                                   int *out_index);
 
@@ -165,9 +164,9 @@ ui_select_base_get_selected_index(const struct ui_select_base *select,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_select_base_set_on_change(struct ui_select_base *select,
-                                           ui_select_on_change_t on_change,
-                                           void *user_data);
+ui_error_t ui_select_base_set_on_change(struct ui_select_base *select,
+                                        ui_select_on_change_t on_change,
+                                        void *user_data);
 
 /**
  * @brief Sets the handler for open state changes.
@@ -177,7 +176,7 @@ enum ui_error ui_select_base_set_on_change(struct ui_select_base *select,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_select_base_set_on_open_change(struct ui_select_base *select,
                                   ui_select_on_open_change_t on_open_change,
                                   void *user_data);
@@ -190,9 +189,9 @@ ui_select_base_set_on_open_change(struct ui_select_base *select,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_select_base_process_event(struct ui_select_base *select,
-                                           const struct ui_event *event,
-                                           double timestamp_ms);
+ui_error_t ui_select_base_process_event(struct ui_select_base *select,
+                                        const struct ui_event *event,
+                                        double timestamp_ms);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -207,11 +206,11 @@ enum ui_error ui_select_base_process_event(struct ui_select_base *select,
  * @param out_cva Pointer to store the vtable.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_select_base_get_cva(struct ui_select_base *select,
-                                     struct ui_control_value_accessor *out_cva);
+ui_error_t ui_select_base_get_cva(struct ui_select_base *select,
+                                  struct ui_control_value_accessor *out_cva);
 
-enum ui_error ui_select_base_get_component(struct ui_select_base *select,
-                                           struct ui_component **out_component);
+ui_error_t ui_select_base_get_component(struct ui_select_base *select,
+                                        struct ui_component **out_component);
 
 #ifdef __cplusplus
 }

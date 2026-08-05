@@ -5,11 +5,11 @@
 #include <stddef.h>
 /* clang-format on */
 
-enum ui_error
+ui_error_t
 ui_css_spatial_nav_parse(const struct ui_css_computed_style *style,
                          struct ui_css_spatial_nav_properties *out_props) {
   const char *val = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!style || !out_props) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -21,6 +21,10 @@ ui_css_spatial_nav_parse(const struct ui_css_computed_style *style,
 
   rc = ui_css_computed_style_get_property(style, "spatial-navigation-action",
                                           &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "focus") == 0) {
       out_props->action = UI_CSS_SPATIAL_NAV_ACTION_FOCUS;
@@ -33,6 +37,10 @@ ui_css_spatial_nav_parse(const struct ui_css_computed_style *style,
 
   rc = ui_css_computed_style_get_property(style, "spatial-navigation-contain",
                                           &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "contain") == 0) {
       out_props->contain = UI_CSS_SPATIAL_NAV_CONTAIN_CONTAIN;
@@ -43,6 +51,10 @@ ui_css_spatial_nav_parse(const struct ui_css_computed_style *style,
 
   rc = ui_css_computed_style_get_property(style, "spatial-navigation-function",
                                           &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "grid") == 0) {
       out_props->function = UI_CSS_SPATIAL_NAV_FUNCTION_GRID;

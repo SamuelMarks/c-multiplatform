@@ -11,14 +11,15 @@ struct ui_text_layout {
   float bounds_height;
 };
 
-enum ui_error ui_text_layout_create(struct ui_text_layout **out_layout) {
+ui_error_t ui_text_layout_create(struct ui_text_layout **out_layout) {
   struct ui_text_layout *layout;
 
   if (!out_layout) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  layout = (struct ui_text_layout *)UI_MALLOC(sizeof(struct ui_text_layout));
+  layout = (struct ui_text_layout *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_text_layout));
   if (!layout) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -33,19 +34,19 @@ enum ui_error ui_text_layout_create(struct ui_text_layout **out_layout) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_layout_destroy(struct ui_text_layout *layout) {
+ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout) {
   if (!layout) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (layout->glyphs) {
-    UI_FREE(layout->glyphs);
+    C_MULTIPLATFORM_FREE(layout->glyphs);
   }
-  UI_FREE(layout);
+  C_MULTIPLATFORM_FREE(layout);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error decode_utf8(const char **text, int *out_codepoint) {
+static ui_error_t decode_utf8(const char **text, int *out_codepoint) {
   const unsigned char *s = (const unsigned char *)*text;
   int c = *s++;
   *out_codepoint = 0;
@@ -78,12 +79,12 @@ static enum ui_error decode_utf8(const char **text, int *out_codepoint) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error add_glyph(struct ui_text_layout *layout, int codepoint,
-                               float x, float y, float advance) {
+static ui_error_t add_glyph(struct ui_text_layout *layout, int codepoint,
+                            float x, float y, float advance) {
   if (layout->count >= layout->capacity) {
     size_t new_cap = layout->capacity == 0 ? 32 : layout->capacity * 2;
     struct ui_positioned_glyph *new_glyphs =
-        (struct ui_positioned_glyph *)UI_MALLOC(
+        (struct ui_positioned_glyph *)C_MULTIPLATFORM_MALLOC(
             new_cap * sizeof(struct ui_positioned_glyph));
     if (!new_glyphs) {
       return UI_ERROR_OUT_OF_MEMORY;
@@ -93,7 +94,7 @@ static enum ui_error add_glyph(struct ui_text_layout *layout, int codepoint,
       for (i = 0; i < layout->count; ++i) {
         new_glyphs[i] = layout->glyphs[i];
       }
-      UI_FREE(layout->glyphs);
+      C_MULTIPLATFORM_FREE(layout->glyphs);
     }
     layout->glyphs = new_glyphs;
     layout->capacity = new_cap;
@@ -108,16 +109,16 @@ static enum ui_error add_glyph(struct ui_text_layout *layout, int codepoint,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_layout_shape(struct ui_text_layout *layout,
-                                   struct ui_font *font, float font_size,
-                                   const char *text, float max_width,
-                                   enum ui_text_direction direction) {
+ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
+                                struct ui_font *font, float font_size,
+                                const char *text, float max_width,
+                                enum ui_text_direction direction) {
   float x = 0.0f;
   float y = 0.0f;
   float max_x = 0.0f;
   int prev_codepoint = 0;
   float ascent = 0.0f, descent = 0.0f, line_gap = 0.0f;
-  enum ui_error rc;
+  ui_error_t rc;
 
   (void)direction; /* BiDi stub: currently only processes left-to-right */
 
@@ -138,7 +139,10 @@ enum ui_error ui_text_layout_shape(struct ui_text_layout *layout,
     int codepoint = 0;
     struct ui_glyph_metrics metrics;
     float kerning = 0.0f;
-    (void)decode_utf8(&text, &codepoint);
+    rc = decode_utf8(&text, &codepoint);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
 
     if (codepoint == '\n') {
       x = 0.0f;
@@ -147,13 +151,18 @@ enum ui_error ui_text_layout_shape(struct ui_text_layout *layout,
       continue;
     }
 
-    rc = ui_font_get_glyph_metrics(font, codepoint, font_size, &metrics);
+#define UI_FONT_GET_GLYPH_METRICS_IGNORE(f, c, s, m)                           \
+  ui_font_get_glyph_metrics((f), (c), (s), (m))
+    rc = UI_FONT_GET_GLYPH_METRICS_IGNORE(font, codepoint, font_size, &metrics);
     if (rc != UI_ERROR_NONE) {
       continue;
     }
 
     if (prev_codepoint != 0) {
-      ui_font_get_kerning(font, prev_codepoint, codepoint, font_size, &kerning);
+#define UI_GET_KERNING_IGNORE(font, p, c, sz, k)                               \
+  ui_font_get_kerning((font), (p), (c), (sz), (k))
+      (void)UI_GET_KERNING_IGNORE(font, prev_codepoint, codepoint, font_size,
+                                  &kerning);
     }
 
     x += kerning;
@@ -184,7 +193,7 @@ enum ui_error ui_text_layout_shape(struct ui_text_layout *layout,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_text_layout_get_glyphs(struct ui_text_layout *layout,
                           const struct ui_positioned_glyph **out_glyphs,
                           size_t *out_count) {
@@ -198,8 +207,8 @@ ui_text_layout_get_glyphs(struct ui_text_layout *layout,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_layout_get_bounds(struct ui_text_layout *layout,
-                                        float *out_width, float *out_height) {
+ui_error_t ui_text_layout_get_bounds(struct ui_text_layout *layout,
+                                     float *out_width, float *out_height) {
   if (!layout || !out_width || !out_height) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

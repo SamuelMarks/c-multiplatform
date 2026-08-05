@@ -6,7 +6,7 @@
 
 int main(void) {
   struct ui_av_sync sync;
-  enum ui_error err;
+  ui_error_t err;
   ui_int64 clock_us;
 
   /* Invalid args */

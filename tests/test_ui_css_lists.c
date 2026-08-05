@@ -101,11 +101,11 @@ static int test_parse_list_style_type(void) {
   /* huge string */
   {
     char long_str[600];
+    char css_str[1000];
     int i;
     for (i = 0; i < 550; i++)
       long_str[i] = 'a';
     long_str[550] = '\0';
-    char css_str[1000];
     sprintf(css_str, "'%s'", long_str);
     if (ui_css_parse_list_style_type(css_str, &type) != UI_ERROR_NONE) {
       printf("fail line %d\n", __LINE__);
@@ -231,7 +231,7 @@ static int test_parse_list_style(void) {
   }
 
   {
-    enum ui_error e = ui_css_parse_list_style("invalid-token", &style);
+    ui_error_t e = ui_css_parse_list_style("invalid-token", &style);
     if (e != UI_ERROR_PARSE_FAILED) {
       printf("fail line %d: returned %d\n", __LINE__, e);
       return 1;

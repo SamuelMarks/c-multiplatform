@@ -26,10 +26,11 @@ struct ui_popover_base;
  * @param out_cva Optional pointer to receive the control value accessor.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_datepicker_base_create(
-    struct ui_datepicker_base **out_datepicker, struct ui_input_base *input,
-    struct ui_popover_base *popover, struct ui_calendar_base *calendar,
-    struct ui_control_value_accessor *out_cva);
+ui_error_t ui_datepicker_base_create(struct ui_datepicker_base **out_datepicker,
+                                     struct ui_input_base *input,
+                                     struct ui_popover_base *popover,
+                                     struct ui_calendar_base *calendar,
+                                     struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Destroys a datepicker coordinator. Does NOT destroy the linked
@@ -37,7 +38,7 @@ enum ui_error ui_datepicker_base_create(
  *
  * @param datepicker The datepicker to destroy.
  */
-void ui_datepicker_base_destroy(struct ui_datepicker_base *datepicker);
+ui_error_t ui_datepicker_base_destroy(struct ui_datepicker_base *datepicker);
 
 /**
  * @brief Parses a text string in YYYY-MM-DD format into a ui_date.
@@ -46,8 +47,7 @@ void ui_datepicker_base_destroy(struct ui_datepicker_base *datepicker);
  * @param out_date Pointer to receive the parsed date.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on parse failure.
  */
-enum ui_error ui_datepicker_parse_date(const char *text,
-                                       struct ui_date *out_date);
+ui_error_t ui_datepicker_parse_date(const char *text, struct ui_date *out_date);
 
 /**
  * @brief Formats a ui_date into a YYYY-MM-DD string.
@@ -57,8 +57,8 @@ enum ui_error ui_datepicker_parse_date(const char *text,
  * @param max_len Maximum length of the output buffer.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_datepicker_format_date(const struct ui_date *date,
-                                        char *out_text, int max_len);
+ui_error_t ui_datepicker_format_date(const struct ui_date *date, char *out_text,
+                                     int max_len);
 
 /**
  * @brief Synchronizes the input text and the calendar selection manually.
@@ -66,7 +66,7 @@ enum ui_error ui_datepicker_format_date(const struct ui_date *date,
  * @param datepicker The datepicker.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_datepicker_base_sync(struct ui_datepicker_base *datepicker);
+ui_error_t ui_datepicker_base_sync(struct ui_datepicker_base *datepicker);
 
 #ifdef __cplusplus
 }

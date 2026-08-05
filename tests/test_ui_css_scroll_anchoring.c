@@ -20,7 +20,7 @@ static void test_scroll_anchoring_cases(void) {
   struct ui_dom_node *node = NULL;
   struct ui_css_computed_style *style = NULL;
   enum ui_css_overflow_anchor anchor;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Null arguments */
   TEST_ASSERT(ui_css_scroll_anchoring_parse(NULL, &anchor) ==
@@ -70,7 +70,7 @@ static void test_scroll_anchoring_cases(void) {
       "invalid", UI_CSS_OVERFLOW_ANCHOR_AUTO); /* fallback to auto on
                                                   invalid/unknown string */
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
 }
 
 int main(void) {

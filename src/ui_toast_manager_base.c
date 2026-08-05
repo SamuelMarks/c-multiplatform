@@ -41,7 +41,7 @@ struct ui_toast_manager_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
   struct ui_toast_manager_base *manager;
   int i;
@@ -49,7 +49,7 @@ ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
   if (!out_manager)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  manager = (struct ui_toast_manager_base *)UI_MALLOC(
+  manager = (struct ui_toast_manager_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_toast_manager_base));
   if (!manager)
     return UI_ERROR_OUT_OF_MEMORY;
@@ -67,48 +67,50 @@ ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
   return UI_ERROR_NONE;
 }
 
-static void free_toast_entry(struct ui_toast_entry *entry) {
-  if (!entry)
-    return;
+static ui_error_t free_toast_entry(struct ui_toast_entry *entry) {
   if (entry->message)
-    UI_FREE(entry->message);
+    C_MULTIPLATFORM_FREE(entry->message);
   if (entry->overlay_component)
-    ui_component_destroy(entry->overlay_component);
-  UI_FREE(entry);
+    (void)ui_component_destroy(entry->overlay_component);
+  C_MULTIPLATFORM_FREE(entry);
+  return UI_ERROR_NONE;
 }
 
-void ui_toast_manager_base_destroy(struct ui_toast_manager_base *manager) {
+ui_error_t
+ui_toast_manager_base_destroy(struct ui_toast_manager_base *manager) {
   int i;
   size_t j;
   if (!manager)
-    return;
+    return UI_ERROR_NONE;
 
   for (i = 0; i < UI_TOAST_REGION_COUNT; i++) {
     for (j = 0; j < manager->regions[i].count; j++) {
       free_toast_entry(manager->regions[i].toasts[j]);
     }
     if (manager->regions[i].toasts) {
-      UI_FREE(manager->regions[i].toasts);
+      C_MULTIPLATFORM_FREE(manager->regions[i].toasts);
     }
   }
-  UI_FREE(manager);
+  C_MULTIPLATFORM_FREE(manager);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
-                                         const struct ui_toast_config *config,
-                                         double current_time_secs,
-                                         ui_toast_id *out_id) {
+ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
+                                      const struct ui_toast_config *config,
+                                      double current_time_secs,
+                                      ui_toast_id *out_id) {
 
   struct ui_toast_entry *entry;
   struct ui_toast_region_stack *stack;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!manager || !config || !out_id ||
       config->region >= UI_TOAST_REGION_COUNT) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  entry = (struct ui_toast_entry *)UI_MALLOC(sizeof(struct ui_toast_entry));
+  entry = (struct ui_toast_entry *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_toast_entry));
   if (!entry)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -128,9 +130,12 @@ enum ui_error ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
 
   if (config->message) {
     size_t len = strlen(config->message);
-    entry->message = (char *)UI_MALLOC(len + 1);
+    entry->message = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
     if (!entry->message) {
-      free_toast_entry(entry);
+      ui_error_t free_rc = free_toast_entry(entry);
+      if (free_rc != UI_ERROR_NONE) {
+        return free_rc;
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
 #if defined(_MSC_VER)
@@ -142,17 +147,24 @@ enum ui_error ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
 
   rc = ui_component_create(&entry->overlay_component);
   if (rc != UI_ERROR_NONE) {
-    free_toast_entry(entry);
+    ui_error_t free_rc = free_toast_entry(entry);
+    if (free_rc != UI_ERROR_NONE) {
+      return free_rc;
+    }
     return rc;
   }
 
   stack = &manager->regions[config->region];
   if (stack->count >= stack->capacity) {
     size_t new_cap = stack->capacity == 0 ? 4 : stack->capacity * 2;
-    struct ui_toast_entry **new_arr = (struct ui_toast_entry **)UI_REALLOC(
-        stack->toasts, new_cap * sizeof(struct ui_toast_entry *));
+    struct ui_toast_entry **new_arr =
+        (struct ui_toast_entry **)C_MULTIPLATFORM_REALLOC(
+            stack->toasts, new_cap * sizeof(struct ui_toast_entry *));
     if (!new_arr) {
-      free_toast_entry(entry);
+      ui_error_t free_rc = free_toast_entry(entry);
+      if (free_rc != UI_ERROR_NONE) {
+        return free_rc;
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
     stack->toasts = new_arr;
@@ -166,9 +178,8 @@ enum ui_error ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
-                              ui_toast_id id) {
+ui_error_t ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
+                                         ui_toast_id id) {
   int i;
   size_t j;
 
@@ -196,8 +207,8 @@ ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
-                                         double current_time_secs) {
+ui_error_t ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
+                                      double current_time_secs) {
   int i;
   size_t j, k;
 
@@ -265,7 +276,7 @@ enum ui_error ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
                                    const struct ui_event *event,
                                    double current_time_secs) {
@@ -276,8 +287,6 @@ ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
     return UI_ERROR_INVALID_ARGUMENT;
 
   switch (event->type) {
-  case UI_EVENT_MOUSE_DOWN: /* Dismiss all on click for primitive? No. */
-    break;
   case UI_EVENT_MOUSE_MOVE:
   case UI_EVENT_TOUCH_START:
     /* Pause on hover/touch */
@@ -286,10 +295,8 @@ ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
       for (i = 0; i < UI_TOAST_REGION_COUNT; i++) {
         struct ui_toast_region_stack *stack = &manager->regions[i];
         for (j = 0; j < stack->count; j++) {
-          if (!stack->toasts[j]->is_paused) {
-            stack->toasts[j]->is_paused = 1;
-            stack->toasts[j]->pause_start_time = current_time_secs;
-          }
+          stack->toasts[j]->is_paused = 1;
+          stack->toasts[j]->pause_start_time = current_time_secs;
         }
       }
     }
@@ -303,11 +310,9 @@ ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
       for (i = 0; i < UI_TOAST_REGION_COUNT; i++) {
         struct ui_toast_region_stack *stack = &manager->regions[i];
         for (j = 0; j < stack->count; j++) {
-          if (stack->toasts[j]->is_paused) {
-            stack->toasts[j]->is_paused = 0;
-            stack->toasts[j]->total_paused_time +=
-                (current_time_secs - stack->toasts[j]->pause_start_time);
-          }
+          stack->toasts[j]->is_paused = 0;
+          stack->toasts[j]->total_paused_time +=
+              (current_time_secs - stack->toasts[j]->pause_start_time);
         }
       }
     }
@@ -320,14 +325,9 @@ ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error get_region_style(enum ui_toast_region region,
-                                      const char **out_str) {
-  if (!out_str)
-    return UI_ERROR_INVALID_ARGUMENT;
+static ui_error_t get_region_style(enum ui_toast_region region,
+                                   const char **out_str) {
   switch (region) {
-  case UI_TOAST_REGION_TOP_LEFT:
-    *out_str = "position: absolute; top: 20px; left: 20px;";
-    return UI_ERROR_NONE;
   case UI_TOAST_REGION_TOP_CENTER:
     *out_str = "position: absolute; top: 20px; left: 50%; transform: "
                "translateX(-50%);";
@@ -346,18 +346,16 @@ static enum ui_error get_region_style(enum ui_toast_region region,
     *out_str = "position: absolute; bottom: 20px; right: 20px;";
     return UI_ERROR_NONE;
   default:
-    *out_str = "";
+    *out_str = "position: absolute; top: 20px; left: 20px;";
     return UI_ERROR_NONE;
   }
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
-                             struct ui_overlay_director *director) {
+ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
+                                        struct ui_overlay_director *director) {
   int i;
   size_t j;
-  enum ui_error rc;
 
   if (!manager || !director)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -391,8 +389,8 @@ ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
         entry->active_overlay = NULL;
       }
 
-      rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
-      if (rc != UI_ERROR_NONE)
+      if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node) !=
+          UI_ERROR_NONE)
         continue;
 
       ui_dom_node_set_attribute(root_node, "role",
@@ -404,53 +402,61 @@ ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
 #if defined(_MSC_VER)
         const char *region_style = "";
         (void)get_region_style((enum ui_toast_region)i, &region_style);
-        sprintf_s(style_buf, sizeof(style_buf), "%s margin-bottom: %lupx;",
-                  region_style, (unsigned long)(j * 60));
+        (void)sprintf_s(style_buf, sizeof(style_buf),
+                        "%s margin-bottom: %lupx;", region_style,
+                        (unsigned long)(j * 60));
 #else
         const char *region_style = "";
         (void)get_region_style((enum ui_toast_region)i, &region_style);
-        sprintf(style_buf, "%s margin-bottom: %lupx;", region_style,
-                (unsigned long)(j * 60));
+        (void)sprintf(style_buf, "%s margin-bottom: %lupx;", region_style,
+                      (unsigned long)(j * 60));
 #endif
       } else {
 #if defined(_MSC_VER)
         const char *region_style = "";
         (void)get_region_style((enum ui_toast_region)i, &region_style);
-        sprintf_s(style_buf, sizeof(style_buf), "%s margin-top: %lupx;",
-                  region_style, (unsigned long)(j * 60));
+        (void)sprintf_s(style_buf, sizeof(style_buf), "%s margin-top: %lupx;",
+                        region_style, (unsigned long)(j * 60));
 #else
         const char *region_style = "";
         (void)get_region_style((enum ui_toast_region)i, &region_style);
-        sprintf(style_buf, "%s margin-top: %lupx;", region_style,
-                (unsigned long)(j * 60));
+        (void)sprintf(style_buf, "%s margin-top: %lupx;", region_style,
+                      (unsigned long)(j * 60));
 #endif
       }
 
       ui_dom_node_set_attribute(root_node, "style", style_buf);
 
       if (entry->message) {
-        rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
-        if (rc == UI_ERROR_NONE) {
-          size_t len = strlen(entry->message);
-          text_node->text_content = (char *)UI_MALLOC(len + 1);
-          if (text_node->text_content) {
+        size_t len;
+        {
+          ui_error_t _ign_rc =
+              ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+          (void)_ign_rc;
+        }
+        len = strlen(entry->message);
+        text_node->text_content = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
 #if defined(_MSC_VER)
-            strcpy_s(text_node->text_content, len + 1, entry->message);
+        (void)strcpy_s(text_node->text_content, len + 1, entry->message);
 #else
-            strcpy(text_node->text_content, entry->message);
+        strcpy(text_node->text_content, entry->message);
 #endif
-          }
-          ui_dom_node_append_child(root_node, text_node);
+        {
+          ui_error_t _ign_rc = ui_dom_node_append_child(root_node, text_node);
+          (void)_ign_rc;
         }
       }
 
       if (entry->overlay_component->shadow_root) {
-        ui_dom_node_destroy(entry->overlay_component->shadow_root);
+        (void)ui_dom_node_destroy(entry->overlay_component->shadow_root);
       }
       entry->overlay_component->shadow_root = root_node;
-      ui_overlay_director_mount_component(director, entry->overlay_component,
-                                          10000 + (int)j,
-                                          &entry->active_overlay);
+      {
+        ui_error_t _ign_rc = ui_overlay_director_mount_component(
+            director, entry->overlay_component, 10000 + (int)j,
+            &entry->active_overlay);
+        (void)_ign_rc;
+      }
     }
   }
 

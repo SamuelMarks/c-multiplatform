@@ -33,20 +33,32 @@ struct ui_os_color_task {
   struct ui_color_rgb result_color;
 };
 
-static enum ui_error ui_os_file_completion(void *user_data) {
+static ui_error_t ui_os_file_completion(void *user_data) {
   struct ui_os_file_task *task = (struct ui_os_file_task *)user_data;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   if (task->result_path[0] != '\0') {
-    rc = ui_file_uploader_drop_file(task->uploader, task->result_path);
-    if (rc == UI_ERROR_NONE) {
-      rc = ui_file_uploader_read_files(task->uploader);
+    ui_error_t drop_rc =
+        ui_file_uploader_drop_file(task->uploader, task->result_path);
+    if (drop_rc != UI_ERROR_NONE) {
+      if (0)
+        return drop_rc;
+    }
+    if (drop_rc == UI_ERROR_NONE) {
+      ui_error_t read_rc = ui_file_uploader_read_files(task->uploader);
+      if (read_rc != UI_ERROR_NONE) {
+        if (0)
+          return read_rc;
+        rc = read_rc;
+      }
+    } else {
+      rc = drop_rc;
     }
   }
-  UI_FREE(task);
+  C_MULTIPLATFORM_FREE(task);
   return rc;
 }
 
-static enum ui_error ui_os_file_worker(void *user_data) {
+static ui_error_t ui_os_file_worker(void *user_data) {
   struct ui_os_file_task *task = (struct ui_os_file_task *)user_data;
 
   /* Mock: Just return a dummy file path for now */
@@ -63,19 +75,28 @@ static enum ui_error ui_os_file_worker(void *user_data) {
 #endif
   }
 
-  ui_reactor_schedule(task->reactor, ui_os_file_completion, task);
+  {
+    ui_error_t sched_rc =
+        ui_reactor_schedule(task->reactor, ui_os_file_completion, task);
+    if (sched_rc != UI_ERROR_NONE)
+      return sched_rc;
+  }
   return ui_reactor_wake(task->reactor);
 }
 
-static enum ui_error ui_os_color_completion(void *user_data) {
+static ui_error_t ui_os_color_completion(void *user_data) {
   struct ui_os_color_task *task = (struct ui_os_color_task *)user_data;
-  enum ui_error rc = UI_ERROR_NONE;
-  rc = ui_color_picker_base_set_rgb(task->picker, &task->result_color);
-  UI_FREE(task);
-  return rc;
+  ui_error_t rc =
+      ui_color_picker_base_set_rgb(task->picker, &task->result_color);
+  if (rc != UI_ERROR_NONE) {
+    C_MULTIPLATFORM_FREE(task);
+    return rc;
+  }
+  C_MULTIPLATFORM_FREE(task);
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error ui_os_color_worker(void *user_data) {
+static ui_error_t ui_os_color_worker(void *user_data) {
   struct ui_os_color_task *task = (struct ui_os_color_task *)user_data;
 
   /* Mock: Just return a dummy color for now */
@@ -84,13 +105,17 @@ static enum ui_error ui_os_color_worker(void *user_data) {
   task->result_color.g = 0;
   task->result_color.b = 0;
 
-  ui_reactor_schedule(task->reactor, ui_os_color_completion, task);
+  {
+    ui_error_t sched_rc =
+        ui_reactor_schedule(task->reactor, ui_os_color_completion, task);
+    if (sched_rc != UI_ERROR_NONE)
+      return sched_rc;
+  }
   return ui_reactor_wake(task->reactor);
 }
 
-enum ui_error ui_os_dialog_show_message_box(const char *title,
-                                            const char *message,
-                                            enum ui_os_message_box_type type) {
+ui_error_t ui_os_dialog_show_message_box(const char *title, const char *message,
+                                         enum ui_os_message_box_type type) {
   if (!title || !message) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -123,7 +148,7 @@ enum ui_error ui_os_dialog_show_message_box(const char *title,
 }
 
 /** \brief ui_os_dialog_open_file_picker_async */
-enum ui_error ui_os_dialog_open_file_picker_async(
+ui_error_t ui_os_dialog_open_file_picker_async(
     struct ui_file_uploader_base *uploader,
     const struct ui_os_file_picker_config *config, struct ui_reactor *reactor,
     struct ui_thread_pool *pool) {
@@ -134,7 +159,8 @@ enum ui_error ui_os_dialog_open_file_picker_async(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  task = (struct ui_os_file_task *)UI_MALLOC(sizeof(struct ui_os_file_task));
+  task = (struct ui_os_file_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_os_file_task));
   if (!task) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -152,7 +178,7 @@ enum ui_error ui_os_dialog_open_file_picker_async(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_os_dialog_open_color_picker_async(struct ui_color_picker_base *picker,
                                      struct ui_reactor *reactor,
                                      struct ui_thread_pool *pool) {
@@ -163,7 +189,8 @@ ui_os_dialog_open_color_picker_async(struct ui_color_picker_base *picker,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  task = (struct ui_os_color_task *)UI_MALLOC(sizeof(struct ui_os_color_task));
+  task = (struct ui_os_color_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_os_color_task));
   if (!task) {
     return UI_ERROR_OUT_OF_MEMORY;
   }

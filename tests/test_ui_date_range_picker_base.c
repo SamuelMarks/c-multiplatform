@@ -3,7 +3,20 @@
 #include <stdio.h>
 #include "../include/ui_date_range_picker_base.h"
 #include "../include/ui_error.h"
-#include "../src/ui_date_range_picker_base.c" /* Include to test state internals */
+/* We redefine the struct here because it's opaque in the header, and we need to inspect state for testing */
+struct ui_date_range_picker_base {
+  struct ui_component *component;
+  enum ui_date_range_picker_state state;
+  struct ui_date start_date;
+  struct ui_date end_date;
+  struct ui_date hover_date;
+
+  ui_date_predicate_cb predicate_cb;
+  void *predicate_user_data;
+
+  ui_date_range_on_change_cb on_change_cb;
+  void *on_change_user_data;
+};
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
@@ -16,9 +29,9 @@ static ui_bool_t mock_predicate(const struct ui_date *date, void *user_data) {
   return UI_FALSE;
 }
 
-static enum ui_error mock_on_change(struct ui_date_range_picker_base *picker,
-                                    const struct ui_date_range *range,
-                                    void *user_data) {
+static ui_error_t mock_on_change(struct ui_date_range_picker_base *picker,
+                                 const struct ui_date_range *range,
+                                 void *user_data) {
   int *called = (int *)user_data;
   (void)picker;
   (void)range;
@@ -28,7 +41,7 @@ static enum ui_error mock_on_change(struct ui_date_range_picker_base *picker,
 
 static int test_create_destroy(void) {
   struct ui_date_range_picker_base *picker = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_date_range_picker_base_create(&picker);
   if (rc != UI_ERROR_NONE || !picker)
@@ -178,52 +191,52 @@ static int test_selection_flow(void) {
   enum ui_date_range_picker_state state;
   int called = 0;
 
-  ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_create(&picker);
   ui_date_range_picker_base_set_on_change(picker, mock_on_change, &called);
 
-  ui_date_range_picker_base_get_state(picker, &state);
+  (void)ui_date_range_picker_base_get_state(picker, &state);
   if (state != UI_DATE_RANGE_PICKER_STATE_IDLE)
     return 1;
 
-  ui_date_range_picker_base_select_date(picker, &start);
-  ui_date_range_picker_base_get_state(picker, &state);
+  (void)ui_date_range_picker_base_select_date(picker, &start);
+  (void)ui_date_range_picker_base_get_state(picker, &state);
   if (state != UI_DATE_RANGE_PICKER_STATE_SELECTING_END_DATE)
     return 1;
 
-  ui_date_range_picker_base_set_hover_date(picker, &hover);
-  ui_date_range_picker_base_get_range(picker, &range);
+  (void)ui_date_range_picker_base_set_hover_date(picker, &hover);
+  (void)ui_date_range_picker_base_get_range(picker, &range);
   if (range.end_date.day != 12)
     return 1;
 
-  ui_date_range_picker_base_set_hover_date(picker, &before_start);
-  ui_date_range_picker_base_get_range(picker, &range);
+  (void)ui_date_range_picker_base_set_hover_date(picker, &before_start);
+  (void)ui_date_range_picker_base_get_range(picker, &range);
   if (range.end_date.day != 10)
     return 1;
 
-  ui_date_range_picker_base_select_date(picker, &before_start);
-  ui_date_range_picker_base_get_state(picker, &state);
+  (void)ui_date_range_picker_base_select_date(picker, &before_start);
+  (void)ui_date_range_picker_base_get_state(picker, &state);
   if (state != UI_DATE_RANGE_PICKER_STATE_SELECTING_END_DATE)
     return 1;
-  ui_date_range_picker_base_get_range(picker, &range);
+  (void)ui_date_range_picker_base_get_range(picker, &range);
   if (range.start_date.day != 5)
     return 1;
 
-  ui_date_range_picker_base_select_date(picker, &end);
-  ui_date_range_picker_base_get_state(picker, &state);
+  (void)ui_date_range_picker_base_select_date(picker, &end);
+  (void)ui_date_range_picker_base_get_state(picker, &state);
   if (state != UI_DATE_RANGE_PICKER_STATE_IDLE)
     return 1;
   if (!called)
     return 1;
-  ui_date_range_picker_base_get_range(picker, &range);
+  (void)ui_date_range_picker_base_get_range(picker, &range);
   if (range.start_date.day != 5 || range.end_date.day != 20)
     return 1;
 
   ui_date_range_picker_base_clear(picker);
-  ui_date_range_picker_base_get_state(picker, &state);
+  (void)ui_date_range_picker_base_get_state(picker, &state);
   if (state != UI_DATE_RANGE_PICKER_STATE_IDLE)
     return 1;
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return 0;
 }
 
@@ -235,26 +248,27 @@ static int test_predicate(void) {
   enum ui_date_range_picker_state state;
   struct ui_date_range range;
 
-  ui_date_range_picker_base_create(&picker);
-  ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate, NULL);
+  (void)ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate,
+                                                        NULL);
 
   /* Selecting disabled date directly fails */
   if (ui_date_range_picker_base_select_date(picker, &d2) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_date_range_picker_base_select_date(picker, &d1);
+  (void)ui_date_range_picker_base_select_date(picker, &d1);
   ui_date_range_picker_base_select_date(picker,
                                         &d3); /* crosses disabled date */
 
-  ui_date_range_picker_base_get_state(picker, &state);
+  (void)ui_date_range_picker_base_get_state(picker, &state);
   if (state != UI_DATE_RANGE_PICKER_STATE_SELECTING_END_DATE)
     return 1; /* restarted selection at d3 */
-  ui_date_range_picker_base_get_range(picker, &range);
+  (void)ui_date_range_picker_base_get_range(picker, &range);
   if (range.start_date.day != 20)
     return 1;
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return 0;
 }
 
@@ -262,7 +276,7 @@ static int test_invalid_dates(void) {
   struct ui_date_range_picker_base *picker = NULL;
   struct ui_date invalid = {2023, 13, 1};
 
-  ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_create(&picker);
   if (ui_date_range_picker_base_select_date(picker, &invalid) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -270,7 +284,7 @@ static int test_invalid_dates(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return 0;
 }
 
@@ -279,13 +293,14 @@ static int test_month_wrap(void) {
   struct ui_date d1 = {2023, 12, 30};
   struct ui_date d2 = {2024, 1, 2};
 
-  ui_date_range_picker_base_create(&picker);
-  ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate, NULL);
+  (void)ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate,
+                                                        NULL);
 
-  ui_date_range_picker_base_select_date(picker, &d1);
-  ui_date_range_picker_base_select_date(picker, &d2);
+  (void)ui_date_range_picker_base_select_date(picker, &d1);
+  (void)ui_date_range_picker_base_select_date(picker, &d2);
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return 0;
 }
 
@@ -294,13 +309,14 @@ static int test_day_wrap_only(void) {
   struct ui_date d1 = {2023, 1, 30};
   struct ui_date d2 = {2023, 2, 2};
 
-  ui_date_range_picker_base_create(&picker);
-  ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate, NULL);
+  (void)ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate,
+                                                        NULL);
 
-  ui_date_range_picker_base_select_date(picker, &d1);
-  ui_date_range_picker_base_select_date(picker, &d2);
+  (void)ui_date_range_picker_base_select_date(picker, &d1);
+  (void)ui_date_range_picker_base_select_date(picker, &d2);
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return 0;
 }
 
@@ -312,19 +328,19 @@ static int test_early_end_date(void) {
   struct ui_date_range range;
   int failed = 0;
 
-  ui_date_range_picker_base_create(&picker);
-  ui_date_range_picker_base_select_date(picker, &d1);
-  ui_date_range_picker_base_set_hover_date(picker, &hover);
-  ui_date_range_picker_base_get_range(picker, &range);
+  (void)ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_select_date(picker, &d1);
+  (void)ui_date_range_picker_base_set_hover_date(picker, &hover);
+  (void)ui_date_range_picker_base_get_range(picker, &range);
   if (range.start_date.day != 10 || range.end_date.day != 10)
     failed = 1;
 
   ui_date_range_picker_base_select_date(picker, &d2); /* should restart */
-  ui_date_range_picker_base_get_range(picker, &range);
+  (void)ui_date_range_picker_base_get_range(picker, &range);
   if (range.start_date.day != 5 || range.end_date.day != 5)
     failed = 1;
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return failed;
 }
 
@@ -332,11 +348,11 @@ static int test_hover_idle(void) {
   struct ui_date_range_picker_base *picker = NULL;
   struct ui_date hover = {2023, 1, 10};
 
-  ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_create(&picker);
   /* Hover while IDLE does nothing, state stays IDLE */
-  ui_date_range_picker_base_set_hover_date(picker, &hover);
+  (void)ui_date_range_picker_base_set_hover_date(picker, &hover);
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return 0;
 }
 
@@ -344,13 +360,13 @@ static int test_select_other_state(void) {
   struct ui_date_range_picker_base *picker = NULL;
   struct ui_date d1 = {2023, 1, 10};
 
-  ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_create(&picker);
   picker->state =
       (enum ui_date_range_picker_state)99; /* Force an unknown state to hit the
                                               else branch of select_date */
-  ui_date_range_picker_base_select_date(picker, &d1);
+  (void)ui_date_range_picker_base_select_date(picker, &d1);
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return 0;
 }
 
@@ -359,14 +375,15 @@ static int test_month_wrap_loop_end(void) {
   struct ui_date d1 = {2023, 12, 31};
   struct ui_date d2 = {2023, 12, 31};
 
-  ui_date_range_picker_base_create(&picker);
-  ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate, NULL);
+  (void)ui_date_range_picker_base_create(&picker);
+  (void)ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate,
+                                                        NULL);
 
   /* Trigger while loop breaking correctly on first compare */
-  ui_date_range_picker_base_select_date(picker, &d1);
-  ui_date_range_picker_base_select_date(picker, &d2);
+  (void)ui_date_range_picker_base_select_date(picker, &d1);
+  (void)ui_date_range_picker_base_select_date(picker, &d2);
 
-  ui_date_range_picker_base_destroy(picker);
+  (void)ui_date_range_picker_base_destroy(picker);
   return 0;
 }
 
@@ -389,7 +406,7 @@ int main(void) {
   g_malloc_fail_countdown = 0;
   {
     struct ui_date_range_picker_base *p = NULL;
-    ui_date_range_picker_base_create(&p);
+    (void)ui_date_range_picker_base_create(&p);
   }
   g_malloc_fail_countdown = -1;
 

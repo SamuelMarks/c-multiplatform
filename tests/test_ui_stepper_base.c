@@ -1,250 +1,344 @@
 /* clang-format off */
 #include "ui_stepper_base.h"
 #include "ui_error.h"
+#include "../src/ui_internal_mem.h"
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
-
-static int validate_hook_always_pass(struct ui_stepper_base *stepper, int index,
-                                     void *user_data) {
-  (void)stepper;
-  (void)index;
-  (void)user_data;
-  return 1;
-}
-
-static int validate_hook_fail_second_step(struct ui_stepper_base *stepper,
-                                          int index, void *user_data) {
-  (void)stepper;
-  (void)user_data;
-  if (index == 1)
-    return 0;
-  return 1;
-}
+#endif
 
 #define ASSERT_SUCCESS(expr)                                                   \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
-    if (err != UI_ERROR_NONE) {                                                \
-      printf("Failed at line %d: %d\n", __LINE__, err);                        \
+    ui_error_t _err = (expr);                                                  \
+    if (_err != UI_ERROR_NONE) {                                               \
+      printf("Failed at line %d: %d\n", __LINE__, _err);                       \
       return 1;                                                                \
     }                                                                          \
   } while (0)
+
 #define ASSERT_EQ(expr, expected)                                              \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
-    if (err != (expected)) {                                                   \
+    ui_error_t _err = (expr);                                                  \
+    if (_err != (expected)) {                                                  \
       printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
-             err);                                                             \
+             _err);                                                            \
       return 1;                                                                \
     }                                                                          \
   } while (0)
 
-static int run_normal_tests(void) {
+#define ASSERT_INT_EQ(expr, expected)                                          \
+  do {                                                                         \
+    int val = (expr);                                                          \
+    if (val != (expected)) {                                                   \
+      printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
+             val);                                                             \
+      return 1;                                                                \
+    }                                                                          \
+  } while (0)
+
+static int test_ui_stepper_base_create_destroy(void) {
   struct ui_stepper_base *stepper = NULL;
-  struct ui_component *comp = NULL;
-  struct ui_dom_node *hdr1 = NULL, *cnt1 = NULL, *hdr2 = NULL, *cnt2 = NULL,
-                     *hdr3 = NULL, *cnt3 = NULL;
-  int idx;
-  enum ui_stepper_step_state state;
 
-  /* Null checks */
   ASSERT_EQ(ui_stepper_base_create(NULL), UI_ERROR_INVALID_ARGUMENT);
-  ui_stepper_base_destroy(NULL);
-
-  ASSERT_EQ(ui_stepper_base_set_mode(NULL, UI_STEPPER_MODE_LINEAR),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_set_validate_hook(NULL, NULL, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_add_step(NULL, "s1", NULL, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_set_active_index(NULL, 0),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_active_index(NULL, &idx),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(
-      ui_stepper_base_set_step_state(NULL, 0, UI_STEPPER_STEP_STATE_DEFAULT),
-      UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_step_state(NULL, 0, &state),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_next_step(NULL), UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_prev_step(NULL), UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_component(NULL, &comp),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_bind_active_index(NULL, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
 
   ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
-
-  /* Null pointer getters on valid stepper */
-  ASSERT_EQ(ui_stepper_base_get_active_index(stepper, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_step_state(stepper, 0, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_component(stepper, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-
-  ASSERT_SUCCESS(ui_stepper_base_get_component(stepper, &comp));
-  if (!comp)
+  if (!stepper)
     return 1;
 
-  ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_LINEAR));
-  ASSERT_SUCCESS(ui_stepper_base_set_validate_hook(
-      stepper, validate_hook_always_pass, NULL));
-
-  /* Test bounds when empty */
-  ASSERT_EQ(ui_stepper_base_set_active_index(stepper, 0),
-            UI_ERROR_OUT_OF_BOUNDS);
-  ASSERT_EQ(ui_stepper_base_next_step(stepper), UI_ERROR_OUT_OF_BOUNDS);
-  ASSERT_EQ(ui_stepper_base_prev_step(stepper), UI_ERROR_OUT_OF_BOUNDS);
-
-  /* Add steps */
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &hdr1));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cnt1));
-  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "step1", hdr1, cnt1));
-
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &hdr2));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cnt2));
-  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "step2", hdr2, cnt2));
-
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &hdr3));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cnt3));
-  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "step3", hdr3, cnt3));
-
-  /* Check initial state */
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &idx));
-  if (idx != 0)
-    return 1;
-
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 0, &state));
-  if (state != UI_STEPPER_STEP_STATE_ACTIVE)
-    return 1;
-
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
-  if (state != UI_STEPPER_STEP_STATE_DEFAULT)
-    return 1;
-
-  ASSERT_EQ(ui_stepper_base_get_step_state(stepper, 3, &state),
-            UI_ERROR_OUT_OF_BOUNDS);
-
-  /* Progression */
-  ASSERT_SUCCESS(ui_stepper_base_next_step(stepper));
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &idx));
-  if (idx != 1)
-    return 1;
-
-  /* Check state after progression */
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 0, &state));
-  if (state != UI_STEPPER_STEP_STATE_COMPLETED)
-    return 1;
-
-  ASSERT_SUCCESS(ui_stepper_base_prev_step(stepper));
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &idx));
-  if (idx != 0)
-    return 1;
-
-  /* Setting state explicitly */
-  ASSERT_SUCCESS(
-      ui_stepper_base_set_step_state(stepper, 1, UI_STEPPER_STEP_STATE_ERROR));
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
-  if (state != UI_STEPPER_STEP_STATE_ERROR)
-    return 1;
-
-  ASSERT_EQ(
-      ui_stepper_base_set_step_state(stepper, -1, UI_STEPPER_STEP_STATE_ERROR),
-      UI_ERROR_OUT_OF_BOUNDS);
-
-  /* Linear validation failing */
-  ASSERT_SUCCESS(ui_stepper_base_set_validate_hook(
-      stepper, validate_hook_fail_second_step, NULL));
-  ASSERT_EQ(ui_stepper_base_set_active_index(stepper, 2),
-            UI_ERROR_UNKNOWN); /* Should fail validation at step 1 */
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &idx));
-  if (idx != 0)
-    return 1;
-
-  /* Switch to non-linear */
-  ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_NON_LINEAR));
-  ASSERT_SUCCESS(ui_stepper_base_set_active_index(
-      stepper, 2)); /* Should succeed bypassing validation */
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &idx));
-  if (idx != 2)
-    return 1;
-
-  /* Next at end should fail bounds */
-  ASSERT_EQ(ui_stepper_base_next_step(stepper), UI_ERROR_OUT_OF_BOUNDS);
-
-  /* Set active index same as current */
-  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 2));
-
-  ASSERT_SUCCESS(ui_stepper_base_bind_active_index(stepper, NULL));
-
-  ui_stepper_base_destroy(stepper);
-
+  (void)ui_stepper_base_destroy(stepper);
+  (void)ui_stepper_base_destroy(NULL);
   return 0;
 }
 
-static int run_oom_tests(void) {
+static int test_ui_stepper_base_get_component(void) {
+  struct ui_stepper_base *stepper = NULL;
+  struct ui_component *comp = NULL;
+
+  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
+  ASSERT_EQ(ui_stepper_base_get_component(NULL, &comp),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_get_component(stepper, NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_SUCCESS(ui_stepper_base_get_component(stepper, &comp));
+
+  (void)ui_stepper_base_destroy(stepper);
+  return 0;
+}
+
+static int test_ui_stepper_base_mode(void) {
+  struct ui_stepper_base *stepper = NULL;
+
+  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
+  ASSERT_EQ(ui_stepper_base_set_mode(NULL, UI_STEPPER_MODE_LINEAR),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_NON_LINEAR));
+  ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_LINEAR));
+
+  (void)ui_stepper_base_destroy(stepper);
+  return 0;
+}
+
+static int mock_validator_allow(struct ui_stepper_base *stepper, int step_index,
+                                void *user_data) {
+  (void)stepper;
+  (void)step_index;
+  (void)user_data;
+  return 1;
+}
+
+static int mock_validator_deny(struct ui_stepper_base *stepper, int step_index,
+                               void *user_data) {
+  (void)stepper;
+  (void)step_index;
+  (void)user_data;
+  return 0;
+}
+
+static int test_ui_stepper_base_add_and_navigate(void) {
+  struct ui_stepper_base *stepper = NULL;
+  struct ui_dom_node *h1 = NULL, *c1 = NULL, *h2 = NULL, *c2 = NULL;
+  int index;
+  enum ui_stepper_step_state state;
+
+  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
+
+  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h1));
+  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1));
+  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h2));
+  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c2));
+
+  ASSERT_EQ(ui_stepper_base_add_step(NULL, "s1", h1, c1),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_add_step(stepper, NULL, h1, c1),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_add_step(stepper, "s1", NULL, c1),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_add_step(stepper, "s1", h1, NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+
+  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "s1", h1, c1));
+  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "s2", h2, c2));
+
+  /* Add 3 more steps to hit capacity expansion branch */
+  for (index = 0; index < 3; index++) {
+    struct ui_dom_node *hn = NULL, *cn = NULL;
+    char buf[16];
+    sprintf(buf, "s%d", index + 3);
+    ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &hn));
+    ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cn));
+    ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, buf, hn, cn));
+  }
+
+  ASSERT_EQ(ui_stepper_base_get_active_index(NULL, &index),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_get_active_index(stepper, NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
+  ASSERT_INT_EQ(index, 0);
+
+  ASSERT_EQ(ui_stepper_base_next_step(NULL), UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_prev_step(NULL), UI_ERROR_INVALID_ARGUMENT);
+
+  /* Linear progression - validator allows */
+  ASSERT_SUCCESS(
+      ui_stepper_base_set_validate_hook(stepper, mock_validator_allow, NULL));
+  ASSERT_EQ(ui_stepper_base_next_step(NULL), UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_SUCCESS(ui_stepper_base_next_step(stepper));
+  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
+  ASSERT_INT_EQ(index, 1);
+
+  /* Prev step */
+  ASSERT_EQ(ui_stepper_base_prev_step(NULL), UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_SUCCESS(ui_stepper_base_prev_step(stepper));
+  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
+  ASSERT_INT_EQ(index, 0);
+
+  /* Jump to index */
+  ASSERT_EQ(ui_stepper_base_set_active_index(NULL, 1),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1));
+  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
+  ASSERT_INT_EQ(index, 1);
+
+  /* Deny */
+  ASSERT_SUCCESS(
+      ui_stepper_base_set_validate_hook(stepper, mock_validator_deny, NULL));
+  ASSERT_SUCCESS(ui_stepper_base_prev_step(stepper)); /* back to 0 */
+  ASSERT_EQ(ui_stepper_base_next_step(stepper), UI_ERROR_UNKNOWN);
+  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
+  ASSERT_INT_EQ(index, 0);
+
+  /* State getting/setting */
+  ASSERT_EQ(ui_stepper_base_get_step_state(NULL, 0, &state),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_get_step_state(stepper, 0, NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_get_step_state(stepper, -1, &state),
+            UI_ERROR_OUT_OF_BOUNDS);
+  ASSERT_EQ(ui_stepper_base_get_step_state(stepper, 999, &state),
+            UI_ERROR_OUT_OF_BOUNDS);
+
+  /* Test out of bounds set_step_state */
+  ASSERT_EQ(
+      ui_stepper_base_set_step_state(NULL, 0, UI_STEPPER_STEP_STATE_COMPLETED),
+      UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_stepper_base_set_step_state(stepper, -1,
+                                           UI_STEPPER_STEP_STATE_COMPLETED),
+            UI_ERROR_OUT_OF_BOUNDS);
+  ASSERT_EQ(ui_stepper_base_set_step_state(stepper, 999,
+                                           UI_STEPPER_STEP_STATE_COMPLETED),
+            UI_ERROR_OUT_OF_BOUNDS);
+
+  ASSERT_SUCCESS(ui_stepper_base_set_step_state(
+      stepper, 1, UI_STEPPER_STEP_STATE_COMPLETED));
+  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
+  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_COMPLETED);
+
+  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 0, &state));
+  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_ACTIVE);
+
+  ASSERT_SUCCESS(
+      ui_stepper_base_set_step_state(stepper, 1, UI_STEPPER_STEP_STATE_ERROR));
+  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
+  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_ERROR);
+
+  ASSERT_SUCCESS(ui_stepper_base_set_step_state(
+      stepper, 1, (enum ui_stepper_step_state)999));
+  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
+  ASSERT_INT_EQ(state, (enum ui_stepper_step_state)999);
+
+  ASSERT_SUCCESS(
+      ui_stepper_base_set_step_state(stepper, 1, UI_STEPPER_STEP_STATE_ACTIVE));
+  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
+  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_ACTIVE);
+
+  ASSERT_SUCCESS(ui_stepper_base_set_step_state(stepper, 1,
+                                                UI_STEPPER_STEP_STATE_DEFAULT));
+  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
+  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_DEFAULT);
+
+  (void)ui_stepper_base_destroy(stepper);
+  return 0;
+}
+
+static int test_ui_stepper_base_bindings(void) {
+  struct ui_stepper_base *stepper = NULL;
+
+  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
+  ASSERT_EQ(ui_stepper_base_bind_active_index(NULL, NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_SUCCESS(ui_stepper_base_bind_active_index(stepper, NULL));
+
+  ASSERT_EQ(ui_stepper_base_set_validate_hook(NULL, NULL, NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+
+  (void)ui_stepper_base_destroy(stepper);
+  return 0;
+}
+
+static int test_ui_stepper_base_allocation_failures(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   struct ui_stepper_base *stepper = NULL;
-  struct ui_dom_node *hdr1 = NULL, *cnt1 = NULL, *hdr2 = NULL, *cnt2 = NULL;
+  struct ui_dom_node *h1 = NULL, *c1 = NULL;
+  int i;
+  ui_error_t err;
 
+  /* Fail split button struct alloc */
   g_malloc_fail_countdown = 0;
-  if (ui_stepper_base_create(&stepper) != UI_ERROR_OUT_OF_MEMORY)
-    return 1;
+  ASSERT_EQ(ui_stepper_base_create(&stepper), UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
-  ui_stepper_base_create(&stepper);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &hdr1);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cnt1);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &hdr2);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cnt2);
+  for (i = 1; i < 2000; ++i) {
+    g_malloc_fail_countdown = i;
+    err = ui_stepper_base_create(&stepper);
+    g_malloc_fail_countdown = -1;
+    if (err == UI_ERROR_NONE) {
+      (void)ui_stepper_base_destroy(stepper);
+      break;
+    }
+  }
 
-  /* OOM array grow */
-  g_malloc_fail_countdown = 0;
-  if (ui_stepper_base_add_step(stepper, "step1", hdr1, cnt1) !=
-      UI_ERROR_OUT_OF_MEMORY)
-    return 1;
-  g_malloc_fail_countdown = -1;
+  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
 
-  /* Array grow succeeds, strdup fails */
-  g_malloc_fail_countdown = 1;
-  if (ui_stepper_base_add_step(stepper, "step1", hdr1, cnt1) !=
-      UI_ERROR_OUT_OF_MEMORY)
-    return 1;
-  g_malloc_fail_countdown = -1;
+  for (i = 0; i < 5; ++i) {
+    ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h1));
+    ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1));
 
-  ui_stepper_base_add_step(stepper, "step1", hdr1, cnt1);
+    g_malloc_fail_countdown = i;
+    err = ui_stepper_base_add_step(stepper, "s1", h1, c1);
+    g_malloc_fail_countdown = -1;
 
-  /* Strdup fail on subsequent */
-  g_malloc_fail_countdown = 0;
-  if (ui_stepper_base_add_step(stepper, "step2", hdr2, cnt2) !=
-      UI_ERROR_OUT_OF_MEMORY)
-    return 1;
-  g_malloc_fail_countdown = -1;
+    if (err == UI_ERROR_NONE) {
+      break;
+    }
 
-  /* The failed adds leave hdr2/cnt2 orphaned from tree if strdup fails, need to
-   * free them if append_child happened */
-  /* This would be handled correctly if ui_stepper_base_add_step cleaned up, but
-     it doesn't currently on string dup fail. So just manually cleanup for
-     tests. */
-  if (hdr2->parent == NULL)
-    ui_dom_node_destroy(hdr2);
-  if (cnt2->parent == NULL)
-    ui_dom_node_destroy(cnt2);
+    ASSERT_EQ(err, UI_ERROR_OUT_OF_MEMORY);
+    (void)ui_dom_node_destroy(h1);
+    (void)ui_dom_node_destroy(c1);
+  }
 
-  ui_stepper_base_destroy(stepper);
-
+  (void)ui_stepper_base_destroy(stepper);
 #endif
   return 0;
 }
 
+static int test_ui_stepper_base_edge_cases(void) {
+  struct ui_stepper_base *stepper = NULL;
+  struct ui_dom_node *h1 = NULL, *c1 = NULL, *h2 = NULL, *c2 = NULL;
+
+  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
+
+  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h1));
+  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1));
+  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h2));
+  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c2));
+
+  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "s1", h1, c1));
+  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "s2", h2, c2));
+
+  /* Test out of bounds set_active_index */
+  ASSERT_EQ(ui_stepper_base_set_active_index(stepper, -1),
+            UI_ERROR_OUT_OF_BOUNDS);
+  ASSERT_EQ(ui_stepper_base_set_active_index(stepper, 5),
+            UI_ERROR_OUT_OF_BOUNDS);
+
+  /* Test prevailing past boundaries */
+  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 0));
+  ASSERT_SUCCESS(
+      ui_stepper_base_set_active_index(stepper, 0)); /* Should return NONE */
+  ASSERT_EQ(ui_stepper_base_prev_step(stepper), UI_ERROR_OUT_OF_BOUNDS);
+
+  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1));
+  ASSERT_SUCCESS(
+      ui_stepper_base_set_active_index(stepper, 0)); /* Test going back */
+  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1)); /* Reset to 1 */
+  ASSERT_EQ(ui_stepper_base_next_step(stepper), UI_ERROR_OUT_OF_BOUNDS);
+
+  /* Test non-linear mode */
+  ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_NON_LINEAR));
+  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 0));
+  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1));
+
+  (void)ui_stepper_base_destroy(stepper);
+  return 0;
+}
+
 int main(void) {
-  if (run_normal_tests() != 0)
+  if (test_ui_stepper_base_create_destroy())
     return 1;
-  if (run_oom_tests() != 0)
+  if (test_ui_stepper_base_get_component())
     return 1;
-  printf("All ui_stepper_base tests passed.\n");
+  if (test_ui_stepper_base_mode())
+    return 1;
+  if (test_ui_stepper_base_add_and_navigate())
+    return 1;
+  if (test_ui_stepper_base_bindings())
+    return 1;
+  if (test_ui_stepper_base_allocation_failures())
+    return 1;
+  if (test_ui_stepper_base_edge_cases())
+    return 1;
   return 0;
 }

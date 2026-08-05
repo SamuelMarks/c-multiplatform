@@ -4,10 +4,10 @@
 #include <stdlib.h>
 /* clang-format on */
 
-static enum ui_error test_focus_ring(void) {
+static ui_error_t test_focus_ring(void) {
   ui_color_t primary = UI_COLOR_ARGB(255, 10, 20, 30);
   struct ui_focus_ring ring;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_focus_ring_get_standard(primary, NULL);
   if (err != UI_ERROR_INVALID_ARGUMENT) {

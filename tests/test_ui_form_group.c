@@ -29,7 +29,7 @@ static int test_ui_form_group(void) {
   enum ui_form_status status;
   ui_bool_t is_valid;
   ui_signal_t *status_sig;
-  enum ui_error rc;
+  ui_error_t rc;
   int ret = 1;
   int i;
 
@@ -300,15 +300,15 @@ static int test_ui_form_group(void) {
     goto cleanup;
   }
 
-  ui_form_control_destroy(control1);
-  ui_form_control_destroy(control2);
-  ui_form_control_destroy(control_invalid);
-  ui_form_control_destroy(control_pending);
+  (void)ui_form_control_destroy(control1);
+  (void)ui_form_control_destroy(control2);
+  (void)ui_form_control_destroy(control_invalid);
+  (void)ui_form_control_destroy(control_pending);
 
   ret = 0;
 cleanup:
-  ui_arena_destroy(arena);
-  ui_arena_destroy(tiny_arena);
+  (void)ui_arena_destroy(arena);
+  (void)ui_arena_destroy(tiny_arena);
   return ret;
 }
 

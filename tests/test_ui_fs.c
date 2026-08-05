@@ -31,7 +31,7 @@ static int run_test(const char *name, int (*test_fn)(void)) {
 
 static int test_fs_read_write(void) {
   int failed = 0;
-  enum ui_error err;
+  ui_error_t err;
   const char *path =
       "/preload.txt"; /* Should exist in Wasm due to --preload-file, fallback to
                          write for native */
@@ -49,7 +49,7 @@ static int test_fs_read_write(void) {
   EXPECT(size != 0);
   EXPECT(data != NULL);
 
-  free(data); /* JS _malloced buffer or native UI_MALLOC */
+  free(data); /* JS _malloced buffer or native MALLOC */
 
 #if !defined(__EMSCRIPTEN__)
   remove(path);
@@ -60,7 +60,7 @@ static int test_fs_read_write(void) {
 
 static int test_fs_opfs_write(void) {
   int failed = 0;
-  enum ui_error err;
+  ui_error_t err;
   const char *path = "opfs_test.txt";
   const char *data = "opfs_data";
 

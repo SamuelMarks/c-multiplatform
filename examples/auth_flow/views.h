@@ -31,9 +31,9 @@ struct ui_route_request;
  * @param out_screen Pointer to receive the constructed auth component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error auth_container_factory(const struct ui_route_request *req,
-                                     void *user_data,
-                                     struct ui_component **out_screen);
+ui_error_t auth_container_factory(const struct ui_route_request *req,
+                                  void *user_data,
+                                  struct ui_component **out_screen);
 
 /**
  * @brief View factory for the Secrets dashboard.
@@ -43,9 +43,9 @@ enum ui_error auth_container_factory(const struct ui_route_request *req,
  * @param out_screen Pointer to receive the constructed secrets component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error secrets_view_factory(const struct ui_route_request *req,
-                                   void *user_data,
-                                   struct ui_component **out_screen);
+ui_error_t secrets_view_factory(const struct ui_route_request *req,
+                                void *user_data,
+                                struct ui_component **out_screen);
 
 #ifdef __cplusplus
 }

@@ -21,16 +21,17 @@ struct ui_portal;
  * rendered.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_portal_create(struct ui_portal **out_portal,
-                               struct ui_dom_node *physical_target);
+ui_error_t ui_portal_create(struct ui_portal **out_portal,
+                            struct ui_dom_node *physical_target);
 
 /**
  * @brief Destroys a portal, safely unmounting and destroying its content to
  * prevent memory leaks.
  *
  * @param portal The portal to destroy.
+ * @return UI_ERROR_NONE on success.
  */
-void ui_portal_destroy(struct ui_portal *portal);
+ui_error_t ui_portal_destroy(struct ui_portal *portal);
 
 /**
  * @brief Sets the content of the portal. This appends the content to the
@@ -41,8 +42,8 @@ void ui_portal_destroy(struct ui_portal *portal);
  * @param content_node The node to render within the portal.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_portal_set_content(struct ui_portal *portal,
-                                    struct ui_dom_node *content_node);
+ui_error_t ui_portal_set_content(struct ui_portal *portal,
+                                 struct ui_dom_node *content_node);
 
 /**
  * @brief Retrieves the content node of the portal.
@@ -51,8 +52,8 @@ enum ui_error ui_portal_set_content(struct ui_portal *portal,
  * @param out_content Pointer to receive the content node.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_portal_get_content(const struct ui_portal *portal,
-                                    struct ui_dom_node **out_content);
+ui_error_t ui_portal_get_content(const struct ui_portal *portal,
+                                 struct ui_dom_node **out_content);
 
 #ifdef __cplusplus
 }

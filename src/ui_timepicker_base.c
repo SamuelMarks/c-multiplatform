@@ -18,15 +18,15 @@ struct ui_timepicker_base {
   enum ui_timepicker_format format;
   int disabled;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 };
 
-static enum ui_error trigger_cva_change(struct ui_timepicker_base *tp) {
+static ui_error_t trigger_cva_change(struct ui_timepicker_base *tp) {
   if (tp && tp->cva_on_change) {
     union ui_signal_payload payload;
     /* Payload is seconds since midnight */
@@ -36,15 +36,15 @@ static enum ui_error trigger_cva_change(struct ui_timepicker_base *tp) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_cva_touched(struct ui_timepicker_base *tp) {
+static ui_error_t trigger_cva_touched(struct ui_timepicker_base *tp) {
   if (tp && tp->cva_on_touched) {
     return tp->cva_on_touched(tp->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error timepicker_cva_write_value(void *component,
-                                                union ui_signal_payload value) {
+static ui_error_t timepicker_cva_write_value(void *component,
+                                             union ui_signal_payload value) {
   struct ui_timepicker_base *tp = (struct ui_timepicker_base *)component;
   int seconds;
   int h, m;
@@ -63,10 +63,9 @@ static enum ui_error timepicker_cva_write_value(void *component,
 }
 
 /** \brief timepicker_cva_register_on_change */
-static enum ui_error timepicker_cva_register_on_change(
+static ui_error_t timepicker_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_timepicker_base *tp = (struct ui_timepicker_base *)component;
   if (!tp)
@@ -76,10 +75,8 @@ static enum ui_error timepicker_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-timepicker_cva_register_on_touched(void *component,
-                                   enum ui_error (*callback)(void *user_data),
-                                   void *user_data) {
+static ui_error_t timepicker_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_timepicker_base *tp = (struct ui_timepicker_base *)component;
   if (!tp)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -88,8 +85,8 @@ timepicker_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error timepicker_cva_set_disabled_state(void *component,
-                                                       int is_disabled) {
+static ui_error_t timepicker_cva_set_disabled_state(void *component,
+                                                    int is_disabled) {
   struct ui_timepicker_base *tp = (struct ui_timepicker_base *)component;
   if (!tp)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -98,19 +95,19 @@ static enum ui_error timepicker_cva_set_disabled_state(void *component,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_timepicker_base_create(struct ui_timepicker_base **out_timepicker,
                           struct ui_control_value_accessor *out_cva) {
   struct ui_timepicker_base *tp;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_timepicker) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  tp =
-      (struct ui_timepicker_base *)UI_MALLOC(sizeof(struct ui_timepicker_base));
+  tp = (struct ui_timepicker_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_timepicker_base));
   if (!tp) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -138,15 +135,16 @@ cleanup:
   return rc;
 }
 
-void ui_timepicker_base_destroy(struct ui_timepicker_base *timepicker) {
+ui_error_t ui_timepicker_base_destroy(struct ui_timepicker_base *timepicker) {
   if (!timepicker) {
-    return;
+    return UI_ERROR_NONE;
   }
-  UI_FREE(timepicker);
+  C_MULTIPLATFORM_FREE(timepicker);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
-                                          int hour, int minute) {
+ui_error_t ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
+                                       int hour, int minute) {
   if (!timepicker) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -161,17 +159,22 @@ enum ui_error ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
     minute = 59;
 
   if (timepicker->hour != hour || timepicker->minute != minute) {
+    ui_error_t rc;
     timepicker->hour = hour;
     timepicker->minute = minute;
-    (void)trigger_cva_touched(timepicker);
-    (void)trigger_cva_change(timepicker);
+    rc = trigger_cva_touched(timepicker);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = trigger_cva_change(timepicker);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_timepicker_base_get_time(const struct ui_timepicker_base *timepicker,
                             int *out_hour, int *out_minute) {
   if (!timepicker || !out_hour || !out_minute) {
@@ -185,7 +188,7 @@ ui_timepicker_base_get_time(const struct ui_timepicker_base *timepicker,
 }
 
 /** \brief ui_timepicker_base_get_formatted_time */
-enum ui_error ui_timepicker_base_get_formatted_time(
+ui_error_t ui_timepicker_base_get_formatted_time(
     const struct ui_timepicker_base *timepicker, int *out_hour, int *out_minute,
     enum ui_timepicker_period *out_period) {
   if (!timepicker || !out_hour || !out_minute || !out_period) {
@@ -217,9 +220,8 @@ enum ui_error ui_timepicker_base_get_formatted_time(
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
-                              enum ui_timepicker_format format) {
+ui_error_t ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
+                                         enum ui_timepicker_format format) {
   if (!timepicker) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -228,7 +230,7 @@ ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_timepicker_base_get_format(const struct ui_timepicker_base *timepicker,
                               enum ui_timepicker_format *out_format) {
   if (!timepicker || !out_format) {
@@ -239,7 +241,7 @@ ui_timepicker_base_get_format(const struct ui_timepicker_base *timepicker,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
                                    char **out_string) {
   int h, m;
@@ -247,16 +249,21 @@ ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
   char *buf = NULL;
   size_t required_size;
 
+  ui_error_t rc;
+
   if (!timepicker || !out_string) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
+  rc = ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* We allocate 32 bytes to prevent GCC format-overflow warnings on int fields
    */
   required_size = 32;
-  buf = (char *)UI_MALLOC(required_size);
+  buf = (char *)C_MULTIPLATFORM_MALLOC(required_size);
   if (!buf) {
     return UI_ERROR_OUT_OF_MEMORY;
   }

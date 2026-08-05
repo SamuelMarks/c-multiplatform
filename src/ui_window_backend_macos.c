@@ -18,7 +18,9 @@ struct ui_window {
     int is_closing;
 };
 
-static enum ui_error macos_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
+static ui_error_t macos_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
+    (void)width;
+    (void)height;
     if (!backend || !title || !out_window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -31,28 +33,28 @@ static enum ui_error macos_create_window(struct ui_window_backend* backend, cons
     return UI_ERROR_UNKNOWN;
 }
 
-static enum ui_error macos_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t macos_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-static enum ui_error macos_show_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t macos_show_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-static enum ui_error macos_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t macos_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-static enum ui_error macos_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
+static ui_error_t macos_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
     if (!backend || !window || !out_event || !out_has_event) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -61,21 +63,21 @@ static enum ui_error macos_poll_events(struct ui_window_backend* backend, struct
     return UI_ERROR_NONE;
 }
 
-static enum ui_error macos_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t macos_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-enum ui_error ui_window_backend_macos_create(struct ui_window_backend** out_backend) {
+ui_error_t ui_window_backend_macos_create(struct ui_window_backend** out_backend) {
     struct ui_window_backend* backend;
 
     if (!out_backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
 
-    backend = (struct ui_window_backend*)UI_MALLOC(sizeof(struct ui_window_backend));
+    backend = (struct ui_window_backend*)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window_backend));
     if (!backend) {
         return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -95,11 +97,11 @@ enum ui_error ui_window_backend_macos_create(struct ui_window_backend** out_back
     return UI_ERROR_NONE;
 }
 
-enum ui_error ui_window_backend_macos_destroy(struct ui_window_backend* backend) {
+ui_error_t ui_window_backend_macos_destroy(struct ui_window_backend* backend) {
     if (!backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
-    UI_FREE(backend);
+    C_MULTIPLATFORM_FREE(backend);
     return UI_ERROR_NONE;
 }
 
@@ -108,7 +110,7 @@ enum ui_error ui_window_backend_macos_destroy(struct ui_window_backend* backend)
 #include "../include/ui_window_backend_macos.h"
 #include <stddef.h>
 
-enum ui_error ui_window_backend_macos_create(struct ui_window_backend** out_backend) {
+ui_error_t ui_window_backend_macos_create(struct ui_window_backend** out_backend) {
     if (!out_backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -116,7 +118,7 @@ enum ui_error ui_window_backend_macos_create(struct ui_window_backend** out_back
     return UI_ERROR_UNKNOWN;
 }
 
-enum ui_error ui_window_backend_macos_destroy(struct ui_window_backend* backend) {
+ui_error_t ui_window_backend_macos_destroy(struct ui_window_backend* backend) {
     if (!backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -129,7 +131,7 @@ enum ui_error ui_window_backend_macos_destroy(struct ui_window_backend* backend)
 #include <stddef.h>
 /* clang-format on */
 
-enum ui_error
+ui_error_t
 ui_window_backend_macos_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -139,8 +141,7 @@ ui_window_backend_macos_create(struct ui_window_backend **out_backend) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_window_backend_macos_destroy(struct ui_window_backend *backend) {
+ui_error_t ui_window_backend_macos_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

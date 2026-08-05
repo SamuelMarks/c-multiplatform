@@ -19,19 +19,19 @@ struct ui_miller_columns_base {
   ui_signal_t *topology_changed_signal;
 };
 
-static enum ui_error topology_equality(union ui_signal_payload a,
-                                       union ui_signal_payload b,
-                                       ui_bool_t *out_equal) {
+static ui_error_t topology_equality(union ui_signal_payload a,
+                                    union ui_signal_payload b,
+                                    ui_bool_t *out_equal) {
   if (out_equal)
     *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_miller_columns_base_create */
-enum ui_error ui_miller_columns_base_create(
+ui_error_t ui_miller_columns_base_create(
     struct ui_arena *arena, const struct ui_tree_model *tree_model,
     void *model_user_data, struct ui_miller_columns_base **out_miller) {
-  enum ui_error err;
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -57,29 +57,33 @@ enum ui_error ui_miller_columns_base_create(
   (*out_miller)->columns[0].selected_child_id = NULL;
 
   initial_payload.int_val = 1;
-  (void)ui_signal_create(
-      arena, initial_payload, UI_SIGNAL_TYPE_INT32, topology_equality, NULL,
-      UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_miller)->topology_changed_signal);
+  {
+    ui_error_t _ign_rc = ui_signal_create(
+        arena, initial_payload, UI_SIGNAL_TYPE_INT32, topology_equality, NULL,
+        UI_SIGNAL_MODE_SINGLE_THREADED,
+        &(*out_miller)->topology_changed_signal);
+    (void)_ign_rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_miller_columns_base_destroy(struct ui_miller_columns_base *miller) {
   if (!miller) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (miller->topology_changed_signal) {
-    ui_signal_destroy(miller->topology_changed_signal);
+    (void)ui_signal_destroy(miller->topology_changed_signal);
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
                                    int column_index, void *node_id) {
 
@@ -122,13 +126,17 @@ ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
 
   /* Emit topology change signal */
   payload.int_val = miller->active_column_count;
-  (void)ui_signal_set(miller->topology_changed_signal, payload);
+  {
+    ui_error_t set_rc = ui_signal_set(miller->topology_changed_signal, payload);
+    if (set_rc != UI_ERROR_NONE)
+      return set_rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_miller_columns_base_navigate_left(struct ui_miller_columns_base *miller) {
   if (!miller) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -143,7 +151,7 @@ ui_miller_columns_base_navigate_left(struct ui_miller_columns_base *miller) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_miller_columns_base_navigate_right(struct ui_miller_columns_base *miller) {
   if (!miller) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -160,7 +168,7 @@ ui_miller_columns_base_navigate_right(struct ui_miller_columns_base *miller) {
 }
 
 /** \brief ui_miller_columns_base_get_column_count */
-enum ui_error ui_miller_columns_base_get_column_count(
+ui_error_t ui_miller_columns_base_get_column_count(
     const struct ui_miller_columns_base *miller, int *out_count) {
   if (!miller || !out_count) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -170,7 +178,7 @@ enum ui_error ui_miller_columns_base_get_column_count(
 }
 
 /** \brief ui_miller_columns_base_get_topology_changed_signal */
-enum ui_error ui_miller_columns_base_get_topology_changed_signal(
+ui_error_t ui_miller_columns_base_get_topology_changed_signal(
     struct ui_miller_columns_base *miller, ui_signal_t **out_signal) {
   if (!miller || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;

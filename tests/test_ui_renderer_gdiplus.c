@@ -6,7 +6,7 @@
 /* clang-format on */
 
 #if defined(_WIN32)
-extern enum ui_error ui_renderer_native_init(struct ui_renderer *renderer);
+extern ui_error_t ui_renderer_native_init(struct ui_renderer *renderer);
 
 int main(void) {
   struct ui_renderer renderer;

@@ -30,10 +30,9 @@ enum ui_state_layer_type {
  * @param out_color The resulting blended color.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_state_layer_get_color(ui_color_t base_color,
-                                       ui_color_t on_color,
-                                       enum ui_state_layer_type state,
-                                       ui_color_t *out_color);
+ui_error_t ui_state_layer_get_color(ui_color_t base_color, ui_color_t on_color,
+                                    enum ui_state_layer_type state,
+                                    ui_color_t *out_color);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@
 ## 2. Core Foundations & FFI
 - [x] **Strict C89 & MSVC Safe Extensions:** Configure CMake matrix for `-std=c89 -pedantic -Wall -Werror`.
 - [x] **No Typedefs:** Use explicit `struct name` and `enum name` globally.
-- [x] **Error Enums & Percolation:** Every function MUST return `enum ui_error` (or a subsystem-specific enum discriminant). All actual return data must use out-parameters.
+- [x] **Error Enums & Percolation:** Every function MUST return `ui_error_t` (or a subsystem-specific enum discriminant). All actual return data must use out-parameters.
   - *Strict Percolation:* Errors must be checked and percolated up the call stack immediately.
   - *Cleanup on Failure:* If an error occurs midway through a function (e.g., a `malloc` failure), the function MUST clean up all locally acquired resources before returning the failure discriminant (typically utilizing a `goto cleanup;` pattern to avoid duplicate free logic). Never leak memory or leave dangling file handles on the error path.
 - [x] Define platform-independent integer types natively (without `<stdint.h>`).

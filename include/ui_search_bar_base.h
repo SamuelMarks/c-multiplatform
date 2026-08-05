@@ -24,11 +24,11 @@ struct ui_search_bar_base {
   struct ui_icon_base *trailing_icon;
   int is_loading;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
@@ -42,10 +42,9 @@ struct ui_search_bar_base {
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_search_bar_base_init(struct ui_search_bar_base *search_bar,
-                        struct ui_component *component,
-                        struct ui_control_value_accessor *out_cva);
+ui_error_t ui_search_bar_base_init(struct ui_search_bar_base *search_bar,
+                                   struct ui_component *component,
+                                   struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Sets the text query in the search bar.
@@ -54,9 +53,8 @@ ui_search_bar_base_init(struct ui_search_bar_base *search_bar,
  * @param query The query text.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
-                             const char *query);
+ui_error_t ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
+                                        const char *query);
 
 /**
  * @brief Sets whether the search bar is in a loading state.
@@ -64,16 +62,15 @@ ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
  * @param search_bar Pointer to the search bar base struct.
  * @param is_loading The new loading state.
  */
-enum ui_error
-ui_search_bar_base_set_loading(struct ui_search_bar_base *search_bar,
-                               int is_loading);
+ui_error_t ui_search_bar_base_set_loading(struct ui_search_bar_base *search_bar,
+                                          int is_loading);
 
 /**
  * @brief Cleans up resources allocated by the search bar base.
  *
  * @param search_bar Pointer to the search bar base struct.
  */
-enum ui_error ui_search_bar_base_cleanup(struct ui_search_bar_base *search_bar);
+ui_error_t ui_search_bar_base_cleanup(struct ui_search_bar_base *search_bar);
 
 #ifdef __cplusplus
 }

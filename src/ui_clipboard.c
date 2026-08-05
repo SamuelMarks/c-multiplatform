@@ -52,8 +52,9 @@ extern int (*g_mock_pclose_fn)(FILE *);
 #define PCLOSE_CMD(stream) pclose(stream)
 #endif
 
-enum ui_error ui_clipboard_set_text(const char *text) {
+ui_error_t ui_clipboard_set_text(const char *text) {
   size_t len;
+  FILE *p = NULL;
   if (!text) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -95,13 +96,11 @@ enum ui_error ui_clipboard_set_text(const char *text) {
     return UI_ERROR_NONE;
   }
 #elif defined(__APPLE__)
-  {
-    FILE *p = POPEN_CMD("pbcopy", "w");
-    if (p) {
-      fputs(text, p);
-      PCLOSE_CMD(p);
-      return UI_ERROR_NONE;
-    }
+  p = POPEN_CMD("pbcopy", "w");
+  if (p) {
+    fputs(text, p);
+    PCLOSE_CMD(p);
+    return UI_ERROR_NONE;
   }
 #elif defined(__linux__) || defined(__unix__)
   {
@@ -128,9 +127,9 @@ fallback:
 
   /* Fallback in-memory clipboard */
   if (s_fallback_clipboard) {
-    UI_FREE(s_fallback_clipboard);
+    C_MULTIPLATFORM_FREE(s_fallback_clipboard);
   }
-  s_fallback_clipboard = (char *)UI_MALLOC(len);
+  s_fallback_clipboard = (char *)C_MULTIPLATFORM_MALLOC(len);
   if (!s_fallback_clipboard) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -139,7 +138,7 @@ fallback:
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_clipboard_get_text(char **out_text) {
+ui_error_t ui_clipboard_get_text(char **out_text) {
   if (!out_text) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -160,7 +159,7 @@ enum ui_error ui_clipboard_get_text(char **out_text) {
         const char *locked = (const char *)GlobalLock(hMem);
         if (locked) {
           size_t len = strlen(locked) + 1;
-          char *copy = (char *)UI_MALLOC(len);
+          char *copy = (char *)C_MULTIPLATFORM_MALLOC(len);
           if (copy) {
             memcpy(copy, locked, len);
             *out_text = copy;
@@ -182,7 +181,7 @@ enum ui_error ui_clipboard_get_text(char **out_text) {
       char buffer[1024];
       size_t total = 0;
       size_t cap = 1024;
-      char *text = (char *)UI_MALLOC(cap);
+      char *text = (char *)C_MULTIPLATFORM_MALLOC(cap);
       if (!text) {
         PCLOSE_CMD(p);
         return UI_ERROR_OUT_OF_MEMORY;
@@ -193,9 +192,9 @@ enum ui_error ui_clipboard_get_text(char **out_text) {
         if (total + len + 1 > cap) {
           char *new_text;
           cap *= 2;
-          new_text = (char *)UI_REALLOC(text, cap);
+          new_text = (char *)C_MULTIPLATFORM_REALLOC(text, cap);
           if (!new_text) {
-            UI_FREE(text);
+            C_MULTIPLATFORM_FREE(text);
             PCLOSE_CMD(p);
             return UI_ERROR_OUT_OF_MEMORY;
           }
@@ -209,7 +208,7 @@ enum ui_error ui_clipboard_get_text(char **out_text) {
         *out_text = text;
         return UI_ERROR_NONE;
       } else {
-        UI_FREE(text);
+        C_MULTIPLATFORM_FREE(text);
       }
     }
   }
@@ -227,7 +226,7 @@ enum ui_error ui_clipboard_get_text(char **out_text) {
       char buffer[1024];
       size_t total = 0;
       size_t cap = 1024;
-      char *text = (char *)UI_MALLOC(cap);
+      char *text = (char *)C_MULTIPLATFORM_MALLOC(cap);
       if (!text) {
         PCLOSE_CMD(p);
         return UI_ERROR_OUT_OF_MEMORY;
@@ -238,9 +237,9 @@ enum ui_error ui_clipboard_get_text(char **out_text) {
         if (total + len + 1 > cap) {
           char *new_text;
           cap *= 2;
-          new_text = (char *)UI_REALLOC(text, cap);
+          new_text = (char *)C_MULTIPLATFORM_REALLOC(text, cap);
           if (!new_text) {
-            UI_FREE(text);
+            C_MULTIPLATFORM_FREE(text);
             PCLOSE_CMD(p);
             return UI_ERROR_OUT_OF_MEMORY;
           }
@@ -254,7 +253,7 @@ enum ui_error ui_clipboard_get_text(char **out_text) {
         *out_text = text;
         return UI_ERROR_NONE;
       } else {
-        UI_FREE(text);
+        C_MULTIPLATFORM_FREE(text);
       }
     }
   }
@@ -268,7 +267,7 @@ fallback:
   /* Fallback in-memory clipboard */
   if (s_fallback_clipboard) {
     size_t len = strlen(s_fallback_clipboard) + 1;
-    *out_text = (char *)UI_MALLOC(len);
+    *out_text = (char *)C_MULTIPLATFORM_MALLOC(len);
     if (!*out_text) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -279,16 +278,16 @@ fallback:
   return UI_ERROR_UNSUPPORTED;
 }
 
-enum ui_error ui_clipboard_free_text(char *text) {
+ui_error_t ui_clipboard_free_text(char *text) {
   if (text) {
-    UI_FREE(text);
+    C_MULTIPLATFORM_FREE(text);
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_clipboard_cleanup(void) {
+ui_error_t ui_clipboard_cleanup(void) {
   if (s_fallback_clipboard) {
-    UI_FREE(s_fallback_clipboard);
+    C_MULTIPLATFORM_FREE(s_fallback_clipboard);
     s_fallback_clipboard = NULL;
   }
   return UI_ERROR_NONE;

@@ -61,7 +61,7 @@ struct ui_gesture_recognizer;
  * @param out_recognizer Pointer to receive the allocated recognizer.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_gesture_recognizer_create(struct ui_gesture_recognizer **out_recognizer);
 
 /**
@@ -69,7 +69,7 @@ ui_gesture_recognizer_create(struct ui_gesture_recognizer **out_recognizer);
  * @param recognizer The recognizer to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_gesture_recognizer_destroy(struct ui_gesture_recognizer *recognizer);
 
 /**
@@ -82,7 +82,7 @@ ui_gesture_recognizer_destroy(struct ui_gesture_recognizer *recognizer);
  * @return UI_ERROR_NONE on success. out_gesture_event->type will be
  * UI_GESTURE_NONE if no gesture is emitted.
  */
-enum ui_error ui_gesture_recognizer_process_event(
+ui_error_t ui_gesture_recognizer_process_event(
     struct ui_gesture_recognizer *recognizer, const struct ui_event *event,
     double timestamp_ms, struct ui_gesture_event *out_gesture_event);
 
@@ -95,7 +95,7 @@ enum ui_error ui_gesture_recognizer_process_event(
  * any.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_gesture_recognizer_update(struct ui_gesture_recognizer *recognizer,
                              double timestamp_ms,
                              struct ui_gesture_event *out_gesture_event);

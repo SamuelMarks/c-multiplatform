@@ -38,9 +38,9 @@ struct ui_audio_sink_backend {
    * @param out_sink Pointer to receive the allocated sink handle.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*create_sink)(struct ui_audio_sink_backend *backend,
-                               const struct ui_audio_sink_config *config,
-                               struct ui_audio_sink **out_sink);
+  ui_error_t (*create_sink)(struct ui_audio_sink_backend *backend,
+                            const struct ui_audio_sink_config *config,
+                            struct ui_audio_sink **out_sink);
 
   /**
    * @brief Destroys an audio sink.
@@ -49,8 +49,8 @@ struct ui_audio_sink_backend {
    * @param sink The sink to destroy.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*destroy_sink)(struct ui_audio_sink_backend *backend,
-                                struct ui_audio_sink *sink);
+  ui_error_t (*destroy_sink)(struct ui_audio_sink_backend *backend,
+                             struct ui_audio_sink *sink);
 
   /**
    * @brief Writes interleaved audio frames to the sink.
@@ -63,9 +63,9 @@ struct ui_audio_sink_backend {
    * written.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*write_frames)(struct ui_audio_sink_backend *backend,
-                                struct ui_audio_sink *sink, const void *frames,
-                                int num_frames, int *out_frames_written);
+  ui_error_t (*write_frames)(struct ui_audio_sink_backend *backend,
+                             struct ui_audio_sink *sink, const void *frames,
+                             int num_frames, int *out_frames_written);
 
   /**
    * @brief Gets the current playback delay (latency) in microseconds.
@@ -75,9 +75,8 @@ struct ui_audio_sink_backend {
    * @param out_delay_us Pointer to receive the delay.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*get_delay)(struct ui_audio_sink_backend *backend,
-                             struct ui_audio_sink *sink,
-                             ui_int64 *out_delay_us);
+  ui_error_t (*get_delay)(struct ui_audio_sink_backend *backend,
+                          struct ui_audio_sink *sink, ui_int64 *out_delay_us);
 
   /**
    * @brief Starts playback on the sink.
@@ -86,8 +85,8 @@ struct ui_audio_sink_backend {
    * @param sink The sink.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*start)(struct ui_audio_sink_backend *backend,
-                         struct ui_audio_sink *sink);
+  ui_error_t (*start)(struct ui_audio_sink_backend *backend,
+                      struct ui_audio_sink *sink);
 
   /**
    * @brief Stops playback on the sink.
@@ -96,8 +95,8 @@ struct ui_audio_sink_backend {
    * @param sink The sink.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*stop)(struct ui_audio_sink_backend *backend,
-                        struct ui_audio_sink *sink);
+  ui_error_t (*stop)(struct ui_audio_sink_backend *backend,
+                     struct ui_audio_sink *sink);
 
   /**
    * @brief Opaque user data for the specific backend implementation.
@@ -111,7 +110,7 @@ struct ui_audio_sink_backend {
  * @param out_backend Pointer to receive the backend struct.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend);
 
 #ifdef __cplusplus

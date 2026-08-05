@@ -30,7 +30,7 @@ struct ui_focus_manager;
  * @param out_manager Pointer to receive the new focus manager.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_focus_manager_create(struct ui_focus_manager **out_manager);
+ui_error_t ui_focus_manager_create(struct ui_focus_manager **out_manager);
 
 /**
  * @brief Destroys a focus manager instance.
@@ -38,7 +38,7 @@ enum ui_error ui_focus_manager_create(struct ui_focus_manager **out_manager);
  * @param manager The focus manager.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_focus_manager_destroy(struct ui_focus_manager *manager);
+ui_error_t ui_focus_manager_destroy(struct ui_focus_manager *manager);
 
 /**
  * @brief Requests focus for a specific DOM node.
@@ -47,8 +47,8 @@ enum ui_error ui_focus_manager_destroy(struct ui_focus_manager *manager);
  * @param node The DOM node to focus.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_focus_manager_request_focus(struct ui_focus_manager *manager,
-                                             struct ui_dom_node *node);
+ui_error_t ui_focus_manager_request_focus(struct ui_focus_manager *manager,
+                                          struct ui_dom_node *node);
 
 /**
  * @brief Gets the currently focused DOM node.
@@ -57,7 +57,7 @@ enum ui_error ui_focus_manager_request_focus(struct ui_focus_manager *manager,
  * @param out_node Pointer to receive the focused DOM node.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_focus_manager_get_focused_node(const struct ui_focus_manager *manager,
                                   struct ui_dom_node **out_node);
 
@@ -69,8 +69,8 @@ ui_focus_manager_get_focused_node(const struct ui_focus_manager *manager,
  * @param forward 1 for forward (Tab), 0 for backward (Shift+Tab).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_focus_manager_advance(struct ui_focus_manager *manager,
-                                       struct ui_dom_node *root, int forward);
+ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
+                                    struct ui_dom_node *root, int forward);
 
 /**
  * @brief Moves focus spatially based on geometry (D-pad or arrow keys).
@@ -80,9 +80,9 @@ enum ui_error ui_focus_manager_advance(struct ui_focus_manager *manager,
  * @param direction The direction to navigate.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_focus_manager_navigate(struct ui_focus_manager *manager,
-                                        struct ui_layout_node *layout_root,
-                                        enum ui_focus_direction direction);
+ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
+                                     struct ui_layout_node *layout_root,
+                                     enum ui_focus_direction direction);
 
 /**
  * @brief Pushes a focus trap (e.g., a Dialog). All focus movement is
@@ -92,8 +92,8 @@ enum ui_error ui_focus_manager_navigate(struct ui_focus_manager *manager,
  * @param trap_root The root DOM node of the trap.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_focus_manager_push_trap(struct ui_focus_manager *manager,
-                                         struct ui_dom_node *trap_root);
+ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
+                                      struct ui_dom_node *trap_root);
 
 /**
  * @brief Pops the top-most focus trap and restores focus to the previously
@@ -102,7 +102,7 @@ enum ui_error ui_focus_manager_push_trap(struct ui_focus_manager *manager,
  * @param manager The focus manager.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_focus_manager_pop_trap(struct ui_focus_manager *manager);
+ui_error_t ui_focus_manager_pop_trap(struct ui_focus_manager *manager);
 
 #ifdef __cplusplus
 }

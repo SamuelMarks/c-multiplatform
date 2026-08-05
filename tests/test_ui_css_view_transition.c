@@ -25,9 +25,9 @@
     }                                                                          \
   } while (0)
 
-static enum ui_error test_parse_view_transition_name(void) {
+static ui_error_t test_parse_view_transition_name(void) {
   struct ui_css_view_transition_name name;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_css_parse_view_transition_name("none", &name);
   EXPECT_EQ(UI_ERROR_NONE, err);
@@ -40,9 +40,9 @@ static enum ui_error test_parse_view_transition_name(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_parse_view_transition_class(void) {
+static ui_error_t test_parse_view_transition_class(void) {
   struct ui_css_view_transition_class vt_class;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_css_parse_view_transition_class("none", &vt_class);
   EXPECT_EQ(UI_ERROR_NONE, err);
@@ -70,10 +70,10 @@ static enum ui_error test_parse_view_transition_class(void) {
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error test_parse_view_transition_more(void) {
+static ui_error_t test_parse_view_transition_more(void) {
   struct ui_css_view_transition_name name;
   struct ui_css_view_transition_class vt_class;
-  enum ui_error err;
+  ui_error_t err;
 
   /* Invalid arguments */
   err = ui_css_parse_view_transition_name(NULL, &name);

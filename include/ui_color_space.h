@@ -70,8 +70,8 @@ struct ui_color_hct {
  * @param out_cam16 Pointer to the output CAM16 structure.
  * @return UI_ERROR_NONE on success, or an error code on failure.
  */
-enum ui_error ui_color_argb_to_cam16(ui_color_t argb,
-                                     struct ui_color_cam16 *out_cam16);
+ui_error_t ui_color_argb_to_cam16(ui_color_t argb,
+                                  struct ui_color_cam16 *out_cam16);
 
 /**
  * @brief Converts a CAM16 color to ARGB.
@@ -80,8 +80,8 @@ enum ui_error ui_color_argb_to_cam16(ui_color_t argb,
  * @param out_argb Pointer to the output ARGB color.
  * @return UI_ERROR_NONE on success, or an error code on failure.
  */
-enum ui_error ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
-                                     ui_color_t *out_argb);
+ui_error_t ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
+                                  ui_color_t *out_argb);
 
 /**
  * @brief Converts an ARGB color to HCT.
@@ -90,8 +90,7 @@ enum ui_error ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
  * @param out_hct Pointer to the output HCT structure.
  * @return UI_ERROR_NONE on success, or an error code on failure.
  */
-enum ui_error ui_color_argb_to_hct(ui_color_t argb,
-                                   struct ui_color_hct *out_hct);
+ui_error_t ui_color_argb_to_hct(ui_color_t argb, struct ui_color_hct *out_hct);
 
 /**
  * @brief Converts an HCT color to ARGB.
@@ -100,8 +99,8 @@ enum ui_error ui_color_argb_to_hct(ui_color_t argb,
  * @param out_argb Pointer to the output ARGB color.
  * @return UI_ERROR_NONE on success, or an error code on failure.
  */
-enum ui_error ui_color_hct_to_argb(const struct ui_color_hct *hct,
-                                   ui_color_t *out_argb);
+ui_error_t ui_color_hct_to_argb(const struct ui_color_hct *hct,
+                                ui_color_t *out_argb);
 
 #ifdef __cplusplus
 }

@@ -8,9 +8,9 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error test_link_base(void) {
+static ui_error_t test_link_base(void) {
   struct ui_link_base *link;
-  enum ui_error err;
+  ui_error_t err;
   const char *attr_val;
   struct ui_signal *signal = (struct ui_signal *)1;
 
@@ -66,7 +66,7 @@ static enum ui_error test_link_base(void) {
                 "Click Again") == 0);
 
   /* Set text with OOM for text node creation */
-  ui_dom_node_destroy(link->base.shadow_root->first_child);
+  (void)ui_dom_node_destroy(link->base.shadow_root->first_child);
   link->base.shadow_root->first_child = NULL;
 
   g_malloc_fail_countdown = 0;
@@ -83,7 +83,7 @@ static enum ui_error test_link_base(void) {
   assert(err == UI_ERROR_NONE);
   assert(link->text_signal == signal);
 
-  ui_component_destroy((struct ui_component *)link);
+  (void)ui_component_destroy((struct ui_component *)link);
 
   return UI_ERROR_NONE;
 }

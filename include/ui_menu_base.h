@@ -23,9 +23,8 @@ struct ui_menu_base;
  * @param item_id The unique identifier of the triggered item.
  * @param user_data Opaque user data.
  */
-typedef enum ui_error (*ui_menu_on_action_t)(struct ui_menu_base *menu,
-                                             const char *item_id,
-                                             void *user_data);
+typedef ui_error_t (*ui_menu_on_action_t)(struct ui_menu_base *menu,
+                                          const char *item_id, void *user_data);
 
 /**
  * @brief Creates a new unstyled menu component.
@@ -33,14 +32,14 @@ typedef enum ui_error (*ui_menu_on_action_t)(struct ui_menu_base *menu,
  * @param out_menu Pointer to receive the allocated menu base.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_menu_base_create(struct ui_menu_base **out_menu);
+ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu);
 
 /**
  * @brief Destroys a menu component.
  *
  * @param menu The menu component to destroy.
  */
-void ui_menu_base_destroy(struct ui_menu_base *menu);
+ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu);
 
 /**
  * @brief Adds an item to the menu.
@@ -53,10 +52,9 @@ void ui_menu_base_destroy(struct ui_menu_base *menu);
  * @param submenu Optional. Another menu to open as a cascading sub-menu.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_menu_base_add_item(struct ui_menu_base *menu,
-                                    const char *item_id,
-                                    struct ui_dom_node *label_node,
-                                    struct ui_menu_base *submenu);
+ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
+                                 struct ui_dom_node *label_node,
+                                 struct ui_menu_base *submenu);
 
 /**
  * @brief Sets the callback for item activation.
@@ -66,9 +64,9 @@ enum ui_error ui_menu_base_add_item(struct ui_menu_base *menu,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_menu_base_set_on_action(struct ui_menu_base *menu,
-                                         ui_menu_on_action_t on_action,
-                                         void *user_data);
+ui_error_t ui_menu_base_set_on_action(struct ui_menu_base *menu,
+                                      ui_menu_on_action_t on_action,
+                                      void *user_data);
 
 /**
  * @brief Opens the menu at specific screen coordinates (e.g., for a context
@@ -80,9 +78,9 @@ enum ui_error ui_menu_base_set_on_action(struct ui_menu_base *menu,
  * @param y The Y screen coordinate.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_menu_base_open_at(struct ui_menu_base *menu,
-                                   struct ui_overlay_director *director, int x,
-                                   int y);
+ui_error_t ui_menu_base_open_at(struct ui_menu_base *menu,
+                                struct ui_overlay_director *director, int x,
+                                int y);
 
 /**
  * @brief Closes the menu and any open sub-menus.
@@ -90,7 +88,7 @@ enum ui_error ui_menu_base_open_at(struct ui_menu_base *menu,
  * @param menu The menu component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_menu_base_close(struct ui_menu_base *menu);
+ui_error_t ui_menu_base_close(struct ui_menu_base *menu);
 
 /**
  * @brief Checks if the menu is open.
@@ -98,8 +96,8 @@ enum ui_error ui_menu_base_close(struct ui_menu_base *menu);
  * @param menu The menu component.
  * @return 1 if open, 0 if closed.
  */
-enum ui_error ui_menu_base_is_open(const struct ui_menu_base *menu,
-                                   int *out_is_open);
+ui_error_t ui_menu_base_is_open(const struct ui_menu_base *menu,
+                                int *out_is_open);
 
 /**
  * @brief Intercepts a potential context menu event (right-click).
@@ -110,7 +108,7 @@ enum ui_error ui_menu_base_is_open(const struct ui_menu_base *menu,
  * @param event The input event to check.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_menu_base_intercept_context_menu(struct ui_menu_base *menu,
                                     struct ui_overlay_director *director,
                                     const struct ui_event *event);
@@ -123,8 +121,8 @@ ui_menu_base_intercept_context_menu(struct ui_menu_base *menu,
  * @param event The input event.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_menu_base_process_event(struct ui_menu_base *menu,
-                                         const struct ui_event *event);
+ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
+                                      const struct ui_event *event);
 
 /**
  * @brief Gets the underlying UI component.
@@ -132,8 +130,8 @@ enum ui_error ui_menu_base_process_event(struct ui_menu_base *menu,
  * @param menu The menu component.
  * @return The underlying component.
  */
-enum ui_error ui_menu_base_get_component(struct ui_menu_base *menu,
-                                         struct ui_component **out_component);
+ui_error_t ui_menu_base_get_component(struct ui_menu_base *menu,
+                                      struct ui_component **out_component);
 
 /**
  * @brief Binds the active state/index to a signal.
@@ -142,8 +140,8 @@ enum ui_error ui_menu_base_get_component(struct ui_menu_base *menu,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_menu_base_bind_active_index(struct ui_menu_base *widget,
-                                             struct ui_signal *signal);
+ui_error_t ui_menu_base_bind_active_index(struct ui_menu_base *widget,
+                                          struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

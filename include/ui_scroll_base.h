@@ -21,9 +21,9 @@ struct ui_scroll_base;
 /**
  * @brief Callback invoked when the scroll position changes.
  */
-typedef enum ui_error (*ui_scroll_on_change_t)(struct ui_scroll_base *scroll,
-                                               float scroll_x, float scroll_y,
-                                               void *user_data);
+typedef ui_error_t (*ui_scroll_on_change_t)(struct ui_scroll_base *scroll,
+                                            float scroll_x, float scroll_y,
+                                            void *user_data);
 
 /**
  * @brief Creates a new unstyled scroll area base component.
@@ -38,14 +38,14 @@ typedef enum ui_error (*ui_scroll_on_change_t)(struct ui_scroll_base *scroll,
  * @param out_scroll Pointer to receive the allocated scroll base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_scroll_base_create(struct ui_scroll_base **out_scroll);
+ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll);
 
 /**
  * @brief Destroys a scroll area component.
  *
  * @param scroll The scroll area to destroy.
  */
-void ui_scroll_base_destroy(struct ui_scroll_base *scroll);
+ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll);
 
 /**
  * @brief Sets the scroll position.
@@ -55,8 +55,8 @@ void ui_scroll_base_destroy(struct ui_scroll_base *scroll);
  * @param y The vertical scroll position.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll,
-                                            float x, float y);
+ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
+                                         float y);
 
 /**
  * @brief Gets the horizontal scroll position.
@@ -64,8 +64,8 @@ enum ui_error ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll,
  * @param scroll The scroll area.
  * @return The horizontal scroll position.
  */
-enum ui_error ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
-                                          float *out_x);
+ui_error_t ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
+                                       float *out_x);
 
 /**
  * @brief Gets the vertical scroll position.
@@ -73,8 +73,8 @@ enum ui_error ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
  * @param scroll The scroll area.
  * @return The vertical scroll position.
  */
-enum ui_error ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
-                                          float *out_y);
+ui_error_t ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
+                                       float *out_y);
 
 /**
  * @brief Sets the content dimensions for overflow calculations.
@@ -84,8 +84,8 @@ enum ui_error ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
  * @param height The content height.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
-                                              float width, float height);
+ui_error_t ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
+                                           float width, float height);
 
 /**
  * @brief Sets the viewport dimensions for overflow calculations.
@@ -95,8 +95,8 @@ enum ui_error ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
  * @param height The viewport height.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
-                                               float width, float height);
+ui_error_t ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
+                                            float width, float height);
 
 /**
  * @brief Sets the change handler for the scroll area.
@@ -106,9 +106,9 @@ enum ui_error ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
  * @param user_data Opaque user data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
-                                           ui_scroll_on_change_t on_change,
-                                           void *user_data);
+ui_error_t ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
+                                        ui_scroll_on_change_t on_change,
+                                        void *user_data);
 
 /**
  * @brief Processes an incoming input event to trigger scrolling (e.g., mouse
@@ -119,9 +119,9 @@ enum ui_error ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_scroll_base_process_event(struct ui_scroll_base *scroll,
-                                           const struct ui_event *event,
-                                           double timestamp_ms);
+ui_error_t ui_scroll_base_process_event(struct ui_scroll_base *scroll,
+                                        const struct ui_event *event,
+                                        double timestamp_ms);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -130,8 +130,8 @@ enum ui_error ui_scroll_base_process_event(struct ui_scroll_base *scroll,
  * @param scroll The scroll area.
  * @return The underlying component.
  */
-enum ui_error ui_scroll_base_get_component(struct ui_scroll_base *scroll,
-                                           struct ui_component **out_component);
+ui_error_t ui_scroll_base_get_component(struct ui_scroll_base *scroll,
+                                        struct ui_component **out_component);
 
 /**
  * @brief Binds the data property.
@@ -140,8 +140,8 @@ enum ui_error ui_scroll_base_get_component(struct ui_scroll_base *scroll,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_scroll_base_bind_data(struct ui_scroll_base *widget,
-                                       struct ui_signal *signal);
+ui_error_t ui_scroll_base_bind_data(struct ui_scroll_base *widget,
+                                    struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

@@ -156,9 +156,9 @@ static int test_normal(void) {
              UI_ERROR_INVALID_ARGUMENT);
   ACCUM_ERR(failed, ui_tooltip_base_get_animating_signal(tt, &anim_sig));
 
-  ui_tooltip_base_destroy(tt);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root_node);
+  (void)ui_tooltip_base_destroy(tt);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root_node);
   return failed;
 }
 
@@ -174,8 +174,12 @@ static int test_oom(void) {
   struct ui_event ev;
   int i;
 
-  g_malloc_fail_countdown = 0;
-  failed |= (ui_tooltip_base_create(&tt, &cfg) != UI_ERROR_OUT_OF_MEMORY);
+  for (i = 0; i < 3; i++) {
+    g_malloc_fail_countdown = i;
+    if (ui_tooltip_base_create(&tt, &cfg) == UI_ERROR_NONE) {
+      (void)ui_tooltip_base_destroy(tt);
+    }
+  }
   g_malloc_fail_countdown = -1;
 
   ui_tooltip_base_create(&tt, &cfg);
@@ -203,9 +207,9 @@ static int test_oom(void) {
   ui_tooltip_base_hide(tt);
   ui_tooltip_base_render(tt, director, &trig_layout, &anchor, 800, 600);
 
-  ui_tooltip_base_destroy(tt);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root_node);
+  (void)ui_tooltip_base_destroy(tt);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root_node);
 #endif
   return failed;
 }

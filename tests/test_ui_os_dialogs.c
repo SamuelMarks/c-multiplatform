@@ -69,7 +69,7 @@ static int test_os_dialogs(void) {
 
   ui_thread_pool_destroy(pool);
   ui_reactor_destroy(reactor);
-  ui_color_picker_base_destroy(color_picker);
+  (void)ui_color_picker_base_destroy(color_picker);
   ui_file_uploader_destroy(&uploader);
 
   return 0;

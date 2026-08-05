@@ -11,23 +11,6 @@
 /* MSVC Safe CRT */
 #endif
 
-static const char *ui_toggle_base_default_css =
-    "input { "
-    "background: var(--toggle-bg, transparent); "
-    "border: var(--toggle-border, 1px solid #ccc); "
-    "border-radius: var(--toggle-border-radius, 2px); "
-    "cursor: var(--toggle-cursor, pointer); "
-    "} "
-    "input[aria-checked=\"true\"] { "
-    "background: var(--toggle-checked-bg, #007bff); "
-    "color: var(--toggle-checked-color, #fff); "
-    "} "
-    "input[aria-disabled=\"true\"] { "
-    "background: var(--toggle-disabled-bg, #eee); "
-    "color: var(--toggle-disabled-color, #999); "
-    "cursor: not-allowed; "
-    "}";
-
 /** \brief ui_toggle_base */
 struct ui_toggle_base {
   struct ui_component *component;
@@ -40,9 +23,9 @@ struct ui_toggle_base {
   void *user_data;
 
   /* CVA callbacks */
-  enum ui_error (*cva_on_change)(union ui_signal_payload, void *);
+  ui_error_t (*cva_on_change)(union ui_signal_payload, void *);
   void *cva_on_change_user_data;
-  enum ui_error (*cva_on_touched)(void *);
+  ui_error_t (*cva_on_touched)(void *);
   void *cva_on_touched_user_data;
 
   struct ui_toggle_base *next;
@@ -51,58 +34,49 @@ struct ui_toggle_base {
 
 static struct ui_toggle_base *g_radio_registry = NULL;
 
-static enum ui_error internal_strdup(const char *src, char **out_str) {
-  size_t len;
-  char *copy;
+static ui_error_t update_dom_state(struct ui_toggle_base *toggle) {
+  ui_error_t rc;
 
-  if (!src || !out_str) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
-
-  len = strlen(src);
-  copy = (char *)UI_MALLOC(len + 1);
-  if (!copy) {
-    return UI_ERROR_OUT_OF_MEMORY;
-  }
-
-#if defined(_MSC_VER)
-  strcpy_s(copy, len + 1, src);
-#else
-  strcpy(copy, src);
-#endif
-
-  *out_str = copy;
-  return UI_ERROR_NONE;
-}
-
-static enum ui_error update_dom_state(struct ui_toggle_base *toggle) {
   if (!toggle)
     return UI_ERROR_INVALID_ARGUMENT;
-  if (toggle && toggle->component && toggle->component->shadow_root) {
-#if defined(__EMSCRIPTEN__)
-    ui_web_bridge_set_property(
-        (uint32_t)(uintptr_t)toggle->component->shadow_root, "checked",
-        toggle->checked ? "true" : "false");
-#endif
-    ui_dom_node_set_attribute(toggle->component->shadow_root, "aria-checked",
-                              toggle->checked ? "true" : "false");
 
-    if (toggle->checked) {
-      ui_dom_node_set_attribute(toggle->component->shadow_root, "checked", "");
-    } else {
-      ui_dom_node_remove_attribute(toggle->component->shadow_root, "checked");
+#if defined(__EMSCRIPTEN__)
+  ui_web_bridge_set_property(
+      (uint32_t)(uintptr_t)toggle->component->shadow_root, "checked",
+      toggle->checked ? "true" : "false");
+#endif
+  rc = ui_dom_node_set_attribute(toggle->component->shadow_root, "aria-checked",
+                                 toggle->checked ? "true" : "false");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  if (toggle->checked) {
+    rc = ui_dom_node_set_attribute(toggle->component->shadow_root, "checked",
+                                   "");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  } else {
+    {
+      ui_error_t _ign_rc = ui_dom_node_remove_attribute(
+          toggle->component->shadow_root, "checked");
+      (void)_ign_rc;
     }
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
+static ui_error_t
 enforce_radio_exclusion(struct ui_toggle_base *checked_radio) {
   struct ui_toggle_base *current;
+  ui_error_t rc;
 
   if (!checked_radio || checked_radio->type != UI_TOGGLE_TYPE_RADIO ||
-      !checked_radio->group_name || !checked_radio->checked) {
+      !checked_radio->checked) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  if (!checked_radio->group_name) {
+    return UI_ERROR_NONE;
   }
 
   current = g_radio_registry;
@@ -112,9 +86,14 @@ enforce_radio_exclusion(struct ui_toggle_base *checked_radio) {
       if (strcmp(current->group_name, checked_radio->group_name) == 0 &&
           current->checked) {
         current->checked = 0;
-        (void)update_dom_state(current);
+        rc = update_dom_state(current);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
         if (current->on_change) {
-          current->on_change(current, 0, current->user_data);
+          rc = current->on_change(current, 0, current->user_data);
+          if (rc != UI_ERROR_NONE)
+            return rc;
         }
       }
     }
@@ -123,17 +102,18 @@ enforce_radio_exclusion(struct ui_toggle_base *checked_radio) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_toggle_base_create(enum ui_toggle_type type,
-                                    struct ui_toggle_base **out_toggle) {
+ui_error_t ui_toggle_base_create(enum ui_toggle_type type,
+                                 struct ui_toggle_base **out_toggle) {
   struct ui_toggle_base *toggle;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
 
   if (!out_toggle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  toggle = (struct ui_toggle_base *)UI_MALLOC(sizeof(struct ui_toggle_base));
+  toggle = (struct ui_toggle_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_toggle_base));
   if (!toggle) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -215,19 +195,19 @@ enum ui_error ui_toggle_base_create(enum ui_toggle_type type,
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (toggle->gesture_recognizer) {
-    ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
   }
   if (toggle->component) {
-    ui_component_destroy(toggle->component);
+    (void)ui_component_destroy(toggle->component);
   }
-  UI_FREE(toggle);
+  C_MULTIPLATFORM_FREE(toggle);
   return rc;
 }
 
-enum ui_error ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
+ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
   if (!toggle) {
     return UI_ERROR_NONE;
   }
@@ -244,22 +224,22 @@ enum ui_error ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
   }
 
   if (toggle->group_name) {
-    UI_FREE(toggle->group_name);
+    C_MULTIPLATFORM_FREE(toggle->group_name);
   }
   if (toggle->gesture_recognizer) {
-    ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
   }
   if (toggle->component) {
-    ui_component_destroy(toggle->component);
+    (void)ui_component_destroy(toggle->component);
   }
 
-  UI_FREE(toggle);
+  C_MULTIPLATFORM_FREE(toggle);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
-                                          int disabled) {
-  enum ui_error rc;
+ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
+                                       int disabled) {
+  ui_error_t rc;
 
   if (!toggle) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -289,10 +269,13 @@ enum ui_error ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
       if (rc != UI_ERROR_NONE)
         return rc;
 
-      rc = ui_dom_node_remove_attribute(toggle->component->shadow_root,
-                                        "disabled");
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      {
+
+        ui_error_t _ign_rc = ui_dom_node_remove_attribute(
+            toggle->component->shadow_root, "disabled");
+
+        (void)_ign_rc;
+      }
 
       rc = ui_dom_node_set_attribute(toggle->component->shadow_root, "tabindex",
                                      "0");
@@ -304,8 +287,8 @@ enum ui_error ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
-                                        int *out_is_checked) {
+ui_error_t ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
+                                     int *out_is_checked) {
   if (!toggle || !out_is_checked) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -313,8 +296,10 @@ enum ui_error ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
-                                         int checked) {
+ui_error_t ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
+                                      int checked) {
+  ui_error_t rc;
+
   if (!toggle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -322,30 +307,38 @@ enum ui_error ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
   /* Radio buttons typically cannot be unchecked by user interaction, but can be
    * programmatically */
   toggle->checked = checked;
-  (void)update_dom_state(toggle);
+  rc = update_dom_state(toggle);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (checked && toggle->type == UI_TOGGLE_TYPE_RADIO) {
-    (void)enforce_radio_exclusion(toggle);
+    rc = enforce_radio_exclusion(toggle);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
-                                            const char *group_name) {
-  enum ui_error rc;
+ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
+                                         const char *group_name) {
+  ui_error_t rc;
 
   if (!toggle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (toggle->group_name) {
-    UI_FREE(toggle->group_name);
+    C_MULTIPLATFORM_FREE(toggle->group_name);
     toggle->group_name = NULL;
   }
 
   if (group_name) {
-    rc = internal_strdup(group_name, &toggle->group_name);
+    rc = ((toggle->group_name = C_MULTIPLATFORM_STRDUP(group_name))
+              ? UI_ERROR_NONE
+              : UI_ERROR_OUT_OF_MEMORY);
     if (rc != UI_ERROR_NONE) {
       return rc;
     }
@@ -359,9 +352,10 @@ enum ui_error ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
     }
   } else {
     if (toggle->component && toggle->component->shadow_root) {
-      rc = ui_dom_node_remove_attribute(toggle->component->shadow_root, "name");
-      if (rc != UI_ERROR_NONE) {
-        return rc;
+      {
+        ui_error_t _ign_rc = ui_dom_node_remove_attribute(
+            toggle->component->shadow_root, "name");
+        (void)_ign_rc;
       }
     }
   }
@@ -369,15 +363,18 @@ enum ui_error ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
   /* Re-evaluate exclusion if we just joined a group and are already checked */
   if (toggle->checked && toggle->type == UI_TOGGLE_TYPE_RADIO &&
       toggle->group_name) {
-    (void)enforce_radio_exclusion(toggle);
+    rc = enforce_radio_exclusion(toggle);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_toggle_base_set_on_change(struct ui_toggle_base *toggle,
-                                           ui_toggle_on_change_t on_change,
-                                           void *user_data) {
+ui_error_t ui_toggle_base_set_on_change(struct ui_toggle_base *toggle,
+                                        ui_toggle_on_change_t on_change,
+                                        void *user_data) {
   if (!toggle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -387,12 +384,11 @@ enum ui_error ui_toggle_base_set_on_change(struct ui_toggle_base *toggle,
 
   return UI_ERROR_NONE;
 }
-
-enum ui_error ui_toggle_base_process_event(struct ui_toggle_base *toggle,
-                                           const struct ui_event *event,
-                                           double timestamp_ms) {
+ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
+                                        const struct ui_event *event,
+                                        double timestamp_ms) {
   struct ui_gesture_event gesture_evt;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!toggle || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -402,10 +398,12 @@ enum ui_error ui_toggle_base_process_event(struct ui_toggle_base *toggle,
     return UI_ERROR_NONE;
   }
 
-  rc = ui_gesture_recognizer_process_event(toggle->gesture_recognizer, event,
-                                           timestamp_ms, &gesture_evt);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+
+    ui_error_t _ign_rc = ui_gesture_recognizer_process_event(
+        toggle->gesture_recognizer, event, timestamp_ms, &gesture_evt);
+
+    (void)_ign_rc;
   }
 
   if (gesture_evt.type == UI_GESTURE_TAP &&
@@ -423,24 +421,38 @@ enum ui_error ui_toggle_base_process_event(struct ui_toggle_base *toggle,
 
     if (new_checked != toggle->checked) {
       toggle->checked = new_checked;
-      (void)update_dom_state(toggle);
+      rc = update_dom_state(toggle);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
 
       if (toggle->checked && toggle->type == UI_TOGGLE_TYPE_RADIO) {
-        (void)enforce_radio_exclusion(toggle);
+        rc = enforce_radio_exclusion(toggle);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
       }
 
       if (toggle->on_change) {
-        toggle->on_change(toggle, toggle->checked, toggle->user_data);
+        rc = toggle->on_change(toggle, toggle->checked, toggle->user_data);
+        if (rc != UI_ERROR_NONE)
+          return rc;
       }
       if (toggle->cva_on_change) {
         union ui_signal_payload payload;
         payload.int_val = toggle->checked;
-        (void)toggle->cva_on_change(payload, toggle->cva_on_change_user_data);
+        rc = toggle->cva_on_change(payload, toggle->cva_on_change_user_data);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
       }
     }
 
     if (toggle->cva_on_touched) {
-      (void)toggle->cva_on_touched(toggle->cva_on_touched_user_data);
+      rc = toggle->cva_on_touched(toggle->cva_on_touched_user_data);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
     }
   }
 
@@ -448,9 +460,8 @@ enum ui_error ui_toggle_base_process_event(struct ui_toggle_base *toggle,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_toggle_base_get_component(struct ui_toggle_base *toggle,
-                             struct ui_component **out_component) {
+ui_error_t ui_toggle_base_get_component(struct ui_toggle_base *toggle,
+                                        struct ui_component **out_component) {
   if (!toggle || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -458,15 +469,15 @@ ui_toggle_base_get_component(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error toggle_cva_write_value(void *component,
-                                            union ui_signal_payload value) {
+static ui_error_t toggle_cva_write_value(void *component,
+                                         union ui_signal_payload value) {
   struct ui_toggle_base *toggle = (struct ui_toggle_base *)component;
   return ui_toggle_base_set_checked(toggle, value.int_val);
 }
 
 /** \brief toggle_cva_register_on_change */
-static enum ui_error toggle_cva_register_on_change(
-    void *component, enum ui_error (*callback)(union ui_signal_payload, void *),
+static ui_error_t toggle_cva_register_on_change(
+    void *component, ui_error_t (*callback)(union ui_signal_payload, void *),
     void *user_data) {
   struct ui_toggle_base *toggle = (struct ui_toggle_base *)component;
   if (!toggle) {
@@ -478,8 +489,9 @@ static enum ui_error toggle_cva_register_on_change(
 }
 
 /** \brief toggle_cva_register_on_touched */
-static enum ui_error toggle_cva_register_on_touched(
-    void *component, enum ui_error (*callback)(void *), void *user_data) {
+static ui_error_t toggle_cva_register_on_touched(void *component,
+                                                 ui_error_t (*callback)(void *),
+                                                 void *user_data) {
   struct ui_toggle_base *toggle = (struct ui_toggle_base *)component;
   if (!toggle) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -489,16 +501,15 @@ static enum ui_error toggle_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error toggle_cva_set_disabled_state(void *component,
-                                                   ui_bool_t is_disabled) {
+static ui_error_t toggle_cva_set_disabled_state(void *component,
+                                                ui_bool_t is_disabled) {
   struct ui_toggle_base *toggle = (struct ui_toggle_base *)component;
   return ui_toggle_base_set_disabled(toggle, (int)is_disabled);
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_toggle_base_get_cva(struct ui_toggle_base *toggle,
-                       struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_toggle_base_get_cva(struct ui_toggle_base *toggle,
+                                  struct ui_control_value_accessor *out_cva) {
   if (!toggle || !out_cva) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

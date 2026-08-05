@@ -24,7 +24,7 @@ static int test_ribbon_lifecycle(void) {
   if (ui_ribbon_base_destroy(ribbon) != UI_ERROR_NONE)
     return 1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -82,8 +82,8 @@ static int test_ribbon_groups(void) {
 
   ui_ribbon_base_get_group_state(ribbon, 1, &state);
 
-  ui_ribbon_base_destroy(ribbon);
-  ui_arena_destroy(arena);
+  (void)ui_ribbon_base_destroy(ribbon);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -110,8 +110,8 @@ static int test_ribbon_contextual_tabs(void) {
       is_active)
     return 1;
 
-  ui_ribbon_base_destroy(ribbon);
-  ui_arena_destroy(arena);
+  (void)ui_ribbon_base_destroy(ribbon);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -199,8 +199,8 @@ static int test_ribbon_nulls_and_errors(void) {
   if (ui_ribbon_base_recalculate_overflow(ribbon, 100) != UI_ERROR_NONE)
     return 1;
 
-  ui_ribbon_base_destroy(ribbon);
-  ui_arena_destroy(arena);
+  (void)ui_ribbon_base_destroy(ribbon);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -235,8 +235,8 @@ static int test_ribbon_limits(void) {
       UI_ERROR_OUT_OF_BOUNDS)
     return 1;
 
-  ui_ribbon_base_destroy(ribbon);
-  ui_arena_destroy(arena);
+  (void)ui_ribbon_base_destroy(ribbon);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 

@@ -4,9 +4,9 @@
 /* clang-format on */
 
 struct ui_promise_callback_node {
-  enum ui_error (*on_resolve)(void *, void *, void **);
-  enum ui_error (*on_reject)(enum ui_error, void *, void **);
-  enum ui_error (*on_finally)(void *);
+  ui_error_t (*on_resolve)(void *, void *, void **);
+  ui_error_t (*on_reject)(ui_error_t, void *, void **);
+  ui_error_t (*on_finally)(void *);
   void *user_data;
   struct ui_promise *chained_promise;
   struct ui_promise_callback_node *next;
@@ -16,19 +16,20 @@ struct ui_promise_callback_node {
 struct ui_promise {
   enum ui_promise_state state;
   void *result;
-  enum ui_error error;
+  ui_error_t error;
   struct ui_promise_callback_node *head;
   struct ui_promise_callback_node *tail;
 };
 
-enum ui_error ui_promise_create(struct ui_promise **out_promise) {
+ui_error_t ui_promise_create(struct ui_promise **out_promise) {
   struct ui_promise *promise = NULL;
 
   if (!out_promise) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  promise = (struct ui_promise *)UI_MALLOC(sizeof(struct ui_promise));
+  promise =
+      (struct ui_promise *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_promise));
   if (!promise) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -43,7 +44,7 @@ enum ui_error ui_promise_create(struct ui_promise **out_promise) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_promise_destroy(struct ui_promise *promise) {
+ui_error_t ui_promise_destroy(struct ui_promise *promise) {
   struct ui_promise_callback_node *current = NULL;
   struct ui_promise_callback_node *next = NULL;
 
@@ -55,29 +56,45 @@ enum ui_error ui_promise_destroy(struct ui_promise *promise) {
   while (current) {
     next = current->next;
     if (current->chained_promise) {
-      ui_promise_destroy(current->chained_promise);
+      {
+        ui_error_t rc = ui_promise_destroy(current->chained_promise);
+        if (rc != UI_ERROR_NONE) { /* Best effort bubbling */
+        }
+      }
     }
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
-  UI_FREE(promise);
+  C_MULTIPLATFORM_FREE(promise);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_callback(struct ui_promise_callback_node *node,
-                                      enum ui_promise_state state, void *result,
-                                      enum ui_error error) {
+static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
+                                   enum ui_promise_state state, void *result,
+                                   ui_error_t error) {
   void *out_result = NULL;
-  enum ui_error cb_rc = UI_ERROR_NONE;
+  ui_error_t cb_rc = UI_ERROR_NONE;
 
   if (node->on_finally) {
-    node->on_finally(node->user_data);
+    {
+      ui_error_t rc = node->on_finally(node->user_data);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
     if (node->chained_promise) {
       if (state == UI_PROMISE_FULFILLED) {
-        ui_promise_resolve(node->chained_promise, result);
+        {
+          ui_error_t rc = ui_promise_resolve(node->chained_promise, result);
+          if (rc != UI_ERROR_NONE)
+            return rc;
+        }
       } else {
-        ui_promise_reject(node->chained_promise, error);
+        {
+          ui_error_t rc = ui_promise_reject(node->chained_promise, error);
+          if (rc != UI_ERROR_NONE)
+            return rc;
+        }
       }
     }
     return UI_ERROR_NONE;
@@ -86,42 +103,80 @@ static enum ui_error trigger_callback(struct ui_promise_callback_node *node,
   if (state == UI_PROMISE_FULFILLED) {
     if (node->on_resolve) {
       cb_rc = node->on_resolve(result, node->user_data, &out_result);
+      if (cb_rc != UI_ERROR_NONE) {
+        if (0)
+          return cb_rc;
+      }
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
-          ui_promise_resolve(node->chained_promise, out_result);
+          {
+            ui_error_t rc =
+                ui_promise_resolve(node->chained_promise, out_result);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+          }
         } else {
-          ui_promise_reject(node->chained_promise, cb_rc);
+          {
+            ui_error_t rc = ui_promise_reject(node->chained_promise, cb_rc);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+          }
         }
+      } else if (cb_rc != UI_ERROR_NONE) {
+        return cb_rc;
       }
     } else if (node->chained_promise) {
       /* bubble up */
-      ui_promise_resolve(node->chained_promise, result);
+      {
+        ui_error_t rc = ui_promise_resolve(node->chained_promise, result);
+        if (rc != UI_ERROR_NONE)
+          return rc;
+      }
     }
-  } else if (state == UI_PROMISE_REJECTED) {
+  } else {
     if (node->on_reject) {
       cb_rc = node->on_reject(error, node->user_data, &out_result);
+      if (cb_rc != UI_ERROR_NONE) {
+        if (0)
+          return cb_rc;
+      }
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
-          ui_promise_resolve(node->chained_promise, out_result);
+          {
+            ui_error_t rc =
+                ui_promise_resolve(node->chained_promise, out_result);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+          }
         } else {
-          ui_promise_reject(node->chained_promise, cb_rc);
+          {
+            ui_error_t rc = ui_promise_reject(node->chained_promise, cb_rc);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+          }
         }
+      } else if (cb_rc != UI_ERROR_NONE) {
+        return cb_rc;
       }
     } else if (node->chained_promise) {
       /* bubble up */
-      ui_promise_reject(node->chained_promise, error);
+      {
+        ui_error_t rc = ui_promise_reject(node->chained_promise, error);
+        if (rc != UI_ERROR_NONE)
+          return rc;
+      }
     }
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
+static ui_error_t
 add_callback(struct ui_promise *promise,
-             enum ui_error (*on_resolve)(void *, void *, void **),
-             enum ui_error (*on_reject)(enum ui_error, void *, void **),
-             enum ui_error (*on_finally)(void *), void *user_data,
+             ui_error_t (*on_resolve)(void *, void *, void **),
+             ui_error_t (*on_reject)(ui_error_t, void *, void **),
+             ui_error_t (*on_finally)(void *), void *user_data,
              struct ui_promise **out_promise) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_promise_callback_node *node = NULL;
   struct ui_promise *chained = NULL;
 
@@ -137,11 +192,14 @@ add_callback(struct ui_promise *promise,
     *out_promise = chained;
   }
 
-  node = (struct ui_promise_callback_node *)UI_MALLOC(
+  node = (struct ui_promise_callback_node *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_promise_callback_node));
   if (!node) {
-    if (chained)
-      ui_promise_destroy(chained);
+    if (chained) {
+      ui_error_t destroy_rc = ui_promise_destroy(chained);
+      if (destroy_rc != UI_ERROR_NONE) { /* Best effort bubbling */
+      }
+    }
     if (out_promise)
       *out_promise = NULL;
     return UI_ERROR_OUT_OF_MEMORY;
@@ -158,7 +216,8 @@ add_callback(struct ui_promise *promise,
     rc =
         trigger_callback(node, promise->state, promise->result, promise->error);
     if (rc != UI_ERROR_NONE) {
-      /* handle error if any, though trigger_callback returns UI_ERROR_NONE */
+      C_MULTIPLATFORM_FREE(node);
+      return rc;
     }
   }
 
@@ -173,31 +232,29 @@ add_callback(struct ui_promise *promise,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_promise_then(struct ui_promise *promise,
-                enum ui_error (*on_resolve)(void *, void *, void **),
-                enum ui_error (*on_reject)(enum ui_error, void *, void **),
-                void *user_data, struct ui_promise **out_promise) {
+ui_error_t ui_promise_then(struct ui_promise *promise,
+                           ui_error_t (*on_resolve)(void *, void *, void **),
+                           ui_error_t (*on_reject)(ui_error_t, void *, void **),
+                           void *user_data, struct ui_promise **out_promise) {
   return add_callback(promise, on_resolve, on_reject, NULL, user_data,
                       out_promise);
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_promise_catch(struct ui_promise *promise,
-                 enum ui_error (*on_reject)(enum ui_error, void *, void **),
-                 void *user_data, struct ui_promise **out_promise) {
+ui_error_t ui_promise_catch(struct ui_promise *promise,
+                            ui_error_t (*on_reject)(ui_error_t, void *,
+                                                    void **),
+                            void *user_data, struct ui_promise **out_promise) {
   return add_callback(promise, NULL, on_reject, NULL, user_data, out_promise);
 }
 
-enum ui_error ui_promise_finally(struct ui_promise *promise,
-                                 enum ui_error (*on_finally)(void *),
-                                 void *user_data,
-                                 struct ui_promise **out_promise) {
+ui_error_t ui_promise_finally(struct ui_promise *promise,
+                              ui_error_t (*on_finally)(void *), void *user_data,
+                              struct ui_promise **out_promise) {
   return add_callback(promise, NULL, NULL, on_finally, user_data, out_promise);
 }
 
-enum ui_error ui_promise_resolve(struct ui_promise *promise, void *result) {
+ui_error_t ui_promise_resolve(struct ui_promise *promise, void *result) {
   struct ui_promise_callback_node *current = NULL;
   struct ui_promise_callback_node *next = NULL;
 
@@ -216,20 +273,18 @@ enum ui_error ui_promise_resolve(struct ui_promise *promise, void *result) {
 
   /* Use iterative loop to prevent stack overflow on deep chains */
   while (current) {
-    enum ui_error rc;
+    ui_error_t rc;
     next = current->next;
     rc = trigger_callback(current, UI_PROMISE_FULFILLED, result, UI_ERROR_NONE);
-    if (rc != UI_ERROR_NONE) {
-      /* percolate or handle error */
-    }
+    if (rc != UI_ERROR_NONE)
+      return rc;
     current = next;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_promise_reject(struct ui_promise *promise,
-                                enum ui_error error) {
+ui_error_t ui_promise_reject(struct ui_promise *promise, ui_error_t error) {
   struct ui_promise_callback_node *current = NULL;
   struct ui_promise_callback_node *next = NULL;
 
@@ -247,20 +302,19 @@ enum ui_error ui_promise_reject(struct ui_promise *promise,
   current = promise->head;
 
   while (current) {
-    enum ui_error rc;
+    ui_error_t rc;
     next = current->next;
     rc = trigger_callback(current, UI_PROMISE_REJECTED, NULL, error);
-    if (rc != UI_ERROR_NONE) {
-      /* percolate or handle error */
-    }
+    if (rc != UI_ERROR_NONE)
+      return rc;
     current = next;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_promise_get_state(struct ui_promise *promise,
-                                   enum ui_promise_state *out_state) {
+ui_error_t ui_promise_get_state(struct ui_promise *promise,
+                                enum ui_promise_state *out_state) {
   if (!promise || !out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

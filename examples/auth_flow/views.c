@@ -50,27 +50,41 @@ struct app_state {
  * @param button The submit button instance.
  * @param user_data Application state context.
  */
-static enum ui_error on_login_submit(struct ui_button_base *button,
-                                     void *user_data) {
+static ui_error_t on_login_submit(struct ui_button_base *button,
+                                  void *user_data) {
   const char *locale = NULL;
   struct app_state *state = (struct app_state *)user_data;
   const char *user = "";
   const char *pass = "";
-  ui_input_base_get_text(state->input_username, &user);
+  ui_error_t err;
 
-  ui_i18n_get_locale(state->i18n, &locale);
-  ui_input_base_get_text(state->input_password, &pass);
+  err = ui_input_base_get_text(state->input_username, &user);
+  if (err != UI_ERROR_NONE)
+    return err;
+
+  err = ui_i18n_get_locale(state->i18n, &locale);
+  if (err != UI_ERROR_NONE)
+    return err;
+
+  err = ui_input_base_get_text(state->input_password, &pass);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   (void)button;
 
-  enum ui_error err;
   err = mock_login((void *)state, user ? user : "", pass ? pass : "");
   if (err == UI_ERROR_NONE) {
-    ui_router_navigate(state->router, "/secrets");
+    ui_error_t nav_err = ui_router_navigate(state->router, "/secrets");
+    if (nav_err != UI_ERROR_NONE)
+      return nav_err;
+    return err;
   } else {
-    ui_router_navigate(state->router, "/login"); /* Force refresh for now */
+    ui_error_t nav_err =
+        ui_router_navigate(state->router, "/login"); /* Force refresh for now */
+    if (nav_err != UI_ERROR_NONE)
+      return nav_err;
+    return err;
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -78,27 +92,41 @@ static enum ui_error on_login_submit(struct ui_button_base *button,
  * @param button The submit button instance.
  * @param user_data Application state context.
  */
-static enum ui_error on_signup_submit(struct ui_button_base *button,
-                                      void *user_data) {
+static ui_error_t on_signup_submit(struct ui_button_base *button,
+                                   void *user_data) {
   const char *locale = NULL;
   struct app_state *state = (struct app_state *)user_data;
   const char *user = "";
   const char *pass = "";
-  ui_input_base_get_text(state->input_username, &user);
+  ui_error_t err;
 
-  ui_i18n_get_locale(state->i18n, &locale);
-  ui_input_base_get_text(state->input_password, &pass);
+  err = ui_input_base_get_text(state->input_username, &user);
+  if (err != UI_ERROR_NONE)
+    return err;
+
+  err = ui_i18n_get_locale(state->i18n, &locale);
+  if (err != UI_ERROR_NONE)
+    return err;
+
+  err = ui_input_base_get_text(state->input_password, &pass);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   (void)button;
 
-  enum ui_error err;
   err = mock_signup((void *)state, user ? user : "", pass ? pass : "");
   if (err == UI_ERROR_NONE) {
-    ui_router_navigate(state->router, "/secrets");
+    ui_error_t nav_err = ui_router_navigate(state->router, "/secrets");
+    if (nav_err != UI_ERROR_NONE)
+      return nav_err;
+    return err;
   } else {
-    ui_router_navigate(state->router, "/signup"); /* Force refresh for now */
+    ui_error_t nav_err = ui_router_navigate(
+        state->router, "/signup"); /* Force refresh for now */
+    if (nav_err != UI_ERROR_NONE)
+      return nav_err;
+    return err;
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -106,32 +134,46 @@ static enum ui_error on_signup_submit(struct ui_button_base *button,
  * @param button The logout button instance.
  * @param user_data Application state context.
  */
-static enum ui_error on_logout(struct ui_button_base *button, void *user_data) {
+static ui_error_t on_logout(struct ui_button_base *button, void *user_data) {
   const char *locale = NULL;
   struct app_state *state = (struct app_state *)user_data;
+  ui_error_t err;
   (void)button;
 
-  ui_i18n_get_locale(state->i18n, &locale);
-  mock_logout((void *)state);
-  ui_router_navigate(state->router, "/login");
+  err = ui_i18n_get_locale(state->i18n, &locale);
+  if (err != UI_ERROR_NONE)
+    return err;
+
+  err = mock_logout((void *)state);
+  if (err != UI_ERROR_NONE)
+    return err;
+
+  err = ui_router_navigate(state->router, "/login");
+  if (err != UI_ERROR_NONE)
+    return err;
   return UI_ERROR_NONE;
 }
 
-enum ui_error auth_container_factory(const struct ui_route_request *req,
-                                     void *user_data,
-                                     struct ui_component **out_screen) {
+ui_error_t auth_container_factory(const struct ui_route_request *req,
+                                  void *user_data,
+                                  struct ui_component **out_screen) {
   struct ui_component *comp;
   struct ui_dom_node *root, *tablist, *tab_login, *tab_signup, *content, *form,
       *lbl_user, *host_user, *lbl_pass, *host_pass, *host_submit, *err_msg;
   const char *path = NULL;
+  ui_error_t err;
 
-  ui_route_request_get_path(req, &path);
+  err = ui_route_request_get_path(req, &path);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   const char *locale = NULL;
   struct app_state *state = (struct app_state *)user_data;
   int is_signup = 0;
 
-  ui_i18n_get_locale(state->i18n, &locale);
+  err = ui_i18n_get_locale(state->i18n, &locale);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   if (state->is_authenticated) {
     /* Need to defer navigation, returning empty node for now */
@@ -141,7 +183,6 @@ enum ui_error auth_container_factory(const struct ui_route_request *req,
     is_signup = 1;
   }
 
-  enum ui_error err;
   err = ui_component_create(&comp);
   if (err != UI_ERROR_NONE)
     return err;
@@ -363,7 +404,10 @@ enum ui_error auth_container_factory(const struct ui_route_request *req,
     err = ui_dom_node_set_attribute(tab_login, "aria-selected", "false");
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
-    ui_button_base_set_on_click(state->btn_submit, on_signup_submit, state);
+    err =
+        ui_button_base_set_on_click(state->btn_submit, on_signup_submit, state);
+    if (err != UI_ERROR_NONE)
+      goto cleanup_comp;
     const char *btn_submit_signup_str = NULL;
     err = get_translated_string(locale, "btn_submit_signup",
                                 &btn_submit_signup_str);
@@ -379,7 +423,10 @@ enum ui_error auth_container_factory(const struct ui_route_request *req,
     err = ui_dom_node_set_attribute(tab_signup, "aria-selected", "false");
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
-    ui_button_base_set_on_click(state->btn_submit, on_login_submit, state);
+    err =
+        ui_button_base_set_on_click(state->btn_submit, on_login_submit, state);
+    if (err != UI_ERROR_NONE)
+      goto cleanup_comp;
     const char *btn_submit_login_str = NULL;
     err = get_translated_string(locale, "btn_submit_login",
                                 &btn_submit_login_str);
@@ -434,22 +481,25 @@ cleanup_comp:
   return err;
 }
 
-enum ui_error secrets_view_factory(const struct ui_route_request *req,
-                                   void *user_data,
-                                   struct ui_component **out_screen) {
+ui_error_t secrets_view_factory(const struct ui_route_request *req,
+                                void *user_data,
+                                struct ui_component **out_screen) {
   struct ui_component *comp;
   struct ui_dom_node *root, *msg, *host_logout;
 
   const char *locale = NULL;
   struct app_state *state = (struct app_state *)user_data;
   char welcome_msg[256];
-  ui_i18n_get_locale(state->i18n, &locale);
+  ui_error_t err;
+
+  err = ui_i18n_get_locale(state->i18n, &locale);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   if (!state->is_authenticated) {
     /* Route guard failed */
   }
 
-  enum ui_error err;
   err = ui_component_create(&comp);
   if (err != UI_ERROR_NONE)
     return err;
@@ -510,7 +560,9 @@ enum ui_error secrets_view_factory(const struct ui_route_request *req,
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
   }
-  ui_button_base_set_on_click(state->btn_logout, on_logout, state);
+  err = ui_button_base_set_on_click(state->btn_logout, on_logout, state);
+  if (err != UI_ERROR_NONE)
+    goto cleanup_comp;
   {
     struct ui_component *tmp_comp;
     err = ui_button_base_get_component(state->btn_logout, &tmp_comp);

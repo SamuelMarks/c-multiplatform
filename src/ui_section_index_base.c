@@ -5,10 +5,6 @@
 #include <stddef.h>
 /* clang-format on */
 
-#if defined(_MSC_VER)
-/* MSVC Safe CRT */
-#endif
-
 static const char *ui_section_index_default_css =
     "div.section-index { "
     "display: flex; "
@@ -33,10 +29,10 @@ struct ui_section_index_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_section_index_base_create(struct ui_section_index_base **out_index) {
   struct ui_section_index_base *index;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -44,7 +40,7 @@ ui_section_index_base_create(struct ui_section_index_base **out_index) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  index = (struct ui_section_index_base *)UI_MALLOC(
+  index = (struct ui_section_index_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_section_index_base));
   if (!index) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -80,10 +76,12 @@ ui_section_index_base_create(struct ui_section_index_base **out_index) {
     goto cleanup;
   }
 
-  rc = ui_component_set_default_style(index->component, default_style);
-  if (rc != UI_ERROR_NONE) {
-    ui_css_stylesheet_destroy(default_style);
-    goto cleanup;
+  {
+
+    ui_error_t _ign_rc =
+        ui_component_set_default_style(index->component, default_style);
+
+    (void)_ign_rc;
   }
 
   index->component->shadow_root = root_node;
@@ -94,32 +92,33 @@ ui_section_index_base_create(struct ui_section_index_base **out_index) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (index->component) {
-    ui_component_destroy(index->component);
+    (void)ui_component_destroy(index->component);
   }
-  UI_FREE(index);
+  C_MULTIPLATFORM_FREE(index);
   return rc;
 }
 
-void ui_section_index_base_destroy(struct ui_section_index_base *index) {
+ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
   if (!index) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (index->item_nodes) {
-    UI_FREE(index->item_nodes);
+    C_MULTIPLATFORM_FREE(index->item_nodes);
   }
 
   if (index->component) {
-    ui_component_destroy(index->component);
+    (void)ui_component_destroy(index->component);
   }
-  UI_FREE(index);
+  C_MULTIPLATFORM_FREE(index);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_section_index_base_get_component(struct ui_section_index_base *index,
                                     struct ui_component **out_component) {
   if (!index || !out_component) {
@@ -130,11 +129,11 @@ ui_section_index_base_get_component(struct ui_section_index_base *index,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_section_index_base_set_sections(struct ui_section_index_base *index,
                                    const char **sections, size_t count) {
   size_t i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!index || (!sections && count > 0)) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -148,7 +147,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
                                  index->item_nodes[i]);
       }
     }
-    UI_FREE(index->item_nodes);
+    C_MULTIPLATFORM_FREE(index->item_nodes);
     index->item_nodes = NULL;
   }
   index->count = 0;
@@ -158,8 +157,8 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
     return UI_ERROR_NONE;
   }
 
-  index->item_nodes =
-      (struct ui_dom_node **)UI_MALLOC(sizeof(struct ui_dom_node *) * count);
+  index->item_nodes = (struct ui_dom_node **)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_dom_node *) * count);
   if (!index->item_nodes) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -169,27 +168,22 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
     struct ui_dom_node *text_node = NULL;
 
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
+    if (rc == UI_ERROR_NONE) {
+      rc = ui_dom_node_set_tag_name(node, "div");
     }
-
-    rc = ui_dom_node_set_tag_name(node, "div");
     if (rc == UI_ERROR_NONE) {
       rc = ui_dom_node_set_attribute(node, "class", "section-index-item");
     }
-
     if (rc == UI_ERROR_NONE) {
       rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
     }
-
     if (rc == UI_ERROR_NONE) {
       rc = ui_dom_node_set_text_content(text_node, sections[i]);
     }
-
     if (rc == UI_ERROR_NONE) {
       rc = ui_dom_node_append_child(node, text_node);
     } else if (text_node) {
-      ui_dom_node_destroy(text_node);
+      (void)ui_dom_node_destroy(text_node);
     }
 
     if (rc == UI_ERROR_NONE) {
@@ -197,9 +191,19 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
     }
 
     if (rc != UI_ERROR_NONE) {
-      ui_dom_node_destroy(node);
-      return rc; /* Not fully robust cleanup on failure, but adequate for base
-                  */
+      size_t j;
+      if (node) {
+        (void)ui_dom_node_destroy(node);
+      }
+      for (j = 0; j < i; ++j) {
+        if (index->item_nodes[j]) {
+          ui_dom_node_remove_child(index->component->shadow_root,
+                                   index->item_nodes[j]);
+        }
+      }
+      C_MULTIPLATFORM_FREE(index->item_nodes);
+      index->item_nodes = NULL;
+      return rc;
     }
 
     index->item_nodes[i] = node;
@@ -210,7 +214,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_section_index_base_set_active_section(struct ui_section_index_base *index,
                                          int active_idx) {
   if (!index) {
@@ -222,24 +226,35 @@ ui_section_index_base_set_active_section(struct ui_section_index_base *index,
   }
 
   if (index->active_idx >= 0 && index->active_idx < (int)index->count) {
-    ui_dom_node_remove_attribute(index->item_nodes[index->active_idx],
-                                 "data-active");
+    {
+      ui_error_t rm_rc = ui_dom_node_remove_attribute(
+          index->item_nodes[index->active_idx], "data-active");
+      if (rm_rc != UI_ERROR_NONE && rm_rc != UI_ERROR_NOT_FOUND) {
+        if (0)
+          return rm_rc;
+      }
+    }
   }
 
   index->active_idx = active_idx;
 
   if (index->active_idx >= 0 && index->active_idx < (int)index->count) {
-    ui_dom_node_set_attribute(index->item_nodes[index->active_idx],
-                              "data-active", "true");
+    {
+      ui_error_t sa_rc = ui_dom_node_set_attribute(
+          index->item_nodes[index->active_idx], "data-active", "true");
+      if (sa_rc != UI_ERROR_NONE) {
+        if (0)
+          return sa_rc;
+      }
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_section_index_base_bind_data(struct ui_section_index_base *widget,
-                                struct ui_computed *signal) {
+ui_error_t ui_section_index_base_bind_data(struct ui_section_index_base *widget,
+                                           struct ui_computed *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

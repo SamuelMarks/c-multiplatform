@@ -18,7 +18,7 @@ extern int g_malloc_fail_countdown;
 static int test_window_manager_creation(void) {
   struct ui_window_manager_base *wm = NULL;
   struct ui_component *comp = NULL;
-  enum ui_error rc = ui_window_manager_base_create(&wm);
+  ui_error_t rc = ui_window_manager_base_create(&wm);
   int failed = 0;
   CHECK_FAIL(rc != UI_ERROR_NONE);
   CHECK_FAIL(wm == NULL);
@@ -26,13 +26,13 @@ static int test_window_manager_creation(void) {
   CHECK_FAIL(ui_window_manager_base_get_component(wm, &comp) != UI_ERROR_NONE);
   CHECK_FAIL(comp == NULL);
 
-  ui_window_manager_base_destroy(wm);
+  (void)ui_window_manager_base_destroy(wm);
   return failed;
 }
 
 static int test_window_manager_operations(void) {
   struct ui_window_manager_base *wm = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   rc = ui_window_manager_base_create(&wm);
@@ -44,7 +44,7 @@ static int test_window_manager_operations(void) {
   rc = ui_window_manager_base_drag(wm, 1, 10.0f, 20.0f);
   CHECK_FAIL(rc != UI_ERROR_NONE);
 
-  ui_window_manager_base_destroy(wm);
+  (void)ui_window_manager_base_destroy(wm);
   return failed;
 }
 
@@ -55,7 +55,7 @@ static int test_invalid_args(void) {
 
   CHECK_FAIL(ui_window_manager_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT);
 
-  ui_window_manager_base_destroy(NULL);
+  (void)ui_window_manager_base_destroy(NULL);
 
   CHECK_FAIL(ui_window_manager_base_get_component(NULL, &comp) !=
              UI_ERROR_INVALID_ARGUMENT);
@@ -76,7 +76,7 @@ static int test_invalid_args(void) {
              UI_ERROR_INVALID_ARGUMENT);
   CHECK_FAIL(ui_window_manager_base_bind_data(wm, NULL) != UI_ERROR_NONE);
 
-  ui_window_manager_base_destroy(wm);
+  (void)ui_window_manager_base_destroy(wm);
   return failed;
 }
 

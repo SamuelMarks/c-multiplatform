@@ -29,8 +29,8 @@ struct ui_engine_config {
  * @param out_engine Pointer to receive the initialized engine handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_engine_create(const struct ui_engine_config *config,
-                               struct ui_engine **out_engine);
+ui_error_t ui_engine_create(const struct ui_engine_config *config,
+                            struct ui_engine **out_engine);
 
 /**
  * @brief Destroys the UI engine and frees all globally allocated resources.
@@ -38,7 +38,7 @@ enum ui_error ui_engine_create(const struct ui_engine_config *config,
  * @param engine The engine handle to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_engine_destroy(struct ui_engine *engine);
+ui_error_t ui_engine_destroy(struct ui_engine *engine);
 
 /**
  * @brief Runs a single iteration of the engine's main loop.
@@ -46,7 +46,7 @@ enum ui_error ui_engine_destroy(struct ui_engine *engine);
  * @param engine The engine handle.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_engine_tick(struct ui_engine *engine);
+ui_error_t ui_engine_tick(struct ui_engine *engine);
 
 #ifdef __cplusplus
 }

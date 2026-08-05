@@ -30,8 +30,8 @@ struct app_state;
  * @return UI_ERROR_NONE on successful authentication, or an appropriate error
  * code.
  */
-enum ui_error mock_login(struct app_state *state, const char *username,
-                         const char *password);
+ui_error_t mock_login(struct app_state *state, const char *username,
+                      const char *password);
 
 /**
  * @brief Simulates a signup attempt.
@@ -42,8 +42,8 @@ enum ui_error mock_login(struct app_state *state, const char *username,
  * @return UI_ERROR_NONE on successful registration and authentication, or an
  * appropriate error code.
  */
-enum ui_error mock_signup(struct app_state *state, const char *username,
-                          const char *password);
+ui_error_t mock_signup(struct app_state *state, const char *username,
+                       const char *password);
 
 /**
  * @brief Simulates a logout request, clearing the current user state.
@@ -51,7 +51,7 @@ enum ui_error mock_signup(struct app_state *state, const char *username,
  * @param state The global application state.
  * @return UI_ERROR_NONE on successful logout.
  */
-enum ui_error mock_logout(struct app_state *state);
+ui_error_t mock_logout(struct app_state *state);
 
 #ifdef __cplusplus
 }

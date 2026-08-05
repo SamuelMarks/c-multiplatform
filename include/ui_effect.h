@@ -20,7 +20,7 @@ typedef struct ui_effect ui_effect_t;
 /**
  * @brief Function pointer for a side effect.
  */
-typedef enum ui_error (*ui_effect_fn)(void *user_data);
+typedef ui_error_t (*ui_effect_fn)(void *user_data);
 
 /**
  * @brief Creates a new effect.
@@ -30,20 +30,19 @@ typedef enum ui_error (*ui_effect_fn)(void *user_data);
  * @param user_data User data passed to the effect function.
  * @param target_reactor The target reactor for the effect execution.
  * @param out_effect The pointer to store the created effect.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
-                               void *user_data,
-                               struct ui_reactor *target_reactor,
-                               ui_effect_t **out_effect);
+ui_error_t ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
+                            void *user_data, struct ui_reactor *target_reactor,
+                            ui_effect_t **out_effect);
 
 /**
  * @brief Destroys the effect.
  *
  * @param effect The effect.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_effect_destroy(ui_effect_t *effect);
+ui_error_t ui_effect_destroy(ui_effect_t *effect);
 
 #ifdef __cplusplus
 }

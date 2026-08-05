@@ -6,7 +6,7 @@
 #if defined(_WIN32) || defined(__CYGWIN__)
 /* MediaFoundation implementation stub */
 
-enum ui_error ui_video_decoder_get_default_backend(
+ui_error_t ui_video_decoder_get_default_backend(
     struct ui_video_decoder_backend *out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;

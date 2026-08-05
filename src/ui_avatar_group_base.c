@@ -15,16 +15,16 @@ struct ui_avatar_group_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_create(struct ui_avatar_group_base **out_group) {
   struct ui_avatar_group_base *group;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_group) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  group = (struct ui_avatar_group_base *)UI_MALLOC(
+  group = (struct ui_avatar_group_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_avatar_group_base));
   if (!group) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -32,7 +32,7 @@ ui_avatar_group_base_create(struct ui_avatar_group_base **out_group) {
 
   rc = ui_component_create(&group->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(group);
+    C_MULTIPLATFORM_FREE(group);
     return rc;
   }
 
@@ -45,16 +45,17 @@ ui_avatar_group_base_create(struct ui_avatar_group_base **out_group) {
   return UI_ERROR_NONE;
 }
 
-void ui_avatar_group_base_destroy(struct ui_avatar_group_base *group) {
+ui_error_t ui_avatar_group_base_destroy(struct ui_avatar_group_base *group) {
   if (!group) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(group->component);
-  UI_FREE(group);
+  (void)ui_component_destroy(group->component);
+  C_MULTIPLATFORM_FREE(group);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_get_component(struct ui_avatar_group_base *group,
                                    struct ui_component **out_component) {
   if (!group || !out_component) {
@@ -65,7 +66,7 @@ ui_avatar_group_base_get_component(struct ui_avatar_group_base *group,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_append_avatar(struct ui_avatar_group_base *group,
                                    struct ui_avatar_base *avatar) {
   if (!group || !avatar) {
@@ -80,7 +81,7 @@ ui_avatar_group_base_append_avatar(struct ui_avatar_group_base *group,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_set_max_avatars(struct ui_avatar_group_base *group,
                                      unsigned int max_avatars) {
   if (!group) {
@@ -91,7 +92,7 @@ ui_avatar_group_base_set_max_avatars(struct ui_avatar_group_base *group,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_get_max_avatars(struct ui_avatar_group_base *group,
                                      unsigned int *out_max_avatars) {
   if (!group || !out_max_avatars) {
@@ -102,7 +103,7 @@ ui_avatar_group_base_get_max_avatars(struct ui_avatar_group_base *group,
 }
 
 /** \brief ui_avatar_group_base_get_truncation_remainder */
-enum ui_error ui_avatar_group_base_get_truncation_remainder(
+ui_error_t ui_avatar_group_base_get_truncation_remainder(
     struct ui_avatar_group_base *group, unsigned int *out_remainder) {
   if (!group || !out_remainder) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -117,9 +118,8 @@ enum ui_error ui_avatar_group_base_get_truncation_remainder(
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_avatar_group_base_bind_data(struct ui_avatar_group_base *widget,
-                               struct ui_computed *signal) {
+ui_error_t ui_avatar_group_base_bind_data(struct ui_avatar_group_base *widget,
+                                          struct ui_computed *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -32,7 +32,7 @@ enum ui_dock_edge {
  * @param out_layout Pointer to receive the allocated layout.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout);
 
 /**
@@ -40,7 +40,8 @@ ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout);
  *
  * @param layout The layout to destroy.
  */
-void ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout);
+ui_error_t
+ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout);
 
 /**
  * @brief Gets the underlying component for DOM mounting.
@@ -48,7 +49,7 @@ void ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout);
  * @param layout The dockable layout.
  * @return The underlying component.
  */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
                                       struct ui_component **out_component);
 
@@ -62,7 +63,7 @@ ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
  * @param edge The edge to dock onto.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
                                    int panel_id, int target_panel_id,
                                    enum ui_dock_edge edge);
@@ -74,7 +75,7 @@ ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
  * @param panel_id The unique ID of the panel to remove.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
                                      int panel_id);
 
@@ -86,7 +87,7 @@ ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
  * @param buffer_size Size of the buffer.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
                                   char *out_buffer, size_t buffer_size);
 
@@ -97,7 +98,7 @@ ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
  * @param buffer The serialized layout string.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
                                     const char *buffer);
 
@@ -109,7 +110,7 @@ ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
  * @param drag_ctx The drag and drop context to integrate with.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_dockable_layout_base_integrate_drag_drop(
+ui_error_t ui_dockable_layout_base_integrate_drag_drop(
     struct ui_dockable_layout_base *layout,
     struct ui_drag_drop_context *drag_ctx);
 

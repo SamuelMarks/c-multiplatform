@@ -20,9 +20,10 @@ static void skip_whitespace(const char **p_str) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_list_style_type(const char *str,
                              struct ui_css_list_style_type_ext *out_type) {
+  ui_error_t rc;
   if (!str || !out_type)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -83,8 +84,9 @@ ui_css_parse_list_style_type(const char *str,
 }
 
 /** \brief ui_css_parse_list_style_position */
-enum ui_error ui_css_parse_list_style_position(
+ui_error_t ui_css_parse_list_style_position(
     const char *str, enum ui_css_list_style_position *out_position) {
+  ui_error_t rc;
   if (!str || !out_position)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -101,9 +103,10 @@ enum ui_error ui_css_parse_list_style_position(
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_parse_list_style_image(const char *str,
-                                            struct ui_css_image *out_image,
-                                            int *out_is_none) {
+ui_error_t ui_css_parse_list_style_image(const char *str,
+                                         struct ui_css_image *out_image,
+                                         int *out_is_none) {
+  ui_error_t rc;
   if (!str || !out_image || !out_is_none)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -118,15 +121,15 @@ enum ui_error ui_css_parse_list_style_image(const char *str,
   return ui_css_parse_image(str, out_image);
 }
 
-enum ui_error ui_css_parse_list_style(const char *str,
-                                      struct ui_css_list_style *out_style) {
+ui_error_t ui_css_parse_list_style(const char *str,
+                                   struct ui_css_list_style *out_style) {
   char token_buf[512];
   char *token;
   char *next_token = NULL;
   int parsed_type = 0;
   int parsed_position = 0;
   int parsed_image = 0;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!str || !out_style)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -150,38 +153,56 @@ enum ui_error ui_css_parse_list_style(const char *str,
   token = UI_STRTOK(token_buf, " \t\r\n", &next_token);
   while (token) {
     /* try parsing as position first since it has fewer keywords */
-    if (!parsed_position && ui_css_parse_list_style_position(
-                                token, &out_style->position) == UI_ERROR_NONE) {
-      parsed_position = 1;
+    if (!parsed_position) {
+      ui_error_t err =
+          ui_css_parse_list_style_position(token, &out_style->position);
+      if (err != UI_ERROR_NONE) {
+        if (0)
+          return err;
+      } else {
+        parsed_position = 1;
+        token = UI_STRTOK(NULL, " \t\r\n", &next_token);
+        continue;
+      }
     }
     /* try parsing as type */
-    else if (!parsed_type && ui_css_parse_list_style_type(
-                                 token, &out_style->type) == UI_ERROR_NONE) {
-      parsed_type = 1;
+    if (!parsed_type) {
+      ui_error_t err = ui_css_parse_list_style_type(token, &out_style->type);
+      if (err != UI_ERROR_NONE) {
+        if (0)
+          return err;
+      } else {
+        parsed_type = 1;
+        token = UI_STRTOK(NULL, " \t\r\n", &next_token);
+        continue;
+      }
     }
     /* try parsing as image */
-    else if (!parsed_image) {
+    if (!parsed_image) {
       int is_none = 0;
-      rc = ui_css_parse_list_style_image(token, &out_style->image, &is_none);
-      if (rc == UI_ERROR_NONE) {
+      ui_error_t err =
+          ui_css_parse_list_style_image(token, &out_style->image, &is_none);
+      if (err != UI_ERROR_NONE) {
+        return err;
+      } else {
         parsed_image = 1;
         out_style->has_image = !is_none;
-      } else {
-        return UI_ERROR_PARSE_FAILED; /* Unrecognized token */
+        token = UI_STRTOK(NULL, " \t\r\n", &next_token);
+        continue;
       }
     } else {
       return UI_ERROR_PARSE_FAILED; /* Unrecognized token or duplicate */
     }
-    token = UI_STRTOK(NULL, " \t\r\n", &next_token);
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_counter_action(const char *str,
                             struct ui_css_counter_action **out_actions) {
+  ui_error_t rc;
   char token_buf[512];
   char *token;
   char *next_token = NULL;
@@ -230,7 +251,7 @@ ui_css_parse_counter_action(const char *str,
       }
     }
 
-    node = (struct ui_css_counter_action *)UI_MALLOC(
+    node = (struct ui_css_counter_action *)C_MULTIPLATFORM_MALLOC(
         sizeof(struct ui_css_counter_action));
     if (!node) {
       ui_css_counter_action_destroy(head);
@@ -271,12 +292,10 @@ ui_css_parse_counter_action(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_css_counter_action_destroy(struct ui_css_counter_action *actions) {
+void ui_css_counter_action_destroy(struct ui_css_counter_action *actions) {
   while (actions) {
     struct ui_css_counter_action *next = actions->next;
-    UI_FREE(actions);
+    C_MULTIPLATFORM_FREE(actions);
     actions = next;
   }
-  return UI_ERROR_NONE;
 }

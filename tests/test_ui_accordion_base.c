@@ -8,9 +8,9 @@
 static int g_change_count = 0;
 static struct ui_disclosure_base *g_last_active = NULL;
 
-static enum ui_error on_accordion_change(struct ui_accordion_base *accordion,
-                                         struct ui_disclosure_base *active,
-                                         void *user_data) {
+static ui_error_t on_accordion_change(struct ui_accordion_base *accordion,
+                                      struct ui_disclosure_base *active,
+                                      void *user_data) {
   (void)accordion;
   (void)user_data;
   g_change_count++;
@@ -24,7 +24,7 @@ static int test_accordion_lifecycle(void) {
   struct ui_disclosure_base *d1 = NULL;
   struct ui_disclosure_base *d2 = NULL;
   struct ui_disclosure_base *d3 = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_accordion_base_create(&accordion);
   if (rc != UI_ERROR_NONE)
@@ -130,10 +130,10 @@ static int test_accordion_lifecycle(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_accordion_base_destroy(accordion);
-  ui_disclosure_base_destroy(d1);
-  ui_disclosure_base_destroy(d2);
-  ui_disclosure_base_destroy(d3);
+  (void)ui_accordion_base_destroy(accordion);
+  (void)ui_disclosure_base_destroy(d1);
+  (void)ui_disclosure_base_destroy(d2);
+  (void)ui_disclosure_base_destroy(d3);
 
   return 0;
 }
@@ -144,7 +144,7 @@ static int test_accordion_edge_cases(void) {
   struct ui_disclosure_base *d2 = NULL;
   struct ui_disclosure_base *d3 = NULL;
   struct ui_disclosure_base *tmp_active = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* 1. NULL pointer args */
   if (ui_accordion_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -235,9 +235,9 @@ static int test_accordion_edge_cases(void) {
     ui_accordion_base_remove_disclosure(accordion, d3);
     ui_accordion_base_remove_disclosure(accordion, d4);
 
-    ui_disclosure_base_destroy(d3);
-    ui_disclosure_base_destroy(d4);
-    ui_disclosure_base_destroy(d5);
+    (void)ui_disclosure_base_destroy(d3);
+    (void)ui_disclosure_base_destroy(d4);
+    (void)ui_disclosure_base_destroy(d5);
   }
 
   /* 7. Remove active disclosure */
@@ -260,12 +260,16 @@ static int test_accordion_edge_cases(void) {
       d3, 0); /* triggers on_child_disclosure_toggle(!is_expanded) without
                  on_change */
   ui_accordion_base_remove_disclosure(accordion, d3);
-  ui_disclosure_base_destroy(d3);
+  (void)ui_disclosure_base_destroy(d3);
 
-  ui_accordion_base_destroy(accordion);
-  ui_disclosure_base_destroy(d1);
-  ui_disclosure_base_destroy(d2);
+  (void)ui_accordion_base_destroy(accordion);
+  (void)ui_disclosure_base_destroy(d1);
+  (void)ui_disclosure_base_destroy(d2);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_accordion_methods_coverage(void);
+  run_accordion_methods_coverage();
+#endif
   return 0;
 }
 

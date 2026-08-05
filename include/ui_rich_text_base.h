@@ -28,12 +28,12 @@ enum ui_rich_text_format {
 /**
  * @brief Creates a rich text editor base component.
  */
-enum ui_error ui_rich_text_base_create(struct ui_rich_text_base **out_editor);
+ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor);
 
 /**
  * @brief Destroys a rich text editor base component.
  */
-void ui_rich_text_base_destroy(struct ui_rich_text_base *editor);
+ui_error_t ui_rich_text_base_destroy(struct ui_rich_text_base *editor);
 
 /**
  * @brief Gets the underlying component.
@@ -42,50 +42,49 @@ void ui_rich_text_base_destroy(struct ui_rich_text_base *editor);
  * @param out_component Output pointer.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_rich_text_base_get_component(struct ui_rich_text_base *editor,
-                                struct ui_component **out_component);
+ui_error_t ui_rich_text_base_get_component(struct ui_rich_text_base *editor,
+                                           struct ui_component **out_component);
 
 /**
  * @brief Sets the content of the editor.
  */
-enum ui_error ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
-                                         const char *text);
+ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
+                                      const char *text);
 
 /**
  * @brief Gets the content of the editor. Returned string must be freed by the
  * caller.
  */
-enum ui_error ui_rich_text_base_get_text(struct ui_rich_text_base *editor,
-                                         char **out_text);
+ui_error_t ui_rich_text_base_get_text(struct ui_rich_text_base *editor,
+                                      char **out_text);
 
 /**
  * @brief Toggles a specific format on the current selection.
  */
-enum ui_error ui_rich_text_base_toggle_format(struct ui_rich_text_base *editor,
-                                              enum ui_rich_text_format format);
+ui_error_t ui_rich_text_base_toggle_format(struct ui_rich_text_base *editor,
+                                           enum ui_rich_text_format format);
 
 /**
  * @brief Performs undo.
  */
-enum ui_error ui_rich_text_base_undo(struct ui_rich_text_base *editor);
+ui_error_t ui_rich_text_base_undo(struct ui_rich_text_base *editor);
 
 /**
  * @brief Performs redo.
  */
-enum ui_error ui_rich_text_base_redo(struct ui_rich_text_base *editor);
+ui_error_t ui_rich_text_base_redo(struct ui_rich_text_base *editor);
 
 /**
  * @brief Processes an input event (keyboard, mouse).
  */
-enum ui_error ui_rich_text_base_process_event(struct ui_rich_text_base *editor,
-                                              const struct ui_event *event);
+ui_error_t ui_rich_text_base_process_event(struct ui_rich_text_base *editor,
+                                           const struct ui_event *event);
 
 /**
  * @brief Sets the IME composition text (called from window backends during IME
  * input).
  */
-enum ui_error
+ui_error_t
 ui_rich_text_base_set_ime_composition(struct ui_rich_text_base *editor,
                                       const char *composition_text);
 
@@ -96,8 +95,8 @@ ui_rich_text_base_set_ime_composition(struct ui_rich_text_base *editor,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_rich_text_base_bind_text(struct ui_rich_text_base *widget,
-                                          struct ui_signal *signal);
+ui_error_t ui_rich_text_base_bind_text(struct ui_rich_text_base *widget,
+                                       struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

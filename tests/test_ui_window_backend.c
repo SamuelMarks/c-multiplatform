@@ -9,10 +9,9 @@ struct mock_window_data {
   int id;
 };
 
-static enum ui_error mock_create_window(struct ui_window_backend *backend,
-                                        const char *title, int width,
-                                        int height,
-                                        struct ui_window **out_window) {
+static ui_error_t mock_create_window(struct ui_window_backend *backend,
+                                     const char *title, int width, int height,
+                                     struct ui_window **out_window) {
   (void)backend;
   (void)title;
   (void)width;
@@ -24,31 +23,31 @@ static enum ui_error mock_create_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mock_destroy_window(struct ui_window_backend *backend,
-                                         struct ui_window *window) {
-  (void)backend;
-  (void)window;
-  return UI_ERROR_NONE;
-}
-
-static enum ui_error mock_show_window(struct ui_window_backend *backend,
+static ui_error_t mock_destroy_window(struct ui_window_backend *backend,
                                       struct ui_window *window) {
   (void)backend;
   (void)window;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mock_hide_window(struct ui_window_backend *backend,
-                                      struct ui_window *window) {
+static ui_error_t mock_show_window(struct ui_window_backend *backend,
+                                   struct ui_window *window) {
   (void)backend;
   (void)window;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mock_poll_events(struct ui_window_backend *backend,
-                                      struct ui_window *window,
-                                      struct ui_event *out_event,
-                                      int *out_has_event) {
+static ui_error_t mock_hide_window(struct ui_window_backend *backend,
+                                   struct ui_window *window) {
+  (void)backend;
+  (void)window;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_poll_events(struct ui_window_backend *backend,
+                                   struct ui_window *window,
+                                   struct ui_event *out_event,
+                                   int *out_has_event) {
   (void)backend;
   (void)window;
   (void)out_event;
@@ -59,8 +58,8 @@ static enum ui_error mock_poll_events(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mock_swap_buffers(struct ui_window_backend *backend,
-                                       struct ui_window *window) {
+static ui_error_t mock_swap_buffers(struct ui_window_backend *backend,
+                                    struct ui_window *window) {
   (void)backend;
   (void)window;
   return UI_ERROR_NONE;
@@ -71,7 +70,7 @@ int main(void) {
   struct ui_window *window = NULL;
   struct ui_event event;
   int has_event;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   backend.create_window = mock_create_window;

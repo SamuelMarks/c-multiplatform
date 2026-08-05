@@ -5,7 +5,7 @@
 /* clang-format on */
 
 int main(void) {
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_color_quantization_options options;
   ui_color_t colors[4];
   size_t count;

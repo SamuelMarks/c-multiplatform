@@ -18,18 +18,18 @@ struct ui_split_pane_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_split_pane_base_create(struct ui_split_pane_base **out_split_pane) {
   struct ui_split_pane_base *pane;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_split_pane) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  pane =
-      (struct ui_split_pane_base *)UI_MALLOC(sizeof(struct ui_split_pane_base));
+  pane = (struct ui_split_pane_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_split_pane_base));
   if (!pane) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -50,15 +50,16 @@ cleanup:
   return rc;
 }
 
-void ui_split_pane_base_destroy(struct ui_split_pane_base *split_pane) {
+ui_error_t ui_split_pane_base_destroy(struct ui_split_pane_base *split_pane) {
   if (!split_pane) {
-    return;
+    return UI_ERROR_NONE;
   }
-  UI_FREE(split_pane);
+  C_MULTIPLATFORM_FREE(split_pane);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_split_pane_base_set_orientation(struct ui_split_pane_base *split_pane,
                                    enum ui_split_pane_orientation orientation) {
   if (!split_pane) {
@@ -69,7 +70,7 @@ ui_split_pane_base_set_orientation(struct ui_split_pane_base *split_pane,
 }
 
 /** \brief ui_split_pane_base_get_orientation */
-enum ui_error ui_split_pane_base_get_orientation(
+ui_error_t ui_split_pane_base_get_orientation(
     const struct ui_split_pane_base *split_pane,
     enum ui_split_pane_orientation *out_orientation) {
   if (!split_pane || !out_orientation) {
@@ -80,7 +81,7 @@ enum ui_error ui_split_pane_base_get_orientation(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_split_pane_base_set_position(struct ui_split_pane_base *split_pane,
                                 int position) {
   if (!split_pane) {
@@ -99,7 +100,7 @@ ui_split_pane_base_set_position(struct ui_split_pane_base *split_pane,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_split_pane_base_get_position(const struct ui_split_pane_base *split_pane,
                                 int *out_position) {
   if (!split_pane || !out_position) {
@@ -110,9 +111,8 @@ ui_split_pane_base_get_position(const struct ui_split_pane_base *split_pane,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_split_pane_base_set_bounds(struct ui_split_pane_base *split_pane,
-                              int min_position, int max_position) {
+ui_error_t ui_split_pane_base_set_bounds(struct ui_split_pane_base *split_pane,
+                                         int min_position, int max_position) {
   if (!split_pane) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -127,13 +127,11 @@ ui_split_pane_base_set_bounds(struct ui_split_pane_base *split_pane,
   split_pane->max_position = max_position;
 
   /* Re-clamp current position */
-  ui_split_pane_base_set_position(split_pane, split_pane->position);
-
-  return UI_ERROR_NONE;
+  return ui_split_pane_base_set_position(split_pane, split_pane->position);
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
                                  const struct ui_event *event) {
   int coord = 0;
@@ -191,9 +189,13 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
       break;
     }
     if (split_pane->is_dragging) {
+      ui_error_t rc;
       delta = coord - split_pane->drag_start_coord;
       new_pos = split_pane->drag_start_pos + delta;
-      ui_split_pane_base_set_position(split_pane, new_pos);
+      rc = ui_split_pane_base_set_position(split_pane, new_pos);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
     }
     break;
 
@@ -209,8 +211,8 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_split_pane_base_bind_data(struct ui_split_pane_base *widget,
-                                           struct ui_signal *signal) {
+ui_error_t ui_split_pane_base_bind_data(struct ui_split_pane_base *widget,
+                                        struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -16,8 +16,9 @@ struct ui_webview_base;
 /**
  * @brief IPC message callback from the web context.
  */
-typedef enum ui_error (*ui_webview_ipc_callback)(
-    struct ui_webview_base *webview, const char *message, void *user_data);
+typedef ui_error_t (*ui_webview_ipc_callback)(struct ui_webview_base *webview,
+                                              const char *message,
+                                              void *user_data);
 
 /**
  * @brief Creates a new unstyled webview component.
@@ -25,7 +26,7 @@ typedef enum ui_error (*ui_webview_ipc_callback)(
  * @param out_webview Pointer to output the initialized webview component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_webview_base_create(struct ui_webview_base **out_webview);
+ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview);
 
 /**
  * @brief Destroys a webview component.
@@ -33,7 +34,7 @@ enum ui_error ui_webview_base_create(struct ui_webview_base **out_webview);
  * @param webview The webview component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_webview_base_destroy(struct ui_webview_base *webview);
+ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview);
 
 /**
  * @brief Retrieves the base component.
@@ -41,9 +42,8 @@ enum ui_error ui_webview_base_destroy(struct ui_webview_base *webview);
  * @param webview The webview component.
  * @return The base component.
  */
-enum ui_error
-ui_webview_base_get_component(struct ui_webview_base *webview,
-                              struct ui_component **out_component);
+ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
+                                         struct ui_component **out_component);
 
 /**
  * @brief Sets the URL to load in the webview.
@@ -52,8 +52,8 @@ ui_webview_base_get_component(struct ui_webview_base *webview,
  * @param url The URL to load.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_webview_base_set_url(struct ui_webview_base *webview,
-                                      const char *url);
+ui_error_t ui_webview_base_set_url(struct ui_webview_base *webview,
+                                   const char *url);
 
 /**
  * @brief Sets raw HTML content for the webview.
@@ -62,8 +62,8 @@ enum ui_error ui_webview_base_set_url(struct ui_webview_base *webview,
  * @param html The HTML content.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_webview_base_set_html(struct ui_webview_base *webview,
-                                       const char *html);
+ui_error_t ui_webview_base_set_html(struct ui_webview_base *webview,
+                                    const char *html);
 
 /**
  * @brief Binds the URL property to a signal.
@@ -72,8 +72,8 @@ enum ui_error ui_webview_base_set_html(struct ui_webview_base *webview,
  * @param signal The signal.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_webview_base_bind_url(struct ui_webview_base *webview,
-                                       struct ui_signal *signal);
+ui_error_t ui_webview_base_bind_url(struct ui_webview_base *webview,
+                                    struct ui_signal *signal);
 
 /**
  * @brief Evaluates JavaScript asynchronously in the webview context.
@@ -82,8 +82,8 @@ enum ui_error ui_webview_base_bind_url(struct ui_webview_base *webview,
  * @param script The JavaScript string.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_webview_base_evaluate_js(struct ui_webview_base *webview,
-                                          const char *script);
+ui_error_t ui_webview_base_evaluate_js(struct ui_webview_base *webview,
+                                       const char *script);
 
 /**
  * @brief Registers a callback for receiving IPC messages from JavaScript.
@@ -93,9 +93,9 @@ enum ui_error ui_webview_base_evaluate_js(struct ui_webview_base *webview,
  * @param user_data User data to pass to the callback.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
-                                               ui_webview_ipc_callback callback,
-                                               void *user_data);
+ui_error_t ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
+                                            ui_webview_ipc_callback callback,
+                                            void *user_data);
 
 /**
  * @brief Simulates an incoming IPC message (for internal routing/testing).
@@ -104,9 +104,8 @@ enum ui_error ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
  * @param message The message content.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
-ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
-                                     const char *message);
+ui_error_t ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
+                                                const char *message);
 
 #ifdef __cplusplus
 }

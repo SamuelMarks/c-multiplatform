@@ -25,7 +25,7 @@ struct ui_section_index_base;
  * @param out_index Pointer to receive the allocated section index base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_section_index_base_create(struct ui_section_index_base **out_index);
 
 /**
@@ -33,7 +33,7 @@ ui_section_index_base_create(struct ui_section_index_base **out_index);
  *
  * @param index The section index to destroy.
  */
-void ui_section_index_base_destroy(struct ui_section_index_base *index);
+ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index);
 
 /**
  * @brief Gets the underlying component.
@@ -41,7 +41,7 @@ void ui_section_index_base_destroy(struct ui_section_index_base *index);
  * @param index The section index.
  * @return The underlying component.
  */
-enum ui_error
+ui_error_t
 ui_section_index_base_get_component(struct ui_section_index_base *index,
                                     struct ui_component **out_component);
 
@@ -55,7 +55,7 @@ ui_section_index_base_get_component(struct ui_section_index_base *index,
  * @param count Number of sections in the array.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_section_index_base_set_sections(struct ui_section_index_base *index,
                                    const char **sections, size_t count);
 
@@ -66,7 +66,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
  * @param active_idx The index in the array to set active, or -1 to clear.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_section_index_base_set_active_section(struct ui_section_index_base *index,
                                          int active_idx);
 
@@ -77,9 +77,8 @@ ui_section_index_base_set_active_section(struct ui_section_index_base *index,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_section_index_base_bind_data(struct ui_section_index_base *widget,
-                                struct ui_computed *signal);
+ui_error_t ui_section_index_base_bind_data(struct ui_section_index_base *widget,
+                                           struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

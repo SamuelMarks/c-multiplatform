@@ -59,45 +59,86 @@ struct app_context {
   int needs_layout;
 };
 
-static enum ui_error create_dom(struct app_context *ctx) {
+static ui_error_t create_dom(struct app_context *ctx) {
   struct ui_dom_node *app, *sidebar, *content, *box1, *box2;
+  ui_error_t err;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &app);
-  ui_dom_node_set_tag_name(app, "body");
-  ui_dom_node_set_attribute(app, "id", "app");
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &app);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_tag_name(app, "body");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(app, "id", "app");
+  if (err != UI_ERROR_NONE)
+    return err;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sidebar);
-  ui_dom_node_set_attribute(sidebar, "id", "sidebar");
-  ui_dom_node_append_child(app, sidebar);
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sidebar);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(sidebar, "id", "sidebar");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_append_child(app, sidebar);
+  if (err != UI_ERROR_NONE)
+    return err;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content);
-  ui_dom_node_set_attribute(content, "id", "content");
-  ui_dom_node_append_child(app, content);
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(content, "id", "content");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_append_child(app, content);
+  if (err != UI_ERROR_NONE)
+    return err;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box1);
-  ui_dom_node_set_attribute(box1, "class", "box");
-  ui_dom_node_set_attribute(box1, "id", "box1");
-  ui_dom_node_append_child(content, box1);
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box1);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(box1, "class", "box");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(box1, "id", "box1");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_append_child(content, box1);
+  if (err != UI_ERROR_NONE)
+    return err;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box2);
-  ui_dom_node_set_attribute(box2, "class", "box");
-  ui_dom_node_set_attribute(box2, "id", "box2");
-  ui_dom_node_append_child(content, box2);
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box2);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(box2, "class", "box");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(box2, "id", "box2");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_append_child(content, box2);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   ctx->root = app;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error draw_layout_node(struct ui_renderer_backend *renderer,
-                                      struct ui_layout_node *node) {
+static ui_error_t draw_layout_node(struct ui_renderer_backend *renderer,
+                                   struct ui_layout_node *node) {
   struct ui_dom_rect rect;
   struct ui_color color = {0.9f, 0.9f, 0.9f, 1.0f}; /* Default */
   struct ui_layout_node *child;
   const char *id = NULL;
+  ui_error_t err;
 
-  ui_cssom_view_get_bounding_client_rect(node, &rect);
+  err = ui_cssom_view_get_bounding_client_rect(node, &rect);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   if (node->dom_node) {
-    ui_dom_node_get_attribute(node->dom_node, "id", &id);
+    err = ui_dom_node_get_attribute(node->dom_node, "id", &id);
+    if (err != UI_ERROR_NONE)
+      return err;
 
     if (id && strcmp(id, "app") == 0) {
       color.r = 1.0f;
@@ -123,13 +164,15 @@ static enum ui_error draw_layout_node(struct ui_renderer_backend *renderer,
   }
 
   if (rect.width > 0 && rect.height > 0) {
-    renderer->draw_rect(renderer, (float)rect.x, (float)rect.y,
-                        (float)rect.width, (float)rect.height, color);
+    err = renderer->draw_rect(renderer, (float)rect.x, (float)rect.y,
+                              (float)rect.width, (float)rect.height, color);
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
   child = node->first_child;
   while (child) {
-    enum ui_error err = draw_layout_node(renderer, child);
+    err = draw_layout_node(renderer, child);
     if (err != UI_ERROR_NONE)
       return err;
     child = child->next_sibling;
@@ -145,42 +188,61 @@ struct render_context {
   struct ui_engine *engine;
 };
 
-static enum ui_error do_render(struct render_context *rctx) {
+static ui_error_t do_render(struct render_context *rctx) {
   struct app_context *app_ctx = rctx->app_ctx;
   struct ui_renderer_backend *renderer = rctx->renderer;
+  ui_error_t err;
 
   if (app_ctx->needs_layout) {
     if (app_ctx->layout_tree) {
-      ui_layout_tree_destroy(app_ctx->layout_tree);
+      err = ui_layout_tree_destroy(app_ctx->layout_tree);
+      if (err != UI_ERROR_NONE)
+        return err;
       app_ctx->layout_tree = NULL;
     }
-    ui_layout_tree_generate(app_ctx->root, app_ctx->stylesheet,
-                            &app_ctx->layout_tree);
-    ui_layout_solve_viewport(app_ctx->layout_tree, app_ctx->window_width,
-                             app_ctx->window_height);
+    err = ui_layout_tree_generate(app_ctx->root, app_ctx->stylesheet,
+                                  &app_ctx->layout_tree);
+    if (err != UI_ERROR_NONE)
+      return err;
+    err = ui_layout_solve_viewport(app_ctx->layout_tree, app_ctx->window_width,
+                                   app_ctx->window_height);
+    if (err != UI_ERROR_NONE)
+      return err;
     app_ctx->needs_layout = 0;
   }
 
-  ui_engine_tick(rctx->engine);
+  err = ui_engine_tick(rctx->engine);
+  if (err != UI_ERROR_NONE)
+    return err;
 
-  renderer->set_viewport(renderer, 0, 0, (int)app_ctx->window_width,
-                         (int)app_ctx->window_height);
+  err = renderer->set_viewport(renderer, 0, 0, (int)app_ctx->window_width,
+                               (int)app_ctx->window_height);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   {
     struct ui_color bg = {1.0f, 1.0f, 1.0f, 1.0f};
-    renderer->clear(renderer, bg);
+    err = renderer->clear(renderer, bg);
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
   if (app_ctx->layout_tree) {
-    draw_layout_node(renderer, app_ctx->layout_tree);
+    err = draw_layout_node(renderer, app_ctx->layout_tree);
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
-  renderer->flush(renderer);
-  rctx->window_backend->swap_buffers(rctx->window_backend, rctx->window);
+  err = renderer->flush(renderer);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = rctx->window_backend->swap_buffers(rctx->window_backend, rctx->window);
+  if (err != UI_ERROR_NONE)
+    return err;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error on_resize_callback(void *user_data, int width,
-                                        int height) {
+static ui_error_t on_resize_callback(void *user_data, int width, int height) {
   struct render_context *rctx = (struct render_context *)user_data;
   rctx->app_ctx->window_width = (float)width;
   rctx->app_ctx->window_height = (float)height;
@@ -194,7 +256,7 @@ static struct render_context g_rctx;
 static void main_loop_step(void) {
   struct ui_event event;
   int has_event = 0;
-  enum ui_error err;
+  ui_error_t err;
 
   do {
     err = g_rctx.window_backend->poll_events(g_rctx.window_backend,
@@ -227,7 +289,7 @@ int main(void) {
   struct ui_window *window = NULL;
   struct app_context app_ctx;
   struct render_context rctx;
-  enum ui_error err;
+  ui_error_t err;
   int running = 1;
 
   memset(&app_ctx, 0, sizeof(app_ctx));

@@ -6,7 +6,7 @@
 /* clang-format on */
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-extern enum ui_error ui_video_decoder_get_default_backend(
+extern ui_error_t ui_video_decoder_get_default_backend(
     struct ui_video_decoder_backend *out_backend);
 
 int main(void) {

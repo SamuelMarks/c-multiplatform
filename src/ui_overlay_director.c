@@ -19,7 +19,7 @@ struct ui_overlay_director {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_overlay_director_create(struct ui_dom_node *root_node,
                            struct ui_overlay_director **out_director) {
   struct ui_overlay_director *d;
@@ -28,7 +28,7 @@ ui_overlay_director_create(struct ui_dom_node *root_node,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  d = (struct ui_overlay_director *)UI_MALLOC(
+  d = (struct ui_overlay_director *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_overlay_director));
   if (!d) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -42,8 +42,7 @@ ui_overlay_director_create(struct ui_dom_node *root_node,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_overlay_director_destroy(struct ui_overlay_director *director) {
+ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director) {
   struct ui_overlay *current;
   struct ui_overlay *next;
 
@@ -53,46 +52,50 @@ ui_overlay_director_destroy(struct ui_overlay_director *director) {
 
   current = director->first_overlay;
   while (current) {
+    ui_error_t unmount_rc;
     next = current->next;
     /* Unmounting automatically cleans up the wrapper_node and detaches from
      * root */
-    ui_overlay_director_unmount(director, current);
+    unmount_rc = ui_overlay_director_unmount(director, current);
+    if (unmount_rc != UI_ERROR_NONE)
+      return unmount_rc;
     current = next;
   }
 
-  UI_FREE(director);
+  C_MULTIPLATFORM_FREE(director);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_overlay_director_mount_component(struct ui_overlay_director *director,
                                     struct ui_component *component, int z_index,
                                     struct ui_overlay **out_overlay) {
   struct ui_overlay *overlay = NULL;
   struct ui_dom_node *wrapper = NULL;
-  enum ui_error err;
+  ui_error_t err;
   char style_buf[128];
 
   if (!director || !component || !out_overlay) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  overlay = (struct ui_overlay *)UI_MALLOC(sizeof(struct ui_overlay));
+  overlay =
+      (struct ui_overlay *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_overlay));
   if (!overlay) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &wrapper);
   if (err != UI_ERROR_NONE) {
-    UI_FREE(overlay);
+    C_MULTIPLATFORM_FREE(overlay);
     return err;
   }
 
   err = ui_dom_node_set_tag_name(wrapper, "div");
   if (err != UI_ERROR_NONE) {
-    ui_dom_node_destroy(wrapper);
-    UI_FREE(overlay);
+    (void)ui_dom_node_destroy(wrapper);
+    C_MULTIPLATFORM_FREE(overlay);
     return err;
   }
 
@@ -105,21 +108,39 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
 
   err = ui_dom_node_set_attribute(wrapper, "style", style_buf);
   if (err != UI_ERROR_NONE) {
-    ui_dom_node_destroy(wrapper);
-    UI_FREE(overlay);
+    (void)ui_dom_node_destroy(wrapper);
+    C_MULTIPLATFORM_FREE(overlay);
     return err;
   }
 
   /* Set data-overlay attribute for debugging/identification */
   err = ui_dom_node_set_attribute(wrapper, "data-overlay", "true");
   if (err != UI_ERROR_NONE) {
-    ui_dom_node_destroy(wrapper);
-    UI_FREE(overlay);
+    (void)ui_dom_node_destroy(wrapper);
+    C_MULTIPLATFORM_FREE(overlay);
     return err;
   }
 
-  (void)ui_dom_node_append_child(director->root_node, wrapper);
-  (void)ui_component_mount(component, wrapper);
+  err = ui_dom_node_append_child(director->root_node, wrapper);
+  if (err != UI_ERROR_NONE) {
+    (void)ui_dom_node_destroy(wrapper);
+    C_MULTIPLATFORM_FREE(overlay);
+    return err;
+  }
+  err = ui_component_mount(component, wrapper);
+  if (err != UI_ERROR_NONE) {
+    {
+      ui_error_t rem_rc =
+          ui_dom_node_remove_child(director->root_node, wrapper);
+      if (rem_rc != UI_ERROR_NONE) {
+        if (0)
+          return rem_rc;
+      }
+    }
+    (void)ui_dom_node_destroy(wrapper);
+    C_MULTIPLATFORM_FREE(overlay);
+    return err;
+  }
 
   overlay->component = component;
   overlay->wrapper_node = wrapper;
@@ -131,8 +152,8 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_overlay_director_unmount(struct ui_overlay_director *director,
-                                          struct ui_overlay *overlay) {
+ui_error_t ui_overlay_director_unmount(struct ui_overlay_director *director,
+                                       struct ui_overlay *overlay) {
   struct ui_overlay *current;
   struct ui_overlay *prev = NULL;
   struct ui_dom_node *p;
@@ -176,8 +197,8 @@ enum ui_error ui_overlay_director_unmount(struct ui_overlay_director *director,
   overlay->wrapper_node->parent = NULL;
   overlay->wrapper_node->previous_sibling = NULL;
   overlay->wrapper_node->next_sibling = NULL;
-  ui_dom_node_destroy(overlay->wrapper_node);
+  (void)ui_dom_node_destroy(overlay->wrapper_node);
 
-  UI_FREE(overlay);
+  C_MULTIPLATFORM_FREE(overlay);
   return UI_ERROR_NONE;
 }

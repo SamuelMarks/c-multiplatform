@@ -4,10 +4,10 @@
 #include <stdio.h>
 /* clang-format on */
 
-enum ui_error ui_surface_base_create(struct ui_surface_base **out_surface) {
+ui_error_t ui_surface_base_create(struct ui_surface_base **out_surface) {
   struct ui_surface_base *surface;
   struct ui_component *base_comp;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!out_surface) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -18,28 +18,29 @@ enum ui_error ui_surface_base_create(struct ui_surface_base **out_surface) {
     return err;
   }
 
-  surface = (struct ui_surface_base *)UI_MALLOC(sizeof(struct ui_surface_base));
+  surface = (struct ui_surface_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_surface_base));
   if (!surface) {
-    ui_component_destroy(base_comp);
+    (void)ui_component_destroy(base_comp);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   surface->base = *base_comp;
-  UI_FREE(base_comp);
+  C_MULTIPLATFORM_FREE(base_comp);
 
   surface->elevation = UI_ELEVATION_LEVEL_0;
 
   err =
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &surface->base.shadow_root);
   if (err != UI_ERROR_NONE) {
-    UI_FREE(surface);
+    C_MULTIPLATFORM_FREE(surface);
     return err;
   }
 
   err = ui_dom_node_set_tag_name(surface->base.shadow_root, "ui-surface");
   if (err != UI_ERROR_NONE) {
-    ui_dom_node_destroy(surface->base.shadow_root);
-    UI_FREE(surface);
+    (void)ui_dom_node_destroy(surface->base.shadow_root);
+    C_MULTIPLATFORM_FREE(surface);
     return err;
   }
 
@@ -47,8 +48,8 @@ enum ui_error ui_surface_base_create(struct ui_surface_base **out_surface) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_surface_base_set_elevation(struct ui_surface_base *surface,
-                                            enum ui_elevation_level level) {
+ui_error_t ui_surface_base_set_elevation(struct ui_surface_base *surface,
+                                         enum ui_elevation_level level) {
   char level_str[16];
 
   if (!surface) {
@@ -67,8 +68,8 @@ enum ui_error ui_surface_base_set_elevation(struct ui_surface_base *surface,
                                    level_str);
 }
 
-enum ui_error ui_surface_base_bind_data(struct ui_surface_base *widget,
-                                        struct ui_signal *signal) {
+ui_error_t ui_surface_base_bind_data(struct ui_surface_base *widget,
+                                     struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

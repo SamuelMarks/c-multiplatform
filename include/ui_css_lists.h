@@ -75,7 +75,7 @@ struct ui_css_counter_action {
  * @param out_type Pointer to receive the parsed type.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_parse_list_style_type(const char *str,
                              struct ui_css_list_style_type_ext *out_type);
 
@@ -86,7 +86,7 @@ ui_css_parse_list_style_type(const char *str,
  * @param out_position Pointer to receive the parsed position.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_parse_list_style_position(const char *str,
                                  enum ui_css_list_style_position *out_position);
 
@@ -98,9 +98,9 @@ ui_css_parse_list_style_position(const char *str,
  * @param out_is_none Pointer to receive whether the value was 'none'.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_list_style_image(const char *str,
-                                            struct ui_css_image *out_image,
-                                            int *out_is_none);
+ui_error_t ui_css_parse_list_style_image(const char *str,
+                                         struct ui_css_image *out_image,
+                                         int *out_is_none);
 
 /**
  * @brief Parses CSS list-style shorthand.
@@ -109,8 +109,8 @@ enum ui_error ui_css_parse_list_style_image(const char *str,
  * @param out_style Pointer to receive the parsed shorthand.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_list_style(const char *str,
-                                      struct ui_css_list_style *out_style);
+ui_error_t ui_css_parse_list_style(const char *str,
+                                   struct ui_css_list_style *out_style);
 
 /**
  * @brief Parses CSS counter-reset, counter-increment, counter-set.
@@ -120,7 +120,7 @@ enum ui_error ui_css_parse_list_style(const char *str,
  * @param out_actions Pointer to receive the parsed actions linked list.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_parse_counter_action(const char *str,
                             struct ui_css_counter_action **out_actions);
 
@@ -129,8 +129,7 @@ ui_css_parse_counter_action(const char *str,
  *
  * @param actions The list to free.
  */
-enum ui_error
-ui_css_counter_action_destroy(struct ui_css_counter_action *actions);
+void ui_css_counter_action_destroy(struct ui_css_counter_action *actions);
 
 #ifdef __cplusplus
 }

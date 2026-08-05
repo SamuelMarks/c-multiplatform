@@ -11,17 +11,17 @@ struct ui_rating_base {
   struct ui_icon_base *half_icon;
   struct ui_icon_base *empty_icon;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
 };
 
-static enum ui_error trigger_cva_change(struct ui_rating_base *rating) {
+static ui_error_t trigger_cva_change(struct ui_rating_base *rating) {
   if (rating && rating->cva_on_change) {
     union ui_signal_payload payload;
     payload.float_val = rating->value;
@@ -30,30 +30,33 @@ static enum ui_error trigger_cva_change(struct ui_rating_base *rating) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_cva_touched(struct ui_rating_base *rating) {
+static ui_error_t trigger_cva_touched(struct ui_rating_base *rating) {
   if (rating && rating->cva_on_touched) {
     return rating->cva_on_touched(rating->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error rating_cva_write_value(void *component,
-                                            union ui_signal_payload value) {
+static ui_error_t rating_cva_write_value(void *component,
+                                         union ui_signal_payload value) {
   struct ui_rating_base *rating = (struct ui_rating_base *)component;
 
   if (!rating) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_rating_base_set_value(rating, value.float_val);
+  {
+    ui_error_t set_rc = ui_rating_base_set_value(rating, value.float_val);
+    if (set_rc != UI_ERROR_NONE)
+      return set_rc;
+  }
   return UI_ERROR_NONE;
 }
 
 /** \brief rating_cva_register_on_change */
-static enum ui_error rating_cva_register_on_change(
+static ui_error_t rating_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_rating_base *rating = (struct ui_rating_base *)component;
   if (!rating)
@@ -63,10 +66,8 @@ static enum ui_error rating_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-rating_cva_register_on_touched(void *component,
-                               enum ui_error (*callback)(void *user_data),
-                               void *user_data) {
+static ui_error_t rating_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_rating_base *rating = (struct ui_rating_base *)component;
   if (!rating)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -75,8 +76,8 @@ rating_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error rating_cva_set_disabled_state(void *component,
-                                                   int is_disabled) {
+static ui_error_t rating_cva_set_disabled_state(void *component,
+                                                int is_disabled) {
   struct ui_rating_base *rating = (struct ui_rating_base *)component;
   if (!rating)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -84,16 +85,17 @@ static enum ui_error rating_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_rating_base_create(struct ui_rating_base **out_rating,
-                                    struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_rating_base_create(struct ui_rating_base **out_rating,
+                                 struct ui_control_value_accessor *out_cva) {
   struct ui_rating_base *rating;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_rating) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rating = (struct ui_rating_base *)UI_MALLOC(sizeof(struct ui_rating_base));
+  rating = (struct ui_rating_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_rating_base));
   if (!rating) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -136,35 +138,36 @@ enum ui_error ui_rating_base_create(struct ui_rating_base **out_rating,
 
 cleanup:
   if (rating->full_icon) {
-    ui_icon_base_destroy(rating->full_icon);
+    (void)ui_icon_base_destroy(rating->full_icon);
   }
   if (rating->half_icon) {
-    ui_icon_base_destroy(rating->half_icon);
+    (void)ui_icon_base_destroy(rating->half_icon);
   }
-  UI_FREE(rating);
+  C_MULTIPLATFORM_FREE(rating);
   return rc;
 }
 
-void ui_rating_base_destroy(struct ui_rating_base *rating) {
+ui_error_t ui_rating_base_destroy(struct ui_rating_base *rating) {
   if (!rating) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (rating->full_icon) {
-    ui_icon_base_destroy(rating->full_icon);
+    (void)ui_icon_base_destroy(rating->full_icon);
   }
   if (rating->half_icon) {
-    ui_icon_base_destroy(rating->half_icon);
+    (void)ui_icon_base_destroy(rating->half_icon);
   }
   if (rating->empty_icon) {
-    ui_icon_base_destroy(rating->empty_icon);
+    (void)ui_icon_base_destroy(rating->empty_icon);
   }
 
-  UI_FREE(rating);
+  C_MULTIPLATFORM_FREE(rating);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_rating_base_set_max(struct ui_rating_base *rating,
-                                     unsigned int max_rating) {
+ui_error_t ui_rating_base_set_max(struct ui_rating_base *rating,
+                                  unsigned int max_rating) {
   if (!rating || max_rating == 0) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -175,8 +178,8 @@ enum ui_error ui_rating_base_set_max(struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_rating_base_get_max(const struct ui_rating_base *rating,
-                                     unsigned int *out_max) {
+ui_error_t ui_rating_base_get_max(const struct ui_rating_base *rating,
+                                  unsigned int *out_max) {
   if (!rating || !out_max) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -184,8 +187,8 @@ enum ui_error ui_rating_base_get_max(const struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_rating_base_set_value(struct ui_rating_base *rating,
-                                       float value) {
+ui_error_t ui_rating_base_set_value(struct ui_rating_base *rating,
+                                    float value) {
   float old_val;
 
   if (!rating || value < 0.0f) {
@@ -200,15 +203,23 @@ enum ui_error ui_rating_base_set_value(struct ui_rating_base *rating,
   }
 
   if (rating->value != old_val) {
-    (void)trigger_cva_change(rating);
-    (void)trigger_cva_touched(rating);
+    {
+      ui_error_t chg_rc = trigger_cva_change(rating);
+      if (chg_rc != UI_ERROR_NONE)
+        return chg_rc;
+    }
+    {
+      ui_error_t t_rc = trigger_cva_touched(rating);
+      if (t_rc != UI_ERROR_NONE)
+        return t_rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_rating_base_get_value(const struct ui_rating_base *rating,
-                                       float *out_value) {
+ui_error_t ui_rating_base_get_value(const struct ui_rating_base *rating,
+                                    float *out_value) {
   if (!rating || !out_value) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -217,9 +228,9 @@ enum ui_error ui_rating_base_get_value(const struct ui_rating_base *rating,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_rating_base_get_item_fraction(const struct ui_rating_base *rating,
-                                 unsigned int index, float *out_fraction) {
+ui_error_t ui_rating_base_get_item_fraction(const struct ui_rating_base *rating,
+                                            unsigned int index,
+                                            float *out_fraction) {
   float item_start;
   float item_end;
 
@@ -241,8 +252,8 @@ ui_rating_base_get_item_fraction(const struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_rating_base_get_full_icon(struct ui_rating_base *rating,
-                                           struct ui_icon_base **out_icon) {
+ui_error_t ui_rating_base_get_full_icon(struct ui_rating_base *rating,
+                                        struct ui_icon_base **out_icon) {
   if (!rating || !out_icon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -250,8 +261,8 @@ enum ui_error ui_rating_base_get_full_icon(struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_rating_base_get_half_icon(struct ui_rating_base *rating,
-                                           struct ui_icon_base **out_icon) {
+ui_error_t ui_rating_base_get_half_icon(struct ui_rating_base *rating,
+                                        struct ui_icon_base **out_icon) {
   if (!rating || !out_icon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -259,8 +270,8 @@ enum ui_error ui_rating_base_get_half_icon(struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_rating_base_get_empty_icon(struct ui_rating_base *rating,
-                                            struct ui_icon_base **out_icon) {
+ui_error_t ui_rating_base_get_empty_icon(struct ui_rating_base *rating,
+                                         struct ui_icon_base **out_icon) {
   if (!rating || !out_icon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

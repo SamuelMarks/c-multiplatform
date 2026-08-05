@@ -7,191 +7,322 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error dummy_cva_on_change(union ui_signal_payload new_value,
-                                         void *user_data) {
+static ui_error_t dummy_cva_on_change(union ui_signal_payload new_value,
+                                      void *user_data) {
   (void)new_value;
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_cva_on_touched(void *user_data) {
+static ui_error_t dummy_cva_on_touched(void *user_data) {
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static int test_chips_basic(void) {
+static ui_error_t test_chips_basic(void) {
+  ui_error_t rc;
   struct ui_chips_base *chips = NULL;
   size_t count = 0;
   const char *token = NULL;
   struct ui_control_value_accessor cva;
 
   /* Invalid arguments tests */
-  if (ui_chips_base_create(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  ui_chips_base_destroy(NULL);
+  rc = ui_chips_base_create(NULL, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_destroy(NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT && rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  if (ui_chips_base_add(NULL, "test") != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  if (ui_chips_base_remove(NULL, 0) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  if (ui_chips_base_remove_last(NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  if (ui_chips_base_get_count(NULL, &count) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  if (ui_chips_base_get_token(NULL, 0, &token) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+  rc = ui_chips_base_add(NULL, "test");
 
-  if (ui_chips_base_create(&chips, &cva) != UI_ERROR_NONE)
-    return 1;
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_remove(NULL, 0);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_remove_last(NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_get_count(NULL, &count);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_get_token(NULL, 0, &token);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  if (ui_chips_base_add(chips, NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  if (ui_chips_base_get_count(chips, NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  if (ui_chips_base_get_token(chips, 0, NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+  rc = ui_chips_base_create(&chips, &cva);
+
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+  rc = ui_chips_base_add(chips, NULL);
+
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_get_count(chips, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_get_token(chips, 0, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Empty state */
-  if (ui_chips_base_remove_last(chips) != UI_ERROR_NOT_FOUND)
-    return 1;
-  if (ui_chips_base_remove(chips, 0) != UI_ERROR_OUT_OF_BOUNDS)
-    return 1;
-  if (ui_chips_base_get_token(chips, 0, &token) != UI_ERROR_OUT_OF_BOUNDS)
-    return 1;
+  rc = ui_chips_base_remove_last(chips);
+  if (rc != UI_ERROR_NOT_FOUND)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_remove(chips, 0);
+  if (rc != UI_ERROR_OUT_OF_BOUNDS)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_get_token(chips, 0, &token);
+  if (rc != UI_ERROR_OUT_OF_BOUNDS)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* CVA methods */
   if (cva.register_on_change(NULL, dummy_cva_on_change, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   if (cva.register_on_touched(NULL, dummy_cva_on_touched, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   if (cva.set_disabled_state(NULL, 1) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  cva.register_on_change(chips, dummy_cva_on_change, NULL);
-  cva.register_on_touched(chips, dummy_cva_on_touched, NULL);
-  cva.set_disabled_state(chips, 1);
-  cva.set_disabled_state(chips, 0);
+  rc = cva.register_on_change(chips, dummy_cva_on_change, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = cva.register_on_touched(chips, dummy_cva_on_touched, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = cva.set_disabled_state(chips, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = cva.set_disabled_state(chips, 0);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   {
     union ui_signal_payload payload;
     payload.ptr_val = NULL;
-    cva.write_value(chips, payload); /* does nothing but cover lines */
+    rc = cva.write_value(chips, payload); /* does nothing but cover lines */
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   /* Functionality */
-  if (ui_chips_base_add(chips, "apple") != UI_ERROR_NONE)
-    return 1;
-  if (ui_chips_base_add(chips, "banana") != UI_ERROR_NONE)
-    return 1;
-  if (ui_chips_base_add(chips, "cherry") != UI_ERROR_NONE)
-    return 1;
-  if (ui_chips_base_add(chips, "date") != UI_ERROR_NONE)
-    return 1;
+  rc = ui_chips_base_add(chips, "apple");
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_add(chips, "banana");
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_add(chips, "cherry");
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_chips_base_add(chips, "date");
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   /* Next add triggers capacity expansion (capacity goes 0->4->8) */
-  if (ui_chips_base_add(chips, "elderberry") != UI_ERROR_NONE)
-    return 1;
+  rc = ui_chips_base_add(chips, "elderberry");
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  ui_chips_base_get_count(chips, &count);
+  rc = ui_chips_base_get_count(chips, &count);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (count != 5)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  if (ui_chips_base_remove(chips, 1) != UI_ERROR_NONE)
-    return 1; /* banana */
-  ui_chips_base_get_count(chips, &count);
+  rc = ui_chips_base_remove(chips, 1);
+
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc; /* banana */
+  rc = ui_chips_base_get_count(chips, &count);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (count != 4)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  ui_chips_base_get_token(chips, 1, &token);
+  rc = ui_chips_base_get_token(chips, 1, &token);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (strcmp(token, "cherry") != 0)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  if (ui_chips_base_remove_last(chips) != UI_ERROR_NONE)
-    return 1; /* elderberry */
-  ui_chips_base_get_count(chips, &count);
+  rc = ui_chips_base_remove_last(chips);
+
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc; /* elderberry */
+  rc = ui_chips_base_get_count(chips, &count);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (count != 3)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  ui_chips_base_destroy(chips);
-  return 0;
+  rc = ui_chips_base_destroy(chips);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  return UI_ERROR_NONE;
 }
 
-static int test_chips_backspace(void) {
+static ui_error_t test_chips_backspace(void) {
+  ui_error_t rc;
   struct ui_chips_base *chips = NULL;
   int move_focus = 0;
 
-  if (ui_chips_base_handle_backspace(NULL, "", &move_focus) !=
-      UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+  rc = ui_chips_base_handle_backspace(NULL, "", &move_focus);
 
-  ui_chips_base_create(&chips, NULL);
-  if (ui_chips_base_handle_backspace(chips, "", NULL) !=
-      UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+  rc = ui_chips_base_create(&chips, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_chips_base_handle_backspace(chips, "", NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Empty chips, empty input -> shouldn't move focus to a chip since there are
    * none */
-  ui_chips_base_handle_backspace(chips, "", &move_focus);
+  rc = ui_chips_base_handle_backspace(chips, "", &move_focus);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (move_focus != 0)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  ui_chips_base_add(chips, "token1");
+  rc = ui_chips_base_add(chips, "token1");
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Has chips, but input is not empty */
-  ui_chips_base_handle_backspace(chips, "a", &move_focus);
+  rc = ui_chips_base_handle_backspace(chips, "a", &move_focus);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (move_focus != 0)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Has chips, input is empty -> SHOULD move focus */
-  ui_chips_base_handle_backspace(chips, "", &move_focus);
+  rc = ui_chips_base_handle_backspace(chips, "", &move_focus);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (move_focus != 1)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  ui_chips_base_handle_backspace(chips, NULL, &move_focus);
+  rc = ui_chips_base_handle_backspace(chips, NULL, &move_focus);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (move_focus != 1)
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  ui_chips_base_destroy(chips);
-  return 0;
+  rc = ui_chips_base_destroy(chips);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  return UI_ERROR_NONE;
 }
 
-static int test_chips_oom(void) {
+static ui_error_t run_oom_test_create_step(int i,
+                                           struct ui_chips_base **out_chips,
+                                           int *out_continue, int *out_break) {
+  ui_error_t rc;
+  g_malloc_fail_countdown = i;
+  rc = ui_chips_base_create(out_chips, NULL);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_OUT_OF_MEMORY) {
+    g_malloc_fail_countdown = -1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  }
+  if (rc == UI_ERROR_OUT_OF_MEMORY) {
+    g_malloc_fail_countdown = -1;
+    *out_continue = 1;
+    return UI_ERROR_NONE;
+  }
+  if (rc == UI_ERROR_NONE) {
+    g_malloc_fail_countdown = -1;
+    {
+      ui_error_t d_rc = ui_chips_base_destroy(*out_chips);
+      if (d_rc != UI_ERROR_NONE)
+        return d_rc;
+    }
+    *out_break = 1;
+    return UI_ERROR_NONE;
+  }
+  g_malloc_fail_countdown = -1;
+  return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+}
+
+static ui_error_t run_oom_test_add_step(int i, struct ui_chips_base *chips,
+                                        int *out_continue, int *out_break) {
+  ui_error_t rc;
+  g_malloc_fail_countdown = i;
+  rc = ui_chips_base_add(chips, "token");
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_OUT_OF_MEMORY) {
+    g_malloc_fail_countdown = -1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  }
+  if (rc == UI_ERROR_OUT_OF_MEMORY) {
+    g_malloc_fail_countdown = -1;
+    *out_continue = 1;
+    return UI_ERROR_NONE;
+  }
+  if (rc == UI_ERROR_NONE) {
+    g_malloc_fail_countdown = -1;
+    *out_break = 1;
+    return UI_ERROR_NONE;
+  }
+  g_malloc_fail_countdown = -1;
+  return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+}
+
+static ui_error_t test_chips_oom(void) {
   struct ui_chips_base *chips = NULL;
   int i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   for (i = 0; i < 3; i++) {
-    g_malloc_fail_countdown = i;
-    rc = ui_chips_base_create(&chips, NULL);
-    g_malloc_fail_countdown = -1;
-    if (rc == UI_ERROR_NONE) {
-      ui_chips_base_destroy(chips);
+    int do_continue = 0, do_break = 0;
+    rc = run_oom_test_create_step(i, &chips, &do_continue, &do_break);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    if (do_continue)
+      continue;
+    if (do_break)
       break;
-    }
   }
 
-  ui_chips_base_create(&chips, NULL);
+  rc = ui_chips_base_create(&chips, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   for (i = 0; i < 3; i++) {
-    g_malloc_fail_countdown = i;
-    rc = ui_chips_base_add(chips, "token");
-    g_malloc_fail_countdown = -1;
-    if (rc == UI_ERROR_NONE) {
+    int do_continue = 0, do_break = 0;
+    rc = run_oom_test_add_step(i, chips, &do_continue, &do_break);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    if (do_continue)
+      continue;
+    if (do_break)
       break;
-    }
   }
-  ui_chips_base_destroy(chips);
+  rc = ui_chips_base_destroy(chips);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  return 0;
+  return UI_ERROR_NONE;
 }
 
 int main(void) {
-  int failed = 0;
+  ui_error_t rc;
   printf("Running ui_chips_base tests...\n");
-  failed |= test_chips_basic();
-  failed |= test_chips_backspace();
-  failed |= test_chips_oom();
-  if (failed) {
+  rc = test_chips_basic();
+  if (rc != UI_ERROR_NONE) {
+    printf("Tests failed.\n");
+    return 1;
+  }
+  rc = test_chips_backspace();
+  if (rc != UI_ERROR_NONE) {
+    printf("Tests failed.\n");
+    return 1;
+  }
+  rc = test_chips_oom();
+  if (rc != UI_ERROR_NONE) {
     printf("Tests failed.\n");
     return 1;
   }

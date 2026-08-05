@@ -12,22 +12,22 @@ struct ui_selection_model {
   void *on_change_user_data;
 };
 
-static enum ui_error trigger_change(struct ui_selection_model *model) {
+static ui_error_t trigger_change(struct ui_selection_model *model) {
   if (model && model->on_change) {
     return model->on_change(model, model->on_change_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_selection_model_create(struct ui_selection_model **out_model) {
+ui_error_t ui_selection_model_create(struct ui_selection_model **out_model) {
   struct ui_selection_model *model;
 
   if (!out_model) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  model =
-      (struct ui_selection_model *)UI_MALLOC(sizeof(struct ui_selection_model));
+  model = (struct ui_selection_model *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_selection_model));
   if (!model) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -44,7 +44,7 @@ enum ui_error ui_selection_model_create(struct ui_selection_model **out_model) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_selection_model_set_on_change(struct ui_selection_model *model,
                                  ui_selection_model_on_change_t callback,
                                  void *user_data) {
@@ -57,21 +57,21 @@ ui_selection_model_set_on_change(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
-void ui_selection_model_destroy(struct ui_selection_model *model) {
+ui_error_t ui_selection_model_destroy(struct ui_selection_model *model) {
   if (!model) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (model->selected_ids) {
-    UI_FREE(model->selected_ids);
+    C_MULTIPLATFORM_FREE(model->selected_ids);
   }
-  UI_FREE(model);
+  C_MULTIPLATFORM_FREE(model);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_selection_model_set_multi_select(struct ui_selection_model *model,
-                                    int is_multi) {
+ui_error_t ui_selection_model_set_multi_select(struct ui_selection_model *model,
+                                               int is_multi) {
   if (!model) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -81,14 +81,14 @@ ui_selection_model_set_multi_select(struct ui_selection_model *model,
   if (!is_multi && model->count > 1) {
     /* Truncate to the first selected item */
     model->count = 1;
-    (void)trigger_change(model);
+    return trigger_change(model);
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_selection_model_select(struct ui_selection_model *model,
-                                        void *id) {
+ui_error_t ui_selection_model_select(struct ui_selection_model *model,
+                                     void *id) {
   int i;
 
   if (!model) {
@@ -102,7 +102,7 @@ enum ui_error ui_selection_model_select(struct ui_selection_model *model,
         /* Fallback cleanup for invalid state */
         model->count = 1;
         model->selected_ids[0] = id;
-        (void)trigger_change(model);
+        return trigger_change(model);
       }
       return UI_ERROR_NONE; /* Already selected */
     }
@@ -111,7 +111,7 @@ enum ui_error ui_selection_model_select(struct ui_selection_model *model,
   if (!model->is_multi) {
     /* Single select: replace selection */
     if (model->capacity < 1) {
-      void **new_arr = (void **)UI_MALLOC(sizeof(void *));
+      void **new_arr = (void **)C_MULTIPLATFORM_MALLOC(sizeof(void *));
       if (!new_arr) {
         return UI_ERROR_OUT_OF_MEMORY;
       }
@@ -120,15 +120,14 @@ enum ui_error ui_selection_model_select(struct ui_selection_model *model,
     }
     model->selected_ids[0] = id;
     model->count = 1;
-    (void)trigger_change(model);
-    return UI_ERROR_NONE;
+    return trigger_change(model);
   }
 
   /* Multi select: append */
   if (model->count >= model->capacity) {
     int new_cap = model->capacity == 0 ? 4 : model->capacity * 2;
-    void **new_arr = (void **)UI_REALLOC(model->selected_ids,
-                                         (size_t)new_cap * sizeof(void *));
+    void **new_arr = (void **)C_MULTIPLATFORM_REALLOC(
+        model->selected_ids, (size_t)new_cap * sizeof(void *));
     if (!new_arr) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -138,13 +137,11 @@ enum ui_error ui_selection_model_select(struct ui_selection_model *model,
 
   model->selected_ids[model->count] = id;
   model->count++;
-  (void)trigger_change(model);
-
-  return UI_ERROR_NONE;
+  return trigger_change(model);
 }
 
-enum ui_error ui_selection_model_deselect(struct ui_selection_model *model,
-                                          void *id) {
+ui_error_t ui_selection_model_deselect(struct ui_selection_model *model,
+                                       void *id) {
   int i;
   int found_index = -1;
 
@@ -164,14 +161,14 @@ enum ui_error ui_selection_model_deselect(struct ui_selection_model *model,
       model->selected_ids[i] = model->selected_ids[i + 1];
     }
     model->count--;
-    (void)trigger_change(model);
+    return trigger_change(model);
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_selection_model_toggle(struct ui_selection_model *model,
-                                        void *id) {
+ui_error_t ui_selection_model_toggle(struct ui_selection_model *model,
+                                     void *id) {
   int i;
   int is_selected = 0;
 
@@ -193,20 +190,20 @@ enum ui_error ui_selection_model_toggle(struct ui_selection_model *model,
   }
 }
 
-enum ui_error ui_selection_model_clear(struct ui_selection_model *model) {
+ui_error_t ui_selection_model_clear(struct ui_selection_model *model) {
   if (!model) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (model->count > 0) {
     model->count = 0;
-    (void)trigger_change(model);
+    return trigger_change(model);
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_selection_model_select_all(struct ui_selection_model *model,
-                                            void **ids, int count) {
+ui_error_t ui_selection_model_select_all(struct ui_selection_model *model,
+                                         void **ids, int count) {
   int i;
   int rc;
 
@@ -236,7 +233,7 @@ enum ui_error ui_selection_model_select_all(struct ui_selection_model *model,
   for (i = 0; i < count; ++i) {
     rc = ui_selection_model_select(model, ids[i]);
     if (rc != UI_ERROR_NONE) {
-      return (enum ui_error)rc;
+      return (ui_error_t)rc;
     }
   }
 
@@ -244,7 +241,7 @@ enum ui_error ui_selection_model_select_all(struct ui_selection_model *model,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_selection_model_is_selected(const struct ui_selection_model *model, void *id,
                                int *out_is_selected) {
   int i;
@@ -265,7 +262,7 @@ ui_selection_model_is_selected(const struct ui_selection_model *model, void *id,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_selection_model_get_selected_count(const struct ui_selection_model *model,
                                       int *out_count) {
   if (!model || !out_count) {
@@ -277,7 +274,7 @@ ui_selection_model_get_selected_count(const struct ui_selection_model *model,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_selection_model_get_selected(const struct ui_selection_model *model,
                                 void **out_ids, int capacity) {
   int i;

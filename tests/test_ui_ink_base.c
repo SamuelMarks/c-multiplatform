@@ -8,7 +8,7 @@
 static int test_ink_smoothing(void) {
   struct ui_ink_base *ink = NULL;
   struct ui_component *comp;
-  enum ui_error rc;
+  ui_error_t rc;
   size_t count = 0;
   struct ui_ink_event ev1 = {0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1000.0};
   struct ui_ink_event ev2 = {10.0f, 0.0f, 0.6f, 0.0f, 0.0f, 0.0f, 1010.0};
@@ -69,7 +69,7 @@ static int test_ink_smoothing(void) {
       return 1;
   }
 
-  ui_ink_base_destroy(ink);
+  (void)ui_ink_base_destroy(ink);
   return 0;
 }
 
@@ -78,7 +78,7 @@ extern int g_malloc_fail_countdown;
 static int test_ink_oom_and_args(void) {
   struct ui_ink_base *ink = NULL;
   struct ui_component *comp;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_ink_event ev1 = {0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1000.0};
   size_t count;
   int i;
@@ -108,7 +108,7 @@ static int test_ink_oom_and_args(void) {
     g_malloc_fail_countdown = i;
     rc = ui_ink_base_create(&ink);
     if (rc == UI_ERROR_NONE) {
-      ui_ink_base_destroy(ink);
+      (void)ui_ink_base_destroy(ink);
       break;
     }
   }
@@ -131,9 +131,9 @@ static int test_ink_oom_and_args(void) {
     struct ui_ink_base *ink2;
     ui_ink_base_create(&ink2);
     ui_ink_base_get_component(ink2, &comp);
-    ui_component_destroy(comp);
+    (void)ui_component_destroy(comp);
     ((void **)ink2)[0] = NULL;
-    ui_ink_base_destroy(ink2);
+    (void)ui_ink_base_destroy(ink2);
   }
 
   /* Force OOM during loop by adding lots of events */
@@ -158,13 +158,13 @@ static int test_ink_oom_and_args(void) {
     ui_ink_base_create(&ink3);
     ui_ink_base_add_event(ink3, &ev1);
     ui_ink_base_finish_stroke(ink3);
-    ui_ink_base_destroy(ink3);
+    (void)ui_ink_base_destroy(ink3);
 
     ui_ink_base_create(&ink3);
     ui_ink_base_add_event(ink3, &ev1);
     ui_ink_base_add_event(ink3, &ev2);
     ui_ink_base_finish_stroke(ink3);
-    ui_ink_base_destroy(ink3);
+    (void)ui_ink_base_destroy(ink3);
   }
 
   /* Test OOM paths inside finish_stroke and append_smoothed_segment */
@@ -210,7 +210,7 @@ static int test_ink_oom_and_args(void) {
         return 1;
       g_malloc_fail_countdown = -1;
 
-      ui_ink_base_destroy(ink_first);
+      (void)ui_ink_base_destroy(ink_first);
     }
 
     /* OOM inside finish_stroke when raw_count == 2 */
@@ -229,17 +229,17 @@ static int test_ink_oom_and_args(void) {
          becomes 2. It will never trigger realloc here! Wait, what if we
          artificially set capacity to 1 by adding events then clearing
          raw_points? We can't. This branch is practically unreachable without
-         mocking UI_REALLOC to always fail. Let's just use
+         mocking REALLOC to always fail. Let's just use
          g_malloc_fail_countdown = 0 to fail ANY realloc, but there is no
          realloc here.
       */
-      ui_ink_base_destroy(ink_two);
+      (void)ui_ink_base_destroy(ink_two);
     }
 
-    ui_ink_base_destroy(ink_oom);
+    (void)ui_ink_base_destroy(ink_oom);
   }
 
-  ui_ink_base_destroy(ink);
+  (void)ui_ink_base_destroy(ink);
   return 0;
 }
 

@@ -12,11 +12,33 @@
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
 
+void test_oom(void) {
+  int i;
+  for (i = 0; i < 4000; i++) {
+    struct ui_css_stylesheet *sheet = NULL;
+    const char *css =
+        "@namespace svg url(\"http://www.w3.org/2000/svg\"); div, .class, #id, "
+        "[href^=\"https\"], ::before, :hover { color: red !important; margin: "
+        "10px; font-family: 'Arial', sans-serif; background: url('img.png'); } "
+        "@media screen { div { width: 100px; } } @layer base { p { margin: 0; "
+        "} } @property --my-color { syntax: \"<color>\"; inherits: false; "
+        "initial-value: #c0ffee; }";
+    g_malloc_fail_countdown = i;
+    ui_css_parse_stylesheet(css, &sheet);
+    g_malloc_fail_countdown = -1;
+    if (sheet) {
+      printf("OOM loop broke at i=%d\n", i);
+      ui_css_stylesheet_destroy(sheet);
+      break;
+    }
+  }
+}
+
 int main(void) {
   struct ui_css_stylesheet *sheet = NULL;
   struct ui_dom_node *node = NULL;
   struct ui_css_computed_style *style = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   const char *val;
 
   const char *css_text =
@@ -294,7 +316,7 @@ int main(void) {
     }
 
     ui_css_computed_style_destroy(style);
-    ui_dom_node_destroy(state_node);
+    (void)ui_dom_node_destroy(state_node);
   }
 
   /* Test Conditional Rules */
@@ -347,7 +369,7 @@ int main(void) {
     }
 
     ui_css_computed_style_destroy(style);
-    ui_dom_node_destroy(cond_node);
+    (void)ui_dom_node_destroy(cond_node);
   }
 
   /* Test Scope Rules */
@@ -419,7 +441,7 @@ int main(void) {
     }
     ui_css_computed_style_destroy(style);
 
-    ui_dom_node_destroy(card_node);
+    (void)ui_dom_node_destroy(card_node);
   }
 
   /* Test Namespace Rules */
@@ -487,7 +509,7 @@ int main(void) {
     }
   }
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   ui_css_stylesheet_destroy(sheet);
 
   /* Parser Recovery and Edge Cases */
@@ -583,7 +605,7 @@ int main(void) {
       return 1;
     }
     ui_css_computed_style_destroy(rec_style);
-    ui_dom_node_destroy(rec_node);
+    (void)ui_dom_node_destroy(rec_node);
 
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &rec_node);
     ui_dom_node_set_tag_name(rec_node, "span");
@@ -595,7 +617,7 @@ int main(void) {
       return 1;
     }
     ui_css_computed_style_destroy(rec_style);
-    ui_dom_node_destroy(rec_node);
+    (void)ui_dom_node_destroy(rec_node);
 
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &rec_node);
     ui_dom_node_set_tag_name(rec_node, "p");
@@ -607,7 +629,7 @@ int main(void) {
       return 1;
     }
     ui_css_computed_style_destroy(rec_style);
-    ui_dom_node_destroy(rec_node);
+    (void)ui_dom_node_destroy(rec_node);
 
     ui_css_stylesheet_destroy(rec_sheet);
 
@@ -624,6 +646,10 @@ int main(void) {
   }
   if (ui_css_parse_stylesheet("body {}", NULL) != UI_ERROR_INVALID_ARGUMENT) {
     printf("Expected INVALID_ARGUMENT for null out pointer\n");
+    return 1;
+  }
+  if (ui_css_parse_stylesheet(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT) {
+    printf("Expected INVALID_ARGUMENT for both null pointers\n");
     return 1;
   }
 
@@ -702,6 +728,7 @@ int main(void) {
     ui_css_stylesheet_destroy(sheet2);
   }
 
+  test_oom();
   printf("All parser tests passed.\n");
   return 0;
 }

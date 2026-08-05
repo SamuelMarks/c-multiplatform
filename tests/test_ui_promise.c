@@ -8,8 +8,8 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error test_resolve_cb(void *result, void *user_data,
-                                     void **out_result) {
+static ui_error_t test_resolve_cb(void *result, void *user_data,
+                                  void **out_result) {
   int *val = (int *)user_data;
   if (val)
     *val = (int)(size_t)result;
@@ -18,9 +18,9 @@ static enum ui_error test_resolve_cb(void *result, void *user_data,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_reject_cb(enum ui_error error, void *user_data,
-                                    void **out_result) {
-  enum ui_error *err = (enum ui_error *)user_data;
+static ui_error_t test_reject_cb(ui_error_t error, void *user_data,
+                                 void **out_result) {
+  ui_error_t *err = (ui_error_t *)user_data;
   if (err)
     *err = error;
   if (out_result)
@@ -28,21 +28,21 @@ static enum ui_error test_reject_cb(enum ui_error error, void *user_data,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_finally_cb(void *user_data) {
+static ui_error_t test_finally_cb(void *user_data) {
   int *val = (int *)user_data;
   if (val)
     *val += 1;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error async_task_resolve(void *user_data) {
+static ui_error_t async_task_resolve(void *user_data) {
   struct ui_promise *promise = (struct ui_promise *)user_data;
   ui_promise_resolve(promise, (void *)100);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_fail_resolve_cb(void *result, void *user_data,
-                                          void **out_result) {
+static ui_error_t test_fail_resolve_cb(void *result, void *user_data,
+                                       void **out_result) {
   (void)result;
   (void)user_data;
   if (out_result)
@@ -50,8 +50,8 @@ static enum ui_error test_fail_resolve_cb(void *result, void *user_data,
   return UI_ERROR_UNKNOWN;
 }
 
-static enum ui_error test_fail_reject_cb(enum ui_error error, void *user_data,
-                                         void **out_result) {
+static ui_error_t test_fail_reject_cb(ui_error_t error, void *user_data,
+                                      void **out_result) {
   (void)error;
   (void)user_data;
   if (out_result)
@@ -63,10 +63,10 @@ static int run_normal_tests(void) {
   struct ui_promise *promise = NULL;
   struct ui_promise *chained = NULL;
   struct ui_promise *chained2 = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   enum ui_promise_state state;
   int test_val = 0;
-  enum ui_error test_err = UI_ERROR_NONE;
+  ui_error_t test_err = UI_ERROR_NONE;
   int finally_called = 0;
   int i;
 
@@ -110,7 +110,7 @@ static int run_normal_tests(void) {
   if (test_val != 42)
     return 1;
 
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test rejection */
   rc = ui_promise_create(&promise);
@@ -139,10 +139,10 @@ static int run_normal_tests(void) {
   if (test_err != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test catch and finally */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   finally_called = 0;
   ui_promise_catch(promise, test_reject_cb, &test_err, &chained);
   ui_promise_finally(chained, test_finally_cb, &finally_called, NULL);
@@ -152,10 +152,10 @@ static int run_normal_tests(void) {
     return 1;
   if (finally_called != 1)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test memory bounds: 10,000 chained promises */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   chained = promise;
   for (i = 0; i < 10000; i++) {
     ui_promise_then(chained, test_resolve_cb, NULL, NULL, &chained2);
@@ -166,59 +166,63 @@ static int run_normal_tests(void) {
   ui_promise_resolve(promise, (void *)123);
   if (finally_called != 1)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test invalid state ignores */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   ui_promise_reject(promise, UI_ERROR_INVALID_ARGUMENT);
   /* rejecting an already rejected promise should return UI_ERROR_NONE and do
    * nothing */
   if (ui_promise_reject(promise, UI_ERROR_OUT_OF_MEMORY) != UI_ERROR_NONE)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test then bubbling (no resolve handler, but chained) */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   ui_promise_then(promise, NULL, NULL, NULL, &chained);
   ui_promise_then(chained, test_resolve_cb, NULL, &test_val, NULL);
+  /* Test empty handler with no chained promise */
+  ui_promise_then(promise, NULL, NULL, NULL, NULL);
   test_val = 0;
   ui_promise_resolve(promise, (void *)1234);
   if (test_val != 1234)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test catch bubbling (no reject handler, but chained) */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   ui_promise_then(promise, NULL, NULL, NULL, &chained);
   ui_promise_catch(chained, test_reject_cb, &test_err, NULL);
+  /* Test empty catch with no chained promise */
+  ui_promise_then(promise, NULL, NULL, NULL, NULL);
   test_err = UI_ERROR_NONE;
   ui_promise_reject(promise, UI_ERROR_OUT_OF_BOUNDS);
   if (test_err != UI_ERROR_OUT_OF_BOUNDS)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test handler failure chaining (resolve) */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   ui_promise_then(promise, test_fail_resolve_cb, NULL, NULL, &chained);
   ui_promise_catch(chained, test_reject_cb, &test_err, NULL);
   test_err = UI_ERROR_NONE;
   ui_promise_resolve(promise, (void *)1);
   if (test_err != UI_ERROR_UNKNOWN)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test handler failure chaining (reject) */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   ui_promise_catch(promise, test_fail_reject_cb, NULL, &chained);
   ui_promise_catch(chained, test_reject_cb, &test_err, NULL);
   test_err = UI_ERROR_NONE;
   ui_promise_reject(promise, UI_ERROR_OUT_OF_MEMORY);
   if (test_err != UI_ERROR_UNKNOWN)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   /* Test finally bubbling */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   ui_promise_finally(promise, test_finally_cb, &finally_called, &chained);
   ui_promise_then(chained, test_resolve_cb, NULL, &test_val, NULL);
   test_val = 0;
@@ -228,9 +232,9 @@ static int run_normal_tests(void) {
     return 1;
   if (test_val != 5678)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   ui_promise_finally(promise, test_finally_cb, &finally_called, &chained);
   ui_promise_catch(chained, test_reject_cb, &test_err, NULL);
   test_err = UI_ERROR_NONE;
@@ -240,7 +244,7 @@ static int run_normal_tests(void) {
     return 1;
   if (test_err != UI_ERROR_NOT_FOUND)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
   if (ui_promise_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_promise_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -255,10 +259,10 @@ static int run_normal_tests(void) {
   if (ui_promise_get_state(NULL, &state) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   if (ui_promise_get_state(promise, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   return 0;
 }
@@ -272,7 +276,7 @@ static int run_async_tests(void) {
 
   /* Test resolution asynchronously (next tick) in single-threaded context */
   ui_execution_context_create(&ctx);
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
 
   ui_promise_then(promise, test_resolve_cb, NULL, &test_val, NULL);
 
@@ -286,8 +290,8 @@ static int run_async_tests(void) {
   if (test_val != 100)
     return 1; /* should be resolved now */
 
-  ui_promise_destroy(promise);
-  ui_execution_context_destroy(ctx);
+  (void)ui_promise_destroy(promise);
+  (void)ui_execution_context_destroy(ctx);
 
   return 0;
 }
@@ -295,7 +299,7 @@ static int run_async_tests(void) {
 static int run_oom_tests(void) {
   struct ui_promise *promise = NULL;
   struct ui_promise *chained = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Running promise OOM tests...\n");
 
@@ -308,11 +312,11 @@ static int run_oom_tests(void) {
   rc = ui_promise_create(&promise);
   if (rc != UI_ERROR_NONE)
     return 1;
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
   promise = NULL;
 
   /* Test chained promise create fail */
-  ui_promise_create(&promise);
+  (void)ui_promise_create(&promise);
   g_malloc_fail_countdown = 0;
   rc =
       ui_promise_then(promise, test_resolve_cb, test_reject_cb, NULL, &chained);
@@ -328,7 +332,14 @@ static int run_oom_tests(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
-  ui_promise_destroy(promise);
+  /* Test node alloc fail when chained is NOT requested */
+  g_malloc_fail_countdown = 0;
+  rc = ui_promise_then(promise, test_resolve_cb, test_reject_cb, NULL, NULL);
+  if (rc != UI_ERROR_OUT_OF_MEMORY)
+    return 1;
+  g_malloc_fail_countdown = -1;
+
+  (void)ui_promise_destroy(promise);
 
   return 0;
 }

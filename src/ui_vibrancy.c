@@ -2,8 +2,8 @@
 #include "ui_vibrancy.h"
 /* clang-format on */
 
-enum ui_error ui_vibrancy_params_init(struct ui_vibrancy_params *params,
-                                      enum ui_vibrancy_material material) {
+ui_error_t ui_vibrancy_params_init(struct ui_vibrancy_params *params,
+                                   enum ui_vibrancy_material material) {
   if (!params) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -5,7 +5,7 @@
 
 int main(void) {
   struct ui_video_decoder_backend backend;
-  enum ui_error err;
+  ui_error_t err;
   int failed = 0;
 
   err = ui_video_decoder_get_default_backend(NULL);

@@ -18,23 +18,23 @@ struct ui_bottom_nav_item_base {
   int active;
 };
 
-enum ui_error ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav) {
+ui_error_t ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav) {
   struct ui_bottom_nav_base *nav;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_nav) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  nav =
-      (struct ui_bottom_nav_base *)UI_MALLOC(sizeof(struct ui_bottom_nav_base));
+  nav = (struct ui_bottom_nav_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_bottom_nav_base));
   if (!nav) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   rc = ui_component_create(&nav->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(nav);
+    C_MULTIPLATFORM_FREE(nav);
     return rc;
   }
 
@@ -44,16 +44,17 @@ enum ui_error ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav) {
   return UI_ERROR_NONE;
 }
 
-void ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav) {
+ui_error_t ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav) {
   if (!nav) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(nav->component);
-  UI_FREE(nav);
+  (void)ui_component_destroy(nav->component);
+  C_MULTIPLATFORM_FREE(nav);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_nav_base_get_component(struct ui_bottom_nav_base *nav,
                                  struct ui_component **out_component) {
   if (!nav || !out_component) {
@@ -64,7 +65,7 @@ ui_bottom_nav_base_get_component(struct ui_bottom_nav_base *nav,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_nav_base_append_item(struct ui_bottom_nav_base *nav,
                                struct ui_bottom_nav_item_base *item) {
   if (!nav || !item) {
@@ -75,16 +76,16 @@ ui_bottom_nav_base_append_item(struct ui_bottom_nav_base *nav,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item) {
   struct ui_bottom_nav_item_base *item;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  item = (struct ui_bottom_nav_item_base *)UI_MALLOC(
+  item = (struct ui_bottom_nav_item_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_bottom_nav_item_base));
   if (!item) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -92,7 +93,7 @@ ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item) {
 
   rc = ui_component_create(&item->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(item);
+    C_MULTIPLATFORM_FREE(item);
     return rc;
   }
 
@@ -101,16 +102,18 @@ ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item) {
   return UI_ERROR_NONE;
 }
 
-void ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item) {
+ui_error_t
+ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item) {
   if (!item) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(item->component);
-  UI_FREE(item);
+  (void)ui_component_destroy(item->component);
+  C_MULTIPLATFORM_FREE(item);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_nav_item_base_get_component(struct ui_bottom_nav_item_base *item,
                                       struct ui_component **out_component) {
   if (!item || !out_component) {
@@ -121,7 +124,7 @@ ui_bottom_nav_item_base_get_component(struct ui_bottom_nav_item_base *item,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
                                    int active) {
   if (!item) {
@@ -132,7 +135,7 @@ ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_nav_item_base_get_active(struct ui_bottom_nav_item_base *item,
                                    int *out_active) {
   if (!item || !out_active) {
@@ -143,7 +146,7 @@ ui_bottom_nav_item_base_get_active(struct ui_bottom_nav_item_base *item,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_nav_base_bind_active_index(struct ui_bottom_nav_base *widget,
                                      struct ui_signal *signal) {
   if (!widget) {

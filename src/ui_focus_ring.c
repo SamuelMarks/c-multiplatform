@@ -2,8 +2,8 @@
 #include "ui_focus_ring.h"
 /* clang-format on */
 
-enum ui_error ui_focus_ring_get_standard(ui_color_t theme_primary_color,
-                                         struct ui_focus_ring *out_ring) {
+ui_error_t ui_focus_ring_get_standard(ui_color_t theme_primary_color,
+                                      struct ui_focus_ring *out_ring) {
   if (!out_ring) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -28,9 +28,9 @@ struct ui_arena;
  *
  * @param arena The memory arena.
  * @param out_manager Output pointer for the created manager.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_safe_area_manager_create(struct ui_arena *arena,
                             struct ui_safe_area_manager **out_manager);
 
@@ -38,19 +38,18 @@ ui_safe_area_manager_create(struct ui_arena *arena,
  * @brief Destroys a safe area manager.
  *
  * @param manager The safe area manager.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
-ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager);
+ui_error_t ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager);
 
 /**
  * @brief Sets the current safe area insets (usually called by window backends).
  *
  * @param manager The safe area manager.
  * @param insets The new insets.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
                                 const struct ui_safe_area_insets *insets);
 
@@ -59,9 +58,9 @@ ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
  *
  * @param manager The safe area manager.
  * @param out_insets Output pointer for the insets.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
                                 struct ui_safe_area_insets *out_insets);
 
@@ -71,9 +70,9 @@ ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
  *
  * @param manager The manager.
  * @param out_signal Output pointer for the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_safe_area_manager_get_change_signal(struct ui_safe_area_manager *manager,
                                        ui_signal_t **out_signal);
 

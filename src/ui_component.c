@@ -14,32 +14,11 @@
 
 static int g_scope_counter = 0;
 
-static enum ui_error internal_strdup(const char *src, char **out_str) {
-  size_t len;
-  char *copy;
-
-  len = strlen(src);
-  copy = (char *)UI_MALLOC(len + 1);
-  if (!copy) {
-    return UI_ERROR_OUT_OF_MEMORY;
-  }
-
-#if defined(_MSC_VER)
-  strcpy_s(copy, len + 1, src);
-#else
-  strcpy(copy, src);
-#endif
-
-  *out_str = copy;
-  return UI_ERROR_NONE;
-}
-
-static enum ui_error rewrite_classes_for_node(struct ui_dom_node *node,
-                                              const char *scope_id) {
+static ui_error_t rewrite_classes_for_node(struct ui_dom_node *node,
+                                           const char *scope_id) {
   const char *attr_val;
   struct ui_dom_node *child;
-  enum ui_error rc;
-
+  ui_error_t rc;
   if (ui_dom_node_get_attribute(node, "class", &attr_val) == UI_ERROR_NONE) {
     size_t word_count = 0;
     const char *p = attr_val;
@@ -55,8 +34,9 @@ static enum ui_error rewrite_classes_for_node(struct ui_dom_node *node,
     {
       size_t new_len =
           strlen(attr_val) + word_count * (strlen(scope_id) + 2) + 1;
-      char *new_classes = (char *)UI_MALLOC(new_len);
+      char *new_classes = (char *)C_MULTIPLATFORM_MALLOC(new_len);
       char *dst;
+      ui_error_t set_rc;
       if (!new_classes)
         return UI_ERROR_OUT_OF_MEMORY;
 
@@ -82,8 +62,12 @@ static enum ui_error rewrite_classes_for_node(struct ui_dom_node *node,
       }
       *dst = '\0';
 
-      ui_dom_node_set_attribute(node, "class", new_classes);
-      UI_FREE(new_classes);
+      set_rc = ui_dom_node_set_attribute(node, "class", new_classes);
+      if (set_rc != UI_ERROR_NONE) {
+        C_MULTIPLATFORM_FREE(new_classes);
+        return set_rc;
+      }
+      C_MULTIPLATFORM_FREE(new_classes);
     }
   }
 
@@ -98,7 +82,7 @@ static enum ui_error rewrite_classes_for_node(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
+static ui_error_t
 rewrite_stylesheet_selectors(struct ui_css_stylesheet *stylesheet,
                              const char *scope_id) {
   struct ui_css_rule *rule;
@@ -110,7 +94,7 @@ rewrite_stylesheet_selectors(struct ui_css_stylesheet *stylesheet,
     while (sel) {
       if (sel->type == UI_CSS_SELECTOR_TYPE_CLASS) {
         size_t new_len = strlen(sel->value) + strlen(scope_id) + 2;
-        char *new_val = (char *)UI_MALLOC(new_len);
+        char *new_val = (char *)C_MULTIPLATFORM_MALLOC(new_len);
         if (!new_val)
           return UI_ERROR_OUT_OF_MEMORY;
 
@@ -119,7 +103,7 @@ rewrite_stylesheet_selectors(struct ui_css_stylesheet *stylesheet,
 #else
         sprintf(new_val, "%s-%s", sel->value, scope_id);
 #endif
-        UI_FREE(sel->value);
+        C_MULTIPLATFORM_FREE(sel->value);
         sel->value = new_val;
       }
       sel = sel->next;
@@ -129,14 +113,15 @@ rewrite_stylesheet_selectors(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_component_create(struct ui_component **out_component) {
+ui_error_t ui_component_create(struct ui_component **out_component) {
   struct ui_component *comp;
 
   if (!out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  comp = (struct ui_component *)UI_MALLOC(sizeof(struct ui_component));
+  comp = (struct ui_component *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_component));
   if (!comp) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -152,32 +137,34 @@ enum ui_error ui_component_create(struct ui_component **out_component) {
   return UI_ERROR_NONE;
 }
 
-void ui_component_destroy(struct ui_component *component) {
+ui_error_t ui_component_destroy(struct ui_component *component) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!component) {
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (component->shadow_root) {
-    ui_dom_node_destroy(component->shadow_root);
+    (void)ui_dom_node_destroy(component->shadow_root);
   }
   if (component->internal_style) {
-    ui_css_stylesheet_destroy(component->internal_style);
+    (void)ui_css_stylesheet_destroy(component->internal_style);
   }
   if (component->override_style) {
-    ui_css_stylesheet_destroy(component->override_style);
+    (void)ui_css_stylesheet_destroy(component->override_style);
   }
   if (component->bound_properties) {
-    ui_css_stylesheet_destroy(component->bound_properties);
+    (void)ui_css_stylesheet_destroy(component->bound_properties);
   }
   if (component->scope_id) {
-    UI_FREE(component->scope_id);
+    C_MULTIPLATFORM_FREE(component->scope_id);
   }
 
-  UI_FREE(component);
+  C_MULTIPLATFORM_FREE(component);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_component_set_default_style(struct ui_component *component,
                                struct ui_css_stylesheet *stylesheet) {
   if (!component || !stylesheet) {
@@ -185,36 +172,40 @@ ui_component_set_default_style(struct ui_component *component,
   }
 
   if (component->internal_style) {
-    ui_css_stylesheet_destroy(component->internal_style);
+    (void)ui_css_stylesheet_destroy(component->internal_style);
   }
   component->internal_style = stylesheet;
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_component_inject_style_override(struct ui_component *component,
-                                                 const char *css_string) {
+ui_error_t ui_component_inject_style_override(struct ui_component *component,
+                                              const char *css_string) {
   struct ui_css_stylesheet *new_override = NULL;
 
   if (!component || !css_string) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_css_parse_stylesheet(css_string, &new_override);
+  {
+    ui_error_t rc = ui_css_parse_stylesheet(css_string, &new_override);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
 
   if (component->override_style) {
-    ui_css_stylesheet_destroy(component->override_style);
+    (void)ui_css_stylesheet_destroy(component->override_style);
   }
   component->override_style = new_override;
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_component_set_property(struct ui_component *component,
-                                        const char *property_name,
-                                        const char *property_value) {
+ui_error_t ui_component_set_property(struct ui_component *component,
+                                     const char *property_name,
+                                     const char *property_value) {
   struct ui_css_rule *rule = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!component || !property_name || !property_value) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -241,7 +232,7 @@ enum ui_error ui_component_set_property(struct ui_component *component,
       ui_css_rule_destroy(rule);
       return rc;
     }
-    ui_css_stylesheet_append_rule(component->bound_properties, rule);
+    (void)ui_css_stylesheet_append_rule(component->bound_properties, rule);
   }
 
   /* Note: A robust implementation would check if the declaration already exists
@@ -250,8 +241,8 @@ enum ui_error ui_component_set_property(struct ui_component *component,
   return ui_css_rule_append_declaration(rule, property_name, property_value, 0);
 }
 
-enum ui_error ui_component_mount(struct ui_component *component,
-                                 struct ui_dom_node *host_node) {
+ui_error_t ui_component_mount(struct ui_component *component,
+                              struct ui_dom_node *host_node) {
   if (!component || !host_node) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -263,9 +254,9 @@ enum ui_error ui_component_mount(struct ui_component *component,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_component_scope_styles(struct ui_component *component) {
+ui_error_t ui_component_scope_styles(struct ui_component *component) {
   char scope_buf[64];
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!component) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -282,23 +273,31 @@ enum ui_error ui_component_scope_styles(struct ui_component *component) {
   sprintf(scope_buf, "uiscope-%d", g_scope_counter);
 #endif
 
-  rc = internal_strdup(scope_buf, &component->scope_id);
+  rc = ((component->scope_id = C_MULTIPLATFORM_STRDUP(scope_buf))
+            ? UI_ERROR_NONE
+            : UI_ERROR_OUT_OF_MEMORY);
   if (rc != UI_ERROR_NONE) {
     return rc;
   }
 
   if (component->shadow_root) {
-    rewrite_classes_for_node(component->shadow_root, component->scope_id);
+    rc = rewrite_classes_for_node(component->shadow_root, component->scope_id);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   if (component->internal_style) {
-    rewrite_stylesheet_selectors(component->internal_style,
-                                 component->scope_id);
+    rc = rewrite_stylesheet_selectors(component->internal_style,
+                                      component->scope_id);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   if (component->override_style) {
-    rewrite_stylesheet_selectors(component->override_style,
-                                 component->scope_id);
+    rc = rewrite_stylesheet_selectors(component->override_style,
+                                      component->scope_id);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;

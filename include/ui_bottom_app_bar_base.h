@@ -34,7 +34,7 @@ enum ui_bottom_app_bar_fab_alignment {
  * @param out_bar Pointer to receive the allocated bottom app bar base.
  * @return UI_ERROR_NONE on success, or an appropriate error enum.
  */
-enum ui_error
+ui_error_t
 ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar);
 
 /**
@@ -42,7 +42,7 @@ ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar);
  *
  * @param bar The bottom app bar to destroy.
  */
-void ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar);
+ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar);
 
 /**
  * @brief Gets the underlying component.
@@ -50,7 +50,7 @@ void ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar);
  * @param bar The bottom app bar.
  * @return The underlying component.
  */
-enum ui_error
+ui_error_t
 ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
                                      struct ui_component **out_component);
 
@@ -65,7 +65,7 @@ ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
  * @param alignment The alignment of the FAB (center or end).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
                                struct ui_fab_base *fab,
                                enum ui_bottom_app_bar_fab_alignment alignment);
@@ -77,7 +77,7 @@ ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_bottom_app_bar_base_bind_active_index(struct ui_bottom_app_bar_base *widget,
                                          struct ui_signal *signal);
 

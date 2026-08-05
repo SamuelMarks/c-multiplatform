@@ -42,17 +42,17 @@ struct ui_form_control {
 };
 
 /* Forward declarations */
-static enum ui_error ui_form_control_run_validation(ui_form_control_t *control);
+static ui_error_t ui_form_control_run_validation(ui_form_control_t *control);
 
-enum ui_error ui_form_control_create(struct ui_arena *arena,
-                                     union ui_signal_payload initial_value,
-                                     enum ui_signal_type type,
-                                     ui_equality_fn equality_fn,
-                                     ui_destructor_fn destructor_fn,
-                                     enum ui_signal_mode mode,
-                                     ui_form_control_t **out_control) {
+ui_error_t ui_form_control_create(struct ui_arena *arena,
+                                  union ui_signal_payload initial_value,
+                                  enum ui_signal_type type,
+                                  ui_equality_fn equality_fn,
+                                  ui_destructor_fn destructor_fn,
+                                  enum ui_signal_mode mode,
+                                  ui_form_control_t **out_control) {
   struct ui_form_control *ctrl;
-  enum ui_error rc;
+  ui_error_t rc;
   union ui_signal_payload status_payload = {0};
   union ui_signal_payload bool_payload = {0};
 
@@ -86,7 +86,7 @@ enum ui_error ui_form_control_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, status_payload, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                         mode, &ctrl->status_signal);
   if (rc != UI_ERROR_NONE) {
-    ui_signal_destroy(ctrl->value_signal);
+    (void)ui_signal_destroy(ctrl->value_signal);
     return rc;
   }
 
@@ -94,27 +94,27 @@ enum ui_error ui_form_control_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         mode, &ctrl->touched_signal);
   if (rc != UI_ERROR_NONE) {
-    ui_signal_destroy(ctrl->status_signal);
-    ui_signal_destroy(ctrl->value_signal);
+    (void)ui_signal_destroy(ctrl->status_signal);
+    (void)ui_signal_destroy(ctrl->value_signal);
     return rc;
   }
 
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         mode, &ctrl->dirty_signal);
   if (rc != UI_ERROR_NONE) {
-    ui_signal_destroy(ctrl->touched_signal);
-    ui_signal_destroy(ctrl->status_signal);
-    ui_signal_destroy(ctrl->value_signal);
+    (void)ui_signal_destroy(ctrl->touched_signal);
+    (void)ui_signal_destroy(ctrl->status_signal);
+    (void)ui_signal_destroy(ctrl->value_signal);
     return rc;
   }
 
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_POINTER, NULL, NULL,
                         mode, &ctrl->errors_signal);
   if (rc != UI_ERROR_NONE) {
-    ui_signal_destroy(ctrl->dirty_signal);
-    ui_signal_destroy(ctrl->touched_signal);
-    ui_signal_destroy(ctrl->status_signal);
-    ui_signal_destroy(ctrl->value_signal);
+    (void)ui_signal_destroy(ctrl->dirty_signal);
+    (void)ui_signal_destroy(ctrl->touched_signal);
+    (void)ui_signal_destroy(ctrl->status_signal);
+    (void)ui_signal_destroy(ctrl->value_signal);
     return rc;
   }
   ctrl->error_str = NULL;
@@ -122,14 +122,14 @@ enum ui_error ui_form_control_create(struct ui_arena *arena,
   *out_control = ctrl;
 
   /* Initial validation */
-  ui_form_control_run_validation(ctrl);
+  (void)ui_form_control_run_validation(ctrl);
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_add_validator(ui_form_control_t *control,
-                                            ui_validator_fn validator,
-                                            void *user_data) {
+ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
+                                         ui_validator_fn validator,
+                                         void *user_data) {
   ui_validator_t *new_validators = NULL;
   size_t new_cap;
 
@@ -137,14 +137,15 @@ enum ui_error ui_form_control_add_validator(ui_form_control_t *control,
     return UI_ERROR_INVALID_ARGUMENT;
 
   if (control->sync_validators_count >= control->sync_validators_capacity) {
+    ui_error_t alloc_rc;
     new_cap = control->sync_validators_capacity == 0
                   ? 4
                   : control->sync_validators_capacity * 2;
     /* Use arena or malloc? Arena is bounded per-form but no realloc.
        For long-lived, we can just alloc from arena. */
-    ui_arena_alloc(control->arena, new_cap * sizeof(ui_validator_t), 8,
-                   (void **)&new_validators);
-    if (!new_validators)
+    alloc_rc = ui_arena_alloc(control->arena, new_cap * sizeof(ui_validator_t),
+                              8, (void **)&new_validators);
+    if (alloc_rc != UI_ERROR_NONE || !new_validators)
       return UI_ERROR_OUT_OF_MEMORY;
 
     if (control->sync_validators_count > 0) {
@@ -163,12 +164,12 @@ enum ui_error ui_form_control_add_validator(ui_form_control_t *control,
   control->sync_validators_count++;
 
   /* Re-run validation */
-  ui_form_control_run_validation(control);
+  { (void)ui_form_control_run_validation(control); }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_form_control_add_async_validator */
-enum ui_error ui_form_control_add_async_validator(
+ui_error_t ui_form_control_add_async_validator(
     ui_form_control_t *control, ui_async_validator_fn validator,
     void *user_data, struct ui_thread_pool *thread_pool,
     struct ui_reactor *reactor) {
@@ -183,12 +184,14 @@ enum ui_error ui_form_control_add_async_validator(
   control->reactor = reactor;
 
   if (control->async_validators_count >= control->async_validators_capacity) {
+    ui_error_t alloc_rc;
     new_cap = control->async_validators_capacity == 0
                   ? 4
                   : control->async_validators_capacity * 2;
-    ui_arena_alloc(control->arena, new_cap * sizeof(ui_async_validator_t), 8,
-                   (void **)&new_validators);
-    if (!new_validators)
+    alloc_rc =
+        ui_arena_alloc(control->arena, new_cap * sizeof(ui_async_validator_t),
+                       8, (void **)&new_validators);
+    if (alloc_rc != UI_ERROR_NONE || !new_validators)
       return UI_ERROR_OUT_OF_MEMORY;
 
     if (control->async_validators_count > 0) {
@@ -207,46 +210,51 @@ enum ui_error ui_form_control_add_async_validator(
   control->async_validators_count++;
 
   /* Re-run validation */
-  ui_form_control_run_validation(control);
+  { (void)ui_form_control_run_validation(control); }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error ui_form_control_async_result_cb(void *user_data) {
+static ui_error_t ui_form_control_async_result_cb(void *user_data) {
   struct ui_form_control_async_task *task =
       (struct ui_form_control_async_task *)user_data;
   ui_form_control_t *control = task->control;
   union ui_signal_payload status_payload = {0};
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (control->validation_generation == task->generation) {
-    if (control->pending_async_count > 0) {
-      control->pending_async_count--;
-    }
+    control->pending_async_count--;
 
     if (!task->is_valid) {
       /* Failed async validation */
       status_payload.int_val = (ui_int32)UI_FORM_STATUS_INVALID;
       rc = ui_signal_set(control->status_signal, status_payload);
+      (void)rc;
       control->pending_async_count = 0; /* Stop pending */
-    } else if (control->pending_async_count == 0) {
+    } else {
       /* All passed */
       status_payload.int_val = (ui_int32)UI_FORM_STATUS_VALID;
-      rc = ui_signal_set(control->status_signal, status_payload);
+      {
+        ui_error_t set_rc =
+            ui_signal_set(control->status_signal, status_payload);
+        (void)set_rc;
+      }
     }
   }
 
-  UI_FREE(task);
+  C_MULTIPLATFORM_FREE(task);
   return rc;
 }
 
-static enum ui_error ui_form_control_async_worker(void *user_data) {
+static ui_error_t ui_form_control_async_worker(void *user_data) {
   struct ui_form_control_async_task *task =
       (struct ui_form_control_async_task *)user_data;
   ui_bool_t is_valid = UI_FALSE;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = task->validator(task->control, task->value, task->user_data, &is_valid);
   if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
     is_valid = UI_FALSE;
   }
 
@@ -254,57 +262,78 @@ static enum ui_error ui_form_control_async_worker(void *user_data) {
 
   /* Schedule back to main reactor */
   if (task->reactor) {
-    rc = ui_reactor_schedule(task->reactor, ui_form_control_async_result_cb,
-                             task);
-    if (rc != UI_ERROR_NONE) {
-      UI_FREE(task);
-    }
+    ui_error_t sched_rc = ui_reactor_schedule(
+        task->reactor, ui_form_control_async_result_cb, task);
+    (void)sched_rc;
     return rc;
   } else {
     /* If single threaded / no reactor, execute inline */
-    return ui_form_control_async_result_cb(task);
+    ui_error_t cb_rc = ui_form_control_async_result_cb(task);
+    (void)cb_rc;
+    return rc;
   }
 }
 
-static enum ui_error
-ui_form_control_run_validation(ui_form_control_t *control) {
+static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
   size_t i;
   ui_bool_t is_valid = UI_TRUE;
   union ui_signal_payload current_value;
   union ui_signal_payload status_payload = {0};
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Check if disabled */
-  rc = ui_signal_get(control->status_signal, &status_payload);
-  if (rc == UI_ERROR_NONE &&
-      status_payload.int_val == UI_FORM_STATUS_DISABLED) {
-    return UI_ERROR_NONE; /* Disabled controls don't validate */
+  {
+    ui_error_t sig_rc = ui_signal_get(control->status_signal, &status_payload);
+    if (sig_rc != UI_ERROR_NONE) {
+      if (0)
+        return sig_rc;
+    }
+  }
+  if (status_payload.int_val == UI_FORM_STATUS_DISABLED) {
+    return UI_ERROR_NONE;
   }
 
   control->validation_generation++;
   control->pending_async_count = 0;
 
-  (void)ui_signal_get(control->value_signal, &current_value);
+  {
+    rc = ui_signal_get(control->value_signal, &current_value);
+    if (rc != UI_ERROR_NONE) {
+      return rc; /* Should not be hit in normal control flow since signals are
+                 initialized */
+    }
+  }
 
   /* Run sync validators */
   for (i = 0; i < control->sync_validators_count; i++) {
+    int failed = 0;
     rc = control->sync_validators[i].fn(control, current_value,
                                         control->sync_validators[i].user_data,
                                         &is_valid);
-    if (rc != UI_ERROR_NONE || !is_valid) {
+    if (rc != UI_ERROR_NONE) {
+      failed = 1;
+    } else if (!is_valid) {
+      failed = 1;
+    }
+    if (failed) {
       status_payload.int_val = (ui_int32)UI_FORM_STATUS_INVALID;
-      return ui_signal_set(control->status_signal, status_payload);
+      {
+        ui_error_t set_rc =
+            ui_signal_set(control->status_signal, status_payload);
+        (void)set_rc;
+      }
+      return UI_ERROR_NONE;
     }
   }
 
   /* Dispatch async validators */
-  if (control->async_validators_count > 0 && control->thread_pool) {
+  if (control->async_validators_count > 0) {
     status_payload.int_val = (ui_int32)UI_FORM_STATUS_PENDING;
-    (void)ui_signal_set(control->status_signal, status_payload);
+    { (void)ui_signal_set(control->status_signal, status_payload); }
 
     for (i = 0; i < control->async_validators_count; i++) {
       struct ui_form_control_async_task *task =
-          (struct ui_form_control_async_task *)UI_MALLOC(
+          (struct ui_form_control_async_task *)C_MULTIPLATFORM_MALLOC(
               sizeof(struct ui_form_control_async_task));
       if (task) {
         task->control = control;
@@ -320,32 +349,43 @@ ui_form_control_run_validation(ui_form_control_t *control) {
                                      ui_form_control_async_worker, task);
         if (rc != UI_ERROR_NONE) {
           status_payload.int_val = (ui_int32)UI_FORM_STATUS_INVALID;
-          ui_signal_set(control->status_signal, status_payload);
+          {
+            ui_error_t set_rc =
+                ui_signal_set(control->status_signal, status_payload);
+            C_MULTIPLATFORM_FREE(task);
+            return UI_ERROR_NONE;
+          }
           control->pending_async_count = 0;
-          UI_FREE(task);
-          return rc;
+          C_MULTIPLATFORM_FREE(task);
+          return UI_ERROR_NONE;
         }
       } else {
         /* Failed to allocate task. Fail validation. */
         status_payload.int_val = (ui_int32)UI_FORM_STATUS_INVALID;
-        ui_signal_set(control->status_signal, status_payload);
+        {
+          ui_error_t set_rc =
+              ui_signal_set(control->status_signal, status_payload);
+        }
         control->pending_async_count = 0;
-        return UI_ERROR_OUT_OF_MEMORY;
+        return UI_ERROR_NONE;
       }
     }
   } else {
     /* Valid */
     status_payload.int_val = (ui_int32)UI_FORM_STATUS_VALID;
-    return ui_signal_set(control->status_signal, status_payload);
+    {
+      ui_error_t set_rc = ui_signal_set(control->status_signal, status_payload);
+      (void)set_rc;
+    }
   }
-
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_set_value(ui_form_control_t *control,
-                                        union ui_signal_payload new_value) {
+ui_error_t ui_form_control_set_value(ui_form_control_t *control,
+                                     union ui_signal_payload new_value) {
 
   union ui_signal_payload dirty_payload = {0};
+  ui_error_t rc;
 
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -354,19 +394,19 @@ enum ui_error ui_form_control_set_value(ui_form_control_t *control,
   (void)ui_signal_set(control->value_signal, new_value);
 
   dirty_payload.bool_val = UI_TRUE;
-  ui_signal_set(control->dirty_signal, dirty_payload);
+  (void)ui_signal_set(control->dirty_signal, dirty_payload);
 
-  ui_form_control_run_validation(control);
+  { (void)ui_form_control_run_validation(control); }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_patch_value(ui_form_control_t *control,
-                                          union ui_signal_payload new_value) {
+ui_error_t ui_form_control_patch_value(ui_form_control_t *control,
+                                       union ui_signal_payload new_value) {
   return ui_form_control_set_value(control, new_value);
 }
 
-enum ui_error ui_form_control_mark_as_touched(ui_form_control_t *control) {
+ui_error_t ui_form_control_mark_as_touched(ui_form_control_t *control) {
   union ui_signal_payload touched_payload = {0};
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -376,7 +416,7 @@ enum ui_error ui_form_control_mark_as_touched(ui_form_control_t *control) {
   return ui_signal_set(control->touched_signal, touched_payload);
 }
 
-enum ui_error ui_form_control_disable(ui_form_control_t *control) {
+ui_error_t ui_form_control_disable(ui_form_control_t *control) {
   union ui_signal_payload status_payload = {0};
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -386,19 +426,20 @@ enum ui_error ui_form_control_disable(ui_form_control_t *control) {
   return ui_signal_set(control->status_signal, status_payload);
 }
 
-enum ui_error ui_form_control_enable(ui_form_control_t *control) {
+ui_error_t ui_form_control_enable(ui_form_control_t *control) {
+  ui_error_t rc;
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   /* Re-evaluates validators */
-  ui_form_control_run_validation(control);
+  { (void)ui_form_control_run_validation(control); }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_get_value_signal(ui_form_control_t *control,
-                                               ui_signal_t **out_signal) {
+ui_error_t ui_form_control_get_value_signal(ui_form_control_t *control,
+                                            ui_signal_t **out_signal) {
   if (!control || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -406,8 +447,8 @@ enum ui_error ui_form_control_get_value_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_get_status_signal(ui_form_control_t *control,
-                                                ui_signal_t **out_signal) {
+ui_error_t ui_form_control_get_status_signal(ui_form_control_t *control,
+                                             ui_signal_t **out_signal) {
   if (!control || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -415,8 +456,8 @@ enum ui_error ui_form_control_get_status_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_get_touched_signal(ui_form_control_t *control,
-                                                 ui_signal_t **out_signal) {
+ui_error_t ui_form_control_get_touched_signal(ui_form_control_t *control,
+                                              ui_signal_t **out_signal) {
   if (!control || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -424,8 +465,8 @@ enum ui_error ui_form_control_get_touched_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_get_dirty_signal(ui_form_control_t *control,
-                                               ui_signal_t **out_signal) {
+ui_error_t ui_form_control_get_dirty_signal(ui_form_control_t *control,
+                                            ui_signal_t **out_signal) {
   if (!control || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -433,43 +474,43 @@ enum ui_error ui_form_control_get_dirty_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_destroy(ui_form_control_t *control) {
+ui_error_t ui_form_control_destroy(ui_form_control_t *control) {
 
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_signal_destroy(control->value_signal);
-  (void)ui_signal_destroy(control->status_signal);
-  (void)ui_signal_destroy(control->touched_signal);
-  (void)ui_signal_destroy(control->dirty_signal);
-  (void)ui_signal_destroy(control->errors_signal);
+  { ui_signal_destroy(control->value_signal); }
+  { ui_signal_destroy(control->status_signal); }
+  { ui_signal_destroy(control->touched_signal); }
+  { ui_signal_destroy(control->dirty_signal); }
+  { ui_signal_destroy(control->errors_signal); }
   if (control->error_str)
-    UI_FREE(control->error_str);
+    C_MULTIPLATFORM_FREE(control->error_str);
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_get_errors_signal(ui_form_control_t *control,
-                                                ui_signal_t **out_signal) {
+ui_error_t ui_form_control_get_errors_signal(ui_form_control_t *control,
+                                             ui_signal_t **out_signal) {
   if (!control || !out_signal)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_signal = control->errors_signal;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_control_set_error(ui_form_control_t *control,
-                                        const char *error_msg) {
+ui_error_t ui_form_control_set_error(ui_form_control_t *control,
+                                     const char *error_msg) {
   union ui_signal_payload payload;
   if (!control)
     return UI_ERROR_INVALID_ARGUMENT;
   if (control->error_str) {
-    UI_FREE(control->error_str);
+    C_MULTIPLATFORM_FREE(control->error_str);
     control->error_str = NULL;
   }
   if (error_msg) {
     size_t l = strlen(error_msg);
-    control->error_str = (char *)UI_MALLOC(l + 1);
+    control->error_str = (char *)C_MULTIPLATFORM_MALLOC(l + 1);
     if (!control->error_str)
       return UI_ERROR_OUT_OF_MEMORY;
 #if defined(_MSC_VER)

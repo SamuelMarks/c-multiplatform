@@ -18,22 +18,23 @@ struct ui_nav_rail_item_base {
   int active;
 };
 
-enum ui_error ui_nav_rail_base_create(struct ui_nav_rail_base **out_rail) {
+ui_error_t ui_nav_rail_base_create(struct ui_nav_rail_base **out_rail) {
   struct ui_nav_rail_base *rail;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_rail) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rail = (struct ui_nav_rail_base *)UI_MALLOC(sizeof(struct ui_nav_rail_base));
+  rail = (struct ui_nav_rail_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_nav_rail_base));
   if (!rail) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   rc = ui_component_create(&rail->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(rail);
+    C_MULTIPLATFORM_FREE(rail);
     return rc;
   }
 
@@ -43,20 +44,20 @@ enum ui_error ui_nav_rail_base_create(struct ui_nav_rail_base **out_rail) {
   return UI_ERROR_NONE;
 }
 
-void ui_nav_rail_base_destroy(struct ui_nav_rail_base *rail) {
+ui_error_t ui_nav_rail_base_destroy(struct ui_nav_rail_base *rail) {
   if (!rail) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (rail->component) {
-    ui_component_destroy(rail->component);
+    (void)ui_component_destroy(rail->component);
   }
-  UI_FREE(rail);
+  C_MULTIPLATFORM_FREE(rail);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_nav_rail_base_get_component(struct ui_nav_rail_base *rail,
-                               struct ui_component **out_component) {
+ui_error_t ui_nav_rail_base_get_component(struct ui_nav_rail_base *rail,
+                                          struct ui_component **out_component) {
   if (!rail || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -64,8 +65,8 @@ ui_nav_rail_base_get_component(struct ui_nav_rail_base *rail,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_nav_rail_base_append_item(struct ui_nav_rail_base *rail,
-                                           struct ui_nav_rail_item_base *item) {
+ui_error_t ui_nav_rail_base_append_item(struct ui_nav_rail_base *rail,
+                                        struct ui_nav_rail_item_base *item) {
   if (!rail || !item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -74,16 +75,16 @@ enum ui_error ui_nav_rail_base_append_item(struct ui_nav_rail_base *rail,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_nav_rail_item_base_create(struct ui_nav_rail_item_base **out_item) {
   struct ui_nav_rail_item_base *item;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  item = (struct ui_nav_rail_item_base *)UI_MALLOC(
+  item = (struct ui_nav_rail_item_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_nav_rail_item_base));
   if (!item) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -91,7 +92,7 @@ ui_nav_rail_item_base_create(struct ui_nav_rail_item_base **out_item) {
 
   rc = ui_component_create(&item->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(item);
+    C_MULTIPLATFORM_FREE(item);
     return rc;
   }
 
@@ -100,18 +101,19 @@ ui_nav_rail_item_base_create(struct ui_nav_rail_item_base **out_item) {
   return UI_ERROR_NONE;
 }
 
-void ui_nav_rail_item_base_destroy(struct ui_nav_rail_item_base *item) {
+ui_error_t ui_nav_rail_item_base_destroy(struct ui_nav_rail_item_base *item) {
   if (!item) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (item->component) {
-    ui_component_destroy(item->component);
+    (void)ui_component_destroy(item->component);
   }
-  UI_FREE(item);
+  C_MULTIPLATFORM_FREE(item);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_nav_rail_item_base_get_component(struct ui_nav_rail_item_base *item,
                                     struct ui_component **out_component) {
   if (!item || !out_component) {
@@ -122,9 +124,8 @@ ui_nav_rail_item_base_get_component(struct ui_nav_rail_item_base *item,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_nav_rail_item_base_set_active(struct ui_nav_rail_item_base *item,
-                                 int active) {
+ui_error_t ui_nav_rail_item_base_set_active(struct ui_nav_rail_item_base *item,
+                                            int active) {
   if (!item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -134,9 +135,8 @@ ui_nav_rail_item_base_set_active(struct ui_nav_rail_item_base *item,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_nav_rail_item_base_get_active(struct ui_nav_rail_item_base *item,
-                                 int *out_active) {
+ui_error_t ui_nav_rail_item_base_get_active(struct ui_nav_rail_item_base *item,
+                                            int *out_active) {
   if (!item || !out_active) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -145,9 +145,8 @@ ui_nav_rail_item_base_get_active(struct ui_nav_rail_item_base *item,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_nav_rail_base_bind_active_index(struct ui_nav_rail_base *widget,
-                                   struct ui_signal *signal) {
+ui_error_t ui_nav_rail_base_bind_active_index(struct ui_nav_rail_base *widget,
+                                              struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

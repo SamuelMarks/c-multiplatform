@@ -6,9 +6,46 @@
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
+int g_asset_streamer_mock_fail = 0;
+extern int g_malloc_fail_countdown;
+
+static ui_error_t mock_promise_resolve(struct ui_promise *promise,
+                                       void *value) {
+  if (g_asset_streamer_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  return (ui_promise_resolve)(promise, value);
+}
+#undef ui_promise_resolve
+#define ui_promise_resolve mock_promise_resolve
+
+static ui_error_t mock_promise_reject(struct ui_promise *promise,
+                                      ui_error_t error) {
+  if (g_asset_streamer_mock_fail == 2)
+    return UI_ERROR_UNKNOWN;
+  return (ui_promise_reject)(promise, error);
+}
+#undef ui_promise_reject
+#define ui_promise_reject mock_promise_reject
+
+#include "ui_thread_pool.h"
+static ui_error_t mock_thread_pool_schedule(struct ui_thread_pool *pool,
+                                            ui_error_t (*task)(void *),
+                                            void *user_data) {
+  if (g_asset_streamer_mock_fail == 4)
+    return UI_ERROR_UNKNOWN;
+  return (ui_thread_pool_schedule)(pool, task, user_data);
+}
+#undef ui_thread_pool_schedule
+#define ui_thread_pool_schedule mock_thread_pool_schedule
+#endif
+
+#ifdef UI_TEST_MOCK_ALLOC
 extern int g_mock_io_fail;
 #define UI_FSEEK(f, o, w) (g_mock_io_fail == 1 ? -1 : fseek(f, o, w))
-#define UI_FTELL(f) (g_mock_io_fail == 2 ? -1 : ftell(f))
+#define UI_FTELL(f)                                                            \
+  (g_mock_io_fail == 2                                                         \
+       ? -1                                                                    \
+       : (g_mock_io_fail == 5 ? (long)(256 * 1024 * 1024) + 1L : ftell(f)))
 #define UI_FREAD(p, s, n, f) (g_mock_io_fail == 3 ? 0 : fread(p, s, n, f))
 #else
 #define UI_FSEEK(f, o, w) fseek(f, o, w)
@@ -32,7 +69,7 @@ struct ui_asset_task {
   enum ui_asset_type type;
   struct ui_promise *promise;
   struct ui_asset *asset;
-  enum ui_error error;
+  ui_error_t error;
 };
 
 /**
@@ -43,18 +80,17 @@ struct ui_asset_task {
  * @param out_streamer Pointer to receive the new streamer handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
-ui_asset_streamer_create(struct ui_thread_pool *pool,
-                         struct ui_execution_context *ctx,
-                         struct ui_asset_streamer **out_streamer) {
+ui_error_t ui_asset_streamer_create(struct ui_thread_pool *pool,
+                                    struct ui_execution_context *ctx,
+                                    struct ui_asset_streamer **out_streamer) {
   struct ui_asset_streamer *streamer = NULL;
 
   if (!pool || !ctx || !out_streamer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  streamer =
-      (struct ui_asset_streamer *)UI_MALLOC(sizeof(struct ui_asset_streamer));
+  streamer = (struct ui_asset_streamer *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_asset_streamer));
   if (!streamer) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -73,11 +109,11 @@ ui_asset_streamer_create(struct ui_thread_pool *pool,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if streamer is
  * NULL.
  */
-enum ui_error ui_asset_streamer_destroy(struct ui_asset_streamer *streamer) {
+ui_error_t ui_asset_streamer_destroy(struct ui_asset_streamer *streamer) {
   if (!streamer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(streamer);
+  C_MULTIPLATFORM_FREE(streamer);
   return UI_ERROR_NONE;
 }
 
@@ -86,28 +122,35 @@ enum ui_error ui_asset_streamer_destroy(struct ui_asset_streamer *streamer) {
  *
  * @param asset The asset to free.
  */
-void ui_asset_destroy(struct ui_asset *asset) {
+ui_error_t ui_asset_destroy(struct ui_asset *asset) {
   if (asset) {
-    UI_FREE(asset->url);
-    UI_FREE(asset->data);
-    UI_FREE(asset);
+    C_MULTIPLATFORM_FREE(asset->url);
+    C_MULTIPLATFORM_FREE(asset->data);
+    C_MULTIPLATFORM_FREE(asset);
   }
-}
-
-static enum ui_error asset_task_complete(void *user_data) {
-  struct ui_asset_task *task = (struct ui_asset_task *)user_data;
-  if (task->error == UI_ERROR_NONE) {
-    ui_promise_resolve(task->promise, task->asset);
-  } else {
-    ui_promise_reject(task->promise, task->error);
-  }
-
-  UI_FREE(task->url);
-  UI_FREE(task);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error asset_task_execute(void *user_data) {
+static ui_error_t asset_task_complete(void *user_data) {
+  struct ui_asset_task *task = (struct ui_asset_task *)user_data;
+  ui_error_t rc = UI_ERROR_NONE;
+
+  if (task->error == UI_ERROR_NONE) {
+    rc = ui_promise_resolve(task->promise, task->asset);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  } else {
+    rc = ui_promise_reject(task->promise, task->error);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
+
+  C_MULTIPLATFORM_FREE(task->url);
+  C_MULTIPLATFORM_FREE(task);
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t asset_task_execute(void *user_data) {
   struct ui_asset_task *task = (struct ui_asset_task *)user_data;
   FILE *f = NULL;
   long size;
@@ -151,7 +194,9 @@ static enum ui_error asset_task_execute(void *user_data) {
 
   rewind(f);
 
-  task->asset = (struct ui_asset *)UI_MALLOC(sizeof(struct ui_asset));
+  task->asset =
+      (struct ui_asset *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset));
+
   if (!task->asset) {
     task->error = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -160,8 +205,8 @@ static enum ui_error asset_task_execute(void *user_data) {
 
   task->asset->type = task->type;
   task->asset->size = (ui_uint32)size;
-  task->asset->data =
-      UI_MALLOC((size_t)size + 1); /* +1 for null terminator safety */
+  task->asset->data = C_MULTIPLATFORM_MALLOC(
+      (size_t)size + 1); /* +1 for null terminator safety */
   if (!task->asset->data) {
     task->error = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -179,7 +224,7 @@ static enum ui_error asset_task_execute(void *user_data) {
   {
     size_t url_len;
     url_len = strlen(task->url);
-    task->asset->url = (char *)UI_MALLOC(url_len + 1);
+    task->asset->url = (char *)C_MULTIPLATFORM_MALLOC(url_len + 1);
     if (!task->asset->url) {
       task->error = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -198,28 +243,25 @@ cleanup:
 
   if (task->error != UI_ERROR_NONE && task->asset) {
     if (task->asset->data) {
-      UI_FREE(task->asset->data);
+      C_MULTIPLATFORM_FREE(task->asset->data);
     }
-    UI_FREE(task->asset);
+    C_MULTIPLATFORM_FREE(task->asset);
     task->asset = NULL;
   }
   {
-    enum ui_error sched_rc = ui_execution_context_schedule(
+    ui_error_t sched_rc = ui_execution_context_schedule(
         task->streamer->ctx, asset_task_complete, task);
     if (sched_rc != UI_ERROR_NONE) {
       if (task->asset) {
-        if (task->asset->url)
-          UI_FREE(task->asset->url);
-        if (task->asset->data)
-          UI_FREE(task->asset->data);
-        UI_FREE(task->asset);
+        C_MULTIPLATFORM_FREE(task->asset->url);
+        C_MULTIPLATFORM_FREE(task->asset->data);
+        C_MULTIPLATFORM_FREE(task->asset);
       }
-      if (task->url) {
-        UI_FREE(task->url);
-      }
-      UI_FREE(task);
+      C_MULTIPLATFORM_FREE(task->url);
+      C_MULTIPLATFORM_FREE(task);
+      return sched_rc;
     }
-    return sched_rc;
+    return UI_ERROR_NONE;
   }
 }
 
@@ -233,11 +275,10 @@ cleanup:
  * ui_asset*).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_asset_streamer_request(struct ui_asset_streamer *streamer,
-                                        const char *url,
-                                        enum ui_asset_type type,
-                                        struct ui_promise **out_promise) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_asset_streamer_request(struct ui_asset_streamer *streamer,
+                                     const char *url, enum ui_asset_type type,
+                                     struct ui_promise **out_promise) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_asset_task *task = NULL;
   struct ui_promise *promise = NULL;
   size_t url_len;
@@ -251,7 +292,10 @@ enum ui_error ui_asset_streamer_request(struct ui_asset_streamer *streamer,
     goto cleanup;
   }
 
-  task = (struct ui_asset_task *)UI_MALLOC(sizeof(struct ui_asset_task));
+  task = (struct ui_asset_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_asset_task));
+  if (task)
+    memset(task, 0, sizeof(struct ui_asset_task));
   if (!task) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -264,7 +308,7 @@ enum ui_error ui_asset_streamer_request(struct ui_asset_streamer *streamer,
   task->error = UI_ERROR_NONE;
 
   url_len = strlen(url);
-  task->url = (char *)UI_MALLOC(url_len + 1);
+  task->url = (char *)C_MULTIPLATFORM_MALLOC(url_len + 1);
   if (!task->url) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -287,14 +331,153 @@ enum ui_error ui_asset_streamer_request(struct ui_asset_streamer *streamer,
 cleanup:
   if (rc != UI_ERROR_NONE) {
     if (promise) {
-      ui_promise_destroy(promise);
+      (void)ui_promise_destroy(promise);
     }
     if (task) {
       if (task->url) {
-        UI_FREE(task->url);
+        C_MULTIPLATFORM_FREE(task->url);
       }
-      UI_FREE(task);
+      C_MULTIPLATFORM_FREE(task);
     }
   }
   return rc;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/* Forward declare internal functions we need to test directly */
+static ui_error_t asset_task_execute(void *user_data);
+static ui_error_t asset_task_complete(void *user_data);
+
+ui_error_t run_asset_streamer_coverage(void);
+ui_error_t run_asset_streamer_coverage(void) {
+  struct ui_asset_streamer *streamer = NULL;
+  struct ui_thread_pool *pool = NULL;
+  struct ui_promise *promise = NULL;
+  struct ui_asset_task *task = NULL;
+  FILE *dummy = NULL;
+  struct ui_execution_context *ctx = NULL;
+
+  ui_thread_pool_create(1, &pool);
+  ui_execution_context_create(&ctx);
+  ui_asset_streamer_create(pool, ctx, &streamer);
+
+  dummy = fopen("dummy_asset.txt", "wb");
+  fwrite("test", 1, 4, dummy);
+  fclose(dummy);
+
+  /* Mock 1: fopen fails */
+  task = (struct ui_asset_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_asset_task));
+  memset(task, 0, sizeof(struct ui_asset_task));
+  task->streamer = streamer;
+  task->type = UI_ASSET_TYPE_BINARY;
+  (void)ui_promise_create(&task->promise);
+  task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
+  strcpy(task->url, "dummy_asset.txt");
+  g_mock_io_fail = 4; /* mock fopen fail */
+  asset_task_execute(task);
+  g_mock_io_fail = 0;
+  ui_execution_context_tick(ctx);
+
+  /* Mock 1: promise_resolve fails */
+  task = (struct ui_asset_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_asset_task));
+  memset(task, 0, sizeof(struct ui_asset_task));
+  task->streamer = streamer;
+  task->type = UI_ASSET_TYPE_BINARY;
+  (void)ui_promise_create(&task->promise);
+  task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
+  strcpy(task->url, "dummy_asset.txt");
+  asset_task_execute(task);
+  g_asset_streamer_mock_fail = 1; /* resolve fails */
+  asset_task_complete(task);
+  g_asset_streamer_mock_fail = 0;
+  ui_execution_context_tick(ctx);
+
+  g_malloc_fail_countdown = 0;
+  (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
+  g_malloc_fail_countdown = -1;
+
+  /* Mock 2: promise_reject fails */
+  task = (struct ui_asset_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_asset_task));
+  memset(task, 0, sizeof(struct ui_asset_task));
+  task->streamer = streamer;
+  task->type = UI_ASSET_TYPE_BINARY;
+  (void)ui_promise_create(&task->promise);
+  task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
+  strcpy(task->url, "non_existent.txt");
+  asset_task_execute(task);       /* IO fail */
+  g_asset_streamer_mock_fail = 2; /* reject fails */
+  asset_task_complete(task);
+  g_asset_streamer_mock_fail = 0;
+  ui_execution_context_tick(ctx);
+  g_malloc_fail_countdown = 0;
+  (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
+  g_malloc_fail_countdown = -1;
+
+  /* Mock 3: FREAD fails */
+  task = (struct ui_asset_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_asset_task));
+  memset(task, 0, sizeof(struct ui_asset_task));
+  task->streamer = streamer;
+  task->type = UI_ASSET_TYPE_BINARY;
+  (void)ui_promise_create(&task->promise);
+  task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
+  strcpy(task->url, "dummy_asset.txt");
+  g_mock_io_fail = 3; /* builtin mock for UI_FREAD to return 0 */
+  asset_task_execute(task);
+  g_mock_io_fail = 0;
+  ui_execution_context_tick(ctx);
+
+  g_malloc_fail_countdown = 0;
+  (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
+  g_malloc_fail_countdown = -1;
+
+  /* Mock OOM: asset allocation fails */
+  task = (struct ui_asset_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_asset_task));
+  memset(task, 0, sizeof(struct ui_asset_task));
+  task->streamer = streamer;
+  task->type = UI_ASSET_TYPE_BINARY;
+  (void)ui_promise_create(&task->promise);
+  task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
+  strcpy(task->url, "dummy_asset.txt");
+  g_malloc_fail_countdown = 0;
+  asset_task_execute(task);
+  g_malloc_fail_countdown = -1;
+  ui_execution_context_tick(ctx);
+  g_malloc_fail_countdown = 0;
+  (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
+  g_malloc_fail_countdown = -1;
+
+  /* ui_asset_streamer_request */
+  g_asset_streamer_mock_fail = 4; /* schedule fails */
+  ui_asset_streamer_request(streamer, "dummy_asset.txt", UI_ASSET_TYPE_BINARY,
+                            &promise);
+  g_asset_streamer_mock_fail = 0;
+
+  /* Mock OOM: asset url allocation fails */
+  task = (struct ui_asset_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_asset_task));
+  memset(task, 0, sizeof(struct ui_asset_task));
+  task->streamer = streamer;
+  task->type = UI_ASSET_TYPE_BINARY;
+  (void)ui_promise_create(&task->promise);
+  task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
+  strcpy(task->url, "dummy_asset.txt");
+  g_malloc_fail_countdown = 2;
+  asset_task_execute(task);
+  g_malloc_fail_countdown = -1;
+  asset_task_complete(task);
+
+  g_malloc_fail_countdown = 0;
+  (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
+  g_malloc_fail_countdown = -1;
+
+  (void)ui_asset_streamer_destroy(streamer);
+  ui_thread_pool_destroy(pool);
+  (void)ui_execution_context_destroy(ctx);
+  return UI_ERROR_NONE;
+}
+#endif

@@ -5,19 +5,19 @@
 #include <assert.h>
 /* clang-format on */
 
-static enum ui_error test_masonry_creation(void) {
+static ui_error_t test_masonry_creation(void) {
   struct ui_masonry_layout_base *masonry = NULL;
-  enum ui_error rc = ui_masonry_layout_base_create(&masonry);
+  ui_error_t rc = ui_masonry_layout_base_create(&masonry);
   assert(rc == UI_ERROR_NONE);
   assert(masonry != NULL);
-  ui_masonry_layout_base_destroy(masonry);
+  (void)ui_masonry_layout_base_destroy(masonry);
   printf("test_masonry_creation passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_masonry_reflow(void) {
+static ui_error_t test_masonry_reflow(void) {
   struct ui_masonry_layout_base *masonry = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_masonry_layout_base_create(&masonry);
   assert(rc == UI_ERROR_NONE);
@@ -25,7 +25,7 @@ static enum ui_error test_masonry_reflow(void) {
   rc = ui_masonry_layout_base_reflow(masonry);
   assert(rc == UI_ERROR_NONE);
 
-  ui_masonry_layout_base_destroy(masonry);
+  (void)ui_masonry_layout_base_destroy(masonry);
   printf("test_masonry_reflow passed\n");
   return UI_ERROR_NONE;
 }
@@ -39,7 +39,7 @@ static void test_masonry_errors(void) {
   if (ui_masonry_layout_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
 
-  ui_masonry_layout_base_destroy(NULL);
+  (void)ui_masonry_layout_base_destroy(NULL);
 
   if (ui_masonry_layout_base_reflow(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
@@ -57,7 +57,7 @@ static void test_masonry_errors(void) {
   ui_masonry_layout_base_create(&masonry);
   ui_masonry_layout_base_get_component(masonry, &comp);
   ui_masonry_layout_base_bind_data(masonry, NULL);
-  ui_masonry_layout_base_destroy(masonry);
+  (void)ui_masonry_layout_base_destroy(masonry);
 
 #ifdef UI_TEST_MOCK_ALLOC
   int i;

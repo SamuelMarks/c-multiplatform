@@ -1,4 +1,3 @@
-/* clang-format off */
 #include "../include/ui_dom_node.h"
 #include "../include/ui_error.h"
 #include "../include/ui_event.h"
@@ -6,7 +5,6 @@
 #include "../include/ui_layout.h"
 #include <stdio.h>
 #include <string.h>
-/* clang-format on */
 
 struct test_state {
   int enter_count;
@@ -23,9 +21,8 @@ struct test_state {
   int key_press_count;
 };
 
-static enum ui_error handle_event(struct ui_dom_node *node,
-                                  const struct ui_event *event,
-                                  void *user_data) {
+static ui_error_t handle_event(struct ui_dom_node *node,
+                               const struct ui_event *event, void *user_data) {
   struct test_state *state = (struct test_state *)user_data;
   (void)node;
   switch (event->type) {
@@ -71,14 +68,16 @@ static enum ui_error handle_event(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_event_dispatch(const struct ui_layout_node *,
-                                const struct ui_event *,
-                                struct ui_mouse_state *, void *);
+ui_error_t ui_event_dispatch(const struct ui_layout_node *,
+                             const struct ui_event *, struct ui_mouse_state *,
+                             void *);
 
+int g_mock_focus_fail = 0;
 static void trigger_null_branches(void) {
   struct ui_mouse_state mouse_state = {NULL, NULL, 0.0, 0};
-  struct ui_layout_node root_layout = {0};
+  struct ui_layout_node root_layout;
   struct ui_event ev;
+  memset(&root_layout, 0, sizeof(root_layout));
   ev.type = UI_EVENT_MOUSE_MOVE;
 
   /* Missing params */
@@ -87,17 +86,140 @@ static void trigger_null_branches(void) {
   ui_event_dispatch(&root_layout, &ev, NULL, NULL);
 }
 
+static ui_error_t failing_handler(struct ui_dom_node *node,
+                                  const struct ui_event *event,
+                                  void *user_data) {
+  return UI_ERROR_UNKNOWN;
+}
+
+static void test_failing_events(void) {
+  struct ui_dom_node *root_dom = NULL;
+  struct ui_layout_node root_layout;
+  struct ui_mouse_state mouse_state = {NULL, NULL, 0.0, 0};
+  struct ui_event ev;
+  struct ui_focus_manager *focus_mgr = NULL;
+
+  ui_focus_manager_create(&focus_mgr);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_dom);
+  ui_dom_node_set_attribute(root_dom, "tabindex", "0");
+  ui_dom_node_set_attribute(root_dom, "tabindex", "0");
+
+  memset(&root_layout, 0, sizeof(root_layout));
+  root_layout.dom_node = root_dom;
+  root_layout.width = 100;
+  root_layout.height = 100;
+
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_MOUSE_LEAVE,
+                                 failing_handler, NULL);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 50;
+  ev.event_data.mouse.y = 50;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ev.event_data.mouse.x = 150;
+  ev.event_data.mouse.y = 150;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_MOUSE_LEAVE,
+                                    failing_handler);
+
+  mouse_state.hovered_node = NULL;
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_MOUSE_ENTER,
+                                 failing_handler, NULL);
+  ev.event_data.mouse.x = 50;
+  ev.event_data.mouse.y = 50;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_MOUSE_ENTER,
+                                    failing_handler);
+
+  mouse_state.hovered_node = &root_layout;
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_MOUSE_MOVE, failing_handler,
+                                 NULL);
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_MOUSE_MOVE,
+                                    failing_handler);
+
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_MOUSE_DOWN, failing_handler,
+                                 NULL);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_MOUSE_DOWN,
+                                    failing_handler);
+
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_CONTEXT_MENU,
+                                 failing_handler, NULL);
+  ev.event_data.mouse.button = 1;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_CONTEXT_MENU,
+                                    failing_handler);
+
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_MOUSE_UP, failing_handler,
+                                 NULL);
+  ev.type = UI_EVENT_MOUSE_UP;
+  ev.event_data.mouse.button = 0;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_MOUSE_UP,
+                                    failing_handler);
+
+  mouse_state.active_node = &root_layout;
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_CLICK, failing_handler,
+                                 NULL);
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_CLICK, failing_handler);
+
+  mouse_state.active_node = &root_layout;
+  mouse_state.click_count = 1;
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_DBLCLICK, failing_handler,
+                                 NULL);
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_DBLCLICK,
+                                    failing_handler);
+
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_MOUSE_WHEEL,
+                                 failing_handler, NULL);
+  ev.type = UI_EVENT_MOUSE_WHEEL;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_MOUSE_WHEEL,
+                                    failing_handler);
+
+  ui_focus_manager_request_focus(focus_mgr, root_dom);
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_KEY_DOWN, failing_handler,
+                                 NULL);
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = 32;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  ui_dom_node_remove_event_listener(root_dom, UI_EVENT_KEY_DOWN,
+                                    failing_handler);
+
+  extern int g_malloc_fail_countdown;
+  ev.event_data.keyboard.key_code = 9;
+  g_malloc_fail_countdown = 0;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  g_malloc_fail_countdown = -1;
+
+  g_mock_focus_fail = 1;
+  ev.type = UI_EVENT_KEY_DOWN;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  g_mock_focus_fail = 0;
+
+  (void)ui_focus_manager_destroy(focus_mgr);
+  (void)ui_dom_node_destroy(root_dom);
+}
+
 int main(void) {
   struct ui_dom_node *root_dom = NULL;
   struct ui_layout_node root_layout;
   struct ui_mouse_state mouse_state = {NULL, NULL, 0.0, 0};
   struct ui_focus_manager *focus_mgr = NULL;
-  struct test_state state = {0};
+  struct test_state state;
   struct ui_event ev;
   struct ui_dom_node *child1 = NULL, *child2 = NULL;
   struct ui_dom_node *focused = NULL;
+  struct ui_layout_node layout_no_dom;
+
+  memset(&state, 0, sizeof(state));
 
   trigger_null_branches();
+  test_failing_events();
 
   ui_focus_manager_create(&focus_mgr);
 
@@ -126,6 +248,8 @@ int main(void) {
                                  (ui_event_handler_t)handle_event, &state);
   ui_dom_node_add_event_listener(root_dom, UI_EVENT_KEY_PRESS,
                                  (ui_event_handler_t)handle_event, &state);
+  /* NULL handler test */
+  ui_dom_node_add_event_listener(root_dom, UI_EVENT_MOUSE_MOVE, NULL, NULL);
 
   memset(&root_layout, 0, sizeof(root_layout));
   root_layout.dom_node = root_dom;
@@ -133,6 +257,16 @@ int main(void) {
   root_layout.y = 10.0f;
   root_layout.width = 100.0f;
   root_layout.height = 100.0f;
+
+  /* Move outside (y < node->y and y > node->y + height) */
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 50;
+  ev.event_data.mouse.y = 5;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+
+  ev.event_data.mouse.x = 50;
+  ev.event_data.mouse.y = 200;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
 
   /* Move outside */
   ev.type = UI_EVENT_MOUSE_MOVE;
@@ -226,6 +360,9 @@ int main(void) {
     return 1;
   }
 
+  /* Key Down with NULL focus_mgr */
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+
   /* Key Press */
   ev.type = UI_EVENT_KEY_PRESS;
   ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
@@ -267,6 +404,11 @@ int main(void) {
     }
   }
 
+  /* Press Tab with no root_layout dom_node */
+  root_layout.dom_node = NULL;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  root_layout.dom_node = root_dom;
+
   /* Press Tab again (forward) */
   ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
   ui_focus_manager_get_focused_node(focus_mgr, &focused);
@@ -290,8 +432,89 @@ int main(void) {
     }
   }
 
-  ui_focus_manager_destroy(focus_mgr);
-  ui_dom_node_destroy(root_dom);
+  /* Tests with layout node having NULL dom_node */
+  memset(&layout_no_dom, 0, sizeof(layout_no_dom));
+  layout_no_dom.dom_node = NULL;
+  layout_no_dom.x = 300.0f;
+  layout_no_dom.y = 300.0f;
+  layout_no_dom.width = 100.0f;
+  layout_no_dom.height = 100.0f;
+
+  /* Move into layout_no_dom */
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 350;
+  ev.event_data.mouse.y = 350;
+  ui_event_dispatch(&layout_no_dom, &ev, &mouse_state, focus_mgr);
+
+  /* Mouse down in layout_no_dom */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ui_event_dispatch(&layout_no_dom, &ev, &mouse_state, focus_mgr);
+
+  /* Mouse up in layout_no_dom */
+  ev.type = UI_EVENT_MOUSE_UP;
+  ui_event_dispatch(&layout_no_dom, &ev, &mouse_state, focus_mgr);
+
+  /* Context menu in layout_no_dom */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 1;
+  ui_event_dispatch(&layout_no_dom, &ev, &mouse_state, focus_mgr);
+
+  /* Wheel in layout_no_dom */
+  ev.type = UI_EVENT_MOUSE_WHEEL;
+  ui_event_dispatch(&layout_no_dom, &ev, &mouse_state, focus_mgr);
+
+  /* Move out of layout_no_dom */
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 500;
+  ev.event_data.mouse.y = 500;
+  ui_event_dispatch(&layout_no_dom, &ev, &mouse_state, focus_mgr);
+
+  /* Down then move out then up */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.x = 50;
+  ev.event_data.mouse.y = 50;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+
+  ev.type = UI_EVENT_MOUSE_UP;
+  ev.event_data.mouse.x = 500;
+  ev.event_data.mouse.y = 500;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state,
+                    focus_mgr); /* trigger branch: hit != active_node */
+
+  /* Missed branches: events outside bounds (hit == NULL) */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  ev.event_data.mouse.button = 1;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  ev.type = UI_EVENT_MOUSE_UP;
+  ev.event_data.mouse.button = 0;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  ev.type = UI_EVENT_MOUSE_WHEEL;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  /* Unhandled event type to trigger final else branch */
+  ev.type = UI_EVENT_CLICK;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  /* Tab with NULL focus_mgr */
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_TAB;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, NULL);
+  /* MOUSE_UP with hit != state->active_node */
+  mouse_state.active_node = NULL;
+  ev.type = UI_EVENT_MOUSE_UP;
+  ev.event_data.mouse.x = 50;
+  ev.event_data.mouse.y = 50;
+  ev.event_data.mouse.button = 0;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+
+  g_mock_focus_fail = 1;
+  ev.type = UI_EVENT_KEY_DOWN;
+  ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
+  g_mock_focus_fail = 0;
+
+  (void)ui_focus_manager_destroy(focus_mgr);
+  (void)ui_dom_node_destroy(root_dom);
 
   printf("All UI Event tests passed.\n");
   return 0;

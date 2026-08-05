@@ -28,15 +28,15 @@ struct ui_ribbon_base {
   ui_signal_t *group_state_changed_signal;
 };
 
-static enum ui_error group_id_equality(union ui_signal_payload a,
-                                       union ui_signal_payload b,
-                                       ui_bool_t *out_equal) {
+static ui_error_t group_id_equality(union ui_signal_payload a,
+                                    union ui_signal_payload b,
+                                    ui_bool_t *out_equal) {
   *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ribbon_base_create(struct ui_arena *arena,
-                                    struct ui_ribbon_base **out_ribbon) {
+ui_error_t ui_ribbon_base_create(struct ui_arena *arena,
+                                 struct ui_ribbon_base **out_ribbon) {
 
   void *ptr;
   union ui_signal_payload initial_payload;
@@ -45,7 +45,13 @@ enum ui_error ui_ribbon_base_create(struct ui_arena *arena,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_arena_alloc(arena, sizeof(struct ui_ribbon_base), 8, &ptr);
+  {
+
+    ui_error_t _ign_rc =
+        ui_arena_alloc(arena, sizeof(struct ui_ribbon_base), 8, &ptr);
+
+    (void)_ign_rc;
+  }
 
   *out_ribbon = (struct ui_ribbon_base *)ptr;
   (*out_ribbon)->arena = arena;
@@ -53,26 +59,29 @@ enum ui_error ui_ribbon_base_create(struct ui_arena *arena,
   (*out_ribbon)->num_contextual_tabs = 0;
 
   initial_payload.int_val = -1; /* -1 means no group has changed yet */
-  (void)ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_INT32,
-                         group_id_equality, NULL,
-                         UI_SIGNAL_MODE_SINGLE_THREADED,
-                         &(*out_ribbon)->group_state_changed_signal);
+  {
+    ui_error_t _ign_rc = ui_signal_create(
+        arena, initial_payload, UI_SIGNAL_TYPE_INT32, group_id_equality, NULL,
+        UI_SIGNAL_MODE_SINGLE_THREADED,
+        &(*out_ribbon)->group_state_changed_signal);
+    (void)_ign_rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon) {
+ui_error_t ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon) {
   if (!ribbon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_signal_destroy(ribbon->group_state_changed_signal);
+  (void)ui_signal_destroy(ribbon->group_state_changed_signal);
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_ribbon_base_add_group_config(struct ui_ribbon_base *ribbon,
                                 const struct ui_ribbon_group_config *config) {
   struct ui_ribbon_group_state *state;
@@ -93,9 +102,9 @@ ui_ribbon_base_add_group_config(struct ui_ribbon_base *ribbon,
 }
 
 /* Helper to find a group by ID */
-static enum ui_error
-find_group_state(const struct ui_ribbon_base *ribbon, int group_id,
-                 struct ui_ribbon_group_state **out_state) {
+static ui_error_t find_group_state(const struct ui_ribbon_base *ribbon,
+                                   int group_id,
+                                   struct ui_ribbon_group_state **out_state) {
   int i;
   *out_state = NULL;
   for (i = 0; i < ribbon->num_groups; ++i) {
@@ -109,8 +118,8 @@ find_group_state(const struct ui_ribbon_base *ribbon, int group_id,
 
 /* Helper to sort indices by group priority (ascending) for overflow calculation
  */
-static enum ui_error
-sort_indices_by_priority(const struct ui_ribbon_base *ribbon, int *indices) {
+static ui_error_t sort_indices_by_priority(const struct ui_ribbon_base *ribbon,
+                                           int *indices) {
   int i, j, temp;
   for (i = 0; i < ribbon->num_groups - 1; i++) {
     for (j = 0; j < ribbon->num_groups - i - 1; j++) {
@@ -122,8 +131,8 @@ sort_indices_by_priority(const struct ui_ribbon_base *ribbon, int *indices) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
-                                                  int available_width) {
+ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
+                                               int available_width) {
   int indices[UI_RIBBON_MAX_GROUPS];
   int i;
   int current_width = 0;
@@ -146,7 +155,11 @@ enum ui_error ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     ribbon->groups[i].current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_NORMAL;
   }
 
-  (void)sort_indices_by_priority(ribbon, indices);
+  {
+    ui_error_t sort_rc = sort_indices_by_priority(ribbon, indices);
+    if (sort_rc != UI_ERROR_NONE)
+      return sort_rc;
+  }
 
   /* Step 1: Collapse low-priority groups to COMPACT if we overflow */
   for (i = 0; i < ribbon->num_groups && current_width > available_width; ++i) {
@@ -156,7 +169,12 @@ enum ui_error ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     gs->current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_COMPACT;
 
     payload.int_val = gs->config.group_id;
-    (void)ui_signal_set(ribbon->group_state_changed_signal, payload);
+    {
+      ui_error_t set_rc =
+          ui_signal_set(ribbon->group_state_changed_signal, payload);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
+    }
   }
 
   /* Step 2: If we still overflow, collapse low-priority groups entirely */
@@ -168,14 +186,19 @@ enum ui_error ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     gs->current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_COLLAPSED;
 
     payload.int_val = gs->config.group_id;
-    (void)ui_signal_set(ribbon->group_state_changed_signal, payload);
+    {
+      ui_error_t set_rc =
+          ui_signal_set(ribbon->group_state_changed_signal, payload);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
                                int group_id,
                                enum ui_ribbon_group_collapse_state *out_state) {
@@ -185,7 +208,11 @@ ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)find_group_state(ribbon, group_id, &gs);
+  {
+    ui_error_t find_rc = find_group_state(ribbon, group_id, &gs);
+    if (find_rc != UI_ERROR_NONE)
+      return find_rc;
+  }
   if (!gs) {
     return UI_ERROR_NOT_FOUND;
   }
@@ -195,7 +222,7 @@ ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_ribbon_base_get_group_state_changed_signal(struct ui_ribbon_base *ribbon,
                                               ui_signal_t **out_signal) {
   if (!ribbon || !out_signal) {
@@ -206,7 +233,7 @@ ui_ribbon_base_get_group_state_changed_signal(struct ui_ribbon_base *ribbon,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_ribbon_base_set_contextual_tab_active(struct ui_ribbon_base *ribbon,
                                          int tab_id, ui_bool_t is_active) {
   int i;
@@ -236,7 +263,7 @@ ui_ribbon_base_set_contextual_tab_active(struct ui_ribbon_base *ribbon,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_ribbon_base_get_contextual_tab_active(const struct ui_ribbon_base *ribbon,
                                          int tab_id, ui_bool_t *out_is_active) {
   int i;

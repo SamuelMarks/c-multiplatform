@@ -6,10 +6,10 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-enum ui_error ui_css_page_parse(const struct ui_css_computed_style *style,
-                                struct ui_css_page_properties *out_props) {
+ui_error_t ui_css_page_parse(const struct ui_css_computed_style *style,
+                             struct ui_css_page_properties *out_props) {
   const char *val = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!style || !out_props) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -22,6 +22,10 @@ enum ui_error ui_css_page_parse(const struct ui_css_computed_style *style,
   out_props->bleed_value = 0.0f;
 
   rc = ui_css_computed_style_get_property(style, "size", &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "portrait") == 0)
       out_props->size = UI_CSS_PAGE_SIZE_PORTRAIT;
@@ -52,6 +56,10 @@ enum ui_error ui_css_page_parse(const struct ui_css_computed_style *style,
   }
 
   rc = ui_css_computed_style_get_property(style, "marks", &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strstr(val, "crop") && strstr(val, "cross"))
       out_props->marks = UI_CSS_PAGE_MARKS_BOTH;
@@ -64,10 +72,14 @@ enum ui_error ui_css_page_parse(const struct ui_css_computed_style *style,
   }
 
   rc = ui_css_computed_style_get_property(style, "page", &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "auto") != 0) {
       size_t len = strlen(val);
-      out_props->page_name = (char *)UI_MALLOC(len + 1);
+      out_props->page_name = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
       if (!out_props->page_name) {
         return UI_ERROR_OUT_OF_MEMORY;
       }
@@ -80,6 +92,10 @@ enum ui_error ui_css_page_parse(const struct ui_css_computed_style *style,
   }
 
   rc = ui_css_computed_style_get_property(style, "bleed", &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "auto") == 0) {
       out_props->bleed_is_auto = 1;
@@ -94,10 +110,10 @@ enum ui_error ui_css_page_parse(const struct ui_css_computed_style *style,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_page_properties_cleanup(struct ui_css_page_properties *props) {
   if (props && props->page_name) {
-    UI_FREE(props->page_name);
+    C_MULTIPLATFORM_FREE(props->page_name);
     props->page_name = NULL;
   }
   return UI_ERROR_NONE;

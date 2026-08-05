@@ -54,8 +54,8 @@ struct ui_design_token_dict {
  * @param out_dict Pointer to output the initialized dictionary.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_design_token_dict_init(struct ui_arena *arena,
-                                        struct ui_design_token_dict *out_dict);
+ui_error_t ui_design_token_dict_init(struct ui_arena *arena,
+                                     struct ui_design_token_dict *out_dict);
 
 /**
  * @brief Sets a color token in the dictionary.
@@ -65,8 +65,8 @@ enum ui_error ui_design_token_dict_init(struct ui_arena *arena,
  * @param color The color value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_design_token_set_color(struct ui_design_token_dict *dict,
-                                        const char *name, ui_color_t color);
+ui_error_t ui_design_token_set_color(struct ui_design_token_dict *dict,
+                                     const char *name, ui_color_t color);
 
 /**
  * @brief Sets a number token in the dictionary.
@@ -76,8 +76,8 @@ enum ui_error ui_design_token_set_color(struct ui_design_token_dict *dict,
  * @param number The number value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_design_token_set_number(struct ui_design_token_dict *dict,
-                                         const char *name, float number);
+ui_error_t ui_design_token_set_number(struct ui_design_token_dict *dict,
+                                      const char *name, float number);
 
 /**
  * @brief Sets a string token in the dictionary.
@@ -87,8 +87,8 @@ enum ui_error ui_design_token_set_number(struct ui_design_token_dict *dict,
  * @param str The string value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_design_token_set_string(struct ui_design_token_dict *dict,
-                                         const char *name, const char *str);
+ui_error_t ui_design_token_set_string(struct ui_design_token_dict *dict,
+                                      const char *name, const char *str);
 
 /**
  * @brief Sets an alias token in the dictionary.
@@ -98,8 +98,8 @@ enum ui_error ui_design_token_set_string(struct ui_design_token_dict *dict,
  * @param target The target token name being aliased.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_design_token_set_alias(struct ui_design_token_dict *dict,
-                                        const char *name, const char *target);
+ui_error_t ui_design_token_set_alias(struct ui_design_token_dict *dict,
+                                     const char *name, const char *target);
 
 /**
  * @brief Retrieves a resolved color token from the dictionary.
@@ -111,9 +111,8 @@ enum ui_error ui_design_token_set_alias(struct ui_design_token_dict *dict,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if missing or mismatched
  * type.
  */
-enum ui_error ui_design_token_get_color(const struct ui_design_token_dict *dict,
-                                        const char *name,
-                                        ui_color_t *out_color);
+ui_error_t ui_design_token_get_color(const struct ui_design_token_dict *dict,
+                                     const char *name, ui_color_t *out_color);
 
 /**
  * @brief Retrieves a resolved number token from the dictionary.
@@ -125,9 +124,8 @@ enum ui_error ui_design_token_get_color(const struct ui_design_token_dict *dict,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if missing or mismatched
  * type.
  */
-enum ui_error
-ui_design_token_get_number(const struct ui_design_token_dict *dict,
-                           const char *name, float *out_number);
+ui_error_t ui_design_token_get_number(const struct ui_design_token_dict *dict,
+                                      const char *name, float *out_number);
 
 #ifdef __cplusplus
 }

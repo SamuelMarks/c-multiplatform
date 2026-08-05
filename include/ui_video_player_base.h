@@ -39,16 +39,16 @@ struct ui_video_player_base {
  * @param av_sync Pointer to the AV sync engine.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_video_player_base_init(struct ui_video_player_base *player,
-                                        struct ui_component *component,
-                                        struct ui_av_sync *av_sync);
+ui_error_t ui_video_player_base_init(struct ui_video_player_base *player,
+                                     struct ui_component *component,
+                                     struct ui_av_sync *av_sync);
 
 /**
  * @brief Toggles play/pause state.
  *
  * @param player Pointer to the video player base struct.
  */
-enum ui_error
+ui_error_t
 ui_video_player_base_toggle_play(struct ui_video_player_base *player);
 
 /**
@@ -57,8 +57,8 @@ ui_video_player_base_toggle_play(struct ui_video_player_base *player);
  * @param player Pointer to the video player base struct.
  * @param time Time in seconds.
  */
-enum ui_error ui_video_player_base_seek(struct ui_video_player_base *player,
-                                        float time);
+ui_error_t ui_video_player_base_seek(struct ui_video_player_base *player,
+                                     float time);
 
 /**
  * @brief Sets the player volume.
@@ -66,16 +66,15 @@ enum ui_error ui_video_player_base_seek(struct ui_video_player_base *player,
  * @param player Pointer to the video player base struct.
  * @param volume Volume level from 0.0 to 1.0.
  */
-enum ui_error
-ui_video_player_base_set_volume(struct ui_video_player_base *player,
-                                float volume);
+ui_error_t ui_video_player_base_set_volume(struct ui_video_player_base *player,
+                                           float volume);
 
 /**
  * @brief Toggles fullscreen mode.
  *
  * @param player Pointer to the video player base struct.
  */
-enum ui_error
+ui_error_t
 ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player);
 
 /**
@@ -85,8 +84,8 @@ ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player);
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_video_player_base_bind_src(struct ui_video_player_base *widget,
-                                            struct ui_signal *signal);
+ui_error_t ui_video_player_base_bind_src(struct ui_video_player_base *widget,
+                                         struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

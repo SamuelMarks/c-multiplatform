@@ -13,7 +13,7 @@ extern "C" {
 /**
  * @brief Notification callback for reactive graph changes.
  */
-typedef enum ui_error (*ui_notify_fn)(void *user_data);
+typedef ui_error_t (*ui_notify_fn)(void *user_data);
 
 /**
  * @brief Represents a listener in the reactive graph.
@@ -27,9 +27,9 @@ struct ui_reactive_node {
  * @brief Gets the currently evaluating reactive node for the current thread.
  *
  * @param out_node Pointer to store the result.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_reactive_graph_get_current_node(struct ui_reactive_node **out_node);
 
 /**
@@ -37,9 +37,9 @@ ui_reactive_graph_get_current_node(struct ui_reactive_node **out_node);
  *
  * @param node The node to set as current.
  * @param out_prev_node Pointer to store the previously active node.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_reactive_graph_set_current_node(struct ui_reactive_node *node,
                                    struct ui_reactive_node **out_prev_node);
 

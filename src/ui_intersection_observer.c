@@ -26,7 +26,7 @@ struct ui_intersection_observer {
 };
 
 /** \brief ui_intersection_observer_create */
-enum ui_error ui_intersection_observer_create(
+ui_error_t ui_intersection_observer_create(
     struct ui_dom_node *root, int root_margin_px, const float *thresholds,
     int threshold_count, struct ui_intersection_observer **out_observer) {
 
@@ -37,7 +37,7 @@ enum ui_error ui_intersection_observer_create(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  obs = (struct ui_intersection_observer *)UI_MALLOC(
+  obs = (struct ui_intersection_observer *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_intersection_observer));
   if (obs == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -46,10 +46,11 @@ enum ui_error ui_intersection_observer_create(
   obs->root = root;
   obs->root_margin_px = root_margin_px;
 
-  if (threshold_count > 0 && thresholds != NULL) {
-    obs->thresholds = (float *)UI_MALLOC(sizeof(float) * threshold_count);
+  if (threshold_count > 0) {
+    obs->thresholds =
+        (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * threshold_count);
     if (obs->thresholds == NULL) {
-      UI_FREE(obs);
+      C_MULTIPLATFORM_FREE(obs);
       return UI_ERROR_OUT_OF_MEMORY;
     }
     for (i = 0; i < threshold_count; i++) {
@@ -63,12 +64,14 @@ enum ui_error ui_intersection_observer_create(
 
   obs->target_capacity = 4;
   obs->target_count = 0;
-  obs->targets = (struct ui_intersection_observer_target *)UI_MALLOC(
-      sizeof(struct ui_intersection_observer_target) * obs->target_capacity);
+  obs->targets =
+      (struct ui_intersection_observer_target *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_intersection_observer_target) *
+          obs->target_capacity);
   if (obs->targets == NULL) {
     if (obs->thresholds)
-      UI_FREE(obs->thresholds);
-    UI_FREE(obs);
+      C_MULTIPLATFORM_FREE(obs->thresholds);
+    C_MULTIPLATFORM_FREE(obs);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -80,25 +83,24 @@ enum ui_error ui_intersection_observer_create(
 }
 
 /** \brief ui_intersection_observer_destroy */
-void ui_intersection_observer_destroy(
-    struct ui_intersection_observer *observer) {
+ui_error_t
+ui_intersection_observer_destroy(struct ui_intersection_observer *observer) {
   if (observer == NULL) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (observer->thresholds != NULL) {
-    UI_FREE(observer->thresholds);
+    C_MULTIPLATFORM_FREE(observer->thresholds);
   }
 
-  if (observer->targets != NULL) {
-    UI_FREE(observer->targets);
-  }
+  C_MULTIPLATFORM_FREE(observer->targets);
 
-  UI_FREE(observer);
+  C_MULTIPLATFORM_FREE(observer);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_intersection_observer_observe(struct ui_intersection_observer *observer,
                                  struct ui_dom_node *target) {
   int i;
@@ -117,15 +119,16 @@ ui_intersection_observer_observe(struct ui_intersection_observer *observer,
 
   if (observer->target_count >= observer->target_capacity) {
     int new_capacity = observer->target_capacity * 2;
-    new_targets = (struct ui_intersection_observer_target *)UI_MALLOC(
-        sizeof(struct ui_intersection_observer_target) * new_capacity);
+    new_targets =
+        (struct ui_intersection_observer_target *)C_MULTIPLATFORM_MALLOC(
+            sizeof(struct ui_intersection_observer_target) * new_capacity);
     if (new_targets == NULL) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_targets, observer->targets,
            sizeof(struct ui_intersection_observer_target) *
                observer->target_count);
-    UI_FREE(observer->targets);
+    C_MULTIPLATFORM_FREE(observer->targets);
     observer->targets = new_targets;
     observer->target_capacity = new_capacity;
   }
@@ -139,7 +142,7 @@ ui_intersection_observer_observe(struct ui_intersection_observer *observer,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_intersection_observer_unobserve(struct ui_intersection_observer *observer,
                                    struct ui_dom_node *target) {
   int i, j;
@@ -162,7 +165,7 @@ ui_intersection_observer_unobserve(struct ui_intersection_observer *observer,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_intersection_observer_disconnect(struct ui_intersection_observer *observer) {
   if (observer == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -172,7 +175,7 @@ ui_intersection_observer_disconnect(struct ui_intersection_observer *observer) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
                                    ui_intersection_observer_cb_t callback,
                                    void *user_data) {
@@ -188,7 +191,7 @@ ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_intersection_observer_evaluate(struct ui_intersection_observer *observer) {
   /* For a fully robust implementation, this would require querying ui_layout
      bounds. We mock this evaluation cycle minimally to satisfy architecture
@@ -210,7 +213,7 @@ ui_intersection_observer_evaluate(struct ui_intersection_observer *observer) {
     return UI_ERROR_NONE;
   }
 
-  entries = (struct ui_intersection_observer_entry *)UI_MALLOC(
+  entries = (struct ui_intersection_observer_entry *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_intersection_observer_entry) * observer->target_count);
   if (entries == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -249,12 +252,12 @@ ui_intersection_observer_evaluate(struct ui_intersection_observer *observer) {
     }
   }
 
-  if (entry_count > 0 && observer->callback != NULL) {
+  if (entry_count > 0) {
     (void)observer->callback(observer, entries, entry_count,
                              observer->user_data);
   }
 
-  UI_FREE(entries);
+  C_MULTIPLATFORM_FREE(entries);
 
   return UI_ERROR_NONE;
 }

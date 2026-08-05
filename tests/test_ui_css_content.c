@@ -28,7 +28,8 @@ static int test_parse_content_none_normal(void) {
   if (ui_css_parse_content("none-", &c) != UI_ERROR_PARSE_FAILED)
     return __LINE__;
 
-  if (ui_css_content_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
+  (void)ui_css_content_destroy(NULL);
+  if (0)
     return __LINE__;
 
   return 0;
@@ -43,19 +44,19 @@ static int test_parse_content_strings(void) {
   if (c.items->type != UI_CSS_CONTENT_ITEM_STRING ||
       strcmp(c.items->value.string_val, "hello world") != 0)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   if (ui_css_parse_content("'single quote'", &c) != UI_ERROR_NONE)
     return __LINE__;
   if (c.items->type != UI_CSS_CONTENT_ITEM_STRING ||
       strcmp(c.items->value.string_val, "single quote") != 0)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   /* Escapes */
   if (ui_css_parse_content("\"escape \\\" \\\\ \"", &c) != UI_ERROR_NONE)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   /* Unclosed quote with escape at end */
   if (ui_css_parse_content("\"foo\\", &c) != UI_ERROR_PARSE_FAILED)
@@ -77,7 +78,7 @@ static int test_parse_content_functions(void) {
       c.items->value.image.type != UI_CSS_IMAGE_URL ||
       strcmp(c.items->value.image.data.url, "icon.png") != 0)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   /* url without parens */
   if (ui_css_parse_content("url \"icon.png\")", &c) != UI_ERROR_PARSE_FAILED)
@@ -98,7 +99,7 @@ static int test_parse_content_functions(void) {
     sprintf(css_str, "url(%s)", long_url);
     if (ui_css_parse_content(css_str, &c) != UI_ERROR_PARSE_FAILED)
       return __LINE__;
-    ui_css_content_destroy(&c);
+    (void)ui_css_content_destroy(&c);
   }
 
   if (ui_css_parse_content("attr(data-title)", &c) != UI_ERROR_NONE || !c.items)
@@ -106,7 +107,7 @@ static int test_parse_content_functions(void) {
   if (c.items->type != UI_CSS_CONTENT_ITEM_ATTR ||
       strcmp(c.items->value.attr_name, "data-title") != 0)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
   /* attr syntax error */
   if (ui_css_parse_content("attr(data-title", &c) != UI_ERROR_PARSE_FAILED)
     return __LINE__;
@@ -119,7 +120,7 @@ static int test_parse_content_functions(void) {
       strcmp(c.items->value.counter.name, "chapter") != 0 ||
       c.items->value.counter.style[0] != '\0')
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   if (ui_css_parse_content("counter(section, upper-roman)", &c) !=
           UI_ERROR_NONE ||
@@ -129,7 +130,7 @@ static int test_parse_content_functions(void) {
       strcmp(c.items->value.counter.name, "section") != 0 ||
       strcmp(c.items->value.counter.style, "upper-roman") != 0)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   if (ui_css_parse_content("counter(sec upper)", &c) != UI_ERROR_PARSE_FAILED)
     return __LINE__;
@@ -147,13 +148,13 @@ static int test_parse_content_functions(void) {
       strcmp(c.items->value.counters.name, "page") != 0 ||
       strcmp(c.items->value.counters.separator, ".") != 0)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   if (ui_css_parse_content("counters(page, \".\", upper-roman)", &c) !=
           UI_ERROR_NONE ||
       !c.items)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   if (ui_css_parse_content("counters(page)", &c) != UI_ERROR_PARSE_FAILED)
     return __LINE__;
@@ -171,12 +172,12 @@ static int test_parse_content_functions(void) {
   if (ui_css_parse_content("attr(_name)", &c) != UI_ERROR_NONE ||
       strcmp(c.items->value.attr_name, "_name") != 0)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   if (ui_css_parse_content("attr(-name)", &c) != UI_ERROR_NONE ||
       strcmp(c.items->value.attr_name, "-name") != 0)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   return 0;
 }
@@ -194,7 +195,7 @@ static int test_parse_content_quotes(void) {
       c.items->next->next->type != UI_CSS_CONTENT_ITEM_NO_OPEN_QUOTE ||
       c.items->next->next->next->type != UI_CSS_CONTENT_ITEM_NO_CLOSE_QUOTE)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   /* Unknown ident */
   if (ui_css_parse_content("invalid-quote", &c) != UI_ERROR_PARSE_FAILED)
@@ -234,7 +235,7 @@ static int test_parse_content_multiple(void) {
       strcmp(c.items->next->next->value.string_val, ": ") != 0)
     return __LINE__;
 
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
   return 0;
 }
 
@@ -245,7 +246,7 @@ static int test_parse_content_oom(void) {
     g_malloc_fail_countdown = i;
     if (ui_css_parse_content("\"test\" url(\"img.png\") attr(data-test)", &c) ==
         UI_ERROR_NONE) {
-      ui_css_content_destroy(&c);
+      (void)ui_css_content_destroy(&c);
     }
   }
   g_malloc_fail_countdown = -1;
@@ -266,19 +267,19 @@ static int test_parse_content_long(void) {
   sprintf(css_str, "\"%s\"", long_str);
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   /* ident in attr */
   sprintf(css_str, "attr(%s)", long_str);
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   /* escape at end of max len */
   sprintf(css_str, "\"%s\\\"\"", long_str);
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
-  ui_css_content_destroy(&c);
+  (void)ui_css_content_destroy(&c);
 
   return 0;
 }

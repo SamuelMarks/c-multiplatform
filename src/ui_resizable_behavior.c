@@ -23,7 +23,7 @@ struct ui_resizable_behavior {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior) {
   struct ui_resizable_behavior *b;
 
@@ -31,7 +31,7 @@ ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  b = (struct ui_resizable_behavior *)UI_MALLOC(
+  b = (struct ui_resizable_behavior *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_resizable_behavior));
   if (!b) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -56,14 +56,16 @@ ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior) {
   return UI_ERROR_NONE;
 }
 
-void ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior) {
+ui_error_t
+ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior) {
   if (!behavior)
-    return;
-  UI_FREE(behavior);
+    return UI_ERROR_NONE;
+  C_MULTIPLATFORM_FREE(behavior);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
                                 unsigned int edges, int min_width,
                                 int min_height, int max_width, int max_height) {
@@ -78,7 +80,7 @@ ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
                                     ui_resizable_on_resize_t on_resize,
                                     void *user_data) {
@@ -90,7 +92,7 @@ ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
 }
 
 /** \brief ui_resizable_behavior_process_event */
-enum ui_error ui_resizable_behavior_process_event(
+ui_error_t ui_resizable_behavior_process_event(
     struct ui_resizable_behavior *behavior, const struct ui_event *event,
     int current_width, int current_height, int hit_test_thickness) {
 
@@ -164,7 +166,12 @@ enum ui_error ui_resizable_behavior_process_event(
 
     if (behavior->on_resize &&
         (new_w != current_width || new_h != current_height)) {
-      behavior->on_resize(new_w, new_h, behavior->user_data);
+      {
+        ui_error_t cb_rc =
+            behavior->on_resize(new_w, new_h, behavior->user_data);
+        if (cb_rc != UI_ERROR_NONE)
+          return cb_rc;
+      }
     }
   } else if (is_up) {
     behavior->is_dragging = 0;

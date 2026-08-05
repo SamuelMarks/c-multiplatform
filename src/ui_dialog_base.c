@@ -35,9 +35,9 @@ struct ui_dialog_base {
   struct ui_computed *animating_signal;
 };
 
-enum ui_error ui_dialog_base_create(struct ui_dialog_base **out_dialog) {
+ui_error_t ui_dialog_base_create(struct ui_dialog_base **out_dialog) {
   struct ui_dialog_base *dialog;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -45,7 +45,8 @@ enum ui_error ui_dialog_base_create(struct ui_dialog_base **out_dialog) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  dialog = (struct ui_dialog_base *)UI_MALLOC(sizeof(struct ui_dialog_base));
+  dialog = (struct ui_dialog_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_dialog_base));
   if (!dialog) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -100,7 +101,7 @@ enum ui_error ui_dialog_base_create(struct ui_dialog_base **out_dialog) {
     goto cleanup;
   }
 
-  ui_component_set_default_style(dialog->component, default_style);
+  /* fix default style */
 
   dialog->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
@@ -110,36 +111,46 @@ enum ui_error ui_dialog_base_create(struct ui_dialog_base **out_dialog) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
-  ui_backdrop_destroy(dialog->backdrop);
-  ui_component_destroy(dialog->component);
-  UI_FREE(dialog);
+  {
+    ui_error_t _ign_rc = ui_backdrop_destroy(dialog->backdrop);
+    (void)_ign_rc;
+  }
+  {
+    ui_error_t _ign_rc = ui_component_destroy(dialog->component);
+    (void)_ign_rc;
+  }
+  C_MULTIPLATFORM_FREE(dialog);
   return rc;
 }
 
-void ui_dialog_base_destroy(struct ui_dialog_base *dialog) {
+ui_error_t ui_dialog_base_destroy(struct ui_dialog_base *dialog) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!dialog) {
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (dialog->is_open && dialog->director) {
-    ui_overlay_director_unmount(dialog->director, dialog->overlay);
+    rc = ui_overlay_director_unmount(dialog->director, dialog->overlay);
+    (void)rc;
   }
 
   if (dialog->is_open && dialog->focus_manager) {
-    ui_focus_manager_pop_trap(dialog->focus_manager);
+    rc = ui_focus_manager_pop_trap(dialog->focus_manager);
+    (void)rc;
   }
 
-  ui_backdrop_destroy(dialog->backdrop);
+  (void)ui_backdrop_destroy(dialog->backdrop);
 
-  ui_component_destroy(dialog->component);
+  (void)ui_component_destroy(dialog->component);
 
-  UI_FREE(dialog);
+  C_MULTIPLATFORM_FREE(dialog);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dialog_base_set_content(struct ui_dialog_base *dialog,
-                                         struct ui_component *content) {
+ui_error_t ui_dialog_base_set_content(struct ui_dialog_base *dialog,
+                                      struct ui_component *content) {
   if (!dialog) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -154,7 +165,7 @@ enum ui_error ui_dialog_base_set_content(struct ui_dialog_base *dialog,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
                                     struct ui_overlay_director *director) {
   if (!dialog) {
@@ -165,7 +176,7 @@ ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dialog_base_set_focus_manager(struct ui_dialog_base *dialog,
                                  struct ui_focus_manager *focus_manager) {
   if (!dialog) {
@@ -175,9 +186,8 @@ ui_dialog_base_set_focus_manager(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dialog_base_set_open(struct ui_dialog_base *dialog,
-                                      int is_open) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_dialog_base_set_open(struct ui_dialog_base *dialog, int is_open) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!dialog) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -203,7 +213,9 @@ enum ui_error ui_dialog_base_set_open(struct ui_dialog_base *dialog,
       if (rc != UI_ERROR_NONE) {
         /* Rollback mount */
         if (dialog->director) {
-          ui_overlay_director_unmount(dialog->director, dialog->overlay);
+          ui_error_t unmount_rc =
+              ui_overlay_director_unmount(dialog->director, dialog->overlay);
+          (void)unmount_rc;
           dialog->overlay = NULL;
         }
         return rc;
@@ -211,10 +223,12 @@ enum ui_error ui_dialog_base_set_open(struct ui_dialog_base *dialog,
     }
   } else {
     if (dialog->focus_manager) {
-      ui_focus_manager_pop_trap(dialog->focus_manager);
+      rc = ui_focus_manager_pop_trap(dialog->focus_manager);
+      (void)rc;
     }
     if (dialog->director) {
-      ui_overlay_director_unmount(dialog->director, dialog->overlay);
+      rc = ui_overlay_director_unmount(dialog->director, dialog->overlay);
+      (void)rc;
       dialog->overlay = NULL;
     }
   }
@@ -223,8 +237,8 @@ enum ui_error ui_dialog_base_set_open(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
-                                     int *out_is_open) {
+ui_error_t ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
+                                  int *out_is_open) {
   if (!dialog || !out_is_open) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -232,9 +246,9 @@ enum ui_error ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
-                                          ui_dialog_on_close_t on_close,
-                                          void *user_data) {
+ui_error_t ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
+                                       ui_dialog_on_close_t on_close,
+                                       void *user_data) {
   if (!dialog) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -243,9 +257,9 @@ enum ui_error ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dialog_base_process_event(struct ui_dialog_base *dialog,
-                                           const struct ui_event *event,
-                                           double timestamp_ms) {
+ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
+                                        const struct ui_event *event,
+                                        double timestamp_ms) {
   int should_dismiss = 0;
 
   (void)timestamp_ms;
@@ -261,15 +275,19 @@ enum ui_error ui_dialog_base_process_event(struct ui_dialog_base *dialog,
   /* In a real engine, content dimensions would come from the layout tree.
      For headless testing, we pass dummy bounds (0,0,0,0) or rely on Escape key.
    */
-  ui_backdrop_process_event(dialog->backdrop, event, 0.0f, 0.0f, 0.0f, 0.0f,
-                            &should_dismiss);
+  {
+    ui_error_t rc = ui_backdrop_process_event(
+        dialog->backdrop, event, 0.0f, 0.0f, 0.0f, 0.0f, &should_dismiss);
+    (void)rc;
+  }
 
   if (should_dismiss) {
     if (dialog->on_close) {
-      dialog->on_close(dialog, dialog->user_data);
+      ui_error_t rc = dialog->on_close(dialog, dialog->user_data);
+      (void)rc;
     } else {
       /* Default behavior if no listener is attached: close it */
-      ui_dialog_base_set_open(dialog, 0);
+      (void)ui_dialog_base_set_open(dialog, 0);
     }
   }
 
@@ -277,9 +295,8 @@ enum ui_error ui_dialog_base_process_event(struct ui_dialog_base *dialog,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_dialog_base_get_component(struct ui_dialog_base *dialog,
-                             struct ui_component **out_component) {
+ui_error_t ui_dialog_base_get_component(struct ui_dialog_base *dialog,
+                                        struct ui_component **out_component) {
   if (!dialog || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -287,8 +304,8 @@ ui_dialog_base_get_component(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dialog_base_bind_open(struct ui_dialog_base *widget,
-                                       struct ui_signal *open_signal) {
+ui_error_t ui_dialog_base_bind_open(struct ui_dialog_base *widget,
+                                    struct ui_signal *open_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -297,7 +314,7 @@ enum ui_error ui_dialog_base_bind_open(struct ui_dialog_base *widget,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dialog_base_get_animating_signal(struct ui_dialog_base *widget,
                                     struct ui_computed **out_animating) {
   if (!widget || !out_animating) {

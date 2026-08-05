@@ -11,7 +11,7 @@ extern int g_malloc_fail_countdown;
 extern int g_ui_timer_clock_gettime_fail;
 #endif
 
-static enum ui_error custom_source(void *user_data, double *out_time_secs) {
+static ui_error_t custom_source(void *user_data, double *out_time_secs) {
   double *val = (double *)user_data;
   if (out_time_secs) {
     *out_time_secs = *val;
@@ -21,7 +21,7 @@ static enum ui_error custom_source(void *user_data, double *out_time_secs) {
 
 static int run_normal_tests(void) {
   struct ui_timer *timer = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   double time1 = 0.0;
   double time2 = 0.0;
 
@@ -75,7 +75,7 @@ static int run_normal_tests(void) {
 
   failed |= (time2 < time1);
 
-#if !defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
   g_ui_timer_clock_gettime_fail = 1;
   failed |= (ui_timer_now(timer, &time2) != UI_ERROR_UNKNOWN);
   g_ui_timer_clock_gettime_fail = 0;
@@ -100,7 +100,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_timer *timer = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_timer_config config;
   double custom_time = 42.5;
   int failed = 0;

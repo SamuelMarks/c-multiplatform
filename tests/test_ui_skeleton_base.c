@@ -7,7 +7,7 @@ extern int g_malloc_fail_countdown;
 
 static int run_normal_tests(void) {
   struct ui_skeleton_base *skel = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   enum ui_skeleton_shape shape;
   int w, h;
   float phase;
@@ -127,7 +127,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_skeleton_base *skel = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing OOM on create...\n");
   g_malloc_fail_countdown = 0;

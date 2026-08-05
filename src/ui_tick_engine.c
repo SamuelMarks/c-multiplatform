@@ -4,7 +4,7 @@
 /* clang-format on */
 
 struct ui_task_node {
-  enum ui_error (*callback)(void *);
+  ui_error_t (*callback)(void *);
   void *user_data;
   struct ui_task_node *next;
 };
@@ -15,8 +15,8 @@ struct ui_tick_engine {
   struct ui_task_node *tail;
 };
 
-enum ui_error ui_tick_engine_create(struct ui_tick_engine **out_engine) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_tick_engine_create(struct ui_tick_engine **out_engine) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_tick_engine *engine = NULL;
 
   if (!out_engine) {
@@ -24,7 +24,8 @@ enum ui_error ui_tick_engine_create(struct ui_tick_engine **out_engine) {
     goto cleanup;
   }
 
-  engine = (struct ui_tick_engine *)UI_MALLOC(sizeof(struct ui_tick_engine));
+  engine = (struct ui_tick_engine *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_tick_engine));
   if (!engine) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -39,7 +40,7 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_tick_engine_destroy(struct ui_tick_engine *engine) {
+ui_error_t ui_tick_engine_destroy(struct ui_tick_engine *engine) {
   struct ui_task_node *current = NULL;
   struct ui_task_node *next = NULL;
 
@@ -50,18 +51,18 @@ enum ui_error ui_tick_engine_destroy(struct ui_tick_engine *engine) {
   current = engine->head;
   while (current) {
     next = current->next;
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
-  UI_FREE(engine);
+  C_MULTIPLATFORM_FREE(engine);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tick_engine_schedule(struct ui_tick_engine *engine,
-                                      enum ui_error (*callback)(void *),
-                                      void *user_data) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_tick_engine_schedule(struct ui_tick_engine *engine,
+                                   ui_error_t (*callback)(void *),
+                                   void *user_data) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_task_node *node = NULL;
 
   if (!engine || !callback) {
@@ -69,7 +70,8 @@ enum ui_error ui_tick_engine_schedule(struct ui_tick_engine *engine,
     goto cleanup;
   }
 
-  node = (struct ui_task_node *)UI_MALLOC(sizeof(struct ui_task_node));
+  node = (struct ui_task_node *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_task_node));
   if (!node) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -90,9 +92,10 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_tick_engine_tick(struct ui_tick_engine *engine) {
+ui_error_t ui_tick_engine_tick(struct ui_tick_engine *engine) {
   struct ui_task_node *current = NULL;
   struct ui_task_node *next = NULL;
+  ui_error_t tick_rc = UI_ERROR_NONE;
 
   if (!engine) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -104,12 +107,18 @@ enum ui_error ui_tick_engine_tick(struct ui_tick_engine *engine) {
 
   while (current) {
     next = current->next;
-    if (current->callback) {
-      current->callback(current->user_data);
+    {
+#define UI_TICK_EXECUTE_CB(c) (c)->callback((c)->user_data)
+      ui_error_t cb_rc = UI_TICK_EXECUTE_CB(current);
+      if (cb_rc != UI_ERROR_NONE) {
+        if (tick_rc == UI_ERROR_NONE) {
+          tick_rc = cb_rc;
+        }
+      }
     }
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
-  return UI_ERROR_NONE;
+  return tick_rc;
 }

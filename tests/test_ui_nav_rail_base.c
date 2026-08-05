@@ -12,7 +12,7 @@ static int run_normal_tests(void) {
   struct ui_nav_rail_item_base *item = NULL;
   struct ui_component *comp;
   int active;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing ui_nav_rail_base_create...\n");
   if (ui_nav_rail_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -86,9 +86,9 @@ static int run_normal_tests(void) {
     return 1;
 
   ui_nav_rail_item_base_destroy(item);
-  ui_nav_rail_base_destroy(rail);
+  (void)ui_nav_rail_base_destroy(rail);
   ui_nav_rail_item_base_destroy(NULL);
-  ui_nav_rail_base_destroy(NULL);
+  (void)ui_nav_rail_base_destroy(NULL);
 
   return 0;
 }
@@ -96,7 +96,7 @@ static int run_normal_tests(void) {
 static int run_oom_tests(void) {
   struct ui_nav_rail_base *rail = NULL;
   struct ui_nav_rail_item_base *item = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   printf("Testing OOM conditions for rail...\n");
@@ -108,7 +108,7 @@ static int run_oom_tests(void) {
       return 1;
     }
     if (rc == UI_ERROR_NONE) {
-      ui_nav_rail_base_destroy(rail);
+      (void)ui_nav_rail_base_destroy(rail);
       break;
     }
   }

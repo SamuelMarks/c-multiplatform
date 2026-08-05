@@ -24,14 +24,15 @@ struct ui_focus_manager;
  * @param out_popover Pointer to receive the allocated popover base.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_popover_base_create(struct ui_popover_base **out_popover);
+ui_error_t ui_popover_base_create(struct ui_popover_base **out_popover);
 
 /**
  * @brief Destroys a popover component.
  *
  * @param popover The popover to destroy.
+ * @return UI_ERROR_NONE on success.
  */
-void ui_popover_base_destroy(struct ui_popover_base *popover);
+ui_error_t ui_popover_base_destroy(struct ui_popover_base *popover);
 
 /**
  * @brief Opens the popover, rendering it into the overlay director and pushing
@@ -48,13 +49,13 @@ void ui_popover_base_destroy(struct ui_popover_base *popover);
  * math.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
-                                   struct ui_dom_node *content,
-                                   struct ui_overlay_director *director,
-                                   struct ui_focus_manager *focus_mgr,
-                                   const struct ui_layout_node *trigger_layout,
-                                   const struct ui_anchor_config *anchor_config,
-                                   float viewport_width, float viewport_height);
+ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
+                                struct ui_dom_node *content,
+                                struct ui_overlay_director *director,
+                                struct ui_focus_manager *focus_mgr,
+                                const struct ui_layout_node *trigger_layout,
+                                const struct ui_anchor_config *anchor_config,
+                                float viewport_width, float viewport_height);
 
 /**
  * @brief Processes an input event to detect if the popover should be dismissed
@@ -64,8 +65,8 @@ enum ui_error ui_popover_base_open(struct ui_popover_base *popover,
  * @param event The input event.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_popover_base_process_event(struct ui_popover_base *popover,
-                                            const struct ui_event *event);
+ui_error_t ui_popover_base_process_event(struct ui_popover_base *popover,
+                                         const struct ui_event *event);
 
 /**
  * @brief Closes the popover, unmounting it from the overlay director and
@@ -74,7 +75,7 @@ enum ui_error ui_popover_base_process_event(struct ui_popover_base *popover,
  * @param popover The popover.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_popover_base_close(struct ui_popover_base *popover);
+ui_error_t ui_popover_base_close(struct ui_popover_base *popover);
 
 /**
  * @brief Checks if the popover is currently open.
@@ -82,8 +83,8 @@ enum ui_error ui_popover_base_close(struct ui_popover_base *popover);
  * @param popover The popover.
  * @return 1 if open, 0 if closed.
  */
-enum ui_error ui_popover_base_is_open(const struct ui_popover_base *popover,
-                                      int *out_is_open);
+ui_error_t ui_popover_base_is_open(const struct ui_popover_base *popover,
+                                   int *out_is_open);
 
 /**
  * @brief Binds the open state to a signal.
@@ -92,8 +93,8 @@ enum ui_error ui_popover_base_is_open(const struct ui_popover_base *popover,
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_popover_base_bind_open(struct ui_popover_base *widget,
-                                        struct ui_signal *open_signal);
+ui_error_t ui_popover_base_bind_open(struct ui_popover_base *widget,
+                                     struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the widget is animating.
@@ -102,7 +103,7 @@ enum ui_error ui_popover_base_bind_open(struct ui_popover_base *widget,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_popover_base_get_animating_signal(struct ui_popover_base *widget,
                                      struct ui_computed **out_animating);
 

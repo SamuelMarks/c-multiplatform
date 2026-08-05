@@ -16,15 +16,15 @@ static int g_change_called = 0;
 static int g_touched_called = 0;
 static int g_last_seconds = -1;
 
-static enum ui_error on_change(union ui_signal_payload new_value,
-                               void *user_data) {
+static ui_error_t on_change(union ui_signal_payload new_value,
+                            void *user_data) {
   (void)user_data;
   g_change_called++;
   g_last_seconds = new_value.int_val;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_touched(void *user_data) {
+static ui_error_t on_touched(void *user_data) {
   (void)user_data;
   g_touched_called++;
   return UI_ERROR_NONE;

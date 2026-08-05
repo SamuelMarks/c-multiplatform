@@ -8,7 +8,7 @@ extern int g_malloc_fail_countdown;
 
 static int run_normal_tests(void) {
   struct ui_grid_list_base *gl = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int cols;
   size_t count;
   int rows;
@@ -115,7 +115,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_grid_list_base *gl = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int rows;
 
   printf("Testing OOM on create...\n");

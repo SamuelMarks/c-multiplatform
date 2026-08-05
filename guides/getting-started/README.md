@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     struct ui_engine *engine = NULL;
     struct ui_window *window = NULL;
     struct ui_button_base *btn = NULL;
-    enum ui_error err = UI_ERROR_NONE;
+    ui_error_t err = UI_ERROR_NONE;
 
     /* 1. Initialize the core engine (allocates arenas and thread pools) */
     err = ui_engine_create(&engine);

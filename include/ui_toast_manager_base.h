@@ -59,7 +59,7 @@ typedef size_t ui_toast_id;
  * @param out_manager Pointer to receive the allocated manager.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager);
 
 /**
@@ -67,7 +67,7 @@ ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager);
  *
  * @param manager The toast manager to destroy.
  */
-void ui_toast_manager_base_destroy(struct ui_toast_manager_base *manager);
+ui_error_t ui_toast_manager_base_destroy(struct ui_toast_manager_base *manager);
 
 /**
  * @brief Enqueues a new toast notification.
@@ -78,10 +78,10 @@ void ui_toast_manager_base_destroy(struct ui_toast_manager_base *manager);
  * @param out_id Pointer to receive the assigned toast ID.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
-                                         const struct ui_toast_config *config,
-                                         double current_time_secs,
-                                         ui_toast_id *out_id);
+ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
+                                      const struct ui_toast_config *config,
+                                      double current_time_secs,
+                                      ui_toast_id *out_id);
 
 /**
  * @brief Programmatically dismisses an active or queued toast.
@@ -90,9 +90,8 @@ enum ui_error ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
  * @param id The ID of the toast to dismiss.
  * @return UI_ERROR_NONE on success, or UI_ERROR_NOT_FOUND if invalid.
  */
-enum ui_error
-ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
-                              ui_toast_id id);
+ui_error_t ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
+                                         ui_toast_id id);
 
 /**
  * @brief Ticks the internal logic: processes auto-dismissal timers and
@@ -102,8 +101,8 @@ ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
  * @param current_time_secs Current monotonic time in seconds.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
-                                         double current_time_secs);
+ui_error_t ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
+                                      double current_time_secs);
 
 /**
  * @brief Processes an input event. Used for pause-on-hover functionality.
@@ -113,7 +112,7 @@ enum ui_error ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
  * @param current_time_secs Current time.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
                                    const struct ui_event *event,
                                    double current_time_secs);
@@ -125,9 +124,8 @@ ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
  * @param director The overlay director managing the highest layer.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
-                             struct ui_overlay_director *director);
+ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
+                                        struct ui_overlay_director *director);
 
 #ifdef __cplusplus
 }

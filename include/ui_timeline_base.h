@@ -33,14 +33,14 @@ struct ui_timeline_node;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-enum ui_error ui_timeline_base_create(struct ui_timeline_base **out_timeline);
+ui_error_t ui_timeline_base_create(struct ui_timeline_base **out_timeline);
 
 /**
  * @brief Destroys a timeline base component and frees all nodes.
  *
  * @param timeline The timeline to destroy.
  */
-void ui_timeline_base_destroy(struct ui_timeline_base *timeline);
+ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline);
 
 /**
  * @brief Sets the alignment of the timeline.
@@ -49,9 +49,8 @@ void ui_timeline_base_destroy(struct ui_timeline_base *timeline);
  * @param alignment The alignment to set.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
-ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
-                               enum ui_timeline_alignment alignment);
+ui_error_t ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
+                                          enum ui_timeline_alignment alignment);
 
 /**
  * @brief Gets the alignment of the timeline.
@@ -60,7 +59,7 @@ ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
  * @param out_alignment Pointer to receive the alignment.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
                                enum ui_timeline_alignment *out_alignment);
 
@@ -73,9 +72,9 @@ ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointers,
  * UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-enum ui_error ui_timeline_base_add_node(struct ui_timeline_base *timeline,
-                                        const char *title,
-                                        const char *description);
+ui_error_t ui_timeline_base_add_node(struct ui_timeline_base *timeline,
+                                     const char *title,
+                                     const char *description);
 
 /**
  * @brief Gets the number of nodes in the timeline.
@@ -84,7 +83,7 @@ enum ui_error ui_timeline_base_add_node(struct ui_timeline_base *timeline,
  * @param out_count Pointer to receive the number of nodes.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
                                 size_t *out_count);
 
@@ -100,9 +99,9 @@ ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointers,
  * UI_ERROR_OUT_OF_BOUNDS if index is invalid.
  */
-enum ui_error ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
-                                        size_t index, const char **out_title,
-                                        const char **out_description);
+ui_error_t ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
+                                     size_t index, const char **out_title,
+                                     const char **out_description);
 
 /**
  * @brief A stub rendering routine for the timeline.
@@ -112,7 +111,7 @@ enum ui_error ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
  * @param timeline The timeline.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_timeline_base_render(struct ui_timeline_base *timeline);
+ui_error_t ui_timeline_base_render(struct ui_timeline_base *timeline);
 
 /**
  * @brief Binds the data property.
@@ -121,8 +120,8 @@ enum ui_error ui_timeline_base_render(struct ui_timeline_base *timeline);
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_timeline_base_bind_data(struct ui_timeline_base *widget,
-                                         struct ui_computed *signal);
+ui_error_t ui_timeline_base_bind_data(struct ui_timeline_base *widget,
+                                      struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

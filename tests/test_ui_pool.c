@@ -9,7 +9,7 @@ extern int g_malloc_fail_countdown;
 
 int main(void) {
   struct ui_pool *pool = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   size_t free_count = 0;
   size_t total_capacity = 0;
   void *ptr1 = NULL;

@@ -5,14 +5,14 @@
 #include <string.h>
 /* clang-format on */
 
-enum ui_error ui_cssom_insert_rule(struct ui_css_stylesheet *stylesheet,
-                                   const char *css_text, size_t index) {
+ui_error_t ui_cssom_insert_rule(struct ui_css_stylesheet *stylesheet,
+                                const char *css_text, size_t index) {
   struct ui_css_stylesheet *temp_sheet = NULL;
   struct ui_css_rule *parsed_rule = NULL;
   struct ui_css_rule *prev = NULL;
   struct ui_css_rule *curr = NULL;
   size_t i = 0;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!stylesheet || !css_text)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -57,8 +57,8 @@ enum ui_error ui_cssom_insert_rule(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_cssom_delete_rule(struct ui_css_stylesheet *stylesheet,
-                                   size_t index) {
+ui_error_t ui_cssom_delete_rule(struct ui_css_stylesheet *stylesheet,
+                                size_t index) {
   struct ui_css_rule *prev = NULL;
   struct ui_css_rule *curr = NULL;
   size_t i = 0;
@@ -87,10 +87,9 @@ enum ui_error ui_cssom_delete_rule(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_cssom_set_property(struct ui_css_rule *rule,
-                                    const char *property_name,
-                                    const char *property_value,
-                                    int is_important) {
+ui_error_t ui_cssom_set_property(struct ui_css_rule *rule,
+                                 const char *property_name,
+                                 const char *property_value, int is_important) {
   struct ui_css_declaration *decl = NULL;
   size_t val_len;
 
@@ -100,9 +99,9 @@ enum ui_error ui_cssom_set_property(struct ui_css_rule *rule,
   decl = rule->declarations;
   while (decl) {
     if (strcmp(decl->property_name, property_name) == 0) {
-      UI_FREE(decl->property_value);
+      C_MULTIPLATFORM_FREE(decl->property_value);
       val_len = strlen(property_value);
-      decl->property_value = (char *)UI_MALLOC(val_len + 1);
+      decl->property_value = (char *)C_MULTIPLATFORM_MALLOC(val_len + 1);
       if (!decl->property_value)
         return UI_ERROR_OUT_OF_MEMORY;
 #if defined(_MSC_VER)
@@ -121,8 +120,8 @@ enum ui_error ui_cssom_set_property(struct ui_css_rule *rule,
                                         is_important);
 }
 
-enum ui_error ui_cssom_remove_property(struct ui_css_rule *rule,
-                                       const char *property_name) {
+ui_error_t ui_cssom_remove_property(struct ui_css_rule *rule,
+                                    const char *property_name) {
   struct ui_css_declaration *prev = NULL;
   struct ui_css_declaration *curr = NULL;
 
@@ -137,9 +136,9 @@ enum ui_error ui_cssom_remove_property(struct ui_css_rule *rule,
       } else {
         rule->declarations = curr->next;
       }
-      UI_FREE(curr->property_name);
-      UI_FREE(curr->property_value);
-      UI_FREE(curr);
+      C_MULTIPLATFORM_FREE(curr->property_name);
+      C_MULTIPLATFORM_FREE(curr->property_value);
+      C_MULTIPLATFORM_FREE(curr);
       return UI_ERROR_NONE;
     }
     prev = curr;
@@ -149,9 +148,9 @@ enum ui_error ui_cssom_remove_property(struct ui_css_rule *rule,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_cssom_get_property_value(const struct ui_css_rule *rule,
-                                          const char *property_name,
-                                          const char **out_value) {
+ui_error_t ui_cssom_get_property_value(const struct ui_css_rule *rule,
+                                       const char *property_name,
+                                       const char **out_value) {
   struct ui_css_declaration *decl = NULL;
 
   if (!rule || !property_name || !out_value)
@@ -169,9 +168,9 @@ enum ui_error ui_cssom_get_property_value(const struct ui_css_rule *rule,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_cssom_get_property_priority(const struct ui_css_rule *rule,
-                                             const char *property_name,
-                                             int *out_is_important) {
+ui_error_t ui_cssom_get_property_priority(const struct ui_css_rule *rule,
+                                          const char *property_name,
+                                          int *out_is_important) {
   struct ui_css_declaration *decl = NULL;
 
   if (!rule || !property_name || !out_is_important)

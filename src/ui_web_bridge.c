@@ -21,9 +21,11 @@ static ui_uint32 *g_cmd_buffer = NULL;
 static size_t g_cmd_pos = 0;
 static size_t g_cmd_capacity = WEB_CMD_BUFFER_SIZE / sizeof(ui_uint32);
 
-static enum ui_error ensure_buffer(size_t words_needed) {
+static ui_error_t ensure_buffer(size_t words_needed) {
+  ui_error_t rc;
   if (!g_cmd_buffer) {
-    g_cmd_buffer = (ui_uint32 *)UI_MALLOC(g_cmd_capacity * sizeof(ui_uint32));
+    g_cmd_buffer =
+        (ui_uint32 *)C_MULTIPLATFORM_MALLOC(g_cmd_capacity * sizeof(ui_uint32));
     if (!g_cmd_buffer) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -31,7 +33,10 @@ static enum ui_error ensure_buffer(size_t words_needed) {
   }
 
   if (g_cmd_pos + words_needed > g_cmd_capacity) {
-    ui_web_bridge_flush();
+    rc = ui_web_bridge_flush();
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -202,16 +207,16 @@ EM_JS(void, flush_to_js, (ui_uint32 * buf, ui_uint32 len), {
 })
 #endif
 
-enum ui_error ui_web_bridge_shutdown(void) {
+ui_error_t ui_web_bridge_shutdown(void) {
   if (g_cmd_buffer) {
-    UI_FREE(g_cmd_buffer);
+    C_MULTIPLATFORM_FREE(g_cmd_buffer);
     g_cmd_buffer = NULL;
   }
   g_cmd_pos = 0;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_flush(void) {
+ui_error_t ui_web_bridge_flush(void) {
 #if defined(__EMSCRIPTEN__)
   if (g_cmd_pos > 0 && g_cmd_buffer) {
     flush_to_js(g_cmd_buffer, (ui_uint32)g_cmd_pos);
@@ -221,8 +226,8 @@ enum ui_error ui_web_bridge_flush(void) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_create_node(ui_uint32 id, const char *tag_name) {
-  enum ui_error rc = ensure_buffer(3);
+ui_error_t ui_web_bridge_create_node(ui_uint32 id, const char *tag_name) {
+  ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -232,8 +237,8 @@ enum ui_error ui_web_bridge_create_node(ui_uint32 id, const char *tag_name) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_destroy_node(ui_uint32 id) {
-  enum ui_error rc = ensure_buffer(2);
+ui_error_t ui_web_bridge_destroy_node(ui_uint32 id) {
+  ui_error_t rc = ensure_buffer(2);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -242,8 +247,8 @@ enum ui_error ui_web_bridge_destroy_node(ui_uint32 id) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_set_text(ui_uint32 id, const char *text) {
-  enum ui_error rc = ensure_buffer(3);
+ui_error_t ui_web_bridge_set_text(ui_uint32 id, const char *text) {
+  ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -253,9 +258,8 @@ enum ui_error ui_web_bridge_set_text(ui_uint32 id, const char *text) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_append_child(ui_uint32 parent_id,
-                                         ui_uint32 child_id) {
-  enum ui_error rc = ensure_buffer(3);
+ui_error_t ui_web_bridge_append_child(ui_uint32 parent_id, ui_uint32 child_id) {
+  ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -265,9 +269,8 @@ enum ui_error ui_web_bridge_append_child(ui_uint32 parent_id,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_remove_child(ui_uint32 parent_id,
-                                         ui_uint32 child_id) {
-  enum ui_error rc = ensure_buffer(3);
+ui_error_t ui_web_bridge_remove_child(ui_uint32 parent_id, ui_uint32 child_id) {
+  ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -277,9 +280,9 @@ enum ui_error ui_web_bridge_remove_child(ui_uint32 parent_id,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_set_bounds(ui_uint32 id, float x, float y, float w,
-                                       float h) {
-  enum ui_error rc = ensure_buffer(6);
+ui_error_t ui_web_bridge_set_bounds(ui_uint32 id, float x, float y, float w,
+                                    float h) {
+  ui_error_t rc = ensure_buffer(6);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -298,10 +301,9 @@ enum ui_error ui_web_bridge_set_bounds(ui_uint32 id, float x, float y, float w,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_insert_before(ui_uint32 parent_id,
-                                          ui_uint32 child_id,
-                                          ui_uint32 reference_id) {
-  enum ui_error rc = ensure_buffer(4);
+ui_error_t ui_web_bridge_insert_before(ui_uint32 parent_id, ui_uint32 child_id,
+                                       ui_uint32 reference_id) {
+  ui_error_t rc = ensure_buffer(4);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -312,9 +314,9 @@ enum ui_error ui_web_bridge_insert_before(ui_uint32 parent_id,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_set_style(ui_uint32 id, const char *property,
-                                      const char *value) {
-  enum ui_error rc = ensure_buffer(4);
+ui_error_t ui_web_bridge_set_style(ui_uint32 id, const char *property,
+                                   const char *value) {
+  ui_error_t rc = ensure_buffer(4);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -331,8 +333,8 @@ enum ui_error ui_web_bridge_set_style(ui_uint32 id, const char *property,
 extern "C" {
 #endif
 
-enum ui_error ui_web_bridge_dispatch_event(int type, float x, float y,
-                                           int buttons) {
+ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
+                                        int buttons) {
   struct ui_event event;
   memset(&event, 0, sizeof(event));
 
@@ -370,7 +372,7 @@ enum ui_error ui_web_bridge_dispatch_event(int type, float x, float y,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_dispatch_resize(float w, float h, float dpr) {
+ui_error_t ui_web_bridge_dispatch_resize(float w, float h, float dpr) {
   struct ui_event event;
   memset(&event, 0, sizeof(event));
   event.type = UI_EVENT_WINDOW_RESIZE;
@@ -380,8 +382,8 @@ enum ui_error ui_web_bridge_dispatch_resize(float w, float h, float dpr) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_dispatch_key(int type, const char *key,
-                                         int modifiers) {
+ui_error_t ui_web_bridge_dispatch_key(int type, const char *key,
+                                      int modifiers) {
   struct ui_event event;
   memset(&event, 0, sizeof(event));
 
@@ -401,10 +403,10 @@ enum ui_error ui_web_bridge_dispatch_key(int type, const char *key,
 }
 #endif
 
-enum ui_error ui_web_bridge_set_aria(ui_uint32 id, const char *role,
-                                     const char *label, int hidden,
-                                     int disabled, int expanded, int checked) {
-  enum ui_error rc = ensure_buffer(8);
+ui_error_t ui_web_bridge_set_aria(ui_uint32 id, const char *role,
+                                  const char *label, int hidden, int disabled,
+                                  int expanded, int checked) {
+  ui_error_t rc = ensure_buffer(8);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -420,8 +422,8 @@ enum ui_error ui_web_bridge_set_aria(ui_uint32 id, const char *role,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_push_state(const char *path) {
-  enum ui_error rc = ensure_buffer(3);
+ui_error_t ui_web_bridge_push_state(const char *path) {
+  ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -431,8 +433,8 @@ enum ui_error ui_web_bridge_push_state(const char *path) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_bridge_replace_state(const char *path) {
-  enum ui_error rc = ensure_buffer(3);
+ui_error_t ui_web_bridge_replace_state(const char *path) {
+  ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -441,9 +443,9 @@ enum ui_error ui_web_bridge_replace_state(const char *path) {
   g_cmd_buffer[g_cmd_pos++] = (ui_uint32)(ui_uintptr)path;
   return UI_ERROR_NONE;
 }
-enum ui_error ui_web_bridge_set_attribute(ui_uint32 id, const char *name,
-                                          const char *value) {
-  enum ui_error rc = ensure_buffer(4);
+ui_error_t ui_web_bridge_set_attribute(ui_uint32 id, const char *name,
+                                       const char *value) {
+  ui_error_t rc = ensure_buffer(4);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -453,9 +455,9 @@ enum ui_error ui_web_bridge_set_attribute(ui_uint32 id, const char *name,
   g_cmd_buffer[g_cmd_pos++] = (ui_uint32)(ui_uintptr)value;
   return UI_ERROR_NONE;
 }
-enum ui_error ui_web_bridge_set_property(ui_uint32 id, const char *name,
-                                         const char *value) {
-  enum ui_error rc = ensure_buffer(4);
+ui_error_t ui_web_bridge_set_property(ui_uint32 id, const char *name,
+                                      const char *value) {
+  ui_error_t rc = ensure_buffer(4);
   if (rc != UI_ERROR_NONE)
     return rc;
 

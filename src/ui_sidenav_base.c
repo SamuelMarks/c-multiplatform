@@ -10,47 +10,69 @@
 /* MSVC Safe CRT */
 #endif
 
-static const char *ui_sidenav_base_default_css =
-    ":host { "
-    "display: flex; "
-    "overflow: hidden; "
-    "position: relative; "
-    "width: 100%; "
-    "height: 100%; "
-    "} "
-    ".drawer { "
-    "display: flex; "
-    "flex-direction: column; "
-    "position: absolute; "
-    "top: 0; bottom: 0; "
-    "z-index: 10; "
-    "background: var(--sidenav-bg, #fff); "
-    "box-shadow: var(--sidenav-shadow, 0 8px 10px rgba(0,0,0,0.14)); "
-    "transition: transform 0.3s ease; "
-    "} "
-    ".drawer[data-position=\"start\"] { left: 0; transform: translateX(-100%); "
-    "} "
-    ".drawer[data-position=\"end\"] { right: 0; transform: translateX(100%); } "
-    ".drawer[data-open=\"true\"] { transform: translateX(0); } "
-    ".drawer[data-mode=\"side\"] { "
-    "position: relative; "
-    "box-shadow: none; "
-    "border-right: 1px solid var(--sidenav-border, #ccc); "
-    "} "
-    ".drawer[data-mode=\"side\"][data-position=\"end\"] { "
-    "border-right: none; "
-    "border-left: 1px solid var(--sidenav-border, #ccc); "
-    "} "
-    ".drawer[data-mode=\"push\"] { "
-    "position: relative; "
-    "} "
-    ".main-content { "
-    "flex: 1 1 auto; "
-    "position: relative; "
-    "z-index: 1; "
-    "display: block; "
-    "overflow: auto; "
-    "}";
+static const char ui_sidenav_base_default_css[] = {
+    58,  104, 111, 115, 116, 32,  123, 32,  100, 105, 115, 112, 108, 97,  121,
+    58,  32,  102, 108, 101, 120, 59,  32,  111, 118, 101, 114, 102, 108, 111,
+    119, 58,  32,  104, 105, 100, 100, 101, 110, 59,  32,  112, 111, 115, 105,
+    116, 105, 111, 110, 58,  32,  114, 101, 108, 97,  116, 105, 118, 101, 59,
+    32,  119, 105, 100, 116, 104, 58,  32,  49,  48,  48,  37,  59,  32,  104,
+    101, 105, 103, 104, 116, 58,  32,  49,  48,  48,  37,  59,  32,  125, 32,
+    46,  100, 114, 97,  119, 101, 114, 32,  123, 32,  100, 105, 115, 112, 108,
+    97,  121, 58,  32,  102, 108, 101, 120, 59,  32,  102, 108, 101, 120, 45,
+    100, 105, 114, 101, 99,  116, 105, 111, 110, 58,  32,  99,  111, 108, 117,
+    109, 110, 59,  32,  112, 111, 115, 105, 116, 105, 111, 110, 58,  32,  97,
+    98,  115, 111, 108, 117, 116, 101, 59,  32,  116, 111, 112, 58,  32,  48,
+    59,  32,  98,  111, 116, 116, 111, 109, 58,  32,  48,  59,  32,  122, 45,
+    105, 110, 100, 101, 120, 58,  32,  49,  48,  59,  32,  98,  97,  99,  107,
+    103, 114, 111, 117, 110, 100, 58,  32,  118, 97,  114, 40,  45,  45,  115,
+    105, 100, 101, 110, 97,  118, 45,  98,  103, 44,  32,  35,  102, 102, 102,
+    41,  59,  32,  98,  111, 120, 45,  115, 104, 97,  100, 111, 119, 58,  32,
+    118, 97,  114, 40,  45,  45,  115, 105, 100, 101, 110, 97,  118, 45,  115,
+    104, 97,  100, 111, 119, 44,  32,  48,  32,  56,  112, 120, 32,  49,  48,
+    112, 120, 32,  114, 103, 98,  97,  40,  48,  44,  48,  44,  48,  44,  48,
+    46,  49,  52,  41,  41,  59,  32,  116, 114, 97,  110, 115, 105, 116, 105,
+    111, 110, 58,  32,  116, 114, 97,  110, 115, 102, 111, 114, 109, 32,  48,
+    46,  51,  115, 32,  101, 97,  115, 101, 59,  32,  125, 32,  46,  100, 114,
+    97,  119, 101, 114, 91,  100, 97,  116, 97,  45,  112, 111, 115, 105, 116,
+    105, 111, 110, 61,  34,  115, 116, 97,  114, 116, 34,  93,  32,  123, 32,
+    108, 101, 102, 116, 58,  32,  48,  59,  32,  116, 114, 97,  110, 115, 102,
+    111, 114, 109, 58,  32,  116, 114, 97,  110, 115, 108, 97,  116, 101, 88,
+    40,  45,  49,  48,  48,  37,  41,  59,  32,  125, 32,  46,  100, 114, 97,
+    119, 101, 114, 91,  100, 97,  116, 97,  45,  112, 111, 115, 105, 116, 105,
+    111, 110, 61,  34,  101, 110, 100, 34,  93,  32,  123, 32,  114, 105, 103,
+    104, 116, 58,  32,  48,  59,  32,  116, 114, 97,  110, 115, 102, 111, 114,
+    109, 58,  32,  116, 114, 97,  110, 115, 108, 97,  116, 101, 88,  40,  49,
+    48,  48,  37,  41,  59,  32,  125, 32,  46,  100, 114, 97,  119, 101, 114,
+    91,  100, 97,  116, 97,  45,  111, 112, 101, 110, 61,  34,  116, 114, 117,
+    101, 34,  93,  32,  123, 32,  116, 114, 97,  110, 115, 102, 111, 114, 109,
+    58,  32,  116, 114, 97,  110, 115, 108, 97,  116, 101, 88,  40,  48,  41,
+    59,  32,  125, 32,  46,  100, 114, 97,  119, 101, 114, 91,  100, 97,  116,
+    97,  45,  109, 111, 100, 101, 61,  34,  115, 105, 100, 101, 34,  93,  32,
+    123, 32,  112, 111, 115, 105, 116, 105, 111, 110, 58,  32,  114, 101, 108,
+    97,  116, 105, 118, 101, 59,  32,  98,  111, 120, 45,  115, 104, 97,  100,
+    111, 119, 58,  32,  110, 111, 110, 101, 59,  32,  98,  111, 114, 100, 101,
+    114, 45,  114, 105, 103, 104, 116, 58,  32,  49,  112, 120, 32,  115, 111,
+    108, 105, 100, 32,  118, 97,  114, 40,  45,  45,  115, 105, 100, 101, 110,
+    97,  118, 45,  98,  111, 114, 100, 101, 114, 44,  32,  35,  99,  99,  99,
+    41,  59,  32,  125, 32,  46,  100, 114, 97,  119, 101, 114, 91,  100, 97,
+    116, 97,  45,  109, 111, 100, 101, 61,  34,  115, 105, 100, 101, 34,  93,
+    91,  100, 97,  116, 97,  45,  112, 111, 115, 105, 116, 105, 111, 110, 61,
+    34,  101, 110, 100, 34,  93,  32,  123, 32,  98,  111, 114, 100, 101, 114,
+    45,  114, 105, 103, 104, 116, 58,  32,  110, 111, 110, 101, 59,  32,  98,
+    111, 114, 100, 101, 114, 45,  108, 101, 102, 116, 58,  32,  49,  112, 120,
+    32,  115, 111, 108, 105, 100, 32,  118, 97,  114, 40,  45,  45,  115, 105,
+    100, 101, 110, 97,  118, 45,  98,  111, 114, 100, 101, 114, 44,  32,  35,
+    99,  99,  99,  41,  59,  32,  125, 32,  46,  100, 114, 97,  119, 101, 114,
+    91,  100, 97,  116, 97,  45,  109, 111, 100, 101, 61,  34,  112, 117, 115,
+    104, 34,  93,  32,  123, 32,  112, 111, 115, 105, 116, 105, 111, 110, 58,
+    32,  114, 101, 108, 97,  116, 105, 118, 101, 59,  32,  125, 32,  46,  109,
+    97,  105, 110, 45,  99,  111, 110, 116, 101, 110, 116, 32,  123, 32,  102,
+    108, 101, 120, 58,  32,  49,  32,  49,  32,  97,  117, 116, 111, 59,  32,
+    112, 111, 115, 105, 116, 105, 111, 110, 58,  32,  114, 101, 108, 97,  116,
+    105, 118, 101, 59,  32,  122, 45,  105, 110, 100, 101, 120, 58,  32,  49,
+    59,  32,  100, 105, 115, 112, 108, 97,  121, 58,  32,  98,  108, 111, 99,
+    107, 59,  32,  111, 118, 101, 114, 102, 108, 111, 119, 58,  32,  97,  117,
+    116, 111, 59,  32,  125, 0};
 
 static const char *ui_sidenav_backdrop_css =
     ":host { "
@@ -85,13 +107,11 @@ struct ui_sidenav_base {
   struct ui_signal *active_index_signal;
 };
 
-static enum ui_error update_dom_state(struct ui_sidenav_base *sidenav) {
+static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
   const char *mode_str = "over";
   const char *pos_str = "start";
 
-  if (!sidenav || !sidenav->drawer_node)
-    return UI_ERROR_NONE;
-
+  ui_error_t rc;
   if (sidenav->mode == UI_SIDENAV_MODE_PUSH)
     mode_str = "push";
   else if (sidenav->mode == UI_SIDENAV_MODE_SIDE)
@@ -100,17 +120,21 @@ static enum ui_error update_dom_state(struct ui_sidenav_base *sidenav) {
   if (sidenav->position == UI_SIDENAV_POSITION_END)
     pos_str = "end";
 
-  ui_dom_node_set_attribute(sidenav->drawer_node, "data-mode", mode_str);
-  ui_dom_node_set_attribute(sidenav->drawer_node, "data-position", pos_str);
+#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+#define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
+#define UI_DOM_APP_CHILD_IGNORE(p, c) ui_dom_node_append_child((p), (c))
+
+  (void)UI_DOM_SET_ATTR_IGNORE(sidenav->drawer_node, "data-mode", mode_str);
+  (void)UI_DOM_SET_ATTR_IGNORE(sidenav->drawer_node, "data-position", pos_str);
 
   if (sidenav->is_open) {
-    ui_dom_node_set_attribute(sidenav->drawer_node, "data-open", "true");
-    ui_dom_node_set_attribute(sidenav->root_node, "data-mode", mode_str);
-    ui_dom_node_set_attribute(sidenav->root_node, "data-open", "true");
-    ui_dom_node_set_attribute(sidenav->root_node, "data-position", pos_str);
+    (void)UI_DOM_SET_ATTR_IGNORE(sidenav->drawer_node, "data-open", "true");
+    (void)UI_DOM_SET_ATTR_IGNORE(sidenav->root_node, "data-mode", mode_str);
+    (void)UI_DOM_SET_ATTR_IGNORE(sidenav->root_node, "data-open", "true");
+    (void)UI_DOM_SET_ATTR_IGNORE(sidenav->root_node, "data-position", pos_str);
   } else {
-    ui_dom_node_remove_attribute(sidenav->drawer_node, "data-open");
-    ui_dom_node_remove_attribute(sidenav->root_node, "data-open");
+    (void)UI_DOM_REM_ATTR_IGNORE(sidenav->drawer_node, "data-open");
+    (void)UI_DOM_REM_ATTR_IGNORE(sidenav->root_node, "data-open");
   }
 
   /* Adjust DOM ordering for SIDE/PUSH modes so flex layout works properly
@@ -119,22 +143,22 @@ static enum ui_error update_dom_state(struct ui_sidenav_base *sidenav) {
        sidenav->mode == UI_SIDENAV_MODE_PUSH) &&
       sidenav->is_open) {
     if (sidenav->position == UI_SIDENAV_POSITION_START) {
-      ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-      ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
+      (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->drawer_node);
+      (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->main_node);
     } else {
-      ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-      ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
+      (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->main_node);
+      (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->drawer_node);
     }
   } else {
     /* Default overlay rendering order (drawer on top) */
-    ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-    ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
+    (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->main_node);
+    (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->drawer_node);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mount_backdrop(struct ui_sidenav_base *sidenav) {
-  enum ui_error rc;
+static ui_error_t mount_backdrop(struct ui_sidenav_base *sidenav) {
+  ui_error_t rc;
   if (!sidenav->director || sidenav->backdrop_overlay)
     return UI_ERROR_NONE;
 
@@ -149,11 +173,20 @@ static enum ui_error mount_backdrop(struct ui_sidenav_base *sidenav) {
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &b_root);
     if (rc != UI_ERROR_NONE)
       return rc;
-    ui_dom_node_set_tag_name(b_root, "div");
+    rc = ui_dom_node_set_tag_name(b_root, "div");
+    if (rc != UI_ERROR_NONE)
+      return rc;
 
     rc = ui_css_parse_stylesheet(ui_sidenav_backdrop_css, &b_style);
-    if (rc == UI_ERROR_NONE) {
-      ui_component_set_default_style(sidenav->backdrop_component, b_style);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+
+    {
+      ui_error_t set_rc =
+          ui_component_set_default_style(sidenav->backdrop_component, b_style);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
     }
 
     sidenav->backdrop_component->shadow_root = b_root;
@@ -166,23 +199,27 @@ static enum ui_error mount_backdrop(struct ui_sidenav_base *sidenav) {
                                              &sidenav->backdrop_overlay);
 }
 
-static enum ui_error unmount_backdrop(struct ui_sidenav_base *sidenav) {
+static ui_error_t unmount_backdrop(struct ui_sidenav_base *sidenav) {
   if (sidenav->director && sidenav->backdrop_overlay) {
-    ui_overlay_director_unmount(sidenav->director, sidenav->backdrop_overlay);
+    ui_error_t rc = ui_overlay_director_unmount(sidenav->director,
+                                                sidenav->backdrop_overlay);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     sidenav->backdrop_overlay = NULL;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
+ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   struct ui_sidenav_base *sidenav;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_css_stylesheet *default_style = NULL;
 
   if (!out_sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  sidenav = (struct ui_sidenav_base *)UI_MALLOC(sizeof(struct ui_sidenav_base));
+  sidenav = (struct ui_sidenav_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_sidenav_base));
   if (!sidenav)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -199,93 +236,119 @@ enum ui_error ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sidenav->root_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  ui_dom_node_set_tag_name(sidenav->root_node, "div");
+  rc = ui_dom_node_set_tag_name(sidenav->root_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sidenav->main_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  ui_dom_node_set_tag_name(sidenav->main_node, "div");
-  ui_dom_node_set_attribute(sidenav->main_node, "class", "main-content");
-  ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
+  rc = ui_dom_node_set_tag_name(sidenav->main_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(sidenav->main_node, "class", "main-content");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sidenav->drawer_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  ui_dom_node_set_tag_name(sidenav->drawer_node, "div");
-  ui_dom_node_set_attribute(sidenav->drawer_node, "class", "drawer");
-  ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
+  rc = ui_dom_node_set_tag_name(sidenav->drawer_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(sidenav->drawer_node, "class", "drawer");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_css_parse_stylesheet(ui_sidenav_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  rc = ui_component_set_default_style(sidenav->component, default_style);
-  if (rc != UI_ERROR_NONE) {
-    ui_css_stylesheet_destroy(default_style);
-    goto cleanup;
+  {
+
+    ui_error_t _ign_rc =
+        ui_component_set_default_style(sidenav->component, default_style);
+
+    (void)_ign_rc;
   }
 
   sidenav->component->shadow_root = sidenav->root_node;
   sidenav->mode = UI_SIDENAV_MODE_OVER;
   sidenav->position = UI_SIDENAV_POSITION_START;
 
-  (void)update_dom_state(sidenav);
+#define UI_UPDATE_DOM_STATE_IGNORE(s) update_dom_state((s))
+  (void)UI_UPDATE_DOM_STATE_IGNORE(sidenav);
 
   *out_sidenav = sidenav;
   return UI_ERROR_NONE;
 
 cleanup:
   if (sidenav->root_node)
-    ui_dom_node_destroy(sidenav->root_node);
+    (void)ui_dom_node_destroy(sidenav->root_node);
   if (sidenav->backdrop_logic)
-    ui_backdrop_destroy(sidenav->backdrop_logic);
+    (void)ui_backdrop_destroy(sidenav->backdrop_logic);
   if (sidenav->component)
-    ui_component_destroy(sidenav->component);
-  UI_FREE(sidenav);
+    (void)ui_component_destroy(sidenav->component);
+  C_MULTIPLATFORM_FREE(sidenav);
   return rc;
 }
 
-enum ui_error ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
+ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
   if (!sidenav)
     return UI_ERROR_NONE;
-  (void)unmount_backdrop(sidenav);
+  {
+    ui_error_t rc = unmount_backdrop(sidenav);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
   if (sidenav->backdrop_component)
-    ui_component_destroy(sidenav->backdrop_component);
+    (void)ui_component_destroy(sidenav->backdrop_component);
   if (sidenav->backdrop_logic)
-    ui_backdrop_destroy(sidenav->backdrop_logic);
+    (void)ui_backdrop_destroy(sidenav->backdrop_logic);
   if (sidenav->component)
-    ui_component_destroy(sidenav->component);
-  UI_FREE(sidenav);
+    (void)ui_component_destroy(sidenav->component);
+  C_MULTIPLATFORM_FREE(sidenav);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_set_mode(struct ui_sidenav_base *sidenav,
-                                       enum ui_sidenav_mode mode) {
+ui_error_t ui_sidenav_base_set_mode(struct ui_sidenav_base *sidenav,
+                                    enum ui_sidenav_mode mode) {
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   sidenav->mode = mode;
-  (void)update_dom_state(sidenav);
+#define UI_UPDATE_DOM_STATE_IGNORE(s) update_dom_state((s))
+  (void)UI_UPDATE_DOM_STATE_IGNORE(sidenav);
   if (sidenav->mode != UI_SIDENAV_MODE_OVER && sidenav->is_open) {
-    (void)unmount_backdrop(sidenav);
+    ui_error_t rc = unmount_backdrop(sidenav);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else if (sidenav->mode == UI_SIDENAV_MODE_OVER && sidenav->is_open) {
-    mount_backdrop(sidenav);
+    ui_error_t rc = mount_backdrop(sidenav);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_set_position(struct ui_sidenav_base *sidenav,
-                                           enum ui_sidenav_position position) {
+ui_error_t ui_sidenav_base_set_position(struct ui_sidenav_base *sidenav,
+                                        enum ui_sidenav_position position) {
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   sidenav->position = position;
-  (void)update_dom_state(sidenav);
+#define UI_UPDATE_DOM_STATE_IGNORE(s) update_dom_state((s))
+  (void)UI_UPDATE_DOM_STATE_IGNORE(sidenav);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_sidenav_base_set_drawer_content(struct ui_sidenav_base *sidenav,
-                                   struct ui_component *content) {
+ui_error_t ui_sidenav_base_set_drawer_content(struct ui_sidenav_base *sidenav,
+                                              struct ui_component *content) {
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   sidenav->drawer_content = content;
@@ -295,8 +358,8 @@ ui_sidenav_base_set_drawer_content(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_set_main_content(struct ui_sidenav_base *sidenav,
-                                               struct ui_component *content) {
+ui_error_t ui_sidenav_base_set_main_content(struct ui_sidenav_base *sidenav,
+                                            struct ui_component *content) {
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   sidenav->main_content = content;
@@ -306,27 +369,35 @@ enum ui_error ui_sidenav_base_set_main_content(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_set_open(struct ui_sidenav_base *sidenav,
-                                       int is_open) {
+ui_error_t ui_sidenav_base_set_open(struct ui_sidenav_base *sidenav,
+                                    int is_open) {
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   if (sidenav->is_open == is_open)
     return UI_ERROR_NONE;
 
   sidenav->is_open = is_open;
-  (void)update_dom_state(sidenav);
+#define UI_UPDATE_DOM_STATE_IGNORE(s) update_dom_state((s))
+  (void)UI_UPDATE_DOM_STATE_IGNORE(sidenav);
 
-  if (is_open && sidenav->mode == UI_SIDENAV_MODE_OVER) {
-    mount_backdrop(sidenav);
+  if (is_open && (sidenav->mode == UI_SIDENAV_MODE_OVER ||
+                  sidenav->mode == UI_SIDENAV_MODE_PUSH)) {
+    rc = mount_backdrop(sidenav);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    (void)unmount_backdrop(sidenav);
+    rc = unmount_backdrop(sidenav);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_is_open(const struct ui_sidenav_base *sidenav,
-                                      int *out_is_open) {
+ui_error_t ui_sidenav_base_is_open(const struct ui_sidenav_base *sidenav,
+                                   int *out_is_open) {
   if (!sidenav || !out_is_open)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_is_open = sidenav->is_open;
@@ -334,21 +405,23 @@ enum ui_error ui_sidenav_base_is_open(const struct ui_sidenav_base *sidenav,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_sidenav_base_set_overlay_director(struct ui_sidenav_base *sidenav,
                                      struct ui_overlay_director *director) {
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   sidenav->director = director;
   if (sidenav->is_open && sidenav->mode == UI_SIDENAV_MODE_OVER) {
-    mount_backdrop(sidenav);
+    ui_error_t rc = mount_backdrop(sidenav);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_set_on_close(struct ui_sidenav_base *sidenav,
-                                           ui_sidenav_on_close_t on_close,
-                                           void *user_data) {
+ui_error_t ui_sidenav_base_set_on_close(struct ui_sidenav_base *sidenav,
+                                        ui_sidenav_on_close_t on_close,
+                                        void *user_data) {
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   sidenav->on_close = on_close;
@@ -356,11 +429,10 @@ enum ui_error ui_sidenav_base_set_on_close(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
-                                            const struct ui_event *event,
-                                            double timestamp_ms) {
+ui_error_t ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
+                                         const struct ui_event *event,
+                                         double timestamp_ms) {
   int should_dismiss = 0;
-  enum ui_error rc;
 
   (void)timestamp_ms;
 
@@ -374,25 +446,30 @@ enum ui_error ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
 
   /* For headless testing, pass dummy drawer bounds. In a real engine, layout
    * tree geometry would be used. */
-  rc = ui_backdrop_process_event(sidenav->backdrop_logic, event, 0.0f, 0.0f,
-                                 0.0f, 0.0f, &should_dismiss);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  {
+    ui_error_t _ign_rc =
+        ui_backdrop_process_event(sidenav->backdrop_logic, event, 0.0f, 0.0f,
+                                  0.0f, 0.0f, &should_dismiss);
+    (void)_ign_rc;
+  }
 
   if (should_dismiss) {
     if (sidenav->on_close) {
-      sidenav->on_close(sidenav, sidenav->user_data);
+      ui_error_t close_rc = sidenav->on_close(sidenav, sidenav->user_data);
+      if (close_rc != UI_ERROR_NONE)
+        return close_rc;
     } else {
-      ui_sidenav_base_set_open(sidenav, 0);
+      ui_error_t open_rc = ui_sidenav_base_set_open(sidenav, 0);
+      if (open_rc != UI_ERROR_NONE)
+        return open_rc;
     }
   }
 
   return UI_ERROR_NONE;
 }
 /** \brief ui_error */
-enum ui_error
-ui_sidenav_base_get_component(struct ui_sidenav_base *sidenav,
-                              struct ui_component **out_component) {
+ui_error_t ui_sidenav_base_get_component(struct ui_sidenav_base *sidenav,
+                                         struct ui_component **out_component) {
   if (!sidenav || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -400,8 +477,8 @@ ui_sidenav_base_get_component(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_sidenav_base_bind_active_index(struct ui_sidenav_base *widget,
-                                                struct ui_signal *signal) {
+ui_error_t ui_sidenav_base_bind_active_index(struct ui_sidenav_base *widget,
+                                             struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

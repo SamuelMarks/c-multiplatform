@@ -23,15 +23,14 @@ struct ui_avatar_group_base;
  * @param out_group Pointer to receive the allocated avatar group base.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_avatar_group_base_create(struct ui_avatar_group_base **out_group);
+ui_error_t ui_avatar_group_base_create(struct ui_avatar_group_base **out_group);
 
 /**
  * @brief Destroys an avatar group base component.
  *
  * @param group The group to destroy.
  */
-void ui_avatar_group_base_destroy(struct ui_avatar_group_base *group);
+ui_error_t ui_avatar_group_base_destroy(struct ui_avatar_group_base *group);
 
 /**
  * @brief Gets the underlying component for the avatar group.
@@ -40,7 +39,7 @@ void ui_avatar_group_base_destroy(struct ui_avatar_group_base *group);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_get_component(struct ui_avatar_group_base *group,
                                    struct ui_component **out_component);
 
@@ -51,7 +50,7 @@ ui_avatar_group_base_get_component(struct ui_avatar_group_base *group,
  * @param avatar The avatar to append.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_append_avatar(struct ui_avatar_group_base *group,
                                    struct ui_avatar_base *avatar);
 
@@ -67,7 +66,7 @@ ui_avatar_group_base_append_avatar(struct ui_avatar_group_base *group,
  * @param max_avatars The maximum number to show. Set to 0 for unlimited.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_set_max_avatars(struct ui_avatar_group_base *group,
                                      unsigned int max_avatars);
 
@@ -78,7 +77,7 @@ ui_avatar_group_base_set_max_avatars(struct ui_avatar_group_base *group,
  * @param out_max_avatars Pointer to receive the max limit.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_avatar_group_base_get_max_avatars(struct ui_avatar_group_base *group,
                                      unsigned int *out_max_avatars);
 
@@ -93,7 +92,7 @@ ui_avatar_group_base_get_max_avatars(struct ui_avatar_group_base *group,
  * "+N").
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_avatar_group_base_get_truncation_remainder(
+ui_error_t ui_avatar_group_base_get_truncation_remainder(
     struct ui_avatar_group_base *group, unsigned int *out_remainder);
 
 /**
@@ -103,9 +102,8 @@ enum ui_error ui_avatar_group_base_get_truncation_remainder(
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_avatar_group_base_bind_data(struct ui_avatar_group_base *widget,
-                               struct ui_computed *signal);
+ui_error_t ui_avatar_group_base_bind_data(struct ui_avatar_group_base *widget,
+                                          struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

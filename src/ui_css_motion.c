@@ -19,8 +19,9 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-enum ui_error ui_css_parse_offset_path(const char *str,
-                                       struct ui_css_offset_path *out_path) {
+ui_error_t ui_css_parse_offset_path(const char *str,
+                                    struct ui_css_offset_path *out_path) {
+  ui_error_t rc;
   if (!str || !out_path)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -82,7 +83,11 @@ enum ui_error ui_css_parse_offset_path(const char *str,
         out_path->ray.is_contain = 1;
       }
 
-      ui_css_parse_value(arg_buf, &out_path->ray.angle);
+      {
+        rc = ui_css_parse_value(arg_buf, &out_path->ray.angle);
+        if (rc != UI_ERROR_NONE)
+          return rc;
+      }
       return UI_ERROR_NONE;
     }
   }
@@ -90,8 +95,8 @@ enum ui_error ui_css_parse_offset_path(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_parse_offset_distance(const char *str,
-                                           struct ui_css_value *out_distance) {
+ui_error_t ui_css_parse_offset_distance(const char *str,
+                                        struct ui_css_value *out_distance) {
   if (!str || !out_distance)
     return UI_ERROR_INVALID_ARGUMENT;
   skip_whitespace(&str);
@@ -99,9 +104,10 @@ enum ui_error ui_css_parse_offset_distance(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_offset_position(const char *str,
                              struct ui_css_offset_position *out_position) {
+  ui_error_t rc;
   if (!str || !out_position)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -120,18 +126,18 @@ ui_css_parse_offset_position(const char *str,
 
   /* Just parse x for now, full bg-position needs a larger parser sharing with
    * backgrounds */
-  if (ui_css_parse_value(str, &out_position->x) == UI_ERROR_NONE) {
-    out_position->y = out_position->x; /* duplicate if y is missing */
-    return UI_ERROR_NONE;
+  rc = ui_css_parse_value(str, &out_position->x);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
-
-  return UI_ERROR_PARSE_FAILED;
+  out_position->y = out_position->x; /* duplicate if y is missing */
+  return rc;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_css_parse_offset_anchor(const char *str,
-                           struct ui_css_offset_anchor *out_anchor) {
+ui_error_t ui_css_parse_offset_anchor(const char *str,
+                                      struct ui_css_offset_anchor *out_anchor) {
+  ui_error_t rc;
   if (!str || !out_anchor)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -148,18 +154,18 @@ ui_css_parse_offset_anchor(const char *str,
     return UI_ERROR_NONE;
   }
 
-  if (ui_css_parse_value(str, &out_anchor->x) == UI_ERROR_NONE) {
-    out_anchor->y = out_anchor->x;
-    return UI_ERROR_NONE;
+  rc = ui_css_parse_value(str, &out_anchor->x);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
-
-  return UI_ERROR_PARSE_FAILED;
+  out_anchor->y = out_anchor->x;
+  return rc;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_css_parse_offset_rotate(const char *str,
-                           struct ui_css_offset_rotate *out_rotate) {
+ui_error_t ui_css_parse_offset_rotate(const char *str,
+                                      struct ui_css_offset_rotate *out_rotate) {
+  ui_error_t rc;
   char token_buf[128];
   char *token;
   char *next_token = NULL;
@@ -186,8 +192,9 @@ ui_css_parse_offset_rotate(const char *str,
       /* reverse implies auto */
       out_rotate->is_auto = 1;
     } else {
-      if (ui_css_parse_value(token, &out_rotate->angle) != UI_ERROR_NONE) {
-        return UI_ERROR_PARSE_FAILED;
+      rc = ui_css_parse_value(token, &out_rotate->angle);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
       }
     }
     token = UI_STRTOK(NULL, " ", &next_token);

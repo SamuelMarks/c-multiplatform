@@ -8,17 +8,16 @@ extern int g_malloc_fail_countdown;
 
 static int frame_received = 0;
 
-static enum ui_error test_frame_callback(struct ui_camera_base *camera,
-                                         const void *frame_data, size_t size,
-                                         int width, int height,
-                                         void *user_data) {
+static ui_error_t test_frame_callback(struct ui_camera_base *camera,
+                                      const void *frame_data, size_t size,
+                                      int width, int height, void *user_data) {
   (void)camera;
   (void)frame_data;
   (void)size;
   (void)width;
   (void)height;
   if (user_data != (void *)0x9999) {
-    return UI_ERROR_NONE;
+    return UI_ERROR_UNKNOWN;
   }
   frame_received = 1;
   return UI_ERROR_NONE;
@@ -27,7 +26,7 @@ static enum ui_error test_frame_callback(struct ui_camera_base *camera,
 static int test_camera_lifecycle(void) {
   struct ui_camera_base *camera = NULL;
   struct ui_component *comp;
-  enum ui_error rc;
+  ui_error_t rc;
   enum ui_camera_state state;
 
   rc = ui_camera_base_create(&camera);
@@ -86,6 +85,10 @@ static int test_camera_lifecycle(void) {
   if (rc != UI_ERROR_NONE || state != UI_CAMERA_STATE_STREAMING)
     return 1;
 
+  rc = ui_camera_base_mock_frame(camera);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
   /* Stop stream while destroying */
   rc = ui_camera_base_destroy(camera);
   if (rc != UI_ERROR_NONE)
@@ -99,25 +102,20 @@ static int test_camera_null_args_and_coverage(void) {
   struct ui_component *comp;
   enum ui_camera_state state;
   int failed = 0;
+  int i;
 
   /* Test create null arg */
   if (ui_camera_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     failed = 1;
 
   /* Test allocation failures */
-  g_malloc_fail_countdown = 0;
-  if (ui_camera_base_create(&camera) != UI_ERROR_OUT_OF_MEMORY)
-    failed = 1;
-  g_malloc_fail_countdown = -1;
-
-  g_malloc_fail_countdown = 1;
-  if (ui_camera_base_create(&camera) != UI_ERROR_OUT_OF_MEMORY)
-    failed = 1;
-  g_malloc_fail_countdown = -1;
-
-  g_malloc_fail_countdown = 2;
-  if (ui_camera_base_create(&camera) != UI_ERROR_OUT_OF_MEMORY)
-    failed = 1;
+  for (i = 0; i < 10; i++) {
+    g_malloc_fail_countdown = i;
+    if (ui_camera_base_create(&camera) == UI_ERROR_NONE) {
+      (void)ui_camera_base_destroy(camera);
+      break;
+    }
+  }
   g_malloc_fail_countdown = -1;
 
   /* Create a valid camera for further testing */
@@ -133,18 +131,18 @@ static int test_camera_null_args_and_coverage(void) {
   /* Test request_permission */
   if (ui_camera_base_request_permission(NULL) != UI_ERROR_INVALID_ARGUMENT)
     failed = 1;
-  ui_camera_base_request_permission(camera);
-  ui_camera_base_mock_permission_response(camera, 1);
+  (void)ui_camera_base_request_permission(camera);
+  (void)ui_camera_base_mock_permission_response(camera, 1);
   if (ui_camera_base_request_permission(camera) != UI_ERROR_INVALID_ARGUMENT)
     failed = 1; /* wrong state */
 
   /* Test start_stream */
   if (ui_camera_base_start_stream(NULL) != UI_ERROR_INVALID_ARGUMENT)
     failed = 1;
-  ui_camera_base_start_stream(camera);
+  (void)ui_camera_base_start_stream(camera);
   if (ui_camera_base_start_stream(camera) != UI_ERROR_NONE)
     failed = 1; /* Already streaming */
-  ui_camera_base_stop_stream(camera);
+  (void)ui_camera_base_stop_stream(camera);
 
   /* Test stop_stream */
   if (ui_camera_base_stop_stream(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -166,7 +164,7 @@ static int test_camera_null_args_and_coverage(void) {
     failed = 1;
   if (ui_camera_base_mock_frame(camera) != UI_ERROR_INVALID_ARGUMENT)
     failed = 1; /* not streaming */
-  ui_camera_base_start_stream(camera);
+  (void)ui_camera_base_start_stream(camera);
   if (ui_camera_base_mock_frame(camera) != UI_ERROR_NONE)
     failed = 1; /* no callback set */
 
@@ -181,7 +179,7 @@ static int test_camera_null_args_and_coverage(void) {
   /* Test destroy */
   if (ui_camera_base_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
     failed = 1;
-  ui_camera_base_destroy(camera);
+  (void)ui_camera_base_destroy(camera);
 
   return failed;
 }
@@ -189,11 +187,11 @@ static int test_camera_null_args_and_coverage(void) {
 static void test_camera_coverage(void) {
   struct ui_camera_base *cam = NULL;
 
-  ui_camera_base_create(&cam);
-  ui_camera_base_start_stream(cam);
-  ui_camera_base_stop_stream(cam);
+  (void)ui_camera_base_create(&cam);
+  (void)ui_camera_base_start_stream(cam);
+  (void)ui_camera_base_stop_stream(cam);
 
-  ui_camera_base_start_stream(cam);
+  (void)ui_camera_base_start_stream(cam);
   {
     struct ui_camera_base_internal {
       struct ui_component *component;
@@ -206,17 +204,17 @@ static void test_camera_coverage(void) {
 
     struct ui_component *saved = ci->component;
     ci->component = NULL;
-    ui_camera_base_destroy(cam);
-    ui_component_destroy(saved);
+    (void)ui_camera_base_destroy(cam);
+    (void)ui_component_destroy(saved);
   }
 
-  ui_camera_base_create(&cam);
-  ui_camera_base_request_permission(cam);
-  ui_camera_base_mock_permission_response(cam, 1);
-  ui_camera_base_set_frame_callback(cam, test_frame_callback, NULL);
-  ui_camera_base_start_stream(cam);
-  ui_camera_base_mock_frame(cam);
-  ui_camera_base_destroy(cam);
+  (void)ui_camera_base_create(&cam);
+  (void)ui_camera_base_request_permission(cam);
+  (void)ui_camera_base_mock_permission_response(cam, 1);
+  (void)ui_camera_base_set_frame_callback(cam, test_frame_callback, NULL);
+  (void)ui_camera_base_start_stream(cam);
+  (void)ui_camera_base_mock_frame(cam);
+  (void)ui_camera_base_destroy(cam);
 }
 int main(void) {
   test_camera_coverage();

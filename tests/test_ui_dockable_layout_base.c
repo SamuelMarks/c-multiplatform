@@ -10,13 +10,13 @@ extern int g_malloc_fail_countdown;
 
 static int test_dockable_layout_lifecycle(void) {
   struct ui_dockable_layout_base *layout = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_component *comp = NULL;
 
   /* Invalid args */
   if (ui_dockable_layout_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_dockable_layout_base_destroy(NULL);
+  (void)ui_dockable_layout_base_destroy(NULL);
   if (ui_dockable_layout_base_get_component(NULL, &comp) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -45,13 +45,13 @@ static int test_dockable_layout_lifecycle(void) {
   if (rc != UI_ERROR_NONE || comp == NULL)
     return 1;
 
-  ui_dockable_layout_base_destroy(layout);
+  (void)ui_dockable_layout_base_destroy(layout);
   return 0;
 }
 
 static int test_dockable_layout_docking(void) {
   struct ui_dockable_layout_base *layout = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   /* Invalid args */
@@ -106,13 +106,13 @@ static int test_dockable_layout_docking(void) {
     return 1;
   }
 
-  ui_dockable_layout_base_destroy(layout);
+  (void)ui_dockable_layout_base_destroy(layout);
   return 0;
 }
 
 static int test_dockable_layout_serialization(void) {
   struct ui_dockable_layout_base *layout = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   char buffer[256];
 
   /* Invalid args */
@@ -167,13 +167,13 @@ static int test_dockable_layout_serialization(void) {
   if (ui_dockable_layout_base_deserialize(layout, "INVALID") != UI_ERROR_NONE)
     return 1;
 
-  ui_dockable_layout_base_destroy(layout);
+  (void)ui_dockable_layout_base_destroy(layout);
   return 0;
 }
 
 static int test_dockable_layout_integrate(void) {
   struct ui_dockable_layout_base *layout = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (ui_dockable_layout_base_integrate_drag_drop(
           NULL, (struct ui_drag_drop_context *)1) != UI_ERROR_INVALID_ARGUMENT)
@@ -190,7 +190,7 @@ static int test_dockable_layout_integrate(void) {
           layout, (struct ui_drag_drop_context *)1) != UI_ERROR_NONE)
     return 1;
 
-  ui_dockable_layout_base_destroy(layout);
+  (void)ui_dockable_layout_base_destroy(layout);
   return 0;
 }
 
@@ -206,6 +206,20 @@ int main(void) {
   if (failed) {
     printf("Tests failed.\n");
     return 1;
+  }
+
+  {
+    char big_buffer[2048] = {0};
+    int i;
+    int offset = 0;
+    struct ui_dockable_layout_base *layout;
+    ui_dockable_layout_base_create(&layout);
+    for (i = 1; i <= 130; i++) {
+      offset += sprintf(big_buffer + offset, "P:%d,T:%d,E:0;", i, i - 1);
+    }
+    /* This will fail to dock the 129th panel, hitting line 198! */
+    ui_dockable_layout_base_deserialize(layout, big_buffer);
+    (void)ui_dockable_layout_base_destroy(layout);
   }
 
   printf("All tests passed.\n");

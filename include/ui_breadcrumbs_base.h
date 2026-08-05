@@ -23,7 +23,7 @@ struct ui_breadcrumbs_base;
  * @param out_breadcrumbs Pointer to receive the allocated breadcrumbs instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_breadcrumbs_base_create(struct ui_router *router,
                            struct ui_breadcrumbs_base **out_breadcrumbs);
 
@@ -32,7 +32,7 @@ ui_breadcrumbs_base_create(struct ui_router *router,
  *
  * @param breadcrumbs The breadcrumbs instance.
  */
-void ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs);
+ui_error_t ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs);
 
 /**
  * @brief Gets the underlying UI component for rendering.
@@ -40,7 +40,7 @@ void ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs);
  * @param breadcrumbs The breadcrumbs instance.
  * @return Pointer to the underlying ui_component, or NULL if invalid.
  */
-enum ui_error
+ui_error_t
 ui_breadcrumbs_base_get_component(struct ui_breadcrumbs_base *breadcrumbs,
                                   struct ui_component **out_component);
 
@@ -51,9 +51,8 @@ ui_breadcrumbs_base_get_component(struct ui_breadcrumbs_base *breadcrumbs,
  * @param path The URL path (e.g., "/settings/profile/security").
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
-ui_breadcrumbs_base_set_path(struct ui_breadcrumbs_base *breadcrumbs,
-                             const char *path);
+ui_error_t ui_breadcrumbs_base_set_path(struct ui_breadcrumbs_base *breadcrumbs,
+                                        const char *path);
 
 /**
  * @brief Simulates a click on a breadcrumb item at the given index, triggering
@@ -63,7 +62,7 @@ ui_breadcrumbs_base_set_path(struct ui_breadcrumbs_base *breadcrumbs,
  * @param index The index of the item to click.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_breadcrumbs_base_simulate_click(struct ui_breadcrumbs_base *breadcrumbs,
                                    size_t index);
 
@@ -74,7 +73,7 @@ ui_breadcrumbs_base_simulate_click(struct ui_breadcrumbs_base *breadcrumbs,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_breadcrumbs_base_bind_active_index(struct ui_breadcrumbs_base *widget,
                                       struct ui_signal *signal);
 

@@ -43,9 +43,8 @@ struct ui_swipe_action_base {
  * @param component The UI component to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
-                          struct ui_component *component);
+ui_error_t ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
+                                     struct ui_component *component);
 
 /**
  * @brief Updates the swipe position.
@@ -54,7 +53,7 @@ ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
  * @param delta_x The change in X position (positive means swiping right).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
                             float delta_x);
 
@@ -67,7 +66,7 @@ ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
  * @param swipe_action Pointer to the swipe action base struct.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action);
 
 /**
@@ -75,7 +74,7 @@ ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action);
  *
  * @param swipe_action Pointer to the swipe action base struct.
  */
-enum ui_error
+ui_error_t
 ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action);
 
 /**
@@ -85,7 +84,7 @@ ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action);
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
                                    struct ui_signal *disabled_signal);
 
@@ -97,9 +96,8 @@ ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_swipe_action_base_bind_text(struct ui_swipe_action_base *widget,
-                               struct ui_signal *text_signal);
+ui_error_t ui_swipe_action_base_bind_text(struct ui_swipe_action_base *widget,
+                                          struct ui_signal *text_signal);
 
 #ifdef __cplusplus
 }

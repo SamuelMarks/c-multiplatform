@@ -41,67 +41,63 @@ struct ui_input_base {
   void *user_data;
 };
 
-static enum ui_error internal_strdup(const char *src, char **out_str) {
-  size_t len;
-  char *copy;
-
-  len = strlen(src);
-  copy = (char *)UI_MALLOC(len + 1);
-  if (!copy) {
-    return UI_ERROR_OUT_OF_MEMORY;
-  }
-
-#if defined(_MSC_VER)
-  strcpy_s(copy, len + 1, src);
-#else
-  strcpy(copy, src);
-#endif
-
-  *out_str = copy;
-  return UI_ERROR_NONE;
-}
-
-static enum ui_error update_dom_state(struct ui_input_base *input) {
+static ui_error_t update_dom_state(struct ui_input_base *input) {
   if (input->component && input->component->shadow_root) {
 #if defined(__EMSCRIPTEN__)
     if (input->text) {
-      ui_web_bridge_set_property(
+      ui_error_t wb_rc = ui_web_bridge_set_property(
           (uint32_t)(uintptr_t)input->component->shadow_root, "value",
           input->text);
+      if (wb_rc != UI_ERROR_NONE)
+        return wb_rc;
     }
 #endif
     if (input->text) {
-
-      ui_dom_node_set_attribute(input->component->shadow_root, "value",
-                                input->text);
+      ui_error_t rc1 = ui_dom_node_set_attribute(input->component->shadow_root,
+                                                 "value", input->text);
+      (void)rc1;
     } else {
-      ui_dom_node_remove_attribute(input->component->shadow_root, "value");
+      ui_error_t rc2 =
+          ui_dom_node_remove_attribute(input->component->shadow_root, "value");
+      (void)rc2;
     }
 
     if (input->placeholder) {
-      ui_dom_node_set_attribute(input->component->shadow_root, "placeholder",
-                                input->placeholder);
+      ui_error_t rc3 = ui_dom_node_set_attribute(
+          input->component->shadow_root, "placeholder", input->placeholder);
+      (void)rc3;
     } else {
-      ui_dom_node_remove_attribute(input->component->shadow_root,
-                                   "placeholder");
+      ui_error_t rc4 = ui_dom_node_remove_attribute(
+          input->component->shadow_root, "placeholder");
+      (void)rc4;
     }
 
     if (input->disabled) {
-      ui_dom_node_set_attribute(input->component->shadow_root, "disabled", "");
-      ui_dom_node_set_attribute(input->component->shadow_root, "aria-disabled",
-                                "true");
+      ui_error_t rc5 = ui_dom_node_set_attribute(input->component->shadow_root,
+                                                 "disabled", "");
+      (void)rc5;
+      {
+        ui_error_t rc6 = ui_dom_node_set_attribute(
+            input->component->shadow_root, "aria-disabled", "true");
+        (void)rc6;
+      }
     } else {
-      ui_dom_node_remove_attribute(input->component->shadow_root, "disabled");
-      ui_dom_node_remove_attribute(input->component->shadow_root,
-                                   "aria-disabled");
+      ui_error_t rc7 = ui_dom_node_remove_attribute(
+          input->component->shadow_root, "disabled");
+      (void)rc7;
+      {
+        ui_error_t rc8 = ui_dom_node_remove_attribute(
+            input->component->shadow_root, "aria-disabled");
+        (void)rc8;
+      }
     }
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_base_create(struct ui_input_base **out_input) {
+ui_error_t ui_input_base_create(struct ui_input_base **out_input) {
   struct ui_input_base *input;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -109,7 +105,8 @@ enum ui_error ui_input_base_create(struct ui_input_base **out_input) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  input = (struct ui_input_base *)UI_MALLOC(sizeof(struct ui_input_base));
+  input = (struct ui_input_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_input_base));
   if (!input) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -153,10 +150,14 @@ enum ui_error ui_input_base_create(struct ui_input_base **out_input) {
     goto cleanup;
   }
 
-  ui_dom_node_set_attribute(root_node, "tabindex", "0");
+  rc = ui_dom_node_set_attribute(root_node, "tabindex", "0");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_css_parse_stylesheet(ui_input_base_default_css, &default_style);
-  rc = ui_component_set_default_style(input->component, default_style);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  (void)ui_component_set_default_style(input->component, default_style);
 
   input->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
@@ -166,59 +167,64 @@ enum ui_error ui_input_base_create(struct ui_input_base **out_input) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (input->gesture_recognizer) {
-    ui_gesture_recognizer_destroy(input->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(input->gesture_recognizer);
   }
   if (input->component) {
-    ui_component_destroy(input->component);
+    (void)ui_component_destroy(input->component);
   }
-  UI_FREE(input);
+  C_MULTIPLATFORM_FREE(input);
   return rc;
 }
 
-static enum ui_error input_cva_on_change_wrapper(struct ui_input_base *input,
-                                                 const char *value,
-                                                 void *user_data);
+static ui_error_t input_cva_on_change_wrapper(struct ui_input_base *input,
+                                              const char *value,
+                                              void *user_data);
 
-void ui_input_base_destroy(struct ui_input_base *input) {
+ui_error_t ui_input_base_destroy(struct ui_input_base *input) {
   if (!input)
-    return;
+    return UI_ERROR_NONE;
   if (input->text)
-    UI_FREE(input->text);
-  UI_FREE(input->placeholder);
+    C_MULTIPLATFORM_FREE(input->text);
+  C_MULTIPLATFORM_FREE(input->placeholder);
   if (input->on_change == input_cva_on_change_wrapper)
-    UI_FREE(input->user_data);
+    C_MULTIPLATFORM_FREE(input->user_data);
   if (input->gesture_recognizer)
-    ui_gesture_recognizer_destroy(input->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(input->gesture_recognizer);
   if (input->component)
-    ui_component_destroy(input->component);
-  UI_FREE(input);
+    (void)ui_component_destroy(input->component);
+  C_MULTIPLATFORM_FREE(input);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_base_set_text(struct ui_input_base *input,
-                                     const char *text) {
+ui_error_t ui_input_base_set_text(struct ui_input_base *input,
+                                  const char *text) {
   char *new_text = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!input)
     return UI_ERROR_INVALID_ARGUMENT;
 
   if (text) {
-    rc = internal_strdup(text, &new_text);
+    rc = ((new_text = C_MULTIPLATFORM_STRDUP(text)) ? UI_ERROR_NONE
+                                                    : UI_ERROR_OUT_OF_MEMORY);
     if (rc != UI_ERROR_NONE)
       return rc;
   }
 
   if (input->text)
-    UI_FREE(input->text);
+    C_MULTIPLATFORM_FREE(input->text);
   input->text = new_text;
   input->cursor_position = new_text ? (int)strlen(new_text) : 0;
-  update_dom_state(input);
+  {
+    ui_error_t uds_rc = update_dom_state(input);
+    (void)uds_rc;
+  }
 
   if (input->on_change) {
-    enum ui_error change_rc = input->on_change(
+    ui_error_t change_rc = input->on_change(
         input, input->text ? input->text : "", input->user_data);
     if (change_rc != UI_ERROR_NONE) {
       return change_rc;
@@ -228,16 +234,16 @@ enum ui_error ui_input_base_set_text(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_base_get_text(const struct ui_input_base *input,
-                                     const char **out_text) {
+ui_error_t ui_input_base_get_text(const struct ui_input_base *input,
+                                  const char **out_text) {
   if (!input || !out_text)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_text = input->text ? input->text : "";
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_base_set_type(struct ui_input_base *input,
-                                     const char *type) {
+ui_error_t ui_input_base_set_type(struct ui_input_base *input,
+                                  const char *type) {
   if (!input || !type) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -245,40 +251,48 @@ enum ui_error ui_input_base_set_type(struct ui_input_base *input,
   return ui_dom_node_set_attribute(input->component->shadow_root, "type", type);
 }
 
-enum ui_error ui_input_base_set_placeholder(struct ui_input_base *input,
-                                            const char *placeholder) {
+ui_error_t ui_input_base_set_placeholder(struct ui_input_base *input,
+                                         const char *placeholder) {
   char *new_ph = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!input)
     return UI_ERROR_INVALID_ARGUMENT;
 
   if (placeholder) {
-    rc = internal_strdup(placeholder, &new_ph);
+    rc = ((new_ph = C_MULTIPLATFORM_STRDUP(placeholder))
+              ? UI_ERROR_NONE
+              : UI_ERROR_OUT_OF_MEMORY);
     if (rc != UI_ERROR_NONE)
       return rc;
   }
 
   if (input->placeholder)
-    UI_FREE(input->placeholder);
+    C_MULTIPLATFORM_FREE(input->placeholder);
   input->placeholder = new_ph;
-  update_dom_state(input);
+  {
+    ui_error_t uds_rc = update_dom_state(input);
+    (void)uds_rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_base_set_disabled(struct ui_input_base *input,
-                                         int disabled) {
+ui_error_t ui_input_base_set_disabled(struct ui_input_base *input,
+                                      int disabled) {
   if (!input)
     return UI_ERROR_INVALID_ARGUMENT;
   input->disabled = disabled;
-  update_dom_state(input);
+  {
+    ui_error_t uds_rc = update_dom_state(input);
+    (void)uds_rc;
+  }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_base_set_on_change(struct ui_input_base *input,
-                                          ui_input_on_change_t on_change,
-                                          void *user_data) {
+ui_error_t ui_input_base_set_on_change(struct ui_input_base *input,
+                                       ui_input_on_change_t on_change,
+                                       void *user_data) {
   if (!input)
     return UI_ERROR_INVALID_ARGUMENT;
   input->on_change = on_change;
@@ -286,9 +300,9 @@ enum ui_error ui_input_base_set_on_change(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_base_process_event(struct ui_input_base *input,
-                                          const struct ui_event *event,
-                                          double timestamp_ms) {
+ui_error_t ui_input_base_process_event(struct ui_input_base *input,
+                                       const struct ui_event *event,
+                                       double timestamp_ms) {
   (void)timestamp_ms;
   if (!input || !event)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -299,7 +313,7 @@ enum ui_error ui_input_base_process_event(struct ui_input_base *input,
     if (event->event_data.keyboard.key_code == UI_KEY_BACKSPACE) {
       if (input->text && input->cursor_position > 0) {
         size_t len = strlen(input->text);
-        char *new_text = (char *)UI_MALLOC(len);
+        char *new_text = (char *)C_MULTIPLATFORM_MALLOC(len);
         if (new_text) {
           size_t i;
           size_t dst = 0;
@@ -309,12 +323,15 @@ enum ui_error ui_input_base_process_event(struct ui_input_base *input,
             }
           }
           new_text[dst] = '\0';
-          UI_FREE(input->text);
+          C_MULTIPLATFORM_FREE(input->text);
           input->text = new_text;
           input->cursor_position--;
-          update_dom_state(input);
+          {
+            ui_error_t uds_rc = update_dom_state(input);
+            (void)uds_rc;
+          }
           if (input->on_change) {
-            enum ui_error change_rc =
+            ui_error_t change_rc =
                 input->on_change(input, input->text, input->user_data);
             if (change_rc != UI_ERROR_NONE)
               return change_rc;
@@ -333,7 +350,7 @@ enum ui_error ui_input_base_process_event(struct ui_input_base *input,
       char c = (char)event->event_data.keyboard.key_code;
       if (c >= 32 && c <= 126) {
         size_t len = input->text ? strlen(input->text) : 0;
-        char *new_text = (char *)UI_MALLOC(len + 2);
+        char *new_text = (char *)C_MULTIPLATFORM_MALLOC(len + 2);
         if (new_text) {
           if (input->text) {
             size_t i;
@@ -345,16 +362,19 @@ enum ui_error ui_input_base_process_event(struct ui_input_base *input,
               new_text[i + 1] = input->text[i];
             }
             new_text[len + 1] = '\0';
-            UI_FREE(input->text);
+            C_MULTIPLATFORM_FREE(input->text);
           } else {
             new_text[0] = c;
             new_text[1] = '\0';
           }
           input->text = new_text;
           input->cursor_position++;
-          update_dom_state(input);
+          {
+            ui_error_t uds_rc = update_dom_state(input);
+            (void)uds_rc;
+          }
           if (input->on_change) {
-            enum ui_error change_rc =
+            ui_error_t change_rc =
                 input->on_change(input, input->text, input->user_data);
             if (change_rc != UI_ERROR_NONE)
               return change_rc;
@@ -369,8 +389,8 @@ enum ui_error ui_input_base_process_event(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error input_cva_write_value(void *component,
-                                           union ui_signal_payload value) {
+static ui_error_t input_cva_write_value(void *component,
+                                        union ui_signal_payload value) {
   struct ui_input_base *input = (struct ui_input_base *)component;
   if (!input)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -379,13 +399,13 @@ static enum ui_error input_cva_write_value(void *component,
 
 /** \brief input_cva_wrapper */
 struct input_cva_wrapper {
-  enum ui_error (*callback)(union ui_signal_payload, void *);
+  ui_error_t (*callback)(union ui_signal_payload, void *);
   void *user_data;
 };
 
-static enum ui_error input_cva_on_change_wrapper(struct ui_input_base *input,
-                                                 const char *text,
-                                                 void *user_data) {
+static ui_error_t input_cva_on_change_wrapper(struct ui_input_base *input,
+                                              const char *text,
+                                              void *user_data) {
   struct input_cva_wrapper *wrap = (struct input_cva_wrapper *)user_data;
   (void)input;
   if (wrap && wrap->callback) {
@@ -397,14 +417,14 @@ static enum ui_error input_cva_on_change_wrapper(struct ui_input_base *input,
 }
 
 /** \brief input_cva_register_on_change */
-static enum ui_error input_cva_register_on_change(
-    void *component, enum ui_error (*callback)(union ui_signal_payload, void *),
+static ui_error_t input_cva_register_on_change(
+    void *component, ui_error_t (*callback)(union ui_signal_payload, void *),
     void *user_data) {
   struct ui_input_base *input = (struct ui_input_base *)component;
   struct input_cva_wrapper *wrap;
   if (!input)
     return UI_ERROR_INVALID_ARGUMENT;
-  wrap = (struct input_cva_wrapper *)UI_MALLOC(sizeof(*wrap));
+  wrap = (struct input_cva_wrapper *)C_MULTIPLATFORM_MALLOC(sizeof(*wrap));
   if (!wrap)
     return UI_ERROR_OUT_OF_MEMORY;
   wrap->callback = callback;
@@ -413,24 +433,25 @@ static enum ui_error input_cva_register_on_change(
 }
 
 /** \brief input_cva_register_on_touched */
-static enum ui_error input_cva_register_on_touched(
-    void *component, enum ui_error (*callback)(void *), void *user_data) {
+static ui_error_t input_cva_register_on_touched(void *component,
+                                                ui_error_t (*callback)(void *),
+                                                void *user_data) {
   (void)component;
   (void)callback;
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error input_cva_set_disabled_state(void *component,
-                                                  ui_bool_t is_disabled) {
+static ui_error_t input_cva_set_disabled_state(void *component,
+                                               ui_bool_t is_disabled) {
   struct ui_input_base *input = (struct ui_input_base *)component;
   if (!input)
     return UI_ERROR_INVALID_ARGUMENT;
   return ui_input_base_set_disabled(input, is_disabled ? 1 : 0);
 }
 
-enum ui_error ui_input_base_get_cva(struct ui_input_base *input,
-                                    struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_input_base_get_cva(struct ui_input_base *input,
+                                 struct ui_control_value_accessor *out_cva) {
   if (!input || !out_cva)
     return UI_ERROR_INVALID_ARGUMENT;
   out_cva->write_value = input_cva_write_value;
@@ -440,8 +461,8 @@ enum ui_error ui_input_base_get_cva(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_base_get_component(struct ui_input_base *input,
-                                          struct ui_component **out_component) {
+ui_error_t ui_input_base_get_component(struct ui_input_base *input,
+                                       struct ui_component **out_component) {
   if (!input || !out_component)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_component = input->component;

@@ -5,7 +5,7 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
-extern enum ui_error
+extern ui_error_t
 ui_window_backend_linux_x11_create(struct ui_window_backend **out_backend);
 
 static int test_x11(void) {

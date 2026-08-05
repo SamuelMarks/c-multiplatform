@@ -21,7 +21,7 @@ static void test_page_floats_cases(void) {
   struct ui_dom_node *node = NULL;
   struct ui_css_computed_style *style = NULL;
   struct ui_css_page_floats_properties props;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Test invalid arguments */
   rc = ui_css_page_floats_parse(NULL, &props);
@@ -138,7 +138,7 @@ static void test_page_floats_cases(void) {
                          UI_CSS_FLOAT_DEFER_NONE, 0, "unknown",
                          UI_CSS_CLEAR_AFTER_NONE);
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
 }
 
 int main(void) {

@@ -36,7 +36,7 @@ struct ui_ink_base;
  * @param out_ink Pointer to output the initialized ink component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ink_base_create(struct ui_ink_base **out_ink);
+ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink);
 
 /**
  * @brief Destroys an ink base component.
@@ -44,7 +44,7 @@ enum ui_error ui_ink_base_create(struct ui_ink_base **out_ink);
  * @param ink The ink component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ink_base_destroy(struct ui_ink_base *ink);
+ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink);
 
 /**
  * @brief Retrieves the base component.
@@ -52,8 +52,8 @@ enum ui_error ui_ink_base_destroy(struct ui_ink_base *ink);
  * @param ink The ink component.
  * @return The base component.
  */
-enum ui_error ui_ink_base_get_component(struct ui_ink_base *ink,
-                                        struct ui_component **out_component);
+ui_error_t ui_ink_base_get_component(struct ui_ink_base *ink,
+                                     struct ui_component **out_component);
 
 /**
  * @brief Adds a new stylus event to the current stroke.
@@ -62,8 +62,8 @@ enum ui_error ui_ink_base_get_component(struct ui_ink_base *ink,
  * @param event The stylus event data.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ink_base_add_event(struct ui_ink_base *ink,
-                                    const struct ui_ink_event *event);
+ui_error_t ui_ink_base_add_event(struct ui_ink_base *ink,
+                                 const struct ui_ink_event *event);
 
 /**
  * @brief Finalizes the current stroke.
@@ -71,7 +71,7 @@ enum ui_error ui_ink_base_add_event(struct ui_ink_base *ink,
  * @param ink The ink component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ink_base_finish_stroke(struct ui_ink_base *ink);
+ui_error_t ui_ink_base_finish_stroke(struct ui_ink_base *ink);
 
 /**
  * @brief Gets the number of smoothed points in the current/last stroke.
@@ -80,8 +80,8 @@ enum ui_error ui_ink_base_finish_stroke(struct ui_ink_base *ink);
  * @param out_count Pointer to receive the count.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
-                                                    size_t *out_count);
+ui_error_t ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
+                                                 size_t *out_count);
 
 /**
  * @brief Gets the smoothed point at the specified index.
@@ -91,9 +91,8 @@ enum ui_error ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
  * @param out_point Pointer to receive the point.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ink_base_get_smoothed_point(struct ui_ink_base *ink,
-                                             size_t index,
-                                             struct ui_ink_event *out_point);
+ui_error_t ui_ink_base_get_smoothed_point(struct ui_ink_base *ink, size_t index,
+                                          struct ui_ink_event *out_point);
 
 #ifdef __cplusplus
 }

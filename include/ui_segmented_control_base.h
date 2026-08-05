@@ -29,7 +29,7 @@ enum ui_segmented_control_mode {
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_segmented_control_base_create(struct ui_segmented_control_base **out_control,
                                  struct ui_control_value_accessor *out_cva);
 
@@ -38,8 +38,8 @@ ui_segmented_control_base_create(struct ui_segmented_control_base **out_control,
  *
  * @param control The control to destroy.
  */
-void ui_segmented_control_base_destroy(
-    struct ui_segmented_control_base *control);
+ui_error_t
+ui_segmented_control_base_destroy(struct ui_segmented_control_base *control);
 
 /**
  * @brief Gets the underlying component for the segmented control.
@@ -48,7 +48,7 @@ void ui_segmented_control_base_destroy(
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_segmented_control_base_get_component(
+ui_error_t ui_segmented_control_base_get_component(
     struct ui_segmented_control_base *control,
     struct ui_component **out_component);
 
@@ -59,7 +59,7 @@ enum ui_error ui_segmented_control_base_get_component(
  * @param mode The selection mode.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_segmented_control_base_set_mode(struct ui_segmented_control_base *control,
                                    enum ui_segmented_control_mode mode);
 
@@ -70,7 +70,7 @@ ui_segmented_control_base_set_mode(struct ui_segmented_control_base *control,
  * @param out_mode Pointer to receive the mode.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_segmented_control_base_get_mode(struct ui_segmented_control_base *control,
                                    enum ui_segmented_control_mode *out_mode);
 
@@ -81,7 +81,7 @@ ui_segmented_control_base_get_mode(struct ui_segmented_control_base *control,
  * @param button The button to append.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_segmented_control_base_append_segment(
+ui_error_t ui_segmented_control_base_append_segment(
     struct ui_segmented_control_base *control,
     struct ui_segmented_button_base *button);
 
@@ -91,7 +91,7 @@ enum ui_error ui_segmented_control_base_append_segment(
  * @param out_button Pointer to receive the allocated button base.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_segmented_button_base_create(struct ui_segmented_button_base **out_button);
 
 /**
@@ -99,7 +99,8 @@ ui_segmented_button_base_create(struct ui_segmented_button_base **out_button);
  *
  * @param button The button to destroy.
  */
-void ui_segmented_button_base_destroy(struct ui_segmented_button_base *button);
+ui_error_t
+ui_segmented_button_base_destroy(struct ui_segmented_button_base *button);
 
 /**
  * @brief Gets the underlying component for the segmented button.
@@ -108,7 +109,7 @@ void ui_segmented_button_base_destroy(struct ui_segmented_button_base *button);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_segmented_button_base_get_component(struct ui_segmented_button_base *button,
                                        struct ui_component **out_component);
 
@@ -119,7 +120,7 @@ ui_segmented_button_base_get_component(struct ui_segmented_button_base *button,
  * @param selected True if selected, false otherwise.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_segmented_button_base_set_selected(struct ui_segmented_button_base *button,
                                       int selected);
 
@@ -130,7 +131,7 @@ ui_segmented_button_base_set_selected(struct ui_segmented_button_base *button,
  * @param out_selected Pointer to receive the selected state.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_segmented_button_base_get_selected(struct ui_segmented_button_base *button,
                                       int *out_selected);
 

@@ -5,10 +5,10 @@
 #include <string.h>
 /* clang-format on */
 
-static enum ui_error test_scaffold_base(void) {
+static ui_error_t test_scaffold_base(void) {
   struct ui_scaffold_base *scaffold;
   struct ui_component *top_bar, *main_content;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_scaffold_base_create(&scaffold);
   if (err != UI_ERROR_NONE) {
@@ -46,15 +46,47 @@ static enum ui_error test_scaffold_base(void) {
     fprintf(stderr, "main content not mounted to slot\n");
     exit(1);
   }
-  ui_component_destroy((struct ui_component *)scaffold);
+  (void)ui_component_destroy((struct ui_component *)scaffold);
   top_bar->shadow_root = NULL;
-  ui_component_destroy(top_bar);
+  (void)ui_component_destroy(top_bar);
   main_content->shadow_root = NULL;
-  ui_component_destroy(main_content);
+  (void)ui_component_destroy(main_content);
+  return 0;
 }
 
+int test_scaffold_base_extra(void);
+int test_scaffold_base_oom(void);
 int main(void) {
   test_scaffold_base();
+  test_scaffold_base_extra();
+  test_scaffold_base_oom();
   printf("test_ui_scaffold_base passed\n");
+  return 0;
+}
+int test_scaffold_base_extra(void) {
+  struct ui_scaffold_base *scaffold = NULL;
+  ui_scaffold_base_create(NULL);
+  ui_scaffold_base_create(&scaffold);
+  if (scaffold) {
+    ui_scaffold_base_set_top_bar(NULL, NULL);
+    ui_scaffold_base_set_top_bar(scaffold, NULL);
+    ui_scaffold_base_set_main_content(NULL, NULL);
+    ui_scaffold_base_set_main_content(scaffold, NULL);
+    ui_scaffold_base_bind_data(NULL, NULL);
+    ui_scaffold_base_bind_data(scaffold, NULL);
+    (void)ui_component_destroy((struct ui_component *)scaffold);
+  }
+  return 0;
+}
+
+int test_scaffold_base_oom(void) {
+  extern int g_malloc_fail_countdown;
+  struct ui_scaffold_base *scaffold = NULL;
+  int i;
+  for (i = 0; i < 20; ++i) {
+    g_malloc_fail_countdown = i;
+    ui_scaffold_base_create(&scaffold);
+  }
+  g_malloc_fail_countdown = -1;
   return 0;
 }

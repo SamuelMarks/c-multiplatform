@@ -29,14 +29,15 @@ struct ui_modifier {
   struct ui_modifier_style *last_style;
 };
 
-enum ui_error ui_modifier_create(struct ui_modifier **out_modifier) {
+ui_error_t ui_modifier_create(struct ui_modifier **out_modifier) {
   struct ui_modifier *modifier;
 
   if (!out_modifier) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  modifier = (struct ui_modifier *)UI_MALLOC(sizeof(struct ui_modifier));
+  modifier =
+      (struct ui_modifier *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_modifier));
   if (!modifier) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -50,23 +51,23 @@ enum ui_error ui_modifier_create(struct ui_modifier **out_modifier) {
   return UI_ERROR_NONE;
 }
 
-void ui_modifier_destroy(struct ui_modifier *modifier) {
+ui_error_t ui_modifier_destroy(struct ui_modifier *modifier) {
   struct ui_modifier_class *c_curr;
   struct ui_modifier_class *c_next;
   struct ui_modifier_style *s_curr;
   struct ui_modifier_style *s_next;
 
   if (!modifier) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   c_curr = modifier->first_class;
   while (c_curr) {
     c_next = c_curr->next;
     if (c_curr->name) {
-      UI_FREE(c_curr->name);
+      C_MULTIPLATFORM_FREE(c_curr->name);
     }
-    UI_FREE(c_curr);
+    C_MULTIPLATFORM_FREE(c_curr);
     c_curr = c_next;
   }
 
@@ -74,24 +75,25 @@ void ui_modifier_destroy(struct ui_modifier *modifier) {
   while (s_curr) {
     s_next = s_curr->next;
     if (s_curr->property) {
-      UI_FREE(s_curr->property);
+      C_MULTIPLATFORM_FREE(s_curr->property);
     }
     if (s_curr->value) {
-      UI_FREE(s_curr->value);
+      C_MULTIPLATFORM_FREE(s_curr->value);
     }
-    UI_FREE(s_curr);
+    C_MULTIPLATFORM_FREE(s_curr);
     s_curr = s_next;
   }
 
-  UI_FREE(modifier);
+  C_MULTIPLATFORM_FREE(modifier);
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error str_dup(const char *src, char **out_dest) {
+static ui_error_t str_dup(const char *src, char **out_dest) {
   size_t len;
   char *dest;
 
   len = strlen(src);
-  dest = (char *)UI_MALLOC(len + 1);
+  dest = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!dest) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -106,17 +108,17 @@ static enum ui_error str_dup(const char *src, char **out_dest) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_modifier_add_class(struct ui_modifier *modifier,
-                                    const char *class_name) {
+ui_error_t ui_modifier_add_class(struct ui_modifier *modifier,
+                                 const char *class_name) {
   struct ui_modifier_class *new_class;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!modifier || !class_name) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  new_class =
-      (struct ui_modifier_class *)UI_MALLOC(sizeof(struct ui_modifier_class));
+  new_class = (struct ui_modifier_class *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_modifier_class));
   if (!new_class) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -126,7 +128,7 @@ enum ui_error ui_modifier_add_class(struct ui_modifier *modifier,
 
   rc = str_dup(class_name, &new_class->name);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(new_class);
+    C_MULTIPLATFORM_FREE(new_class);
     return rc;
   }
 
@@ -140,18 +142,18 @@ enum ui_error ui_modifier_add_class(struct ui_modifier *modifier,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_modifier_add_style(struct ui_modifier *modifier,
-                                    const char *property_name,
-                                    const char *property_value) {
+ui_error_t ui_modifier_add_style(struct ui_modifier *modifier,
+                                 const char *property_name,
+                                 const char *property_value) {
   struct ui_modifier_style *new_style;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!modifier || !property_name || !property_value) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  new_style =
-      (struct ui_modifier_style *)UI_MALLOC(sizeof(struct ui_modifier_style));
+  new_style = (struct ui_modifier_style *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_modifier_style));
   if (!new_style) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -162,14 +164,14 @@ enum ui_error ui_modifier_add_style(struct ui_modifier *modifier,
 
   rc = str_dup(property_name, &new_style->property);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(new_style);
+    C_MULTIPLATFORM_FREE(new_style);
     return rc;
   }
 
   rc = str_dup(property_value, &new_style->value);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(new_style->property);
-    UI_FREE(new_style);
+    C_MULTIPLATFORM_FREE(new_style->property);
+    C_MULTIPLATFORM_FREE(new_style);
     return rc;
   }
 
@@ -183,8 +185,8 @@ enum ui_error ui_modifier_add_style(struct ui_modifier *modifier,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_modifier_apply(const struct ui_modifier *modifier,
-                                struct ui_component *component) {
+ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
+                             struct ui_component *component) {
   const char *existing_class = NULL;
   const char *existing_style = NULL;
   struct ui_modifier_class *c_curr;
@@ -193,17 +195,26 @@ enum ui_error ui_modifier_apply(const struct ui_modifier *modifier,
   char *new_style_str = NULL;
   size_t class_len = 0;
   size_t style_len = 0;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!modifier || !component || !component->shadow_root) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   /* Calculate length for new class string */
-  if (ui_dom_node_get_attribute(component->shadow_root, "class",
-                                &existing_class) == UI_ERROR_NONE) {
-    if (existing_class && existing_class[0] != '\0') {
-      class_len = strlen(existing_class) + 1; /* +1 for space */
+  {
+    ui_error_t attr_rc = ui_dom_node_get_attribute(component->shadow_root,
+                                                   "class", &existing_class);
+    if (attr_rc != UI_ERROR_NONE) {
+      if (0)
+        return attr_rc;
+      if (attr_rc != UI_ERROR_NOT_FOUND)
+        return attr_rc;
+    }
+    if (attr_rc == UI_ERROR_NONE) {
+      if (existing_class && existing_class[0] != '\0') {
+        class_len = strlen(existing_class) + 1; /* +1 for space */
+      }
     }
   }
 
@@ -214,7 +225,7 @@ enum ui_error ui_modifier_apply(const struct ui_modifier *modifier,
   }
 
   if (class_len > 0) {
-    new_class_str = (char *)UI_MALLOC(class_len + 1);
+    new_class_str = (char *)C_MULTIPLATFORM_MALLOC(class_len + 1);
     if (!new_class_str) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -249,15 +260,35 @@ enum ui_error ui_modifier_apply(const struct ui_modifier *modifier,
     rc = ui_dom_node_set_attribute(component->shadow_root, "class",
                                    new_class_str);
     if (rc != UI_ERROR_NONE) {
-      goto cleanup;
+      if (new_class_str) {
+        C_MULTIPLATFORM_FREE(new_class_str);
+      }
+      if (new_style_str) {
+        C_MULTIPLATFORM_FREE(new_style_str);
+      }
+      return rc;
     }
   }
 
   /* Calculate length for new style string */
-  if (ui_dom_node_get_attribute(component->shadow_root, "style",
-                                &existing_style) == UI_ERROR_NONE) {
-    if (existing_style && existing_style[0] != '\0') {
-      style_len = strlen(existing_style) + 1; /* +1 for space */
+  {
+    ui_error_t attr_rc = ui_dom_node_get_attribute(component->shadow_root,
+                                                   "style", &existing_style);
+    if (attr_rc != UI_ERROR_NONE) {
+      if (0)
+        return attr_rc;
+      if (attr_rc != UI_ERROR_NOT_FOUND) {
+        rc = attr_rc;
+        if (new_class_str) {
+          C_MULTIPLATFORM_FREE(new_class_str);
+        }
+        return attr_rc;
+      }
+    }
+    if (attr_rc == UI_ERROR_NONE) {
+      if (existing_style && existing_style[0] != '\0') {
+        style_len = strlen(existing_style) + 1; /* +1 for space */
+      }
     }
   }
 
@@ -269,7 +300,7 @@ enum ui_error ui_modifier_apply(const struct ui_modifier *modifier,
   }
 
   if (style_len > 0) {
-    new_style_str = (char *)UI_MALLOC(style_len + 1);
+    new_style_str = (char *)C_MULTIPLATFORM_MALLOC(style_len + 1);
     if (!new_style_str) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -317,16 +348,22 @@ enum ui_error ui_modifier_apply(const struct ui_modifier *modifier,
     rc = ui_dom_node_set_attribute(component->shadow_root, "style",
                                    new_style_str);
     if (rc != UI_ERROR_NONE) {
-      goto cleanup;
+      if (new_class_str) {
+        C_MULTIPLATFORM_FREE(new_class_str);
+      }
+      if (new_style_str) {
+        C_MULTIPLATFORM_FREE(new_style_str);
+      }
+      return rc;
     }
   }
 
 cleanup:
   if (new_class_str) {
-    UI_FREE(new_class_str);
+    C_MULTIPLATFORM_FREE(new_class_str);
   }
   if (new_style_str) {
-    UI_FREE(new_style_str);
+    C_MULTIPLATFORM_FREE(new_style_str);
   }
   return rc;
 }

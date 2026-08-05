@@ -5,7 +5,7 @@
 
 int main(void) {
   struct ui_text_layout *layout = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   /* Just testing the mock fallback path for now, to ensure it returns
@@ -40,7 +40,7 @@ int main(void) {
                                           NULL, 0.0f, UI_TEXT_DIRECTION_LTR);
   failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
 
-  ui_text_layout_destroy(layout);
+  (void)ui_text_layout_destroy(layout);
 
   if (!failed) {
     /* Simulate HarfBuzz contextual integrations mapping ligature configurations

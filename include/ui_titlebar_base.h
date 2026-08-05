@@ -38,19 +38,19 @@ struct ui_titlebar_config {
  * @param arena The memory arena.
  * @param config The configuration.
  * @param out_titlebar Output pointer for the created component.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_titlebar_base_create(struct ui_arena *arena,
-                                      const struct ui_titlebar_config *config,
-                                      struct ui_titlebar_base **out_titlebar);
+ui_error_t ui_titlebar_base_create(struct ui_arena *arena,
+                                   const struct ui_titlebar_config *config,
+                                   struct ui_titlebar_base **out_titlebar);
 
 /**
  * @brief Destroys a custom titlebar component.
  *
  * @param titlebar The component.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar);
+ui_error_t ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar);
 
 /**
  * @brief Performs a hit test to determine what area was clicked.
@@ -59,9 +59,9 @@ enum ui_error ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar);
  * @param x The X coordinate.
  * @param y The Y coordinate.
  * @param out_result Output pointer for the hit test result.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_titlebar_base_hit_test(struct ui_titlebar_base *titlebar, float x, float y,
                           enum ui_titlebar_hit_test_result *out_result);
 
@@ -74,9 +74,9 @@ ui_titlebar_base_hit_test(struct ui_titlebar_base *titlebar, float x, float y,
  * @param y The Y coordinate of the rect.
  * @param w The width of the rect.
  * @param h The height of the rect.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_titlebar_base_add_button_rect(struct ui_titlebar_base *titlebar,
                                  enum ui_titlebar_hit_test_result btn_type,
                                  float x, float y, float w, float h);

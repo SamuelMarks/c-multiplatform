@@ -4,8 +4,7 @@
 #include <stdio.h>
 /* clang-format on */
 
-extern enum ui_error
-ui_renderer_gles_fallback_init(struct ui_renderer *renderer);
+extern ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *renderer);
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
@@ -14,7 +13,7 @@ extern int g_mock_gles2_create_fail;
 
 int main(void) {
   struct ui_renderer renderer;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Running ui_renderer_gles_fallback tests...\n");
 

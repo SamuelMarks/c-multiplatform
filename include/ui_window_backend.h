@@ -34,9 +34,9 @@ struct ui_window_backend {
    * @param out_window Pointer to receive the native window handle.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*create_window)(struct ui_window_backend *backend,
-                                 const char *title, int width, int height,
-                                 struct ui_window **out_window);
+  ui_error_t (*create_window)(struct ui_window_backend *backend,
+                              const char *title, int width, int height,
+                              struct ui_window **out_window);
 
   /**
    * @brief Destroys a native window and its rendering context.
@@ -45,8 +45,8 @@ struct ui_window_backend {
    * @param window The window to destroy.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*destroy_window)(struct ui_window_backend *backend,
-                                  struct ui_window *window);
+  ui_error_t (*destroy_window)(struct ui_window_backend *backend,
+                               struct ui_window *window);
 
   /**
    * @brief Shows a previously hidden window.
@@ -55,8 +55,8 @@ struct ui_window_backend {
    * @param window The window to show.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*show_window)(struct ui_window_backend *backend,
-                               struct ui_window *window);
+  ui_error_t (*show_window)(struct ui_window_backend *backend,
+                            struct ui_window *window);
 
   /**
    * @brief Hides a visible window.
@@ -65,8 +65,8 @@ struct ui_window_backend {
    * @param window The window to hide.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*hide_window)(struct ui_window_backend *backend,
-                               struct ui_window *window);
+  ui_error_t (*hide_window)(struct ui_window_backend *backend,
+                            struct ui_window *window);
 
   /**
    * @brief Polls the OS event queue for the specified window.
@@ -78,9 +78,9 @@ struct ui_window_backend {
    * empty.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*poll_events)(struct ui_window_backend *backend,
-                               struct ui_window *window,
-                               struct ui_event *out_event, int *out_has_event);
+  ui_error_t (*poll_events)(struct ui_window_backend *backend,
+                            struct ui_window *window,
+                            struct ui_event *out_event, int *out_has_event);
 
   /**
    * @brief Swaps the rendering buffers (e.g., EGLSwapBuffers, SwapBuffers,
@@ -90,8 +90,8 @@ struct ui_window_backend {
    * @param window The window whose buffers should be swapped.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*swap_buffers)(struct ui_window_backend *backend,
-                                struct ui_window *window);
+  ui_error_t (*swap_buffers)(struct ui_window_backend *backend,
+                             struct ui_window *window);
 
   /**
    * @brief Injects an OS-level deep link URI into the event queue (e.g. from
@@ -101,8 +101,8 @@ struct ui_window_backend {
    * @param uri The deep link URI string.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*push_deep_link)(struct ui_window_backend *backend,
-                                  const char *uri);
+  ui_error_t (*push_deep_link)(struct ui_window_backend *backend,
+                               const char *uri);
 
   /**
    * @brief Retrieves the native OS window handle (e.g., HWND, NSWindow*, etc.).
@@ -124,9 +124,9 @@ struct ui_window_backend {
    * @param user_data User data for the callback.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*set_on_resize_callback)(
+  ui_error_t (*set_on_resize_callback)(
       struct ui_window_backend *backend, struct ui_window *window,
-      enum ui_error (*callback)(void *user_data, int width, int height),
+      ui_error_t (*callback)(void *user_data, int width, int height),
       void *user_data);
 
   /**

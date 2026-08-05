@@ -12,9 +12,10 @@ static void skip_whitespace(const char **p_str) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_scrollbar_width(const char *str,
                              enum ui_css_scrollbar_width *out_width) {
+  ui_error_t rc;
   if (!str || !out_width)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -35,13 +36,13 @@ ui_css_parse_scrollbar_width(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_scrollbar_color(const char *str,
                              struct ui_css_scrollbar_color *out_color) {
   char token_buf[256];
   const char *space;
   size_t len;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!str || !out_color)
     return UI_ERROR_INVALID_ARGUMENT;

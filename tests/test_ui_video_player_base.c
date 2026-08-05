@@ -12,7 +12,7 @@ struct ui_component {
 static int test_video_player_init(void) {
   struct ui_video_player_base player;
   struct ui_component comp;
-  enum ui_error err;
+  ui_error_t err;
   int failed = 0;
 
   err = ui_video_player_base_init(NULL, &comp, NULL);

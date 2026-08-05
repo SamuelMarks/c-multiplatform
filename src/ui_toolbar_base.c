@@ -12,16 +12,17 @@ struct ui_toolbar_base {
   struct ui_signal *data_signal;
 };
 
-enum ui_error ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar) {
+ui_error_t ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar) {
   struct ui_toolbar_base *tb;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_toolbar) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  tb = (struct ui_toolbar_base *)UI_MALLOC(sizeof(struct ui_toolbar_base));
+  tb = (struct ui_toolbar_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_toolbar_base));
   if (!tb) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -37,19 +38,20 @@ cleanup:
   return rc;
 }
 
-void ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar) {
+ui_error_t ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar) {
   if (!toolbar) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (toolbar->title) {
-    UI_FREE(toolbar->title);
+    C_MULTIPLATFORM_FREE(toolbar->title);
   }
-  UI_FREE(toolbar);
+  C_MULTIPLATFORM_FREE(toolbar);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
-                                        const char *title) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
+                                     const char *title) {
+  ui_error_t rc = UI_ERROR_NONE;
   size_t len;
   char *new_title = NULL;
 
@@ -59,20 +61,16 @@ enum ui_error ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
   }
 
   len = strlen(title);
-  new_title = (char *)UI_MALLOC(len + 1);
+  new_title = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!new_title) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
 
-  if (UI_STRCPY(new_title, len + 1, title) != 0) {
-    UI_FREE(new_title);
-    rc = UI_ERROR_UNKNOWN;
-    goto cleanup;
-  }
+  (void)UI_STRCPY(new_title, len + 1, title);
 
   if (toolbar->title) {
-    UI_FREE(toolbar->title);
+    C_MULTIPLATFORM_FREE(toolbar->title);
   }
   toolbar->title = new_title;
 
@@ -80,9 +78,9 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_toolbar_base_get_title(const struct ui_toolbar_base *toolbar,
-                                        const char **out_title) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_toolbar_base_get_title(const struct ui_toolbar_base *toolbar,
+                                     const char **out_title) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!toolbar || !out_title) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -95,9 +93,9 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_toolbar_base_set_mode(struct ui_toolbar_base *toolbar,
-                                       enum ui_toolbar_mode mode) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_toolbar_base_set_mode(struct ui_toolbar_base *toolbar,
+                                    enum ui_toolbar_mode mode) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!toolbar) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -110,9 +108,9 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_toolbar_base_get_mode(const struct ui_toolbar_base *toolbar,
-                                       enum ui_toolbar_mode *out_mode) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_toolbar_base_get_mode(const struct ui_toolbar_base *toolbar,
+                                    enum ui_toolbar_mode *out_mode) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!toolbar || !out_mode) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -126,10 +124,9 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
-                              enum ui_toolbar_alignment alignment) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
+                                         enum ui_toolbar_alignment alignment) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!toolbar) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -143,10 +140,10 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_toolbar_base_get_alignment(const struct ui_toolbar_base *toolbar,
                               enum ui_toolbar_alignment *out_alignment) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!toolbar || !out_alignment) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -159,8 +156,8 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_toolbar_base_bind_data(struct ui_toolbar_base *widget,
-                                        struct ui_signal *signal) {
+ui_error_t ui_toolbar_base_bind_data(struct ui_toolbar_base *widget,
+                                     struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

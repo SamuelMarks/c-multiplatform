@@ -16,7 +16,7 @@ int main(void) {
   struct ui_window *window = NULL;
   struct ui_event ev;
   int has_event = 0;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Null checks */
   rc = ui_e2e_headless_create(800, 600, NULL);
@@ -219,6 +219,57 @@ int main(void) {
     rc = ui_e2e_headless_type_key(ctx, UI_KEY_SPACE, 0);
     if (rc != UI_ERROR_OUT_OF_MEMORY)
       return 1;
+  }
+
+  {
+    int i;
+    struct ui_event ev_fill;
+    memset(&ev_fill, 0, sizeof(ev_fill));
+
+    while (backend->poll_events(backend, window, &ev_fill, &has_event) ==
+               UI_ERROR_NONE &&
+           has_event) {
+    }
+
+    for (i = 0; i < 254; i++) {
+      ui_e2e_headless_push_event(ctx, &ev_fill);
+    }
+    rc = ui_e2e_headless_click(ctx, 10, 10);
+    if (rc != UI_ERROR_OUT_OF_MEMORY)
+      return 1;
+
+    while (backend->poll_events(backend, window, &ev_fill, &has_event) ==
+               UI_ERROR_NONE &&
+           has_event) {
+    }
+
+    for (i = 0; i < 254; i++) {
+      ui_e2e_headless_push_event(ctx, &ev_fill);
+    }
+    rc = ui_e2e_headless_type_key(ctx, UI_KEY_SPACE, 0);
+    if (rc != UI_ERROR_OUT_OF_MEMORY)
+      return 1;
+
+    while (backend->poll_events(backend, window, &ev_fill, &has_event) ==
+               UI_ERROR_NONE &&
+           has_event) {
+    }
+
+    for (i = 0; i < 255; i++) {
+      ui_e2e_headless_push_event(ctx, &ev_fill);
+    }
+#ifdef _WIN32
+    rc = backend->push_deep_link(backend, L"test");
+#else
+    rc = backend->push_deep_link(backend, "test");
+#endif
+    if (rc != UI_ERROR_OUT_OF_MEMORY)
+      return 1;
+
+    while (backend->poll_events(backend, window, &ev_fill, &has_event) ==
+               UI_ERROR_NONE &&
+           has_event) {
+    }
   }
 
   rc = backend->destroy_window(backend, window);

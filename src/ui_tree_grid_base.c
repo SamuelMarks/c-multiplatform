@@ -19,24 +19,24 @@ struct ui_tree_grid_base {
   size_t active_col;
 };
 
-enum ui_error ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
-                                       const struct ui_tree_grid_model *model) {
+ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
+                                    const struct ui_tree_grid_model *model) {
   struct ui_tree_grid_base *tree_grid;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_tree_grid || !model) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  tree_grid =
-      (struct ui_tree_grid_base *)UI_MALLOC(sizeof(struct ui_tree_grid_base));
+  tree_grid = (struct ui_tree_grid_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_tree_grid_base));
   if (!tree_grid) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   rc = ui_component_create(&tree_grid->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(tree_grid);
+    C_MULTIPLATFORM_FREE(tree_grid);
     return rc;
   }
 
@@ -49,16 +49,17 @@ enum ui_error ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
   return UI_ERROR_NONE;
 }
 
-void ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid) {
+ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid) {
   if (!tree_grid) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(tree_grid->component);
-  UI_FREE(tree_grid);
+  (void)ui_component_destroy(tree_grid->component);
+  C_MULTIPLATFORM_FREE(tree_grid);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_tree_grid_base_get_component(struct ui_tree_grid_base *tree_grid,
                                 struct ui_component **out_component) {
   if (!tree_grid || !out_component) {
@@ -69,7 +70,7 @@ ui_tree_grid_base_get_component(struct ui_tree_grid_base *tree_grid,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
                               void *node_id, int *out_is_expanded) {
   size_t i;
@@ -89,20 +90,18 @@ ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
-                               void *node_id, int expanded) {
-  int currently_expanded;
+ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
+                                          void *node_id, int expanded) {
+  int currently_expanded = 0;
   size_t i;
-  enum ui_error rc;
 
   if (!tree_grid || !node_id) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-
-  rc = ui_tree_grid_base_is_expanded(tree_grid, node_id, &currently_expanded);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+    ui_error_t _ign_rc =
+        ui_tree_grid_base_is_expanded(tree_grid, node_id, &currently_expanded);
+    (void)_ign_rc;
   }
 
   if (expanded && !currently_expanded) {
@@ -115,8 +114,7 @@ ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
     for (i = 0; i < tree_grid->expanded_count; i++) {
       if (tree_grid->expanded_nodes[i] == node_id) {
         tree_grid->expanded_nodes[i] =
-            tree_grid->expanded_nodes[tree_grid->expanded_count - 1];
-        tree_grid->expanded_count--;
+            tree_grid->expanded_nodes[--tree_grid->expanded_count];
         break;
       }
     }
@@ -125,10 +123,10 @@ ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
-                                            void *node_id) {
+ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
+                                         void *node_id) {
   int expanded;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_tree_grid_base_is_expanded(tree_grid, node_id, &expanded);
   if (rc != UI_ERROR_NONE) {
@@ -139,7 +137,7 @@ enum ui_error ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
                                    const struct ui_keyboard_event *event) {
   if (!tree_grid || !event) {
@@ -152,10 +150,15 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   if (event->key_code == UI_KEY_RIGHT) {
     if (tree_grid->active_node) {
       int expanded;
-      ui_tree_grid_base_is_expanded(tree_grid, tree_grid->active_node,
-                                    &expanded);
+      ui_error_t is_exp_rc = ui_tree_grid_base_is_expanded(
+          tree_grid, tree_grid->active_node, &expanded);
+      if (is_exp_rc != UI_ERROR_NONE)
+        return is_exp_rc;
       if (!expanded) {
-        ui_tree_grid_base_set_expanded(tree_grid, tree_grid->active_node, 1);
+        ui_error_t set_exp_rc = ui_tree_grid_base_set_expanded(
+            tree_grid, tree_grid->active_node, 1);
+        if (set_exp_rc != UI_ERROR_NONE)
+          return set_exp_rc;
       } else {
         /* If already expanded, might move focus to first child or next column
          */
@@ -165,10 +168,15 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   } else if (event->key_code == UI_KEY_LEFT) {
     if (tree_grid->active_node) {
       int expanded;
-      ui_tree_grid_base_is_expanded(tree_grid, tree_grid->active_node,
-                                    &expanded);
+      ui_error_t is_exp_rc = ui_tree_grid_base_is_expanded(
+          tree_grid, tree_grid->active_node, &expanded);
+      if (is_exp_rc != UI_ERROR_NONE)
+        return is_exp_rc;
       if (expanded) {
-        ui_tree_grid_base_set_expanded(tree_grid, tree_grid->active_node, 0);
+        ui_error_t set_exp_rc = ui_tree_grid_base_set_expanded(
+            tree_grid, tree_grid->active_node, 0);
+        if (set_exp_rc != UI_ERROR_NONE)
+          return set_exp_rc;
       } else {
         /* Move focus to parent or prev col */
         if (tree_grid->active_col > 0)
@@ -180,13 +188,14 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_tree_grid_base_render(struct ui_tree_grid_base *tree_grid,
-                                       struct ui_dom_node *container) {
+ui_error_t ui_tree_grid_base_render(struct ui_tree_grid_base *tree_grid,
+                                    struct ui_dom_node *container) {
   if (!tree_grid || !container) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_dom_node_set_attribute(container, "role", "treegrid");
+#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+  (void)UI_DOM_SET_ATTR_IGNORE(container, "role", "treegrid");
 
   /* Rendering recursion would go here. */
 

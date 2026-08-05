@@ -21,7 +21,7 @@ struct ui_coachmark_tour;
 /**
  * @brief Callback invoked when a tour step changes or ends.
  */
-typedef enum ui_error (*ui_coachmark_on_step_change_t)(
+typedef ui_error_t (*ui_coachmark_on_step_change_t)(
     struct ui_coachmark_tour *tour, int current_step, void *user_data);
 
 /**
@@ -38,25 +38,25 @@ struct ui_coachmark_step {
 /**
  * @brief Creates a coachmark tour component.
  */
-enum ui_error ui_coachmark_tour_create(struct ui_overlay_director *director,
-                                       struct ui_coachmark_tour **out_tour);
+ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
+                                    struct ui_coachmark_tour **out_tour);
 
 /**
  * @brief Destroys a coachmark tour component.
  */
-void ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour);
+ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Sets the steps for the tour.
  */
-enum ui_error ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
-                                          const struct ui_coachmark_step *steps,
-                                          int step_count);
+ui_error_t ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
+                                       const struct ui_coachmark_step *steps,
+                                       int step_count);
 
 /**
  * @brief Sets a callback for when the step changes.
  */
-enum ui_error
+ui_error_t
 ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
                                      ui_coachmark_on_step_change_t on_change,
                                      void *user_data);
@@ -64,22 +64,22 @@ ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
 /**
  * @brief Starts the tour at step 0.
  */
-enum ui_error ui_coachmark_tour_start(struct ui_coachmark_tour *tour);
+ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Advances to the next step.
  */
-enum ui_error ui_coachmark_tour_next(struct ui_coachmark_tour *tour);
+ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Goes back to the previous step.
  */
-enum ui_error ui_coachmark_tour_prev(struct ui_coachmark_tour *tour);
+ui_error_t ui_coachmark_tour_prev(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Skips/ends the tour.
  */
-enum ui_error ui_coachmark_tour_skip(struct ui_coachmark_tour *tour);
+ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Binds the coachmark tour's open state to a signal.
@@ -88,8 +88,8 @@ enum ui_error ui_coachmark_tour_skip(struct ui_coachmark_tour *tour);
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
-                                          struct ui_signal *open_signal);
+ui_error_t ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
+                                       struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the tour is animating.
@@ -98,7 +98,7 @@ enum ui_error ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_coachmark_tour_get_animating_signal(struct ui_coachmark_tour *tour,
                                        struct ui_computed **out_animating);
 
@@ -106,16 +106,16 @@ ui_coachmark_tour_get_animating_signal(struct ui_coachmark_tour *tour,
  * @brief Updates layout/positioning for the current step (useful on window
  * resize).
  */
-enum ui_error ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
-                                              float viewport_width,
-                                              float viewport_height);
+ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
+                                           float viewport_width,
+                                           float viewport_height);
 
 /**
  * @brief Processes input events for the coachmark (keyboard navigation like
  * ESC, Tab).
  */
-enum ui_error ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
-                                              const struct ui_event *event);
+ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
+                                           const struct ui_event *event);
 
 #ifdef __cplusplus
 }

@@ -7,7 +7,7 @@
 
 int main(void) {
   struct ui_window_backend *backend = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   printf("Running ui_window_backend_win32 tests...\n");

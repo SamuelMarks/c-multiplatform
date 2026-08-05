@@ -1,5 +1,4 @@
 /* clang-format off */
-#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -15,92 +14,125 @@ struct ui_component {
   int id;
 };
 
-static enum ui_error test_image_init(void) {
+static int test_image_init(void) {
   struct ui_image_base image;
   struct ui_component comp;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_image_base_init(NULL, &comp);
-  assert(err == UI_ERROR_INVALID_ARGUMENT);
+  if (err != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
   err = ui_image_base_init(&image, NULL);
-  assert(err == UI_ERROR_INVALID_ARGUMENT);
+  if (err != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
   err = ui_image_base_init(&image, &comp);
-  assert(err == UI_ERROR_NONE);
-  assert(image.component == &comp);
-  assert(image.state == UI_IMAGE_STATE_IDLE);
-  assert(image.lazy_load == 0);
-  assert(image.src_url == NULL);
-  assert(image.alt_text == NULL);
-  return UI_ERROR_NONE;
+  if (err != UI_ERROR_NONE)
+    return 1;
+  if (image.component != &comp)
+    return 1;
+  if (image.state != UI_IMAGE_STATE_IDLE)
+    return 1;
+  if (image.lazy_load != 0)
+    return 1;
+  if (image.src_url != NULL)
+    return 1;
+  if (image.alt_text != NULL)
+    return 1;
+  return 0;
 }
 
-static enum ui_error test_image_set_src(void) {
+static int test_image_set_src(void) {
   struct ui_image_base image;
   struct ui_component comp;
-  enum ui_error err;
+  ui_error_t err;
   char *alt;
 
-  ui_image_base_init(&image, &comp);
+  if (ui_image_base_init(&image, &comp) != UI_ERROR_NONE)
+    return 1;
 
   err = ui_image_base_set_src(NULL, "https://example.com/img.png", 0);
-  assert(err == UI_ERROR_INVALID_ARGUMENT);
+  if (err != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
   err = ui_image_base_set_src(&image, NULL, 0);
-  assert(err == UI_ERROR_INVALID_ARGUMENT);
+  if (err != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
   g_malloc_fail_countdown = 0;
   err = ui_image_base_set_src(&image, "https://example.com/img.png", 0);
-  assert(err == UI_ERROR_OUT_OF_MEMORY);
+  if (err != UI_ERROR_OUT_OF_MEMORY)
+    return 1;
   g_malloc_fail_countdown = -1;
 
   err = ui_image_base_set_src(&image, "https://example.com/img.png", 0);
-  assert(err == UI_ERROR_NONE);
-  assert(strcmp(image.src_url, "https://example.com/img.png") == 0);
-  assert(image.lazy_load == 0);
-  assert(image.state == UI_IMAGE_STATE_LOADING);
+  if (err != UI_ERROR_NONE)
+    return 1;
+  if (strcmp(image.src_url, "https://example.com/img.png") != 0)
+    return 1;
+  if (image.lazy_load != 0)
+    return 1;
+  if (image.state != UI_IMAGE_STATE_LOADING)
+    return 1;
 
   err = ui_image_base_set_src(&image, "https://example.com/lazy.png", 1);
-  assert(err == UI_ERROR_NONE);
-  assert(strcmp(image.src_url, "https://example.com/lazy.png") == 0);
-  assert(image.lazy_load == 1);
-  assert(image.state == UI_IMAGE_STATE_IDLE);
+  if (err != UI_ERROR_NONE)
+    return 1;
+  if (strcmp(image.src_url, "https://example.com/lazy.png") != 0)
+    return 1;
+  if (image.lazy_load != 1)
+    return 1;
+  if (image.state != UI_IMAGE_STATE_IDLE)
+    return 1;
 
   alt = (char *)malloc(10);
-  strcpy(alt, "alt");
-  image.alt_text = alt;
+  if (alt) {
+    strcpy(alt, "alt");
+    image.alt_text = alt;
+  }
 
   err = ui_image_base_cleanup(NULL);
-  assert(err == UI_ERROR_INVALID_ARGUMENT);
+  if (err != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
-  ui_image_base_cleanup(&image);
-  assert(image.src_url == NULL);
-  assert(image.alt_text == NULL);
-  return UI_ERROR_NONE;
+  if (ui_image_base_cleanup(&image) != UI_ERROR_NONE)
+    return 1;
+  if (image.src_url != NULL)
+    return 1;
+  if (image.alt_text != NULL)
+    return 1;
+  return 0;
 }
 
-static enum ui_error test_image_bind_src(void) {
+static int test_image_bind_src(void) {
   struct ui_image_base image;
   struct ui_component comp;
   struct ui_signal *signal = (struct ui_signal *)1;
-  enum ui_error err;
+  ui_error_t err;
 
-  ui_image_base_init(&image, &comp);
+  if (ui_image_base_init(&image, &comp) != UI_ERROR_NONE)
+    return 1;
 
   err = ui_image_base_bind_src(NULL, signal);
-  assert(err == UI_ERROR_INVALID_ARGUMENT);
+  if (err != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
   err = ui_image_base_bind_src(&image, signal);
-  assert(err == UI_ERROR_NONE);
-  assert(image.src_signal == signal);
+  if (err != UI_ERROR_NONE)
+    return 1;
+  if (image.src_signal != signal)
+    return 1;
 
-  return UI_ERROR_NONE;
+  return 0;
 }
 
 int main(void) {
-  test_image_init();
-  test_image_set_src();
-  test_image_bind_src();
+  if (test_image_init())
+    return 1;
+  if (test_image_set_src())
+    return 1;
+  if (test_image_bind_src())
+    return 1;
   return 0;
 }

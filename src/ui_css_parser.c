@@ -46,28 +46,23 @@ struct ui_css_tokenizer {
   size_t len;
 };
 
-static enum ui_error advance(struct ui_css_tokenizer *tz) {
-  tz->pos++;
-  return UI_ERROR_NONE;
-}
+static void advance(struct ui_css_tokenizer *tz) { tz->pos++; }
 
-static enum ui_error peek(struct ui_css_tokenizer *tz, char *out_char) {
+static void peek(struct ui_css_tokenizer *tz, char *out_char) {
   *out_char = tz->text[tz->pos];
-  return UI_ERROR_NONE;
 }
 
-static enum ui_error is_ident_start(char c, int *out_is_start) {
+static void is_ident_start(char c, int *out_is_start) {
   *out_is_start = isalpha((unsigned char)c) || c == '_' || c == '-';
-  return UI_ERROR_NONE;
 }
 
-static enum ui_error is_ident_char(char c, int *out_is_char) {
+static void is_ident_char(char c, int *out_is_char) {
   *out_is_char = isalnum((unsigned char)c) || c == '_' || c == '-';
-  return UI_ERROR_NONE;
 }
 
-static enum ui_error skip_whitespace_and_comments(struct ui_css_tokenizer *tz) {
+static void skip_whitespace_and_comments(struct ui_css_tokenizer *tz) {
   char c;
+  ui_error_t rc;
   while (tz->pos < tz->len) {
     peek(tz, &c);
     if (isspace((unsigned char)c)) {
@@ -89,13 +84,13 @@ static enum ui_error skip_whitespace_and_comments(struct ui_css_tokenizer *tz) {
       break;
     }
   }
-  return UI_ERROR_NONE;
 }
 
-static enum ui_error next_token(struct ui_css_tokenizer *tz,
-                                struct ui_css_token *out_token) {
+static void next_token(struct ui_css_tokenizer *tz,
+                       struct ui_css_token *out_token) {
   struct ui_css_token t;
   char c;
+  ui_error_t rc;
 
   skip_whitespace_and_comments(tz);
 
@@ -105,7 +100,7 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
   if (tz->pos >= tz->len) {
     t.type = TOKEN_EOF;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   }
 
   peek(tz, &c);
@@ -116,67 +111,67 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
     t.type = TOKEN_LBRACE;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '}':
     advance(tz);
     t.type = TOKEN_RBRACE;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '[':
     advance(tz);
     t.type = TOKEN_LBRACKET;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case ']':
     advance(tz);
     t.type = TOKEN_RBRACKET;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '(':
     advance(tz);
     t.type = TOKEN_LPAREN;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case ')':
     advance(tz);
     t.type = TOKEN_RPAREN;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case ':':
     advance(tz);
     t.type = TOKEN_COLON;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case ';':
     advance(tz);
     t.type = TOKEN_SEMICOLON;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case ',':
     advance(tz);
     t.type = TOKEN_COMMA;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '.':
     advance(tz);
     t.type = TOKEN_DOT;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '#':
     advance(tz);
     t.type = TOKEN_HASH;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '*':
     advance(tz);
     peek(tz, &c);
@@ -189,13 +184,13 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       t.length = 1;
     }
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '=':
     advance(tz);
     t.type = TOKEN_EQUALS;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '^':
     advance(tz);
     peek(tz, &c);
@@ -204,12 +199,12 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       t.type = TOKEN_PREFIX_MATCH;
       t.length = 2;
       *out_token = t;
-      return UI_ERROR_NONE;
+      return;
     }
     t.type = TOKEN_ERROR;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '$':
     advance(tz);
     peek(tz, &c);
@@ -218,12 +213,12 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       t.type = TOKEN_SUFFIX_MATCH;
       t.length = 2;
       *out_token = t;
-      return UI_ERROR_NONE;
+      return;
     }
     t.type = TOKEN_ERROR;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '|':
     advance(tz);
     peek(tz, &c);
@@ -232,12 +227,12 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       t.type = TOKEN_DASH_MATCH;
       t.length = 2;
       *out_token = t;
-      return UI_ERROR_NONE;
+      return;
     }
     t.type = TOKEN_ERROR;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '~':
     advance(tz);
     peek(tz, &c);
@@ -246,12 +241,12 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       t.type = TOKEN_INCLUDE_MATCH;
       t.length = 2;
       *out_token = t;
-      return UI_ERROR_NONE;
+      return;
     }
     t.type = TOKEN_ERROR;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   case '@': {
     int is_start = 0;
     advance(tz);
@@ -269,12 +264,12 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       t.type = TOKEN_AT_KEYWORD;
       t.length = (size_t)((tz->text + tz->pos) - t.start);
       *out_token = t;
-      return UI_ERROR_NONE;
+      return;
     }
     t.type = TOKEN_ERROR;
     t.length = 1;
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   }
   case '"':
   case '\'': {
@@ -284,8 +279,9 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       peek(tz, &c);
       if (c == quote)
         break;
-      if (c == '\\')
+      if (c == '\\') {
         advance(tz);
+      }
       advance(tz);
     }
     if (tz->pos < tz->len)
@@ -293,7 +289,7 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
     t.type = TOKEN_STRING;
     t.length = (size_t)((tz->text + tz->pos) - t.start);
     *out_token = t;
-    return UI_ERROR_NONE;
+    return;
   }
   default: {
     int is_start = 0;
@@ -310,7 +306,7 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       t.type = TOKEN_IDENT;
       t.length = (size_t)((tz->text + tz->pos) - t.start);
       *out_token = t;
-      return UI_ERROR_NONE;
+      return;
     } else if (isdigit((unsigned char)c) || c == '+' || c == '-') {
       while (tz->pos < tz->len) {
         peek(tz, &c);
@@ -321,21 +317,20 @@ static enum ui_error next_token(struct ui_css_tokenizer *tz,
       t.type = TOKEN_IDENT;
       t.length = (size_t)((tz->text + tz->pos) - t.start);
       *out_token = t;
-      return UI_ERROR_NONE;
+      return;
     } else {
       advance(tz);
       t.type = TOKEN_ERROR;
       t.length = 1;
       *out_token = t;
-      return UI_ERROR_NONE;
+      return;
     }
   }
   }
 }
 
-static enum ui_error dup_token_str(const struct ui_css_token *t,
-                                   char **out_str) {
-  char *s = (char *)UI_MALLOC(t->length + 1);
+static ui_error_t dup_token_str(const struct ui_css_token *t, char **out_str) {
+  char *s = (char *)C_MULTIPLATFORM_MALLOC(t->length + 1);
   if (!s) {
     *out_str = NULL;
     return UI_ERROR_OUT_OF_MEMORY;
@@ -346,8 +341,8 @@ static enum ui_error dup_token_str(const struct ui_css_token *t,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dup_range_trim(const char *start, const char *end,
-                                    char **out_str) {
+static ui_error_t dup_range_trim(const char *start, const char *end,
+                                 char **out_str) {
   const char *s = start;
   const char *e = end;
   size_t len;
@@ -359,7 +354,7 @@ static enum ui_error dup_range_trim(const char *start, const char *end,
     e--;
 
   len = (size_t)(e - s);
-  res = (char *)UI_MALLOC(len + 1);
+  res = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!res) {
     *out_str = NULL;
     return UI_ERROR_OUT_OF_MEMORY;
@@ -371,12 +366,12 @@ static enum ui_error dup_range_trim(const char *start, const char *end,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
-                                     struct ui_css_token *inout_token,
-                                     struct ui_css_selector **out_selectors) {
+static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
+                                  struct ui_css_token *inout_token,
+                                  struct ui_css_selector **out_selectors) {
   struct ui_css_rule *dummy_rule = NULL;
   struct ui_css_token token = *inout_token;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &dummy_rule);
   if (rc != UI_ERROR_NONE) {
@@ -390,16 +385,16 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
       if (token.type == TOKEN_IDENT) {
         char *val = NULL;
         rc = dup_token_str(&token, &val);
-        if (!val) {
-          rc = UI_ERROR_OUT_OF_MEMORY;
+        if (rc != UI_ERROR_NONE) {
           goto cleanup;
         }
         rc = ui_css_rule_append_selector(dummy_rule, UI_CSS_SELECTOR_TYPE_CLASS,
                                          val);
-        UI_FREE(val);
         if (rc != UI_ERROR_NONE) {
+          C_MULTIPLATFORM_FREE(val);
           goto cleanup;
         }
+        C_MULTIPLATFORM_FREE(val);
         next_token(tz, &token);
       }
     } else if (token.type == TOKEN_HASH) {
@@ -407,31 +402,31 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
       if (token.type == TOKEN_IDENT) {
         char *val = NULL;
         rc = dup_token_str(&token, &val);
-        if (!val) {
-          rc = UI_ERROR_OUT_OF_MEMORY;
+        if (rc != UI_ERROR_NONE) {
           goto cleanup;
         }
         rc = ui_css_rule_append_selector(dummy_rule, UI_CSS_SELECTOR_TYPE_ID,
                                          val);
-        UI_FREE(val);
         if (rc != UI_ERROR_NONE) {
+          C_MULTIPLATFORM_FREE(val);
           goto cleanup;
         }
+        C_MULTIPLATFORM_FREE(val);
         next_token(tz, &token);
       }
     } else if (token.type == TOKEN_IDENT) {
       char *val = NULL;
       rc = dup_token_str(&token, &val);
-      if (!val) {
-        rc = UI_ERROR_OUT_OF_MEMORY;
+      if (rc != UI_ERROR_NONE) {
         goto cleanup;
       }
       rc = ui_css_rule_append_selector(dummy_rule, UI_CSS_SELECTOR_TYPE_TAG,
                                        val);
-      UI_FREE(val);
       if (rc != UI_ERROR_NONE) {
+        C_MULTIPLATFORM_FREE(val);
         goto cleanup;
       }
+      C_MULTIPLATFORM_FREE(val);
       next_token(tz, &token);
     } else if (token.type == TOKEN_ASTERISK) {
       rc = ui_css_rule_append_selector(dummy_rule,
@@ -448,8 +443,7 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
         char *attr_val = NULL;
         rc = dup_token_str(&token, &attr_name);
 
-        if (!attr_name) {
-          rc = UI_ERROR_OUT_OF_MEMORY;
+        if (rc != UI_ERROR_NONE) {
           goto cleanup;
         }
 
@@ -471,7 +465,7 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
           next_token(tz, &token);
           if (token.type == TOKEN_IDENT || token.type == TOKEN_STRING) {
             if (token.type == TOKEN_STRING && token.length >= 2) {
-              attr_val = (char *)UI_MALLOC(token.length - 1);
+              attr_val = (char *)C_MULTIPLATFORM_MALLOC(token.length - 1);
               if (attr_val) {
                 memcpy(attr_val, token.start + 1, token.length - 2);
                 attr_val[token.length - 2] = '\0';
@@ -479,11 +473,10 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
             } else {
               attr_val = NULL;
               rc = dup_token_str(&token, &attr_val);
-            }
-            if (!attr_val) {
-              UI_FREE(attr_name);
-              rc = UI_ERROR_OUT_OF_MEMORY;
-              goto cleanup;
+              if (rc != UI_ERROR_NONE) {
+                C_MULTIPLATFORM_FREE(attr_name);
+                goto cleanup;
+              }
             }
             next_token(tz, &token);
           }
@@ -492,22 +485,26 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
         if (token.type == TOKEN_RBRACKET) {
           rc = ui_css_rule_append_selector_attr(dummy_rule, attr_name, op,
                                                 attr_val);
+          if (rc != UI_ERROR_NONE) {
+            C_MULTIPLATFORM_FREE(attr_name);
+            if (attr_val)
+              C_MULTIPLATFORM_FREE(attr_val);
+            goto cleanup;
+          }
           next_token(tz, &token);
         }
 
-        UI_FREE(attr_name);
+        C_MULTIPLATFORM_FREE(attr_name);
         if (attr_val)
-          UI_FREE(attr_val);
-        if (rc != UI_ERROR_NONE) {
-          goto cleanup;
-        }
+          C_MULTIPLATFORM_FREE(attr_val);
       } else {
         while (token.type != TOKEN_RBRACKET && token.type != TOKEN_EOF &&
                token.type != TOKEN_LBRACE) {
           next_token(tz, &token);
         }
-        if (token.type == TOKEN_RBRACKET)
+        if (token.type == TOKEN_RBRACKET) {
           next_token(tz, &token);
+        }
       }
     } else if (token.type == TOKEN_COLON) {
       next_token(tz, &token);
@@ -517,25 +514,24 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
         if (token.type == TOKEN_IDENT) {
           char *pseudo_val = NULL;
           rc = dup_token_str(&token, &pseudo_val);
-          if (!pseudo_val) {
-            rc = UI_ERROR_OUT_OF_MEMORY;
+          if (rc != UI_ERROR_NONE) {
             goto cleanup;
           }
 
           rc = ui_css_rule_append_selector(
               dummy_rule, UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT, pseudo_val);
-          UI_FREE(pseudo_val);
           if (rc != UI_ERROR_NONE) {
+            C_MULTIPLATFORM_FREE(pseudo_val);
             goto cleanup;
           }
+          C_MULTIPLATFORM_FREE(pseudo_val);
 
           next_token(tz, &token);
         }
       } else if (token.type == TOKEN_IDENT) {
         char *pseudo_val = NULL;
         rc = dup_token_str(&token, &pseudo_val);
-        if (!pseudo_val) {
-          rc = UI_ERROR_OUT_OF_MEMORY;
+        if (rc != UI_ERROR_NONE) {
           goto cleanup;
         }
 
@@ -549,14 +545,17 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
             strcmp(pseudo_val, "first-letter") == 0) {
           rc = ui_css_rule_append_selector(
               dummy_rule, UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT, pseudo_val);
+          if (rc != UI_ERROR_NONE) {
+            C_MULTIPLATFORM_FREE(pseudo_val);
+            goto cleanup;
+          }
         } else {
           rc = ui_css_rule_append_selector(
               dummy_rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS, pseudo_val);
-        }
-
-        if (rc != UI_ERROR_NONE) {
-          UI_FREE(pseudo_val);
-          goto cleanup;
+          if (rc != UI_ERROR_NONE) {
+            C_MULTIPLATFORM_FREE(pseudo_val);
+            goto cleanup;
+          }
         }
 
         next_token(tz, &token);
@@ -568,20 +567,20 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
               strcmp(pseudo_val, "host") == 0 ||
               strcmp(pseudo_val, "host-context") == 0) {
             struct ui_css_selector *nested = NULL;
+            struct ui_css_selector *last;
             next_token(tz, &token);
             rc = parse_selectors(tz, &token, &nested);
-            if (rc == UI_ERROR_NONE) {
-              struct ui_css_selector *last = dummy_rule->selectors;
-              while (last && last->next)
-                last = last->next;
-              if (last) {
-                last->nested_selector = nested;
-              } else {
-                /* fallback should not happen */
-              }
-            } else {
-              UI_FREE(pseudo_val);
+            if (rc != UI_ERROR_NONE) {
+              C_MULTIPLATFORM_FREE(pseudo_val);
               goto cleanup;
+            }
+            last = dummy_rule->selectors;
+            while (last && last->next)
+              last = last->next;
+            if (last) {
+              last->nested_selector = nested;
+            } else {
+              /* fallback should not happen */
             }
             if (token.type == TOKEN_RPAREN) {
               next_token(tz, &token);
@@ -594,8 +593,9 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
                 paren_depth++;
               if (token.type == TOKEN_RPAREN)
                 paren_depth--;
-              if (paren_depth > 0)
+              if (paren_depth > 0) {
                 next_token(tz, &token);
+              }
             }
             if (token.type == TOKEN_RPAREN) {
               next_token(tz, &token);
@@ -603,7 +603,7 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
           }
         }
 
-        UI_FREE(pseudo_val);
+        C_MULTIPLATFORM_FREE(pseudo_val);
       }
     } else if (token.type == TOKEN_COMMA) {
       next_token(tz, &token);
@@ -617,27 +617,30 @@ static enum ui_error parse_selectors(struct ui_css_tokenizer *tz,
   dummy_rule->selectors = NULL; /* Transfer ownership */
   rc = UI_ERROR_NONE;
 
-cleanup:
-  ui_css_rule_destroy(dummy_rule);
+cleanup: {
+  ui_error_t destroy_rc = ui_css_rule_destroy(dummy_rule);
+  (void)destroy_rc;
+}
   *inout_token = token;
   return rc;
 }
 
-static enum ui_error is_nested_rule(struct ui_css_tokenizer *tz,
-                                    struct ui_css_token first_token,
-                                    int *out_is_nested) {
+static void is_nested_rule(struct ui_css_tokenizer *tz,
+                           struct ui_css_token first_token,
+                           int *out_is_nested) {
   struct ui_css_tokenizer temp_tz = *tz;
   struct ui_css_token t = first_token;
+
   *out_is_nested = 0;
   if (t.type == TOKEN_AT_KEYWORD) {
     *out_is_nested = 1;
-    return UI_ERROR_NONE;
+    return;
   }
   if (t.type == TOKEN_DOT || t.type == TOKEN_HASH || t.type == TOKEN_COLON ||
       t.type == TOKEN_LBRACKET || t.type == TOKEN_ASTERISK ||
       t.type == TOKEN_COMMA) {
     *out_is_nested = 1;
-    return UI_ERROR_NONE;
+    return;
   }
 
   while (t.type != TOKEN_EOF && t.type != TOKEN_LBRACE &&
@@ -648,22 +651,22 @@ static enum ui_error is_nested_rule(struct ui_css_tokenizer *tz,
   if (t.type == TOKEN_LBRACE) {
     *out_is_nested = 1;
   }
-  return UI_ERROR_NONE;
+  return;
 }
 
-static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
-                                     struct ui_css_token *inout_token,
-                                     struct ui_css_stylesheet *sheet,
-                                     struct ui_css_rule **out_rules);
+static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
+                                  struct ui_css_token *inout_token,
+                                  struct ui_css_stylesheet *sheet,
+                                  struct ui_css_rule **out_rules);
 
-static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
-                                     struct ui_css_token *inout_token,
-                                     struct ui_css_stylesheet *sheet,
-                                     struct ui_css_rule **out_rules) {
+static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
+                                  struct ui_css_token *inout_token,
+                                  struct ui_css_stylesheet *sheet,
+                                  struct ui_css_rule **out_rules) {
   struct ui_css_token token = *inout_token;
   struct ui_css_rule *rule_head = NULL;
   struct ui_css_rule *rule_tail = NULL;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   while (token.type != TOKEN_EOF && token.type != TOKEN_RBRACE) {
     struct ui_css_rule *current_rule = NULL;
@@ -680,30 +683,41 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
     if (token.type == TOKEN_AT_KEYWORD) {
       at_name = NULL;
       rc = dup_token_str(&token, &at_name);
-      if (!at_name) {
-        rc = UI_ERROR_OUT_OF_MEMORY;
+      if (rc != UI_ERROR_NONE) {
         goto cleanup;
       }
 
       if (strcmp(at_name, "@layer") == 0) {
-        UI_FREE(at_name);
+        C_MULTIPLATFORM_FREE(at_name);
         next_token(tz, &token);
 
         if (token.type == TOKEN_IDENT) {
           layer_name = NULL;
           rc = dup_token_str(&token, &layer_name);
+          if (rc != UI_ERROR_NONE)
+            return rc;
           next_token(tz, &token);
 
           if (token.type == TOKEN_COMMA || token.type == TOKEN_SEMICOLON) {
-            ui_css_stylesheet_register_layer(sheet, layer_name, &order);
-            UI_FREE(layer_name);
+            rc = ui_css_stylesheet_register_layer(sheet, layer_name, &order);
+            if (rc != UI_ERROR_NONE)
+              return rc;
+            C_MULTIPLATFORM_FREE(layer_name);
             while (token.type == TOKEN_COMMA) {
               next_token(tz, &token);
               if (token.type == TOKEN_IDENT) {
                 layer_name = NULL;
                 rc = dup_token_str(&token, &layer_name);
-                ui_css_stylesheet_register_layer(sheet, layer_name, &order);
-                UI_FREE(layer_name);
+                if (rc != UI_ERROR_NONE)
+                  return rc;
+                rc =
+                    ui_css_stylesheet_register_layer(sheet, layer_name, &order);
+                if (rc != UI_ERROR_NONE) {
+                  if (layer_name)
+                    C_MULTIPLATFORM_FREE(layer_name);
+                  goto cleanup;
+                }
+                C_MULTIPLATFORM_FREE(layer_name);
                 next_token(tz, &token);
               }
             }
@@ -717,20 +731,28 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
         rc = ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule);
         if (rc != UI_ERROR_NONE) {
           if (layer_name)
-            UI_FREE(layer_name);
+            C_MULTIPLATFORM_FREE(layer_name);
           goto cleanup;
         }
 
         layer_rule->layer_name = layer_name; /* Ownership transfer */
         if (layer_name) {
-          ui_css_stylesheet_register_layer(sheet, layer_name, &order);
+          rc = ui_css_stylesheet_register_layer(sheet, layer_name, &order);
+          if (rc != UI_ERROR_NONE) {
+            if (layer_name)
+              C_MULTIPLATFORM_FREE(layer_name);
+            goto cleanup;
+          }
         }
 
         if (token.type == TOKEN_LBRACE) {
           next_token(tz, &token);
           rc = parse_rule_list(tz, &token, sheet, &layer_rule->nested_rules);
           if (rc != UI_ERROR_NONE) {
-            ui_css_rule_destroy(layer_rule);
+            {
+              ui_error_t destroy_rc = ui_css_rule_destroy(layer_rule);
+              (void)destroy_rc;
+            }
             goto cleanup;
           }
           if (token.type == TOKEN_RBRACE) {
@@ -749,7 +771,7 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
         char *scope_start = NULL;
         char *scope_end = NULL;
 
-        UI_FREE(at_name);
+        C_MULTIPLATFORM_FREE(at_name);
         next_token(tz, &token);
 
         /* Very naive @scope parser: capture (start) to (end) as string blocks
@@ -766,6 +788,8 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
           if (token.start > s_start) {
             scope_start = NULL;
             rc = dup_range_trim(s_start, token.start, &scope_start);
+            if (rc != UI_ERROR_NONE)
+              goto cleanup;
           }
 
           if (token.type == TOKEN_IDENT && strncmp(token.start, "to", 2) == 0 &&
@@ -778,6 +802,8 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
             if (token.start > s_start) {
               scope_end = NULL;
               rc = dup_range_trim(s_start, token.start, &scope_end);
+              if (rc != UI_ERROR_NONE)
+                goto cleanup;
             }
           }
         }
@@ -785,9 +811,9 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
         rc = ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &scope_rule);
         if (rc != UI_ERROR_NONE) {
           if (scope_start)
-            UI_FREE(scope_start);
+            C_MULTIPLATFORM_FREE(scope_start);
           if (scope_end)
-            UI_FREE(scope_end);
+            C_MULTIPLATFORM_FREE(scope_end);
           goto cleanup;
         }
         scope_rule->scope_start = scope_start;
@@ -797,7 +823,10 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
           next_token(tz, &token);
           rc = parse_rule_list(tz, &token, sheet, &scope_rule->nested_rules);
           if (rc != UI_ERROR_NONE) {
-            ui_css_rule_destroy(scope_rule);
+            {
+              ui_error_t destroy_rc = ui_css_rule_destroy(scope_rule);
+              (void)destroy_rc;
+            }
             goto cleanup;
           }
           if (token.type == TOKEN_RBRACE) {
@@ -815,7 +844,7 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
         struct ui_css_rule *prop_rule = NULL;
         char *prop_name = NULL;
 
-        UI_FREE(at_name);
+        C_MULTIPLATFORM_FREE(at_name);
         next_token(tz, &token);
 
         /* Read custom property name */
@@ -827,13 +856,15 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
           if (token.start > s_start) {
             prop_name = NULL;
             rc = dup_range_trim(s_start, token.start, &prop_name);
+            if (rc != UI_ERROR_NONE)
+              goto cleanup;
           }
         }
 
         rc = ui_css_rule_create(UI_CSS_RULE_TYPE_PROPERTY, &prop_rule);
         if (rc != UI_ERROR_NONE) {
           if (prop_name)
-            UI_FREE(prop_name);
+            C_MULTIPLATFORM_FREE(prop_name);
           goto cleanup;
         }
         prop_rule->property_name = prop_name;
@@ -845,9 +876,11 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
             if (token.type == TOKEN_IDENT) {
               char *desc_name = NULL;
               rc = dup_token_str(&token, &desc_name);
-              if (!desc_name) {
-                rc = UI_ERROR_OUT_OF_MEMORY;
-                ui_css_rule_destroy(prop_rule);
+              if (rc != UI_ERROR_NONE) {
+                {
+                  ui_error_t destroy_rc = ui_css_rule_destroy(prop_rule);
+                  (void)destroy_rc;
+                }
                 goto cleanup;
               }
 
@@ -864,6 +897,14 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
                 }
                 desc_val = NULL;
                 rc = dup_range_trim(v_start, token.start, &desc_val);
+                if (rc != UI_ERROR_NONE) {
+                  C_MULTIPLATFORM_FREE(desc_name);
+                  {
+                    ui_error_t destroy_rc = ui_css_rule_destroy(prop_rule);
+                    (void)destroy_rc;
+                  }
+                  goto cleanup;
+                }
 
                 if (strcmp(desc_name, "syntax") == 0) {
                   prop_rule->property_syntax = desc_val;
@@ -874,12 +915,12 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
                     prop_rule->property_inherits = 0;
                   }
                   if (desc_val)
-                    UI_FREE(desc_val);
+                    C_MULTIPLATFORM_FREE(desc_val);
                 } else if (strcmp(desc_name, "initial-value") == 0) {
                   prop_rule->property_initial_value = desc_val;
                 } else {
                   if (desc_val)
-                    UI_FREE(desc_val);
+                    C_MULTIPLATFORM_FREE(desc_val);
                 }
 
                 if (token.type == TOKEN_SEMICOLON) {
@@ -894,7 +935,7 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
                   next_token(tz, &token);
                 }
               }
-              UI_FREE(desc_name);
+              C_MULTIPLATFORM_FREE(desc_name);
             } else {
               while (token.type != TOKEN_SEMICOLON &&
                      token.type != TOKEN_RBRACE && token.type != TOKEN_EOF) {
@@ -919,18 +960,20 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
       } else if (strcmp(at_name, "@namespace") == 0) {
         char *prefix = NULL;
         char *uri = NULL;
-        UI_FREE(at_name);
+        C_MULTIPLATFORM_FREE(at_name);
         next_token(tz, &token);
 
         if (token.type == TOKEN_IDENT && strncmp(token.start, "url", 3) != 0) {
           prefix = NULL;
           rc = dup_token_str(&token, &prefix);
+          if (rc != UI_ERROR_NONE)
+            return rc;
           next_token(tz, &token);
         }
 
         if (token.type == TOKEN_STRING || token.type == TOKEN_IDENT) {
           if (token.type == TOKEN_STRING && token.length >= 2) {
-            uri = (char *)UI_MALLOC(token.length - 1);
+            uri = (char *)C_MULTIPLATFORM_MALLOC(token.length - 1);
             if (uri) {
               memcpy(uri, token.start + 1, token.length - 2);
               uri[token.length - 2] = '\0';
@@ -962,12 +1005,22 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
                 if (p2 > p1) {
                   uri = NULL;
                   rc = dup_range_trim(p1, p2, &uri);
+                  if (rc != UI_ERROR_NONE) {
+                    if (prefix)
+                      C_MULTIPLATFORM_FREE(prefix);
+                    goto cleanup;
+                  }
                 }
               }
             }
           } else {
             uri = NULL;
             rc = dup_token_str(&token, &uri);
+            if (rc != UI_ERROR_NONE) {
+              if (prefix)
+                C_MULTIPLATFORM_FREE(prefix);
+              goto cleanup;
+            }
           }
           if (token.type != TOKEN_SEMICOLON && token.type != TOKEN_EOF) {
             while (token.type != TOKEN_SEMICOLON && token.type != TOKEN_EOF) {
@@ -981,12 +1034,27 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
         }
 
         if (uri) {
-          ui_css_stylesheet_register_namespace(sheet, prefix, uri);
-          UI_FREE(uri);
+          /* we only support one default namespace for now per namespace rules,
+           * or ignore prefixes */
+          if (!prefix) {
+            rc = ui_css_stylesheet_register_namespace(sheet, NULL, uri);
+            if (rc != UI_ERROR_NONE) {
+              C_MULTIPLATFORM_FREE(uri);
+              goto cleanup;
+            }
+          } else {
+            rc = ui_css_stylesheet_register_namespace(sheet, prefix, uri);
+            if (rc != UI_ERROR_NONE) {
+              C_MULTIPLATFORM_FREE(uri);
+              if (prefix)
+                C_MULTIPLATFORM_FREE(prefix);
+              goto cleanup;
+            }
+          }
+          C_MULTIPLATFORM_FREE(uri);
         }
-        if (prefix) {
-          UI_FREE(prefix);
-        }
+        if (prefix)
+          C_MULTIPLATFORM_FREE(prefix);
         continue;
       } else if (strcmp(at_name, "@media") == 0 ||
                  strcmp(at_name, "@supports") == 0 ||
@@ -996,7 +1064,7 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
         int is_media = (strcmp(at_name, "@media") == 0);
         int is_container = (strcmp(at_name, "@container") == 0);
 
-        UI_FREE(at_name);
+        C_MULTIPLATFORM_FREE(at_name);
         next_token(tz, &token);
 
         if (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
@@ -1007,6 +1075,8 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
           if (token.start > c_start) {
             condition_text = NULL;
             rc = dup_range_trim(c_start, token.start, &condition_text);
+            if (rc != UI_ERROR_NONE)
+              goto cleanup;
           }
         }
 
@@ -1017,7 +1087,7 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
                                 &cond_rule);
         if (rc != UI_ERROR_NONE) {
           if (condition_text)
-            UI_FREE(condition_text);
+            C_MULTIPLATFORM_FREE(condition_text);
           goto cleanup;
         }
 
@@ -1033,7 +1103,10 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
           next_token(tz, &token);
           rc = parse_rule_list(tz, &token, sheet, &cond_rule->nested_rules);
           if (rc != UI_ERROR_NONE) {
-            ui_css_rule_destroy(cond_rule);
+            {
+              ui_error_t destroy_rc = ui_css_rule_destroy(cond_rule);
+              (void)destroy_rc;
+            }
             goto cleanup;
           }
           if (token.type == TOKEN_RBRACE) {
@@ -1049,7 +1122,7 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
         continue;
       } else {
         /* Unknown @ rule, skip to { ... } or ; */
-        UI_FREE(at_name);
+        C_MULTIPLATFORM_FREE(at_name);
         while (token.type != TOKEN_SEMICOLON && token.type != TOKEN_LBRACE &&
                token.type != TOKEN_EOF) {
           next_token(tz, &token);
@@ -1080,7 +1153,10 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
     /* Parse selectors */
     rc = parse_selectors(tz, &token, &current_rule->selectors);
     if (rc != UI_ERROR_NONE) {
-      ui_css_rule_destroy(current_rule);
+      {
+        ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
+        (void)destroy_rc;
+      }
       goto cleanup;
     }
 
@@ -1095,7 +1171,10 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
           struct ui_css_rule *nested_rules = NULL;
           rc = parse_rule_list(tz, &token, sheet, &nested_rules);
           if (rc != UI_ERROR_NONE) {
-            ui_css_rule_destroy(current_rule);
+            {
+              ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
+              (void)destroy_rc;
+            }
             goto cleanup;
           }
           if (nested_rules) {
@@ -1104,9 +1183,11 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
         } else if (token.type == TOKEN_IDENT) {
           char *prop = NULL;
           rc = dup_token_str(&token, &prop);
-          if (!prop) {
-            rc = UI_ERROR_OUT_OF_MEMORY;
-            ui_css_rule_destroy(current_rule);
+          if (rc != UI_ERROR_NONE) {
+            {
+              ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
+              (void)destroy_rc;
+            }
             goto cleanup;
           }
 
@@ -1129,10 +1210,12 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
             val_end = token.start;
             val = NULL;
             rc = dup_range_trim(val_start, val_end, &val);
-            if (!val) {
-              UI_FREE(prop);
-              rc = UI_ERROR_OUT_OF_MEMORY;
-              ui_css_rule_destroy(current_rule);
+            if (rc != UI_ERROR_NONE) {
+              C_MULTIPLATFORM_FREE(prop);
+              {
+                ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
+                (void)destroy_rc;
+              }
               goto cleanup;
             }
 
@@ -1160,19 +1243,23 @@ static enum ui_error parse_rule_list(struct ui_css_tokenizer *tz,
 
             rc = ui_css_rule_append_declaration(current_rule, prop, val,
                                                 is_important);
-            UI_FREE(prop);
-            UI_FREE(val);
-
             if (rc != UI_ERROR_NONE) {
-              ui_css_rule_destroy(current_rule);
+              C_MULTIPLATFORM_FREE(prop);
+              C_MULTIPLATFORM_FREE(val);
+              {
+                ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
+                (void)destroy_rc;
+              }
               goto cleanup;
             }
+            C_MULTIPLATFORM_FREE(prop);
+            C_MULTIPLATFORM_FREE(val);
 
             if (token.type == TOKEN_SEMICOLON) {
               next_token(tz, &token);
             }
           } else {
-            UI_FREE(prop);
+            C_MULTIPLATFORM_FREE(prop);
             while (token.type != TOKEN_SEMICOLON &&
                    token.type != TOKEN_RBRACE && token.type != TOKEN_EOF) {
               next_token(tz, &token);
@@ -1212,7 +1299,10 @@ cleanup: {
   struct ui_css_rule *curr = rule_head;
   while (curr) {
     struct ui_css_rule *next = curr->next;
-    ui_css_rule_destroy(curr);
+    {
+      ui_error_t destroy_rc = ui_css_rule_destroy(curr);
+      (void)destroy_rc;
+    }
     curr = next;
   }
 }
@@ -1221,15 +1311,17 @@ cleanup: {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_css_parse_stylesheet(const char *css_text,
-                        struct ui_css_stylesheet **out_stylesheet) {
+ui_error_t ui_css_parse_stylesheet(const char *css_text,
+                                   struct ui_css_stylesheet **out_stylesheet) {
   struct ui_css_tokenizer tz;
   struct ui_css_token token;
   struct ui_css_stylesheet *sheet = NULL;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
-  if (!css_text || !out_stylesheet) {
+  if (!css_text) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (!out_stylesheet) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 

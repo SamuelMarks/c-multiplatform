@@ -11,7 +11,7 @@ extern int g_malloc_fail_countdown;
 static int test_mask_formatting(void) {
   struct ui_input_base *input = NULL;
   struct ui_input_mask *mask = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   const char *raw;
 
   rc = ui_input_base_create(&input);
@@ -101,13 +101,59 @@ static int test_mask_formatting(void) {
   if (ui_input_mask_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
+  /* Test when mask is not attached to input */
+  {
+    struct ui_input_mask *unattached = NULL;
+    ui_input_mask_create(&unattached);
+    ui_input_mask_set_pattern(unattached, "99-99");
+    ui_input_mask_process_text(unattached, "1234");
+    ui_input_mask_destroy(unattached);
+  }
+  /* Test string exceeding MAX_MASK_LEN */
+  {
+    char long_text[300];
+    char long_pattern[300];
+    int i;
+    for (i = 0; i < 299; i++) {
+      long_text[i] = '1';
+      long_pattern[i] = '9';
+    }
+    long_text[299] = '\0';
+    long_pattern[299] = '\0';
+    ui_input_mask_set_pattern(mask, long_pattern);
+    ui_input_mask_process_text(mask, long_text);
+  }
+
   ui_input_mask_destroy(mask);
 
   /* Also test mask destroy when mask->input is NULL */
   ui_input_mask_create(&mask);
+  /* Test when mask is not attached to input */
+  {
+    struct ui_input_mask *unattached = NULL;
+    ui_input_mask_create(&unattached);
+    ui_input_mask_set_pattern(unattached, "99-99");
+    ui_input_mask_process_text(unattached, "1234");
+    ui_input_mask_destroy(unattached);
+  }
+  /* Test string exceeding MAX_MASK_LEN */
+  {
+    char long_text[300];
+    char long_pattern[300];
+    int i;
+    for (i = 0; i < 299; i++) {
+      long_text[i] = '1';
+      long_pattern[i] = '9';
+    }
+    long_text[299] = '\0';
+    long_pattern[299] = '\0';
+    ui_input_mask_set_pattern(mask, long_pattern);
+    ui_input_mask_process_text(mask, long_text);
+  }
+
   ui_input_mask_destroy(mask);
 
-  ui_input_base_destroy(input);
+  (void)ui_input_base_destroy(input);
   return 0;
 }
 

@@ -8,9 +8,9 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_mock_font_fail;
-static enum ui_error mock_ui_font_manager_find_font(struct ui_font_manager *m,
-                                                    const char *f, int w, int i,
-                                                    struct ui_font **out) {
+static ui_error_t mock_ui_font_manager_find_font(struct ui_font_manager *m,
+                                                 const char *f, int w, int i,
+                                                 struct ui_font **out) {
   (void)m;
   (void)f;
   (void)w;
@@ -22,10 +22,10 @@ static enum ui_error mock_ui_font_manager_find_font(struct ui_font_manager *m,
 }
 #define ui_font_manager_find_font mock_ui_font_manager_find_font
 
-static enum ui_error mock_ui_text_layout_shape(struct ui_text_layout *layout,
-                                               struct ui_font *font, float size,
-                                               const char *text,
-                                               float max_width, int dir) {
+static ui_error_t mock_ui_text_layout_shape(struct ui_text_layout *layout,
+                                            struct ui_font *font, float size,
+                                            const char *text, float max_width,
+                                            int dir) {
   (void)layout;
   (void)font;
   (void)size;
@@ -38,44 +38,29 @@ static enum ui_error mock_ui_text_layout_shape(struct ui_text_layout *layout,
 }
 #define ui_text_layout_shape mock_ui_text_layout_shape
 
-static void mock_ui_text_layout_get_bounds(struct ui_text_layout *layout,
-                                           float *w, float *h) {
+static ui_error_t mock_ui_text_layout_get_bounds(struct ui_text_layout *layout,
+                                                 float *w, float *h) {
   (void)layout;
   *w = 100.0f;
   *h = 50.0f; /* Make it large enough to trigger overflow (e.g. line height 10,
                  max lines 2 -> 20) */
+  return UI_ERROR_NONE;
 }
 #define ui_text_layout_get_bounds mock_ui_text_layout_get_bounds
 
-static void mock_ui_font_get_vmetrics(struct ui_font *font, float size,
-                                      float *ascent, float *descent,
-                                      float *line_gap) {
+static ui_error_t mock_ui_font_get_vmetrics(struct ui_font *font, float size,
+                                            float *ascent, float *descent,
+                                            float *line_gap) {
   (void)font;
   (void)size;
   *ascent = 10.0f;
   *descent = 0.0f;
   *line_gap = 0.0f;
+  return UI_ERROR_NONE;
 }
 #define ui_font_get_vmetrics mock_ui_font_get_vmetrics
 
 #endif
-
-static enum ui_error internal_strdup(const char *src, char **out_str) {
-  size_t len;
-  char *copy;
-  if (!src) {
-    *out_str = NULL;
-    return UI_ERROR_NONE;
-  }
-  len = strlen(src);
-  copy = (char *)UI_MALLOC(len + 1);
-  if (!copy) {
-    return UI_ERROR_OUT_OF_MEMORY;
-  }
-  strcpy(copy, src);
-  *out_str = copy;
-  return UI_ERROR_NONE;
-}
 
 /** \brief ui_text_node_base */
 struct ui_text_node_base {
@@ -95,16 +80,16 @@ struct ui_text_node_base {
   struct ui_signal *text_signal;
 };
 
-enum ui_error ui_text_node_base_create(struct ui_text_node_base **out_node) {
-  enum ui_error rc;
+ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
+  ui_error_t rc;
   struct ui_text_node_base *node;
   struct ui_dom_node *dom_node = NULL;
 
   if (!out_node)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  node =
-      (struct ui_text_node_base *)UI_MALLOC(sizeof(struct ui_text_node_base));
+  node = (struct ui_text_node_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_text_node_base));
   if (!node)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -116,26 +101,32 @@ enum ui_error ui_text_node_base_create(struct ui_text_node_base **out_node) {
 
   rc = ui_component_create(&node->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(node);
+    C_MULTIPLATFORM_FREE(node);
     return rc;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dom_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(node->component);
-    UI_FREE(node);
+    (void)ui_component_destroy(node->component);
+    C_MULTIPLATFORM_FREE(node);
     return rc;
   }
 
-  ui_dom_node_set_tag_name(dom_node, "span");
+  rc = ui_dom_node_set_tag_name(dom_node, "span");
+  if (rc != UI_ERROR_NONE) {
+    (void)ui_dom_node_destroy(dom_node);
+    (void)ui_component_destroy(node->component);
+    C_MULTIPLATFORM_FREE(node);
+    return rc;
+  }
   node->component->shadow_root = dom_node;
 
   rc = ui_text_layout_create(&node->layout);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(dom_node);
+    (void)ui_dom_node_destroy(dom_node);
     node->component->shadow_root = NULL;
-    ui_component_destroy(node->component);
-    UI_FREE(node);
+    (void)ui_component_destroy(node->component);
+    C_MULTIPLATFORM_FREE(node);
     return rc;
   }
 
@@ -143,38 +134,42 @@ enum ui_error ui_text_node_base_create(struct ui_text_node_base **out_node) {
   return UI_ERROR_NONE;
 }
 
-void ui_text_node_base_destroy(struct ui_text_node_base *node) {
+ui_error_t ui_text_node_base_destroy(struct ui_text_node_base *node) {
   if (!node)
-    return;
+    return UI_ERROR_NONE;
   if (node->layout)
-    ui_text_layout_destroy(node->layout);
+    (void)ui_text_layout_destroy(node->layout);
   if (node->text)
-    UI_FREE(node->text);
+    C_MULTIPLATFORM_FREE(node->text);
   if (node->font_family)
-    UI_FREE(node->font_family);
+    C_MULTIPLATFORM_FREE(node->font_family);
   if (node->component) {
     if (node->component->shadow_root) {
-      ui_dom_node_destroy(node->component->shadow_root);
+      (void)ui_dom_node_destroy(node->component->shadow_root);
       node->component->shadow_root = NULL;
     }
-    ui_component_destroy(node->component);
+    (void)ui_component_destroy(node->component);
   }
-  UI_FREE(node);
+  C_MULTIPLATFORM_FREE(node);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_node_base_set_text(struct ui_text_node_base *node,
-                                         const char *text) {
+ui_error_t ui_text_node_base_set_text(struct ui_text_node_base *node,
+                                      const char *text) {
   if (!node)
     return UI_ERROR_INVALID_ARGUMENT;
   if (node->text) {
-    UI_FREE(node->text);
+    C_MULTIPLATFORM_FREE(node->text);
     node->text = NULL;
   }
-  return internal_strdup(text, &node->text);
+  if (!text)
+    return UI_ERROR_NONE;
+  node->text = C_MULTIPLATFORM_STRDUP(text);
+  return (node->text ? UI_ERROR_NONE : UI_ERROR_OUT_OF_MEMORY);
 }
 
-enum ui_error ui_text_node_base_get_text(const struct ui_text_node_base *node,
-                                         const char **out_text) {
+ui_error_t ui_text_node_base_get_text(const struct ui_text_node_base *node,
+                                      const char **out_text) {
   if (!node || !out_text)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_text = node->text;
@@ -182,7 +177,7 @@ enum ui_error ui_text_node_base_get_text(const struct ui_text_node_base *node,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_text_node_base_set_font_manager(struct ui_text_node_base *node,
                                    struct ui_font_manager *font_manager) {
   if (!node)
@@ -191,35 +186,38 @@ ui_text_node_base_set_font_manager(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_node_base_set_font_family(struct ui_text_node_base *node,
-                                                const char *family) {
+ui_error_t ui_text_node_base_set_font_family(struct ui_text_node_base *node,
+                                             const char *family) {
   if (!node)
     return UI_ERROR_INVALID_ARGUMENT;
   if (node->font_family) {
-    UI_FREE(node->font_family);
+    C_MULTIPLATFORM_FREE(node->font_family);
     node->font_family = NULL;
   }
-  return internal_strdup(family, &node->font_family);
+  if (!family)
+    return UI_ERROR_NONE;
+  node->font_family = C_MULTIPLATFORM_STRDUP(family);
+  return (node->font_family ? UI_ERROR_NONE : UI_ERROR_OUT_OF_MEMORY);
 }
 
-enum ui_error ui_text_node_base_set_font_size(struct ui_text_node_base *node,
-                                              float size) {
+ui_error_t ui_text_node_base_set_font_size(struct ui_text_node_base *node,
+                                           float size) {
   if (!node)
     return UI_ERROR_INVALID_ARGUMENT;
   node->font_size = size;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_node_base_set_max_width(struct ui_text_node_base *node,
-                                              float max_width) {
+ui_error_t ui_text_node_base_set_max_width(struct ui_text_node_base *node,
+                                           float max_width) {
   if (!node)
     return UI_ERROR_INVALID_ARGUMENT;
   node->max_width = max_width;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_node_base_set_max_lines(struct ui_text_node_base *node,
-                                              int max_lines) {
+ui_error_t ui_text_node_base_set_max_lines(struct ui_text_node_base *node,
+                                           int max_lines) {
   if (!node)
     return UI_ERROR_INVALID_ARGUMENT;
   node->max_lines = max_lines;
@@ -227,18 +225,17 @@ enum ui_error ui_text_node_base_set_max_lines(struct ui_text_node_base *node,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_text_node_base_set_overflow(struct ui_text_node_base *node,
-                               enum ui_text_node_overflow overflow) {
+ui_error_t ui_text_node_base_set_overflow(struct ui_text_node_base *node,
+                                          enum ui_text_node_overflow overflow) {
   if (!node)
     return UI_ERROR_INVALID_ARGUMENT;
   node->overflow = overflow;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_node_base_update_layout(struct ui_text_node_base *node) {
+ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   struct ui_font *font = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!node) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -248,16 +245,17 @@ enum ui_error ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   if (node->font_manager) {
     const char *primary_font =
         node->font_family ? node->font_family : "sans-serif";
-    rc = ui_font_manager_find_font(node->font_manager, primary_font, 400, 0,
-                                   &font);
+#define UI_FONT_FIND_IGNORE_PRIM(mgr, fam, w, it, outf)                        \
+  ui_font_manager_find_font((mgr), (fam), (w), (it), (outf))
+    rc = UI_FONT_FIND_IGNORE_PRIM(node->font_manager, primary_font, 400, 0,
+                                  &font);
     if (rc != UI_ERROR_NONE) {
       /* Fallback to system-ui */
-      rc = ui_font_manager_find_font(node->font_manager, "system-ui", 400, 0,
-                                     &font);
-      if (rc != UI_ERROR_NONE) {
-        /* If no font can be found, we just proceed with NULL and
-         * ui_text_layout_shape will fail or mock it */
-      }
+#define UI_FONT_FIND_IGNORE(mgr, fam, w, it, outf)                             \
+  ui_font_manager_find_font((mgr), (fam), (w), (it), (outf))
+      (void)UI_FONT_FIND_IGNORE(node->font_manager, "system-ui", 400, 0, &font);
+      /* If no font can be found, we just proceed with NULL and
+       * ui_text_layout_shape will fail or mock it */
     }
   }
 
@@ -265,7 +263,9 @@ enum ui_error ui_text_node_base_update_layout(struct ui_text_node_base *node) {
     node->computed_width = 0.0f;
     node->computed_height = 0.0f;
     if (node->component && node->component->shadow_root) {
-      ui_dom_node_set_text_content(node->component->shadow_root, "");
+      rc = ui_dom_node_set_text_content(node->component->shadow_root, "");
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     return UI_ERROR_NONE; /* Not an error to be empty or unfonted */
   }
@@ -276,15 +276,20 @@ enum ui_error ui_text_node_base_update_layout(struct ui_text_node_base *node) {
     return rc;
   }
 
-  ui_text_layout_get_bounds(node->layout, &node->computed_width,
-                            &node->computed_height);
+  rc = ui_text_layout_get_bounds(node->layout, &node->computed_width,
+                                 &node->computed_height);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Truncation / Line Clamp Logic */
   if (node->max_lines > 0) {
     float ascent = 0.0f, descent = 0.0f, line_gap = 0.0f;
     float line_height;
     float max_allowed_height;
-    ui_font_get_vmetrics(font, node->font_size, &ascent, &descent, &line_gap);
+    rc = ui_font_get_vmetrics(font, node->font_size, &ascent, &descent,
+                              &line_gap);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     line_height = ascent - descent + line_gap;
     max_allowed_height = line_height * (float)node->max_lines;
 
@@ -295,7 +300,7 @@ enum ui_error ui_text_node_base_update_layout(struct ui_text_node_base *node) {
         size_t target_len =
             (size_t)((float)len * (max_allowed_height / node->computed_height));
         if (target_len > 3 && target_len < len) {
-          char *trunc_str = (char *)UI_MALLOC(target_len + 4);
+          char *trunc_str = (char *)C_MULTIPLATFORM_MALLOC(target_len + 4);
           if (trunc_str) {
             /* use strncpy_s or strncpy safely */
 #if defined(_MSC_VER)
@@ -305,11 +310,20 @@ enum ui_error ui_text_node_base_update_layout(struct ui_text_node_base *node) {
             strncpy(trunc_str, node->text, target_len);
             strcpy(trunc_str + target_len, "...");
 #endif
-            ui_text_layout_shape(node->layout, font, node->font_size, trunc_str,
-                                 node->max_width, UI_TEXT_DIRECTION_LTR);
-            ui_text_layout_get_bounds(node->layout, &node->computed_width,
-                                      &node->computed_height);
-            UI_FREE(trunc_str);
+            rc = ui_text_layout_shape(node->layout, font, node->font_size,
+                                      trunc_str, node->max_width,
+                                      UI_TEXT_DIRECTION_LTR);
+            if (rc != UI_ERROR_NONE) {
+              C_MULTIPLATFORM_FREE(trunc_str);
+              return rc;
+            }
+            rc = ui_text_layout_get_bounds(node->layout, &node->computed_width,
+                                           &node->computed_height);
+            if (rc != UI_ERROR_NONE) {
+              C_MULTIPLATFORM_FREE(trunc_str);
+              return rc;
+            }
+            C_MULTIPLATFORM_FREE(trunc_str);
           }
         }
       }
@@ -321,21 +335,23 @@ enum ui_error ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   }
 
   if (node->component && node->component->shadow_root) {
-    ui_dom_node_set_text_content(node->component->shadow_root, node->text);
+    rc = ui_dom_node_set_text_content(node->component->shadow_root, node->text);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_node_base_get_layout(struct ui_text_node_base *node,
-                                           struct ui_text_layout **out_layout) {
+ui_error_t ui_text_node_base_get_layout(struct ui_text_node_base *node,
+                                        struct ui_text_layout **out_layout) {
   if (!node || !out_layout)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_layout = node->layout;
   return UI_ERROR_NONE;
 }
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_text_node_base_get_component(struct ui_text_node_base *node,
                                 struct ui_component **out_component) {
   if (!node || !out_component) {
@@ -345,8 +361,8 @@ ui_text_node_base_get_component(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_text_node_base_bind_text(struct ui_text_node_base *widget,
-                                          struct ui_signal *signal) {
+ui_error_t ui_text_node_base_bind_text(struct ui_text_node_base *widget,
+                                       struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

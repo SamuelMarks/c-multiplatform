@@ -15,10 +15,10 @@ struct ui_fab_base {
   int id;
 };
 
-static enum ui_error test_speed_dial_init(void) {
+static ui_error_t test_speed_dial_init(void) {
   struct ui_speed_dial_base sd;
   struct ui_component comp;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_speed_dial_base_init(NULL, &comp);
   assert(err == UI_ERROR_INVALID_ARGUMENT);
@@ -34,12 +34,12 @@ static enum ui_error test_speed_dial_init(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_speed_dial_operations(void) {
+static ui_error_t test_speed_dial_operations(void) {
   struct ui_speed_dial_base sd;
   struct ui_component comp;
   struct ui_fab_base fab1 = {1};
   struct ui_fab_base fab2 = {2};
-  enum ui_error err;
+  ui_error_t err;
 
   ui_speed_dial_base_init(&sd, &comp);
 
@@ -86,10 +86,10 @@ static enum ui_error test_speed_dial_operations(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_speed_dial_bindings(void) {
+static ui_error_t test_speed_dial_bindings(void) {
   struct ui_speed_dial_base sd;
   struct ui_component comp;
-  enum ui_error err;
+  ui_error_t err;
 
   ui_speed_dial_base_init(&sd, &comp);
 

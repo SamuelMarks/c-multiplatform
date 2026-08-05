@@ -21,8 +21,7 @@ struct ui_hotkey_registry {
 };
 
 /** \brief ui_error */
-enum ui_error
-ui_hotkey_registry_create(struct ui_hotkey_registry **out_registry) {
+ui_error_t ui_hotkey_registry_create(struct ui_hotkey_registry **out_registry) {
   struct ui_hotkey_registry *registry;
   int i;
 
@@ -30,8 +29,8 @@ ui_hotkey_registry_create(struct ui_hotkey_registry **out_registry) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  registry =
-      (struct ui_hotkey_registry *)UI_MALLOC(sizeof(struct ui_hotkey_registry));
+  registry = (struct ui_hotkey_registry *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_hotkey_registry));
   if (!registry) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -45,17 +44,18 @@ ui_hotkey_registry_create(struct ui_hotkey_registry **out_registry) {
   return UI_ERROR_NONE;
 }
 
-void ui_hotkey_registry_destroy(struct ui_hotkey_registry *registry) {
+ui_error_t ui_hotkey_registry_destroy(struct ui_hotkey_registry *registry) {
   if (!registry) {
-    return;
+    return UI_ERROR_NONE;
   }
-  UI_FREE(registry);
+  C_MULTIPLATFORM_FREE(registry);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_hotkey_registry_register(struct ui_hotkey_registry *registry,
-                                          struct ui_hotkey_chord chord,
-                                          ui_hotkey_callback_t callback,
-                                          void *user_data, int *out_id) {
+ui_error_t ui_hotkey_registry_register(struct ui_hotkey_registry *registry,
+                                       struct ui_hotkey_chord chord,
+                                       ui_hotkey_callback_t callback,
+                                       void *user_data, int *out_id) {
   int i;
   if (!registry || !callback || !out_id) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -77,8 +77,8 @@ enum ui_error ui_hotkey_registry_register(struct ui_hotkey_registry *registry,
   return UI_ERROR_OUT_OF_BOUNDS;
 }
 
-enum ui_error ui_hotkey_registry_unregister(struct ui_hotkey_registry *registry,
-                                            int id) {
+ui_error_t ui_hotkey_registry_unregister(struct ui_hotkey_registry *registry,
+                                         int id) {
   int i;
   if (!registry) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -97,10 +97,9 @@ enum ui_error ui_hotkey_registry_unregister(struct ui_hotkey_registry *registry,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_hotkey_registry_process_event(struct ui_hotkey_registry *registry,
-                                 const struct ui_event *event,
-                                 int *out_handled) {
+ui_error_t ui_hotkey_registry_process_event(struct ui_hotkey_registry *registry,
+                                            const struct ui_event *event,
+                                            int *out_handled) {
   int i;
 
   if (!registry || !event || !out_handled) {
@@ -120,7 +119,12 @@ ui_hotkey_registry_process_event(struct ui_hotkey_registry *registry,
         registry->entries[i].chord.modifiers ==
             event->event_data.keyboard.modifiers) {
 
-      registry->entries[i].callback(registry->entries[i].user_data);
+      {
+        ui_error_t cb_rc =
+            registry->entries[i].callback(registry->entries[i].user_data);
+        if (cb_rc != UI_ERROR_NONE)
+          return cb_rc;
+      }
       *out_handled = 1;
       return UI_ERROR_NONE;
     }

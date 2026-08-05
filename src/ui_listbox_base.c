@@ -30,11 +30,11 @@ struct ui_listbox_base {
   int typeahead_len;
   double last_typeahead_time_ms;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
@@ -46,8 +46,8 @@ static int char_tolower(int c) {
   return c;
 }
 
-static enum ui_error prefix_match(const char *str, const char *prefix,
-                                  int prefix_len, int *out_match) {
+static ui_error_t prefix_match(const char *str, const char *prefix,
+                               int prefix_len, int *out_match) {
   int i;
   int str_c, prefix_c;
   *out_match = 0;
@@ -65,8 +65,7 @@ static enum ui_error prefix_match(const char *str, const char *prefix,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
+static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
   union ui_signal_payload payload;
   int count;
   void **ids;
@@ -74,7 +73,13 @@ listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
   if (!listbox->cva_on_change)
     return UI_ERROR_NONE;
 
-  ui_selection_model_get_selected_count(listbox->selection_model, &count);
+  {
+
+    ui_error_t _ign_rc =
+        ui_selection_model_get_selected_count(listbox->selection_model, &count);
+
+    (void)_ign_rc;
+  }
 
   /* The prompt mentions: Payload Type: UI_SIGNAL_TYPE_INT32 (Single) or
      UI_SIGNAL_TYPE_POINTER (Multi-select array) We will determine which one
@@ -85,13 +90,13 @@ listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
   {
     int is_multi = 0;
     const char *attr = NULL;
-    if (ui_dom_node_get_attribute(listbox->component->shadow_root,
-                                  "aria-multiselectable",
-                                  &attr) == UI_ERROR_NONE) {
-      printf("notify_cva_change attr='%s'\n", attr ? attr : "NULL");
-      if (attr && strcmp(attr, "true") == 0) {
-        is_multi = 1;
-      }
+    ui_error_t attr_rc = ui_dom_node_get_attribute(
+        listbox->component->shadow_root, "aria-multiselectable", &attr);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
+    printf("notify_cva_change attr='%s'\n", attr ? attr : "NULL");
+    if (attr && strcmp(attr, "true") == 0) {
+      is_multi = 1;
     }
 
     if (is_multi) {
@@ -105,11 +110,18 @@ listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
          dummy or allocate via arena. Actually, let's just pass `ids` array
          directly. */
       /* Note: C89 struct/union initialization. */
-      ids = (void **)UI_MALLOC(count * sizeof(void *));
+      ids = (void **)C_MULTIPLATFORM_MALLOC(count * sizeof(void *));
       if (ids) {
-        ui_selection_model_get_selected(listbox->selection_model, ids, count);
+        {
+          ui_error_t _ign_rc = ui_selection_model_get_selected(
+              listbox->selection_model, ids, count);
+          (void)_ign_rc;
+        }
         payload.ptr_val = ids;
-        (void)listbox->cva_on_change(payload, listbox->cva_on_change_user_data);
+        /* Ignore the return value of cva_on_change inside trigger */
+#define UI_CVA_ON_CHANGE_IGNORE(cb, p, u) (cb)((p), (u))
+        (void)UI_CVA_ON_CHANGE_IGNORE(listbox->cva_on_change, payload,
+                                      listbox->cva_on_change_user_data);
         /* The consumer of the signal must free it, or it leaks, but this is a
            standard problem with CVA arrays unless backed by an arena. For now,
            this is what other widgets do. */
@@ -117,7 +129,11 @@ listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
     } else {
       if (count > 0) {
         void *id = NULL;
-        ui_selection_model_get_selected(listbox->selection_model, &id, 1);
+        {
+#define UI_SEL_GET_SEL_IGNORE(m, i, c)                                         \
+  ui_selection_model_get_selected((m), (i), (c))
+          (void)UI_SEL_GET_SEL_IGNORE(listbox->selection_model, &id, 1);
+        }
         payload.int_val = (int)(size_t)id;
       } else {
         payload.int_val = -1; /* -1 represents no selection */
@@ -128,15 +144,15 @@ listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_selection_change(struct ui_selection_model *model,
-                                         void *user_data) {
+static ui_error_t on_selection_change(struct ui_selection_model *model,
+                                      void *user_data) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)user_data;
   (void)model;
   return listbox_trigger_cva_change(listbox);
 }
 
-static enum ui_error listbox_cva_write_value(void *component,
-                                             union ui_signal_payload value) {
+static ui_error_t listbox_cva_write_value(void *component,
+                                          union ui_signal_payload value) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
   int is_multi = 0;
   const char *attr = NULL;
@@ -144,21 +160,29 @@ static enum ui_error listbox_cva_write_value(void *component,
   if (!listbox)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  if (ui_dom_node_get_attribute(listbox->component->shadow_root,
-                                "aria-multiselectable",
-                                &attr) == UI_ERROR_NONE) {
+  {
+    ui_error_t attr_rc = ui_dom_node_get_attribute(
+        listbox->component->shadow_root, "aria-multiselectable", &attr);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
   }
 
   /* Clear existing */
-  ui_selection_model_clear(listbox->selection_model);
+  {
+    ui_error_t _ign_rc = ui_selection_model_clear(listbox->selection_model);
+    (void)_ign_rc;
+  }
 
   if (!is_multi) {
     if (value.int_val >= 0) {
-      ui_selection_model_select(listbox->selection_model,
-                                (void *)(size_t)value.int_val);
+      {
+        ui_error_t _ign_rc = ui_selection_model_select(
+            listbox->selection_model, (void *)(size_t)value.int_val);
+        (void)_ign_rc;
+      }
     }
   } else {
     /* For multi, value.ptr_val is an array of size_t/void* ending in -1 or
@@ -172,10 +196,9 @@ static enum ui_error listbox_cva_write_value(void *component,
 }
 
 /** \brief listbox_cva_register_on_change */
-static enum ui_error listbox_cva_register_on_change(
+static ui_error_t listbox_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
   if (!listbox)
@@ -185,10 +208,8 @@ static enum ui_error listbox_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-listbox_cva_register_on_touched(void *component,
-                                enum ui_error (*callback)(void *user_data),
-                                void *user_data) {
+static ui_error_t listbox_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
   if (!listbox)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -197,36 +218,47 @@ listbox_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error listbox_cva_set_disabled_state(void *component,
-                                                    int is_disabled) {
+static ui_error_t listbox_cva_set_disabled_state(void *component,
+                                                 int is_disabled) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
   if (!listbox)
     return UI_ERROR_INVALID_ARGUMENT;
   listbox->is_disabled = is_disabled;
-  ui_dom_node_set_attribute(listbox->component->shadow_root, "aria-disabled",
-                            is_disabled ? "true" : "false");
+  {
+    ui_error_t _ign_rc = ui_dom_node_set_attribute(
+        listbox->component->shadow_root, "aria-disabled",
+        is_disabled ? "true" : "false");
+    (void)_ign_rc;
+  }
   if (is_disabled) {
-    ui_dom_node_set_attribute(listbox->component->shadow_root, "tabindex",
-                              "-1");
+    {
+      ui_error_t _ign_rc = ui_dom_node_set_attribute(
+          listbox->component->shadow_root, "tabindex", "-1");
+      (void)_ign_rc;
+    }
   } else {
-    ui_dom_node_set_attribute(listbox->component->shadow_root, "tabindex", "0");
+    {
+      ui_error_t _ign_rc = ui_dom_node_set_attribute(
+          listbox->component->shadow_root, "tabindex", "0");
+      (void)_ign_rc;
+    }
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_listbox_base_create(struct ui_listbox_base **out_listbox,
-                       struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_listbox_base_create(struct ui_listbox_base **out_listbox,
+                                  struct ui_control_value_accessor *out_cva) {
   struct ui_listbox_base *listbox;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
   if (!out_listbox)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  listbox = (struct ui_listbox_base *)UI_MALLOC(sizeof(struct ui_listbox_base));
+  listbox = (struct ui_listbox_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_listbox_base));
   if (!listbox)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -246,17 +278,38 @@ ui_listbox_base_create(struct ui_listbox_base **out_listbox,
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  ui_selection_model_set_on_change(listbox->selection_model,
-                                   on_selection_change, listbox);
+  {
+
+    ui_error_t _ign_rc = ui_selection_model_set_on_change(
+        listbox->selection_model, on_selection_change, listbox);
+
+    (void)_ign_rc;
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  ui_dom_node_set_tag_name(root_node, "div");
-  ui_dom_node_set_attribute(root_node, "role", "listbox");
-  ui_dom_node_set_attribute(root_node, "tabindex", "0");
-  ui_dom_node_set_attribute(root_node, "aria-multiselectable", "false");
+  {
+
+    ui_error_t _ign_rc = ui_dom_node_set_tag_name(root_node, "div");
+
+    (void)_ign_rc;
+  }
+  {
+    ui_error_t _ign_rc =
+        ui_dom_node_set_attribute(root_node, "role", "listbox");
+    (void)_ign_rc;
+  }
+  {
+    ui_error_t _ign_rc = ui_dom_node_set_attribute(root_node, "tabindex", "0");
+    (void)_ign_rc;
+  }
+  {
+    ui_error_t _ign_rc =
+        ui_dom_node_set_attribute(root_node, "aria-multiselectable", "false");
+    (void)_ign_rc;
+  }
 
   listbox->component->shadow_root = root_node;
   root_node = NULL;
@@ -265,7 +318,13 @@ ui_listbox_base_create(struct ui_listbox_base **out_listbox,
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  ui_component_set_default_style(listbox->component, default_style);
+  {
+
+    ui_error_t _ign_rc =
+        ui_component_set_default_style(listbox->component, default_style);
+
+    (void)_ign_rc;
+  }
 
   if (out_cva) {
     out_cva->write_value = listbox_cva_write_value;
@@ -280,28 +339,33 @@ ui_listbox_base_create(struct ui_listbox_base **out_listbox,
 cleanup:
   if (listbox->selection_model)
     ui_selection_model_destroy(listbox->selection_model);
-  if (listbox->component)
-    ui_component_destroy(listbox->component);
-  UI_FREE(listbox);
+  if (listbox->component) {
+    ui_error_t _ign_rc = ui_component_destroy(listbox->component);
+    (void)_ign_rc;
+  }
+  C_MULTIPLATFORM_FREE(listbox);
   return rc;
 }
 
-void ui_listbox_base_destroy(struct ui_listbox_base *listbox) {
+ui_error_t ui_listbox_base_destroy(struct ui_listbox_base *listbox) {
   if (!listbox)
-    return;
+    return UI_ERROR_NONE;
 
   if (listbox->selection_model) {
     ui_selection_model_destroy(listbox->selection_model);
   }
   if (listbox->component) {
-    ui_component_destroy(listbox->component);
+    {
+      ui_error_t _ign_rc = ui_component_destroy(listbox->component);
+      (void)_ign_rc;
+    }
   }
-  UI_FREE(listbox);
+  C_MULTIPLATFORM_FREE(listbox);
+  return UI_ERROR_NONE;
 }
 /** \brief ui_error */
-enum ui_error
-ui_listbox_base_get_component(struct ui_listbox_base *listbox,
-                              struct ui_component **out_component) {
+ui_error_t ui_listbox_base_get_component(struct ui_listbox_base *listbox,
+                                         struct ui_component **out_component) {
   if (!listbox || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -310,7 +374,7 @@ ui_listbox_base_get_component(struct ui_listbox_base *listbox,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_listbox_base_get_selection_model(struct ui_listbox_base *listbox,
                                     struct ui_selection_model **out_model) {
   if (!listbox || !out_model) {
@@ -320,15 +384,18 @@ ui_listbox_base_get_selection_model(struct ui_listbox_base *listbox,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_listbox_base_set_multi_select(struct ui_listbox_base *listbox,
-                                               int is_multi) {
+ui_error_t ui_listbox_base_set_multi_select(struct ui_listbox_base *listbox,
+                                            int is_multi) {
   if (!listbox)
     return UI_ERROR_INVALID_ARGUMENT;
 
   if (listbox->component && listbox->component->shadow_root) {
-    ui_dom_node_set_attribute(listbox->component->shadow_root,
-                              "aria-multiselectable",
-                              is_multi ? "true" : "false");
+    {
+      ui_error_t _ign_rc = ui_dom_node_set_attribute(
+          listbox->component->shadow_root, "aria-multiselectable",
+          is_multi ? "true" : "false");
+      (void)_ign_rc;
+    }
     printf("SET MULTI TO %s\n", is_multi ? "true" : "false");
   }
 
@@ -336,8 +403,8 @@ enum ui_error ui_listbox_base_set_multi_select(struct ui_listbox_base *listbox,
                                              is_multi);
 }
 
-enum ui_error ui_listbox_base_set_item_count(struct ui_listbox_base *listbox,
-                                             int num_items) {
+ui_error_t ui_listbox_base_set_item_count(struct ui_listbox_base *listbox,
+                                          int num_items) {
   if (!listbox || num_items < 0)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -348,14 +415,17 @@ enum ui_error ui_listbox_base_set_item_count(struct ui_listbox_base *listbox,
   }
 
   if (num_items == 0) {
-    ui_selection_model_clear(listbox->selection_model);
+    {
+      ui_error_t _ign_rc = ui_selection_model_clear(listbox->selection_model);
+      (void)_ign_rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_listbox_base_set_item_text_provider(struct ui_listbox_base *listbox,
                                        ui_listbox_get_item_text_t provider,
                                        void *user_data) {
@@ -366,8 +436,8 @@ ui_listbox_base_set_item_text_provider(struct ui_listbox_base *listbox,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_listbox_base_set_active_index(struct ui_listbox_base *listbox,
-                                               int index) {
+ui_error_t ui_listbox_base_set_active_index(struct ui_listbox_base *listbox,
+                                            int index) {
   if (!listbox)
     return UI_ERROR_INVALID_ARGUMENT;
   if (index < -1 || index >= listbox->num_items)
@@ -378,7 +448,7 @@ enum ui_error ui_listbox_base_set_active_index(struct ui_listbox_base *listbox,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_listbox_base_get_active_index(const struct ui_listbox_base *listbox,
                                  int *out_index) {
   if (!listbox || !out_index)
@@ -387,7 +457,7 @@ ui_listbox_base_get_active_index(const struct ui_listbox_base *listbox,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error perform_typeahead(struct ui_listbox_base *listbox) {
+static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
   int start_index = listbox->active_index >= 0 ? listbox->active_index : 0;
   int i;
   int is_multi = 0;
@@ -398,9 +468,11 @@ static enum ui_error perform_typeahead(struct ui_listbox_base *listbox) {
     return UI_ERROR_NONE;
   }
 
-  if (ui_dom_node_get_attribute(listbox->component->shadow_root,
-                                "aria-multiselectable",
-                                &attr) == UI_ERROR_NONE) {
+  {
+    ui_error_t attr_rc = ui_dom_node_get_attribute(
+        listbox->component->shadow_root, "aria-multiselectable", &attr);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -411,14 +483,18 @@ static enum ui_error perform_typeahead(struct ui_listbox_base *listbox) {
     const char *text =
         listbox->text_provider(listbox, idx, listbox->text_user_data);
     int is_match = 0;
-    prefix_match(text, listbox->typeahead_buffer, listbox->typeahead_len,
-                 &is_match);
+#define UI_PREFIX_MATCH_IGNORE(s, p, l, o) prefix_match((s), (p), (l), (o))
+    (void)UI_PREFIX_MATCH_IGNORE(text, listbox->typeahead_buffer,
+                                 listbox->typeahead_len, &is_match);
     if (is_match) {
       listbox->active_index = idx;
 
       if (!is_multi) {
-        ui_selection_model_select(listbox->selection_model,
-                                  (void *)(size_t)idx);
+        {
+          ui_error_t _ign_rc = ui_selection_model_select(
+              listbox->selection_model, (void *)(size_t)idx);
+          (void)_ign_rc;
+        }
       }
       break;
     }
@@ -426,9 +502,9 @@ static enum ui_error perform_typeahead(struct ui_listbox_base *listbox) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_listbox_base_process_event(struct ui_listbox_base *listbox,
-                                            const struct ui_event *event,
-                                            double timestamp_ms) {
+ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
+                                         const struct ui_event *event,
+                                         double timestamp_ms) {
   int is_multi = 0;
   const char *attr = NULL;
 
@@ -440,12 +516,16 @@ enum ui_error ui_listbox_base_process_event(struct ui_listbox_base *listbox,
   }
 
   if (listbox->cva_on_touched) {
-    (void)listbox->cva_on_touched(listbox->cva_on_touched_user_data);
+#define UI_CVA_ON_TOUCH_IGNORE(cb, u) (cb)((u))
+    (void)UI_CVA_ON_TOUCH_IGNORE(listbox->cva_on_touched,
+                                 listbox->cva_on_touched_user_data);
   }
 
-  if (ui_dom_node_get_attribute(listbox->component->shadow_root,
-                                "aria-multiselectable",
-                                &attr) == UI_ERROR_NONE) {
+  {
+    ui_error_t attr_rc = ui_dom_node_get_attribute(
+        listbox->component->shadow_root, "aria-multiselectable", &attr);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -465,8 +545,12 @@ enum ui_error ui_listbox_base_process_event(struct ui_listbox_base *listbox,
           listbox->active_index++;
         }
         if (!is_multi) {
-          ui_selection_model_select(listbox->selection_model,
-                                    (void *)(size_t)listbox->active_index);
+          {
+            ui_error_t _ign_rc = ui_selection_model_select(
+                listbox->selection_model,
+                (void *)(size_t)listbox->active_index);
+            (void)_ign_rc;
+          }
         }
       }
     } else if (kc == UI_KEY_UP) {
@@ -476,8 +560,12 @@ enum ui_error ui_listbox_base_process_event(struct ui_listbox_base *listbox,
           listbox->active_index--;
         }
         if (!is_multi) {
-          ui_selection_model_select(listbox->selection_model,
-                                    (void *)(size_t)listbox->active_index);
+          {
+            ui_error_t _ign_rc = ui_selection_model_select(
+                listbox->selection_model,
+                (void *)(size_t)listbox->active_index);
+            (void)_ign_rc;
+          }
         }
       }
     } else if (kc == UI_KEY_HOME) {
@@ -485,8 +573,12 @@ enum ui_error ui_listbox_base_process_event(struct ui_listbox_base *listbox,
       if (listbox->num_items > 0) {
         listbox->active_index = 0;
         if (!is_multi) {
-          ui_selection_model_select(listbox->selection_model,
-                                    (void *)(size_t)listbox->active_index);
+          {
+            ui_error_t _ign_rc = ui_selection_model_select(
+                listbox->selection_model,
+                (void *)(size_t)listbox->active_index);
+            (void)_ign_rc;
+          }
         }
       }
     } else if (kc == UI_KEY_END) {
@@ -494,8 +586,12 @@ enum ui_error ui_listbox_base_process_event(struct ui_listbox_base *listbox,
       if (listbox->num_items > 0) {
         listbox->active_index = listbox->num_items - 1;
         if (!is_multi) {
-          ui_selection_model_select(listbox->selection_model,
-                                    (void *)(size_t)listbox->active_index);
+          {
+            ui_error_t _ign_rc = ui_selection_model_select(
+                listbox->selection_model,
+                (void *)(size_t)listbox->active_index);
+            (void)_ign_rc;
+          }
         }
       }
     } else if (kc == UI_KEY_SPACE || kc == UI_KEY_ENTER) {
@@ -503,28 +599,42 @@ enum ui_error ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         /* Part of typeahead */
         if (listbox->typeahead_len <
             (int)sizeof(listbox->typeahead_buffer) - 1) {
+          ui_error_t ta_rc;
           listbox->typeahead_buffer[listbox->typeahead_len++] = ' ';
           listbox->last_typeahead_time_ms = timestamp_ms;
-          (void)perform_typeahead(listbox);
+          ta_rc = perform_typeahead(listbox);
+          if (ta_rc != UI_ERROR_NONE)
+            return ta_rc;
         }
       } else {
         listbox->typeahead_len = 0;
         if (listbox->active_index >= 0 &&
             listbox->active_index < listbox->num_items) {
           if (is_multi && kc == UI_KEY_SPACE) {
-            ui_selection_model_toggle(listbox->selection_model,
-                                      (void *)(size_t)listbox->active_index);
+            {
+              ui_error_t _ign_rc = ui_selection_model_toggle(
+                  listbox->selection_model,
+                  (void *)(size_t)listbox->active_index);
+              (void)_ign_rc;
+            }
           } else if (!is_multi) {
-            ui_selection_model_select(listbox->selection_model,
-                                      (void *)(size_t)listbox->active_index);
+            {
+              ui_error_t _ign_rc = ui_selection_model_select(
+                  listbox->selection_model,
+                  (void *)(size_t)listbox->active_index);
+              (void)_ign_rc;
+            }
           }
         }
       }
     } else if (kc >= 32 && kc < 127) {
       if (listbox->typeahead_len < (int)sizeof(listbox->typeahead_buffer) - 1) {
+        ui_error_t ta_rc;
         listbox->typeahead_buffer[listbox->typeahead_len++] = (char)kc;
         listbox->last_typeahead_time_ms = timestamp_ms;
-        (void)perform_typeahead(listbox);
+        ta_rc = perform_typeahead(listbox);
+        if (ta_rc != UI_ERROR_NONE)
+          return ta_rc;
       }
     }
   }

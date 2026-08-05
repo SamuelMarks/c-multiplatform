@@ -7,35 +7,43 @@
 #include <stddef.h>
 /* clang-format on */
 
-static void trigger_event(const struct ui_dom_node *node,
-                          const struct ui_event *event) {
+static ui_error_t trigger_event(const struct ui_dom_node *node,
+                                const struct ui_event *event) {
   struct ui_dom_event_listener *listener;
+  if (!node)
+    return UI_ERROR_NONE;
   listener = node->listeners;
   while (listener) {
-    if (listener->type == event->type && listener->handler) {
-      listener->handler((struct ui_dom_node *)node, event, listener->user_data);
+    if (listener->type == event->type) {
+      {
+        ui_error_t h_rc = listener->handler((struct ui_dom_node *)node, event,
+                                            listener->user_data);
+        if (h_rc != UI_ERROR_NONE) {
+          return h_rc;
+        }
+      }
     }
     listener = listener->next;
   }
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error hit_test(const struct ui_layout_node *node, float x,
-                              float y, const struct ui_layout_node **out_node) {
+static void hit_test(const struct ui_layout_node *node, float x, float y,
+                     const struct ui_layout_node **out_node) {
   *out_node = NULL;
   if (x >= node->x && x <= node->x + node->width && y >= node->y &&
       y <= node->y + node->height) {
     *out_node = node;
   }
-  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_event_dispatch(const struct ui_layout_node *layout_root,
-                                const struct ui_event *event,
-                                struct ui_mouse_state *state, void *user_data);
+ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
+                             const struct ui_event *event,
+                             struct ui_mouse_state *state, void *user_data);
 
-enum ui_error ui_event_dispatch(const struct ui_layout_node *layout_root,
-                                const struct ui_event *event,
-                                struct ui_mouse_state *state, void *user_data) {
+ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
+                             const struct ui_event *event,
+                             struct ui_mouse_state *state, void *user_data) {
   struct ui_focus_manager *focus_mgr = (struct ui_focus_manager *)user_data;
   if (!layout_root || !event || !state)
     return UI_ERROR_NONE;
@@ -45,58 +53,111 @@ enum ui_error ui_event_dispatch(const struct ui_layout_node *layout_root,
       event->type == UI_EVENT_MOUSE_WHEEL) {
 
     const struct ui_layout_node *hit = NULL;
-    hit_test(layout_root, (float)event->event_data.mouse.x,
-             (float)event->event_data.mouse.y, &hit);
+    {
+      hit_test(layout_root, (float)event->event_data.mouse.x,
+               (float)event->event_data.mouse.y, &hit);
+    }
 
     if (event->type == UI_EVENT_MOUSE_MOVE) {
       if (hit != state->hovered_node) {
         if (state->hovered_node && state->hovered_node->dom_node) {
           struct ui_event ev_leave = *event;
+          ui_error_t rc;
           ev_leave.type = UI_EVENT_MOUSE_LEAVE;
-          trigger_event(state->hovered_node->dom_node, &ev_leave);
+          {
+            ui_error_t trig_rc1 =
+                trigger_event(state->hovered_node->dom_node, &ev_leave);
+            if (trig_rc1 != UI_ERROR_NONE) {
+              return trig_rc1;
+            }
+          }
         }
         state->hovered_node = (struct ui_layout_node *)hit;
         if (state->hovered_node && state->hovered_node->dom_node) {
           struct ui_event ev_enter = *event;
+          ui_error_t rc;
           ev_enter.type = UI_EVENT_MOUSE_ENTER;
-          trigger_event(state->hovered_node->dom_node, &ev_enter);
+          {
+            ui_error_t trig_rc2 =
+                trigger_event(state->hovered_node->dom_node, &ev_enter);
+            if (trig_rc2 != UI_ERROR_NONE) {
+              return trig_rc2;
+            }
+          }
         }
       }
       if (hit && hit->dom_node) {
-        trigger_event(hit->dom_node, event);
+        {
+          ui_error_t trig_rc3 = trigger_event(hit->dom_node, event);
+          if (trig_rc3 != UI_ERROR_NONE) {
+            return trig_rc3;
+          }
+        }
       }
     } else if (event->type == UI_EVENT_MOUSE_DOWN) {
       if (hit && hit->dom_node) {
-        trigger_event(hit->dom_node, event);
+        {
+          ui_error_t trig_rc4 = trigger_event(hit->dom_node, event);
+          if (trig_rc4 != UI_ERROR_NONE) {
+            return trig_rc4;
+          }
+        }
       }
       state->active_node = (struct ui_layout_node *)hit;
       if (hit && event->event_data.mouse.button == 1) {
         struct ui_event ev_ctx = *event;
+        ui_error_t rc;
         ev_ctx.type = UI_EVENT_CONTEXT_MENU;
-        trigger_event(hit->dom_node, &ev_ctx);
+        {
+          ui_error_t trig_rc5 = trigger_event(hit->dom_node, &ev_ctx);
+          if (trig_rc5 != UI_ERROR_NONE) {
+            return trig_rc5;
+          }
+        }
       }
     } else if (event->type == UI_EVENT_MOUSE_UP) {
       if (hit && hit->dom_node) {
-        trigger_event(hit->dom_node, event);
+        {
+          ui_error_t trig_rc6 = trigger_event(hit->dom_node, event);
+          if (trig_rc6 != UI_ERROR_NONE) {
+            return trig_rc6;
+          }
+        }
       }
       if (hit && hit == state->active_node &&
           event->event_data.mouse.button == 0) {
         struct ui_event ev_click;
+        ui_error_t rc;
         state->click_count++;
         ev_click = *event;
         ev_click.type = UI_EVENT_CLICK;
-        trigger_event(hit->dom_node, &ev_click);
+        {
+          ui_error_t trig_rc7 = trigger_event(hit->dom_node, &ev_click);
+          if (trig_rc7 != UI_ERROR_NONE) {
+            return trig_rc7;
+          }
+        }
         if (state->click_count == 2) {
           struct ui_event ev_dbl;
           ev_dbl = *event;
           ev_dbl.type = UI_EVENT_DBLCLICK;
-          trigger_event(hit->dom_node, &ev_dbl);
+          {
+            ui_error_t trig_rc8 = trigger_event(hit->dom_node, &ev_dbl);
+            if (trig_rc8 != UI_ERROR_NONE) {
+              return trig_rc8;
+            }
+          }
           state->click_count = 0;
         }
       }
-    } else if (event->type == UI_EVENT_MOUSE_WHEEL) {
+    } else {
       if (hit && hit->dom_node) {
-        trigger_event(hit->dom_node, event);
+        {
+          ui_error_t trig_rc9 = trigger_event(hit->dom_node, event);
+          if (trig_rc9 != UI_ERROR_NONE) {
+            return trig_rc9;
+          }
+        }
       }
     }
   } else if (event->type == UI_EVENT_KEY_DOWN ||
@@ -104,16 +165,21 @@ enum ui_error ui_event_dispatch(const struct ui_layout_node *layout_root,
              event->type == UI_EVENT_KEY_PRESS) {
     struct ui_dom_node *focused = NULL;
     if (focus_mgr) {
-      ui_focus_manager_get_focused_node(focus_mgr, &focused);
+      (void)ui_focus_manager_get_focused_node(focus_mgr, &focused);
     }
     if (focused) {
-      trigger_event(focused, event);
+      {
+        ui_error_t trig_rc10 = trigger_event(focused, event);
+        if (trig_rc10 != UI_ERROR_NONE) {
+          return trig_rc10;
+        }
+      }
     }
     if (event->type == UI_EVENT_KEY_DOWN &&
         event->event_data.keyboard.key_code == UI_KEY_TAB && focus_mgr &&
         layout_root->dom_node) {
       int forward = !(event->event_data.keyboard.modifiers & UI_MODIFIER_SHIFT);
-      ui_focus_manager_advance(
+      (void)ui_focus_manager_advance(
           focus_mgr, (struct ui_dom_node *)layout_root->dom_node, forward);
     }
   }

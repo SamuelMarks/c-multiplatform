@@ -42,8 +42,8 @@ static const struct i18n_entry DICTIONARY[] = {
     {"err_user_exists", "Username already exists.", "El usuario ya existe.",
      "Ce nom d'utilisateur existe déjà."}};
 
-enum ui_error get_translated_string(const char *locale, const char *key,
-                                    const char **out_str) {
+ui_error_t get_translated_string(const char *locale, const char *key,
+                                 const char **out_str) {
   size_t i;
   size_t count = sizeof(DICTIONARY) / sizeof(DICTIONARY[0]);
 

@@ -5,7 +5,7 @@
 
 int main(void) {
   struct ui_audio_sink_backend backend;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_audio_sink_get_default_backend(NULL);
   if (err != UI_ERROR_INVALID_ARGUMENT) {

@@ -22,7 +22,7 @@ struct ui_share_task {
   struct ui_share_payload payload_copy;
 };
 
-enum ui_error ui_share_is_supported(int *out_is_available) {
+ui_error_t ui_share_is_supported(int *out_is_available) {
   if (!out_is_available) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -32,15 +32,16 @@ enum ui_error ui_share_is_supported(int *out_is_available) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_share_request_async(const struct ui_share_payload *payload,
-                                     struct ui_promise *promise) {
+ui_error_t ui_share_request_async(const struct ui_share_payload *payload,
+                                  struct ui_promise *promise) {
   struct ui_share_task *task;
 
   if (!payload || !promise) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  task = (struct ui_share_task *)UI_MALLOC(sizeof(struct ui_share_task));
+  task = (struct ui_share_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_share_task));
   if (!task) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -55,6 +56,6 @@ enum ui_error ui_share_request_async(const struct ui_share_payload *payload,
 
   ui_promise_resolve(promise, NULL);
 
-  UI_FREE(task);
+  C_MULTIPLATFORM_FREE(task);
   return UI_ERROR_NONE;
 }

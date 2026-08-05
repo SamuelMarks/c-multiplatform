@@ -4,7 +4,7 @@
 /* clang-format on */
 
 int main(void) {
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_ripple_config config;
   struct ui_ripple_state state;
   int test_failed = 0;

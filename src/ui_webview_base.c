@@ -13,16 +13,17 @@ struct ui_webview_base {
   char *current_html;
 };
 
-enum ui_error ui_webview_base_create(struct ui_webview_base **out_webview) {
+ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview) {
   struct ui_webview_base *webview;
   struct ui_dom_node *root_node = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_webview) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  webview = (struct ui_webview_base *)UI_MALLOC(sizeof(struct ui_webview_base));
+  webview = (struct ui_webview_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_webview_base));
   if (!webview) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -30,44 +31,55 @@ enum ui_error ui_webview_base_create(struct ui_webview_base **out_webview) {
 
   rc = ui_component_create(&webview->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(webview);
+    C_MULTIPLATFORM_FREE(webview);
     return rc;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(webview->component);
-    UI_FREE(webview);
+    (void)ui_component_destroy(webview->component);
+    C_MULTIPLATFORM_FREE(webview);
     return rc;
   }
 
-  ui_dom_node_set_tag_name(root_node, "iframe");
-  ui_dom_node_set_attribute(root_node, "role", "application");
+  rc = ui_dom_node_set_tag_name(root_node, "iframe");
+  if (rc != UI_ERROR_NONE) {
+    (void)ui_dom_node_destroy(root_node);
+    (void)ui_component_destroy(webview->component);
+    C_MULTIPLATFORM_FREE(webview);
+    return rc;
+  }
+  rc = ui_dom_node_set_attribute(root_node, "role", "application");
+  if (rc != UI_ERROR_NONE) {
+    (void)ui_dom_node_destroy(root_node);
+    (void)ui_component_destroy(webview->component);
+    C_MULTIPLATFORM_FREE(webview);
+    return rc;
+  }
   webview->component->shadow_root = root_node;
 
   *out_webview = webview;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_webview_base_destroy(struct ui_webview_base *webview) {
+ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview) {
   if (!webview) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  ui_component_destroy(webview->component);
+  (void)ui_component_destroy(webview->component);
   if (webview->current_url) {
-    UI_FREE(webview->current_url);
+    C_MULTIPLATFORM_FREE(webview->current_url);
   }
   if (webview->current_html) {
-    UI_FREE(webview->current_html);
+    C_MULTIPLATFORM_FREE(webview->current_html);
   }
-  UI_FREE(webview);
+  C_MULTIPLATFORM_FREE(webview);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_webview_base_get_component(struct ui_webview_base *webview,
-                              struct ui_component **out_component) {
+ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
+                                         struct ui_component **out_component) {
   if (!webview || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -75,12 +87,12 @@ ui_webview_base_get_component(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error duplicate_string(const char *str, char **out_copy) {
+static ui_error_t duplicate_string(const char *str, char **out_copy) {
   size_t len;
   char *dup;
   *out_copy = NULL;
   len = strlen(str);
-  dup = (char *)UI_MALLOC(len + 1);
+  dup = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!dup)
     return UI_ERROR_OUT_OF_MEMORY;
   memcpy(dup, str, len);
@@ -89,18 +101,18 @@ static enum ui_error duplicate_string(const char *str, char **out_copy) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_webview_base_set_url(struct ui_webview_base *webview,
-                                      const char *url) {
+ui_error_t ui_webview_base_set_url(struct ui_webview_base *webview,
+                                   const char *url) {
   if (!webview) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (webview->current_url) {
-    UI_FREE(webview->current_url);
+    C_MULTIPLATFORM_FREE(webview->current_url);
     webview->current_url = NULL;
   }
   if (url) {
     char *tmp = NULL;
-    enum ui_error err = duplicate_string(url, &tmp);
+    ui_error_t err = duplicate_string(url, &tmp);
     if (err != UI_ERROR_NONE)
       return err;
     webview->current_url = tmp;
@@ -114,18 +126,18 @@ enum ui_error ui_webview_base_set_url(struct ui_webview_base *webview,
   }
 }
 
-enum ui_error ui_webview_base_set_html(struct ui_webview_base *webview,
-                                       const char *html) {
+ui_error_t ui_webview_base_set_html(struct ui_webview_base *webview,
+                                    const char *html) {
   if (!webview) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (webview->current_html) {
-    UI_FREE(webview->current_html);
+    C_MULTIPLATFORM_FREE(webview->current_html);
     webview->current_html = NULL;
   }
   if (html) {
     char *tmp = NULL;
-    enum ui_error err = duplicate_string(html, &tmp);
+    ui_error_t err = duplicate_string(html, &tmp);
     if (err != UI_ERROR_NONE)
       return err;
     webview->current_html = tmp;
@@ -133,8 +145,8 @@ enum ui_error ui_webview_base_set_html(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_webview_base_bind_url(struct ui_webview_base *webview,
-                                       struct ui_signal *signal) {
+ui_error_t ui_webview_base_bind_url(struct ui_webview_base *webview,
+                                    struct ui_signal *signal) {
   if (!webview) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -142,8 +154,8 @@ enum ui_error ui_webview_base_bind_url(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_webview_base_evaluate_js(struct ui_webview_base *webview,
-                                          const char *script) {
+ui_error_t ui_webview_base_evaluate_js(struct ui_webview_base *webview,
+                                       const char *script) {
   if (!webview || !script) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -151,9 +163,9 @@ enum ui_error ui_webview_base_evaluate_js(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
-                                               ui_webview_ipc_callback callback,
-                                               void *user_data) {
+ui_error_t ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
+                                            ui_webview_ipc_callback callback,
+                                            void *user_data) {
   if (!webview) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -163,14 +175,17 @@ enum ui_error ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
-                                     const char *message) {
+ui_error_t ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
+                                                const char *message) {
   if (!webview || !message) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (webview->ipc_callback) {
-    webview->ipc_callback(webview, message, webview->ipc_user_data);
+    ui_error_t rc =
+        webview->ipc_callback(webview, message, webview->ipc_user_data);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
   return UI_ERROR_NONE;
 }

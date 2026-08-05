@@ -26,62 +26,50 @@ struct app_state {
 
 static int test_mock_login(void) {
   struct app_state state;
-  enum ui_error err;
+  ui_error_t err;
   int fails = 0;
 
   memset(&state, 0, sizeof(state));
 
   err = mock_login(&state, "admin", "password");
-  if (err != UI_ERROR_NONE || state.is_authenticated != 1 ||
-      strcmp(state.current_user, "admin") != 0) {
-    printf("FAIL: Valid login should succeed.\n");
-    fails++;
-  }
+  fails |= (err != UI_ERROR_NONE | state.is_authenticated != 1 |
+            strcmp(state.current_user, "admin") != 0);
 
   err = mock_login(&state, "admin", "wrong");
-  if (err != UI_ERROR_INVALID_ARGUMENT || state.is_authenticated != 0 ||
-      strcmp(state.auth_error_message, "err_invalid_credentials") != 0) {
-    printf("FAIL: Invalid login should fail.\n");
-    fails++;
-  }
+  fails |= (err != UI_ERROR_INVALID_ARGUMENT | state.is_authenticated != 0 |
+            strcmp(state.auth_error_message, "err_invalid_credentials") != 0);
+
+  err = mock_login(&state, "wrong", "password");
+  fails |= (err != UI_ERROR_INVALID_ARGUMENT | state.is_authenticated != 0);
 
   return fails;
 }
 
 static int test_mock_signup(void) {
   struct app_state state;
-  enum ui_error err;
+  ui_error_t err;
   int fails = 0;
 
   memset(&state, 0, sizeof(state));
 
   err = mock_signup(&state, "admin", "newpass");
-  if (err != UI_ERROR_INVALID_ARGUMENT || state.is_authenticated != 0 ||
-      strcmp(state.auth_error_message, "err_user_exists") != 0) {
-    printf("FAIL: Signup with existing user should fail.\n");
-    fails++;
-  }
+  fails |= (err != UI_ERROR_INVALID_ARGUMENT | state.is_authenticated != 0 |
+            strcmp(state.auth_error_message, "err_user_exists") != 0);
 
   err = mock_signup(&state, "newuser", "12");
-  if (err != UI_ERROR_INVALID_ARGUMENT || state.is_authenticated != 0 ||
-      strcmp(state.auth_error_message, "err_invalid_credentials") != 0) {
-    printf("FAIL: Signup with short password should fail.\n");
-    fails++;
-  }
+  fails |= (err != UI_ERROR_INVALID_ARGUMENT | state.is_authenticated != 0 |
+            strcmp(state.auth_error_message, "err_invalid_credentials") != 0);
 
   err = mock_signup(&state, "newuser", "goodpass");
-  if (err != UI_ERROR_NONE || state.is_authenticated != 1 ||
-      strcmp(state.current_user, "newuser") != 0) {
-    printf("FAIL: Valid signup should succeed.\n");
-    fails++;
-  }
+  fails |= (err != UI_ERROR_NONE | state.is_authenticated != 1 |
+            strcmp(state.current_user, "newuser") != 0);
 
   return fails;
 }
 
 static int test_mock_logout(void) {
   struct app_state state;
-  enum ui_error err;
+  ui_error_t err;
   int fails = 0;
 
   memset(&state, 0, sizeof(state));
@@ -90,11 +78,9 @@ static int test_mock_logout(void) {
   strcpy(state.auth_error_message, "some error");
 
   err = mock_logout(&state);
-  if (err != UI_ERROR_NONE || state.is_authenticated != 0 ||
-      state.current_user[0] != '\0' || state.auth_error_message[0] != '\0') {
-    printf("FAIL: Logout should clear state.\n");
-    fails++;
-  }
+  fails |=
+      (err != UI_ERROR_NONE | state.is_authenticated != 0 |
+       state.current_user[0] != '\0' | state.auth_error_message[0] != '\0');
 
   return fails;
 }
@@ -107,12 +93,6 @@ int main(void) {
   total_fails += test_mock_login();
   total_fails += test_mock_signup();
   total_fails += test_mock_logout();
-
-  if (total_fails == 0) {
-    printf("All mock backend tests PASSED\n");
-  } else {
-    printf("Some mock backend tests FAILED\n");
-  }
 
   return total_fails;
 }

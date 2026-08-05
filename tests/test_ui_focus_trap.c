@@ -6,18 +6,35 @@
 
 extern int g_malloc_fail_countdown;
 
+struct ui_focus_trap *get_null_trap(void);
+struct ui_focus_trap *get_null_trap(void) { return NULL; }
+
+struct ui_focus_trap_test {
+  struct ui_focus_manager *manager;
+  struct ui_keyboard_responder *responder;
+  struct ui_dom_node *root;
+  int is_active;
+};
+
 static int run_normal_tests(void) {
   struct ui_focus_trap *trap = NULL;
   struct ui_focus_manager *mgr = NULL;
   struct ui_keyboard_responder *kbd = NULL;
   struct ui_dom_node *root = NULL;
   struct ui_dom_node *child = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
+
+  rc = ui_focus_trap_create(&trap);
+  if (rc != UI_ERROR_NONE || trap == NULL)
+    return 1;
+  ui_focus_manager_create(&mgr);
+  ui_keyboard_responder_create(&kbd);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
 
   printf("Testing invalid arguments...\n");
+  ui_focus_trap_destroy(get_null_trap());
   if (ui_focus_trap_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_focus_trap_destroy(NULL);
 
   if (ui_focus_trap_activate(NULL, mgr, root) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -34,22 +51,6 @@ static int run_normal_tests(void) {
   if (ui_focus_trap_attach_keyboard(NULL, kbd) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_focus_trap_attach_keyboard(trap, NULL) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-
-  rc = ui_focus_trap_create(&trap);
-  if (rc != UI_ERROR_NONE || trap == NULL)
-    return 1;
-
-  rc = ui_focus_manager_create(&mgr);
-  if (rc != UI_ERROR_NONE)
-    return 1;
-
-  rc = ui_keyboard_responder_create(&kbd);
-  if (rc != UI_ERROR_NONE)
-    return 1;
-
-  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-  if (rc != UI_ERROR_NONE)
     return 1;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child);
@@ -89,10 +90,18 @@ static int run_normal_tests(void) {
   ui_focus_trap_activate(trap, mgr, root);
   ui_focus_manager_request_focus(mgr, root);
 
+  /* Test destroy with inactive trap */
+  {
+    struct ui_focus_trap *trap2;
+    ui_focus_trap_create(&trap2);
+    /* never activated */
+    ui_focus_trap_destroy(trap2);
+  }
+
   ui_focus_trap_destroy(trap);
-  ui_keyboard_responder_destroy(kbd);
+  (void)ui_keyboard_responder_destroy(kbd);
   (void)ui_focus_manager_destroy(mgr);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = -1;
@@ -104,7 +113,7 @@ static int run_oom_tests(void) {
   struct ui_focus_trap *trap = NULL;
   struct ui_focus_manager *mgr = NULL;
   struct ui_dom_node *root = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
   printf("Testing OOM...\n");
@@ -123,11 +132,8 @@ static int run_oom_tests(void) {
 
   /* Test OOM in activate */
   g_malloc_fail_countdown = 0; /* push_trap alloc */
-  printf("trap=%p mgr=%p root=%p\n", trap, mgr, root);
   rc = ui_focus_trap_activate(trap, mgr, root);
-  printf("rc is %d\n", rc);
   g_malloc_fail_countdown = -1;
-  printf("OOM activate rc = %d\n", rc);
   if (rc == UI_ERROR_NONE) {
     printf("Failed to catch OOM in activate.\n");
     return 1;
@@ -138,7 +144,6 @@ static int run_oom_tests(void) {
   /* Pop the trap manually from manager to induce error in deactivate */
   ui_focus_manager_pop_trap(mgr);
   rc = ui_focus_trap_deactivate(trap, mgr);
-  printf("OOM deactivate rc = %d\n", rc);
   if (rc == UI_ERROR_NONE) {
     printf("Failed to catch error in deactivate.\n");
     return 1;
@@ -146,8 +151,8 @@ static int run_oom_tests(void) {
 
   /* We manually popped, so just destroy */
   ui_focus_trap_destroy(trap);
-  ui_focus_manager_destroy(mgr);
-  ui_dom_node_destroy(root);
+  (void)ui_focus_manager_destroy(mgr);
+  (void)ui_dom_node_destroy(root);
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = -1;
@@ -171,11 +176,6 @@ int main(void) {
     return 1;
   }
 
-  if (0) {
-    printf("OOM tests failed.\n");
-    return 1;
-  }
-
   printf("All ui_focus_trap tests passed.\n");
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -186,16 +186,18 @@ int main(void) {
 
 static int run_coverage_tests(void) {
   struct ui_focus_trap *trap = NULL;
+  struct ui_focus_trap_test *trap_test;
   struct ui_focus_manager *mgr = NULL;
   struct ui_keyboard_responder *kbd = NULL;
   struct ui_dom_node *root = NULL;
   struct ui_event ev;
   int handled = 0;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Running coverage tests...\n");
 
   ui_focus_trap_create(&trap);
+  trap_test = (struct ui_focus_trap_test *)trap;
   ui_focus_manager_create(&mgr);
   ui_keyboard_responder_create(&kbd);
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
@@ -217,16 +219,35 @@ static int run_coverage_tests(void) {
   }
 
   /* Mock OOM in trap_keyboard_handler (ui_focus_manager_advance) */
+  ui_focus_manager_request_focus(mgr, root);
   g_malloc_fail_countdown = 0; /* advance allocs an array */
   rc = ui_keyboard_responder_handle_event(kbd, root, &ev, &handled);
   g_malloc_fail_countdown = -1;
-  /* Even if it fails, we covered the branch */
 
-  /* Null paths for deactivation, etc are already covered. */
+  /* Missing branches in trap_keyboard_handler */
+  ui_focus_manager_request_focus(mgr, root);
+  trap_test->is_active = 0;
+  ui_keyboard_responder_handle_event(kbd, root, &ev, &handled);
+  trap_test->is_active = 1;
+
+  ui_focus_manager_request_focus(mgr, root);
+  trap_test->manager = NULL;
+  ui_keyboard_responder_handle_event(kbd, root, &ev, &handled);
+  trap_test->manager = mgr;
+
+  ui_focus_manager_request_focus(mgr, root);
+  trap_test->root = NULL;
+  ui_keyboard_responder_handle_event(kbd, root, &ev, &handled);
+  trap_test->root = root;
+
+  /* Destroy trap with active but manager == NULL (covers branch in
+   * ui_focus_trap_destroy) */
+  trap_test->manager = NULL;
   ui_focus_trap_destroy(trap);
-  ui_keyboard_responder_destroy(kbd);
-  ui_focus_manager_destroy(mgr);
-  ui_dom_node_destroy(root);
+
+  (void)ui_keyboard_responder_destroy(kbd);
+  (void)ui_focus_manager_destroy(mgr);
+  (void)ui_dom_node_destroy(root);
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = -1;

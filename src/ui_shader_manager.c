@@ -39,56 +39,78 @@ static unsigned int mock_glCreateShader(int type) {
   (void)type;
   return mock_id_counter++;
 }
-static void mock_glShaderSource(unsigned int shader, int count,
-                                const char **string, const int *length) {
+static ui_error_t mock_glShaderSource(unsigned int shader, int count,
+                                      const char **string, const int *length) {
   (void)shader;
   (void)count;
   (void)string;
   (void)length;
+  return UI_ERROR_NONE;
 }
-static void mock_glCompileShader(unsigned int shader) { (void)shader; }
-static void mock_glGetShaderiv(unsigned int shader, int pname, int *params) {
+static ui_error_t mock_glCompileShader(unsigned int shader) {
+  (void)shader;
+  return UI_ERROR_NONE;
+}
+static ui_error_t mock_glGetShaderiv(unsigned int shader, int pname,
+                                     int *params) {
   (void)shader;
   (void)pname;
   *params = (g_mock_shader_fail == (int)shader) ? 0 : 1;
+  return UI_ERROR_NONE;
 }
 static unsigned int mock_glCreateProgram(void) { return mock_id_counter++; }
-static void mock_glAttachShader(unsigned int program, unsigned int shader) {
+static ui_error_t mock_glAttachShader(unsigned int program,
+                                      unsigned int shader) {
   (void)program;
   (void)shader;
+  return UI_ERROR_NONE;
 }
-static void mock_glLinkProgram(unsigned int program) { (void)program; }
-static void mock_glGetProgramiv(unsigned int program, int pname, int *params) {
+static ui_error_t mock_glLinkProgram(unsigned int program) {
+  (void)program;
+  return UI_ERROR_NONE;
+}
+static ui_error_t mock_glGetProgramiv(unsigned int program, int pname,
+                                      int *params) {
   (void)program;
   (void)pname;
   *params = g_mock_program_fail ? 0 : 1;
+  return UI_ERROR_NONE;
 }
-static void mock_glDeleteShader(unsigned int shader) { (void)shader; }
-static void mock_glDeleteProgram(unsigned int program) { (void)program; }
+static ui_error_t mock_glDeleteShader(unsigned int shader) {
+  (void)shader;
+  return UI_ERROR_NONE;
+}
+static ui_error_t mock_glDeleteProgram(unsigned int program) {
+  (void)program;
+  return UI_ERROR_NONE;
+}
 static int mock_glGetUniformLocation(unsigned int program, const char *name) {
   (void)program;
   (void)name;
   return 1;
 }
-static void mock_glUniformMatrix4fv(int location, int count,
-                                    unsigned char transpose,
-                                    const float *value) {
+static ui_error_t mock_glUniformMatrix4fv(int location, int count,
+                                          unsigned char transpose,
+                                          const float *value) {
   (void)location;
   (void)count;
   (void)transpose;
   (void)value;
+  return UI_ERROR_NONE;
 }
-static void mock_glUniform4f(int location, float v0, float v1, float v2,
-                             float v3) {
+static ui_error_t mock_glUniform4f(int location, float v0, float v1, float v2,
+                                   float v3) {
   (void)location;
   (void)v0;
   (void)v1;
   (void)v2;
   (void)v3;
+  return UI_ERROR_NONE;
 }
-static void mock_glUniform1f(int location, float v0) {
+static ui_error_t mock_glUniform1f(int location, float v0) {
   (void)location;
   (void)v0;
+  return UI_ERROR_NONE;
 }
 
 #define UI_GL_CREATE_SHADER mock_glCreateShader
@@ -135,15 +157,15 @@ struct ui_shader_manager {
   struct ui_shader_entry *head;
 };
 
-enum ui_error ui_shader_manager_create(struct ui_shader_manager **out_manager) {
+ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager) {
   struct ui_shader_manager *manager;
 
   if (!out_manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  manager =
-      (struct ui_shader_manager *)UI_MALLOC(sizeof(struct ui_shader_manager));
+  manager = (struct ui_shader_manager *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_shader_manager));
   if (!manager) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -154,7 +176,7 @@ enum ui_error ui_shader_manager_create(struct ui_shader_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_shader_manager_destroy(struct ui_shader_manager *manager) {
+ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager) {
   struct ui_shader_entry *current;
   struct ui_shader_entry *next;
 
@@ -166,19 +188,19 @@ enum ui_error ui_shader_manager_destroy(struct ui_shader_manager *manager) {
   while (current) {
     next = current->next;
     UI_GL_DELETE_PROGRAM(current->program_id);
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
-  UI_FREE(manager);
+  C_MULTIPLATFORM_FREE(manager);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_shader_manager_get_program(struct ui_shader_manager *manager,
-                                            const char *name,
-                                            const char *vertex_source,
-                                            const char *fragment_source,
-                                            unsigned int *out_program_id) {
+ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
+                                         const char *name,
+                                         const char *vertex_source,
+                                         const char *fragment_source,
+                                         unsigned int *out_program_id) {
   struct ui_shader_entry *current;
   struct ui_shader_entry *new_entry;
   unsigned int vertex_shader;
@@ -238,8 +260,8 @@ enum ui_error ui_shader_manager_get_program(struct ui_shader_manager *manager,
   }
 
   /* Cache the compiled program */
-  new_entry =
-      (struct ui_shader_entry *)UI_MALLOC(sizeof(struct ui_shader_entry));
+  new_entry = (struct ui_shader_entry *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_shader_entry));
   if (!new_entry) {
     UI_GL_DELETE_PROGRAM(program_id);
     return UI_ERROR_OUT_OF_MEMORY;
@@ -258,7 +280,7 @@ enum ui_error ui_shader_manager_get_program(struct ui_shader_manager *manager,
 }
 
 /** \brief ui_shader_manager_set_uniform_matrix */
-enum ui_error ui_shader_manager_set_uniform_matrix(
+ui_error_t ui_shader_manager_set_uniform_matrix(
     struct ui_shader_manager *manager, unsigned int program_id,
     const char *uniform_name, const float *matrix4x4) {
   int loc;
@@ -272,7 +294,7 @@ enum ui_error ui_shader_manager_set_uniform_matrix(
 }
 
 /** \brief ui_shader_manager_set_uniform_color */
-enum ui_error ui_shader_manager_set_uniform_color(
+ui_error_t ui_shader_manager_set_uniform_color(
     struct ui_shader_manager *manager, unsigned int program_id,
     const char *uniform_name, float r, float g, float b, float a) {
   int loc;
@@ -286,7 +308,7 @@ enum ui_error ui_shader_manager_set_uniform_color(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_shader_manager_set_uniform_float(struct ui_shader_manager *manager,
                                     unsigned int program_id,
                                     const char *uniform_name, float value) {

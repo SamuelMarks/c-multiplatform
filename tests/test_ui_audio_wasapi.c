@@ -6,7 +6,7 @@
 /* clang-format on */
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-extern enum ui_error
+extern ui_error_t
 ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend);
 
 int main(void) {

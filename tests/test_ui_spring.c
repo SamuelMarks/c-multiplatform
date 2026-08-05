@@ -7,7 +7,7 @@ int main(void) {
   struct ui_spring_config config;
   struct ui_spring_state state;
   struct ui_spring_state next_state;
-  enum ui_error err;
+  ui_error_t err;
 
   config.damping = 10.0f;
   config.stiffness = 100.0f;

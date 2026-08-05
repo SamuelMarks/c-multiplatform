@@ -39,7 +39,7 @@ struct ui_auth_request_config {
  * available, 0 otherwise).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_auth_is_supported(int *out_is_available);
+ui_error_t ui_auth_is_supported(int *out_is_available);
 
 /**
  * @brief Requests authentication using the system's secure enclave
@@ -52,8 +52,8 @@ enum ui_error ui_auth_is_supported(int *out_is_available);
  * completion.
  * @return UI_ERROR_NONE if the request was successfully dispatched.
  */
-enum ui_error ui_auth_request_async(const struct ui_auth_request_config *config,
-                                    struct ui_promise *promise);
+ui_error_t ui_auth_request_async(const struct ui_auth_request_config *config,
+                                 struct ui_promise *promise);
 
 #ifdef __cplusplus
 }

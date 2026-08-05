@@ -56,7 +56,7 @@ struct ui_css_computed_style; /* Forward declare */
  * @param out_props Pointer to the struct to populate.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_page_floats_parse(const struct ui_css_computed_style *style,
                          struct ui_css_page_floats_properties *out_props);
 

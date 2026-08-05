@@ -42,7 +42,7 @@ static void test_properties(const char *decl_prop, const char *decl_val,
   }
 
   ui_css_computed_style_destroy(style);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   ui_css_stylesheet_destroy(sheet);
 }
 
@@ -185,7 +185,7 @@ int main(void) {
   struct ui_dom_node *node = NULL;
   struct ui_css_computed_style *style = NULL;
   struct ui_css_speech_properties props;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Basic valid coverage */
   test_properties("speak", "never", verify_speak_never);
@@ -284,7 +284,7 @@ int main(void) {
 
   ui_css_speech_cleanup(&props);
   ui_css_computed_style_destroy(style);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   ui_css_stylesheet_destroy(sheet);
 
   /* empty string edge cases to hit !str branches in parse_* inside
@@ -313,7 +313,7 @@ int main(void) {
 
   ui_css_speech_cleanup(&props);
   ui_css_computed_style_destroy(style);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   ui_css_stylesheet_destroy(sheet);
 
   /* NULL pointer checks */
@@ -349,7 +349,7 @@ int main(void) {
             }
             ui_css_computed_style_destroy(style);
           }
-          ui_dom_node_destroy(node);
+          (void)ui_dom_node_destroy(node);
         }
         ui_css_stylesheet_destroy(sheet);
       }

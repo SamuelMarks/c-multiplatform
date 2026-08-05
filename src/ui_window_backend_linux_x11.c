@@ -20,10 +20,9 @@ struct ui_window {
   Atom wm_delete_window;
 };
 
-static enum ui_error linux_create_window(struct ui_window_backend *backend,
-                                         const char *title, int width,
-                                         int height,
-                                         struct ui_window **out_window) {
+static ui_error_t linux_create_window(struct ui_window_backend *backend,
+                                      const char *title, int width, int height,
+                                      struct ui_window **out_window) {
   Display *dpy;
   Window win;
   int screen;
@@ -68,7 +67,8 @@ static enum ui_error linux_create_window(struct ui_window_backend *backend,
   glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
   glXMakeCurrent(dpy, win, glc);
 
-  win_obj = (struct ui_window *)UI_MALLOC(sizeof(struct ui_window));
+  win_obj =
+      (struct ui_window *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window));
   if (!win_obj) {
     glXMakeCurrent(dpy, None, NULL);
     glXDestroyContext(dpy, glc);
@@ -91,8 +91,8 @@ static enum ui_error linux_create_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_destroy_window(struct ui_window_backend *backend,
-                                          struct ui_window *window) {
+static ui_error_t linux_destroy_window(struct ui_window_backend *backend,
+                                       struct ui_window *window) {
   if (!backend || !window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -106,12 +106,12 @@ static enum ui_error linux_destroy_window(struct ui_window_backend *backend,
     }
     XCloseDisplay((Display *)window->display);
   }
-  UI_FREE(window);
+  C_MULTIPLATFORM_FREE(window);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_show_window(struct ui_window_backend *backend,
-                                       struct ui_window *window) {
+static ui_error_t linux_show_window(struct ui_window_backend *backend,
+                                    struct ui_window *window) {
   if (!backend || !window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -120,8 +120,8 @@ static enum ui_error linux_show_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_hide_window(struct ui_window_backend *backend,
-                                       struct ui_window *window) {
+static ui_error_t linux_hide_window(struct ui_window_backend *backend,
+                                    struct ui_window *window) {
   if (!backend || !window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -130,10 +130,10 @@ static enum ui_error linux_hide_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_poll_events(struct ui_window_backend *backend,
-                                       struct ui_window *window,
-                                       struct ui_event *out_event,
-                                       int *out_has_event) {
+static ui_error_t linux_poll_events(struct ui_window_backend *backend,
+                                    struct ui_window *window,
+                                    struct ui_event *out_event,
+                                    int *out_has_event) {
   Display *dpy;
   XEvent xev;
 
@@ -165,8 +165,8 @@ static enum ui_error linux_poll_events(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_swap_buffers(struct ui_window_backend *backend,
-                                        struct ui_window *window) {
+static ui_error_t linux_swap_buffers(struct ui_window_backend *backend,
+                                     struct ui_window *window) {
   if (!backend || !window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -175,7 +175,7 @@ static enum ui_error linux_swap_buffers(struct ui_window_backend *backend,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   struct ui_window_backend *backend;
 
@@ -183,8 +183,8 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  backend =
-      (struct ui_window_backend *)UI_MALLOC(sizeof(struct ui_window_backend));
+  backend = (struct ui_window_backend *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_window_backend));
   if (!backend) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -205,12 +205,11 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
+ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(backend);
+  C_MULTIPLATFORM_FREE(backend);
   return UI_ERROR_NONE;
 }
 
@@ -219,7 +218,7 @@ ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
 #include "../include/ui_window_backend_linux.h"
 #include <stddef.h>
 
-enum ui_error
+ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -229,8 +228,7 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
+ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

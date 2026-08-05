@@ -12,15 +12,15 @@ static int g_change_called = 0;
 static const char *g_change_value = NULL;
 static int g_touched_called = 0;
 
-static enum ui_error on_change(union ui_signal_payload new_value,
-                               void *user_data) {
+static ui_error_t on_change(union ui_signal_payload new_value,
+                            void *user_data) {
   g_change_called++;
   g_change_value = (const char *)new_value.ptr_val;
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_touched(void *user_data) {
+static ui_error_t on_touched(void *user_data) {
   g_touched_called++;
   (void)user_data;
   return UI_ERROR_NONE;
@@ -50,6 +50,9 @@ static void test_pin_input_creation_and_events(void) {
   cva.register_on_touched(pin_input, on_touched, NULL);
 
   /* Set value */
+  payload.ptr_val = "12345";
+  cva.write_value(pin_input, payload);
+
   payload.ptr_val = "12";
   cva.write_value(pin_input, payload);
 
@@ -93,8 +96,8 @@ static void test_pin_input_creation_and_events(void) {
   ui_pin_input_base_on_paste(pin_input, "1");
   assert(g_change_called == 0);
 
-  ui_pin_input_base_destroy(pin_input);
-  ui_pin_input_base_destroy(NULL);
+  (void)ui_pin_input_base_destroy(pin_input);
+  (void)ui_pin_input_base_destroy(NULL);
 }
 
 static void test_pin_input_nulls(void) {
@@ -128,7 +131,7 @@ static void test_pin_input_nulls(void) {
   assert(ui_pin_input_base_on_paste(NULL, "5") == UI_ERROR_INVALID_ARGUMENT);
   assert(ui_pin_input_base_on_paste(dummy, NULL) == UI_ERROR_INVALID_ARGUMENT);
 
-  ui_pin_input_base_destroy(dummy);
+  (void)ui_pin_input_base_destroy(dummy);
 }
 
 static void test_pin_input_oom(void) {
@@ -137,7 +140,7 @@ static void test_pin_input_oom(void) {
   for (i = 0; i < 10; i++) {
     g_malloc_fail_countdown = i;
     if (ui_pin_input_base_create(&pin_input, 4, NULL) == UI_ERROR_NONE) {
-      ui_pin_input_base_destroy(pin_input);
+      (void)ui_pin_input_base_destroy(pin_input);
       break;
     }
   }
@@ -159,7 +162,7 @@ int main(void) {
   ui_pin_input_base_on_input(unregistered, 0, "1");
   ui_pin_input_base_on_backspace(unregistered, 0);
   ui_pin_input_base_on_paste(unregistered, "12");
-  ui_pin_input_base_destroy(unregistered);
+  (void)ui_pin_input_base_destroy(unregistered);
 
   printf("test_ui_pin_input_base passed\n");
   return 0;

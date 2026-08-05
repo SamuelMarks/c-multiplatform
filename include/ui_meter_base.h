@@ -34,7 +34,7 @@ struct ui_meter_base {
  * @param out_meter Pointer to output the initialized meter.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_meter_base_create(struct ui_meter_base **out_meter);
+ui_error_t ui_meter_base_create(struct ui_meter_base **out_meter);
 
 /**
  * @brief Sets the current value of the meter.
@@ -43,7 +43,7 @@ enum ui_error ui_meter_base_create(struct ui_meter_base **out_meter);
  * @param value The value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_meter_base_set_value(struct ui_meter_base *meter, float value);
+ui_error_t ui_meter_base_set_value(struct ui_meter_base *meter, float value);
 
 /**
  * @brief Sets the minimum and maximum boundaries of the meter.
@@ -53,8 +53,8 @@ enum ui_error ui_meter_base_set_value(struct ui_meter_base *meter, float value);
  * @param max_val The maximum value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_meter_base_set_bounds(struct ui_meter_base *meter,
-                                       float min_val, float max_val);
+ui_error_t ui_meter_base_set_bounds(struct ui_meter_base *meter, float min_val,
+                                    float max_val);
 
 /**
  * @brief Sets the gauge thresholds for low, high, and optimum ranges.
@@ -65,9 +65,9 @@ enum ui_error ui_meter_base_set_bounds(struct ui_meter_base *meter,
  * @param optimum_val The optimum value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_meter_base_set_thresholds(struct ui_meter_base *meter,
-                                           float low_val, float high_val,
-                                           float optimum_val);
+ui_error_t ui_meter_base_set_thresholds(struct ui_meter_base *meter,
+                                        float low_val, float high_val,
+                                        float optimum_val);
 
 /**
  * @brief Binds the value property.
@@ -76,8 +76,8 @@ enum ui_error ui_meter_base_set_thresholds(struct ui_meter_base *meter,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_meter_base_bind_value(struct ui_meter_base *widget,
-                                       struct ui_signal *signal);
+ui_error_t ui_meter_base_bind_value(struct ui_meter_base *widget,
+                                    struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

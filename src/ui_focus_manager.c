@@ -18,14 +18,15 @@ struct ui_focus_manager {
   size_t traps_capacity;
 };
 
-enum ui_error ui_focus_manager_create(struct ui_focus_manager **out_manager) {
+ui_error_t ui_focus_manager_create(struct ui_focus_manager **out_manager) {
   struct ui_focus_manager *mgr;
 
   if (!out_manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  mgr = (struct ui_focus_manager *)UI_MALLOC(sizeof(struct ui_focus_manager));
+  mgr = (struct ui_focus_manager *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_focus_manager));
   if (!mgr) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -39,19 +40,19 @@ enum ui_error ui_focus_manager_create(struct ui_focus_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_focus_manager_destroy(struct ui_focus_manager *manager) {
+ui_error_t ui_focus_manager_destroy(struct ui_focus_manager *manager) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (manager->traps) {
-    UI_FREE(manager->traps);
+    C_MULTIPLATFORM_FREE(manager->traps);
   }
-  UI_FREE(manager);
+  C_MULTIPLATFORM_FREE(manager);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_focus_manager_request_focus(struct ui_focus_manager *manager,
-                                             struct ui_dom_node *node) {
+ui_error_t ui_focus_manager_request_focus(struct ui_focus_manager *manager,
+                                          struct ui_dom_node *node) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -60,7 +61,7 @@ enum ui_error ui_focus_manager_request_focus(struct ui_focus_manager *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_focus_manager_get_focused_node(const struct ui_focus_manager *manager,
                                   struct ui_dom_node **out_node) {
   if (!manager || !out_node) {
@@ -70,51 +71,43 @@ ui_focus_manager_get_focused_node(const struct ui_focus_manager *manager,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error is_focusable(struct ui_dom_node *node,
-                                  ui_bool_t *out_focusable) {
+static ui_error_t is_focusable(struct ui_dom_node *node,
+                               ui_bool_t *out_focusable) {
   const char *tabindex_val = NULL;
 
-  if (!out_focusable)
-    return UI_ERROR_INVALID_ARGUMENT;
   *out_focusable = UI_FALSE;
-
-  if (!node)
-    return UI_ERROR_INVALID_ARGUMENT;
 
   if (node->type != UI_DOM_NODE_TYPE_ELEMENT) {
     return UI_ERROR_NONE;
   }
-  if (ui_dom_node_get_attribute(node, "tabindex", &tabindex_val) ==
-          UI_ERROR_NONE &&
-      tabindex_val != NULL) {
-    int index = atoi(tabindex_val);
-    if (index >= 0) {
-      *out_focusable = UI_TRUE;
+  {
+    ui_error_t rc = ui_dom_node_get_attribute(node, "tabindex", &tabindex_val);
+    if (rc == UI_ERROR_NONE) {
+      int index = atoi(tabindex_val);
+      if (index >= 0) {
+        *out_focusable = UI_TRUE;
+      }
     }
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gather_focusable_nodes(struct ui_dom_node *root,
-                                            struct ui_dom_node ***out_nodes,
-                                            size_t *out_count,
-                                            size_t *out_capacity) {
+static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
+                                         struct ui_dom_node ***out_nodes,
+                                         size_t *out_count,
+                                         size_t *out_capacity) {
   struct ui_dom_node *child;
   ui_bool_t focusable = UI_FALSE;
-  enum ui_error rc;
+  ui_error_t rc;
 
-  if (!root || !out_nodes || !out_count || !out_capacity)
-    return UI_ERROR_INVALID_ARGUMENT;
-
-  rc = is_focusable(root, &focusable);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  { (void)is_focusable(root, &focusable); }
 
   if (focusable) {
     if (*out_count >= *out_capacity) {
       size_t new_cap = (*out_capacity == 0) ? 16 : (*out_capacity * 2);
-      struct ui_dom_node **new_arr = (struct ui_dom_node **)UI_REALLOC(
-          *out_nodes, new_cap * sizeof(struct ui_dom_node *));
+      struct ui_dom_node **new_arr =
+          (struct ui_dom_node **)C_MULTIPLATFORM_REALLOC(
+              *out_nodes, new_cap * sizeof(struct ui_dom_node *));
       if (new_arr) {
         *out_nodes = new_arr;
         *out_capacity = new_cap;
@@ -127,23 +120,27 @@ static enum ui_error gather_focusable_nodes(struct ui_dom_node *root,
 
   child = root->first_child;
   while (child) {
-    rc = gather_focusable_nodes(child, out_nodes, out_count, out_capacity);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    {
+      ui_error_t g_rc =
+          gather_focusable_nodes(child, out_nodes, out_count, out_capacity);
+      if (g_rc != UI_ERROR_NONE) {
+        return g_rc;
+      }
+    }
     child = child->next_sibling;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_focus_manager_advance(struct ui_focus_manager *manager,
-                                       struct ui_dom_node *root, int forward) {
+ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
+                                    struct ui_dom_node *root, int forward) {
   struct ui_dom_node *target_root;
   struct ui_dom_node **nodes = NULL;
   size_t count = 0;
   size_t capacity = 0;
   size_t i;
   int current_index = -1;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!manager || !root) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -154,16 +151,9 @@ enum ui_error ui_focus_manager_advance(struct ui_focus_manager *manager,
     target_root = manager->traps[manager->traps_count - 1].root;
   }
 
-  rc = gather_focusable_nodes(target_root, &nodes, &count, &capacity);
-  if (rc != UI_ERROR_NONE) {
-    if (nodes)
-      UI_FREE(nodes);
-    return rc;
-  }
+  gather_focusable_nodes(target_root, &nodes, &count, &capacity);
 
   if (count == 0) {
-    if (nodes)
-      UI_FREE(nodes);
     return UI_ERROR_NONE;
   }
 
@@ -188,35 +178,31 @@ enum ui_error ui_focus_manager_advance(struct ui_focus_manager *manager,
     }
   }
 
-  if (nodes) {
-    UI_FREE(nodes);
-  }
+  C_MULTIPLATFORM_FREE(nodes);
 
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
+static ui_error_t
 gather_focusable_layout_nodes(struct ui_layout_node *node,
                               struct ui_layout_node ***out_nodes,
                               size_t *out_count, size_t *out_capacity) {
   struct ui_layout_node *child;
   ui_bool_t focusable = UI_FALSE;
-  enum ui_error rc = UI_ERROR_NONE;
-
-  if (!node || !out_nodes || !out_count || !out_capacity)
-    return UI_ERROR_INVALID_ARGUMENT;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (node->dom_node) {
-    rc = is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    {
+      (void)is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
+    }
   }
 
   if (focusable) {
     if (*out_count >= *out_capacity) {
       size_t new_cap = (*out_capacity == 0) ? 16 : (*out_capacity * 2);
-      struct ui_layout_node **new_arr = (struct ui_layout_node **)UI_REALLOC(
-          *out_nodes, new_cap * sizeof(struct ui_layout_node *));
+      struct ui_layout_node **new_arr =
+          (struct ui_layout_node **)C_MULTIPLATFORM_REALLOC(
+              *out_nodes, new_cap * sizeof(struct ui_layout_node *));
       if (new_arr) {
         *out_nodes = new_arr;
         *out_capacity = new_cap;
@@ -229,24 +215,23 @@ gather_focusable_layout_nodes(struct ui_layout_node *node,
 
   child = node->first_child;
   while (child) {
-    rc = gather_focusable_layout_nodes(child, out_nodes, out_count,
-                                       out_capacity);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    {
+      ui_error_t g_rc = gather_focusable_layout_nodes(child, out_nodes,
+                                                      out_count, out_capacity);
+      if (g_rc != UI_ERROR_NONE) {
+        return g_rc;
+      }
+    }
     child = child->next_sibling;
   }
   return UI_ERROR_NONE;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error get_distance(struct ui_layout_node *a,
-                                  struct ui_layout_node *b,
-                                  enum ui_focus_direction dir,
-                                  float *out_distance) {
+static void get_distance(struct ui_layout_node *a, struct ui_layout_node *b,
+                         enum ui_focus_direction dir, float *out_distance) {
   float dx = 0.0f, dy = 0.0f;
   float center_ax, center_ay, center_bx, center_by;
-
-  if (!a || !b || !out_distance)
-    return UI_ERROR_INVALID_ARGUMENT;
 
   center_ax = a->x + a->width * 0.5f;
   center_ay = a->y + a->height * 0.5f;
@@ -258,38 +243,40 @@ static enum ui_error get_distance(struct ui_layout_node *a,
   switch (dir) {
   case UI_FOCUS_DIRECTION_UP:
     if (center_by >= center_ay)
-      return UI_ERROR_NONE; /* Must be strictly above */
+      return; /* Must be strictly above */
     dx = center_ax - center_bx;
     dy = center_ay - center_by;
     break;
   case UI_FOCUS_DIRECTION_DOWN:
     if (center_by <= center_ay)
-      return UI_ERROR_NONE; /* Must be strictly below */
+      return; /* Must be strictly below */
     dx = center_ax - center_bx;
     dy = center_by - center_ay;
     break;
   case UI_FOCUS_DIRECTION_LEFT:
     if (center_bx >= center_ax)
-      return UI_ERROR_NONE; /* Must be strictly left */
+      return; /* Must be strictly left */
     dx = center_ax - center_bx;
     dy = center_ay - center_by;
     break;
   case UI_FOCUS_DIRECTION_RIGHT:
     if (center_bx <= center_ax)
-      return UI_ERROR_NONE; /* Must be strictly right */
+      return; /* Must be strictly right */
     dx = center_bx - center_ax;
     dy = center_ay - center_by;
+    break;
+  default:
     break;
   }
 
   /* Give heavy penalty to perpendicular distance */
   *out_distance = dy * dy + dx * dx * 4.0f;
-  return UI_ERROR_NONE;
+  return;
 }
 
-enum ui_error ui_focus_manager_navigate(struct ui_focus_manager *manager,
-                                        struct ui_layout_node *layout_root,
-                                        enum ui_focus_direction direction) {
+ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
+                                     struct ui_layout_node *layout_root,
+                                     enum ui_focus_direction direction) {
   struct ui_layout_node **nodes = NULL;
   size_t count = 0;
   size_t capacity = 0;
@@ -297,7 +284,7 @@ enum ui_error ui_focus_manager_navigate(struct ui_focus_manager *manager,
   struct ui_layout_node *current_layout_node = NULL;
   struct ui_layout_node *best_node = NULL;
   float best_distance = -1.0f;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!manager || !layout_root) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -307,11 +294,12 @@ enum ui_error ui_focus_manager_navigate(struct ui_focus_manager *manager,
     return UI_ERROR_NONE; /* No starting point for spatial navigation */
   }
 
-  rc = gather_focusable_layout_nodes(layout_root, &nodes, &count, &capacity);
-  if (rc != UI_ERROR_NONE) {
-    if (nodes)
-      UI_FREE(nodes);
-    return rc;
+  {
+    ui_error_t g_rc =
+        gather_focusable_layout_nodes(layout_root, &nodes, &count, &capacity);
+    if (g_rc != UI_ERROR_NONE) {
+      return g_rc;
+    }
   }
 
   for (i = 0; i < count; ++i) {
@@ -323,7 +311,7 @@ enum ui_error ui_focus_manager_navigate(struct ui_focus_manager *manager,
 
   if (!current_layout_node) {
     if (nodes)
-      UI_FREE(nodes);
+      C_MULTIPLATFORM_FREE(nodes);
     return UI_ERROR_NONE;
   }
 
@@ -349,7 +337,7 @@ enum ui_error ui_focus_manager_navigate(struct ui_focus_manager *manager,
         continue;
     }
 
-    (void)get_distance(current_layout_node, nodes[i], direction, &dist);
+    get_distance(current_layout_node, nodes[i], direction, &dist);
 
     if (dist >= 0.0f) {
       if (best_distance < 0.0f || dist < best_distance) {
@@ -363,15 +351,13 @@ enum ui_error ui_focus_manager_navigate(struct ui_focus_manager *manager,
     manager->focused_node = (struct ui_dom_node *)best_node->dom_node;
   }
 
-  if (nodes) {
-    UI_FREE(nodes);
-  }
+  C_MULTIPLATFORM_FREE(nodes);
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_focus_manager_push_trap(struct ui_focus_manager *manager,
-                                         struct ui_dom_node *trap_root) {
+ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
+                                      struct ui_dom_node *trap_root) {
   if (!manager || !trap_root) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -379,8 +365,9 @@ enum ui_error ui_focus_manager_push_trap(struct ui_focus_manager *manager,
   if (manager->traps_count >= manager->traps_capacity) {
     size_t new_cap =
         (manager->traps_capacity == 0) ? 4 : (manager->traps_capacity * 2);
-    struct ui_focus_trap *new_arr = (struct ui_focus_trap *)UI_REALLOC(
-        manager->traps, new_cap * sizeof(struct ui_focus_trap));
+    struct ui_focus_trap *new_arr =
+        (struct ui_focus_trap *)C_MULTIPLATFORM_REALLOC(
+            manager->traps, new_cap * sizeof(struct ui_focus_trap));
     if (!new_arr) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -394,12 +381,12 @@ enum ui_error ui_focus_manager_push_trap(struct ui_focus_manager *manager,
   manager->traps_count++;
 
   /* Reset focus to the trap root or its first focusable element */
-  ui_focus_manager_advance(manager, trap_root, 1);
+  (void)ui_focus_manager_advance(manager, trap_root, 1);
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_focus_manager_pop_trap(struct ui_focus_manager *manager) {
+ui_error_t ui_focus_manager_pop_trap(struct ui_focus_manager *manager) {
   struct ui_focus_trap *popped;
 
   if (!manager) {

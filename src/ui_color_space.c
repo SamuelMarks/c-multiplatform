@@ -8,8 +8,8 @@
 #endif
 
 /* Standard sRGB to XYZ matrix */
-static enum ui_error srgb_to_xyz(float r, float g, float b, float *x, float *y,
-                                 float *z) {
+static ui_error_t srgb_to_xyz(float r, float g, float b, float *x, float *y,
+                              float *z) {
   /* Linearize */
   r = (r <= 0.04045f) ? (r / 12.92f) : (float)pow((r + 0.055) / 1.055, 2.4);
   g = (g <= 0.04045f) ? (g / 12.92f) : (float)pow((g + 0.055) / 1.055, 2.4);
@@ -21,8 +21,8 @@ static enum ui_error srgb_to_xyz(float r, float g, float b, float *x, float *y,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error xyz_to_srgb(float x, float y, float z, float *r, float *g,
-                                 float *b) {
+static ui_error_t xyz_to_srgb(float x, float y, float z, float *r, float *g,
+                              float *b) {
   float r_lin = x * 3.2406f + y * -1.5372f + z * -0.4986f;
   float g_lin = x * -0.9689f + y * 1.8758f + z * 0.0415f;
   float b_lin = x * 0.0557f + y * -0.2040f + z * 1.0570f;
@@ -51,8 +51,8 @@ static float calc_lab_f_inv(float t) {
   return (108.0f / 841.0f) * (t - (4.0f / 29.0f));
 }
 
-static enum ui_error xyz_to_lab(float x, float y, float z, float *l, float *a,
-                                float *b_out) {
+static ui_error_t xyz_to_lab(float x, float y, float z, float *l, float *a,
+                             float *b_out) {
   /* D65 standard illuminant */
   float xn = 0.95047f;
   float yn = 1.00000f;
@@ -68,8 +68,8 @@ static enum ui_error xyz_to_lab(float x, float y, float z, float *l, float *a,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error lab_to_xyz(float l, float a, float b_in, float *x,
-                                float *y, float *z) {
+static ui_error_t lab_to_xyz(float l, float a, float b_in, float *x, float *y,
+                             float *z) {
   float xn = 0.95047f;
   float yn = 1.00000f;
   float zn = 1.08883f;
@@ -84,8 +84,8 @@ static enum ui_error lab_to_xyz(float l, float a, float b_in, float *x,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error lab_to_lch(float l, float a, float b_in, float *l_out,
-                                float *c, float *h) {
+static ui_error_t lab_to_lch(float l, float a, float b_in, float *l_out,
+                             float *c, float *h) {
   *l_out = l;
   *c = (float)sqrt(a * a + b_in * b_in);
   *h = (float)(atan2(b_in, a) * 180.0 / M_PI);
@@ -95,8 +95,8 @@ static enum ui_error lab_to_lch(float l, float a, float b_in, float *l_out,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error lch_to_lab(float l, float c, float h, float *l_out,
-                                float *a, float *b_out) {
+static ui_error_t lch_to_lab(float l, float c, float h, float *l_out, float *a,
+                             float *b_out) {
   float h_rad = h * (float)M_PI / 180.0f;
   *l_out = l;
   *a = c * (float)cos(h_rad);
@@ -112,8 +112,8 @@ static float math_clamp(float v, float min, float max) {
   return v;
 }
 
-enum ui_error ui_color_argb_to_cam16(ui_color_t argb,
-                                     struct ui_color_cam16 *out_cam16) {
+ui_error_t ui_color_argb_to_cam16(ui_color_t argb,
+                                  struct ui_color_cam16 *out_cam16) {
   float r, g, b, x, y, z, l, a_val, b_val, l_ch, c, h;
 
   if (!out_cam16) {
@@ -124,10 +124,12 @@ enum ui_error ui_color_argb_to_cam16(ui_color_t argb,
   g = UI_COLOR_GREEN(argb) / 255.0f;
   b = UI_COLOR_BLUE(argb) / 255.0f;
 
-  /* Surrogate implementation: mapping LAB/LCh to CAM16 fields approximately */
-  srgb_to_xyz(r, g, b, &x, &y, &z);
-  xyz_to_lab(x, y, z, &l, &a_val, &b_val);
-  lab_to_lch(l, a_val, b_val, &l_ch, &c, &h);
+  {
+    ui_error_t rc;
+    (void)srgb_to_xyz(r, g, b, &x, &y, &z);
+    (void)xyz_to_lab(x, y, z, &l, &a_val, &b_val);
+    (void)lab_to_lch(l, a_val, b_val, &l_ch, &c, &h);
+  }
 
   out_cam16->hue = h;
   out_cam16->chroma = c;
@@ -139,8 +141,8 @@ enum ui_error ui_color_argb_to_cam16(ui_color_t argb,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
-                                     ui_color_t *out_argb) {
+ui_error_t ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
+                                  ui_color_t *out_argb) {
   float l_ch, a_val, b_val, x, y, z, r, g, b;
   ui_uint8 r8, g8, b8;
 
@@ -148,9 +150,13 @@ enum ui_error ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  lch_to_lab(cam16->j, cam16->chroma, cam16->hue, &l_ch, &a_val, &b_val);
-  lab_to_xyz(l_ch, a_val, b_val, &x, &y, &z);
-  xyz_to_srgb(x, y, z, &r, &g, &b);
+  {
+    ui_error_t rc;
+    (void)lch_to_lab(cam16->j, cam16->chroma, cam16->hue, &l_ch, &a_val,
+                     &b_val);
+    (void)lab_to_xyz(l_ch, a_val, b_val, &x, &y, &z);
+    (void)xyz_to_srgb(x, y, z, &r, &g, &b);
+  }
 
   r8 = (ui_uint8)(math_clamp(r, 0.0f, 1.0f) * 255.0f + 0.5f);
   g8 = (ui_uint8)(math_clamp(g, 0.0f, 1.0f) * 255.0f + 0.5f);
@@ -160,8 +166,7 @@ enum ui_error ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_argb_to_hct(ui_color_t argb,
-                                   struct ui_color_hct *out_hct) {
+ui_error_t ui_color_argb_to_hct(ui_color_t argb, struct ui_color_hct *out_hct) {
   float r, g, b, x, y, z, l, a_val, b_val, l_ch, c, h;
 
   if (!out_hct) {
@@ -173,9 +178,12 @@ enum ui_error ui_color_argb_to_hct(ui_color_t argb,
   b = UI_COLOR_BLUE(argb) / 255.0f;
 
   /* Use LCh as a close surrogate for HCT */
-  srgb_to_xyz(r, g, b, &x, &y, &z);
-  xyz_to_lab(x, y, z, &l, &a_val, &b_val);
-  lab_to_lch(l, a_val, b_val, &l_ch, &c, &h);
+  {
+    ui_error_t rc;
+    (void)srgb_to_xyz(r, g, b, &x, &y, &z);
+    (void)xyz_to_lab(x, y, z, &l, &a_val, &b_val);
+    (void)lab_to_lch(l, a_val, b_val, &l_ch, &c, &h);
+  }
 
   out_hct->hue = h;
   out_hct->chroma = c;
@@ -184,8 +192,8 @@ enum ui_error ui_color_argb_to_hct(ui_color_t argb,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_hct_to_argb(const struct ui_color_hct *hct,
-                                   ui_color_t *out_argb) {
+ui_error_t ui_color_hct_to_argb(const struct ui_color_hct *hct,
+                                ui_color_t *out_argb) {
   float l_ch, a_val, b_val, x, y, z, r, g, b;
   ui_uint8 r8, g8, b8;
 
@@ -193,9 +201,12 @@ enum ui_error ui_color_hct_to_argb(const struct ui_color_hct *hct,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  lch_to_lab(hct->tone, hct->chroma, hct->hue, &l_ch, &a_val, &b_val);
-  lab_to_xyz(l_ch, a_val, b_val, &x, &y, &z);
-  xyz_to_srgb(x, y, z, &r, &g, &b);
+  {
+    ui_error_t rc;
+    (void)lch_to_lab(hct->tone, hct->chroma, hct->hue, &l_ch, &a_val, &b_val);
+    (void)lab_to_xyz(l_ch, a_val, b_val, &x, &y, &z);
+    (void)xyz_to_srgb(x, y, z, &r, &g, &b);
+  }
 
   r8 = (ui_uint8)(math_clamp(r, 0.0f, 1.0f) * 255.0f + 0.5f);
   g8 = (ui_uint8)(math_clamp(g, 0.0f, 1.0f) * 255.0f + 0.5f);

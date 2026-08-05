@@ -13,17 +13,17 @@ struct ui_radio_group_base {
   ui_radio_group_on_change_t on_change;
   void *user_data;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
   int is_disabled;
 };
 
-static enum ui_error trigger_cva_change(struct ui_radio_group_base *group,
-                                        int active_index) {
+static ui_error_t trigger_cva_change(struct ui_radio_group_base *group,
+                                     int active_index) {
   if (group->cva_on_change) {
     union ui_signal_payload payload;
     payload.int_val = active_index;
@@ -32,15 +32,15 @@ static enum ui_error trigger_cva_change(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_cva_touched(struct ui_radio_group_base *group) {
+static ui_error_t trigger_cva_touched(struct ui_radio_group_base *group) {
   if (group->cva_on_touched) {
     return group->cva_on_touched(group->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-radio_group_cva_write_value(void *component, union ui_signal_payload value) {
+static ui_error_t radio_group_cva_write_value(void *component,
+                                              union ui_signal_payload value) {
   struct ui_radio_group_base *group = (struct ui_radio_group_base *)component;
   int index;
 
@@ -50,19 +50,27 @@ radio_group_cva_write_value(void *component, union ui_signal_payload value) {
   index = value.int_val;
 
   if (index >= 0 && index < (int)group->count) {
-    ui_radio_group_base_set_active(group, group->toggles[index]);
+    {
+      ui_error_t set_rc =
+          ui_radio_group_base_set_active(group, group->toggles[index]);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
+    }
   } else {
-    ui_radio_group_base_set_active(group, NULL);
+    {
+      ui_error_t set_rc = ui_radio_group_base_set_active(group, NULL);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief radio_group_cva_register_on_change */
-static enum ui_error radio_group_cva_register_on_change(
+static ui_error_t radio_group_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_radio_group_base *group = (struct ui_radio_group_base *)component;
   if (!group)
@@ -72,10 +80,8 @@ static enum ui_error radio_group_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-radio_group_cva_register_on_touched(void *component,
-                                    enum ui_error (*callback)(void *user_data),
-                                    void *user_data) {
+static ui_error_t radio_group_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_radio_group_base *group = (struct ui_radio_group_base *)component;
   if (!group)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -84,8 +90,8 @@ radio_group_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error radio_group_cva_set_disabled_state(void *component,
-                                                        ui_bool_t is_disabled) {
+static ui_error_t radio_group_cva_set_disabled_state(void *component,
+                                                     ui_bool_t is_disabled) {
   struct ui_radio_group_base *group = (struct ui_radio_group_base *)component;
   size_t i;
   if (!group)
@@ -101,11 +107,11 @@ static enum ui_error radio_group_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_child_toggle_change(struct ui_toggle_base *toggle,
-                                            int checked, void *user_data) {
+static ui_error_t on_child_toggle_change(struct ui_toggle_base *toggle,
+                                         int checked, void *user_data) {
   struct ui_radio_group_base *group = (struct ui_radio_group_base *)user_data;
   size_t i;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!checked) {
     /* In a standard radio group, you cannot uncheck an item by clicking it.
@@ -119,9 +125,18 @@ static enum ui_error on_child_toggle_change(struct ui_toggle_base *toggle,
   for (i = 0; i < group->count; ++i) {
     int is_checked = 0;
     if (group->toggles[i] != toggle) {
-      ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+      {
+        ui_error_t check_rc =
+            ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+        if (check_rc != UI_ERROR_NONE)
+          return check_rc;
+      }
       if (is_checked) {
-        ui_toggle_base_set_checked(group->toggles[i], 0);
+        {
+          ui_error_t chk_rc = ui_toggle_base_set_checked(group->toggles[i], 0);
+          if (chk_rc != UI_ERROR_NONE)
+            return chk_rc;
+        }
       }
     }
   }
@@ -143,7 +158,7 @@ static enum ui_error on_child_toggle_change(struct ui_toggle_base *toggle,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_radio_group_base_create(struct ui_radio_group_base **out_group,
                            struct ui_control_value_accessor *out_cva) {
   struct ui_radio_group_base *group;
@@ -152,7 +167,7 @@ ui_radio_group_base_create(struct ui_radio_group_base **out_group,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  group = (struct ui_radio_group_base *)UI_MALLOC(
+  group = (struct ui_radio_group_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_radio_group_base));
   if (!group) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -181,24 +196,30 @@ ui_radio_group_base_create(struct ui_radio_group_base **out_group,
   return UI_ERROR_NONE;
 }
 
-void ui_radio_group_base_destroy(struct ui_radio_group_base *group) {
+ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group) {
   size_t i;
   if (!group)
-    return;
+    return UI_ERROR_NONE;
 
   /* Unhook callbacks to prevent dangling pointers */
   for (i = 0; i < group->count; ++i) {
-    ui_toggle_base_set_on_change(group->toggles[i], NULL, NULL);
+    {
+      ui_error_t set_rc =
+          ui_toggle_base_set_on_change(group->toggles[i], NULL, NULL);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
+    }
   }
 
   if (group->toggles) {
-    UI_FREE(group->toggles);
+    C_MULTIPLATFORM_FREE(group->toggles);
   }
-  UI_FREE(group);
+  C_MULTIPLATFORM_FREE(group);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
-                                             struct ui_toggle_base *toggle) {
+ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
+                                          struct ui_toggle_base *toggle) {
   size_t i;
 
   if (!group || !toggle)
@@ -215,7 +236,7 @@ enum ui_error ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
     if (new_cap == 0) {
       new_cap = 4;
     }
-    new_arr = (struct ui_toggle_base **)UI_REALLOC(
+    new_arr = (struct ui_toggle_base **)C_MULTIPLATFORM_REALLOC(
         group->toggles, new_cap * sizeof(struct ui_toggle_base *));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
@@ -224,13 +245,26 @@ enum ui_error ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
   }
 
   group->toggles[group->count++] = toggle;
-  ui_toggle_base_set_on_change(toggle, on_child_toggle_change, group);
+  {
+    ui_error_t set_rc =
+        ui_toggle_base_set_on_change(toggle, on_child_toggle_change, group);
+    if (set_rc != UI_ERROR_NONE)
+      return set_rc;
+  }
 
   {
     int is_checked = 0;
-    ui_toggle_base_is_checked(toggle, &is_checked);
+    {
+      ui_error_t check_rc = ui_toggle_base_is_checked(toggle, &is_checked);
+      if (check_rc != UI_ERROR_NONE)
+        return check_rc;
+    }
     if (is_checked) {
-      (void)on_child_toggle_change(toggle, 1, group);
+      {
+        ui_error_t on_rc = on_child_toggle_change(toggle, 1, group);
+        if (on_rc != UI_ERROR_NONE)
+          return on_rc;
+      }
     }
   }
 
@@ -238,9 +272,8 @@ enum ui_error ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
-                                  struct ui_toggle_base *toggle) {
+ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
+                                             struct ui_toggle_base *toggle) {
   size_t i;
   int found = -1;
 
@@ -257,7 +290,11 @@ ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
   if (found < 0)
     return UI_ERROR_NOT_FOUND;
 
-  ui_toggle_base_set_on_change(toggle, NULL, NULL);
+  {
+    ui_error_t set_rc = ui_toggle_base_set_on_change(toggle, NULL, NULL);
+    if (set_rc != UI_ERROR_NONE)
+      return set_rc;
+  }
 
   if (group->active_toggle == toggle) {
     group->active_toggle = NULL;
@@ -271,8 +308,8 @@ ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_radio_group_base_set_active(struct ui_radio_group_base *group,
-                                             struct ui_toggle_base *toggle) {
+ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
+                                          struct ui_toggle_base *toggle) {
   size_t i;
   int valid_toggle = 0;
 
@@ -292,12 +329,25 @@ enum ui_error ui_radio_group_base_set_active(struct ui_radio_group_base *group,
 
   for (i = 0; i < group->count; ++i) {
     if (group->toggles[i] == toggle) {
-      ui_toggle_base_set_checked(group->toggles[i], 1);
+      {
+        ui_error_t chk_rc = ui_toggle_base_set_checked(group->toggles[i], 1);
+        if (chk_rc != UI_ERROR_NONE)
+          return chk_rc;
+      }
     } else {
       int is_checked = 0;
-      ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+      {
+        ui_error_t check_rc =
+            ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+        if (check_rc != UI_ERROR_NONE)
+          return check_rc;
+      }
       if (is_checked) {
-        ui_toggle_base_set_checked(group->toggles[i], 0);
+        {
+          ui_error_t chk_rc = ui_toggle_base_set_checked(group->toggles[i], 0);
+          if (chk_rc != UI_ERROR_NONE)
+            return chk_rc;
+        }
       }
     }
   }
@@ -307,7 +357,7 @@ enum ui_error ui_radio_group_base_set_active(struct ui_radio_group_base *group,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_radio_group_base_get_active(const struct ui_radio_group_base *group,
                                struct ui_toggle_base **out_toggle) {
   if (!group || !out_toggle)
@@ -317,7 +367,7 @@ ui_radio_group_base_get_active(const struct ui_radio_group_base *group,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_radio_group_base_set_on_change(struct ui_radio_group_base *group,
                                   ui_radio_group_on_change_t on_change,
                                   void *user_data) {
@@ -329,9 +379,8 @@ ui_radio_group_base_set_on_change(struct ui_radio_group_base *group,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_radio_group_base_process_event(struct ui_radio_group_base *group,
-                                  const struct ui_event *event) {
+ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
+                                             const struct ui_event *event) {
   int active_idx = -1;
   size_t i;
   int next_idx;
@@ -342,7 +391,11 @@ ui_radio_group_base_process_event(struct ui_radio_group_base *group,
   if (group->is_disabled)
     return UI_ERROR_NONE;
 
-  (void)trigger_cva_touched(group);
+  {
+    ui_error_t touch_rc = trigger_cva_touched(group);
+    if (touch_rc != UI_ERROR_NONE)
+      return touch_rc;
+  }
 
   if (group->count == 0)
     return UI_ERROR_NONE;
@@ -373,8 +426,18 @@ ui_radio_group_base_process_event(struct ui_radio_group_base *group,
           next_idx = 0;
       }
 
-      ui_toggle_base_set_checked(group->toggles[next_idx], 1);
-      (void)on_child_toggle_change(group->toggles[next_idx], 1, group);
+      {
+        ui_error_t chk_rc =
+            ui_toggle_base_set_checked(group->toggles[next_idx], 1);
+        if (chk_rc != UI_ERROR_NONE)
+          return chk_rc;
+      }
+      {
+        ui_error_t on_rc =
+            on_child_toggle_change(group->toggles[next_idx], 1, group);
+        if (on_rc != UI_ERROR_NONE)
+          return on_rc;
+      }
     }
   }
 

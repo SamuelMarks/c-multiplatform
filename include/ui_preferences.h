@@ -27,9 +27,9 @@ struct ui_preferences;
  * @param out_prefs Pointer to receive the new preferences handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_preferences_create(struct ui_thread_pool *pool,
-                                    struct ui_execution_context *ctx,
-                                    struct ui_preferences **out_prefs);
+ui_error_t ui_preferences_create(struct ui_thread_pool *pool,
+                                 struct ui_execution_context *ctx,
+                                 struct ui_preferences **out_prefs);
 
 /**
  * @brief Destroys a preferences manager and frees its resources.
@@ -37,7 +37,7 @@ enum ui_error ui_preferences_create(struct ui_thread_pool *pool,
  * @param prefs The preferences manager to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_preferences_destroy(struct ui_preferences *prefs);
+ui_error_t ui_preferences_destroy(struct ui_preferences *prefs);
 
 /**
  * @brief Sets a string value for a given key.
@@ -47,8 +47,8 @@ enum ui_error ui_preferences_destroy(struct ui_preferences *prefs);
  * @param value The value to set.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_preferences_set_string(struct ui_preferences *prefs,
-                                        const char *key, const char *value);
+ui_error_t ui_preferences_set_string(struct ui_preferences *prefs,
+                                     const char *key, const char *value);
 
 /**
  * @brief Gets a string value for a given key.
@@ -56,12 +56,12 @@ enum ui_error ui_preferences_set_string(struct ui_preferences *prefs,
  * @param prefs The preferences manager.
  * @param key The key to get.
  * @param out_value Pointer to receive the allocated string value. Must be freed
- * with UI_FREE.
+ * with C_MULTIPLATFORM_FREE.
  * @return UI_ERROR_NONE on success. UI_ERROR_NOT_FOUND if the key does not
  * exist.
  */
-enum ui_error ui_preferences_get_string(struct ui_preferences *prefs,
-                                        const char *key, char **out_value);
+ui_error_t ui_preferences_get_string(struct ui_preferences *prefs,
+                                     const char *key, char **out_value);
 
 #ifdef __cplusplus
 }
@@ -81,7 +81,7 @@ enum ui_error ui_preferences_get_string(struct ui_preferences *prefs,
  * operation.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_preferences_save_binary_async(struct ui_preferences *prefs,
-                                               const char *key,
-                                               const void *data, size_t length,
-                                               struct ui_promise **out_promise);
+ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
+                                            const char *key, const void *data,
+                                            size_t length,
+                                            struct ui_promise **out_promise);

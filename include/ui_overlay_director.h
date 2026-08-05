@@ -28,7 +28,7 @@ struct ui_overlay;
  * @param out_director Pointer to receive the allocated director.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_overlay_director_create(struct ui_dom_node *root_node,
                            struct ui_overlay_director **out_director);
 
@@ -37,7 +37,7 @@ ui_overlay_director_create(struct ui_dom_node *root_node,
  * @param director The director to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_overlay_director_destroy(struct ui_overlay_director *director);
+ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director);
 
 /**
  * @brief Mounts a component as a top-level overlay.
@@ -47,7 +47,7 @@ enum ui_error ui_overlay_director_destroy(struct ui_overlay_director *director);
  * @param out_overlay Pointer to receive the overlay instance handle.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_overlay_director_mount_component(struct ui_overlay_director *director,
                                     struct ui_component *component, int z_index,
                                     struct ui_overlay **out_overlay);
@@ -58,8 +58,8 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
  * @param overlay The overlay to unmount.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_overlay_director_unmount(struct ui_overlay_director *director,
-                                          struct ui_overlay *overlay);
+ui_error_t ui_overlay_director_unmount(struct ui_overlay_director *director,
+                                       struct ui_overlay *overlay);
 
 #ifdef __cplusplus
 }

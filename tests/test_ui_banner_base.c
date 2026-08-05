@@ -13,7 +13,7 @@ extern int g_malloc_fail_countdown;
 static void test_banner_base(void) {
   struct ui_banner_base *banner;
   struct ui_component *base_comp;
-  enum ui_error err;
+  ui_error_t err;
   const char *attr_val;
   int is_open = 0;
   struct ui_computed *anim_sig = NULL;
@@ -89,9 +89,9 @@ static void test_banner_base(void) {
   assert(ui_banner_base_get_animating_signal(banner, &anim_sig) ==
          UI_ERROR_NONE);
 
-  ui_banner_base_destroy(banner);
-  ui_signal_destroy(signal);
-  ui_arena_destroy(arena);
+  (void)ui_banner_base_destroy(banner);
+  (void)ui_signal_destroy(signal);
+  (void)ui_arena_destroy(arena);
 
   /* OOM Loops */
   int i;
@@ -100,7 +100,7 @@ static void test_banner_base(void) {
     g_malloc_fail_countdown = i;
     err = ui_banner_base_create(&test_banner);
     if (err == UI_ERROR_NONE) {
-      ui_banner_base_destroy(test_banner);
+      (void)ui_banner_base_destroy(test_banner);
       break;
     } else {
       assert(err == UI_ERROR_OUT_OF_MEMORY);
@@ -121,10 +121,15 @@ static void test_banner_base(void) {
     }
   }
   g_malloc_fail_countdown = -1;
-  ui_banner_base_destroy(banner);
+  (void)ui_banner_base_destroy(banner);
 }
 
 int main(void) {
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_banner_coverage(void);
+  run_banner_coverage();
+#endif
+
   test_banner_base();
   printf("test_ui_banner_base passed\n");
   return 0;

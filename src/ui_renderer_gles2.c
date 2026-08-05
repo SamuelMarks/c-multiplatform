@@ -1,3 +1,4 @@
+#define GL_SILENCE_DEPRECATION
 #if defined(_WIN32) || defined(__CYGWIN__)
 /* clang-format off */
 #include <winsock2.h>
@@ -57,8 +58,8 @@ static PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 /* wglGetProcAddress is provided by wingdi.h via gl.h */
 #endif
 
-static void load_gl_extensions(void) {
-    if (glCreateProgram) return;
+static ui_error_t load_gl_extensions(void) {
+    if (glCreateProgram) return UI_ERROR_NONE;
     glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
     glUniform2f = (PFNGLUNIFORM2FPROC)wglGetProcAddress("glUniform2f");
     glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
@@ -78,6 +79,7 @@ static void load_gl_extensions(void) {
     glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
     glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram");
     glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
+  return UI_ERROR_NONE;
 }
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
@@ -206,8 +208,8 @@ static const char *fragment_shader_source = "precision mediump float;\n"
                                             "  gl_FragColor = v_color;\n"
                                             "}\n";
 
-static enum ui_error compile_shader(unsigned int type, const char *source,
-                                    unsigned int *out_shader) {
+static ui_error_t compile_shader(unsigned int type, const char *source,
+                                 unsigned int *out_shader) {
   unsigned int shader;
   *out_shader = 0;
 #if defined(_WIN32) || defined(__CYGWIN__)
@@ -221,7 +223,7 @@ static enum ui_error compile_shader(unsigned int type, const char *source,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_flush(struct ui_renderer_backend *backend) {
+static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
   if (!backend || !backend->user_data) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -269,11 +271,11 @@ static enum ui_error gles2_flush(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_draw_triangles(struct ui_renderer_backend *backend,
-                                          const struct ui_vertex *vertices,
-                                          int vertex_count,
-                                          const unsigned short *indices,
-                                          int index_count) {
+static ui_error_t gles2_draw_triangles(struct ui_renderer_backend *backend,
+                                       const struct ui_vertex *vertices,
+                                       int vertex_count,
+                                       const unsigned short *indices,
+                                       int index_count) {
   struct gles2_renderer_data *data;
   int i;
   int start_vertex;
@@ -286,7 +288,11 @@ static enum ui_error gles2_draw_triangles(struct ui_renderer_backend *backend,
   /* If batch is full, flush it */
   if (data->vertex_count + vertex_count > GLES2_MAX_VERTICES ||
       data->index_count + index_count > GLES2_MAX_INDICES) {
-    (void)gles2_flush(backend);
+    {
+      ui_error_t rc = gles2_flush(backend);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
     if (vertex_count > GLES2_MAX_VERTICES || index_count > GLES2_MAX_INDICES) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -308,9 +314,9 @@ static enum ui_error gles2_draw_triangles(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_draw_rect(struct ui_renderer_backend *backend,
-                                     float x, float y, float width,
-                                     float height, struct ui_color color) {
+static ui_error_t gles2_draw_rect(struct ui_renderer_backend *backend, float x,
+                                  float y, float width, float height,
+                                  struct ui_color color) {
   struct ui_vertex vertices[4];
   unsigned short indices[6];
 
@@ -345,35 +351,37 @@ static enum ui_error gles2_draw_rect(struct ui_renderer_backend *backend,
   return gles2_draw_triangles(backend, vertices, 4, indices, 6);
 }
 
-static enum ui_error gles2_draw_border(struct ui_renderer_backend *backend,
-                                       float x, float y, float width,
-                                       float height, float thickness,
-                                       struct ui_color color) {
-  enum ui_error rc = UI_ERROR_NONE;
+static ui_error_t gles2_draw_border(struct ui_renderer_backend *backend,
+                                    float x, float y, float width, float height,
+                                    float thickness, struct ui_color color) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!backend || !backend->user_data) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rc = (enum ui_error)(
-      (int)rc | (int)gles2_draw_rect(backend, x, y, width, thickness, color));
-  rc = (enum ui_error)((int)rc |
-                       (int)gles2_draw_rect(backend, x, y + height - thickness,
-                                            width, thickness, color));
-  rc = (enum ui_error)(
-      (int)rc | (int)gles2_draw_rect(backend, x, y + thickness, thickness,
-                                     height - (2.0f * thickness), color));
-  rc = (enum ui_error)(
-      (int)rc | (int)gles2_draw_rect(backend, x + width - thickness,
-                                     y + thickness, thickness,
-                                     height - (2.0f * thickness), color));
+  rc = gles2_draw_rect(backend, x, y, width, thickness, color);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = gles2_draw_rect(backend, x, y + height - thickness, width, thickness,
+                       color);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = gles2_draw_rect(backend, x, y + thickness, thickness,
+                       height - (2.0f * thickness), color);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = gles2_draw_rect(backend, x + width - thickness, y + thickness, thickness,
+                       height - (2.0f * thickness), color);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   return rc;
 }
 
-static enum ui_error gles2_init(struct ui_renderer_backend *backend,
-                                struct ui_window_backend *window_backend,
-                                struct ui_window *window) {
+static ui_error_t gles2_init(struct ui_renderer_backend *backend,
+                             struct ui_window_backend *window_backend,
+                             struct ui_window *window) {
   struct gles2_renderer_data *data;
   unsigned int vs, fs;
   (void)window_backend;
@@ -385,7 +393,7 @@ static enum ui_error gles2_init(struct ui_renderer_backend *backend,
 
   load_gl_extensions();
 
-  data = (struct gles2_renderer_data *)UI_MALLOC(
+  data = (struct gles2_renderer_data *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct gles2_renderer_data));
   if (!data) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -426,7 +434,7 @@ static enum ui_error gles2_init(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_destroy(struct ui_renderer_backend *backend) {
+static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -442,14 +450,14 @@ static enum ui_error gles2_destroy(struct ui_renderer_backend *backend) {
       glDeleteBuffers(1, &data->vbo);
       glDeleteBuffers(1, &data->ibo);
     }
-    UI_FREE(backend->user_data);
+    C_MULTIPLATFORM_FREE(backend->user_data);
     backend->user_data = NULL;
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_set_viewport(struct ui_renderer_backend *backend,
-                                        int x, int y, int width, int height) {
+static ui_error_t gles2_set_viewport(struct ui_renderer_backend *backend, int x,
+                                     int y, int width, int height) {
   struct gles2_renderer_data *data;
   if (!backend || !backend->user_data) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -463,8 +471,8 @@ static enum ui_error gles2_set_viewport(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_clear(struct ui_renderer_backend *backend,
-                                 struct ui_color color) {
+static ui_error_t gles2_clear(struct ui_renderer_backend *backend,
+                              struct ui_color color) {
   (void)backend;
   glClearColor(color.r, color.g, color.b, color.a);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -479,31 +487,39 @@ struct gles2_texture {
   int height;
 };
 
-static enum ui_error gles2_push_clip(struct ui_renderer_backend *backend,
-                                     float x, float y, float width,
-                                     float height) {
+static ui_error_t gles2_push_clip(struct ui_renderer_backend *backend, float x,
+                                  float y, float width, float height) {
   (void)x;
   (void)y;
   (void)width;
   (void)height;
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-  gles2_flush(backend);
+  {
+    ui_error_t rc = gles2_flush(backend);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
   /* glScissor logic would go here. We mock it for the test. */
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_pop_clip(struct ui_renderer_backend *backend) {
+static ui_error_t gles2_pop_clip(struct ui_renderer_backend *backend) {
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-  gles2_flush(backend);
+  {
+    ui_error_t rc = gles2_flush(backend);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-gles2_push_stencil_clip(struct ui_renderer_backend *backend,
-                        const struct ui_vertex *vertices, int vertex_count,
-                        const unsigned short *indices, int index_count) {
+static ui_error_t gles2_push_stencil_clip(struct ui_renderer_backend *backend,
+                                          const struct ui_vertex *vertices,
+                                          int vertex_count,
+                                          const unsigned short *indices,
+                                          int index_count) {
   (void)vertices;
   (void)vertex_count;
   (void)indices;
@@ -514,26 +530,34 @@ gles2_push_stencil_clip(struct ui_renderer_backend *backend,
   (void)index_count;
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-  gles2_flush(backend);
+  {
+    ui_error_t rc = gles2_flush(backend);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
+static ui_error_t gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-  gles2_flush(backend);
+  {
+    ui_error_t rc = gles2_flush(backend);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
   return UI_ERROR_NONE;
 }
-static enum ui_error gles2_create_texture(struct ui_renderer_backend *backend,
-                                          int width, int height,
-                                          void **out_texture_handle) {
+static ui_error_t gles2_create_texture(struct ui_renderer_backend *backend,
+                                       int width, int height,
+                                       void **out_texture_handle) {
   struct gles2_texture *tex;
   if (!backend || !out_texture_handle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  tex = (struct gles2_texture *)UI_MALLOC(sizeof(struct gles2_texture));
+  tex = (struct gles2_texture *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct gles2_texture));
   if (!tex) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -547,18 +571,17 @@ static enum ui_error gles2_create_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_destroy_texture(struct ui_renderer_backend *backend,
-                                           void *texture_handle) {
+static ui_error_t gles2_destroy_texture(struct ui_renderer_backend *backend,
+                                        void *texture_handle) {
   if (!backend || !texture_handle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(texture_handle);
+  C_MULTIPLATFORM_FREE(texture_handle);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-gles2_set_render_target(struct ui_renderer_backend *backend,
-                        void *texture_handle) {
+static ui_error_t gles2_set_render_target(struct ui_renderer_backend *backend,
+                                          void *texture_handle) {
   (void)texture_handle;
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -566,16 +589,18 @@ gles2_set_render_target(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error gles2_draw_texture(struct ui_renderer_backend *backend,
-                                        void *texture_handle, float x, float y,
-                                        float width, float height,
-                                        float opacity) {
+static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
+                                     void *texture_handle, float x, float y,
+                                     float width, float height, float opacity) {
   struct ui_color color;
   if (!backend || !texture_handle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-
-  (void)gles2_flush(backend);
+  {
+    ui_error_t rc = gles2_flush(backend);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
 
   color.r = 1.0f;
   color.g = 1.0f;
@@ -584,9 +609,9 @@ static enum ui_error gles2_draw_texture(struct ui_renderer_backend *backend,
   return gles2_draw_rect(backend, x, y, width, height, color);
 }
 
-static enum ui_error gles2_read_pixels(struct ui_renderer_backend *backend,
-                                       int width, int height,
-                                       unsigned char *out_rgba_buffer) {
+static ui_error_t gles2_read_pixels(struct ui_renderer_backend *backend,
+                                    int width, int height,
+                                    unsigned char *out_rgba_buffer) {
   if (!backend || !out_rgba_buffer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -595,15 +620,14 @@ static enum ui_error gles2_read_pixels(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 /** \brief ui_error */
-enum ui_error
-ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
+ui_error_t ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
   struct ui_renderer_backend *backend;
 
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  backend = (struct ui_renderer_backend *)UI_MALLOC(
+  backend = (struct ui_renderer_backend *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_renderer_backend));
   if (!backend) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -632,11 +656,11 @@ ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_renderer_gles2_destroy(struct ui_renderer_backend *backend) {
+ui_error_t ui_renderer_gles2_destroy(struct ui_renderer_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   gles2_destroy(backend); /* free user_data if present */
-  UI_FREE(backend);
+  C_MULTIPLATFORM_FREE(backend);
   return UI_ERROR_NONE;
 }

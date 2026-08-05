@@ -32,7 +32,7 @@ struct ui_intersection_observer_entry {
  * @param entry_count Number of entries in the array.
  * @param user_data Opaque pointer passed during subscription.
  */
-typedef enum ui_error (*ui_intersection_observer_cb_t)(
+typedef ui_error_t (*ui_intersection_observer_cb_t)(
     struct ui_intersection_observer *observer,
     const struct ui_intersection_observer_entry *entries, int entry_count,
     void *user_data);
@@ -49,7 +49,7 @@ typedef enum ui_error (*ui_intersection_observer_cb_t)(
  * @param out_observer Pointer to receive the new observer instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_intersection_observer_create(struct ui_dom_node *root, int root_margin_px,
                                 const float *thresholds, int threshold_count,
                                 struct ui_intersection_observer **out_observer);
@@ -58,8 +58,8 @@ ui_intersection_observer_create(struct ui_dom_node *root, int root_margin_px,
  * @brief Destroys an intersection observer.
  * @param observer The observer to destroy.
  */
-void ui_intersection_observer_destroy(
-    struct ui_intersection_observer *observer);
+ui_error_t
+ui_intersection_observer_destroy(struct ui_intersection_observer *observer);
 
 /**
  * @brief Starts observing a target element.
@@ -67,7 +67,7 @@ void ui_intersection_observer_destroy(
  * @param target The DOM node to observe.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_intersection_observer_observe(struct ui_intersection_observer *observer,
                                  struct ui_dom_node *target);
 
@@ -77,7 +77,7 @@ ui_intersection_observer_observe(struct ui_intersection_observer *observer,
  * @param target The DOM node to stop observing.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_intersection_observer_unobserve(struct ui_intersection_observer *observer,
                                    struct ui_dom_node *target);
 
@@ -86,7 +86,7 @@ ui_intersection_observer_unobserve(struct ui_intersection_observer *observer,
  * @param observer The observer instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_intersection_observer_disconnect(struct ui_intersection_observer *observer);
 
 /**
@@ -96,7 +96,7 @@ ui_intersection_observer_disconnect(struct ui_intersection_observer *observer);
  * @param user_data Opaque pointer to pass to the callback.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
                                    ui_intersection_observer_cb_t callback,
                                    void *user_data);
@@ -107,7 +107,7 @@ ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
  * @param observer The observer instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_intersection_observer_evaluate(struct ui_intersection_observer *observer);
 
 #ifdef __cplusplus

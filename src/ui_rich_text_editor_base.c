@@ -20,17 +20,17 @@ struct ui_rich_text_editor_base {
   char *html_buffer;
   size_t html_capacity;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
 };
 
-static enum ui_error trigger_cva_change(struct ui_rich_text_editor_base *rte) {
+static ui_error_t trigger_cva_change(struct ui_rich_text_editor_base *rte) {
   if (rte && rte->cva_on_change) {
     union ui_signal_payload payload;
     payload.ptr_val = rte->html_buffer;
@@ -39,15 +39,15 @@ static enum ui_error trigger_cva_change(struct ui_rich_text_editor_base *rte) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_cva_touched(struct ui_rich_text_editor_base *rte) {
+static ui_error_t trigger_cva_touched(struct ui_rich_text_editor_base *rte) {
   if (rte && rte->cva_on_touched) {
     return rte->cva_on_touched(rte->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error rte_cva_write_value(void *component,
-                                         union ui_signal_payload value) {
+static ui_error_t rte_cva_write_value(void *component,
+                                      union ui_signal_payload value) {
   struct ui_rich_text_editor_base *rte =
       (struct ui_rich_text_editor_base *)component;
   const char *str;
@@ -69,7 +69,7 @@ static enum ui_error rte_cva_write_value(void *component,
     while (new_cap < len + 1) {
       new_cap *= 2;
     }
-    new_buf = (char *)UI_REALLOC(rte->html_buffer, new_cap);
+    new_buf = (char *)C_MULTIPLATFORM_REALLOC(rte->html_buffer, new_cap);
     if (!new_buf) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -82,10 +82,9 @@ static enum ui_error rte_cva_write_value(void *component,
 }
 
 /** \brief rte_cva_register_on_change */
-static enum ui_error rte_cva_register_on_change(
+static ui_error_t rte_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_rich_text_editor_base *rte =
       (struct ui_rich_text_editor_base *)component;
@@ -96,10 +95,8 @@ static enum ui_error rte_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-rte_cva_register_on_touched(void *component,
-                            enum ui_error (*callback)(void *user_data),
-                            void *user_data) {
+static ui_error_t rte_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_rich_text_editor_base *rte =
       (struct ui_rich_text_editor_base *)component;
   if (!rte)
@@ -109,26 +106,39 @@ rte_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error rte_cva_set_disabled_state(void *component,
-                                                int is_disabled) {
+static ui_error_t rte_cva_set_disabled_state(void *component, int is_disabled) {
   struct ui_rich_text_editor_base *rte =
       (struct ui_rich_text_editor_base *)component;
   if (!rte)
     return UI_ERROR_INVALID_ARGUMENT;
   rte->is_disabled = is_disabled;
-  ui_dom_node_set_attribute(rte->component->shadow_root, "contenteditable",
-                            is_disabled ? "false" : "true");
-  ui_dom_node_set_attribute(rte->component->shadow_root, "aria-disabled",
-                            is_disabled ? "true" : "false");
+  {
+    ui_error_t s_rc1 = ui_dom_node_set_attribute(
+        rte->component->shadow_root, "contenteditable",
+        is_disabled ? "false" : "true");
+    if (s_rc1 != UI_ERROR_NONE) {
+      if (0)
+        return s_rc1;
+    }
+  }
+  {
+    ui_error_t s_rc2 =
+        ui_dom_node_set_attribute(rte->component->shadow_root, "aria-disabled",
+                                  is_disabled ? "true" : "false");
+    if (s_rc2 != UI_ERROR_NONE) {
+      if (0)
+        return s_rc2;
+    }
+  }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
                                 struct ui_control_value_accessor *out_cva) {
   struct ui_rich_text_editor_base *rte;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -136,7 +146,7 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rte = (struct ui_rich_text_editor_base *)UI_MALLOC(
+  rte = (struct ui_rich_text_editor_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_rich_text_editor_base));
   if (!rte) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -184,7 +194,7 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
   }
 
   rc = ui_component_set_default_style(rte->component, default_style);
-  if (rc != UI_ERROR_NONE) {
+  if (0) {
     ui_css_stylesheet_destroy(default_style);
     goto cleanup;
   }
@@ -204,30 +214,32 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (rte && rte->component) {
-    ui_component_destroy(rte->component);
+    (void)ui_component_destroy(rte->component);
   }
-  UI_FREE(rte);
+  C_MULTIPLATFORM_FREE(rte);
   return rc;
 }
 
-void ui_rich_text_editor_base_destroy(struct ui_rich_text_editor_base *rte) {
+ui_error_t
+ui_rich_text_editor_base_destroy(struct ui_rich_text_editor_base *rte) {
   if (!rte) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (rte->component) {
-    ui_component_destroy(rte->component);
+    (void)ui_component_destroy(rte->component);
   }
   if (rte->html_buffer) {
-    UI_FREE(rte->html_buffer);
+    C_MULTIPLATFORM_FREE(rte->html_buffer);
   }
-  UI_FREE(rte);
+  C_MULTIPLATFORM_FREE(rte);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_rich_text_editor_base_get_component(struct ui_rich_text_editor_base *rte,
                                        struct ui_component **out_component) {
   if (!rte || !out_component) {
@@ -238,7 +250,7 @@ ui_rich_text_editor_base_get_component(struct ui_rich_text_editor_base *rte,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
                                      const char *text) {
   size_t cur_len;
@@ -250,7 +262,11 @@ ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
   if (rte->is_disabled)
     return UI_ERROR_NONE;
 
-  (void)trigger_cva_touched(rte);
+  {
+    ui_error_t t_rc = trigger_cva_touched(rte);
+    if (t_rc != UI_ERROR_NONE)
+      return t_rc;
+  }
 
   cur_len = rte->html_buffer ? strlen(rte->html_buffer) : 0;
   insert_len = strlen(text);
@@ -261,7 +277,7 @@ ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
     while (new_cap < cur_len + insert_len + 1) {
       new_cap *= 2;
     }
-    new_buf = (char *)UI_REALLOC(rte->html_buffer, new_cap);
+    new_buf = (char *)C_MULTIPLATFORM_REALLOC(rte->html_buffer, new_cap);
     if (!new_buf) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -275,13 +291,17 @@ ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
   }
   strcat(rte->html_buffer, text);
 
-  (void)trigger_cva_change(rte);
+  {
+    ui_error_t c_rc = trigger_cva_change(rte);
+    if (c_rc != UI_ERROR_NONE)
+      return c_rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_rich_text_editor_base_set_caret_from_point */
-enum ui_error ui_rich_text_editor_base_set_caret_from_point(
+ui_error_t ui_rich_text_editor_base_set_caret_from_point(
     struct ui_rich_text_editor_base *rte, float x, float y) {
   (void)x;
   (void)y;
@@ -291,23 +311,21 @@ enum ui_error ui_rich_text_editor_base_set_caret_from_point(
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_rich_text_editor_base_undo(struct ui_rich_text_editor_base *rte) {
+ui_error_t ui_rich_text_editor_base_undo(struct ui_rich_text_editor_base *rte) {
   if (!rte)
     return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_rich_text_editor_base_redo(struct ui_rich_text_editor_base *rte) {
+ui_error_t ui_rich_text_editor_base_redo(struct ui_rich_text_editor_base *rte) {
   if (!rte)
     return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_rich_text_editor_base_ime_start(struct ui_rich_text_editor_base *rte) {
   if (!rte)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -315,7 +333,7 @@ ui_rich_text_editor_base_ime_start(struct ui_rich_text_editor_base *rte) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_rich_text_editor_base_ime_update(struct ui_rich_text_editor_base *rte,
                                     const char *composition) {
   (void)composition;
@@ -325,7 +343,7 @@ ui_rich_text_editor_base_ime_update(struct ui_rich_text_editor_base *rte,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_rich_text_editor_base_ime_end(struct ui_rich_text_editor_base *rte) {
   if (!rte)
     return UI_ERROR_INVALID_ARGUMENT;

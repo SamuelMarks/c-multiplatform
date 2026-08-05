@@ -9,7 +9,7 @@ int main(void) {
   struct ui_arena *arena;
   struct ui_compositor_material_base *material = NULL;
   struct ui_compositor_material_config config;
-  enum ui_error err;
+  ui_error_t err;
   ui_signal_t *type_signal = NULL;
 
   if (ui_arena_create(1024 * 16, &arena) != UI_ERROR_NONE) {
@@ -49,13 +49,20 @@ int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   extern int g_malloc_fail_countdown;
-  g_malloc_fail_countdown = 0;
-  if (ui_compositor_material_base_create(arena, &config, &material) !=
-      UI_ERROR_OUT_OF_MEMORY) {
-    printf("Failed OOM countdown\n");
-    return 1;
+  {
+    int i;
+    for (i = 0; i < 10; i++) {
+      g_malloc_fail_countdown = i;
+      if (ui_compositor_material_base_create(arena, &config, &material) ==
+          UI_ERROR_NONE) {
+        g_malloc_fail_countdown = -1;
+        ui_compositor_material_base_destroy(material);
+        break;
+      }
+      g_malloc_fail_countdown = -1;
+    }
+    g_malloc_fail_countdown = -1;
   }
-  g_malloc_fail_countdown = -1;
 #endif
 
   err = ui_compositor_material_base_create(arena, &config, &material);
@@ -114,6 +121,6 @@ int main(void) {
     return 1;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }

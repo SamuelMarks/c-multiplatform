@@ -47,10 +47,10 @@ struct ui_window {
   int has_pending_event;
 };
 
-static void log_xdg_toplevel_configure(void *data,
-                                       struct xdg_toplevel *xdg_toplevel,
-                                       int32_t width, int32_t height,
-                                       struct wl_array *states) {
+static ui_error_t log_xdg_toplevel_configure(void *data,
+                                             struct xdg_toplevel *xdg_toplevel,
+                                             int32_t width, int32_t height,
+                                             struct wl_array *states) {
   struct ui_window *win = (struct ui_window *)data;
   (void)xdg_toplevel;
   (void)states;
@@ -67,61 +67,68 @@ static void log_xdg_toplevel_configure(void *data,
     win->pending_event.event_data.window.height = height;
     win->has_pending_event = 1;
   }
+  return UI_ERROR_NONE;
 }
 
-static void log_xdg_toplevel_close(void *data,
-                                   struct xdg_toplevel *xdg_toplevel) {
+static ui_error_t log_xdg_toplevel_close(void *data,
+                                         struct xdg_toplevel *xdg_toplevel) {
   struct ui_window *win = (struct ui_window *)data;
   (void)xdg_toplevel;
   win->is_closing = 1;
   win->pending_event.type = UI_EVENT_WINDOW_CLOSE;
   win->has_pending_event = 1;
+  return UI_ERROR_NONE;
 }
 
-static void log_xdg_toplevel_configure_bounds(void *data,
-                                              struct xdg_toplevel *xdg_toplevel,
-                                              int32_t width, int32_t height) {
+static ui_error_t
+log_xdg_toplevel_configure_bounds(void *data, struct xdg_toplevel *xdg_toplevel,
+                                  int32_t width, int32_t height) {
   (void)data;
   (void)xdg_toplevel;
   (void)width;
   (void)height;
+  return UI_ERROR_NONE;
 }
 
-static void log_xdg_toplevel_wm_capabilities(void *data,
-                                             struct xdg_toplevel *xdg_toplevel,
-                                             struct wl_array *capabilities) {
+static ui_error_t
+log_xdg_toplevel_wm_capabilities(void *data, struct xdg_toplevel *xdg_toplevel,
+                                 struct wl_array *capabilities) {
   (void)data;
   (void)xdg_toplevel;
   (void)capabilities;
+  return UI_ERROR_NONE;
 }
 
 static const struct xdg_toplevel_listener xdg_toplevel_listener = {
     log_xdg_toplevel_configure, log_xdg_toplevel_close,
     log_xdg_toplevel_configure_bounds, log_xdg_toplevel_wm_capabilities};
 
-static void log_xdg_surface_configure(void *data,
-                                      struct xdg_surface *xdg_surface,
-                                      uint32_t serial) {
+static ui_error_t log_xdg_surface_configure(void *data,
+                                            struct xdg_surface *xdg_surface,
+                                            uint32_t serial) {
   struct ui_window *win = (struct ui_window *)data;
   (void)win;
   xdg_surface_ack_configure(xdg_surface, serial);
+  return UI_ERROR_NONE;
 }
 
 static const struct xdg_surface_listener xdg_surface_listener = {
     log_xdg_surface_configure};
 
-static void log_xdg_wm_base_ping(void *data, struct xdg_wm_base *xdg_wm_base,
-                                 uint32_t serial) {
+static ui_error_t log_xdg_wm_base_ping(void *data,
+                                       struct xdg_wm_base *xdg_wm_base,
+                                       uint32_t serial) {
   (void)data;
   xdg_wm_base_pong(xdg_wm_base, serial);
+  return UI_ERROR_NONE;
 }
 
 static const struct xdg_wm_base_listener xdg_wm_base_listener = {
     log_xdg_wm_base_ping};
 
-static void log_registry_handler(void *data, struct wl_registry *registry,
-                                 uint32_t id, const char *interface,
-                                 uint32_t version) {
+static ui_error_t log_registry_handler(void *data, struct wl_registry *registry,
+                                       uint32_t id, const char *interface,
+                                       uint32_t version) {
   struct ui_window *win = (struct ui_window *)data;
   (void)version;
   if (strcmp(interface, "wl_compositor") == 0) {
@@ -132,22 +139,23 @@ static void log_registry_handler(void *data, struct wl_registry *registry,
         registry, id, &xdg_wm_base_interface, 1);
     xdg_wm_base_add_listener(win->xdg_wm_base, &xdg_wm_base_listener, win);
   }
+  return UI_ERROR_NONE;
 }
 
-static void log_registry_remover(void *data, struct wl_registry *registry,
-                                 uint32_t id) {
+static ui_error_t log_registry_remover(void *data, struct wl_registry *registry,
+                                       uint32_t id) {
   (void)data;
   (void)registry;
   (void)id;
+  return UI_ERROR_NONE;
 }
 
 static const struct wl_registry_listener registry_listener = {
     log_registry_handler, log_registry_remover};
 
-static enum ui_error linux_create_window(struct ui_window_backend *backend,
-                                         const char *title, int width,
-                                         int height,
-                                         struct ui_window **out_window) {
+static ui_error_t linux_create_window(struct ui_window_backend *backend,
+                                      const char *title, int width, int height,
+                                      struct ui_window **out_window) {
   struct ui_window *win_obj;
   EGLint num_config;
   EGLConfig egl_config;
@@ -170,7 +178,8 @@ static enum ui_error linux_create_window(struct ui_window_backend *backend,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  win_obj = (struct ui_window *)UI_MALLOC(sizeof(struct ui_window));
+  win_obj =
+      (struct ui_window *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window));
   if (!win_obj) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -181,7 +190,7 @@ static enum ui_error linux_create_window(struct ui_window_backend *backend,
 
   win_obj->display = wl_display_connect(NULL);
   if (!win_obj->display) {
-    UI_FREE(win_obj);
+    C_MULTIPLATFORM_FREE(win_obj);
     return UI_ERROR_UNKNOWN;
   }
 
@@ -191,7 +200,7 @@ static enum ui_error linux_create_window(struct ui_window_backend *backend,
 
   if (!win_obj->compositor || !win_obj->xdg_wm_base) {
     wl_display_disconnect(win_obj->display);
-    UI_FREE(win_obj);
+    C_MULTIPLATFORM_FREE(win_obj);
     return UI_ERROR_UNKNOWN;
   }
 
@@ -266,12 +275,12 @@ cleanup:
     wl_surface_destroy(win_obj->surface);
   }
   wl_display_disconnect(win_obj->display);
-  UI_FREE(win_obj);
+  C_MULTIPLATFORM_FREE(win_obj);
   return UI_ERROR_UNKNOWN;
 }
 
-static enum ui_error linux_destroy_window(struct ui_window_backend *backend,
-                                          struct ui_window *window) {
+static ui_error_t linux_destroy_window(struct ui_window_backend *backend,
+                                       struct ui_window *window) {
   if (!backend || !window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -310,30 +319,30 @@ static enum ui_error linux_destroy_window(struct ui_window_backend *backend,
     }
     wl_display_disconnect(window->display);
   }
-  UI_FREE(window);
+  C_MULTIPLATFORM_FREE(window);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_show_window(struct ui_window_backend *backend,
-                                       struct ui_window *window) {
+static ui_error_t linux_show_window(struct ui_window_backend *backend,
+                                    struct ui_window *window) {
   if (!backend || !window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_hide_window(struct ui_window_backend *backend,
-                                       struct ui_window *window) {
+static ui_error_t linux_hide_window(struct ui_window_backend *backend,
+                                    struct ui_window *window) {
   if (!backend || !window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_poll_events(struct ui_window_backend *backend,
-                                       struct ui_window *window,
-                                       struct ui_event *out_event,
-                                       int *out_has_event) {
+static ui_error_t linux_poll_events(struct ui_window_backend *backend,
+                                    struct ui_window *window,
+                                    struct ui_event *out_event,
+                                    int *out_has_event) {
   if (!backend || !window || !out_event || !out_has_event) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -352,8 +361,8 @@ static enum ui_error linux_poll_events(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error linux_swap_buffers(struct ui_window_backend *backend,
-                                        struct ui_window *window) {
+static ui_error_t linux_swap_buffers(struct ui_window_backend *backend,
+                                     struct ui_window *window) {
   if (!backend || !window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -362,7 +371,7 @@ static enum ui_error linux_swap_buffers(struct ui_window_backend *backend,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   struct ui_window_backend *backend;
 
@@ -370,8 +379,8 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  backend =
-      (struct ui_window_backend *)UI_MALLOC(sizeof(struct ui_window_backend));
+  backend = (struct ui_window_backend *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_window_backend));
   if (!backend) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -392,12 +401,11 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
+ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(backend);
+  C_MULTIPLATFORM_FREE(backend);
   return UI_ERROR_NONE;
 }
 
@@ -406,7 +414,7 @@ ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
 #include "../include/ui_window_backend_linux.h"
 #include <stddef.h>
 
-enum ui_error
+ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -416,8 +424,7 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
+ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

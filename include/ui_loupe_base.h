@@ -37,9 +37,9 @@ struct ui_loupe_config {
  * @param out_loupe Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_loupe_base_create(struct ui_arena *arena,
-                                   const struct ui_loupe_config *config,
-                                   struct ui_loupe_base **out_loupe);
+ui_error_t ui_loupe_base_create(struct ui_arena *arena,
+                                const struct ui_loupe_config *config,
+                                struct ui_loupe_base **out_loupe);
 
 /**
  * @brief Destroys a loupe base component.
@@ -47,7 +47,7 @@ enum ui_error ui_loupe_base_create(struct ui_arena *arena,
  * @param loupe The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_loupe_base_destroy(struct ui_loupe_base *loupe);
+ui_error_t ui_loupe_base_destroy(struct ui_loupe_base *loupe);
 
 /**
  * @brief Updates the focal point of the loupe (typically the user's touch
@@ -58,7 +58,7 @@ enum ui_error ui_loupe_base_destroy(struct ui_loupe_base *loupe);
  * @param focal_point The absolute focal point.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_loupe_base_set_focal_point(struct ui_loupe_base *loupe,
                               const struct ui_dom_point *focal_point);
 
@@ -71,9 +71,8 @@ ui_loupe_base_set_focal_point(struct ui_loupe_base *loupe,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
-ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
-                                        ui_signal_t **out_signal);
+ui_error_t ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
+                                                   ui_signal_t **out_signal);
 
 /**
  * @brief Gets the current focal point.
@@ -82,9 +81,8 @@ ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
  * @param out_focal_point Pointer to receive the focal point.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
-ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
-                              struct ui_dom_point *out_focal_point);
+ui_error_t ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
+                                         struct ui_dom_point *out_focal_point);
 
 /**
  * @brief Toggles the visibility of the loupe (e.g. show on touch start, hide on
@@ -94,8 +92,8 @@ ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
  * @param visible True to show the loupe, false to hide.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
-                                        ui_bool_t visible);
+ui_error_t ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
+                                     ui_bool_t visible);
 
 /**
  * @brief Sets the magnification level.
@@ -104,8 +102,8 @@ enum ui_error ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
  * @param magnification_level The new magnification level (e.g., 1.5f).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_loupe_base_set_magnification_level(struct ui_loupe_base *loupe,
-                                                    float magnification_level);
+ui_error_t ui_loupe_base_set_magnification_level(struct ui_loupe_base *loupe,
+                                                 float magnification_level);
 
 #ifdef __cplusplus
 }

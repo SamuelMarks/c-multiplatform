@@ -2,8 +2,8 @@
 #include "ui_geometry.h"
 /* clang-format on */
 
-enum ui_error ui_dom_point_init(struct ui_dom_point *point, double x, double y,
-                                double z, double w) {
+ui_error_t ui_dom_point_init(struct ui_dom_point *point, double x, double y,
+                             double z, double w) {
   if (!point) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -14,8 +14,8 @@ enum ui_error ui_dom_point_init(struct ui_dom_point *point, double x, double y,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
-                               double width, double height) {
+ui_error_t ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
+                            double width, double height) {
   if (!rect) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -43,8 +43,7 @@ enum ui_error ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error get_min(double a, double b, double c, double d,
-                             double *out_min) {
+static double get_min(double a, double b, double c, double d) {
   double min;
   min = a;
   if (b < min)
@@ -53,12 +52,10 @@ static enum ui_error get_min(double a, double b, double c, double d,
     min = c;
   if (d < min)
     min = d;
-  *out_min = min;
-  return UI_ERROR_NONE;
+  return min;
 }
 
-static enum ui_error get_max(double a, double b, double c, double d,
-                             double *out_max) {
+static double get_max(double a, double b, double c, double d) {
   double max;
   max = a;
   if (b > max)
@@ -67,15 +64,14 @@ static enum ui_error get_max(double a, double b, double c, double d,
     max = c;
   if (d > max)
     max = d;
-  *out_max = max;
-  return UI_ERROR_NONE;
+  return max;
 }
 
-enum ui_error ui_dom_quad_init(struct ui_dom_quad *quad,
-                               const struct ui_dom_point *p1,
-                               const struct ui_dom_point *p2,
-                               const struct ui_dom_point *p3,
-                               const struct ui_dom_point *p4) {
+ui_error_t ui_dom_quad_init(struct ui_dom_quad *quad,
+                            const struct ui_dom_point *p1,
+                            const struct ui_dom_point *p2,
+                            const struct ui_dom_point *p3,
+                            const struct ui_dom_point *p4) {
   double min_x, max_x, min_y, max_y;
 
   if (!quad || !p1 || !p2 || !p3 || !p4) {
@@ -87,16 +83,16 @@ enum ui_error ui_dom_quad_init(struct ui_dom_quad *quad,
   quad->p3 = *p3;
   quad->p4 = *p4;
 
-  get_min(p1->x, p2->x, p3->x, p4->x, &min_x);
-  get_max(p1->x, p2->x, p3->x, p4->x, &max_x);
-  get_min(p1->y, p2->y, p3->y, p4->y, &min_y);
-  get_max(p1->y, p2->y, p3->y, p4->y, &max_y);
+  min_x = get_min(p1->x, p2->x, p3->x, p4->x);
+  max_x = get_max(p1->x, p2->x, p3->x, p4->x);
+  min_y = get_min(p1->y, p2->y, p3->y, p4->y);
+  max_y = get_max(p1->y, p2->y, p3->y, p4->y);
 
-  ui_dom_rect_init(&quad->bounds, min_x, min_y, max_x - min_x, max_y - min_y);
-  return UI_ERROR_NONE;
+  return ui_dom_rect_init(&quad->bounds, min_x, min_y, max_x - min_x,
+                          max_y - min_y);
 }
 
-enum ui_error ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix) {
+ui_error_t ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix) {
   if (!matrix) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -7,6 +7,10 @@
 #include <math.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_chart_mock_fail = -1;
+#endif
+
 struct ui_chart_base {
   struct ui_arena *arena;
   enum ui_chart_coordinate_system coord_system;
@@ -19,9 +23,9 @@ struct ui_chart_base {
   ui_signal_t *topology_signal;
 };
 
-static enum ui_error void_equality(union ui_signal_payload a,
-                                   union ui_signal_payload b,
-                                   ui_bool_t *out_equal) {
+static ui_error_t void_equality(union ui_signal_payload a,
+                                union ui_signal_payload b,
+                                ui_bool_t *out_equal) {
   (void)a;
   (void)b;
   /* Internal signal callback assumes out_equal is valid */
@@ -29,10 +33,10 @@ static enum ui_error void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chart_base_create(struct ui_arena *arena,
-                                   enum ui_chart_coordinate_system coord_system,
-                                   struct ui_chart_base **out_chart) {
-  enum ui_error err;
+ui_error_t ui_chart_base_create(struct ui_arena *arena,
+                                enum ui_chart_coordinate_system coord_system,
+                                struct ui_chart_base **out_chart) {
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -43,11 +47,11 @@ enum ui_error ui_chart_base_create(struct ui_arena *arena,
   err = ui_arena_alloc(arena, sizeof(struct ui_chart_base), 8, &ptr);
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    void *dummy = UI_MALLOC(1);
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
     if (!dummy) {
       err = UI_ERROR_OUT_OF_MEMORY;
     } else {
-      UI_FREE(dummy);
+      C_MULTIPLATFORM_FREE(dummy);
     }
   }
 #endif
@@ -83,11 +87,11 @@ enum ui_error ui_chart_base_create(struct ui_arena *arena,
                          &(*out_chart)->topology_signal);
 #ifdef UI_TEST_MOCK_ALLOC
   {
-    void *dummy = UI_MALLOC(1);
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
     if (!dummy) {
       err = UI_ERROR_OUT_OF_MEMORY;
     } else {
-      UI_FREE(dummy);
+      C_MULTIPLATFORM_FREE(dummy);
     }
   }
 #endif
@@ -97,15 +101,15 @@ enum ui_error ui_chart_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chart_base_destroy(struct ui_chart_base *chart) {
+ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart) {
   if (!chart)
     return UI_ERROR_INVALID_ARGUMENT;
-  ui_signal_destroy(chart->topology_signal);
+  (void)ui_signal_destroy(chart->topology_signal);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_chart_base_set_x_scale(struct ui_chart_base *chart,
                           const struct ui_chart_scale_config *config) {
   union ui_signal_payload payload;
@@ -119,7 +123,7 @@ ui_chart_base_set_x_scale(struct ui_chart_base *chart,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_chart_base_set_y_scale(struct ui_chart_base *chart,
                           const struct ui_chart_scale_config *config) {
   union ui_signal_payload payload;
@@ -132,8 +136,8 @@ ui_chart_base_set_y_scale(struct ui_chart_base *chart,
   return ui_signal_set(chart->topology_signal, payload);
 }
 
-enum ui_error ui_chart_base_set_draw_bounds(struct ui_chart_base *chart,
-                                            const struct ui_dom_rect *bounds) {
+ui_error_t ui_chart_base_set_draw_bounds(struct ui_chart_base *chart,
+                                         const struct ui_dom_rect *bounds) {
   union ui_signal_payload payload;
   if (!chart || !bounds)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -144,12 +148,21 @@ enum ui_error ui_chart_base_set_draw_bounds(struct ui_chart_base *chart,
   return ui_signal_set(chart->topology_signal, payload);
 }
 
-static enum ui_error scale_value(double val,
-                                 const struct ui_chart_scale_config *scale,
-                                 double *out_val) {
+static ui_error_t scale_value(double val,
+                              const struct ui_chart_scale_config *scale,
+                              double *out_val) {
   double domain_span = scale->domain_max - scale->domain_min;
   double range_span = scale->range_max - scale->range_min;
   double normalized = 0.0;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_chart_mock_fail == 0) {
+    g_chart_mock_fail = -1;
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_chart_mock_fail > 0)
+    g_chart_mock_fail--;
+#endif
 
   if (domain_span == 0.0) {
     *out_val = scale->range_min; /* Avoid div/0 */
@@ -171,12 +184,21 @@ static enum ui_error scale_value(double val,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error unscale_value(double pixel,
-                                   const struct ui_chart_scale_config *scale,
-                                   double *out_val) {
+static ui_error_t unscale_value(double pixel,
+                                const struct ui_chart_scale_config *scale,
+                                double *out_val) {
   double domain_span = scale->domain_max - scale->domain_min;
   double range_span = scale->range_max - scale->range_min;
   double normalized = 0.0;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_chart_mock_fail == 0) {
+    g_chart_mock_fail = -1;
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_chart_mock_fail > 0)
+    g_chart_mock_fail--;
+#endif
 
   if (range_span == 0.0) {
     *out_val = scale->domain_min;
@@ -197,19 +219,23 @@ static enum ui_error unscale_value(double pixel,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_chart_base_data_to_pixel(const struct ui_chart_base *chart, double data_x,
-                            double data_y,
-                            struct ui_dom_point *out_pixel_point) {
+ui_error_t ui_chart_base_data_to_pixel(const struct ui_chart_base *chart,
+                                       double data_x, double data_y,
+                                       struct ui_dom_point *out_pixel_point) {
   if (!chart || !out_pixel_point)
     return UI_ERROR_INVALID_ARGUMENT;
 
   if (chart->coord_system == UI_CHART_COORDINATE_CARTESIAN) {
+    ui_error_t rc;
     out_pixel_point->x = 0.0f;
-    (void)scale_value(data_x, &chart->x_scale, &out_pixel_point->x);
+    rc = scale_value(data_x, &chart->x_scale, &out_pixel_point->x);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     out_pixel_point->x += chart->draw_bounds.x;
     out_pixel_point->y = 0.0f;
-    (void)scale_value(data_y, &chart->y_scale, &out_pixel_point->y);
+    rc = scale_value(data_y, &chart->y_scale, &out_pixel_point->y);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     out_pixel_point->y += chart->draw_bounds.y;
   } else if (chart->coord_system == UI_CHART_COORDINATE_POLAR) {
     /* data_x is angle (radians), data_y is radius */
@@ -217,9 +243,14 @@ ui_chart_base_data_to_pixel(const struct ui_chart_base *chart, double data_x,
     double cy = chart->draw_bounds.y + chart->draw_bounds.height / 2.0;
     double radius = 0.0;
     double angle = 0.0;
-    (void)scale_value(data_y, &chart->y_scale, &radius);
+    ui_error_t rc;
+    rc = scale_value(data_y, &chart->y_scale, &radius);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     /* In polar, x_scale could map abstract angle (e.g. 0-100%) to 0-2PI */
-    (void)scale_value(data_x, &chart->x_scale, &angle);
+    rc = scale_value(data_x, &chart->x_scale, &angle);
+    if (rc != UI_ERROR_NONE)
+      return rc;
 
     out_pixel_point->x = cx + (radius * cos(angle));
     out_pixel_point->y = cy + (radius * sin(angle));
@@ -231,10 +262,9 @@ ui_chart_base_data_to_pixel(const struct ui_chart_base *chart, double data_x,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chart_base_pixel_to_data(const struct ui_chart_base *chart,
-                                          double pixel_x, double pixel_y,
-                                          double *out_data_x,
-                                          double *out_data_y) {
+ui_error_t ui_chart_base_pixel_to_data(const struct ui_chart_base *chart,
+                                       double pixel_x, double pixel_y,
+                                       double *out_data_x, double *out_data_y) {
 
   if (!chart || !out_data_x || !out_data_y)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -250,28 +280,38 @@ enum ui_error ui_chart_base_pixel_to_data(const struct ui_chart_base *chart,
   if (chart->coord_system == UI_CHART_COORDINATE_CARTESIAN) {
     double rel_x = pixel_x - chart->draw_bounds.x;
     double rel_y = pixel_y - chart->draw_bounds.y;
-    (void)unscale_value(rel_x, &chart->x_scale, out_data_x);
-    (void)unscale_value(rel_y, &chart->y_scale, out_data_y);
+    ui_error_t rc;
+    rc = unscale_value(rel_x, &chart->x_scale, out_data_x);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = unscale_value(rel_y, &chart->y_scale, out_data_y);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else if (chart->coord_system == UI_CHART_COORDINATE_POLAR) {
     double cx = chart->draw_bounds.x + chart->draw_bounds.width / 2.0;
     double cy = chart->draw_bounds.y + chart->draw_bounds.height / 2.0;
     double dx = pixel_x - cx;
     double dy = pixel_y - cy;
+    ui_error_t rc;
 
     double radius = sqrt((dx * dx) + (dy * dy));
     double angle = atan2(dy, dx);
     if (angle < 0)
       angle += 2.0 * 3.14159265358979323846; /* Normalize to 0-2PI */
 
-    (void)unscale_value(radius, &chart->y_scale, out_data_y);
-    (void)unscale_value(angle, &chart->x_scale, out_data_x);
+    rc = unscale_value(radius, &chart->y_scale, out_data_y);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = unscale_value(angle, &chart->x_scale, out_data_x);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chart_base_get_topology_signal(struct ui_chart_base *chart,
-                                                ui_signal_t **out_signal) {
+ui_error_t ui_chart_base_get_topology_signal(struct ui_chart_base *chart,
+                                             ui_signal_t **out_signal) {
   if (!chart || !out_signal)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_signal = chart->topology_signal;

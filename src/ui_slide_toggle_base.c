@@ -13,15 +13,15 @@ struct ui_slide_toggle_base {
   float drag_offset_x;
   float drag_start_offset_x;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 };
 
-static enum ui_error trigger_cva_change(struct ui_slide_toggle_base *toggle) {
+static ui_error_t trigger_cva_change(struct ui_slide_toggle_base *toggle) {
   if (toggle && toggle->cva_on_change) {
     union ui_signal_payload payload;
     payload.bool_val = toggle->checked;
@@ -30,15 +30,15 @@ static enum ui_error trigger_cva_change(struct ui_slide_toggle_base *toggle) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_cva_touched(struct ui_slide_toggle_base *toggle) {
+static ui_error_t trigger_cva_touched(struct ui_slide_toggle_base *toggle) {
   if (toggle && toggle->cva_on_touched) {
     return toggle->cva_on_touched(toggle->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-slide_toggle_cva_write_value(void *component, union ui_signal_payload value) {
+static ui_error_t slide_toggle_cva_write_value(void *component,
+                                               union ui_signal_payload value) {
   struct ui_slide_toggle_base *toggle =
       (struct ui_slide_toggle_base *)component;
 
@@ -51,10 +51,9 @@ slide_toggle_cva_write_value(void *component, union ui_signal_payload value) {
 }
 
 /** \brief slide_toggle_cva_register_on_change */
-static enum ui_error slide_toggle_cva_register_on_change(
+static ui_error_t slide_toggle_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_slide_toggle_base *toggle =
       (struct ui_slide_toggle_base *)component;
@@ -65,10 +64,8 @@ static enum ui_error slide_toggle_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-slide_toggle_cva_register_on_touched(void *component,
-                                     enum ui_error (*callback)(void *user_data),
-                                     void *user_data) {
+static ui_error_t slide_toggle_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_slide_toggle_base *toggle =
       (struct ui_slide_toggle_base *)component;
   if (!toggle)
@@ -78,8 +75,8 @@ slide_toggle_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error slide_toggle_cva_set_disabled_state(void *component,
-                                                         int is_disabled) {
+static ui_error_t slide_toggle_cva_set_disabled_state(void *component,
+                                                      int is_disabled) {
   struct ui_slide_toggle_base *toggle =
       (struct ui_slide_toggle_base *)component;
   if (!toggle)
@@ -89,18 +86,18 @@ static enum ui_error slide_toggle_cva_set_disabled_state(void *component,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_create(struct ui_slide_toggle_base **out_toggle,
                             struct ui_control_value_accessor *out_cva) {
   struct ui_slide_toggle_base *toggle;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_toggle) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  toggle = (struct ui_slide_toggle_base *)UI_MALLOC(
+  toggle = (struct ui_slide_toggle_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_slide_toggle_base));
   if (!toggle) {
     rc = UI_ERROR_OUT_OF_MEMORY;
@@ -120,7 +117,7 @@ ui_slide_toggle_base_create(struct ui_slide_toggle_base **out_toggle,
 
   rc = ui_gesture_recognizer_create(&toggle->recognizer);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(toggle);
+    C_MULTIPLATFORM_FREE(toggle);
     goto cleanup;
   }
 
@@ -137,20 +134,20 @@ cleanup:
   return rc;
 }
 
-void ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle) {
+ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle) {
   if (!toggle) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (toggle->recognizer) {
-    ui_gesture_recognizer_destroy(toggle->recognizer);
+    (void)ui_gesture_recognizer_destroy(toggle->recognizer);
   }
-  UI_FREE(toggle);
+  C_MULTIPLATFORM_FREE(toggle);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
-                                 int checked) {
+ui_error_t ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
+                                            int checked) {
   if (!toggle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -159,7 +156,7 @@ ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_get_checked(const struct ui_slide_toggle_base *toggle,
                                  int *out_checked) {
   if (!toggle || !out_checked) {
@@ -170,7 +167,7 @@ ui_slide_toggle_base_get_checked(const struct ui_slide_toggle_base *toggle,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_set_disabled(struct ui_slide_toggle_base *toggle,
                                   int disabled) {
   if (!toggle) {
@@ -185,7 +182,7 @@ ui_slide_toggle_base_set_disabled(struct ui_slide_toggle_base *toggle,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_get_disabled(const struct ui_slide_toggle_base *toggle,
                                   int *out_disabled) {
   if (!toggle || !out_disabled) {
@@ -195,24 +192,32 @@ ui_slide_toggle_base_get_disabled(const struct ui_slide_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle) {
+ui_error_t ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle) {
   if (!toggle) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (!toggle->disabled) {
     toggle->checked = !toggle->checked;
-    (void)trigger_cva_touched(toggle);
-    (void)trigger_cva_change(toggle);
+    {
+      ui_error_t rc1 = trigger_cva_touched(toggle);
+      if (rc1 != UI_ERROR_NONE)
+        return rc1;
+    }
+    {
+      ui_error_t rc2 = trigger_cva_change(toggle);
+      if (rc2 != UI_ERROR_NONE)
+        return rc2;
+    }
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
                                    const struct ui_event *event,
                                    double timestamp_ms) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_gesture_event gesture_event;
 
   if (!toggle || !event) {
@@ -235,8 +240,16 @@ ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
     toggle->checked = !toggle->checked;
     toggle->is_dragging = 0;
     toggle->drag_offset_x = 0.0f;
-    (void)trigger_cva_touched(toggle);
-    (void)trigger_cva_change(toggle);
+    {
+      ui_error_t rc1 = trigger_cva_touched(toggle);
+      if (rc1 != UI_ERROR_NONE)
+        return rc1;
+    }
+    {
+      ui_error_t rc2 = trigger_cva_change(toggle);
+      if (rc2 != UI_ERROR_NONE)
+        return rc2;
+    }
   } else if (gesture_event.type == UI_GESTURE_PAN) {
     if (gesture_event.state == UI_GESTURE_STATE_BEGAN) {
       toggle->is_dragging = 1;
@@ -264,8 +277,16 @@ ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
           changed = 1;
         }
         if (changed) {
-          (void)trigger_cva_touched(toggle);
-          (void)trigger_cva_change(toggle);
+          {
+            ui_error_t rc1 = trigger_cva_touched(toggle);
+            if (rc1 != UI_ERROR_NONE)
+              return rc1;
+          }
+          {
+            ui_error_t rc2 = trigger_cva_change(toggle);
+            if (rc2 != UI_ERROR_NONE)
+              return rc2;
+          }
         }
       }
       toggle->drag_offset_x = 0.0f;
@@ -277,7 +298,7 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_get_drag_offset(const struct ui_slide_toggle_base *toggle,
                                      float *out_offset_x) {
   if (!toggle || !out_offset_x) {
@@ -288,7 +309,7 @@ ui_slide_toggle_base_get_drag_offset(const struct ui_slide_toggle_base *toggle,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_is_dragging(const struct ui_slide_toggle_base *toggle,
                                  int *out_is_dragging) {
   if (!toggle || !out_is_dragging) {

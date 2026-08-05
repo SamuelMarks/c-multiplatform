@@ -10,9 +10,9 @@ extern int g_malloc_fail_countdown;
 static int g_cb_called = 0;
 static struct ui_mutation_record g_last_record;
 
-static enum ui_error mutation_cb(struct ui_mutation_observer *observer,
-                                 const struct ui_mutation_record *records,
-                                 int record_count, void *user_data) {
+static ui_error_t mutation_cb(struct ui_mutation_observer *observer,
+                              const struct ui_mutation_record *records,
+                              int record_count, void *user_data) {
   int i;
   (void)observer;
   (void)user_data;
@@ -31,7 +31,7 @@ static int run_normal_tests(void) {
   struct ui_dom_node *child2 = NULL;
   struct ui_dom_node *nodes[10];
   struct ui_mutation_observer_init options = {1, 1, 1, 1, 1};
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   if (ui_mutation_observer_create(NULL, NULL, NULL) !=
@@ -142,7 +142,7 @@ static int run_normal_tests(void) {
     if (g_cb_called != 1)
       return 1;
 
-    ui_dom_node_destroy(text_node2);
+    (void)ui_dom_node_destroy(text_node2);
     ui_mutation_observer_destroy(obs);
   }
 
@@ -170,7 +170,7 @@ static int run_normal_tests(void) {
 
   ui_dom_node_destroy(root); /* destroys child1, child2, text_node */
   for (i = 0; i < 10; i++) {
-    ui_dom_node_destroy(nodes[i]);
+    (void)ui_dom_node_destroy(nodes[i]);
   }
 
   return 0;
@@ -181,7 +181,7 @@ static int run_oom_tests(void) {
   struct ui_mutation_observer *obs = NULL;
   struct ui_dom_node *root = NULL;
   struct ui_mutation_observer_init options = {1, 1, 1, 1, 1};
-  enum ui_error rc;
+  ui_error_t rc;
 
   g_malloc_fail_countdown = 0;
   if (ui_mutation_observer_create(mutation_cb, NULL, &obs) !=
@@ -215,13 +215,13 @@ static int run_oom_tests(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
-  ui_dom_node_destroy(n1);
-  ui_dom_node_destroy(n2);
-  ui_dom_node_destroy(n3);
-  ui_dom_node_destroy(n4);
-  ui_dom_node_destroy(n5);
+  (void)ui_dom_node_destroy(n1);
+  (void)ui_dom_node_destroy(n2);
+  (void)ui_dom_node_destroy(n3);
+  (void)ui_dom_node_destroy(n4);
+  (void)ui_dom_node_destroy(n5);
   ui_mutation_observer_destroy(obs);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 
   /* Trigger string OOM in attribute notify */
   {
@@ -243,7 +243,7 @@ static int run_oom_tests(void) {
     ui_mutation_observer_notify_character_data(test_node, "old_val");
     g_malloc_fail_countdown = -1;
 
-    ui_dom_node_destroy(test_node);
+    (void)ui_dom_node_destroy(test_node);
     ui_mutation_observer_destroy(obs);
   }
 #endif

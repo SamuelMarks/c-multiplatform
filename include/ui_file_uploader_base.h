@@ -54,11 +54,11 @@ struct ui_file_uploader_base {
       dropzone_list; /**< Internal drag list for hooking into ui_drag_drop */
 
   /* CVA Integration */
-  enum ui_error (*on_change_cb)(union ui_signal_payload new_value,
-                                void *user_data);
+  ui_error_t (*on_change_cb)(union ui_signal_payload new_value,
+                             void *user_data);
   void *on_change_user_data;
 
-  enum ui_error (*on_touched_cb)(void *user_data);
+  ui_error_t (*on_touched_cb)(void *user_data);
   void *on_touched_user_data;
 
   ui_bool_t is_disabled;
@@ -75,23 +75,23 @@ struct ui_file_uploader_base {
  * @param out_cva Optional CVA output pointer.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_file_uploader_init(struct ui_file_uploader_base *uploader,
-                                    int max_files, int x, int y, int width,
-                                    int height,
-                                    struct ui_control_value_accessor *out_cva);
+ui_error_t ui_file_uploader_init(struct ui_file_uploader_base *uploader,
+                                 int max_files, int x, int y, int width,
+                                 int height,
+                                 struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Destroys a file uploader component, freeing all resources.
  * @param uploader Pointer to the uploader structure.
  */
-void ui_file_uploader_destroy(struct ui_file_uploader_base *uploader);
+ui_error_t ui_file_uploader_destroy(struct ui_file_uploader_base *uploader);
 
 /**
  * @brief Simulates a drag enter event (e.g., from an OS file drag).
  * @param uploader Pointer to the uploader structure.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_file_uploader_on_drag_enter(struct ui_file_uploader_base *uploader);
 
 /**
@@ -99,7 +99,7 @@ ui_file_uploader_on_drag_enter(struct ui_file_uploader_base *uploader);
  * @param uploader Pointer to the uploader structure.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader);
 
 /**
@@ -109,16 +109,15 @@ ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader);
  * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_FULL if max_files is
  * reached.
  */
-enum ui_error ui_file_uploader_drop_file(struct ui_file_uploader_base *uploader,
-                                         const char *file_path);
+ui_error_t ui_file_uploader_drop_file(struct ui_file_uploader_base *uploader,
+                                      const char *file_path);
 
 /**
  * @brief Reads all newly dropped files from the filesystem securely.
  * @param uploader Pointer to the uploader structure.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_file_uploader_read_files(struct ui_file_uploader_base *uploader);
+ui_error_t ui_file_uploader_read_files(struct ui_file_uploader_base *uploader);
 
 /**
  * @brief Registers the uploader's dropzone with a drag and drop context.
@@ -126,7 +125,7 @@ ui_file_uploader_read_files(struct ui_file_uploader_base *uploader);
  * @param drag_ctx Pointer to the drag and drop context.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_file_uploader_register_dropzone(struct ui_file_uploader_base *uploader,
                                    struct ui_drag_drop_context *drag_ctx);
 

@@ -16,7 +16,7 @@ int main(void) {
   struct ui_arena *arena;
   struct ui_form_control *control;
   union ui_signal_payload init_val;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   init_val.int_val = 0;
@@ -31,9 +31,9 @@ int main(void) {
                                   NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                                   &control);
       if (rc == UI_ERROR_NONE) {
-        ui_form_control_destroy(control);
+        (void)ui_form_control_destroy(control);
       }
-      ui_arena_destroy(arena);
+      (void)ui_arena_destroy(arena);
     }
 
     ui_mock_alloc_fail_enabled = 0;

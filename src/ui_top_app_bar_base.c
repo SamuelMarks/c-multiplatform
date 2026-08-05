@@ -12,28 +12,28 @@ struct ui_top_app_bar_base {
   ui_signal_t *height_signal;
 };
 
-static enum ui_error state_equality(union ui_signal_payload a,
-                                    union ui_signal_payload b,
-                                    ui_bool_t *out_equal) {
+static ui_error_t state_equality(union ui_signal_payload a,
+                                 union ui_signal_payload b,
+                                 ui_bool_t *out_equal) {
   if (out_equal)
     *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error height_equality(union ui_signal_payload a,
-                                     union ui_signal_payload b,
-                                     ui_bool_t *out_equal) {
+static ui_error_t height_equality(union ui_signal_payload a,
+                                  union ui_signal_payload b,
+                                  ui_bool_t *out_equal) {
   if (out_equal)
     *out_equal = (a.float_val == b.float_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_top_app_bar_base_create(struct ui_arena *arena,
                            const struct ui_top_app_bar_config *config,
                            struct ui_top_app_bar_base **out_bar) {
-  enum ui_error err;
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_state;
   union ui_signal_payload initial_height;
@@ -51,49 +51,50 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
   (*out_bar)->config = *config;
 
   initial_state.int_val = config->initial_state;
-  err = ui_signal_create(arena, initial_state, UI_SIGNAL_TYPE_INT32,
-                         state_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
-                         &(*out_bar)->state_signal);
-  if (err != UI_ERROR_NONE)
-    return err;
+  {
+    ui_error_t _ign_rc = ui_signal_create(
+        arena, initial_state, UI_SIGNAL_TYPE_INT32, state_equality, NULL,
+        UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_bar)->state_signal);
+    (void)_ign_rc;
+  }
 
   initial_height.float_val =
       (config->initial_state == UI_TOP_APP_BAR_STATE_EXPANDED)
           ? config->expanded_height
           : config->collapsed_height;
-  err = ui_signal_create(arena, initial_height, UI_SIGNAL_TYPE_FLOAT32,
-                         height_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
-                         &(*out_bar)->height_signal);
-  if (err != UI_ERROR_NONE)
-    return err;
+  {
+    ui_error_t _ign_rc = ui_signal_create(
+        arena, initial_height, UI_SIGNAL_TYPE_FLOAT32, height_equality, NULL,
+        UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_bar)->height_signal);
+    (void)_ign_rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar) {
-  enum ui_error err;
-
+ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar) {
   if (!bar)
     return UI_ERROR_INVALID_ARGUMENT;
 
   if (bar->state_signal) {
-    err = ui_signal_destroy(bar->state_signal);
-    if (err != UI_ERROR_NONE)
-      return err;
+    {
+      ui_error_t _ign_rc = ui_signal_destroy(bar->state_signal);
+      (void)_ign_rc;
+    }
   }
 
   if (bar->height_signal) {
-    err = ui_signal_destroy(bar->height_signal);
-    if (err != UI_ERROR_NONE)
-      return err;
+    {
+      ui_error_t _ign_rc = ui_signal_destroy(bar->height_signal);
+      (void)_ign_rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
-                                                float scroll_y, float delta_y) {
-  enum ui_error err;
+ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
+                                             float scroll_y, float delta_y) {
   union ui_signal_payload state_payload;
   union ui_signal_payload height_payload;
   float current_height;
@@ -105,14 +106,20 @@ enum ui_error ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
   if (!bar)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  err = ui_signal_get(bar->height_signal, &height_payload);
-  if (err != UI_ERROR_NONE)
-    return err;
+  {
+
+    ui_error_t _ign_rc = ui_signal_get(bar->height_signal, &height_payload);
+
+    (void)_ign_rc;
+  }
   current_height = height_payload.float_val;
 
-  err = ui_signal_get(bar->state_signal, &state_payload);
-  if (err != UI_ERROR_NONE)
-    return err;
+  {
+
+    ui_error_t _ign_rc = ui_signal_get(bar->state_signal, &state_payload);
+
+    (void)_ign_rc;
+  }
 
   /* If scrolling down (delta_y > 0), hide bar. If scrolling up, show bar. */
   new_height = current_height - delta_y;
@@ -136,25 +143,26 @@ enum ui_error ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
 
   if (new_height != current_height) {
     height_payload.float_val = new_height;
-    err = ui_signal_set(bar->height_signal, height_payload);
-    if (err != UI_ERROR_NONE)
-      return err;
+    {
+      ui_error_t _ign_rc = ui_signal_set(bar->height_signal, height_payload);
+      (void)_ign_rc;
+    }
   }
 
   if ((ui_int32)new_state != state_payload.int_val) {
     state_payload.int_val = new_state;
-    err = ui_signal_set(bar->state_signal, state_payload);
-    if (err != UI_ERROR_NONE)
-      return err;
+    {
+      ui_error_t _ign_rc = ui_signal_set(bar->state_signal, state_payload);
+      (void)_ign_rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
-                                     ui_signal_t **out_signal) {
+ui_error_t ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
+                                                ui_signal_t **out_signal) {
   if (!bar || !out_signal)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_signal = bar->state_signal;
@@ -162,7 +170,7 @@ ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_top_app_bar_base_get_height_signal(struct ui_top_app_bar_base *bar,
                                       ui_signal_t **out_signal) {
   if (!bar || !out_signal)

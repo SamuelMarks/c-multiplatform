@@ -200,15 +200,15 @@ static int test_ui_form_array(void) {
   if (ui_form_array_destroy(array) != UI_ERROR_NONE)
     goto cleanup;
 
-  ui_form_control_destroy(control1);
-  ui_form_control_destroy(control2);
-  ui_form_control_destroy(control_invalid);
-  ui_form_control_destroy(control_pending);
+  (void)ui_form_control_destroy(control1);
+  (void)ui_form_control_destroy(control2);
+  (void)ui_form_control_destroy(control_invalid);
+  (void)ui_form_control_destroy(control_pending);
 
   ret = 0;
 cleanup:
-  ui_arena_destroy(arena);
-  ui_arena_destroy(tiny_arena);
+  (void)ui_arena_destroy(arena);
+  (void)ui_arena_destroy(tiny_arena);
   return ret;
 }
 

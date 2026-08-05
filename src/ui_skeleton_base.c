@@ -13,16 +13,17 @@ struct ui_skeleton_base {
   struct ui_signal *active_signal;
 };
 
-enum ui_error ui_skeleton_base_create(struct ui_skeleton_base **out_skeleton) {
+ui_error_t ui_skeleton_base_create(struct ui_skeleton_base **out_skeleton) {
   struct ui_skeleton_base *skel;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_skeleton) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  skel = (struct ui_skeleton_base *)UI_MALLOC(sizeof(struct ui_skeleton_base));
+  skel = (struct ui_skeleton_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_skeleton_base));
   if (!skel) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -44,15 +45,16 @@ cleanup:
   return rc;
 }
 
-void ui_skeleton_base_destroy(struct ui_skeleton_base *skeleton) {
+ui_error_t ui_skeleton_base_destroy(struct ui_skeleton_base *skeleton) {
   if (!skeleton) {
-    return;
+    return UI_ERROR_NONE;
   }
-  UI_FREE(skeleton);
+  C_MULTIPLATFORM_FREE(skeleton);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_skeleton_base_set_shape(struct ui_skeleton_base *skeleton,
-                                         enum ui_skeleton_shape shape) {
+ui_error_t ui_skeleton_base_set_shape(struct ui_skeleton_base *skeleton,
+                                      enum ui_skeleton_shape shape) {
   if (!skeleton) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -61,9 +63,8 @@ enum ui_error ui_skeleton_base_set_shape(struct ui_skeleton_base *skeleton,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_skeleton_base_get_shape(const struct ui_skeleton_base *skeleton,
-                           enum ui_skeleton_shape *out_shape) {
+ui_error_t ui_skeleton_base_get_shape(const struct ui_skeleton_base *skeleton,
+                                      enum ui_skeleton_shape *out_shape) {
   if (!skeleton || !out_shape) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -71,8 +72,8 @@ ui_skeleton_base_get_shape(const struct ui_skeleton_base *skeleton,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_skeleton_base_set_dimensions(struct ui_skeleton_base *skeleton,
-                                              int width, int height) {
+ui_error_t ui_skeleton_base_set_dimensions(struct ui_skeleton_base *skeleton,
+                                           int width, int height) {
   if (!skeleton) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -89,7 +90,7 @@ enum ui_error ui_skeleton_base_set_dimensions(struct ui_skeleton_base *skeleton,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_skeleton_base_get_dimensions(const struct ui_skeleton_base *skeleton,
                                 int *out_width, int *out_height) {
   if (!skeleton || !out_width || !out_height) {
@@ -102,8 +103,8 @@ ui_skeleton_base_get_dimensions(const struct ui_skeleton_base *skeleton,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_skeleton_base_tick(struct ui_skeleton_base *skeleton,
-                                    float delta_time_ms) {
+ui_error_t ui_skeleton_base_tick(struct ui_skeleton_base *skeleton,
+                                 float delta_time_ms) {
   if (!skeleton) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -120,7 +121,7 @@ enum ui_error ui_skeleton_base_tick(struct ui_skeleton_base *skeleton,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_skeleton_base_get_animation_phase(const struct ui_skeleton_base *skeleton,
                                      float *out_phase) {
   if (!skeleton || !out_phase) {
@@ -137,7 +138,7 @@ ui_skeleton_base_get_animation_phase(const struct ui_skeleton_base *skeleton,
 }
 
 /** \brief ui_skeleton_base_get_animation_config */
-enum ui_error ui_skeleton_base_get_animation_config(
+ui_error_t ui_skeleton_base_get_animation_config(
     const struct ui_skeleton_base *skeleton,
     struct ui_skeleton_animation_config **out_config) {
   if (!skeleton || !out_config) {
@@ -148,8 +149,8 @@ enum ui_error ui_skeleton_base_get_animation_config(
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_skeleton_base_bind_active(struct ui_skeleton_base *widget,
-                                           struct ui_signal *signal) {
+ui_error_t ui_skeleton_base_bind_active(struct ui_skeleton_base *widget,
+                                        struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

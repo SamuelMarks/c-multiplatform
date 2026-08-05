@@ -3,14 +3,14 @@
 #include "../include/ui_error.h"
 #include <stdio.h>
 
-extern enum ui_error
+extern ui_error_t
 ui_window_backend_ios_create(struct ui_window_backend **out_backend);
-extern enum ui_error
+extern ui_error_t
 ui_window_backend_ios_destroy(struct ui_window_backend *backend);
 
 int main(void) {
   struct ui_window_backend *backend = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int failed = 0;
 
   printf("Running ui_window_backend_ios tests...\n");

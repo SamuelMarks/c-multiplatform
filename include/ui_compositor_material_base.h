@@ -61,7 +61,7 @@ struct ui_compositor_material_config {
  * @param out_material Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_compositor_material_base_create(
+ui_error_t ui_compositor_material_base_create(
     struct ui_arena *arena, const struct ui_compositor_material_config *config,
     struct ui_compositor_material_base **out_material);
 
@@ -71,7 +71,7 @@ enum ui_error ui_compositor_material_base_create(
  * @param material The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_compositor_material_base_destroy(
+ui_error_t ui_compositor_material_base_destroy(
     struct ui_compositor_material_base *material);
 
 /**
@@ -81,7 +81,7 @@ enum ui_error ui_compositor_material_base_destroy(
  * @param type The desired material type.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_compositor_material_base_set_type(
+ui_error_t ui_compositor_material_base_set_type(
     struct ui_compositor_material_base *material,
     enum ui_compositor_material_type type);
 
@@ -93,7 +93,7 @@ enum ui_error ui_compositor_material_base_set_type(
  * @param fallback_mode The fallback mode.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_compositor_material_base_set_fallback_mode(
+ui_error_t ui_compositor_material_base_set_fallback_mode(
     struct ui_compositor_material_base *material,
     enum ui_compositor_fallback_mode fallback_mode);
 
@@ -105,7 +105,7 @@ enum ui_error ui_compositor_material_base_set_fallback_mode(
  * @param opacity Opacity value between 0.0f and 1.0f.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_compositor_material_base_set_opacity(
+ui_error_t ui_compositor_material_base_set_opacity(
     struct ui_compositor_material_base *material, float opacity);
 
 /**
@@ -116,7 +116,7 @@ enum ui_error ui_compositor_material_base_set_opacity(
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_compositor_material_base_get_type_signal(
+ui_error_t ui_compositor_material_base_get_type_signal(
     struct ui_compositor_material_base *material, ui_signal_t **out_signal);
 
 #ifdef __cplusplus

@@ -28,9 +28,21 @@ extern int g_malloc_fail_countdown;
     }                                                                          \
   } while (0)
 
-static enum ui_error test_parse_outline(void) {
+static ui_error_t test_parse_outline(void) {
   struct ui_css_outline outline;
-  enum ui_error err;
+  struct ui_css_value width;
+  enum ui_css_outline_style style;
+  ui_error_t err;
+
+  /* Null checks */
+  EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_css_parse_outline_width(NULL, &width));
+  EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_css_parse_outline_width("thin", NULL));
+  EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_css_parse_outline_style(NULL, &style));
+  EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_css_parse_outline_style("solid", NULL));
 
   err = ui_css_parse_outline("   solid 5px #ff0000", &outline);
   EXPECT_EQ(UI_ERROR_NONE, err);
@@ -113,9 +125,9 @@ static enum ui_error test_parse_outline(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_parse_cursor(void) {
+static ui_error_t test_parse_cursor(void) {
   struct ui_css_cursor cursor;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_css_parse_cursor("pointer", &cursor);
   EXPECT_EQ(UI_ERROR_NONE, err);
@@ -271,9 +283,9 @@ static enum ui_error test_parse_cursor(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_parse_user_select(void) {
+static ui_error_t test_parse_user_select(void) {
   enum ui_css_user_select select;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_css_parse_user_select("none", &select);
   EXPECT_EQ(UI_ERROR_NONE, err);
@@ -296,9 +308,9 @@ static enum ui_error test_parse_user_select(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_parse_appearance(void) {
+static ui_error_t test_parse_appearance(void) {
   enum ui_css_appearance appearance;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_css_parse_appearance("button", &appearance);
   EXPECT_EQ(UI_ERROR_NONE, err);
@@ -344,9 +356,9 @@ static enum ui_error test_parse_appearance(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_parse_pointer_events(void) {
+static ui_error_t test_parse_pointer_events(void) {
   enum ui_css_pointer_events events;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_css_parse_pointer_events("none", &events);
   EXPECT_EQ(UI_ERROR_NONE, err);
@@ -381,10 +393,10 @@ static enum ui_error test_parse_pointer_events(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_parse_overscroll_behavior(void) {
+static ui_error_t test_parse_overscroll_behavior(void) {
   struct ui_css_overscroll_behavior_shorthand shorthand;
   enum ui_css_overscroll_behavior behavior;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_css_parse_overscroll_behavior("none", &shorthand);
   EXPECT_EQ(UI_ERROR_NONE, err);

@@ -28,8 +28,8 @@ enum ui_resizable_edge {
 /**
  * @brief Callback invoked when a resize operation requests a size change.
  */
-typedef enum ui_error (*ui_resizable_on_resize_t)(int new_width, int new_height,
-                                                  void *user_data);
+typedef ui_error_t (*ui_resizable_on_resize_t)(int new_width, int new_height,
+                                               void *user_data);
 
 /**
  * @brief Creates a new resizable behavior.
@@ -37,7 +37,7 @@ typedef enum ui_error (*ui_resizable_on_resize_t)(int new_width, int new_height,
  * @param out_behavior Pointer to receive the allocated behavior.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior);
 
 /**
@@ -45,7 +45,8 @@ ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior);
  *
  * @param behavior The behavior to destroy.
  */
-void ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior);
+ui_error_t
+ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior);
 
 /**
  * @brief Configures the resizable constraints and edges.
@@ -58,7 +59,7 @@ void ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior);
  * @param max_height Maximum height (or -1 for none).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
                                 unsigned int edges, int min_width,
                                 int min_height, int max_width, int max_height);
@@ -71,7 +72,7 @@ ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
  * @param user_data Opaque user data for the callback.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
                                     ui_resizable_on_resize_t on_resize,
                                     void *user_data);
@@ -86,7 +87,7 @@ ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
  * @param hit_test_thickness Thickness of the draggable edge area in pixels.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_resizable_behavior_process_event(
+ui_error_t ui_resizable_behavior_process_event(
     struct ui_resizable_behavior *behavior, const struct ui_event *event,
     int current_width, int current_height, int hit_test_thickness);
 

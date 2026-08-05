@@ -7,7 +7,7 @@ This document is an exhaustive exploration of the C-Multiplatform UI engine's in
 The engine forces a highly restrictive subset of C to guarantee portability and longevity.
 
 *   **Strict C89 Compilation:** The CMake matrix enforces `-std=c89 -pedantic -Wall -Werror`. We do not rely on C99 or later. This guarantees the engine compiles on embedded systems, ancient toolchains, and modern compilers alike (MSVC, GCC, Clang, Emscripten).
-*   **No Typedefs:** We strictly avoid hiding structures and pointers behind `typedef`s (except where required by platform APIs). You will always see `struct ui_window_backend*` and `enum ui_error` explicitly.
+*   **No Typedefs:** We strictly avoid hiding structures and pointers behind `typedef`s (except where required by platform APIs). You will always see `struct ui_window_backend*` and `ui_error_t` explicitly.
 *   **No `<stdint.h>`:** To guarantee C89 compliance without requiring compiler extensions, platform-independent integer types are defined natively within the core headers.
 *   **Zero UI-Layer Mutexes:** Locking DOM nodes individually destroys 60 FPS rendering. The UI state and DOM are mutated *exclusively* on the main thread.
 
@@ -32,10 +32,10 @@ Errors are first-class citizens. Functions never return void if they can fail, a
 
 ```c
 /* Standard Engine Pattern */
-enum ui_error process_image(struct ui_engine *engine, struct ui_image **out_image) {
+ui_error_t process_image(struct ui_engine *engine, struct ui_image **out_image) {
     struct ui_image *img = NULL;
     void *decode_buffer = NULL;
-    enum ui_error err = UI_ERROR_NONE;
+    ui_error_t err = UI_ERROR_NONE;
 
     if (!engine || !out_image) return UI_ERROR_INVALID_ARGUMENT;
 

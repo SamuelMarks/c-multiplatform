@@ -18,7 +18,7 @@ struct ui_window {
     int is_closing;
 };
 
-static enum ui_error ios_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
+static ui_error_t ios_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
     if (!backend || !title || !out_window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -31,28 +31,28 @@ static enum ui_error ios_create_window(struct ui_window_backend* backend, const 
     return UI_ERROR_UNKNOWN;
 }
 
-static enum ui_error ios_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t ios_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-static enum ui_error ios_show_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t ios_show_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-static enum ui_error ios_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t ios_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-static enum ui_error ios_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
+static ui_error_t ios_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
     if (!backend || !window || !out_event || !out_has_event) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -61,21 +61,21 @@ static enum ui_error ios_poll_events(struct ui_window_backend* backend, struct u
     return UI_ERROR_NONE;
 }
 
-static enum ui_error ios_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t ios_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-enum ui_error ui_window_backend_ios_create(struct ui_window_backend** out_backend) {
+ui_error_t ui_window_backend_ios_create(struct ui_window_backend** out_backend) {
     struct ui_window_backend* backend;
 
     if (!out_backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
 
-    backend = (struct ui_window_backend*)UI_MALLOC(sizeof(struct ui_window_backend));
+    backend = (struct ui_window_backend*)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window_backend));
     if (!backend) {
         return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -95,11 +95,11 @@ enum ui_error ui_window_backend_ios_create(struct ui_window_backend** out_backen
     return UI_ERROR_NONE;
 }
 
-enum ui_error ui_window_backend_ios_destroy(struct ui_window_backend* backend) {
+ui_error_t ui_window_backend_ios_destroy(struct ui_window_backend* backend) {
     if (!backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
-    UI_FREE(backend);
+    C_MULTIPLATFORM_FREE(backend);
     return UI_ERROR_NONE;
 }
 
@@ -108,7 +108,7 @@ enum ui_error ui_window_backend_ios_destroy(struct ui_window_backend* backend) {
 #include "../include/ui_window_backend_ios.h"
 #include <stddef.h>
 
-enum ui_error ui_window_backend_ios_create(struct ui_window_backend** out_backend) {
+ui_error_t ui_window_backend_ios_create(struct ui_window_backend** out_backend) {
     if (!out_backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -116,7 +116,7 @@ enum ui_error ui_window_backend_ios_create(struct ui_window_backend** out_backen
     return UI_ERROR_UNKNOWN;
 }
 
-enum ui_error ui_window_backend_ios_destroy(struct ui_window_backend* backend) {
+ui_error_t ui_window_backend_ios_destroy(struct ui_window_backend* backend) {
     if (!backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -129,7 +129,7 @@ enum ui_error ui_window_backend_ios_destroy(struct ui_window_backend* backend) {
 #include <stddef.h>
 /* clang-format on */
 
-enum ui_error
+ui_error_t
 ui_window_backend_ios_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -138,7 +138,7 @@ ui_window_backend_ios_create(struct ui_window_backend **out_backend) {
   return UI_ERROR_UNKNOWN;
 }
 
-enum ui_error ui_window_backend_ios_destroy(struct ui_window_backend *backend) {
+ui_error_t ui_window_backend_ios_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

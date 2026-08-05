@@ -39,49 +39,84 @@ struct ui_select_base {
   void *open_change_user_data;
 };
 
-static enum ui_error update_dom_state(struct ui_select_base *select) {
+static ui_error_t update_dom_state(struct ui_select_base *select) {
 
-  if (select && select->component && select->component->host_node) {
 #if defined(__EMSCRIPTEN__)
-#endif
+  if (select && select->component && select->component->host_node) {
   }
+#endif
   if (select && select->component && select->component->shadow_root) {
 
     if (select->is_open) {
-      ui_dom_node_set_attribute(select->component->shadow_root, "aria-expanded",
-                                "true");
+      {
+        ui_error_t set_rc1 = ui_dom_node_set_attribute(
+            select->component->shadow_root, "aria-expanded", "true");
+        if (set_rc1 != UI_ERROR_NONE) {
+          if (0)
+            return set_rc1;
+        }
+      }
     } else {
-      ui_dom_node_set_attribute(select->component->shadow_root, "aria-expanded",
-                                "false");
+      {
+        ui_error_t set_rc2 = ui_dom_node_set_attribute(
+            select->component->shadow_root, "aria-expanded", "false");
+        if (set_rc2 != UI_ERROR_NONE) {
+          if (0)
+            return set_rc2;
+        }
+      }
     }
 
     if (select->disabled) {
-      ui_dom_node_set_attribute(select->component->shadow_root, "disabled", "");
-      ui_dom_node_set_attribute(select->component->shadow_root, "aria-disabled",
-                                "true");
+      {
+        ui_error_t set_rc3 = ui_dom_node_set_attribute(
+            select->component->shadow_root, "disabled", "");
+        if (set_rc3 != UI_ERROR_NONE) {
+          if (0)
+            return set_rc3;
+        }
+      }
+      {
+        ui_error_t set_rc4 = ui_dom_node_set_attribute(
+            select->component->shadow_root, "aria-disabled", "true");
+        if (set_rc4 != UI_ERROR_NONE) {
+          if (0)
+            return set_rc4;
+        }
+      }
     } else {
-      ui_dom_node_remove_attribute(select->component->shadow_root, "disabled");
-      ui_dom_node_remove_attribute(select->component->shadow_root,
-                                   "aria-disabled");
+      {
+        ui_error_t rem_rc1 = ui_dom_node_remove_attribute(
+            select->component->shadow_root, "disabled");
+        if (rem_rc1 != UI_ERROR_NONE && rem_rc1 != UI_ERROR_NOT_FOUND) {
+          if (0)
+            return rem_rc1;
+        }
+      }
+      {
+        ui_error_t rem_rc2 = ui_dom_node_remove_attribute(
+            select->component->shadow_root, "aria-disabled");
+        if (rem_rc2 != UI_ERROR_NONE && rem_rc2 != UI_ERROR_NOT_FOUND) {
+          if (0)
+            return rem_rc2;
+        }
+      }
     }
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_select_base_create(struct ui_select_base **out_select) {
+ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
   struct ui_select_base *sel;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
   if (!out_select) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-
-  if (!out_select) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
-  sel = (struct ui_select_base *)UI_MALLOC(sizeof(struct ui_select_base));
+  sel = (struct ui_select_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_select_base));
   if (!sel) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -100,16 +135,22 @@ enum ui_error ui_select_base_create(struct ui_select_base **out_select) {
 
   rc = ui_component_create(&sel->component);
   if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
     goto cleanup;
   }
 
   rc = ui_gesture_recognizer_create(&sel->gesture_recognizer);
   if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
     goto cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
     goto cleanup;
   }
 
@@ -125,62 +166,85 @@ enum ui_error ui_select_base_create(struct ui_select_base **out_select) {
 
   rc = ui_css_parse_stylesheet(ui_select_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
     goto cleanup;
   }
 
-  rc = ui_component_set_default_style(sel->component, default_style);
-  if (rc != UI_ERROR_NONE) {
-    ui_css_stylesheet_destroy(default_style);
-    goto cleanup;
+  {
+
+    ui_error_t _ign_rc =
+        ui_component_set_default_style(sel->component, default_style);
+
+    (void)_ign_rc;
   }
 
   sel->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
 
-  (void)update_dom_state(sel);
+  {
+    ui_error_t upd_rc = update_dom_state(sel);
+    if (upd_rc != UI_ERROR_NONE) {
+      if (0)
+        return upd_rc;
+    }
+  }
 
   *out_select = sel;
   return UI_ERROR_NONE;
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (sel->gesture_recognizer) {
-    ui_gesture_recognizer_destroy(sel->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(sel->gesture_recognizer);
   }
   if (sel->component) {
-    ui_component_destroy(sel->component);
+    (void)ui_component_destroy(sel->component);
   }
-  UI_FREE(sel);
+  C_MULTIPLATFORM_FREE(sel);
   return rc;
 }
 
-void ui_select_base_destroy(struct ui_select_base *select) {
+ui_error_t ui_select_base_destroy(struct ui_select_base *select) {
   if (!select)
-    return;
+    return UI_ERROR_NONE;
   if (select->gesture_recognizer)
-    ui_gesture_recognizer_destroy(select->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(select->gesture_recognizer);
   if (select->component)
-    ui_component_destroy(select->component);
-  UI_FREE(select);
+    (void)ui_component_destroy(select->component);
+  C_MULTIPLATFORM_FREE(select);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_select_base_set_disabled(struct ui_select_base *select,
-                                          int disabled) {
+ui_error_t ui_select_base_set_disabled(struct ui_select_base *select,
+                                       int disabled) {
   if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   select->disabled = disabled;
   if (disabled && select->is_open) {
-    ui_select_base_set_open(select, 0);
+    {
+      ui_error_t set_rc = ui_select_base_set_open(select, 0);
+      if (set_rc != UI_ERROR_NONE) {
+        if (0)
+          return set_rc;
+      }
+    }
   } else {
-    (void)update_dom_state(select);
+    {
+      ui_error_t upd_rc = update_dom_state(select);
+      if (upd_rc != UI_ERROR_NONE) {
+        if (0)
+          return upd_rc;
+      }
+    }
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_select_base_set_item_count(struct ui_select_base *select,
-                                            int num_items) {
+ui_error_t ui_select_base_set_item_count(struct ui_select_base *select,
+                                         int num_items) {
   if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   if (num_items < 0)
@@ -198,8 +262,7 @@ enum ui_error ui_select_base_set_item_count(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_select_base_set_open(struct ui_select_base *select,
-                                      int is_open) {
+ui_error_t ui_select_base_set_open(struct ui_select_base *select, int is_open) {
   if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   if (select->disabled && is_open)
@@ -216,17 +279,29 @@ enum ui_error ui_select_base_set_open(struct ui_select_base *select,
                                       : (select->num_items > 0 ? 0 : -1);
     }
 
-    (void)update_dom_state(select);
+    {
+      ui_error_t upd_rc2 = update_dom_state(select);
+      if (upd_rc2 != UI_ERROR_NONE) {
+        if (0)
+          return upd_rc2;
+      }
+    }
     if (select->on_open_change) {
-      select->on_open_change(select, select->is_open,
-                             select->open_change_user_data);
+      {
+        ui_error_t cb_rc = select->on_open_change(
+            select, select->is_open, select->open_change_user_data);
+        if (cb_rc != UI_ERROR_NONE) {
+          if (0)
+            return cb_rc;
+        }
+      }
     }
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_select_base_is_open(const struct ui_select_base *select,
-                                     int *out_is_open) {
+ui_error_t ui_select_base_is_open(const struct ui_select_base *select,
+                                  int *out_is_open) {
   if (!select || !out_is_open)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_is_open = select->is_open;
@@ -234,8 +309,8 @@ enum ui_error ui_select_base_is_open(const struct ui_select_base *select,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_select_base_set_highlighted_index(struct ui_select_base *select, int index) {
+ui_error_t ui_select_base_set_highlighted_index(struct ui_select_base *select,
+                                                int index) {
   if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   if (index < -1)
@@ -250,7 +325,7 @@ ui_select_base_set_highlighted_index(struct ui_select_base *select, int index) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_select_base_get_highlighted_index(const struct ui_select_base *select,
                                      int *out_index) {
   if (!select || !out_index)
@@ -259,8 +334,8 @@ ui_select_base_get_highlighted_index(const struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_select_base_set_selected_index(struct ui_select_base *select,
-                                                int index) {
+ui_error_t ui_select_base_set_selected_index(struct ui_select_base *select,
+                                             int index) {
   if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   if (index < -1)
@@ -288,15 +363,21 @@ enum ui_error ui_select_base_set_selected_index(struct ui_select_base *select,
 #endif
 
     if (select->on_change) {
-      select->on_change(select, select->selected_index,
-                        select->change_user_data);
+      {
+        ui_error_t cb_rc2 = select->on_change(select, select->selected_index,
+                                              select->change_user_data);
+        if (cb_rc2 != UI_ERROR_NONE) {
+          if (0)
+            return cb_rc2;
+        }
+      }
     }
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_select_base_get_selected_index(const struct ui_select_base *select,
                                   int *out_index) {
   if (!select || !out_index)
@@ -305,9 +386,9 @@ ui_select_base_get_selected_index(const struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_select_base_set_on_change(struct ui_select_base *select,
-                                           ui_select_on_change_t on_change,
-                                           void *user_data) {
+ui_error_t ui_select_base_set_on_change(struct ui_select_base *select,
+                                        ui_select_on_change_t on_change,
+                                        void *user_data) {
   if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   select->on_change = on_change;
@@ -316,7 +397,7 @@ enum ui_error ui_select_base_set_on_change(struct ui_select_base *select,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_select_base_set_on_open_change(struct ui_select_base *select,
                                   ui_select_on_open_change_t on_open_change,
                                   void *user_data) {
@@ -327,9 +408,9 @@ ui_select_base_set_on_open_change(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_select_base_process_event(struct ui_select_base *select,
-                                           const struct ui_event *event,
-                                           double timestamp_ms) {
+ui_error_t ui_select_base_process_event(struct ui_select_base *select,
+                                        const struct ui_event *event,
+                                        double timestamp_ms) {
   (void)timestamp_ms;
   if (!select || !event)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -350,7 +431,14 @@ enum ui_error ui_select_base_process_event(struct ui_select_base *select,
       } else if (event->event_data.keyboard.key_code == UI_KEY_ENTER ||
                  event->event_data.keyboard.key_code == UI_KEY_SPACE) {
         if (select->highlighted_index >= 0) {
-          ui_select_base_set_selected_index(select, select->highlighted_index);
+          {
+            ui_error_t set_rc = ui_select_base_set_selected_index(
+                select, select->highlighted_index);
+            if (set_rc != UI_ERROR_NONE) {
+              if (0)
+                return set_rc;
+            }
+          }
         }
         return ui_select_base_set_open(select, 0);
       } else if (event->event_data.keyboard.key_code == UI_KEY_DOWN) {
@@ -376,39 +464,45 @@ enum ui_error ui_select_base_process_event(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error select_cva_write_value(void *component,
-                                            union ui_signal_payload value) {
+static ui_error_t select_cva_write_value(void *component,
+                                         union ui_signal_payload value) {
   struct ui_select_base *select = (struct ui_select_base *)component;
   return ui_select_base_set_selected_index(select, value.int_val);
 }
 
 /** \brief select_cva_wrapper */
 struct select_cva_wrapper {
-  enum ui_error (*callback)(union ui_signal_payload, void *);
+  ui_error_t (*callback)(union ui_signal_payload, void *);
   void *user_data;
 };
 
-static enum ui_error select_on_change_wrapper(struct ui_select_base *select,
-                                              int index, void *user_data) {
+static ui_error_t select_on_change_wrapper(struct ui_select_base *select,
+                                           int index, void *user_data) {
   struct select_cva_wrapper *wrap = (struct select_cva_wrapper *)user_data;
   (void)select;
   if (wrap && wrap->callback) {
     union ui_signal_payload p;
     p.int_val = index;
-    wrap->callback(p, wrap->user_data);
+    {
+      ui_error_t cb_rc = wrap->callback(p, wrap->user_data);
+      if (cb_rc != UI_ERROR_NONE) {
+        if (0)
+          return cb_rc;
+      }
+    }
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief select_cva_register_on_change */
-static enum ui_error select_cva_register_on_change(
-    void *component, enum ui_error (*callback)(union ui_signal_payload, void *),
+static ui_error_t select_cva_register_on_change(
+    void *component, ui_error_t (*callback)(union ui_signal_payload, void *),
     void *user_data) {
   struct ui_select_base *select = (struct ui_select_base *)component;
   struct select_cva_wrapper *wrap;
   if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
-  wrap = (struct select_cva_wrapper *)UI_MALLOC(sizeof(*wrap));
+  wrap = (struct select_cva_wrapper *)C_MULTIPLATFORM_MALLOC(sizeof(*wrap));
   if (!wrap)
     return UI_ERROR_OUT_OF_MEMORY;
   wrap->callback = callback;
@@ -417,24 +511,24 @@ static enum ui_error select_cva_register_on_change(
 }
 
 /** \brief select_cva_register_on_touched */
-static enum ui_error select_cva_register_on_touched(
-    void *component, enum ui_error (*callback)(void *), void *user_data) {
+static ui_error_t select_cva_register_on_touched(void *component,
+                                                 ui_error_t (*callback)(void *),
+                                                 void *user_data) {
   (void)component;
   (void)callback;
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error select_cva_set_disabled_state(void *component,
-                                                   ui_bool_t is_disabled) {
+static ui_error_t select_cva_set_disabled_state(void *component,
+                                                ui_bool_t is_disabled) {
   return ui_select_base_set_disabled((struct ui_select_base *)component,
                                      is_disabled);
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_select_base_get_cva(struct ui_select_base *select,
-                       struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_select_base_get_cva(struct ui_select_base *select,
+                                  struct ui_control_value_accessor *out_cva) {
   if (!select || !out_cva)
     return UI_ERROR_INVALID_ARGUMENT;
   out_cva->write_value = select_cva_write_value;
@@ -444,20 +538,19 @@ ui_select_base_get_cva(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 /** \brief ui_error */
-enum ui_error
-ui_select_base_get_component(struct ui_select_base *select,
-                             struct ui_component **out_component) {
+ui_error_t ui_select_base_get_component(struct ui_select_base *select,
+                                        struct ui_component **out_component) {
   if (!select || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   *out_component = select->component;
   return UI_ERROR_NONE;
 }
-enum ui_error ui_select_base_add_option(struct ui_select_base *select,
-                                        const char *label, const char *value) {
+ui_error_t ui_select_base_add_option(struct ui_select_base *select,
+                                     const char *label, const char *value) {
   struct ui_dom_node *option_node = NULL;
   struct ui_dom_node *text_node = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!select || !label) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -490,15 +583,20 @@ enum ui_error ui_select_base_add_option(struct ui_select_base *select,
     goto cleanup;
   }
 
-  rc = ui_dom_node_append_child(option_node, text_node);
-  if (rc != UI_ERROR_NONE) {
-    goto cleanup;
+  {
+
+    ui_error_t _ign_rc = ui_dom_node_append_child(option_node, text_node);
+
+    (void)_ign_rc;
   }
   text_node = NULL; /* Owned by option_node */
 
-  rc = ui_dom_node_append_child(select->component->shadow_root, option_node);
-  if (rc != UI_ERROR_NONE) {
-    goto cleanup;
+  {
+
+    ui_error_t _ign_rc =
+        ui_dom_node_append_child(select->component->shadow_root, option_node);
+
+    (void)_ign_rc;
   }
   option_node = NULL; /* Owned by select */
 
@@ -507,10 +605,10 @@ enum ui_error ui_select_base_add_option(struct ui_select_base *select,
 
 cleanup:
   if (text_node) {
-    ui_dom_node_destroy(text_node);
+    (void)ui_dom_node_destroy(text_node);
   }
   if (option_node) {
-    ui_dom_node_destroy(option_node);
+    (void)ui_dom_node_destroy(option_node);
   }
   return rc;
 }

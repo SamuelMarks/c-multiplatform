@@ -1,3 +1,4 @@
+extern int g_malloc_fail_countdown;
 /* clang-format off */
 #include "../include/ui_dom_node.h"
 #include "../include/ui_error.h"
@@ -64,8 +65,8 @@ static void test_menu_missing_coverage(void) {
   struct ui_menu_base *sub2 = NULL;
 
   g_malloc_fail_countdown = -1;
-  ui_signal_destroy(sig);
-  ui_menu_base_destroy(menu);
+  (void)ui_signal_destroy(sig);
+  (void)ui_menu_base_destroy(menu);
   ui_menu_base_create(&menu);
 
   ui_menu_base_create(&sub1);
@@ -94,11 +95,11 @@ static void test_menu_missing_coverage(void) {
   ui_menu_base_process_event(sub2,
                              &ev); /* trigger s2_item, should cascade close! */
 
-  ui_menu_base_destroy(sub2);
-  ui_menu_base_destroy(sub1);
-  ui_menu_base_destroy(menu);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
+  (void)ui_menu_base_destroy(sub2);
+  (void)ui_menu_base_destroy(sub1);
+  (void)ui_menu_base_destroy(menu);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root);
 }
 static int g_action_triggered = 0;
 static char g_last_action_id[256];
@@ -112,8 +113,8 @@ static char g_last_action_id[256];
     }                                                                          \
   } while (0)
 
-static enum ui_error test_on_action(struct ui_menu_base *menu,
-                                    const char *item_id, void *user_data) {
+static ui_error_t test_on_action(struct ui_menu_base *menu, const char *item_id,
+                                 void *user_data) {
   (void)menu;
   (void)user_data;
   g_action_triggered++;
@@ -130,12 +131,12 @@ static enum ui_error test_on_action(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_menu_creation_and_open(void) {
+static ui_error_t test_menu_creation_and_open(void) {
   struct ui_menu_base *menu = NULL;
   struct ui_overlay_director *director = NULL;
   struct ui_dom_node *root = NULL;
   struct ui_dom_node *item1 = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_overlay_director_create(root, &director);
@@ -183,13 +184,13 @@ static enum ui_error test_menu_creation_and_open(void) {
     EXPECT_EQ(UI_ERROR_NONE, rc, "intercept_context_menu");
   }
 
-  ui_menu_base_destroy(menu);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
+  (void)ui_menu_base_destroy(menu);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_menu_cascading(void) {
+static ui_error_t test_menu_cascading(void) {
   struct ui_menu_base *main_menu = NULL;
   struct ui_menu_base *sub_menu = NULL;
   struct ui_overlay_director *director = NULL;
@@ -233,14 +234,14 @@ static enum ui_error test_menu_cascading(void) {
     EXPECT_EQ(0, is_open, "submenu should be closed");
   }
 
-  ui_menu_base_destroy(main_menu);
-  ui_menu_base_destroy(sub_menu);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
+  (void)ui_menu_base_destroy(main_menu);
+  (void)ui_menu_base_destroy(sub_menu);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_menu_keyboard_nav(void) {
+static ui_error_t test_menu_keyboard_nav(void) {
   struct ui_menu_base *menu = NULL;
   struct ui_overlay_director *director = NULL;
   struct ui_dom_node *root = NULL;
@@ -284,9 +285,9 @@ static enum ui_error test_menu_keyboard_nav(void) {
   printf("Escape key and click-outside closure metrics verified.\n");
   /* Simulate screen edge collision / flip validation logic internally */
   printf("Screen edge boundary collision tracking verified.\n");
-  ui_menu_base_destroy(menu);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
+  (void)ui_menu_base_destroy(menu);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root);
   return UI_ERROR_NONE;
 }
 
@@ -337,10 +338,10 @@ static void test_menu_missing_branches(void) {
   ev.event_data.mouse.button = 2;
   ui_menu_base_intercept_context_menu(menu, director, &ev);
 
-  ui_menu_base_destroy(menu);
-  ui_menu_base_destroy(sub);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
+  (void)ui_menu_base_destroy(menu);
+  (void)ui_menu_base_destroy(sub);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root);
 }
 
 static void test_menu_errors(void) {
@@ -349,7 +350,7 @@ static void test_menu_errors(void) {
 
   if (ui_menu_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
-  ui_menu_base_destroy(NULL);
+  (void)ui_menu_base_destroy(NULL);
 
   /* Test missing bind arg branches */
   ui_menu_base_bind_active_index(NULL, NULL);

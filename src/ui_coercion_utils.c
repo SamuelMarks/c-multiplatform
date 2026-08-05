@@ -8,7 +8,7 @@
 #include "c89stringutils_string_extras.h"
 /* clang-format on */
 
-enum ui_error ui_coerce_string_to_bool(const char *str, int *out_val) {
+ui_error_t ui_coerce_string_to_bool(const char *str, int *out_val) {
   if (str == NULL || out_val == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -28,7 +28,7 @@ enum ui_error ui_coerce_string_to_bool(const char *str, int *out_val) {
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-enum ui_error ui_coerce_string_to_int(const char *str, int *out_val) {
+ui_error_t ui_coerce_string_to_int(const char *str, int *out_val) {
   char *endptr;
   long val;
 
@@ -45,7 +45,7 @@ enum ui_error ui_coerce_string_to_int(const char *str, int *out_val) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coerce_string_to_float(const char *str, float *out_val) {
+ui_error_t ui_coerce_string_to_float(const char *str, float *out_val) {
   char *endptr;
   double val;
 
@@ -62,8 +62,7 @@ enum ui_error ui_coerce_string_to_float(const char *str, float *out_val) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_safe_string_copy(char *dest, size_t dest_size,
-                                  const char *src) {
+ui_error_t ui_safe_string_copy(char *dest, size_t dest_size, const char *src) {
   if (dest == NULL || src == NULL || dest_size == 0) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -84,8 +83,8 @@ enum ui_error ui_safe_string_copy(char *dest, size_t dest_size,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_safe_string_format(char *dest, size_t dest_size,
-                                    const char *format, ...) {
+ui_error_t ui_safe_string_format(char *dest, size_t dest_size,
+                                 const char *format, ...) {
   va_list args;
   int rc;
 

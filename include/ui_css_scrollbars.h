@@ -37,9 +37,8 @@ struct ui_css_scrollbar_color {
  * @param out_width Pointer to receive the parsed width.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_parse_scrollbar_width(const char *str,
-                             enum ui_css_scrollbar_width *out_width);
+ui_error_t ui_css_parse_scrollbar_width(const char *str,
+                                        enum ui_css_scrollbar_width *out_width);
 
 /**
  * @brief Parses the CSS 'scrollbar-color' property.
@@ -48,7 +47,7 @@ ui_css_parse_scrollbar_width(const char *str,
  * @param out_color Pointer to receive the parsed color config.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_parse_scrollbar_color(const char *str,
                              struct ui_css_scrollbar_color *out_color);
 

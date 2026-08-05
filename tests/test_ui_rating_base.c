@@ -5,14 +5,14 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error dummy_on_change(union ui_signal_payload new_value,
-                                     void *user_data) {
+static ui_error_t dummy_on_change(union ui_signal_payload new_value,
+                                  void *user_data) {
   float *val = (float *)user_data;
   *val = new_value.float_val;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_on_touched(void *user_data) {
+static ui_error_t dummy_on_touched(void *user_data) {
   int *touched = (int *)user_data;
   *touched = 1;
   return UI_ERROR_NONE;
@@ -20,7 +20,7 @@ static enum ui_error dummy_on_touched(void *user_data) {
 
 static int run_normal_tests(void) {
   struct ui_rating_base *rating = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   unsigned int max_rating = 0;
   float value = -1.0f;
   float fraction = -1.0f;
@@ -217,7 +217,7 @@ static int run_normal_tests(void) {
   if (rc != UI_ERROR_NONE || !icon)
     return 1;
 
-  ui_rating_base_destroy(rating);
+  (void)ui_rating_base_destroy(rating);
 
   {
     /* Test destruction branch when only some icons were allocated due to
@@ -232,7 +232,7 @@ static int run_normal_tests(void) {
     ui_rating_base_create(&rating3, NULL);
     g_malloc_fail_countdown = -1;
 
-    ui_rating_base_destroy(NULL);
+    (void)ui_rating_base_destroy(NULL);
   }
 
   return 0;
@@ -240,7 +240,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_rating_base *rating = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing OOM on create... 0\n");
   g_malloc_fail_countdown = 0;

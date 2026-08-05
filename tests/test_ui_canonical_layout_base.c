@@ -70,7 +70,7 @@ static void test_canonical_layout_null_args_and_coverage(void) {
       g_malloc_fail_countdown = 1;
       ui_canonical_layout_base_create(small_arena, &config, &layout);
       g_malloc_fail_countdown = -1;
-      ui_arena_destroy(small_arena);
+      (void)ui_arena_destroy(small_arena);
     }
   }
 
@@ -85,14 +85,14 @@ static void test_canonical_layout_null_args_and_coverage(void) {
   }
 
   ui_canonical_layout_base_destroy(layout);
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 }
 
 int main(void) {
   struct ui_arena *arena;
   struct ui_canonical_layout_base *layout = NULL;
   struct ui_canonical_layout_config config;
-  enum ui_error err;
+  ui_error_t err;
   enum ui_window_size_class size_class;
   ui_signal_t *signal = NULL;
   int failed = 0;
@@ -159,7 +159,7 @@ int main(void) {
     failed = 1;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   if (failed)
     return 1;
   return 0;

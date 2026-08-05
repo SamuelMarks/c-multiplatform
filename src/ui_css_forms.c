@@ -3,8 +3,8 @@
 #include <string.h>
 /* clang-format on */
 
-enum ui_error ui_css_parse_field_sizing(const char *str,
-                                        enum ui_css_field_sizing *out_sizing) {
+ui_error_t ui_css_parse_field_sizing(const char *str,
+                                     enum ui_css_field_sizing *out_sizing) {
   if (!str || !out_sizing) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -20,9 +20,9 @@ enum ui_error ui_css_parse_field_sizing(const char *str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_accent_color(const char *str,
-                                        struct ui_css_accent_color *out_color) {
-  enum ui_error rc;
+ui_error_t ui_css_parse_accent_color(const char *str,
+                                     struct ui_css_accent_color *out_color) {
+  ui_error_t rc;
 
   if (!str || !out_color) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -42,9 +42,9 @@ enum ui_error ui_css_parse_accent_color(const char *str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_caret_color(const char *str,
-                                       struct ui_css_caret_color *out_color) {
-  enum ui_error rc;
+ui_error_t ui_css_parse_caret_color(const char *str,
+                                    struct ui_css_caret_color *out_color) {
+  ui_error_t rc;
 
   if (!str || !out_color) {
     return UI_ERROR_INVALID_ARGUMENT;

@@ -20,9 +20,9 @@ struct ui_loupe_base {
   ui_signal_t *overlay_origin_signal;
 };
 
-static enum ui_error point_equality(union ui_signal_payload a,
-                                    union ui_signal_payload b,
-                                    ui_bool_t *out_equal) {
+static ui_error_t point_equality(union ui_signal_payload a,
+                                 union ui_signal_payload b,
+                                 ui_bool_t *out_equal) {
   const struct ui_dom_point *pa = (const struct ui_dom_point *)a.ptr_val;
   const struct ui_dom_point *pb = (const struct ui_dom_point *)b.ptr_val;
 
@@ -32,10 +32,10 @@ static enum ui_error point_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_loupe_base_create(struct ui_arena *arena,
-                                   const struct ui_loupe_config *config,
-                                   struct ui_loupe_base **out_loupe) {
-  enum ui_error err;
+ui_error_t ui_loupe_base_create(struct ui_arena *arena,
+                                const struct ui_loupe_config *config,
+                                struct ui_loupe_base **out_loupe) {
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -78,20 +78,20 @@ enum ui_error ui_loupe_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_loupe_base_destroy(struct ui_loupe_base *loupe) {
+ui_error_t ui_loupe_base_destroy(struct ui_loupe_base *loupe) {
   if (!loupe) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (loupe->overlay_origin_signal) {
-    ui_signal_destroy(loupe->overlay_origin_signal);
+    (void)ui_signal_destroy(loupe->overlay_origin_signal);
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_loupe_base_set_focal_point(struct ui_loupe_base *loupe,
                               const struct ui_dom_point *focal_point) {
 
@@ -115,9 +115,8 @@ ui_loupe_base_set_focal_point(struct ui_loupe_base *loupe,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
-                                        ui_signal_t **out_signal) {
+ui_error_t ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
+                                                   ui_signal_t **out_signal) {
   if (!loupe || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -126,9 +125,8 @@ ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
-                              struct ui_dom_point *out_focal_point) {
+ui_error_t ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
+                                         struct ui_dom_point *out_focal_point) {
   if (!loupe || !out_focal_point) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -136,8 +134,8 @@ ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
-                                        ui_bool_t visible) {
+ui_error_t ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
+                                     ui_bool_t visible) {
   if (!loupe) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -145,8 +143,8 @@ enum ui_error ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_loupe_base_set_magnification_level(struct ui_loupe_base *loupe,
-                                                    float magnification_level) {
+ui_error_t ui_loupe_base_set_magnification_level(struct ui_loupe_base *loupe,
+                                                 float magnification_level) {
   if (!loupe) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -9,7 +9,7 @@
 static int test_hsv_rgb_conversions(void) {
   struct ui_color_rgb rgb;
   struct ui_color_hsv hsv;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* NULL checks */
   if (ui_color_picker_hsv_to_rgb(NULL, &rgb) != UI_ERROR_INVALID_ARGUMENT)
@@ -144,7 +144,7 @@ static int test_hsv_rgb_conversions(void) {
 static int test_hex_conversions(void) {
   struct ui_color_rgb rgb;
   char hex[8];
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (ui_color_picker_rgb_to_hex(NULL, hex, sizeof(hex)) !=
       UI_ERROR_INVALID_ARGUMENT)
@@ -189,7 +189,7 @@ static int test_hex_conversions(void) {
 
 static int test_2d_mapping(void) {
   struct ui_color_hsv hsv;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (ui_color_picker_calc_hsv_from_2d(0, 0, 0, 0, 100, &hsv) !=
       UI_ERROR_INVALID_ARGUMENT)
@@ -242,8 +242,8 @@ static int test_2d_mapping(void) {
   return 0;
 }
 
-static enum ui_error dummy_cva_on_change(union ui_signal_payload new_value,
-                                         void *user_data) {
+static ui_error_t dummy_cva_on_change(union ui_signal_payload new_value,
+                                      void *user_data) {
   (void)new_value;
   (void)user_data;
   return UI_ERROR_NONE;
@@ -282,7 +282,7 @@ static int test_manager_state(void) {
 #endif
 
   ui_color_picker_base_create(&p2, NULL);
-  ui_color_picker_base_destroy(p2);
+  (void)ui_color_picker_base_destroy(p2);
 
   /* Hit trigger_cva_change when cva_on_change is NULL */
   rgb.r = 255;
@@ -335,7 +335,78 @@ static int test_manager_state(void) {
   if (rgb.r != 0 || rgb.g != 0 || rgb.b != 255)
     return 1;
 
-  ui_color_picker_base_destroy(picker);
+  (void)ui_color_picker_base_destroy(picker);
+  return 0;
+}
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_color_picker_mock_fail;
+extern int g_color_picker_mock_target;
+extern int g_color_picker_mock_current;
+#endif
+
+static int test_oom(void) {
+  int i;
+  ui_error_t rc;
+  struct ui_color_picker_base *picker = NULL;
+
+  for (i = 0; i < 7; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_color_picker_base_create(&picker, NULL);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE) {
+      (void)ui_color_picker_base_destroy(picker);
+      break;
+    } else if (rc != UI_ERROR_OUT_OF_MEMORY) {
+      printf("OOM test failed with unexpected error %d\n", rc);
+      return 1;
+    }
+  }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  /* Mock DOM Failures */
+  for (i = 1; i <= 6; i++) {
+    int t;
+    for (t = 1; t <= 5; t++) {
+      g_color_picker_mock_fail = i;
+      g_color_picker_mock_target = t;
+      g_color_picker_mock_current = 0;
+      rc = ui_color_picker_base_create(&picker, NULL);
+      if (rc == UI_ERROR_NONE) {
+        (void)ui_color_picker_base_destroy(picker);
+        picker = NULL;
+      }
+    }
+  }
+
+  /* Mock DOM Failures during set disabled */
+  ui_color_picker_base_create(&picker, NULL);
+  for (i = 5; i <= 5; i++) {
+    int t;
+    for (t = 1; t <= 10; t++) {
+      g_color_picker_mock_fail = i;
+      g_color_picker_mock_target = t;
+      g_color_picker_mock_current = 0;
+      ui_color_picker_base_set_rgb(
+          picker,
+          NULL); /* Need to hit DOM paths, but there isn't a get_cva exposed */
+    }
+  }
+
+  /* Mock DOM Failures during destroy */
+  for (i = 4; i <= 4; i++) {
+    int t;
+    for (t = 1; t <= 2; t++) {
+      g_color_picker_mock_fail = i;
+      g_color_picker_mock_target = t;
+      g_color_picker_mock_current = 0;
+      ui_color_picker_base_create(&picker, NULL);
+      (void)ui_color_picker_base_destroy(picker);
+    }
+  }
+  g_color_picker_mock_fail = 0;
+#endif
+
   return 0;
 }
 
@@ -347,6 +418,7 @@ int main(void) {
   failed |= test_hex_conversions();
   failed |= test_2d_mapping();
   failed |= test_manager_state();
+  failed |= test_oom();
 
   if (failed) {
     printf("Tests failed.\n");

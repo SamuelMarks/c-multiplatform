@@ -43,14 +43,14 @@ struct ui_toolbar_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-enum ui_error ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar);
+ui_error_t ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar);
 
 /**
  * @brief Destroys a toolbar base component and frees its title if allocated.
  *
  * @param toolbar The toolbar to destroy.
  */
-void ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar);
+ui_error_t ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar);
 
 /**
  * @brief Sets the title of the toolbar.
@@ -62,8 +62,8 @@ void ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer,
  * UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-enum ui_error ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
-                                        const char *title);
+ui_error_t ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
+                                     const char *title);
 
 /**
  * @brief Gets the title of the toolbar.
@@ -73,8 +73,8 @@ enum ui_error ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
  * toolbar).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_toolbar_base_get_title(const struct ui_toolbar_base *toolbar,
-                                        const char **out_title);
+ui_error_t ui_toolbar_base_get_title(const struct ui_toolbar_base *toolbar,
+                                     const char **out_title);
 
 /**
  * @brief Sets the layout mode of the toolbar.
@@ -83,8 +83,8 @@ enum ui_error ui_toolbar_base_get_title(const struct ui_toolbar_base *toolbar,
  * @param mode The mode to set.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_toolbar_base_set_mode(struct ui_toolbar_base *toolbar,
-                                       enum ui_toolbar_mode mode);
+ui_error_t ui_toolbar_base_set_mode(struct ui_toolbar_base *toolbar,
+                                    enum ui_toolbar_mode mode);
 
 /**
  * @brief Gets the layout mode of the toolbar.
@@ -93,8 +93,8 @@ enum ui_error ui_toolbar_base_set_mode(struct ui_toolbar_base *toolbar,
  * @param out_mode Pointer to receive the mode.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_toolbar_base_get_mode(const struct ui_toolbar_base *toolbar,
-                                       enum ui_toolbar_mode *out_mode);
+ui_error_t ui_toolbar_base_get_mode(const struct ui_toolbar_base *toolbar,
+                                    enum ui_toolbar_mode *out_mode);
 
 /**
  * @brief Sets the alignment of the toolbar contents.
@@ -103,9 +103,8 @@ enum ui_error ui_toolbar_base_get_mode(const struct ui_toolbar_base *toolbar,
  * @param alignment The alignment to set (row or column).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
-ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
-                              enum ui_toolbar_alignment alignment);
+ui_error_t ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
+                                         enum ui_toolbar_alignment alignment);
 
 /**
  * @brief Gets the alignment of the toolbar contents.
@@ -114,7 +113,7 @@ ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
  * @param out_alignment Pointer to receive the alignment.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_toolbar_base_get_alignment(const struct ui_toolbar_base *toolbar,
                               enum ui_toolbar_alignment *out_alignment);
 
@@ -125,8 +124,8 @@ ui_toolbar_base_get_alignment(const struct ui_toolbar_base *toolbar,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_toolbar_base_bind_data(struct ui_toolbar_base *widget,
-                                        struct ui_signal *signal);
+ui_error_t ui_toolbar_base_bind_data(struct ui_toolbar_base *widget,
+                                     struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

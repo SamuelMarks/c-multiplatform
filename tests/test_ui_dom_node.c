@@ -2,21 +2,68 @@
 #include <stdio.h>
 #include <string.h>
 #include "../include/ui_dom_node.h"
+#include "../include/ui_mutation_observer.h"
 #include "../src/ui_internal_mem.h"
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
 
+static ui_error_t failing_mut_cb(struct ui_mutation_observer *observer,
+                                 const struct ui_mutation_record *records,
+                                 int record_count, void *user_data) {
+  return UI_ERROR_UNKNOWN;
+}
+
+static void test_dom_node_mutation_failure(void) {
+  struct ui_dom_node *node = NULL;
+  struct ui_dom_node *text_node = NULL;
+  struct ui_mutation_observer *obs = NULL;
+  struct ui_mutation_observer_init init;
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+
+  /* Set initial values so the update/remove paths are hit! */
+  ui_dom_node_set_attribute(node, "class", "initial");
+  ui_dom_node_set_text_content(text_node, "initial_text");
+
+  ui_mutation_observer_create(failing_mut_cb, NULL, &obs);
+
+  init.child_list = 1;
+  init.attributes = 1;
+  init.character_data = 1;
+  init.subtree = 1;
+  init.attribute_old_value = 1;
+
+  ui_mutation_observer_observe(obs, node, &init);
+  ui_mutation_observer_observe(obs, text_node, &init);
+
+  /* These will fail because the callback returns UI_ERROR_UNKNOWN */
+  ui_dom_node_set_attribute(node, "new_attr",
+                            "val"); /* hits creation failure (line 251) */
+  ui_dom_node_set_attribute(node, "class",
+                            "box"); /* hits update failure (line 208) */
+  ui_dom_node_remove_attribute(node,
+                               "class"); /* hits remove failure (line 322) */
+  ui_dom_node_set_text_content(
+      text_node, "hello"); /* hits text content failure (line 387) */
+
+  ui_mutation_observer_destroy(obs);
+  (void)ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(text_node);
+}
+
 int main(void) {
   struct ui_dom_node *root = NULL;
   struct ui_dom_node *child1 = NULL;
   struct ui_dom_node *child2 = NULL;
   struct ui_dom_node *text_node = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   const char *val;
 
   printf("Starting test_ui_dom_node...\n");
+  test_dom_node_mutation_failure();
 
   /* Test 1: Basic Node Creation and Property Setting */
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
@@ -218,9 +265,9 @@ int main(void) {
       return 1;
     }
 
-    ui_dom_node_destroy(child1);
-    ui_dom_node_destroy(child2);
-    ui_dom_node_destroy(child3);
+    (void)ui_dom_node_destroy(child1);
+    (void)ui_dom_node_destroy(child2);
+    (void)ui_dom_node_destroy(child3);
   }
 
   /* Re-append for cleanup */
@@ -299,8 +346,8 @@ int main(void) {
   /* Let the remaining listener be destroyed by ui_dom_node_destroy */
 
   /* Clean up the whole tree */
-  ui_dom_node_destroy(root);
-  ui_dom_node_destroy(NULL);
+  (void)ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(NULL);
 
   /* Test 5: Error Percolation and Null Checks */
   if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, NULL) !=
@@ -361,15 +408,15 @@ int main(void) {
   if (ui_dom_node_set_text_content(text_node, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_dom_node_destroy(text_node);
+  (void)ui_dom_node_destroy(text_node);
 
   /* Comment node text content test */
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_COMMENT, &text_node);
   if (ui_dom_node_set_text_content(text_node, "comment") != UI_ERROR_NONE)
     return 1;
-  ui_dom_node_destroy(text_node);
+  (void)ui_dom_node_destroy(text_node);
 
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 
   /* Test 6: Mock Malloc Failures */
   g_malloc_fail_countdown = 0;
@@ -422,9 +469,9 @@ int main(void) {
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY)
     return 1;
-  ui_dom_node_destroy(text_node);
+  (void)ui_dom_node_destroy(text_node);
 
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 
   printf("All dom node tests passed.\n");
   return 0;

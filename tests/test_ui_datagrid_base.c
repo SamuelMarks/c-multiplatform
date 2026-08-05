@@ -10,20 +10,21 @@ extern int g_malloc_fail_countdown;
 
 static int test_datagrid_base_lifecycle(void) {
   struct ui_datagrid_base *datagrid = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_datagrid_base_create(&datagrid);
   if (rc != UI_ERROR_NONE || datagrid == NULL)
     return 1;
 
-  ui_datagrid_base_destroy(datagrid);
+  if (ui_datagrid_base_destroy(datagrid) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_datagrid_base_get_component(void) {
   struct ui_datagrid_base *datagrid = NULL;
   struct ui_component *comp = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_datagrid_base_create(&datagrid);
   if (rc != UI_ERROR_NONE)
@@ -33,13 +34,14 @@ static int test_datagrid_base_get_component(void) {
   if (rc != UI_ERROR_NONE || comp == NULL)
     return 1;
 
-  ui_datagrid_base_destroy(datagrid);
+  if (ui_datagrid_base_destroy(datagrid) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_datagrid_base_resize_column(void) {
   struct ui_datagrid_base *datagrid = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_datagrid_base_create(&datagrid);
   if (rc != UI_ERROR_NONE)
@@ -49,13 +51,14 @@ static int test_datagrid_base_resize_column(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_datagrid_base_destroy(datagrid);
+  if (ui_datagrid_base_destroy(datagrid) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_datagrid_base_move_focus(void) {
   struct ui_datagrid_base *datagrid = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_datagrid_base_create(&datagrid);
   if (rc != UI_ERROR_NONE)
@@ -65,14 +68,15 @@ static int test_datagrid_base_move_focus(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_datagrid_base_destroy(datagrid);
+  if (ui_datagrid_base_destroy(datagrid) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_datagrid_base_bind_data(void) {
   struct ui_datagrid_base *datagrid = NULL;
   struct ui_computed *signal = (struct ui_computed *)0x1234;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_datagrid_base_create(&datagrid);
   if (rc != UI_ERROR_NONE)
@@ -82,7 +86,8 @@ static int test_datagrid_base_bind_data(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_datagrid_base_destroy(datagrid);
+  if (ui_datagrid_base_destroy(datagrid) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
@@ -102,7 +107,8 @@ static int test_datagrid_base_errors(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  ui_datagrid_base_destroy(NULL);
+  if (ui_datagrid_base_destroy(NULL) != UI_ERROR_NONE)
+    return 1;
 
   if (ui_datagrid_base_get_component(NULL, &comp) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -120,12 +126,13 @@ static int test_datagrid_base_errors(void) {
 
   int i;
   for (i = 1; i < 100; ++i) {
-    enum ui_error create_rc;
+    ui_error_t create_rc;
     g_malloc_fail_countdown = i;
     create_rc = ui_datagrid_base_create(&datagrid);
     g_malloc_fail_countdown = -1;
     if (create_rc == UI_ERROR_NONE) {
-      ui_datagrid_base_destroy(datagrid);
+      if (ui_datagrid_base_destroy(datagrid) != UI_ERROR_NONE)
+        return 1;
     }
   }
   return 0;

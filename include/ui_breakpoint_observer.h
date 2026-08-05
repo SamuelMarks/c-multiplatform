@@ -32,7 +32,7 @@ enum ui_breakpoint {
  * @param out_observer Pointer to receive the allocated observer.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
                               struct ui_breakpoint_observer **out_observer);
 
@@ -41,7 +41,8 @@ ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
  *
  * @param observer The observer to destroy.
  */
-void ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer);
+ui_error_t
+ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer);
 
 /**
  * @brief Retrieves the reactive signal representing whether a specific
@@ -54,7 +55,7 @@ void ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer);
  * @param out_signal Pointer to receive the signal.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_breakpoint_observer_get_signal(struct ui_breakpoint_observer *observer,
                                   enum ui_breakpoint breakpoint,
                                   struct ui_signal **out_signal);
@@ -67,9 +68,9 @@ ui_breakpoint_observer_get_signal(struct ui_breakpoint_observer *observer,
  * @param current_time_ms The current monotonic time in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_breakpoint_observer_tick(struct ui_breakpoint_observer *observer,
-                            float current_width, double current_time_ms);
+ui_error_t ui_breakpoint_observer_tick(struct ui_breakpoint_observer *observer,
+                                       float current_width,
+                                       double current_time_ms);
 
 #ifdef __cplusplus
 }

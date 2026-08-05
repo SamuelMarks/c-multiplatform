@@ -10,35 +10,16 @@
 /* Use MSVC Safe CRT internally, string.h is already included. */
 #endif
 
-static enum ui_error internal_strdup(const char *src, char **out_str) {
-  size_t len;
-  char *copy;
-
-  len = strlen(src);
-  copy = (char *)UI_MALLOC(len + 1);
-  if (!copy) {
-    return UI_ERROR_OUT_OF_MEMORY;
-  }
-
-#if defined(_MSC_VER)
-  strcpy_s(copy, len + 1, src);
-#else
-  strcpy(copy, src);
-#endif
-
-  *out_str = copy;
-  return UI_ERROR_NONE;
-}
-
-enum ui_error ui_dom_node_create(enum ui_dom_node_type type,
-                                 struct ui_dom_node **out_node) {
+ui_error_t ui_dom_node_create(enum ui_dom_node_type type,
+                              struct ui_dom_node **out_node) {
   struct ui_dom_node *node;
 
   if (!out_node) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  node = (struct ui_dom_node *)UI_MALLOC(sizeof(struct ui_dom_node));
+  node =
+      (struct ui_dom_node *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_dom_node));
   if (!node) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -68,7 +49,7 @@ enum ui_error ui_dom_node_create(enum ui_dom_node_type type,
   return UI_ERROR_NONE;
 }
 
-void ui_dom_node_destroy(struct ui_dom_node *node) {
+ui_error_t ui_dom_node_destroy(struct ui_dom_node *node) {
   struct ui_dom_node *child;
   struct ui_dom_node *next_child;
   struct ui_dom_attribute *attr;
@@ -76,14 +57,14 @@ void ui_dom_node_destroy(struct ui_dom_node *node) {
   struct ui_dom_event_listener *listener, *next_listener;
 
   if (!node) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   /* Recursively destroy children */
   child = node->first_child;
   while (child) {
     next_child = child->next_sibling;
-    ui_dom_node_destroy(child);
+    (void)ui_dom_node_destroy(child);
     child = next_child;
   }
 
@@ -93,31 +74,32 @@ void ui_dom_node_destroy(struct ui_dom_node *node) {
   listener = node->listeners;
   while (listener) {
     next_listener = listener->next;
-    UI_FREE(listener);
+    C_MULTIPLATFORM_FREE(listener);
     listener = next_listener;
   }
   while (attr) {
     next_attr = attr->next;
-    UI_FREE(attr->name);
-    UI_FREE(attr->value);
-    UI_FREE(attr);
+    C_MULTIPLATFORM_FREE(attr->name);
+    C_MULTIPLATFORM_FREE(attr->value);
+    C_MULTIPLATFORM_FREE(attr);
     attr = next_attr;
   }
 
   /* Free strings */
-  UI_FREE(node->tag_name);
-  UI_FREE(node->text_content);
+  C_MULTIPLATFORM_FREE(node->tag_name);
+  C_MULTIPLATFORM_FREE(node->text_content);
 
   /* Phase 3 Web Bridge Hook */
 #if defined(__EMSCRIPTEN__)
   ui_web_bridge_destroy_node((uint32_t)(uintptr_t)node);
 #endif
 
-  UI_FREE(node);
+  C_MULTIPLATFORM_FREE(node);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dom_node_append_child(struct ui_dom_node *parent,
-                                       struct ui_dom_node *child) {
+ui_error_t ui_dom_node_append_child(struct ui_dom_node *parent,
+                                    struct ui_dom_node *child) {
   if (!parent || !child) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -149,8 +131,8 @@ enum ui_error ui_dom_node_append_child(struct ui_dom_node *parent,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dom_node_remove_child(struct ui_dom_node *parent,
-                                       struct ui_dom_node *child) {
+ui_error_t ui_dom_node_remove_child(struct ui_dom_node *parent,
+                                    struct ui_dom_node *child) {
   if (!parent || !child || child->parent != parent) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -176,13 +158,13 @@ enum ui_error ui_dom_node_remove_child(struct ui_dom_node *parent,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dom_node_set_attribute(struct ui_dom_node *node,
-                                        const char *name, const char *value) {
+ui_error_t ui_dom_node_set_attribute(struct ui_dom_node *node, const char *name,
+                                     const char *value) {
   struct ui_dom_attribute *attr;
   struct ui_dom_attribute *new_attr;
   char *name_copy;
   char *value_copy;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!node || !name || !value) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -202,36 +184,54 @@ enum ui_error ui_dom_node_set_attribute(struct ui_dom_node *node,
     if (strcmp(attr->name, name) == 0) {
       char *old_val_ptr = attr->value;
       /* Update existing attribute */
-      err = internal_strdup(value, &value_copy);
+      err = ((value_copy = C_MULTIPLATFORM_STRDUP(value))
+                 ? UI_ERROR_NONE
+                 : UI_ERROR_OUT_OF_MEMORY);
       if (err != UI_ERROR_NONE) {
         goto cleanup;
       }
       attr->value = value_copy;
 
 #if defined(__EMSCRIPTEN__)
-      ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, value);
+      {
+        ui_error_t bridge_rc =
+            ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, value);
+        if (bridge_rc != UI_ERROR_NONE) {
+          C_MULTIPLATFORM_FREE(old_val_ptr);
+          return bridge_rc;
+        }
+      }
 #endif
 
-      ui_mutation_observer_notify_attribute(node, name, old_val_ptr);
-      UI_FREE(old_val_ptr);
+      {
+        ui_error_t mut_rc =
+            ui_mutation_observer_notify_attribute(node, name, old_val_ptr);
+        if (mut_rc != UI_ERROR_NONE) {
+          C_MULTIPLATFORM_FREE(old_val_ptr);
+          return mut_rc;
+        }
+      }
+      C_MULTIPLATFORM_FREE(old_val_ptr);
       return UI_ERROR_NONE;
     }
     attr = attr->next;
   }
 
   /* Create new attribute */
-  err = internal_strdup(name, &name_copy);
+  err = ((name_copy = C_MULTIPLATFORM_STRDUP(name)) ? UI_ERROR_NONE
+                                                    : UI_ERROR_OUT_OF_MEMORY);
   if (err != UI_ERROR_NONE) {
     goto cleanup;
   }
 
-  err = internal_strdup(value, &value_copy);
+  err = ((value_copy = C_MULTIPLATFORM_STRDUP(value)) ? UI_ERROR_NONE
+                                                      : UI_ERROR_OUT_OF_MEMORY);
   if (err != UI_ERROR_NONE) {
     goto cleanup;
   }
 
-  new_attr =
-      (struct ui_dom_attribute *)UI_MALLOC(sizeof(struct ui_dom_attribute));
+  new_attr = (struct ui_dom_attribute *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_dom_attribute));
   if (!new_attr) {
     err = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -243,23 +243,29 @@ enum ui_error ui_dom_node_set_attribute(struct ui_dom_node *node,
   node->attributes = new_attr;
 
 #if defined(__EMSCRIPTEN__)
-  ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, value);
+  {
+    ui_error_t bridge_rc =
+        ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, value);
+    if (bridge_rc != UI_ERROR_NONE)
+      return bridge_rc;
+  }
 #endif
 
-  ui_mutation_observer_notify_attribute(node, name, NULL);
+  err = ui_mutation_observer_notify_attribute(node, name, NULL);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   return UI_ERROR_NONE;
 
 cleanup:
-  UI_FREE(name_copy);
-  UI_FREE(value_copy);
-  UI_FREE(new_attr);
+  C_MULTIPLATFORM_FREE(name_copy);
+  C_MULTIPLATFORM_FREE(value_copy);
+  C_MULTIPLATFORM_FREE(new_attr);
   return err;
 }
 
-enum ui_error ui_dom_node_get_attribute(const struct ui_dom_node *node,
-                                        const char *name,
-                                        const char **out_value) {
+ui_error_t ui_dom_node_get_attribute(const struct ui_dom_node *node,
+                                     const char *name, const char **out_value) {
   struct ui_dom_attribute *attr;
 
   if (!node || !name || !out_value) {
@@ -282,8 +288,8 @@ enum ui_error ui_dom_node_get_attribute(const struct ui_dom_node *node,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_dom_node_remove_attribute(struct ui_dom_node *node,
-                                           const char *name) {
+ui_error_t ui_dom_node_remove_attribute(struct ui_dom_node *node,
+                                        const char *name) {
   struct ui_dom_attribute *attr;
   struct ui_dom_attribute *prev = NULL;
 
@@ -306,13 +312,23 @@ enum ui_error ui_dom_node_remove_attribute(struct ui_dom_node *node,
       }
 
 #if defined(__EMSCRIPTEN__)
-      ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, NULL);
+      {
+        ui_error_t bridge_rc =
+            ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, NULL);
+        if (bridge_rc != UI_ERROR_NONE)
+          return bridge_rc;
+      }
 #endif
 
-      ui_mutation_observer_notify_attribute(node, name, old_val_ptr);
-      UI_FREE(attr->name);
-      UI_FREE(old_val_ptr);
-      UI_FREE(attr);
+      {
+        ui_error_t mut_rc =
+            ui_mutation_observer_notify_attribute(node, name, old_val_ptr);
+        if (mut_rc != UI_ERROR_NONE)
+          return mut_rc;
+      }
+      C_MULTIPLATFORM_FREE(attr->name);
+      C_MULTIPLATFORM_FREE(old_val_ptr);
+      C_MULTIPLATFORM_FREE(attr);
       return UI_ERROR_NONE;
     }
     prev = attr;
@@ -322,10 +338,10 @@ enum ui_error ui_dom_node_remove_attribute(struct ui_dom_node *node,
   return UI_ERROR_NONE; /* Not found, but not an error to remove it */
 }
 
-enum ui_error ui_dom_node_set_tag_name(struct ui_dom_node *node,
-                                       const char *tag_name) {
+ui_error_t ui_dom_node_set_tag_name(struct ui_dom_node *node,
+                                    const char *tag_name) {
   char *tag_copy;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!node || !tag_name) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -335,22 +351,24 @@ enum ui_error ui_dom_node_set_tag_name(struct ui_dom_node *node,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  err = internal_strdup(tag_name, &tag_copy);
+  err =
+      ((tag_copy = C_MULTIPLATFORM_STRDUP(tag_name)) ? UI_ERROR_NONE
+                                                     : UI_ERROR_OUT_OF_MEMORY);
   if (err != UI_ERROR_NONE) {
     return err;
   }
 
-  UI_FREE(node->tag_name);
+  C_MULTIPLATFORM_FREE(node->tag_name);
 
   node->tag_name = tag_copy;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dom_node_set_text_content(struct ui_dom_node *node,
-                                           const char *text) {
+ui_error_t ui_dom_node_set_text_content(struct ui_dom_node *node,
+                                        const char *text) {
   char *text_copy;
   char *old_val_ptr = NULL;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!node || !text) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -361,7 +379,8 @@ enum ui_error ui_dom_node_set_text_content(struct ui_dom_node *node,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  err = internal_strdup(text, &text_copy);
+  err = ((text_copy = C_MULTIPLATFORM_STRDUP(text)) ? UI_ERROR_NONE
+                                                    : UI_ERROR_OUT_OF_MEMORY);
   if (err != UI_ERROR_NONE) {
     return err;
   }
@@ -370,27 +389,32 @@ enum ui_error ui_dom_node_set_text_content(struct ui_dom_node *node,
 
   node->text_content = text_copy;
 
-  ui_mutation_observer_notify_character_data(node, old_val_ptr);
+  err = ui_mutation_observer_notify_character_data(node, old_val_ptr);
+  if (err != UI_ERROR_NONE) { /* mock can fail before free */
+    return err;
+  }
 
   if (old_val_ptr) {
-    UI_FREE(old_val_ptr);
+    C_MULTIPLATFORM_FREE(old_val_ptr);
   }
 
 #if defined(__EMSCRIPTEN__)
-  ui_web_bridge_set_text((uint32_t)(uintptr_t)node, node->text_content);
+  err = ui_web_bridge_set_text((uint32_t)(uintptr_t)node, node->text_content);
+  if (err != UI_ERROR_NONE)
+    return err;
 #endif
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dom_node_add_event_listener(struct ui_dom_node *node,
-                                             enum ui_event_type type,
-                                             ui_event_handler_t handler,
-                                             void *user_data) {
+ui_error_t ui_dom_node_add_event_listener(struct ui_dom_node *node,
+                                          enum ui_event_type type,
+                                          ui_event_handler_t handler,
+                                          void *user_data) {
   struct ui_dom_event_listener *listener;
   if (!node || !handler)
     return UI_ERROR_INVALID_ARGUMENT;
-  listener = UI_MALLOC(sizeof(struct ui_dom_event_listener));
+  listener = C_MULTIPLATFORM_MALLOC(sizeof(struct ui_dom_event_listener));
   if (!listener)
     return UI_ERROR_OUT_OF_MEMORY;
   listener->type = type;
@@ -401,9 +425,9 @@ enum ui_error ui_dom_node_add_event_listener(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_dom_node_remove_event_listener(struct ui_dom_node *node,
-                                                enum ui_event_type type,
-                                                ui_event_handler_t handler) {
+ui_error_t ui_dom_node_remove_event_listener(struct ui_dom_node *node,
+                                             enum ui_event_type type,
+                                             ui_event_handler_t handler) {
   struct ui_dom_event_listener *curr, *prev = NULL;
   if (!node || !handler)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -414,7 +438,7 @@ enum ui_error ui_dom_node_remove_event_listener(struct ui_dom_node *node,
         prev->next = curr->next;
       else
         node->listeners = curr->next;
-      UI_FREE(curr);
+      C_MULTIPLATFORM_FREE(curr);
       return UI_ERROR_NONE;
     }
     prev = curr;

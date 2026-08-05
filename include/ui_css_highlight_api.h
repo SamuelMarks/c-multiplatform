@@ -42,9 +42,9 @@ struct ui_css_highlight;
  * @param out_highlight Pointer to the created highlight.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_highlight_create(enum ui_css_highlight_type type,
-                                      const char *custom_name,
-                                      struct ui_css_highlight **out_highlight);
+ui_error_t ui_css_highlight_create(enum ui_css_highlight_type type,
+                                   const char *custom_name,
+                                   struct ui_css_highlight **out_highlight);
 
 /**
  * @brief Adds a text range to the highlight.
@@ -54,16 +54,15 @@ enum ui_error ui_css_highlight_create(enum ui_css_highlight_type type,
  * @param end_offset End offset in the text.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_highlight_add_range(struct ui_css_highlight *highlight,
-                                         size_t start_offset,
-                                         size_t end_offset);
+ui_error_t ui_css_highlight_add_range(struct ui_css_highlight *highlight,
+                                      size_t start_offset, size_t end_offset);
 
 /**
  * @brief Destroys a CSS custom highlight context.
  *
  * @param highlight The highlight to destroy.
  */
-void ui_css_highlight_destroy(struct ui_css_highlight *highlight);
+ui_error_t ui_css_highlight_destroy(struct ui_css_highlight *highlight);
 
 #ifdef __cplusplus
 }

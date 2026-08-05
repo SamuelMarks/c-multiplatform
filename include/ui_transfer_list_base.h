@@ -40,11 +40,11 @@ struct ui_transfer_list_base {
   struct ui_transfer_list_item *left_list;
   struct ui_transfer_list_item *right_list;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
@@ -58,7 +58,7 @@ struct ui_transfer_list_base {
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_transfer_list_base_init(struct ui_transfer_list_base *list,
                            struct ui_component *component,
                            struct ui_control_value_accessor *out_cva);
@@ -72,8 +72,8 @@ ui_transfer_list_base_init(struct ui_transfer_list_base *list,
  * @param data User data associated with the item.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
-                                             int to_right, int id, void *data);
+ui_error_t ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
+                                          int to_right, int id, void *data);
 
 /**
  * @brief Selects or unselects an item by ID.
@@ -83,7 +83,7 @@ enum ui_error ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
  * @param selected The selection state to apply.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
                                    int selected);
 
@@ -95,7 +95,7 @@ ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
  * to left.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
                                     int to_right);
 
@@ -107,15 +107,15 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
  * left.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
-                                             int to_right);
+ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
+                                          int to_right);
 
 /**
  * @brief Cleans up resources allocated by the transfer list.
  *
  * @param list Pointer to the transfer list struct.
  */
-enum ui_error ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list);
+ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list);
 
 #ifdef __cplusplus
 }

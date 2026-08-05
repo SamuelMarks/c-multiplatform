@@ -23,9 +23,11 @@ static int test_null_args(void) {
 
   if (ui_hover_card_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_hover_card_base_destroy(NULL);
+  if (ui_hover_card_base_destroy(NULL) != UI_ERROR_NONE)
+    return 1;
 
-  ui_hover_card_base_create(&hover_card);
+  if (ui_hover_card_base_create(&hover_card) != UI_ERROR_NONE)
+    return 1;
 
   if (ui_hover_card_base_get_component(NULL, &comp) !=
       UI_ERROR_INVALID_ARGUMENT)
@@ -54,9 +56,11 @@ static int test_null_args(void) {
   if (hover_card) {
     void *temp_c = hover_card->component;
     hover_card->component = NULL;
-    ui_hover_card_base_destroy(hover_card);
+    if (ui_hover_card_base_destroy(hover_card) != UI_ERROR_NONE)
+      return 1;
     /* We must free temp_c to avoid memory leak since we hijacked it */
-    ui_component_destroy(temp_c);
+    if (ui_component_destroy(temp_c) != UI_ERROR_NONE)
+      return 1;
     hover_card = NULL;
   }
 
@@ -93,9 +97,11 @@ static int test_normal_lifecycle(void) {
   if (hover_card) {
     void *temp_c = hover_card->component;
     hover_card->component = NULL;
-    ui_hover_card_base_destroy(hover_card);
+    if (ui_hover_card_base_destroy(hover_card) != UI_ERROR_NONE)
+      return 1;
     /* We must free temp_c to avoid memory leak since we hijacked it */
-    ui_component_destroy(temp_c);
+    if (ui_component_destroy(temp_c) != UI_ERROR_NONE)
+      return 1;
     hover_card = NULL;
   }
 
@@ -112,7 +118,8 @@ static int run_oom_tests(void) {
     if (ui_hover_card_base_create(&hover_card) != UI_ERROR_NONE) {
       failed_at_least_once = 1;
     } else {
-      ui_hover_card_base_destroy(hover_card);
+      if (ui_hover_card_base_destroy(hover_card) != UI_ERROR_NONE)
+        return 1;
       break; /* We succeeded, no more allocs to fail */
     }
   }
@@ -127,8 +134,10 @@ static int test_shadow_root_null(void) {
   struct ui_hover_card_base *hover_card = NULL;
   struct ui_component *comp = NULL;
 
-  ui_hover_card_base_create(&hover_card);
-  ui_hover_card_base_get_component(hover_card, &comp);
+  if (ui_hover_card_base_create(&hover_card) != UI_ERROR_NONE)
+    return 1;
+  if (ui_hover_card_base_get_component(hover_card, &comp) != UI_ERROR_NONE)
+    return 1;
 
   /* Temporarily remove shadow_root to hit branches */
   if (comp && comp->shadow_root) {
@@ -158,9 +167,11 @@ static int test_shadow_root_null(void) {
   if (hover_card) {
     void *temp_c = hover_card->component;
     hover_card->component = NULL;
-    ui_hover_card_base_destroy(hover_card);
+    if (ui_hover_card_base_destroy(hover_card) != UI_ERROR_NONE)
+      return 1;
     /* We must free temp_c to avoid memory leak since we hijacked it */
-    ui_component_destroy(temp_c);
+    if (ui_component_destroy(temp_c) != UI_ERROR_NONE)
+      return 1;
     hover_card = NULL;
   }
 

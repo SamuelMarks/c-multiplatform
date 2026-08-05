@@ -9,7 +9,7 @@ extern int g_malloc_fail_countdown;
 
 int main(void) {
   struct ui_arena *arena = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   void *ptr1 = NULL;
   void *ptr2 = NULL;
   void *ptr3 = NULL;
@@ -194,7 +194,7 @@ int main(void) {
     }
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 
   printf("All arena tests passed.\n");
   return 0;

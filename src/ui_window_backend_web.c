@@ -22,7 +22,7 @@ struct web_backend_data {
     struct ui_window* active_window;
 };
 
-static enum ui_error web_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
+static ui_error_t web_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
     struct ui_window* win;
     struct web_backend_data* bdata;
     EmscriptenWebGLContextAttributes attr;
@@ -34,7 +34,7 @@ static enum ui_error web_create_window(struct ui_window_backend* backend, const 
     }
 
     bdata = (struct web_backend_data*)backend->user_data;
-    win = (struct ui_window*)UI_MALLOC(sizeof(struct ui_window));
+    win = (struct ui_window*)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window));
     if (!win) {
         return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -62,7 +62,7 @@ static enum ui_error web_create_window(struct ui_window_backend* backend, const 
         attr.majorVersion = 1;
         ctx = emscripten_webgl_create_context("#canvas", &attr);
         if (!ctx) {
-            UI_FREE(win);
+            C_MULTIPLATFORM_FREE(win);
             return UI_ERROR_UNKNOWN;
         }
     }
@@ -78,32 +78,32 @@ static enum ui_error web_create_window(struct ui_window_backend* backend, const 
     return UI_ERROR_NONE;
 }
 
-static enum ui_error web_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t web_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     if (window->gl_context) {
         emscripten_webgl_destroy_context(window->gl_context);
     }
-    UI_FREE(window);
+    C_MULTIPLATFORM_FREE(window);
     return UI_ERROR_NONE;
 }
 
-static enum ui_error web_show_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t web_show_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-static enum ui_error web_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t web_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     return UI_ERROR_NONE;
 }
 
-static enum ui_error web_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
+static ui_error_t web_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
     if (!backend || !window || !out_event || !out_has_event) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -112,7 +112,7 @@ static enum ui_error web_poll_events(struct ui_window_backend* backend, struct u
     return UI_ERROR_NONE;
 }
 
-static enum ui_error web_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t web_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -139,7 +139,7 @@ static EM_BOOL web_resize_callback(int eventType, const EmscriptenUiEvent *uiEve
     return EM_TRUE;
 }
 
-static enum ui_error web_set_on_resize_callback(struct ui_window_backend* backend, struct ui_window* window, enum ui_error (*cb)(void*, int, int), void* user_data) {
+static ui_error_t web_set_on_resize_callback(struct ui_window_backend* backend, struct ui_window* window, ui_error_t (*cb)(void*, int, int), void* user_data) {
     struct web_backend_data* bdata;
     (void)window;
     if (!backend || !backend->user_data) return UI_ERROR_INVALID_ARGUMENT;
@@ -149,7 +149,7 @@ static enum ui_error web_set_on_resize_callback(struct ui_window_backend* backen
     return UI_ERROR_NONE;
 }
 
-enum ui_error ui_window_backend_web_create(struct ui_window_backend** out_backend) {
+ui_error_t ui_window_backend_web_create(struct ui_window_backend** out_backend) {
     struct ui_window_backend* backend;
     struct web_backend_data* bdata;
 
@@ -157,7 +157,7 @@ enum ui_error ui_window_backend_web_create(struct ui_window_backend** out_backen
         return UI_ERROR_INVALID_ARGUMENT;
     }
 
-    bdata = (struct web_backend_data*)UI_MALLOC(sizeof(struct web_backend_data));
+    bdata = (struct web_backend_data*)C_MULTIPLATFORM_MALLOC(sizeof(struct web_backend_data));
     if (!bdata) {
         return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -165,9 +165,9 @@ enum ui_error ui_window_backend_web_create(struct ui_window_backend** out_backen
     bdata->resize_user_data = NULL;
     bdata->active_window = NULL;
 
-    backend = (struct ui_window_backend*)UI_MALLOC(sizeof(struct ui_window_backend));
+    backend = (struct ui_window_backend*)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window_backend));
     if (!backend) {
-        UI_FREE(bdata);
+        C_MULTIPLATFORM_FREE(bdata);
         return UI_ERROR_OUT_OF_MEMORY;
     }
 
@@ -188,14 +188,14 @@ enum ui_error ui_window_backend_web_create(struct ui_window_backend** out_backen
     return UI_ERROR_NONE;
 }
 
-enum ui_error ui_window_backend_web_destroy(struct ui_window_backend* backend) {
+ui_error_t ui_window_backend_web_destroy(struct ui_window_backend* backend) {
     if (!backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
     if (backend->user_data) {
-        UI_FREE(backend->user_data);
+        C_MULTIPLATFORM_FREE(backend->user_data);
     }
-    UI_FREE(backend);
+    C_MULTIPLATFORM_FREE(backend);
     return UI_ERROR_NONE;
 }
 
@@ -205,7 +205,7 @@ enum ui_error ui_window_backend_web_destroy(struct ui_window_backend* backend) {
 #include <stddef.h>
 /* clang-format on */
 
-enum ui_error
+ui_error_t
 ui_window_backend_web_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -214,7 +214,7 @@ ui_window_backend_web_create(struct ui_window_backend **out_backend) {
   return UI_ERROR_UNKNOWN;
 }
 
-enum ui_error ui_window_backend_web_destroy(struct ui_window_backend *backend) {
+ui_error_t ui_window_backend_web_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

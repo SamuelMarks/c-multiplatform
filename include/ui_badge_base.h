@@ -22,14 +22,14 @@ struct ui_badge_base;
  * @param out_badge Pointer to receive the allocated badge component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_badge_base_create(struct ui_badge_base **out_badge);
+ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge);
 
 /**
  * @brief Destroys a badge base component.
  *
  * @param badge The badge component to destroy.
  */
-void ui_badge_base_destroy(struct ui_badge_base *badge);
+ui_error_t ui_badge_base_destroy(struct ui_badge_base *badge);
 
 /**
  * @brief Sets the value to display in the badge.
@@ -40,8 +40,8 @@ void ui_badge_base_destroy(struct ui_badge_base *badge);
  * @param max_value The maximum value before adding a '+' suffix (e.g., 99).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_badge_base_set_value(struct ui_badge_base *badge, int value,
-                                      int max_value);
+ui_error_t ui_badge_base_set_value(struct ui_badge_base *badge, int value,
+                                   int max_value);
 
 /**
  * @brief Sets the content of the badge to a custom text string, overriding
@@ -51,8 +51,8 @@ enum ui_error ui_badge_base_set_value(struct ui_badge_base *badge, int value,
  * @param text The custom text to display.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_badge_base_set_text(struct ui_badge_base *badge,
-                                     const char *text);
+ui_error_t ui_badge_base_set_text(struct ui_badge_base *badge,
+                                  const char *text);
 
 /**
  * @brief Hides or shows the badge. Useful for hiding empty badges.
@@ -61,8 +61,7 @@ enum ui_error ui_badge_base_set_text(struct ui_badge_base *badge,
  * @param is_hidden 1 to hide, 0 to show.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_badge_base_set_hidden(struct ui_badge_base *badge,
-                                       int is_hidden);
+ui_error_t ui_badge_base_set_hidden(struct ui_badge_base *badge, int is_hidden);
 
 /**
  * @brief Gets the underlying component for rendering.
@@ -70,8 +69,8 @@ enum ui_error ui_badge_base_set_hidden(struct ui_badge_base *badge,
  * @param badge The badge component.
  * @return The underlying ui_component pointer.
  */
-enum ui_error ui_badge_base_get_component(struct ui_badge_base *badge,
-                                          struct ui_component **out_component);
+ui_error_t ui_badge_base_get_component(struct ui_badge_base *badge,
+                                       struct ui_component **out_component);
 
 /**
  * @brief Binds the text property.
@@ -80,8 +79,8 @@ enum ui_error ui_badge_base_get_component(struct ui_badge_base *badge,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_badge_base_bind_text(struct ui_badge_base *widget,
-                                      struct ui_signal *signal);
+ui_error_t ui_badge_base_bind_text(struct ui_badge_base *widget,
+                                   struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

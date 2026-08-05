@@ -47,7 +47,7 @@ struct ui_syntax_bracket_match {
  * @param out_surface Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_syntax_surface_base_create(struct ui_arena *arena,
                               struct ui_rich_text_base *base_rich_text,
                               struct ui_syntax_surface_base **out_surface);
@@ -58,7 +58,7 @@ ui_syntax_surface_base_create(struct ui_arena *arena,
  * @param surface The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface);
 
 /**
@@ -71,7 +71,7 @@ ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface);
  * @param out_width Pointer to receive the calculated gutter width.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_syntax_surface_base_calculate_gutter_width(
+ui_error_t ui_syntax_surface_base_calculate_gutter_width(
     const struct ui_syntax_surface_base *surface, int total_lines,
     float char_width, float *out_width);
 
@@ -84,7 +84,7 @@ enum ui_error ui_syntax_surface_base_calculate_gutter_width(
  * @param collapse True to collapse, false to expand.
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if invalid range.
  */
-enum ui_error
+ui_error_t
 ui_syntax_surface_base_set_fold_region(struct ui_syntax_surface_base *surface,
                                        int start_line, int end_line,
                                        ui_bool_t collapse);
@@ -97,7 +97,7 @@ ui_syntax_surface_base_set_fold_region(struct ui_syntax_surface_base *surface,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_syntax_surface_base_get_fold_changed_signal(
+ui_error_t ui_syntax_surface_base_get_fold_changed_signal(
     struct ui_syntax_surface_base *surface, ui_signal_t **out_signal);
 
 /**
@@ -110,7 +110,7 @@ enum ui_error ui_syntax_surface_base_get_fold_changed_signal(
  * line is hidden inside a fold.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_syntax_surface_base_get_visual_line_index(
+ui_error_t ui_syntax_surface_base_get_visual_line_index(
     const struct ui_syntax_surface_base *surface, int absolute_line,
     int *out_visual_index);
 
@@ -121,7 +121,7 @@ enum ui_error ui_syntax_surface_base_get_visual_line_index(
  * @param absolute_line The physical line number (0-indexed).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_syntax_surface_base_set_active_line(struct ui_syntax_surface_base *surface,
                                        int absolute_line);
 
@@ -133,7 +133,7 @@ ui_syntax_surface_base_set_active_line(struct ui_syntax_surface_base *surface,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_syntax_surface_base_get_active_line_signal(
+ui_error_t ui_syntax_surface_base_get_active_line_signal(
     struct ui_syntax_surface_base *surface, ui_signal_t **out_signal);
 
 /**
@@ -143,7 +143,7 @@ enum ui_error ui_syntax_surface_base_get_active_line_signal(
  * @param match The bracket match coordinates.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_syntax_surface_base_set_bracket_match(
+ui_error_t ui_syntax_surface_base_set_bracket_match(
     struct ui_syntax_surface_base *surface,
     const struct ui_syntax_bracket_match *match);
 

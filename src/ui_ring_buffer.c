@@ -14,8 +14,8 @@ struct ui_ring_buffer {
   void *buffer;
 };
 
-enum ui_error ui_ring_buffer_create(size_t item_size, size_t capacity,
-                                    struct ui_ring_buffer **out_buffer) {
+ui_error_t ui_ring_buffer_create(size_t item_size, size_t capacity,
+                                 struct ui_ring_buffer **out_buffer) {
   struct ui_ring_buffer *rb = NULL;
   size_t actual_capacity;
 
@@ -27,7 +27,8 @@ enum ui_error ui_ring_buffer_create(size_t item_size, size_t capacity,
    * larger than requested */
   actual_capacity = capacity + 1;
 
-  rb = (struct ui_ring_buffer *)UI_MALLOC(sizeof(struct ui_ring_buffer));
+  rb = (struct ui_ring_buffer *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_ring_buffer));
   if (!rb) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -37,10 +38,10 @@ enum ui_error ui_ring_buffer_create(size_t item_size, size_t capacity,
   rb->lock = 0;
   rb->capacity = actual_capacity;
   rb->item_size = item_size;
-  rb->buffer = UI_MALLOC(item_size * actual_capacity);
+  rb->buffer = C_MULTIPLATFORM_MALLOC(item_size * actual_capacity);
 
   if (!rb->buffer) {
-    UI_FREE(rb);
+    C_MULTIPLATFORM_FREE(rb);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -48,20 +49,18 @@ enum ui_error ui_ring_buffer_create(size_t item_size, size_t capacity,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ring_buffer_destroy(struct ui_ring_buffer *buffer) {
+ui_error_t ui_ring_buffer_destroy(struct ui_ring_buffer *buffer) {
   if (!buffer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (buffer->buffer) {
-    UI_FREE(buffer->buffer);
-  }
-  UI_FREE(buffer);
+  C_MULTIPLATFORM_FREE(buffer->buffer);
+  C_MULTIPLATFORM_FREE(buffer);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ring_buffer_push(struct ui_ring_buffer *buffer,
-                                  const void *item) {
+ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer,
+                               const void *item) {
   long head;
   long tail;
   long next_head;
@@ -69,9 +68,16 @@ enum ui_error ui_ring_buffer_push(struct ui_ring_buffer *buffer,
   if (!buffer || !item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-
-  ui_atomic_load(&buffer->head, &head);
-  ui_atomic_load(&buffer->tail, &tail);
+  {
+    ui_error_t load_rc = ui_atomic_load(&buffer->head, &head);
+    if (load_rc != UI_ERROR_NONE)
+      return load_rc;
+  }
+  {
+    ui_error_t load_rc = ui_atomic_load(&buffer->tail, &tail);
+    if (load_rc != UI_ERROR_NONE)
+      return load_rc;
+  }
 
   next_head = (head + 1) % (long)buffer->capacity;
 
@@ -81,14 +87,16 @@ enum ui_error ui_ring_buffer_push(struct ui_ring_buffer *buffer,
 
   memcpy((char *)buffer->buffer + (head * buffer->item_size), item,
          buffer->item_size);
-
-  (void)ui_atomic_store(&buffer->head, next_head);
+  {
+    ui_error_t store_rc = ui_atomic_store(&buffer->head, next_head);
+    if (store_rc != UI_ERROR_NONE)
+      return store_rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ring_buffer_pop(struct ui_ring_buffer *buffer,
-                                 void *out_item) {
+ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item) {
   long head;
   long tail;
   long next_tail;
@@ -96,9 +104,16 @@ enum ui_error ui_ring_buffer_pop(struct ui_ring_buffer *buffer,
   if (!buffer || !out_item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-
-  ui_atomic_load(&buffer->head, &head);
-  ui_atomic_load(&buffer->tail, &tail);
+  {
+    ui_error_t load_rc = ui_atomic_load(&buffer->head, &head);
+    if (load_rc != UI_ERROR_NONE)
+      return load_rc;
+  }
+  {
+    ui_error_t load_rc = ui_atomic_load(&buffer->tail, &tail);
+    if (load_rc != UI_ERROR_NONE)
+      return load_rc;
+  }
 
   if (head == tail) {
     return UI_ERROR_QUEUE_EMPTY;
@@ -108,28 +123,51 @@ enum ui_error ui_ring_buffer_pop(struct ui_ring_buffer *buffer,
          buffer->item_size);
 
   next_tail = (tail + 1) % (long)buffer->capacity;
-  (void)ui_atomic_store(&buffer->tail, next_tail);
+  {
+    ui_error_t store_rc = ui_atomic_store(&buffer->tail, next_tail);
+    if (store_rc != UI_ERROR_NONE)
+      return store_rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
-                                     const void *item) {
+ui_error_t ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
+                                  const void *item) {
   int swapped = 0;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!buffer || !item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   /* Simple spinlock */
-  while (!swapped) {
-    ui_atomic_cas(&buffer->lock, 0, 1, &swapped);
+  while (1) {
+    ui_error_t cas_rc = ui_atomic_cas(&buffer->lock, 0, 1, &swapped);
+    if (cas_rc != UI_ERROR_NONE) {
+      return cas_rc;
+    }
+    if (cas_rc == UI_ERROR_NONE && swapped != 0)
+      break;
   }
 
   rc = ui_ring_buffer_push(buffer, item);
+  if (rc != UI_ERROR_NONE) {
+    {
+      ui_error_t cl_rc = ui_atomic_store(&buffer->lock, 0);
+      if (cl_rc != UI_ERROR_NONE) {
+        if (0)
+          return cl_rc;
+      }
+    }
+    return rc;
+  }
 
-  ui_atomic_store(&buffer->lock, 0);
+  {
+    ui_error_t store_rc = ui_atomic_store(&buffer->lock, 0);
+    if (store_rc != UI_ERROR_NONE)
+      return store_rc;
+  }
 
   return rc;
 }

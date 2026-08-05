@@ -11,8 +11,8 @@ extern int g_malloc_fail_countdown;
 
 static int ipc_received = 0;
 
-static enum ui_error test_ipc_callback(struct ui_webview_base *webview,
-                                       const char *message, void *user_data) {
+static ui_error_t test_ipc_callback(struct ui_webview_base *webview,
+                                    const char *message, void *user_data) {
   (void)webview;
   if (user_data != (void *)0x1234) {
     return UI_ERROR_NONE;
@@ -28,7 +28,7 @@ static enum ui_error test_ipc_callback(struct ui_webview_base *webview,
 int main(void) {
   struct ui_webview_base *webview = NULL;
   struct ui_component *comp = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   printf("Running ui_webview_base tests...\n");

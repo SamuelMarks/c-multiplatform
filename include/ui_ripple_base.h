@@ -39,7 +39,7 @@ struct ui_ripple_state {
  * @param out_config Pointer to the config struct to initialize.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ripple_config_init(struct ui_ripple_config *out_config);
+ui_error_t ui_ripple_config_init(struct ui_ripple_config *out_config);
 
 /**
  * @brief Starts a new ripple effect.
@@ -50,8 +50,8 @@ enum ui_error ui_ripple_config_init(struct ui_ripple_config *out_config);
  * @param out_state Pointer to the state struct to update.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ripple_start(const struct ui_ripple_config *config, float x,
-                              float y, struct ui_ripple_state *out_state);
+ui_error_t ui_ripple_start(const struct ui_ripple_config *config, float x,
+                           float y, struct ui_ripple_state *out_state);
 
 /**
  * @brief Updates an active ripple's state over time.
@@ -61,8 +61,8 @@ enum ui_error ui_ripple_start(const struct ui_ripple_config *config, float x,
  * @param state Pointer to the state struct to update.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_ripple_update(const struct ui_ripple_config *config,
-                               float delta_ms, struct ui_ripple_state *state);
+ui_error_t ui_ripple_update(const struct ui_ripple_config *config,
+                            float delta_ms, struct ui_ripple_state *state);
 
 #ifdef __cplusplus
 }

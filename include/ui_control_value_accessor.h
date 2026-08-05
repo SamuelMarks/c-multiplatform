@@ -20,10 +20,10 @@ struct ui_component;
  * @brief Function pointer for writing a value to the view (component).
  * @param component The UI component.
  * @param value The value to write.
- * @return enum ui_error
+ * @return ui_error_t
  */
-typedef enum ui_error (*ui_cva_write_value_fn)(void *component,
-                                               union ui_signal_payload value);
+typedef ui_error_t (*ui_cva_write_value_fn)(void *component,
+                                            union ui_signal_payload value);
 
 /**
  * @brief Function pointer for registering a callback when the view value
@@ -32,12 +32,11 @@ typedef enum ui_error (*ui_cva_write_value_fn)(void *component,
  * @param callback The callback to invoke on change.
  * @param user_data Opaque user data for the callback (typically the form
  * control).
- * @return enum ui_error
+ * @return ui_error_t
  */
-typedef enum ui_error (*ui_cva_register_on_change_fn)(
+typedef ui_error_t (*ui_cva_register_on_change_fn)(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data);
 
 /**
@@ -45,20 +44,19 @@ typedef enum ui_error (*ui_cva_register_on_change_fn)(
  * @param component The UI component.
  * @param callback The callback to invoke on touch.
  * @param user_data Opaque user data for the callback.
- * @return enum ui_error
+ * @return ui_error_t
  */
-typedef enum ui_error (*ui_cva_register_on_touched_fn)(
-    void *component, enum ui_error (*callback)(void *user_data),
-    void *user_data);
+typedef ui_error_t (*ui_cva_register_on_touched_fn)(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data);
 
 /**
  * @brief Function pointer for setting the disabled state of the view.
  * @param component The UI component.
  * @param is_disabled Whether it is disabled.
- * @return enum ui_error
+ * @return ui_error_t
  */
-typedef enum ui_error (*ui_cva_set_disabled_state_fn)(void *component,
-                                                      ui_bool_t is_disabled);
+typedef ui_error_t (*ui_cva_set_disabled_state_fn)(void *component,
+                                                   ui_bool_t is_disabled);
 
 /**
  * @brief Control Value Accessor vtable interface.

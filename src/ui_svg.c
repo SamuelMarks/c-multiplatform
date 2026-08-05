@@ -7,7 +7,7 @@
 #include <math.h>
 /* clang-format on */
 
-static enum ui_error skip_whitespace_and_commas(const char **ptr) {
+static ui_error_t skip_whitespace_and_commas(const char **ptr) {
   while (**ptr) {
     if (isspace((unsigned char)**ptr) || **ptr == ',') {
       (*ptr)++;
@@ -18,9 +18,11 @@ static enum ui_error skip_whitespace_and_commas(const char **ptr) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error parse_float(const char **ptr, float *out_val) {
+static ui_error_t parse_float(const char **ptr, float *out_val) {
   char *end;
-  (void)skip_whitespace_and_commas(ptr);
+  ui_error_t skip_rc = skip_whitespace_and_commas(ptr);
+  if (skip_rc != UI_ERROR_NONE)
+    return skip_rc;
   if (!**ptr) {
     return UI_ERROR_PARSE_FAILED;
   }
@@ -32,11 +34,12 @@ static enum ui_error parse_float(const char **ptr, float *out_val) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error ensure_capacity(struct ui_svg_path *path) {
+static ui_error_t ensure_capacity(struct ui_svg_path *path) {
   if (path->count >= path->capacity) {
     ui_uint32 new_cap = path->capacity == 0 ? 16 : path->capacity * 2;
-    struct ui_svg_command *new_cmds = (struct ui_svg_command *)UI_REALLOC(
-        path->commands, new_cap * sizeof(struct ui_svg_command));
+    struct ui_svg_command *new_cmds =
+        (struct ui_svg_command *)C_MULTIPLATFORM_REALLOC(
+            path->commands, new_cap * sizeof(struct ui_svg_command));
     if (!new_cmds) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -46,15 +49,15 @@ static enum ui_error ensure_capacity(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error reflect_point(struct ui_svg_point *out_p,
-                                   const struct ui_svg_point *p,
-                                   const struct ui_svg_point *ref) {
+static ui_error_t reflect_point(struct ui_svg_point *out_p,
+                                const struct ui_svg_point *p,
+                                const struct ui_svg_point *ref) {
   out_p->x = ref->x * 2.0f - p->x;
   out_p->y = ref->y * 2.0f - p->y;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_svg_path_init(struct ui_svg_path *path) {
+ui_error_t ui_svg_path_init(struct ui_svg_path *path) {
   if (!path) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -64,18 +67,19 @@ enum ui_error ui_svg_path_init(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
-void ui_svg_path_destroy(struct ui_svg_path *path) {
+ui_error_t ui_svg_path_destroy(struct ui_svg_path *path) {
   if (path) {
     if (path->commands) {
-      UI_FREE(path->commands);
+      C_MULTIPLATFORM_FREE(path->commands);
     }
     path->commands = NULL;
     path->count = 0;
     path->capacity = 0;
   }
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
+ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
   const char *ptr;
   char cmd;
   char last_cmd;
@@ -84,7 +88,7 @@ enum ui_error ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
   float start_x;
   float start_y;
   struct ui_svg_point last_cp;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!path || !d_attr) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -101,7 +105,10 @@ enum ui_error ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
   last_cp.y = 0.0f;
 
   while (*ptr) {
-    (void)skip_whitespace_and_commas(&ptr);
+    ui_error_t skip_rc = skip_whitespace_and_commas(&ptr);
+    if (skip_rc != UI_ERROR_NONE) {
+      return skip_rc;
+    }
     if (!*ptr) {
       break;
     }
@@ -227,10 +234,14 @@ enum ui_error ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
         if (last_cmd == 'c' || last_cmd == 'C' || last_cmd == 's' ||
             last_cmd == 'S') {
           struct ui_svg_point current_p;
+          ui_error_t refl_rc;
           current_p.x = cx;
           current_p.y = cy;
-          (void)reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp,
-                              &current_p);
+          refl_rc = reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp,
+                                  &current_p);
+          if (refl_rc != UI_ERROR_NONE) {
+            return refl_rc;
+          }
         } else {
           new_cmd.data.cubic_bezier.cp1.x = cx;
           new_cmd.data.cubic_bezier.cp1.y = cy;
@@ -262,10 +273,14 @@ enum ui_error ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
         if (last_cmd == 'q' || last_cmd == 'Q' || last_cmd == 't' ||
             last_cmd == 'T') {
           struct ui_svg_point current_p;
+          ui_error_t refl_rc;
           current_p.x = cx;
           current_p.y = cy;
-          (void)reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
-                              &current_p);
+          refl_rc = reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
+                                  &current_p);
+          if (refl_rc != UI_ERROR_NONE) {
+            return refl_rc;
+          }
         } else {
           new_cmd.data.quadratic_bezier.cp.x = cx;
           new_cmd.data.quadratic_bezier.cp.y = cy;
@@ -309,7 +324,7 @@ enum ui_error ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
 cleanup:
   if (rc != UI_ERROR_NONE) {
     if (path->commands) {
-      UI_FREE(path->commands);
+      C_MULTIPLATFORM_FREE(path->commands);
       path->commands = NULL;
     }
     path->count = 0;
@@ -318,7 +333,7 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_svg_flattened_path_init(struct ui_svg_flattened_path *path) {
+ui_error_t ui_svg_flattened_path_init(struct ui_svg_flattened_path *path) {
   if (!path)
     return UI_ERROR_INVALID_ARGUMENT;
   path->subpaths = NULL;
@@ -327,24 +342,25 @@ enum ui_error ui_svg_flattened_path_init(struct ui_svg_flattened_path *path) {
   return UI_ERROR_NONE;
 }
 
-void ui_svg_flattened_path_destroy(struct ui_svg_flattened_path *path) {
+ui_error_t ui_svg_flattened_path_destroy(struct ui_svg_flattened_path *path) {
   ui_uint32 i;
   if (!path)
-    return;
+    return UI_ERROR_NONE;
   for (i = 0; i < path->count; i++) {
     if (path->subpaths[i].points) {
-      UI_FREE(path->subpaths[i].points);
+      C_MULTIPLATFORM_FREE(path->subpaths[i].points);
     }
   }
   if (path->subpaths) {
-    UI_FREE(path->subpaths);
+    C_MULTIPLATFORM_FREE(path->subpaths);
   }
   path->subpaths = NULL;
   path->count = 0;
   path->capacity = 0;
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_svg_geometry_init(struct ui_svg_geometry *geom) {
+ui_error_t ui_svg_geometry_init(struct ui_svg_geometry *geom) {
   if (!geom)
     return UI_ERROR_INVALID_ARGUMENT;
   geom->vertices = NULL;
@@ -356,27 +372,29 @@ enum ui_error ui_svg_geometry_init(struct ui_svg_geometry *geom) {
   return UI_ERROR_NONE;
 }
 
-void ui_svg_geometry_destroy(struct ui_svg_geometry *geom) {
+ui_error_t ui_svg_geometry_destroy(struct ui_svg_geometry *geom) {
   if (!geom)
-    return;
+    return UI_ERROR_NONE;
   if (geom->vertices)
-    UI_FREE(geom->vertices);
+    C_MULTIPLATFORM_FREE(geom->vertices);
   if (geom->indices)
-    UI_FREE(geom->indices);
+    C_MULTIPLATFORM_FREE(geom->indices);
   geom->vertices = NULL;
   geom->indices = NULL;
   geom->vertex_count = 0;
   geom->vertex_capacity = 0;
   geom->index_count = 0;
   geom->index_capacity = 0;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error append_subpath(struct ui_svg_flattened_path *path,
-                                    struct ui_svg_subpath **out_subpath) {
+static ui_error_t append_subpath(struct ui_svg_flattened_path *path,
+                                 struct ui_svg_subpath **out_subpath) {
   if (path->count >= path->capacity) {
     ui_uint32 new_cap = path->capacity == 0 ? 4 : path->capacity * 2;
-    struct ui_svg_subpath *new_arr = (struct ui_svg_subpath *)UI_REALLOC(
-        path->subpaths, new_cap * sizeof(struct ui_svg_subpath));
+    struct ui_svg_subpath *new_arr =
+        (struct ui_svg_subpath *)C_MULTIPLATFORM_REALLOC(
+            path->subpaths, new_cap * sizeof(struct ui_svg_subpath));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     path->subpaths = new_arr;
@@ -391,12 +409,13 @@ static enum ui_error append_subpath(struct ui_svg_flattened_path *path,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error append_point(struct ui_svg_subpath *subpath, float x,
-                                  float y) {
+static ui_error_t append_point(struct ui_svg_subpath *subpath, float x,
+                               float y) {
   if (subpath->count >= subpath->capacity) {
     ui_uint32 new_cap = subpath->capacity == 0 ? 16 : subpath->capacity * 2;
-    struct ui_svg_point *new_arr = (struct ui_svg_point *)UI_REALLOC(
-        subpath->points, new_cap * sizeof(struct ui_svg_point));
+    struct ui_svg_point *new_arr =
+        (struct ui_svg_point *)C_MULTIPLATFORM_REALLOC(
+            subpath->points, new_cap * sizeof(struct ui_svg_point));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     subpath->points = new_arr;
@@ -414,7 +433,7 @@ static enum ui_error append_point(struct ui_svg_subpath *subpath, float x,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
+static ui_error_t
 flatten_cubic_recursive(struct ui_svg_subpath *subpath, struct ui_svg_point p0,
                         struct ui_svg_point p1, struct ui_svg_point p2,
                         struct ui_svg_point p3, float tolerance_sq, int depth) {
@@ -422,7 +441,7 @@ flatten_cubic_recursive(struct ui_svg_subpath *subpath, struct ui_svg_point p0,
   float dy = p3.y - p0.y;
   float d1 = (float)fabs((p1.x - p3.x) * dy - (p1.y - p3.y) * dx);
   float d2 = (float)fabs((p2.x - p3.x) * dy - (p2.y - p3.y) * dx);
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (depth > 10 ||
       (d1 + d2) * (d1 + d2) < tolerance_sq * (dx * dx + dy * dy)) {
@@ -453,16 +472,15 @@ flatten_cubic_recursive(struct ui_svg_subpath *subpath, struct ui_svg_point p0,
   }
 }
 
-static enum ui_error flatten_quadratic_recursive(struct ui_svg_subpath *subpath,
-                                                 struct ui_svg_point p0,
-                                                 struct ui_svg_point p1,
-                                                 struct ui_svg_point p2,
-                                                 float tolerance_sq,
-                                                 int depth) {
+static ui_error_t flatten_quadratic_recursive(struct ui_svg_subpath *subpath,
+                                              struct ui_svg_point p0,
+                                              struct ui_svg_point p1,
+                                              struct ui_svg_point p2,
+                                              float tolerance_sq, int depth) {
   float dx = p2.x - p0.x;
   float dy = p2.y - p0.y;
   float d = (float)fabs((p1.x - p2.x) * dy - (p1.y - p2.y) * dx);
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (depth > 10 || d * d < tolerance_sq * (dx * dx + dy * dy)) {
     return append_point(subpath, p2.x, p2.y);
@@ -486,11 +504,11 @@ static enum ui_error flatten_quadratic_recursive(struct ui_svg_subpath *subpath,
   }
 }
 
-static enum ui_error arc_to_lines(struct ui_svg_subpath *subpath,
-                                  struct ui_svg_point p0, float rx, float ry,
-                                  float x_axis_rotation, int large_arc_flag,
-                                  int sweep_flag, struct ui_svg_point p,
-                                  float tolerance) {
+static ui_error_t arc_to_lines(struct ui_svg_subpath *subpath,
+                               struct ui_svg_point p0, float rx, float ry,
+                               float x_axis_rotation, int large_arc_flag,
+                               int sweep_flag, struct ui_svg_point p,
+                               float tolerance) {
   /* W3C Endpoint to Center parameterization */
   float pi = 3.14159265358979323846f;
   float rad = x_axis_rotation * pi / 180.0f;
@@ -504,7 +522,7 @@ static enum ui_error arc_to_lines(struct ui_svg_subpath *subpath,
   float sign, sq, coef, cxp, cyp, cx, cy;
   float ux, uy, vx, vy, start_angle, angle_extent;
   int segments, i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   (void)tolerance;
 
@@ -584,14 +602,14 @@ static enum ui_error arc_to_lines(struct ui_svg_subpath *subpath,
   return append_point(subpath, p.x, p.y);
 }
 
-enum ui_error ui_svg_path_flatten(struct ui_svg_flattened_path *flattened,
-                                  const struct ui_svg_path *path,
-                                  float tolerance) {
+ui_error_t ui_svg_path_flatten(struct ui_svg_flattened_path *flattened,
+                               const struct ui_svg_path *path,
+                               float tolerance) {
   ui_uint32 i;
   struct ui_svg_subpath *current_subpath = NULL;
   struct ui_svg_point current_point;
   struct ui_svg_point start_point;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   float tolerance_sq = tolerance * tolerance;
 
   if (!flattened || !path)
@@ -677,14 +695,14 @@ cleanup:
   return rc;
 }
 
-static enum ui_error append_vertex(struct ui_svg_geometry *geom,
-                                   struct ui_svg_point p,
-                                   ui_uint32 *out_index) {
+static ui_error_t append_vertex(struct ui_svg_geometry *geom,
+                                struct ui_svg_point p, ui_uint32 *out_index) {
   if (geom->vertex_count >= geom->vertex_capacity) {
     ui_uint32 new_cap =
         geom->vertex_capacity == 0 ? 64 : geom->vertex_capacity * 2;
-    struct ui_svg_point *new_arr = (struct ui_svg_point *)UI_REALLOC(
-        geom->vertices, new_cap * sizeof(struct ui_svg_point));
+    struct ui_svg_point *new_arr =
+        (struct ui_svg_point *)C_MULTIPLATFORM_REALLOC(
+            geom->vertices, new_cap * sizeof(struct ui_svg_point));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     geom->vertices = new_arr;
@@ -696,13 +714,12 @@ static enum ui_error append_vertex(struct ui_svg_geometry *geom,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error append_index(struct ui_svg_geometry *geom,
-                                  ui_uint32 index) {
+static ui_error_t append_index(struct ui_svg_geometry *geom, ui_uint32 index) {
   if (geom->index_count >= geom->index_capacity) {
     ui_uint32 new_cap =
         geom->index_capacity == 0 ? 128 : geom->index_capacity * 2;
-    ui_uint32 *new_arr =
-        (ui_uint32 *)UI_REALLOC(geom->indices, new_cap * sizeof(ui_uint32));
+    ui_uint32 *new_arr = (ui_uint32 *)C_MULTIPLATFORM_REALLOC(
+        geom->indices, new_cap * sizeof(ui_uint32));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     geom->indices = new_arr;
@@ -713,37 +730,45 @@ static enum ui_error append_index(struct ui_svg_geometry *geom,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error triangle_area(struct ui_svg_point a, struct ui_svg_point b,
-                                   struct ui_svg_point c, float *out_area) {
+static ui_error_t triangle_area(struct ui_svg_point a, struct ui_svg_point b,
+                                struct ui_svg_point c, float *out_area) {
   *out_area = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error is_point_in_triangle(struct ui_svg_point p,
-                                          struct ui_svg_point a,
-                                          struct ui_svg_point b,
-                                          struct ui_svg_point c,
-                                          int *out_match) {
+static ui_error_t is_point_in_triangle(struct ui_svg_point p,
+                                       struct ui_svg_point a,
+                                       struct ui_svg_point b,
+                                       struct ui_svg_point c, int *out_match) {
+  ui_error_t rc;
   float area = 0.0f;
   float w1 = 0.0f, w2 = 0.0f, w3 = 0.0f;
   *out_match = 0;
-  (void)triangle_area(a, b, c, &area);
-  (void)triangle_area(b, c, p, &w1);
+  rc = triangle_area(a, b, c, &area);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = triangle_area(b, c, p, &w1);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   w1 /= area;
-  (void)triangle_area(c, a, p, &w2);
+  rc = triangle_area(c, a, p, &w2);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   w2 /= area;
-  (void)triangle_area(a, b, p, &w3);
+  rc = triangle_area(a, b, p, &w3);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   w3 /= area;
   *out_match = (w1 >= 0.0f && w2 >= 0.0f && w3 >= 0.0f);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
                        const struct ui_svg_flattened_path *flattened) {
   ui_uint32 i;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!geom || !flattened)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -766,7 +791,7 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
     if (n < 3)
       continue;
 
-    linked = (ui_uint32 *)UI_MALLOC(n * sizeof(ui_uint32));
+    linked = (ui_uint32 *)C_MULTIPLATFORM_MALLOC(n * sizeof(ui_uint32));
     if (!linked) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -808,23 +833,29 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
       do {
         /* Find prev */
         float area = 0.0f;
+        ui_error_t tri_rc;
         for (prev = 0; prev < original_n; prev++) {
           if (linked[prev] == curr)
             break;
         }
         next = linked[curr];
-
-        (void)triangle_area(subpath->points[prev], subpath->points[curr],
-                            subpath->points[next], &area);
+        tri_rc = triangle_area(subpath->points[prev], subpath->points[curr],
+                               subpath->points[next], &area);
+        if (tri_rc != UI_ERROR_NONE) {
+          return tri_rc;
+        }
         if (area > 0.0f) {
           /* Convex, test if any other point is inside */
           int is_ear = 1;
           ui_uint32 test_pt = linked[next];
           while (test_pt != prev) {
             int is_in = 0;
-            (void)is_point_in_triangle(
+            ui_error_t in_rc = is_point_in_triangle(
                 subpath->points[test_pt], subpath->points[prev],
                 subpath->points[curr], subpath->points[next], &is_in);
+            if (in_rc != UI_ERROR_NONE) {
+              return in_rc;
+            }
             if (is_in) {
               is_ear = 0;
               break;
@@ -836,33 +867,33 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
             ui_uint32 i1, i2, i3;
             rc = append_vertex(geom, subpath->points[prev], &i1);
             if (rc != UI_ERROR_NONE) {
-              UI_FREE(linked);
+              C_MULTIPLATFORM_FREE(linked);
               goto cleanup;
             }
             rc = append_vertex(geom, subpath->points[curr], &i2);
             if (rc != UI_ERROR_NONE) {
-              UI_FREE(linked);
+              C_MULTIPLATFORM_FREE(linked);
               goto cleanup;
             }
             rc = append_vertex(geom, subpath->points[next], &i3);
             if (rc != UI_ERROR_NONE) {
-              UI_FREE(linked);
+              C_MULTIPLATFORM_FREE(linked);
               goto cleanup;
             }
 
             rc = append_index(geom, i1);
             if (rc != UI_ERROR_NONE) {
-              UI_FREE(linked);
+              C_MULTIPLATFORM_FREE(linked);
               goto cleanup;
             }
             rc = append_index(geom, i2);
             if (rc != UI_ERROR_NONE) {
-              UI_FREE(linked);
+              C_MULTIPLATFORM_FREE(linked);
               goto cleanup;
             }
             rc = append_index(geom, i3);
             if (rc != UI_ERROR_NONE) {
-              UI_FREE(linked);
+              C_MULTIPLATFORM_FREE(linked);
               goto cleanup;
             }
 
@@ -878,7 +909,7 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
         curr = linked[curr];
       } while (curr != start);
     }
-    UI_FREE(linked);
+    C_MULTIPLATFORM_FREE(linked);
   }
 
 cleanup:
@@ -886,12 +917,12 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_svg_tessellate_stroke(struct ui_svg_geometry *geom,
                          const struct ui_svg_flattened_path *flattened,
                          float stroke_width) {
   ui_uint32 i, j;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   float half_width = stroke_width * 0.5f;
 
   if (!geom || !flattened)

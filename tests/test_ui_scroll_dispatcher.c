@@ -9,9 +9,9 @@ static float g_last_scroll_x = -1.0f;
 static float g_last_scroll_y = -1.0f;
 static void *g_callback_user_data = NULL;
 
-static enum ui_error test_callback(struct ui_scroll_dispatcher *dispatcher,
-                                   const struct ui_scroll_info *info,
-                                   void *user_data) {
+static ui_error_t test_callback(struct ui_scroll_dispatcher *dispatcher,
+                                const struct ui_scroll_info *info,
+                                void *user_data) {
   (void)dispatcher;
   g_callback_called++;
   if (info) {
@@ -23,8 +23,9 @@ static enum ui_error test_callback(struct ui_scroll_dispatcher *dispatcher,
   return UI_ERROR_NONE;
 }
 
+void test_ui_scroll_dispatcher_oom(void);
 int main(void) {
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_scroll_dispatcher *dispatcher = NULL;
   struct ui_layout_observer *layout_obs = NULL;
   struct ui_scroll_info info;
@@ -180,13 +181,51 @@ cleanup:
     ui_layout_observer_destroy(layout_obs);
   }
   if (dispatcher) {
-    ui_scroll_dispatcher_destroy(dispatcher);
+    (void)ui_scroll_dispatcher_destroy(dispatcher);
   }
 
   if (test_failed) {
     return 1;
   }
 
+  test_ui_scroll_dispatcher_oom();
   printf("All scroll dispatcher tests passed.\n");
   return 0;
+}
+void test_ui_scroll_dispatcher_oom(void) {
+  extern int g_malloc_fail_countdown;
+  struct ui_scroll_dispatcher *dispatcher = NULL;
+  int i;
+  for (i = 0; i < 5; ++i) {
+    g_malloc_fail_countdown = i;
+    ui_scroll_dispatcher_create(&dispatcher);
+  }
+  g_malloc_fail_countdown = -1;
+
+  ui_scroll_dispatcher_create(&dispatcher);
+  if (dispatcher) {
+    for (i = 0; i < 5; ++i) {
+      g_malloc_fail_countdown = i;
+      int reg_id;
+      ui_scroll_dispatcher_register(dispatcher, NULL, NULL, &reg_id);
+    }
+    g_malloc_fail_countdown = -1;
+
+    /* force reallocation */
+    for (i = 0; i < 20; ++i) {
+      int reg_id;
+      ui_scroll_dispatcher_register(dispatcher, NULL, NULL, &reg_id);
+    }
+
+    /* force OOM during realloc */
+    g_malloc_fail_countdown = 0;
+    int r;
+    ui_scroll_dispatcher_register(dispatcher, NULL, NULL, &r);
+    g_malloc_fail_countdown = -1;
+
+    (void)ui_scroll_dispatcher_destroy(dispatcher);
+  }
+
+  (void)ui_scroll_dispatcher_destroy(NULL);
+  ui_scroll_dispatcher_unregister(NULL, 0);
 }

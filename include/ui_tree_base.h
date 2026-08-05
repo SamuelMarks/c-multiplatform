@@ -40,8 +40,8 @@ struct ui_tree_model {
   void *(*get_child)(void *node_id, size_t index, void *user_data);
 
   /** Renders the user-facing content of the node into cell_node. */
-  enum ui_error (*render_node)(void *node_id, struct ui_dom_node *cell_node,
-                               void *user_data);
+  ui_error_t (*render_node)(void *node_id, struct ui_dom_node *cell_node,
+                            void *user_data);
 
   void *user_data;
 };
@@ -54,15 +54,15 @@ struct ui_tree_model {
  * callbacks.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_tree_base_create(struct ui_tree_base **out_tree,
-                                  const struct ui_tree_model *model);
+ui_error_t ui_tree_base_create(struct ui_tree_base **out_tree,
+                               const struct ui_tree_model *model);
 
 /**
  * @brief Destroys a tree component.
  *
  * @param tree The tree to destroy.
  */
-enum ui_error ui_tree_base_destroy(struct ui_tree_base *tree);
+ui_error_t ui_tree_base_destroy(struct ui_tree_base *tree);
 
 /**
  * @brief Gets the selection model attached to this tree.
@@ -70,7 +70,7 @@ enum ui_error ui_tree_base_destroy(struct ui_tree_base *tree);
  * @param tree The tree.
  * @return The selection model, or NULL.
  */
-enum ui_error
+ui_error_t
 ui_tree_base_get_selection_model(struct ui_tree_base *tree,
                                  struct ui_selection_model **out_model);
 
@@ -81,8 +81,8 @@ ui_tree_base_get_selection_model(struct ui_tree_base *tree,
  * @param node_id The stable node identifier.
  * @return 1 if expanded, 0 if collapsed.
  */
-enum ui_error ui_tree_base_is_expanded(const struct ui_tree_base *tree,
-                                       void *node_id, int *out_is_expanded);
+ui_error_t ui_tree_base_is_expanded(const struct ui_tree_base *tree,
+                                    void *node_id, int *out_is_expanded);
 
 /**
  * @brief Sets the expanded state of a specific node.
@@ -92,8 +92,8 @@ enum ui_error ui_tree_base_is_expanded(const struct ui_tree_base *tree,
  * @param expanded 1 to expand, 0 to collapse.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_tree_base_set_expanded(struct ui_tree_base *tree,
-                                        void *node_id, int expanded);
+ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
+                                     int expanded);
 
 /**
  * @brief Toggles the expanded state of a specific node.
@@ -102,8 +102,7 @@ enum ui_error ui_tree_base_set_expanded(struct ui_tree_base *tree,
  * @param node_id The stable node identifier.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_tree_base_toggle_node(struct ui_tree_base *tree,
-                                       void *node_id);
+ui_error_t ui_tree_base_toggle_node(struct ui_tree_base *tree, void *node_id);
 
 /**
  * @brief Sets the active/focused node for keyboard navigation.
@@ -112,8 +111,8 @@ enum ui_error ui_tree_base_toggle_node(struct ui_tree_base *tree,
  * @param node_id The stable node identifier, or NULL to clear focus.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_tree_base_set_active_node(struct ui_tree_base *tree,
-                                           void *node_id);
+ui_error_t ui_tree_base_set_active_node(struct ui_tree_base *tree,
+                                        void *node_id);
 
 /**
  * @brief Gets the active/focused node.
@@ -121,8 +120,8 @@ enum ui_error ui_tree_base_set_active_node(struct ui_tree_base *tree,
  * @param tree The tree.
  * @return The active node identifier, or NULL if none.
  */
-enum ui_error ui_tree_base_get_active_node(const struct ui_tree_base *tree,
-                                           void **out_node);
+ui_error_t ui_tree_base_get_active_node(const struct ui_tree_base *tree,
+                                        void **out_node);
 
 /**
  * @brief Handles keyboard events for ARIA standard tree traversal.
@@ -134,9 +133,8 @@ enum ui_error ui_tree_base_get_active_node(const struct ui_tree_base *tree,
  * @param event The keyboard event.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_tree_base_handle_key_event(struct ui_tree_base *tree,
-                              const struct ui_keyboard_event *event);
+ui_error_t ui_tree_base_handle_key_event(struct ui_tree_base *tree,
+                                         const struct ui_keyboard_event *event);
 
 /**
  * @brief Generates the tree DOM structure including full ARIA mappings
@@ -147,8 +145,8 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
  * appended.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_tree_base_render(struct ui_tree_base *tree,
-                                  struct ui_dom_node *container);
+ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
+                               struct ui_dom_node *container);
 
 /**
  * @brief Binds the data property.
@@ -157,8 +155,8 @@ enum ui_error ui_tree_base_render(struct ui_tree_base *tree,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_tree_base_bind_data(struct ui_tree_base *widget,
-                                     struct ui_computed *signal);
+ui_error_t ui_tree_base_bind_data(struct ui_tree_base *widget,
+                                  struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

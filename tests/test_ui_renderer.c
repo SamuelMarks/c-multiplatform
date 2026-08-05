@@ -4,11 +4,17 @@
 #include <stdlib.h>
 /* clang-format on */
 
+void test_ui_renderer_oom_fallback(void);
+void test_ui_renderer_oom_fallback_error(void);
+void test_ui_renderer_oom_real(void);
 int main(void) {
   struct ui_renderer *renderer = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Running ui_renderer tests...\n");
+  test_ui_renderer_oom_fallback();
+  test_ui_renderer_oom_fallback_error();
+  test_ui_renderer_oom_real();
 #ifdef _WIN32
   if (getenv("WINELOADER") != NULL) {
     printf("Skipping ui_renderer tests under Wine CI to avoid pipe hangs.\n");
@@ -232,4 +238,30 @@ int main(void) {
 
   printf("ui_renderer tests passed.\n");
   return 0;
+}
+
+void test_ui_renderer_oom_fallback(void) {
+  struct ui_renderer *renderer;
+  extern int g_native_init_fail;
+  g_native_init_fail = 1;
+  ui_renderer_create(&renderer);
+  g_native_init_fail = 0;
+}
+
+void test_ui_renderer_oom_fallback_error(void) {
+  struct ui_renderer *renderer;
+  extern int g_native_init_fail;
+  extern int g_gles_init_fail;
+  g_native_init_fail = 1;
+  g_gles_init_fail = 1;
+  ui_renderer_create(&renderer);
+  g_native_init_fail = 0;
+  g_gles_init_fail = 0;
+}
+void test_ui_renderer_oom_real(void) {
+  extern int g_malloc_fail_countdown;
+  struct ui_renderer *renderer;
+  g_malloc_fail_countdown = 0;
+  ui_renderer_create(&renderer);
+  g_malloc_fail_countdown = -1;
 }

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_safe_area_manager.h"
+#include "ui_internal_mem.h"
 #include "ui_arena.h"
 #include <stddef.h>
 /* clang-format on */
@@ -10,36 +11,26 @@ struct ui_safe_area_manager {
   ui_signal_t *change_signal;
 };
 
-static enum ui_error insets_equality(union ui_signal_payload a,
-                                     union ui_signal_payload b,
-                                     ui_bool_t *out_equal) {
+static ui_error_t insets_equality(union ui_signal_payload a,
+                                  union ui_signal_payload b,
+                                  ui_bool_t *out_equal) {
   struct ui_safe_area_insets *insets_a =
       (struct ui_safe_area_insets *)a.ptr_val;
   struct ui_safe_area_insets *insets_b =
       (struct ui_safe_area_insets *)b.ptr_val;
 
-  if (!insets_a || !insets_b) {
-    if (out_equal)
-      *out_equal = (insets_a == insets_b);
-    return UI_ERROR_NONE;
-  }
-
-  if (out_equal) {
-    *out_equal =
-        (insets_a->top == insets_b->top &&
-         insets_a->bottom == insets_b->bottom &&
-         insets_a->left == insets_b->left && insets_a->right == insets_b->right)
-            ? UI_TRUE
-            : UI_FALSE;
-  }
+  *out_equal =
+      (memcmp(insets_a, insets_b, sizeof(struct ui_safe_area_insets)) == 0)
+          ? UI_TRUE
+          : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_safe_area_manager_create(struct ui_arena *arena,
                             struct ui_safe_area_manager **out_manager) {
-  enum ui_error err;
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -48,6 +39,16 @@ ui_safe_area_manager_create(struct ui_arena *arena,
   }
 
   err = ui_arena_alloc(arena, sizeof(struct ui_safe_area_manager), 8, &ptr);
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
+    if (!dummy) {
+      err = UI_ERROR_OUT_OF_MEMORY;
+    } else {
+      C_MULTIPLATFORM_FREE(dummy);
+    }
+  }
+#endif
   if (err != UI_ERROR_NONE) {
     return err;
   }
@@ -63,6 +64,16 @@ ui_safe_area_manager_create(struct ui_arena *arena,
   err = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
                          insets_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                          &(*out_manager)->change_signal);
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
+    if (!dummy) {
+      err = UI_ERROR_OUT_OF_MEMORY;
+    } else {
+      C_MULTIPLATFORM_FREE(dummy);
+    }
+  }
+#endif
   if (err != UI_ERROR_NONE) {
     return err;
   }
@@ -71,29 +82,36 @@ ui_safe_area_manager_create(struct ui_arena *arena,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager) {
-  enum ui_error err;
+ui_error_t ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager) {
+  ui_error_t err;
 
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (manager->change_signal) {
-    err = ui_signal_destroy(manager->change_signal);
-    if (err != UI_ERROR_NONE) {
-      return err;
+  err = ui_signal_destroy(manager->change_signal);
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
+    if (!dummy) {
+      err = UI_ERROR_UNKNOWN;
+    } else {
+      C_MULTIPLATFORM_FREE(dummy);
     }
+  }
+#endif
+  if (err != UI_ERROR_NONE) {
+    return err;
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
                                 const struct ui_safe_area_insets *insets) {
-  enum ui_error err;
+  ui_error_t err;
   union ui_signal_payload new_payload;
 
   if (!manager || !insets) {
@@ -104,6 +122,16 @@ ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
 
   new_payload.ptr_val = &manager->current_insets;
   err = ui_signal_set(manager->change_signal, new_payload);
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
+    if (!dummy) {
+      err = UI_ERROR_UNKNOWN;
+    } else {
+      C_MULTIPLATFORM_FREE(dummy);
+    }
+  }
+#endif
   if (err != UI_ERROR_NONE) {
     return err;
   }
@@ -112,7 +140,7 @@ ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
                                 struct ui_safe_area_insets *out_insets) {
   if (!manager || !out_insets) {
@@ -124,7 +152,7 @@ ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_safe_area_manager_get_change_signal(struct ui_safe_area_manager *manager,
                                        ui_signal_t **out_signal) {
   if (!manager || !out_signal) {

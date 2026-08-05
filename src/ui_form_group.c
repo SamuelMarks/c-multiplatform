@@ -20,11 +20,11 @@ struct ui_form_group {
   size_t capacity;
 };
 
-enum ui_error ui_form_group_create(struct ui_arena *arena,
-                                   enum ui_signal_mode mode,
-                                   ui_form_group_t **out_group) {
+ui_error_t ui_form_group_create(struct ui_arena *arena,
+                                enum ui_signal_mode mode,
+                                ui_form_group_t **out_group) {
   struct ui_form_group *group;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!arena || !out_group) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -44,11 +44,11 @@ enum ui_error ui_form_group_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error strdup_arena(struct ui_arena *arena, const char *str,
-                                  char **out_str) {
+static ui_error_t strdup_arena(struct ui_arena *arena, const char *str,
+                               char **out_str) {
   size_t len = strlen(str);
   char *copy;
-  enum ui_error rc = ui_arena_alloc(arena, len + 1, 1, (void **)&copy);
+  ui_error_t rc = ui_arena_alloc(arena, len + 1, 1, (void **)&copy);
   if (rc == UI_ERROR_NONE) {
     memcpy(copy, str, len + 1);
     *out_str = copy;
@@ -56,9 +56,9 @@ static enum ui_error strdup_arena(struct ui_arena *arena, const char *str,
   return rc;
 }
 
-enum ui_error ui_form_group_add_node(ui_form_group_t *group, const char *name,
-                                     ui_form_node_t node) {
-  enum ui_error rc;
+ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
+                                  ui_form_node_t node) {
+  ui_error_t rc;
   struct ui_form_group_entry *new_entries = NULL;
   size_t new_cap;
 
@@ -91,17 +91,16 @@ enum ui_error ui_form_group_add_node(ui_form_group_t *group, const char *name,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_group_add_control(ui_form_group_t *group,
-                                        const char *name,
-                                        ui_form_control_t *control) {
+ui_error_t ui_form_group_add_control(ui_form_group_t *group, const char *name,
+                                     ui_form_control_t *control) {
   ui_form_node_t node = {0};
   node.type = UI_FORM_NODE_CONTROL;
   node.node.control = control;
   return ui_form_group_add_node(group, name, node);
 }
 
-enum ui_error ui_form_group_get_node(ui_form_group_t *group, const char *name,
-                                     ui_form_node_t *out_node) {
+ui_error_t ui_form_group_get_node(ui_form_group_t *group, const char *name,
+                                  ui_form_node_t *out_node) {
   size_t i;
   if (!group || !name || !out_node)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -116,11 +115,10 @@ enum ui_error ui_form_group_get_node(ui_form_group_t *group, const char *name,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_form_group_get_control(ui_form_group_t *group,
-                                        const char *name,
-                                        ui_form_control_t **out_control) {
+ui_error_t ui_form_group_get_control(ui_form_group_t *group, const char *name,
+                                     ui_form_control_t **out_control) {
   ui_form_node_t node = {0};
-  enum ui_error rc = ui_form_group_get_node(group, name, &node);
+  ui_error_t rc = ui_form_group_get_node(group, name, &node);
   if (rc != UI_ERROR_NONE)
     return rc;
 
@@ -132,14 +130,13 @@ enum ui_error ui_form_group_get_control(ui_form_group_t *group,
 }
 
 /** \brief ui_error */
-enum ui_error
-_ui_form_group_get_status_internal(struct ui_form_group *group,
-                                   enum ui_form_status *out_status,
-                                   size_t depth) {
+ui_error_t _ui_form_group_get_status_internal(struct ui_form_group *group,
+                                              enum ui_form_status *out_status,
+                                              size_t depth) {
   size_t i;
   enum ui_form_status aggregated_status = UI_FORM_STATUS_VALID;
   enum ui_form_status child_status;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!group || !out_status)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -162,22 +159,22 @@ _ui_form_group_get_status_internal(struct ui_form_group *group,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_group_get_status(ui_form_group_t *group,
-                                       enum ui_form_status *out_status) {
+ui_error_t ui_form_group_get_status(ui_form_group_t *group,
+                                    enum ui_form_status *out_status) {
   return _ui_form_group_get_status_internal(group, out_status, 0);
 }
 
-enum ui_error ui_form_group_is_valid(ui_form_group_t *group,
-                                     ui_bool_t *out_valid) {
+ui_error_t ui_form_group_is_valid(ui_form_group_t *group,
+                                  ui_bool_t *out_valid) {
   enum ui_form_status status;
-  enum ui_error rc = ui_form_group_get_status(group, &status);
+  ui_error_t rc = ui_form_group_get_status(group, &status);
   if (rc != UI_ERROR_NONE)
     return rc;
   *out_valid = (status == UI_FORM_STATUS_VALID);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_group_destroy(ui_form_group_t *group) {
+ui_error_t ui_form_group_destroy(ui_form_group_t *group) {
   if (!group)
     return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;

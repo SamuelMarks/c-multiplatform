@@ -24,16 +24,15 @@ struct ui_live_announcer {
 };
 
 /** \brief ui_error */
-enum ui_error
-ui_live_announcer_create(struct ui_live_announcer **out_announcer) {
+ui_error_t ui_live_announcer_create(struct ui_live_announcer **out_announcer) {
   struct ui_live_announcer *announcer;
 
   if (!out_announcer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  announcer =
-      (struct ui_live_announcer *)UI_MALLOC(sizeof(struct ui_live_announcer));
+  announcer = (struct ui_live_announcer *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_live_announcer));
   if (!announcer) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -45,16 +44,20 @@ ui_live_announcer_create(struct ui_live_announcer **out_announcer) {
   return UI_ERROR_NONE;
 }
 
-void ui_live_announcer_destroy(struct ui_live_announcer *announcer) {
+ui_error_t ui_live_announcer_destroy(struct ui_live_announcer *announcer) {
   if (announcer) {
-    ui_live_announcer_clear(announcer);
-    UI_FREE(announcer);
+    ui_error_t rc = ui_live_announcer_clear(announcer);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    C_MULTIPLATFORM_FREE(announcer);
   }
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_live_announce(struct ui_live_announcer *announcer,
-                               const char *message,
-                               enum ui_live_politeness politeness) {
+ui_error_t ui_live_announce(struct ui_live_announcer *announcer,
+                            const char *message,
+                            enum ui_live_politeness politeness) {
   struct ui_live_message *msg;
   size_t len;
   char *text_copy;
@@ -64,15 +67,16 @@ enum ui_error ui_live_announce(struct ui_live_announcer *announcer,
   }
 
   len = strlen(message);
-  text_copy = (char *)UI_MALLOC(len + 1);
+  text_copy = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!text_copy) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
   UI_STRCPY(text_copy, len + 1, message);
 
-  msg = (struct ui_live_message *)UI_MALLOC(sizeof(struct ui_live_message));
+  msg = (struct ui_live_message *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_live_message));
   if (!msg) {
-    UI_FREE(text_copy);
+    C_MULTIPLATFORM_FREE(text_copy);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -94,7 +98,7 @@ enum ui_error ui_live_announce(struct ui_live_announcer *announcer,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_live_announcer_clear(struct ui_live_announcer *announcer) {
+ui_error_t ui_live_announcer_clear(struct ui_live_announcer *announcer) {
   struct ui_live_message *current;
   struct ui_live_message *next;
 
@@ -105,8 +109,8 @@ enum ui_error ui_live_announcer_clear(struct ui_live_announcer *announcer) {
   current = announcer->queue_head;
   while (current) {
     next = current->next;
-    UI_FREE(current->text);
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current->text);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 

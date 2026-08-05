@@ -5,9 +5,9 @@
 #include <stdio.h>
 /* clang-format on */
 
-static enum ui_error mock_factory(const struct ui_property_row *row,
-                                  void *user_data,
-                                  struct ui_component **out_comp) {
+static ui_error_t mock_factory(const struct ui_property_row *row,
+                               void *user_data,
+                               struct ui_component **out_comp) {
   (void)row;
   (void)user_data;
   *out_comp = NULL; /* Mock */
@@ -32,12 +32,13 @@ static enum ui_error mock_factory(const struct ui_property_row *row,
     }                                                                          \
   } while (0)
 
+void test_property_grid_extra_err(void);
 int main(void) {
   struct ui_arena *arena;
   struct ui_property_grid_base *grid = NULL;
   struct ui_property_row row1;
   struct ui_property_row row2;
-  enum ui_error err;
+  ui_error_t err;
   ui_signal_t *signal = NULL;
   int i;
   char group_id_buf[128][32];
@@ -112,7 +113,7 @@ int main(void) {
             UI_ERROR_NOT_FOUND);
 
   /* Exhaust rows and groups to hit out of bounds */
-  for (i = 0; i < 128; i++) {
+  for (i = 0; i < 128 + 1; i++) {
     struct ui_property_row dummy_row;
     dummy_row.id = "dummy";
     dummy_row.label = "Dummy";
@@ -125,7 +126,7 @@ int main(void) {
       dummy_row.group_id = NULL;
     }
     err = ui_property_grid_base_add_property(grid, &dummy_row);
-    if (i >= 128 - 2) {
+    if (i >= 128) {
       if (err != UI_ERROR_OUT_OF_BOUNDS) {
         printf("Failed at line %d: Expected OUT_OF_BOUNDS\n", __LINE__);
         return 1;
@@ -142,8 +143,14 @@ int main(void) {
       ui_property_grid_base_set_group_collapsed(grid, "NewGroup33", UI_TRUE),
       UI_ERROR_OUT_OF_BOUNDS);
   ASSERT_SUCCESS(ui_property_grid_base_destroy(grid));
-
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   printf("Test passed!\n");
   return 0;
+}
+void test_property_grid_extra_err(void) {
+  /* To hit out_group=NULL in get_or_create_group, we need to call it. But it's
+  static and called via add_property and set_group_collapsed which don't pass
+  NULL. So we can't easily hit it without modifying the source. Wait,
+  ui_property_grid_base.c is compiled into the test directly? No, it's in
+  libui_engine_test.a. */
 }

@@ -28,7 +28,7 @@ struct ui_split_button_base;
  * @param out_split_button Pointer to receive the allocated split button base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_split_button_base_create(struct ui_split_button_base **out_split_button);
 
 /**
@@ -36,7 +36,8 @@ ui_split_button_base_create(struct ui_split_button_base **out_split_button);
  *
  * @param split_button The split button to destroy.
  */
-void ui_split_button_base_destroy(struct ui_split_button_base *split_button);
+ui_error_t
+ui_split_button_base_destroy(struct ui_split_button_base *split_button);
 
 /**
  * @brief Sets the disabled state of both parts of the split button.
@@ -45,7 +46,7 @@ void ui_split_button_base_destroy(struct ui_split_button_base *split_button);
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_split_button_base_set_disabled(struct ui_split_button_base *split_button,
                                   int disabled);
 
@@ -56,7 +57,7 @@ ui_split_button_base_set_disabled(struct ui_split_button_base *split_button,
  * @param out_main_btn Pointer to receive the primary button.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_split_button_base_get_main_button(struct ui_split_button_base *split_button,
                                      struct ui_button_base **out_main_btn);
 
@@ -67,7 +68,7 @@ ui_split_button_base_get_main_button(struct ui_split_button_base *split_button,
  * @param out_trigger_btn Pointer to receive the trigger button.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_split_button_base_get_trigger_button(
+ui_error_t ui_split_button_base_get_trigger_button(
     struct ui_split_button_base *split_button,
     struct ui_button_base **out_trigger_btn);
 
@@ -78,7 +79,7 @@ enum ui_error ui_split_button_base_get_trigger_button(
  * @param split_button The split button.
  * @return The underlying component.
  */
-enum ui_error
+ui_error_t
 ui_split_button_base_get_component(struct ui_split_button_base *split_button,
                                    struct ui_component **out_component);
 
@@ -89,7 +90,7 @@ ui_split_button_base_get_component(struct ui_split_button_base *split_button,
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_split_button_base_bind_disabled(struct ui_split_button_base *widget,
                                    struct ui_signal *disabled_signal);
 
@@ -101,9 +102,8 @@ ui_split_button_base_bind_disabled(struct ui_split_button_base *widget,
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_split_button_base_bind_text(struct ui_split_button_base *widget,
-                               struct ui_signal *text_signal);
+ui_error_t ui_split_button_base_bind_text(struct ui_split_button_base *widget,
+                                          struct ui_signal *text_signal);
 
 #ifdef __cplusplus
 }

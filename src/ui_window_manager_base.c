@@ -20,10 +20,10 @@ struct ui_window_manager_base {
 };
 
 /** \brief ui_window_manager_base_create */
-enum ui_error ui_window_manager_base_create(
+ui_error_t ui_window_manager_base_create(
     struct ui_window_manager_base **out_window_manager) {
   struct ui_window_manager_base *wm;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -31,7 +31,7 @@ enum ui_error ui_window_manager_base_create(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  wm = (struct ui_window_manager_base *)UI_MALLOC(
+  wm = (struct ui_window_manager_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_window_manager_base));
   if (!wm) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -66,7 +66,13 @@ enum ui_error ui_window_manager_base_create(
     goto cleanup;
   }
 
-  (void)ui_component_set_default_style(wm->component, default_style);
+  {
+
+    ui_error_t _ign_rc =
+        ui_component_set_default_style(wm->component, default_style);
+
+    (void)_ign_rc;
+  }
 
   wm->component->shadow_root = root_node;
   root_node = NULL;
@@ -76,29 +82,30 @@ enum ui_error ui_window_manager_base_create(
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (wm && wm->component) {
-    ui_component_destroy(wm->component);
+    (void)ui_component_destroy(wm->component);
   }
-  UI_FREE(wm);
+  C_MULTIPLATFORM_FREE(wm);
   return rc;
 }
 
 /** \brief ui_window_manager_base_destroy */
-void ui_window_manager_base_destroy(
-    struct ui_window_manager_base *window_manager) {
+ui_error_t
+ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager) {
   if (!window_manager) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (window_manager->component) {
-    ui_component_destroy(window_manager->component);
+    (void)ui_component_destroy(window_manager->component);
   }
-  UI_FREE(window_manager);
+  C_MULTIPLATFORM_FREE(window_manager);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_window_manager_base_get_component */
-enum ui_error ui_window_manager_base_get_component(
+ui_error_t ui_window_manager_base_get_component(
     struct ui_window_manager_base *window_manager,
     struct ui_component **out_component) {
   if (!window_manager || !out_component) {
@@ -109,7 +116,7 @@ enum ui_error ui_window_manager_base_get_component(
 }
 
 /** \brief ui_window_manager_base_bring_to_front */
-enum ui_error ui_window_manager_base_bring_to_front(
+ui_error_t ui_window_manager_base_bring_to_front(
     struct ui_window_manager_base *window_manager, int window_id) {
   (void)window_id;
   if (!window_manager) {
@@ -120,7 +127,7 @@ enum ui_error ui_window_manager_base_bring_to_front(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
                             int window_id, float delta_x, float delta_y) {
   (void)window_id;
@@ -134,7 +141,7 @@ ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_window_manager_base_bind_data(struct ui_window_manager_base *widget,
                                  struct ui_computed *signal) {
   if (!widget) {

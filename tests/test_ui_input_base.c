@@ -13,8 +13,8 @@ static char g_last_text[256];
 
 #define EXPECT(cond) failed |= !(cond)
 
-static enum ui_error on_input_change(struct ui_input_base *input,
-                                     const char *text, void *user_data) {
+static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
+                                  void *user_data) {
   (void)input;
   (void)user_data;
   g_change_count++;
@@ -24,8 +24,8 @@ static enum ui_error on_input_change(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_cva_change(union ui_signal_payload payload,
-                                   void *user_data) {
+static ui_error_t on_cva_change(union ui_signal_payload payload,
+                                void *user_data) {
   (void)user_data;
   g_change_count++;
   UI_STRNCPY(g_last_text, sizeof(g_last_text),
@@ -35,7 +35,7 @@ static enum ui_error on_cva_change(union ui_signal_payload payload,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_cva_touched(void *user_data) {
+static ui_error_t on_cva_touched(void *user_data) {
   (void)user_data;
   return UI_ERROR_NONE;
 }
@@ -43,7 +43,7 @@ static enum ui_error on_cva_touched(void *user_data) {
 static int run_normal_tests(void) {
   int failed = 0;
   struct ui_input_base *input = NULL;
-  enum ui_error err;
+  ui_error_t err;
   struct ui_event ev;
   struct ui_control_value_accessor cva;
 
@@ -257,12 +257,12 @@ static int run_normal_tests(void) {
   printf("Shift+Arrow Key highlight constraint checked.\n");
   /* Simulate Copy/Paste clipboard injection mapping */
   printf("Clipboard bindings constraint checked.\n");
-  ui_input_base_destroy(input);
+  (void)ui_input_base_destroy(input);
   return failed;
 }
 
-static enum ui_error on_input_change_fail(struct ui_input_base *input,
-                                          const char *text, void *user_data) {
+static ui_error_t on_input_change_fail(struct ui_input_base *input,
+                                       const char *text, void *user_data) {
   (void)input;
   (void)text;
   (void)user_data;
@@ -273,7 +273,7 @@ static int run_failure_tests(void) {
   int failed = 0;
   struct ui_input_base *input = NULL;
   struct ui_event ev;
-  enum ui_error err;
+  ui_error_t err;
 
   printf("Running failure tests...\n");
   ui_input_base_create(&input);
@@ -304,13 +304,13 @@ static int run_failure_tests(void) {
     EXPECT(err == UI_ERROR_NONE);
   }
 
-  ui_input_base_destroy(input);
+  (void)ui_input_base_destroy(input);
   return failed;
 }
 static int run_oom_tests(void) {
   int failed = 0;
   struct ui_input_base *input = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
   struct ui_event ev;
   struct ui_control_value_accessor cva;
@@ -318,12 +318,12 @@ static int run_oom_tests(void) {
   printf("Running input base OOM tests...\n");
 
   /* Creation OOM */
-  for (i = 0; i < 20; i++) {
+  for (i = 0; i < 150; i++) {
     g_malloc_fail_countdown = i;
     err = ui_input_base_create(&input);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      ui_input_base_destroy(input);
+      (void)ui_input_base_destroy(input);
       break;
     }
   }
@@ -366,7 +366,7 @@ static int run_oom_tests(void) {
   g_malloc_fail_countdown = -1;
   EXPECT(err == UI_ERROR_OUT_OF_MEMORY);
 
-  ui_input_base_destroy(input);
+  (void)ui_input_base_destroy(input);
 
   return failed;
 }

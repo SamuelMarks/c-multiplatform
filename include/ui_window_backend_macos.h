@@ -16,7 +16,7 @@ extern "C" {
  * @param out_backend Pointer to receive the allocated backend instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_window_backend_macos_create(struct ui_window_backend **out_backend);
 
 /**
@@ -25,8 +25,7 @@ ui_window_backend_macos_create(struct ui_window_backend **out_backend);
  * @param backend The backend instance to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_window_backend_macos_destroy(struct ui_window_backend *backend);
+ui_error_t ui_window_backend_macos_destroy(struct ui_window_backend *backend);
 
 #ifdef __cplusplus
 }

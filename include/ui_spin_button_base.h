@@ -17,7 +17,7 @@ struct ui_spin_button_base;
 /**
  * @brief Callback invoked when the spin button value changes.
  */
-typedef enum ui_error (*ui_spin_button_on_change_t)(
+typedef ui_error_t (*ui_spin_button_on_change_t)(
     struct ui_spin_button_base *spin_button, double value, void *user_data);
 
 /**
@@ -34,7 +34,7 @@ typedef enum ui_error (*ui_spin_button_on_change_t)(
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
                            struct ui_control_value_accessor *out_cva);
 
@@ -43,7 +43,7 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
  *
  * @param spin_button The spin button to destroy.
  */
-void ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button);
+ui_error_t ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button);
 
 /**
  * @brief Sets the minimum value.
@@ -52,9 +52,8 @@ void ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button);
  * @param min The minimum value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
-                            double min);
+ui_error_t ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
+                                       double min);
 
 /**
  * @brief Sets the maximum value.
@@ -63,9 +62,8 @@ ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
  * @param max The maximum value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
-                            double max);
+ui_error_t ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
+                                       double max);
 
 /**
  * @brief Sets the current value. Clamps to min/max.
@@ -74,7 +72,7 @@ ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
  * @param value The current value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
                               double value);
 
@@ -84,7 +82,7 @@ ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
  * @param spin_button The spin button.
  * @return The current value.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_get_value(const struct ui_spin_button_base *spin_button,
                               double *out_val);
 
@@ -95,9 +93,8 @@ ui_spin_button_base_get_value(const struct ui_spin_button_base *spin_button,
  * @param step The step increment.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
-                             double step);
+ui_error_t ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
+                                        double step);
 
 /**
  * @brief Sets the disabled state.
@@ -106,7 +103,7 @@ ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
                                  int disabled);
 
@@ -118,7 +115,7 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_set_on_change(struct ui_spin_button_base *spin_button,
                                   ui_spin_button_on_change_t on_change,
                                   void *user_data);
@@ -129,7 +126,7 @@ ui_spin_button_base_set_on_change(struct ui_spin_button_base *spin_button,
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_increment(struct ui_spin_button_base *spin_button);
 
 /**
@@ -138,7 +135,7 @@ ui_spin_button_base_increment(struct ui_spin_button_base *spin_button);
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_decrement(struct ui_spin_button_base *spin_button);
 
 /**
@@ -147,7 +144,7 @@ ui_spin_button_base_decrement(struct ui_spin_button_base *spin_button);
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_spin_button_base_start_continuous_increment(
+ui_error_t ui_spin_button_base_start_continuous_increment(
     struct ui_spin_button_base *spin_button);
 
 /**
@@ -156,7 +153,7 @@ enum ui_error ui_spin_button_base_start_continuous_increment(
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_spin_button_base_start_continuous_decrement(
+ui_error_t ui_spin_button_base_start_continuous_decrement(
     struct ui_spin_button_base *spin_button);
 
 /**
@@ -165,7 +162,7 @@ enum ui_error ui_spin_button_base_start_continuous_decrement(
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_stop_continuous(struct ui_spin_button_base *spin_button);
 
 /**
@@ -175,9 +172,8 @@ ui_spin_button_base_stop_continuous(struct ui_spin_button_base *spin_button);
  * @param delta_ms The time passed since last tick in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
-                            double delta_ms);
+ui_error_t ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
+                                       double delta_ms);
 
 /**
  * @brief Processes an incoming input event (e.g., Up/Down arrows).
@@ -186,7 +182,7 @@ ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
  * @param event The input event.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
                                   const struct ui_event *event);
 
@@ -196,7 +192,7 @@ ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
  * @param spin_button The spin button.
  * @return The underlying component.
  */
-enum ui_error
+ui_error_t
 ui_spin_button_base_get_component(struct ui_spin_button_base *spin_button,
                                   struct ui_component **out_component);
 

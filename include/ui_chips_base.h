@@ -20,15 +20,15 @@ struct ui_chips_base;
  * @param out_cva Optional pointer to receive the control value accessor.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_chips_base_create(struct ui_chips_base **out_chips,
-                                   struct ui_control_value_accessor *out_cva);
+ui_error_t ui_chips_base_create(struct ui_chips_base **out_chips,
+                                struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Destroys a chips collection manager and frees its tokens.
  *
  * @param chips The chips base to destroy.
  */
-void ui_chips_base_destroy(struct ui_chips_base *chips);
+ui_error_t ui_chips_base_destroy(struct ui_chips_base *chips);
 
 /**
  * @brief Adds a token to the collection.
@@ -37,7 +37,7 @@ void ui_chips_base_destroy(struct ui_chips_base *chips);
  * @param token The string token to copy and add.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_chips_base_add(struct ui_chips_base *chips, const char *token);
+ui_error_t ui_chips_base_add(struct ui_chips_base *chips, const char *token);
 
 /**
  * @brief Removes a token from the collection by index.
@@ -46,7 +46,7 @@ enum ui_error ui_chips_base_add(struct ui_chips_base *chips, const char *token);
  * @param index The index of the token to remove.
  * @return UI_ERROR_NONE on success, or UI_ERROR_OUT_OF_BOUNDS.
  */
-enum ui_error ui_chips_base_remove(struct ui_chips_base *chips, size_t index);
+ui_error_t ui_chips_base_remove(struct ui_chips_base *chips, size_t index);
 
 /**
  * @brief Removes the last token from the collection.
@@ -54,7 +54,7 @@ enum ui_error ui_chips_base_remove(struct ui_chips_base *chips, size_t index);
  * @param chips The chips base.
  * @return UI_ERROR_NONE on success, or UI_ERROR_NOT_FOUND if empty.
  */
-enum ui_error ui_chips_base_remove_last(struct ui_chips_base *chips);
+ui_error_t ui_chips_base_remove_last(struct ui_chips_base *chips);
 
 /**
  * @brief Gets the number of tokens in the collection.
@@ -63,8 +63,8 @@ enum ui_error ui_chips_base_remove_last(struct ui_chips_base *chips);
  * @param out_count Pointer to receive the count.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_chips_base_get_count(const struct ui_chips_base *chips,
-                                      size_t *out_count);
+ui_error_t ui_chips_base_get_count(const struct ui_chips_base *chips,
+                                   size_t *out_count);
 
 /**
  * @brief Gets a token string from the collection by index.
@@ -74,8 +74,8 @@ enum ui_error ui_chips_base_get_count(const struct ui_chips_base *chips,
  * @param out_token Pointer to receive the string pointer.
  * @return UI_ERROR_NONE on success, or UI_ERROR_OUT_OF_BOUNDS.
  */
-enum ui_error ui_chips_base_get_token(const struct ui_chips_base *chips,
-                                      size_t index, const char **out_token);
+ui_error_t ui_chips_base_get_token(const struct ui_chips_base *chips,
+                                   size_t index, const char **out_token);
 
 /**
  * @brief Handles focus routing when Backspace is pressed.
@@ -87,9 +87,9 @@ enum ui_error ui_chips_base_get_token(const struct ui_chips_base *chips,
  * should move, 0 otherwise.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_chips_base_handle_backspace(struct ui_chips_base *chips,
-                                             const char *current_input,
-                                             int *out_focus_moved_to_last);
+ui_error_t ui_chips_base_handle_backspace(struct ui_chips_base *chips,
+                                          const char *current_input,
+                                          int *out_focus_moved_to_last);
 
 #ifdef __cplusplus
 }

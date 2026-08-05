@@ -37,7 +37,7 @@ There are three levels of invalidation, ordered from least to most expensive:
 3.  **`UI_INVALIDATE_DATA`**: (Specifically for Data Grids or Lists). The underlying array of data changed. The component needs to destroy its children and re-instantiate them from the data source before layout and paint.
 
 ```c
-enum ui_error on_btn_clicked(struct ui_button_base *btn, void *user_data) {
+ui_error_t on_btn_clicked(struct ui_button_base *btn, void *user_data) {
     struct my_button_state *state = (struct my_button_state*)user_data;
 
     // Mutate state

@@ -9,7 +9,7 @@ extern int g_malloc_fail_countdown;
 
 static int test_predictive_back_lifecycle(void) {
   struct ui_predictive_back *t = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_predictive_back_create(&t);
   if (rc != UI_ERROR_NONE || t == NULL)
@@ -22,7 +22,7 @@ static int test_predictive_back_lifecycle(void) {
 static int test_predictive_back_gesture(void) {
   struct ui_predictive_back *t = NULL;
   struct ui_event ev;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_signal *sig1 = (struct ui_signal *)0x123;
   struct ui_signal *sig2 = (struct ui_signal *)0x456;
 

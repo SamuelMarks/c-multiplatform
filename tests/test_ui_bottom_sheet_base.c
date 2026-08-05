@@ -37,126 +37,185 @@ struct ui_bottom_sheet_base_internal {
 static int g_closed_count = 0;
 static int g_close_should_fail = 0;
 
-static enum ui_error on_close_handler(struct ui_bottom_sheet_base *sheet,
-                                      void *user_data) {
+static ui_error_t on_close_handler(struct ui_bottom_sheet_base *sheet,
+                                   void *user_data) {
   (void)sheet;
   (void)user_data;
   if (g_close_should_fail)
     return UI_ERROR_OUT_OF_MEMORY;
   g_closed_count++;
   return UI_ERROR_NONE;
+  return UI_ERROR_NONE;
 }
 
-static int run_normal_tests(void) {
+static ui_error_t run_normal_tests(void) {
   struct ui_bottom_sheet_base *sheet = NULL;
   struct ui_overlay_director *director = NULL;
   struct ui_dom_node *root = NULL;
   struct ui_event ev;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing invalid arguments...\n");
   fflush(stdout);
-  assert(ui_bottom_sheet_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
-  ui_bottom_sheet_base_destroy(NULL); /* Should not crash */
+  rc = ui_bottom_sheet_base_create(NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_destroy(NULL); /* Should not crash */
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  assert(ui_bottom_sheet_base_set_content(NULL, NULL) ==
-         UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_bottom_sheet_base_set_open(NULL, 1) == UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_set_content(NULL, NULL);
+
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_open(NULL, 1);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   int is_open = 0;
-  assert(ui_bottom_sheet_base_is_open(NULL, &is_open) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_is_open(NULL, &is_open);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  assert(ui_bottom_sheet_base_set_overlay_director(NULL, NULL) ==
-         UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_bottom_sheet_base_set_on_close(NULL, NULL, NULL) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_set_overlay_director(NULL, NULL);
+
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_on_close(NULL, NULL, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
-  assert(ui_bottom_sheet_base_process_event(NULL, &ev, 0.0) ==
-         UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_bottom_sheet_base_update(NULL, 0.0) == UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_process_event(NULL, &ev, 0.0);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_update(NULL, 0.0);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   struct ui_component *tmp_comp = NULL;
-  assert(ui_bottom_sheet_base_get_component(NULL, &tmp_comp) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_get_component(NULL, &tmp_comp);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   struct ui_spring_config spring = {1.0f, 1.0f, 1.0f};
-  assert(ui_bottom_sheet_base_set_spring_config(NULL, &spring) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_set_spring_config(NULL, &spring);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  assert(ui_bottom_sheet_base_bind_open(NULL, NULL) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_bind_open(NULL, NULL);
+
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   struct ui_computed *anim_sig = NULL;
-  assert(ui_bottom_sheet_base_get_animating_signal(NULL, &anim_sig) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_get_animating_signal(NULL, &anim_sig);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   printf("Creating sheet...\n");
   fflush(stdout);
   rc = ui_bottom_sheet_base_create(&sheet);
   assert(rc == UI_ERROR_NONE && sheet != NULL);
 
-  assert(ui_bottom_sheet_base_is_open(sheet, NULL) ==
-         UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_bottom_sheet_base_process_event(sheet, NULL, 0.0) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_bottom_sheet_base_is_open(sheet, NULL);
 
-  assert(ui_bottom_sheet_base_get_component(sheet, NULL) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_process_event(sheet, NULL, 0.0);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+  rc = ui_bottom_sheet_base_get_component(sheet, NULL);
+
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   assert(ui_bottom_sheet_base_get_component(sheet, &tmp_comp) ==
              UI_ERROR_NONE &&
          tmp_comp != NULL);
 
-  assert(ui_bottom_sheet_base_set_spring_config(sheet, NULL) ==
-         UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_bottom_sheet_base_set_spring_config(sheet, &spring) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_spring_config(sheet, NULL);
+
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_spring_config(sheet, &spring);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   struct ui_arena *arena = NULL;
-  ui_arena_create(1024, &arena);
+  rc = ui_arena_create(1024, &arena);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   struct ui_signal *signal = NULL;
   union ui_signal_payload init_payload;
   memset(&init_payload, 0, sizeof(init_payload));
-  ui_signal_create(arena, init_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
-                   UI_SIGNAL_MODE_SINGLE_THREADED, &signal);
-  assert(ui_bottom_sheet_base_bind_open(sheet, signal) == UI_ERROR_NONE);
+  rc = ui_signal_create(arena, init_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
+                        UI_SIGNAL_MODE_SINGLE_THREADED, &signal);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_bottom_sheet_base_bind_open(sheet, signal);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  assert(ui_bottom_sheet_base_get_animating_signal(sheet, NULL) ==
-         UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_bottom_sheet_base_get_animating_signal(sheet, &anim_sig) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_get_animating_signal(sheet, NULL);
+
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_get_animating_signal(sheet, &anim_sig);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   printf("Check DOM\n");
   fflush(stdout);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-  ui_overlay_director_create(root, &director);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_overlay_director_create(root, &director);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  assert(ui_bottom_sheet_base_set_overlay_director(sheet, director) ==
-         UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_on_close(sheet, on_close_handler, NULL) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_overlay_director(sheet, director);
+
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_on_close(sheet, on_close_handler, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   printf("Check open\n");
   fflush(stdout);
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_is_open(sheet, &is_open) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_is_open(sheet, &is_open);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   assert(is_open == 1);
 
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) ==
-         UI_ERROR_NONE); /* Already open */
-  assert(ui_bottom_sheet_base_set_open(sheet, 0) == UI_ERROR_NONE); /* Close */
-  assert(ui_bottom_sheet_base_is_open(sheet, &is_open) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc; /* Already open */
+  rc = ui_bottom_sheet_base_set_open(sheet, 0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc; /* Close */
+  rc = ui_bottom_sheet_base_is_open(sheet, &is_open);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   assert(is_open == 0);
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = 0;
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_OUT_OF_MEMORY);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_OUT_OF_MEMORY)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   g_malloc_fail_countdown = -1;
 #endif
   /* Open again for keyboard test */
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   printf("Check escape\n");
   fflush(stdout);
@@ -164,12 +223,15 @@ static int run_normal_tests(void) {
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 100.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 100.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   assert(g_closed_count == 1);
 
   /* Open again for gesture test */
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   g_closed_count = 0;
 
   printf("Drag down to dismiss physics evaluated bounding velocity.\n");
@@ -178,55 +240,71 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 200.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 200.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 200; /* Move down 100 pixels */
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 210.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 210.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 220;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 220.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 220.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   assert(g_closed_count == 1);
 
   /* Open again for gesture test without on_close handler */
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_on_close(sheet, NULL, NULL) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_on_close(sheet, NULL, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 10;
   ev.event_data.mouse.y = 10;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 300.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 300.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 10;
   ev.event_data.mouse.y = 110;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 310.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 310.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 10;
   ev.event_data.mouse.y = 120;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 320.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 320.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  ui_bottom_sheet_base_is_open(sheet, &is_open);
+  rc = ui_bottom_sheet_base_is_open(sheet, &is_open);
+
+  if (rc != UI_ERROR_NONE)
+    return rc;
   assert(is_open == 0); /* Closed via fallback because no handler */
 
   /* Open again for backdrop click test */
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_on_close(sheet, on_close_handler, NULL) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_on_close(sheet, on_close_handler, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   g_closed_count = 0;
 
   memset(&ev, 0, sizeof(ev));
@@ -234,78 +312,115 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 200; /* Outside the bounds provided to backdrop */
   ev.event_data.mouse.y = 200;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 400.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 400.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.x = 200;
   ev.event_data.mouse.y = 200;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 410.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 410.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   assert(g_closed_count == 1);
 
   /* Backdrop click test without handler */
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_on_close(sheet, NULL, NULL) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_on_close(sheet, NULL, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 200;
   ev.event_data.mouse.y = 200;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 500.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 500.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.x = 200;
   ev.event_data.mouse.y = 200;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 510.0) ==
-         UI_ERROR_NONE);
-  ui_bottom_sheet_base_is_open(sheet, &is_open);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 510.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_is_open(sheet, &is_open);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   assert(is_open == 0);
 
   /* Test setting actual content */
   struct ui_component *content_comp = NULL;
-  ui_component_create(&content_comp);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content_comp->shadow_root);
-  assert(ui_bottom_sheet_base_set_content(sheet, content_comp) ==
-         UI_ERROR_NONE);
-  ui_component_destroy(content_comp);
+  rc = ui_component_create(&content_comp);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content_comp->shadow_root);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_bottom_sheet_base_set_content(sheet, content_comp);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_component_destroy(content_comp);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  assert(ui_bottom_sheet_base_set_content(sheet, NULL) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_content(sheet, NULL);
 
-  assert(ui_bottom_sheet_base_update(sheet, 250.0) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_open(sheet, 0) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_update(sheet, 260.0) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 265.0) ==
-         UI_ERROR_NONE);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_update(sheet, 270.0) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_on_close(sheet, on_close_handler, NULL) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_update(sheet, 250.0);
+
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_open(sheet, 0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_update(sheet, 260.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 265.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_update(sheet, 270.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_on_close(sheet, on_close_handler, NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Error paths for on_close */
   g_close_should_fail = 1;
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 600.0) ==
-         UI_ERROR_OUT_OF_MEMORY);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 600.0);
+  if (rc != UI_ERROR_OUT_OF_MEMORY)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 200; /* Backdrop */
   ev.event_data.mouse.y = 200;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 610.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 610.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.x = 200;
   ev.event_data.mouse.y = 200;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 620.0) ==
-         UI_ERROR_OUT_OF_MEMORY);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 620.0);
+  if (rc != UI_ERROR_OUT_OF_MEMORY)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* And for swipe */
   memset(&ev, 0, sizeof(ev));
@@ -313,29 +428,33 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 700.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 700.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 200;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 710.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 710.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 220;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 720.0) ==
-         UI_ERROR_OUT_OF_MEMORY);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 720.0);
+  if (rc != UI_ERROR_OUT_OF_MEMORY)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Test gesture state CHANGED (not ENDED) */
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 150;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 730.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 730.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Test gesture state ENDED but velocity/delta conditions fail (e.g. swipe up)
    */
@@ -344,21 +463,24 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 200;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 740.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 740.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100; /* Move UP */
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 750.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 750.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 760.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 760.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Test diagonal swipe to get delta_y > 0 but velocity_y <= 300 */
   memset(&ev, 0, sizeof(ev));
@@ -366,23 +488,26 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100;
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 800.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 800.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 600;
   ev.event_data.mouse.y = 120;
   /* dt = 100ms. dx = 500 -> vx = 5000. dy = 20 -> vy = 200 */
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 900.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 900.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 600;
   ev.event_data.mouse.y = 121; /* delta_y = 1 on UP event, so delta_y > 0 is
                                   true, but velocity_y is 200 <= 300 */
-  assert(ui_bottom_sheet_base_process_event(sheet, &ev, 910.0) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_process_event(sheet, &ev, 910.0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Test error paths inside ui_bottom_sheet_base_process_event by poking
    * internals */
@@ -394,33 +519,49 @@ static int run_normal_tests(void) {
     struct ui_dom_node *old_sheet_node = internal->sheet_node;
 
     internal->backdrop_logic = NULL;
-    assert(ui_bottom_sheet_base_process_event(sheet, &ev, 800.0) ==
-           UI_ERROR_INVALID_ARGUMENT);
+    rc = ui_bottom_sheet_base_process_event(sheet, &ev, 800.0);
+    if (rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
     internal->backdrop_logic = old_backdrop;
 
     internal->gesture_recognizer = NULL;
-    assert(ui_bottom_sheet_base_process_event(sheet, &ev, 810.0) ==
-           UI_ERROR_INVALID_ARGUMENT);
+    rc = ui_bottom_sheet_base_process_event(sheet, &ev, 810.0);
+    if (rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
     internal->gesture_recognizer = old_gesture;
     internal->sheet_node = NULL;
-    assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
+    rc = ui_bottom_sheet_base_set_open(sheet, 1);
+    if (rc != UI_ERROR_NONE)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
     internal->sheet_node = old_sheet_node;
   }
 
   g_close_should_fail = 0;
 
-  ui_bottom_sheet_base_destroy(sheet);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
-  ui_signal_destroy(signal);
-  ui_arena_destroy(arena);
-  return 0;
+  rc = ui_bottom_sheet_base_destroy(sheet);
+
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_overlay_director_destroy(director);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_destroy(root);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_signal_destroy(signal);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_arena_destroy(arena);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  return UI_ERROR_NONE;
+  return UI_ERROR_NONE;
 }
 
-static int run_oom_tests(void) {
+static ui_error_t run_oom_tests(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   struct ui_bottom_sheet_base *sheet = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   printf("Testing OOM...\n");
@@ -431,90 +572,244 @@ static int run_oom_tests(void) {
     if (rc == UI_ERROR_OUT_OF_MEMORY) {
       continue;
     } else if (rc == UI_ERROR_NONE) {
-      ui_bottom_sheet_base_destroy(sheet);
+      rc = ui_bottom_sheet_base_destroy(sheet);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       break;
     } else {
       printf("OOM failed at index %d with code %d\n", i, rc);
       g_malloc_fail_countdown = -1;
-      return 1;
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
     }
   }
   g_malloc_fail_countdown = -1;
 #endif
-  return 0;
+  return UI_ERROR_NONE;
+  return UI_ERROR_NONE;
 }
 
-static void test_branch_coverage_destroy(void) {
+static ui_error_t test_branch_coverage_destroy(void) {
+  ui_error_t rc;
   struct ui_bottom_sheet_base *sheet = NULL;
 
   /* Test destroy when closed */
-  assert(ui_bottom_sheet_base_create(&sheet) == UI_ERROR_NONE);
-  ui_bottom_sheet_base_destroy(sheet);
+  rc = ui_bottom_sheet_base_create(&sheet);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_destroy(sheet);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Test destroy when open but no director */
-  assert(ui_bottom_sheet_base_create(&sheet) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
-  ui_bottom_sheet_base_destroy(sheet);
+  rc = ui_bottom_sheet_base_create(&sheet);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_destroy(sheet);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Test set_open edge cases */
   struct ui_overlay_director *director = NULL;
   struct ui_dom_node *root = NULL;
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-  ui_overlay_director_create(root, &director);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_overlay_director_create(root, &director);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Test open without director, then close without director (covers else branch
    * without director) */
-  assert(ui_bottom_sheet_base_create(&sheet) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_open(sheet, 0) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_create(&sheet);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_open(sheet, 0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Now test with director but no overlay, then close */
-  assert(ui_bottom_sheet_base_set_overlay_director(sheet, director) ==
-         UI_ERROR_NONE);
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_overlay_director(sheet, director);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   /* Force overlay to NULL to test that branch */
-  ui_overlay_director_unmount(
+  rc = ui_overlay_director_unmount(
       director, ((struct ui_bottom_sheet_base_internal *)sheet)->overlay);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   ((struct ui_bottom_sheet_base_internal *)sheet)->overlay = NULL;
-  assert(ui_bottom_sheet_base_set_open(sheet, 0) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_open(sheet, 0);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
   /* Test destroy when open, with director, but overlay is NULL */
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
-  ui_overlay_director_unmount(
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_overlay_director_unmount(
       director, ((struct ui_bottom_sheet_base_internal *)sheet)->overlay);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   ((struct ui_bottom_sheet_base_internal *)sheet)->overlay = NULL;
-  ui_bottom_sheet_base_destroy(sheet);
+  rc = ui_bottom_sheet_base_destroy(sheet);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  assert(ui_bottom_sheet_base_create(&sheet) == UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_create(&sheet);
+
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   /* Set director but mock mount error inside set_open if possible,
      or just test open and close repeatedly */
-  assert(ui_bottom_sheet_base_set_overlay_director(sheet, director) ==
-         UI_ERROR_NONE);
+  rc = ui_bottom_sheet_base_set_overlay_director(sheet, director);
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = 0;
-  assert(ui_bottom_sheet_base_set_open(sheet, 1) == UI_ERROR_OUT_OF_MEMORY);
+  rc = ui_bottom_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_OUT_OF_MEMORY)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   g_malloc_fail_countdown = -1;
 #endif
 
-  ui_bottom_sheet_base_destroy(sheet);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
+  rc = ui_bottom_sheet_base_destroy(sheet);
+
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_overlay_director_destroy(director);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_destroy(root);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t run_mock_fail_tests(void) {
+#ifdef UI_TEST_MOCK_ALLOC
+  int i;
+  extern int g_bottom_sheet_mock_fail;
+
+  for (i = 1; i <= 16; i++) {
+    struct ui_bottom_sheet_base *sheet = NULL;
+    ui_error_t rc;
+    g_bottom_sheet_mock_fail = i;
+    rc = ui_bottom_sheet_base_create(&sheet);
+    if (rc == UI_ERROR_NONE && sheet) {
+      g_bottom_sheet_mock_fail = 0;
+      ui_bottom_sheet_base_destroy(sheet);
+    }
+  }
+
+  struct ui_overlay_director *director = NULL;
+  struct ui_dom_node *root = NULL;
+
+  struct ui_event ev;
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+
+/* Helper macro to test a specific mock failure safely */
+#define TEST_MOCK(fail_id, action)                                             \
+  do {                                                                         \
+    struct ui_bottom_sheet_base *sheet = NULL;                                 \
+    ui_bottom_sheet_base_create(&sheet);                                       \
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);                       \
+    ui_overlay_director_create(root, &director);                               \
+    ui_bottom_sheet_base_set_overlay_director(sheet, director);                \
+    g_bottom_sheet_mock_fail = (fail_id);                                      \
+    action;                                                                    \
+    g_bottom_sheet_mock_fail = 0;                                              \
+    if ((fail_id) != 8 && (fail_id) != 9 && (fail_id) != 10)                   \
+      ui_bottom_sheet_base_destroy(sheet);                                     \
+    ui_overlay_director_destroy(director);                                     \
+    ui_dom_node_destroy(root);                                                 \
+  } while (0)
+
+  TEST_MOCK(4, ui_bottom_sheet_base_set_open(sheet, 1));
+  TEST_MOCK(5, {
+    ui_bottom_sheet_base_set_open(sheet, 1);
+    g_bottom_sheet_mock_fail = 5;
+    ui_bottom_sheet_base_set_open(sheet, 0);
+  });
+
+  /* Set open signal and test it */
+  TEST_MOCK(11, {
+    ui_bottom_sheet_base_bind_open(sheet, (struct ui_signal *)1);
+    ui_bottom_sheet_base_set_open(sheet, 1);
+    g_bottom_sheet_mock_fail = 11;
+    ui_bottom_sheet_base_set_open(sheet, 0);
+  });
+
+  TEST_MOCK(7, {
+    ui_bottom_sheet_base_set_open(sheet, 1);
+    g_bottom_sheet_mock_fail = 7;
+    ui_bottom_sheet_base_set_open(sheet, 0);
+  });
+  TEST_MOCK(7, {
+    ui_bottom_sheet_base_set_open(sheet, 1);
+    g_bottom_sheet_mock_fail = 7;
+    ui_bottom_sheet_base_destroy(sheet);
+    g_bottom_sheet_mock_fail = 0;
+  });
+  TEST_MOCK(12, ui_bottom_sheet_base_update(sheet, 100.0));
+  TEST_MOCK(16, ui_bottom_sheet_base_process_event(sheet, &ev, 100.0));
+  TEST_MOCK(17, {
+    ui_bottom_sheet_base_set_open(sheet, 1);
+    g_bottom_sheet_mock_fail = 17;
+    ui_bottom_sheet_base_process_event(sheet, &ev, 100.0);
+    g_bottom_sheet_mock_fail = 0;
+  });
+  TEST_MOCK(18, {
+    ui_bottom_sheet_base_set_open(sheet, 1);
+    g_bottom_sheet_mock_fail = 18;
+    ui_bottom_sheet_base_process_event(sheet, &ev, 100.0);
+    g_bottom_sheet_mock_fail = 0;
+  });
+
+  TEST_MOCK(8, ui_bottom_sheet_base_destroy(sheet));
+  TEST_MOCK(9, ui_bottom_sheet_base_destroy(sheet));
+  TEST_MOCK(10, ui_bottom_sheet_base_destroy(sheet));
+
+#undef TEST_MOCK
+#endif
+  return UI_ERROR_NONE;
 }
 
 int main(void) {
-  if (run_normal_tests() != 0) {
+  ui_error_t rc;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_bottom_sheet_coverage(void);
+  rc = run_bottom_sheet_coverage();
+  if (rc != UI_ERROR_NONE)
+    return rc;
+#endif
+
+  if (run_normal_tests() != UI_ERROR_NONE) {
     printf("Normal tests failed.\n");
     return 1;
   }
 
-  test_branch_coverage_destroy();
+  rc = test_branch_coverage_destroy();
 
-  if (run_oom_tests() != 0) {
+  if (rc != UI_ERROR_NONE)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+  if (run_oom_tests() != UI_ERROR_NONE) {
     printf("OOM tests failed.\n");
-    return 1;
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   }
 
+  run_mock_fail_tests();
   printf("All ui_bottom_sheet_base tests passed.\n");
   return 0;
 }

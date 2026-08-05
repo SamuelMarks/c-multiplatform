@@ -31,7 +31,7 @@ Events flow top-down. Your wrapper will intercept hardware events (Mouse, Touch,
 
 ```c
 /* Example Event Delegation */
-enum ui_error fluent_button_process_event(struct fluent_button *btn, const struct ui_event *event, double timestamp_ms) {
+ui_error_t fluent_button_process_event(struct fluent_button *btn, const struct ui_event *event, double timestamp_ms) {
     if (event->type == UI_EVENT_MOUSE_MOVE) {
         /* Design System logic: Calculate and update the Fluent hover highlight position */
         update_fluent_reveal_effect(btn, event->event_data.mouse.x, event->event_data.mouse.y);
@@ -53,7 +53,7 @@ struct fluent_input {
 };
 
 /* The constructor */
-enum ui_error fluent_input_create(
+ui_error_t fluent_input_create(
     struct ui_engine *engine,
     struct fluent_input **out_input,
     struct ui_control_value_accessor **out_cva /* EXPORT THE CVA */

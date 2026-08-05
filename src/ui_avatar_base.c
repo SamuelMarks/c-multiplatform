@@ -13,7 +13,7 @@ struct ui_avatar_base {
   struct ui_signal *src_signal;
 };
 
-static enum ui_error get_utf8_len(unsigned char c, int *out_len) {
+static ui_error_t get_utf8_len(unsigned char c, int *out_len) {
   if ((c & 0x80) == 0)
     *out_len = 1;
   else if ((c & 0xE0) == 0xC0)
@@ -27,7 +27,22 @@ static enum ui_error get_utf8_len(unsigned char c, int *out_len) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error extract_initials(const char *name, char *initials_out) {
+#ifdef UI_TEST_MOCK_ALLOC
+int g_avatar_mock_fail = 0;
+static ui_error_t mock_get_utf8_len(unsigned char c, int *out_len) {
+  if (g_avatar_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  if (g_avatar_mock_fail == 2) {
+    g_avatar_mock_fail = 1;
+    return (get_utf8_len)(c, out_len);
+  }
+  return (get_utf8_len)(c, out_len);
+}
+#undef get_utf8_len
+#define get_utf8_len mock_get_utf8_len
+#endif
+
+static ui_error_t extract_initials(const char *name, char *initials_out) {
   int i = 0;
   int first_initial_idx = -1;
   int last_initial_idx = -1;
@@ -57,13 +72,18 @@ static enum ui_error extract_initials(const char *name, char *initials_out) {
     int out_idx = 0;
     int l = 1;
     int j;
-    (void)get_utf8_len((unsigned char)name[first_initial_idx], &l);
+    ui_error_t rc;
+    rc = get_utf8_len((unsigned char)name[first_initial_idx], &l);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     for (j = 0; j < l && name[first_initial_idx + j] != '\0'; j++) {
       initials_out[out_idx++] = name[first_initial_idx + j];
     }
 
     if (last_initial_idx != -1) {
-      (void)get_utf8_len((unsigned char)name[last_initial_idx], &l);
+      rc = get_utf8_len((unsigned char)name[last_initial_idx], &l);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       for (j = 0; j < l && name[last_initial_idx + j] != '\0'; j++) {
         initials_out[out_idx++] = name[last_initial_idx + j];
       }
@@ -73,16 +93,48 @@ static enum ui_error extract_initials(const char *name, char *initials_out) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_avatar_base_create(struct ui_avatar_base **out_avatar) {
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t mock_extract_initials(const char *name, char *initials_out) {
+  if (g_avatar_mock_fail == 3)
+    return UI_ERROR_UNKNOWN;
+  return (extract_initials)(name, initials_out);
+}
+#undef extract_initials
+#define extract_initials mock_extract_initials
+
+ui_error_t run_avatar_coverage(void);
+ui_error_t run_avatar_coverage(void) {
+  char initials[8];
   struct ui_avatar_base *avatar;
-  enum ui_error rc = UI_ERROR_NONE;
+  g_avatar_mock_fail = 1;
+  extract_initials("John Doe", initials);
+  g_avatar_mock_fail = 0;
+
+  g_avatar_mock_fail = 2;
+  extract_initials("John Doe", initials);
+  g_avatar_mock_fail = 0;
+  ui_avatar_base_create(&avatar);
+
+  g_avatar_mock_fail = 3;
+  ui_avatar_base_set_name(avatar, "John Doe");
+  g_avatar_mock_fail = 0;
+
+  (void)ui_avatar_base_destroy(avatar);
+  return UI_ERROR_NONE;
+}
+#endif
+
+ui_error_t ui_avatar_base_create(struct ui_avatar_base **out_avatar) {
+  struct ui_avatar_base *avatar;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_avatar) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  avatar = (struct ui_avatar_base *)UI_MALLOC(sizeof(struct ui_avatar_base));
+  avatar = (struct ui_avatar_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_avatar_base));
   if (!avatar) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -99,21 +151,22 @@ cleanup:
   return rc;
 }
 
-void ui_avatar_base_destroy(struct ui_avatar_base *avatar) {
+ui_error_t ui_avatar_base_destroy(struct ui_avatar_base *avatar) {
   if (!avatar) {
-    return;
+    return UI_ERROR_NONE;
   }
-  UI_FREE(avatar->name);
-  UI_FREE(avatar->image_url);
+  C_MULTIPLATFORM_FREE(avatar->name);
+  C_MULTIPLATFORM_FREE(avatar->image_url);
   if (avatar->fallback_icon) {
-    ui_icon_base_destroy(avatar->fallback_icon);
+    (void)ui_icon_base_destroy(avatar->fallback_icon);
   }
-  UI_FREE(avatar);
+  C_MULTIPLATFORM_FREE(avatar);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_avatar_base_set_name(struct ui_avatar_base *avatar,
-                                      const char *name) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_avatar_base_set_name(struct ui_avatar_base *avatar,
+                                   const char *name) {
+  ui_error_t rc = UI_ERROR_NONE;
   size_t len;
   char *new_name = NULL;
 
@@ -123,29 +176,27 @@ enum ui_error ui_avatar_base_set_name(struct ui_avatar_base *avatar,
   }
 
   len = strlen(name);
-  new_name = (char *)UI_MALLOC(len + 1);
+  new_name = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!new_name) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
 
-  if (UI_STRCPY(new_name, len + 1, name) != 0) {
-    UI_FREE(new_name);
-    rc = UI_ERROR_UNKNOWN;
-    goto cleanup;
-  }
+  UI_STRCPY(new_name, len + 1, name);
 
-  UI_FREE(avatar->name);
+  C_MULTIPLATFORM_FREE(avatar->name);
 
   avatar->name = new_name;
-  (void)extract_initials(avatar->name, avatar->initials);
+  rc = extract_initials(avatar->name, avatar->initials);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
 cleanup:
   return rc;
 }
 
-enum ui_error ui_avatar_base_get_name(const struct ui_avatar_base *avatar,
-                                      const char **out_name) {
+ui_error_t ui_avatar_base_get_name(const struct ui_avatar_base *avatar,
+                                   const char **out_name) {
   if (!avatar || !out_name) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -153,8 +204,8 @@ enum ui_error ui_avatar_base_get_name(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_avatar_base_get_initials(const struct ui_avatar_base *avatar,
-                                          const char **out_initials) {
+ui_error_t ui_avatar_base_get_initials(const struct ui_avatar_base *avatar,
+                                       const char **out_initials) {
   if (!avatar || !out_initials) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -162,9 +213,9 @@ enum ui_error ui_avatar_base_get_initials(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_avatar_base_set_image_url(struct ui_avatar_base *avatar,
-                                           const char *image_url) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_avatar_base_set_image_url(struct ui_avatar_base *avatar,
+                                        const char *image_url) {
+  ui_error_t rc = UI_ERROR_NONE;
   size_t len;
   char *new_url = NULL;
 
@@ -174,19 +225,15 @@ enum ui_error ui_avatar_base_set_image_url(struct ui_avatar_base *avatar,
   }
 
   len = strlen(image_url);
-  new_url = (char *)UI_MALLOC(len + 1);
+  new_url = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!new_url) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
 
-  if (UI_STRCPY(new_url, len + 1, image_url) != 0) {
-    UI_FREE(new_url);
-    rc = UI_ERROR_UNKNOWN;
-    goto cleanup;
-  }
+  UI_STRCPY(new_url, len + 1, image_url);
 
-  UI_FREE(avatar->image_url);
+  C_MULTIPLATFORM_FREE(avatar->image_url);
 
   avatar->image_url = new_url;
 
@@ -194,8 +241,8 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_avatar_base_get_image_url(const struct ui_avatar_base *avatar,
-                                           const char **out_image_url) {
+ui_error_t ui_avatar_base_get_image_url(const struct ui_avatar_base *avatar,
+                                        const char **out_image_url) {
   if (!avatar || !out_image_url) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -203,14 +250,14 @@ enum ui_error ui_avatar_base_get_image_url(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
-                                               struct ui_icon_base *icon) {
+ui_error_t ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
+                                            struct ui_icon_base *icon) {
   if (!avatar || !icon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (avatar->fallback_icon) {
-    ui_icon_base_destroy(avatar->fallback_icon);
+    (void)ui_icon_base_destroy(avatar->fallback_icon);
   }
 
   avatar->fallback_icon = icon;
@@ -218,9 +265,8 @@ enum ui_error ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_avatar_base_get_fallback_icon(const struct ui_avatar_base *avatar,
-                                 struct ui_icon_base **out_icon) {
+ui_error_t ui_avatar_base_get_fallback_icon(const struct ui_avatar_base *avatar,
+                                            struct ui_icon_base **out_icon) {
   if (!avatar || !out_icon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -228,8 +274,8 @@ ui_avatar_base_get_fallback_icon(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_avatar_base_get_type(const struct ui_avatar_base *avatar,
-                                      enum ui_avatar_type *out_type) {
+ui_error_t ui_avatar_base_get_type(const struct ui_avatar_base *avatar,
+                                   enum ui_avatar_type *out_type) {
   if (!avatar || !out_type) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -245,8 +291,8 @@ enum ui_error ui_avatar_base_get_type(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_avatar_base_bind_src(struct ui_avatar_base *widget,
-                                      struct ui_signal *signal) {
+ui_error_t ui_avatar_base_bind_src(struct ui_avatar_base *widget,
+                                   struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

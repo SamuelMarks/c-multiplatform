@@ -45,8 +45,8 @@ struct ui_image_base {
  * @param component The UI component to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_image_base_init(struct ui_image_base *image,
-                                 struct ui_component *component);
+ui_error_t ui_image_base_init(struct ui_image_base *image,
+                              struct ui_component *component);
 
 /**
  * @brief Sets the image source URL and optional lazy load behavior.
@@ -56,15 +56,15 @@ enum ui_error ui_image_base_init(struct ui_image_base *image,
  * @param lazy_load If true, image will load lazily.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_image_base_set_src(struct ui_image_base *image,
-                                    const char *src_url, int lazy_load);
+ui_error_t ui_image_base_set_src(struct ui_image_base *image,
+                                 const char *src_url, int lazy_load);
 
 /**
  * @brief Cleans up resources allocated by the image base.
  *
  * @param image Pointer to the image base struct.
  */
-enum ui_error ui_image_base_cleanup(struct ui_image_base *image);
+ui_error_t ui_image_base_cleanup(struct ui_image_base *image);
 
 /**
  * @brief Binds the src property.
@@ -73,8 +73,8 @@ enum ui_error ui_image_base_cleanup(struct ui_image_base *image);
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_image_base_bind_src(struct ui_image_base *widget,
-                                     struct ui_signal *signal);
+ui_error_t ui_image_base_bind_src(struct ui_image_base *widget,
+                                  struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

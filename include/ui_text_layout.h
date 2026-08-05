@@ -31,12 +31,12 @@ enum ui_text_direction { UI_TEXT_DIRECTION_LTR, UI_TEXT_DIRECTION_RTL };
 /**
  * @brief Creates a text layout object.
  */
-enum ui_error ui_text_layout_create(struct ui_text_layout **out_layout);
+ui_error_t ui_text_layout_create(struct ui_text_layout **out_layout);
 
 /**
  * @brief Destroys a text layout object.
  */
-enum ui_error ui_text_layout_destroy(struct ui_text_layout *layout);
+ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout);
 
 /**
  * @brief Shapes text into positioned glyphs, handling BiDi (stubbed), kerning,
@@ -51,15 +51,15 @@ enum ui_error ui_text_layout_destroy(struct ui_text_layout *layout);
  * @param direction The base text direction.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_text_layout_shape(struct ui_text_layout *layout,
-                                   struct ui_font *font, float font_size,
-                                   const char *text, float max_width,
-                                   enum ui_text_direction direction);
+ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
+                                struct ui_font *font, float font_size,
+                                const char *text, float max_width,
+                                enum ui_text_direction direction);
 
 /**
  * @brief Retrieves the positioned glyphs.
  */
-enum ui_error
+ui_error_t
 ui_text_layout_get_glyphs(struct ui_text_layout *layout,
                           const struct ui_positioned_glyph **out_glyphs,
                           size_t *out_count);
@@ -67,8 +67,8 @@ ui_text_layout_get_glyphs(struct ui_text_layout *layout,
 /**
  * @brief Retrieves the computed bounding box of the shaped text.
  */
-enum ui_error ui_text_layout_get_bounds(struct ui_text_layout *layout,
-                                        float *out_width, float *out_height);
+ui_error_t ui_text_layout_get_bounds(struct ui_text_layout *layout,
+                                     float *out_width, float *out_height);
 
 #ifdef __cplusplus
 }

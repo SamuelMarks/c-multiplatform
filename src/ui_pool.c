@@ -39,7 +39,7 @@ struct ui_pool {
  * @param pool The pool to allocate a chunk for.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-static enum ui_error allocate_chunk(struct ui_pool *pool) {
+static ui_error_t allocate_chunk(struct ui_pool *pool) {
   struct ui_pool_chunk *chunk = NULL;
   size_t chunk_size = 0;
   char *data = NULL;
@@ -47,7 +47,7 @@ static enum ui_error allocate_chunk(struct ui_pool *pool) {
 
   chunk_size = sizeof(struct ui_pool_chunk) +
                (pool->element_size * pool->chunk_capacity);
-  chunk = (struct ui_pool_chunk *)UI_MALLOC(chunk_size);
+  chunk = (struct ui_pool_chunk *)C_MULTIPLATFORM_MALLOC(chunk_size);
   if (!chunk) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -71,8 +71,8 @@ static enum ui_error allocate_chunk(struct ui_pool *pool) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pool_create(size_t element_size, size_t chunk_capacity,
-                             struct ui_pool **out_pool) {
+ui_error_t ui_pool_create(size_t element_size, size_t chunk_capacity,
+                          struct ui_pool **out_pool) {
   struct ui_pool *pool = NULL;
 
   if (!out_pool || element_size == 0 || chunk_capacity == 0) {
@@ -90,7 +90,7 @@ enum ui_error ui_pool_create(size_t element_size, size_t chunk_capacity,
     element_size += sizeof(void *) - (element_size % sizeof(void *));
   }
 
-  pool = (struct ui_pool *)UI_MALLOC(sizeof(struct ui_pool));
+  pool = (struct ui_pool *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_pool));
   if (!pool) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -106,7 +106,7 @@ enum ui_error ui_pool_create(size_t element_size, size_t chunk_capacity,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pool_destroy(struct ui_pool *pool) {
+ui_error_t ui_pool_destroy(struct ui_pool *pool) {
   struct ui_pool_chunk *current = NULL;
   struct ui_pool_chunk *next = NULL;
 
@@ -117,16 +117,16 @@ enum ui_error ui_pool_destroy(struct ui_pool *pool) {
   current = pool->chunk_head;
   while (current) {
     next = current->next;
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
-  UI_FREE(pool);
+  C_MULTIPLATFORM_FREE(pool);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pool_alloc(struct ui_pool *pool, void **out_ptr) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_pool_alloc(struct ui_pool *pool, void **out_ptr) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!pool || !out_ptr) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -146,7 +146,7 @@ enum ui_error ui_pool_alloc(struct ui_pool *pool, void **out_ptr) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pool_free(struct ui_pool *pool, void *ptr) {
+ui_error_t ui_pool_free(struct ui_pool *pool, void *ptr) {
   struct ui_pool_free_node *node = NULL;
 
   if (!pool || !ptr) {
@@ -161,8 +161,8 @@ enum ui_error ui_pool_free(struct ui_pool *pool, void *ptr) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pool_get_metrics(struct ui_pool *pool, size_t *out_free_count,
-                                  size_t *out_total_capacity) {
+ui_error_t ui_pool_get_metrics(struct ui_pool *pool, size_t *out_free_count,
+                               size_t *out_total_capacity) {
   if (!pool) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

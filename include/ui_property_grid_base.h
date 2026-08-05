@@ -47,7 +47,7 @@ struct ui_property_row {
  * @brief Callback signature for providing custom component editors for specific
  * properties.
  */
-typedef enum ui_error (*ui_property_editor_factory_fn)(
+typedef ui_error_t (*ui_property_editor_factory_fn)(
     const struct ui_property_row *row, void *user_data,
     struct ui_component **out_editor_component);
 
@@ -58,7 +58,7 @@ typedef enum ui_error (*ui_property_editor_factory_fn)(
  * @param out_grid Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_property_grid_base_create(struct ui_arena *arena,
                              struct ui_property_grid_base **out_grid);
 
@@ -68,7 +68,7 @@ ui_property_grid_base_create(struct ui_arena *arena,
  * @param grid The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_property_grid_base_destroy(struct ui_property_grid_base *grid);
+ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid);
 
 /**
  * @brief Registers a property row in the grid data model.
@@ -77,7 +77,7 @@ enum ui_error ui_property_grid_base_destroy(struct ui_property_grid_base *grid);
  * @param row The property row definition.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_property_grid_base_add_property(struct ui_property_grid_base *grid,
                                    const struct ui_property_row *row);
 
@@ -90,7 +90,7 @@ ui_property_grid_base_add_property(struct ui_property_grid_base *grid,
  * @param user_data Opaque data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_property_grid_base_set_editor_factory(
+ui_error_t ui_property_grid_base_set_editor_factory(
     struct ui_property_grid_base *grid,
     ui_property_editor_factory_fn factory_fn, void *user_data);
 
@@ -101,9 +101,8 @@ enum ui_error ui_property_grid_base_set_editor_factory(
  * @param search_query The string to filter by (filters against labels).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
-ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
-                                 const char *search_query);
+ui_error_t ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
+                                            const char *search_query);
 
 /**
  * @brief Toggles the collapsed/expanded state of a specific property group.
@@ -113,7 +112,7 @@ ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
  * @param is_collapsed True to collapse, false to expand.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
                                           const char *group_id,
                                           ui_bool_t is_collapsed);
@@ -126,7 +125,7 @@ ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_property_grid_base_get_value_changed_signal(
+ui_error_t ui_property_grid_base_get_value_changed_signal(
     struct ui_property_grid_base *grid, ui_signal_t **out_signal);
 
 /**
@@ -137,7 +136,7 @@ enum ui_error ui_property_grid_base_get_value_changed_signal(
  * @param property_id The ID of the property to trigger a change for.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 _ui_property_grid_base_trigger_change(struct ui_property_grid_base *grid,
                                       const char *property_id);
 

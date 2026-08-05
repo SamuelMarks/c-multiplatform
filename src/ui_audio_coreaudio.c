@@ -6,7 +6,7 @@
 #if defined(__APPLE__)
 /* CoreAudio implementation stub */
 
-enum ui_error
+ui_error_t
 ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;

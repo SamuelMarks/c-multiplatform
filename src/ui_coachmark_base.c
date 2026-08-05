@@ -30,33 +30,40 @@ struct ui_coachmark_tour {
   struct ui_computed *animating_signal;
 };
 
-static enum ui_error update_aria_and_focus(struct ui_coachmark_tour *tour) {
+static ui_error_t update_aria_and_focus(struct ui_coachmark_tour *tour) {
+  ui_error_t rc = UI_ERROR_NONE;
   /* This updates the aria roles for the current coachmark container. */
-  ui_dom_node_set_attribute(tour->coachmark_container->shadow_root, "role",
-                            "dialog");
-  ui_dom_node_set_attribute(tour->coachmark_container->shadow_root,
-                            "aria-modal", "true");
+  rc = ui_dom_node_set_attribute(tour->coachmark_container->shadow_root, "role",
+                                 "dialog");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(tour->coachmark_container->shadow_root,
+                                 "aria-modal", "true");
+  if (rc != UI_ERROR_NONE)
+    return rc;
   /* Focus management would typically set focus to the first focusable element
      inside tour->steps[tour->current_step].content_component. Here we ensure
      the container is focusable and focus it to trap accessibility. */
-  ui_dom_node_set_attribute(tour->coachmark_container->shadow_root, "tabindex",
-                            "-1");
+  rc = ui_dom_node_set_attribute(tour->coachmark_container->shadow_root,
+                                 "tabindex", "-1");
+  if (rc != UI_ERROR_NONE)
+    return rc;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coachmark_tour_create(struct ui_overlay_director *director,
-                                       struct ui_coachmark_tour **out_tour) {
+ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
+                                    struct ui_coachmark_tour **out_tour) {
   struct ui_coachmark_tour *tour;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *container_node;
-  struct ui_dom_node *backdrop_node;
+  struct ui_dom_node *backdrop_node = NULL;
 
   if (!director || !out_tour) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  tour =
-      (struct ui_coachmark_tour *)UI_MALLOC(sizeof(struct ui_coachmark_tour));
+  tour = (struct ui_coachmark_tour *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_coachmark_tour));
   if (!tour) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -67,70 +74,91 @@ enum ui_error ui_coachmark_tour_create(struct ui_overlay_director *director,
 
   rc = ui_component_create(&tour->coachmark_container);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(tour);
+    C_MULTIPLATFORM_FREE(tour);
     return rc;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(tour->coachmark_container);
-    UI_FREE(tour);
+    (void)ui_component_destroy(tour->coachmark_container);
+    C_MULTIPLATFORM_FREE(tour);
     return rc;
   }
-  ui_dom_node_set_tag_name(container_node, "div");
+  rc = ui_dom_node_set_tag_name(container_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
   tour->coachmark_container->shadow_root = container_node;
+  container_node = NULL;
 
   rc = ui_component_create(&tour->backdrop_comp);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(container_node);
-    tour->coachmark_container->shadow_root = NULL;
-    ui_component_destroy(tour->coachmark_container);
-    UI_FREE(tour);
+    (void)ui_component_destroy(tour->coachmark_container);
+    C_MULTIPLATFORM_FREE(tour);
     return rc;
   }
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &backdrop_node);
-  ui_dom_node_set_tag_name(backdrop_node, "div");
-  ui_dom_node_set_attribute(
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &backdrop_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_tag_name(backdrop_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(
       backdrop_node, "style",
       "position: fixed; inset: 0; background: rgba(0,0,0,0.5);");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
   tour->backdrop_comp->shadow_root = backdrop_node;
+  backdrop_node = NULL;
 
   *out_tour = tour;
   return UI_ERROR_NONE;
+
+cleanup:
+  if (backdrop_node)
+    (void)ui_dom_node_destroy(backdrop_node);
+  if (tour->backdrop_comp)
+    (void)ui_component_destroy(tour->backdrop_comp);
+  if (container_node)
+    (void)ui_dom_node_destroy(container_node);
+  if (tour->coachmark_container)
+    (void)ui_component_destroy(tour->coachmark_container);
+  C_MULTIPLATFORM_FREE(tour);
+  return rc;
 }
 
-void ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour) {
+ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour) {
   if (!tour)
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
 
-  ui_coachmark_tour_skip(tour);
+  (void)ui_coachmark_tour_skip(tour);
 
   if (tour->steps) {
-    UI_FREE(tour->steps);
+    C_MULTIPLATFORM_FREE(tour->steps);
   }
 
-  ui_component_destroy(tour->coachmark_container);
-  ui_component_destroy(tour->backdrop_comp);
+  (void)ui_component_destroy(tour->coachmark_container);
+  (void)ui_component_destroy(tour->backdrop_comp);
 
-  UI_FREE(tour);
+  C_MULTIPLATFORM_FREE(tour);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
-                                          const struct ui_coachmark_step *steps,
-                                          int step_count) {
+ui_error_t ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
+                                       const struct ui_coachmark_step *steps,
+                                       int step_count) {
   if (!tour || (!steps && step_count > 0)) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (tour->steps) {
-    UI_FREE(tour->steps);
+    C_MULTIPLATFORM_FREE(tour->steps);
     tour->steps = NULL;
   }
   tour->step_count = step_count;
 
   if (step_count > 0) {
-    tour->steps = (struct ui_coachmark_step *)UI_MALLOC(
+    tour->steps = (struct ui_coachmark_step *)C_MULTIPLATFORM_MALLOC(
         sizeof(struct ui_coachmark_step) * step_count);
     if (!tour->steps) {
       tour->step_count = 0;
@@ -142,7 +170,7 @@ enum ui_error ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
                                      ui_coachmark_on_step_change_t on_change,
                                      void *user_data) {
@@ -153,9 +181,9 @@ ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error render_current_step(struct ui_coachmark_tour *tour) {
+static ui_error_t render_current_step(struct ui_coachmark_tour *tour) {
   struct ui_dom_node *container_node;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   container_node = tour->coachmark_container->shadow_root;
   /* Remove old children from container */
@@ -164,21 +192,28 @@ static enum ui_error render_current_step(struct ui_coachmark_tour *tour) {
   /* For now we just replace the content conceptually. */
   if (tour->steps[tour->current_step].content_component &&
       tour->steps[tour->current_step].content_component->shadow_root) {
-    ui_dom_node_append_child(
+    rc = ui_dom_node_append_child(
         container_node,
         tour->steps[tour->current_step].content_component->shadow_root);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
-  update_aria_and_focus(tour);
+  rc = update_aria_and_focus(tour);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (tour->on_step_change) {
     rc = tour->on_step_change(tour, tour->current_step,
                               tour->on_step_change_user_data);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return rc;
 }
 
-enum ui_error ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
+ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!tour || tour->step_count == 0)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -189,24 +224,45 @@ enum ui_error ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
   tour->is_active = 1;
   tour->current_step = 0;
 
-  ui_overlay_director_mount_component(tour->director, tour->backdrop_comp, 100,
-                                      &tour->backdrop_overlay);
+  rc = ui_overlay_director_mount_component(tour->director, tour->backdrop_comp,
+                                           100, &tour->backdrop_overlay);
+  if (rc != UI_ERROR_NONE) {
+    tour->is_active = 0;
+    return rc;
+  }
 
-  ui_overlay_director_mount_component(tour->director, tour->coachmark_container,
-                                      101, &tour->coachmark_overlay);
+  rc = ui_overlay_director_mount_component(
+      tour->director, tour->coachmark_container, 101, &tour->coachmark_overlay);
+  if (rc != UI_ERROR_NONE) {
+    (void)ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+    tour->backdrop_overlay = NULL;
+    tour->is_active = 0;
+    return rc;
+  }
 
-  (void)render_current_step(tour);
+  rc = render_current_step(tour);
+  if (rc != UI_ERROR_NONE) {
+    (void)ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
+    tour->coachmark_overlay = NULL;
+    (void)ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+    tour->backdrop_overlay = NULL;
+    tour->is_active = 0;
+    return rc;
+  }
 
   if (tour->open_signal) {
     union ui_signal_payload payload;
     payload.bool_val = 1;
-    ui_signal_set(tour->open_signal, payload);
+    rc = ui_signal_set(tour->open_signal, payload);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coachmark_tour_next(struct ui_coachmark_tour *tour) {
+ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!tour)
     return UI_ERROR_INVALID_ARGUMENT;
   if (!tour->is_active)
@@ -217,14 +273,17 @@ enum ui_error ui_coachmark_tour_next(struct ui_coachmark_tour *tour) {
        first. Skipping exact child removal for simplicity here, assuming DOM
        node manages parent linkage. */
     tour->current_step++;
-    (void)render_current_step(tour);
+    rc = render_current_step(tour);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    ui_coachmark_tour_skip(tour);
+    (void)ui_coachmark_tour_skip(tour);
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coachmark_tour_prev(struct ui_coachmark_tour *tour) {
+ui_error_t ui_coachmark_tour_prev(struct ui_coachmark_tour *tour) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!tour)
     return UI_ERROR_INVALID_ARGUMENT;
   if (!tour->is_active)
@@ -232,45 +291,53 @@ enum ui_error ui_coachmark_tour_prev(struct ui_coachmark_tour *tour) {
 
   if (tour->current_step > 0) {
     tour->current_step--;
-    (void)render_current_step(tour);
+    rc = render_current_step(tour);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
+ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
   if (!tour)
     return UI_ERROR_INVALID_ARGUMENT;
   if (!tour->is_active)
     return UI_ERROR_NONE;
 
-  ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
+  (void)ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
   tour->coachmark_overlay = NULL;
 
-  ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+  (void)ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
   tour->backdrop_overlay = NULL;
 
   tour->is_active = 0;
   tour->current_step = -1;
 
   if (tour->on_step_change) {
-    tour->on_step_change(tour, -1, tour->on_step_change_user_data);
+    ui_error_t rc =
+        tour->on_step_change(tour, -1, tour->on_step_change_user_data);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   if (tour->open_signal) {
     union ui_signal_payload payload;
+    ui_error_t rc;
     payload.bool_val = 0;
-    ui_signal_set(tour->open_signal, payload);
+    rc = ui_signal_set(tour->open_signal, payload);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
-                                              float viewport_width,
-                                              float viewport_height) {
+ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
+                                           float viewport_width,
+                                           float viewport_height) {
   struct ui_anchor_config config;
   float out_x = 0.0f, out_y = 0.0f;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!tour || !tour->is_active) {
     return UI_ERROR_NONE;
@@ -309,8 +376,8 @@ enum ui_error ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
-                                              const struct ui_event *event) {
+ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
+                                           const struct ui_event *event) {
   if (!tour || !event)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -320,7 +387,7 @@ enum ui_error ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
   if (event->type == UI_EVENT_KEY_DOWN) {
     if (event->event_data.keyboard.key_code == UI_KEY_ESCAPE) {
       if (tour->steps[tour->current_step].allow_skip) {
-        ui_coachmark_tour_skip(tour);
+        (void)ui_coachmark_tour_skip(tour);
         return UI_ERROR_NONE;
       }
     }
@@ -331,8 +398,8 @@ enum ui_error ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
-                                          struct ui_signal *open_signal) {
+ui_error_t ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
+                                       struct ui_signal *open_signal) {
   if (!tour) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -341,7 +408,7 @@ enum ui_error ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_coachmark_tour_get_animating_signal(struct ui_coachmark_tour *tour,
                                        struct ui_computed **out_animating) {
   if (!tour || !out_animating) {

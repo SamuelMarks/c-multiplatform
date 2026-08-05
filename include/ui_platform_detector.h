@@ -28,14 +28,14 @@ struct ui_platform_detector;
  * @param out_detector Pointer to receive the new instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_platform_detector_create(struct ui_platform_detector **out_detector);
 
 /**
  * @brief Destroys a platform detector instance.
  * @param detector The instance to destroy.
  */
-void ui_platform_detector_destroy(struct ui_platform_detector *detector);
+ui_error_t ui_platform_detector_destroy(struct ui_platform_detector *detector);
 
 /**
  * @brief Gets the capabilities of the current platform.
@@ -43,7 +43,7 @@ void ui_platform_detector_destroy(struct ui_platform_detector *detector);
  * @param out_capabilities Pointer to receive the capabilities bitmask.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_platform_detector_get_capabilities(struct ui_platform_detector *detector,
                                       unsigned int *out_capabilities);
 
@@ -54,7 +54,7 @@ ui_platform_detector_get_capabilities(struct ui_platform_detector *detector,
  * @param out_has_capability Pointer to receive 1 if true, 0 if false.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_platform_detector_has_capability(struct ui_platform_detector *detector,
                                     unsigned int capability,
                                     int *out_has_capability);

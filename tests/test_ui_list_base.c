@@ -12,7 +12,7 @@ static int run_normal_tests(void) {
   struct ui_list_item_base *item = NULL;
   struct ui_component *comp;
   enum ui_list_orientation orientation;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing ui_list_base_create...\n");
   if (ui_list_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -97,7 +97,7 @@ static int run_normal_tests(void) {
 static int run_oom_tests(void) {
   struct ui_list_base *list = NULL;
   struct ui_list_item_base *item = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   printf("Testing OOM conditions for list...\n");

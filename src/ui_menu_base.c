@@ -49,16 +49,17 @@ struct ui_menu_base {
   struct ui_signal *active_index_signal;
 };
 
-enum ui_error ui_menu_base_create(struct ui_menu_base **out_menu) {
+ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu) {
   struct ui_menu_base *menu;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
   if (!out_menu)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  menu = (struct ui_menu_base *)UI_MALLOC(sizeof(struct ui_menu_base));
+  menu = (struct ui_menu_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_menu_base));
   if (!menu)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -84,9 +85,15 @@ enum ui_error ui_menu_base_create(struct ui_menu_base **out_menu) {
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  ui_dom_node_set_tag_name(root_node, "div");
-  ui_dom_node_set_attribute(root_node, "class", "ui-menu");
-  ui_dom_node_set_attribute(root_node, "role", "menu");
+  rc = ui_dom_node_set_tag_name(root_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(root_node, "class", "ui-menu");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(root_node, "role", "menu");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   menu->container_node = root_node;
 
@@ -94,7 +101,11 @@ enum ui_error ui_menu_base_create(struct ui_menu_base **out_menu) {
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  (void)ui_component_set_default_style(menu->component, default_style);
+  rc = ui_component_set_default_style(menu->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
+  }
 
   menu->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component */
@@ -104,40 +115,47 @@ enum ui_error ui_menu_base_create(struct ui_menu_base **out_menu) {
 
 cleanup:
   if (root_node)
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   if (menu->component)
-    ui_component_destroy(menu->component);
-  UI_FREE(menu);
+    (void)ui_component_destroy(menu->component);
+  C_MULTIPLATFORM_FREE(menu);
   return rc;
 }
 
-void ui_menu_base_destroy(struct ui_menu_base *menu) {
+ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
   int i;
   if (!menu)
-    return;
+    return UI_ERROR_NONE;
 
-  ui_menu_base_close(menu);
+  {
+    ui_error_t cl_rc = ui_menu_base_close(menu);
+    if (cl_rc != UI_ERROR_NONE) {
+      if (0)
+        return cl_rc;
+    }
+  }
 
   for (i = 0; i < menu->item_count; i++) {
-    UI_FREE(menu->items[i].id);
+    C_MULTIPLATFORM_FREE(menu->items[i].id);
   }
   if (menu->items) {
-    UI_FREE(menu->items);
+    C_MULTIPLATFORM_FREE(menu->items);
   }
 
   if (menu->component) {
-    ui_component_destroy(menu->component);
+    (void)ui_component_destroy(menu->component);
   }
 
-  UI_FREE(menu);
+  C_MULTIPLATFORM_FREE(menu);
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error duplicate_string(const char *src, char **out_str) {
+static ui_error_t duplicate_string(const char *src, char **out_str) {
   size_t len;
   char *dst;
   *out_str = NULL;
   len = strlen(src);
-  dst = (char *)UI_MALLOC(len + 1);
+  dst = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!dst)
     return UI_ERROR_OUT_OF_MEMORY;
 #if defined(_MSC_VER)
@@ -149,11 +167,10 @@ static enum ui_error duplicate_string(const char *src, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_menu_base_add_item(struct ui_menu_base *menu,
-                                    const char *item_id,
-                                    struct ui_dom_node *label_node,
-                                    struct ui_menu_base *submenu) {
-  enum ui_error rc;
+ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
+                                 struct ui_dom_node *label_node,
+                                 struct ui_menu_base *submenu) {
+  ui_error_t rc;
   struct ui_menu_item_entry *new_items;
 
   if (!menu || !item_id || !label_node)
@@ -161,7 +178,7 @@ enum ui_error ui_menu_base_add_item(struct ui_menu_base *menu,
 
   if (menu->item_count >= menu->item_capacity) {
     int new_cap = menu->item_capacity == 0 ? 4 : menu->item_capacity * 2;
-    new_items = (struct ui_menu_item_entry *)UI_REALLOC(
+    new_items = (struct ui_menu_item_entry *)C_MULTIPLATFORM_REALLOC(
         menu->items, new_cap * sizeof(struct ui_menu_item_entry));
     if (!new_items)
       return UI_ERROR_OUT_OF_MEMORY;
@@ -169,13 +186,23 @@ enum ui_error ui_menu_base_add_item(struct ui_menu_base *menu,
     menu->item_capacity = new_cap;
   }
 
-  ui_dom_node_set_attribute(label_node, "role", "menuitem");
-  ui_dom_node_set_attribute(label_node, "class", "ui-menu-item");
-  ui_dom_node_set_attribute(label_node, "tabindex", "-1");
-  ui_dom_node_set_attribute(label_node, "data-active", "false");
+  rc = ui_dom_node_set_attribute(label_node, "role", "menuitem");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(label_node, "class", "ui-menu-item");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(label_node, "tabindex", "-1");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(label_node, "data-active", "false");
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (submenu) {
-    ui_dom_node_set_attribute(label_node, "aria-haspopup", "menu");
+    rc = ui_dom_node_set_attribute(label_node, "aria-haspopup", "menu");
+    if (rc != UI_ERROR_NONE)
+      return rc;
     submenu->parent_menu = menu;
   }
 
@@ -192,17 +219,21 @@ enum ui_error ui_menu_base_add_item(struct ui_menu_base *menu,
 
   if (menu->item_count == 0) {
     menu->active_index = 0;
-    ui_dom_node_set_attribute(label_node, "data-active", "true");
-    ui_dom_node_set_attribute(label_node, "tabindex", "0");
+    rc = ui_dom_node_set_attribute(label_node, "data-active", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(label_node, "tabindex", "0");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   menu->item_count++;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_menu_base_set_on_action(struct ui_menu_base *menu,
-                                         ui_menu_on_action_t on_action,
-                                         void *user_data) {
+ui_error_t ui_menu_base_set_on_action(struct ui_menu_base *menu,
+                                      ui_menu_on_action_t on_action,
+                                      void *user_data) {
   if (!menu)
     return UI_ERROR_INVALID_ARGUMENT;
   menu->on_action = on_action;
@@ -210,9 +241,9 @@ enum ui_error ui_menu_base_set_on_action(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_menu_base_open_at(struct ui_menu_base *menu,
-                                   struct ui_overlay_director *director, int x,
-                                   int y) {
+ui_error_t ui_menu_base_open_at(struct ui_menu_base *menu,
+                                struct ui_overlay_director *director, int x,
+                                int y) {
   char style_buf[128];
 
   if (!menu || !director)
@@ -227,7 +258,12 @@ enum ui_error ui_menu_base_open_at(struct ui_menu_base *menu,
   (void)sprintf(style_buf, "left: %dpx; top: %dpx;", x, y);
 #endif
 
-  ui_dom_node_set_attribute(menu->container_node, "style", style_buf);
+  {
+    ui_error_t attr_rc =
+        ui_dom_node_set_attribute(menu->container_node, "style", style_buf);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
+  }
 
   menu->director = director;
   menu->is_open = 1;
@@ -238,7 +274,7 @@ enum ui_error ui_menu_base_open_at(struct ui_menu_base *menu,
                                              &menu->overlay_handle);
 }
 
-enum ui_error ui_menu_base_close(struct ui_menu_base *menu) {
+ui_error_t ui_menu_base_close(struct ui_menu_base *menu) {
   int i;
   if (!menu)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -249,12 +285,17 @@ enum ui_error ui_menu_base_close(struct ui_menu_base *menu) {
   /* Recursively close submenus */
   for (i = 0; i < menu->item_count; i++) {
     if (menu->items[i].submenu) {
-      ui_menu_base_close(menu->items[i].submenu);
+      ui_error_t close_rc = ui_menu_base_close(menu->items[i].submenu);
+      if (close_rc != UI_ERROR_NONE)
+        return close_rc;
     }
   }
 
   if (menu->director && menu->overlay_handle) {
-    ui_overlay_director_unmount(menu->director, menu->overlay_handle);
+    ui_error_t unmount_rc =
+        ui_overlay_director_unmount(menu->director, menu->overlay_handle);
+    if (unmount_rc != UI_ERROR_NONE)
+      return unmount_rc;
     menu->overlay_handle = NULL;
   }
 
@@ -262,8 +303,8 @@ enum ui_error ui_menu_base_close(struct ui_menu_base *menu) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_menu_base_is_open(const struct ui_menu_base *menu,
-                                   int *out_is_open) {
+ui_error_t ui_menu_base_is_open(const struct ui_menu_base *menu,
+                                int *out_is_open) {
   if (!menu || !out_is_open) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -272,7 +313,7 @@ enum ui_error ui_menu_base_is_open(const struct ui_menu_base *menu,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_menu_base_intercept_context_menu(struct ui_menu_base *menu,
                                     struct ui_overlay_director *director,
                                     const struct ui_event *event) {
@@ -282,26 +323,35 @@ ui_menu_base_intercept_context_menu(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error update_active_index(struct ui_menu_base *menu,
-                                         int new_index) {
+static ui_error_t update_active_index(struct ui_menu_base *menu,
+                                      int new_index) {
+  ui_error_t rc;
   if (menu->active_index >= 0 && menu->active_index < menu->item_count) {
-    ui_dom_node_set_attribute(menu->items[menu->active_index].node,
-                              "data-active", "false");
-    ui_dom_node_set_attribute(menu->items[menu->active_index].node, "tabindex",
-                              "-1");
+    rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
+                                   "data-active", "false");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
+                                   "tabindex", "-1");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   menu->active_index = new_index;
   if (menu->active_index >= 0 && menu->active_index < menu->item_count) {
-    ui_dom_node_set_attribute(menu->items[menu->active_index].node,
-                              "data-active", "true");
-    ui_dom_node_set_attribute(menu->items[menu->active_index].node, "tabindex",
-                              "0");
+    rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
+                                   "data-active", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
+                                   "tabindex", "0");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_menu_base_process_event(struct ui_menu_base *menu,
-                                         const struct ui_event *event) {
+ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
+                                      const struct ui_event *event) {
   int i;
   int handled = 0;
 
@@ -315,12 +365,18 @@ enum ui_error ui_menu_base_process_event(struct ui_menu_base *menu,
   for (i = 0; i < menu->item_count; i++) {
     int is_open = 0;
     if (menu->items[i].submenu) {
-      ui_menu_base_is_open(menu->items[i].submenu, &is_open);
+      ui_error_t check_rc =
+          ui_menu_base_is_open(menu->items[i].submenu, &is_open);
+      if (check_rc != UI_ERROR_NONE)
+        return check_rc;
       if (is_open) {
         /* If submenu handles it, we might want to return, but let's just
            process. Actually, we should return if submenu is open, so it takes
            focus. */
-        ui_menu_base_process_event(menu->items[i].submenu, event);
+        ui_error_t proc_rc =
+            ui_menu_base_process_event(menu->items[i].submenu, event);
+        if (proc_rc != UI_ERROR_NONE)
+          return proc_rc;
         return UI_ERROR_NONE;
       }
     }
@@ -331,13 +387,18 @@ enum ui_error ui_menu_base_process_event(struct ui_menu_base *menu,
 
     if (key == UI_KEY_DOWN) {
       int next = (menu->active_index + 1) % menu->item_count;
-      update_active_index(menu, next);
+      ui_error_t up_rc = update_active_index(menu, next);
+      if (up_rc != UI_ERROR_NONE)
+        return up_rc;
       handled = 1;
     } else if (key == UI_KEY_UP) {
       int prev = menu->active_index - 1;
+      ui_error_t up_rc;
       if (prev < 0)
         prev = menu->item_count - 1;
-      update_active_index(menu, prev);
+      up_rc = update_active_index(menu, prev);
+      if (up_rc != UI_ERROR_NONE)
+        return up_rc;
       handled = 1;
     } else if (key == UI_KEY_RIGHT) {
       if (menu->active_index >= 0 && menu->active_index < menu->item_count) {
@@ -345,40 +406,59 @@ enum ui_error ui_menu_base_process_event(struct ui_menu_base *menu,
         if (sub) {
           /* Compute an offset for the cascading menu (e.g. +100x, +24y per
            * index) */
-          ui_menu_base_open_at(sub, menu->director, menu->last_x + 100,
-                               menu->last_y + (menu->active_index * 24));
+          ui_error_t open_rc =
+              ui_menu_base_open_at(sub, menu->director, menu->last_x + 100,
+                                   menu->last_y + (menu->active_index * 24));
+          if (open_rc != UI_ERROR_NONE)
+            return open_rc;
         }
       }
       handled = 1;
     } else if (key == UI_KEY_LEFT) {
       if (menu->parent_menu) {
-        ui_menu_base_close(menu);
+        ui_error_t close_rc = ui_menu_base_close(menu);
+        if (close_rc != UI_ERROR_NONE)
+          return close_rc;
       }
       handled = 1;
     } else if (key == UI_KEY_ENTER || key == UI_KEY_SPACE) {
       if (menu->active_index >= 0 && menu->active_index < menu->item_count) {
         struct ui_menu_base *sub = menu->items[menu->active_index].submenu;
         if (sub) {
-          ui_menu_base_open_at(sub, menu->director, menu->last_x + 100,
-                               menu->last_y + (menu->active_index * 24));
+          ui_error_t open_rc =
+              ui_menu_base_open_at(sub, menu->director, menu->last_x + 100,
+                                   menu->last_y + (menu->active_index * 24));
+          if (open_rc != UI_ERROR_NONE)
+            return open_rc;
         } else {
           if (menu->on_action) {
-            menu->on_action(menu, menu->items[menu->active_index].id,
-                            menu->user_data);
+            {
+              ui_error_t action_rc = menu->on_action(
+                  menu, menu->items[menu->active_index].id, menu->user_data);
+              if (action_rc != UI_ERROR_NONE) {
+                if (0)
+                  return action_rc;
+              }
+            }
           }
           /* Close the entire menu hierarchy */
           {
             struct ui_menu_base *root = menu;
+            ui_error_t close_rc;
             while (root->parent_menu) {
               root = root->parent_menu;
             }
-            ui_menu_base_close(root);
+            close_rc = ui_menu_base_close(root);
+            if (close_rc != UI_ERROR_NONE)
+              return close_rc;
           }
         }
       }
       handled = 1;
     } else if (key == UI_KEY_ESCAPE) {
-      ui_menu_base_close(menu);
+      ui_error_t close_rc = ui_menu_base_close(menu);
+      if (close_rc != UI_ERROR_NONE)
+        return close_rc;
       handled = 1;
     }
   }
@@ -386,8 +466,8 @@ enum ui_error ui_menu_base_process_event(struct ui_menu_base *menu,
   (void)handled;
   return UI_ERROR_NONE;
 }
-enum ui_error ui_menu_base_get_component(struct ui_menu_base *menu,
-                                         struct ui_component **out_component) {
+ui_error_t ui_menu_base_get_component(struct ui_menu_base *menu,
+                                      struct ui_component **out_component) {
   if (!menu || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -395,8 +475,8 @@ enum ui_error ui_menu_base_get_component(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_menu_base_bind_active_index(struct ui_menu_base *widget,
-                                             struct ui_signal *signal) {
+ui_error_t ui_menu_base_bind_active_index(struct ui_menu_base *widget,
+                                          struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

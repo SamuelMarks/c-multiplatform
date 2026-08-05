@@ -31,9 +31,9 @@
 #pragma GCC diagnostic pop
 #endif
 
-static enum ui_error rgb_to_lab(unsigned char r_in, unsigned char g_in,
-                                unsigned char b_in, double *L_out,
-                                double *a_out, double *b_out) {
+static ui_error_t rgb_to_lab(unsigned char r_in, unsigned char g_in,
+                             unsigned char b_in, double *L_out, double *a_out,
+                             double *b_out) {
   double r, g, b, x, y, z;
   double x_ref = 95.047;
   double y_ref = 100.000;
@@ -69,24 +69,31 @@ static enum ui_error rgb_to_lab(unsigned char r_in, unsigned char g_in,
   return UI_ERROR_NONE;
 }
 
-static double calculate_delta_e(unsigned char r1, unsigned char g1,
-                                unsigned char b1, unsigned char r2,
-                                unsigned char g2, unsigned char b2) {
+static ui_error_t calculate_delta_e(unsigned char r1, unsigned char g1,
+                                    unsigned char b1, unsigned char r2,
+                                    unsigned char g2, unsigned char b2,
+                                    double *out_delta_e) {
   double L1, a1, b_lab1;
   double L2, a2, b_lab2;
+  ui_error_t rc;
 
-  (void)rgb_to_lab(r1, g1, b1, &L1, &a1, &b_lab1);
-  (void)rgb_to_lab(r2, g2, b2, &L2, &a2, &b_lab2);
+  rc = rgb_to_lab(r1, g1, b1, &L1, &a1, &b_lab1);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = rgb_to_lab(r2, g2, b2, &L2, &a2, &b_lab2);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  return sqrt(pow(L1 - L2, 2.0) + pow(a1 - a2, 2.0) +
-              pow(b_lab1 - b_lab2, 2.0));
+  *out_delta_e =
+      sqrt(pow(L1 - L2, 2.0) + pow(a1 - a2, 2.0) + pow(b_lab1 - b_lab2, 2.0));
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_visual_fuzzy_match(const unsigned char *img_a,
-                                    const unsigned char *img_b, int width,
-                                    int height,
-                                    const struct ui_visual_test_config *config,
-                                    int *out_matched) {
+ui_error_t ui_visual_fuzzy_match(const unsigned char *img_a,
+                                 const unsigned char *img_b, int width,
+                                 int height,
+                                 const struct ui_visual_test_config *config,
+                                 int *out_matched) {
   int i;
   int total_pixels = width * height;
   double sum_sq_diff = 0.0;
@@ -119,7 +126,11 @@ enum ui_error ui_visual_fuzzy_match(const unsigned char *img_a,
                    (diff_a * diff_a);
 
     if (r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2) {
-      double delta_e = calculate_delta_e(r1, g1, b1, r2, g2, b2);
+      double delta_e;
+      ui_error_t rc;
+      rc = calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       /* Include alpha difference conceptually in drift, although deltaE is RGB
        * only */
       if (delta_e > config->delta_e_threshold ||
@@ -143,10 +154,10 @@ enum ui_error ui_visual_fuzzy_match(const unsigned char *img_a,
   return 0; /* Match */
 }
 
-enum ui_error ui_visual_generate_heatmap(const unsigned char *img_a,
-                                         const unsigned char *img_b, int width,
-                                         int height,
-                                         unsigned char *output_heatmap) {
+ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
+                                      const unsigned char *img_b, int width,
+                                      int height,
+                                      unsigned char *output_heatmap) {
   int i;
   int total_pixels = width * height;
 
@@ -172,9 +183,14 @@ enum ui_error ui_visual_generate_heatmap(const unsigned char *img_a,
       output_heatmap[idx + 2] = 0; /* B */
       output_heatmap[idx + 3] = 0; /* A (Transparent) */
     } else {
-      double delta_e = calculate_delta_e(r1, g1, b1, r2, g2, b2);
+      double delta_e;
+      int intensity;
+      ui_error_t rc;
+      rc = calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       /* Scale intensity based on difference */
-      int intensity = (int)((delta_e / 100.0) * 255.0);
+      intensity = (int)((delta_e / 100.0) * 255.0);
       if (intensity > 255)
         intensity = 255;
       if (intensity < 50)
@@ -195,9 +211,9 @@ static void log_stbi_write_c_file(void *context, void *data, int size) {
   fwrite(data, 1, size, f);
 }
 
-enum ui_error ui_visual_write_heatmap_to_disk(const char *filepath,
-                                              const unsigned char *heatmap_data,
-                                              int width, int height) {
+ui_error_t ui_visual_write_heatmap_to_disk(const char *filepath,
+                                           const unsigned char *heatmap_data,
+                                           int width, int height) {
   FILE *f = NULL;
   int rc;
 

@@ -58,7 +58,7 @@ struct ui_mutation_observer;
  * @param record_count Number of records in the array.
  * @param user_data Opaque pointer passed during creation.
  */
-typedef enum ui_error (*ui_mutation_observer_cb_t)(
+typedef ui_error_t (*ui_mutation_observer_cb_t)(
     struct ui_mutation_observer *observer,
     const struct ui_mutation_record *records, int record_count,
     void *user_data);
@@ -70,7 +70,7 @@ typedef enum ui_error (*ui_mutation_observer_cb_t)(
  * @param out_observer Pointer to receive the new observer instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
                             struct ui_mutation_observer **out_observer);
 
@@ -78,7 +78,7 @@ ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
  * @brief Destroys a mutation observer.
  * @param observer The observer to destroy.
  */
-void ui_mutation_observer_destroy(struct ui_mutation_observer *observer);
+ui_error_t ui_mutation_observer_destroy(struct ui_mutation_observer *observer);
 
 /**
  * @brief Starts observing a target element.
@@ -87,7 +87,7 @@ void ui_mutation_observer_destroy(struct ui_mutation_observer *observer);
  * @param options The initialization options.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_mutation_observer_observe(struct ui_mutation_observer *observer,
                              struct ui_dom_node *target,
                              const struct ui_mutation_observer_init *options);
@@ -98,7 +98,7 @@ ui_mutation_observer_observe(struct ui_mutation_observer *observer,
  * @param observer The observer instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_mutation_observer_disconnect(struct ui_mutation_observer *observer);
 
 /**
@@ -107,10 +107,9 @@ ui_mutation_observer_disconnect(struct ui_mutation_observer *observer);
  * @param added The node added (or NULL).
  * @param removed The node removed (or NULL).
  */
-enum ui_error
-ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
-                                       struct ui_dom_node *added,
-                                       struct ui_dom_node *removed);
+ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
+                                                  struct ui_dom_node *added,
+                                                  struct ui_dom_node *removed);
 
 /**
  * @brief Internal notification hook when an attribute is modified.
@@ -118,16 +117,16 @@ ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
  * @param name The name of the attribute.
  * @param old_value The previous value (or NULL).
  */
-enum ui_error ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
-                                                    const char *name,
-                                                    const char *old_value);
+ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
+                                                 const char *name,
+                                                 const char *old_value);
 
 /**
  * @brief Internal notification hook when text content is modified.
  * @param target The target node.
  * @param old_value The previous text content (or NULL).
  */
-enum ui_error
+ui_error_t
 ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
                                            const char *old_value);
 

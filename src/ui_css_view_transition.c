@@ -13,19 +13,20 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
-static void skip_whitespace(const char **p_str) {
+static ui_error_t skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_css_parse_view_transition_name */
-enum ui_error ui_css_parse_view_transition_name(
+ui_error_t ui_css_parse_view_transition_name(
     const char *str, struct ui_css_view_transition_name *out_name) {
   if (!str || !out_name)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  { (void)skip_whitespace(&str); }
 
   out_name->is_none = 0;
   out_name->name[0] = '\0';
@@ -44,7 +45,7 @@ enum ui_error ui_css_parse_view_transition_name(
   return UI_ERROR_NONE;
 }
 /** \brief ui_css_view_transition_class_destroy */
-enum ui_error ui_css_view_transition_class_destroy(
+ui_error_t ui_css_view_transition_class_destroy(
     struct ui_css_view_transition_class *vt_class) {
   struct ui_css_view_transition_class_name *current;
   struct ui_css_view_transition_class_name *next;
@@ -55,7 +56,7 @@ enum ui_error ui_css_view_transition_class_destroy(
   current = vt_class->names;
   while (current) {
     next = current->next;
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
   vt_class->names = NULL;
@@ -64,7 +65,7 @@ enum ui_error ui_css_view_transition_class_destroy(
 }
 
 /** \brief ui_css_parse_view_transition_class */
-enum ui_error ui_css_parse_view_transition_class(
+ui_error_t ui_css_parse_view_transition_class(
     const char *str, struct ui_css_view_transition_class *out_class) {
   char token_buf[1024];
   char *token;
@@ -78,7 +79,7 @@ enum ui_error ui_css_parse_view_transition_class(
   out_class->is_none = 0;
   out_class->names = NULL;
 
-  skip_whitespace(&str);
+  { (void)skip_whitespace(&str); }
 
   if (strcmp(str, "none") == 0) {
     out_class->is_none = 1;
@@ -91,12 +92,12 @@ enum ui_error ui_css_parse_view_transition_class(
   token = UI_STRTOK(token_buf, " ", &next_token);
   while (token) {
     struct ui_css_view_transition_class_name *node =
-        (struct ui_css_view_transition_class_name *)UI_MALLOC(
+        (struct ui_css_view_transition_class_name *)C_MULTIPLATFORM_MALLOC(
             sizeof(struct ui_css_view_transition_class_name));
 
     if (!node) {
       out_class->names = head;
-      ui_css_view_transition_class_destroy(out_class);
+      { (void)ui_css_view_transition_class_destroy(out_class); }
       return UI_ERROR_OUT_OF_MEMORY;
     }
 

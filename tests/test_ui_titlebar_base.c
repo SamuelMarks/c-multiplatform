@@ -73,7 +73,7 @@ static int test_normal(void) {
   ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_CLOSE_BTN);
 
   ACCUM_ERR(failed, ui_titlebar_base_destroy(tb));
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 
   /* Now test non-draggable drag area */
   ACCUM_ERR(failed, ui_arena_create(4096, &arena));
@@ -82,7 +82,7 @@ static int test_normal(void) {
   ACCUM_ERR(failed, ui_titlebar_base_hit_test(tb, 10.0f, 10.0f, &res));
   ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_NONE);
   ACCUM_ERR(failed, ui_titlebar_base_destroy(tb));
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 
   return failed;
 }
@@ -97,7 +97,7 @@ static int test_oom(void) {
   ui_arena_create(4096, &small_arena);
   g_malloc_fail_countdown = 1;
   {
-    enum ui_error rc = ui_titlebar_base_create(small_arena, &config, &tb);
+    ui_error_t rc = ui_titlebar_base_create(small_arena, &config, &tb);
     if (rc == UI_ERROR_NONE) {
     }
   }
@@ -106,14 +106,14 @@ static int test_oom(void) {
   ui_titlebar_base_create(small_arena, &config, &tb);
   g_malloc_fail_countdown = 1;
   {
-    enum ui_error rc = ui_titlebar_base_add_button_rect(
+    ui_error_t rc = ui_titlebar_base_add_button_rect(
         tb, UI_TITLEBAR_HIT_TEST_CLOSE_BTN, 0, 0, 10, 10);
     if (rc == UI_ERROR_NONE) {
     }
   }
   g_malloc_fail_countdown = -1;
 
-  ui_arena_destroy(small_arena);
+  (void)ui_arena_destroy(small_arena);
 #endif
   return failed;
 }

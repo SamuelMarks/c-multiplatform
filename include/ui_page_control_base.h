@@ -28,7 +28,7 @@ struct ui_page_control_base {
  * @param out_control Pointer to output the initialized page control.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
+ui_error_t
 ui_page_control_base_create(struct ui_page_control_base **out_control);
 
 /**
@@ -38,7 +38,7 @@ ui_page_control_base_create(struct ui_page_control_base **out_control);
  * @param count The number of pages.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_page_control_base_set_number_of_pages(struct ui_page_control_base *control,
                                          int count);
 
@@ -49,7 +49,7 @@ ui_page_control_base_set_number_of_pages(struct ui_page_control_base *control,
  * @param page The index of the active page (0-based).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_page_control_base_set_current_page(struct ui_page_control_base *control,
                                       int page);
 
@@ -60,7 +60,7 @@ ui_page_control_base_set_current_page(struct ui_page_control_base *control,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_page_control_base_bind_current_page(struct ui_page_control_base *widget,
                                        struct ui_signal *signal);
 

@@ -45,7 +45,7 @@ struct ui_media_source {
    * @param uri The URI to open.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*open)(struct ui_media_source *source, const char *uri);
+  ui_error_t (*open)(struct ui_media_source *source, const char *uri);
 
   /**
    * @brief Reads the next encoded packet from the demuxer.
@@ -55,8 +55,8 @@ struct ui_media_source {
    * caller.
    * @return UI_ERROR_NONE on success, or an EOF error if finished.
    */
-  enum ui_error (*read_packet)(struct ui_media_source *source,
-                               struct ui_media_packet *out_packet);
+  ui_error_t (*read_packet)(struct ui_media_source *source,
+                            struct ui_media_packet *out_packet);
 
   /**
    * @brief Seeks to a specific timestamp in microseconds.
@@ -65,7 +65,7 @@ struct ui_media_source {
    * @param timestamp_us Target time in microseconds.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*seek)(struct ui_media_source *source, ui_int64 timestamp_us);
+  ui_error_t (*seek)(struct ui_media_source *source, ui_int64 timestamp_us);
 
   /**
    * @brief Gets the total duration of the media in microseconds.
@@ -74,8 +74,8 @@ struct ui_media_source {
    * @param out_duration_us Pointer to receive the duration.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*get_duration)(struct ui_media_source *source,
-                                ui_int64 *out_duration_us);
+  ui_error_t (*get_duration)(struct ui_media_source *source,
+                             ui_int64 *out_duration_us);
 
   /**
    * @brief Closes the media source and frees associated resources.
@@ -83,7 +83,7 @@ struct ui_media_source {
    * @param source The media source instance.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*close)(struct ui_media_source *source);
+  ui_error_t (*close)(struct ui_media_source *source);
 
   /**
    * @brief Opaque user data for the backend implementation.

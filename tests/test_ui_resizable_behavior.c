@@ -7,7 +7,7 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error mock_on_resize(int new_w, int new_h, void *user_data) {
+static ui_error_t mock_on_resize(int new_w, int new_h, void *user_data) {
   int *dims = (int *)user_data;
   dims[0] = new_w;
   dims[1] = new_h;
@@ -16,7 +16,7 @@ static enum ui_error mock_on_resize(int new_w, int new_h, void *user_data) {
 
 static int test_resizable_lifecycle(void) {
   struct ui_resizable_behavior *b = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_resizable_behavior_create(&b);
   if (rc != UI_ERROR_NONE || b == NULL)
@@ -28,7 +28,7 @@ static int test_resizable_lifecycle(void) {
 
 static int test_resizable_dragging(void) {
   struct ui_resizable_behavior *b = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_event ev;
   int dims[2] = {0, 0};
 

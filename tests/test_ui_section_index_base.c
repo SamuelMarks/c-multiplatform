@@ -4,45 +4,158 @@
 #include <stdio.h>
 /* clang-format on */
 
-int main(void) {
+extern int g_malloc_fail_countdown;
+
+static int test_ui_section_index_base_init(void) {
   struct ui_section_index_base *index = NULL;
   struct ui_component *comp = NULL;
-  enum ui_error rc;
-  const char *sections[] = {"A", "B", "C", "D"};
+  ui_error_t rc;
+  int i;
+
+  /* Test NULL out */
+  rc = ui_section_index_base_create(NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  /* Test creation OOM */
+  for (i = 0; i < 40; ++i) {
+    g_malloc_fail_countdown = i;
+    rc = ui_section_index_base_create(&index);
+    if (rc == UI_ERROR_NONE) {
+      (void)ui_section_index_base_destroy(index);
+    } else {
+      if (index != NULL)
+        return 1; /* index should be null on fail */
+    }
+  }
+  g_malloc_fail_countdown = -1;
+
+  /* Successful create */
+  rc = ui_section_index_base_create(&index);
+  if (rc != UI_ERROR_NONE || !index)
+    return 1;
+
+  /* Test NULL args */
+  rc = ui_section_index_base_get_component(NULL, &comp);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  rc = ui_section_index_base_get_component(index, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  /* Test get component */
+  rc = ui_section_index_base_get_component(index, &comp);
+  if (rc != UI_ERROR_NONE || !comp)
+    return 1;
+
+  /* Test bind data invalid */
+  rc = ui_section_index_base_bind_data(NULL, (struct ui_computed *)0x1);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  /* Test bind data */
+  rc = ui_section_index_base_bind_data(index, (struct ui_computed *)0x1);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  /* Destroy */
+  (void)ui_section_index_base_destroy(NULL);
+  (void)ui_section_index_base_destroy(index);
+
+  return 0;
+}
+
+static int test_ui_section_index_base_sections(void) {
+  struct ui_section_index_base *index = NULL;
+  const char *sections[] = {"A", "B", "C"};
+  ui_error_t rc;
+  int i;
 
   rc = ui_section_index_base_create(&index);
-  if (rc != UI_ERROR_NONE) {
-    printf("Failed to create section index\n");
+  if (rc != UI_ERROR_NONE)
     return 1;
-  }
 
-  if (ui_section_index_base_get_component(index, &comp) != UI_ERROR_NONE ||
-      !comp) {
-    printf("Failed to get component\n");
+  /* Test invalid args */
+  rc = ui_section_index_base_set_sections(NULL, sections, 3);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  }
-
-  rc = ui_section_index_base_set_sections(index, sections, 4);
-  if (rc != UI_ERROR_NONE) {
-    printf("Failed to set sections\n");
+  rc = ui_section_index_base_set_sections(index, NULL, 3);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  }
 
-  rc = ui_section_index_base_set_active_section(index, 2); /* Highlight 'C' */
-  if (rc != UI_ERROR_NONE) {
-    printf("Failed to set active section\n");
+  /* Test set zero sections */
+  rc = ui_section_index_base_set_sections(index, sections, 0);
+  if (rc != UI_ERROR_NONE)
     return 1;
-  }
 
-  /* Test out of bounds */
+  /* Test set sections OOM */
+  for (i = 0; i < 20; ++i) {
+    g_malloc_fail_countdown = i;
+    rc = ui_section_index_base_set_sections(index, sections, 3);
+    if (rc == UI_ERROR_NONE) {
+      break; /* We succeeded eventually */
+    }
+  }
+  g_malloc_fail_countdown = -1;
+
+  /* Re-set sections correctly */
+  rc = ui_section_index_base_set_sections(index, sections, 3);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  /* Test re-setting to replace existing items */
+  const char *sections2[] = {"X", "Y"};
+  rc = ui_section_index_base_set_sections(index, sections2, 2);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  /* Test active section */
+  rc = ui_section_index_base_set_active_section(NULL, 1);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
   rc = ui_section_index_base_set_active_section(index, 5);
-  if (rc != UI_ERROR_OUT_OF_BOUNDS) {
-    printf("Expected UI_ERROR_OUT_OF_BOUNDS for active section out of range\n");
+  if (rc != UI_ERROR_OUT_OF_BOUNDS)
+    return 1;
+
+  rc = ui_section_index_base_set_active_section(index, 1);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  /* Set again to test clearing previous active section */
+  rc = ui_section_index_base_set_active_section(index, 0);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  /* Set -1 to test out of bounds / clearing active section safely (but wait,
+   * out of bounds is only checked on > count, what about < 0?) */
+  /* Our implementation says active_idx >= 0 && active_idx < index->count is
+     checked before removing. Wait, it says: if (active_idx >=
+     (int)index->count) { return UI_ERROR_OUT_OF_BOUNDS; } Then it removes the
+     old active_idx. Then index->active_idx = active_idx; Then if
+     (index->active_idx >= 0 ...) it sets it. Let's verify what happens if
+     active_idx is -1.
+  */
+  rc = ui_section_index_base_set_active_section(index, -1);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  (void)ui_section_index_base_destroy(index);
+  return 0;
+}
+
+int main(void) {
+  int failed = 0;
+  printf("Running ui_section_index_base tests...\n");
+
+  failed |= test_ui_section_index_base_init();
+  failed |= test_ui_section_index_base_sections();
+
+  if (failed) {
+    printf("Tests failed.\n");
     return 1;
   }
 
-  ui_section_index_base_destroy(index);
-
-  printf("test_ui_section_index_base passed\n");
+  printf("All tests passed.\n");
   return 0;
 }

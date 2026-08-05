@@ -33,7 +33,7 @@ struct ui_scroll_info {
  * @param info Information about the scroll event.
  * @param user_data Opaque user data provided during registration.
  */
-typedef enum ui_error (*ui_scroll_dispatcher_cb_t)(
+typedef ui_error_t (*ui_scroll_dispatcher_cb_t)(
     struct ui_scroll_dispatcher *dispatcher, const struct ui_scroll_info *info,
     void *user_data);
 
@@ -43,7 +43,7 @@ typedef enum ui_error (*ui_scroll_dispatcher_cb_t)(
  * @param out_dispatcher Pointer to receive the created dispatcher.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
+ui_error_t
 ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher);
 
 /**
@@ -52,7 +52,7 @@ ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher);
  * @param dispatcher The dispatcher to destroy.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
+ui_error_t
 ui_scroll_dispatcher_destroy(struct ui_scroll_dispatcher *dispatcher);
 
 /**
@@ -64,7 +64,7 @@ ui_scroll_dispatcher_destroy(struct ui_scroll_dispatcher *dispatcher);
  * @param out_registration_id Pointer to receive a unique registration ID.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
+ui_error_t
 ui_scroll_dispatcher_register(struct ui_scroll_dispatcher *dispatcher,
                               ui_scroll_dispatcher_cb_t callback,
                               void *user_data, int *out_registration_id);
@@ -77,7 +77,7 @@ ui_scroll_dispatcher_register(struct ui_scroll_dispatcher *dispatcher,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if ID doesn't exist, or
  * an error code.
  */
-enum ui_error
+ui_error_t
 ui_scroll_dispatcher_unregister(struct ui_scroll_dispatcher *dispatcher,
                                 int registration_id);
 
@@ -88,9 +88,8 @@ ui_scroll_dispatcher_unregister(struct ui_scroll_dispatcher *dispatcher,
  * @param info Information about the scroll event.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
-ui_scroll_dispatcher_notify(struct ui_scroll_dispatcher *dispatcher,
-                            const struct ui_scroll_info *info);
+ui_error_t ui_scroll_dispatcher_notify(struct ui_scroll_dispatcher *dispatcher,
+                                       const struct ui_scroll_info *info);
 
 /**
  * @brief Integrates the scroll dispatcher with a layout observer.
@@ -102,7 +101,7 @@ ui_scroll_dispatcher_notify(struct ui_scroll_dispatcher *dispatcher,
  * @param layout_observer The layout observer to integrate with.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_scroll_dispatcher_bind_layout_observer(
+ui_error_t ui_scroll_dispatcher_bind_layout_observer(
     struct ui_scroll_dispatcher *dispatcher,
     struct ui_layout_observer *layout_observer);
 

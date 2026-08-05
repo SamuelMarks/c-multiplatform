@@ -23,7 +23,7 @@ struct ui_arena;
  * @param out_arena Pointer to receive the new arena handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_arena_create(size_t block_size, struct ui_arena **out_arena);
+ui_error_t ui_arena_create(size_t block_size, struct ui_arena **out_arena);
 
 /**
  * @brief Destroys an arena and frees all its associated memory blocks.
@@ -31,7 +31,7 @@ enum ui_error ui_arena_create(size_t block_size, struct ui_arena **out_arena);
  * @param arena The arena to destroy.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if arena is NULL.
  */
-enum ui_error ui_arena_destroy(struct ui_arena *arena);
+ui_error_t ui_arena_destroy(struct ui_arena *arena);
 
 /**
  * @brief Allocates memory from the arena.
@@ -42,8 +42,8 @@ enum ui_error ui_arena_destroy(struct ui_arena *arena);
  * @param out_ptr Pointer to receive the allocated memory address.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_arena_alloc(struct ui_arena *arena, size_t size,
-                             size_t alignment, void **out_ptr);
+ui_error_t ui_arena_alloc(struct ui_arena *arena, size_t size, size_t alignment,
+                          void **out_ptr);
 
 /**
  * @brief Resets the arena, invalidating all allocations but retaining the
@@ -52,7 +52,7 @@ enum ui_error ui_arena_alloc(struct ui_arena *arena, size_t size,
  * @param arena The arena to reset.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_arena_reset(struct ui_arena *arena);
+ui_error_t ui_arena_reset(struct ui_arena *arena);
 
 struct ui_arena_savepoint {
   struct ui_arena_block *block;
@@ -65,8 +65,8 @@ struct ui_arena_savepoint {
  * @param out_sp Pointer to receive the savepoint.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_arena_save(struct ui_arena *arena,
-                            struct ui_arena_savepoint *out_sp);
+ui_error_t ui_arena_save(struct ui_arena *arena,
+                         struct ui_arena_savepoint *out_sp);
 /**
  * @brief Restores the arena to a previously saved state.
  *
@@ -74,8 +74,8 @@ enum ui_error ui_arena_save(struct ui_arena *arena,
  * @param sp The savepoint to restore from.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_arena_restore(struct ui_arena *arena,
-                               struct ui_arena_savepoint sp);
+ui_error_t ui_arena_restore(struct ui_arena *arena,
+                            struct ui_arena_savepoint sp);
 
 #ifdef __cplusplus
 }

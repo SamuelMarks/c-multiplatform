@@ -31,8 +31,8 @@ struct app_state {
   char auth_error_message[128]; /**< Error message buffer */
 };
 
-enum ui_error mock_login(struct app_state *state, const char *username,
-                         const char *password) {
+ui_error_t mock_login(struct app_state *state, const char *username,
+                      const char *password) {
   if (strcmp(username, "admin") == 0 && strcmp(password, "password") == 0) {
     state->is_authenticated = 1;
     strncpy(state->current_user, username, 63);
@@ -47,8 +47,8 @@ enum ui_error mock_login(struct app_state *state, const char *username,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-enum ui_error mock_signup(struct app_state *state, const char *username,
-                          const char *password) {
+ui_error_t mock_signup(struct app_state *state, const char *username,
+                       const char *password) {
   if (strcmp(username, "admin") == 0) {
     state->is_authenticated = 0;
     strncpy(state->auth_error_message, "err_user_exists", 127);
@@ -69,7 +69,7 @@ enum ui_error mock_signup(struct app_state *state, const char *username,
   return UI_ERROR_NONE;
 }
 
-enum ui_error mock_logout(struct app_state *state) {
+ui_error_t mock_logout(struct app_state *state) {
   state->is_authenticated = 0;
   state->current_user[0] = '\0';
   state->auth_error_message[0] = '\0';

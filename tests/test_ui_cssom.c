@@ -19,7 +19,7 @@ extern int g_malloc_fail_countdown;
 
 static char *my_strdup(const char *s) {
   size_t len = strlen(s);
-  char *d = UI_MALLOC(len + 1);
+  char *d = C_MULTIPLATFORM_MALLOC(len + 1);
   if (d)
     strcpy(d, s);
   return d;
@@ -31,7 +31,7 @@ int main(void) {
   struct ui_dom_node *node = NULL, *child = NULL, *grandchild = NULL;
   struct ui_css_computed_style *style = NULL;
   struct ui_css_variable_store *store = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int order;
   const char *val;
 
@@ -44,7 +44,9 @@ int main(void) {
   /* Namespaces */
   TEST_ASSERT(ui_css_stylesheet_register_namespace(NULL, "a", "b") ==
               UI_ERROR_INVALID_ARGUMENT);
-  TEST_ASSERT(ui_css_stylesheet_register_namespace(sheet, NULL, NULL) ==
+  TEST_ASSERT(ui_css_stylesheet_register_namespace(sheet, "a", NULL) ==
+              UI_ERROR_INVALID_ARGUMENT);
+  TEST_ASSERT(ui_css_stylesheet_register_namespace(NULL, NULL, NULL) ==
               UI_ERROR_INVALID_ARGUMENT);
   rc = ui_css_stylesheet_register_namespace(sheet, "svg",
                                             "http://www.w3.org/2000/svg");
@@ -56,6 +58,8 @@ int main(void) {
   TEST_ASSERT(ui_css_stylesheet_register_layer(NULL, "base", &order) ==
               UI_ERROR_INVALID_ARGUMENT);
   TEST_ASSERT(ui_css_stylesheet_register_layer(sheet, "base", NULL) ==
+              UI_ERROR_INVALID_ARGUMENT);
+  TEST_ASSERT(ui_css_stylesheet_register_layer(NULL, NULL, NULL) ==
               UI_ERROR_INVALID_ARGUMENT);
   rc = ui_css_stylesheet_register_layer(sheet, NULL, &order); /* Unlayered */
   TEST_ASSERT(rc == UI_ERROR_NONE && order == 0x7FFFFFFF);
@@ -77,6 +81,8 @@ int main(void) {
   TEST_ASSERT(ui_css_stylesheet_append_rule(NULL, rule) ==
               UI_ERROR_INVALID_ARGUMENT);
   TEST_ASSERT(ui_css_stylesheet_append_rule(sheet, NULL) ==
+              UI_ERROR_INVALID_ARGUMENT);
+  TEST_ASSERT(ui_css_stylesheet_append_rule(NULL, NULL) ==
               UI_ERROR_INVALID_ARGUMENT);
   rc = ui_css_stylesheet_append_rule(sheet, rule);
   TEST_ASSERT(rc == UI_ERROR_NONE);
@@ -185,7 +191,7 @@ int main(void) {
   TEST_ASSERT(ui_css_rule_append_selector_attr(NULL, "type",
                                                UI_CSS_ATTR_OP_EQUALS, "text") ==
               UI_ERROR_INVALID_ARGUMENT);
-  TEST_ASSERT(ui_css_rule_append_selector_attr(rule, NULL,
+  TEST_ASSERT(ui_css_rule_append_selector_attr(NULL, NULL,
                                                UI_CSS_ATTR_OP_EQUALS, "text") ==
               UI_ERROR_INVALID_ARGUMENT);
 
@@ -217,6 +223,8 @@ int main(void) {
   TEST_ASSERT(ui_css_rule_append_declaration(rule, NULL, "red", 0) ==
               UI_ERROR_INVALID_ARGUMENT);
   TEST_ASSERT(ui_css_rule_append_declaration(rule, "color", NULL, 0) ==
+              UI_ERROR_INVALID_ARGUMENT);
+  TEST_ASSERT(ui_css_rule_append_declaration(NULL, NULL, NULL, 0) ==
               UI_ERROR_INVALID_ARGUMENT);
 
   rc = ui_css_rule_append_declaration(rule, "color", "red", 0);
@@ -285,6 +293,8 @@ int main(void) {
               UI_ERROR_INVALID_ARGUMENT);
   TEST_ASSERT(ui_css_computed_style_get_property(style, "color", NULL) ==
               UI_ERROR_INVALID_ARGUMENT);
+  TEST_ASSERT(ui_css_computed_style_get_property(NULL, NULL, NULL) ==
+              UI_ERROR_INVALID_ARGUMENT);
 
   rc = ui_css_computed_style_get_property(style, "color", &val);
   TEST_ASSERT(rc == UI_ERROR_NONE && strcmp(val, "red") == 0);
@@ -344,6 +354,7 @@ int main(void) {
 
   /* CSS Variables */
   TEST_ASSERT(ui_css_variable_store_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
+  ui_css_variable_store_destroy(NULL);
   rc = ui_css_variable_store_create(&store);
   TEST_ASSERT(rc == UI_ERROR_NONE);
 
@@ -352,6 +363,8 @@ int main(void) {
   TEST_ASSERT(ui_css_variable_store_set(store, NULL, "b") ==
               UI_ERROR_INVALID_ARGUMENT);
   TEST_ASSERT(ui_css_variable_store_set(store, "a", NULL) ==
+              UI_ERROR_INVALID_ARGUMENT);
+  TEST_ASSERT(ui_css_variable_store_set(NULL, NULL, NULL) ==
               UI_ERROR_INVALID_ARGUMENT);
 
   rc = ui_css_variable_store_set(store, "--bg", "blue");
@@ -366,6 +379,8 @@ int main(void) {
               UI_ERROR_INVALID_ARGUMENT);
   TEST_ASSERT(ui_css_resolve_variables(store, "var(--bg)", NULL) ==
               UI_ERROR_INVALID_ARGUMENT);
+  TEST_ASSERT(ui_css_resolve_variables(NULL, NULL, &resolved) ==
+              UI_ERROR_INVALID_ARGUMENT);
 
   rc = ui_css_resolve_variables(store, "var(--bg)", &resolved);
   TEST_ASSERT(rc == UI_ERROR_NONE && strcmp(resolved, "green") == 0);
@@ -378,6 +393,149 @@ int main(void) {
 
   ui_css_variable_store_destroy(store);
   ui_dom_node_destroy(node); /* Recursively frees child, grandchild */
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) and"); /* missing end term */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or"); /* missing end term */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+  {
+    struct ui_css_rule *rule;
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) and"); /* missing end term */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+  {
+    struct ui_css_rule *rule;
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or"); /* missing end term */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
   ui_css_stylesheet_destroy(sheet);
 
   /* OOM Mocks - Very high coverage */
@@ -459,8 +617,150 @@ int main(void) {
   ui_css_computed_style_destroy(style);
   g_malloc_fail_countdown = -1;
 
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) and"); /* missing end term */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or"); /* missing end term */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+  {
+    struct ui_css_rule *rule;
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) and"); /* missing end term */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+  {
+    struct ui_css_rule *rule;
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or"); /* missing end term */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
   ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
 
   /* Eval condition paths */
   /* These are static functions but reached via supports/media rules */
@@ -542,13 +842,13 @@ int main(void) {
                          "(a) or"};
   for (i = 0; i < sizeof(conds) / sizeof(conds[0]); i++) {
     if (r->supports_condition) {
-      UI_FREE(r->supports_condition);
+      C_MULTIPLATFORM_FREE(r->supports_condition);
     }
     r->supports_condition = my_strdup(conds[i]);
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
@@ -567,11 +867,11 @@ int main(void) {
   }
   ui_css_computed_style_destroy(style);
   g_malloc_fail_countdown = -1;
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
 
   /* Check supports evaluation failure */
   if (r->supports_condition) {
-    UI_FREE(r->supports_condition);
+    C_MULTIPLATFORM_FREE(r->supports_condition);
   }
   r->supports_condition = my_strdup("(a) and"); /* parse error */
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
@@ -580,7 +880,149 @@ int main(void) {
     printf("Expected PARSE_FAILED, got %d\n", rc);
     TEST_ASSERT(rc == UI_ERROR_PARSE_FAILED);
   }
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) and"); /* missing end term */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or"); /* missing end term */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+  {
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+  {
+    struct ui_css_rule *rule;
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) and"); /* missing end term */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+  {
+    struct ui_css_rule *rule;
+    struct ui_css_stylesheet *tmp_sheet = NULL;
+    struct ui_css_computed_style *tmp_style = NULL;
+    ui_css_stylesheet_create(&tmp_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex) or"); /* missing end term */
+    ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+    ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+    ui_css_stylesheet_destroy(tmp_sheet);
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
+
+  {
+    /* Test evaluating condition parenthesis errors */
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition =
+        ui_mock_strdup("((display: flex"); /* missing ) */
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+      ui_css_computed_style_destroy(style);
+    }
+  }
 
   ui_css_stylesheet_destroy(sheet);
 
@@ -613,8 +1055,150 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
     ui_css_stylesheet_destroy(sheet);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   {
@@ -643,8 +1227,150 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
     ui_css_stylesheet_destroy(sheet);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   {
@@ -693,8 +1419,150 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
     ui_css_stylesheet_destroy(sheet);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   {
@@ -717,7 +1585,7 @@ int main(void) {
      */
 
     ui_css_rule_destroy(rule_has);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   {
@@ -739,8 +1607,150 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
     ui_css_stylesheet_destroy(sheet);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   {
@@ -786,8 +1796,150 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
     ui_css_stylesheet_destroy(sheet);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   {
@@ -818,8 +1970,150 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
     ui_css_stylesheet_destroy(sheet);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   {
@@ -853,8 +2147,150 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
     ui_css_stylesheet_destroy(sheet);
-    ui_dom_node_destroy(node);
+    (void)ui_dom_node_destroy(node);
   }
 
   {
@@ -885,8 +2321,542 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("(not (display: flex)"); /* missing inner end */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+    {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or )"); /* trailing paren */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) and"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+    {
+      struct ui_css_rule *rule;
+      struct ui_css_stylesheet *tmp_sheet = NULL;
+      struct ui_css_computed_style *tmp_style = NULL;
+      ui_css_stylesheet_create(&tmp_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex) or"); /* missing end term */
+      ui_css_stylesheet_append_rule(tmp_sheet, rule);
+
+      ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      ui_css_stylesheet_destroy(tmp_sheet);
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        ui_css_computed_style_destroy(style);
+      }
+    }
+
+    ui_css_stylesheet_destroy(sheet);
+    (void)ui_dom_node_destroy(node);
+  }
+
+  {
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+    int order1, order2, order3;
+    ui_css_stylesheet_register_layer(sheet, "L1", &order1);
+    ui_css_stylesheet_register_layer(sheet, "L2", &order2);
+    ui_css_stylesheet_register_layer(sheet, "L3", &order3);
+    ui_css_stylesheet_destroy(sheet);
+  }
+  {
+    /* Missing pseudo classes */
+    struct ui_dom_node *node;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+
+    const char *pseudos[] = {"disabled",      "enabled",   "required",
+                             "optional",      "read-only", "read-write",
+                             "indeterminate", "default",   "invalid",
+                             "valid",         "unknown"};
+
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+
+    for (int i = 0; i < 11; ++i) {
+      struct ui_css_rule *rule;
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
+                                  pseudos[i]);
+      ui_css_stylesheet_append_rule(sheet, rule);
+    }
+
+    /* Empty rule without selector */
+    struct ui_css_rule *empty_rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &empty_rule);
+    ui_css_stylesheet_append_rule(sheet, empty_rule);
+
+    struct ui_css_rule *attr_rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &attr_rule);
+    ui_css_rule_append_selector_attr(attr_rule, "lang", UI_CSS_ATTR_OP_DASH,
+                                     "en");
+    ui_css_stylesheet_append_rule(sheet, attr_rule);
+
+    /* Test state 1: no attributes */
+    struct ui_css_computed_style *style;
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    /* Test dash mismatch */
+    ui_dom_node_set_attribute(node, "lang", "es");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+    ui_dom_node_remove_attribute(node, "lang");
+    ui_dom_node_set_attribute(node, "lang", "eng");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    /* Test state 2: With native attributes */
+    ui_dom_node_set_attribute(node, "disabled", "");
+    ui_dom_node_set_attribute(node, "required", "");
+    ui_dom_node_set_attribute(node, "readonly", "");
+    ui_dom_node_set_attribute(node, "indeterminate", "");
+    ui_dom_node_set_attribute(node, "default", "");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    /* Test state 3: With aria attributes (true) */
+    ui_dom_node_remove_attribute(node, "disabled");
+    ui_dom_node_remove_attribute(node, "required");
+    ui_dom_node_remove_attribute(node, "readonly");
+    ui_dom_node_remove_attribute(node, "indeterminate");
+    ui_dom_node_remove_attribute(node, "default");
+
+    ui_dom_node_set_attribute(node, "aria-disabled", "true");
+    ui_dom_node_set_attribute(node, "aria-required", "true");
+    ui_dom_node_set_attribute(node, "aria-readonly", "true");
+    ui_dom_node_set_attribute(node, "aria-checked", "true");
+    ui_dom_node_set_attribute(node, "aria-invalid", "true");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    /* Test state 4: with aria attributes (false) */
+    ui_dom_node_set_attribute(node, "aria-disabled", "false");
+    ui_dom_node_set_attribute(node, "aria-required", "false");
+    ui_dom_node_set_attribute(node, "aria-readonly", "false");
+    ui_dom_node_set_attribute(node, "aria-checked", "false");
+    ui_dom_node_set_attribute(node, "aria-invalid", "false");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
     ui_css_stylesheet_destroy(sheet);
     ui_dom_node_destroy(node);
+  }
+  {
+    /* Important rules overriding */
+    struct ui_dom_node *node;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+
+    int order1, order2;
+    ui_css_stylesheet_register_layer(sheet, "L1", &order1);
+    ui_css_stylesheet_register_layer(sheet, "L2", &order2);
+
+    struct ui_css_rule *rule1, *rule2, *rule3, *rule4;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule1);
+    ui_css_rule_append_selector(rule1, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(rule1, "color", "red", 0);
+    ui_css_rule_append_declaration(rule1, "background", "red", 1);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule2);
+    ui_css_rule_append_selector(rule2, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(rule2, "color", "blue",
+                                   1); /* overrides normal */
+    ui_css_rule_append_declaration(rule2, "background", "blue",
+                                   0); /* fails to override important */
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule3);
+    ui_css_rule_append_selector(rule3, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(rule3, "color", "green",
+                                   1); /* same important, overrides */
+
+    ui_css_stylesheet_append_rule(sheet, rule1);
+    ui_css_stylesheet_append_rule(sheet, rule2);
+    ui_css_stylesheet_append_rule(sheet, rule3);
+
+    ui_dom_node_set_tag_name(node, "div");
+
+    struct ui_css_computed_style *style;
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    ui_css_stylesheet_destroy(sheet);
+    ui_dom_node_destroy(node);
+  }
+
+  {
+    /* More coverage */
+    struct ui_dom_node *node;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+
+    struct ui_css_rule *r1, *r2, *r3, *r4, *r5;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r1);
+    ui_css_rule_append_selector(r1, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS, "not");
+    ui_css_stylesheet_append_rule(sheet, r1);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r2);
+    ui_css_rule_append_selector(r2, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
+                                "checked");
+    ui_css_stylesheet_append_rule(sheet, r2);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r3);
+    ui_css_rule_append_selector(r3, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
+                                "target");
+    ui_css_stylesheet_append_rule(sheet, r3);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r4);
+    ui_css_rule_append_selector(r4, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
+                                "target-within");
+    ui_css_stylesheet_append_rule(sheet, r4);
+
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &r5);
+    r5->scope_start = NULL;
+    r5->scope_end = NULL;
+    struct ui_css_rule *r5_nested;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r5_nested);
+    ui_css_rule_append_selector(r5_nested, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    r5->nested_rules = r5_nested;
+    ui_css_stylesheet_append_rule(sheet, r5);
+
+    /* has(.container) */
+    struct ui_css_rule *r6;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r6);
+    ui_css_rule_append_selector(r6, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
+                                "has(.container)");
+    ui_css_stylesheet_append_rule(sheet, r6);
+
+    ui_dom_node_set_tag_name(node, "div");
+    ui_dom_node_set_attribute(node, "checked", "");
+    ui_dom_node_set_attribute(node, "class", "container");
+
+    struct ui_css_computed_style *style;
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    ui_dom_node_remove_attribute(node, "checked");
+    ui_dom_node_set_attribute(node, "aria-checked", "true");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    ui_dom_node_set_attribute(node, "aria-checked", "false");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    ui_css_stylesheet_destroy(sheet);
+    ui_dom_node_destroy(node);
+  }
+
+  {
+    /* Missing edge cases */
+    struct ui_dom_node *node;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+    ui_dom_node_set_tag_name(node, "div");
+
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+
+    struct ui_css_rule *r1;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r1);
+    ui_css_rule_append_selector(r1, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
+                                "read-write");
+    ui_css_stylesheet_append_rule(sheet, r1);
+
+    struct ui_css_computed_style *style;
+
+    /* :read-write with disabled attribute */
+    ui_dom_node_set_attribute(node, "disabled", "");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    /* :read-write with aria-disabled */
+    ui_dom_node_remove_attribute(node, "disabled");
+    ui_dom_node_set_attribute(node, "aria-disabled", "true");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    ui_css_stylesheet_destroy(sheet);
+    ui_dom_node_destroy(node);
+  }
+
+  {
+    /* Text node matching */
+    struct ui_dom_node *node;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &node);
+
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    struct ui_css_computed_style *style;
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    ui_css_stylesheet_destroy(sheet);
+    ui_dom_node_destroy(node);
+  }
+  {
+    /* Nested parens in supports condition */
+    struct ui_dom_node *node;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+    rule->supports_condition = my_strdup("(not ((display: flex)))");
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    struct ui_css_computed_style *style;
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    ui_css_stylesheet_destroy(sheet);
+    ui_dom_node_destroy(node);
+  }
+  {
+    /* Reverts Author origin test */
+    struct ui_dom_node *node;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+
+    struct ui_css_rule *rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(rule, "color", "revert", 0);
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    struct ui_css_computed_style *style;
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+
+    ui_css_stylesheet_destroy(sheet);
+    ui_dom_node_destroy(node);
+  }
+  int cssom_oom_cnt = 0;
+  while (1) {
+    g_malloc_fail_countdown = cssom_oom_cnt;
+    cssom_oom_cnt++;
+
+    struct ui_css_stylesheet *cov_sheet = NULL;
+    ui_error_t rc_sheet = ui_css_stylesheet_create(&cov_sheet);
+
+    if (rc_sheet == UI_ERROR_NONE && cov_sheet != NULL) {
+      struct ui_css_rule *cov_rule = NULL;
+      if (ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &cov_rule) ==
+          UI_ERROR_NONE) {
+        ui_css_rule_append_selector(cov_rule, UI_CSS_SELECTOR_TYPE_CLASS,
+                                    "myclass");
+        ui_css_rule_append_selector_attr(cov_rule, "href",
+                                         UI_CSS_ATTR_OP_EQUALS, "http");
+        ui_css_rule_append_selector_attr(cov_rule, "disabled",
+                                         UI_CSS_ATTR_OP_NONE, NULL);
+        ui_css_rule_append_selector_attr(cov_rule, "lang", UI_CSS_ATTR_OP_DASH,
+                                         "en");
+        ui_css_rule_append_selector_attr(cov_rule, "href",
+                                         UI_CSS_ATTR_OP_PREFIX, "https");
+        ui_css_rule_append_selector_attr(cov_rule, "href",
+                                         UI_CSS_ATTR_OP_SUFFIX, ".pdf");
+        ui_css_rule_append_selector_attr(cov_rule, "href",
+                                         UI_CSS_ATTR_OP_SUBSTRING, "example");
+        ui_css_rule_append_selector_attr(cov_rule, "class",
+                                         UI_CSS_ATTR_OP_INCLUDES, "btn");
+        ui_css_rule_append_declaration(cov_rule, "color", "red", 0);
+        ui_css_rule_append_declaration(cov_rule, "margin", "10px", 0);
+        ui_css_stylesheet_append_rule(cov_sheet, cov_rule);
+      }
+
+      struct ui_css_rule *rule_media = NULL;
+      if (ui_css_rule_create(UI_CSS_RULE_TYPE_MEDIA, &rule_media) ==
+          UI_ERROR_NONE) {
+        rule_media->media_condition = my_strdup("(max-width: 600px)");
+        ui_css_rule_append_declaration(rule_media, "padding", "5px", 0);
+        ui_css_stylesheet_append_rule(cov_sheet, rule_media);
+      }
+
+      struct ui_css_rule *rule_scope = NULL;
+      if (ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &rule_scope) ==
+          UI_ERROR_NONE) {
+        rule_scope->scope_start = my_strdup(".card");
+        rule_scope->scope_end = my_strdup(".hole");
+        ui_css_stylesheet_append_rule(cov_sheet, rule_scope);
+      }
+
+      struct ui_css_rule *rule_scope2 = NULL;
+      if (ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &rule_scope2) ==
+          UI_ERROR_NONE) {
+        rule_scope2->scope_start = my_strdup(".container");
+        rule_scope2->scope_end = NULL;
+        ui_css_stylesheet_append_rule(cov_sheet, rule_scope2);
+      }
+
+      struct ui_css_rule *rule_supports = NULL;
+      if (ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_supports) ==
+          UI_ERROR_NONE) {
+        rule_supports->supports_condition = my_strdup("(display: grid)");
+        ui_css_stylesheet_append_rule(cov_sheet, rule_supports);
+      }
+
+      struct ui_css_rule *rule_container = NULL;
+      if (ui_css_rule_create(UI_CSS_RULE_TYPE_CONTAINER, &rule_container) ==
+          UI_ERROR_NONE) {
+        rule_container->container_condition = my_strdup("(min-width: 700px)");
+        ui_css_stylesheet_append_rule(cov_sheet, rule_container);
+      }
+
+      struct ui_css_rule *rule_property = NULL;
+      if (ui_css_rule_create(UI_CSS_RULE_TYPE_PROPERTY, &rule_property) ==
+          UI_ERROR_NONE) {
+        rule_property->property_name = my_strdup("--my-prop");
+        rule_property->property_syntax = my_strdup("<color>");
+        rule_property->property_initial_value = my_strdup("red");
+        ui_css_stylesheet_append_rule(cov_sheet, rule_property);
+      }
+
+      struct ui_css_rule *rule_layer = NULL;
+      if (ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &rule_layer) ==
+          UI_ERROR_NONE) {
+        rule_layer->layer_name = my_strdup("theme");
+        ui_css_stylesheet_append_rule(cov_sheet, rule_layer);
+      }
+
+      int order2 = 2;
+      ui_css_stylesheet_register_layer(cov_sheet, "L2", &order2);
+
+      ui_css_stylesheet_destroy(cov_sheet);
+    }
+
+    if (g_malloc_fail_countdown > 0) {
+      g_malloc_fail_countdown = -1;
+      break;
+    }
   }
 
   printf("test_ui_cssom passed.\n");

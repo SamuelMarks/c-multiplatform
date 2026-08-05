@@ -1,3 +1,4 @@
+#include <string.h>
 /* clang-format off */
 #include "../include/ui_radio_group_base.h"
 #include "../include/ui_toggle_base.h"
@@ -13,9 +14,9 @@ static int mock_on_change_fail = 0;
 static int cva_change_called = 0;
 static int cva_touched_called = 0;
 
-static enum ui_error on_group_change(struct ui_radio_group_base *group,
-                                     struct ui_toggle_base *active,
-                                     void *user_data) {
+static ui_error_t on_group_change(struct ui_radio_group_base *group,
+                                  struct ui_toggle_base *active,
+                                  void *user_data) {
   (void)group;
   (void)user_data;
   group_changed_count++;
@@ -25,13 +26,13 @@ static enum ui_error on_group_change(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_cva_change(union ui_signal_payload new_value,
-                                   void *user_data) {
+static ui_error_t on_cva_change(union ui_signal_payload new_value,
+                                void *user_data) {
   cva_change_called++;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_cva_touched(void *user_data) {
+static ui_error_t on_cva_touched(void *user_data) {
   cva_touched_called++;
   return UI_ERROR_NONE;
 }
@@ -129,11 +130,11 @@ static int test_radio_group_basic(void) {
   ui_radio_group_base_remove_toggle(group, r2);
 
   ui_radio_group_base_destroy(group);
-  ui_toggle_base_destroy(r1);
-  ui_toggle_base_destroy(r2);
-  ui_toggle_base_destroy(r3);
-  ui_toggle_base_destroy(r4);
-  ui_toggle_base_destroy(r5);
+  (void)ui_toggle_base_destroy(r1);
+  (void)ui_toggle_base_destroy(r2);
+  (void)ui_toggle_base_destroy(r3);
+  (void)ui_toggle_base_destroy(r4);
+  (void)ui_toggle_base_destroy(r5);
   return 0;
 }
 
@@ -216,9 +217,9 @@ static int test_radio_group_keyboard(void) {
     return 1;
 
   ui_radio_group_base_destroy(group);
-  ui_toggle_base_destroy(r1);
-  ui_toggle_base_destroy(r2);
-  ui_toggle_base_destroy(r3);
+  (void)ui_toggle_base_destroy(r1);
+  (void)ui_toggle_base_destroy(r2);
+  (void)ui_toggle_base_destroy(r3);
   return 0;
 }
 
@@ -292,8 +293,8 @@ static int test_radio_group_nulls(void) {
   ui_radio_group_base_add_toggle(group, checked);
 
   ui_radio_group_base_destroy(group);
-  ui_toggle_base_destroy(r1);
-  ui_toggle_base_destroy(checked);
+  (void)ui_toggle_base_destroy(r1);
+  (void)ui_toggle_base_destroy(checked);
 
   return 0;
 }
@@ -313,20 +314,20 @@ static int test_radio_group_oom(void) {
 
   for (i = 0; i < 5; i++) {
     struct ui_toggle_base *t;
-    enum ui_error rc;
+    ui_error_t rc;
     ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &t);
     g_malloc_fail_countdown = 0; /* fail the realloc */
     rc = ui_radio_group_base_add_toggle(group, t);
     g_malloc_fail_countdown = -1;
     if (rc == UI_ERROR_OUT_OF_MEMORY) {
-      ui_toggle_base_destroy(t);
+      (void)ui_toggle_base_destroy(t);
     } else {
       /* Added */
     }
   }
 
   ui_radio_group_base_destroy(group);
-  ui_toggle_base_destroy(r1);
+  (void)ui_toggle_base_destroy(r1);
   return 0;
 }
 
@@ -381,8 +382,8 @@ static int test_radio_group_edge_cases(void) {
   mock_on_change_fail = 0;
 
   ui_radio_group_base_destroy(group);
-  ui_toggle_base_destroy(r1);
-  ui_toggle_base_destroy(r2);
+  (void)ui_toggle_base_destroy(r1);
+  (void)ui_toggle_base_destroy(r2);
 
   return 0;
 }

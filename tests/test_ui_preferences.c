@@ -30,7 +30,7 @@ static int test_preferences_lifecycle(void) {
   struct ui_thread_pool *pool = NULL;
   struct ui_execution_context *ctx = NULL;
   struct ui_preferences *prefs = NULL;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_thread_pool_create(2, &pool);
   if (err != UI_ERROR_NONE)
@@ -44,13 +44,13 @@ static int test_preferences_lifecycle(void) {
 
   err = ui_preferences_create(pool, ctx, &prefs);
   if (err != UI_ERROR_NONE) {
-    ui_execution_context_destroy(ctx);
+    (void)ui_execution_context_destroy(ctx);
     ui_thread_pool_destroy(pool);
     return 1;
   }
 
   ui_preferences_destroy(prefs);
-  ui_execution_context_destroy(ctx);
+  (void)ui_execution_context_destroy(ctx);
   ui_thread_pool_destroy(pool);
 
   return 0;
@@ -60,7 +60,7 @@ static int test_preferences_set_get(void) {
   struct ui_thread_pool *pool = NULL;
   struct ui_execution_context *ctx = NULL;
   struct ui_preferences *prefs = NULL;
-  enum ui_error err;
+  ui_error_t err;
   char *val = NULL;
 
   ui_thread_pool_create(2, &pool);
@@ -82,7 +82,7 @@ static int test_preferences_set_get(void) {
     return 1;
   if (strcmp(val, "test_value") != 0)
     return 1;
-  free(val); /* Note: JS _malloced buffer currently needs free() not UI_FREE
+  free(val); /* Note: JS _malloced buffer currently needs free() not FREE
                 here due to testing context */
 #else
   if (err != UI_ERROR_UNSUPPORTED)
@@ -90,7 +90,7 @@ static int test_preferences_set_get(void) {
 #endif
 
   ui_preferences_destroy(prefs);
-  ui_execution_context_destroy(ctx);
+  (void)ui_execution_context_destroy(ctx);
   ui_thread_pool_destroy(pool);
 
   return 0;
@@ -101,7 +101,7 @@ static int test_preferences_save_binary(void) {
   struct ui_execution_context *ctx = NULL;
   struct ui_preferences *prefs = NULL;
   struct ui_promise *promise = NULL;
-  enum ui_error err;
+  ui_error_t err;
   const char *data = "binary_data";
 
   ui_thread_pool_create(2, &pool);
@@ -119,9 +119,9 @@ static int test_preferences_save_binary(void) {
     /* Rejected natively currently */
 #endif
 
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
   ui_preferences_destroy(prefs);
-  ui_execution_context_destroy(ctx);
+  (void)ui_execution_context_destroy(ctx);
   ui_thread_pool_destroy(pool);
 
   return 0;
@@ -176,7 +176,7 @@ static int test_preferences_nulls(void) {
     return 1;
 
   ui_preferences_destroy(prefs);
-  ui_execution_context_destroy(ctx);
+  (void)ui_execution_context_destroy(ctx);
   ui_thread_pool_destroy(pool);
   return 0;
 }
@@ -204,7 +204,7 @@ static int test_preferences_oom(void) {
   g_malloc_fail_countdown = -1;
 
   ui_preferences_destroy(prefs);
-  ui_execution_context_destroy(ctx);
+  (void)ui_execution_context_destroy(ctx);
   ui_thread_pool_destroy(pool);
   return 0;
 }

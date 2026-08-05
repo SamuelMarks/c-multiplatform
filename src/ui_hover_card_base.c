@@ -22,10 +22,10 @@ struct ui_hover_card_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_hover_card_base_create(struct ui_hover_card_base **out_hover_card) {
   struct ui_hover_card_base *hover_card;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -33,8 +33,8 @@ ui_hover_card_base_create(struct ui_hover_card_base **out_hover_card) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  hover_card =
-      (struct ui_hover_card_base *)UI_MALLOC(sizeof(struct ui_hover_card_base));
+  hover_card = (struct ui_hover_card_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_hover_card_base));
   if (!hover_card) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -81,27 +81,28 @@ ui_hover_card_base_create(struct ui_hover_card_base **out_hover_card) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (hover_card && hover_card->component) {
-    ui_component_destroy(hover_card->component);
+    (void)ui_component_destroy(hover_card->component);
   }
-  UI_FREE(hover_card);
+  C_MULTIPLATFORM_FREE(hover_card);
   return rc;
 }
 
-void ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card) {
+ui_error_t ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card) {
   if (!hover_card) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (hover_card->component) {
-    ui_component_destroy(hover_card->component);
+    (void)ui_component_destroy(hover_card->component);
   }
-  UI_FREE(hover_card);
+  C_MULTIPLATFORM_FREE(hover_card);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_hover_card_base_get_component(struct ui_hover_card_base *hover_card,
                                  struct ui_component **out_component) {
   if (!hover_card || !out_component) {
@@ -112,7 +113,7 @@ ui_hover_card_base_get_component(struct ui_hover_card_base *hover_card,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_hover_card_base_on_mouse_enter(struct ui_hover_card_base *hover_card) {
   if (!hover_card) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -126,7 +127,7 @@ ui_hover_card_base_on_mouse_enter(struct ui_hover_card_base *hover_card) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_hover_card_base_on_mouse_leave(struct ui_hover_card_base *hover_card,
                                   float cursor_x, float cursor_y) {
   (void)cursor_x;
@@ -144,8 +145,8 @@ ui_hover_card_base_on_mouse_leave(struct ui_hover_card_base *hover_card,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_hover_card_base_bind_open(struct ui_hover_card_base *widget,
-                                           struct ui_signal *open_signal) {
+ui_error_t ui_hover_card_base_bind_open(struct ui_hover_card_base *widget,
+                                        struct ui_signal *open_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -154,7 +155,7 @@ enum ui_error ui_hover_card_base_bind_open(struct ui_hover_card_base *widget,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_hover_card_base_get_animating_signal(struct ui_hover_card_base *widget,
                                         struct ui_computed **out_animating) {
   if (!widget || !out_animating) {

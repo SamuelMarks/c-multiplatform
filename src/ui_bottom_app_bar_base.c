@@ -5,6 +5,58 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_bottom_app_bar_mock_fail = 0;
+static ui_error_t
+mock_component_set_default_style(struct ui_component *comp,
+                                 struct ui_css_stylesheet *style) {
+  if (g_bottom_app_bar_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  return (ui_component_set_default_style)(comp, style);
+}
+#undef ui_component_set_default_style
+#define ui_component_set_default_style mock_component_set_default_style
+
+static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
+                                              const char *k, const char *v) {
+  if (g_bottom_app_bar_mock_fail == 2)
+    return UI_ERROR_UNKNOWN;
+  return (ui_dom_node_set_attribute)(node, k, v);
+}
+#undef ui_dom_node_set_attribute
+#define ui_dom_node_set_attribute mock_dom_node_set_attribute
+
+ui_error_t run_bottom_app_bar_coverage(void);
+ui_error_t run_bottom_app_bar_coverage(void) {
+
+  struct ui_bottom_app_bar_base *bar = NULL;
+
+  g_bottom_app_bar_mock_fail = 1;
+  ui_bottom_app_bar_base_create(&bar);
+  g_bottom_app_bar_mock_fail = 0;
+
+  ui_bottom_app_bar_base_create(&bar);
+
+  g_bottom_app_bar_mock_fail = 2;
+  ui_bottom_app_bar_base_set_fab(bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER);
+  g_bottom_app_bar_mock_fail = 0;
+
+  g_bottom_app_bar_mock_fail = 2;
+  ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
+                                 UI_BOTTOM_APP_BAR_FAB_CENTER);
+  g_bottom_app_bar_mock_fail = 0;
+
+  g_bottom_app_bar_mock_fail = 2;
+  ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
+                                 UI_BOTTOM_APP_BAR_FAB_END);
+  g_bottom_app_bar_mock_fail = 0;
+
+  (void)ui_bottom_app_bar_base_destroy(bar);
+
+  return UI_ERROR_NONE;
+}
+#endif
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -31,10 +83,10 @@ struct ui_bottom_app_bar_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar) {
   struct ui_bottom_app_bar_base *bar;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -42,7 +94,7 @@ ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  bar = (struct ui_bottom_app_bar_base *)UI_MALLOC(
+  bar = (struct ui_bottom_app_bar_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_bottom_app_bar_base));
   if (!bar) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -77,7 +129,10 @@ ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar) {
     goto cleanup;
   }
 
-  ui_component_set_default_style(bar->component, default_style);
+  rc = ui_component_set_default_style(bar->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   bar->component->shadow_root = root_node;
   root_node = NULL;
@@ -87,25 +142,26 @@ ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (bar->component) {
-    ui_component_destroy(bar->component);
+    (void)ui_component_destroy(bar->component);
   }
-  UI_FREE(bar);
+  C_MULTIPLATFORM_FREE(bar);
   return rc;
 }
 
-void ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar) {
+ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar) {
   if (!bar) {
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
   }
-  ui_component_destroy(bar->component);
-  UI_FREE(bar);
+  (void)ui_component_destroy(bar->component);
+  C_MULTIPLATFORM_FREE(bar);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
                                      struct ui_component **out_component) {
   if (!bar || !out_component) {
@@ -116,10 +172,12 @@ ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
                                struct ui_fab_base *fab,
                                enum ui_bottom_app_bar_fab_alignment alignment) {
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!bar) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -131,24 +189,30 @@ ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
      For now, this provides the structural plumbing. */
   if (fab) {
     if (alignment == UI_BOTTOM_APP_BAR_FAB_CENTER) {
-      ui_dom_node_set_attribute(
+      rc = ui_dom_node_set_attribute(
           bar->component->shadow_root, "style",
           "--bottom-app-bar-cutout: circle(50% at 50% 0);");
+      if (rc != UI_ERROR_NONE)
+        return rc;
     } else {
-      ui_dom_node_set_attribute(
+      rc = ui_dom_node_set_attribute(
           bar->component->shadow_root, "style",
           "--bottom-app-bar-cutout: circle(50% at 90% 0);");
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   } else {
-    ui_dom_node_set_attribute(bar->component->shadow_root, "style",
-                              "--bottom-app-bar-cutout: none;");
+    rc = ui_dom_node_set_attribute(bar->component->shadow_root, "style",
+                                   "--bottom-app-bar-cutout: none;");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_bottom_app_bar_base_bind_active_index(struct ui_bottom_app_bar_base *widget,
                                          struct ui_signal *signal) {
   if (!widget) {

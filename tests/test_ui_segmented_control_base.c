@@ -10,21 +10,21 @@ static int g_change_called = 0;
 static int g_change_val = -1;
 static int g_touched_called = 0;
 
-static enum ui_error dummy_change(union ui_signal_payload new_value,
-                                  void *user_data) {
+static ui_error_t dummy_change(union ui_signal_payload new_value,
+                               void *user_data) {
   g_change_called++;
   g_change_val = new_value.int_val;
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_touched(void *user_data) {
+static ui_error_t dummy_touched(void *user_data) {
   g_touched_called++;
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_touched_fail(void *user_data) {
+static ui_error_t dummy_touched_fail(void *user_data) {
   (void)user_data;
   return UI_ERROR_UNKNOWN;
 }
@@ -34,7 +34,7 @@ int main(void) {
   struct ui_segmented_button_base *btn1 = NULL, *btn2 = NULL, *btn3 = NULL;
   struct ui_control_value_accessor cva;
   struct ui_component *comp;
-  enum ui_error err;
+  ui_error_t err;
 
   printf("Starting test_ui_segmented_control_base...\n");
 
@@ -231,10 +231,10 @@ int main(void) {
                                         1); /* hits null checks in triggers */
 
   ui_segmented_button_base_destroy(btn_nocva);
-  ui_segmented_control_base_destroy(control_no_cva);
+  (void)ui_segmented_control_base_destroy(control_no_cva);
 
   /* Double destroy safely */
-  ui_segmented_control_base_destroy(NULL);
+  (void)ui_segmented_control_base_destroy(NULL);
   ui_segmented_button_base_destroy(NULL);
 
   ui_segmented_button_base_destroy(btn_orphan);
@@ -244,7 +244,28 @@ int main(void) {
   ui_segmented_button_base_destroy(btn3);
   ui_segmented_button_base_destroy(btn4);
   ui_segmented_button_base_destroy(btn5);
-  ui_segmented_control_base_destroy(control);
+
+  /* Specifically test REALLOC failure */
+  {
+    int j;
+    for (j = 0; j < 10; ++j) {
+      struct ui_segmented_button_base *btn_realloc;
+      if (ui_segmented_button_base_create(&btn_realloc) == UI_ERROR_NONE) {
+        ui_error_t realloc_rc;
+        g_malloc_fail_countdown =
+            0; /* Will hit REALLOC when capacity is exceeded */
+        realloc_rc =
+            ui_segmented_control_base_append_segment(control, btn_realloc);
+        g_malloc_fail_countdown = -1;
+        if (realloc_rc == UI_ERROR_OUT_OF_MEMORY) {
+          ui_segmented_button_base_destroy(btn_realloc);
+          break; /* We hit the REALLOC failure, test complete */
+        }
+      }
+    }
+  }
+
+  (void)ui_segmented_control_base_destroy(control);
   control = NULL;
 
   /* Allocation failures */
@@ -284,7 +305,7 @@ int main(void) {
 
   ui_segmented_button_base_destroy(btn1);
   btn1 = NULL;
-  ui_segmented_control_base_destroy(control);
+  (void)ui_segmented_control_base_destroy(control);
   control = NULL;
 
   printf("All tests passed.\n");

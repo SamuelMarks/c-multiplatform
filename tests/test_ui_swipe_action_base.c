@@ -69,7 +69,7 @@ int main(void) {
   ACCUM_ERR(failed, ui_swipe_action_base_bind_disabled(&swipe, NULL));
   ACCUM_ERR(failed, ui_swipe_action_base_bind_text(&swipe, NULL));
 
-  ui_component_destroy(comp);
+  (void)ui_component_destroy(comp);
 
   if (!failed) {
     printf("All ui_swipe_action_base tests passed.\n");

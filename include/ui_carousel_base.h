@@ -47,15 +47,15 @@ struct ui_carousel_config {
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY if allocation fails,
  * or UI_ERROR_INVALID_ARGUMENT if args are null.
  */
-enum ui_error ui_carousel_base_create(struct ui_carousel_base **out_carousel,
-                                      const struct ui_carousel_config *config);
+ui_error_t ui_carousel_base_create(struct ui_carousel_base **out_carousel,
+                                   const struct ui_carousel_config *config);
 
 /**
  * @brief Destroys the carousel.
  *
  * @param carousel The carousel to destroy.
  */
-void ui_carousel_base_destroy(struct ui_carousel_base *carousel);
+ui_error_t ui_carousel_base_destroy(struct ui_carousel_base *carousel);
 
 /**
  * @brief Sets the number of items in the carousel.
@@ -64,8 +64,8 @@ void ui_carousel_base_destroy(struct ui_carousel_base *carousel);
  * @param count The number of items.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-enum ui_error ui_carousel_base_set_item_count(struct ui_carousel_base *carousel,
-                                              size_t count);
+ui_error_t ui_carousel_base_set_item_count(struct ui_carousel_base *carousel,
+                                           size_t count);
 
 /**
  * @brief Sets the viewport size.
@@ -75,9 +75,8 @@ enum ui_error ui_carousel_base_set_item_count(struct ui_carousel_base *carousel,
  * @param height Viewport height.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-enum ui_error
-ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
-                                   float width, float height);
+ui_error_t ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
+                                              float width, float height);
 
 /**
  * @brief Gets the underlying component.
@@ -85,9 +84,8 @@ ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
  * @param carousel The carousel instance.
  * @return The component, or NULL if null.
  */
-enum ui_error
-ui_carousel_base_get_component(struct ui_carousel_base *carousel,
-                               struct ui_component **out_component);
+ui_error_t ui_carousel_base_get_component(struct ui_carousel_base *carousel,
+                                          struct ui_component **out_component);
 
 /**
  * @brief Feeds a raw event into the carousel for gesture paging.
@@ -97,9 +95,9 @@ ui_carousel_base_get_component(struct ui_carousel_base *carousel,
  * @param timestamp_ms Current timestamp.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-enum ui_error ui_carousel_base_process_event(struct ui_carousel_base *carousel,
-                                             const struct ui_event *event,
-                                             double timestamp_ms);
+ui_error_t ui_carousel_base_process_event(struct ui_carousel_base *carousel,
+                                          const struct ui_event *event,
+                                          double timestamp_ms);
 
 /**
  * @brief Updates the carousel per frame (for scroll animations/snapping).
@@ -108,8 +106,8 @@ enum ui_error ui_carousel_base_process_event(struct ui_carousel_base *carousel,
  * @param timestamp_ms Current timestamp.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-enum ui_error ui_carousel_base_tick(struct ui_carousel_base *carousel,
-                                    double timestamp_ms);
+ui_error_t ui_carousel_base_tick(struct ui_carousel_base *carousel,
+                                 double timestamp_ms);
 
 /**
  * @brief Scrolls to a specific index.
@@ -120,9 +118,8 @@ enum ui_error ui_carousel_base_tick(struct ui_carousel_base *carousel,
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if index is out of
  * range, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-enum ui_error
-ui_carousel_base_scroll_to_index(struct ui_carousel_base *carousel,
-                                 size_t index, int smooth);
+ui_error_t ui_carousel_base_scroll_to_index(struct ui_carousel_base *carousel,
+                                            size_t index, int smooth);
 
 /**
  * @brief Binds the data property.
@@ -131,8 +128,8 @@ ui_carousel_base_scroll_to_index(struct ui_carousel_base *carousel,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_carousel_base_bind_data(struct ui_carousel_base *widget,
-                                         struct ui_computed *signal);
+ui_error_t ui_carousel_base_bind_data(struct ui_carousel_base *widget,
+                                      struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

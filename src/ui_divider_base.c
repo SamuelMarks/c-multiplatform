@@ -38,34 +38,35 @@ struct ui_divider_base {
   struct ui_signal *data_signal;
 };
 
-static enum ui_error update_dom_state(struct ui_divider_base *divider) {
+static ui_error_t update_dom_state(struct ui_divider_base *divider) {
   if (divider->orientation == UI_DIVIDER_ORIENTATION_VERTICAL) {
-    ui_dom_node_set_attribute(divider->root_node, "data-orientation",
-                              "vertical");
+    (void)ui_dom_node_set_attribute(divider->root_node, "data-orientation",
+                                    "vertical");
   } else {
-    ui_dom_node_set_attribute(divider->root_node, "data-orientation",
-                              "horizontal");
+    (void)ui_dom_node_set_attribute(divider->root_node, "data-orientation",
+                                    "horizontal");
   }
 
   if (divider->inset) {
-    ui_dom_node_set_attribute(divider->root_node, "data-inset", "true");
+    (void)ui_dom_node_set_attribute(divider->root_node, "data-inset", "true");
   } else {
-    ui_dom_node_remove_attribute(divider->root_node, "data-inset");
+    (void)ui_dom_node_remove_attribute(divider->root_node, "data-inset");
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_divider_base_create(struct ui_divider_base **out_divider) {
+ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider) {
   struct ui_divider_base *divider;
   struct ui_css_stylesheet *default_style = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_divider) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  divider = (struct ui_divider_base *)UI_MALLOC(sizeof(struct ui_divider_base));
+  divider = (struct ui_divider_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_divider_base));
   if (!divider) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -93,7 +94,7 @@ enum ui_error ui_divider_base_create(struct ui_divider_base **out_divider) {
     goto cleanup;
   }
 
-  ui_component_set_default_style(divider->component, default_style);
+  (void)ui_component_set_default_style(divider->component, default_style);
 
   divider->component->shadow_root = divider->root_node;
   divider->orientation = UI_DIVIDER_ORIENTATION_HORIZONTAL;
@@ -106,47 +107,45 @@ enum ui_error ui_divider_base_create(struct ui_divider_base **out_divider) {
 
 cleanup:
   if (divider->root_node) {
-    ui_dom_node_destroy(divider->root_node);
+    (void)ui_dom_node_destroy(divider->root_node);
   }
-  ui_component_destroy(divider->component);
-  UI_FREE(divider);
+  (void)ui_component_destroy(divider->component);
+  C_MULTIPLATFORM_FREE(divider);
   return rc;
 }
 
-void ui_divider_base_destroy(struct ui_divider_base *divider) {
+ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   if (!divider) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(divider->component);
-  UI_FREE(divider);
+  (void)ui_component_destroy(divider->component);
+  C_MULTIPLATFORM_FREE(divider);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_divider_base_set_orientation(struct ui_divider_base *divider,
                                 enum ui_divider_orientation orientation) {
   if (!divider) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   divider->orientation = orientation;
-  (void)update_dom_state(divider);
-  return UI_ERROR_NONE;
+  return update_dom_state(divider);
 }
 
-enum ui_error ui_divider_base_set_inset(struct ui_divider_base *divider,
-                                        int inset) {
+ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
+                                     int inset) {
   if (!divider) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   divider->inset = inset;
-  (void)update_dom_state(divider);
-  return UI_ERROR_NONE;
+  return update_dom_state(divider);
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_divider_base_get_component(struct ui_divider_base *divider,
-                              struct ui_component **out_component) {
+ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
+                                         struct ui_component **out_component) {
   if (!divider || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -154,8 +153,8 @@ ui_divider_base_get_component(struct ui_divider_base *divider,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_divider_base_bind_data(struct ui_divider_base *widget,
-                                        struct ui_signal *signal) {
+ui_error_t ui_divider_base_bind_data(struct ui_divider_base *widget,
+                                     struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -40,9 +40,9 @@ struct ui_top_app_bar_config {
  * @param arena The memory arena.
  * @param config The configuration.
  * @param out_bar Output pointer for the created component.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_top_app_bar_base_create(struct ui_arena *arena,
                            const struct ui_top_app_bar_config *config,
                            struct ui_top_app_bar_base **out_bar);
@@ -51,9 +51,9 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
  * @brief Destroys a top app bar base component.
  *
  * @param bar The component.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar);
+ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar);
 
 /**
  * @brief Handles scroll events.
@@ -61,10 +61,10 @@ enum ui_error ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar);
  * @param bar The component.
  * @param scroll_y The absolute scroll position.
  * @param delta_y The change in scroll position.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
-                                                float scroll_y, float delta_y);
+ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
+                                             float scroll_y, float delta_y);
 
 /**
  * @brief Gets the signal for the current state.
@@ -72,11 +72,10 @@ enum ui_error ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
  *
  * @param bar The component.
  * @param out_signal Output pointer for the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
-ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
-                                     ui_signal_t **out_signal);
+ui_error_t ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
+                                                ui_signal_t **out_signal);
 
 /**
  * @brief Gets the signal for the current height.
@@ -84,9 +83,9 @@ ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
  *
  * @param bar The component.
  * @param out_signal Output pointer for the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
+ui_error_t
 ui_top_app_bar_base_get_height_signal(struct ui_top_app_bar_base *bar,
                                       ui_signal_t **out_signal);
 

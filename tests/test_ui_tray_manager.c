@@ -7,12 +7,26 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_malloc_fail_countdown;
+#endif
+
 int main(void) {
   struct ui_tray_manager *tray = NULL;
   struct ui_menu_base *menu = NULL;
   struct ui_image_base image;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
+
+  rc = ui_tray_manager_create(NULL);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  g_malloc_fail_countdown = 0;
+  rc = ui_tray_manager_create(&tray);
+  failed |= (rc != UI_ERROR_OUT_OF_MEMORY);
+  g_malloc_fail_countdown = -1;
+#endif
 
   rc = ui_tray_manager_create(&tray);
   failed |= (rc != UI_ERROR_NONE);
@@ -22,23 +36,54 @@ int main(void) {
 
   memset(&image, 0, sizeof(image));
 
+  rc = ui_tray_manager_set_tooltip(NULL, "Test Tooltip");
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_tray_manager_set_tooltip(tray, NULL);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+
   rc = ui_tray_manager_set_tooltip(tray, "Test Tooltip");
   failed |= (rc != UI_ERROR_NONE);
+
+  rc = ui_tray_manager_set_icon(NULL, &image);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_tray_manager_set_icon(tray, NULL);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
 
   rc = ui_tray_manager_set_icon(tray, &image);
   failed |= (rc != UI_ERROR_NONE);
 
+  rc = ui_tray_manager_set_context_menu(NULL, menu);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+
   rc = ui_tray_manager_set_context_menu(tray, menu);
+  failed |= (rc != UI_ERROR_NONE);
+
+  rc = ui_tray_manager_show(NULL);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+
+  rc = ui_tray_manager_show(tray);
   failed |= (rc != UI_ERROR_NONE);
 
   rc = ui_tray_manager_show(tray);
   failed |= (rc != UI_ERROR_NONE);
 
+  rc = ui_tray_manager_hide(NULL);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+
   rc = ui_tray_manager_hide(tray);
   failed |= (rc != UI_ERROR_NONE);
 
+  rc = ui_tray_manager_hide(tray);
+  failed |= (rc != UI_ERROR_NONE);
+
+  rc = ui_tray_manager_show(tray);
+  failed |= (rc != UI_ERROR_NONE);
+
+  rc = ui_tray_manager_destroy(NULL);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+
   ui_tray_manager_destroy(tray);
-  ui_menu_base_destroy(menu);
+  (void)ui_menu_base_destroy(menu);
 
   if (!failed) {
     printf("test_ui_tray_manager passed\n");

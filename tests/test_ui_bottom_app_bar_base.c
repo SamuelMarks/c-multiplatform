@@ -14,11 +14,11 @@ static void test_bottom_app_bar_edge_cases(void) {
   struct ui_component *comp = NULL;
   struct ui_signal *signal = (struct ui_signal *)0x123;
   int i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Invalid arguments */
   assert(ui_bottom_app_bar_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
-  ui_bottom_app_bar_base_destroy(NULL);
+  (void)ui_bottom_app_bar_base_destroy(NULL);
 
   assert(ui_bottom_app_bar_base_get_component(NULL, &comp) ==
          UI_ERROR_INVALID_ARGUMENT);
@@ -47,8 +47,8 @@ static void test_bottom_app_bar_edge_cases(void) {
   assert(ui_bottom_app_bar_base_set_fab(
              bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER) == UI_ERROR_NONE);
 
-  ui_bottom_app_bar_base_destroy(bar);
-  ui_fab_base_destroy(fab);
+  (void)ui_bottom_app_bar_base_destroy(bar);
+  (void)ui_fab_base_destroy(fab);
 
   /* OOM loop */
   for (i = 0; i < 20; i++) {
@@ -56,7 +56,7 @@ static void test_bottom_app_bar_edge_cases(void) {
     struct ui_bottom_app_bar_base *test_bar = NULL;
     rc = ui_bottom_app_bar_base_create(&test_bar);
     if (rc == UI_ERROR_NONE) {
-      ui_bottom_app_bar_base_destroy(test_bar);
+      (void)ui_bottom_app_bar_base_destroy(test_bar);
       break;
     } else {
       assert(rc == UI_ERROR_OUT_OF_MEMORY);
@@ -67,10 +67,16 @@ static void test_bottom_app_bar_edge_cases(void) {
 }
 
 int main(void) {
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_bottom_app_bar_coverage(void);
+  run_bottom_app_bar_coverage();
+#endif
+
   struct ui_bottom_app_bar_base *bar = NULL;
   struct ui_fab_base *fab = NULL;
   struct ui_component *comp = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_bottom_app_bar_base_create(&bar);
   if (rc != UI_ERROR_NONE) {
@@ -96,8 +102,8 @@ int main(void) {
     return 1;
   }
 
-  ui_bottom_app_bar_base_destroy(bar);
-  ui_fab_base_destroy(fab);
+  (void)ui_bottom_app_bar_base_destroy(bar);
+  (void)ui_fab_base_destroy(fab);
 
   test_bottom_app_bar_edge_cases();
 

@@ -32,7 +32,7 @@ struct ui_scaffold_base {
  * @param out_scaffold Pointer to output the initialized scaffold.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold);
+ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold);
 
 /**
  * @brief Sets the top app bar component of the scaffold.
@@ -41,8 +41,8 @@ enum ui_error ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold);
  * @param top_bar The top bar component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_scaffold_base_set_top_bar(struct ui_scaffold_base *scaffold,
-                                           struct ui_component *top_bar);
+ui_error_t ui_scaffold_base_set_top_bar(struct ui_scaffold_base *scaffold,
+                                        struct ui_component *top_bar);
 
 /**
  * @brief Sets the main content component of the scaffold.
@@ -51,9 +51,8 @@ enum ui_error ui_scaffold_base_set_top_bar(struct ui_scaffold_base *scaffold,
  * @param content The main content component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_scaffold_base_set_main_content(struct ui_scaffold_base *scaffold,
-                                  struct ui_component *content);
+ui_error_t ui_scaffold_base_set_main_content(struct ui_scaffold_base *scaffold,
+                                             struct ui_component *content);
 
 /**
  * @brief Binds the data property.
@@ -62,8 +61,8 @@ ui_scaffold_base_set_main_content(struct ui_scaffold_base *scaffold,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_scaffold_base_bind_data(struct ui_scaffold_base *widget,
-                                         struct ui_signal *signal);
+ui_error_t ui_scaffold_base_bind_data(struct ui_scaffold_base *widget,
+                                      struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

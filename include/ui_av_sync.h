@@ -27,7 +27,7 @@ struct ui_av_sync {
  * @param sync The sync instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_av_sync_init(struct ui_av_sync *sync);
+ui_error_t ui_av_sync_init(struct ui_av_sync *sync);
 
 /**
  * @brief Updates the clock with the latest audio PTS.
@@ -38,9 +38,9 @@ enum ui_error ui_av_sync_init(struct ui_av_sync *sync);
  * updates).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_av_sync_update_audio_pts(struct ui_av_sync *sync,
-                                          ui_int64 audio_pts_us,
-                                          ui_int64 sys_time_us);
+ui_error_t ui_av_sync_update_audio_pts(struct ui_av_sync *sync,
+                                       ui_int64 audio_pts_us,
+                                       ui_int64 sys_time_us);
 
 /**
  * @brief Ticks the sync clock using system time.
@@ -50,8 +50,8 @@ enum ui_error ui_av_sync_update_audio_pts(struct ui_av_sync *sync,
  * @param sys_time_us The current system time.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_av_sync_tick_system(struct ui_av_sync *sync,
-                                     ui_int64 sys_time_us);
+ui_error_t ui_av_sync_tick_system(struct ui_av_sync *sync,
+                                  ui_int64 sys_time_us);
 
 /**
  * @brief Retrieves the current interpolated master clock to sync video frames
@@ -61,8 +61,8 @@ enum ui_error ui_av_sync_tick_system(struct ui_av_sync *sync,
  * @param out_clock_us Pointer to receive the master clock time.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_av_sync_get_clock(struct ui_av_sync *sync,
-                                   ui_int64 *out_clock_us);
+ui_error_t ui_av_sync_get_clock(struct ui_av_sync *sync,
+                                ui_int64 *out_clock_us);
 
 #ifdef __cplusplus
 }

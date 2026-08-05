@@ -8,8 +8,8 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_mock_append_child_fail_countdown;
-static enum ui_error mock_ui_dom_node_append_child(struct ui_dom_node *parent,
-                                                   struct ui_dom_node *child) {
+static ui_error_t mock_ui_dom_node_append_child(struct ui_dom_node *parent,
+                                                struct ui_dom_node *child) {
   if (g_mock_append_child_fail_countdown == 0) {
     g_mock_append_child_fail_countdown = -1;
     return UI_ERROR_UNKNOWN;
@@ -36,12 +36,12 @@ struct ui_table_base {
   struct ui_computed *data_signal;
 };
 
-enum ui_error ui_table_base_create(struct ui_table_base **out_table,
-                                   const struct ui_table_model *model) {
+ui_error_t ui_table_base_create(struct ui_table_base **out_table,
+                                const struct ui_table_model *model) {
   struct ui_table_base *table;
   size_t num_cols;
   size_t i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_table || !model || !model->get_row_count ||
       !model->get_column_count || !model->render_cell ||
@@ -49,7 +49,8 @@ enum ui_error ui_table_base_create(struct ui_table_base **out_table,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  table = (struct ui_table_base *)UI_MALLOC(sizeof(struct ui_table_base));
+  table = (struct ui_table_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_table_base));
   if (!table)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -62,7 +63,7 @@ enum ui_error ui_table_base_create(struct ui_table_base **out_table,
 
   rc = ui_selection_model_create(&table->selection_model);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(table);
+    C_MULTIPLATFORM_FREE(table);
     return rc;
   }
 
@@ -70,11 +71,12 @@ enum ui_error ui_table_base_create(struct ui_table_base **out_table,
   table->num_cols = num_cols;
 
   if (num_cols > 0) {
-    table->col_configs = (struct ui_table_column_config *)UI_MALLOC(
-        num_cols * sizeof(struct ui_table_column_config));
+    table->col_configs =
+        (struct ui_table_column_config *)C_MULTIPLATFORM_MALLOC(
+            num_cols * sizeof(struct ui_table_column_config));
     if (!table->col_configs) {
       ui_selection_model_destroy(table->selection_model);
-      UI_FREE(table);
+      C_MULTIPLATFORM_FREE(table);
       return UI_ERROR_OUT_OF_MEMORY;
     }
     for (i = 0; i < num_cols; i++) {
@@ -91,20 +93,21 @@ enum ui_error ui_table_base_create(struct ui_table_base **out_table,
   return UI_ERROR_NONE;
 }
 
-void ui_table_base_destroy(struct ui_table_base *table) {
+ui_error_t ui_table_base_destroy(struct ui_table_base *table) {
   if (!table)
-    return;
+    return UI_ERROR_NONE;
   if (table->selection_model) {
     ui_selection_model_destroy(table->selection_model);
   }
   if (table->col_configs) {
-    UI_FREE(table->col_configs);
+    C_MULTIPLATFORM_FREE(table->col_configs);
   }
-  UI_FREE(table);
+  C_MULTIPLATFORM_FREE(table);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_table_base_get_selection_model(struct ui_table_base *table,
                                   struct ui_selection_model **out_model) {
   if (!table || !out_model)
@@ -114,7 +117,7 @@ ui_table_base_get_selection_model(struct ui_table_base *table,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
                                 const struct ui_table_column_config *config) {
   if (!table || !config)
@@ -127,7 +130,7 @@ ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_table_base_set_sort_config(struct ui_table_base *table,
                               const struct ui_table_sort_config *config) {
   if (!table || !config)
@@ -141,7 +144,7 @@ ui_table_base_set_sort_config(struct ui_table_base *table,
 }
 
 /** \brief ui_table_base_set_pagination_config */
-enum ui_error ui_table_base_set_pagination_config(
+ui_error_t ui_table_base_set_pagination_config(
     struct ui_table_base *table,
     const struct ui_table_pagination_config *config) {
   if (!table || !config)
@@ -161,13 +164,13 @@ static const char *get_aria_sort_string(enum ui_table_sort_direction dir) {
   }
 }
 
-enum ui_error ui_table_base_render(struct ui_table_base *table,
-                                   struct ui_dom_node *container) {
+ui_error_t ui_table_base_render(struct ui_table_base *table,
+                                struct ui_dom_node *container) {
   struct ui_dom_node *table_root = NULL;
   struct ui_dom_node *thead = NULL;
   struct ui_dom_node *header_row = NULL;
   struct ui_dom_node *tbody = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   size_t i, j;
   size_t total_rows, total_cols;
   size_t start_row, end_row;
@@ -183,7 +186,9 @@ enum ui_error ui_table_base_render(struct ui_table_base *table,
   if (rc != UI_ERROR_NONE)
     return rc;
 
-  ui_dom_node_set_attribute(table_root, "role", "grid");
+#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+
+  (void)UI_DOM_SET_ATTR_IGNORE(table_root, "role", "grid");
 
   /* Construct the table inside table_root.
      Eagerly appending ensures a single ui_dom_node_destroy on table_root
@@ -195,20 +200,20 @@ enum ui_error ui_table_base_render(struct ui_table_base *table,
     goto cleanup;
   rc = ui_dom_node_append_child(table_root, thead);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(thead);
+    (void)ui_dom_node_destroy(thead);
     goto cleanup;
   }
-  ui_dom_node_set_attribute(thead, "role", "rowgroup");
+  (void)UI_DOM_SET_ATTR_IGNORE(thead, "role", "rowgroup");
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &header_row);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
   rc = ui_dom_node_append_child(thead, header_row);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(header_row);
+    (void)ui_dom_node_destroy(header_row);
     goto cleanup;
   }
-  ui_dom_node_set_attribute(header_row, "role", "row");
+  (void)UI_DOM_SET_ATTR_IGNORE(header_row, "role", "row");
 
   for (j = 0; j < total_cols; j++) {
     struct ui_dom_node *header_cell;
@@ -219,7 +224,7 @@ enum ui_error ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
     rc = ui_dom_node_append_child(header_row, header_cell);
     if (rc != UI_ERROR_NONE) {
-      ui_dom_node_destroy(header_cell);
+      (void)ui_dom_node_destroy(header_cell);
       goto cleanup;
     }
 
@@ -257,10 +262,10 @@ enum ui_error ui_table_base_render(struct ui_table_base *table,
     goto cleanup;
   rc = ui_dom_node_append_child(table_root, tbody);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(tbody);
+    (void)ui_dom_node_destroy(tbody);
     goto cleanup;
   }
-  ui_dom_node_set_attribute(tbody, "role", "rowgroup");
+  (void)UI_DOM_SET_ATTR_IGNORE(tbody, "role", "rowgroup");
 
   start_row = 0;
   end_row = total_rows;
@@ -284,7 +289,7 @@ enum ui_error ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
     rc = ui_dom_node_append_child(tbody, row);
     if (rc != UI_ERROR_NONE) {
-      ui_dom_node_destroy(row);
+      (void)ui_dom_node_destroy(row);
       goto cleanup;
     }
 
@@ -305,7 +310,7 @@ enum ui_error ui_table_base_render(struct ui_table_base *table,
         goto cleanup;
       rc = ui_dom_node_append_child(row, cell);
       if (rc != UI_ERROR_NONE) {
-        ui_dom_node_destroy(cell);
+        (void)ui_dom_node_destroy(cell);
         goto cleanup;
       }
 
@@ -340,12 +345,12 @@ enum ui_error ui_table_base_render(struct ui_table_base *table,
 
 cleanup:
   if (table_root)
-    ui_dom_node_destroy(table_root);
+    (void)ui_dom_node_destroy(table_root);
   return rc;
 }
 
-enum ui_error ui_table_base_bind_data(struct ui_table_base *widget,
-                                      struct ui_computed *signal) {
+ui_error_t ui_table_base_bind_data(struct ui_table_base *widget,
+                                   struct ui_computed *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

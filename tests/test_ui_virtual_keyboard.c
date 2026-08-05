@@ -11,7 +11,7 @@ extern int g_malloc_fail_countdown;
 
 static int test_virtual_keyboard_lifecycle(void) {
   struct ui_virtual_keyboard *vk = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   rc = ui_virtual_keyboard_create(NULL);
@@ -34,7 +34,7 @@ static int test_virtual_keyboard_lifecycle(void) {
 
 static int test_virtual_keyboard_properties(void) {
   struct ui_virtual_keyboard *vk = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   float height;
   int failed = 0;
 
@@ -70,7 +70,7 @@ static int test_virtual_keyboard_binds(void) {
   struct ui_virtual_keyboard *vk = NULL;
   struct ui_safe_area_manager *sam = (struct ui_safe_area_manager *)0x1234;
   struct ui_signal *sig = (struct ui_signal *)0x5678;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   rc = ui_virtual_keyboard_create(&vk);

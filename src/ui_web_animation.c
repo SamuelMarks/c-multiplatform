@@ -32,7 +32,7 @@ struct ui_web_animation {
 };
 
 /** \brief ui_web_animation_effect_create_keyframe_effect */
-enum ui_error ui_web_animation_effect_create_keyframe_effect(
+ui_error_t ui_web_animation_effect_create_keyframe_effect(
     struct ui_dom_node *target, struct ui_web_animation_keyframe *keyframes,
     const struct ui_web_animation_timing *timing,
     struct ui_web_animation_effect **out_effect) {
@@ -42,7 +42,7 @@ enum ui_error ui_web_animation_effect_create_keyframe_effect(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  effect = (struct ui_web_animation_effect *)UI_MALLOC(
+  effect = (struct ui_web_animation_effect *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_web_animation_effect));
   if (!effect) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -57,7 +57,7 @@ enum ui_error ui_web_animation_effect_create_keyframe_effect(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_web_animation_effect_destroy(struct ui_web_animation_effect *effect) {
   struct ui_web_animation_keyframe *kf;
   struct ui_web_animation_keyframe *next_kf;
@@ -75,22 +75,22 @@ ui_web_animation_effect_destroy(struct ui_web_animation_effect *effect) {
     prop = kf->properties;
     while (prop) {
       next_prop = prop->next;
-      UI_FREE(prop->property_name);
-      UI_FREE(prop->value);
-      UI_FREE(prop);
+      C_MULTIPLATFORM_FREE(prop->property_name);
+      C_MULTIPLATFORM_FREE(prop->value);
+      C_MULTIPLATFORM_FREE(prop);
       prop = next_prop;
     }
 
-    UI_FREE(kf);
+    C_MULTIPLATFORM_FREE(kf);
     kf = next_kf;
   }
 
-  UI_FREE(effect);
+  C_MULTIPLATFORM_FREE(effect);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_web_animation_timeline_create_document_timeline */
-enum ui_error ui_web_animation_timeline_create_document_timeline(
+ui_error_t ui_web_animation_timeline_create_document_timeline(
     struct ui_web_animation_timeline **out_timeline) {
   struct ui_web_animation_timeline *timeline;
 
@@ -98,7 +98,7 @@ enum ui_error ui_web_animation_timeline_create_document_timeline(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  timeline = (struct ui_web_animation_timeline *)UI_MALLOC(
+  timeline = (struct ui_web_animation_timeline *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_web_animation_timeline));
   if (!timeline) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -113,7 +113,7 @@ enum ui_error ui_web_animation_timeline_create_document_timeline(
 }
 
 /** \brief ui_web_animation_timeline_create_scroll_timeline */
-enum ui_error ui_web_animation_timeline_create_scroll_timeline(
+ui_error_t ui_web_animation_timeline_create_scroll_timeline(
     struct ui_dom_node *source, enum ui_web_animation_scroll_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
   struct ui_web_animation_timeline *timeline;
@@ -122,7 +122,7 @@ enum ui_error ui_web_animation_timeline_create_scroll_timeline(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  timeline = (struct ui_web_animation_timeline *)UI_MALLOC(
+  timeline = (struct ui_web_animation_timeline *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_web_animation_timeline));
   if (!timeline) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -137,7 +137,7 @@ enum ui_error ui_web_animation_timeline_create_scroll_timeline(
 }
 
 /** \brief ui_web_animation_timeline_create_view_timeline */
-enum ui_error ui_web_animation_timeline_create_view_timeline(
+ui_error_t ui_web_animation_timeline_create_view_timeline(
     struct ui_dom_node *subject, enum ui_web_animation_scroll_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
   struct ui_web_animation_timeline *timeline;
@@ -146,7 +146,7 @@ enum ui_error ui_web_animation_timeline_create_view_timeline(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  timeline = (struct ui_web_animation_timeline *)UI_MALLOC(
+  timeline = (struct ui_web_animation_timeline *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_web_animation_timeline));
   if (!timeline) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -161,7 +161,7 @@ enum ui_error ui_web_animation_timeline_create_view_timeline(
 }
 
 /** \brief ui_web_animation_timeline_create_pointer_timeline */
-enum ui_error ui_web_animation_timeline_create_pointer_timeline(
+ui_error_t ui_web_animation_timeline_create_pointer_timeline(
     struct ui_dom_node *target, enum ui_web_animation_pointer_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
   struct ui_web_animation_timeline *timeline;
@@ -170,7 +170,7 @@ enum ui_error ui_web_animation_timeline_create_pointer_timeline(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  timeline = (struct ui_web_animation_timeline *)UI_MALLOC(
+  timeline = (struct ui_web_animation_timeline *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_web_animation_timeline));
   if (!timeline) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -185,7 +185,7 @@ enum ui_error ui_web_animation_timeline_create_pointer_timeline(
 }
 
 /** \brief ui_web_animation_timeline_set_current_time */
-enum ui_error ui_web_animation_timeline_set_current_time(
+ui_error_t ui_web_animation_timeline_set_current_time(
     struct ui_web_animation_timeline *timeline, double time) {
   if (!timeline) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -195,28 +195,27 @@ enum ui_error ui_web_animation_timeline_set_current_time(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_web_animation_timeline_destroy(struct ui_web_animation_timeline *timeline) {
   if (!timeline) {
     return UI_ERROR_NONE;
   }
-  UI_FREE(timeline);
+  C_MULTIPLATFORM_FREE(timeline);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_web_animation_create(struct ui_web_animation_effect *effect,
-                        struct ui_web_animation_timeline *timeline,
-                        struct ui_web_animation **out_animation) {
+ui_error_t ui_web_animation_create(struct ui_web_animation_effect *effect,
+                                   struct ui_web_animation_timeline *timeline,
+                                   struct ui_web_animation **out_animation) {
   struct ui_web_animation *animation;
 
   if (!out_animation) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  animation =
-      (struct ui_web_animation *)UI_MALLOC(sizeof(struct ui_web_animation));
+  animation = (struct ui_web_animation *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_web_animation));
   if (!animation) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -231,7 +230,7 @@ ui_web_animation_create(struct ui_web_animation_effect *effect,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_animation_destroy(struct ui_web_animation *animation) {
+ui_error_t ui_web_animation_destroy(struct ui_web_animation *animation) {
   if (!animation) {
     return UI_ERROR_NONE;
   }
@@ -243,7 +242,7 @@ enum ui_error ui_web_animation_destroy(struct ui_web_animation *animation) {
     ui_web_animation_timeline_destroy(animation->timeline);
   }
 
-  UI_FREE(animation);
+  C_MULTIPLATFORM_FREE(animation);
   return UI_ERROR_NONE;
 }
 
@@ -257,7 +256,7 @@ static double get_active_duration(const struct ui_web_animation *anim) {
   return anim->effect->timing.duration * anim->effect->timing.iterations;
 }
 
-enum ui_error ui_web_animation_play(struct ui_web_animation *animation) {
+ui_error_t ui_web_animation_play(struct ui_web_animation *animation) {
   double active_duration;
 
   if (!animation) {
@@ -287,7 +286,7 @@ enum ui_error ui_web_animation_play(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_animation_pause(struct ui_web_animation *animation) {
+ui_error_t ui_web_animation_pause(struct ui_web_animation *animation) {
   if (!animation) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -299,7 +298,7 @@ enum ui_error ui_web_animation_pause(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_animation_reverse(struct ui_web_animation *animation) {
+ui_error_t ui_web_animation_reverse(struct ui_web_animation *animation) {
   if (!animation) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -308,7 +307,7 @@ enum ui_error ui_web_animation_reverse(struct ui_web_animation *animation) {
   return ui_web_animation_play(animation);
 }
 
-enum ui_error ui_web_animation_cancel(struct ui_web_animation *animation) {
+ui_error_t ui_web_animation_cancel(struct ui_web_animation *animation) {
   if (!animation) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -318,7 +317,7 @@ enum ui_error ui_web_animation_cancel(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_animation_finish(struct ui_web_animation *animation) {
+ui_error_t ui_web_animation_finish(struct ui_web_animation *animation) {
   double active_duration;
 
   if (!animation) {
@@ -340,7 +339,7 @@ enum ui_error ui_web_animation_finish(struct ui_web_animation *animation) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_web_animation_get_play_state(const struct ui_web_animation *animation,
                                 enum ui_web_animation_play_state *out_state) {
   if (!animation || !out_state) {
@@ -352,7 +351,7 @@ ui_web_animation_get_play_state(const struct ui_web_animation *animation,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_web_animation_get_current_time(const struct ui_web_animation *animation,
                                   double *out_time) {
   if (!animation || !out_time) {
@@ -364,9 +363,8 @@ ui_web_animation_get_current_time(const struct ui_web_animation *animation,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_web_animation_set_current_time(struct ui_web_animation *animation,
-                                  double time) {
+ui_error_t ui_web_animation_set_current_time(struct ui_web_animation *animation,
+                                             double time) {
   double active_duration;
 
   if (!animation) {
@@ -393,7 +391,7 @@ ui_web_animation_set_current_time(struct ui_web_animation *animation,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_web_animation_get_playback_rate(const struct ui_web_animation *animation,
                                    double *out_rate) {
   if (!animation || !out_rate) {
@@ -405,7 +403,7 @@ ui_web_animation_get_playback_rate(const struct ui_web_animation *animation,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_web_animation_set_playback_rate(struct ui_web_animation *animation,
                                    double rate) {
   if (!animation) {
@@ -416,8 +414,8 @@ ui_web_animation_set_playback_rate(struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_web_animation_tick(struct ui_web_animation *animation,
-                                    double delta_time_ms) {
+ui_error_t ui_web_animation_tick(struct ui_web_animation *animation,
+                                 double delta_time_ms) {
   double new_time;
   double active_duration;
 

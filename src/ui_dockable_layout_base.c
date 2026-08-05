@@ -25,17 +25,17 @@ struct ui_dockable_layout_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout) {
   struct ui_dockable_layout_base *layout;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   if (!out_layout) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  layout = (struct ui_dockable_layout_base *)UI_MALLOC(
+  layout = (struct ui_dockable_layout_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_dockable_layout_base));
   if (!layout) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -43,7 +43,7 @@ ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout) {
 
   rc = ui_component_create(&layout->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(layout);
+    C_MULTIPLATFORM_FREE(layout);
     return rc;
   }
 
@@ -57,16 +57,18 @@ ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout) {
   return UI_ERROR_NONE;
 }
 
-void ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout) {
+ui_error_t
+ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout) {
   if (!layout) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(layout->component);
-  UI_FREE(layout);
+  (void)ui_component_destroy(layout->component);
+  C_MULTIPLATFORM_FREE(layout);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
                                       struct ui_component **out_component) {
   if (!layout || !out_component) {
@@ -77,7 +79,7 @@ ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
                                    int panel_id, int target_panel_id,
                                    enum ui_dock_edge edge) {
@@ -112,7 +114,7 @@ ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
                                      int panel_id) {
   int i;
@@ -131,7 +133,7 @@ ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
                                   char *out_buffer, size_t buffer_size) {
   int i;
@@ -166,7 +168,7 @@ ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
                                     const char *buffer) {
   int i;
@@ -190,7 +192,11 @@ ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
 #else
       if (sscanf(ptr, "P:%d,T:%d,E:%d;", &p, &t, &e) == 3) {
 #endif
-        ui_dockable_layout_base_dock_panel(layout, p, t, (enum ui_dock_edge)e);
+        ui_error_t dock_rc = ui_dockable_layout_base_dock_panel(
+            layout, p, t, (enum ui_dock_edge)e);
+        if (dock_rc != UI_ERROR_NONE) {
+          return dock_rc;
+        }
       }
       next_semi = strchr(ptr, ';');
       if (next_semi) {
@@ -205,7 +211,7 @@ ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
 }
 
 /** \brief ui_dockable_layout_base_integrate_drag_drop */
-enum ui_error ui_dockable_layout_base_integrate_drag_drop(
+ui_error_t ui_dockable_layout_base_integrate_drag_drop(
     struct ui_dockable_layout_base *layout,
     struct ui_drag_drop_context *drag_ctx) {
   if (!layout || !drag_ctx) {

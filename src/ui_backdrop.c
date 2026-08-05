@@ -4,19 +4,44 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_backdrop_mock_fail = 0;
+
+ui_error_t run_backdrop_coverage(void);
+ui_error_t run_backdrop_coverage(void) {
+  struct ui_backdrop *backdrop = NULL;
+  struct ui_event ev;
+  int should_dismiss;
+  ui_backdrop_create(&backdrop);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+
+  g_backdrop_mock_fail = 1;
+  ui_backdrop_process_event(backdrop, &ev, 0.0, 0.0, 0.0, 0.0, &should_dismiss);
+  g_backdrop_mock_fail = 0;
+
+  ev.type = UI_EVENT_MOUSE_UP;
+  g_backdrop_mock_fail = 1;
+  ui_backdrop_process_event(backdrop, &ev, 0.0, 0.0, 0.0, 0.0, &should_dismiss);
+  g_backdrop_mock_fail = 0;
+
+  (void)ui_backdrop_destroy(backdrop);
+  return UI_ERROR_NONE;
+}
+#endif
+
 struct ui_backdrop {
   int is_active;
   int pointer_down_was_outside;
 };
 
-enum ui_error ui_backdrop_create(struct ui_backdrop **out_backdrop) {
+ui_error_t ui_backdrop_create(struct ui_backdrop **out_backdrop) {
   struct ui_backdrop *bd;
 
   if (!out_backdrop) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  bd = (struct ui_backdrop *)UI_MALLOC(sizeof(struct ui_backdrop));
+  bd = (struct ui_backdrop *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_backdrop));
   if (!bd) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -28,17 +53,17 @@ enum ui_error ui_backdrop_create(struct ui_backdrop **out_backdrop) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_backdrop_destroy(struct ui_backdrop *backdrop) {
+ui_error_t ui_backdrop_destroy(struct ui_backdrop *backdrop) {
   if (!backdrop) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  UI_FREE(backdrop);
+  C_MULTIPLATFORM_FREE(backdrop);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error is_point_outside(float x, float y, float cx, float cy,
-                                      float cw, float ch, int *out_is) {
+static ui_error_t is_point_outside(float x, float y, float cx, float cy,
+                                   float cw, float ch, int *out_is) {
   if (x < cx) {
     *out_is = 1;
   } else if (x > cx + cw) {
@@ -53,8 +78,18 @@ static enum ui_error is_point_outside(float x, float y, float cx, float cy,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_backdrop_set_active(struct ui_backdrop *backdrop,
-                                     int is_active) {
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t mock_is_point_outside(float x, float y, float cx, float cy,
+                                        float cw, float ch, int *out_is) {
+  if (g_backdrop_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  return (is_point_outside)(x, y, cx, cy, cw, ch, out_is);
+}
+#undef is_point_outside
+#define is_point_outside mock_is_point_outside
+#endif
+
+ui_error_t ui_backdrop_set_active(struct ui_backdrop *backdrop, int is_active) {
   if (!backdrop) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -62,12 +97,11 @@ enum ui_error ui_backdrop_set_active(struct ui_backdrop *backdrop,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_backdrop_process_event(struct ui_backdrop *backdrop,
-                                        const struct ui_event *event,
-                                        float content_x, float content_y,
-                                        float content_width,
-                                        float content_height,
-                                        int *out_should_dismiss) {
+ui_error_t ui_backdrop_process_event(struct ui_backdrop *backdrop,
+                                     const struct ui_event *event,
+                                     float content_x, float content_y,
+                                     float content_width, float content_height,
+                                     int *out_should_dismiss) {
   float ev_x = 0.0f;
   float ev_y = 0.0f;
   int is_down = 0;
@@ -145,8 +179,10 @@ enum ui_error ui_backdrop_process_event(struct ui_backdrop *backdrop,
 
   if (is_down) {
     int is_out = 0;
-    (void)is_point_outside(ev_x, ev_y, content_x, content_y, content_width,
-                           content_height, &is_out);
+    ui_error_t rc = is_point_outside(ev_x, ev_y, content_x, content_y,
+                                     content_width, content_height, &is_out);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     if (is_out) {
       backdrop->pointer_down_was_outside = 1;
     } else {
@@ -154,8 +190,10 @@ enum ui_error ui_backdrop_process_event(struct ui_backdrop *backdrop,
     }
   } else if (is_up) {
     int is_out = 0;
-    (void)is_point_outside(ev_x, ev_y, content_x, content_y, content_width,
-                           content_height, &is_out);
+    ui_error_t rc = is_point_outside(ev_x, ev_y, content_x, content_y,
+                                     content_width, content_height, &is_out);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     if (backdrop->pointer_down_was_outside) {
       if (is_out) {
         *out_should_dismiss = 1;

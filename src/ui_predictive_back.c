@@ -17,15 +17,15 @@ struct ui_predictive_back {
 };
 
 /** \brief ui_error */
-enum ui_error
-ui_predictive_back_create(struct ui_predictive_back **out_tracker) {
+ui_error_t ui_predictive_back_create(struct ui_predictive_back **out_tracker) {
   struct ui_predictive_back *t;
 
   if (!out_tracker) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  t = (struct ui_predictive_back *)UI_MALLOC(sizeof(struct ui_predictive_back));
+  t = (struct ui_predictive_back *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_predictive_back));
   if (!t) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -43,15 +43,16 @@ ui_predictive_back_create(struct ui_predictive_back **out_tracker) {
   return UI_ERROR_NONE;
 }
 
-void ui_predictive_back_destroy(struct ui_predictive_back *tracker) {
+ui_error_t ui_predictive_back_destroy(struct ui_predictive_back *tracker) {
   if (!tracker)
-    return;
-  UI_FREE(tracker);
+    return UI_ERROR_NONE;
+  C_MULTIPLATFORM_FREE(tracker);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_predictive_back_configure(struct ui_predictive_back *tracker,
-                                           int edge_width_px,
-                                           int screen_width_px) {
+ui_error_t ui_predictive_back_configure(struct ui_predictive_back *tracker,
+                                        int edge_width_px,
+                                        int screen_width_px) {
   if (!tracker)
     return UI_ERROR_INVALID_ARGUMENT;
   tracker->edge_width_px = edge_width_px;
@@ -60,17 +61,16 @@ enum ui_error ui_predictive_back_configure(struct ui_predictive_back *tracker,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_predictive_back_bind_progress(struct ui_predictive_back *tracker,
-                                 struct ui_signal *progress_signal) {
+ui_error_t ui_predictive_back_bind_progress(struct ui_predictive_back *tracker,
+                                            struct ui_signal *progress_signal) {
   if (!tracker || !progress_signal)
     return UI_ERROR_INVALID_ARGUMENT;
   tracker->progress_signal = progress_signal;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_predictive_back_bind_commit(struct ui_predictive_back *tracker,
-                                             struct ui_signal *commit_signal) {
+ui_error_t ui_predictive_back_bind_commit(struct ui_predictive_back *tracker,
+                                          struct ui_signal *commit_signal) {
   if (!tracker || !commit_signal)
     return UI_ERROR_INVALID_ARGUMENT;
   tracker->commit_signal = commit_signal;
@@ -78,9 +78,8 @@ enum ui_error ui_predictive_back_bind_commit(struct ui_predictive_back *tracker,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_predictive_back_process_event(struct ui_predictive_back *tracker,
-                                 const struct ui_event *event) {
+ui_error_t ui_predictive_back_process_event(struct ui_predictive_back *tracker,
+                                            const struct ui_event *event) {
   int tx = 0;
 
   if (!tracker || !event)

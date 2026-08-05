@@ -35,16 +35,15 @@ struct ui_layout_observer {
 };
 
 /** \brief ui_error */
-enum ui_error
-ui_layout_observer_create(struct ui_layout_observer **out_observer) {
+ui_error_t ui_layout_observer_create(struct ui_layout_observer **out_observer) {
   struct ui_layout_observer *obs;
 
   if (!out_observer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  obs =
-      (struct ui_layout_observer *)UI_MALLOC(sizeof(struct ui_layout_observer));
+  obs = (struct ui_layout_observer *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_layout_observer));
   if (!obs) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -58,23 +57,24 @@ ui_layout_observer_create(struct ui_layout_observer **out_observer) {
   return UI_ERROR_NONE;
 }
 
-void ui_layout_observer_destroy(struct ui_layout_observer *observer) {
+ui_error_t ui_layout_observer_destroy(struct ui_layout_observer *observer) {
   if (!observer) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (observer->breakpoints) {
-    UI_FREE(observer->breakpoints);
+    C_MULTIPLATFORM_FREE(observer->breakpoints);
   }
   if (observer->subscribers) {
-    UI_FREE(observer->subscribers);
+    C_MULTIPLATFORM_FREE(observer->subscribers);
   }
 
-  UI_FREE(observer);
+  C_MULTIPLATFORM_FREE(observer);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
                                   int min_width, int max_width, int min_height,
                                   int max_height, int *out_breakpoint_id) {
@@ -90,7 +90,7 @@ ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
                       ? 4
                       : observer->breakpoint_capacity * 2;
     struct ui_layout_breakpoint *new_bps =
-        (struct ui_layout_breakpoint *)UI_REALLOC(
+        (struct ui_layout_breakpoint *)C_MULTIPLATFORM_REALLOC(
             observer->breakpoints,
             sizeof(struct ui_layout_breakpoint) * new_cap);
     if (!new_bps) {
@@ -109,7 +109,7 @@ ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
   bp->is_active = 0;
 
   /* Pre-evaluate if we already have a dimension */
-  if (observer->last_width >= 0 && observer->last_height >= 0) {
+  if (observer->last_width >= 0) {
     int active = 1;
     if (min_width >= 0 && observer->last_width < min_width)
       active = 0;
@@ -126,9 +126,9 @@ ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_layout_observer_subscribe(struct ui_layout_observer *observer,
-                                           ui_layout_observer_cb_t callback,
-                                           void *user_data) {
+ui_error_t ui_layout_observer_subscribe(struct ui_layout_observer *observer,
+                                        ui_layout_observer_cb_t callback,
+                                        void *user_data) {
 
   struct ui_layout_subscriber *sub;
 
@@ -141,7 +141,7 @@ enum ui_error ui_layout_observer_subscribe(struct ui_layout_observer *observer,
                       ? 4
                       : observer->subscriber_capacity * 2;
     struct ui_layout_subscriber *new_subs =
-        (struct ui_layout_subscriber *)UI_REALLOC(
+        (struct ui_layout_subscriber *)C_MULTIPLATFORM_REALLOC(
             observer->subscribers,
             sizeof(struct ui_layout_subscriber) * new_cap);
     if (!new_subs) {
@@ -159,9 +159,8 @@ enum ui_error ui_layout_observer_subscribe(struct ui_layout_observer *observer,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_layout_observer_notify_resize(struct ui_layout_observer *observer, int width,
-                                 int height) {
+ui_error_t ui_layout_observer_notify_resize(struct ui_layout_observer *observer,
+                                            int width, int height) {
   int i, j;
 
   if (!observer || width < 0 || height < 0) {
@@ -191,8 +190,11 @@ ui_layout_observer_notify_resize(struct ui_layout_observer *observer, int width,
     if (active != bp->is_active) {
       bp->is_active = active;
       for (j = 0; j < observer->subscriber_count; j++) {
-        observer->subscribers[j].callback(observer, bp->id, active,
-                                          observer->subscribers[j].user_data);
+        ui_error_t cb_rc = observer->subscribers[j].callback(
+            observer, bp->id, active, observer->subscribers[j].user_data);
+        if (cb_rc != UI_ERROR_NONE) {
+          return cb_rc;
+        }
       }
     }
   }
@@ -201,7 +203,7 @@ ui_layout_observer_notify_resize(struct ui_layout_observer *observer, int width,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_layout_observer_is_active(const struct ui_layout_observer *observer,
                              int breakpoint_id, int *out_is_active) {
   int i;

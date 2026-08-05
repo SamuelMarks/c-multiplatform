@@ -11,7 +11,7 @@ extern int g_malloc_fail_countdown;
 
 /* Forward declare the internal mock tick since it's not exported by the header,
    but we want to test its effect on signals */
-enum ui_error ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager);
+ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager);
 
 static int test_sensor_manager_basic(void) {
   struct ui_execution_context *ctx = NULL;
@@ -21,7 +21,7 @@ static int test_sensor_manager_basic(void) {
   struct ui_sensor_vector3 vec_accel;
   struct ui_sensor_vector3 vec_gyro;
   union ui_signal_payload initial_payload = {0};
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_execution_context_create(&ctx);
   if (rc != UI_ERROR_NONE) {
@@ -96,10 +96,10 @@ static int test_sensor_manager_basic(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_signal_destroy(signal);
-  ui_sensor_manager_destroy(manager);
-  ui_execution_context_destroy(ctx);
-  ui_arena_destroy(arena);
+  (void)ui_signal_destroy(signal);
+  (void)ui_sensor_manager_destroy(manager);
+  (void)ui_execution_context_destroy(ctx);
+  (void)ui_arena_destroy(arena);
 
   return 0;
 }
@@ -124,7 +124,7 @@ static int test_sensor_manager_nulls(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_sensor_manager_create(&manager);
+  (void)ui_sensor_manager_create(&manager);
 
   if (ui_sensor_manager_bind_orientation(manager, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
@@ -149,11 +149,11 @@ static int test_sensor_manager_nulls(void) {
     return 1; /* not running */
 
   /* tick mock without signal bounded */
-  ui_sensor_manager_start(manager);
+  (void)ui_sensor_manager_start(manager);
   if (ui_sensor_manager_tick_mock(manager) != UI_ERROR_NONE)
     return 1;
 
-  ui_sensor_manager_destroy(manager);
+  (void)ui_sensor_manager_destroy(manager);
 
   return 0;
 }

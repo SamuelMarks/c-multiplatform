@@ -27,6 +27,67 @@ static const char *ui_button_base_default_css =
     "}";
 
 /** \brief ui_button_base */
+#ifdef UI_TEST_MOCK_ALLOC
+int g_button_mock_fail = 0;
+
+static ui_error_t mock_ui_dom_node_set_attribute(struct ui_dom_node *node,
+                                                 const char *k, const char *v) {
+  if (g_button_mock_fail == 168 || g_button_mock_fail == 240 ||
+      g_button_mock_fail == 282 || g_button_mock_fail == 290 ||
+      g_button_mock_fail == 298)
+    return UI_ERROR_UNKNOWN;
+  return ui_dom_node_set_attribute(node, k, v);
+}
+#define ui_dom_node_set_attribute mock_ui_dom_node_set_attribute
+
+static ui_error_t mock_ui_ripple_config_init(struct ui_ripple_config *config) {
+  if (g_button_mock_fail == 81)
+    return UI_ERROR_UNKNOWN;
+  return ui_ripple_config_init(config);
+}
+#define ui_ripple_config_init mock_ui_ripple_config_init
+
+static ui_error_t
+mock_ui_component_set_default_style(struct ui_component *comp,
+                                    struct ui_css_stylesheet *style) {
+  if (g_button_mock_fail == 123)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_set_default_style(comp, style);
+}
+#define ui_component_set_default_style mock_ui_component_set_default_style
+
+static ui_error_t mock_ui_dom_node_remove_attribute(struct ui_dom_node *node,
+                                                    const char *name) {
+  if (g_button_mock_fail == 195)
+    return UI_ERROR_UNKNOWN;
+  return ui_dom_node_remove_attribute(node, name);
+}
+#define ui_dom_node_remove_attribute mock_ui_dom_node_remove_attribute
+
+static ui_error_t mock_ui_gesture_recognizer_process_event(
+    struct ui_gesture_recognizer *recognizer, const struct ui_event *event,
+    double timestamp_ms, struct ui_gesture_event *out_event) {
+  if (g_button_mock_fail == 237)
+    return UI_ERROR_UNKNOWN;
+  if (g_button_mock_fail == 253) {
+    out_event->type = UI_GESTURE_TAP;
+    return UI_ERROR_NONE;
+  }
+  return ui_gesture_recognizer_process_event(recognizer, event, timestamp_ms,
+                                             out_event);
+}
+#define ui_gesture_recognizer_process_event                                    \
+  mock_ui_gesture_recognizer_process_event
+
+static ui_error_t mock_ui_ripple_start(struct ui_ripple_config *config, float x,
+                                       float y, struct ui_ripple_state *state) {
+  if (g_button_mock_fail == 245)
+    return UI_ERROR_UNKNOWN;
+  return ui_ripple_start(config, x, y, state);
+}
+#define ui_ripple_start mock_ui_ripple_start
+#endif
+
 struct ui_button_base {
   struct ui_component *component;
   struct ui_gesture_recognizer *gesture_recognizer;
@@ -40,9 +101,9 @@ struct ui_button_base {
   struct ui_ripple_state ripple_state;
 };
 
-enum ui_error ui_button_base_create(struct ui_button_base **out_button) {
+ui_error_t ui_button_base_create(struct ui_button_base **out_button) {
   struct ui_button_base *btn;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -50,7 +111,8 @@ enum ui_error ui_button_base_create(struct ui_button_base **out_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  btn = (struct ui_button_base *)UI_MALLOC(sizeof(struct ui_button_base));
+  btn = (struct ui_button_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_button_base));
   if (!btn) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -60,7 +122,9 @@ enum ui_error ui_button_base_create(struct ui_button_base **out_button) {
   btn->disabled = 0;
   btn->on_click = NULL;
   btn->user_data = NULL;
-  ui_ripple_config_init(&btn->ripple_config);
+  rc = ui_ripple_config_init(&btn->ripple_config);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
   memset(&btn->ripple_state, 0, sizeof(struct ui_ripple_state));
   btn->disabled_signal = NULL;
   btn->text_signal = NULL;
@@ -100,7 +164,9 @@ enum ui_error ui_button_base_create(struct ui_button_base **out_button) {
     goto cleanup;
   }
 
-  ui_component_set_default_style(btn->component, default_style);
+  rc = ui_component_set_default_style(btn->component, default_style);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   btn->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
@@ -110,32 +176,33 @@ enum ui_error ui_button_base_create(struct ui_button_base **out_button) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (btn->gesture_recognizer) {
-    ui_gesture_recognizer_destroy(btn->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(btn->gesture_recognizer);
   }
   if (btn->component) {
-    ui_component_destroy(btn->component);
+    (void)ui_component_destroy(btn->component);
   }
-  UI_FREE(btn);
+  C_MULTIPLATFORM_FREE(btn);
   return rc;
 }
 
-void ui_button_base_destroy(struct ui_button_base *button) {
+ui_error_t ui_button_base_destroy(struct ui_button_base *button) {
   if (!button) {
-    return;
+    return UI_ERROR_NONE;
   }
 
-  ui_gesture_recognizer_destroy(button->gesture_recognizer);
-  ui_component_destroy(button->component);
+  (void)ui_gesture_recognizer_destroy(button->gesture_recognizer);
+  (void)ui_component_destroy(button->component);
 
-  UI_FREE(button);
+  C_MULTIPLATFORM_FREE(button);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_button_base_set_disabled(struct ui_button_base *button,
-                                          int disabled) {
-  enum ui_error rc;
+ui_error_t ui_button_base_set_disabled(struct ui_button_base *button,
+                                       int disabled) {
+  ui_error_t rc;
 
   if (!button) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -168,7 +235,10 @@ enum ui_error ui_button_base_set_disabled(struct ui_button_base *button,
       return rc;
     }
 
-    ui_dom_node_remove_attribute(button->component->shadow_root, "disabled");
+    rc = ui_dom_node_remove_attribute(button->component->shadow_root,
+                                      "disabled");
+    if (rc != UI_ERROR_NONE)
+      return rc;
 
     rc = ui_dom_node_set_attribute(button->component->shadow_root, "tabindex",
                                    "0");
@@ -180,9 +250,9 @@ enum ui_error ui_button_base_set_disabled(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_button_base_set_on_click(struct ui_button_base *button,
-                                          ui_button_on_click_t on_click,
-                                          void *user_data) {
+ui_error_t ui_button_base_set_on_click(struct ui_button_base *button,
+                                       ui_button_on_click_t on_click,
+                                       void *user_data) {
   if (!button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -193,10 +263,11 @@ enum ui_error ui_button_base_set_on_click(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_button_base_process_event(struct ui_button_base *button,
-                                           const struct ui_event *event,
-                                           double timestamp_ms) {
+ui_error_t ui_button_base_process_event(struct ui_button_base *button,
+                                        const struct ui_event *event,
+                                        double timestamp_ms) {
   struct ui_gesture_event gesture_evt;
+  ui_error_t rc;
 
   if (!button || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -206,20 +277,26 @@ enum ui_error ui_button_base_process_event(struct ui_button_base *button,
     return UI_ERROR_NONE;
   }
 
-  ui_gesture_recognizer_process_event(button->gesture_recognizer, event,
-                                      timestamp_ms, &gesture_evt);
+  rc = ui_gesture_recognizer_process_event(button->gesture_recognizer, event,
+                                           timestamp_ms, &gesture_evt);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Handle Mouse Down directly for Ripple Trigger */
   if (event->type == UI_EVENT_MOUSE_DOWN) {
     if (event->event_data.mouse.button == 0) {
-      ui_ripple_start(&button->ripple_config, event->event_data.mouse.x,
-                      event->event_data.mouse.y, &button->ripple_state);
+      rc = ui_ripple_start(&button->ripple_config, event->event_data.mouse.x,
+                           event->event_data.mouse.y, &button->ripple_state);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
 
   if (gesture_evt.type == UI_GESTURE_TAP) {
     if (button->on_click) {
-      button->on_click(button, button->user_data);
+      rc = button->on_click(button, button->user_data);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
 
@@ -227,9 +304,8 @@ enum ui_error ui_button_base_process_event(struct ui_button_base *button,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_button_base_get_component(struct ui_button_base *button,
-                             struct ui_component **out_component) {
+ui_error_t ui_button_base_get_component(struct ui_button_base *button,
+                                        struct ui_component **out_component) {
   if (!button || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -237,8 +313,8 @@ ui_button_base_get_component(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_button_base_bind_disabled(struct ui_button_base *widget,
-                                           struct ui_signal *disabled_signal) {
+ui_error_t ui_button_base_bind_disabled(struct ui_button_base *widget,
+                                        struct ui_signal *disabled_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -246,8 +322,8 @@ enum ui_error ui_button_base_bind_disabled(struct ui_button_base *widget,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_button_base_bind_text(struct ui_button_base *widget,
-                                       struct ui_signal *text_signal) {
+ui_error_t ui_button_base_bind_text(struct ui_button_base *widget,
+                                    struct ui_signal *text_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -256,9 +332,8 @@ enum ui_error ui_button_base_bind_text(struct ui_button_base *widget,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_button_base_get_ripple_state(struct ui_button_base *button,
-                                struct ui_ripple_state *out_state) {
+ui_error_t ui_button_base_get_ripple_state(struct ui_button_base *button,
+                                           struct ui_ripple_state *out_state) {
   if (!button || !out_state)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_state = button->ripple_state;

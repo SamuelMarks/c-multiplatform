@@ -38,7 +38,7 @@ struct ui_key_manager {
  * @param manager Pointer to the manager to initialize.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_key_manager_init(struct ui_key_manager *manager);
+ui_error_t ui_key_manager_init(struct ui_key_manager *manager);
 
 /**
  * @brief Cleans up a key manager and frees its resources.
@@ -46,7 +46,7 @@ enum ui_error ui_key_manager_init(struct ui_key_manager *manager);
  * @param manager Pointer to the manager to cleanup.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_key_manager_cleanup(struct ui_key_manager *manager);
+ui_error_t ui_key_manager_cleanup(struct ui_key_manager *manager);
 
 /**
  * @brief Registers a new hotkey.
@@ -55,8 +55,8 @@ enum ui_error ui_key_manager_cleanup(struct ui_key_manager *manager);
  * @param hotkey The hotkey definition to register.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_key_manager_register(struct ui_key_manager *manager,
-                                      const struct ui_hotkey *hotkey);
+ui_error_t ui_key_manager_register(struct ui_key_manager *manager,
+                                   const struct ui_hotkey *hotkey);
 
 /**
  * @brief Unregisters a hotkey by its ID.
@@ -65,7 +65,7 @@ enum ui_error ui_key_manager_register(struct ui_key_manager *manager,
  * @param id The ID of the hotkey to unregister.
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if ID doesn't exist.
  */
-enum ui_error ui_key_manager_unregister(struct ui_key_manager *manager, int id);
+ui_error_t ui_key_manager_unregister(struct ui_key_manager *manager, int id);
 
 /**
  * @brief Processes a keyboard event and triggers callbacks for matching
@@ -77,10 +77,9 @@ enum ui_error ui_key_manager_unregister(struct ui_key_manager *manager, int id);
  * triggered.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
-ui_key_manager_process_event(const struct ui_key_manager *manager,
-                             const struct ui_keyboard_event *event,
-                             int *out_handled);
+ui_error_t ui_key_manager_process_event(const struct ui_key_manager *manager,
+                                        const struct ui_keyboard_event *event,
+                                        int *out_handled);
 
 /**
  * @brief Formats a hotkey into a human-readable string (e.g., "Ctrl+Shift+A").
@@ -90,9 +89,8 @@ ui_key_manager_process_event(const struct ui_key_manager *manager,
  * @param buffer_size Size of the output buffer.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_key_manager_format_hotkey(const struct ui_hotkey *hotkey,
-                                           char *out_buffer,
-                                           size_t buffer_size);
+ui_error_t ui_key_manager_format_hotkey(const struct ui_hotkey *hotkey,
+                                        char *out_buffer, size_t buffer_size);
 
 #ifdef __cplusplus
 }

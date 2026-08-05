@@ -79,13 +79,13 @@ struct ui_drag_drop_context;
  * @param out_ctx Pointer to receive the context.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_drag_drop_create(struct ui_drag_drop_context **out_ctx);
+ui_error_t ui_drag_drop_create(struct ui_drag_drop_context **out_ctx);
 
 /**
  * @brief Destroys a drag and drop context.
  * @param ctx The context to destroy.
  */
-enum ui_error ui_drag_drop_destroy(struct ui_drag_drop_context *ctx);
+ui_error_t ui_drag_drop_destroy(struct ui_drag_drop_context *ctx);
 
 /**
  * @brief Configures the pointer distance threshold (in pixels) to differentiate
@@ -94,8 +94,8 @@ enum ui_error ui_drag_drop_destroy(struct ui_drag_drop_context *ctx);
  * @param distance The distance threshold (e.g., 5).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_drag_drop_set_drag_threshold(struct ui_drag_drop_context *ctx,
-                                              int distance);
+ui_error_t ui_drag_drop_set_drag_threshold(struct ui_drag_drop_context *ctx,
+                                           int distance);
 
 /**
  * @brief Clears all registered lists. Typically called at the beginning of an
@@ -103,7 +103,7 @@ enum ui_error ui_drag_drop_set_drag_threshold(struct ui_drag_drop_context *ctx,
  * @param ctx The context.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx);
+ui_error_t ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx);
 
 /**
  * @brief Registers a list and its items with the drag context for the current
@@ -113,8 +113,8 @@ enum ui_error ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx);
  * @param list The list bounds and its items.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
-                                    const struct ui_drag_list *list);
+ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
+                                 const struct ui_drag_list *list);
 
 /**
  * @brief Processes an input event.
@@ -122,8 +122,8 @@ enum ui_error ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
  * @param event The input event to process (mouse, touch).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
-                                         const struct ui_event *event);
+ui_error_t ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
+                                      const struct ui_event *event);
 
 /**
  * @brief Retrieves the current state of the drag operation.
@@ -131,8 +131,8 @@ enum ui_error ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
  * @param out_state Pointer to receive the state.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
-                                     enum ui_drag_state *out_state);
+ui_error_t ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
+                                  enum ui_drag_state *out_state);
 
 /**
  * @brief Retrieves information about the item currently being dragged.
@@ -146,10 +146,11 @@ enum ui_error ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
  * dragged item.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_STATE if not dragging.
  */
-enum ui_error
-ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
-                              int *out_item_id, int *out_source_list_id,
-                              int *out_current_x, int *out_current_y);
+ui_error_t ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
+                                         int *out_item_id,
+                                         int *out_source_list_id,
+                                         int *out_current_x,
+                                         int *out_current_y);
 
 /**
  * @brief Retrieves the calculated placeholder position for visual rendering.
@@ -157,7 +158,7 @@ ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
  * @param out_placeholder Pointer to receive the placeholder data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_drag_drop_get_placeholder(const struct ui_drag_drop_context *ctx,
                              struct ui_drag_placeholder *out_placeholder);
 
@@ -172,10 +173,10 @@ ui_drag_drop_get_placeholder(const struct ui_drag_drop_context *ctx,
  * @param out_to_index The destination index within the destination list.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_drag_drop_get_drop_event(struct ui_drag_drop_context *ctx,
-                                          int *out_dropped, int *out_item_id,
-                                          int *out_from_list, int *out_to_list,
-                                          int *out_to_index);
+ui_error_t ui_drag_drop_get_drop_event(struct ui_drag_drop_context *ctx,
+                                       int *out_dropped, int *out_item_id,
+                                       int *out_from_list, int *out_to_list,
+                                       int *out_to_index);
 
 #ifdef __cplusplus
 }

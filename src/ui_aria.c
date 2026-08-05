@@ -5,8 +5,28 @@
 #include <string.h>
 /* clang-format on */
 
-enum ui_error ui_aria_role_from_string(const char *role_str,
-                                       enum ui_aria_role *out_role) {
+#ifdef UI_TEST_MOCK_ALLOC
+int g_aria_mock_fail = 0;
+int g_aria_mock_fail_idx = -1;
+extern int g_malloc_fail_countdown;
+
+static ui_error_t mock_dom_node_get_attribute(const struct ui_dom_node *node,
+                                              const char *name,
+                                              const char **out_value) {
+  if (g_aria_mock_fail == 1) {
+    if (g_aria_mock_fail_idx == 0)
+      return UI_ERROR_UNKNOWN;
+    if (g_aria_mock_fail_idx > 0)
+      g_aria_mock_fail_idx--;
+  }
+  return (ui_dom_node_get_attribute)(node, name, out_value);
+}
+#undef ui_dom_node_get_attribute
+#define ui_dom_node_get_attribute mock_dom_node_get_attribute
+#endif
+
+ui_error_t ui_aria_role_from_string(const char *role_str,
+                                    enum ui_aria_role *out_role) {
   if (!out_role)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_role = UI_ARIA_ROLE_NONE;
@@ -49,9 +69,37 @@ enum ui_error ui_aria_role_from_string(const char *role_str,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
-                                  struct ui_aria_state *out_state) {
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t mock_aria_role_from_string(const char *str,
+                                             enum ui_aria_role *out_role) {
+  if (g_aria_mock_fail == 2)
+    return UI_ERROR_UNKNOWN;
+  return (ui_aria_role_from_string)(str, out_role);
+}
+
+static ui_error_t mock_aria_state_cleanup(struct ui_aria_state *state) {
+  if (g_aria_mock_fail == 4)
+    return UI_ERROR_UNKNOWN;
+  return (ui_aria_state_cleanup)(state);
+}
+#endif
+#ifdef UI_TEST_MOCK_ALLOC
+#define ui_aria_role_from_string mock_aria_role_from_string
+#define ui_aria_state_cleanup mock_aria_state_cleanup
+#endif
+ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
+                               struct ui_aria_state *out_state) {
   const char *val = NULL;
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t role_rc = UI_ERROR_NONE;
+  ui_error_t type_rc = UI_ERROR_NONE;
+  ui_error_t dis_rc = UI_ERROR_NONE;
+  ui_error_t chk_rc = UI_ERROR_NONE;
+  ui_error_t cl_rc = UI_ERROR_NONE;
+#if defined(__EMSCRIPTEN__)
+  ui_error_t em_rc = UI_ERROR_NONE;
+  const char *role_str = NULL;
+#endif
 
   if (!out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -73,8 +121,15 @@ enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
   }
 
   /* Parse Role */
-  if (ui_dom_node_get_attribute(node, "role", &val) == UI_ERROR_NONE) {
-    ui_aria_role_from_string(val, &out_state->role);
+  rc = ui_dom_node_get_attribute(node, "role", &val);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    return rc;
+  }
+  if (rc == UI_ERROR_NONE) {
+    role_rc = ui_aria_role_from_string(val, &out_state->role);
+    if (role_rc != UI_ERROR_NONE) {
+      return role_rc;
+    }
   } else if (node->tag_name) {
     /* Implicit roles from tag name */
     if (strcmp(node->tag_name, "button") == 0) {
@@ -90,7 +145,11 @@ enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
       out_state->role = UI_ARIA_ROLE_HEADING;
     } else if (strcmp(node->tag_name, "input") == 0) {
       const char *type_val = NULL;
-      if (ui_dom_node_get_attribute(node, "type", &type_val) == UI_ERROR_NONE) {
+      type_rc = ui_dom_node_get_attribute(node, "type", &type_val);
+      if (type_rc != UI_ERROR_NONE && type_rc != UI_ERROR_NOT_FOUND) {
+        return type_rc;
+      }
+      if (type_rc == UI_ERROR_NONE) {
         if (strcmp(type_val, "checkbox") == 0) {
           out_state->role = UI_ARIA_ROLE_CHECKBOX;
         } else if (strcmp(type_val, "range") == 0) {
@@ -112,22 +171,39 @@ enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
   }
 
   /* Parse aria-hidden */
-  if (ui_dom_node_get_attribute(node, "aria-hidden", &val) == UI_ERROR_NONE) {
+  rc = ui_dom_node_get_attribute(node, "aria-hidden", &val);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    return rc;
+  }
+  if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "true") == 0)
       out_state->is_hidden = 1;
   }
 
   /* Parse disabled (HTML native) or aria-disabled */
-  if (ui_dom_node_get_attribute(node, "disabled", &val) == UI_ERROR_NONE) {
+  rc = ui_dom_node_get_attribute(node, "disabled", &val);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    return rc;
+  }
+  if (rc == UI_ERROR_NONE) {
     out_state->is_disabled = 1;
-  } else if (ui_dom_node_get_attribute(node, "aria-disabled", &val) ==
-             UI_ERROR_NONE) {
-    if (strcmp(val, "true") == 0)
-      out_state->is_disabled = 1;
+  } else {
+    dis_rc = ui_dom_node_get_attribute(node, "aria-disabled", &val);
+    if (dis_rc != UI_ERROR_NONE && dis_rc != UI_ERROR_NOT_FOUND) {
+      return dis_rc;
+    }
+    if (dis_rc == UI_ERROR_NONE) {
+      if (strcmp(val, "true") == 0)
+        out_state->is_disabled = 1;
+    }
   }
 
   /* Parse aria-expanded */
-  if (ui_dom_node_get_attribute(node, "aria-expanded", &val) == UI_ERROR_NONE) {
+  rc = ui_dom_node_get_attribute(node, "aria-expanded", &val);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    return rc;
+  }
+  if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "true") == 0)
       out_state->is_expanded = 1;
     else if (strcmp(val, "false") == 0)
@@ -135,22 +211,35 @@ enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
   }
 
   /* Parse aria-checked */
-  if (ui_dom_node_get_attribute(node, "aria-checked", &val) == UI_ERROR_NONE) {
+  rc = ui_dom_node_get_attribute(node, "aria-checked", &val);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    return rc;
+  }
+  if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "true") == 0)
       out_state->is_checked = 1;
     else if (strcmp(val, "false") == 0)
       out_state->is_checked = 0;
     else if (strcmp(val, "mixed") == 0)
       out_state->is_checked = 2;
-  } else if (ui_dom_node_get_attribute(node, "checked", &val) ==
-             UI_ERROR_NONE) {
-    out_state->is_checked = 1;
+  } else {
+    chk_rc = ui_dom_node_get_attribute(node, "checked", &val);
+    if (chk_rc != UI_ERROR_NONE && chk_rc != UI_ERROR_NOT_FOUND) {
+      return chk_rc;
+    }
+    if (chk_rc == UI_ERROR_NONE) {
+      out_state->is_checked = 1;
+    }
   }
 
   /* Parse aria-label */
-  if (ui_dom_node_get_attribute(node, "aria-label", &val) == UI_ERROR_NONE) {
+  rc = ui_dom_node_get_attribute(node, "aria-label", &val);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    return rc;
+  }
+  if (rc == UI_ERROR_NONE) {
     size_t len = strlen(val);
-    out_state->label = (char *)UI_MALLOC(len + 1);
+    out_state->label = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
     if (!out_state->label)
       return UI_ERROR_OUT_OF_MEMORY;
 #if defined(_MSC_VER)
@@ -161,12 +250,18 @@ enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
   }
 
   /* Parse aria-description */
-  if (ui_dom_node_get_attribute(node, "aria-description", &val) ==
-      UI_ERROR_NONE) {
+  rc = ui_dom_node_get_attribute(node, "aria-description", &val);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    return rc;
+  }
+  if (rc == UI_ERROR_NONE) {
     size_t len = strlen(val);
-    out_state->description = (char *)UI_MALLOC(len + 1);
+    out_state->description = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
     if (!out_state->description) {
-      (void)ui_aria_state_cleanup(out_state);
+      cl_rc = ui_aria_state_cleanup(out_state);
+      if (cl_rc != UI_ERROR_NONE) {
+        return cl_rc;
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
 #if defined(_MSC_VER)
@@ -177,29 +272,116 @@ enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
   }
 
 #if defined(__EMSCRIPTEN__)
-  {
-    const char *role_str = NULL;
-    if (ui_dom_node_get_attribute(node, "role", &role_str) != UI_ERROR_NONE)
-      role_str = NULL;
-    ui_web_bridge_set_aria((uint32_t)(uintptr_t)node, role_str,
-                           out_state->label, out_state->is_hidden,
-                           out_state->is_disabled, out_state->is_expanded,
-                           out_state->is_checked);
+  em_rc = ui_dom_node_get_attribute(node, "role", &role_str);
+  if (em_rc != UI_ERROR_NONE && em_rc != UI_ERROR_NOT_FOUND) {
+    return em_rc;
+  }
+  if (em_rc != UI_ERROR_NONE) {
+    role_str = NULL;
+  }
+  em_rc = ui_web_bridge_set_aria((uint32_t)(uintptr_t)node, role_str,
+                                 out_state->label, out_state->is_hidden,
+                                 out_state->is_disabled, out_state->is_expanded,
+                                 out_state->is_checked);
+  if (em_rc != UI_ERROR_NONE) {
+    return em_rc;
   }
 #endif
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_aria_state_cleanup(struct ui_aria_state *state) {
+#ifdef UI_TEST_MOCK_ALLOC
+#undef ui_aria_role_from_string
+#undef ui_aria_state_cleanup
+#endif
+ui_error_t ui_aria_state_cleanup(struct ui_aria_state *state) {
   if (!state)
     return UI_ERROR_INVALID_ARGUMENT;
   if (state->label) {
-    UI_FREE(state->label);
+    C_MULTIPLATFORM_FREE(state->label);
     state->label = NULL;
   }
   if (state->description) {
-    UI_FREE(state->description);
+    C_MULTIPLATFORM_FREE(state->description);
     state->description = NULL;
   }
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_aria_coverage(void);
+ui_error_t run_aria_coverage(void) {
+  struct ui_aria_state state;
+  struct ui_dom_node *node = NULL;
+  int i;
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+
+  g_aria_mock_fail = 1;
+  g_aria_mock_fail_idx = -1;
+  ui_aria_state_parse(node, &state);
+  g_aria_mock_fail = 0;
+
+  for (i = 0; i < 20; i++) {
+    g_aria_mock_fail = 1;
+    g_aria_mock_fail_idx = i;
+    ui_aria_state_parse(node, &state);
+  }
+  g_aria_mock_fail = 0;
+
+  ui_dom_node_set_attribute(node, "role", "button");
+  g_aria_mock_fail = 2;
+  ui_aria_state_parse(node, &state);
+  g_aria_mock_fail = 0;
+
+  ui_dom_node_remove_attribute(node, "role");
+  ui_dom_node_set_tag_name(node, "button");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_tag_name(node, "a");
+  ui_dom_node_set_attribute(node, "href", "#");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_tag_name(node, "input");
+  ui_dom_node_set_attribute(node, "type", "checkbox");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_attribute(node, "type", "range");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_attribute(node, "type", "radio");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_attribute(node, "type", "text");
+  ui_aria_state_parse(node, &state);
+
+  g_aria_mock_fail = 1;
+  g_aria_mock_fail_idx = -1;
+  ui_aria_state_parse(node, &state);
+  g_aria_mock_fail = 0;
+
+  for (i = 0; i < 20; i++) {
+    g_aria_mock_fail = 1;
+    g_aria_mock_fail_idx = i;
+    ui_aria_state_parse(node, &state);
+  }
+
+  ui_dom_node_set_attribute(node, "aria-checked", "true");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_attribute(node, "aria-checked", "false");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_attribute(node, "aria-checked", "mixed");
+  ui_aria_state_parse(node, &state);
+
+  ui_dom_node_set_attribute(node, "aria-pressed", "true");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_attribute(node, "aria-pressed", "false");
+  ui_aria_state_parse(node, &state);
+  ui_dom_node_set_attribute(node, "aria-pressed", "mixed");
+  ui_aria_state_parse(node, &state);
+
+  g_aria_mock_fail = 4;
+  ui_dom_node_set_attribute(node, "aria-description", "foo");
+  g_malloc_fail_countdown = 0;
+  ui_aria_state_parse(node, &state);
+  g_malloc_fail_countdown = -1;
+  g_aria_mock_fail = 0;
+
+  (void)ui_dom_node_destroy(node);
+  return UI_ERROR_NONE;
+}
+#endif

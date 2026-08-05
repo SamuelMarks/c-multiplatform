@@ -14,16 +14,17 @@ struct ui_preferences {
   struct ui_execution_context *ctx;
 };
 
-enum ui_error ui_preferences_create(struct ui_thread_pool *pool,
-                                    struct ui_execution_context *ctx,
-                                    struct ui_preferences **out_prefs) {
+ui_error_t ui_preferences_create(struct ui_thread_pool *pool,
+                                 struct ui_execution_context *ctx,
+                                 struct ui_preferences **out_prefs) {
   struct ui_preferences *prefs;
 
   if (!pool || !ctx || !out_prefs) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  prefs = (struct ui_preferences *)UI_MALLOC(sizeof(struct ui_preferences));
+  prefs = (struct ui_preferences *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_preferences));
   if (!prefs) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -35,11 +36,11 @@ enum ui_error ui_preferences_create(struct ui_thread_pool *pool,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_preferences_destroy(struct ui_preferences *prefs) {
+ui_error_t ui_preferences_destroy(struct ui_preferences *prefs) {
   if (!prefs) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(prefs);
+  C_MULTIPLATFORM_FREE(prefs);
   return UI_ERROR_NONE;
 }
 
@@ -70,8 +71,8 @@ EM_JS(char *, get_local_storage_js, (const char *key), {
 })
 #endif
 
-enum ui_error ui_preferences_set_string(struct ui_preferences *prefs,
-                                        const char *key, const char *value) {
+ui_error_t ui_preferences_set_string(struct ui_preferences *prefs,
+                                     const char *key, const char *value) {
   if (!prefs || !key || !value) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -87,8 +88,8 @@ enum ui_error ui_preferences_set_string(struct ui_preferences *prefs,
 #endif
 }
 
-enum ui_error ui_preferences_get_string(struct ui_preferences *prefs,
-                                        const char *key, char **out_value) {
+ui_error_t ui_preferences_get_string(struct ui_preferences *prefs,
+                                     const char *key, char **out_value) {
   if (!prefs || !key || !out_value) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -151,11 +152,11 @@ EM_JS(int, idb_save_js,
 #endif
 
 /** \brief ui_error */
-enum ui_error
-ui_preferences_save_binary_async(struct ui_preferences *prefs, const char *key,
-                                 const void *data, size_t length,
-                                 struct ui_promise **out_promise) {
-  enum ui_error rc;
+ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
+                                            const char *key, const void *data,
+                                            size_t length,
+                                            struct ui_promise **out_promise) {
+  ui_error_t rc;
   struct ui_promise *promise;
 
   if (!prefs || !key || !data || !out_promise) {
@@ -176,7 +177,9 @@ ui_preferences_save_binary_async(struct ui_preferences *prefs, const char *key,
   }
 #else
   /* Native implementation stub */
-  ui_promise_reject(promise, UI_ERROR_UNSUPPORTED);
+  rc = ui_promise_reject(promise, UI_ERROR_UNSUPPORTED);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 #endif
 
   *out_promise = promise;

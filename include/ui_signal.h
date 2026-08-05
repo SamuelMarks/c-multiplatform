@@ -50,20 +50,20 @@ typedef struct ui_signal ui_signal_t;
  * @brief Function pointer for equality check.
  * Must set *out_equal to UI_TRUE or UI_FALSE.
  */
-typedef enum ui_error (*ui_equality_fn)(union ui_signal_payload a,
-                                        union ui_signal_payload b,
-                                        ui_bool_t *out_equal);
+typedef ui_error_t (*ui_equality_fn)(union ui_signal_payload a,
+                                     union ui_signal_payload b,
+                                     ui_bool_t *out_equal);
 
 /**
  * @brief Function pointer for destructor.
  */
-typedef enum ui_error (*ui_destructor_fn)(union ui_signal_payload payload);
+typedef ui_error_t (*ui_destructor_fn)(union ui_signal_payload payload);
 
 /**
  * @brief Function pointer for update.
  */
-typedef enum ui_error (*ui_update_fn)(union ui_signal_payload current_value,
-                                      union ui_signal_payload *out_value);
+typedef ui_error_t (*ui_update_fn)(union ui_signal_payload current_value,
+                                   union ui_signal_payload *out_value);
 
 /**
  * @brief Creates a new signal.
@@ -75,50 +75,51 @@ typedef enum ui_error (*ui_update_fn)(union ui_signal_payload current_value,
  * @param destructor_fn The destructor function.
  * @param mode The signal mode.
  * @param out_signal The pointer to store the created signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error
-ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
-                 enum ui_signal_type type, ui_equality_fn equality_fn,
-                 ui_destructor_fn destructor_fn, enum ui_signal_mode mode,
-                 ui_signal_t **out_signal);
+ui_error_t ui_signal_create(struct ui_arena *arena,
+                            union ui_signal_payload initial_value,
+                            enum ui_signal_type type,
+                            ui_equality_fn equality_fn,
+                            ui_destructor_fn destructor_fn,
+                            enum ui_signal_mode mode, ui_signal_t **out_signal);
 
 /**
  * @brief Gets the current value of the signal.
  *
  * @param signal The signal.
  * @param out_value The pointer to store the current value.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_signal_get(ui_signal_t *signal,
-                            union ui_signal_payload *out_value);
+ui_error_t ui_signal_get(ui_signal_t *signal,
+                         union ui_signal_payload *out_value);
 
 /**
  * @brief Sets the value of the signal.
  *
  * @param signal The signal.
  * @param new_value The new value to set.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_signal_set(ui_signal_t *signal,
-                            union ui_signal_payload new_value);
+ui_error_t ui_signal_set(ui_signal_t *signal,
+                         union ui_signal_payload new_value);
 
 /**
  * @brief Updates the value of the signal using an update function.
  *
  * @param signal The signal.
  * @param update_fn The update function.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn);
+ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn);
 
 /**
  * @brief Destroys the signal.
  *
  * @param signal The signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_signal_destroy(ui_signal_t *signal);
+ui_error_t ui_signal_destroy(ui_signal_t *signal);
 
 #ifdef __cplusplus
 }

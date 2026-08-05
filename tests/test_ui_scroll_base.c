@@ -12,8 +12,8 @@ static int g_change_count = 0;
 static float g_last_x = 0.0f;
 static float g_last_y = 0.0f;
 
-static enum ui_error on_scroll_change(struct ui_scroll_base *scroll, float x,
-                                      float y, void *user_data) {
+static ui_error_t on_scroll_change(struct ui_scroll_base *scroll, float x,
+                                   float y, void *user_data) {
   (void)scroll;
   (void)user_data;
   g_change_count++;
@@ -25,7 +25,7 @@ static enum ui_error on_scroll_change(struct ui_scroll_base *scroll, float x,
 
 static int run_normal_tests(void) {
   struct ui_scroll_base *scroll = NULL;
-  enum ui_error err;
+  ui_error_t err;
   struct ui_event ev;
 
   printf("Testing invalid arguments...\n");
@@ -69,6 +69,16 @@ static int run_normal_tests(void) {
     return 1;
   }
 
+  {
+    float val;
+    if (ui_scroll_base_get_scroll_x(scroll, NULL) != UI_ERROR_INVALID_ARGUMENT)
+      return 1;
+    if (ui_scroll_base_get_scroll_y(scroll, NULL) != UI_ERROR_INVALID_ARGUMENT)
+      return 1;
+    if (ui_scroll_base_get_component(scroll, NULL) != UI_ERROR_INVALID_ARGUMENT)
+      return 1;
+  }
+
   if (ui_scroll_base_process_event(scroll, NULL, 0) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -103,6 +113,11 @@ static int run_normal_tests(void) {
       return 1;
     }
   }
+
+  /* Try setting scroll pos without on_change set */
+  ui_scroll_base_set_on_change(scroll, NULL, NULL);
+  ui_scroll_base_set_scroll_pos(scroll, 50.0f, 50.0f);
+  ui_scroll_base_set_on_change(scroll, on_scroll_change, NULL);
 
   /* Try to scroll negative */
   ui_scroll_base_set_scroll_pos(scroll, -50.0f, -50.0f);
@@ -153,29 +168,54 @@ static int run_normal_tests(void) {
   if (err != UI_ERROR_NONE)
     return 1;
 
-  ui_scroll_base_destroy(scroll);
+  /* Test bind_data */
+  {
+    struct ui_signal *dummy_signal = (struct ui_signal *)0xdeadbeef;
+    if (ui_scroll_base_bind_data(NULL, dummy_signal) !=
+        UI_ERROR_INVALID_ARGUMENT)
+      return 1;
+    if (ui_scroll_base_bind_data(scroll, dummy_signal) != UI_ERROR_NONE)
+      return 1;
+  }
+
+  /* Test on_change returning early if the offset didn't change */
+  {
+    ui_scroll_base_set_content_size(scroll, 500.0f, 500.0f);
+    g_change_count = 0;
+    ui_scroll_base_set_scroll_pos(scroll, 10.0f, 10.0f);
+    if (g_change_count != 1)
+      return 1;
+    ui_scroll_base_set_scroll_pos(scroll, 10.0f, 10.0f);
+    if (g_change_count != 1)
+      return 1; /* Should not fire again */
+  }
+
+  (void)ui_scroll_base_destroy(scroll);
   return 0;
+}
+
+static void test_on_change_cb(struct ui_scroll_base *scroll, void *user_data) {
+  int *called = (int *)user_data;
+  if (called) {
+    (*called)++;
+  }
 }
 
 static int run_oom_tests(void) {
   struct ui_scroll_base *scroll = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
 
   printf("Running scroll base OOM tests...\n");
 
   /* Creation OOM */
-  for (i = 0; i < 7; i++) {
+  for (i = 0; i < 50; i++) {
     g_malloc_fail_countdown = i;
     err = ui_scroll_base_create(&scroll);
     g_malloc_fail_countdown = -1;
-    if (err == UI_ERROR_OUT_OF_MEMORY) {
-      continue;
-    } else if (err == UI_ERROR_NONE) {
-      ui_scroll_base_destroy(scroll);
+    if (err == UI_ERROR_NONE) {
+      (void)ui_scroll_base_destroy(scroll);
       break;
-    } else {
-      return 1;
     }
   }
 

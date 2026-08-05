@@ -28,7 +28,7 @@ struct ui_share_payload {
  * @param out_is_available Pointer to receive 1 if available, 0 otherwise.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_share_is_supported(int *out_is_available);
+ui_error_t ui_share_is_supported(int *out_is_available);
 
 /**
  * @brief Triggers the native OS share sheet asynchronously.
@@ -41,8 +41,8 @@ enum ui_error ui_share_is_supported(int *out_is_available);
  * rejected on failure. The resolved value will be NULL (void*).
  * @return UI_ERROR_NONE if the share request was successfully dispatched.
  */
-enum ui_error ui_share_request_async(const struct ui_share_payload *payload,
-                                     struct ui_promise *promise);
+ui_error_t ui_share_request_async(const struct ui_share_payload *payload,
+                                  struct ui_promise *promise);
 
 #ifdef __cplusplus
 }

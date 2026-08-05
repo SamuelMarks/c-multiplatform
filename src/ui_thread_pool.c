@@ -31,7 +31,7 @@ extern int UI_WINAPI CloseHandle(ui_win_handle);
 #endif
 
 struct ui_task_node {
-  enum ui_error (*callback)(void *);
+  ui_error_t (*callback)(void *);
   void *user_data;
   struct ui_task_node *next;
 };
@@ -85,10 +85,10 @@ static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
 
     if (task) {
       if (task->callback) {
-        (void)task->callback(
-            task->user_data); /* Best effort in background thread */
+#define UI_EXECUTE_TASK_CB(t) (t)->callback((t)->user_data)
+        (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
       }
-      UI_FREE(task);
+      C_MULTIPLATFORM_FREE(task);
       task = NULL;
     } else {
       if (pool->shutdown) {
@@ -126,10 +126,10 @@ static void *ui_worker_thread(void *arg) {
 
     if (task) {
       if (task->callback) {
-        (void)task->callback(
-            task->user_data); /* Best effort in background thread */
+#define UI_EXECUTE_TASK_CB(t) (t)->callback((t)->user_data)
+        (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
       }
-      UI_FREE(task);
+      C_MULTIPLATFORM_FREE(task);
       task = NULL;
     }
   }
@@ -138,9 +138,9 @@ static void *ui_worker_thread(void *arg) {
 #endif
 #endif
 
-enum ui_error ui_thread_pool_create(int num_threads,
-                                    struct ui_thread_pool **out_pool) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_thread_pool_create(int num_threads,
+                                 struct ui_thread_pool **out_pool) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_thread_pool *pool = NULL;
 #ifndef UI_SINGLE_THREADED
   int i;
@@ -152,7 +152,8 @@ enum ui_error ui_thread_pool_create(int num_threads,
     goto cleanup;
   }
 
-  pool = (struct ui_thread_pool *)UI_MALLOC(sizeof(struct ui_thread_pool));
+  pool = (struct ui_thread_pool *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_thread_pool));
   if (!pool) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -181,8 +182,8 @@ enum ui_error ui_thread_pool_create(int num_threads,
     goto cleanup;
   }
 
-  pool->threads =
-      (ui_win_handle *)UI_MALLOC(sizeof(ui_win_handle) * num_threads);
+  pool->threads = (ui_win_handle *)C_MULTIPLATFORM_MALLOC(
+      sizeof(ui_win_handle) * num_threads);
   if (!pool->threads) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -221,7 +222,8 @@ enum ui_error ui_thread_pool_create(int num_threads,
   (void)pthread_cond_init(&pool->cond, NULL);
   pool->cond_initialized = 1;
 
-  pool->threads = (pthread_t *)UI_MALLOC(sizeof(pthread_t) * num_threads);
+  pool->threads =
+      (pthread_t *)C_MULTIPLATFORM_MALLOC(sizeof(pthread_t) * num_threads);
   if (!pool->threads) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -264,7 +266,7 @@ cleanup:
           CloseHandle(pool->threads[i]);
         }
       }
-      UI_FREE(pool->threads);
+      C_MULTIPLATFORM_FREE(pool->threads);
     }
     if (pool->semaphore)
       CloseHandle(pool->semaphore);
@@ -283,7 +285,7 @@ cleanup:
           (void)pthread_join(pool->threads[i], NULL);
         }
       }
-      UI_FREE(pool->threads);
+      C_MULTIPLATFORM_FREE(pool->threads);
     }
     if (pool->cond_initialized)
       pthread_cond_destroy(&pool->cond);
@@ -291,12 +293,12 @@ cleanup:
       pthread_mutex_destroy(&pool->mutex);
 #endif
 #endif
-    UI_FREE(pool);
+    C_MULTIPLATFORM_FREE(pool);
   }
   return rc;
 }
 
-enum ui_error ui_thread_pool_destroy(struct ui_thread_pool *pool) {
+ui_error_t ui_thread_pool_destroy(struct ui_thread_pool *pool) {
 #ifndef UI_SINGLE_THREADED
   int i;
 #endif
@@ -316,7 +318,7 @@ enum ui_error ui_thread_pool_destroy(struct ui_thread_pool *pool) {
     CloseHandle(pool->threads[i]);
   }
 
-  UI_FREE(pool->threads);
+  C_MULTIPLATFORM_FREE(pool->threads);
   CloseHandle(pool->semaphore);
   CloseHandle(pool->mutex);
 #else
@@ -328,26 +330,27 @@ enum ui_error ui_thread_pool_destroy(struct ui_thread_pool *pool) {
   for (i = 0; i < pool->num_threads; i++) {
     pthread_join(pool->threads[i], NULL);
   }
-  UI_FREE(pool->threads);
+  C_MULTIPLATFORM_FREE(pool->threads);
 
   pthread_mutex_destroy(&pool->mutex);
   pthread_cond_destroy(&pool->cond);
 #endif
 #endif
 
-  UI_FREE(pool);
+  C_MULTIPLATFORM_FREE(pool);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_thread_pool_schedule(struct ui_thread_pool *pool,
-                                      enum ui_error (*callback)(void *),
-                                      void *user_data) {
+ui_error_t ui_thread_pool_schedule(struct ui_thread_pool *pool,
+                                   ui_error_t (*callback)(void *),
+                                   void *user_data) {
   struct ui_task_node *node = NULL;
 
   if (!pool || !callback)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  node = (struct ui_task_node *)UI_MALLOC(sizeof(struct ui_task_node));
+  node = (struct ui_task_node *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_task_node));
   if (!node)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -387,8 +390,8 @@ enum ui_error ui_thread_pool_schedule(struct ui_thread_pool *pool,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_thread_pool_tick(struct ui_thread_pool *pool) {
-  enum ui_error tick_rc = UI_ERROR_NONE;
+ui_error_t ui_thread_pool_tick(struct ui_thread_pool *pool) {
+  ui_error_t tick_rc = UI_ERROR_NONE;
   if (!pool)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -401,11 +404,11 @@ enum ui_error ui_thread_pool_tick(struct ui_thread_pool *pool) {
     while (current) {
       next = current->next;
       if (current->callback) {
-        enum ui_error cb_rc = current->callback(current->user_data);
+        ui_error_t cb_rc = current->callback(current->user_data);
         if (tick_rc == UI_ERROR_NONE && cb_rc != UI_ERROR_NONE)
           tick_rc = cb_rc;
       }
-      UI_FREE(current);
+      C_MULTIPLATFORM_FREE(current);
       current = next;
     }
   }

@@ -21,7 +21,7 @@ static void test_page_parse_cases(void) {
   struct ui_dom_node *node = NULL;
   struct ui_css_computed_style *style = NULL;
   struct ui_css_page_properties props;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Test invalid arguments */
   rc = ui_css_page_parse(NULL, &props);
@@ -181,7 +181,7 @@ static void test_page_parse_cases(void) {
     ui_css_page_properties_cleanup(&p);
   }
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
 }
 
 int main(void) {

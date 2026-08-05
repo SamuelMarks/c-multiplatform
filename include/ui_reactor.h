@@ -27,7 +27,7 @@ struct ui_reactor;
  * @param out_reactor Pointer to receive the new reactor handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_reactor_create(struct ui_reactor **out_reactor);
+ui_error_t ui_reactor_create(struct ui_reactor **out_reactor);
 
 /**
  * @brief Destroys a reactor instance.
@@ -36,7 +36,7 @@ enum ui_error ui_reactor_create(struct ui_reactor **out_reactor);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if reactor is
  * NULL.
  */
-enum ui_error ui_reactor_destroy(struct ui_reactor *reactor);
+ui_error_t ui_reactor_destroy(struct ui_reactor *reactor);
 
 /**
  * @brief Registers an OS handle (fd or SOCKET) with the reactor.
@@ -48,10 +48,10 @@ enum ui_error ui_reactor_destroy(struct ui_reactor *reactor);
  * @param user_data Opaque pointer passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
-ui_reactor_register(struct ui_reactor *reactor, void *os_handle, int events,
-                    enum ui_error (*callback)(void *, int, void *),
-                    void *user_data);
+ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
+                               int events,
+                               ui_error_t (*callback)(void *, int, void *),
+                               void *user_data);
 
 /**
  * @brief Unregisters an OS handle from the reactor.
@@ -60,8 +60,7 @@ ui_reactor_register(struct ui_reactor *reactor, void *os_handle, int events,
  * @param os_handle The OS handle to unregister.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_reactor_unregister(struct ui_reactor *reactor,
-                                    void *os_handle);
+ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle);
 
 /**
  * @brief Polls the reactor for events and dispatches callbacks.
@@ -70,7 +69,7 @@ enum ui_error ui_reactor_unregister(struct ui_reactor *reactor,
  * @param timeout_ms Maximum time to wait in milliseconds (-1 for infinite).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms);
+ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms);
 
 /**
  * @brief Schedules a callback to be executed on the reactor's thread.
@@ -80,9 +79,8 @@ enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms);
  * @param user_data Opaque pointer passed to the callback.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_reactor_schedule(struct ui_reactor *reactor,
-                                  enum ui_error (*callback)(void *),
-                                  void *user_data);
+ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
+                               ui_error_t (*callback)(void *), void *user_data);
 
 /**
  * @brief Wakes up a reactor blocked in polling.
@@ -90,7 +88,7 @@ enum ui_error ui_reactor_schedule(struct ui_reactor *reactor,
  * @param reactor The reactor to wake.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_reactor_wake(struct ui_reactor *reactor);
+ui_error_t ui_reactor_wake(struct ui_reactor *reactor);
 
 #ifdef __cplusplus
 }

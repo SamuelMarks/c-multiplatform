@@ -8,14 +8,13 @@ static UI_THREAD_LOCAL struct ui_execution_context *g_current_context = NULL;
 
 /** \brief ui_execution_context */
 struct ui_execution_context {
-  enum ui_error (*task_callback)(void *);
+  ui_error_t (*task_callback)(void *);
   void *task_user_data;
 };
 
 /** \brief ui_error */
-enum ui_error
-ui_execution_context_create(struct ui_execution_context **out_ctx) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_execution_context_create(struct ui_execution_context **out_ctx) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_execution_context *ctx = NULL;
 
   if (!out_ctx) {
@@ -23,7 +22,7 @@ ui_execution_context_create(struct ui_execution_context **out_ctx) {
     goto cleanup;
   }
 
-  ctx = (struct ui_execution_context *)UI_MALLOC(
+  ctx = (struct ui_execution_context *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_execution_context));
   if (!ctx) {
     rc = UI_ERROR_OUT_OF_MEMORY;
@@ -39,18 +38,18 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_execution_context_destroy(struct ui_execution_context *ctx) {
+ui_error_t ui_execution_context_destroy(struct ui_execution_context *ctx) {
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  UI_FREE(ctx);
+  C_MULTIPLATFORM_FREE(ctx);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_execution_context_schedule(struct ui_execution_context *ctx,
-                                            enum ui_error (*callback)(void *),
-                                            void *user_data) {
+ui_error_t ui_execution_context_schedule(struct ui_execution_context *ctx,
+                                         ui_error_t (*callback)(void *),
+                                         void *user_data) {
   if (!ctx || !callback) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -60,8 +59,8 @@ enum ui_error ui_execution_context_schedule(struct ui_execution_context *ctx,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_execution_context_tick(struct ui_execution_context *ctx) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_execution_context_tick(struct ui_execution_context *ctx) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -70,12 +69,15 @@ enum ui_error ui_execution_context_tick(struct ui_execution_context *ctx) {
     rc = ctx->task_callback(ctx->task_user_data);
     ctx->task_callback = NULL;
     ctx->task_user_data = NULL;
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    return UI_ERROR_NONE;
   }
 
-  return rc;
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_execution_context_cancel(struct ui_execution_context *ctx) {
+ui_error_t ui_execution_context_cancel(struct ui_execution_context *ctx) {
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -87,14 +89,13 @@ enum ui_error ui_execution_context_cancel(struct ui_execution_context *ctx) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_execution_context_set_current(struct ui_execution_context *ctx) {
+ui_error_t ui_execution_context_set_current(struct ui_execution_context *ctx) {
   g_current_context = ctx;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_execution_context_get_current(struct ui_execution_context **out_ctx) {
   if (!out_ctx) {
     return UI_ERROR_INVALID_ARGUMENT;

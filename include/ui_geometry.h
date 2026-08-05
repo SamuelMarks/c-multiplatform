@@ -63,8 +63,8 @@ struct ui_dom_matrix {
  * @param z The z coordinate.
  * @param w The w coordinate.
  */
-enum ui_error ui_dom_point_init(struct ui_dom_point *point, double x, double y,
-                                double z, double w);
+ui_error_t ui_dom_point_init(struct ui_dom_point *point, double x, double y,
+                             double z, double w);
 
 /**
  * @brief Initializes a DOMRect, automatically computing top/right/bottom/left.
@@ -75,8 +75,8 @@ enum ui_error ui_dom_point_init(struct ui_dom_point *point, double x, double y,
  * @param width The width.
  * @param height The height.
  */
-enum ui_error ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
-                               double width, double height);
+ui_error_t ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
+                            double width, double height);
 
 /**
  * @brief Initializes a DOMQuad from 4 points.
@@ -87,18 +87,18 @@ enum ui_error ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
  * @param p3 Point 3.
  * @param p4 Point 4.
  */
-enum ui_error ui_dom_quad_init(struct ui_dom_quad *quad,
-                               const struct ui_dom_point *p1,
-                               const struct ui_dom_point *p2,
-                               const struct ui_dom_point *p3,
-                               const struct ui_dom_point *p4);
+ui_error_t ui_dom_quad_init(struct ui_dom_quad *quad,
+                            const struct ui_dom_point *p1,
+                            const struct ui_dom_point *p2,
+                            const struct ui_dom_point *p3,
+                            const struct ui_dom_point *p4);
 
 /**
  * @brief Initializes a DOMMatrix to the identity matrix.
  *
  * @param matrix The matrix to initialize.
  */
-enum ui_error ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix);
+ui_error_t ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix);
 
 #ifdef __cplusplus
 }

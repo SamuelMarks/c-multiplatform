@@ -31,7 +31,7 @@ static int s_tests_failed = 0;
     }                                                                          \
   } while (0)
 
-static enum ui_error test_invalid_args(void) {
+static ui_error_t test_invalid_args(void) {
   struct ui_dom_node *root = NULL;
   struct ui_overlay_director *dir = NULL;
   struct ui_component *comp = NULL;
@@ -67,22 +67,22 @@ static enum ui_error test_invalid_args(void) {
 
   ASSERT_EQ(UI_ERROR_NOT_FOUND, ui_overlay_director_unmount(dir2, overlay));
 
-  ui_overlay_director_destroy(dir2);
-  ui_dom_node_destroy(root2);
-  ui_overlay_director_destroy(dir);
-  ui_dom_node_destroy(root);
-  ui_component_destroy(comp);
+  (void)ui_overlay_director_destroy(dir2);
+  (void)ui_dom_node_destroy(root2);
+  (void)ui_overlay_director_destroy(dir);
+  (void)ui_dom_node_destroy(root);
+  (void)ui_component_destroy(comp);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_overlay_director_lifecycle(void) {
+static ui_error_t test_overlay_director_lifecycle(void) {
   struct ui_dom_node *root = NULL;
   struct ui_overlay_director *dir = NULL;
   struct ui_component *comp1 = NULL;
   struct ui_component *comp2 = NULL;
   struct ui_overlay *overlay1 = NULL;
   struct ui_overlay *overlay2 = NULL;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ASSERT_EQ(UI_ERROR_NONE, err);
@@ -120,28 +120,28 @@ static enum ui_error test_overlay_director_lifecycle(void) {
   /* Destroy component manually since we unmounted it, wait, ui_component_mount
      transfers ownership? No, ui_component_destroy must be called by the user.
    */
-  ui_component_destroy(comp1);
+  (void)ui_component_destroy(comp1);
 
   /* Destroy director (should unmount overlay2 automatically) */
   err = ui_overlay_director_destroy(dir);
   ASSERT_EQ(UI_ERROR_NONE, err);
 
-  ui_component_destroy(comp2);
+  (void)ui_component_destroy(comp2);
 
   /* Root node should have 0 children now */
   ASSERT_TRUE(root->first_child == NULL);
   ASSERT_TRUE(root->last_child == NULL);
 
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_oom(void) {
+static ui_error_t test_oom(void) {
   struct ui_dom_node *root = NULL;
   struct ui_overlay_director *dir = NULL;
   struct ui_component *comp = NULL;
   struct ui_overlay *overlay = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
@@ -183,9 +183,9 @@ static enum ui_error test_oom(void) {
     }
   }
 
-  ui_overlay_director_destroy(dir);
-  ui_dom_node_destroy(root);
-  ui_component_destroy(comp);
+  (void)ui_overlay_director_destroy(dir);
+  (void)ui_dom_node_destroy(root);
+  (void)ui_component_destroy(comp);
 }
 
 int main(void) {

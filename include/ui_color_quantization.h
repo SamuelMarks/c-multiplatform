@@ -40,7 +40,7 @@ struct ui_color_quantization_options {
  * extracted.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
                          size_t height, int channels,
                          const struct ui_color_quantization_options *options,

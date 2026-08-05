@@ -8,21 +8,21 @@
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
 
-void *ui_mock_malloc(size_t size);
-void ui_mock_free(void *ptr);
-static enum ui_error test_callback(void *user_data) {
+void *C_MULTIPLATFORM_MALLOC(size_t size);
+void C_MULTIPLATFORM_FREE(void *ptr);
+static ui_error_t test_callback(void *user_data) {
   int *val = (int *)user_data;
   *val = 42;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_cancel_callback(void *user_data) {
+static ui_error_t test_cancel_callback(void *user_data) {
   int *val = (int *)user_data;
   *val = 99; /* Should not be executed */
   return UI_ERROR_NONE;
 }
 
-static enum ui_error thread_pool_callback(void *user_data) {
+static ui_error_t thread_pool_callback(void *user_data) {
   int *val = (int *)user_data;
   *val = 100;
   return UI_ERROR_NONE;
@@ -30,7 +30,7 @@ static enum ui_error thread_pool_callback(void *user_data) {
 
 static int run_normal_tests(void) {
   struct ui_execution_context *ctx = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int test_val = 0;
 
   printf("Running normal tests...\n");
@@ -104,7 +104,7 @@ static int run_normal_tests(void) {
     return 1;
   }
 
-  ui_execution_context_destroy(ctx);
+  (void)ui_execution_context_destroy(ctx);
 
   if (ui_execution_context_get_current(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -134,7 +134,7 @@ static int run_paradigm_tests(void) {
     ui_execution_context_tick(ctx);
     if (test_val != 42)
       return 1;
-    ui_execution_context_destroy(ctx);
+    (void)ui_execution_context_destroy(ctx);
     ui_execution_context_set_current(NULL);
   }
 
@@ -172,8 +172,8 @@ static int run_paradigm_tests(void) {
         return 1;
     }
 
-    ui_execution_context_destroy(ctxs[0]);
-    ui_execution_context_destroy(ctxs[1]);
+    (void)ui_execution_context_destroy(ctxs[0]);
+    (void)ui_execution_context_destroy(ctxs[1]);
   }
 
   return 0;
@@ -181,7 +181,7 @@ static int run_paradigm_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_execution_context *ctx = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Running OOM tests...\n");
 
@@ -197,6 +197,23 @@ static int run_oom_tests(void) {
   }
 
   g_malloc_fail_countdown = -1; /* reset */
+  return 0;
+}
+
+static ui_error_t failing_task_cb(void *user_data) { return UI_ERROR_UNKNOWN; }
+
+static int test_execution_context_fail(void) {
+  struct ui_execution_context *ctx = NULL;
+
+  ui_execution_context_create(&ctx);
+  ui_execution_context_schedule(ctx, failing_task_cb, NULL);
+
+  if (ui_execution_context_tick(ctx) != UI_ERROR_UNKNOWN) {
+    (void)ui_execution_context_destroy(ctx);
+    return 1;
+  }
+
+  (void)ui_execution_context_destroy(ctx);
   return 0;
 }
 

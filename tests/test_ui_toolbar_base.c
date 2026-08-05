@@ -9,7 +9,7 @@ extern int g_malloc_fail_countdown;
 
 static int run_normal_tests(void) {
   struct ui_toolbar_base *tb = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   const char *title = NULL;
   enum ui_toolbar_mode mode;
   enum ui_toolbar_alignment align;
@@ -65,6 +65,12 @@ static int run_normal_tests(void) {
   ui_toolbar_base_get_title(tb, &title);
   failed |= (!title || strcmp(title, "Another Title") != 0);
 
+  /* Bind data */
+  failed |=
+      (ui_toolbar_base_bind_data(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT);
+  failed |= (ui_toolbar_base_bind_data(tb, (struct ui_signal *)0x1234) !=
+             UI_ERROR_NONE);
+
   ui_toolbar_base_destroy(tb);
   ui_toolbar_base_destroy(NULL); /* Should be safe */
 
@@ -73,7 +79,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_toolbar_base *tb = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   printf("Testing OOM on create...\n");

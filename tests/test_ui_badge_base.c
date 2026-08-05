@@ -8,7 +8,7 @@
 static int test_badge_formatting(void) {
   struct ui_badge_base *badge = NULL;
   struct ui_component *comp;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_badge_base_create(&badge);
   if (rc != UI_ERROR_NONE)
@@ -64,7 +64,7 @@ static int test_badge_formatting(void) {
   /* Placement validation usually verified structurally via layout logic.
      We confirm anchor configuration parameters are available inside logic */
   printf("Badge format formatting constraints passed.\n");
-  ui_badge_base_destroy(badge);
+  (void)ui_badge_base_destroy(badge);
   return 0;
 }
 
@@ -77,7 +77,7 @@ static int test_badge_nulls_and_errors(void) {
 
   if (ui_badge_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_badge_base_destroy(NULL);
+  (void)ui_badge_base_destroy(NULL);
 
   if (ui_badge_base_get_component(NULL, &comp) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -107,10 +107,10 @@ static int test_badge_nulls_and_errors(void) {
   g_malloc_fail_countdown = -1;
 
   /* text node alloc failure */
-  g_malloc_fail_countdown = 3; /* ui_dom_node_create TEXT fails */
-  if (ui_badge_base_create(&badge) == UI_ERROR_OUT_OF_MEMORY)
+  g_malloc_fail_countdown = 5; /* ui_dom_node_create TEXT fails */
+  if (ui_badge_base_create(&badge) != UI_ERROR_OUT_OF_MEMORY)
     return 1;
-  ui_badge_base_destroy(badge);
+  (void)ui_badge_base_destroy(badge);
   g_malloc_fail_countdown = -1;
 
   /* test get_component with null out parameter */
@@ -126,7 +126,7 @@ static int test_badge_nulls_and_errors(void) {
   {
     struct ui_dom_node *child = comp->shadow_root->first_child;
     ui_dom_node_remove_child(comp->shadow_root, child);
-    ui_dom_node_destroy(child);
+    (void)ui_dom_node_destroy(child);
   }
   if (ui_badge_base_set_value(badge, 1, 10) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -134,7 +134,7 @@ static int test_badge_nulls_and_errors(void) {
     return 1;
 
   /* test missing shadow_root branch */
-  ui_dom_node_destroy(comp->shadow_root);
+  (void)ui_dom_node_destroy(comp->shadow_root);
   comp->shadow_root = NULL;
   if (ui_badge_base_set_value(badge, 1, 10) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -144,7 +144,7 @@ static int test_badge_nulls_and_errors(void) {
     return 1;
 
   /* test missing component branch */
-  ui_component_destroy(comp);
+  (void)ui_component_destroy(comp);
   ((void **)badge)[0] = NULL;
   if (ui_badge_base_set_value(badge, 1, 10) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -153,12 +153,18 @@ static int test_badge_nulls_and_errors(void) {
   if (ui_badge_base_set_hidden(badge, 1) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_badge_base_destroy(badge);
+  (void)ui_badge_base_destroy(badge);
 
   return 0;
 }
 
 int main(void) {
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_badge_coverage(void);
+  run_badge_coverage();
+#endif
+
   int failed = 0;
   printf("Running ui_badge_base tests...\n");
 

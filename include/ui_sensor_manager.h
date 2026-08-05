@@ -42,7 +42,7 @@ struct ui_sensor_manager;
  * @param out_manager Pointer to receive the manager instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_sensor_manager_create(struct ui_sensor_manager **out_manager);
+ui_error_t ui_sensor_manager_create(struct ui_sensor_manager **out_manager);
 
 /**
  * @brief Destroys the sensor manager and releases hardware handles.
@@ -50,7 +50,7 @@ enum ui_error ui_sensor_manager_create(struct ui_sensor_manager **out_manager);
  * @param manager The manager instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_sensor_manager_destroy(struct ui_sensor_manager *manager);
+ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager);
 
 /**
  * @brief Starts polling hardware sensors and computing smoothed orientation
@@ -59,7 +59,7 @@ enum ui_error ui_sensor_manager_destroy(struct ui_sensor_manager *manager);
  * @param manager The manager instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_sensor_manager_start(struct ui_sensor_manager *manager);
+ui_error_t ui_sensor_manager_start(struct ui_sensor_manager *manager);
 
 /**
  * @brief Stops polling hardware sensors to conserve battery.
@@ -67,7 +67,7 @@ enum ui_error ui_sensor_manager_start(struct ui_sensor_manager *manager);
  * @param manager The manager instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_sensor_manager_stop(struct ui_sensor_manager *manager);
+ui_error_t ui_sensor_manager_stop(struct ui_sensor_manager *manager);
 
 /**
  * @brief Binds a reactive signal to the smoothed quaternion output.
@@ -77,9 +77,8 @@ enum ui_error ui_sensor_manager_stop(struct ui_sensor_manager *manager);
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
-                                   struct ui_signal *signal);
+ui_error_t ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
+                                              struct ui_signal *signal);
 
 /**
  * @brief Retrieves the latest raw accelerometer vector data.
@@ -88,7 +87,7 @@ ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
  * @param out_accel Pointer to receive the vector data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
                                     struct ui_sensor_vector3 *out_accel);
 
@@ -99,9 +98,8 @@ ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
  * @param out_gyro Pointer to receive the vector data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
-                                struct ui_sensor_vector3 *out_gyro);
+ui_error_t ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
+                                           struct ui_sensor_vector3 *out_gyro);
 
 #ifdef __cplusplus
 }

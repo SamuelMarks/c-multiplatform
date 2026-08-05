@@ -2,9 +2,9 @@
 #include "ui_textarea_autosize.h"
 /* clang-format on */
 
-enum ui_error ui_textarea_autosize_config_init(
+ui_error_t ui_textarea_autosize_config_init(
     struct ui_textarea_autosize_config *out_config) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_config) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -22,11 +22,11 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_textarea_autosize_calculate(const struct ui_textarea_autosize_config *config,
                                size_t num_lines,
                                struct ui_textarea_autosize_state *out_state) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   float content_height;
   float target_height;
   int has_scrollbar;

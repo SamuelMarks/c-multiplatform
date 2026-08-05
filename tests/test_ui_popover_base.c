@@ -17,7 +17,7 @@ extern int g_malloc_fail_countdown;
 
 static int test_popover_lifecycle(void) {
   struct ui_popover_base *popover;
-  enum ui_error rc;
+  ui_error_t rc;
   int is_open = 0;
 
   rc = ui_popover_base_create(&popover);
@@ -28,7 +28,7 @@ static int test_popover_lifecycle(void) {
   if (is_open)
     return 1;
 
-  ui_popover_base_destroy(popover);
+  (void)ui_popover_base_destroy(popover);
   return 0;
 }
 
@@ -40,7 +40,7 @@ static int test_popover_open_close(void) {
   struct ui_dom_node *content_node;
   struct ui_layout_node trigger;
   struct ui_anchor_config anchor;
-  enum ui_error rc;
+  ui_error_t rc;
   int is_open = 0;
 
   rc = ui_popover_base_create(&popover);
@@ -96,11 +96,11 @@ static int test_popover_open_close(void) {
   if (is_open)
     return 1;
 
-  ui_popover_base_destroy(popover);
+  (void)ui_popover_base_destroy(popover);
   (void)ui_focus_manager_destroy(focus_mgr);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root_node);
-  ui_dom_node_destroy(content_node);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root_node);
+  (void)ui_dom_node_destroy(content_node);
   /* Note: content_node is conceptually owned by the user, but since the popover
      mounted it, destroying the popover tree during close cleans it up. However,
      we removed it above, so we must free it. */
@@ -116,7 +116,7 @@ static int test_popover_click_outside(void) {
   struct ui_layout_node trigger;
   struct ui_anchor_config anchor;
   struct ui_event ev;
-  enum ui_error rc;
+  ui_error_t rc;
   int is_open = 0;
 
   rc = ui_popover_base_create(&popover);
@@ -177,11 +177,11 @@ static int test_popover_click_outside(void) {
   /* Close via destroy while open */
   ui_popover_base_open(popover, content_node, director, NULL, &trigger, &anchor,
                        800.0f, 600.0f);
-  ui_popover_base_destroy(popover);
+  (void)ui_popover_base_destroy(popover);
 
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root_node);
-  ui_dom_node_destroy(content_node);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root_node);
+  (void)ui_dom_node_destroy(content_node);
 
   return 0;
 }
@@ -200,7 +200,7 @@ static int test_popover_nulls(void) {
 
   if (ui_popover_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_popover_base_destroy(NULL);
+  (void)ui_popover_base_destroy(NULL);
 
   if (ui_popover_base_open(NULL, content, director, focus_mgr, &trigger,
                            &anchor, 800, 600) != UI_ERROR_INVALID_ARGUMENT)
@@ -247,7 +247,7 @@ static int test_popover_nulls(void) {
   if (ui_popover_base_get_animating_signal(popover, &comp) != UI_ERROR_NONE)
     return 1;
 
-  ui_popover_base_destroy(popover);
+  (void)ui_popover_base_destroy(popover);
   return 0;
 }
 
@@ -269,7 +269,7 @@ static int test_popover_oom_and_errors(void) {
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     if (ui_popover_base_create(&popover) == UI_ERROR_NONE) {
-      ui_popover_base_destroy(popover);
+      (void)ui_popover_base_destroy(popover);
       break;
     }
   }
@@ -297,7 +297,7 @@ static int test_popover_oom_and_errors(void) {
   /* Fail dom node creation via malloc */
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
-    enum ui_error rc =
+    ui_error_t rc =
         ui_popover_base_open(popover, content_node, director, focus_mgr,
                              &trigger, &anchor, 800, 600);
     g_malloc_fail_countdown = -1;
@@ -318,10 +318,10 @@ static int test_popover_oom_and_errors(void) {
 
   ui_dom_node_destroy(dummy_parent); /* also destroys content_node */
 
-  ui_popover_base_destroy(popover);
-  ui_focus_manager_destroy(focus_mgr);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root_node);
+  (void)ui_popover_base_destroy(popover);
+  (void)ui_focus_manager_destroy(focus_mgr);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root_node);
   return 0;
 }
 

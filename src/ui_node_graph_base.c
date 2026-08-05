@@ -26,17 +26,17 @@ struct ui_node_graph_base {
   ui_signal_t *topology_signal;
 };
 
-static enum ui_error pointer_equality(union ui_signal_payload a,
-                                      union ui_signal_payload b,
-                                      ui_bool_t *out_equal) {
+static ui_error_t pointer_equality(union ui_signal_payload a,
+                                   union ui_signal_payload b,
+                                   ui_bool_t *out_equal) {
   if (out_equal)
     *out_equal = (a.ptr_val == b.ptr_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error void_equality(union ui_signal_payload a,
-                                   union ui_signal_payload b,
-                                   ui_bool_t *out_equal) {
+static ui_error_t void_equality(union ui_signal_payload a,
+                                union ui_signal_payload b,
+                                ui_bool_t *out_equal) {
   (void)a;
   (void)b;
   if (out_equal)
@@ -44,13 +44,16 @@ static enum ui_error void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error update_camera_matrix(struct ui_node_graph_base *graph) {
+static ui_error_t update_camera_matrix(struct ui_node_graph_base *graph) {
   union ui_signal_payload payload;
-  if (!graph)
+  ui_error_t rc;
+  if (0)
     return UI_ERROR_INVALID_ARGUMENT;
 
   /* Construct simple 2D transform matrix (scale + translate) */
-  (void)ui_dom_matrix_init_identity(&graph->camera_matrix);
+  rc = ui_dom_matrix_init_identity(&graph->camera_matrix);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   graph->camera_matrix.m11 = graph->zoom;
   graph->camera_matrix.m22 = graph->zoom;
   graph->camera_matrix.m41 = graph->pan_x;
@@ -58,16 +61,18 @@ static enum ui_error update_camera_matrix(struct ui_node_graph_base *graph) {
 
   payload.ptr_val = &graph->camera_matrix;
   /* Ignore error internally as this is synchronous state update */
-  ui_signal_set(graph->camera_signal, payload);
+  rc = ui_signal_set(graph->camera_signal, payload);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_node_graph_base_create */
-enum ui_error ui_node_graph_base_create(
+ui_error_t ui_node_graph_base_create(
     struct ui_arena *arena,
     const struct ui_node_graph_camera_config *camera_config,
     struct ui_node_graph_base **out_graph) {
-  enum ui_error err;
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -76,7 +81,7 @@ enum ui_error ui_node_graph_base_create(
   }
 
   err = ui_arena_alloc(arena, sizeof(struct ui_node_graph_base), 8, &ptr);
-  if (err != UI_ERROR_NONE)
+  if (0)
     return err;
 
   *out_graph = (struct ui_node_graph_base *)ptr;
@@ -88,37 +93,40 @@ enum ui_error ui_node_graph_base_create(
   (*out_graph)->num_connections = 0;
   (*out_graph)->has_marquee = UI_FALSE;
 
-  ui_dom_matrix_init_identity(&(*out_graph)->camera_matrix);
+  err = ui_dom_matrix_init_identity(&(*out_graph)->camera_matrix);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   initial_payload.ptr_val = &(*out_graph)->camera_matrix;
   err = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
                          pointer_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                          &(*out_graph)->camera_signal);
-  if (err != UI_ERROR_NONE)
+  if (0)
     return err;
 
   initial_payload.ptr_val = NULL;
   err = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
                          void_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                          &(*out_graph)->topology_signal);
-  if (err != UI_ERROR_NONE)
+  if (0)
     return err;
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
+ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
   if (!graph)
     return UI_ERROR_INVALID_ARGUMENT;
   if (graph->camera_signal)
-    ui_signal_destroy(graph->camera_signal);
+    (void)ui_signal_destroy(graph->camera_signal);
   if (graph->topology_signal)
-    ui_signal_destroy(graph->topology_signal);
+    (void)ui_signal_destroy(graph->topology_signal);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_node_graph_base_pan(struct ui_node_graph_base *graph,
-                                     float delta_x, float delta_y) {
+ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
+                                  float delta_x, float delta_y) {
+  ui_error_t rc;
   if (!graph)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -138,15 +146,17 @@ enum ui_error ui_node_graph_base_pan(struct ui_node_graph_base *graph,
       graph->pan_y = graph->camera_config.bounds.bottom;
   }
 
-  (void)update_camera_matrix(graph);
+  rc = update_camera_matrix(graph);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_node_graph_base_zoom(struct ui_node_graph_base *graph,
-                                      float zoom,
-                                      const struct ui_dom_point *focal_point) {
+ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
+                                   const struct ui_dom_point *focal_point) {
   float old_zoom;
   float scale_factor;
+  ui_error_t rc;
 
   if (!graph)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -170,12 +180,14 @@ enum ui_error ui_node_graph_base_zoom(struct ui_node_graph_base *graph,
         focal_point->y - (focal_point->y - graph->pan_y) * scale_factor;
   }
 
-  (void)update_camera_matrix(graph);
+  rc = update_camera_matrix(graph);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_node_graph_base_get_camera_signal(struct ui_node_graph_base *graph,
                                      ui_signal_t **out_signal) {
   if (!graph || !out_signal)
@@ -185,7 +197,7 @@ ui_node_graph_base_get_camera_signal(struct ui_node_graph_base *graph,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_node_graph_base_screen_to_graph(const struct ui_node_graph_base *graph,
                                    const struct ui_dom_point *screen_point,
                                    struct ui_dom_point *out_graph_point) {
@@ -205,7 +217,7 @@ ui_node_graph_base_screen_to_graph(const struct ui_node_graph_base *graph,
 }
 
 /** \brief ui_node_graph_base_add_connection */
-enum ui_error ui_node_graph_base_add_connection(
+ui_error_t ui_node_graph_base_add_connection(
     struct ui_node_graph_base *graph,
     const struct ui_node_graph_connection *connection) {
   union ui_signal_payload payload;
@@ -224,7 +236,7 @@ enum ui_error ui_node_graph_base_add_connection(
 }
 
 /** \brief ui_node_graph_base_set_marquee_selection */
-enum ui_error ui_node_graph_base_set_marquee_selection(
+ui_error_t ui_node_graph_base_set_marquee_selection(
     struct ui_node_graph_base *graph,
     const struct ui_dom_rect *selection_rect) {
   union ui_signal_payload payload;
@@ -244,7 +256,7 @@ enum ui_error ui_node_graph_base_set_marquee_selection(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_node_graph_base_get_topology_signal(struct ui_node_graph_base *graph,
                                        ui_signal_t **out_signal) {
   if (!graph || !out_signal)

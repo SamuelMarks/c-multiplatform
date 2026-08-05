@@ -25,18 +25,18 @@ struct ui_window_controls_base {
   int num_regions;
 };
 
-static enum ui_error state_equality(union ui_signal_payload a,
-                                    union ui_signal_payload b,
-                                    ui_bool_t *out_equal) {
+static ui_error_t state_equality(union ui_signal_payload a,
+                                 union ui_signal_payload b,
+                                 ui_bool_t *out_equal) {
   *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_window_controls_base_create(struct ui_arena *arena,
                                struct ui_window_controls_base **out_controls) {
-  enum ui_error err;
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -66,22 +66,22 @@ ui_window_controls_base_create(struct ui_arena *arena,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_window_controls_base_destroy(struct ui_window_controls_base *controls) {
   if (!controls) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_signal_destroy(controls->state_signal);
+  (void)ui_signal_destroy(controls->state_signal);
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
                                   enum ui_window_state state) {
-  enum ui_error err;
+  ui_error_t err;
   union ui_signal_payload payload;
 
   if (!controls) {
@@ -100,7 +100,7 @@ ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
 }
 
 /** \brief ui_window_controls_base_get_state_signal */
-enum ui_error ui_window_controls_base_get_state_signal(
+ui_error_t ui_window_controls_base_get_state_signal(
     struct ui_window_controls_base *controls, ui_signal_t **out_signal) {
   if (!controls || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -110,7 +110,7 @@ enum ui_error ui_window_controls_base_get_state_signal(
 }
 
 /** \brief ui_window_controls_base_hit_test */
-enum ui_error ui_window_controls_base_hit_test(
+ui_error_t ui_window_controls_base_hit_test(
     struct ui_window_controls_base *controls, int x, int y,
     enum ui_window_control_hit_region *out_region) {
   int i;
@@ -133,7 +133,7 @@ enum ui_error ui_window_controls_base_hit_test(
 }
 
 /** \brief ui_window_controls_base_set_region_rect */
-enum ui_error ui_window_controls_base_set_region_rect(
+ui_error_t ui_window_controls_base_set_region_rect(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region, int x, int y, int width,
     int height) {
@@ -171,7 +171,7 @@ enum ui_error ui_window_controls_base_set_region_rect(
 }
 
 /** \brief ui_window_controls_base_trigger_hover_intent */
-enum ui_error ui_window_controls_base_trigger_hover_intent(
+ui_error_t ui_window_controls_base_trigger_hover_intent(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region) {
   if (!controls) {

@@ -47,7 +47,11 @@ static void test_scroll_snap_cases(void) {
               UI_ERROR_INVALID_ARGUMENT);
 
   /* Empty style -> defaults */
-  TEST_ASSERT(ui_css_scroll_snap_parse(style, &props) == UI_ERROR_NONE);
+  ui_error_t rc = ui_css_scroll_snap_parse(style, &props);
+  if (rc != UI_ERROR_NONE) {
+    printf("rc = %d\n", (int)rc);
+  }
+  TEST_ASSERT(rc == UI_ERROR_NONE);
   TEST_ASSERT(props.type.axis == UI_CSS_SCROLL_SNAP_AXIS_NONE);
   TEST_ASSERT(props.type.strictness == UI_CSS_SCROLL_SNAP_STRICTNESS_NONE);
   TEST_ASSERT(props.align.block == UI_CSS_SCROLL_SNAP_ALIGN_NONE);
@@ -289,7 +293,7 @@ static void test_scroll_snap_cases(void) {
         TEST_ASSERT(p.padding.top.value == 0.0f);
       });
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
 }
 
 int main(void) {

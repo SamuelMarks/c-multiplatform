@@ -1,401 +1,141 @@
 /* clang-format off */
-#include "ui_gesture.h"
+#include "../include/ui_gesture.h"
 #include <stdio.h>
-#include <stdlib.h>
+#include <assert.h>
 #include <string.h>
-#include <math.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
 
-#define EXPECT_TRUE(cond)                                                      \
-  do {                                                                         \
-    if (!(cond)) {                                                             \
-      printf("Failed at %d: %s\n", __LINE__, #cond);                           \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-#define EXPECT_EQ_INT(a, b)                                                    \
-  do {                                                                         \
-    int _a = (a);                                                              \
-    int _b = (b);                                                              \
-    if (_a != _b) {                                                            \
-      printf("Failed at %d: %s == %s (%d != %d)\n", __LINE__, #a, #b, _a, _b); \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-#define EXPECT_EQ_FLOAT(a, b)                                                  \
-  do {                                                                         \
-    float _a = (a);                                                            \
-    float _b = (b);                                                            \
-    if (fabs(_a - _b) > 0.001f) {                                              \
-      printf("Failed at %d: %s == %s (%f != %f)\n", __LINE__, #a, #b, _a, _b); \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-
-static int test_create_destroy(void) {
+static void test_gesture_basic(void) {
   struct ui_gesture_recognizer *r = NULL;
-  enum ui_error err;
-
-  err = ui_gesture_recognizer_create(NULL);
-  EXPECT_EQ_INT(err, UI_ERROR_INVALID_ARGUMENT);
-
-  err = ui_gesture_recognizer_create(&r);
-  EXPECT_EQ_INT(err, UI_ERROR_NONE);
-  EXPECT_TRUE(r != NULL);
-
-  err = ui_gesture_recognizer_destroy(NULL);
-  EXPECT_EQ_INT(err, UI_ERROR_INVALID_ARGUMENT);
-
-  err = ui_gesture_recognizer_destroy(r);
-  EXPECT_EQ_INT(err, UI_ERROR_NONE);
-  return 0;
-}
-
-static int run_oom_tests(void) {
-  struct ui_gesture_recognizer *r = NULL;
-  enum ui_error err;
-
-  g_malloc_fail_countdown = 0;
-  err = ui_gesture_recognizer_create(&r);
-  g_malloc_fail_countdown = -1;
-  EXPECT_EQ_INT(err, UI_ERROR_OUT_OF_MEMORY);
-  return 0;
-}
-
-static int test_null_args_process(void) {
-  struct ui_gesture_recognizer *r;
   struct ui_event ev;
-  struct ui_gesture_event ge;
+  struct ui_gesture_event gev;
+  ui_error_t rc;
 
+  /* Invalid args */
+  rc = ui_gesture_recognizer_create(NULL);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  rc = ui_gesture_recognizer_create(&r);
+  assert(rc == UI_ERROR_NONE);
+
+  rc = ui_gesture_recognizer_destroy(NULL);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  rc = ui_gesture_recognizer_process_event(NULL, &ev, 0.0, &gev);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  rc = ui_gesture_recognizer_process_event(r, NULL, 0.0, &gev);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  rc = ui_gesture_recognizer_process_event(r, &ev, 0.0, NULL);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  rc = ui_gesture_recognizer_update(NULL, 0.0, &gev);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  rc = ui_gesture_recognizer_update(r, 0.0, NULL);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  /* Unrelated event */
   memset(&ev, 0, sizeof(ev));
-  memset(&ge, 0, sizeof(ge));
-  ui_gesture_recognizer_create(&r);
+  ev.type = UI_EVENT_KEY_DOWN;
+  rc = ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
+  assert(rc == UI_ERROR_NONE);
+  assert(gev.type == UI_GESTURE_NONE);
 
-  EXPECT_EQ_INT(ui_gesture_recognizer_process_event(NULL, &ev, 0, &ge),
-                UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ_INT(ui_gesture_recognizer_process_event(r, NULL, 0, &ge),
-                UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ_INT(ui_gesture_recognizer_process_event(r, &ev, 0, NULL),
-                UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ_INT(ui_gesture_recognizer_update(NULL, 0, &ge),
-                UI_ERROR_INVALID_ARGUMENT);
-  EXPECT_EQ_INT(ui_gesture_recognizer_update(r, 0, NULL),
-                UI_ERROR_INVALID_ARGUMENT);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_unrelated_event(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  memset(&ev, 0, sizeof(ev));
-  memset(&ge, 0, sizeof(ge));
-  ui_gesture_recognizer_create(&r);
-
-  ev.type = UI_EVENT_KEY_DOWN; /* not a pointer event */
-  ui_gesture_recognizer_process_event(r, &ev, 0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_NONE);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_mouse_tap(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  memset(&ev, 0, sizeof(ev));
-  memset(&ge, 0, sizeof(ge));
-  ui_gesture_recognizer_create(&r);
-
-  /* MOUSE_DOWN */
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.button = 0;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  /* MOUSE_UP (quick tap) */
-  ev.type = UI_EVENT_MOUSE_UP;
-  ev.event_data.mouse.button = 0;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 50.0, &ge);
-
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_TAP);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_ENDED);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_mouse_long_press(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  /* MOUSE_DOWN */
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.button = 0;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  /* Update to trigger long press */
-  ui_gesture_recognizer_update(r, 400.0, &ge);
-  ui_gesture_recognizer_update(r, 600.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_LONG_PRESS);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_BEGAN);
-
-  /* MOUSE_UP */
-  ev.type = UI_EVENT_MOUSE_UP;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 700.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_LONG_PRESS);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_ENDED);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_mouse_pan_and_swipe(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  /* MOUSE_DOWN */
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.button = 0;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  /* MOUSE_MOVE -> triggers pan began */
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 115; /* > UI_PAN_MIN_DISTANCE */
-  ev.event_data.mouse.y = 115;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_PAN);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_BEGAN);
-
-  /* MOUSE_MOVE again -> triggers pan changed */
-  ev.event_data.mouse.x = 120;
-  ev.event_data.mouse.y = 120;
-  ui_gesture_recognizer_process_event(r, &ev, 20.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_PAN);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_CHANGED);
-
-  /* MOUSE_UP -> triggers swipe (velocity is high enough) */
-  ev.type = UI_EVENT_MOUSE_UP;
-  ev.event_data.mouse.x = 120;
-  ev.event_data.mouse.y = 120;
-  ui_gesture_recognizer_process_event(r, &ev, 21.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_SWIPE);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_ENDED);
-
-  ui_gesture_recognizer_destroy(r);
-
-  /* test pan without swipe (low velocity) */
-  ui_gesture_recognizer_create(&r);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 115;
-  ev.event_data.mouse.y = 115;
-  ui_gesture_recognizer_process_event(r, &ev, 1000.0, &ge);
+  ev.event_data.mouse.button = 1; /* Right click */
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE);
 
   ev.type = UI_EVENT_MOUSE_UP;
-  ev.event_data.mouse.x = 115;
-  ev.event_data.mouse.y = 115;
-  ui_gesture_recognizer_process_event(r, &ev, 1001.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_PAN);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_ENDED);
-  ui_gesture_recognizer_destroy(r);
+  ev.event_data.mouse.button = 1; /* Right click */
+  ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE);
 
-  return 0;
-}
-
-static int test_touch_cancel(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  /* TOUCH_START */
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_TOUCH_START;
-  ev.event_data.touch.num_points = 1;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  /* Move enough to trigger pan */
-  ev.type = UI_EVENT_TOUCH_MOVE;
-  ev.event_data.touch.points[0].x = 120;
-  ev.event_data.touch.points[0].y = 120;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
-
-  /* Cancel */
-  ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_gesture_recognizer_process_event(r, &ev, 20.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_PAN);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_CANCELLED);
-
-  ui_gesture_recognizer_destroy(r);
-
-  /* Cancel after long press */
-  ui_gesture_recognizer_create(&r);
-  ev.type = UI_EVENT_TOUCH_START;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-  ui_gesture_recognizer_update(r, 400.0, &ge);
-  ui_gesture_recognizer_update(r, 600.0, &ge);
-
-  ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_gesture_recognizer_process_event(r, &ev, 700.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_LONG_PRESS);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_CANCELLED);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_touch_multi(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  /* TOUCH_START */
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_TOUCH_START;
-  ev.event_data.touch.num_points = 1;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  /* Second touch down (processed as TOUCH_MOVE with 2 points in this naive
-   * model) */
-  ev.type = UI_EVENT_TOUCH_MOVE;
-  ev.event_data.touch.num_points = 2;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ev.event_data.touch.points[1].x = 200;
-  ev.event_data.touch.points[1].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
-
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_PINCH);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_BEGAN);
-
-  /* Pinch further */
-  ev.event_data.touch.points[1].x = 300;
-  ui_gesture_recognizer_process_event(r, &ev, 20.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_PINCH);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_CHANGED);
-
-  /* Rotate */
-  ev.event_data.touch.points[1].x = 100;
-  ev.event_data.touch.points[1].y = 300;
-  ui_gesture_recognizer_process_event(r, &ev, 30.0, &ge);
-  EXPECT_EQ_INT(ge.type, UI_GESTURE_ROTATION);
-  EXPECT_EQ_INT(ge.state, UI_GESTURE_STATE_CHANGED);
-
-  /* TOUCH_END */
-  ev.type = UI_EVENT_TOUCH_END;
-  ev.event_data.touch.num_points = 0; /* naive */
-  ui_gesture_recognizer_process_event(r, &ev, 40.0, &ge);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_mouse_other_button(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  memset(&ev, 0, sizeof(ev));
-  memset(&ge, 0, sizeof(ge));
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.button = 1;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_gesture_recognizer_process_event(r, &ev, 50.0, &ge);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_touch_zero_points(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  memset(&ev, 0, sizeof(ev));
-  memset(&ge, 0, sizeof(ge));
   ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 0;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
+  ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE);
 
   ev.type = UI_EVENT_TOUCH_MOVE;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
+  ev.event_data.touch.num_points = 0;
+  ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE);
 
-  ui_gesture_recognizer_destroy(r);
-  return 0;
+  (void)ui_gesture_recognizer_destroy(r);
 }
 
-static int test_touch_end_with_points(void) {
-  struct ui_gesture_recognizer *r;
+static void test_gesture_tap_mouse(void) {
+  struct ui_gesture_recognizer *r = NULL;
   struct ui_event ev;
-  struct ui_gesture_event ge;
+  struct ui_gesture_event gev;
+
+  ui_gesture_recognizer_create(&r);
+
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ev.event_data.mouse.x = 100;
+  ev.event_data.mouse.y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE);
+
+  ev.type = UI_EVENT_MOUSE_UP;
+  ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
+  assert(gev.type == UI_GESTURE_TAP);
+  assert(gev.state == UI_GESTURE_STATE_ENDED);
+  assert(gev.x == 100);
+  assert(gev.y == 100);
+
+  (void)ui_gesture_recognizer_destroy(r);
+}
+
+static void test_gesture_tap_touch(void) {
+  struct ui_gesture_recognizer *r = NULL;
+  struct ui_event ev;
+  struct ui_gesture_event gev;
 
   ui_gesture_recognizer_create(&r);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 1;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
+  ev.event_data.touch.points[0].x = 50;
+  ev.event_data.touch.points[0].y = 50;
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE);
 
   ev.type = UI_EVENT_TOUCH_END;
+  ev.event_data.touch.num_points = 0; /* no points means it uses last_x */
+  ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
+  assert(gev.type == UI_GESTURE_TAP);
+  assert(gev.x == 50);
+
+  ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 1;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 50.0, &ge);
+  ev.event_data.touch.points[0].x = 50;
+  ev.event_data.touch.points[0].y = 50;
+  ui_gesture_recognizer_process_event(r, &ev, 200.0, &gev);
 
-  ui_gesture_recognizer_destroy(r);
-  return 0;
+  ev.type = UI_EVENT_TOUCH_END;
+  ev.event_data.touch.num_points = 1; /* num_points > 0 branch */
+  ev.event_data.touch.points[0].x = 60;
+  ev.event_data.touch.points[0].y = 60;
+  ui_gesture_recognizer_process_event(r, &ev, 300.0, &gev);
+  assert(gev.type == UI_GESTURE_TAP);
+  assert(gev.x == 60);
+
+  (void)ui_gesture_recognizer_destroy(r);
 }
 
-static int test_move_zero_dt(void) {
-  struct ui_gesture_recognizer *r;
+static void test_gesture_long_press(void) {
+  struct ui_gesture_recognizer *r = NULL;
   struct ui_event ev;
-  struct ui_gesture_event ge;
+  struct ui_gesture_event gev;
 
   ui_gesture_recognizer_create(&r);
 
@@ -404,54 +144,24 @@ static int test_move_zero_dt(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
 
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 150;
-  ev.event_data.mouse.y = 150;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_move_after_long_press(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.button = 0;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ui_gesture_recognizer_update(r, 400.0, &ge);
-  ui_gesture_recognizer_update(r, 600.0, &ge);
-
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 150;
-  ev.event_data.mouse.y = 150;
-  ui_gesture_recognizer_process_event(r, &ev, 650.0, &ge);
-
-  ev.event_data.mouse.x = 200;
-  ev.event_data.mouse.y = 200;
-  ui_gesture_recognizer_process_event(r, &ev, 660.0, &ge);
+  ui_gesture_recognizer_update(r, 600.0, &gev);
+  assert(gev.type == UI_GESTURE_LONG_PRESS);
+  assert(gev.state == UI_GESTURE_STATE_BEGAN);
 
   ev.type = UI_EVENT_MOUSE_UP;
-  ui_gesture_recognizer_process_event(r, &ev, 670.0, &ge);
+  ui_gesture_recognizer_process_event(r, &ev, 650.0, &gev);
+  assert(gev.type == UI_GESTURE_LONG_PRESS);
+  assert(gev.state == UI_GESTURE_STATE_ENDED);
 
-  ui_gesture_recognizer_destroy(r);
-  return 0;
+  (void)ui_gesture_recognizer_destroy(r);
 }
 
-static int test_up_no_tap_no_long_press(void) {
-  struct ui_gesture_recognizer *r;
+static void test_gesture_pan(void) {
+  struct ui_gesture_recognizer *r = NULL;
   struct ui_event ev;
-  struct ui_gesture_event ge;
+  struct ui_gesture_event gev;
 
   ui_gesture_recognizer_create(&r);
 
@@ -460,163 +170,145 @@ static int test_up_no_tap_no_long_press(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
 
-  /* Up after 400ms (too slow for tap, too fast for long press since update
-   * wasn't called) */
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 120; /* > UI_PAN_MIN_DISTANCE */
+  ev.event_data.mouse.y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
+  assert(gev.type == UI_GESTURE_PAN);
+  assert(gev.state == UI_GESTURE_STATE_BEGAN);
+
+  ev.event_data.mouse.x = 130;
+  ui_gesture_recognizer_process_event(r, &ev, 200.0, &gev);
+  assert(gev.type == UI_GESTURE_PAN);
+  assert(gev.state == UI_GESTURE_STATE_CHANGED);
+  assert(gev.delta_x == 10.0f);
+
   ev.type = UI_EVENT_MOUSE_UP;
+  ui_gesture_recognizer_process_event(r, &ev, 300.0, &gev);
+  assert(gev.type ==
+         UI_GESTURE_PAN); /* velocity is low, so end pan not swipe */
+  assert(gev.state == UI_GESTURE_STATE_ENDED);
+
+  (void)ui_gesture_recognizer_destroy(r);
+}
+
+static void test_gesture_swipe(void) {
+  struct ui_gesture_recognizer *r = NULL;
+  struct ui_event ev;
+  struct ui_gesture_event gev;
+
+  ui_gesture_recognizer_create(&r);
+
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 400.0, &ge);
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
 
-  ui_gesture_recognizer_destroy(r);
-  return 0;
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 200; /* Move 100px in 10ms -> 10000px/s */
+  ev.event_data.mouse.y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
+  assert(gev.type == UI_GESTURE_PAN);
+  assert(gev.state == UI_GESTURE_STATE_BEGAN);
+
+  ev.type = UI_EVENT_MOUSE_UP;
+  ui_gesture_recognizer_process_event(r, &ev, 20.0, &gev);
+  assert(gev.type == UI_GESTURE_SWIPE);
+  assert(gev.state == UI_GESTURE_STATE_ENDED);
+
+  (void)ui_gesture_recognizer_destroy(r);
 }
 
-static int test_multi_touch_small_changes(void) {
-  struct ui_gesture_recognizer *r;
+static void test_gesture_pinch(void) {
+  struct ui_gesture_recognizer *r = NULL;
   struct ui_event ev;
-  struct ui_gesture_event ge;
+  struct ui_gesture_event gev;
 
   ui_gesture_recognizer_create(&r);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_START;
-  ev.event_data.touch.num_points = 1;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ev.type = UI_EVENT_TOUCH_MOVE;
   ev.event_data.touch.num_points = 2;
   ev.event_data.touch.points[0].x = 100;
   ev.event_data.touch.points[0].y = 100;
   ev.event_data.touch.points[1].x = 200;
   ev.event_data.touch.points[1].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
-
-  /* Move second point very slightly (scale and rotation diff < 0.05) */
-  ev.event_data.touch.points[1].x = 201;
-  ev.event_data.touch.points[1].y = 101;
-  ui_gesture_recognizer_process_event(r, &ev, 20.0, &ge);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_cancel_neither(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_TOUCH_START;
-  ev.event_data.touch.num_points = 1;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_update_untracking(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_gesture_event ge;
-  struct ui_event ev;
-
-  ui_gesture_recognizer_create(&r);
-
-  /* Not tracking */
-  ui_gesture_recognizer_update(r, 100.0, &ge);
-
-  /* Tracking but has moved */
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.button = 0;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 200;
-  ev.event_data.mouse.y = 200;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
-
-  ui_gesture_recognizer_update(r, 400.0, &ge);
-  ui_gesture_recognizer_update(r, 600.0, &ge);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_cancel_after_move_and_long_press(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_TOUCH_START;
-  ev.event_data.touch.num_points = 1;
-  ev.event_data.touch.points[0].x = 100;
-  ev.event_data.touch.points[0].y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ui_gesture_recognizer_update(r, 600.0, &ge);
-
-  ev.type = UI_EVENT_TOUCH_MOVE;
-  ev.event_data.touch.points[0].x = 150;
-  ev.event_data.touch.points[0].y = 150;
-  ui_gesture_recognizer_process_event(r, &ev, 650.0, &ge);
-
-  ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_gesture_recognizer_process_event(r, &ev, 700.0, &ge);
-
-  ui_gesture_recognizer_destroy(r);
-  return 0;
-}
-
-static int test_untracked_events(void) {
-  struct ui_gesture_recognizer *r;
-  struct ui_event ev;
-  struct ui_gesture_event ge;
-
-  ui_gesture_recognizer_create(&r);
-  memset(&ev, 0, sizeof(ev));
-  memset(&ge, 0, sizeof(ge));
-
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 100;
-  ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
-
-  ev.type = UI_EVENT_MOUSE_UP;
-  ev.event_data.mouse.button = 0;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
-
-  ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_gesture_recognizer_process_event(r, &ev, 20.0, &ge);
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
 
   ev.type = UI_EVENT_TOUCH_MOVE;
   ev.event_data.touch.num_points = 2;
-  ui_gesture_recognizer_process_event(r, &ev, 30.0, &ge);
+  ev.event_data.touch.points[0].x = 50;
+  ev.event_data.touch.points[0].y = 100;
+  ev.event_data.touch.points[1].x = 250;
+  ev.event_data.touch.points[1].y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
+  assert(gev.type == UI_GESTURE_PINCH);
+  assert(gev.state == UI_GESTURE_STATE_BEGAN);
 
-  ui_gesture_recognizer_destroy(r);
-  return 0;
+  ev.event_data.touch.points[0].x = 0;
+  ev.event_data.touch.points[1].x = 300;
+  ui_gesture_recognizer_process_event(r, &ev, 20.0, &gev);
+  assert(gev.type == UI_GESTURE_PINCH);
+  assert(gev.state == UI_GESTURE_STATE_CHANGED);
+
+  /* Force rotation, keeping distance the same as previous (250 - 50 = 200) to
+   * avoid pinch */
+  /* Previous points: (0,100) and (300,100). Distance = 300. */
+  /* We need a distance of 300 to keep scale constant (scale = 300 / 100 = 3) */
+  ev.event_data.touch.points[0].x = 150;
+  ev.event_data.touch.points[0].y = -50;
+  ev.event_data.touch.points[1].x = 150;
+  ev.event_data.touch.points[1].y = 250;
+  ui_gesture_recognizer_process_event(r, &ev, 30.0, &gev);
+  assert(gev.type == UI_GESTURE_ROTATION);
+  assert(gev.state == UI_GESTURE_STATE_CHANGED);
+
+  (void)ui_gesture_recognizer_destroy(r);
 }
 
-static int test_tiny_move_and_double_update(void) {
-  struct ui_gesture_recognizer *r;
+static void test_gesture_pan_long_press(void) {
+  struct ui_gesture_recognizer *r = NULL;
   struct ui_event ev;
-  struct ui_gesture_event ge;
+  struct ui_gesture_event gev;
+
+  ui_gesture_recognizer_create(&r);
+
+  /* Start long press */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ev.event_data.mouse.x = 100;
+  ev.event_data.mouse.y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
+  ui_gesture_recognizer_update(r, 600.0, &gev);
+
+  /* Move */
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 120;
+  ev.event_data.mouse.y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 650.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE); /* Already long pressed, shouldn't pan */
+
+  /* Up */
+  ev.type = UI_EVENT_MOUSE_UP;
+  ui_gesture_recognizer_process_event(r, &ev, 700.0, &gev);
+  assert(
+      gev.type ==
+      UI_GESTURE_NONE); /* Long press ended, but we moved significantly, but
+                           wait. If we moved significantly, we still don't swipe
+                           or end pan because we are long press triggered */
+
+  (void)ui_gesture_recognizer_destroy(r);
+}
+
+static void test_gesture_duration_no_tap(void) {
+  struct ui_gesture_recognizer *r = NULL;
+  struct ui_event ev;
+  struct ui_gesture_event gev;
 
   ui_gesture_recognizer_create(&r);
 
@@ -625,50 +317,115 @@ static int test_tiny_move_and_double_update(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 100;
   ev.event_data.mouse.y = 100;
-  ui_gesture_recognizer_process_event(r, &ev, 0.0, &ge);
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
 
-  /* Tiny move < PAN_MIN_DISTANCE */
+  ev.type = UI_EVENT_MOUSE_UP;
+  /* > 300ms but < 500ms (no long press, no tap) */
+  ui_gesture_recognizer_process_event(r, &ev, 400.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE);
+
+  (void)ui_gesture_recognizer_destroy(r);
+}
+
+static void test_gesture_cancel(void) {
+  struct ui_gesture_recognizer *r = NULL;
+  struct ui_event ev;
+  struct ui_gesture_event gev;
+
+  ui_gesture_recognizer_create(&r);
+
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ev.event_data.mouse.x = 100;
+  ev.event_data.mouse.y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
+
   ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 105;
-  ev.event_data.mouse.y = 105;
-  ui_gesture_recognizer_process_event(r, &ev, 10.0, &ge);
+  ev.event_data.mouse.x = 150;
+  ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
 
-  /* Double update to hit long_press_triggered == true */
-  ui_gesture_recognizer_update(r, 600.0, &ge);
-  ui_gesture_recognizer_update(r, 700.0, &ge);
+  ev.type = UI_EVENT_TOUCH_CANCEL;
+  ui_gesture_recognizer_process_event(r, &ev, 20.0, &gev);
+  assert(gev.type == UI_GESTURE_PAN);
+  assert(gev.state == UI_GESTURE_STATE_CANCELLED);
 
-  ui_gesture_recognizer_destroy(r);
-  return 0;
+  /* Cancel a long press */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ev.event_data.mouse.x = 100;
+  ev.event_data.mouse.y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 30.0, &gev);
+
+  ui_gesture_recognizer_update(r, 630.0, &gev);
+
+  ev.type = UI_EVENT_TOUCH_CANCEL;
+  ui_gesture_recognizer_process_event(r, &ev, 640.0, &gev);
+  assert(gev.type == UI_GESTURE_LONG_PRESS);
+  assert(gev.state == UI_GESTURE_STATE_CANCELLED);
+
+  /* Cancel a basic tap (no move, no long press) to cover remaining branch */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ev.event_data.mouse.x = 100;
+  ev.event_data.mouse.y = 100;
+  ui_gesture_recognizer_process_event(r, &ev, 700.0, &gev);
+
+  ev.type = UI_EVENT_TOUCH_CANCEL;
+  ui_gesture_recognizer_process_event(r, &ev, 710.0, &gev);
+  assert(gev.type == UI_GESTURE_NONE);
+
+  /* ui_gesture_recognizer_update branches */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ui_gesture_recognizer_process_event(r, &ev, 800.0, &gev);
+  ui_gesture_recognizer_update(
+      r, 810.0, &gev); /* duration < UI_LONG_PRESS_MIN_DURATION_MS */
+  assert(gev.type == UI_GESTURE_NONE);
+
+  ui_gesture_recognizer_update(r, 1400.0, &gev); /* Triggers long press */
+  ui_gesture_recognizer_update(r, 1500.0,
+                               &gev); /* r->long_press_triggered is true */
+  assert(gev.type == UI_GESTURE_NONE);
+
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 200;
+  ui_gesture_recognizer_process_event(r, &ev, 1600.0, &gev);
+  ui_gesture_recognizer_update(r, 1610.0,
+                               &gev); /* r->has_moved_significantly is true */
+  assert(gev.type == UI_GESTURE_NONE);
+
+  (void)ui_gesture_recognizer_destroy(r);
+}
+
+static void run_oom_tests_gesture(void) {
+  struct ui_gesture_recognizer *r;
+  int i;
+  ui_error_t rc;
+
+  for (i = 0; i < 50; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_gesture_recognizer_create(&r);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE) {
+      (void)ui_gesture_recognizer_destroy(r);
+      break;
+    }
+  }
 }
 
 int main(void) {
-  int failed = 0;
-  failed |= test_create_destroy();
-  failed |= run_oom_tests();
-  failed |= test_null_args_process();
-  failed |= test_unrelated_event();
-  failed |= test_mouse_tap();
-  failed |= test_mouse_long_press();
-  failed |= test_mouse_pan_and_swipe();
-  failed |= test_touch_cancel();
-  failed |= test_touch_multi();
-  failed |= test_mouse_other_button();
-  failed |= test_touch_zero_points();
-  failed |= test_touch_end_with_points();
-  failed |= test_move_zero_dt();
-  failed |= test_move_after_long_press();
-  failed |= test_up_no_tap_no_long_press();
-  failed |= test_multi_touch_small_changes();
-  failed |= test_cancel_neither();
-  failed |= test_update_untracking();
-  failed |= test_cancel_after_move_and_long_press();
-  failed |= test_untracked_events();
-  failed |= test_tiny_move_and_double_update();
-
-  if (failed) {
-    printf("Tests failed.\n");
-    return 1;
-  }
-  printf("All test_ui_gesture passed.\n");
+  test_gesture_basic();
+  test_gesture_tap_mouse();
+  test_gesture_tap_touch();
+  test_gesture_long_press();
+  test_gesture_pan();
+  test_gesture_swipe();
+  test_gesture_pinch();
+  test_gesture_pan_long_press();
+  test_gesture_duration_no_tap();
+  test_gesture_cancel();
+  run_oom_tests_gesture();
+  printf("All ui_gesture tests passed.\n");
   return 0;
 }

@@ -58,13 +58,13 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
     return DefWindowProcA(hwnd, uMsg, wParam, lParam);
 }
 
-static enum ui_error win32_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
+static ui_error_t win32_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
     struct ui_window* win;
     WNDCLASSA wc;
     HINSTANCE hInstance;
     PIXELFORMATDESCRIPTOR pfd;
     int pixel_format;
-    enum ui_error rc;
+    ui_error_t rc;
 
     if (!backend || !title || !out_window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -85,7 +85,7 @@ static enum ui_error win32_create_window(struct ui_window_backend* backend, cons
 
     RegisterClassA(&wc);
 
-    win = (struct ui_window*)UI_MALLOC(sizeof(struct ui_window));
+    win = (struct ui_window*)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window));
     if (!win) {
         rc = UI_ERROR_OUT_OF_MEMORY;
         goto cleanup;
@@ -172,12 +172,12 @@ cleanup:
         if (win->hwnd) {
             DestroyWindow(win->hwnd);
         }
-        UI_FREE(win);
+        C_MULTIPLATFORM_FREE(win);
     }
     return rc;
 }
 
-static enum ui_error win32_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t win32_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -192,11 +192,11 @@ static enum ui_error win32_destroy_window(struct ui_window_backend* backend, str
     if (window->hwnd) {
         DestroyWindow(window->hwnd);
     }
-    UI_FREE(window);
+    C_MULTIPLATFORM_FREE(window);
     return UI_ERROR_NONE;
 }
 
-static enum ui_error win32_show_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t win32_show_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -204,7 +204,7 @@ static enum ui_error win32_show_window(struct ui_window_backend* backend, struct
     return UI_ERROR_NONE;
 }
 
-static enum ui_error win32_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t win32_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -212,7 +212,7 @@ static enum ui_error win32_hide_window(struct ui_window_backend* backend, struct
     return UI_ERROR_NONE;
 }
 
-static enum ui_error win32_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
+static ui_error_t win32_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
     MSG msg;
 
     if (!backend || !window || !out_event || !out_has_event) {
@@ -247,7 +247,7 @@ static void* win32_get_os_handle(struct ui_window_backend* backend, struct ui_wi
     return (void*)window->hwnd;
 }
 
-static enum ui_error win32_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
+static ui_error_t win32_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -255,7 +255,7 @@ static enum ui_error win32_swap_buffers(struct ui_window_backend* backend, struc
     return UI_ERROR_NONE;
 }
 
-static enum ui_error win32_set_on_resize_callback(struct ui_window_backend* backend, struct ui_window* window, enum ui_error (*callback)(void*, int, int), void* user_data) {
+static ui_error_t win32_set_on_resize_callback(struct ui_window_backend* backend, struct ui_window* window, ui_error_t (*callback)(void*, int, int), void* user_data) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -264,14 +264,14 @@ static enum ui_error win32_set_on_resize_callback(struct ui_window_backend* back
     return UI_ERROR_NONE;
 }
 
-enum ui_error ui_window_backend_win32_create(struct ui_window_backend** out_backend) {
+ui_error_t ui_window_backend_win32_create(struct ui_window_backend** out_backend) {
     struct ui_window_backend* backend;
 
     if (!out_backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
 
-    backend = (struct ui_window_backend*)UI_MALLOC(sizeof(struct ui_window_backend));
+    backend = (struct ui_window_backend*)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_window_backend));
     if (!backend) {
         return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -291,11 +291,11 @@ enum ui_error ui_window_backend_win32_create(struct ui_window_backend** out_back
     return UI_ERROR_NONE;
 }
 
-enum ui_error ui_window_backend_win32_destroy(struct ui_window_backend* backend) {
+ui_error_t ui_window_backend_win32_destroy(struct ui_window_backend* backend) {
     if (!backend) {
         return UI_ERROR_INVALID_ARGUMENT;
     }
-    UI_FREE(backend);
+    C_MULTIPLATFORM_FREE(backend);
     return UI_ERROR_NONE;
 }
 
@@ -305,7 +305,7 @@ enum ui_error ui_window_backend_win32_destroy(struct ui_window_backend* backend)
 #include <stddef.h>
 /* clang-format on */
 
-enum ui_error
+ui_error_t
 ui_window_backend_win32_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -315,8 +315,7 @@ ui_window_backend_win32_create(struct ui_window_backend **out_backend) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_window_backend_win32_destroy(struct ui_window_backend *backend) {
+ui_error_t ui_window_backend_win32_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

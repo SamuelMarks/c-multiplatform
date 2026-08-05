@@ -4,7 +4,7 @@
 /* clang-format on */
 
 int main(void) {
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Test triggering different haptic feedback types.
      Since this is a stub, we expect UI_ERROR_UNSUPPORTED. */

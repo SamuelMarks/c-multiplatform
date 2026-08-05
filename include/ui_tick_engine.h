@@ -20,7 +20,7 @@ struct ui_tick_engine;
  * @param out_engine Pointer to receive the new engine handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_tick_engine_create(struct ui_tick_engine **out_engine);
+ui_error_t ui_tick_engine_create(struct ui_tick_engine **out_engine);
 
 /**
  * @brief Destroys a tick engine and frees its resources.
@@ -29,7 +29,7 @@ enum ui_error ui_tick_engine_create(struct ui_tick_engine **out_engine);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if engine is
  * NULL.
  */
-enum ui_error ui_tick_engine_destroy(struct ui_tick_engine *engine);
+ui_error_t ui_tick_engine_destroy(struct ui_tick_engine *engine);
 
 /**
  * @brief Schedules a task for execution on the next tick.
@@ -39,9 +39,9 @@ enum ui_error ui_tick_engine_destroy(struct ui_tick_engine *engine);
  * @param user_data Opaque pointer passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_tick_engine_schedule(struct ui_tick_engine *engine,
-                                      enum ui_error (*callback)(void *),
-                                      void *user_data);
+ui_error_t ui_tick_engine_schedule(struct ui_tick_engine *engine,
+                                   ui_error_t (*callback)(void *),
+                                   void *user_data);
 
 /**
  * @brief Processes all scheduled tasks in the queue.
@@ -49,7 +49,7 @@ enum ui_error ui_tick_engine_schedule(struct ui_tick_engine *engine,
  * @param engine The engine to tick.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_tick_engine_tick(struct ui_tick_engine *engine);
+ui_error_t ui_tick_engine_tick(struct ui_tick_engine *engine);
 
 #ifdef __cplusplus
 }

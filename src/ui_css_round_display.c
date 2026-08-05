@@ -11,30 +11,34 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-static enum ui_css_geometry_box parse_geometry_box(const char *str) {
+static void parse_geometry_box(const char *str,
+                               enum ui_css_geometry_box *out_box) {
   if (strstr(str, "margin-box"))
-    return UI_CSS_GEOMETRY_BOX_MARGIN_BOX;
-  if (strstr(str, "border-box"))
-    return UI_CSS_GEOMETRY_BOX_BORDER_BOX;
-  if (strstr(str, "padding-box"))
-    return UI_CSS_GEOMETRY_BOX_PADDING_BOX;
-  if (strstr(str, "content-box"))
-    return UI_CSS_GEOMETRY_BOX_CONTENT_BOX;
-  if (strstr(str, "fill-box"))
-    return UI_CSS_GEOMETRY_BOX_FILL_BOX;
-  if (strstr(str, "stroke-box"))
-    return UI_CSS_GEOMETRY_BOX_STROKE_BOX;
-  if (strstr(str, "view-box"))
-    return UI_CSS_GEOMETRY_BOX_VIEW_BOX;
-  return UI_CSS_GEOMETRY_BOX_NONE;
+    *out_box = UI_CSS_GEOMETRY_BOX_MARGIN_BOX;
+  else if (strstr(str, "border-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_BORDER_BOX;
+  else if (strstr(str, "padding-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_PADDING_BOX;
+  else if (strstr(str, "content-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_CONTENT_BOX;
+  else if (strstr(str, "fill-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_FILL_BOX;
+  else if (strstr(str, "stroke-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_STROKE_BOX;
+  else if (strstr(str, "view-box"))
+    *out_box = UI_CSS_GEOMETRY_BOX_VIEW_BOX;
+  else
+    *out_box = UI_CSS_GEOMETRY_BOX_NONE;
 }
 
-enum ui_error ui_css_parse_shape_inside(const char *str,
-                                        struct ui_css_shape_inside *out_shape) {
+ui_error_t ui_css_parse_shape_inside(const char *str,
+                                     struct ui_css_shape_inside *out_shape) {
+  ui_error_t rc;
   if (!str || !out_shape)
     return UI_ERROR_INVALID_ARGUMENT;
 
   skip_whitespace(&str);
+
   out_shape->box = UI_CSS_GEOMETRY_BOX_NONE;
   out_shape->shape.type = UI_CSS_BASIC_SHAPE_NONE;
   out_shape->shape.arguments[0] = '\0';
@@ -55,7 +59,7 @@ enum ui_error ui_css_parse_shape_inside(const char *str,
     return UI_ERROR_NONE;
   }
 
-  out_shape->box = parse_geometry_box(str);
+  { parse_geometry_box(str, &out_shape->box); }
 
   if (strstr(str, "inset(")) {
     out_shape->shape.type = UI_CSS_BASIC_SHAPE_INSET;
@@ -82,7 +86,7 @@ enum ui_error ui_css_parse_shape_inside(const char *str,
 
     if (out_shape->box == UI_CSS_GEOMETRY_BOX_NONE) {
       const char *after_paren = paren_end ? (paren_end + 1) : str;
-      out_shape->box = parse_geometry_box(after_paren);
+      { parse_geometry_box(after_paren, &out_shape->box); }
     }
   }
 
@@ -95,7 +99,7 @@ enum ui_error ui_css_parse_shape_inside(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_border_boundary(const char *str,
                              enum ui_css_border_boundary *out_boundary) {
   if (!str || !out_boundary)

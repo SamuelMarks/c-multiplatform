@@ -18,9 +18,8 @@ struct ui_input_base;
 /**
  * @brief Callback invoked when the input's text state changes.
  */
-typedef enum ui_error (*ui_input_on_change_t)(struct ui_input_base *input,
-                                              const char *text,
-                                              void *user_data);
+typedef ui_error_t (*ui_input_on_change_t)(struct ui_input_base *input,
+                                           const char *text, void *user_data);
 
 /**
  * @brief Creates a new unstyled input base component.
@@ -39,14 +38,14 @@ typedef enum ui_error (*ui_input_on_change_t)(struct ui_input_base *input,
  * @param out_input Pointer to receive the allocated input base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_input_base_create(struct ui_input_base **out_input);
+ui_error_t ui_input_base_create(struct ui_input_base **out_input);
 
 /**
  * @brief Destroys an input base component.
  *
  * @param input The input to destroy.
  */
-void ui_input_base_destroy(struct ui_input_base *input);
+ui_error_t ui_input_base_destroy(struct ui_input_base *input);
 
 /**
  * @brief Sets the text of the input.
@@ -55,8 +54,8 @@ void ui_input_base_destroy(struct ui_input_base *input);
  * @param text The text string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_input_base_set_text(struct ui_input_base *input,
-                                     const char *text);
+ui_error_t ui_input_base_set_text(struct ui_input_base *input,
+                                  const char *text);
 
 /**
  * @brief Gets the current text of the input.
@@ -64,8 +63,8 @@ enum ui_error ui_input_base_set_text(struct ui_input_base *input,
  * @param input The input.
  * @return The current text.
  */
-enum ui_error ui_input_base_get_text(const struct ui_input_base *input,
-                                     const char **out_text);
+ui_error_t ui_input_base_get_text(const struct ui_input_base *input,
+                                  const char **out_text);
 
 /**
  * @brief Sets the input type (e.g., "password", "number", "email", "tel").
@@ -76,8 +75,8 @@ enum ui_error ui_input_base_get_text(const struct ui_input_base *input,
  * @param type The input type string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_input_base_set_type(struct ui_input_base *input,
-                                     const char *type);
+ui_error_t ui_input_base_set_type(struct ui_input_base *input,
+                                  const char *type);
 
 /**
  * @brief Sets the placeholder text.
@@ -86,8 +85,8 @@ enum ui_error ui_input_base_set_type(struct ui_input_base *input,
  * @param placeholder The placeholder string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_input_base_set_placeholder(struct ui_input_base *input,
-                                            const char *placeholder);
+ui_error_t ui_input_base_set_placeholder(struct ui_input_base *input,
+                                         const char *placeholder);
 
 /**
  * @brief Sets the disabled state of the input.
@@ -97,8 +96,8 @@ enum ui_error ui_input_base_set_placeholder(struct ui_input_base *input,
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_input_base_set_disabled(struct ui_input_base *input,
-                                         int disabled);
+ui_error_t ui_input_base_set_disabled(struct ui_input_base *input,
+                                      int disabled);
 
 /**
  * @brief Sets the change handler for the input.
@@ -108,9 +107,9 @@ enum ui_error ui_input_base_set_disabled(struct ui_input_base *input,
  * @param user_data Opaque user data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_input_base_set_on_change(struct ui_input_base *input,
-                                          ui_input_on_change_t on_change,
-                                          void *user_data);
+ui_error_t ui_input_base_set_on_change(struct ui_input_base *input,
+                                       ui_input_on_change_t on_change,
+                                       void *user_data);
 
 /**
  * @brief Processes an incoming input event to trigger typing.
@@ -120,9 +119,9 @@ enum ui_error ui_input_base_set_on_change(struct ui_input_base *input,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_input_base_process_event(struct ui_input_base *input,
-                                          const struct ui_event *event,
-                                          double timestamp_ms);
+ui_error_t ui_input_base_process_event(struct ui_input_base *input,
+                                       const struct ui_event *event,
+                                       double timestamp_ms);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -137,11 +136,11 @@ enum ui_error ui_input_base_process_event(struct ui_input_base *input,
  * @param out_cva Pointer to store the vtable.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_input_base_get_cva(struct ui_input_base *input,
-                                    struct ui_control_value_accessor *out_cva);
+ui_error_t ui_input_base_get_cva(struct ui_input_base *input,
+                                 struct ui_control_value_accessor *out_cva);
 
-enum ui_error ui_input_base_get_component(struct ui_input_base *input,
-                                          struct ui_component **out_component);
+ui_error_t ui_input_base_get_component(struct ui_input_base *input,
+                                       struct ui_component **out_component);
 
 #ifdef __cplusplus
 }

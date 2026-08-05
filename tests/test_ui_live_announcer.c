@@ -8,7 +8,7 @@ extern int g_malloc_fail_countdown;
 
 static int test_live_announcer_lifecycle(void) {
   struct ui_live_announcer *announcer = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_live_announcer_create(&announcer);
   if (rc != UI_ERROR_NONE)
@@ -28,30 +28,30 @@ static int test_live_announcer_lifecycle(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_live_announcer_destroy(announcer);
+  (void)ui_live_announcer_destroy(announcer);
   return 0;
 }
 
 static int test_live_announcer_edge_cases(void) {
   struct ui_live_announcer *announcer;
-  ui_live_announcer_create(&announcer);
+  (void)ui_live_announcer_create(&announcer);
 
-  ui_live_announcer_create(NULL);
-  ui_live_announce(NULL, "a", UI_LIVE_POLITE);
-  ui_live_announce(announcer, NULL, UI_LIVE_POLITE);
-  ui_live_announcer_clear(NULL);
-  ui_live_announcer_destroy(NULL);
+  (void)ui_live_announcer_create(NULL);
+  (void)ui_live_announce(NULL, "a", UI_LIVE_POLITE);
+  (void)ui_live_announce(announcer, NULL, UI_LIVE_POLITE);
+  (void)ui_live_announcer_clear(NULL);
+  (void)ui_live_announcer_destroy(NULL);
 
   g_malloc_fail_countdown = 0;
-  ui_live_announcer_create(&announcer);
+  (void)ui_live_announcer_create(&announcer);
 
-  ui_live_announcer_create(&announcer);
+  (void)ui_live_announcer_create(&announcer);
   g_malloc_fail_countdown = 0;
-  ui_live_announce(announcer, "a", UI_LIVE_POLITE);
+  (void)ui_live_announce(announcer, "a", UI_LIVE_POLITE);
   g_malloc_fail_countdown = 1;
-  ui_live_announce(announcer, "b", UI_LIVE_POLITE);
+  (void)ui_live_announce(announcer, "b", UI_LIVE_POLITE);
 
-  ui_live_announcer_destroy(announcer);
+  (void)ui_live_announcer_destroy(announcer);
   g_malloc_fail_countdown = -1;
   return 0;
 }

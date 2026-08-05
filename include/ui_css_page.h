@@ -58,8 +58,8 @@ struct ui_css_computed_style; /* Forward declare */
  * @param out_props Pointer to the struct to populate.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_page_parse(const struct ui_css_computed_style *style,
-                                struct ui_css_page_properties *out_props);
+ui_error_t ui_css_page_parse(const struct ui_css_computed_style *style,
+                             struct ui_css_page_properties *out_props);
 
 /**
  * @brief Destroys string allocations within page properties.
@@ -67,8 +67,7 @@ enum ui_error ui_css_page_parse(const struct ui_css_computed_style *style,
  * @param props The struct to clean up.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_page_properties_cleanup(struct ui_css_page_properties *props);
+ui_error_t ui_css_page_properties_cleanup(struct ui_css_page_properties *props);
 
 #ifdef __cplusplus
 }

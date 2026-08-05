@@ -15,7 +15,7 @@ static int test_web_animation_lifecycle(void) {
   struct ui_web_animation_timeline *timeline = NULL;
   struct ui_web_animation *animation = NULL;
   struct ui_web_animation_timing timing;
-  enum ui_error err;
+  ui_error_t err;
   int failed = 0;
 
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
@@ -78,7 +78,7 @@ static int test_web_animation_lifecycle(void) {
   }
 
   ui_web_animation_destroy(animation);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   return failed;
 }
 
@@ -128,7 +128,7 @@ static int test_web_animation_reverse(void) {
   }
 
   ui_web_animation_destroy(animation);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   return failed;
 }
 
@@ -137,7 +137,7 @@ static int test_scroll_driven_timelines(void) {
   struct ui_web_animation_timeline *scroll_timeline = NULL;
   struct ui_web_animation_timeline *view_timeline = NULL;
   struct ui_web_animation_timeline *pointer_timeline = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int failed = 0;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
@@ -160,7 +160,7 @@ static int test_scroll_driven_timelines(void) {
   ui_web_animation_timeline_destroy(scroll_timeline);
   ui_web_animation_timeline_destroy(view_timeline);
   ui_web_animation_timeline_destroy(pointer_timeline);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   return failed;
 }
 
@@ -233,7 +233,7 @@ static int test_web_animation_extra(void) {
   ui_web_animation_effect_create_keyframe_effect(node, NULL, &timing, &effect);
   ui_web_animation_effect_destroy(effect);
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   return failed;
 }
 
@@ -380,7 +380,7 @@ static int test_web_animation_coverage(void) {
   ui_web_animation_tick(animation, 2000.0);
 
   ui_web_animation_destroy(animation);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   return failed;
 }
 
@@ -405,12 +405,12 @@ static int test_web_animation_more_coverage(void) {
 
   /* Add dummy properties to hit the free loop */
   struct ui_web_animation_keyframe *kf =
-      UI_MALLOC(sizeof(struct ui_web_animation_keyframe));
+      C_MULTIPLATFORM_MALLOC(sizeof(struct ui_web_animation_keyframe));
   {
-    struct ui_web_animation_keyframe_property *prop =
-        UI_MALLOC(sizeof(struct ui_web_animation_keyframe_property));
-    char *prop_name = UI_MALLOC(10);
-    char *prop_val = UI_MALLOC(10);
+    struct ui_web_animation_keyframe_property *prop = C_MULTIPLATFORM_MALLOC(
+        sizeof(struct ui_web_animation_keyframe_property));
+    char *prop_name = C_MULTIPLATFORM_MALLOC(10);
+    char *prop_val = C_MULTIPLATFORM_MALLOC(10);
     prop_name[0] = '\0';
     prop_val[0] = '\0';
     prop->property_name = prop_name;
@@ -483,7 +483,7 @@ static int test_web_animation_more_coverage(void) {
   ui_web_animation_set_current_time(animation, -500.0);
 
   ui_web_animation_destroy(animation);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
 
   return failed;
 }

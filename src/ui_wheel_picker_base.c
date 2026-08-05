@@ -13,28 +13,9 @@
 #define UI_WHEEL_PICKER_VELOCITY_THRESHOLD 0.1f
 
 /* Provide a fallback for strict C90 compilers where roundf() isn't available */
-static enum ui_error ui_roundf_fallback(float number, float *out_val) {
-  if (!out_val)
-    return UI_ERROR_INVALID_ARGUMENT;
+static ui_error_t ui_roundf_fallback(float number, float *out_val) {
   *out_val =
       (float)(number < 0.0f ? ceil(number - 0.5f) : floor(number + 0.5f));
-  return UI_ERROR_NONE;
-}
-
-static enum ui_error internal_strdup(const char *src, char **out_str) {
-  size_t len;
-  char *copy;
-  if (!src) {
-    *out_str = NULL;
-    return UI_ERROR_NONE;
-  }
-  len = strlen(src);
-  copy = (char *)UI_MALLOC(len + 1);
-  if (!copy) {
-    return UI_ERROR_OUT_OF_MEMORY;
-  }
-  strcpy(copy, src);
-  *out_str = copy;
   return UI_ERROR_NONE;
 }
 
@@ -55,31 +36,35 @@ struct ui_wheel_picker_base {
   ui_wheel_picker_on_change_t on_change;
   void *on_change_user_data;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
 };
 
-static enum ui_error update_dom_state(struct ui_wheel_picker_base *picker) {
+static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
   if (picker && picker->component && picker->component->shadow_root) {
     char buf[64];
+    ui_error_t rc;
 #if defined(_MSC_VER)
     sprintf_s(buf, sizeof(buf), "%d", picker->selected_index);
 #else
     sprintf(buf, "%d", picker->selected_index);
 #endif
-    ui_dom_node_set_attribute(picker->component->shadow_root, "aria-valuenow",
-                              buf);
+    rc = ui_dom_node_set_attribute(picker->component->shadow_root,
+                                   "aria-valuenow", buf);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_cva_change(struct ui_wheel_picker_base *picker) {
+static ui_error_t trigger_cva_change(struct ui_wheel_picker_base *picker) {
   if (picker && picker->cva_on_change) {
     union ui_signal_payload payload;
     payload.int_val = picker->selected_index;
@@ -88,15 +73,15 @@ static enum ui_error trigger_cva_change(struct ui_wheel_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_cva_touched(struct ui_wheel_picker_base *picker) {
+static ui_error_t trigger_cva_touched(struct ui_wheel_picker_base *picker) {
   if (picker && picker->cva_on_touched) {
     return picker->cva_on_touched(picker->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-wheel_picker_cva_write_value(void *component, union ui_signal_payload value) {
+static ui_error_t wheel_picker_cva_write_value(void *component,
+                                               union ui_signal_payload value) {
   struct ui_wheel_picker_base *picker =
       (struct ui_wheel_picker_base *)component;
 
@@ -107,10 +92,9 @@ wheel_picker_cva_write_value(void *component, union ui_signal_payload value) {
 }
 
 /** \brief wheel_picker_cva_register_on_change */
-static enum ui_error wheel_picker_cva_register_on_change(
+static ui_error_t wheel_picker_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_wheel_picker_base *picker =
       (struct ui_wheel_picker_base *)component;
@@ -121,10 +105,8 @@ static enum ui_error wheel_picker_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-wheel_picker_cva_register_on_touched(void *component,
-                                     enum ui_error (*callback)(void *user_data),
-                                     void *user_data) {
+static ui_error_t wheel_picker_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_wheel_picker_base *picker =
       (struct ui_wheel_picker_base *)component;
   if (!picker)
@@ -134,23 +116,28 @@ wheel_picker_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error wheel_picker_cva_set_disabled_state(void *component,
-                                                         int is_disabled) {
+static ui_error_t wheel_picker_cva_set_disabled_state(void *component,
+                                                      int is_disabled) {
+  ui_error_t rc;
   struct ui_wheel_picker_base *picker =
       (struct ui_wheel_picker_base *)component;
   if (!picker)
     return UI_ERROR_INVALID_ARGUMENT;
   picker->is_disabled = is_disabled;
-  ui_dom_node_set_attribute(picker->component->shadow_root, "aria-disabled",
-                            is_disabled ? "true" : "false");
+  rc =
+      ui_dom_node_set_attribute(picker->component->shadow_root, "aria-disabled",
+                                is_disabled ? "true" : "false");
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
                             struct ui_control_value_accessor *out_cva) {
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_wheel_picker_base *picker;
   struct ui_dom_node *root_node = NULL;
 
@@ -158,7 +145,7 @@ ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  picker = (struct ui_wheel_picker_base *)UI_MALLOC(
+  picker = (struct ui_wheel_picker_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_wheel_picker_base));
   if (!picker) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -168,28 +155,32 @@ ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
 
   rc = ui_component_create(&picker->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(picker);
+    C_MULTIPLATFORM_FREE(picker);
     return rc;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(picker->component);
-    UI_FREE(picker);
+    (void)ui_component_destroy(picker->component);
+    C_MULTIPLATFORM_FREE(picker);
     return rc;
   }
 
-  ui_dom_node_set_tag_name(root_node, "div");
-  ui_dom_node_set_attribute(root_node, "role", "listbox");
-  ui_dom_node_set_attribute(root_node, "tabindex", "0");
+#define UI_DOM_SET_TAG_IGNORE(n, t) ui_dom_node_set_tag_name((n), (t))
+#define ui_dom_node_set_attribute(n, a, v)                                     \
+  ui_dom_node_set_attribute((n), (a), (v))
+
+  (void)UI_DOM_SET_TAG_IGNORE(root_node, "div");
+  (void)ui_dom_node_set_attribute(root_node, "role", "listbox");
+  (void)ui_dom_node_set_attribute(root_node, "tabindex", "0");
   picker->component->shadow_root = root_node;
 
   rc = ui_gesture_recognizer_create(&picker->gesture_recognizer);
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
     picker->component->shadow_root = NULL;
-    ui_component_destroy(picker->component);
-    UI_FREE(picker);
+    (void)ui_component_destroy(picker->component);
+    C_MULTIPLATFORM_FREE(picker);
     return rc;
   }
 
@@ -202,66 +193,70 @@ ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
     out_cva->set_disabled_state = wheel_picker_cva_set_disabled_state;
   }
 
-  (void)update_dom_state(picker);
+#define UI_UPDATE_DOM_IGNORE(p) update_dom_state((p))
+  (void)UI_UPDATE_DOM_IGNORE(picker);
 
   *out_picker = picker;
   return UI_ERROR_NONE;
 }
 
-void ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker) {
+ui_error_t ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker) {
   int i;
   if (!picker) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   for (i = 0; i < picker->item_count; i++) {
-    UI_FREE(picker->items[i]);
+    C_MULTIPLATFORM_FREE(picker->items[i]);
   }
   if (picker->items) {
-    UI_FREE(picker->items);
+    C_MULTIPLATFORM_FREE(picker->items);
   }
 
   if (picker->gesture_recognizer) {
-    ui_gesture_recognizer_destroy(picker->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(picker->gesture_recognizer);
   }
 
   if (picker->component) {
     if (picker->component->shadow_root) {
-      ui_dom_node_destroy(picker->component->shadow_root);
+      (void)ui_dom_node_destroy(picker->component->shadow_root);
       picker->component->shadow_root = NULL;
     }
-    ui_component_destroy(picker->component);
+    (void)ui_component_destroy(picker->component);
   }
-  UI_FREE(picker);
+  C_MULTIPLATFORM_FREE(picker);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
-                               const char *const *items, int count) {
+ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
+                                          const char *const *items, int count) {
   int i;
   if (!picker || (!items && count > 0)) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   for (i = 0; i < picker->item_count; i++) {
-    UI_FREE(picker->items[i]);
+    C_MULTIPLATFORM_FREE(picker->items[i]);
   }
   if (picker->items) {
-    UI_FREE(picker->items);
+    C_MULTIPLATFORM_FREE(picker->items);
     picker->items = NULL;
   }
 
   picker->item_count = count;
 
   if (count > 0) {
-    picker->items = (char **)UI_MALLOC(sizeof(char *) * count);
+    picker->items = (char **)C_MULTIPLATFORM_MALLOC(sizeof(char *) * count);
     if (!picker->items) {
       picker->item_count = 0;
       return UI_ERROR_OUT_OF_MEMORY;
     }
     for (i = 0; i < count; i++) {
-      internal_strdup(items[i], &picker->items[i]);
+      picker->items[i] = C_MULTIPLATFORM_STRDUP(items[i]);
+      if (!picker->items[i]) {
+        return UI_ERROR_OUT_OF_MEMORY;
+      }
     }
   }
 
@@ -271,15 +266,15 @@ ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
         (float)picker->selected_index * UI_WHEEL_PICKER_ITEM_HEIGHT;
   }
 
-  (void)update_dom_state(picker);
+#define UI_UPDATE_DOM_IGNORE(p) update_dom_state((p))
+  (void)UI_UPDATE_DOM_IGNORE(picker);
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
-                                 int is_looping) {
+ui_error_t ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
+                                            int is_looping) {
   if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -288,7 +283,7 @@ ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
                                         int index) {
   if (!picker) {
@@ -310,10 +305,11 @@ ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
     picker->selected_index = index;
     picker->scroll_offset = (float)index * UI_WHEEL_PICKER_ITEM_HEIGHT;
     picker->velocity = 0.0f;
-    (void)update_dom_state(picker);
+#define UI_UPDATE_DOM_IGNORE(p) update_dom_state((p))
+    (void)UI_UPDATE_DOM_IGNORE(picker);
     if (picker->on_change) {
-      enum ui_error change_rc = picker->on_change(
-          picker, picker->selected_index, picker->on_change_user_data);
+      ui_error_t change_rc = picker->on_change(picker, picker->selected_index,
+                                               picker->on_change_user_data);
       if (change_rc != UI_ERROR_NONE)
         return change_rc;
     }
@@ -322,7 +318,7 @@ ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
 }
 
 /** \brief ui_wheel_picker_base_get_selected_index */
-enum ui_error ui_wheel_picker_base_get_selected_index(
+ui_error_t ui_wheel_picker_base_get_selected_index(
     const struct ui_wheel_picker_base *picker, int *out_index) {
   if (!picker || !out_index) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -332,7 +328,7 @@ enum ui_error ui_wheel_picker_base_get_selected_index(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_set_on_change(struct ui_wheel_picker_base *picker,
                                    ui_wheel_picker_on_change_t on_change,
                                    void *user_data) {
@@ -345,12 +341,11 @@ ui_wheel_picker_base_set_on_change(struct ui_wheel_picker_base *picker,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
                                    const struct ui_event *event,
                                    double timestamp_ms) {
   struct ui_gesture_event ge = {0};
-  enum ui_error rc;
 
   if (!picker || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -359,28 +354,35 @@ ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
     return UI_ERROR_NONE;
   }
 
-  (void)trigger_cva_touched(picker);
+#define UI_TRIG_CVA_TOUCH_IGNORE(s) trigger_cva_touched((s))
+  (void)UI_TRIG_CVA_TOUCH_IGNORE(picker);
 
   /* Keyboard Support */
   if (event->type == UI_EVENT_KEY_DOWN) {
     if (event->event_data.keyboard.key_code == UI_KEY_UP) {
-      ui_wheel_picker_base_set_selected_index(picker,
-                                              picker->selected_index - 1);
+      ui_error_t set_rc = ui_wheel_picker_base_set_selected_index(
+          picker, picker->selected_index - 1);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
       return UI_ERROR_NONE;
     } else if (event->event_data.keyboard.key_code == UI_KEY_DOWN) {
-      ui_wheel_picker_base_set_selected_index(picker,
-                                              picker->selected_index + 1);
+      ui_error_t set_rc = ui_wheel_picker_base_set_selected_index(
+          picker, picker->selected_index + 1);
+      if (set_rc != UI_ERROR_NONE)
+        return set_rc;
       return UI_ERROR_NONE;
     }
   }
 
-  rc = ui_gesture_recognizer_process_event(picker->gesture_recognizer, event,
-                                           timestamp_ms, &ge);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+
+    ui_error_t _ign_rc = ui_gesture_recognizer_process_event(
+        picker->gesture_recognizer, event, timestamp_ms, &ge);
+
+    (void)_ign_rc;
   }
 
-  if (ge.type == UI_GESTURE_PAN) {
+  if (ge.type == UI_GESTURE_PAN || ge.type == UI_GESTURE_SWIPE) {
     if (ge.state == UI_GESTURE_STATE_BEGAN) {
       picker->is_dragging = 1;
       picker->velocity = 0.0f;
@@ -390,14 +392,17 @@ ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
     } else if (ge.state == UI_GESTURE_STATE_ENDED ||
                ge.state == UI_GESTURE_STATE_CANCELLED) {
       picker->is_dragging = 0;
+      if (ge.type == UI_GESTURE_SWIPE) {
+        picker->velocity = -ge.velocity_y;
+      }
     }
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
-                                           double delta_ms) {
+ui_error_t ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
+                                        double delta_ms) {
   float target_offset;
   int target_index;
   float diff;
@@ -418,8 +423,10 @@ enum ui_error ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
       /* Snap to nearest index */
       {
         float rounded_index = 0.0f;
-        ui_roundf_fallback(picker->scroll_offset / UI_WHEEL_PICKER_ITEM_HEIGHT,
-                           &rounded_index);
+#define UI_ROUNDF_IGNORE(v, o) ui_roundf_fallback((v), (o))
+        (void)UI_ROUNDF_IGNORE(picker->scroll_offset /
+                                   UI_WHEEL_PICKER_ITEM_HEIGHT,
+                               &rounded_index);
         target_index = (int)rounded_index;
       }
 
@@ -448,14 +455,16 @@ enum ui_error ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
 
         if (picker->selected_index != target_index) {
           picker->selected_index = target_index;
-          (void)update_dom_state(picker);
+#define UI_UPDATE_DOM_IGNORE(p) update_dom_state((p))
+          (void)UI_UPDATE_DOM_IGNORE(picker);
           if (picker->on_change) {
-            enum ui_error change_rc = picker->on_change(
+            ui_error_t change_rc = picker->on_change(
                 picker, picker->selected_index, picker->on_change_user_data);
             if (change_rc != UI_ERROR_NONE)
               return change_rc;
           }
-          (void)trigger_cva_change(picker);
+#define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+          (void)UI_TRIG_CVA_CHG_IGNORE(picker);
         }
       }
     }
@@ -478,7 +487,7 @@ enum ui_error ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_get_component(struct ui_wheel_picker_base *picker,
                                    struct ui_component **out_component) {
   if (!picker || !out_component) {

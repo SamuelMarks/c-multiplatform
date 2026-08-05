@@ -9,17 +9,17 @@ struct ui_chips_base {
   size_t count;
   size_t capacity;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
 };
 
-static enum ui_error trigger_cva_change(struct ui_chips_base *chips) {
+static ui_error_t trigger_cva_change(struct ui_chips_base *chips) {
   union ui_signal_payload payload;
   if (chips->cva_on_change) {
     /* Pass the token array directly as a pointer payload.
@@ -31,8 +31,8 @@ static enum ui_error trigger_cva_change(struct ui_chips_base *chips) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error chips_cva_write_value(void *component,
-                                           union ui_signal_payload value) {
+static ui_error_t chips_cva_write_value(void *component,
+                                        union ui_signal_payload value) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
   /* Complex arrays from signals might require deep updates.
      For this base implementation, we do not fully replace the array
@@ -43,10 +43,9 @@ static enum ui_error chips_cva_write_value(void *component,
 }
 
 /** \brief chips_cva_register_on_change */
-static enum ui_error chips_cva_register_on_change(
+static ui_error_t chips_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
   if (!chips)
@@ -56,10 +55,8 @@ static enum ui_error chips_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-chips_cva_register_on_touched(void *component,
-                              enum ui_error (*callback)(void *user_data),
-                              void *user_data) {
+static ui_error_t chips_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
   if (!chips)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -68,8 +65,8 @@ chips_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error chips_cva_set_disabled_state(void *component,
-                                                  ui_bool_t is_disabled) {
+static ui_error_t chips_cva_set_disabled_state(void *component,
+                                               ui_bool_t is_disabled) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
   if (!chips)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -77,13 +74,14 @@ static enum ui_error chips_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chips_base_create(struct ui_chips_base **out_chips,
-                                   struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_chips_base_create(struct ui_chips_base **out_chips,
+                                struct ui_control_value_accessor *out_cva) {
   struct ui_chips_base *chips;
   if (!out_chips) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  chips = (struct ui_chips_base *)UI_MALLOC(sizeof(struct ui_chips_base));
+  chips = (struct ui_chips_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_chips_base));
   if (!chips) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -107,22 +105,22 @@ enum ui_error ui_chips_base_create(struct ui_chips_base **out_chips,
   return UI_ERROR_NONE;
 }
 
-void ui_chips_base_destroy(struct ui_chips_base *chips) {
+ui_error_t ui_chips_base_destroy(struct ui_chips_base *chips) {
   size_t i;
   if (!chips) {
-    return;
+    return UI_ERROR_NONE;
   }
   for (i = 0; i < chips->count; ++i) {
-    UI_FREE(chips->tokens[i]);
+    C_MULTIPLATFORM_FREE(chips->tokens[i]);
   }
   if (chips->tokens) {
-    UI_FREE(chips->tokens);
+    C_MULTIPLATFORM_FREE(chips->tokens);
   }
-  UI_FREE(chips);
+  C_MULTIPLATFORM_FREE(chips);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chips_base_add(struct ui_chips_base *chips,
-                                const char *token) {
+ui_error_t ui_chips_base_add(struct ui_chips_base *chips, const char *token) {
   char **new_tokens;
   char *new_token;
   size_t len;
@@ -132,7 +130,8 @@ enum ui_error ui_chips_base_add(struct ui_chips_base *chips,
   }
   if (chips->count == chips->capacity) {
     size_t new_cap = chips->capacity == 0 ? 4 : chips->capacity * 2;
-    new_tokens = (char **)UI_REALLOC(chips->tokens, new_cap * sizeof(char *));
+    new_tokens = (char **)C_MULTIPLATFORM_REALLOC(chips->tokens,
+                                                  new_cap * sizeof(char *));
     if (!new_tokens) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -141,18 +140,17 @@ enum ui_error ui_chips_base_add(struct ui_chips_base *chips,
   }
 
   len = strlen(token);
-  new_token = (char *)UI_MALLOC(len + 1);
+  new_token = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!new_token) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
   UI_STRCPY(new_token, len + 1, token);
 
   chips->tokens[chips->count++] = new_token;
-  (void)trigger_cva_change(chips);
-  return UI_ERROR_NONE;
+  return trigger_cva_change(chips);
 }
 
-enum ui_error ui_chips_base_remove(struct ui_chips_base *chips, size_t index) {
+ui_error_t ui_chips_base_remove(struct ui_chips_base *chips, size_t index) {
   size_t i;
   if (!chips) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -160,16 +158,15 @@ enum ui_error ui_chips_base_remove(struct ui_chips_base *chips, size_t index) {
   if (index >= chips->count) {
     return UI_ERROR_OUT_OF_BOUNDS;
   }
-  UI_FREE(chips->tokens[index]);
+  C_MULTIPLATFORM_FREE(chips->tokens[index]);
   for (i = index; i < chips->count - 1; ++i) {
     chips->tokens[i] = chips->tokens[i + 1];
   }
   chips->count--;
-  (void)trigger_cva_change(chips);
-  return UI_ERROR_NONE;
+  return trigger_cva_change(chips);
 }
 
-enum ui_error ui_chips_base_remove_last(struct ui_chips_base *chips) {
+ui_error_t ui_chips_base_remove_last(struct ui_chips_base *chips) {
   if (!chips) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -179,8 +176,8 @@ enum ui_error ui_chips_base_remove_last(struct ui_chips_base *chips) {
   return ui_chips_base_remove(chips, chips->count - 1);
 }
 
-enum ui_error ui_chips_base_get_count(const struct ui_chips_base *chips,
-                                      size_t *out_count) {
+ui_error_t ui_chips_base_get_count(const struct ui_chips_base *chips,
+                                   size_t *out_count) {
   if (!chips || !out_count) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -188,8 +185,8 @@ enum ui_error ui_chips_base_get_count(const struct ui_chips_base *chips,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chips_base_get_token(const struct ui_chips_base *chips,
-                                      size_t index, const char **out_token) {
+ui_error_t ui_chips_base_get_token(const struct ui_chips_base *chips,
+                                   size_t index, const char **out_token) {
   if (!chips || !out_token) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -200,9 +197,9 @@ enum ui_error ui_chips_base_get_token(const struct ui_chips_base *chips,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_chips_base_handle_backspace(struct ui_chips_base *chips,
-                                             const char *current_input,
-                                             int *out_focus_moved_to_last) {
+ui_error_t ui_chips_base_handle_backspace(struct ui_chips_base *chips,
+                                          const char *current_input,
+                                          int *out_focus_moved_to_last) {
   if (!chips || !out_focus_moved_to_last) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -30,7 +30,7 @@ static int s_tests_failed = 0;
     }                                                                          \
   } while (0)
 
-static enum ui_error test_invalid_args(void) {
+static ui_error_t test_invalid_args(void) {
   struct ui_layout_node target;
   struct ui_layout_node overlay;
   struct ui_anchor_config config;
@@ -54,12 +54,12 @@ static enum ui_error test_invalid_args(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_geometry_anchor_basic(void) {
+static ui_error_t test_geometry_anchor_basic(void) {
   struct ui_layout_node target;
   struct ui_layout_node overlay;
   struct ui_anchor_config config;
   float out_x, out_y;
-  enum ui_error err;
+  ui_error_t err;
 
   memset(&target, 0, sizeof(target));
   memset(&overlay, 0, sizeof(overlay));
@@ -106,7 +106,7 @@ static enum ui_error test_geometry_anchor_basic(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_geometry_anchor_viewport_clamping(void) {
+static ui_error_t test_geometry_anchor_viewport_clamping(void) {
   struct ui_layout_node target;
   struct ui_layout_node overlay;
   struct ui_anchor_config config;

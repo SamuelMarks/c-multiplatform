@@ -14,16 +14,17 @@ struct ui_label_base {
   struct ui_signal *text_signal;
 };
 
-enum ui_error ui_label_base_create(struct ui_label_base **out_label) {
+ui_error_t ui_label_base_create(struct ui_label_base **out_label) {
   struct ui_label_base *lbl;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
 
   if (!out_label) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  lbl = (struct ui_label_base *)UI_MALLOC(sizeof(struct ui_label_base));
+  lbl = (struct ui_label_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_label_base));
   if (!lbl) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -55,33 +56,32 @@ enum ui_error ui_label_base_create(struct ui_label_base **out_label) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (lbl->component) {
-    ui_component_destroy(lbl->component);
+    (void)ui_component_destroy(lbl->component);
   }
-  UI_FREE(lbl);
+  C_MULTIPLATFORM_FREE(lbl);
   return rc;
 }
 
-void ui_label_base_destroy(struct ui_label_base *label) {
+ui_error_t ui_label_base_destroy(struct ui_label_base *label) {
   if (!label) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (label->target_id) {
-    UI_FREE(label->target_id);
+    C_MULTIPLATFORM_FREE(label->target_id);
   }
 
-  if (label->component) {
-    ui_component_destroy(label->component);
-  }
+  (void)ui_component_destroy(label->component);
 
-  UI_FREE(label);
+  C_MULTIPLATFORM_FREE(label);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_label_base_set_for(struct ui_label_base *label,
-                                    const char *target_id) {
+ui_error_t ui_label_base_set_for(struct ui_label_base *label,
+                                 const char *target_id) {
   size_t len;
 
   if (!label) {
@@ -89,13 +89,13 @@ enum ui_error ui_label_base_set_for(struct ui_label_base *label,
   }
 
   if (label->target_id) {
-    UI_FREE(label->target_id);
+    C_MULTIPLATFORM_FREE(label->target_id);
     label->target_id = NULL;
   }
 
   if (target_id) {
     len = strlen(target_id);
-    label->target_id = (char *)UI_MALLOC(len + 1);
+    label->target_id = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
     if (!label->target_id) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -118,8 +118,8 @@ enum ui_error ui_label_base_set_for(struct ui_label_base *label,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_label_base_set_target_node(struct ui_label_base *label,
-                                            struct ui_dom_node *target_node) {
+ui_error_t ui_label_base_set_target_node(struct ui_label_base *label,
+                                         struct ui_dom_node *target_node) {
   if (!label) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -128,9 +128,9 @@ enum ui_error ui_label_base_set_target_node(struct ui_label_base *label,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_label_base_process_event(struct ui_label_base *label,
-                                          const struct ui_event *event,
-                                          double timestamp_ms) {
+ui_error_t ui_label_base_process_event(struct ui_label_base *label,
+                                       const struct ui_event *event,
+                                       double timestamp_ms) {
   /* In a real engine, we'd fire a click event on target_node, or search for
    * target_id globally if target_node is null. This acts as a stub to be
    * elaborated upon. */
@@ -144,8 +144,8 @@ enum ui_error ui_label_base_process_event(struct ui_label_base *label,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_label_base_get_component(struct ui_label_base *label,
-                                          struct ui_component **out_component) {
+ui_error_t ui_label_base_get_component(struct ui_label_base *label,
+                                       struct ui_component **out_component) {
   if (!label || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -153,11 +153,26 @@ enum ui_error ui_label_base_get_component(struct ui_label_base *label,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_label_base_bind_text(struct ui_label_base *widget,
-                                      struct ui_signal *signal) {
+ui_error_t ui_label_base_bind_text(struct ui_label_base *widget,
+                                   struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   widget->text_signal = signal;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t ui_test_label_base_set_for_no_component(void);
+
+ui_error_t ui_test_label_base_set_for_no_component(void) {
+  struct ui_label_base *lbl = NULL;
+  (void)ui_label_base_create(&lbl);
+  (void)ui_component_destroy(lbl->component);
+  lbl->component = NULL;
+  (void)ui_label_base_set_for(lbl, "fail-target-2");
+  (void)ui_label_base_set_for(lbl, NULL);
+  (void)ui_label_base_destroy(lbl);
+  return UI_ERROR_NONE;
+}
+#endif

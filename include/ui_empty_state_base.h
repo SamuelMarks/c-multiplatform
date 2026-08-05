@@ -28,8 +28,7 @@ struct ui_empty_state_base {
  * @param out_state Pointer to output the initialized empty state.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error
-ui_empty_state_base_create(struct ui_empty_state_base **out_state);
+ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state);
 
 /**
  * @brief Sets the title text of the empty state.
@@ -38,8 +37,8 @@ ui_empty_state_base_create(struct ui_empty_state_base **out_state);
  * @param text The title text.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_empty_state_base_set_title(struct ui_empty_state_base *state,
-                                            const char *text);
+ui_error_t ui_empty_state_base_set_title(struct ui_empty_state_base *state,
+                                         const char *text);
 
 /**
  * @brief Sets the description text of the empty state.
@@ -48,7 +47,7 @@ enum ui_error ui_empty_state_base_set_title(struct ui_empty_state_base *state,
  * @param text The description text.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_empty_state_base_set_description(struct ui_empty_state_base *state,
                                     const char *text);
 
@@ -59,8 +58,8 @@ ui_empty_state_base_set_description(struct ui_empty_state_base *state,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_empty_state_base_bind_data(struct ui_empty_state_base *widget,
-                                            struct ui_signal *signal);
+ui_error_t ui_empty_state_base_bind_data(struct ui_empty_state_base *widget,
+                                         struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

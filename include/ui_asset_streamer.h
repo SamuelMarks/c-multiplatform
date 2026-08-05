@@ -49,9 +49,9 @@ struct ui_asset_streamer;
  * @param out_streamer Pointer to receive the new streamer handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_asset_streamer_create(struct ui_thread_pool *pool,
-                                       struct ui_execution_context *ctx,
-                                       struct ui_asset_streamer **out_streamer);
+ui_error_t ui_asset_streamer_create(struct ui_thread_pool *pool,
+                                    struct ui_execution_context *ctx,
+                                    struct ui_asset_streamer **out_streamer);
 
 /**
  * @brief Destroys an asset streamer and frees its resources.
@@ -60,7 +60,7 @@ enum ui_error ui_asset_streamer_create(struct ui_thread_pool *pool,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if streamer is
  * NULL.
  */
-enum ui_error ui_asset_streamer_destroy(struct ui_asset_streamer *streamer);
+ui_error_t ui_asset_streamer_destroy(struct ui_asset_streamer *streamer);
 
 /**
  * @brief Requests an asset to be loaded asynchronously.
@@ -72,17 +72,16 @@ enum ui_error ui_asset_streamer_destroy(struct ui_asset_streamer *streamer);
  * ui_asset*).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_asset_streamer_request(struct ui_asset_streamer *streamer,
-                                        const char *url,
-                                        enum ui_asset_type type,
-                                        struct ui_promise **out_promise);
+ui_error_t ui_asset_streamer_request(struct ui_asset_streamer *streamer,
+                                     const char *url, enum ui_asset_type type,
+                                     struct ui_promise **out_promise);
 
 /**
  * @brief Frees a loaded asset.
  *
  * @param asset The asset to free.
  */
-void ui_asset_destroy(struct ui_asset *asset);
+ui_error_t ui_asset_destroy(struct ui_asset *asset);
 
 #ifdef __cplusplus
 }

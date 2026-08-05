@@ -10,30 +10,30 @@ struct ui_focus_trap {
   int is_active;
 };
 
-static enum ui_error trap_keyboard_handler(struct ui_dom_node *node,
-                                           void *user_data) {
+static ui_error_t trap_keyboard_handler(struct ui_dom_node *node,
+                                        void *user_data) {
   struct ui_focus_trap *trap = (struct ui_focus_trap *)user_data;
   (void)node;
-  if (trap != NULL && trap->is_active && trap->manager != NULL &&
-      trap->root != NULL) {
+  if (trap->is_active) {
     /* Default advance forward. If shift was held, should be backward.
        For scaffolding, we'll just test the integration plumbing calling
        advance. */
-    enum ui_error rc = ui_focus_manager_advance(trap->manager, trap->root, 1);
+    ui_error_t rc = ui_focus_manager_advance(trap->manager, trap->root, 1);
     if (rc != UI_ERROR_NONE)
       return rc;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_focus_trap_create(struct ui_focus_trap **out_trap) {
+ui_error_t ui_focus_trap_create(struct ui_focus_trap **out_trap) {
   struct ui_focus_trap *trap;
 
   if (out_trap == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  trap = (struct ui_focus_trap *)UI_MALLOC(sizeof(struct ui_focus_trap));
+  trap = (struct ui_focus_trap *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_focus_trap));
   if (trap == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -47,19 +47,23 @@ enum ui_error ui_focus_trap_create(struct ui_focus_trap **out_trap) {
   return UI_ERROR_NONE;
 }
 
-void ui_focus_trap_destroy(struct ui_focus_trap *trap) {
+ui_error_t ui_focus_trap_destroy(struct ui_focus_trap *trap) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (trap != NULL) {
-    if (trap->is_active && trap->manager != NULL) {
-      ui_focus_trap_deactivate(trap, trap->manager);
+    if (trap->is_active) {
+      rc = ui_focus_trap_deactivate(trap, trap->manager);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
-    UI_FREE(trap);
+    C_MULTIPLATFORM_FREE(trap);
   }
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_focus_trap_activate(struct ui_focus_trap *trap,
-                                     struct ui_focus_manager *manager,
-                                     struct ui_dom_node *root) {
-  enum ui_error rc;
+ui_error_t ui_focus_trap_activate(struct ui_focus_trap *trap,
+                                  struct ui_focus_manager *manager,
+                                  struct ui_dom_node *root) {
+  ui_error_t rc;
 
   if (trap == NULL || manager == NULL || root == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -80,9 +84,9 @@ enum ui_error ui_focus_trap_activate(struct ui_focus_trap *trap,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_focus_trap_deactivate(struct ui_focus_trap *trap,
-                                       struct ui_focus_manager *manager) {
-  enum ui_error rc;
+ui_error_t ui_focus_trap_deactivate(struct ui_focus_trap *trap,
+                                    struct ui_focus_manager *manager) {
+  ui_error_t rc;
 
   if (trap == NULL || manager == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -104,7 +108,7 @@ enum ui_error ui_focus_trap_deactivate(struct ui_focus_trap *trap,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_focus_trap_attach_keyboard(struct ui_focus_trap *trap,
                               struct ui_keyboard_responder *responder) {
   if (trap == NULL || responder == NULL) {

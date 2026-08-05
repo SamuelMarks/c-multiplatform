@@ -90,7 +90,7 @@ void test_bounds(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 }
 
 void test_sequences_and_overflow(void) {
@@ -190,8 +190,8 @@ void test_sequences_and_overflow(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
-  ui_dom_node_destroy(oroot);
+  (void)ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(oroot);
 }
 
 void test_null_api_calls(void) {
@@ -243,7 +243,7 @@ void test_percentage_negative(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 }
 
 void test_percentage_negative_block(void) {
@@ -284,7 +284,7 @@ void test_percentage_negative_block(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 }
 
 void test_content_negative(void) {
@@ -342,5 +342,5 @@ void test_content_negative(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 }

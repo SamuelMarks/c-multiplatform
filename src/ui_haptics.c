@@ -7,7 +7,7 @@
 /* MSVC Safe CRT */
 #endif
 
-enum ui_error ui_haptics_trigger(enum ui_haptic_feedback_type type) {
+ui_error_t ui_haptics_trigger(enum ui_haptic_feedback_type type) {
   /* Suppress unused parameter warning */
   (void)type;
 

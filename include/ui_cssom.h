@@ -167,15 +167,14 @@ struct ui_css_computed_style {
  * @param out_stylesheet Pointer to receive the new stylesheet.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_stylesheet_create(struct ui_css_stylesheet **out_stylesheet);
+ui_error_t ui_css_stylesheet_create(struct ui_css_stylesheet **out_stylesheet);
 
 /**
  * @brief Destroys a CSS stylesheet and all its rules.
  *
  * @param stylesheet The stylesheet to destroy.
  */
-enum ui_error ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet);
+ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet);
 
 /**
  * @brief Appends a rule to the stylesheet.
@@ -184,9 +183,8 @@ enum ui_error ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet);
  * @param rule The rule to append.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_stylesheet_append_rule(struct ui_css_stylesheet *stylesheet,
-                              struct ui_css_rule *rule);
+ui_error_t ui_css_stylesheet_append_rule(struct ui_css_stylesheet *stylesheet,
+                                         struct ui_css_rule *rule);
 
 /**
  * @brief Registers a layer by name in the stylesheet, or returns its existing
@@ -197,7 +195,7 @@ ui_css_stylesheet_append_rule(struct ui_css_stylesheet *stylesheet,
  * @param out_order Pointer to receive the assigned layer order integer.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_stylesheet_register_layer(struct ui_css_stylesheet *stylesheet,
                                  const char *name, int *out_order);
 
@@ -209,7 +207,7 @@ ui_css_stylesheet_register_layer(struct ui_css_stylesheet *stylesheet,
  * @param uri The namespace URI.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
                                      const char *prefix, const char *uri);
 
@@ -220,15 +218,15 @@ ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
  * @param out_rule Pointer to receive the new rule.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_rule_create(enum ui_css_rule_type type,
-                                 struct ui_css_rule **out_rule);
+ui_error_t ui_css_rule_create(enum ui_css_rule_type type,
+                              struct ui_css_rule **out_rule);
 
 /**
  * @brief Destroys a CSS rule, including its selectors and declarations.
  *
  * @param rule The rule to destroy.
  */
-enum ui_error ui_css_rule_destroy(struct ui_css_rule *rule);
+ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule);
 
 /**
  * @brief Appends a selector to a rule.
@@ -238,9 +236,9 @@ enum ui_error ui_css_rule_destroy(struct ui_css_rule *rule);
  * @param value The string value of the selector.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_rule_append_selector(struct ui_css_rule *rule,
-                                          enum ui_css_selector_type type,
-                                          const char *value);
+ui_error_t ui_css_rule_append_selector(struct ui_css_rule *rule,
+                                       enum ui_css_selector_type type,
+                                       const char *value);
 
 /**
  * @brief Appends an attribute selector to a rule.
@@ -251,9 +249,10 @@ enum ui_error ui_css_rule_append_selector(struct ui_css_rule *rule,
  * @param attr_value The value to match (can be NULL if op is NONE).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_rule_append_selector_attr(
-    struct ui_css_rule *rule, const char *attr_name,
-    enum ui_css_attr_operator attr_op, const char *attr_value);
+ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
+                                            const char *attr_name,
+                                            enum ui_css_attr_operator attr_op,
+                                            const char *attr_value);
 
 /**
  * @brief Appends a declaration to a rule.
@@ -263,10 +262,10 @@ enum ui_error ui_css_rule_append_selector_attr(
  * @param property_value The value of the property.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_rule_append_declaration(struct ui_css_rule *rule,
-                                             const char *property_name,
-                                             const char *property_value,
-                                             int is_important);
+ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
+                                          const char *property_name,
+                                          const char *property_value,
+                                          int is_important);
 
 /**
  * @brief Resolves the style for a DOM node by matching it against the given
@@ -277,9 +276,9 @@ enum ui_error ui_css_rule_append_declaration(struct ui_css_rule *rule,
  * @param out_style Pointer to receive the computed style object.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
-                                   const struct ui_dom_node *node,
-                                   struct ui_css_computed_style **out_style);
+ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
+                                const struct ui_dom_node *node,
+                                struct ui_css_computed_style **out_style);
 
 /**
  * @brief Retrieves the value of a property from a computed style.
@@ -290,7 +289,7 @@ enum ui_error ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if the property is not
  * set.
  */
-enum ui_error
+ui_error_t
 ui_css_computed_style_get_property(const struct ui_css_computed_style *style,
                                    const char *property_name,
                                    const char **out_value);
@@ -300,8 +299,7 @@ ui_css_computed_style_get_property(const struct ui_css_computed_style *style,
  *
  * @param style The computed style to destroy.
  */
-enum ui_error
-ui_css_computed_style_destroy(struct ui_css_computed_style *style);
+ui_error_t ui_css_computed_style_destroy(struct ui_css_computed_style *style);
 
 /**
  * @brief Represents a single CSS custom property (variable).
@@ -325,7 +323,7 @@ struct ui_css_variable_store {
  * @param out_store Pointer to receive the new store.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_variable_store_create(struct ui_css_variable_store **out_store);
 
 /**
@@ -333,8 +331,7 @@ ui_css_variable_store_create(struct ui_css_variable_store **out_store);
  *
  * @param store The store to destroy.
  */
-enum ui_error
-ui_css_variable_store_destroy(struct ui_css_variable_store *store);
+ui_error_t ui_css_variable_store_destroy(struct ui_css_variable_store *store);
 
 /**
  * @brief Sets a CSS variable (e.g. "--my-color", "#f00") in the store.
@@ -344,8 +341,8 @@ ui_css_variable_store_destroy(struct ui_css_variable_store *store);
  * @param value The variable value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_variable_store_set(struct ui_css_variable_store *store,
-                                        const char *name, const char *value);
+ui_error_t ui_css_variable_store_set(struct ui_css_variable_store *store,
+                                     const char *name, const char *value);
 
 /**
  * @brief Resolves CSS variables (e.g. "var(--color, red)") within a property
@@ -356,9 +353,9 @@ enum ui_error ui_css_variable_store_set(struct ui_css_variable_store *store,
  * @param out_resolved Pointer to receive the allocated resolved string.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_resolve_variables(const struct ui_css_variable_store *store,
-                         const char *property_value, char **out_resolved);
+ui_error_t ui_css_resolve_variables(const struct ui_css_variable_store *store,
+                                    const char *property_value,
+                                    char **out_resolved);
 
 #ifdef __cplusplus
 }

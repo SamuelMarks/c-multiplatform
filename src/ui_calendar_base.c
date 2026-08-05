@@ -17,18 +17,18 @@ struct ui_calendar_base {
   ui_calendar_on_select_t on_select;
   void *on_select_user_data;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
 };
 
-static enum ui_error calendar_cva_write_value(void *component,
-                                              union ui_signal_payload value) {
+static ui_error_t calendar_cva_write_value(void *component,
+                                           union ui_signal_payload value) {
   struct ui_calendar_base *cal = (struct ui_calendar_base *)component;
   struct ui_date *date;
 
@@ -44,10 +44,9 @@ static enum ui_error calendar_cva_write_value(void *component,
 }
 
 /** \brief calendar_cva_register_on_change */
-static enum ui_error calendar_cva_register_on_change(
+static ui_error_t calendar_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_calendar_base *cal = (struct ui_calendar_base *)component;
   if (!cal)
@@ -57,10 +56,8 @@ static enum ui_error calendar_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-calendar_cva_register_on_touched(void *component,
-                                 enum ui_error (*callback)(void *user_data),
-                                 void *user_data) {
+static ui_error_t calendar_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_calendar_base *cal = (struct ui_calendar_base *)component;
   if (!cal)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -69,8 +66,8 @@ calendar_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error calendar_cva_set_disabled_state(void *component,
-                                                     int is_disabled) {
+static ui_error_t calendar_cva_set_disabled_state(void *component,
+                                                  int is_disabled) {
   struct ui_calendar_base *cal = (struct ui_calendar_base *)component;
   if (!cal)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -78,7 +75,7 @@ static enum ui_error calendar_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_calendar_is_leap_year(int year, int *out_is_leap) {
+ui_error_t ui_calendar_is_leap_year(int year, int *out_is_leap) {
   if (!out_is_leap)
     return UI_ERROR_INVALID_ARGUMENT;
   if (year % 400 == 0)
@@ -92,7 +89,7 @@ enum ui_error ui_calendar_is_leap_year(int year, int *out_is_leap) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_calendar_days_in_month(int year, int month, int *out_days) {
+ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days) {
   if (!out_days)
     return UI_ERROR_INVALID_ARGUMENT;
   if (month < 1 || month > 12) {
@@ -101,7 +98,7 @@ enum ui_error ui_calendar_days_in_month(int year, int month, int *out_days) {
   }
   if (month == 2) {
     int is_leap = 0;
-    ui_calendar_is_leap_year(year, &is_leap);
+    (void)ui_calendar_is_leap_year(year, &is_leap);
     *out_days = is_leap ? 29 : 28;
     return UI_ERROR_NONE;
   }
@@ -113,8 +110,8 @@ enum ui_error ui_calendar_days_in_month(int year, int month, int *out_days) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_calendar_get_day_of_week(int year, int month, int day,
-                                          enum ui_day_of_week *out_dow) {
+ui_error_t ui_calendar_get_day_of_week(int year, int month, int day,
+                                       enum ui_day_of_week *out_dow) {
   static const int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
   int dow;
   if (!out_dow)
@@ -130,16 +127,16 @@ enum ui_error ui_calendar_get_day_of_week(int year, int month, int day,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_calendar_base_create(struct ui_calendar_base **out_calendar,
-                        struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_calendar_base_create(struct ui_calendar_base **out_calendar,
+                                   struct ui_control_value_accessor *out_cva) {
   struct ui_calendar_base *cal;
 
   if (!out_calendar) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  cal = (struct ui_calendar_base *)UI_MALLOC(sizeof(struct ui_calendar_base));
+  cal = (struct ui_calendar_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_calendar_base));
   if (!cal) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -169,17 +166,17 @@ ui_calendar_base_create(struct ui_calendar_base **out_calendar,
   return UI_ERROR_NONE;
 }
 
-void ui_calendar_base_destroy(struct ui_calendar_base *calendar) {
+ui_error_t ui_calendar_base_destroy(struct ui_calendar_base *calendar) {
   if (!calendar) {
-    return;
+    return UI_ERROR_NONE;
   }
-  UI_FREE(calendar);
+  C_MULTIPLATFORM_FREE(calendar);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_calendar_base_set_start_of_week(struct ui_calendar_base *calendar,
-                                   enum ui_day_of_week start_day) {
+ui_error_t ui_calendar_base_set_start_of_week(struct ui_calendar_base *calendar,
+                                              enum ui_day_of_week start_day) {
   if (!calendar)
     return UI_ERROR_INVALID_ARGUMENT;
   if ((int)start_day < 0 || (int)start_day > 6)
@@ -188,8 +185,8 @@ ui_calendar_base_set_start_of_week(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_calendar_base_set_min_date(struct ui_calendar_base *calendar,
-                                            const struct ui_date *min_date) {
+ui_error_t ui_calendar_base_set_min_date(struct ui_calendar_base *calendar,
+                                         const struct ui_date *min_date) {
   if (!calendar)
     return UI_ERROR_INVALID_ARGUMENT;
   if (min_date) {
@@ -201,8 +198,8 @@ enum ui_error ui_calendar_base_set_min_date(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_calendar_base_set_max_date(struct ui_calendar_base *calendar,
-                                            const struct ui_date *max_date) {
+ui_error_t ui_calendar_base_set_max_date(struct ui_calendar_base *calendar,
+                                         const struct ui_date *max_date) {
   if (!calendar)
     return UI_ERROR_INVALID_ARGUMENT;
   if (max_date) {
@@ -214,8 +211,8 @@ enum ui_error ui_calendar_base_set_max_date(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_calendar_base_set_view_month(struct ui_calendar_base *calendar,
-                                              int year, int month) {
+ui_error_t ui_calendar_base_set_view_month(struct ui_calendar_base *calendar,
+                                           int year, int month) {
   if (!calendar)
     return UI_ERROR_INVALID_ARGUMENT;
   if (month < 1 || month > 12)
@@ -224,14 +221,17 @@ enum ui_error ui_calendar_base_set_view_month(struct ui_calendar_base *calendar,
   calendar->view_month = month;
 
   if (calendar->cva_on_touched) {
-    (void)calendar->cva_on_touched(calendar->cva_on_touched_user_data);
+    ui_error_t rc =
+        calendar->cva_on_touched(calendar->cva_on_touched_user_data);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_calendar_base_get_view_month(const struct ui_calendar_base *calendar,
                                 int *out_year, int *out_month) {
   if (!calendar || !out_year || !out_month)
@@ -241,8 +241,8 @@ ui_calendar_base_get_view_month(const struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error compare_dates(const struct ui_date *d1,
-                                   const struct ui_date *d2, int *out_cmp) {
+static ui_error_t compare_dates(const struct ui_date *d1,
+                                const struct ui_date *d2, int *out_cmp) {
   if (d1->year != d2->year)
     *out_cmp = d1->year - d2->year;
   else if (d1->month != d2->month)
@@ -252,8 +252,8 @@ static enum ui_error compare_dates(const struct ui_date *d1,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_calendar_base_select_date(struct ui_calendar_base *calendar,
-                                           const struct ui_date *date) {
+ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
+                                        const struct ui_date *date) {
   int cmp_res = 0;
   if (!calendar || !date)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -262,7 +262,7 @@ enum ui_error ui_calendar_base_select_date(struct ui_calendar_base *calendar,
     return UI_ERROR_OUT_OF_BOUNDS;
   {
     int days = 0;
-    ui_calendar_days_in_month(date->year, date->month, &days);
+    (void)ui_calendar_days_in_month(date->year, date->month, &days);
     if (date->day < 1)
       return UI_ERROR_OUT_OF_BOUNDS;
     if (date->day > days)
@@ -270,13 +270,13 @@ enum ui_error ui_calendar_base_select_date(struct ui_calendar_base *calendar,
   }
 
   if (calendar->has_min) {
-    compare_dates(date, &calendar->min_date, &cmp_res);
+    (void)compare_dates(date, &calendar->min_date, &cmp_res);
     if (cmp_res < 0) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
   }
   if (calendar->has_max) {
-    compare_dates(date, &calendar->max_date, &cmp_res);
+    (void)compare_dates(date, &calendar->max_date, &cmp_res);
     if (cmp_res > 0) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
@@ -288,7 +288,7 @@ enum ui_error ui_calendar_base_select_date(struct ui_calendar_base *calendar,
   calendar->view_month = date->month;
 
   if (calendar->on_select) {
-    enum ui_error select_rc =
+    ui_error_t select_rc =
         calendar->on_select(calendar, date, calendar->on_select_user_data);
     if (select_rc != UI_ERROR_NONE)
       return select_rc;
@@ -296,15 +296,18 @@ enum ui_error ui_calendar_base_select_date(struct ui_calendar_base *calendar,
 
   if (calendar->cva_on_change) {
     union ui_signal_payload payload;
+    ui_error_t rc;
     payload.ptr_val = &calendar->selected_date;
-    (void)calendar->cva_on_change(payload, calendar->cva_on_change_user_data);
+    rc = calendar->cva_on_change(payload, calendar->cva_on_change_user_data);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_calendar_base_get_selected_date(const struct ui_calendar_base *calendar,
                                    struct ui_date *out_date) {
   if (!calendar || !out_date)
@@ -316,24 +319,26 @@ ui_calendar_base_get_selected_date(const struct ui_calendar_base *calendar,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_calendar_base_clear_selection(struct ui_calendar_base *calendar) {
+ui_error_t ui_calendar_base_clear_selection(struct ui_calendar_base *calendar) {
   if (!calendar)
     return UI_ERROR_INVALID_ARGUMENT;
   calendar->has_selection = 0;
 
   if (calendar->cva_on_change) {
     union ui_signal_payload payload;
+    ui_error_t rc;
     payload.ptr_val = NULL;
-    (void)calendar->cva_on_change(payload, calendar->cva_on_change_user_data);
+    rc = calendar->cva_on_change(payload, calendar->cva_on_change_user_data);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_calendar_base_set_on_select(struct ui_calendar_base *calendar,
-                                             ui_calendar_on_select_t on_select,
-                                             void *user_data) {
+ui_error_t ui_calendar_base_set_on_select(struct ui_calendar_base *calendar,
+                                          ui_calendar_on_select_t on_select,
+                                          void *user_data) {
   if (!calendar)
     return UI_ERROR_INVALID_ARGUMENT;
   calendar->on_select = on_select;
@@ -342,14 +347,18 @@ enum ui_error ui_calendar_base_set_on_select(struct ui_calendar_base *calendar,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
                                 struct ui_date *out_grid, int *out_count) {
   int first_dow, days_in_month, days_in_prev;
   int prev_y, prev_m, next_y, next_m;
   int offset, i, d;
 
-  if (!calendar || !out_grid || !out_count)
+  if (!calendar)
+    return UI_ERROR_INVALID_ARGUMENT;
+  if (!out_grid)
+    return UI_ERROR_INVALID_ARGUMENT;
+  if (!out_count)
     return UI_ERROR_INVALID_ARGUMENT;
 
   {
@@ -357,11 +366,12 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     (void)ui_calendar_get_day_of_week(calendar->view_year, calendar->view_month,
                                       1, &tmp_dow);
     first_dow = tmp_dow;
-    first_dow = tmp_dow;
   }
-  days_in_month = 0;
-  ui_calendar_days_in_month(calendar->view_year, calendar->view_month,
-                            &days_in_month);
+  {
+    days_in_month = 0;
+    (void)ui_calendar_days_in_month(calendar->view_year, calendar->view_month,
+                                    &days_in_month);
+  }
 
   prev_y = calendar->view_year;
   prev_m = calendar->view_month - 1;
@@ -377,7 +387,7 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     next_y++;
   }
 
-  ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev);
+  { (void)ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev); }
 
   offset = first_dow - (int)calendar->start_of_week;
   if (offset < 0)

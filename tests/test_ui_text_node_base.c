@@ -16,7 +16,7 @@ static int test_oom(void) {
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
     if (ui_text_node_base_create(&node) == UI_ERROR_NONE) {
-      ui_text_node_base_destroy(node);
+      (void)ui_text_node_base_destroy(node);
     }
   }
   g_malloc_fail_countdown = -1;
@@ -28,14 +28,14 @@ static int test_oom(void) {
     ui_text_node_base_set_text(node, "Hello");
   }
   g_malloc_fail_countdown = -1;
-  ui_text_node_base_destroy(node);
+  (void)ui_text_node_base_destroy(node);
 #endif
   return failed;
 }
 
 int main(void) {
   struct ui_text_node_base *node = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_font_manager *font_mgr = NULL;
   struct ui_text_layout *layout = NULL;
   struct ui_component *comp;
@@ -173,10 +173,10 @@ int main(void) {
   if (rc != UI_ERROR_NONE || comp == NULL)
     failed |= 1;
 
-  ui_text_node_base_destroy(node);
-  ui_font_manager_destroy(font_mgr);
+  (void)ui_text_node_base_destroy(node);
+  (void)ui_font_manager_destroy(font_mgr);
 
-  ui_text_node_base_destroy(NULL);
+  (void)ui_text_node_base_destroy(NULL);
 
   failed |= test_oom();
 

@@ -24,14 +24,14 @@ enum ui_bidi_direction {
  * @param direction The new global direction (LTR or RTL).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_bidi_set_direction(enum ui_bidi_direction direction);
+ui_error_t ui_bidi_set_direction(enum ui_bidi_direction direction);
 
 /**
  * @brief Gets the current global bidirectional text direction.
  *
  * @return The current global direction.
  */
-enum ui_error ui_bidi_get_direction(enum ui_bidi_direction *out_dir);
+ui_error_t ui_bidi_get_direction(enum ui_bidi_direction *out_dir);
 
 /**
  * @brief Normalizes a horizontal key code based on the current global
@@ -40,8 +40,8 @@ enum ui_error ui_bidi_get_direction(enum ui_bidi_direction *out_dir);
  * @param key The input key code.
  * @return The normalized key code.
  */
-enum ui_error ui_bidi_normalize_horizontal_key(enum ui_key_code key,
-                                               enum ui_key_code *out_key);
+ui_error_t ui_bidi_normalize_horizontal_key(enum ui_key_code key,
+                                            enum ui_key_code *out_key);
 
 #ifdef __cplusplus
 }

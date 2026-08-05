@@ -9,7 +9,7 @@ extern struct ui_image_decoder_backend ui_image_decoder_png;
 int main(void) {
   struct ui_image img;
   unsigned char dummy_data[4] = {0, 0, 0, 0};
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Running ui_image_png tests...\n");
 

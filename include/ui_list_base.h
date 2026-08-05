@@ -31,14 +31,14 @@ enum ui_list_orientation {
  * @param out_list Pointer to receive the allocated list base.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_list_base_create(struct ui_list_base **out_list);
+ui_error_t ui_list_base_create(struct ui_list_base **out_list);
 
 /**
  * @brief Destroys a list component.
  *
  * @param list The list to destroy.
  */
-void ui_list_base_destroy(struct ui_list_base *list);
+ui_error_t ui_list_base_destroy(struct ui_list_base *list);
 
 /**
  * @brief Gets the underlying component for the list.
@@ -47,8 +47,8 @@ void ui_list_base_destroy(struct ui_list_base *list);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_list_base_get_component(struct ui_list_base *list,
-                                         struct ui_component **out_component);
+ui_error_t ui_list_base_get_component(struct ui_list_base *list,
+                                      struct ui_component **out_component);
 
 /**
  * @brief Sets the orientation of the list (vertical or horizontal).
@@ -57,9 +57,8 @@ enum ui_error ui_list_base_get_component(struct ui_list_base *list,
  * @param orientation The orientation.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_list_base_set_orientation(struct ui_list_base *list,
-                             enum ui_list_orientation orientation);
+ui_error_t ui_list_base_set_orientation(struct ui_list_base *list,
+                                        enum ui_list_orientation orientation);
 
 /**
  * @brief Gets the current orientation of the list.
@@ -68,7 +67,7 @@ ui_list_base_set_orientation(struct ui_list_base *list,
  * @param out_orientation Pointer to receive the orientation.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_list_base_get_orientation(struct ui_list_base *list,
                              enum ui_list_orientation *out_orientation);
 
@@ -79,8 +78,8 @@ ui_list_base_get_orientation(struct ui_list_base *list,
  * @param item The list item to append.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_list_base_append_item(struct ui_list_base *list,
-                                       struct ui_list_item_base *item);
+ui_error_t ui_list_base_append_item(struct ui_list_base *list,
+                                    struct ui_list_item_base *item);
 
 /**
  * @brief Creates a new unstyled list item component (`role="listitem"`).
@@ -88,14 +87,14 @@ enum ui_error ui_list_base_append_item(struct ui_list_base *list,
  * @param out_item Pointer to receive the allocated list item base.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_list_item_base_create(struct ui_list_item_base **out_item);
+ui_error_t ui_list_item_base_create(struct ui_list_item_base **out_item);
 
 /**
  * @brief Destroys a list item component.
  *
  * @param item The list item to destroy.
  */
-void ui_list_item_base_destroy(struct ui_list_item_base *item);
+ui_error_t ui_list_item_base_destroy(struct ui_list_item_base *item);
 
 /**
  * @brief Gets the underlying component for the list item.
@@ -104,9 +103,8 @@ void ui_list_item_base_destroy(struct ui_list_item_base *item);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_list_item_base_get_component(struct ui_list_item_base *item,
-                                struct ui_component **out_component);
+ui_error_t ui_list_item_base_get_component(struct ui_list_item_base *item,
+                                           struct ui_component **out_component);
 
 /**
  * @brief Binds the data property.
@@ -115,8 +113,8 @@ ui_list_item_base_get_component(struct ui_list_item_base *item,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_list_base_bind_data(struct ui_list_base *widget,
-                                     struct ui_computed *signal);
+ui_error_t ui_list_base_bind_data(struct ui_list_base *widget,
+                                  struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

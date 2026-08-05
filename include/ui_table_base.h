@@ -64,10 +64,10 @@ struct ui_table_column_config {
 struct ui_table_model {
   size_t (*get_row_count)(void *user_data);
   size_t (*get_column_count)(void *user_data);
-  enum ui_error (*render_cell)(size_t row, size_t col,
-                               struct ui_dom_node *cell_node, void *user_data);
-  enum ui_error (*render_header)(size_t col, struct ui_dom_node *header_node,
-                                 void *user_data);
+  ui_error_t (*render_cell)(size_t row, size_t col,
+                            struct ui_dom_node *cell_node, void *user_data);
+  ui_error_t (*render_header)(size_t col, struct ui_dom_node *header_node,
+                              void *user_data);
   void *user_data;
 };
 
@@ -78,15 +78,15 @@ struct ui_table_model {
  * @param model Data model providing dimensions and rendering callbacks.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_table_base_create(struct ui_table_base **out_table,
-                                   const struct ui_table_model *model);
+ui_error_t ui_table_base_create(struct ui_table_base **out_table,
+                                const struct ui_table_model *model);
 
 /**
  * @brief Destroys a table component.
  *
  * @param table The table to destroy.
  */
-void ui_table_base_destroy(struct ui_table_base *table);
+ui_error_t ui_table_base_destroy(struct ui_table_base *table);
 
 /**
  * @brief Gets the selection model attached to this table.
@@ -94,7 +94,7 @@ void ui_table_base_destroy(struct ui_table_base *table);
  * @param table The table.
  * @return The selection model, or NULL.
  */
-enum ui_error
+ui_error_t
 ui_table_base_get_selection_model(struct ui_table_base *table,
                                   struct ui_selection_model **out_model);
 
@@ -106,7 +106,7 @@ ui_table_base_get_selection_model(struct ui_table_base *table,
  * @param config The column sizing configuration.
  * @return UI_ERROR_NONE on success, or UI_ERROR_OUT_OF_BOUNDS.
  */
-enum ui_error
+ui_error_t
 ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
                                 const struct ui_table_column_config *config);
 
@@ -117,7 +117,7 @@ ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
  * @param config The sort configuration.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_table_base_set_sort_config(struct ui_table_base *table,
                               const struct ui_table_sort_config *config);
 
@@ -128,7 +128,7 @@ ui_table_base_set_sort_config(struct ui_table_base *table,
  * @param config The pagination configuration.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_table_base_set_pagination_config(
+ui_error_t ui_table_base_set_pagination_config(
     struct ui_table_base *table,
     const struct ui_table_pagination_config *config);
 
@@ -141,8 +141,8 @@ enum ui_error ui_table_base_set_pagination_config(
  * be appended.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_table_base_render(struct ui_table_base *table,
-                                   struct ui_dom_node *container);
+ui_error_t ui_table_base_render(struct ui_table_base *table,
+                                struct ui_dom_node *container);
 
 /**
  * @brief Binds the data property.
@@ -151,8 +151,8 @@ enum ui_error ui_table_base_render(struct ui_table_base *table,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_table_base_bind_data(struct ui_table_base *widget,
-                                      struct ui_computed *signal);
+ui_error_t ui_table_base_bind_data(struct ui_table_base *widget,
+                                   struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

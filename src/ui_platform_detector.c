@@ -18,7 +18,7 @@ struct ui_platform_detector {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_platform_detector_create(struct ui_platform_detector **out_detector) {
   struct ui_platform_detector *detector;
   unsigned int caps = 0;
@@ -27,7 +27,7 @@ ui_platform_detector_create(struct ui_platform_detector **out_detector) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  detector = (struct ui_platform_detector *)UI_MALLOC(
+  detector = (struct ui_platform_detector *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_platform_detector));
   if (detector == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -48,14 +48,15 @@ ui_platform_detector_create(struct ui_platform_detector **out_detector) {
   return UI_ERROR_NONE;
 }
 
-void ui_platform_detector_destroy(struct ui_platform_detector *detector) {
+ui_error_t ui_platform_detector_destroy(struct ui_platform_detector *detector) {
   if (detector != NULL) {
-    UI_FREE(detector);
+    C_MULTIPLATFORM_FREE(detector);
   }
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_platform_detector_get_capabilities(struct ui_platform_detector *detector,
                                       unsigned int *out_capabilities) {
   if (detector == NULL || out_capabilities == NULL) {
@@ -67,7 +68,7 @@ ui_platform_detector_get_capabilities(struct ui_platform_detector *detector,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_platform_detector_has_capability(struct ui_platform_detector *detector,
                                     unsigned int capability,
                                     int *out_has_capability) {

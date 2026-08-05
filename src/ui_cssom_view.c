@@ -2,7 +2,7 @@
 #include "ui_cssom_view.h"
 /* clang-format on */
 
-enum ui_error
+ui_error_t
 ui_cssom_view_get_bounding_client_rect(const struct ui_layout_node *node,
                                        struct ui_dom_rect *out_rect) {
   float abs_x = 0.0f;
@@ -23,13 +23,17 @@ ui_cssom_view_get_bounding_client_rect(const struct ui_layout_node *node,
      but if it's the content size, we need to add padding and border.
      Assuming layout_node->width and height are the final border-box dimension.
    */
-  ui_dom_rect_init(out_rect, abs_x, abs_y, node->width, node->height);
+  {
+    ui_error_t rc =
+        ui_dom_rect_init(out_rect, abs_x, abs_y, node->width, node->height);
+    (void)rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_cssom_view_get_client_width(const struct ui_layout_node *node,
-                                             float *out_width) {
+ui_error_t ui_cssom_view_get_client_width(const struct ui_layout_node *node,
+                                          float *out_width) {
   if (!node || !out_width) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -48,8 +52,8 @@ enum ui_error ui_cssom_view_get_client_width(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_cssom_view_get_client_height(const struct ui_layout_node *node,
-                                              float *out_height) {
+ui_error_t ui_cssom_view_get_client_height(const struct ui_layout_node *node,
+                                           float *out_height) {
   if (!node || !out_height) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -64,8 +68,8 @@ enum ui_error ui_cssom_view_get_client_height(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_cssom_view_get_client_top(const struct ui_layout_node *node,
-                                           float *out_top) {
+ui_error_t ui_cssom_view_get_client_top(const struct ui_layout_node *node,
+                                        float *out_top) {
   if (!node || !out_top) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -74,8 +78,8 @@ enum ui_error ui_cssom_view_get_client_top(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_cssom_view_get_client_left(const struct ui_layout_node *node,
-                                            float *out_left) {
+ui_error_t ui_cssom_view_get_client_left(const struct ui_layout_node *node,
+                                         float *out_left) {
   if (!node || !out_left) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -84,8 +88,8 @@ enum ui_error ui_cssom_view_get_client_left(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_cssom_view_get_scroll_width(const struct ui_layout_node *node,
-                                             float *out_width) {
+ui_error_t ui_cssom_view_get_scroll_width(const struct ui_layout_node *node,
+                                          float *out_width) {
   if (!node || !out_width) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -97,8 +101,8 @@ enum ui_error ui_cssom_view_get_scroll_width(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_cssom_view_get_scroll_height(const struct ui_layout_node *node,
-                                              float *out_height) {
+ui_error_t ui_cssom_view_get_scroll_height(const struct ui_layout_node *node,
+                                           float *out_height) {
   if (!node || !out_height) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

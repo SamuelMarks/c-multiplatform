@@ -13,9 +13,9 @@ int g_mock_glyph_metrics_fail = 0;
 #define ACCUM_FAIL(failed, expr) failed |= (expr)
 
 /* Override ui_font functions */
-enum ui_error ui_font_get_vmetrics(struct ui_font *font, float font_size,
-                                   float *out_ascent, float *out_descent,
-                                   float *out_line_gap) {
+ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
+                                float *out_ascent, float *out_descent,
+                                float *out_line_gap) {
   (void)font;
   (void)font_size;
   if (g_mock_font_fail)
@@ -26,9 +26,9 @@ enum ui_error ui_font_get_vmetrics(struct ui_font *font, float font_size,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
-                                        float font_size,
-                                        struct ui_glyph_metrics *out_metrics) {
+ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
+                                     float font_size,
+                                     struct ui_glyph_metrics *out_metrics) {
   (void)font;
   (void)font_size;
   if (g_mock_glyph_metrics_fail == 1 ||
@@ -41,9 +41,9 @@ enum ui_error ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_font_get_kerning(struct ui_font *font, int prev_codepoint,
-                                  int codepoint, float font_size,
-                                  float *out_kerning) {
+ui_error_t ui_font_get_kerning(struct ui_font *font, int prev_codepoint,
+                               int codepoint, float font_size,
+                               float *out_kerning) {
   (void)font;
   (void)prev_codepoint;
   (void)codepoint;
@@ -91,7 +91,7 @@ static int test_text_layout(void) {
   ACCUM_ERR(failed, ui_text_layout_get_glyphs(layout, &glyphs, &count));
   ACCUM_ERR(failed, ui_text_layout_get_bounds(layout, &w, &h));
 
-  ui_text_layout_destroy(layout);
+  (void)ui_text_layout_destroy(layout);
 
   failed |= (ui_text_layout_create(NULL) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_text_layout_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT);
@@ -139,7 +139,7 @@ static int test_text_layout(void) {
                             UI_TEXT_DIRECTION_LTR) != UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
-  ui_text_layout_destroy(layout);
+  (void)ui_text_layout_destroy(layout);
 
   return failed;
 }

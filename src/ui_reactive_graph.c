@@ -8,7 +8,7 @@
 static UI_THREAD_LOCAL struct ui_reactive_node *g_current_node = NULL;
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_reactive_graph_get_current_node(struct ui_reactive_node **out_node) {
   if (!out_node)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -17,7 +17,7 @@ ui_reactive_graph_get_current_node(struct ui_reactive_node **out_node) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_reactive_graph_set_current_node(struct ui_reactive_node *node,
                                    struct ui_reactive_node **out_prev_node) {
   if (out_prev_node)

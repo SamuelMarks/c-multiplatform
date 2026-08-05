@@ -43,14 +43,14 @@ struct ui_skeleton_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-enum ui_error ui_skeleton_base_create(struct ui_skeleton_base **out_skeleton);
+ui_error_t ui_skeleton_base_create(struct ui_skeleton_base **out_skeleton);
 
 /**
  * @brief Destroys a skeleton loader component.
  *
  * @param skeleton The skeleton to destroy.
  */
-void ui_skeleton_base_destroy(struct ui_skeleton_base *skeleton);
+ui_error_t ui_skeleton_base_destroy(struct ui_skeleton_base *skeleton);
 
 /**
  * @brief Sets the requested shape of the skeleton loader.
@@ -59,8 +59,8 @@ void ui_skeleton_base_destroy(struct ui_skeleton_base *skeleton);
  * @param shape The shape to set.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_skeleton_base_set_shape(struct ui_skeleton_base *skeleton,
-                                         enum ui_skeleton_shape shape);
+ui_error_t ui_skeleton_base_set_shape(struct ui_skeleton_base *skeleton,
+                                      enum ui_skeleton_shape shape);
 
 /**
  * @brief Gets the requested shape of the skeleton loader.
@@ -69,9 +69,8 @@ enum ui_error ui_skeleton_base_set_shape(struct ui_skeleton_base *skeleton,
  * @param out_shape Pointer to receive the shape.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
-ui_skeleton_base_get_shape(const struct ui_skeleton_base *skeleton,
-                           enum ui_skeleton_shape *out_shape);
+ui_error_t ui_skeleton_base_get_shape(const struct ui_skeleton_base *skeleton,
+                                      enum ui_skeleton_shape *out_shape);
 
 /**
  * @brief Sets the dimensions of the skeleton loader.
@@ -81,8 +80,8 @@ ui_skeleton_base_get_shape(const struct ui_skeleton_base *skeleton,
  * @param height Requested height in pixels.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_skeleton_base_set_dimensions(struct ui_skeleton_base *skeleton,
-                                              int width, int height);
+ui_error_t ui_skeleton_base_set_dimensions(struct ui_skeleton_base *skeleton,
+                                           int width, int height);
 
 /**
  * @brief Gets the dimensions of the skeleton loader.
@@ -92,7 +91,7 @@ enum ui_error ui_skeleton_base_set_dimensions(struct ui_skeleton_base *skeleton,
  * @param out_height Pointer to receive the height.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_skeleton_base_get_dimensions(const struct ui_skeleton_base *skeleton,
                                 int *out_width, int *out_height);
 
@@ -105,8 +104,8 @@ ui_skeleton_base_get_dimensions(const struct ui_skeleton_base *skeleton,
  * @param delta_time_ms Delta time since last frame in milliseconds.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_skeleton_base_tick(struct ui_skeleton_base *skeleton,
-                                    float delta_time_ms);
+ui_error_t ui_skeleton_base_tick(struct ui_skeleton_base *skeleton,
+                                 float delta_time_ms);
 
 /**
  * @brief Gets the current animation phase offset [0.0, 1.0].
@@ -115,7 +114,7 @@ enum ui_error ui_skeleton_base_tick(struct ui_skeleton_base *skeleton,
  * @param out_phase Pointer to receive the phase offset.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_skeleton_base_get_animation_phase(const struct ui_skeleton_base *skeleton,
                                      float *out_phase);
 
@@ -126,7 +125,7 @@ ui_skeleton_base_get_animation_phase(const struct ui_skeleton_base *skeleton,
  * @param out_config Pointer to receive the configuration.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_skeleton_base_get_animation_config(
+ui_error_t ui_skeleton_base_get_animation_config(
     const struct ui_skeleton_base *skeleton,
     struct ui_skeleton_animation_config **out_config);
 
@@ -137,8 +136,8 @@ enum ui_error ui_skeleton_base_get_animation_config(
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_skeleton_base_bind_active(struct ui_skeleton_base *widget,
-                                           struct ui_signal *signal);
+ui_error_t ui_skeleton_base_bind_active(struct ui_skeleton_base *widget,
+                                        struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

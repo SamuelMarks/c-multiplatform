@@ -18,14 +18,14 @@ struct ui_modifier;
  * @param out_modifier Pointer to receive the allocated modifier.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_modifier_create(struct ui_modifier **out_modifier);
+ui_error_t ui_modifier_create(struct ui_modifier **out_modifier);
 
 /**
  * @brief Destroys a modifier payload.
  *
  * @param modifier The modifier to destroy.
  */
-void ui_modifier_destroy(struct ui_modifier *modifier);
+ui_error_t ui_modifier_destroy(struct ui_modifier *modifier);
 
 /**
  * @brief Adds a custom CSS class to the modifier.
@@ -34,8 +34,8 @@ void ui_modifier_destroy(struct ui_modifier *modifier);
  * @param class_name The CSS class name to inject.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_modifier_add_class(struct ui_modifier *modifier,
-                                    const char *class_name);
+ui_error_t ui_modifier_add_class(struct ui_modifier *modifier,
+                                 const char *class_name);
 
 /**
  * @brief Adds a custom inline CSS style to the modifier.
@@ -45,9 +45,9 @@ enum ui_error ui_modifier_add_class(struct ui_modifier *modifier,
  * @param property_value The CSS property value (e.g., "red").
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_modifier_add_style(struct ui_modifier *modifier,
-                                    const char *property_name,
-                                    const char *property_value);
+ui_error_t ui_modifier_add_style(struct ui_modifier *modifier,
+                                 const char *property_name,
+                                 const char *property_value);
 
 /**
  * @brief Applies the modifier to a given component's isolated DOM root.
@@ -56,8 +56,8 @@ enum ui_error ui_modifier_add_style(struct ui_modifier *modifier,
  * @param component The component to apply the modifier to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_modifier_apply(const struct ui_modifier *modifier,
-                                struct ui_component *component);
+ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
+                             struct ui_component *component);
 
 #ifdef __cplusplus
 }

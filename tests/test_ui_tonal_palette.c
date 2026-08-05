@@ -8,7 +8,7 @@ static int test_tonal_palette(void) {
   ui_color_t key_color = UI_COLOR_ARGB(255, 0, 0, 255); /* Blue */
   struct ui_tonal_palette palette;
   ui_color_t tone_0, tone_100, tone_50;
-  enum ui_error err;
+  ui_error_t err;
   int failed = 0;
 
   err = ui_tonal_palette_from_color(key_color, &palette);

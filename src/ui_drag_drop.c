@@ -39,14 +39,14 @@ struct ui_drag_drop_context {
   int pointer_is_down;
 };
 
-enum ui_error ui_drag_drop_create(struct ui_drag_drop_context **out_ctx) {
+ui_error_t ui_drag_drop_create(struct ui_drag_drop_context **out_ctx) {
   struct ui_drag_drop_context *ctx;
 
   if (!out_ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ctx = (struct ui_drag_drop_context *)UI_MALLOC(
+  ctx = (struct ui_drag_drop_context *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_drag_drop_context));
   if (!ctx) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -57,10 +57,10 @@ enum ui_error ui_drag_drop_create(struct ui_drag_drop_context **out_ctx) {
   ctx->active_pointer_id = -1;
   ctx->list_capacity = 4;
 
-  ctx->lists = (struct ui_drag_list *)UI_MALLOC(sizeof(struct ui_drag_list) *
-                                                ctx->list_capacity);
+  ctx->lists = (struct ui_drag_list *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_drag_list) * ctx->list_capacity);
   if (!ctx->lists) {
-    UI_FREE(ctx);
+    C_MULTIPLATFORM_FREE(ctx);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -68,7 +68,7 @@ enum ui_error ui_drag_drop_create(struct ui_drag_drop_context **out_ctx) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_drag_drop_destroy(struct ui_drag_drop_context *ctx) {
+ui_error_t ui_drag_drop_destroy(struct ui_drag_drop_context *ctx) {
   int i;
 
   if (!ctx) {
@@ -77,20 +77,18 @@ enum ui_error ui_drag_drop_destroy(struct ui_drag_drop_context *ctx) {
 
   for (i = 0; i < ctx->list_count; i++) {
     if (ctx->lists[i].items) {
-      UI_FREE(ctx->lists[i].items);
+      C_MULTIPLATFORM_FREE(ctx->lists[i].items);
     }
   }
 
-  if (ctx->lists) {
-    UI_FREE(ctx->lists);
-  }
+  C_MULTIPLATFORM_FREE(ctx->lists);
 
-  UI_FREE(ctx);
+  C_MULTIPLATFORM_FREE(ctx);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_drag_drop_set_drag_threshold(struct ui_drag_drop_context *ctx,
-                                              int distance) {
+ui_error_t ui_drag_drop_set_drag_threshold(struct ui_drag_drop_context *ctx,
+                                           int distance) {
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -98,7 +96,7 @@ enum ui_error ui_drag_drop_set_drag_threshold(struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx) {
+ui_error_t ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx) {
   int i;
 
   if (!ctx) {
@@ -107,7 +105,7 @@ enum ui_error ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx) {
 
   for (i = 0; i < ctx->list_count; i++) {
     if (ctx->lists[i].items) {
-      UI_FREE(ctx->lists[i].items);
+      C_MULTIPLATFORM_FREE(ctx->lists[i].items);
       ctx->lists[i].items = NULL;
     }
   }
@@ -116,18 +114,23 @@ enum ui_error ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
-                                    const struct ui_drag_list *list) {
+ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
+                                 const struct ui_drag_list *list) {
   struct ui_drag_list *new_list;
 
   if (!ctx || !list) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
+  if (list->item_count > 0 && !list->items) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
   if (ctx->list_count >= ctx->list_capacity) {
     int new_cap = ctx->list_capacity * 2;
-    struct ui_drag_list *new_lists = (struct ui_drag_list *)UI_REALLOC(
-        ctx->lists, sizeof(struct ui_drag_list) * new_cap);
+    struct ui_drag_list *new_lists =
+        (struct ui_drag_list *)C_MULTIPLATFORM_REALLOC(
+            ctx->lists, sizeof(struct ui_drag_list) * new_cap);
     if (!new_lists) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -139,21 +142,22 @@ enum ui_error ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
   *new_list = *list;
   new_list->items = NULL;
 
-  if (list->item_count > 0 && list->items) {
-    new_list->items = (struct ui_drag_item *)UI_MALLOC(
-        sizeof(struct ui_drag_item) * list->item_count);
-    if (!new_list->items) {
-      ctx->list_count--; /* Revert count on failure */
-      return UI_ERROR_OUT_OF_MEMORY;
+  if (list->item_count > 0)
+    if (list->items) {
+      new_list->items = (struct ui_drag_item *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_drag_item) * list->item_count);
+      if (!new_list->items) {
+        ctx->list_count--; /* Revert count on failure */
+        return UI_ERROR_OUT_OF_MEMORY;
+      }
+      memcpy(new_list->items, list->items,
+             sizeof(struct ui_drag_item) * list->item_count);
     }
-    memcpy(new_list->items, list->items,
-           sizeof(struct ui_drag_item) * list->item_count);
-  }
 
   return UI_ERROR_NONE;
 }
 
-static enum ui_error update_placeholder(struct ui_drag_drop_context *ctx) {
+static void update_placeholder(struct ui_drag_drop_context *ctx) {
   int drag_center_x =
       ctx->current_x - ctx->drag_item_offset_x + ctx->drag_item_width / 2;
   int drag_center_y =
@@ -181,7 +185,7 @@ static enum ui_error update_placeholder(struct ui_drag_drop_context *ctx) {
             ctx->placeholder.index = j;
             ctx->placeholder.x = item->x;
             ctx->placeholder.y = item->y;
-            return UI_ERROR_NONE;
+            return;
           }
         }
 
@@ -202,7 +206,7 @@ static enum ui_error update_placeholder(struct ui_drag_drop_context *ctx) {
             ctx->placeholder.index = j;
             ctx->placeholder.x = item->x;
             ctx->placeholder.y = item->y;
-            return UI_ERROR_NONE;
+            return;
           }
         }
 
@@ -216,18 +220,18 @@ static enum ui_error update_placeholder(struct ui_drag_drop_context *ctx) {
           ctx->placeholder.y = list->y;
         }
       }
-      return UI_ERROR_NONE;
+      return;
     }
   }
-  return UI_ERROR_NONE;
+  return;
 }
 
-static enum ui_error handle_pointer_down(struct ui_drag_drop_context *ctx,
-                                         int pointer_id, int x, int y) {
+static void handle_pointer_down(struct ui_drag_drop_context *ctx,
+                                int pointer_id, int x, int y) {
   int i, j;
 
   if (ctx->state != UI_DRAG_STATE_IDLE) {
-    return UI_ERROR_NONE;
+    return;
   }
 
   ctx->active_pointer_id = pointer_id;
@@ -251,17 +255,19 @@ static enum ui_error handle_pointer_down(struct ui_drag_drop_context *ctx,
         ctx->drag_item_height = item->height;
         ctx->drag_item_offset_x = x - item->x;
         ctx->drag_item_offset_y = y - item->y;
-        return UI_ERROR_NONE;
+        return;
       }
     }
   }
-  return UI_ERROR_NONE;
+  return;
 }
 
-static enum ui_error handle_pointer_move(struct ui_drag_drop_context *ctx,
-                                         int pointer_id, int x, int y) {
-  if (ctx->active_pointer_id != pointer_id || !ctx->pointer_is_down) {
-    return UI_ERROR_NONE;
+static void handle_pointer_move(struct ui_drag_drop_context *ctx,
+                                int pointer_id, int x, int y) {
+  if (ctx->active_pointer_id != pointer_id)
+    return;
+  if (!ctx->pointer_is_down) {
+    return;
   }
 
   ctx->current_x = x;
@@ -276,15 +282,15 @@ static enum ui_error handle_pointer_move(struct ui_drag_drop_context *ctx,
   }
 
   if (ctx->state == UI_DRAG_STATE_DRAGGING) {
-    (void)update_placeholder(ctx);
+    update_placeholder(ctx);
   }
-  return UI_ERROR_NONE;
+  return;
 }
 
-static enum ui_error handle_pointer_up(struct ui_drag_drop_context *ctx,
-                                       int pointer_id) {
+static void handle_pointer_up(struct ui_drag_drop_context *ctx,
+                              int pointer_id) {
   if (ctx->active_pointer_id != pointer_id) {
-    return UI_ERROR_NONE;
+    return;
   }
 
   if (ctx->state == UI_DRAG_STATE_DRAGGING && ctx->placeholder.active) {
@@ -299,23 +305,23 @@ static enum ui_error handle_pointer_up(struct ui_drag_drop_context *ctx,
   ctx->pointer_is_down = 0;
   ctx->active_pointer_id = -1;
   ctx->placeholder.active = 0;
-  return UI_ERROR_NONE;
+  return;
 }
 
-static enum ui_error handle_pointer_cancel(struct ui_drag_drop_context *ctx,
-                                           int pointer_id) {
+static void handle_pointer_cancel(struct ui_drag_drop_context *ctx,
+                                  int pointer_id) {
   if (ctx->active_pointer_id != pointer_id) {
-    return UI_ERROR_NONE;
+    return;
   }
   ctx->state = UI_DRAG_STATE_IDLE;
   ctx->pointer_is_down = 0;
   ctx->active_pointer_id = -1;
   ctx->placeholder.active = 0;
-  return UI_ERROR_NONE;
+  return;
 }
 
-enum ui_error ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
-                                         const struct ui_event *event) {
+ui_error_t ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
+                                      const struct ui_event *event) {
   if (!ctx || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -323,41 +329,41 @@ enum ui_error ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
   switch (event->type) {
   case UI_EVENT_MOUSE_DOWN:
     if (event->event_data.mouse.button == 0) {
-      (void)handle_pointer_down(ctx, 0, event->event_data.mouse.x,
-                                event->event_data.mouse.y);
+      handle_pointer_down(ctx, 0, event->event_data.mouse.x,
+                          event->event_data.mouse.y);
     }
     break;
-  case UI_EVENT_MOUSE_MOVE:
-    (void)handle_pointer_move(ctx, 0, event->event_data.mouse.x,
-                              event->event_data.mouse.y);
-    break;
+  case UI_EVENT_MOUSE_MOVE: {
+    handle_pointer_move(ctx, 0, event->event_data.mouse.x,
+                        event->event_data.mouse.y);
+  } break;
   case UI_EVENT_MOUSE_UP:
     if (event->event_data.mouse.button == 0) {
-      (void)handle_pointer_up(ctx, 0);
+      handle_pointer_up(ctx, 0);
     }
     break;
   case UI_EVENT_TOUCH_START:
     if (event->event_data.touch.num_points > 0) {
-      (void)handle_pointer_down(ctx, event->event_data.touch.points[0].id,
-                                event->event_data.touch.points[0].x,
-                                event->event_data.touch.points[0].y);
+      handle_pointer_down(ctx, event->event_data.touch.points[0].id,
+                          event->event_data.touch.points[0].x,
+                          event->event_data.touch.points[0].y);
     }
     break;
   case UI_EVENT_TOUCH_MOVE:
     if (event->event_data.touch.num_points > 0) {
-      (void)handle_pointer_move(ctx, event->event_data.touch.points[0].id,
-                                event->event_data.touch.points[0].x,
-                                event->event_data.touch.points[0].y);
+      handle_pointer_move(ctx, event->event_data.touch.points[0].id,
+                          event->event_data.touch.points[0].x,
+                          event->event_data.touch.points[0].y);
     }
     break;
   case UI_EVENT_TOUCH_END:
     if (event->event_data.touch.num_points > 0) {
-      (void)handle_pointer_up(ctx, event->event_data.touch.points[0].id);
+      handle_pointer_up(ctx, event->event_data.touch.points[0].id);
     }
     break;
   case UI_EVENT_TOUCH_CANCEL:
     if (event->event_data.touch.num_points > 0) {
-      (void)handle_pointer_cancel(ctx, event->event_data.touch.points[0].id);
+      handle_pointer_cancel(ctx, event->event_data.touch.points[0].id);
     }
     break;
   default:
@@ -367,8 +373,8 @@ enum ui_error ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
-                                     enum ui_drag_state *out_state) {
+ui_error_t ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
+                                  enum ui_drag_state *out_state) {
   if (!ctx || !out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -377,10 +383,11 @@ enum ui_error ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
-                              int *out_item_id, int *out_source_list_id,
-                              int *out_current_x, int *out_current_y) {
+ui_error_t ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
+                                         int *out_item_id,
+                                         int *out_source_list_id,
+                                         int *out_current_x,
+                                         int *out_current_y) {
 
   if (!ctx || !out_item_id || !out_source_list_id || !out_current_x ||
       !out_current_y) {
@@ -400,7 +407,7 @@ ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_drag_drop_get_placeholder(const struct ui_drag_drop_context *ctx,
                              struct ui_drag_placeholder *out_placeholder) {
   if (!ctx || !out_placeholder) {
@@ -410,10 +417,10 @@ ui_drag_drop_get_placeholder(const struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_drag_drop_get_drop_event(struct ui_drag_drop_context *ctx,
-                                          int *out_dropped, int *out_item_id,
-                                          int *out_from_list, int *out_to_list,
-                                          int *out_to_index) {
+ui_error_t ui_drag_drop_get_drop_event(struct ui_drag_drop_context *ctx,
+                                       int *out_dropped, int *out_item_id,
+                                       int *out_from_list, int *out_to_list,
+                                       int *out_to_index) {
 
   if (!ctx || !out_dropped || !out_item_id || !out_from_list || !out_to_list ||
       !out_to_index) {

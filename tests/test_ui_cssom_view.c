@@ -9,7 +9,7 @@
 static int test_get_bounding_client_rect(void) {
   struct ui_layout_node node;
   struct ui_dom_rect rect;
-  enum ui_error rc;
+  ui_error_t rc;
 
   memset(&node, 0, sizeof(node));
   node.x = 100.0f;
@@ -37,7 +37,7 @@ static int test_get_client_width_height(void) {
   struct ui_layout_node node;
   float client_width = 0.0f;
   float client_height = 0.0f;
-  enum ui_error rc;
+  ui_error_t rc;
 
   memset(&node, 0, sizeof(node));
   node.content_width = 100.0f;
@@ -69,7 +69,7 @@ static int test_get_client_top_left(void) {
   struct ui_layout_node node;
   float client_top = 0.0f;
   float client_left = 0.0f;
-  enum ui_error rc;
+  ui_error_t rc;
 
   memset(&node, 0, sizeof(node));
   node.border[UI_BOX_EDGE_TOP] = 5.0f;
@@ -94,7 +94,7 @@ static int test_get_scroll_width_height(void) {
   struct ui_layout_node node;
   float scroll_width = 0.0f;
   float scroll_height = 0.0f;
-  enum ui_error rc;
+  ui_error_t rc;
 
   memset(&node, 0, sizeof(node));
   node.content_width = 500.0f;
@@ -169,7 +169,7 @@ static int test_null_arguments(void) {
 static int test_negative_client_size(void) {
   struct ui_layout_node node;
   float val;
-  enum ui_error rc;
+  ui_error_t rc;
 
   memset(&node, 0, sizeof(node));
   node.content_width = 10.0f;

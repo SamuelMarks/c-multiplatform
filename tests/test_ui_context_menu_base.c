@@ -15,7 +15,7 @@ static int test_context_menu_clamping(void) {
   struct ui_overlay_director *director = NULL;
   struct ui_dom_node *body = NULL;
   struct ui_menu_base *menu = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &body);
   if (rc != UI_ERROR_NONE)
@@ -98,8 +98,8 @@ static int test_context_menu_clamping(void) {
   g_malloc_fail_countdown = -1;
 #endif
 
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(body);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(body);
   return 0;
 }
 

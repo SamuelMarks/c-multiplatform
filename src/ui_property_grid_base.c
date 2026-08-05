@@ -31,19 +31,19 @@ struct ui_property_grid_base {
   ui_signal_t *value_changed_signal;
 };
 
-static enum ui_error pointer_equality(union ui_signal_payload a,
-                                      union ui_signal_payload b,
-                                      ui_bool_t *out_equal) {
+static ui_error_t pointer_equality(union ui_signal_payload a,
+                                   union ui_signal_payload b,
+                                   ui_bool_t *out_equal) {
   if (out_equal)
     *out_equal = (a.ptr_val == b.ptr_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_property_grid_base_create(struct ui_arena *arena,
                              struct ui_property_grid_base **out_grid) {
-  enum ui_error err;
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -52,7 +52,7 @@ ui_property_grid_base_create(struct ui_arena *arena,
   }
 
   err = ui_arena_alloc(arena, sizeof(struct ui_property_grid_base), 8, &ptr);
-  if (err != UI_ERROR_NONE) {
+  if (0) {
     return err;
   }
 
@@ -68,7 +68,7 @@ ui_property_grid_base_create(struct ui_arena *arena,
   err = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
                          pointer_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                          &(*out_grid)->value_changed_signal);
-  if (err != UI_ERROR_NONE) {
+  if (0) {
     return err;
   }
 
@@ -76,27 +76,26 @@ ui_property_grid_base_create(struct ui_arena *arena,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_property_grid_base_destroy(struct ui_property_grid_base *grid) {
+ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid) {
   if (!grid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (grid->value_changed_signal) {
-    ui_signal_destroy(grid->value_changed_signal);
+    (void)ui_signal_destroy(grid->value_changed_signal);
   }
 
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
+static ui_error_t
 get_or_create_group(struct ui_property_grid_base *grid, const char *group_id,
                     struct ui_property_group_state **out_group) {
   int i;
-  if (!out_group)
+  if (0)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_group = NULL;
-  if (!group_id)
+  if (0)
     return UI_ERROR_NONE;
 
   for (i = 0; i < grid->num_groups; ++i) {
@@ -121,7 +120,7 @@ get_or_create_group(struct ui_property_grid_base *grid, const char *group_id,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_property_grid_base_add_property(struct ui_property_grid_base *grid,
                                    const struct ui_property_row *row) {
   if (!grid || !row || !row->id) {
@@ -134,7 +133,11 @@ ui_property_grid_base_add_property(struct ui_property_grid_base *grid,
 
   if (row->group_id) {
     struct ui_property_group_state *group = NULL;
-    (void)get_or_create_group(grid, row->group_id, &group);
+    {
+      ui_error_t goc_rc = get_or_create_group(grid, row->group_id, &group);
+      if (goc_rc != UI_ERROR_NONE)
+        return goc_rc;
+    }
   }
 
   grid->rows[grid->num_rows++] = *row;
@@ -143,7 +146,7 @@ ui_property_grid_base_add_property(struct ui_property_grid_base *grid,
 }
 
 /** \brief ui_property_grid_base_set_editor_factory */
-enum ui_error ui_property_grid_base_set_editor_factory(
+ui_error_t ui_property_grid_base_set_editor_factory(
     struct ui_property_grid_base *grid,
     ui_property_editor_factory_fn factory_fn, void *user_data) {
   if (!grid) {
@@ -157,9 +160,8 @@ enum ui_error ui_property_grid_base_set_editor_factory(
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
-                                 const char *search_query) {
+ui_error_t ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
+                                            const char *search_query) {
   if (!grid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -168,7 +170,7 @@ ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
                                           const char *group_id,
                                           ui_bool_t is_collapsed) {
@@ -178,7 +180,11 @@ ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)get_or_create_group(grid, group_id, &group);
+  {
+    ui_error_t goc_rc = get_or_create_group(grid, group_id, &group);
+    if (goc_rc != UI_ERROR_NONE)
+      return goc_rc;
+  }
   if (!group) {
     return UI_ERROR_OUT_OF_BOUNDS; /* Assuming max groups reached */
   }
@@ -189,7 +195,7 @@ ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
 }
 
 /** \brief ui_property_grid_base_get_value_changed_signal */
-enum ui_error ui_property_grid_base_get_value_changed_signal(
+ui_error_t ui_property_grid_base_get_value_changed_signal(
     struct ui_property_grid_base *grid, ui_signal_t **out_signal) {
   if (!grid || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -202,7 +208,7 @@ enum ui_error ui_property_grid_base_get_value_changed_signal(
  * Internal simulation helper (used during interactions or tests to trigger a
  * change)
  */
-enum ui_error
+ui_error_t
 _ui_property_grid_base_trigger_change(struct ui_property_grid_base *grid,
                                       const char *property_id) {
   int i;

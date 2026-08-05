@@ -168,50 +168,49 @@ struct ui_css_overscroll_behavior_shorthand {
 /**
  * @brief Parses the outline-width CSS property.
  */
-enum ui_error ui_css_parse_outline_width(const char *str,
-                                         struct ui_css_value *out_width);
+ui_error_t ui_css_parse_outline_width(const char *str,
+                                      struct ui_css_value *out_width);
 
 /**
  * @brief Parses the outline-style CSS property.
  */
-enum ui_error ui_css_parse_outline_style(const char *str,
-                                         enum ui_css_outline_style *out_style);
+ui_error_t ui_css_parse_outline_style(const char *str,
+                                      enum ui_css_outline_style *out_style);
 
 /**
  * @brief Parses the outline shorthand CSS property.
  */
-enum ui_error ui_css_parse_outline(const char *str,
-                                   struct ui_css_outline *out_outline);
+ui_error_t ui_css_parse_outline(const char *str,
+                                struct ui_css_outline *out_outline);
 
 /**
  * @brief Destroys a parsed cursor property (frees linked images).
  */
-enum ui_error ui_css_cursor_destroy(struct ui_css_cursor *cursor);
+ui_error_t ui_css_cursor_destroy(struct ui_css_cursor *cursor);
 
 /**
  * @brief Parses the cursor CSS property.
  */
-enum ui_error ui_css_parse_cursor(const char *str,
-                                  struct ui_css_cursor *out_cursor);
+ui_error_t ui_css_parse_cursor(const char *str,
+                               struct ui_css_cursor *out_cursor);
 
 /**
  * @brief Parses the user-select CSS property.
  */
-enum ui_error ui_css_parse_user_select(const char *str,
-                                       enum ui_css_user_select *out_select);
+ui_error_t ui_css_parse_user_select(const char *str,
+                                    enum ui_css_user_select *out_select);
 
 /**
  * @brief Parses the appearance CSS property.
  */
-enum ui_error ui_css_parse_appearance(const char *str,
-                                      enum ui_css_appearance *out_appearance);
+ui_error_t ui_css_parse_appearance(const char *str,
+                                   enum ui_css_appearance *out_appearance);
 
 /**
  * @brief Parses the pointer-events CSS property.
  */
-enum ui_error
-ui_css_parse_pointer_events(const char *str,
-                            enum ui_css_pointer_events *out_events);
+ui_error_t ui_css_parse_pointer_events(const char *str,
+                                       enum ui_css_pointer_events *out_events);
 
 /**
  * @brief Parses the overscroll-behavior-x or overscroll-behavior-y CSS
@@ -221,7 +220,7 @@ ui_css_parse_pointer_events(const char *str,
  * @param out_behavior Pointer to receive the parsed behavior.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_overscroll_behavior_axis(
+ui_error_t ui_css_parse_overscroll_behavior_axis(
     const char *str, enum ui_css_overscroll_behavior *out_behavior);
 
 /**
@@ -232,7 +231,7 @@ enum ui_error ui_css_parse_overscroll_behavior_axis(
  * structure.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_overscroll_behavior(
+ui_error_t ui_css_parse_overscroll_behavior(
     const char *str,
     struct ui_css_overscroll_behavior_shorthand *out_shorthand);
 

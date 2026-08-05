@@ -76,10 +76,11 @@ struct app_context {
 static const char *languages[] = {"English", "Hebrew", "Arabic", "Japanese"};
 static const char *themes[] = {"Light", "Dark"};
 
-static enum ui_error update_ui(struct app_context *ctx) {
+static ui_error_t update_ui(struct app_context *ctx) {
   char buffer[256];
   const char *lang = languages[ctx->state.lang_idx];
   const char *theme = themes[ctx->state.is_dark];
+  ui_error_t err;
 
 #if defined(_MSC_VER)
   sprintf_s(buffer, sizeof(buffer), "Language: %s | Theme: %s", lang, theme);
@@ -87,57 +88,87 @@ static enum ui_error update_ui(struct app_context *ctx) {
   sprintf(buffer, "Language: %s | Theme: %s", lang, theme);
 #endif
 
-  ui_dom_node_set_text_content(ctx->state.status_text, buffer);
+  err = ui_dom_node_set_text_content(ctx->state.status_text, buffer);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   if (ctx->state.lang_idx == 1 || ctx->state.lang_idx == 2) {
-    ui_dom_node_set_attribute(ctx->state.toolbar, "dir", "rtl");
-    ui_dom_node_set_attribute(ctx->state.toolbar, "style",
-                              "flex-direction: row-reverse;");
+    err = ui_dom_node_set_attribute(ctx->state.toolbar, "dir", "rtl");
+    if (err != UI_ERROR_NONE)
+      return err;
+    err = ui_dom_node_set_attribute(ctx->state.toolbar, "style",
+                                    "flex-direction: row-reverse;");
+    if (err != UI_ERROR_NONE)
+      return err;
   } else {
-    ui_dom_node_set_attribute(ctx->state.toolbar, "dir", "ltr");
-    ui_dom_node_set_attribute(ctx->state.toolbar, "style",
-                              "flex-direction: row;");
+    err = ui_dom_node_set_attribute(ctx->state.toolbar, "dir", "ltr");
+    if (err != UI_ERROR_NONE)
+      return err;
+    err = ui_dom_node_set_attribute(ctx->state.toolbar, "style",
+                                    "flex-direction: row;");
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
   if (ctx->state.is_dark) {
-    ui_dom_node_set_attribute(ctx->state.toolbar, "data-theme", "dark");
+    err = ui_dom_node_set_attribute(ctx->state.toolbar, "data-theme", "dark");
+    if (err != UI_ERROR_NONE)
+      return err;
   } else {
-    ui_dom_node_set_attribute(ctx->state.toolbar, "data-theme", "light");
+    err = ui_dom_node_set_attribute(ctx->state.toolbar, "data-theme", "light");
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
   ctx->needs_layout = 1;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error on_theme_click(struct ui_button_base *button,
-                                    void *user_data) {
+static ui_error_t on_theme_click(struct ui_button_base *button,
+                                 void *user_data) {
   struct app_context *ctx = (struct app_context *)user_data;
+  ui_error_t err;
   ctx->state.is_dark = !ctx->state.is_dark;
   printf("[Event] Theme toggled to %s\n", themes[ctx->state.is_dark]);
-  update_ui(ctx);
+  err = update_ui(ctx);
+  if (err != UI_ERROR_NONE)
+    return err;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error on_lang_click(struct ui_button_base *button,
-                                   void *user_data) {
+static ui_error_t on_lang_click(struct ui_button_base *button,
+                                void *user_data) {
   struct app_context *ctx = (struct app_context *)user_data;
+  ui_error_t err;
   ctx->state.lang_idx = (ctx->state.lang_idx + 1) % 4;
   printf("[Event] Language toggled to %s\n", languages[ctx->state.lang_idx]);
-  update_ui(ctx);
+  err = update_ui(ctx);
+  if (err != UI_ERROR_NONE)
+    return err;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error draw_layout_node(struct app_context *ctx,
-                                      struct ui_renderer_backend *renderer,
-                                      struct ui_layout_node *node) {
+static ui_error_t draw_layout_node(struct app_context *ctx,
+                                   struct ui_renderer_backend *renderer,
+                                   struct ui_layout_node *node) {
   struct ui_dom_rect rect;
   struct ui_color color = {0.8f, 0.8f, 0.8f, 1.0f};
   struct ui_layout_node *child;
   const char *id = NULL;
   const char *cls = NULL;
+  ui_error_t err;
 
-  ui_cssom_view_get_bounding_client_rect(node, &rect);
+  err = ui_cssom_view_get_bounding_client_rect(node, &rect);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   if (node->dom_node) {
-    ui_dom_node_get_attribute(node->dom_node, "id", &id);
-    ui_dom_node_get_attribute(node->dom_node, "class", &cls);
+    err = ui_dom_node_get_attribute(node->dom_node, "id", &id);
+    if (err != UI_ERROR_NONE)
+      return err;
+    err = ui_dom_node_get_attribute(node->dom_node, "class", &cls);
+    if (err != UI_ERROR_NONE)
+      return err;
 
     if (id && strcmp(id, "toolbar") == 0) {
       if (ctx->state.is_dark) {
@@ -165,13 +196,15 @@ static enum ui_error draw_layout_node(struct app_context *ctx,
   }
 
   if (rect.width > 0 && rect.height > 0) {
-    renderer->draw_rect(renderer, (float)rect.x, (float)rect.y,
-                        (float)rect.width, (float)rect.height, color);
+    err = renderer->draw_rect(renderer, (float)rect.x, (float)rect.y,
+                              (float)rect.width, (float)rect.height, color);
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
   child = node->first_child;
   while (child) {
-    enum ui_error err = draw_layout_node(ctx, renderer, child);
+    err = draw_layout_node(ctx, renderer, child);
     if (err != UI_ERROR_NONE)
       return err;
     child = child->next_sibling;
@@ -187,41 +220,60 @@ struct render_context {
   struct ui_engine *engine;
 };
 
-static enum ui_error do_render(struct render_context *rctx) {
+static ui_error_t do_render(struct render_context *rctx) {
   struct app_context *app_ctx = rctx->app_ctx;
   struct ui_renderer_backend *renderer = rctx->renderer;
+  ui_error_t err;
 
   if (app_ctx->needs_layout) {
     if (app_ctx->layout_tree) {
-      ui_layout_tree_destroy(app_ctx->layout_tree);
+      err = ui_layout_tree_destroy(app_ctx->layout_tree);
+      if (err != UI_ERROR_NONE)
+        return err;
       app_ctx->layout_tree = NULL;
     }
-    ui_layout_tree_generate(app_ctx->state.root, app_ctx->stylesheet,
-                            &app_ctx->layout_tree);
-    ui_layout_solve_viewport(app_ctx->layout_tree, app_ctx->window_width,
-                             app_ctx->window_height);
+    err = ui_layout_tree_generate(app_ctx->state.root, app_ctx->stylesheet,
+                                  &app_ctx->layout_tree);
+    if (err != UI_ERROR_NONE)
+      return err;
+    err = ui_layout_solve_viewport(app_ctx->layout_tree, app_ctx->window_width,
+                                   app_ctx->window_height);
+    if (err != UI_ERROR_NONE)
+      return err;
     app_ctx->needs_layout = 0;
   }
 
-  renderer->set_viewport(renderer, 0, 0, (int)app_ctx->window_width,
-                         (int)app_ctx->window_height);
+  err = renderer->set_viewport(renderer, 0, 0, (int)app_ctx->window_width,
+                               (int)app_ctx->window_height);
+  if (err != UI_ERROR_NONE)
+    return err;
   {
     struct ui_color bg = {1.0f, 1.0f, 1.0f, 1.0f};
-    renderer->clear(renderer, bg);
+    err = renderer->clear(renderer, bg);
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
   if (app_ctx->layout_tree) {
-    draw_layout_node(app_ctx, renderer, app_ctx->layout_tree);
+    err = draw_layout_node(app_ctx, renderer, app_ctx->layout_tree);
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
-  renderer->flush(renderer);
-  rctx->window_backend->swap_buffers(rctx->window_backend, rctx->window);
+  err = renderer->flush(renderer);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = rctx->window_backend->swap_buffers(rctx->window_backend, rctx->window);
+  if (err != UI_ERROR_NONE)
+    return err;
 
-  return ui_engine_tick(rctx->engine);
+  err = ui_engine_tick(rctx->engine);
+  if (err != UI_ERROR_NONE)
+    return err;
+  return UI_ERROR_NONE;
 }
 
-static enum ui_error on_resize_callback(void *user_data, int width,
-                                        int height) {
+static ui_error_t on_resize_callback(void *user_data, int width, int height) {
   struct render_context *rctx = (struct render_context *)user_data;
   rctx->app_ctx->window_width = (float)width;
   rctx->app_ctx->window_height = (float)height;
@@ -235,7 +287,7 @@ static struct render_context g_rctx;
 static void main_loop_step(void) {
   struct ui_event event;
   int has_event = 0;
-  enum ui_error err;
+  ui_error_t err;
 
   do {
     err = g_rctx.window_backend->poll_events(g_rctx.window_backend,
@@ -270,7 +322,7 @@ int main(void) {
   struct render_context rctx;
   struct ui_dom_node *host_theme;
   struct ui_dom_node *host_lang;
-  enum ui_error err;
+  ui_error_t err;
   int running = 1;
   int frame = 0;
   struct ui_event simulate_click;

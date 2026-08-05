@@ -38,25 +38,25 @@ typedef struct ui_form_control ui_form_control_t;
  * @param destructor_fn The destructor function.
  * @param mode The signal mode.
  * @param out_control The pointer to store the created form control.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_create(struct ui_arena *arena,
-                                     union ui_signal_payload initial_value,
-                                     enum ui_signal_type type,
-                                     ui_equality_fn equality_fn,
-                                     ui_destructor_fn destructor_fn,
-                                     enum ui_signal_mode mode,
-                                     ui_form_control_t **out_control);
+ui_error_t ui_form_control_create(struct ui_arena *arena,
+                                  union ui_signal_payload initial_value,
+                                  enum ui_signal_type type,
+                                  ui_equality_fn equality_fn,
+                                  ui_destructor_fn destructor_fn,
+                                  enum ui_signal_mode mode,
+                                  ui_form_control_t **out_control);
 
 /**
  * @brief Sets the value of the form control, updating its state.
  *
  * @param control The form control.
  * @param new_value The new value to set.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_set_value(ui_form_control_t *control,
-                                        union ui_signal_payload new_value);
+ui_error_t ui_form_control_set_value(ui_form_control_t *control,
+                                     union ui_signal_payload new_value);
 
 /**
  * @brief Patches the value of the form control.
@@ -64,44 +64,44 @@ enum ui_error ui_form_control_set_value(ui_form_control_t *control,
  *
  * @param control The form control.
  * @param new_value The new value to set.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_patch_value(ui_form_control_t *control,
-                                          union ui_signal_payload new_value);
+ui_error_t ui_form_control_patch_value(ui_form_control_t *control,
+                                       union ui_signal_payload new_value);
 
 /**
  * @brief Marks the form control as touched.
  *
  * @param control The form control.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_mark_as_touched(ui_form_control_t *control);
+ui_error_t ui_form_control_mark_as_touched(ui_form_control_t *control);
 
 /**
  * @brief Disables the form control.
  *
  * @param control The form control.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_disable(ui_form_control_t *control);
+ui_error_t ui_form_control_disable(ui_form_control_t *control);
 
 /**
  * @brief Enables the form control.
  *
  * @param control The form control.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_enable(ui_form_control_t *control);
+ui_error_t ui_form_control_enable(ui_form_control_t *control);
 
 /**
  * @brief Gets the value signal of the form control.
  *
  * @param control The form control.
  * @param out_signal The pointer to store the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_get_value_signal(ui_form_control_t *control,
-                                               ui_signal_t **out_signal);
+ui_error_t ui_form_control_get_value_signal(ui_form_control_t *control,
+                                            ui_signal_t **out_signal);
 
 /**
  * @brief Gets the status signal of the form control.
@@ -109,10 +109,10 @@ enum ui_error ui_form_control_get_value_signal(ui_form_control_t *control,
  *
  * @param control The form control.
  * @param out_signal The pointer to store the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_get_status_signal(ui_form_control_t *control,
-                                                ui_signal_t **out_signal);
+ui_error_t ui_form_control_get_status_signal(ui_form_control_t *control,
+                                             ui_signal_t **out_signal);
 
 /**
  * @brief Gets the touched signal of the form control.
@@ -120,10 +120,10 @@ enum ui_error ui_form_control_get_status_signal(ui_form_control_t *control,
  *
  * @param control The form control.
  * @param out_signal The pointer to store the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_get_touched_signal(ui_form_control_t *control,
-                                                 ui_signal_t **out_signal);
+ui_error_t ui_form_control_get_touched_signal(ui_form_control_t *control,
+                                              ui_signal_t **out_signal);
 
 /**
  * @brief Gets the dirty signal of the form control.
@@ -131,7 +131,7 @@ enum ui_error ui_form_control_get_touched_signal(ui_form_control_t *control,
  *
  * @param control The form control.
  * @param out_signal The pointer to store the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
 
 /**
@@ -140,31 +140,31 @@ enum ui_error ui_form_control_get_touched_signal(ui_form_control_t *control,
  *
  * @param control The form control.
  * @param out_signal The pointer to store the signal.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_get_errors_signal(ui_form_control_t *control,
-                                                ui_signal_t **out_signal);
+ui_error_t ui_form_control_get_errors_signal(ui_form_control_t *control,
+                                             ui_signal_t **out_signal);
 
 /**
  * @brief Sets the error string on the form control.
  *
  * @param control The form control.
  * @param error_msg The error message (or NULL).
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_set_error(ui_form_control_t *control,
-                                        const char *error_msg);
+ui_error_t ui_form_control_set_error(ui_form_control_t *control,
+                                     const char *error_msg);
 
-enum ui_error ui_form_control_get_dirty_signal(ui_form_control_t *control,
-                                               ui_signal_t **out_signal);
+ui_error_t ui_form_control_get_dirty_signal(ui_form_control_t *control,
+                                            ui_signal_t **out_signal);
 
 /**
  * @brief Destroys the form control.
  *
  * @param control The form control.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_destroy(ui_form_control_t *control);
+ui_error_t ui_form_control_destroy(ui_form_control_t *control);
 
 #ifdef __cplusplus
 }
@@ -176,11 +176,11 @@ enum ui_error ui_form_control_destroy(ui_form_control_t *control);
  * @param control The form control.
  * @param validator The validator function.
  * @param user_data Opaque data for the validator.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_add_validator(ui_form_control_t *control,
-                                            ui_validator_fn validator,
-                                            void *user_data);
+ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
+                                         ui_validator_fn validator,
+                                         void *user_data);
 
 /**
  * @brief Adds an asynchronous validator to the form control.
@@ -190,9 +190,9 @@ enum ui_error ui_form_control_add_validator(ui_form_control_t *control,
  * @param user_data Opaque data for the validator.
  * @param thread_pool The background thread pool to dispatch work to.
  * @param reactor The reactor to receive completion events.
- * @return enum ui_error
+ * @return ui_error_t
  */
-enum ui_error ui_form_control_add_async_validator(
+ui_error_t ui_form_control_add_async_validator(
     ui_form_control_t *control, ui_async_validator_fn validator,
     void *user_data, struct ui_thread_pool *thread_pool,
     struct ui_reactor *reactor);

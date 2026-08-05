@@ -33,12 +33,12 @@ struct ui_arena {
  * @param out_block Pointer to receive the allocated block.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-static enum ui_error allocate_block(size_t size,
-                                    struct ui_arena_block **out_block) {
+static ui_error_t allocate_block(size_t size,
+                                 struct ui_arena_block **out_block) {
   struct ui_arena_block *block = NULL;
 
-  block =
-      (struct ui_arena_block *)UI_MALLOC(sizeof(struct ui_arena_block) + size);
+  block = (struct ui_arena_block *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_arena_block) + size);
   if (!block) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -64,14 +64,14 @@ struct ui_arena;
  * @param out_arena Pointer to receive the new arena handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_arena_create(size_t block_size, struct ui_arena **out_arena) {
+ui_error_t ui_arena_create(size_t block_size, struct ui_arena **out_arena) {
   struct ui_arena *arena = NULL;
 
   if (!out_arena || block_size == 0) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  arena = (struct ui_arena *)UI_MALLOC(sizeof(struct ui_arena));
+  arena = (struct ui_arena *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_arena));
   if (!arena) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -90,7 +90,7 @@ enum ui_error ui_arena_create(size_t block_size, struct ui_arena **out_arena) {
  * @param arena The arena to destroy.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if arena is NULL.
  */
-enum ui_error ui_arena_destroy(struct ui_arena *arena) {
+ui_error_t ui_arena_destroy(struct ui_arena *arena) {
   struct ui_arena_block *current = NULL;
   struct ui_arena_block *next = NULL;
 
@@ -101,11 +101,11 @@ enum ui_error ui_arena_destroy(struct ui_arena *arena) {
   current = arena->head;
   while (current) {
     next = current->next;
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
-  UI_FREE(arena);
+  C_MULTIPLATFORM_FREE(arena);
   return UI_ERROR_NONE;
 }
 
@@ -118,8 +118,8 @@ enum ui_error ui_arena_destroy(struct ui_arena *arena) {
  * @param out_ptr Pointer to receive the allocated memory address.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_arena_alloc(struct ui_arena *arena, size_t size,
-                             size_t alignment, void **out_ptr) {
+ui_error_t ui_arena_alloc(struct ui_arena *arena, size_t size, size_t alignment,
+                          void **out_ptr) {
   struct ui_arena_block *block = NULL;
   size_t padding = 0;
   ui_uintptr current_addr = 0;
@@ -158,7 +158,7 @@ enum ui_error ui_arena_alloc(struct ui_arena *arena, size_t size,
     struct ui_arena_block *new_block = NULL;
     size_t new_block_size = arena->default_block_size;
     size_t required_size = size + alignment; /* safe estimation */
-    enum ui_error rc;
+    ui_error_t rc;
 
     if (required_size > new_block_size) {
       new_block_size = required_size;
@@ -197,7 +197,7 @@ enum ui_error ui_arena_alloc(struct ui_arena *arena, size_t size,
  * @param arena The arena to reset.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_arena_reset(struct ui_arena *arena) {
+ui_error_t ui_arena_reset(struct ui_arena *arena) {
   struct ui_arena_block *current = NULL;
 
   if (!arena) {
@@ -224,8 +224,8 @@ enum ui_error ui_arena_reset(struct ui_arena *arena) {
  * @param out_sp Pointer to receive the savepoint.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_arena_save(struct ui_arena *arena,
-                            struct ui_arena_savepoint *out_sp) {
+ui_error_t ui_arena_save(struct ui_arena *arena,
+                         struct ui_arena_savepoint *out_sp) {
   if (!arena || !out_sp) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -246,8 +246,8 @@ enum ui_error ui_arena_save(struct ui_arena *arena,
  * @param sp The savepoint to restore from.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_arena_restore(struct ui_arena *arena,
-                               struct ui_arena_savepoint sp) {
+ui_error_t ui_arena_restore(struct ui_arena *arena,
+                            struct ui_arena_savepoint sp) {
   struct ui_arena_block *current = NULL;
 
   if (!arena) {

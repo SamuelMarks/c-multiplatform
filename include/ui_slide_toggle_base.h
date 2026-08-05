@@ -26,7 +26,7 @@ struct ui_slide_toggle_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_create(struct ui_slide_toggle_base **out_toggle,
                             struct ui_control_value_accessor *out_cva);
 
@@ -35,7 +35,7 @@ ui_slide_toggle_base_create(struct ui_slide_toggle_base **out_toggle,
  *
  * @param toggle The slide toggle to destroy.
  */
-void ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle);
+ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle);
 
 /**
  * @brief Sets the boolean state of the toggle.
@@ -44,9 +44,8 @@ void ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle);
  * @param checked Non-zero for true/checked, zero for false/unchecked.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
-ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
-                                 int checked);
+ui_error_t ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
+                                            int checked);
 
 /**
  * @brief Gets the boolean state of the toggle.
@@ -55,7 +54,7 @@ ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
  * @param out_checked Pointer to receive the checked state (1 or 0).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_get_checked(const struct ui_slide_toggle_base *toggle,
                                  int *out_checked);
 
@@ -66,7 +65,7 @@ ui_slide_toggle_base_get_checked(const struct ui_slide_toggle_base *toggle,
  * @param disabled Non-zero to disable interaction.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_set_disabled(struct ui_slide_toggle_base *toggle,
                                   int disabled);
 
@@ -77,7 +76,7 @@ ui_slide_toggle_base_set_disabled(struct ui_slide_toggle_base *toggle,
  * @param out_disabled Pointer to receive the disabled state.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_get_disabled(const struct ui_slide_toggle_base *toggle,
                                   int *out_disabled);
 
@@ -87,7 +86,7 @@ ui_slide_toggle_base_get_disabled(const struct ui_slide_toggle_base *toggle,
  * @param toggle The slide toggle.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle);
+ui_error_t ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle);
 
 /**
  * @brief Processes an input event (click, touch, or drag) through the internal
@@ -101,7 +100,7 @@ enum ui_error ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle);
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
                                    const struct ui_event *event,
                                    double timestamp_ms);
@@ -116,7 +115,7 @@ ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
  * @param out_offset_x Pointer to receive the pan offset in pixels.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_get_drag_offset(const struct ui_slide_toggle_base *toggle,
                                      float *out_offset_x);
 
@@ -128,7 +127,7 @@ ui_slide_toggle_base_get_drag_offset(const struct ui_slide_toggle_base *toggle,
  * idle).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_slide_toggle_base_is_dragging(const struct ui_slide_toggle_base *toggle,
                                  int *out_is_dragging);
 

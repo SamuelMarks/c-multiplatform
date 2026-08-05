@@ -49,7 +49,7 @@ struct ui_font_axis {
  * @param out_manager Pointer to receive the allocated font manager.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_manager_create(struct ui_font_manager **out_manager);
+ui_error_t ui_font_manager_create(struct ui_font_manager **out_manager);
 
 /**
  * @brief Destroys a font manager and all loaded fonts.
@@ -57,7 +57,7 @@ enum ui_error ui_font_manager_create(struct ui_font_manager **out_manager);
  * @param manager The font manager to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_manager_destroy(struct ui_font_manager *manager);
+ui_error_t ui_font_manager_destroy(struct ui_font_manager *manager);
 
 /**
  * @brief Loads a font from memory.
@@ -68,10 +68,10 @@ enum ui_error ui_font_manager_destroy(struct ui_font_manager *manager);
  * @param out_font Pointer to receive the font handle.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_manager_load_font_memory(struct ui_font_manager *manager,
-                                               const unsigned char *font_data,
-                                               size_t data_size,
-                                               struct ui_font **out_font);
+ui_error_t ui_font_manager_load_font_memory(struct ui_font_manager *manager,
+                                            const unsigned char *font_data,
+                                            size_t data_size,
+                                            struct ui_font **out_font);
 
 /**
  * @brief Sets the CSS properties for a font for tracking.
@@ -82,8 +82,8 @@ enum ui_error ui_font_manager_load_font_memory(struct ui_font_manager *manager,
  * @param is_italic Non-zero if italic/oblique.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_set_metadata(struct ui_font *font, const char *family,
-                                   int weight, int is_italic);
+ui_error_t ui_font_set_metadata(struct ui_font *font, const char *family,
+                                int weight, int is_italic);
 
 /**
  * @brief Gets the load status of the font.
@@ -92,8 +92,8 @@ enum ui_error ui_font_set_metadata(struct ui_font *font, const char *family,
  * @param out_status Pointer to receive the status.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_get_status(struct ui_font *font,
-                                 enum ui_font_status *out_status);
+ui_error_t ui_font_get_status(struct ui_font *font,
+                              enum ui_font_status *out_status);
 
 /**
  * @brief Sets the load status of the font (useful for async networking
@@ -103,8 +103,7 @@ enum ui_error ui_font_get_status(struct ui_font *font,
  * @param status The new status.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_set_status(struct ui_font *font,
-                                 enum ui_font_status status);
+ui_error_t ui_font_set_status(struct ui_font *font, enum ui_font_status status);
 
 /**
  * @brief Finds a font matching the CSS requirements in the manager.
@@ -116,10 +115,9 @@ enum ui_error ui_font_set_status(struct ui_font *font,
  * @param out_font Pointer to receive the matching font handle.
  * @return UI_ERROR_NONE if a font is found, UI_ERROR_NOT_FOUND otherwise.
  */
-enum ui_error ui_font_manager_find_font(struct ui_font_manager *manager,
-                                        const char *family, int weight,
-                                        int is_italic,
-                                        struct ui_font **out_font);
+ui_error_t ui_font_manager_find_font(struct ui_font_manager *manager,
+                                     const char *family, int weight,
+                                     int is_italic, struct ui_font **out_font);
 
 /**
  * @brief Sets the variable font axes for a specific font instance.
@@ -129,9 +127,9 @@ enum ui_error ui_font_manager_find_font(struct ui_font_manager *manager,
  * @param axis_count Number of axes.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_set_variations(struct ui_font *font,
-                                     const struct ui_font_axis *axes,
-                                     int axis_count);
+ui_error_t ui_font_set_variations(struct ui_font *font,
+                                  const struct ui_font_axis *axes,
+                                  int axis_count);
 
 /**
  * @brief Gets the variable font axes set for a specific font instance.
@@ -141,9 +139,9 @@ enum ui_error ui_font_set_variations(struct ui_font *font,
  * @param out_axis_count Pointer to receive the number of axes.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_get_variations(struct ui_font *font,
-                                     struct ui_font_axis **out_axes,
-                                     int *out_axis_count);
+ui_error_t ui_font_get_variations(struct ui_font *font,
+                                  struct ui_font_axis **out_axes,
+                                  int *out_axis_count);
 
 /**
  * @brief Retrieves the glyph metrics for a character at a specific size.
@@ -154,9 +152,9 @@ enum ui_error ui_font_get_variations(struct ui_font *font,
  * @param out_metrics Pointer to receive the glyph metrics.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
-                                        float font_size,
-                                        struct ui_glyph_metrics *out_metrics);
+ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
+                                     float font_size,
+                                     struct ui_glyph_metrics *out_metrics);
 
 /**
  * @brief Retrieves vertical font metrics for a specific size.
@@ -168,9 +166,9 @@ enum ui_error ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
  * @param out_line_gap Pointer to receive the line gap.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_get_vmetrics(struct ui_font *font, float font_size,
-                                   float *out_ascent, float *out_descent,
-                                   float *out_line_gap);
+ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
+                                float *out_ascent, float *out_descent,
+                                float *out_line_gap);
 
 /**
  * @brief Retrieves the kerning advance between two codepoints for a specific
@@ -183,9 +181,9 @@ enum ui_error ui_font_get_vmetrics(struct ui_font *font, float font_size,
  * @param out_kerning Pointer to receive the kerning advance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_get_kerning(struct ui_font *font, int codepoint1,
-                                  int codepoint2, float font_size,
-                                  float *out_kerning);
+ui_error_t ui_font_get_kerning(struct ui_font *font, int codepoint1,
+                               int codepoint2, float font_size,
+                               float *out_kerning);
 
 /**
  * @brief Retrieves the raw font data.
@@ -195,9 +193,8 @@ enum ui_error ui_font_get_kerning(struct ui_font *font, int codepoint1,
  * @param out_size Pointer to receive the font data size.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_get_data(struct ui_font *font,
-                               const unsigned char **out_data,
-                               size_t *out_size);
+ui_error_t ui_font_get_data(struct ui_font *font,
+                            const unsigned char **out_data, size_t *out_size);
 
 /**
  * @brief Generates an atlas texture for a set of codepoints.
@@ -211,10 +208,10 @@ enum ui_error ui_font_get_data(struct ui_font *font,
  * @param out_height Pointer to receive the atlas height.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_generate_atlas(struct ui_font *font, float font_size,
-                                     const int *codepoints, int codepoint_count,
-                                     unsigned char **out_atlas_rgba,
-                                     int *out_width, int *out_height);
+ui_error_t ui_font_generate_atlas(struct ui_font *font, float font_size,
+                                  const int *codepoints, int codepoint_count,
+                                  unsigned char **out_atlas_rgba,
+                                  int *out_width, int *out_height);
 
 /**
  * @brief Frees a generated atlas.
@@ -222,7 +219,7 @@ enum ui_error ui_font_generate_atlas(struct ui_font *font, float font_size,
  * @param atlas_rgba The atlas buffer.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_font_free_atlas(unsigned char *atlas_rgba);
+ui_error_t ui_font_free_atlas(unsigned char *atlas_rgba);
 
 #ifdef __cplusplus
 }

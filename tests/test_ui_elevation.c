@@ -9,7 +9,7 @@ static void test_elevation(void) {
   ui_color_t tint = UI_COLOR_ARGB(255, 0, 0, 255);        /* Blue */
   ui_color_t result;
   struct ui_drop_shadow s1, s2;
-  enum ui_error err;
+  ui_error_t err;
 
   /* Test ui_elevation_get_tinted_surface null pointers */
   err = ui_elevation_get_tinted_surface(surface, tint, UI_ELEVATION_LEVEL_0,

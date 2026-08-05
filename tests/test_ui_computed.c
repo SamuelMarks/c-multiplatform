@@ -11,8 +11,8 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error dummy_compute(void *user_data,
-                                   union ui_signal_payload *out_val) {
+static ui_error_t dummy_compute(void *user_data,
+                                union ui_signal_payload *out_val) {
   int *data = (int *)user_data;
   out_val->int_val = *data * 2;
   return UI_ERROR_NONE;
@@ -30,13 +30,18 @@ struct mock_ui_computed {
   struct ui_reactive_node self_node;
 };
 
-static enum ui_error dummy_notify(void *user_data) {
+static ui_error_t dummy_notify(void *user_data) {
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_compute_fail(void *user_data,
-                                        union ui_signal_payload *out_val) {
+static ui_error_t dummy_notify_fail(void *user_data) {
+  (void)user_data;
+  return UI_ERROR_NOT_FOUND;
+}
+
+static ui_error_t dummy_compute_fail(void *user_data,
+                                     union ui_signal_payload *out_val) {
   (void)user_data;
   (void)out_val;
   return UI_ERROR_NOT_FOUND;
@@ -48,7 +53,7 @@ static int test_subscribers(void) {
   int my_data = 10;
   int i;
   struct mock_ui_computed *mock;
-  struct ui_reactive_node dummy_nodes[5];
+  struct ui_reactive_node dummy_nodes[15];
 
   ui_computed_create(NULL, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
@@ -63,10 +68,34 @@ static int test_subscribers(void) {
     /* Add again to trigger duplicate check branch */
     ui_computed_get(comp, &out_val);
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  /* Realloc fail */
+  for (i = 5; i < 10; i++) {
+    dummy_nodes[i].notify_fn = dummy_notify;
+    dummy_nodes[i].user_data = NULL;
+    g_malloc_fail_countdown = 0;
+    ui_reactive_graph_set_current_node(&dummy_nodes[i], NULL);
+    ui_computed_get(comp, &out_val);
+    g_malloc_fail_countdown = -1;
+  }
+#endif
+
+  ui_reactive_graph_set_current_node(NULL, NULL);
+  /* Trigger successful notify */
+  mock->self_node.notify_fn(comp);
+  ui_computed_get(comp, &out_val); /* Reset dirty flag */
+
+  /* Add failing notify */
+  dummy_nodes[10].notify_fn = dummy_notify_fail;
+  dummy_nodes[10].user_data = NULL;
+  ui_reactive_graph_set_current_node(&dummy_nodes[10], NULL);
+  ui_computed_get(comp, &out_val);
+
   ui_reactive_graph_set_current_node(NULL, NULL);
 
-  /* Trigger notify to hit subscribers loop */
-  mock->is_dirty = 0;
+  /* Trigger failing notify */
+  mock->self_node.notify_fn(comp);
   mock->self_node.notify_fn(comp);
 
   /* Trigger again to hit already dirty branch */
@@ -94,14 +123,14 @@ static int test_subscribers(void) {
     ui_computed_get(comp2, &out_val);
     ui_reactive_graph_set_current_node(NULL, NULL);
 
-    ui_computed_destroy(comp2);
+    (void)ui_computed_destroy(comp2);
   }
 
-  ui_computed_destroy(comp);
+  (void)ui_computed_destroy(comp);
   ui_computed_create(NULL, dummy_compute_fail, NULL, UI_SIGNAL_TYPE_INT32,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
   ui_computed_get(comp, &out_val);
-  ui_computed_destroy(comp);
+  (void)ui_computed_destroy(comp);
 
   return 0;
 }
@@ -137,17 +166,17 @@ static int test_computed(void) {
     ui_computed_create(NULL, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
                        UI_SIGNAL_MODE_MULTI_THREADED, &mtcomp);
     ui_computed_get(mtcomp, &out_val);
-    ui_computed_destroy(mtcomp);
+    (void)ui_computed_destroy(mtcomp);
   }
 
-  ui_computed_destroy(comp);
+  (void)ui_computed_destroy(comp);
 
   /* Null tests */
   ui_computed_create(NULL, NULL, NULL, 0, 0, &comp);
   ui_computed_create(NULL, dummy_compute, NULL, 0, 0, NULL);
   ui_computed_get(NULL, NULL);
   ui_computed_get(comp, NULL);
-  ui_computed_destroy(NULL);
+  (void)ui_computed_destroy(NULL);
 
   /* Malloc fails */
   g_malloc_fail_countdown = 0;
@@ -161,10 +190,23 @@ static int test_computed(void) {
   {
     struct ui_arena *arena;
     ui_arena_create(256, &arena);
+
+    comp = NULL;
+    g_malloc_fail_countdown = 0;
     ui_computed_create(arena, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
                        UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
-    ui_computed_destroy(comp);
-    ui_arena_destroy(arena);
+    g_malloc_fail_countdown = -1;
+
+    if (comp)
+      (void)ui_computed_destroy(comp);
+
+    comp = NULL;
+    ui_computed_create(arena, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
+                       UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
+    if (comp)
+      (void)ui_computed_destroy(comp);
+
+    (void)ui_arena_destroy(arena);
   }
 
   return 0;

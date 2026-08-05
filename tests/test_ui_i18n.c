@@ -24,7 +24,8 @@ static int test_edge_cases(void) {
   if (ui_i18n_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_i18n_create(&i18n);
+  if (ui_i18n_create(&i18n) != UI_ERROR_NONE)
+    return 1;
 
   if (ui_i18n_set_locale(NULL, "en-US") != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -115,7 +116,8 @@ static int test_edge_cases(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_i18n_destroy(i18n);
+  if (ui_i18n_destroy(i18n) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
@@ -125,90 +127,114 @@ static int test_interpolate_edge_cases(void) {
   const char *keys[] = {"a", "ab"};
   const char *vals[] = {"1", "2"};
 
-  ui_i18n_create(&i18n);
+  if (ui_i18n_create(&i18n) != UI_ERROR_NONE)
+    return 1;
 
   /* Test single { (no second {) */
-  ui_i18n_interpolate(i18n, "Test { no double", keys, vals, 0, buf,
-                      sizeof(buf));
+  if (ui_i18n_interpolate(i18n, "Test { no double", keys, vals, 0, buf,
+                          sizeof(buf)) != UI_ERROR_NONE)
+    return 1;
   if (strcmp(buf, "Test { no double") != 0)
     return 1;
 
   /* Test incomplete {{ without closing }} */
-  ui_i18n_interpolate(i18n, "Test {{ incomplete", keys, vals, 0, buf,
-                      sizeof(buf));
+  if (ui_i18n_interpolate(i18n, "Test {{ incomplete", keys, vals, 0, buf,
+                          sizeof(buf)) != UI_ERROR_NONE)
+    return 1;
   if (strcmp(buf, "Test {{ incomplete") != 0)
     return 1;
 
   /* Test key not found */
-  ui_i18n_interpolate(i18n, "Test {{c}}", keys, vals, 2, buf, sizeof(buf));
+  if (ui_i18n_interpolate(i18n, "Test {{c}}", keys, vals, 2, buf,
+                          sizeof(buf)) != UI_ERROR_NONE)
+    return 1;
   if (strcmp(buf, "Test {{c}}") != 0)
     return 1;
 
   /* Test {{ with single } */
-  ui_i18n_interpolate(i18n, "Test {{name}x", keys, vals, 2, buf, sizeof(buf));
+  if (ui_i18n_interpolate(i18n, "Test {{name}x", keys, vals, 2, buf,
+                          sizeof(buf)) != UI_ERROR_NONE)
+    return 1;
 
   /* Test prefix match but different length */
   {
     const char *k2[] = {"ab"};
     const char *v2[] = {"2"};
-    ui_i18n_interpolate(i18n, "Test {{a}}", k2, v2, 1, buf, sizeof(buf));
+    if (ui_i18n_interpolate(i18n, "Test {{a}}", k2, v2, 1, buf, sizeof(buf)) !=
+        UI_ERROR_NONE)
+      return 1;
   }
 
   /* Test buffer overflow prevention during replacement */
   {
     const char *k3[] = {"a"};
     const char *v3[] = {"12345"};
-    ui_i18n_interpolate(i18n, "T{{a}}", k3, v3, 1, buf,
-                        6); /* "T" (1) + "12345" (5) = 6 >= 5 (out_len-1) */
+    if (ui_i18n_interpolate(i18n, "T{{a}}", k3, v3, 1, buf, 6) != UI_ERROR_NONE)
+      return 1; /* "T" (1) + "12345" (5) = 6 >= 5 (out_len-1) */
   }
 
   /* Test prefix match but different length */
-  ui_i18n_interpolate(i18n, "Test {{a}}", keys, vals, 2, buf, sizeof(buf));
+  if (ui_i18n_interpolate(i18n, "Test {{a}}", keys, vals, 2, buf,
+                          sizeof(buf)) != UI_ERROR_NONE)
+    return 1;
   if (strcmp(buf, "Test 1") != 0)
     return 1;
-  ui_i18n_interpolate(i18n, "Test {{ab}}", keys, vals, 2, buf, sizeof(buf));
+  if (ui_i18n_interpolate(i18n, "Test {{ab}}", keys, vals, 2, buf,
+                          sizeof(buf)) != UI_ERROR_NONE)
+    return 1;
   if (strcmp(buf, "Test 2") != 0)
     return 1;
 
   /* Test buffer overflow prevention during replacement */
-  ui_i18n_interpolate(i18n, "Test {{a}} and some long text", keys, vals, 1, buf,
-                      10);
+  if (ui_i18n_interpolate(i18n, "Test {{a}} and some long text", keys, vals, 1,
+                          buf, 10) != UI_ERROR_NONE)
+    return 1;
   /* Buffer is 10 bytes: "Test 1 an" + null */
   if (strcmp(buf, "Test 1 an") != 0)
     return 1;
 
-  ui_i18n_destroy(i18n);
+  if (ui_i18n_destroy(i18n) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_other_rtl_locales(void) {
   struct ui_i18n *i18n = NULL;
   enum ui_bidi_direction tmp_dir;
-  ui_i18n_create(&i18n);
+  if (ui_i18n_create(&i18n) != UI_ERROR_NONE)
+    return 1;
 
-  ui_i18n_set_locale(i18n, "fa-IR");
-  ui_bidi_get_direction(&tmp_dir);
+  if (ui_i18n_set_locale(i18n, "fa-IR") != UI_ERROR_NONE)
+    return 1;
+  if (ui_bidi_get_direction(&tmp_dir) != UI_ERROR_NONE)
+    return 1;
   if (tmp_dir != UI_BIDI_DIR_RTL)
     return 1;
 
-  ui_i18n_set_locale(i18n, "ur-PK");
-  ui_bidi_get_direction(&tmp_dir);
+  if (ui_i18n_set_locale(i18n, "ur-PK") != UI_ERROR_NONE)
+    return 1;
+  if (ui_bidi_get_direction(&tmp_dir) != UI_ERROR_NONE)
+    return 1;
   if (tmp_dir != UI_BIDI_DIR_RTL)
     return 1;
 
-  ui_i18n_set_locale(i18n, "he-IL");
-  ui_bidi_get_direction(&tmp_dir);
+  if (ui_i18n_set_locale(i18n, "he-IL") != UI_ERROR_NONE)
+    return 1;
+  if (ui_bidi_get_direction(&tmp_dir) != UI_ERROR_NONE)
+    return 1;
   if (tmp_dir != UI_BIDI_DIR_RTL)
     return 1;
 
-  ui_i18n_destroy(i18n);
+  if (ui_i18n_destroy(i18n) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_pluralize_one(void) {
   struct ui_i18n *i18n = NULL;
   char buf[64];
-  ui_i18n_create(&i18n);
+  if (ui_i18n_create(&i18n) != UI_ERROR_NONE)
+    return 1;
 
   if (ui_i18n_pluralize(i18n, 1, "zero", "one", "other", buf, sizeof(buf)) !=
       UI_ERROR_NONE)
@@ -216,13 +242,14 @@ static int test_pluralize_one(void) {
   if (strcmp(buf, "one") != 0)
     return 1;
 
-  ui_i18n_destroy(i18n);
+  if (ui_i18n_destroy(i18n) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_i18n_lifecycle(void) {
   struct ui_i18n *i18n = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_i18n_create(&i18n);
   if (rc != UI_ERROR_NONE || i18n == NULL)
@@ -237,7 +264,7 @@ static int test_i18n_lifecycle(void) {
 
 static int test_i18n_locale_bidi(void) {
   struct ui_i18n *i18n = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   const char *loc;
 
   rc = ui_i18n_create(&i18n);
@@ -270,13 +297,14 @@ static int test_i18n_locale_bidi(void) {
       return 1;
   }
 
-  ui_i18n_destroy(i18n);
+  if (ui_i18n_destroy(i18n) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_i18n_formatting(void) {
   struct ui_i18n *i18n = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   char buf[64];
 
   rc = ui_i18n_create(&i18n);
@@ -301,13 +329,14 @@ static int test_i18n_formatting(void) {
   if (rc != UI_ERROR_NONE || strcmp(buf, "Multiple items") != 0)
     return 1;
 
-  ui_i18n_destroy(i18n);
+  if (ui_i18n_destroy(i18n) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 
 static int test_i18n_interpolate(void) {
   struct ui_i18n *i18n = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   char buf[128];
   const char *keys[] = {"name", "count"};
   const char *vals[] = {"World", "10"};
@@ -330,7 +359,8 @@ static int test_i18n_interpolate(void) {
          "securely.\n");
   printf(
       "Translation interpolations mapping parameter sets natively verified.\n");
-  ui_i18n_destroy(i18n);
+  if (ui_i18n_destroy(i18n) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 

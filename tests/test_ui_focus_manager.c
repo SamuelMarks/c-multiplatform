@@ -15,7 +15,7 @@ get_focused_node(const struct ui_focus_manager *manager) {
   return out;
 }
 
-static enum ui_error test_invalid_args() {
+static ui_error_t test_invalid_args() {
   struct ui_focus_manager *manager = NULL;
   struct ui_dom_node *node = NULL;
   struct ui_layout_node *layout = NULL;
@@ -30,6 +30,9 @@ static enum ui_error test_invalid_args() {
   assert(ui_focus_manager_request_focus(NULL, node) ==
          UI_ERROR_INVALID_ARGUMENT);
   assert(get_focused_node(NULL) == NULL);
+
+  assert(ui_focus_manager_get_focused_node(manager, NULL) ==
+         UI_ERROR_INVALID_ARGUMENT);
 
   assert(ui_focus_manager_advance(NULL, node, 1) == UI_ERROR_INVALID_ARGUMENT);
   assert(ui_focus_manager_advance(manager, NULL, 1) ==
@@ -49,13 +52,13 @@ static enum ui_error test_invalid_args() {
   assert(ui_focus_manager_pop_trap(manager) == UI_ERROR_INVALID_ARGUMENT);
 
   (void)ui_focus_manager_destroy(manager);
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_focus_manager_create_destroy() {
+static ui_error_t test_focus_manager_create_destroy() {
   struct ui_focus_manager *manager = NULL;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_focus_manager_create(&manager);
   assert(err == UI_ERROR_NONE);
@@ -66,7 +69,7 @@ static enum ui_error test_focus_manager_create_destroy() {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_focus_manager_request_focus() {
+static ui_error_t test_focus_manager_request_focus() {
   struct ui_focus_manager *manager = NULL;
   struct ui_dom_node *node = NULL;
 
@@ -76,13 +79,13 @@ static enum ui_error test_focus_manager_request_focus() {
   ui_focus_manager_request_focus(manager, node);
   assert(get_focused_node(manager) == node);
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
   (void)ui_focus_manager_destroy(manager);
   printf("test_focus_manager_request_focus passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_focus_manager_advance() {
+static ui_error_t test_focus_manager_advance() {
   struct ui_focus_manager *manager = NULL;
   struct ui_dom_node *root = NULL;
   struct ui_dom_node *child1 = NULL;
@@ -123,6 +126,11 @@ static enum ui_error test_focus_manager_advance() {
   ui_dom_node_append_child(root, child2);
   ui_dom_node_append_child(root, child3);
 
+  /* Nothing focused initially. Advance backward should focus last (child3). */
+  ui_focus_manager_advance(manager, root, 0);
+  assert(get_focused_node(manager) == child3);
+
+  ui_focus_manager_request_focus(manager, NULL);
   /* Nothing focused initially. Advance forward should focus first (root). */
   ui_focus_manager_advance(manager, root, 1);
   assert(get_focused_node(manager) == root);
@@ -153,26 +161,26 @@ static enum ui_error test_focus_manager_advance() {
   ui_focus_manager_request_focus(manager, child2);
   ui_focus_manager_advance(manager, root, 1);
   assert(get_focused_node(manager) == root);
-  ui_dom_node_destroy(child2);
+  (void)ui_dom_node_destroy(child2);
 
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 
   /* Test empty tree */
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_focus_manager_advance(manager, root, 1);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 
   /* Test text node is_focusable */
   ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &root);
   ui_focus_manager_advance(manager, root, 1);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
 
   (void)ui_focus_manager_destroy(manager);
   printf("test_focus_manager_advance passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_focus_manager_traps() {
+static ui_error_t test_focus_manager_traps() {
   struct ui_focus_manager *manager = NULL;
   struct ui_dom_node *root = NULL;
   struct ui_dom_node *trap = NULL;
@@ -234,17 +242,32 @@ static enum ui_error test_focus_manager_traps() {
   ui_focus_manager_advance(manager, root, 1);
   assert(get_focused_node(manager) == trap);
 
+  /* Grow trap capacity */
+  {
+    int i;
+    struct ui_dom_node *traps[5];
+    for (i = 0; i < 5; i++) {
+      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &traps[i]);
+      ui_dom_node_set_attribute(traps[i], "tabindex", "0");
+      ui_dom_node_append_child(root, traps[i]);
+      ui_focus_manager_push_trap(manager, traps[i]);
+    }
+    for (i = 0; i < 5; i++) {
+      ui_focus_manager_pop_trap(manager);
+    }
+  }
+
   /* Pop trap */
   ui_focus_manager_pop_trap(manager);
   assert(get_focused_node(manager) == root);
 
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
   (void)ui_focus_manager_destroy(manager);
   printf("test_focus_manager_traps passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_focus_manager_navigate() {
+static ui_error_t test_focus_manager_navigate() {
   struct ui_focus_manager *manager = NULL;
   struct ui_layout_node lroot, lchild1, lchild2, lchild3, lchild4;
   struct ui_dom_node root, child1, child2, child3, child4, missing;
@@ -334,6 +357,9 @@ static enum ui_error test_focus_manager_navigate() {
   ui_focus_manager_navigate(manager, &lroot, UI_FOCUS_DIRECTION_UP);
   assert(get_focused_node(manager) == &child1); /* Stays on 1 */
 
+  /* Trigger default case in navigate switch */
+  ui_focus_manager_navigate(manager, &lroot, (enum ui_focus_direction)99);
+
   /* Test navigation when current node is not in layout tree */
   memset(&missing, 0, sizeof(missing));
   ui_focus_manager_request_focus(manager, &missing);
@@ -392,12 +418,12 @@ static enum ui_error test_focus_manager_navigate() {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_oom(void) {
+static ui_error_t test_oom(void) {
   struct ui_focus_manager *manager = NULL;
   struct ui_dom_node *root = NULL;
   struct ui_dom_node *child1 = NULL;
   struct ui_layout_node lroot, lchild1;
-  enum ui_error err;
+  ui_error_t err;
 
   /* Creation OOM */
   g_malloc_fail_countdown = 0;
@@ -468,7 +494,7 @@ static enum ui_error test_oom(void) {
    * and invalid argument checks. */
 
   (void)ui_focus_manager_destroy(manager);
-  ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(root);
   return UI_ERROR_NONE;
 }
 
@@ -518,8 +544,8 @@ static void test_focus_manager_coverage(void) {
   ui_focus_manager_navigate(mgr, &lnode, UI_FOCUS_DIRECTION_DOWN);
   ui_focus_manager_navigate(mgr, NULL, UI_FOCUS_DIRECTION_DOWN);
 
-  ui_focus_manager_destroy(mgr);
-  ui_dom_node_destroy(root);
+  (void)ui_focus_manager_destroy(mgr);
+  (void)ui_dom_node_destroy(root);
 }
 
 int main() {
@@ -590,12 +616,13 @@ static int run_coverage_focus(void) {
         lc[i - 1].next_sibling = &lc[i];
     }
 
-    g_malloc_fail_countdown = 16; /* Should fail when resizing beyond 16 */
+    g_malloc_fail_countdown =
+        1; /* Should fail when resizing beyond 16 (second realloc) */
     ui_focus_manager_advance(mgr, root, 1);
     g_malloc_fail_countdown = -1;
 
     ui_focus_manager_request_focus(mgr, root);
-    g_malloc_fail_countdown = 16;
+    g_malloc_fail_countdown = 1;
     ui_focus_manager_navigate(mgr, &lroot, UI_FOCUS_DIRECTION_DOWN);
     g_malloc_fail_countdown = -1;
 
@@ -603,7 +630,7 @@ static int run_coverage_focus(void) {
       ui_dom_node_remove_attribute(c[i], "tabindex");
   }
 
-  ui_dom_node_destroy(root);
-  ui_focus_manager_destroy(mgr);
+  (void)ui_dom_node_destroy(root);
+  (void)ui_focus_manager_destroy(mgr);
   return 0;
 }

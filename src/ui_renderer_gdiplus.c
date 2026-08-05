@@ -292,28 +292,28 @@ static int gdiplus_draw_text(void *ctx, const char *text,
   text_len = MultiByteToWideChar(CP_UTF8, 0, text, -1, NULL, 0);
   if (text_len <= 0)
     return UI_ERROR_INVALID_ARGUMENT;
-  wtext = (WCHAR *)UI_MALLOC(text_len * sizeof(WCHAR));
+  wtext = (WCHAR *)C_MULTIPLATFORM_MALLOC(text_len * sizeof(WCHAR));
   if (!wtext)
     return UI_ERROR_INVALID_ARGUMENT;
   MultiByteToWideChar(CP_UTF8, 0, text, -1, wtext, text_len);
 
   /* Load font from memory */
   if (GdipNewPrivateFontCollection(&collection) != Ok) {
-    UI_FREE(wtext);
+    C_MULTIPLATFORM_FREE(wtext);
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (GdipPrivateAddMemoryFont(collection, font_data, (INT)font_size_bytes) !=
       Ok) {
     GdipDeletePrivateFontCollection(&collection);
-    UI_FREE(wtext);
+    C_MULTIPLATFORM_FREE(wtext);
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (GdipGetFontCollectionFamilyCount(collection, &numFound) != Ok ||
       numFound == 0) {
     GdipDeletePrivateFontCollection(&collection);
-    UI_FREE(wtext);
+    C_MULTIPLATFORM_FREE(wtext);
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
@@ -321,7 +321,7 @@ static int gdiplus_draw_text(void *ctx, const char *text,
           Ok ||
       numFound == 0) {
     GdipDeletePrivateFontCollection(&collection);
-    UI_FREE(wtext);
+    C_MULTIPLATFORM_FREE(wtext);
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
@@ -329,7 +329,7 @@ static int gdiplus_draw_text(void *ctx, const char *text,
    */
   if (GdipCreateFont(family, r->height, 0, 2, &font) != Ok) {
     GdipDeletePrivateFontCollection(&collection);
-    UI_FREE(wtext);
+    C_MULTIPLATFORM_FREE(wtext);
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
@@ -346,7 +346,7 @@ static int gdiplus_draw_text(void *ctx, const char *text,
 
   GdipDeleteFont(font);
   GdipDeletePrivateFontCollection(&collection);
-  UI_FREE(wtext);
+  C_MULTIPLATFORM_FREE(wtext);
 
   return UI_ERROR_NONE;
 }
@@ -389,8 +389,8 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
     if (GdipCreateLineBrushFromRectWithAngle(
             &rect, 0, 0, gradient->data.linear_gradient.angle, TRUE,
             WrapModeClamp, &brush) == Ok) {
-      colors = (ARGB *)UI_MALLOC(sizeof(ARGB) * count);
-      positions = (float *)UI_MALLOC(sizeof(float) * count);
+      colors = (ARGB *)C_MULTIPLATFORM_MALLOC(sizeof(ARGB) * count);
+      positions = (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * count);
       if (colors && positions) {
         for (i = 0; i < count; ++i) {
           colors[i] = ui_css_color_to_argb(
@@ -403,9 +403,9 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
                           r->width, r->height);
       }
       if (colors)
-        UI_FREE(colors);
+        C_MULTIPLATFORM_FREE(colors);
       if (positions)
-        UI_FREE(positions);
+        C_MULTIPLATFORM_FREE(positions);
       GdipDeleteBrush((GpBrush *)brush);
     }
     return UI_ERROR_NONE;
@@ -432,8 +432,8 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
       GdipAddPathEllipse(path, r->x, r->y, r->width, r->height);
 
       if (GdipCreatePathGradientFromPath(path, &brush) == Ok) {
-        colors = (ARGB *)UI_MALLOC(sizeof(ARGB) * count);
-        positions = (float *)UI_MALLOC(sizeof(float) * count);
+        colors = (ARGB *)C_MULTIPLATFORM_MALLOC(sizeof(ARGB) * count);
+        positions = (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * count);
         if (colors && positions) {
           GpPointF center;
 
@@ -455,9 +455,9 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
                             r->width, r->height);
         }
         if (colors)
-          UI_FREE(colors);
+          C_MULTIPLATFORM_FREE(colors);
         if (positions)
-          UI_FREE(positions);
+          C_MULTIPLATFORM_FREE(positions);
         GdipDeleteBrush((GpBrush *)brush);
       }
       GdipDeletePath(path);
@@ -600,7 +600,7 @@ static int gdiplus_destroy(void *ctx) {
     if (gctx->offscreen_bitmap)
       GdipDisposeImage((GpImage *)gctx->offscreen_bitmap);
     GdiplusShutdown(gctx->token);
-    UI_FREE(gctx);
+    C_MULTIPLATFORM_FREE(gctx);
   }
   return UI_ERROR_NONE;
 }
@@ -612,7 +612,7 @@ static const struct ui_renderer_vtable gdiplus_vtable = {
     gdiplus_set_blend_mode, gdiplus_set_shadow, gdiplus_read_pixels,
     gdiplus_destroy};
 
-enum ui_error ui_renderer_native_init(struct ui_renderer *renderer) {
+ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
   struct gdiplus_context *gctx;
   struct GdiplusStartupInput input;
   ULONG_PTR token;
@@ -629,7 +629,8 @@ enum ui_error ui_renderer_native_init(struct ui_renderer *renderer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  gctx = (struct gdiplus_context *)UI_MALLOC(sizeof(struct gdiplus_context));
+  gctx = (struct gdiplus_context *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct gdiplus_context));
   if (!gctx) {
     GdiplusShutdown(token);
     return UI_ERROR_INVALID_ARGUMENT;

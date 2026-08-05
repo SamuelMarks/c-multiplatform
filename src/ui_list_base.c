@@ -18,15 +18,16 @@ struct ui_list_item_base {
   struct ui_component *component;
 };
 
-enum ui_error ui_list_base_create(struct ui_list_base **out_list) {
+ui_error_t ui_list_base_create(struct ui_list_base **out_list) {
   struct ui_list_base *list;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_list) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  list = (struct ui_list_base *)UI_MALLOC(sizeof(struct ui_list_base));
+  list = (struct ui_list_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_list_base));
   if (!list) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -46,18 +47,19 @@ enum ui_error ui_list_base_create(struct ui_list_base **out_list) {
   return UI_ERROR_NONE;
 }
 
-void ui_list_base_destroy(struct ui_list_base *list) {
+ui_error_t ui_list_base_destroy(struct ui_list_base *list) {
   if (!list) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (list->component) {
-    ui_component_destroy(list->component);
+    (void)ui_component_destroy(list->component);
   }
-  UI_FREE(list);
+  C_MULTIPLATFORM_FREE(list);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_list_base_get_component(struct ui_list_base *list,
-                                         struct ui_component **out_component) {
+ui_error_t ui_list_base_get_component(struct ui_list_base *list,
+                                      struct ui_component **out_component) {
   if (!list || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -66,9 +68,8 @@ enum ui_error ui_list_base_get_component(struct ui_list_base *list,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_list_base_set_orientation(struct ui_list_base *list,
-                             enum ui_list_orientation orientation) {
+ui_error_t ui_list_base_set_orientation(struct ui_list_base *list,
+                                        enum ui_list_orientation orientation) {
   if (!list) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -77,7 +78,7 @@ ui_list_base_set_orientation(struct ui_list_base *list,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_list_base_get_orientation(struct ui_list_base *list,
                              enum ui_list_orientation *out_orientation) {
   if (!list || !out_orientation) {
@@ -87,8 +88,8 @@ ui_list_base_get_orientation(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_list_base_append_item(struct ui_list_base *list,
-                                       struct ui_list_item_base *item) {
+ui_error_t ui_list_base_append_item(struct ui_list_base *list,
+                                    struct ui_list_item_base *item) {
   if (!list || !item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -99,16 +100,16 @@ enum ui_error ui_list_base_append_item(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_list_item_base_create(struct ui_list_item_base **out_item) {
+ui_error_t ui_list_item_base_create(struct ui_list_item_base **out_item) {
   struct ui_list_item_base *item;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  item =
-      (struct ui_list_item_base *)UI_MALLOC(sizeof(struct ui_list_item_base));
+  item = (struct ui_list_item_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_list_item_base));
   if (!item) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -126,18 +127,19 @@ enum ui_error ui_list_item_base_create(struct ui_list_item_base **out_item) {
   return UI_ERROR_NONE;
 }
 
-void ui_list_item_base_destroy(struct ui_list_item_base *item) {
+ui_error_t ui_list_item_base_destroy(struct ui_list_item_base *item) {
   if (!item) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (item->component) {
-    ui_component_destroy(item->component);
+    (void)ui_component_destroy(item->component);
   }
-  UI_FREE(item);
+  C_MULTIPLATFORM_FREE(item);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_list_item_base_get_component(struct ui_list_item_base *item,
                                 struct ui_component **out_component) {
   if (!item || !out_component) {
@@ -147,8 +149,8 @@ ui_list_item_base_get_component(struct ui_list_item_base *item,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_list_base_bind_data(struct ui_list_base *widget,
-                                     struct ui_computed *signal) {
+ui_error_t ui_list_base_bind_data(struct ui_list_base *widget,
+                                  struct ui_computed *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

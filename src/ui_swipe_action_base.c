@@ -3,9 +3,8 @@
 #include <math.h>
 /* clang-format on */
 
-enum ui_error
-ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
-                          struct ui_component *component) {
+ui_error_t ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
+                                     struct ui_component *component) {
   if (!swipe_action || !component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -19,7 +18,7 @@ ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
                             float delta_x) {
   if (!swipe_action) {
@@ -37,7 +36,7 @@ ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action) {
   if (!swipe_action) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -56,7 +55,7 @@ ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action) {
   if (!swipe_action)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -68,7 +67,7 @@ ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
                                    struct ui_signal *disabled_signal) {
   if (!widget) {
@@ -79,9 +78,8 @@ ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_swipe_action_base_bind_text(struct ui_swipe_action_base *widget,
-                               struct ui_signal *text_signal) {
+ui_error_t ui_swipe_action_base_bind_text(struct ui_swipe_action_base *widget,
+                                          struct ui_signal *text_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -25,16 +25,15 @@ extern long UI_WINAPI _InterlockedExchange(long volatile *, long);
 #pragma intrinsic(_InterlockedCompareExchangePointer)
 #pragma intrinsic(_InterlockedExchange)
 
-enum ui_error ui_atomic_add(ui_atomic_t *target, long value,
-                            long *out_old_value) {
+ui_error_t ui_atomic_add(ui_atomic_t *target, long value, long *out_old_value) {
   if (!target || !out_old_value)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_old_value = _InterlockedExchangeAdd((volatile long *)target, value);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_atomic_cas(ui_atomic_t *target, long expected, long new_value,
-                            int *out_swapped) {
+ui_error_t ui_atomic_cas(ui_atomic_t *target, long expected, long new_value,
+                         int *out_swapped) {
   if (!target || !out_swapped)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_swapped = _InterlockedCompareExchange((volatile long *)target, new_value,
@@ -44,8 +43,8 @@ enum ui_error ui_atomic_cas(ui_atomic_t *target, long expected, long new_value,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_atomic_ptr_cas(void *volatile *target, void *expected,
-                                void *new_value, int *out_swapped) {
+ui_error_t ui_atomic_ptr_cas(void *volatile *target, void *expected,
+                             void *new_value, int *out_swapped) {
   if (!target || !out_swapped)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_swapped = _InterlockedCompareExchangePointer(target, new_value,
@@ -55,14 +54,14 @@ enum ui_error ui_atomic_ptr_cas(void *volatile *target, void *expected,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_atomic_load(ui_atomic_t *target, long *out_value) {
+ui_error_t ui_atomic_load(ui_atomic_t *target, long *out_value) {
   if (!target || !out_value)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_value = _InterlockedCompareExchange((volatile long *)target, 0, 0);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_atomic_store(ui_atomic_t *target, long value) {
+ui_error_t ui_atomic_store(ui_atomic_t *target, long value) {
   if (!target)
     return UI_ERROR_INVALID_ARGUMENT;
   _InterlockedExchange((volatile long *)target, value);
@@ -71,8 +70,7 @@ enum ui_error ui_atomic_store(ui_atomic_t *target, long value) {
 
 #elif defined(__GNUC__) || defined(__clang__)
 
-enum ui_error ui_atomic_add(ui_atomic_t *target, long value,
-                            long *out_old_value) {
+ui_error_t ui_atomic_add(ui_atomic_t *target, long value, long *out_old_value) {
   if (!target)
     return UI_ERROR_INVALID_ARGUMENT;
   if (!out_old_value)
@@ -81,8 +79,8 @@ enum ui_error ui_atomic_add(ui_atomic_t *target, long value,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_atomic_cas(ui_atomic_t *target, long expected, long new_value,
-                            int *out_swapped) {
+ui_error_t ui_atomic_cas(ui_atomic_t *target, long expected, long new_value,
+                         int *out_swapped) {
   if (!target)
     return UI_ERROR_INVALID_ARGUMENT;
   if (!out_swapped)
@@ -92,8 +90,8 @@ enum ui_error ui_atomic_cas(ui_atomic_t *target, long expected, long new_value,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_atomic_ptr_cas(void *volatile *target, void *expected,
-                                void *new_value, int *out_swapped) {
+ui_error_t ui_atomic_ptr_cas(void *volatile *target, void *expected,
+                             void *new_value, int *out_swapped) {
   if (!target)
     return UI_ERROR_INVALID_ARGUMENT;
   if (!out_swapped)
@@ -103,7 +101,7 @@ enum ui_error ui_atomic_ptr_cas(void *volatile *target, void *expected,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_atomic_load(ui_atomic_t *target, long *out_value) {
+ui_error_t ui_atomic_load(ui_atomic_t *target, long *out_value) {
   if (!target)
     return UI_ERROR_INVALID_ARGUMENT;
   if (!out_value)
@@ -112,7 +110,7 @@ enum ui_error ui_atomic_load(ui_atomic_t *target, long *out_value) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_atomic_store(ui_atomic_t *target, long value) {
+ui_error_t ui_atomic_store(ui_atomic_t *target, long value) {
   if (!target)
     return UI_ERROR_INVALID_ARGUMENT;
   __sync_lock_test_and_set(target, value);

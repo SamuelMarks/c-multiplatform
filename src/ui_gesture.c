@@ -35,14 +35,14 @@ struct ui_gesture_recognizer {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_gesture_recognizer_create(struct ui_gesture_recognizer **out_recognizer) {
   struct ui_gesture_recognizer *r;
   if (!out_recognizer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  r = (struct ui_gesture_recognizer *)UI_MALLOC(
+  r = (struct ui_gesture_recognizer *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_gesture_recognizer));
   if (!r) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -69,16 +69,16 @@ ui_gesture_recognizer_create(struct ui_gesture_recognizer **out_recognizer) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_gesture_recognizer_destroy(struct ui_gesture_recognizer *recognizer) {
   if (!recognizer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(recognizer);
+  C_MULTIPLATFORM_FREE(recognizer);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error ui_gesture_reset(struct ui_gesture_recognizer *r) {
+static ui_error_t ui_gesture_reset(struct ui_gesture_recognizer *r) {
   r->is_tracking = 0;
   r->has_moved_significantly = 0;
   r->long_press_triggered = 0;
@@ -92,7 +92,7 @@ static enum ui_error ui_gesture_reset(struct ui_gesture_recognizer *r) {
 }
 
 /** \brief ui_gesture_recognizer_process_event */
-enum ui_error ui_gesture_recognizer_process_event(
+ui_error_t ui_gesture_recognizer_process_event(
     struct ui_gesture_recognizer *r, const struct ui_event *event,
     double timestamp_ms, struct ui_gesture_event *out_gesture_event) {
   int current_x = 0;
@@ -313,7 +313,10 @@ enum ui_error ui_gesture_recognizer_process_event(
         }
       }
     }
-    ui_gesture_reset(r);
+    {
+      ui_error_t reset_rc = ui_gesture_reset(r);
+      (void)reset_rc;
+    }
   } else if (is_cancel && r->is_tracking) {
     if (r->has_moved_significantly && !r->long_press_triggered) {
       out_gesture_event->type = UI_GESTURE_PAN;
@@ -326,14 +329,17 @@ enum ui_error ui_gesture_recognizer_process_event(
       out_gesture_event->x = r->last_x;
       out_gesture_event->y = r->last_y;
     }
-    ui_gesture_reset(r);
+    {
+      ui_error_t reset_rc = ui_gesture_reset(r);
+      (void)reset_rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_gesture_recognizer_update(struct ui_gesture_recognizer *r,
                              double timestamp_ms,
                              struct ui_gesture_event *out_gesture_event) {

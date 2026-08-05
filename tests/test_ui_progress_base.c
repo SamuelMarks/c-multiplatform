@@ -9,7 +9,7 @@ extern int g_malloc_fail_countdown;
 static int test_progress_lifecycle(void) {
   struct ui_progress_base *progress = NULL;
   struct ui_component *comp;
-  enum ui_error rc;
+  ui_error_t rc;
   float percentage;
 
   /* Null checks */
@@ -152,13 +152,13 @@ static int test_progress_lifecycle(void) {
 
   /* Call setting determinate and indeterminate to ensure silent void return
    * doesn't crash when shadow_root is missing */
-  ui_dom_node_destroy(comp->shadow_root);
+  (void)ui_dom_node_destroy(comp->shadow_root);
   comp->shadow_root = NULL;
   ui_progress_base_set_determinate(progress, 50.0f, 0.0f, 100.0f);
   ui_progress_base_set_indeterminate(progress);
 
-  ui_progress_base_destroy(progress);
-  ui_progress_base_destroy(NULL);
+  (void)ui_progress_base_destroy(progress);
+  (void)ui_progress_base_destroy(NULL);
 
   /* test zero range */
   ui_progress_base_create(&progress);
@@ -172,26 +172,26 @@ static int test_progress_lifecycle(void) {
 
   /* test missing component branch inside update_dom_state */
   ui_progress_base_get_component(progress, &comp);
-  ui_component_destroy(comp);
+  (void)ui_component_destroy(comp);
   ((void **)progress)[0] = NULL;
   ui_progress_base_set_determinate(
       progress, 50.0f, 0.0f, 100.0f); /* should silently fail internally */
 
-  ui_progress_base_destroy(progress);
+  (void)ui_progress_base_destroy(progress);
 
   return 0;
 }
 
 static int run_oom_tests(void) {
   struct ui_progress_base *progress = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
 
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_progress_base_create(&progress);
     if (rc == UI_ERROR_NONE) {
-      ui_progress_base_destroy(progress);
+      (void)ui_progress_base_destroy(progress);
       break;
     }
   }

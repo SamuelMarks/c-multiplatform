@@ -28,8 +28,8 @@ struct ui_tonal_palette {
  * @param out_palette The resulting tonal palette structure.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_tonal_palette_from_color(ui_color_t argb,
-                                          struct ui_tonal_palette *out_palette);
+ui_error_t ui_tonal_palette_from_color(ui_color_t argb,
+                                       struct ui_tonal_palette *out_palette);
 
 /**
  * @brief Gets a specific shade from the tonal palette.
@@ -39,8 +39,8 @@ enum ui_error ui_tonal_palette_from_color(ui_color_t argb,
  * @param out_color The resulting ARGB color.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_tonal_palette_get_tone(const struct ui_tonal_palette *palette,
-                                        float tone, ui_color_t *out_color);
+ui_error_t ui_tonal_palette_get_tone(const struct ui_tonal_palette *palette,
+                                     float tone, ui_color_t *out_color);
 
 #ifdef __cplusplus
 }

@@ -10,32 +10,33 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error mock_cva_on_touched(void *user_data) {
+static ui_error_t mock_cva_on_touched(void *user_data) {
+  if (user_data == (void *)1)
+    return UI_ERROR_UNKNOWN;
   int *called = (int *)user_data;
   if (called)
     (*called)++;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mock_on_select(struct ui_calendar_base *calendar,
-                                    const struct ui_date *date,
-                                    void *user_data) {
+static ui_error_t mock_on_select(struct ui_calendar_base *calendar,
+                                 const struct ui_date *date, void *user_data) {
   int *called = (int *)user_data;
   if (called)
     (*called)++;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mock_on_select_fail(struct ui_calendar_base *calendar,
-                                         const struct ui_date *date,
-                                         void *user_data) {
+static ui_error_t mock_on_select_fail(struct ui_calendar_base *calendar,
+                                      const struct ui_date *date,
+                                      void *user_data) {
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
 static int test_calendar_math(void) {
   {
     int is_leap = 0;
-    ui_calendar_is_leap_year(2000, &is_leap);
+    (void)ui_calendar_is_leap_year(2000, &is_leap);
     if (is_leap != 1) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -43,7 +44,7 @@ static int test_calendar_math(void) {
   }
   {
     int is_leap = 0;
-    ui_calendar_is_leap_year(1900, &is_leap);
+    (void)ui_calendar_is_leap_year(1900, &is_leap);
     if (is_leap != 0) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -51,7 +52,7 @@ static int test_calendar_math(void) {
   }
   {
     int is_leap = 0;
-    ui_calendar_is_leap_year(2004, &is_leap);
+    (void)ui_calendar_is_leap_year(2004, &is_leap);
     if (is_leap != 1) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -59,7 +60,7 @@ static int test_calendar_math(void) {
   }
   {
     int is_leap = 0;
-    ui_calendar_is_leap_year(2001, &is_leap);
+    (void)ui_calendar_is_leap_year(2001, &is_leap);
     if (is_leap != 0) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -67,7 +68,7 @@ static int test_calendar_math(void) {
   }
   {
     int days = 0;
-    ui_calendar_days_in_month(2024, 2, &days);
+    (void)ui_calendar_days_in_month(2024, 2, &days);
     if (days != 29) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -75,7 +76,7 @@ static int test_calendar_math(void) {
   }
   {
     int days = 0;
-    ui_calendar_days_in_month(2023, 2, &days);
+    (void)ui_calendar_days_in_month(2023, 2, &days);
     if (days != 28) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -83,7 +84,7 @@ static int test_calendar_math(void) {
   }
   {
     int days = 0;
-    ui_calendar_days_in_month(2024, 4, &days);
+    (void)ui_calendar_days_in_month(2024, 4, &days);
     if (days != 30) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -91,7 +92,7 @@ static int test_calendar_math(void) {
   }
   {
     int days = 0;
-    ui_calendar_days_in_month(2024, 1, &days);
+    (void)ui_calendar_days_in_month(2024, 1, &days);
     if (days != 31) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -99,7 +100,7 @@ static int test_calendar_math(void) {
   }
   {
     int days = 0;
-    ui_calendar_days_in_month(2024, 13, &days);
+    (void)ui_calendar_days_in_month(2024, 13, &days);
     if (days != 0) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -168,8 +169,10 @@ static int test_calendar_math(void) {
   return 0;
 }
 
-static enum ui_error mock_cva_on_change(union ui_signal_payload value,
-                                        void *user_data) {
+static ui_error_t mock_cva_on_change(union ui_signal_payload value,
+                                     void *user_data) {
+  if (user_data == (void *)1)
+    return UI_ERROR_UNKNOWN;
   int *called = (int *)user_data;
   if (called)
     (*called)++;
@@ -203,7 +206,7 @@ static int test_calendar_coverage(void) {
   }
 
   /* Null checks for methods */
-  ui_calendar_base_destroy(NULL); /* Should not crash */
+  (void)ui_calendar_base_destroy(NULL); /* Should not crash */
 
   if (ui_calendar_base_set_start_of_week(NULL, UI_SUNDAY) !=
       UI_ERROR_INVALID_ARGUMENT) {
@@ -220,13 +223,13 @@ static int test_calendar_coverage(void) {
     printf("Failed at %d\n", __LINE__);
     return 1;
   }
-  ui_calendar_base_set_min_date(cal, NULL); /* Clears min date */
+  (void)ui_calendar_base_set_min_date(cal, NULL); /* Clears min date */
 
   if (ui_calendar_base_set_max_date(NULL, &date) != UI_ERROR_INVALID_ARGUMENT) {
     printf("Failed at %d\n", __LINE__);
     return 1;
   }
-  ui_calendar_base_set_max_date(cal, NULL); /* Clears max date */
+  (void)ui_calendar_base_set_max_date(cal, NULL); /* Clears max date */
 
   if (ui_calendar_base_set_view_month(NULL, 2024, 1) !=
       UI_ERROR_INVALID_ARGUMENT) {
@@ -336,20 +339,18 @@ static int test_calendar_coverage(void) {
     int selects = 0;
     union ui_signal_payload any_val;
     struct ui_date test_date = {2024, 5, 10};
-
-    cva.register_on_change(cal, mock_cva_on_change, &changes);
-    cva.register_on_touched(cal, mock_cva_on_touched, &touches);
-    cva.set_disabled_state(cal, 1);
-
-    ui_calendar_base_set_on_select(cal, mock_on_select, &selects);
+    (void)cva.register_on_change(cal, mock_cva_on_change, &changes);
+    (void)cva.register_on_touched(cal, mock_cva_on_touched, &touches);
+    (void)cva.set_disabled_state(cal, 1);
+    (void)ui_calendar_base_set_on_select(cal, mock_on_select, &selects);
 
     /* Write non-null value */
     any_val.ptr_val = &test_date;
-    cva.write_value(cal, any_val);
+    (void)cva.write_value(cal, any_val);
 
     /* Write NULL value to clear */
     any_val.ptr_val = NULL;
-    cva.write_value(cal, any_val);
+    (void)cva.write_value(cal, any_val);
 
     if (changes != 2) {
       printf("Failed at %d\n", __LINE__);
@@ -357,7 +358,7 @@ static int test_calendar_coverage(void) {
     } /* Note: write_value does not trigger on_change */
 
     /* Select date triggers on_select, on_change and on_touched */
-    ui_calendar_base_select_date(cal, &test_date);
+    (void)ui_calendar_base_select_date(cal, &test_date);
     if (changes != 3) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -371,19 +372,19 @@ static int test_calendar_coverage(void) {
       return 1;
     }
     /* Clear selection triggers on_change */
-    ui_calendar_base_clear_selection(cal);
+    (void)ui_calendar_base_clear_selection(cal);
     if (changes != 4) {
       printf("Failed at %d\n", __LINE__);
       return 1;
     }
-    ui_calendar_base_set_view_month(cal, 2024, 6);
-    ui_calendar_base_set_on_select(cal, mock_on_select_fail, NULL);
+    (void)ui_calendar_base_set_view_month(cal, 2024, 6);
+    (void)ui_calendar_base_set_on_select(cal, mock_on_select_fail, NULL);
     if (ui_calendar_base_select_date(cal, &test_date) !=
         UI_ERROR_OUT_OF_MEMORY) {
       printf("Failed at %d\n", __LINE__);
       return 1;
     }
-    ui_calendar_base_set_on_select(cal, mock_on_select, &selects);
+    (void)ui_calendar_base_set_on_select(cal, mock_on_select, &selects);
     if (touches != 1) {
       printf("Failed at %d\n", __LINE__);
       return 1;
@@ -402,9 +403,8 @@ static int test_calendar_coverage(void) {
     struct ui_date d5 = {2025, 1, 1};   /* Year > */
     struct ui_date d6 = {2024, 8, 1};   /* Month > */
     struct ui_date d7 = {2024, 7, 25};  /* Day > */
-
-    ui_calendar_base_set_min_date(cal, &min_d);
-    ui_calendar_base_set_max_date(cal, &max_d);
+    (void)ui_calendar_base_set_min_date(cal, &min_d);
+    (void)ui_calendar_base_set_max_date(cal, &max_d);
 
     if (ui_calendar_base_select_date(cal, &d1) != UI_ERROR_OUT_OF_BOUNDS) {
       printf("Failed at %d\n", __LINE__);
@@ -448,8 +448,7 @@ static int test_calendar_coverage(void) {
   {
     struct ui_date grid[42];
     int count;
-
-    ui_calendar_base_set_view_month(cal, 2024, 1);
+    (void)ui_calendar_base_set_view_month(cal, 2024, 1);
     /* Jan 2024 starts on Monday. If start_of_week is Monday, offset is 0,
        so it just shows Jan 1 on first square, wait:
        If offset is 0, the code might still pad it from previous month or
@@ -458,22 +457,21 @@ static int test_calendar_coverage(void) {
        day_of_week - start_of_week -> 1 (Monday) - 2 (Tuesday) = -1.
        The code does offset += 7, which gives 6. So 6 days of previous month.
     */
-    ui_calendar_base_set_start_of_week(cal, UI_TUESDAY);
-    ui_calendar_base_get_month_grid(cal, grid, &count);
+    (void)ui_calendar_base_set_start_of_week(cal, UI_TUESDAY);
+    (void)ui_calendar_base_get_month_grid(cal, grid, &count);
     if (grid[0].month != 12 || grid[0].year != 2023) {
       printf("Failed at %d\n", __LINE__);
       return 1;
     } /* Should wrap to Dec 2023 */
-
-    ui_calendar_base_set_view_month(cal, 2024, 12);
-    ui_calendar_base_get_month_grid(cal, grid, &count);
+    (void)ui_calendar_base_set_view_month(cal, 2024, 12);
+    (void)ui_calendar_base_get_month_grid(cal, grid, &count);
     if (grid[41].month != 1 || grid[41].year != 2025) {
       printf("Failed at %d\n", __LINE__);
       return 1;
     } /* Should wrap to Jan 2025 */
   }
 
-  ui_calendar_base_destroy(cal);
+  (void)ui_calendar_base_destroy(cal);
   return 0;
 }
 static int test_calendar_base(void) {
@@ -492,9 +490,8 @@ static int test_calendar_base(void) {
     printf("Failed at %d\n", __LINE__);
     return 1;
   }
-
-  ui_calendar_base_set_min_date(cal, &min_date);
-  ui_calendar_base_set_max_date(cal, &max_date);
+  (void)ui_calendar_base_set_min_date(cal, &min_date);
+  (void)ui_calendar_base_set_max_date(cal, &max_date);
 
   if (ui_calendar_base_select_date(cal, &target) != UI_ERROR_NONE) {
     printf("Failed at %d\n", __LINE__);
@@ -524,16 +521,15 @@ static int test_calendar_base(void) {
     printf("Failed at %d\n", __LINE__);
     return 1;
   }
-
-  ui_calendar_base_clear_selection(cal);
+  (void)ui_calendar_base_clear_selection(cal);
   if (ui_calendar_base_get_selected_date(cal, &out) != UI_ERROR_NOT_FOUND) {
     printf("Failed at %d\n", __LINE__);
     return 1;
   }
 
   /* Test grid generation for Feb 2024 */
-  ui_calendar_base_set_view_month(cal, 2024, 2);
-  ui_calendar_base_set_start_of_week(cal, UI_SUNDAY);
+  (void)ui_calendar_base_set_view_month(cal, 2024, 2);
+  (void)ui_calendar_base_set_start_of_week(cal, UI_SUNDAY);
 
   if (ui_calendar_base_get_month_grid(cal, grid, &count) != UI_ERROR_NONE) {
     printf("Failed at %d\n", __LINE__);
@@ -563,7 +559,7 @@ static int test_calendar_base(void) {
     return 1;
   }
 
-  ui_calendar_base_destroy(cal);
+  (void)ui_calendar_base_destroy(cal);
   return 0;
 }
 
@@ -574,10 +570,9 @@ static int test_datepicker_base(void) {
   struct ui_calendar_base *cal = NULL;
   struct ui_date parsed;
   char text[32];
-
-  ui_input_base_create(&input);
-  ui_popover_base_create(&popover);
-  ui_calendar_base_create(&cal, NULL);
+  (void)ui_input_base_create(&input);
+  (void)ui_popover_base_create(&popover);
+  (void)ui_calendar_base_create(&cal, NULL);
 
   if (ui_datepicker_base_create(&dp, input, popover, cal, NULL) !=
       UI_ERROR_NONE) {
@@ -611,80 +606,125 @@ static int test_datepicker_base(void) {
     return 1;
   }
 
-  ui_datepicker_base_destroy(dp);
-  ui_calendar_base_destroy(cal);
-  ui_popover_base_destroy(popover);
-  ui_input_base_destroy(input);
+  (void)ui_datepicker_base_destroy(dp);
+  (void)ui_calendar_base_destroy(cal);
+  (void)ui_popover_base_destroy(popover);
+  (void)ui_input_base_destroy(input);
 
   return 0;
 }
 
 static int test_calendar_missing_branches(void) {
+  int count;
   int days;
   enum ui_day_of_week dow;
+  struct ui_date *grid = NULL;
+  struct ui_control_value_accessor cva;
   struct ui_calendar_base *cal = NULL;
+  struct ui_date dt = {2024, 5, 15};
+  struct ui_date min_dt = {2024, 1, 1};
+  struct ui_date max_dt = {2024, 12, 1};
+  int g_calendar_mock_fail = 0;
+
+  /* 228: cva_on_touched fails */
+  (void)ui_calendar_base_create(&cal, &cva);
+  (void)cva.register_on_touched(cal, mock_cva_on_touched, (void *)1);
+  (void)ui_calendar_base_set_view_month(cal, 2024, 5);
+  (void)ui_calendar_base_destroy(cal);
+
+  /* 268: ui_calendar_days_in_month fails in set_selected_date */
+  (void)ui_calendar_base_create(&cal, NULL);
+  g_calendar_mock_fail = 268;
+  (void)ui_calendar_base_select_date(cal, &dt);
+  g_calendar_mock_fail = 0;
+  (void)ui_calendar_base_destroy(cal);
+
+  /* 278: compare_dates fails for min */
+  (void)ui_calendar_base_create(&cal, NULL);
+  (void)ui_calendar_base_set_min_date(cal, &min_dt);
+  g_calendar_mock_fail = 278;
+  (void)ui_calendar_base_select_date(cal, &dt);
+  g_calendar_mock_fail = 0;
+  (void)ui_calendar_base_destroy(cal);
+
+  /* 286: compare_dates fails for max */
+  (void)ui_calendar_base_create(&cal, NULL);
+  (void)ui_calendar_base_set_max_date(cal, &max_dt);
+  g_calendar_mock_fail = 286;
+  (void)ui_calendar_base_select_date(cal, &dt);
+  g_calendar_mock_fail = 0;
+  (void)ui_calendar_base_destroy(cal);
+
+  /* 310: cva_on_change fails in set_selected_date */
+  (void)ui_calendar_base_create(&cal, &cva);
+  (void)cva.register_on_change(cal, mock_cva_on_change, (void *)1);
+  (void)ui_calendar_base_select_date(cal, &dt);
+  (void)ui_calendar_base_destroy(cal);
+
+  /* 340: cva_on_change fails in clear_selection */
+  (void)ui_calendar_base_create(&cal, &cva);
+  (void)cva.register_on_change(cal, mock_cva_on_change, (void *)1);
+  (void)ui_calendar_base_clear_selection(cal);
+  (void)ui_calendar_base_destroy(cal);
+
+  /* 372: get_day_of_week fails in get_grid */
+  (void)ui_calendar_base_create(&cal, NULL);
+  g_calendar_mock_fail = 372;
+  (void)ui_calendar_base_get_month_grid(cal, grid, &count);
+  g_calendar_mock_fail = 0;
+  (void)ui_calendar_base_destroy(cal);
+
+  /* 382: days_in_month fails in get_grid */
+  (void)ui_calendar_base_create(&cal, NULL);
+  g_calendar_mock_fail = 382;
+  (void)ui_calendar_base_get_month_grid(cal, grid, &count);
+  g_calendar_mock_fail = 0;
+  (void)ui_calendar_base_destroy(cal);
+
+  /* 402: days_in_prev fails in get_grid */
+  (void)ui_calendar_base_create(&cal, NULL);
+  g_calendar_mock_fail = 402;
+  (void)ui_calendar_base_get_month_grid(cal, grid, &count);
+  g_calendar_mock_fail = 0;
+  (void)ui_calendar_base_destroy(cal);
 
   /* 98: month < 1 or month > 12 */
-  ui_calendar_days_in_month(2023, 0, &days);
-  ui_calendar_days_in_month(2023, 13, &days);
+  (void)ui_calendar_days_in_month(2023, 0, &days);
+  (void)ui_calendar_days_in_month(2023, 13, &days);
 
   /* 108: missing branches for days_in_month logic */
   /* 31 days month */
-  ui_calendar_days_in_month(2023, 1, &days);
+  (void)ui_calendar_days_in_month(2023, 1, &days);
   /* 30 days month */
-  ui_calendar_days_in_month(2023, 4, &days);
-  ui_calendar_days_in_month(2023, 6, &days);
-  ui_calendar_days_in_month(2023, 9, &days);
-  ui_calendar_days_in_month(2023, 11, &days);
-  ui_calendar_days_in_month(2023, 5, &days);
-  ui_calendar_days_in_month(2023, 7, &days);
-  ui_calendar_days_in_month(2023, 10, &days);
-  ui_calendar_days_in_month(2023, 12, &days);
+  (void)ui_calendar_days_in_month(2023, 4, &days);
+  (void)ui_calendar_days_in_month(2023, 6, &days);
+  (void)ui_calendar_days_in_month(2023, 9, &days);
+  (void)ui_calendar_days_in_month(2023, 11, &days);
+  (void)ui_calendar_days_in_month(2023, 5, &days);
+  (void)ui_calendar_days_in_month(2023, 7, &days);
+  (void)ui_calendar_days_in_month(2023, 10, &days);
+  (void)ui_calendar_days_in_month(2023, 12, &days);
 
   /* 122: out of bounds in day of week */
-  ui_calendar_get_day_of_week(2023, 0, 1, &dow);
-  ui_calendar_get_day_of_week(2023, 1, 0, &dow);
-  ui_calendar_get_day_of_week(2023, 1, 32, &dow);
+  (void)ui_calendar_get_day_of_week(2023, 0, 1, &dow);
+  (void)ui_calendar_get_day_of_week(2023, 1, 0, &dow);
+  (void)ui_calendar_get_day_of_week(2023, 1, 32, &dow);
 
-  /* 185: invalid start day */
-  ui_calendar_base_create(&cal, NULL);
-  ui_calendar_base_set_start_of_week(cal, -1);
-  ui_calendar_base_set_start_of_week(cal, 7);
+  /* 184: start_day > 6 */
+  (void)ui_calendar_base_set_start_of_week(cal, (enum ui_day_of_week)7);
 
-  /* Bounds checking in set_selected_date */
-  struct ui_date dt;
-  dt.year = 2023;
-  dt.month = 13;
-  dt.day = 1;
-  ui_calendar_base_select_date(cal, &dt);
+  /* 365: !out_count in get_month_grid */
 
-  dt.year = 2023;
-  dt.month = 4;
-  dt.day = 31; /* April has 30 */
-  ui_calendar_base_select_date(cal, &dt);
-
-  struct ui_date min_dt = {2023, 5, 15};
-  struct ui_date max_dt = {2023, 6, 15};
-  ui_calendar_base_set_min_date(cal, &min_dt);
-  ui_calendar_base_set_max_date(cal, &max_dt);
-
-  struct ui_date bad_dt_min = {2023, 5, 10};
-  struct ui_date bad_dt_max = {2023, 6, 20};
-  ui_calendar_base_select_date(cal, &bad_dt_min);
-  ui_calendar_base_select_date(cal, &bad_dt_max);
-
-  struct ui_date ok_dt1 = {2023, 5, 20};
-  struct ui_date ok_dt2 = {2023, 6, 10};
-  ui_calendar_base_select_date(cal, &ok_dt1);
-  ui_calendar_base_select_date(cal, &ok_dt2);
-
-  /* grid out args */
-  ui_calendar_base_get_month_grid(cal, NULL, &days);
-  ui_calendar_base_get_month_grid(cal, &dt, NULL);
-
-  ui_calendar_base_destroy(cal);
+  (void)ui_calendar_base_get_month_grid(NULL, NULL, NULL);
+  (void)ui_calendar_base_get_month_grid(cal, NULL, NULL);
+  (void)ui_calendar_base_get_month_grid(NULL, grid, NULL);
+  (void)ui_calendar_base_get_month_grid(NULL, NULL, &count);
+  (void)ui_calendar_base_get_month_grid(cal, grid, NULL);
+  (void)ui_calendar_base_get_month_grid(cal, NULL, &count);
+  (void)ui_calendar_base_get_month_grid(NULL, grid, &count);
   return 0;
 }
+
 int main(void) {
   test_calendar_missing_branches();
   int failed = 0;

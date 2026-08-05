@@ -9,25 +9,26 @@ extern int g_malloc_fail_countdown;
 
 /* Mock free from standard library for test purposes since mock allocator isn't
  * exposed directly via a shared header in tests in the same way */
-extern void ui_mock_free(void *ptr);
+extern void C_MULTIPLATFORM_FREE(void *ptr);
 
 static int g_auth_success = 0;
 
-static enum ui_error on_auth_resolved(void *result_ptr, void *user_data,
-                                      void **out_result) {
+static ui_error_t on_auth_resolved(void *result_ptr, void *user_data,
+                                   void **out_result) {
   enum ui_auth_result *res = (enum ui_auth_result *)result_ptr;
   (void)user_data;
   if (res && *res == UI_AUTH_RESULT_SUCCESS) {
     g_auth_success = 1;
   }
   if (res) {
-    ui_mock_free(res); /* Free the dynamically allocated result from the mock */
+    C_MULTIPLATFORM_FREE(
+        res); /* Free the dynamically allocated result from the mock */
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_auth_rejected(enum ui_error err, void *user_data,
-                                      void **out_result) {
+static ui_error_t on_auth_rejected(ui_error_t err, void *user_data,
+                                   void **out_result) {
   (void)err;
   (void)user_data;
   fprintf(stderr, "Auth promise rejected\n");
@@ -37,7 +38,7 @@ static enum ui_error on_auth_rejected(enum ui_error err, void *user_data,
 int main(void) {
   struct ui_promise *promise = NULL;
   struct ui_auth_request_config config;
-  enum ui_error rc;
+  ui_error_t rc;
   int is_supported = 0;
   int i;
 
@@ -66,7 +67,7 @@ int main(void) {
   /* OOM loops */
   for (i = 0; i < 2; i++) {
     struct ui_promise *p = NULL;
-    ui_promise_create(&p);
+    (void)ui_promise_create(&p);
     g_malloc_fail_countdown = i;
     rc = ui_auth_request_async(&config, p);
     if (rc == UI_ERROR_NONE) {
@@ -74,7 +75,7 @@ int main(void) {
        * returns NONE */
     }
     g_malloc_fail_countdown = -1;
-    ui_promise_destroy(p);
+    (void)ui_promise_destroy(p);
   }
 
   rc = ui_promise_then(promise, on_auth_resolved, on_auth_rejected, NULL, NULL);
@@ -94,7 +95,12 @@ int main(void) {
     return 1;
   }
 
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_auth_coverage(void);
+  (void)run_auth_coverage();
+#endif
 
   printf("test_ui_auth passed\n");
   return 0;

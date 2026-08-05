@@ -22,14 +22,14 @@ struct ui_datagrid_base;
  * @param out_datagrid Pointer to receive the allocated component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid);
+ui_error_t ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid);
 
 /**
  * @brief Destroys a datagrid base component.
  *
  * @param datagrid The component to destroy.
  */
-void ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid);
+ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -38,9 +38,8 @@ void ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid);
  * @param datagrid The datagrid component.
  * @return The underlying component.
  */
-enum ui_error
-ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
-                               struct ui_component **out_component);
+ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
+                                          struct ui_component **out_component);
 
 /**
  * @brief Handles manual column resizing via drag events.
@@ -50,8 +49,8 @@ ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
  * @param new_width The new calculated width in pixels.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
-                                             int col_index, float new_width);
+ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
+                                          int col_index, float new_width);
 
 /**
  * @brief Moves the 2D roving tabindex focus cell.
@@ -61,8 +60,8 @@ enum ui_error ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
  * @param col_delta Horizontal movement (-1 for left, 1 for right, 0 for none).
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
-                                          int row_delta, int col_delta);
+ui_error_t ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
+                                       int row_delta, int col_delta);
 
 /**
  * @brief Binds the data property.
@@ -71,8 +70,8 @@ enum ui_error ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_datagrid_base_bind_data(struct ui_datagrid_base *widget,
-                                         struct ui_computed *signal);
+ui_error_t ui_datagrid_base_bind_data(struct ui_datagrid_base *widget,
+                                      struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

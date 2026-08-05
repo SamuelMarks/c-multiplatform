@@ -7,6 +7,20 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_breakpoint_mock_fail = 0;
+static ui_error_t mock_ui_signal_set(struct ui_signal *signal,
+                                     union ui_signal_payload value) {
+  if (g_breakpoint_mock_fail > 0) {
+    g_breakpoint_mock_fail--;
+    if (g_breakpoint_mock_fail == 0)
+      return UI_ERROR_UNKNOWN;
+  }
+  return ui_signal_set(signal, value);
+}
+#define ui_signal_set mock_ui_signal_set
+#endif
+
 #define DEBOUNCE_DELAY_MS 50.0
 
 struct ui_breakpoint_observer {
@@ -20,14 +34,14 @@ struct ui_breakpoint_observer {
   int is_debouncing;
 };
 
-static enum ui_error
-evaluate_breakpoints(struct ui_breakpoint_observer *observer, float width) {
+static ui_error_t evaluate_breakpoints(struct ui_breakpoint_observer *observer,
+                                       float width) {
   union ui_signal_payload is_xsmall = {0};
   union ui_signal_payload is_small = {0};
   union ui_signal_payload is_medium = {0};
   union ui_signal_payload is_large = {0};
   union ui_signal_payload is_xlarge = {0};
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   is_xsmall.bool_val = width < 600.0f ? 1 : 0;
   is_small.bool_val = width >= 600.0f && width < 900.0f ? 1 : 0;
@@ -35,28 +49,38 @@ evaluate_breakpoints(struct ui_breakpoint_observer *observer, float width) {
   is_large.bool_val = width >= 1200.0f && width < 1536.0f ? 1 : 0;
   is_xlarge.bool_val = width >= 1536.0f ? 1 : 0;
 
-  ui_signal_set(observer->signals[UI_BREAKPOINT_XSMALL], is_xsmall);
-  ui_signal_set(observer->signals[UI_BREAKPOINT_SMALL], is_small);
-  ui_signal_set(observer->signals[UI_BREAKPOINT_MEDIUM], is_medium);
-  ui_signal_set(observer->signals[UI_BREAKPOINT_LARGE], is_large);
-  ui_signal_set(observer->signals[UI_BREAKPOINT_XLARGE], is_xlarge);
+  rc = ui_signal_set(observer->signals[UI_BREAKPOINT_XSMALL], is_xsmall);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_signal_set(observer->signals[UI_BREAKPOINT_SMALL], is_small);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_signal_set(observer->signals[UI_BREAKPOINT_MEDIUM], is_medium);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_signal_set(observer->signals[UI_BREAKPOINT_LARGE], is_large);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_signal_set(observer->signals[UI_BREAKPOINT_XLARGE], is_xlarge);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   return rc;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
                               struct ui_breakpoint_observer **out_observer) {
   struct ui_breakpoint_observer *observer;
   union ui_signal_payload initial_payload = {0};
   int i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_observer)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  observer = (struct ui_breakpoint_observer *)UI_MALLOC(
+  observer = (struct ui_breakpoint_observer *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_breakpoint_observer));
   if (!observer)
     return UI_ERROR_OUT_OF_MEMORY;
@@ -65,7 +89,7 @@ ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
 
   rc = ui_arena_create(1024, &observer->arena);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(observer);
+    C_MULTIPLATFORM_FREE(observer);
     return rc;
   }
 
@@ -87,22 +111,24 @@ ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
   return UI_ERROR_NONE;
 }
 
-void ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer) {
+ui_error_t
+ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer) {
   int i;
   if (!observer)
-    return;
+    return UI_ERROR_NONE;
 
   for (i = 0; i < UI_BREAKPOINT_COUNT; i++) {
-    ui_signal_destroy(observer->signals[i]);
+    (void)ui_signal_destroy(observer->signals[i]);
   }
 
-  ui_arena_destroy(observer->arena);
+  (void)ui_arena_destroy(observer->arena);
 
-  UI_FREE(observer);
+  C_MULTIPLATFORM_FREE(observer);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_breakpoint_observer_get_signal(struct ui_breakpoint_observer *observer,
                                   enum ui_breakpoint breakpoint,
                                   struct ui_signal **out_signal) {
@@ -115,9 +141,9 @@ ui_breakpoint_observer_get_signal(struct ui_breakpoint_observer *observer,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_breakpoint_observer_tick(struct ui_breakpoint_observer *observer,
-                            float current_width, double current_time_ms) {
+ui_error_t ui_breakpoint_observer_tick(struct ui_breakpoint_observer *observer,
+                                       float current_width,
+                                       double current_time_ms) {
   if (!observer)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -129,8 +155,11 @@ ui_breakpoint_observer_tick(struct ui_breakpoint_observer *observer,
 
   if (observer->is_debouncing &&
       (current_time_ms - observer->last_resize_time >= DEBOUNCE_DELAY_MS)) {
+    ui_error_t rc;
     observer->last_width = observer->target_width;
-    (void)evaluate_breakpoints(observer, observer->last_width);
+    rc = evaluate_breakpoints(observer, observer->last_width);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     observer->is_debouncing = 0;
   }
 

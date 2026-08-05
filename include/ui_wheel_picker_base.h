@@ -17,7 +17,7 @@ struct ui_wheel_picker_base;
 /**
  * @brief Callback invoked when the wheel picker selection changes.
  */
-typedef enum ui_error (*ui_wheel_picker_on_change_t)(
+typedef ui_error_t (*ui_wheel_picker_on_change_t)(
     struct ui_wheel_picker_base *picker, int selected_index, void *user_data);
 
 /**
@@ -26,14 +26,14 @@ typedef enum ui_error (*ui_wheel_picker_on_change_t)(
  * @param out_picker Pointer to receive the allocated component.
  * @param out_cva Optional pointer to receive the CVA interface.
  */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
                             struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Destroys a wheel picker base component.
  */
-void ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker);
+ui_error_t ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker);
 
 /**
  * @brief Sets the data for the picker.
@@ -42,34 +42,32 @@ void ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker);
  * @param items Array of string items.
  * @param count Number of items.
  */
-enum ui_error
-ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
-                               const char *const *items, int count);
+ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
+                                          const char *const *items, int count);
 
 /**
  * @brief Enables or disables infinite looping of the items.
  */
-enum ui_error
-ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
-                                 int is_looping);
+ui_error_t ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
+                                            int is_looping);
 
 /**
  * @brief Sets the currently selected index.
  */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
                                         int index);
 
 /**
  * @brief Gets the currently selected index.
  */
-enum ui_error ui_wheel_picker_base_get_selected_index(
+ui_error_t ui_wheel_picker_base_get_selected_index(
     const struct ui_wheel_picker_base *picker, int *out_index);
 
 /**
  * @brief Sets the change callback.
  */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_set_on_change(struct ui_wheel_picker_base *picker,
                                    ui_wheel_picker_on_change_t on_change,
                                    void *user_data);
@@ -77,7 +75,7 @@ ui_wheel_picker_base_set_on_change(struct ui_wheel_picker_base *picker,
 /**
  * @brief Processes input events for gestures and keyboard navigation.
  */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
                                    const struct ui_event *event,
                                    double timestamp_ms);
@@ -85,13 +83,13 @@ ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
 /**
  * @brief Updates the physics simulation (momentum scrolling, snapping).
  */
-enum ui_error ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
-                                           double delta_ms);
+ui_error_t ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
+                                        double delta_ms);
 
 /**
  * @brief Gets the underlying component.
  */
-enum ui_error
+ui_error_t
 ui_wheel_picker_base_get_component(struct ui_wheel_picker_base *picker,
                                    struct ui_component **out_component);
 

@@ -7,7 +7,7 @@
 
 static void test_empty_state_base(void) {
   struct ui_empty_state_base *state = NULL;
-  enum ui_error err;
+  ui_error_t err;
   const char *attr_val;
   struct ui_signal *dummy_signal = (struct ui_signal *)0x1234;
 
@@ -92,7 +92,7 @@ static void test_empty_state_base(void) {
     exit(1);
   }
 
-  ui_component_destroy((struct ui_component *)state);
+  (void)ui_component_destroy((struct ui_component *)state);
 }
 
 static void test_oom(void) {
@@ -102,7 +102,7 @@ static void test_oom(void) {
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     if (ui_empty_state_base_create(&state) == UI_ERROR_NONE) {
-      ui_component_destroy((struct ui_component *)state);
+      (void)ui_component_destroy((struct ui_component *)state);
     }
     g_malloc_fail_countdown = -1;
   }

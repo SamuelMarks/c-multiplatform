@@ -7,6 +7,7 @@
 #include "../include/ui_atomic.h"
 #include "ui_internal_mem.h"
 #include "ui_reactive_graph.h"
+#include <stdio.h>
 /* clang-format on */
 
 struct ui_computed {
@@ -26,25 +27,25 @@ struct ui_computed {
   size_t subscribers_capacity;
 };
 
-static enum ui_error ui_computed_lock(ui_computed_t *comp) {
+static ui_error_t ui_computed_lock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
-    int is_swapped = 0;
-    while (is_swapped == 0) {
+    ui_int32 is_swapped = 0;
+    while (!is_swapped) {
       (void)ui_atomic_cas(&comp->lock, 0, 1, &is_swapped);
     }
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error ui_computed_unlock(ui_computed_t *comp) {
+static ui_error_t ui_computed_unlock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     (void)ui_atomic_store(&comp->lock, 0);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error ui_computed_add_subscriber(ui_computed_t *comp,
-                                                struct ui_reactive_node *node) {
+static ui_error_t ui_computed_add_subscriber(ui_computed_t *comp,
+                                             struct ui_reactive_node *node) {
   size_t i;
   struct ui_reactive_node **new_array = NULL;
   size_t new_cap = 0;
@@ -58,8 +59,11 @@ static enum ui_error ui_computed_add_subscriber(ui_computed_t *comp,
   if (comp->subscribers_count >= comp->subscribers_capacity) {
     new_cap =
         comp->subscribers_capacity == 0 ? 4 : comp->subscribers_capacity * 2;
-    new_array = (struct ui_reactive_node **)UI_REALLOC(
+    new_array = (struct ui_reactive_node **)C_MULTIPLATFORM_REALLOC(
         comp->subscribers, new_cap * sizeof(struct ui_reactive_node *));
+    if (!new_array) {
+      return UI_ERROR_OUT_OF_MEMORY;
+    }
     comp->subscribers = new_array;
     comp->subscribers_capacity = new_cap;
   }
@@ -68,11 +72,12 @@ static enum ui_error ui_computed_add_subscriber(ui_computed_t *comp,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error ui_computed_on_notify(void *user_data) {
+static ui_error_t ui_computed_on_notify(void *user_data) {
   ui_computed_t *comp = (ui_computed_t *)user_data;
   size_t i;
   struct ui_reactive_node **subs_copy = NULL;
   size_t subs_count = 0;
+  ui_error_t rc;
 
   (void)ui_computed_lock(comp);
 
@@ -85,7 +90,7 @@ static enum ui_error ui_computed_on_notify(void *user_data) {
 
   /* Make a copy of subscribers to notify outside the lock */
   if (comp->subscribers_count > 0) {
-    subs_copy = (struct ui_reactive_node **)UI_MALLOC(
+    subs_copy = (struct ui_reactive_node **)C_MULTIPLATFORM_MALLOC(
         comp->subscribers_count * sizeof(struct ui_reactive_node *));
     if (subs_copy) {
       subs_count = comp->subscribers_count;
@@ -99,19 +104,22 @@ static enum ui_error ui_computed_on_notify(void *user_data) {
 
   if (subs_copy) {
     for (i = 0; i < subs_count; i++) {
-      (void)subs_copy[i]->notify_fn(subs_copy[i]->user_data);
+      rc = subs_copy[i]->notify_fn(subs_copy[i]->user_data);
+      if (rc != UI_ERROR_NONE) {
+        C_MULTIPLATFORM_FREE(subs_copy);
+        return rc;
+      }
     }
-    UI_FREE(subs_copy);
+    C_MULTIPLATFORM_FREE(subs_copy);
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_computed_create(struct ui_arena *arena,
-                                 ui_compute_fn compute_fn, void *user_data,
-                                 enum ui_signal_type type,
-                                 enum ui_signal_mode mode,
-                                 ui_computed_t **out_computed) {
+ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
+                              void *user_data, enum ui_signal_type type,
+                              enum ui_signal_mode mode,
+                              ui_computed_t **out_computed) {
   ui_computed_t *comp = NULL;
 
   if (!out_computed || !compute_fn) {
@@ -121,9 +129,11 @@ enum ui_error ui_computed_create(struct ui_arena *arena,
   if (arena) {
     void *ptr = NULL;
     (void)ui_arena_alloc(arena, sizeof(ui_computed_t), sizeof(void *), &ptr);
+    if (!ptr)
+      return UI_ERROR_OUT_OF_MEMORY;
     comp = (ui_computed_t *)ptr;
   } else {
-    comp = (ui_computed_t *)UI_MALLOC(sizeof(ui_computed_t));
+    comp = (ui_computed_t *)C_MULTIPLATFORM_MALLOC(sizeof(ui_computed_t));
   }
 
   if (!comp) {
@@ -148,10 +158,11 @@ enum ui_error ui_computed_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_computed_get(ui_computed_t *computed,
-                              union ui_signal_payload *out_value) {
+ui_error_t ui_computed_get(ui_computed_t *computed,
+                           union ui_signal_payload *out_value) {
   struct ui_reactive_node *current_node = NULL;
   struct ui_reactive_node *prev_node = NULL;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!computed || !out_value) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -161,15 +172,25 @@ enum ui_error ui_computed_get(ui_computed_t *computed,
 
   /* Dependency tracking */
   (void)ui_reactive_graph_get_current_node(&current_node);
+
   if (current_node && current_node != &computed->self_node) {
-    (void)ui_computed_add_subscriber(computed, current_node);
+    rc = ui_computed_add_subscriber(computed, current_node);
+    if (rc != UI_ERROR_NONE) {
+      (void)ui_computed_unlock(computed);
+      return rc;
+    }
   }
 
   if (computed->is_dirty) {
     /* Push self to graph to track inner dependencies */
     (void)ui_reactive_graph_set_current_node(&computed->self_node, &prev_node);
 
-    computed->compute_fn(computed->user_data, &computed->cached_value);
+    rc = computed->compute_fn(computed->user_data, &computed->cached_value);
+    if (rc != UI_ERROR_NONE) {
+      (void)ui_reactive_graph_set_current_node(prev_node, NULL);
+      (void)ui_computed_unlock(computed);
+      return rc;
+    }
 
     (void)ui_reactive_graph_set_current_node(prev_node, NULL);
     computed->is_dirty = UI_FALSE;
@@ -177,23 +198,21 @@ enum ui_error ui_computed_get(ui_computed_t *computed,
 
   *out_value = computed->cached_value;
 
-  (void)ui_computed_unlock(computed);
-
-  return UI_ERROR_NONE;
+  return ui_computed_unlock(computed);
 }
 
-enum ui_error ui_computed_destroy(ui_computed_t *computed) {
+ui_error_t ui_computed_destroy(ui_computed_t *computed) {
   if (!computed) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (computed->subscribers) {
-    UI_FREE(computed->subscribers);
+    C_MULTIPLATFORM_FREE(computed->subscribers);
     computed->subscribers = NULL;
   }
 
   if (!computed->arena) {
-    UI_FREE(computed);
+    C_MULTIPLATFORM_FREE(computed);
   }
 
   return UI_ERROR_NONE;

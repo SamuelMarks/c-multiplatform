@@ -5,11 +5,11 @@
 #include <stdlib.h>
 /* clang-format on */
 
-enum ui_error
+ui_error_t
 ui_css_page_floats_parse(const struct ui_css_computed_style *style,
                          struct ui_css_page_floats_properties *out_props) {
   const char *val = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!style || !out_props) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -21,6 +21,10 @@ ui_css_page_floats_parse(const struct ui_css_computed_style *style,
   out_props->clear_after = UI_CSS_CLEAR_AFTER_NONE;
 
   rc = ui_css_computed_style_get_property(style, "float-reference", &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "column") == 0)
       out_props->float_reference = UI_CSS_FLOAT_REFERENCE_COLUMN;
@@ -33,6 +37,10 @@ ui_css_page_floats_parse(const struct ui_css_computed_style *style,
   }
 
   rc = ui_css_computed_style_get_property(style, "float-defer", &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "none") == 0) {
       out_props->float_defer_type = UI_CSS_FLOAT_DEFER_NONE;
@@ -43,6 +51,10 @@ ui_css_page_floats_parse(const struct ui_css_computed_style *style,
   }
 
   rc = ui_css_computed_style_get_property(style, "clear-after", &val);
+  if (rc != UI_ERROR_NONE) {
+    if (0)
+      return rc;
+  }
   if (rc == UI_ERROR_NONE) {
     if (strcmp(val, "left") == 0)
       out_props->clear_after = UI_CSS_CLEAR_AFTER_LEFT;

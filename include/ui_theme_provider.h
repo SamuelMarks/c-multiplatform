@@ -27,9 +27,9 @@ struct ui_theme_provider {
  * @param out_provider Pointer to output the initialized provider.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_theme_provider_create(struct ui_arena *arena,
-                                       struct ui_design_token_dict *tokens,
-                                       struct ui_theme_provider **out_provider);
+ui_error_t ui_theme_provider_create(struct ui_arena *arena,
+                                    struct ui_design_token_dict *tokens,
+                                    struct ui_theme_provider **out_provider);
 
 /**
  * @brief Mounts the theme provider to a DOM node, making its tokens available
@@ -39,8 +39,8 @@ enum ui_error ui_theme_provider_create(struct ui_arena *arena,
  * @param node The DOM node to mount to.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_theme_provider_mount(struct ui_theme_provider *provider,
-                                      struct ui_dom_node *node);
+ui_error_t ui_theme_provider_mount(struct ui_theme_provider *provider,
+                                   struct ui_dom_node *node);
 
 /**
  * @brief Retrieves the closest design token dictionary from the component's
@@ -51,8 +51,8 @@ enum ui_error ui_theme_provider_mount(struct ui_theme_provider *provider,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if no theme provider is
  * found.
  */
-enum ui_error ui_theme_provider_get(struct ui_dom_node *node,
-                                    struct ui_design_token_dict **out_tokens);
+ui_error_t ui_theme_provider_get(struct ui_dom_node *node,
+                                 struct ui_design_token_dict **out_tokens);
 
 #ifdef __cplusplus
 }

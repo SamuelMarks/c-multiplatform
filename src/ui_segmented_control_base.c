@@ -15,10 +15,10 @@ struct ui_segmented_control_base {
   int button_count;
   int button_capacity;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
@@ -31,7 +31,7 @@ struct ui_segmented_button_base {
   struct ui_segmented_control_base *parent;
   int index;
 };
-static enum ui_error
+static ui_error_t
 trigger_cva_change(struct ui_segmented_control_base *control,
                    struct ui_segmented_button_base *active_button) {
   (void)active_button;
@@ -52,7 +52,7 @@ trigger_cva_change(struct ui_segmented_control_base *control,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
+static ui_error_t
 trigger_cva_touched(struct ui_segmented_control_base *control) {
   if (control && control->cva_on_touched) {
     return control->cva_on_touched(control->cva_on_touched_user_data);
@@ -60,8 +60,8 @@ trigger_cva_touched(struct ui_segmented_control_base *control) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error segmented_cva_write_value(void *component,
-                                               union ui_signal_payload value) {
+static ui_error_t segmented_cva_write_value(void *component,
+                                            union ui_signal_payload value) {
   struct ui_segmented_control_base *control =
       (struct ui_segmented_control_base *)component;
   int index;
@@ -80,10 +80,9 @@ static enum ui_error segmented_cva_write_value(void *component,
 }
 
 /** \brief segmented_cva_register_on_change */
-static enum ui_error segmented_cva_register_on_change(
+static ui_error_t segmented_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_segmented_control_base *control =
       (struct ui_segmented_control_base *)component;
@@ -94,10 +93,8 @@ static enum ui_error segmented_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-segmented_cva_register_on_touched(void *component,
-                                  enum ui_error (*callback)(void *user_data),
-                                  void *user_data) {
+static ui_error_t segmented_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_segmented_control_base *control =
       (struct ui_segmented_control_base *)component;
   if (!control)
@@ -107,8 +104,8 @@ segmented_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error segmented_cva_set_disabled_state(void *component,
-                                                      int is_disabled) {
+static ui_error_t segmented_cva_set_disabled_state(void *component,
+                                                   int is_disabled) {
   struct ui_segmented_control_base *control =
       (struct ui_segmented_control_base *)component;
   if (!control)
@@ -118,17 +115,17 @@ static enum ui_error segmented_cva_set_disabled_state(void *component,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_segmented_control_base_create(struct ui_segmented_control_base **out_control,
                                  struct ui_control_value_accessor *out_cva) {
   struct ui_segmented_control_base *control;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  control = (struct ui_segmented_control_base *)UI_MALLOC(
+  control = (struct ui_segmented_control_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_segmented_control_base));
   if (!control) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -145,7 +142,7 @@ ui_segmented_control_base_create(struct ui_segmented_control_base **out_control,
 
   rc = ui_component_create(&control->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(control);
+    C_MULTIPLATFORM_FREE(control);
     return rc;
   }
 
@@ -166,22 +163,23 @@ ui_segmented_control_base_create(struct ui_segmented_control_base **out_control,
 }
 
 /** \brief ui_segmented_control_base_destroy */
-void ui_segmented_control_base_destroy(
-    struct ui_segmented_control_base *control) {
+ui_error_t
+ui_segmented_control_base_destroy(struct ui_segmented_control_base *control) {
   if (!control) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (control->component) {
-    ui_component_destroy(control->component);
+    (void)ui_component_destroy(control->component);
   }
   if (control->buttons) {
-    UI_FREE(control->buttons);
+    C_MULTIPLATFORM_FREE(control->buttons);
   }
-  UI_FREE(control);
+  C_MULTIPLATFORM_FREE(control);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_segmented_control_base_get_component */
-enum ui_error ui_segmented_control_base_get_component(
+ui_error_t ui_segmented_control_base_get_component(
     struct ui_segmented_control_base *control,
     struct ui_component **out_component) {
   if (!control || !out_component) {
@@ -192,7 +190,7 @@ enum ui_error ui_segmented_control_base_get_component(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_segmented_control_base_set_mode(struct ui_segmented_control_base *control,
                                    enum ui_segmented_control_mode mode) {
   if (!control) {
@@ -203,7 +201,7 @@ ui_segmented_control_base_set_mode(struct ui_segmented_control_base *control,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_segmented_control_base_get_mode(struct ui_segmented_control_base *control,
                                    enum ui_segmented_control_mode *out_mode) {
   if (!control || !out_mode) {
@@ -214,7 +212,7 @@ ui_segmented_control_base_get_mode(struct ui_segmented_control_base *control,
 }
 
 /** \brief ui_segmented_control_base_append_segment */
-enum ui_error ui_segmented_control_base_append_segment(
+ui_error_t ui_segmented_control_base_append_segment(
     struct ui_segmented_control_base *control,
     struct ui_segmented_button_base *button) {
   if (!control || !button) {
@@ -225,7 +223,7 @@ enum ui_error ui_segmented_control_base_append_segment(
     int new_cap =
         control->button_capacity == 0 ? 4 : control->button_capacity * 2;
     struct ui_segmented_button_base **new_arr =
-        (struct ui_segmented_button_base **)UI_REALLOC(
+        (struct ui_segmented_button_base **)C_MULTIPLATFORM_REALLOC(
             control->buttons,
             new_cap * sizeof(struct ui_segmented_button_base *));
     if (!new_arr) {
@@ -245,16 +243,16 @@ enum ui_error ui_segmented_control_base_append_segment(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_segmented_button_base_create(struct ui_segmented_button_base **out_button) {
   struct ui_segmented_button_base *button;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  button = (struct ui_segmented_button_base *)UI_MALLOC(
+  button = (struct ui_segmented_button_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_segmented_button_base));
   if (!button) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -262,7 +260,7 @@ ui_segmented_button_base_create(struct ui_segmented_button_base **out_button) {
 
   rc = ui_component_create(&button->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(button);
+    C_MULTIPLATFORM_FREE(button);
     return rc;
   }
 
@@ -276,18 +274,20 @@ ui_segmented_button_base_create(struct ui_segmented_button_base **out_button) {
   return UI_ERROR_NONE;
 }
 
-void ui_segmented_button_base_destroy(struct ui_segmented_button_base *button) {
+ui_error_t
+ui_segmented_button_base_destroy(struct ui_segmented_button_base *button) {
   if (!button) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (button->component) {
-    ui_component_destroy(button->component);
+    (void)ui_component_destroy(button->component);
   }
-  UI_FREE(button);
+  C_MULTIPLATFORM_FREE(button);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_segmented_button_base_get_component(struct ui_segmented_button_base *button,
                                        struct ui_component **out_component) {
   if (!button || !out_component) {
@@ -298,7 +298,7 @@ ui_segmented_button_base_get_component(struct ui_segmented_button_base *button,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_segmented_button_base_set_selected(struct ui_segmented_button_base *button,
                                       int selected) {
   int i;
@@ -314,7 +314,7 @@ ui_segmented_button_base_set_selected(struct ui_segmented_button_base *button,
     button->selected = selected;
 
     if (button->parent) {
-      enum ui_error t_rc = trigger_cva_touched(button->parent);
+      ui_error_t t_rc = trigger_cva_touched(button->parent);
       if (t_rc != UI_ERROR_NONE)
         return t_rc;
 
@@ -335,7 +335,7 @@ ui_segmented_button_base_set_selected(struct ui_segmented_button_base *button,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_segmented_button_base_get_selected(struct ui_segmented_button_base *button,
                                       int *out_selected) {
   if (!button || !out_selected) {

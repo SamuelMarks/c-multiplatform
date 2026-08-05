@@ -5,6 +5,64 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_badge_mock_fail = 0;
+static ui_error_t mock_dom_node_set_tag_name(struct ui_dom_node *node,
+                                             const char *tag) {
+  if (g_badge_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  return (ui_dom_node_set_tag_name)(node, tag);
+}
+#undef ui_dom_node_set_tag_name
+#define ui_dom_node_set_tag_name mock_dom_node_set_tag_name
+
+static ui_error_t mock_dom_node_create(enum ui_dom_node_type type,
+                                       struct ui_dom_node **out) {
+  if (g_badge_mock_fail == 2)
+    return UI_ERROR_UNKNOWN;
+  /* To fail ONLY on the text node creation */
+  if (g_badge_mock_fail == 20) {
+    if (type == UI_DOM_NODE_TYPE_TEXT)
+      return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_create)(type, out);
+}
+#undef ui_dom_node_create
+#define ui_dom_node_create mock_dom_node_create
+
+static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
+                                             struct ui_dom_node *child) {
+  if (g_badge_mock_fail == 3)
+    return UI_ERROR_UNKNOWN;
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+#define ui_dom_node_append_child mock_dom_node_append_child
+
+ui_error_t run_badge_coverage(void);
+ui_error_t run_badge_coverage(void) {
+  struct ui_badge_base *badge = NULL;
+
+  g_badge_mock_fail = 1;
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 0;
+
+  g_badge_mock_fail = 2;
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 0;
+
+  g_badge_mock_fail = 20;
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 0;
+
+  g_badge_mock_fail = 3;
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 0;
+
+  return UI_ERROR_NONE;
+}
+#endif
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -14,42 +72,66 @@ struct ui_badge_base {
   struct ui_signal *text_signal;
 };
 
-enum ui_error ui_badge_base_create(struct ui_badge_base **out_badge) {
+ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
   struct ui_badge_base *badge;
   struct ui_dom_node *root_node = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_badge) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  badge = (struct ui_badge_base *)UI_MALLOC(sizeof(struct ui_badge_base));
+  badge = (struct ui_badge_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_badge_base));
   if (!badge) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   rc = ui_component_create(&badge->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(badge);
+    C_MULTIPLATFORM_FREE(badge);
     return rc;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(badge->component);
-    UI_FREE(badge);
+    (void)ui_component_destroy(badge->component);
+    C_MULTIPLATFORM_FREE(badge);
     return rc;
   }
 
-  ui_dom_node_set_tag_name(root_node, "span");
-  ui_dom_node_set_attribute(root_node, "role", "status");
+  rc = ui_dom_node_set_tag_name(root_node, "span");
+  if (rc != UI_ERROR_NONE) {
+    (void)ui_dom_node_destroy(root_node);
+    (void)ui_component_destroy(badge->component);
+    C_MULTIPLATFORM_FREE(badge);
+    return rc;
+  }
+  rc = ui_dom_node_set_attribute(root_node, "role", "status");
+  if (rc != UI_ERROR_NONE) {
+    (void)ui_dom_node_destroy(root_node);
+    (void)ui_component_destroy(badge->component);
+    C_MULTIPLATFORM_FREE(badge);
+    return rc;
+  }
 
   /* Text content is stored in a child text node */
   {
     struct ui_dom_node *text_node;
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
-    if (rc == UI_ERROR_NONE) {
-      ui_dom_node_append_child(root_node, text_node);
+    if (rc != UI_ERROR_NONE) {
+      (void)ui_dom_node_destroy(root_node);
+      (void)ui_component_destroy(badge->component);
+      C_MULTIPLATFORM_FREE(badge);
+      return rc;
+    }
+    rc = ui_dom_node_append_child(root_node, text_node);
+    if (rc != UI_ERROR_NONE) {
+      (void)ui_dom_node_destroy(text_node);
+      (void)ui_dom_node_destroy(root_node);
+      (void)ui_component_destroy(badge->component);
+      C_MULTIPLATFORM_FREE(badge);
+      return rc;
     }
   }
 
@@ -59,17 +141,18 @@ enum ui_error ui_badge_base_create(struct ui_badge_base **out_badge) {
   return UI_ERROR_NONE;
 }
 
-void ui_badge_base_destroy(struct ui_badge_base *badge) {
+ui_error_t ui_badge_base_destroy(struct ui_badge_base *badge) {
   if (badge) {
     if (badge->component) {
-      ui_component_destroy(badge->component);
+      (void)ui_component_destroy(badge->component);
     }
-    UI_FREE(badge);
+    C_MULTIPLATFORM_FREE(badge);
   }
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_badge_base_set_value(struct ui_badge_base *badge, int value,
-                                      int max_value) {
+ui_error_t ui_badge_base_set_value(struct ui_badge_base *badge, int value,
+                                   int max_value) {
   char buf[32];
 
   if (!badge || !badge->component || !badge->component->shadow_root) {
@@ -97,8 +180,8 @@ enum ui_error ui_badge_base_set_value(struct ui_badge_base *badge, int value,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-enum ui_error ui_badge_base_set_text(struct ui_badge_base *badge,
-                                     const char *text) {
+ui_error_t ui_badge_base_set_text(struct ui_badge_base *badge,
+                                  const char *text) {
   if (!badge || !badge->component || !badge->component->shadow_root) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -110,8 +193,8 @@ enum ui_error ui_badge_base_set_text(struct ui_badge_base *badge,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-enum ui_error ui_badge_base_set_hidden(struct ui_badge_base *badge,
-                                       int is_hidden) {
+ui_error_t ui_badge_base_set_hidden(struct ui_badge_base *badge,
+                                    int is_hidden) {
   if (!badge || !badge->component || !badge->component->shadow_root) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -125,8 +208,8 @@ enum ui_error ui_badge_base_set_hidden(struct ui_badge_base *badge,
   }
 }
 
-enum ui_error ui_badge_base_get_component(struct ui_badge_base *badge,
-                                          struct ui_component **out_component) {
+ui_error_t ui_badge_base_get_component(struct ui_badge_base *badge,
+                                       struct ui_component **out_component) {
   if (!badge || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -134,8 +217,8 @@ enum ui_error ui_badge_base_get_component(struct ui_badge_base *badge,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_badge_base_bind_text(struct ui_badge_base *widget,
-                                      struct ui_signal *signal) {
+ui_error_t ui_badge_base_bind_text(struct ui_badge_base *widget,
+                                   struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -9,31 +9,74 @@
 /* MSVC Safe CRT */
 #endif
 
-static const char *ui_card_base_css =
-    ":host { "
-    "display: block; "
-    "position: relative; "
-    "background: var(--card-bg, #ffffff); "
-    "border-radius: var(--card-radius, 4px); "
-    "box-shadow: var(--card-shadow, 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 "
-    "rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12)); "
-    "padding: var(--card-padding, 16px); "
-    "} "
-    ".header { "
-    "display: flex; "
-    "flex-direction: row; "
-    "align-items: center; "
-    "margin-bottom: var(--card-header-mb, 16px); "
-    "} "
-    ".content { "
-    "display: block; "
-    "} "
-    ".actions { "
-    "display: flex; "
-    "flex-direction: row; "
-    "align-items: center; "
-    "padding-top: var(--card-actions-pt, 8px); "
-    "}";
+#ifdef UI_TEST_MOCK_ALLOC
+int g_card_mock_fail = -1;
+
+static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
+                                             struct ui_dom_node *child) {
+  if (g_card_mock_fail == 0) {
+    g_card_mock_fail = -1;
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_card_mock_fail > 0)
+    g_card_mock_fail--;
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+#define ui_dom_node_append_child mock_dom_node_append_child
+
+static ui_error_t
+mock_component_set_default_style(struct ui_component *component,
+                                 struct ui_css_stylesheet *stylesheet) {
+  if (g_card_mock_fail == 0) {
+    g_card_mock_fail = -1;
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_card_mock_fail > 0)
+    g_card_mock_fail--;
+  return (ui_component_set_default_style)(component, stylesheet);
+}
+#undef ui_component_set_default_style
+#define ui_component_set_default_style mock_component_set_default_style
+#endif
+
+static const char ui_card_base_css[] = {
+    58,  104, 111, 115, 116, 32,  123, 32,  100, 105, 115, 112, 108, 97,  121,
+    58,  32,  98,  108, 111, 99,  107, 59,  32,  112, 111, 115, 105, 116, 105,
+    111, 110, 58,  32,  114, 101, 108, 97,  116, 105, 118, 101, 59,  32,  98,
+    97,  99,  107, 103, 114, 111, 117, 110, 100, 58,  32,  118, 97,  114, 40,
+    45,  45,  99,  97,  114, 100, 45,  98,  103, 44,  32,  35,  102, 102, 102,
+    102, 102, 102, 41,  59,  32,  98,  111, 114, 100, 101, 114, 45,  114, 97,
+    100, 105, 117, 115, 58,  32,  118, 97,  114, 40,  45,  45,  99,  97,  114,
+    100, 45,  114, 97,  100, 105, 117, 115, 44,  32,  52,  112, 120, 41,  59,
+    32,  98,  111, 120, 45,  115, 104, 97,  100, 111, 119, 58,  32,  118, 97,
+    114, 40,  45,  45,  99,  97,  114, 100, 45,  115, 104, 97,  100, 111, 119,
+    44,  32,  48,  32,  50,  112, 120, 32,  49,  112, 120, 32,  45,  49,  112,
+    120, 32,  114, 103, 98,  97,  40,  48,  44,  48,  44,  48,  44,  46,  50,
+    41,  44,  32,  48,  32,  49,  112, 120, 32,  49,  112, 120, 32,  48,  32,
+    114, 103, 98,  97,  40,  48,  44,  48,  44,  48,  44,  46,  49,  52,  41,
+    44,  32,  48,  32,  49,  112, 120, 32,  51,  112, 120, 32,  48,  32,  114,
+    103, 98,  97,  40,  48,  44,  48,  44,  48,  44,  46,  49,  50,  41,  41,
+    59,  32,  112, 97,  100, 100, 105, 110, 103, 58,  32,  118, 97,  114, 40,
+    45,  45,  99,  97,  114, 100, 45,  112, 97,  100, 100, 105, 110, 103, 44,
+    32,  49,  54,  112, 120, 41,  59,  32,  125, 32,  46,  104, 101, 97,  100,
+    101, 114, 32,  123, 32,  100, 105, 115, 112, 108, 97,  121, 58,  32,  102,
+    108, 101, 120, 59,  32,  102, 108, 101, 120, 45,  100, 105, 114, 101, 99,
+    116, 105, 111, 110, 58,  32,  114, 111, 119, 59,  32,  97,  108, 105, 103,
+    110, 45,  105, 116, 101, 109, 115, 58,  32,  99,  101, 110, 116, 101, 114,
+    59,  32,  109, 97,  114, 103, 105, 110, 45,  98,  111, 116, 116, 111, 109,
+    58,  32,  118, 97,  114, 40,  45,  45,  99,  97,  114, 100, 45,  104, 101,
+    97,  100, 101, 114, 45,  109, 98,  44,  32,  49,  54,  112, 120, 41,  59,
+    32,  125, 32,  46,  99,  111, 110, 116, 101, 110, 116, 32,  123, 32,  100,
+    105, 115, 112, 108, 97,  121, 58,  32,  98,  108, 111, 99,  107, 59,  32,
+    125, 32,  46,  97,  99,  116, 105, 111, 110, 115, 32,  123, 32,  100, 105,
+    115, 112, 108, 97,  121, 58,  32,  102, 108, 101, 120, 59,  32,  102, 108,
+    101, 120, 45,  100, 105, 114, 101, 99,  116, 105, 111, 110, 58,  32,  114,
+    111, 119, 59,  32,  97,  108, 105, 103, 110, 45,  105, 116, 101, 109, 115,
+    58,  32,  99,  101, 110, 116, 101, 114, 59,  32,  112, 97,  100, 100, 105,
+    110, 103, 45,  116, 111, 112, 58,  32,  118, 97,  114, 40,  45,  45,  99,
+    97,  114, 100, 45,  97,  99,  116, 105, 111, 110, 115, 45,  112, 116, 44,
+    32,  56,  112, 120, 41,  59,  32,  125, 0};
 
 /** \brief ui_card_base */
 struct ui_card_base {
@@ -49,16 +92,17 @@ struct ui_card_base {
   struct ui_signal *data_signal;
 };
 
-enum ui_error ui_card_base_create(struct ui_card_base **out_card) {
+ui_error_t ui_card_base_create(struct ui_card_base **out_card) {
   struct ui_card_base *card;
   struct ui_css_stylesheet *default_style = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_card) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  card = (struct ui_card_base *)UI_MALLOC(sizeof(struct ui_card_base));
+  card = (struct ui_card_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_card_base));
   if (!card) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -108,16 +152,24 @@ enum ui_error ui_card_base_create(struct ui_card_base **out_card) {
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  (void)ui_dom_node_append_child(card->root_node, card->header_node);
-  (void)ui_dom_node_append_child(card->root_node, card->content_node);
-  (void)ui_dom_node_append_child(card->root_node, card->actions_node);
+  rc = ui_dom_node_append_child(card->root_node, card->header_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(card->root_node, card->content_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(card->root_node, card->actions_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_css_parse_stylesheet(ui_card_base_css, &default_style);
   if (rc != UI_ERROR_NONE) {
     goto cleanup;
   }
 
-  (void)ui_component_set_default_style(card->component, default_style);
+  rc = ui_component_set_default_style(card->component, default_style);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   card->component->shadow_root = card->root_node;
 
@@ -126,35 +178,36 @@ enum ui_error ui_card_base_create(struct ui_card_base **out_card) {
 
 cleanup:
   if (card->header_node && card->header_node->parent == NULL) {
-    ui_dom_node_destroy(card->header_node);
+    (void)ui_dom_node_destroy(card->header_node);
   }
   if (card->content_node && card->content_node->parent == NULL) {
-    ui_dom_node_destroy(card->content_node);
+    (void)ui_dom_node_destroy(card->content_node);
   }
   if (card->actions_node && card->actions_node->parent == NULL) {
-    ui_dom_node_destroy(card->actions_node);
+    (void)ui_dom_node_destroy(card->actions_node);
   }
   if (card->root_node) {
-    ui_dom_node_destroy(card->root_node);
+    (void)ui_dom_node_destroy(card->root_node);
   }
   if (card->component)
-    ui_component_destroy(card->component);
-  UI_FREE(card);
+    (void)ui_component_destroy(card->component);
+  C_MULTIPLATFORM_FREE(card);
   return rc;
 }
 
-void ui_card_base_destroy(struct ui_card_base *card) {
+ui_error_t ui_card_base_destroy(struct ui_card_base *card) {
   if (!card) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (card->component) {
-    ui_component_destroy(card->component);
+    (void)ui_component_destroy(card->component);
   }
-  UI_FREE(card);
+  C_MULTIPLATFORM_FREE(card);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_card_base_set_header(struct ui_card_base *card,
-                                      struct ui_component *header_content) {
+ui_error_t ui_card_base_set_header(struct ui_card_base *card,
+                                   struct ui_component *header_content) {
   if (!card) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -165,8 +218,8 @@ enum ui_error ui_card_base_set_header(struct ui_card_base *card,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_card_base_set_content(struct ui_card_base *card,
-                                       struct ui_component *content) {
+ui_error_t ui_card_base_set_content(struct ui_card_base *card,
+                                    struct ui_component *content) {
   if (!card) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -177,8 +230,8 @@ enum ui_error ui_card_base_set_content(struct ui_card_base *card,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_card_base_set_actions(struct ui_card_base *card,
-                                       struct ui_component *actions) {
+ui_error_t ui_card_base_set_actions(struct ui_card_base *card,
+                                    struct ui_component *actions) {
   if (!card) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -189,8 +242,8 @@ enum ui_error ui_card_base_set_actions(struct ui_card_base *card,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_card_base_get_component(struct ui_card_base *card,
-                                         struct ui_component **out_component) {
+ui_error_t ui_card_base_get_component(struct ui_card_base *card,
+                                      struct ui_component **out_component) {
   if (!card || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -198,8 +251,8 @@ enum ui_error ui_card_base_get_component(struct ui_card_base *card,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_card_base_bind_data(struct ui_card_base *widget,
-                                     struct ui_signal *signal) {
+ui_error_t ui_card_base_bind_data(struct ui_card_base *widget,
+                                  struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -12,14 +12,13 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
-static enum ui_error skip_whitespace(const char **p_str) {
+static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
-  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_parse_contain(const char *str, unsigned int *out_flags) {
+ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags) {
   char token_buf[256];
   char *token;
   char *next_token = NULL;
@@ -32,7 +31,7 @@ enum ui_error ui_css_parse_contain(const char *str, unsigned int *out_flags) {
   if (!str || !out_flags)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  (void)skip_whitespace(&str);
+  skip_whitespace(&str);
 
   UI_STRNCPY(token_buf, sizeof(token_buf), str, sizeof(token_buf) - 1);
   token_buf[sizeof(token_buf) - 1] = '\0';
@@ -104,12 +103,12 @@ enum ui_error ui_css_parse_contain(const char *str, unsigned int *out_flags) {
 }
 
 /** \brief ui_css_parse_content_visibility */
-enum ui_error ui_css_parse_content_visibility(
+ui_error_t ui_css_parse_content_visibility(
     const char *str, enum ui_css_content_visibility *out_visibility) {
   if (!str || !out_visibility)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  (void)skip_whitespace(&str);
+  skip_whitespace(&str);
 
   if (strcmp(str, "visible") == 0) {
     *out_visibility = UI_CSS_CONTENT_VISIBILITY_VISIBLE;
@@ -125,7 +124,7 @@ enum ui_error ui_css_parse_content_visibility(
   return UI_ERROR_PARSE_FAILED;
 }
 
-static enum ui_error
+static ui_error_t
 parse_intrinsic_dim(const char **p_str,
                     struct ui_css_contain_intrinsic_dim *dim) {
   char token_buf[64];
@@ -137,7 +136,7 @@ parse_intrinsic_dim(const char **p_str,
   dim->is_none = 0;
   dim->length.unit = UI_CSS_UNIT_NONE;
 
-  (void)skip_whitespace(&str);
+  skip_whitespace(&str);
   if (!*str) {
     return UI_ERROR_PARSE_FAILED; /* Unexpected end of string */
   }
@@ -147,7 +146,7 @@ parse_intrinsic_dim(const char **p_str,
       (isspace((unsigned char)str[4]) || str[4] == '\0')) {
     dim->has_auto = 1;
     str += 4;
-    (void)skip_whitespace(&str);
+    skip_whitespace(&str);
     if (!*str) {
       /* 'auto' alone is valid, means auto none */
       dim->is_none = 1;
@@ -174,34 +173,32 @@ parse_intrinsic_dim(const char **p_str,
   }
 
   /* Try parsing as a length */
-  if (ui_css_parse_value(token_buf, &dim->length) == UI_ERROR_NONE) {
+  {
+    ui_error_t rc2 = ui_css_parse_value(token_buf, &dim->length);
+    if (rc2 != UI_ERROR_NONE) {
+      return rc2;
+    }
     *p_str = space;
     return UI_ERROR_NONE;
   }
-
-  /* If we had 'auto' and then a failure, we might have eaten part of the next
-   * dimension if it wasn't a valid length */
-  /* But 'auto' must be followed by 'none' or `<length>` in the same dimension
-   * slot if there's two tokens for one slot */
-  return UI_ERROR_PARSE_FAILED;
 }
 
 /** \brief ui_css_parse_contain_intrinsic_size */
-enum ui_error ui_css_parse_contain_intrinsic_size(
+ui_error_t ui_css_parse_contain_intrinsic_size(
     const char *str, struct ui_css_contain_intrinsic_size *out_size) {
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!str || !out_size)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  (void)skip_whitespace(&str);
+  skip_whitespace(&str);
 
   rc = parse_intrinsic_dim(&str, &out_size->width);
   if (rc != UI_ERROR_NONE) {
     return rc;
   }
 
-  (void)skip_whitespace(&str);
+  skip_whitespace(&str);
   if (*str == '\0') {
     /* If only one value is given, it applies to both */
     out_size->height = out_size->width;
@@ -214,7 +211,7 @@ enum ui_error ui_css_parse_contain_intrinsic_size(
     return rc;
   }
 
-  (void)skip_whitespace(&str);
+  skip_whitespace(&str);
   if (*str != '\0') {
     /* Extra garbage at the end */
     return UI_ERROR_PARSE_FAILED;

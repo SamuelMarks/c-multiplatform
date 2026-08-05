@@ -21,15 +21,14 @@ struct ui_css_env_manager;
  * @param out_manager Pointer to receive the new manager.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_env_manager_create(struct ui_css_env_manager **out_manager);
+ui_error_t ui_css_env_manager_create(struct ui_css_env_manager **out_manager);
 
 /**
  * @brief Destroys an environment variable manager.
  *
  * @param manager The manager to destroy.
  */
-void ui_css_env_manager_destroy(struct ui_css_env_manager *manager);
+ui_error_t ui_css_env_manager_destroy(struct ui_css_env_manager *manager);
 
 /**
  * @brief Sets an environment variable. If the variable exists, its value is
@@ -42,9 +41,9 @@ void ui_css_env_manager_destroy(struct ui_css_env_manager *manager);
  * this value.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_env_manager_set(struct ui_css_env_manager *manager,
-                                     const char *name,
-                                     struct ui_css_value_ext *value);
+ui_error_t ui_css_env_manager_set(struct ui_css_env_manager *manager,
+                                  const char *name,
+                                  struct ui_css_value_ext *value);
 
 /**
  * @brief Retrieves the value of an environment variable.
@@ -55,9 +54,9 @@ enum ui_error ui_css_env_manager_set(struct ui_css_env_manager *manager,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if the variable does not
  * exist.
  */
-enum ui_error ui_css_env_manager_get(const struct ui_css_env_manager *manager,
-                                     const char *name,
-                                     const struct ui_css_value_ext **out_value);
+ui_error_t ui_css_env_manager_get(const struct ui_css_env_manager *manager,
+                                  const char *name,
+                                  const struct ui_css_value_ext **out_value);
 
 /**
  * @brief Removes an environment variable.
@@ -66,8 +65,8 @@ enum ui_error ui_css_env_manager_get(const struct ui_css_env_manager *manager,
  * @param name The name of the environment variable to remove.
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if it does not exist.
  */
-enum ui_error ui_css_env_manager_remove(struct ui_css_env_manager *manager,
-                                        const char *name);
+ui_error_t ui_css_env_manager_remove(struct ui_css_env_manager *manager,
+                                     const char *name);
 
 #ifdef __cplusplus
 }

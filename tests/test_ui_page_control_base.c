@@ -9,7 +9,7 @@ extern int g_malloc_fail_countdown;
 
 static void test_page_control_base(void) {
   struct ui_page_control_base *control;
-  enum ui_error err;
+  ui_error_t err;
   const char *attr_val;
   struct ui_signal *signal = (struct ui_signal *)0x1234;
 
@@ -59,12 +59,12 @@ static void test_page_control_base(void) {
     exit(1);
   }
 
-  ui_component_destroy((struct ui_component *)control);
+  (void)ui_component_destroy((struct ui_component *)control);
 }
 
 static void test_page_control_base_errors(void) {
   struct ui_page_control_base *control = NULL;
-  enum ui_error err;
+  ui_error_t err;
 
   /* NULL checks */
   if (ui_page_control_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -107,7 +107,7 @@ static void test_page_control_base_errors(void) {
      Its own !control check is unreachable!
   */
 
-  ui_component_destroy((struct ui_component *)control);
+  (void)ui_component_destroy((struct ui_component *)control);
 }
 
 static void test_page_control_base_oom(void) {
@@ -117,7 +117,7 @@ static void test_page_control_base_oom(void) {
   for (countdown = 0; countdown < 5; countdown++) {
     g_malloc_fail_countdown = countdown;
     if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {
-      ui_component_destroy((struct ui_component *)control);
+      (void)ui_component_destroy((struct ui_component *)control);
     }
   }
   g_malloc_fail_countdown = -1;

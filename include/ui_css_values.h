@@ -154,8 +154,7 @@ struct ui_css_math_expr {
  * @return UI_ERROR_NONE on success, UI_ERROR_PARSE_FAILED if the format is
  * invalid.
  */
-enum ui_error ui_css_parse_value(const char *str,
-                                 struct ui_css_value *out_value);
+ui_error_t ui_css_parse_value(const char *str, struct ui_css_value *out_value);
 
 /**
  * @brief Parses an extended CSS value string, which can include math functions
@@ -166,8 +165,8 @@ enum ui_error ui_css_parse_value(const char *str,
  * @return UI_ERROR_NONE on success, UI_ERROR_PARSE_FAILED if the format is
  * invalid.
  */
-enum ui_error ui_css_parse_value_ext(const char *str,
-                                     struct ui_css_value_ext **out_value);
+ui_error_t ui_css_parse_value_ext(const char *str,
+                                  struct ui_css_value_ext **out_value);
 
 /**
  * @brief Destroys an extended CSS value, freeing associated math expression
@@ -175,7 +174,7 @@ enum ui_error ui_css_parse_value_ext(const char *str,
  *
  * @param val The value to destroy.
  */
-enum ui_error ui_css_value_ext_destroy(struct ui_css_value_ext *val);
+void ui_css_value_ext_destroy(struct ui_css_value_ext *val);
 
 /**
  * @brief Represents color spaces for CSS Color Module Level 3, 4, 5, 6.
@@ -214,8 +213,7 @@ struct ui_css_color {
  * @return UI_ERROR_NONE on success, UI_ERROR_PARSE_FAILED if the format is
  * invalid.
  */
-enum ui_error ui_css_parse_color(const char *str,
-                                 struct ui_css_color *out_color);
+ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color);
 
 /**
  * @brief Types of CSS images.
@@ -278,8 +276,7 @@ struct ui_css_image {
  * @param out_image Pointer to receive the parsed image.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_image(const char *str,
-                                 struct ui_css_image *out_image);
+ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image);
 
 /**
  * @brief Geometry box used for clipping and masking.
@@ -331,8 +328,8 @@ struct ui_css_clip_path {
  * @param out_clip_path Pointer to receive the parsed clip-path.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_clip_path(const char *str,
-                                     struct ui_css_clip_path *out_clip_path);
+ui_error_t ui_css_parse_clip_path(const char *str,
+                                  struct ui_css_clip_path *out_clip_path);
 
 /**
  * @brief CSS mask composite operator.
@@ -371,8 +368,8 @@ struct ui_css_mask_layer {
  * @param out_mask Pointer to receive the parsed mask layer.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_mask(const char *str,
-                                struct ui_css_mask_layer *out_mask);
+ui_error_t ui_css_parse_mask(const char *str,
+                             struct ui_css_mask_layer *out_mask);
 
 /**
  * @brief Represents a CSS shape-outside value.
@@ -390,9 +387,8 @@ struct ui_css_shape_outside {
  * @param out_shape Pointer to receive the parsed shape-outside.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_parse_shape_outside(const char *str,
-                           struct ui_css_shape_outside *out_shape);
+ui_error_t ui_css_parse_shape_outside(const char *str,
+                                      struct ui_css_shape_outside *out_shape);
 
 /**
  * @brief CSS Transform function types.
@@ -446,15 +442,15 @@ struct ui_css_transform {
  * @param out_transform Pointer to receive the parsed transform.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_transform(const char *str,
-                                     struct ui_css_transform **out_transform);
+ui_error_t ui_css_parse_transform(const char *str,
+                                  struct ui_css_transform **out_transform);
 
 /**
  * @brief Destroys a CSS transform list.
  *
  * @param transform The transform to destroy.
  */
-enum ui_error ui_css_transform_destroy(struct ui_css_transform *transform);
+ui_error_t ui_css_transform_destroy(struct ui_css_transform *transform);
 
 /**
  * @brief CSS Filter function types.
@@ -511,15 +507,15 @@ struct ui_css_filter {
  * @param out_filter Pointer to receive the parsed filter.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_filter(const char *str,
-                                  struct ui_css_filter **out_filter);
+ui_error_t ui_css_parse_filter(const char *str,
+                               struct ui_css_filter **out_filter);
 
 /**
  * @brief Destroys a CSS filter list.
  *
  * @param filter The filter to destroy.
  */
-enum ui_error ui_css_filter_destroy(struct ui_css_filter *filter);
+ui_error_t ui_css_filter_destroy(struct ui_css_filter *filter);
 
 /**
  * @brief CSS blend modes.
@@ -550,8 +546,8 @@ enum ui_css_blend_mode {
  * @param out_blend_mode Pointer to receive the parsed blend mode.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_blend_mode(const char *str,
-                                      enum ui_css_blend_mode *out_blend_mode);
+ui_error_t ui_css_parse_blend_mode(const char *str,
+                                   enum ui_css_blend_mode *out_blend_mode);
 
 /**
  * @brief Represents a single CSS shadow (box-shadow or text-shadow).
@@ -581,15 +577,15 @@ struct ui_css_shadow_list {
  * @param out_shadows Pointer to receive the parsed shadow list.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_shadow(const char *str,
-                                  struct ui_css_shadow_list **out_shadows);
+ui_error_t ui_css_parse_shadow(const char *str,
+                               struct ui_css_shadow_list **out_shadows);
 
 /**
  * @brief Destroys a CSS shadow list.
  *
  * @param list The shadow list to destroy.
  */
-enum ui_error ui_css_shadow_list_destroy(struct ui_css_shadow_list *list);
+ui_error_t ui_css_shadow_list_destroy(struct ui_css_shadow_list *list);
 
 /**
  * @brief SVG Fill Rule.
@@ -648,8 +644,8 @@ struct ui_css_dasharray {
  * @param out_rule Pointer to receive the parsed rule.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_fill_rule(const char *str,
-                                     enum ui_css_fill_rule *out_rule);
+ui_error_t ui_css_parse_fill_rule(const char *str,
+                                  enum ui_css_fill_rule *out_rule);
 
 /**
  * @brief Parses a stroke-linecap value.
@@ -658,9 +654,8 @@ enum ui_error ui_css_parse_fill_rule(const char *str,
  * @param out_linecap Pointer to receive the parsed linecap.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_parse_stroke_linecap(const char *str,
-                            enum ui_css_stroke_linecap *out_linecap);
+ui_error_t ui_css_parse_stroke_linecap(const char *str,
+                                       enum ui_css_stroke_linecap *out_linecap);
 
 /**
  * @brief Parses a stroke-linejoin value.
@@ -669,7 +664,7 @@ ui_css_parse_stroke_linecap(const char *str,
  * @param out_linejoin Pointer to receive the parsed linejoin.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_parse_stroke_linejoin(const char *str,
                              enum ui_css_stroke_linejoin *out_linejoin);
 
@@ -680,8 +675,7 @@ ui_css_parse_stroke_linejoin(const char *str,
  * @param out_paint Pointer to receive the parsed paint.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_paint(const char *str,
-                                 struct ui_css_paint *out_paint);
+ui_error_t ui_css_parse_paint(const char *str, struct ui_css_paint *out_paint);
 
 /**
  * @brief Parses a stroke-dasharray value.
@@ -690,8 +684,8 @@ enum ui_error ui_css_parse_paint(const char *str,
  * @param out_dasharray Pointer to receive the parsed dasharray.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_dasharray(const char *str,
-                                     struct ui_css_dasharray *out_dasharray);
+ui_error_t ui_css_parse_dasharray(const char *str,
+                                  struct ui_css_dasharray *out_dasharray);
 
 /**
  * @brief CSS Easing function types.
@@ -755,7 +749,7 @@ struct ui_css_transition {
  * @param out_easing Pointer to receive the parsed easing function.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_css_parse_easing_function(const char *str,
                              struct ui_css_easing_function *out_easing);
 
@@ -766,16 +760,15 @@ ui_css_parse_easing_function(const char *str,
  * @param out_transitions Pointer to receive the parsed transitions.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_parse_transition(const char *str,
-                        struct ui_css_transition **out_transitions);
+ui_error_t ui_css_parse_transition(const char *str,
+                                   struct ui_css_transition **out_transitions);
 
 /**
  * @brief Destroys a CSS transition list.
  *
  * @param transitions The transition list to destroy.
  */
-enum ui_error ui_css_transition_destroy(struct ui_css_transition *transitions);
+ui_error_t ui_css_transition_destroy(struct ui_css_transition *transitions);
 
 /**
  * @brief CSS Animation Direction.
@@ -827,15 +820,15 @@ struct ui_css_animation {
  * @param out_animations Pointer to receive the parsed animations.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_animation(const char *str,
-                                     struct ui_css_animation **out_animations);
+ui_error_t ui_css_parse_animation(const char *str,
+                                  struct ui_css_animation **out_animations);
 
 /**
  * @brief Destroys a CSS animation list.
  *
  * @param animations The animation list to destroy.
  */
-enum ui_error ui_css_animation_destroy(struct ui_css_animation *animations);
+ui_error_t ui_css_animation_destroy(struct ui_css_animation *animations);
 
 #ifdef __cplusplus
 }

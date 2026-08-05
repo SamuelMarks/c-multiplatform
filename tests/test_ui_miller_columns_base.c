@@ -56,9 +56,8 @@ static void *mock_get_child(void *node_id, size_t index, void *user_data) {
   return NULL;
 }
 
-static enum ui_error mock_render_node(void *node_id,
-                                      struct ui_dom_node *cell_node,
-                                      void *user_data) {
+static ui_error_t mock_render_node(void *node_id, struct ui_dom_node *cell_node,
+                                   void *user_data) {
   (void)node_id;
   (void)cell_node;
   (void)user_data;
@@ -152,8 +151,8 @@ static void test_miller_errors(void) {
   ui_miller_columns_base_navigate_left(miller);
   ui_miller_columns_base_navigate_right(miller);
 
-  ui_miller_columns_base_destroy(miller);
-  ui_arena_destroy(arena);
+  (void)ui_miller_columns_base_destroy(miller);
+  (void)ui_arena_destroy(arena);
 #endif
 }
 
@@ -186,8 +185,8 @@ static void test_oom(void) {
     g_malloc_fail_countdown = -1;
   }
 
-  ui_miller_columns_base_destroy(miller);
-  ui_arena_destroy(arena);
+  (void)ui_miller_columns_base_destroy(miller);
+  (void)ui_arena_destroy(arena);
 #endif
 }
 
@@ -206,7 +205,7 @@ static void test_miller_missing_coverage(void) {
   ui_miller_columns_base_navigate_left(NULL);
   ui_miller_columns_base_navigate_right(NULL);
   ui_miller_columns_base_create(NULL, NULL, NULL, NULL);
-  ui_miller_columns_base_destroy(NULL);
+  (void)ui_miller_columns_base_destroy(NULL);
   ui_miller_columns_base_select_item(NULL, 0, NULL);
   ui_miller_columns_base_get_column_count(NULL, NULL);
   ui_miller_columns_base_get_topology_changed_signal(NULL, NULL);
@@ -225,8 +224,8 @@ static void test_miller_missing_coverage(void) {
   for (i = 0; i < 10; i++) {
     ui_miller_columns_base_navigate_right(miller);
   }
-  ui_miller_columns_base_destroy(miller);
-  ui_arena_destroy(arena);
+  (void)ui_miller_columns_base_destroy(miller);
+  (void)ui_arena_destroy(arena);
 }
 
 int main(void) {
@@ -236,7 +235,7 @@ int main(void) {
   struct ui_arena *arena;
   struct ui_miller_columns_base *miller = NULL;
   struct ui_tree_model tree_model;
-  enum ui_error err;
+  ui_error_t err;
   ui_signal_t *signal = NULL;
   int col_count = 0;
 
@@ -300,6 +299,6 @@ int main(void) {
   if (err != UI_ERROR_NONE)
     return 1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }

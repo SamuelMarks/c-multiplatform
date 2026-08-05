@@ -55,8 +55,8 @@ struct ui_aria_state {
  * @param role_str The role string.
  * @return The corresponding enum ui_aria_role, or UI_ARIA_ROLE_NONE.
  */
-enum ui_error ui_aria_role_from_string(const char *role_str,
-                                       enum ui_aria_role *out_role);
+ui_error_t ui_aria_role_from_string(const char *role_str,
+                                    enum ui_aria_role *out_role);
 
 /**
  * @brief Parses the ARIA and semantic attributes of a DOM node into a state
@@ -67,8 +67,8 @@ enum ui_error ui_aria_role_from_string(const char *role_str,
  * @param out_state Pointer to the state struct to populate.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
-                                  struct ui_aria_state *out_state);
+ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
+                               struct ui_aria_state *out_state);
 
 /**
  * @brief Cleans up allocated resources within a parsed ARIA state struct.
@@ -76,7 +76,7 @@ enum ui_error ui_aria_state_parse(const struct ui_dom_node *node,
  * @param state The state struct to clean up.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_aria_state_cleanup(struct ui_aria_state *state);
+ui_error_t ui_aria_state_cleanup(struct ui_aria_state *state);
 
 #ifdef __cplusplus
 }

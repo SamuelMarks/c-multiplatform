@@ -36,7 +36,7 @@ extern "C" {
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on parsing
  * failure.
  */
-enum ui_error ui_coerce_string_to_bool(const char *str, int *out_val);
+ui_error_t ui_coerce_string_to_bool(const char *str, int *out_val);
 
 /**
  * @brief Safely parses a string into an integer.
@@ -46,7 +46,7 @@ enum ui_error ui_coerce_string_to_bool(const char *str, int *out_val);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on parsing
  * failure.
  */
-enum ui_error ui_coerce_string_to_int(const char *str, int *out_val);
+ui_error_t ui_coerce_string_to_int(const char *str, int *out_val);
 
 /**
  * @brief Safely parses a string into a float.
@@ -56,7 +56,7 @@ enum ui_error ui_coerce_string_to_int(const char *str, int *out_val);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on parsing
  * failure.
  */
-enum ui_error ui_coerce_string_to_float(const char *str, float *out_val);
+ui_error_t ui_coerce_string_to_float(const char *str, float *out_val);
 
 /**
  * @brief Safely copies a string, guaranteeing null termination.
@@ -67,8 +67,7 @@ enum ui_error ui_coerce_string_to_float(const char *str, float *out_val);
  * @param src The source string to copy.
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if truncated.
  */
-enum ui_error ui_safe_string_copy(char *dest, size_t dest_size,
-                                  const char *src);
+ui_error_t ui_safe_string_copy(char *dest, size_t dest_size, const char *src);
 
 /**
  * @brief Safely formats a string.
@@ -83,7 +82,7 @@ enum ui_error ui_safe_string_copy(char *dest, size_t dest_size,
 __attribute__((format(printf, 3, 4)))
 #endif
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_safe_string_format(char *dest, size_t dest_size, const char *format, ...);
 
 #ifdef __cplusplus

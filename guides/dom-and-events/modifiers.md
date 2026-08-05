@@ -22,7 +22,7 @@ struct hover_scale_state {
 };
 
 // Event interceptor
-enum ui_error on_hover_scale_event(struct ui_modifier *mod, const struct ui_event *event) {
+ui_error_t on_hover_scale_event(struct ui_modifier *mod, const struct ui_event *event) {
     /* Example modifier state handling. Note: Actual struct fields depend on internal implementation */
     /* struct hover_scale_state *state = (struct hover_scale_state*)mod->user_data; */
     /* struct ui_component *target = mod->target; */
@@ -37,9 +37,9 @@ enum ui_error on_hover_scale_event(struct ui_modifier *mod, const struct ui_even
 }
 
 // Factory function
-enum ui_error create_hover_scale_modifier(struct ui_modifier **out_mod) {
+ui_error_t create_hover_scale_modifier(struct ui_modifier **out_mod) {
     struct ui_modifier *mod = NULL;
-    enum ui_error err = ui_modifier_create(&mod);
+    ui_error_t err = ui_modifier_create(&mod);
     if (err != UI_ERROR_NONE) {
         return err;
     }

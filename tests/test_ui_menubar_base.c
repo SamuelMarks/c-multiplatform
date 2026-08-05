@@ -7,10 +7,10 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error test_menubar_base(void) {
+static ui_error_t test_menubar_base(void) {
   struct ui_menubar_base *menubar;
   struct ui_component *menu_item;
-  enum ui_error err;
+  ui_error_t err;
   const char *attr_val;
 
   err = ui_menubar_base_create(&menubar);
@@ -40,9 +40,9 @@ static enum ui_error test_menubar_base(void) {
     fprintf(stderr, "menu item not appended correctly\n");
     exit(1);
   }
-  ui_component_destroy((struct ui_component *)menubar);
+  (void)ui_component_destroy((struct ui_component *)menubar);
   menu_item->shadow_root = NULL;
-  ui_component_destroy(menu_item);
+  (void)ui_component_destroy(menu_item);
   return UI_ERROR_NONE;
 }
 
@@ -50,7 +50,7 @@ static int test_edge_cases(void) {
   struct ui_menubar_base *menubar;
   struct ui_component item;
   int i;
-  enum ui_error err;
+  ui_error_t err;
 
   ui_menubar_base_create(NULL);
   ui_menubar_base_append_item(NULL, &item);
@@ -59,13 +59,13 @@ static int test_edge_cases(void) {
 
   ui_menubar_base_create(&menubar);
   ui_menubar_base_bind_active_index(menubar, (struct ui_signal *)1);
-  ui_component_destroy((struct ui_component *)menubar);
+  (void)ui_component_destroy((struct ui_component *)menubar);
 
   for (i = 0; i < 4; i++) {
     g_malloc_fail_countdown = i;
     err = ui_menubar_base_create(&menubar);
     if (err == UI_ERROR_NONE) {
-      ui_component_destroy((struct ui_component *)menubar);
+      (void)ui_component_destroy((struct ui_component *)menubar);
     }
   }
   g_malloc_fail_countdown = -1;

@@ -7,14 +7,14 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error dummy_on_change(union ui_signal_payload value,
-                                     void *user_data) {
+static ui_error_t dummy_on_change(union ui_signal_payload value,
+                                  void *user_data) {
   int *called = (int *)user_data;
   *called = 1;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_on_touched(void *user_data) {
+static ui_error_t dummy_on_touched(void *user_data) {
   int *called = (int *)user_data;
   *called = 1;
   return UI_ERROR_NONE;
@@ -80,33 +80,33 @@ static int run_coverage_tests(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   extern int g_mock_io_fail;
-  extern void ui_mock_free(void *);
+  extern void C_MULTIPLATFORM_FREE(void *);
   if (uploader.files[0].data)
-    ui_mock_free(uploader.files[0].data);
+    C_MULTIPLATFORM_FREE(uploader.files[0].data);
   uploader.files[0].data = NULL; /* reset to read again */
   g_mock_io_fail = 1;            /* UI_FSEEK */
   ui_file_uploader_read_files(&uploader);
   if (uploader.files[0].data)
-    ui_mock_free(uploader.files[0].data);
+    C_MULTIPLATFORM_FREE(uploader.files[0].data);
   uploader.files[0].data = NULL;
   g_mock_io_fail = 2; /* UI_FTELL */
   ui_file_uploader_read_files(&uploader);
   if (uploader.files[0].data)
-    ui_mock_free(uploader.files[0].data);
+    C_MULTIPLATFORM_FREE(uploader.files[0].data);
   uploader.files[0].data = NULL;
   g_mock_io_fail = 3; /* UI_FREAD */
   ui_file_uploader_read_files(&uploader);
   if (uploader.files[0].data)
-    ui_mock_free(uploader.files[0].data);
+    C_MULTIPLATFORM_FREE(uploader.files[0].data);
   uploader.files[0].data = NULL;
   g_mock_io_fail = 4; /* UI_FSEEK_SET_FAIL */
   ui_file_uploader_read_files(&uploader);
   g_mock_io_fail = 0;
 
   if (uploader.files[0].data)
-    ui_mock_free(uploader.files[0].data);
+    C_MULTIPLATFORM_FREE(uploader.files[0].data);
   uploader.files[0].data = NULL;
-  g_malloc_fail_countdown = 0; /* Fail UI_MALLOC in read_files */
+  g_malloc_fail_countdown = 0; /* Fail MALLOC in read_files */
   ui_file_uploader_read_files(&uploader);
   g_malloc_fail_countdown = -1;
 
@@ -116,7 +116,7 @@ static int run_coverage_tests(void) {
     for (i = 0; i < uploader.file_count; i++) {
       if (uploader.files[i].data) {
 #ifdef UI_TEST_MOCK_ALLOC
-        ui_mock_free(uploader.files[i].data);
+        C_MULTIPLATFORM_FREE(uploader.files[i].data);
 #else
         free(uploader.files[i].data);
 #endif
@@ -131,20 +131,44 @@ static int run_coverage_tests(void) {
 
   if (uploader.files[0].data) {
 #ifdef UI_TEST_MOCK_ALLOC
-    ui_mock_free(uploader.files[0].data);
+    C_MULTIPLATFORM_FREE(uploader.files[0].data);
 #else
     free(uploader.files[0].data);
 #endif
   }
+
   uploader.files[0].data = (unsigned char *)malloc(1);
   uploader.files[0].data[0] = '\0';
+  uploader.files[1].data = NULL;
+  uploader.file_count = 2;
+
   payload.ptr_val = NULL;
   if (cva.write_value) {
     cva.write_value(&uploader, payload);
   }
+
+  /* Trigger write_value with non-NULL ptr_val */
+  payload.ptr_val = (void *)1;
+  if (cva.write_value) {
+    cva.write_value(&uploader, payload);
+  }
+
   ui_file_uploader_destroy(&uploader);
   remove("test_coverage.txt");
   remove("test.txt");
+
+  /* Test 0 file size */
+  FILE *fp_empty = fopen("empty_test.txt", "wb");
+  if (fp_empty) {
+    fclose(fp_empty);
+  }
+  ui_file_uploader_init(&uploader, 2, 0, 0, 100, 100, NULL);
+  ui_file_uploader_drop_file(&uploader, "empty_test.txt");
+  ui_file_uploader_drop_file(&uploader,
+                             "some/fake/path/file.txt"); /* test path slash */
+  ui_file_uploader_read_files(&uploader);
+  ui_file_uploader_destroy(&uploader);
+  remove("empty_test.txt");
 
   if (ui_file_uploader_init(&uploader, 1, 0, 0, 100, 100, NULL) !=
       UI_ERROR_NONE) {
@@ -162,7 +186,7 @@ static int run_coverage_tests(void) {
 static int run_normal_tests(void) {
   struct ui_file_uploader_base uploader;
   struct ui_drag_drop_context *drag_ctx = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   FILE *fp;
 
   if (ui_file_uploader_init(NULL, 5, 0, 0, 100, 100, NULL) !=
@@ -238,7 +262,7 @@ static int run_normal_tests(void) {
     if (ui_file_uploader_register_dropzone(&uploader, drag_ctx) !=
         UI_ERROR_NONE)
       return 1;
-    ui_drag_drop_destroy(drag_ctx);
+    (void)ui_drag_drop_destroy(drag_ctx);
   }
 
   ui_file_uploader_destroy(&uploader);
@@ -250,14 +274,56 @@ static int run_normal_tests(void) {
 static int run_oom_tests(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   struct ui_file_uploader_base uploader;
-  enum ui_error rc;
+  ui_error_t rc;
   g_malloc_fail_countdown = 0;
+  memset(&uploader, 0, sizeof(uploader));
   rc = ui_file_uploader_init(&uploader, 5, 0, 0, 100, 100, NULL);
   g_malloc_fail_countdown = -1;
+  ui_file_uploader_destroy(&uploader);
   if (rc != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 #endif
   return 0;
+}
+
+static ui_error_t mock_touch_fail(void *ud) {
+  return UI_ERROR_INVALID_ARGUMENT;
+}
+static ui_error_t mock_change_fail(union ui_signal_payload v, void *ud) {
+  return UI_ERROR_INVALID_ARGUMENT;
+}
+
+static void test_failing_callbacks(void) {
+  struct ui_file_uploader_base uploader;
+
+  ui_file_uploader_init(&uploader, 2, 0, 0, 100, 100, NULL);
+  uploader.on_touched_cb = mock_touch_fail;
+  ui_file_uploader_on_drag_enter(&uploader);
+  ui_file_uploader_destroy(&uploader);
+
+  ui_file_uploader_init(&uploader, 2, 0, 0, 100, 100, NULL);
+  uploader.on_touched_cb = mock_touch_fail;
+  ui_file_uploader_drop_file(&uploader, "test.txt");
+  ui_file_uploader_destroy(&uploader);
+
+  ui_file_uploader_init(&uploader, 2, 0, 0, 100, 100, NULL);
+  uploader.on_change_cb = mock_change_fail;
+  ui_file_uploader_drop_file(&uploader, "test.txt");
+  ui_file_uploader_destroy(&uploader);
+
+  FILE *fp = fopen("fail_test.txt", "w");
+  if (fp) {
+    fprintf(fp, "123");
+    fclose(fp);
+  }
+
+  ui_file_uploader_init(&uploader, 2, 0, 0, 100, 100, NULL);
+  ui_file_uploader_drop_file(&uploader, "fail_test.txt");
+  uploader.on_change_cb = mock_change_fail;
+  ui_file_uploader_read_files(&uploader);
+  ui_file_uploader_destroy(&uploader);
+
+  remove("fail_test.txt");
 }
 
 int main(void) {
@@ -269,6 +335,7 @@ int main(void) {
     printf("run_oom_tests failed\n");
     return 1;
   }
+  test_failing_callbacks();
   int cov_ret = run_coverage_tests();
   if (cov_ret != 0) {
     printf("run_coverage_tests failed: %d\n", cov_ret);

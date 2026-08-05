@@ -1,83 +1,69 @@
-# C Multiplatform UI Engine & Media Framework
+c-multiplatform
+===============
+
+[![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Doc Coverage](https://img.shields.io/badge/docs-29%25-red.svg)](#)
+[![Test Coverage](https://img.shields.io/badge/coverage-46%25-red.svg)](#)
 
 The universal, ultra-lightweight UI and media engine for the next generation of cross-platform applications.
 
-Built entirely in **strictly-compliant C89**, this multi-threaded engine delivers a complete W3C CSS layout system, modern reactive state (Signals), and a robust Component Development Kit (CDK) across Web, Mobile, and Desktop.
+---
 
-## The Ground-Up Rewrite: A Paradigm Shift
+`c-multiplatform` is a ground-up reimagining of cross-platform UI development. Built entirely in **strictly-compliant C89**, this engine delivers a complete W3C CSS layout system, modern reactive state (Signals), and a robust Component Development Kit (CDK) across **iOS, Android, Web, macOS, Linux, and Windows**.
 
-This project (`tmp/c-multiplatform`) represents a complete, ground-up reimplementation of the original `c-multiplatform` architecture. The initial prototype revealed architectural constraints in supporting highly dynamic, state-driven user interfaces. We have moved away from a rigid "Design System in C" towards a **Component Dev Kit (CDK)** approach. 
+## The Lingua Franca of FFI
 
-Developers can compose these CDK primitives to build their *own* design systems without fighting the framework, while retaining the extreme performance of a native C core. Accessibility (a11y) and Internationalization (i18n) are integrated foundationally at the lowest ABI level, rather than being tightly coupled as an afterthought.
+Why C? Because **C is the lowest common denominator of the world of FFI (Foreign Function Interface)**.
 
-## The Vision: Beyond Flutter, React Native, and KMP
+By leveraging the universal C ABI as a fully opaque FFI boundary, `c-multiplatform` acts as a hyper-fast, invisible UI runtime that can be seamlessly bound to **any modern language**—Rust, Go, C#, Python, Zig, Swift, or JavaScript—with **zero bridge overhead**. Write the core UI rendering in lightning-fast native C, and write the business logic in whatever language your team is most productive in.
 
-The current landscape of cross-platform development forces compromises: heavy JavaScript bridges (React Native), proprietary layout systems and massive bundle sizes (Flutter), or language-ecosystem lock-in (Kotlin Multiplatform).
+## A True Alternative to Flutter, React Native, and Kotlin Multiplatform
 
-**This framework takes a different approach:**
-By leveraging the universal C ABI as a fully opaque FFI boundary, it acts as a hyper-fast, invisible UI runtime that can be seamlessly bound to **any modern language** (Rust, Go, C#, Python, Zig, Swift, JS) with **zero bridge overhead**.
+The current landscape of cross-platform development forces compromises:
+- **React Native** relies on heavy, asynchronous JavaScript bridges that degrade performance.
+- **Flutter** forces developers into the proprietary Dart ecosystem, ships massive bundle sizes, and its Web target draws to a `<canvas>`, breaking native text selection and accessibility.
+- **Kotlin Multiplatform (KMP)** ties projects deeply into the JVM and Kotlin compiler ecosystem.
 
-*   **No "Widget Soup":** Instead of proprietary layout algorithms, we implemented a 100% W3C CSS Engine (Flexbox, Grid, Cascading). Design your layouts using the web standards you already know, but render them via native OpenGL ES 2.0 or native DOM.
-*   **Zero Language Lock-in:** Write your business logic in Rust, Python, or Go. The engine handles the heavy lifting of DOM generation, text shaping, A/V synchronization, and composition. The reactive signal graph safely traverses the FFI boundary.
-*   **Insane Performance & Footprint:** Written in C89 with custom memory pools and multi-reactor architecture. It bypasses massive VM/JS engine initialization overhead, ensuring near-instantaneous Time-To-Interactive (TTI).
-*   **Modern Paradigms, Native Speeds:** Brings modern concepts like Reactive Signals and Headless UI to a bare-metal execution environment.
+**`c-multiplatform` introduces a fundamentally different approach:**
+- **Zero Language Lock-in:** Use the engine via FFI from your language of choice.
+- **Insane Performance & Footprint:** Bypasses massive VM/JS engine initialization overhead, ensuring near-instantaneous Time-To-Interactive (TTI).
+- **Web Target Focus (Real DOM):** Unlike traditional frameworks that draw to a single WebGL `<canvas>` (breaking a11y), the WASM target uses an **Inspectable DOM** approach. UI primitives map to real HTML DOM nodes with native inputs, ensuring flawless screen reader and password manager support.
+
+## Uncompromising Portability & Toolchains
+
+Because `c-multiplatform` adheres to strict C89 standards, it offers unprecedented compiler and platform support out of the gate. Whether compiling with the latest **LLVM/Clang**, modern **GCC**, or spanning over two decades of Microsoft tooling (from legacy **MSVC 2005** to the upcoming **MSVC 2026**), this engine is designed to build reliably.
+
+It is built to run literally anywhere: from high-end desktop environments and modern smartphones, down to legacy Windows machines, resource-constrained embedded systems, and modern WebAssembly environments.
+
+## Architecture & Computational Models
+
+The engine’s architecture is highly adaptable to its target environment, capable of shifting its execution model to suit the host platform:
+
+- **Flexible Threading Models:** By default, the engine utilizes a robust multi-threaded multi-reactor pattern (separating UI, rendering, and I/O threads) for maximum throughput on desktop and mobile targets. However, it can be compiled to operate entirely single-threaded (`-DUI_SINGLE_THREADED=ON`) for single-core embedded devices or strict cooperative environments like WASM.
+- **Custom Memory Management:** Bypasses standard `malloc`/`free` overhead using custom memory pools and arena allocators. This ensures zero memory fragmentation, deterministic performance, and O(1) allocation strategies which are critical for sustaining 60/120fps rendering.
+- **Reactive Execution:** The UI doesn't rely on expensive virtual DOM diffing. Instead, it uses a granular, push-based reactive Signal graph (`ui_signal`, `ui_computed`) that propagates state changes deterministically, synchronizing perfectly with the display refresh rate (VSync).
+
+## Core Features
+
+### 🏗️ Component Dev Kit (CDK) Approach
+Rather than dictating a rigid visual design system, `c-multiplatform` introduces a Headless CDK approach to C. It provides purely structural, unstyled behavioral components (Alerts, Dropdowns, Datepickers, Focus Traps). Developers can compose these primitives to build bespoke design systems from scratch without friction, all while retaining native C speeds.
+
+### 🌍 Universal Accessibility (a11y) & Internationalization (i18n)
+Accessibility and Internationalization are treated as foundational pillars at the lowest ABI level.
+- **a11y:** Built-in ARIA support, robust focus management, and geometric tethering exist natively before any visual themes are applied.
+- **i18n:** Natively handled text shaping (via HarfBuzz integration), bidirectional (RTL) text support, and seamless font fallback mechanisms are built directly into the text rendering pipeline.
+
+### 🎨 100% W3C CSS Engine
+Design layouts using familiar web standards. Full support for CSS Selectors, Flexbox, Grid, Color Level 5, Math functions, and Animations. Render them via native OpenGL ES 2.0 on desktop/mobile or native DOM on the web.
+
+### 🧠 Reactive State (Signals)
+A built-in core Signal engine (`ui_signal`, `ui_computed`, `ui_effect`) brings modern, fine-grained reactivity and a robust Forms framework without virtual DOM diffing overhead.
 
 ---
 
-## Core Differentiators
+## Building from Source
 
-- ⚡ **Universal C ABI:** Bind to anything. Truly native cross-platform without the ecosystem constraints of KMP or the JS payload of React Native.
-- 🎨 **100% W3C CSS Engine:** Full support for CSS Selectors, Grid, Flexbox, Color Level 5, Math functions, and Animations. Features **zero-copy lexing** directly from memory-mapped files and enables dynamic hot-reloading without recompiling C code.
-- 🧠 **Reactive State (Signals):** Built-in core Signal engine (`ui_signal`, `ui_computed`, `ui_effect`) replacing imperative updates. Includes a reactive Forms framework for complex validation and dependency graphs.
-- 🏗️ **Headless CDK:** Purely structural, unstyled behavioral components guaranteeing robust focus management, ARIA accessibility, and geometric tethering before any visual themes are applied.
-- 🌐 **Web Target Focus — Beyond the Canvas Trap:** Unlike traditional cross-platform frameworks that draw to a single WebGL `<canvas>` (breaking a11y and text selection), our WASM target uses an **Inspectable DOM** approach. UI primitives map to real HTML DOM nodes with native inputs, ensuring flawless screen reader and password manager support.
-- 🛡️ **Military-Grade Robustness:** Valgrind/ASAN memory leak testing, strict C89 compliance, and an uncompromising push for **100% Test Coverage** (unit and property-based testing) and **100% Documentation Coverage** to provide mathematical API guarantees.
-
----
-
-## Upcoming Flagship Use Cases
-
-The new architecture enables zero-overhead isomorphic execution, bridging dynamic interpretation with AoT C code ejection:
-
-1. **Survey Maker & Production Lifecycle:** Rapid iteration via remote over-the-air schema updates, ejecting to native C for perfect 60fps performance and zero parsing in production.
-2. **Full Low-Code App Builder:** Visual IDE rendering directly to canvas, with an "Export App" function generating statically-linked, zero-dependency native binaries.
-3. **API-Driven Auto-Generated Interfaces:** UI components, validation, and layout derived natively from **OpenAPI 3.1**, with dynamic event orchestration via **Arazzo** specs.
-
----
-
-## Architecture & Master Plans
-
-Due to the immense scope and robustness constraints, the architectural plan is split into domain-specific modules:
-
-* **[Core & Platform (PLAN_CORE.md)](PLAN_CORE.md):** Abstract execution, memory pools, strict C89 standards, FFI boundaries, and OS windowing/input abstractions.
-* **[Engine (PLAN_ENGINE.md)](PLAN_ENGINE.md):** DOM generation, Media, text shaping, and GLES 2.0 Compositor.
-* **[CSS Engine (PLAN_CSS_W3C.md)](PLAN_CSS_W3C.md):** 100% W3C CSS Implementation.
-* **[Runtime Widgets (PLAN_RUNTIME_WIDGETS.md)](PLAN_RUNTIME_WIDGETS.md):** Component implementation plans and specifications.
-* **[Signal & State (SIGNAL_TODO_PLAN.md)](SIGNAL_TODO_PLAN.md):** The core Signal engine and reactive Forms framework.
-* **[Quality Assurance (PLAN_QUALITY.md)](PLAN_QUALITY.md):** Coverage constraints, leak testing, and documentation mandates.
-* **[Wayland (WAYLAND_PLAN.md)](WAYLAND_PLAN.md):** Native Wayland display server integration plan.
-* **[Test Plan (TEST_PLAN.md)](TEST_PLAN.md):** Testing methodology and tracking.
-
----
-
-## Developer Guides
-
-Detailed guides can be found in the [`guides/`](guides/) directory. Key highlights include:
-
-* [Getting Started](guides/getting-started/)
-* [Architecture Overview](guides/architecture/)
-* [DOM, Components & Event System](guides/dom-and-events/)
-* [State Management](guides/state-management/)
-* [Layout & Styling](guides/layout-and-styling/)
-* [Advanced CSS Engine](guides/css-engine/)
-
-[**View all Guides & Documentation in the Guides Index**](guides/README.md)
-
----
-
-## Getting Started: Building from Source
-
-This project is built using CMake (minimum version 3.15) and relies on standard C toolchains (GCC, Clang, MSVC).
+This project is built using CMake (minimum version 3.15).
 
 ```bash
 mkdir build
@@ -88,10 +74,81 @@ cmake --build .
 
 ### Configuration Options
 
-You can customize the build using the following CMake options:
+Customize the computational model and platform features via CMake:
 - `-DUI_ENABLE_WAYLAND=ON/OFF`: Enable Wayland Support on Linux (default: ON)
 - `-DUI_USE_HARFBUZZ=ON/OFF`: Enable HarfBuzz integration for complex text shaping (default: OFF)
 - `-DUI_ENABLE_UNICODE=ON/OFF`: Enable UNICODE charset (default: ON)
-- `-DUI_SINGLE_THREADED=ON/OFF`: Disable Multi-threading (default: OFF)
-- `-DUI_CRT_STATIC=ON/OFF`: Use Static CRT linkage (default: OFF)
-- `-DUI_ENABLE_LTO=ON/OFF`: Enable Link-Time Optimization (default: OFF)
+- `-DUI_SINGLE_THREADED=ON/OFF`: Disable multi-threading for cooperative/embedded environments (default: OFF)
+
+---
+
+## Getting Started
+
+Writing UI in pure C is straightforward using the CDK and Signal APIs. Here is a simple example of creating a window with a reactive button counter:
+
+```c
+#include "ui_engine.h"
+#include "ui_button_base.h"
+#include "ui_layout.h"
+
+// A reactive signal to hold counter state
+ui_signal_t* counter_signal;
+
+// Click handler
+void on_button_click(ui_event_t* event) {
+    int current_val = ui_signal_get_int(counter_signal);
+    ui_signal_set_int(counter_signal, current_val + 1);
+}
+
+int main(int argc, char** argv) {
+    // Initialize the engine (automatically selects optimal threading/memory model)
+    ui_engine_init();
+
+    // Create a new window
+    ui_window_t* window = ui_window_create("c-multiplatform Example", 800, 600);
+
+    // Initialize state
+    counter_signal = ui_signal_create_int(0);
+
+    // Create a container with Flexbox layout
+    ui_node_t* container = ui_node_create();
+    ui_node_set_style(container, "display: flex; justify-content: center; align-items: center; height: 100%;");
+
+    // Create a button component from the CDK
+    ui_node_t* button = ui_button_create("Click Me!");
+
+    // Bind the button text to the signal
+    ui_button_bind_text_format(button, "Clicks: %d", counter_signal);
+
+    // Attach event listener
+    ui_node_on(button, "click", on_button_click);
+
+    // Assemble the tree
+    ui_node_append_child(container, button);
+    ui_window_set_root(window, container);
+
+    // Start the main event loop
+    ui_engine_run(window);
+
+    // Cleanup
+    ui_engine_cleanup();
+    return 0;
+}
+```
+
+---
+
+## License
+
+Licensed under either of
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or <https://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or <https://opensource.org/licenses/MIT>)
+
+at your option.
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.

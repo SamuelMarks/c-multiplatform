@@ -43,8 +43,8 @@ struct ui_image_decoder_backend {
    * @param format The image format enum.
    * @return 1 if supported, 0 otherwise.
    */
-  enum ui_error (*supports_format)(enum ui_image_format format,
-                                   int *out_supported);
+  ui_error_t (*supports_format)(enum ui_image_format format,
+                                int *out_supported);
 
   /**
    * @brief Decodes image from memory.
@@ -54,8 +54,8 @@ struct ui_image_decoder_backend {
    * @param out_image Pointer to receive the decoded image structure.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*decode_memory)(const void *data, size_t size,
-                                 struct ui_image *out_image);
+  ui_error_t (*decode_memory)(const void *data, size_t size,
+                              struct ui_image *out_image);
 
   /**
    * @brief Frees the decoded image pixel data.
@@ -63,7 +63,7 @@ struct ui_image_decoder_backend {
    * @param image The image to free.
    * @return UI_ERROR_NONE on success.
    */
-  enum ui_error (*free_image)(struct ui_image *image);
+  ui_error_t (*free_image)(struct ui_image *image);
 };
 
 /**
@@ -75,9 +75,8 @@ struct ui_image_decoder_backend {
  * @param out_image Pointer to receive the decoded image structure.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_image_decode_memory(enum ui_image_format format,
-                                     const void *data, size_t size,
-                                     struct ui_image *out_image);
+ui_error_t ui_image_decode_memory(enum ui_image_format format, const void *data,
+                                  size_t size, struct ui_image *out_image);
 
 /**
  * @brief Frees a decoded image.
@@ -85,7 +84,7 @@ enum ui_error ui_image_decode_memory(enum ui_image_format format,
  * @param image The image to free.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_image_free(struct ui_image *image);
+ui_error_t ui_image_free(struct ui_image *image);
 
 #ifdef __cplusplus
 }

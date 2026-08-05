@@ -1,3 +1,4 @@
+#include <string.h>
 /* clang-format off */
 #include "ui_keyboard_responder.h"
 #include <assert.h>
@@ -11,7 +12,7 @@ static int g_action_called = 0;
 static struct ui_dom_node *g_action_node = NULL;
 static void *g_action_user_data = NULL;
 
-static enum ui_error test_action_cb(struct ui_dom_node *node, void *user_data) {
+static ui_error_t test_action_cb(struct ui_dom_node *node, void *user_data) {
   g_action_called++;
   g_action_node = node;
   g_action_user_data = user_data;
@@ -20,9 +21,9 @@ static enum ui_error test_action_cb(struct ui_dom_node *node, void *user_data) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_keyboard_responder_create_destroy() {
+static ui_error_t test_keyboard_responder_create_destroy() {
   struct ui_keyboard_responder *responder = NULL;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_keyboard_responder_create(NULL);
   assert(err == UI_ERROR_INVALID_ARGUMENT);
@@ -31,13 +32,14 @@ static enum ui_error test_keyboard_responder_create_destroy() {
   assert(err == UI_ERROR_NONE);
   assert(responder != NULL);
 
-  ui_keyboard_responder_destroy(NULL);
-  ui_keyboard_responder_destroy(responder);
+  (void)ui_keyboard_responder_destroy(NULL);
+  (void)ui_keyboard_responder_destroy(responder);
+  return UI_ERROR_NONE;
   printf("test_keyboard_responder_create_destroy passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_keyboard_responder_bind_and_handle() {
+static ui_error_t test_keyboard_responder_bind_and_handle() {
   struct ui_keyboard_responder *responder = NULL;
   struct ui_dom_node *button_node = NULL;
   struct ui_dom_node *generic_node = NULL;
@@ -58,10 +60,18 @@ static enum ui_error test_keyboard_responder_bind_and_handle() {
   assert(ui_keyboard_responder_bind_key(NULL, "button", UI_KEY_SPACE,
                                         test_action_cb,
                                         NULL) == UI_ERROR_INVALID_ARGUMENT);
+  assert(ui_keyboard_responder_bind_key(responder, NULL, UI_KEY_SPACE,
+                                        test_action_cb,
+                                        NULL) == UI_ERROR_INVALID_ARGUMENT);
+  assert(ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE, NULL,
+                                        NULL) == UI_ERROR_INVALID_ARGUMENT);
 
   assert(ui_keyboard_responder_handle_event(responder, button_node, &ev,
                                             NULL) == UI_ERROR_INVALID_ARGUMENT);
   assert(ui_keyboard_responder_handle_event(NULL, button_node, &ev, &handled) ==
+         UI_ERROR_INVALID_ARGUMENT);
+  assert(ui_keyboard_responder_handle_event(responder, button_node, NULL,
+                                            &handled) ==
          UI_ERROR_INVALID_ARGUMENT);
 
   {
@@ -81,6 +91,26 @@ static enum ui_error test_keyboard_responder_bind_and_handle() {
   /* Bind Space key on "button" */
   ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE,
                                  test_action_cb, &user_data_val);
+
+  /* Force multiple bindings to test capacity scaling branches */
+  ui_keyboard_responder_bind_key(responder, "div", UI_KEY_ENTER, test_action_cb,
+                                 NULL);
+  ui_keyboard_responder_bind_key(responder, "span", UI_KEY_ENTER,
+                                 test_action_cb, NULL);
+  ui_keyboard_responder_bind_key(responder, "a", UI_KEY_ENTER, test_action_cb,
+                                 NULL);
+  ui_keyboard_responder_bind_key(responder, "input", UI_KEY_ENTER,
+                                 test_action_cb, NULL);
+  ui_keyboard_responder_bind_key(responder, "textarea", UI_KEY_ENTER,
+                                 test_action_cb, NULL);
+  ui_keyboard_responder_bind_key(responder, "p", UI_KEY_ENTER, test_action_cb,
+                                 NULL);
+  ui_keyboard_responder_bind_key(responder, "h1", UI_KEY_ENTER, test_action_cb,
+                                 NULL);
+  ui_keyboard_responder_bind_key(responder, "h2", UI_KEY_ENTER, test_action_cb,
+                                 NULL);
+  ui_keyboard_responder_bind_key(responder, "h3", UI_KEY_ENTER, test_action_cb,
+                                 NULL);
 
   /* Test 1: Button tag with Space key */
   ev.type = UI_EVENT_KEY_DOWN;
@@ -126,16 +156,51 @@ static enum ui_error test_keyboard_responder_bind_and_handle() {
   assert(handled == 0);
   assert(g_action_called == 0);
 
-  ui_dom_node_destroy(button_node);
-  ui_dom_node_destroy(generic_node);
-  ui_keyboard_responder_destroy(responder);
+  /* Test 6: Node with no tag and no role */
+  {
+    struct ui_dom_node *empty_node = NULL;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &empty_node);
+    /* empty_node has no tag name and no attributes */
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_SPACE;
+    handled = 0;
+    ui_keyboard_responder_handle_event(responder, empty_node, &ev, &handled);
+    assert(handled == 0);
+
+    /* set tag to something else, no role */
+    ui_dom_node_set_tag_name(empty_node, "other");
+    handled = 0;
+    ui_keyboard_responder_handle_event(responder, empty_node, &ev, &handled);
+    assert(handled == 0);
+
+    /* set role to something else */
+    ui_dom_node_set_attribute(empty_node, "role", "other_role");
+    handled = 0;
+    ui_keyboard_responder_handle_event(responder, empty_node, &ev, &handled);
+    assert(handled == 0);
+
+    /* test role without tag */
+    (void)ui_dom_node_destroy(empty_node);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &empty_node);
+    ui_dom_node_set_attribute(empty_node, "role", "button");
+    handled = 0;
+    ui_keyboard_responder_handle_event(responder, empty_node, &ev, &handled);
+    assert(handled == 1);
+
+    (void)ui_dom_node_destroy(empty_node);
+  }
+
+  (void)ui_dom_node_destroy(button_node);
+  (void)ui_dom_node_destroy(generic_node);
+  (void)ui_keyboard_responder_destroy(responder);
+  return UI_ERROR_NONE;
   printf("test_keyboard_responder_bind_and_handle passed\n");
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_oom(void) {
+static ui_error_t test_oom(void) {
   struct ui_keyboard_responder *responder = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
 
   /* Creation OOM */
@@ -155,7 +220,8 @@ static enum ui_error test_oom(void) {
     assert(err == UI_ERROR_OUT_OF_MEMORY);
   }
 
-  ui_keyboard_responder_destroy(responder);
+  (void)ui_keyboard_responder_destroy(responder);
+  return UI_ERROR_NONE;
 }
 
 int main() {

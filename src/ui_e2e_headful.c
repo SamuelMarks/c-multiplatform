@@ -18,16 +18,16 @@ struct ui_e2e_headful_ctx {
   struct ui_window *window;
 };
 
-enum ui_error ui_e2e_headful_create(struct ui_window_backend *backend,
-                                    struct ui_window *window,
-                                    struct ui_e2e_headful_ctx **out_ctx) {
+ui_error_t ui_e2e_headful_create(struct ui_window_backend *backend,
+                                 struct ui_window *window,
+                                 struct ui_e2e_headful_ctx **out_ctx) {
   struct ui_e2e_headful_ctx *ctx;
   if (!backend || !window || !out_ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ctx =
-      (struct ui_e2e_headful_ctx *)UI_MALLOC(sizeof(struct ui_e2e_headful_ctx));
+  ctx = (struct ui_e2e_headful_ctx *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_e2e_headful_ctx));
   if (!ctx) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -39,11 +39,11 @@ enum ui_error ui_e2e_headful_create(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx) {
+ui_error_t ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx) {
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(ctx);
+  C_MULTIPLATFORM_FREE(ctx);
   return UI_ERROR_NONE;
 }
 
@@ -78,8 +78,7 @@ static WORD map_ui_key_to_vk(int key_code) {
   }
 }
 
-enum ui_error ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x,
-                                   int y) {
+ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
   HWND hwnd;
   POINT pt;
   INPUT inputs[2];
@@ -129,8 +128,8 @@ enum ui_error ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx,
-                                      int key_code, unsigned int modifiers) {
+ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
+                                   unsigned int modifiers) {
   HWND hwnd;
   WORD vk;
   INPUT inputs[4];
@@ -205,16 +204,15 @@ enum ui_error ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx,
 
 #else
 
-enum ui_error ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x,
-                                   int y) {
+ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
   (void)ctx;
   (void)x;
   (void)y;
   return UI_ERROR_UNSUPPORTED;
 }
 
-enum ui_error ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx,
-                                      int key_code, unsigned int modifiers) {
+ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
+                                   unsigned int modifiers) {
   (void)ctx;
   (void)key_code;
   (void)modifiers;

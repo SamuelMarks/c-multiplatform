@@ -1,3 +1,4 @@
+#include "../src/ui_internal_mem.h"
 /* clang-format off */
 #include "ui_listbox_base.h"
 #include "ui_selection_model.h"
@@ -19,22 +20,24 @@ static const char *get_item_text(struct ui_listbox_base *listbox, int index,
                                  void *user_data) {
   (void)listbox;
   (void)user_data;
+  if (index == 3)
+    return NULL;
   if (index >= 0 && index < 6)
     return items[index];
   return NULL;
 }
 
-static enum ui_error dummy_on_change(union ui_signal_payload value,
-                                     void *user_data) {
+static ui_error_t dummy_on_change(union ui_signal_payload value,
+                                  void *user_data) {
   if (user_data)
     *(int *)user_data = 1;
   if (is_multi_select_cva && value.ptr_val) {
-    ui_mock_free(value.ptr_val);
+    C_MULTIPLATFORM_FREE(value.ptr_val);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_on_touched(void *user_data) {
+static ui_error_t dummy_on_touched(void *user_data) {
   *(int *)user_data = 1;
   return UI_ERROR_NONE;
 }
@@ -43,7 +46,7 @@ static int run_normal_tests(void) {
   struct ui_listbox_base *listbox = NULL;
   struct ui_selection_model *model = NULL;
   struct ui_control_value_accessor cva;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_event ev;
   int is_selected;
 
@@ -363,22 +366,22 @@ static int run_normal_tests(void) {
   if (cva.register_on_touched)
     cva.register_on_touched(NULL, dummy_on_touched, NULL);
 
-  ui_listbox_base_destroy(listbox);
-  ui_listbox_base_destroy(NULL);
+  (void)ui_listbox_base_destroy(listbox);
+  (void)ui_listbox_base_destroy(NULL);
 
   return 0;
 }
 
 static int run_oom_tests(void) {
   struct ui_listbox_base *listbox = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int i;
   printf("Testing OOM handling...\n");
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_listbox_base_create(&listbox, NULL);
     if (rc == UI_ERROR_NONE) {
-      ui_listbox_base_destroy(listbox);
+      (void)ui_listbox_base_destroy(listbox);
       break;
     }
   }

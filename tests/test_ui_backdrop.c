@@ -31,11 +31,11 @@ static int s_tests_failed = 0;
     }                                                                          \
   } while (0)
 
-static enum ui_error test_backdrop_escape_key(void) {
+static ui_error_t test_backdrop_escape_key(void) {
   struct ui_backdrop *bd = NULL;
   struct ui_event ev;
   int should_dismiss = 0;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_backdrop_create(&bd);
   ASSERT_EQ(UI_ERROR_NONE, err);
@@ -56,15 +56,15 @@ static enum ui_error test_backdrop_escape_key(void) {
   ASSERT_EQ(UI_ERROR_NONE, err);
   ASSERT_EQ(0, should_dismiss);
 
-  ui_backdrop_destroy(bd);
+  (void)ui_backdrop_destroy(bd);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_backdrop_click_outside(void) {
+static ui_error_t test_backdrop_click_outside(void) {
   struct ui_backdrop *bd = NULL;
   struct ui_event ev;
   int should_dismiss = 0;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_backdrop_create(&bd);
   ASSERT_EQ(UI_ERROR_NONE, err);
@@ -168,15 +168,15 @@ static enum ui_error test_backdrop_click_outside(void) {
                                   &should_dismiss);
   ASSERT_EQ(0, should_dismiss); /* Should NOT dismiss */
 
-  ui_backdrop_destroy(bd);
+  (void)ui_backdrop_destroy(bd);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_backdrop_other_events(void) {
+static ui_error_t test_backdrop_other_events(void) {
   struct ui_backdrop *bd = NULL;
   struct ui_event ev;
   int should_dismiss = 0;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_backdrop_create(&bd);
   ASSERT_EQ(UI_ERROR_NONE, err);
@@ -262,11 +262,11 @@ static enum ui_error test_backdrop_other_events(void) {
                                   &should_dismiss);
   ASSERT_EQ(0, should_dismiss);
 
-  ui_backdrop_destroy(bd);
+  (void)ui_backdrop_destroy(bd);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_invalid_args_and_oom(void) {
+static ui_error_t test_invalid_args_and_oom(void) {
   struct ui_backdrop *bd = NULL;
   struct ui_event ev;
   int should_dismiss = 0;
@@ -288,7 +288,7 @@ static enum ui_error test_invalid_args_and_oom(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
             ui_backdrop_process_event(bd, &ev, 0, 0, 100, 100, NULL));
 
-  ui_backdrop_destroy(bd);
+  (void)ui_backdrop_destroy(bd);
   bd = NULL;
 
   g_malloc_fail_countdown = 0;
@@ -298,6 +298,11 @@ static enum ui_error test_invalid_args_and_oom(void) {
 }
 
 int main(void) {
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_backdrop_coverage(void);
+  run_backdrop_coverage();
+#endif
   test_backdrop_escape_key();
   test_backdrop_click_outside();
   test_backdrop_other_events();

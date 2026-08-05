@@ -7,7 +7,7 @@
 
 int main(void) {
   struct ui_shader_manager *manager = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   unsigned int program_id_h;
   unsigned int program_id_v;
 

@@ -19,10 +19,10 @@ struct ui_masonry_layout_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
   struct ui_masonry_layout_base *masonry;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -30,7 +30,7 @@ ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  masonry = (struct ui_masonry_layout_base *)UI_MALLOC(
+  masonry = (struct ui_masonry_layout_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_masonry_layout_base));
   if (!masonry) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -64,7 +64,11 @@ ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
     goto cleanup;
   }
 
-  (void)ui_component_set_default_style(masonry->component, default_style);
+  rc = ui_component_set_default_style(masonry->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
+  }
 
   masonry->component->shadow_root = root_node;
   root_node = NULL;
@@ -74,27 +78,29 @@ ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (masonry->component) {
-    ui_component_destroy(masonry->component);
+    (void)ui_component_destroy(masonry->component);
   }
-  UI_FREE(masonry);
+  C_MULTIPLATFORM_FREE(masonry);
   return rc;
 }
 
-void ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
+ui_error_t
+ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
   if (!masonry) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (masonry->component) {
-    ui_component_destroy(masonry->component);
+    (void)ui_component_destroy(masonry->component);
   }
-  UI_FREE(masonry);
+  C_MULTIPLATFORM_FREE(masonry);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_masonry_layout_base_reflow(struct ui_masonry_layout_base *masonry) {
   if (!masonry) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -106,7 +112,7 @@ ui_masonry_layout_base_reflow(struct ui_masonry_layout_base *masonry) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_masonry_layout_base_get_component(struct ui_masonry_layout_base *masonry,
                                      struct ui_component **out_component) {
   if (!masonry || !out_component) {
@@ -117,7 +123,7 @@ ui_masonry_layout_base_get_component(struct ui_masonry_layout_base *masonry,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_masonry_layout_base_bind_data(struct ui_masonry_layout_base *widget,
                                  struct ui_computed *signal) {
   if (!widget) {

@@ -7,8 +7,8 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error test_on_change(struct ui_range_slider_base *slider,
-                                    float low, float high, void *user_data) {
+static ui_error_t test_on_change(struct ui_range_slider_base *slider, float low,
+                                 float high, void *user_data) {
   float *last_vals = (float *)user_data;
   last_vals[0] = low;
   last_vals[1] = high;
@@ -17,7 +17,7 @@ static enum ui_error test_on_change(struct ui_range_slider_base *slider,
 
 static int test_range_slider_basic(void) {
   struct ui_range_slider_base *slider = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   float vals[2] = {-1.0f, -1.0f};
   float low, high;
 
@@ -161,7 +161,7 @@ static int test_range_slider_basic(void) {
 
   ui_range_slider_base_set_disabled(slider, 0);
 
-  ui_range_slider_base_destroy(slider);
+  (void)ui_range_slider_base_destroy(slider);
   return 0;
 }
 
@@ -196,7 +196,7 @@ static int test_range_slider_bounds(void) {
     return 1;
   }
 
-  ui_range_slider_base_destroy(slider);
+  (void)ui_range_slider_base_destroy(slider);
   return 0;
 }
 
@@ -303,7 +303,7 @@ static int test_range_slider_events(void) {
   ev.type = UI_EVENT_KEY_UP;
   ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
 
-  ui_range_slider_base_destroy(slider);
+  (void)ui_range_slider_base_destroy(slider);
   return 0;
 }
 
@@ -317,7 +317,7 @@ static int test_range_slider_nulls(void) {
 
   if (ui_range_slider_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_range_slider_base_destroy(NULL);
+  (void)ui_range_slider_base_destroy(NULL);
 
   if (ui_range_slider_base_set_min(NULL, 0) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -364,17 +364,20 @@ static int test_range_slider_nulls(void) {
   if (comp == NULL)
     return 1;
 
-  ui_range_slider_base_destroy(slider);
+  (void)ui_range_slider_base_destroy(slider);
   return 0;
 }
 
 static int test_range_slider_oom(void) {
   struct ui_range_slider_base *slider = NULL;
   int i;
-  for (i = 0; i < 20; i++) {
+  for (i = 0; i < 100; i++) {
     g_malloc_fail_countdown = i;
     if (ui_range_slider_base_create(&slider) == UI_ERROR_NONE) {
-      ui_range_slider_base_destroy(slider);
+      (void)ui_range_slider_base_destroy(slider);
+      printf("OOM loop broke at %d\n", i);
+      printf("OOM loop broke at %d\n", i);
+      printf("OOM loop broke at %d\n", i);
       break;
     }
   }
@@ -382,6 +385,8 @@ static int test_range_slider_oom(void) {
   return 0;
 }
 
+void test_extra_range(void);
+void test_extra_range_more(void);
 int main(void) {
   int failed = 0;
   failed |= test_range_slider_basic();
@@ -389,6 +394,8 @@ int main(void) {
   failed |= test_range_slider_events();
   failed |= test_range_slider_nulls();
   failed |= test_range_slider_oom();
+  test_extra_range();
+  test_extra_range_more();
 
   if (failed) {
     fprintf(stderr, "test_ui_range_slider_base failed\n");
@@ -397,4 +404,49 @@ int main(void) {
 
   printf("test_ui_range_slider_base passed\n");
   return 0;
+}
+#include "ui_range_slider_base.h"
+
+void test_extra_range(void) {
+  struct ui_range_slider_base *slider = NULL;
+  ui_range_slider_base_create(&slider);
+  if (slider) {
+    ui_range_slider_base_set_step(slider, 0.0f);
+    ui_range_slider_base_set_max(slider, 100.0f);
+    struct ui_event ev;
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+    ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW,
+                                       0.0);
+
+    /* Cover key_code not handled */
+    ev.event_data.keyboard.key_code = UI_KEY_UNKNOWN;
+    ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW,
+                                       0.0);
+
+    /* Also try active_thumb high */
+    ev.event_data.keyboard.key_code = UI_KEY_UNKNOWN;
+    ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH,
+                                       0.0);
+
+    (void)ui_range_slider_base_destroy(slider);
+  }
+}
+void test_extra_range_more(void) {
+  struct ui_range_slider_base *slider = NULL;
+  ui_range_slider_base_create(&slider);
+  if (slider) {
+    ui_range_slider_base_set_step(slider, 2.0f);
+    struct ui_event ev;
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+    ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW,
+                                       0.0);
+
+    /* Cover invalid active_thumb */
+    ui_range_slider_base_process_event(slider, &ev,
+                                       (enum ui_range_slider_thumb)99, 0.0);
+
+    (void)ui_range_slider_base_destroy(slider);
+  }
 }

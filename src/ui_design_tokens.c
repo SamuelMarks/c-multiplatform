@@ -6,10 +6,10 @@
 #define UI_MAX_ALIAS_DEPTH 32
 #define UI_TOKEN_INITIAL_CAPACITY 64
 
-enum ui_error ui_design_token_dict_init(struct ui_arena *arena,
-                                        struct ui_design_token_dict *out_dict) {
+ui_error_t ui_design_token_dict_init(struct ui_arena *arena,
+                                     struct ui_design_token_dict *out_dict) {
   void *ptr;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!arena || !out_dict) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -40,12 +40,12 @@ find_token(const struct ui_design_token_dict *dict, const char *name) {
   return NULL;
 }
 
-static enum ui_error duplicate_string(struct ui_arena *arena, const char *str,
-                                      const char **out_copy) {
+static ui_error_t duplicate_string(struct ui_arena *arena, const char *str,
+                                   const char **out_copy) {
   size_t len = strlen(str);
   void *ptr;
   char *copy;
-  enum ui_error err;
+  ui_error_t err;
 
   *out_copy = NULL;
   err = ui_arena_alloc(arena, len + 1, 1, &ptr);
@@ -63,12 +63,12 @@ static enum ui_error duplicate_string(struct ui_arena *arena, const char *str,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error ensure_capacity(struct ui_design_token_dict *dict) {
+static ui_error_t ensure_capacity(struct ui_design_token_dict *dict) {
   ui_uint32 new_capacity;
   struct ui_design_token *new_tokens;
   ui_uint32 i;
   void *ptr;
-  enum ui_error err;
+  ui_error_t err;
 
   if (dict->count < dict->capacity) {
     return UI_ERROR_NONE;
@@ -93,46 +93,47 @@ static enum ui_error ensure_capacity(struct ui_design_token_dict *dict) {
   return UI_ERROR_NONE;
 }
 
-static struct ui_design_token *
-get_or_create_token(struct ui_design_token_dict *dict, const char *name,
-                    enum ui_error *out_err) {
+static ui_error_t get_or_create_token(struct ui_design_token_dict *dict,
+                                      const char *name,
+                                      struct ui_design_token **out_token) {
   struct ui_design_token *token = find_token(dict, name);
 
-  *out_err = UI_ERROR_NONE;
-
   if (token) {
-    return token;
+    *out_token = token;
+    return UI_ERROR_NONE;
   }
 
-  *out_err = ensure_capacity(dict);
-  if (*out_err != UI_ERROR_NONE) {
-    return NULL;
+  {
+    ui_error_t rc = ensure_capacity(dict);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
 
   token = &dict->tokens[dict->count++];
   {
-    enum ui_error dup_err = duplicate_string(dict->arena, name, &token->name);
+    ui_error_t dup_err = duplicate_string(dict->arena, name, &token->name);
     if (dup_err != UI_ERROR_NONE) {
       dict->count--; /* Revert */
-      *out_err = UI_ERROR_OUT_OF_MEMORY;
-      return NULL;
+      return dup_err;
     }
   }
 
-  return token;
+  *out_token = token;
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_design_token_set_color(struct ui_design_token_dict *dict,
-                                        const char *name, ui_color_t color) {
-  enum ui_error err;
+ui_error_t ui_design_token_set_color(struct ui_design_token_dict *dict,
+                                     const char *name, ui_color_t color) {
+  ui_error_t err;
   struct ui_design_token *token;
 
   if (!dict || !name) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  token = get_or_create_token(dict, name, &err);
-  if (!token) {
+  err = get_or_create_token(dict, name, &token);
+  if (err != UI_ERROR_NONE) {
     return err;
   }
 
@@ -142,17 +143,17 @@ enum ui_error ui_design_token_set_color(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_design_token_set_number(struct ui_design_token_dict *dict,
-                                         const char *name, float number) {
-  enum ui_error err;
+ui_error_t ui_design_token_set_number(struct ui_design_token_dict *dict,
+                                      const char *name, float number) {
+  ui_error_t err;
   struct ui_design_token *token;
 
   if (!dict || !name) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  token = get_or_create_token(dict, name, &err);
-  if (!token) {
+  err = get_or_create_token(dict, name, &token);
+  if (err != UI_ERROR_NONE) {
     return err;
   }
 
@@ -162,9 +163,9 @@ enum ui_error ui_design_token_set_number(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_design_token_set_string(struct ui_design_token_dict *dict,
-                                         const char *name, const char *str) {
-  enum ui_error err;
+ui_error_t ui_design_token_set_string(struct ui_design_token_dict *dict,
+                                      const char *name, const char *str) {
+  ui_error_t err;
   struct ui_design_token *token;
   const char *dup_str;
 
@@ -172,12 +173,13 @@ enum ui_error ui_design_token_set_string(struct ui_design_token_dict *dict,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (duplicate_string(dict->arena, str, &dup_str) != UI_ERROR_NONE) {
-    return UI_ERROR_OUT_OF_MEMORY;
+  err = duplicate_string(dict->arena, str, &dup_str);
+  if (err != UI_ERROR_NONE) {
+    return err;
   }
 
-  token = get_or_create_token(dict, name, &err);
-  if (!token) {
+  err = get_or_create_token(dict, name, &token);
+  if (err != UI_ERROR_NONE) {
     return err;
   }
 
@@ -187,9 +189,9 @@ enum ui_error ui_design_token_set_string(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_design_token_set_alias(struct ui_design_token_dict *dict,
-                                        const char *name, const char *target) {
-  enum ui_error err;
+ui_error_t ui_design_token_set_alias(struct ui_design_token_dict *dict,
+                                     const char *name, const char *target) {
+  ui_error_t err;
   struct ui_design_token *token;
   const char *dup_target;
 
@@ -197,12 +199,13 @@ enum ui_error ui_design_token_set_alias(struct ui_design_token_dict *dict,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (duplicate_string(dict->arena, target, &dup_target) != UI_ERROR_NONE) {
-    return UI_ERROR_OUT_OF_MEMORY;
+  err = duplicate_string(dict->arena, target, &dup_target);
+  if (err != UI_ERROR_NONE) {
+    return err;
   }
 
-  token = get_or_create_token(dict, name, &err);
-  if (!token) {
+  err = get_or_create_token(dict, name, &token);
+  if (err != UI_ERROR_NONE) {
     return err;
   }
 
@@ -212,9 +215,9 @@ enum ui_error ui_design_token_set_alias(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error resolve_token(const struct ui_design_token_dict *dict,
-                                   const char *name,
-                                   struct ui_design_token **out_token) {
+static ui_error_t resolve_token(const struct ui_design_token_dict *dict,
+                                const char *name,
+                                struct ui_design_token **out_token) {
   ui_uint32 depth = 0;
   struct ui_design_token *token;
   const char *current_name = name;
@@ -239,10 +242,9 @@ static enum ui_error resolve_token(const struct ui_design_token_dict *dict,
   return UI_ERROR_UNKNOWN; /* Cycle or max depth reached */
 }
 
-enum ui_error ui_design_token_get_color(const struct ui_design_token_dict *dict,
-                                        const char *name,
-                                        ui_color_t *out_color) {
-  enum ui_error err;
+ui_error_t ui_design_token_get_color(const struct ui_design_token_dict *dict,
+                                     const char *name, ui_color_t *out_color) {
+  ui_error_t err;
   struct ui_design_token *token;
 
   if (!dict || !name || !out_color) {
@@ -263,10 +265,9 @@ enum ui_error ui_design_token_get_color(const struct ui_design_token_dict *dict,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_design_token_get_number(const struct ui_design_token_dict *dict,
-                           const char *name, float *out_number) {
-  enum ui_error err;
+ui_error_t ui_design_token_get_number(const struct ui_design_token_dict *dict,
+                                      const char *name, float *out_number) {
+  ui_error_t err;
   struct ui_design_token *token;
 
   if (!dict || !name || !out_number) {

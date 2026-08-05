@@ -17,7 +17,7 @@ int main(void) {
   struct ui_arena *arena;
   struct ui_loupe_base *loupe = NULL;
   struct ui_loupe_config config;
-  enum ui_error err;
+  ui_error_t err;
   ui_signal_t *signal = NULL;
   struct ui_dom_point focal_point;
   struct ui_dom_point result_point;
@@ -122,7 +122,7 @@ int main(void) {
         g_malloc_fail_countdown = -1;
         if (loupe_oom)
           ui_loupe_base_destroy(loupe_oom);
-        ui_arena_destroy(small_arena);
+        (void)ui_arena_destroy(small_arena);
       }
     }
   }
@@ -132,6 +132,6 @@ int main(void) {
     return 1;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }

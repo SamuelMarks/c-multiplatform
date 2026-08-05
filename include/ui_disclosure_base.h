@@ -25,7 +25,7 @@ struct ui_disclosure_base;
  * @param is_expanded The new expanded state (1 if expanded, 0 if collapsed).
  * @param user_data Opaque user data.
  */
-typedef enum ui_error (*ui_disclosure_on_toggle_t)(
+typedef ui_error_t (*ui_disclosure_on_toggle_t)(
     struct ui_disclosure_base *disclosure, int is_expanded, void *user_data);
 
 /**
@@ -43,7 +43,7 @@ typedef enum ui_error (*ui_disclosure_on_toggle_t)(
  * @param out_disclosure Pointer to receive the allocated disclosure base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure);
 
 /**
@@ -51,7 +51,7 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure);
  *
  * @param disclosure The disclosure to destroy.
  */
-void ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure);
+ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure);
 
 /**
  * @brief Sets the disabled state of the disclosure component.
@@ -61,7 +61,7 @@ void ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure);
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
                                 int disabled);
 
@@ -72,7 +72,7 @@ ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
  * @param is_expanded 1 to expand, 0 to collapse.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
                                 int is_expanded);
 
@@ -82,7 +82,7 @@ ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
  * @param disclosure The disclosure component.
  * @return 1 if expanded, 0 if collapsed.
  */
-enum ui_error
+ui_error_t
 ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
                                int *out_is_expanded);
 
@@ -94,7 +94,7 @@ ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
                                  ui_disclosure_on_toggle_t on_toggle,
                                  void *user_data);
@@ -107,7 +107,7 @@ ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
                                  const struct ui_event *event,
                                  double timestamp_ms);
@@ -119,7 +119,7 @@ ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
  * @param out_component Output pointer for the component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
                                  struct ui_component **out_component);
 
@@ -130,8 +130,8 @@ ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_disclosure_base_bind_data(struct ui_disclosure_base *widget,
-                                           struct ui_signal *signal);
+ui_error_t ui_disclosure_base_bind_data(struct ui_disclosure_base *widget,
+                                        struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

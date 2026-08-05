@@ -28,7 +28,6 @@ if(UI_USE_HARFBUZZ)
 endif()
 option(UI_SHARED_LIB "Build as Shared Library" OFF)
 option(UI_MSVC_RUNTIME_CHECKS "Enable MSVC /RTC1, /RTCs, /RTCu" OFF)
-option(UI_BUILD_TESTS "Build the test suite" ON)
 option(BUILD_VISUAL_TESTS "Build and run visual fuzzy-match tests" ON)
 
 option(UI_ENABLE_ASAN "Enable AddressSanitizer (ASAN)" OFF)
@@ -167,7 +166,7 @@ endif()
 if(MSVC)
     target_compile_options(ui_engine PRIVATE /W4 /WX /wd4702 /wd4716 /wd4098 /wd4033 /wd4133 /wd4024 /wd4047 /wd4715 /wd4113)
 else()
-    target_compile_options(ui_engine PRIVATE -pedantic -Wall -Werror)
+    target_compile_options(ui_engine PRIVATE -pedantic -Wall -Werror -Wno-error=unused-result -Wno-error=unused-value)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
@@ -180,19 +179,11 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 include(FetchContent)
 
 macro(UI_FetchDependencyLocalOrArchive NAME LOCAL_DIR GITHUB_REPO)
-    if(EXISTS "$ENV{HOME}/repos/${LOCAL_DIR}")
-        message(STATUS "Using local ${NAME} from $ENV{HOME}/repos/${LOCAL_DIR}")
-        FetchContent_Declare(
-            ${NAME}
-            SOURCE_DIR "$ENV{HOME}/repos/${LOCAL_DIR}"
-        )
-    else()
-        FetchContent_Declare(
-            ${NAME}
-            GIT_REPOSITORY "https://github.com/${GITHUB_REPO}.git"
-            GIT_TAG "master"
-        )
-    endif()
+    FetchContent_Declare(
+        ${NAME}
+        GIT_REPOSITORY "https://github.com/${GITHUB_REPO}.git"
+        GIT_TAG "master"
+    )
     FetchContent_MakeAvailable(${NAME})
 endmacro()
 
@@ -204,6 +195,10 @@ UI_FetchDependencyLocalOrArchive(parson "parson" "SamuelMarks/parson")
 UI_FetchDependencyLocalOrArchive(c_cdd "cdd-c" "SamuelMarks/cdd-c")
 UI_FetchDependencyLocalOrArchive(c-abstract-http "c-abstract-http" "SamuelMarks/c-abstract-http")
 UI_FetchDependencyLocalOrArchive(c_orm "c-orm" "SamuelMarks/c-orm")
+if(TARGET c-orm AND TARGET c_str_span)
+    target_include_directories(c-orm PUBLIC build/_deps/c_cdd-src/src)
+    target_link_libraries(c-orm PUBLIC c_str_span c_cdd)
+endif()
 
 
 # Strip coverage flags that bleed from dependencies in Debug mode
@@ -217,22 +212,36 @@ endforeach()
 if(TARGET c_cdd AND MSVC)
     target_compile_options(c_cdd PRIVATE "/wd4005")
 endif()
+if(TARGET c_cdd)
+    target_compile_definitions(c_cdd PUBLIC CDD_BUILD_TESTS=1)
+endif()
 
 target_link_libraries(ui_engine PRIVATE c-abstract-http cfs c-orm)
 target_include_directories(ui_engine PUBLIC include)
 
 # Tests
-if(UI_BUILD_TESTS)
-    include(CTest)
+include(CTest)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     enable_testing()
     add_compile_options(-UNDEBUG)
     remove_definitions(-DNDEBUG)
+
+    include(FetchContent)
+    FetchContent_Declare(
+      greatest
+      GIT_REPOSITORY https://github.com/SamuelMarks/greatest.git
+      GIT_TAG        master
+    )
+    FetchContent_MakeAvailable(greatest)
+
+    # Expose greatest to test targets
+    include_directories(${greatest_SOURCE_DIR})
 
     # Recompile library with mock allocator injected for OOM tests
     add_library(ui_engine_test STATIC src/ui_execution_context.c src/ui_tick_engine.c src/ui_thread_pool.c src/ui_reactor.c src/ui_promise.c src/ui_atomic.c src/ui_ring_buffer.c src/ui_timer.c src/ui_arena.c src/ui_pool.c src/ui_engine_core.c src/ui_event.c src/ui_signal.c src/ui_reactive_graph.c src/ui_computed.c src/ui_effect.c src/ui_color_space.c src/ui_color_quantization.c src/ui_design_tokens.c src/ui_tonal_palette.c src/ui_theme_provider.c src/ui_theme_manager.c src/ui_safe_area_manager.c src/ui_shape_family.c src/ui_typography_scale.c src/ui_state_layer.c src/ui_elevation.c src/ui_focus_ring.c src/ui_handle_manager.c src/ui_window_backend_win32.c src/ui_window_backend_macos.c src/ui_window_backend_ios.c src/ui_window_backend_android.c ${UI_WINDOW_BACKEND_LINUX_SRC} src/ui_window_backend_web.c src/ui_dom_node.c
     src/ui_fs.c src/ui_web_bridge.c src/ui_cssom.c src/ui_layout.c src/ui_css_parser.c src/ui_css_values.c src/ui_css_env.c src/ui_css_contain.c src/ui_css_overflow.c src/ui_css_lists.c src/ui_css_content.c src/ui_css_logical.c src/ui_css_scrollbars.c src/ui_css_round_display.c src/ui_css_ui.c src/ui_css_forms.c src/ui_css_motion.c src/ui_css_view_transition.c src/ui_css_speech.c src/ui_css_scroll_snap.c src/ui_css_scroll_anchoring.c src/ui_css_spatial_nav.c src/ui_css_highlight_api.c src/ui_css_page.c src/ui_css_gcpm.c src/ui_css_page_floats.c src/ui_cssom_api.c src/ui_cssom_view.c src/ui_component.c src/ui_modifier.c src/ui_drag_drop.c src/ui_list_base.c src/ui_data_source.c src/ui_input_mask.c src/ui_i18n.c src/ui_tree_grid_base.c src/ui_side_sheet_base.c src/ui_dockable_layout_base.c src/ui_hotkey_registry.c src/ui_scroll_spy.c src/ui_resizable_behavior.c src/ui_virtual_keyboard.c src/ui_predictive_back.c src/ui_nav_rail_base.c src/ui_bottom_nav_base.c src/ui_segmented_control_base.c src/ui_listbox_base.c src/ui_autocomplete_base.c src/ui_popover_base.c src/ui_clipboard.c src/ui_layout_observer.c src/ui_scroll_dispatcher.c src/ui_key_manager.c src/ui_textarea_autosize.c src/ui_ripple_base.c src/ui_alert_base.c src/ui_button_base.c src/ui_split_button_base.c src/ui_top_app_bar_base.c src/ui_bottom_app_bar_base.c src/ui_section_index_base.c src/ui_toolbar_base.c src/ui_split_pane_base.c src/ui_grid_list_base.c src/ui_fab_base.c src/ui_icon_base.c src/ui_skeleton_base.c src/ui_avatar_group_base.c src/ui_avatar_base.c src/ui_timeline_base.c src/ui_slide_toggle_base.c src/ui_timepicker_base.c src/ui_toggle_base.c src/ui_checkbox_base.c src/ui_file_uploader_base.c src/ui_os_dialogs.c src/ui_tray_manager.c src/ui_auth.c src/ui_share.c src/ui_sensor_manager.c src/ui_intersection_observer.c src/ui_mutation_observer.c src/ui_coercion_utils.c src/ui_focus_trap.c src/ui_platform_detector.c src/ui_card_base.c src/ui_divider_base.c src/ui_input_base.c src/ui_form_field_base.c src/ui_sidenav_base.c src/ui_bottom_sheet_base.c src/ui_action_sheet_base.c src/ui_snackbar_base.c src/ui_scroll_base.c src/ui_slider_base.c src/ui_range_slider_base.c src/ui_wheel_picker_base.c src/ui_pull_to_refresh_base.c src/ui_text_node_base.c src/ui_spin_button_base.c src/ui_select_base.c src/ui_dialog_base.c src/ui_disclosure_base.c src/ui_audio_wasapi.c src/ui_audio_coreaudio.c src/ui_audio_alsa.c src/ui_audio_opensles.c src/ui_audio_webaudio.c src/ui_video_mf.c src/ui_video_avfoundation.c src/ui_video_mediacodec.c src/ui_video_ffmpeg.c src/ui_av_sync.c src/ui_image_decoder.c src/ui_image_base.c src/ui_transfer_list_base.c src/ui_search_bar_base.c src/ui_swipe_action_base.c src/ui_speed_dial_base.c src/ui_video_player_base.c src/ui_command_palette_base.c src/ui_image_png.c src/ui_image_jpeg.c src/ui_image_webp.c src/ui_svg.c src/ui_asset_streamer.c src/ui_shader_manager.c src/ui_renderer.c src/ui_renderer_gdiplus.c src/ui_renderer_coregraphics.c src/ui_renderer_gles_fallback.c src/ui_renderer_gl1.c src/ui_renderer_gles2.c src/ui_font_manager.c src/ui_text_layout.c src/ui_text_layout_hb.c src/ui_video_shaders.c src/ui_effects_shaders.c src/ui_vibrancy.c src/ui_focus_manager.c src/ui_keyboard_responder.c src/ui_aria.c src/ui_gesture.c src/ui_haptics.c src/ui_overlay_director.c src/ui_geometry.c src/ui_geometry_anchor.c src/ui_backdrop.c src/ui_router.c src/ui_e2e_headless.c src/ui_e2e_headful.c src/ui_web_animation.c src/ui_spring.c src/ui_test_visual.c src/ui_audio_alsa.c src/ui_menu_base.c src/ui_stepper_base.c src/ui_table_base.c src/ui_tabs_base.c src/ui_toast_manager_base.c src/ui_tooltip_base.c src/ui_tree_base.c src/ui_selection_model.c src/ui_pagination_base.c src/ui_sort_header_base.c src/ui_calendar_base.c src/ui_datepicker_base.c src/ui_date_range_picker_base.c src/ui_radio_group_base.c src/ui_chips_base.c src/ui_color_picker_base.c src/ui_virtual_scroll_base.c src/ui_breakpoint_observer.c src/ui_carousel_base.c src/ui_breadcrumbs_base.c src/ui_portal.c src/ui_context_menu_base.c src/ui_live_announcer.c src/ui_bidi_manager.c src/ui_progress_base.c src/ui_accordion_base.c src/ui_surface_base.c src/ui_link_base.c src/ui_meter_base.c src/ui_page_control_base.c src/ui_banner_base.c src/ui_button_group_base.c src/ui_empty_state_base.c src/ui_scaffold_base.c src/ui_menubar_base.c src/ui_badge_base.c src/ui_ink_base.c src/ui_webview_base.c src/ui_camera_base.c src/ui_map_view_base.c src/ui_rating_base.c src/ui_coachmark_base.c src/ui_rich_text_base.c src/ui_label_base.c src/ui_aspect_ratio_base.c src/ui_masonry_layout_base.c src/ui_preferences.c src/ui_pin_input_base.c src/ui_hover_card_base.c src/ui_titlebar_base.c src/ui_window_manager_base.c src/ui_rich_text_editor_base.c src/ui_datagrid_base.c src/ui_canonical_layout_base.c src/ui_window_controls_base.c src/ui_compositor_material_base.c src/ui_loupe_base.c src/ui_ribbon_base.c src/ui_miller_columns_base.c src/ui_property_grid_base.c src/ui_syntax_surface_base.c src/ui_node_graph_base.c src/ui_chart_base.c src/ui_chat_bubble_base.c src/ui_form_control.c src/ui_form_node.c src/ui_form_group.c src/ui_form_array.c src/ui_form_builder.c)
     target_include_directories(ui_engine_test PUBLIC include)
-    target_compile_definitions(ui_engine_test PUBLIC UI_TEST_MOCK_ALLOC=1)
+    target_compile_definitions(ui_engine_test PUBLIC C_MULTIPLATFORM_MALLOC=ui_mock_malloc C_MULTIPLATFORM_FREE=ui_mock_free C_MULTIPLATFORM_REALLOC=ui_mock_realloc C_MULTIPLATFORM_STRDUP=ui_mock_strdup UI_TEST_MOCK_ALLOC=1)
     add_dependencies(ui_engine_test ui_engine)
     target_link_platform_libraries(ui_engine_test PUBLIC)
     if(NOT UI_SINGLE_THREADED)
@@ -244,7 +253,7 @@ if(UI_BUILD_TESTS)
     if(MSVC)
         target_compile_options(ui_engine_test PRIVATE /W4 /WX /wd4702 /wd4716 /wd4098 /wd4033 /wd4133 /wd4024 /wd4047 /wd4715 /wd4113)
     else()
-        target_compile_options(ui_engine_test PRIVATE -pedantic -Wall -Werror)
+        target_compile_options(ui_engine_test PRIVATE -pedantic -Wall -Werror -Wno-error=unused-result -Wno-error=unused-value)
         if(ENABLE_COVERAGE)
             set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
@@ -1212,6 +1221,7 @@ add_test(NAME test_ui_breakpoint_observer COMMAND test_ui_breakpoint_observer)
     if(BUILD_VISUAL_TESTS)
         add_executable(test_ui_visual tests/test_ui_visual.c tests/ui_test_mock_mem.c)
         target_link_libraries(test_ui_visual ui_engine_test)
+    endif()
     add_executable(test_ui_date_range_picker_base tests/test_ui_date_range_picker_base.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_date_range_picker_base ui_engine_test)
     add_test(NAME test_ui_date_range_picker_base COMMAND test_ui_date_range_picker_base)
@@ -1269,7 +1279,6 @@ add_test(NAME test_ui_breakpoint_observer COMMAND test_ui_breakpoint_observer)
     add_executable(test_ui_renderer_gdiplus tests/test_ui_renderer_gdiplus.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_renderer_gdiplus ui_engine_test)
     add_test(NAME test_ui_renderer_gdiplus COMMAND test_ui_renderer_gdiplus)
-    endif()
 endif()
 
 

@@ -22,9 +22,9 @@ struct ui_syntax_surface_base {
   ui_signal_t *active_line_signal;
 };
 
-static enum ui_error void_equality(union ui_signal_payload a,
-                                   union ui_signal_payload b,
-                                   ui_bool_t *out_equal) {
+static ui_error_t void_equality(union ui_signal_payload a,
+                                union ui_signal_payload b,
+                                ui_bool_t *out_equal) {
   (void)a;
   (void)b;
   if (out_equal)
@@ -32,20 +32,20 @@ static enum ui_error void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error int_equality(union ui_signal_payload a,
-                                  union ui_signal_payload b,
-                                  ui_bool_t *out_equal) {
+static ui_error_t int_equality(union ui_signal_payload a,
+                               union ui_signal_payload b,
+                               ui_bool_t *out_equal) {
   if (out_equal)
     *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_syntax_surface_base_create(struct ui_arena *arena,
                               struct ui_rich_text_base *base_rich_text,
                               struct ui_syntax_surface_base **out_surface) {
-  enum ui_error err;
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -84,22 +84,22 @@ ui_syntax_surface_base_create(struct ui_arena *arena,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface) {
   if (!surface) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (surface->fold_changed_signal)
-    ui_signal_destroy(surface->fold_changed_signal);
+    (void)ui_signal_destroy(surface->fold_changed_signal);
   if (surface->active_line_signal)
-    ui_signal_destroy(surface->active_line_signal);
+    (void)ui_signal_destroy(surface->active_line_signal);
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_syntax_surface_base_calculate_gutter_width */
-enum ui_error ui_syntax_surface_base_calculate_gutter_width(
+ui_error_t ui_syntax_surface_base_calculate_gutter_width(
     const struct ui_syntax_surface_base *surface, int total_lines,
     float char_width, float *out_width) {
   int num_digits = 1;
@@ -121,7 +121,7 @@ enum ui_error ui_syntax_surface_base_calculate_gutter_width(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_syntax_surface_base_set_fold_region(struct ui_syntax_surface_base *surface,
                                        int start_line, int end_line,
                                        ui_bool_t collapse) {
@@ -157,7 +157,7 @@ ui_syntax_surface_base_set_fold_region(struct ui_syntax_surface_base *surface,
 }
 
 /** \brief ui_syntax_surface_base_get_fold_changed_signal */
-enum ui_error ui_syntax_surface_base_get_fold_changed_signal(
+ui_error_t ui_syntax_surface_base_get_fold_changed_signal(
     struct ui_syntax_surface_base *surface, ui_signal_t **out_signal) {
   if (!surface || !out_signal)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -166,7 +166,7 @@ enum ui_error ui_syntax_surface_base_get_fold_changed_signal(
 }
 
 /** \brief ui_syntax_surface_base_get_visual_line_index */
-enum ui_error ui_syntax_surface_base_get_visual_line_index(
+ui_error_t ui_syntax_surface_base_get_visual_line_index(
     const struct ui_syntax_surface_base *surface, int absolute_line,
     int *out_visual_index) {
   int i;
@@ -202,7 +202,7 @@ enum ui_error ui_syntax_surface_base_get_visual_line_index(
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_syntax_surface_base_set_active_line(struct ui_syntax_surface_base *surface,
                                        int absolute_line) {
   union ui_signal_payload payload;
@@ -217,7 +217,7 @@ ui_syntax_surface_base_set_active_line(struct ui_syntax_surface_base *surface,
 }
 
 /** \brief ui_syntax_surface_base_get_active_line_signal */
-enum ui_error ui_syntax_surface_base_get_active_line_signal(
+ui_error_t ui_syntax_surface_base_get_active_line_signal(
     struct ui_syntax_surface_base *surface, ui_signal_t **out_signal) {
   if (!surface || !out_signal)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -226,7 +226,7 @@ enum ui_error ui_syntax_surface_base_get_active_line_signal(
 }
 
 /** \brief ui_syntax_surface_base_set_bracket_match */
-enum ui_error ui_syntax_surface_base_set_bracket_match(
+ui_error_t ui_syntax_surface_base_set_bracket_match(
     struct ui_syntax_surface_base *surface,
     const struct ui_syntax_bracket_match *match) {
   if (!surface || !match) {

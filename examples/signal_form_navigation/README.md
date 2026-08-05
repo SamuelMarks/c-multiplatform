@@ -79,7 +79,7 @@ The screen factory receives the `ui_route_request`, extracts the shared state (t
 #include "ui_input_base.h"
 #include "ui_button_base.h"
 
-enum ui_error factory_step_1(const struct ui_route_request *req, void *user_data, struct ui_component **out_screen) {
+ui_error_t factory_step_1(const struct ui_route_request *req, void *user_data, struct ui_component **out_screen) {
     /* 1. Extract the shared form state */
     ui_form_group_t *form = (ui_form_group_t *)ui_route_request_get_state(req);
 
@@ -114,7 +114,7 @@ The second screen retrieves the exact same form pointer. Any updates made here i
 ```c
 #include "ui_slide_toggle_base.h"
 
-enum ui_error factory_step_2(const struct ui_route_request *req, void *user_data, struct ui_component **out_screen) {
+ui_error_t factory_step_2(const struct ui_route_request *req, void *user_data, struct ui_component **out_screen) {
     /* Extract the exact same shared form state */
     ui_form_group_t *form = (ui_form_group_t *)ui_route_request_get_state(req);
 

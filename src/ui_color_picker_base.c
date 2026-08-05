@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "ui_color_picker_base.h"
 #include "ui_internal_mem.h"
+#include "ui_dom_node.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,22 +21,30 @@ static double ui_math_round_fallback(double number) {
 #define ROUND ui_math_round_fallback
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+
+int g_color_picker_mock_fail = 0;
+int g_color_picker_mock_target = 0;
+int g_color_picker_mock_current = 0;
+
+#endif
+
 /** \brief ui_color_picker_base */
 struct ui_color_picker_base {
   struct ui_color_rgb rgb;
   struct ui_color_hsv hsv;
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
 };
 
-static enum ui_error trigger_cva_change(struct ui_color_picker_base *picker) {
+static ui_error_t trigger_cva_change(struct ui_color_picker_base *picker) {
   union ui_signal_payload payload;
   int color_int;
 
@@ -48,8 +57,8 @@ static enum ui_error trigger_cva_change(struct ui_color_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-color_picker_cva_write_value(void *component, union ui_signal_payload value) {
+static ui_error_t color_picker_cva_write_value(void *component,
+                                               union ui_signal_payload value) {
   struct ui_color_picker_base *picker =
       (struct ui_color_picker_base *)component;
   struct ui_color_rgb rgb;
@@ -67,10 +76,9 @@ color_picker_cva_write_value(void *component, union ui_signal_payload value) {
 }
 
 /** \brief color_picker_cva_register_on_change */
-static enum ui_error color_picker_cva_register_on_change(
+static ui_error_t color_picker_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_color_picker_base *picker =
       (struct ui_color_picker_base *)component;
@@ -81,10 +89,8 @@ static enum ui_error color_picker_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-color_picker_cva_register_on_touched(void *component,
-                                     enum ui_error (*callback)(void *user_data),
-                                     void *user_data) {
+static ui_error_t color_picker_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_color_picker_base *picker =
       (struct ui_color_picker_base *)component;
   if (!picker)
@@ -94,8 +100,8 @@ color_picker_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error color_picker_cva_set_disabled_state(void *component,
-                                                         int is_disabled) {
+static ui_error_t color_picker_cva_set_disabled_state(void *component,
+                                                      int is_disabled) {
   struct ui_color_picker_base *picker =
       (struct ui_color_picker_base *)component;
   if (!picker)
@@ -105,7 +111,7 @@ static enum ui_error color_picker_cva_set_disabled_state(void *component,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
                             struct ui_control_value_accessor *out_cva) {
   struct ui_color_picker_base *picker;
@@ -114,7 +120,7 @@ ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  picker = (struct ui_color_picker_base *)UI_MALLOC(
+  picker = (struct ui_color_picker_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_color_picker_base));
   if (!picker) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -146,16 +152,15 @@ ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_color_picker_base_destroy(struct ui_color_picker_base *picker) {
+ui_error_t ui_color_picker_base_destroy(struct ui_color_picker_base *picker) {
   if (picker) {
-    UI_FREE(picker);
+    C_MULTIPLATFORM_FREE(picker);
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_picker_hsv_to_rgb(const struct ui_color_hsv *hsv,
-                                         struct ui_color_rgb *out_rgb) {
+ui_error_t ui_color_picker_hsv_to_rgb(const struct ui_color_hsv *hsv,
+                                      struct ui_color_rgb *out_rgb) {
   double c, x, m;
   double r1, g1, b1;
   double hd;
@@ -202,8 +207,8 @@ enum ui_error ui_color_picker_hsv_to_rgb(const struct ui_color_hsv *hsv,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_picker_rgb_to_hsv(const struct ui_color_rgb *rgb,
-                                         struct ui_color_hsv *out_hsv) {
+ui_error_t ui_color_picker_rgb_to_hsv(const struct ui_color_rgb *rgb,
+                                      struct ui_color_hsv *out_hsv) {
   double r, g, b;
   double cmax, cmin, delta;
   double max_rg, min_rg;
@@ -246,8 +251,8 @@ enum ui_error ui_color_picker_rgb_to_hsv(const struct ui_color_rgb *rgb,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_picker_rgb_to_hex(const struct ui_color_rgb *rgb,
-                                         char *out_hex, size_t hex_size) {
+ui_error_t ui_color_picker_rgb_to_hex(const struct ui_color_rgb *rgb,
+                                      char *out_hex, size_t hex_size) {
   if (!rgb || !out_hex || hex_size < 8) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -261,8 +266,8 @@ enum ui_error ui_color_picker_rgb_to_hex(const struct ui_color_rgb *rgb,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_picker_hex_to_rgb(const char *hex,
-                                         struct ui_color_rgb *out_rgb) {
+ui_error_t ui_color_picker_hex_to_rgb(const char *hex,
+                                      struct ui_color_rgb *out_rgb) {
   const char *p = hex;
   unsigned int r, g, b;
 
@@ -293,9 +298,9 @@ enum ui_error ui_color_picker_hex_to_rgb(const char *hex,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
-                                               double width, double height,
-                                               struct ui_color_hsv *out_hsv) {
+ui_error_t ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
+                                            double width, double height,
+                                            struct ui_color_hsv *out_hsv) {
   if (!out_hsv || width <= 0.0 || height <= 0.0) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -322,7 +327,7 @@ enum ui_error ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_color_picker_base_get_rgb(const struct ui_color_picker_base *picker,
                              struct ui_color_rgb *out_rgb) {
   if (!picker || !out_rgb) {
@@ -333,27 +338,24 @@ ui_color_picker_base_get_rgb(const struct ui_color_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
-                                           const struct ui_color_rgb *rgb) {
+ui_error_t ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
+                                        const struct ui_color_rgb *rgb) {
   if (!picker || !rgb) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   picker->rgb = *rgb;
-  ui_color_picker_rgb_to_hsv(&picker->rgb, &picker->hsv);
-  (void)trigger_cva_change(picker);
-  return UI_ERROR_NONE;
+  (void)ui_color_picker_rgb_to_hsv(&picker->rgb, &picker->hsv);
+  return trigger_cva_change(picker);
 }
 
-enum ui_error ui_color_picker_base_set_hsv(struct ui_color_picker_base *picker,
-                                           const struct ui_color_hsv *hsv) {
+ui_error_t ui_color_picker_base_set_hsv(struct ui_color_picker_base *picker,
+                                        const struct ui_color_hsv *hsv) {
   if (!picker || !hsv) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   picker->hsv = *hsv;
-
-  ui_color_picker_hsv_to_rgb(&picker->hsv, &picker->rgb);
-  (void)trigger_cva_change(picker);
-  return UI_ERROR_NONE;
+  (void)ui_color_picker_hsv_to_rgb(&picker->hsv, &picker->rgb);
+  return trigger_cva_change(picker);
 }

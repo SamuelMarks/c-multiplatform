@@ -16,7 +16,7 @@ extern "C" {
  * @param text The null-terminated text to copy to the clipboard.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_clipboard_set_text(const char *text);
+ui_error_t ui_clipboard_set_text(const char *text);
 
 /**
  * @brief Retrieves the clipboard text.
@@ -25,19 +25,19 @@ enum ui_error ui_clipboard_set_text(const char *text);
  * free it using ui_clipboard_free_text.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_clipboard_get_text(char **out_text);
+ui_error_t ui_clipboard_get_text(char **out_text);
 
 /**
  * @brief Frees text allocated by ui_clipboard_get_text.
  *
  * @param text The text to free.
  */
-enum ui_error ui_clipboard_free_text(char *text);
+ui_error_t ui_clipboard_free_text(char *text);
 
 /**
  * @brief Clears the fallback memory clipboard, if any was allocated.
  */
-enum ui_error ui_clipboard_cleanup(void);
+ui_error_t ui_clipboard_cleanup(void);
 
 #ifdef __cplusplus
 }

@@ -11,7 +11,7 @@ struct ui_pagination_base {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_pagination_base_create(struct ui_pagination_base **out_pagination) {
   struct ui_pagination_base *p;
 
@@ -19,7 +19,8 @@ ui_pagination_base_create(struct ui_pagination_base **out_pagination) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  p = (struct ui_pagination_base *)UI_MALLOC(sizeof(struct ui_pagination_base));
+  p = (struct ui_pagination_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_pagination_base));
   if (!p) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -32,17 +33,17 @@ ui_pagination_base_create(struct ui_pagination_base **out_pagination) {
   return UI_ERROR_NONE;
 }
 
-void ui_pagination_base_destroy(struct ui_pagination_base *pagination) {
+ui_error_t ui_pagination_base_destroy(struct ui_pagination_base *pagination) {
   if (!pagination) {
-    return;
+    return UI_ERROR_NONE;
   }
-  UI_FREE(pagination);
+  C_MULTIPLATFORM_FREE(pagination);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_pagination_base_set_config(struct ui_pagination_base *pagination,
-                              size_t total_items, size_t page_size) {
+ui_error_t ui_pagination_base_set_config(struct ui_pagination_base *pagination,
+                                         size_t total_items, size_t page_size) {
   size_t total_pages;
 
   if (!pagination || page_size == 0) {
@@ -63,7 +64,7 @@ ui_pagination_base_set_config(struct ui_pagination_base *pagination,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_pagination_base_get_total_pages(const struct ui_pagination_base *pagination,
                                    size_t *out_total_pages) {
   if (!pagination || !out_total_pages) {
@@ -81,7 +82,7 @@ ui_pagination_base_get_total_pages(const struct ui_pagination_base *pagination,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_pagination_base_set_current_page(struct ui_pagination_base *pagination,
                                     size_t page_index) {
   size_t total_pages;
@@ -108,7 +109,7 @@ ui_pagination_base_set_current_page(struct ui_pagination_base *pagination,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_pagination_base_get_current_page(const struct ui_pagination_base *pagination,
                                     size_t *out_current_page) {
   if (!pagination || !out_current_page) {
@@ -119,7 +120,7 @@ ui_pagination_base_get_current_page(const struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pagination_base_next(struct ui_pagination_base *pagination) {
+ui_error_t ui_pagination_base_next(struct ui_pagination_base *pagination) {
   size_t total_pages;
 
   if (!pagination) {
@@ -141,8 +142,7 @@ enum ui_error ui_pagination_base_next(struct ui_pagination_base *pagination) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_pagination_base_previous(struct ui_pagination_base *pagination) {
+ui_error_t ui_pagination_base_previous(struct ui_pagination_base *pagination) {
   if (!pagination) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -154,7 +154,7 @@ ui_pagination_base_previous(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pagination_base_first(struct ui_pagination_base *pagination) {
+ui_error_t ui_pagination_base_first(struct ui_pagination_base *pagination) {
   if (!pagination) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -163,7 +163,7 @@ enum ui_error ui_pagination_base_first(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pagination_base_last(struct ui_pagination_base *pagination) {
+ui_error_t ui_pagination_base_last(struct ui_pagination_base *pagination) {
   size_t total_pages;
 
   if (!pagination) {
@@ -183,7 +183,7 @@ enum ui_error ui_pagination_base_last(struct ui_pagination_base *pagination) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_pagination_base_get_bounds(const struct ui_pagination_base *pagination,
                               size_t *out_start_index, size_t *out_end_index) {
   size_t start, end;
@@ -212,7 +212,7 @@ ui_pagination_base_get_bounds(const struct ui_pagination_base *pagination,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_pagination_base_bind_current_page(struct ui_pagination_base *widget,
                                      struct ui_signal *signal) {
   if (!widget) {

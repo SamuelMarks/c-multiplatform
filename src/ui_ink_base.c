@@ -16,16 +16,17 @@ struct ui_ink_base {
   size_t smoothed_count;
 };
 
-enum ui_error ui_ink_base_create(struct ui_ink_base **out_ink) {
+ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
   struct ui_ink_base *ink;
   struct ui_dom_node *root_node = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_ink) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ink = (struct ui_ink_base *)UI_MALLOC(sizeof(struct ui_ink_base));
+  ink =
+      (struct ui_ink_base *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_ink_base));
   if (!ink) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -33,44 +34,60 @@ enum ui_error ui_ink_base_create(struct ui_ink_base **out_ink) {
 
   rc = ui_component_create(&ink->component);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(ink);
+    C_MULTIPLATFORM_FREE(ink);
     return rc;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    ui_component_destroy(ink->component);
-    UI_FREE(ink);
+    (void)ui_component_destroy(ink->component);
+    C_MULTIPLATFORM_FREE(ink);
     return rc;
   }
 
-  ui_dom_node_set_tag_name(root_node, "canvas");
-  ui_dom_node_set_attribute(root_node, "role", "img");
+  {
+    ui_error_t rc2 = ui_dom_node_set_tag_name(root_node, "canvas");
+    if (rc2 != UI_ERROR_NONE) {
+      (void)ui_component_destroy(ink->component);
+      (void)ui_dom_node_destroy(root_node);
+      C_MULTIPLATFORM_FREE(ink);
+      return rc2;
+    }
+  }
+  {
+    ui_error_t rc3 = ui_dom_node_set_attribute(root_node, "role", "img");
+    if (rc3 != UI_ERROR_NONE) {
+      (void)ui_component_destroy(ink->component);
+      (void)ui_dom_node_destroy(root_node);
+      C_MULTIPLATFORM_FREE(ink);
+      return rc3;
+    }
+  }
   ink->component->shadow_root = root_node;
 
   *out_ink = ink;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ink_base_destroy(struct ui_ink_base *ink) {
+ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink) {
   if (!ink) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (ink->component) {
-    ui_component_destroy(ink->component);
+    (void)ui_component_destroy(ink->component);
   }
   if (ink->raw_points) {
-    UI_FREE(ink->raw_points);
+    C_MULTIPLATFORM_FREE(ink->raw_points);
   }
   if (ink->smoothed_points) {
-    UI_FREE(ink->smoothed_points);
+    C_MULTIPLATFORM_FREE(ink->smoothed_points);
   }
-  UI_FREE(ink);
+  C_MULTIPLATFORM_FREE(ink);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ink_base_get_component(struct ui_ink_base *ink,
-                                        struct ui_component **out_component) {
+ui_error_t ui_ink_base_get_component(struct ui_ink_base *ink,
+                                     struct ui_component **out_component) {
   if (!ink || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -78,12 +95,11 @@ enum ui_error ui_ink_base_get_component(struct ui_ink_base *ink,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error interpolate_catmull_rom(const struct ui_ink_event *p0,
-                                             const struct ui_ink_event *p1,
-                                             const struct ui_ink_event *p2,
-                                             const struct ui_ink_event *p3,
-                                             float t,
-                                             struct ui_ink_event *out) {
+static ui_error_t interpolate_catmull_rom(const struct ui_ink_event *p0,
+                                          const struct ui_ink_event *p1,
+                                          const struct ui_ink_event *p2,
+                                          const struct ui_ink_event *p3,
+                                          float t, struct ui_ink_event *out) {
   float t2, t3;
   t2 = t * t;
   t3 = t2 * t;
@@ -103,11 +119,11 @@ static enum ui_error interpolate_catmull_rom(const struct ui_ink_event *p0,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error append_smoothed_segment(struct ui_ink_base *ink,
-                                             const struct ui_ink_event *p0,
-                                             const struct ui_ink_event *p1,
-                                             const struct ui_ink_event *p2,
-                                             const struct ui_ink_event *p3) {
+static ui_error_t append_smoothed_segment(struct ui_ink_base *ink,
+                                          const struct ui_ink_event *p0,
+                                          const struct ui_ink_event *p1,
+                                          const struct ui_ink_event *p2,
+                                          const struct ui_ink_event *p3) {
   int i;
   int steps = 4;
   for (i = 1; i <= steps; ++i) {
@@ -117,7 +133,7 @@ static enum ui_error append_smoothed_segment(struct ui_ink_base *ink,
 
     if (ink->smoothed_count >= ink->smoothed_capacity) {
       size_t new_cap = ink->smoothed_capacity * 2;
-      struct ui_ink_event *new_arr = UI_REALLOC(
+      struct ui_ink_event *new_arr = C_MULTIPLATFORM_REALLOC(
           ink->smoothed_points, new_cap * sizeof(struct ui_ink_event));
       if (!new_arr) {
         return UI_ERROR_OUT_OF_MEMORY;
@@ -130,16 +146,16 @@ static enum ui_error append_smoothed_segment(struct ui_ink_base *ink,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ink_base_add_event(struct ui_ink_base *ink,
-                                    const struct ui_ink_event *event) {
+ui_error_t ui_ink_base_add_event(struct ui_ink_base *ink,
+                                 const struct ui_ink_event *event) {
   if (!ink || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (ink->raw_count >= ink->raw_capacity) {
     size_t new_cap = ink->raw_capacity == 0 ? 16 : ink->raw_capacity * 2;
-    struct ui_ink_event *new_arr =
-        UI_REALLOC(ink->raw_points, new_cap * sizeof(struct ui_ink_event));
+    struct ui_ink_event *new_arr = C_MULTIPLATFORM_REALLOC(
+        ink->raw_points, new_cap * sizeof(struct ui_ink_event));
     if (!new_arr) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -150,8 +166,8 @@ enum ui_error ui_ink_base_add_event(struct ui_ink_base *ink,
 
   if (ink->raw_count == 1) {
     size_t new_cap = 32;
-    struct ui_ink_event *new_arr =
-        UI_REALLOC(ink->smoothed_points, new_cap * sizeof(struct ui_ink_event));
+    struct ui_ink_event *new_arr = C_MULTIPLATFORM_REALLOC(
+        ink->smoothed_points, new_cap * sizeof(struct ui_ink_event));
     if (!new_arr) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -170,7 +186,7 @@ enum ui_error ui_ink_base_add_event(struct ui_ink_base *ink,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ink_base_finish_stroke(struct ui_ink_base *ink) {
+ui_error_t ui_ink_base_finish_stroke(struct ui_ink_base *ink) {
   if (!ink) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -188,8 +204,8 @@ enum ui_error ui_ink_base_finish_stroke(struct ui_ink_base *ink) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
-                                                    size_t *out_count) {
+ui_error_t ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
+                                                 size_t *out_count) {
   if (!ink || !out_count) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -197,9 +213,8 @@ enum ui_error ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_ink_base_get_smoothed_point(struct ui_ink_base *ink,
-                                             size_t index,
-                                             struct ui_ink_event *out_point) {
+ui_error_t ui_ink_base_get_smoothed_point(struct ui_ink_base *ink, size_t index,
+                                          struct ui_ink_event *out_point) {
   if (!ink || !out_point) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

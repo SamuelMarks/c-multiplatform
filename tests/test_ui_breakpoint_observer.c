@@ -27,19 +27,19 @@ static void test_invalid_args(void) {
   assert(ui_breakpoint_observer_tick(NULL, 100.0f, 0.0) ==
          UI_ERROR_INVALID_ARGUMENT);
 
-  ui_breakpoint_observer_destroy(observer);
+  (void)ui_breakpoint_observer_destroy(observer);
 }
 
 static void test_oom(void) {
   int i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   for (i = 0; i < 20; i++) {
     struct ui_breakpoint_observer *observer = NULL;
     g_malloc_fail_countdown = i;
     rc = ui_breakpoint_observer_create(NULL, &observer);
     if (rc == UI_ERROR_NONE) {
-      ui_breakpoint_observer_destroy(observer);
+      (void)ui_breakpoint_observer_destroy(observer);
       break;
     } else {
       assert(rc == UI_ERROR_OUT_OF_MEMORY);
@@ -48,12 +48,22 @@ static void test_oom(void) {
   g_malloc_fail_countdown = -1;
 }
 
+extern int g_breakpoint_mock_fail;
+
 static void test_widths(void) {
   struct ui_breakpoint_observer *o = NULL;
+  int i;
   ui_breakpoint_observer_create(NULL, &o);
 
-  ui_breakpoint_observer_tick(o, 400.0, 100.0);        /* xsmall */
-  ui_breakpoint_observer_tick(o, 400.0, 100.0 + 60.0); /* trigger debounce */
+  for (i = 1; i <= 5; i++) {
+    g_breakpoint_mock_fail = i;
+    ui_breakpoint_observer_tick(o, 400.0 + i * 10, 1000.0 * i);
+    ui_breakpoint_observer_tick(o, 400.0 + i * 10, 1000.0 * i + 60.0);
+  }
+  g_breakpoint_mock_fail = 0;
+
+  ui_breakpoint_observer_tick(o, 400.0, 1000.0);        /* xsmall */
+  ui_breakpoint_observer_tick(o, 400.0, 1000.0 + 60.0); /* trigger debounce */
 
   ui_breakpoint_observer_tick(o, 600.0, 200.0); /* small lower bound */
   ui_breakpoint_observer_tick(o, 600.0, 200.0 + 60.0);
@@ -67,7 +77,7 @@ static void test_widths(void) {
   ui_breakpoint_observer_tick(o, 1536.0, 500.0); /* xlarge lower bound */
   ui_breakpoint_observer_tick(o, 1536.0, 500.0 + 60.0);
 
-  ui_breakpoint_observer_destroy(o);
+  (void)ui_breakpoint_observer_destroy(o);
 }
 int main(void) {
   test_widths();
@@ -75,7 +85,7 @@ int main(void) {
   struct ui_signal *small_sig;
   struct ui_signal *large_sig;
   union ui_signal_payload val_small, val_large;
-  enum ui_error rc;
+  ui_error_t rc;
 
   test_invalid_args();
   test_oom();
@@ -136,7 +146,7 @@ int main(void) {
   /* Wait beyond debounce threshold with no width change */
   ui_breakpoint_observer_tick(observer, 1300.0f, 200.0);
 
-  ui_breakpoint_observer_destroy(observer);
+  (void)ui_breakpoint_observer_destroy(observer);
   printf("test_ui_breakpoint_observer passed\n");
   return 0;
 }

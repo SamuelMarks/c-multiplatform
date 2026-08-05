@@ -110,7 +110,7 @@ static void test_spatial_nav_cases(void) {
                    UI_CSS_SPATIAL_NAV_CONTAIN_AUTO, "invalid",
                    UI_CSS_SPATIAL_NAV_FUNCTION_NORMAL);
 
-  ui_dom_node_destroy(node);
+  (void)ui_dom_node_destroy(node);
 }
 
 int main(void) {

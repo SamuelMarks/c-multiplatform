@@ -9,7 +9,7 @@ extern int g_malloc_fail_countdown;
 
 #define ASSERT_SUCCESS(expr)                                                   \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
+    ui_error_t err = (expr);                                                   \
     if (err != UI_ERROR_NONE) {                                                \
       printf("Failed at line %d: %d\n", __LINE__, err);                        \
       return 1;                                                                \
@@ -17,7 +17,7 @@ extern int g_malloc_fail_countdown;
   } while (0)
 #define ASSERT_EQ(expr, expected)                                              \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
+    ui_error_t err = (expr);                                                   \
     if (err != (expected)) {                                                   \
       printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
              err);                                                             \
@@ -42,7 +42,7 @@ static int run_normal_tests(void) {
 
   /* Missing destroy fn in api! Just free for tests */
   if (surface) {
-    ui_component_destroy(&surface->base);
+    (void)ui_component_destroy(&surface->base);
   }
 
   return 0;

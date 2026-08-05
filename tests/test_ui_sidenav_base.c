@@ -5,8 +5,10 @@
 #include <stdio.h>
 /* clang-format on */
 
-static enum ui_error mock_on_close(struct ui_sidenav_base *sidenav,
-                                   void *user_data) {
+extern int g_malloc_fail_countdown;
+
+static ui_error_t mock_on_close(struct ui_sidenav_base *sidenav,
+                                void *user_data) {
   int *called = (int *)user_data;
   (void)sidenav;
   *called = 1;
@@ -15,7 +17,7 @@ static enum ui_error mock_on_close(struct ui_sidenav_base *sidenav,
 
 #define ASSERT_SUCCESS(expr)                                                   \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
+    ui_error_t err = (expr);                                                   \
     if (err != UI_ERROR_NONE) {                                                \
       printf("Failed at line %d: %d\n", __LINE__, err);                        \
       return 1;                                                                \
@@ -23,7 +25,7 @@ static enum ui_error mock_on_close(struct ui_sidenav_base *sidenav,
   } while (0)
 #define ASSERT_EQ(expr, expected)                                              \
   do {                                                                         \
-    enum ui_error err = (expr);                                                \
+    ui_error_t err = (expr);                                                   \
     if (err != (expected)) {                                                   \
       printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
              err);                                                             \
@@ -43,7 +45,7 @@ int main(void) {
 
   /* Null checks */
   ASSERT_EQ(ui_sidenav_base_create(NULL), UI_ERROR_INVALID_ARGUMENT);
-  ui_sidenav_base_destroy(NULL);
+  (void)ui_sidenav_base_destroy(NULL);
 
   ASSERT_EQ(ui_sidenav_base_set_mode(NULL, UI_SIDENAV_MODE_OVER),
             UI_ERROR_INVALID_ARGUMENT);
@@ -162,11 +164,39 @@ int main(void) {
   /* Close when already closed */
   ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 0));
 
-  ui_sidenav_base_destroy(sidenav);
-  ui_component_destroy(content_comp1);
-  ui_component_destroy(content_comp2);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root);
+  printf("Testing OOM on create...\n");
+  {
+    int i;
+    for (i = 0; i < 50; i++) {
+      g_malloc_fail_countdown = i;
+      if (ui_sidenav_base_create(&sidenav) == UI_ERROR_NONE) {
+        (void)ui_sidenav_base_destroy(sidenav);
+        break;
+      }
+    }
+    g_malloc_fail_countdown = -1;
+  }
+
+  {
+    int i;
+    for (i = 0; i < 30; i++) {
+      ui_sidenav_base_create(&sidenav);
+      ui_sidenav_base_set_overlay_director(sidenav, director);
+      g_malloc_fail_countdown = i;
+      if (ui_sidenav_base_set_open(sidenav, 1) == UI_ERROR_NONE) {
+        (void)ui_sidenav_base_destroy(sidenav);
+        break;
+      }
+      g_malloc_fail_countdown = -1;
+      (void)ui_sidenav_base_destroy(sidenav);
+    }
+  }
+  g_malloc_fail_countdown = -1;
+
+  (void)ui_component_destroy(content_comp1);
+  (void)ui_component_destroy(content_comp2);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root);
 
   printf("All tests passed.\n");
   return 0;

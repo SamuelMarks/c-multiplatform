@@ -28,8 +28,8 @@ struct ui_css_gcpm_properties {
  * @param out_props Pointer to the properties struct.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_gcpm_parse(const struct ui_css_computed_style *style,
-                                struct ui_css_gcpm_properties *out_props);
+ui_error_t ui_css_gcpm_parse(const struct ui_css_computed_style *style,
+                             struct ui_css_gcpm_properties *out_props);
 
 /**
  * @brief Destroys string allocations within GCPM properties.
@@ -37,8 +37,7 @@ enum ui_error ui_css_gcpm_parse(const struct ui_css_computed_style *style,
  * @param props The struct to clean up.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_css_gcpm_properties_cleanup(struct ui_css_gcpm_properties *props);
+void ui_css_gcpm_properties_cleanup(struct ui_css_gcpm_properties *props);
 
 #ifdef __cplusplus
 }

@@ -17,17 +17,17 @@ struct ui_pin_input_base {
   int length;
   char *buffer; /* Nul-terminated concatenated string */
 
-  enum ui_error (*cva_on_change)(union ui_signal_payload new_value,
-                                 void *user_data);
+  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
+                              void *user_data);
   void *cva_on_change_user_data;
 
-  enum ui_error (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data);
   void *cva_on_touched_user_data;
 
   int is_disabled;
 };
 
-static enum ui_error trigger_change(struct ui_pin_input_base *pin_input) {
+static ui_error_t trigger_change(struct ui_pin_input_base *pin_input) {
   if (pin_input->cva_on_change) {
     union ui_signal_payload payload;
     payload.ptr_val = pin_input->buffer;
@@ -37,15 +37,15 @@ static enum ui_error trigger_change(struct ui_pin_input_base *pin_input) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_touched(struct ui_pin_input_base *pin_input) {
+static ui_error_t trigger_touched(struct ui_pin_input_base *pin_input) {
   if (pin_input->cva_on_touched) {
     return pin_input->cva_on_touched(pin_input->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error pin_input_cva_write_value(void *component,
-                                               union ui_signal_payload value) {
+static ui_error_t pin_input_cva_write_value(void *component,
+                                            union ui_signal_payload value) {
   struct ui_pin_input_base *pin_input = (struct ui_pin_input_base *)component;
   const char *str;
 
@@ -71,10 +71,9 @@ static enum ui_error pin_input_cva_write_value(void *component,
 }
 
 /** \brief pin_input_cva_register_on_change */
-static enum ui_error pin_input_cva_register_on_change(
+static ui_error_t pin_input_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_pin_input_base *pin_input = (struct ui_pin_input_base *)component;
   if (!pin_input)
@@ -84,10 +83,8 @@ static enum ui_error pin_input_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-pin_input_cva_register_on_touched(void *component,
-                                  enum ui_error (*callback)(void *user_data),
-                                  void *user_data) {
+static ui_error_t pin_input_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_pin_input_base *pin_input = (struct ui_pin_input_base *)component;
   if (!pin_input)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -96,23 +93,28 @@ pin_input_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error pin_input_cva_set_disabled_state(void *component,
-                                                      int is_disabled) {
+static ui_error_t pin_input_cva_set_disabled_state(void *component,
+                                                   int is_disabled) {
   struct ui_pin_input_base *pin_input = (struct ui_pin_input_base *)component;
   if (!pin_input)
     return UI_ERROR_INVALID_ARGUMENT;
   pin_input->is_disabled = is_disabled;
-  ui_dom_node_set_attribute(pin_input->component->shadow_root, "aria-disabled",
-                            is_disabled ? "true" : "false");
+  {
+    ui_error_t attr_rc = ui_dom_node_set_attribute(
+        pin_input->component->shadow_root, "aria-disabled",
+        is_disabled ? "true" : "false");
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
+  }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input, int length,
-                         struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input,
+                                    int length,
+                                    struct ui_control_value_accessor *out_cva) {
   struct ui_pin_input_base *pin_input;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -120,8 +122,8 @@ ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input, int length,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  pin_input =
-      (struct ui_pin_input_base *)UI_MALLOC(sizeof(struct ui_pin_input_base));
+  pin_input = (struct ui_pin_input_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_pin_input_base));
   if (!pin_input) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -129,10 +131,10 @@ ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input, int length,
   memset(pin_input, 0, sizeof(struct ui_pin_input_base));
   pin_input->length = length;
 
-  pin_input->buffer = (char *)UI_MALLOC((size_t)length + 1);
+  pin_input->buffer = (char *)C_MULTIPLATFORM_MALLOC((size_t)length + 1);
   if (!pin_input->buffer) {
-    UI_FREE(pin_input->buffer);
-    UI_FREE(pin_input);
+    C_MULTIPLATFORM_FREE(pin_input->buffer);
+    C_MULTIPLATFORM_FREE(pin_input);
     return UI_ERROR_OUT_OF_MEMORY;
   }
   memset(pin_input->buffer, 0, (size_t)length + 1);
@@ -162,7 +164,11 @@ ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input, int length,
     goto cleanup;
   }
 
-  (void)ui_component_set_default_style(pin_input->component, default_style);
+  rc = ui_component_set_default_style(pin_input->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
+  }
 
   pin_input->component->shadow_root = root_node;
   root_node = NULL;
@@ -179,27 +185,28 @@ ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input, int length,
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (pin_input->component) {
-    ui_component_destroy(pin_input->component);
+    (void)ui_component_destroy(pin_input->component);
   }
-  UI_FREE(pin_input->buffer);
-  UI_FREE(pin_input);
+  C_MULTIPLATFORM_FREE(pin_input->buffer);
+  C_MULTIPLATFORM_FREE(pin_input);
   return rc;
 }
 
-void ui_pin_input_base_destroy(struct ui_pin_input_base *pin_input) {
+ui_error_t ui_pin_input_base_destroy(struct ui_pin_input_base *pin_input) {
   if (!pin_input) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(pin_input->component);
-  UI_FREE(pin_input->buffer);
-  UI_FREE(pin_input);
+  (void)ui_component_destroy(pin_input->component);
+  C_MULTIPLATFORM_FREE(pin_input->buffer);
+  C_MULTIPLATFORM_FREE(pin_input);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_pin_input_base_get_component(struct ui_pin_input_base *pin_input,
                                 struct ui_component **out_component) {
   if (!out_component)
@@ -212,8 +219,8 @@ ui_pin_input_base_get_component(struct ui_pin_input_base *pin_input,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pin_input_base_on_input(struct ui_pin_input_base *pin_input,
-                                         int index, const char *c) {
+ui_error_t ui_pin_input_base_on_input(struct ui_pin_input_base *pin_input,
+                                      int index, const char *c) {
   if (!pin_input || !c) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -223,8 +230,16 @@ enum ui_error ui_pin_input_base_on_input(struct ui_pin_input_base *pin_input,
 
   if (index >= 0 && index < pin_input->length) {
     pin_input->buffer[index] = c[0];
-    (void)trigger_change(pin_input);
-    (void)trigger_touched(pin_input);
+    {
+      ui_error_t rc = trigger_change(pin_input);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
+    {
+      ui_error_t rc = trigger_touched(pin_input);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
   }
 
   /* Auto-advance logic would go here: move focus to index + 1 */
@@ -232,8 +247,8 @@ enum ui_error ui_pin_input_base_on_input(struct ui_pin_input_base *pin_input,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_pin_input_base_on_backspace(struct ui_pin_input_base *pin_input, int index) {
+ui_error_t ui_pin_input_base_on_backspace(struct ui_pin_input_base *pin_input,
+                                          int index) {
   if (!pin_input) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -243,16 +258,24 @@ ui_pin_input_base_on_backspace(struct ui_pin_input_base *pin_input, int index) {
 
   if (index >= 0 && index < pin_input->length) {
     pin_input->buffer[index] = '\0';
-    (void)trigger_change(pin_input);
-    (void)trigger_touched(pin_input);
+    {
+      ui_error_t rc = trigger_change(pin_input);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
+    {
+      ui_error_t rc = trigger_touched(pin_input);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
   }
 
   /* Cascading backspace logic: if empty, move focus to index - 1 and clear */
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_pin_input_base_on_paste(struct ui_pin_input_base *pin_input,
-                                         const char *pasted_text) {
+ui_error_t ui_pin_input_base_on_paste(struct ui_pin_input_base *pin_input,
+                                      const char *pasted_text) {
   size_t pasted_len;
   size_t copy_len;
 
@@ -270,8 +293,16 @@ enum ui_error ui_pin_input_base_on_paste(struct ui_pin_input_base *pin_input,
   memset(pin_input->buffer, 0, (size_t)pin_input->length + 1);
   memcpy(pin_input->buffer, pasted_text, copy_len);
 
-  (void)trigger_change(pin_input);
-  (void)trigger_touched(pin_input);
+  {
+    ui_error_t rc = trigger_change(pin_input);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
+  {
+    ui_error_t rc = trigger_touched(pin_input);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
 
   /* Paste splitting logic: distribute characters across consecutive inputs */
   return UI_ERROR_NONE;

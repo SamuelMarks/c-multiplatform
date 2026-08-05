@@ -11,7 +11,7 @@ static int run_normal_tests(void) {
   int ival = -1;
   float fval = -1.0f;
   char buffer[32];
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing invalid arguments...\n");
   if (ui_coerce_string_to_bool(NULL, &bval) != UI_ERROR_INVALID_ARGUMENT)

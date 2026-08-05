@@ -75,35 +75,33 @@ struct ui_css_offset_rotate {
 /**
  * @brief Parses the offset-path CSS property.
  */
-enum ui_error ui_css_parse_offset_path(const char *str,
-                                       struct ui_css_offset_path *out_path);
+ui_error_t ui_css_parse_offset_path(const char *str,
+                                    struct ui_css_offset_path *out_path);
 
 /**
  * @brief Parses the offset-distance CSS property.
  */
-enum ui_error ui_css_parse_offset_distance(const char *str,
-                                           struct ui_css_value *out_distance);
+ui_error_t ui_css_parse_offset_distance(const char *str,
+                                        struct ui_css_value *out_distance);
 
 /**
  * @brief Parses the offset-position CSS property.
  */
-enum ui_error
+ui_error_t
 ui_css_parse_offset_position(const char *str,
                              struct ui_css_offset_position *out_position);
 
 /**
  * @brief Parses the offset-anchor CSS property.
  */
-enum ui_error
-ui_css_parse_offset_anchor(const char *str,
-                           struct ui_css_offset_anchor *out_anchor);
+ui_error_t ui_css_parse_offset_anchor(const char *str,
+                                      struct ui_css_offset_anchor *out_anchor);
 
 /**
  * @brief Parses the offset-rotate CSS property.
  */
-enum ui_error
-ui_css_parse_offset_rotate(const char *str,
-                           struct ui_css_offset_rotate *out_rotate);
+ui_error_t ui_css_parse_offset_rotate(const char *str,
+                                      struct ui_css_offset_rotate *out_rotate);
 
 #ifdef __cplusplus
 }

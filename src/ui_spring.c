@@ -2,10 +2,10 @@
 #include "../include/ui_spring.h"
 /* clang-format on */
 
-enum ui_error ui_spring_update(const struct ui_spring_config *config,
-                               const struct ui_spring_state *current,
-                               float target, float delta_time_s,
-                               struct ui_spring_state *out_state) {
+ui_error_t ui_spring_update(const struct ui_spring_config *config,
+                            const struct ui_spring_state *current, float target,
+                            float delta_time_s,
+                            struct ui_spring_state *out_state) {
   float force;
   float acceleration;
 

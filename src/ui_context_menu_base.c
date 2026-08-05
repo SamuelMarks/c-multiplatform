@@ -10,16 +10,15 @@ struct ui_context_menu_base {
 };
 
 /** \brief ui_error */
-enum ui_error
-ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
+ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
   struct ui_context_menu_base *ctx_menu;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!out_menu) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ctx_menu = (struct ui_context_menu_base *)UI_MALLOC(
+  ctx_menu = (struct ui_context_menu_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_context_menu_base));
   if (!ctx_menu) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -27,7 +26,7 @@ ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
 
   rc = ui_menu_base_create(&ctx_menu->menu);
   if (rc != UI_ERROR_NONE) {
-    UI_FREE(ctx_menu);
+    C_MULTIPLATFORM_FREE(ctx_menu);
     return rc;
   }
 
@@ -35,16 +34,16 @@ ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_context_menu_base_destroy(struct ui_context_menu_base *menu) {
+ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu) {
   if (menu) {
-    ui_menu_base_destroy(menu->menu);
-    UI_FREE(menu);
+    (void)ui_menu_base_destroy(menu->menu);
+    C_MULTIPLATFORM_FREE(menu);
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
-                                            struct ui_menu_base **out_menu) {
+ui_error_t ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
+                                         struct ui_menu_base **out_menu) {
   if (!menu || !out_menu) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -52,12 +51,12 @@ enum ui_error ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_context_menu_base_open_at(struct ui_context_menu_base *menu,
-                                           struct ui_overlay_director *director,
-                                           int target_x, int target_y,
-                                           int menu_width, int menu_height,
-                                           int viewport_width,
-                                           int viewport_height) {
+ui_error_t ui_context_menu_base_open_at(struct ui_context_menu_base *menu,
+                                        struct ui_overlay_director *director,
+                                        int target_x, int target_y,
+                                        int menu_width, int menu_height,
+                                        int viewport_width,
+                                        int viewport_height) {
   int clamped_x = target_x;
   int clamped_y = target_y;
 
@@ -85,9 +84,8 @@ enum ui_error ui_context_menu_base_open_at(struct ui_context_menu_base *menu,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
-                               struct ui_signal *open_signal) {
+ui_error_t ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
+                                          struct ui_signal *open_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -96,7 +94,7 @@ ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_context_menu_base_get_animating_signal(struct ui_context_menu_base *widget,
                                           struct ui_computed **out_animating) {
   if (!widget || !out_animating) {

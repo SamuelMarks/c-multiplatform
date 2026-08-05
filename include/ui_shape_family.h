@@ -30,8 +30,8 @@ enum ui_shape_family {
  * @param out_radius Pointer to store the resulting radius (in logical pixels).
  * @return UI_ERROR_NONE on success, or an error code.
  */
-enum ui_error ui_shape_family_get_radius(enum ui_shape_family family,
-                                         float *out_radius);
+ui_error_t ui_shape_family_get_radius(enum ui_shape_family family,
+                                      float *out_radius);
 
 #ifdef __cplusplus
 }

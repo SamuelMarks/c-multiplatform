@@ -140,11 +140,11 @@ static const char *LANGUAGES[] = {"en-US", "es-ES", "fr-FR"};
  * @param ctx The application context.
  * @return UI_ERROR_NONE on success.
  */
-static enum ui_error update_theme_ui(struct app_context *ctx) {
+static ui_error_t update_theme_ui(struct app_context *ctx) {
   enum ui_theme_mode mode;
   struct ui_dom_node *host_theme;
   const char *label;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_theme_manager_get_mode(ctx->state.theme_manager, &mode);
   if (err != UI_ERROR_NONE)
@@ -180,10 +180,10 @@ static enum ui_error update_theme_ui(struct app_context *ctx) {
  * @param ctx The application context.
  * @return UI_ERROR_NONE on success.
  */
-static enum ui_error update_lang_ui(struct app_context *ctx) {
+static ui_error_t update_lang_ui(struct app_context *ctx) {
   const char *locale = NULL;
   struct ui_dom_node *host_lang;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_i18n_get_locale(ctx->state.i18n, &locale);
   if (err != UI_ERROR_NONE)
@@ -222,23 +222,32 @@ static enum ui_error update_lang_ui(struct app_context *ctx) {
  * @param button The button instance.
  * @param user_data Application context.
  */
-static enum ui_error on_theme_toggle(struct ui_button_base *button,
-                                     void *user_data) {
+static ui_error_t on_theme_toggle(struct ui_button_base *button,
+                                  void *user_data) {
   struct app_context *ctx = (struct app_context *)user_data;
   enum ui_theme_mode mode;
-  enum ui_error err;
+  ui_error_t err;
   (void)button;
 
   err = ui_theme_manager_get_mode(ctx->state.theme_manager, &mode);
   if (err != UI_ERROR_NONE)
     return err;
   if (mode == UI_THEME_MODE_DARK) {
-    ui_theme_manager_set_mode(ctx->state.theme_manager, UI_THEME_MODE_LIGHT);
+    err = ui_theme_manager_set_mode(ctx->state.theme_manager,
+                                    UI_THEME_MODE_LIGHT);
+    if (err != UI_ERROR_NONE)
+      return err;
   } else {
-    ui_theme_manager_set_mode(ctx->state.theme_manager, UI_THEME_MODE_DARK);
+    err =
+        ui_theme_manager_set_mode(ctx->state.theme_manager, UI_THEME_MODE_DARK);
+    if (err != UI_ERROR_NONE)
+      return err;
   }
 
-  update_theme_ui(ctx);
+  err = update_theme_ui(ctx);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
   ctx->needs_layout = 1;
   return UI_ERROR_NONE;
 }
@@ -248,15 +257,23 @@ static enum ui_error on_theme_toggle(struct ui_button_base *button,
  * @param button The button instance.
  * @param user_data Application context.
  */
-static enum ui_error on_lang_toggle(struct ui_button_base *button,
-                                    void *user_data) {
+static ui_error_t on_lang_toggle(struct ui_button_base *button,
+                                 void *user_data) {
   struct app_context *ctx = (struct app_context *)user_data;
+  ui_error_t err;
   (void)button;
 
   ctx->state.current_lang_idx = (ctx->state.current_lang_idx + 1) % 3;
-  ui_i18n_set_locale(ctx->state.i18n, LANGUAGES[ctx->state.current_lang_idx]);
+  err = ui_i18n_set_locale(ctx->state.i18n,
+                           LANGUAGES[ctx->state.current_lang_idx]);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
 
-  update_lang_ui(ctx);
+  err = update_lang_ui(ctx);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
   ctx->needs_layout = 1;
   return UI_ERROR_NONE;
 }
@@ -269,16 +286,16 @@ static enum ui_error on_lang_toggle(struct ui_button_base *button,
  * @param node Current layout node in the tree traversal.
  * @return UI_ERROR_NONE on success.
  */
-static enum ui_error draw_layout_node(struct app_context *ctx,
-                                      struct ui_renderer_backend *renderer,
-                                      struct ui_layout_node *node) {
+static ui_error_t draw_layout_node(struct app_context *ctx,
+                                   struct ui_renderer_backend *renderer,
+                                   struct ui_layout_node *node) {
   struct ui_dom_rect rect;
   struct ui_color color = {0.8f, 0.8f, 0.8f, 1.0f};
   struct ui_layout_node *child;
   const char *id = NULL;
   const char *cls = NULL;
   enum ui_theme_mode mode;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_theme_manager_get_mode(ctx->state.theme_manager, &mode);
   if (err != UI_ERROR_NONE)
@@ -354,10 +371,10 @@ static enum ui_error draw_layout_node(struct app_context *ctx,
  * @param rctx The renderer context enclosing state and handles.
  * @return UI_ERROR_NONE on success.
  */
-static enum ui_error do_render(struct render_context *rctx) {
+static ui_error_t do_render(struct render_context *rctx) {
   struct app_context *app_ctx;
   struct ui_renderer_backend *renderer;
-  enum ui_error err;
+  ui_error_t err;
 
   app_ctx = rctx->app_ctx;
   renderer = rctx->renderer;
@@ -421,8 +438,7 @@ static enum ui_error do_render(struct render_context *rctx) {
  * @param width New pixel width.
  * @param height New pixel height.
  */
-static enum ui_error on_resize_callback(void *user_data, int width,
-                                        int height) {
+static ui_error_t on_resize_callback(void *user_data, int width, int height) {
   struct render_context *rctx;
   rctx = (struct render_context *)user_data;
   rctx->app_ctx->window_width = (float)width;
@@ -438,9 +454,8 @@ static enum ui_error on_resize_callback(void *user_data, int width,
  * @param event The generic input event from the OS window.
  * @return UI_ERROR_NONE on success.
  */
-static enum ui_error route_event(struct app_context *ctx,
-                                 struct ui_event *event) {
-  enum ui_error err;
+static ui_error_t route_event(struct app_context *ctx, struct ui_event *event) {
+  ui_error_t err;
 
   if (event->type == UI_EVENT_MOUSE_DOWN || event->type == UI_EVENT_MOUSE_UP) {
   }
@@ -474,7 +489,7 @@ static struct render_context g_rctx;
 static void main_loop_step(void) {
   struct ui_event event;
   int has_event = 0;
-  enum ui_error err;
+  ui_error_t err;
 
   do {
     err = g_rctx.window_backend->poll_events(g_rctx.window_backend,
@@ -510,7 +525,7 @@ int main(void) {
   struct app_context app_ctx;
   struct render_context rctx;
   struct ui_dom_node *actions_container;
-  enum ui_error err;
+  ui_error_t err;
   int running = 1;
 
   printf("Starting Auth Flow Example...\n");

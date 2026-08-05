@@ -12,17 +12,18 @@ struct ui_grid_list_base {
   struct ui_computed *data_signal;
 };
 
-enum ui_error ui_grid_list_base_create(struct ui_grid_list_base **out_grid_list,
-                                       int columns) {
+ui_error_t ui_grid_list_base_create(struct ui_grid_list_base **out_grid_list,
+                                    int columns) {
   struct ui_grid_list_base *gl;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_grid_list || columns < 1) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  gl = (struct ui_grid_list_base *)UI_MALLOC(sizeof(struct ui_grid_list_base));
+  gl = (struct ui_grid_list_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_grid_list_base));
   if (!gl) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -39,18 +40,19 @@ cleanup:
   return rc;
 }
 
-void ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list) {
+ui_error_t ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list) {
   if (!grid_list) {
-    return;
+    return UI_ERROR_NONE;
   }
   if (grid_list->items) {
-    UI_FREE(grid_list->items);
+    C_MULTIPLATFORM_FREE(grid_list->items);
   }
-  UI_FREE(grid_list);
+  C_MULTIPLATFORM_FREE(grid_list);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
-                                            int columns) {
+ui_error_t ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
+                                         int columns) {
   if (!grid_list || columns < 1) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -59,7 +61,7 @@ enum ui_error ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
                               int *out_columns) {
   if (!grid_list || !out_columns) {
@@ -69,9 +71,9 @@ ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
-                                         int rowspan, int colspan) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
+                                      int rowspan, int colspan) {
+  ui_error_t rc = UI_ERROR_NONE;
   size_t new_cap;
   struct ui_grid_list_item *new_items;
 
@@ -82,7 +84,7 @@ enum ui_error ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
 
   if (grid_list->item_count == grid_list->item_capacity) {
     new_cap = grid_list->item_capacity == 0 ? 4 : grid_list->item_capacity * 2;
-    new_items = (struct ui_grid_list_item *)UI_MALLOC(
+    new_items = (struct ui_grid_list_item *)C_MULTIPLATFORM_MALLOC(
         new_cap * sizeof(struct ui_grid_list_item));
     if (!new_items) {
       rc = UI_ERROR_OUT_OF_MEMORY;
@@ -94,7 +96,7 @@ enum ui_error ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
       for (i = 0; i < grid_list->item_count; i++) {
         new_items[i] = grid_list->items[i];
       }
-      UI_FREE(grid_list->items);
+      C_MULTIPLATFORM_FREE(grid_list->items);
     }
 
     grid_list->items = new_items;
@@ -110,7 +112,7 @@ cleanup:
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
                                  size_t *out_count) {
   if (!grid_list || !out_count) {
@@ -121,7 +123,7 @@ ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
                            size_t index,
                            const struct ui_grid_list_item **out_item) {
@@ -136,10 +138,10 @@ ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
                                  int *out_rows) {
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
   int *col_occupancy = NULL;
   int c;
   size_t i;
@@ -150,7 +152,8 @@ ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
     goto cleanup;
   }
 
-  col_occupancy = (int *)UI_MALLOC(grid_list->columns * sizeof(int));
+  col_occupancy =
+      (int *)C_MULTIPLATFORM_MALLOC(grid_list->columns * sizeof(int));
   if (!col_occupancy) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -207,13 +210,13 @@ ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
 
 cleanup:
   if (col_occupancy) {
-    UI_FREE(col_occupancy);
+    C_MULTIPLATFORM_FREE(col_occupancy);
   }
   return rc;
 }
 
-enum ui_error ui_grid_list_base_bind_data(struct ui_grid_list_base *widget,
-                                          struct ui_computed *signal) {
+ui_error_t ui_grid_list_base_bind_data(struct ui_grid_list_base *widget,
+                                       struct ui_computed *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

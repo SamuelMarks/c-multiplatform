@@ -31,7 +31,7 @@ struct ui_checkbox_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY if allocation fails,
  * or UI_ERROR_INVALID_ARGUMENT if out_checkbox is null.
  */
-enum ui_error ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox);
+ui_error_t ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox);
 
 /**
  * @brief Destroys a checkbox instance and frees its resources.
@@ -39,7 +39,7 @@ enum ui_error ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox);
  * @param checkbox The checkbox instance to destroy. If null, this function does
  * nothing.
  */
-enum ui_error ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox);
+ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox);
 
 /**
  * @brief Retrieves the current state of the checkbox.
@@ -49,8 +49,8 @@ enum ui_error ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox);
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if any
  * parameter is null.
  */
-enum ui_error ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
-                                         enum ui_checkbox_state *out_state);
+ui_error_t ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
+                                      enum ui_checkbox_state *out_state);
 
 /**
  * @brief Sets the state of the checkbox.
@@ -60,8 +60,8 @@ enum ui_error ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if checkbox is
  * null or state is invalid.
  */
-enum ui_error ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
-                                         enum ui_checkbox_state state);
+ui_error_t ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
+                                      enum ui_checkbox_state state);
 
 /**
  * @brief Toggles the checkbox state.
@@ -78,11 +78,10 @@ enum ui_error ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
  * @param out_cva Pointer to store the vtable.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
-                         struct ui_control_value_accessor *out_cva);
+ui_error_t ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
+                                    struct ui_control_value_accessor *out_cva);
 
-enum ui_error ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox);
+ui_error_t ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox);
 
 #ifdef __cplusplus
 }

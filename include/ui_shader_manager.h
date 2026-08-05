@@ -17,7 +17,7 @@ struct ui_shader_manager;
  * @param out_manager Pointer to receive the allocated manager.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_shader_manager_create(struct ui_shader_manager **out_manager);
+ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager);
 
 /**
  * @brief Destroys a shader manager, freeing all cached shaders.
@@ -25,7 +25,7 @@ enum ui_error ui_shader_manager_create(struct ui_shader_manager **out_manager);
  * @param manager The manager to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_shader_manager_destroy(struct ui_shader_manager *manager);
+ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager);
 
 /**
  * @brief Compiles and links a shader program, or returns it from the cache if
@@ -38,21 +38,21 @@ enum ui_error ui_shader_manager_destroy(struct ui_shader_manager *manager);
  * @param out_program_id Pointer to receive the compiled program ID (GLuint).
  * @return UI_ERROR_NONE on success, or UI_ERROR_UNKNOWN if compilation fails.
  */
-enum ui_error ui_shader_manager_get_program(struct ui_shader_manager *manager,
-                                            const char *name,
-                                            const char *vertex_source,
-                                            const char *fragment_source,
-                                            unsigned int *out_program_id);
+ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
+                                         const char *name,
+                                         const char *vertex_source,
+                                         const char *fragment_source,
+                                         unsigned int *out_program_id);
 
-enum ui_error
+ui_error_t
 ui_shader_manager_set_uniform_matrix(struct ui_shader_manager *manager,
                                      unsigned int location, const char *name,
                                      const float *matrix);
-enum ui_error
+ui_error_t
 ui_shader_manager_set_uniform_color(struct ui_shader_manager *manager,
                                     unsigned int location, const char *name,
                                     float r, float g, float b, float a);
-enum ui_error
+ui_error_t
 ui_shader_manager_set_uniform_float(struct ui_shader_manager *manager,
                                     unsigned int location, const char *name,
                                     float value);

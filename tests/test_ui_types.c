@@ -20,35 +20,35 @@ typedef char
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
 
-void *ui_mock_malloc(size_t size);
-void *ui_mock_realloc(void *ptr, size_t size);
-void ui_mock_free(void *ptr);
+void *C_MULTIPLATFORM_MALLOC(size_t size);
+void *C_MULTIPLATFORM_REALLOC(void *ptr, size_t size);
+void C_MULTIPLATFORM_FREE(void *ptr);
 
 int main(void) {
   void *p;
   void *p2;
 
   g_malloc_fail_countdown = 0;
-  p = ui_mock_malloc(10);
+  p = C_MULTIPLATFORM_MALLOC(10);
   if (p != NULL)
     return 1;
 
   g_malloc_fail_countdown = 1;
-  p = ui_mock_malloc(10);
+  p = C_MULTIPLATFORM_MALLOC(10);
   if (p == NULL)
     return 1;
 
   g_malloc_fail_countdown = 0;
-  p2 = ui_mock_realloc(p, 20);
+  p2 = C_MULTIPLATFORM_REALLOC(p, 20);
   if (p2 != NULL)
     return 1;
 
   g_malloc_fail_countdown = 1;
-  p2 = ui_mock_realloc(p, 20);
+  p2 = C_MULTIPLATFORM_REALLOC(p, 20);
   if (p2 == NULL)
     return 1;
 
-  ui_mock_free(p2);
+  C_MULTIPLATFORM_FREE(p2);
 
   printf("All types tests passed.\n");
   return 0;

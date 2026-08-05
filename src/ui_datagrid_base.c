@@ -17,9 +17,9 @@ struct ui_datagrid_base {
   struct ui_computed *data_signal;
 };
 
-enum ui_error ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid) {
+ui_error_t ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid) {
   struct ui_datagrid_base *datagrid;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -27,8 +27,8 @@ enum ui_error ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  datagrid =
-      (struct ui_datagrid_base *)UI_MALLOC(sizeof(struct ui_datagrid_base));
+  datagrid = (struct ui_datagrid_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_datagrid_base));
   if (!datagrid) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -75,27 +75,27 @@ enum ui_error ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (datagrid->component) {
-    ui_component_destroy(datagrid->component);
+    (void)ui_component_destroy(datagrid->component);
   }
-  UI_FREE(datagrid);
+  C_MULTIPLATFORM_FREE(datagrid);
   return rc;
 }
 
-void ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
+ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
   if (!datagrid) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(datagrid->component);
-  UI_FREE(datagrid);
+  (void)ui_component_destroy(datagrid->component);
+  C_MULTIPLATFORM_FREE(datagrid);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
-                               struct ui_component **out_component) {
+ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
+                                          struct ui_component **out_component) {
   if (!datagrid || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -103,8 +103,8 @@ ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
-                                             int col_index, float new_width) {
+ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
+                                          int col_index, float new_width) {
   (void)col_index;
   (void)new_width;
   if (!datagrid)
@@ -112,8 +112,8 @@ enum ui_error ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
-                                          int row_delta, int col_delta) {
+ui_error_t ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
+                                       int row_delta, int col_delta) {
   (void)row_delta;
   (void)col_delta;
   if (!datagrid)
@@ -121,8 +121,8 @@ enum ui_error ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_datagrid_base_bind_data(struct ui_datagrid_base *widget,
-                                         struct ui_computed *signal) {
+ui_error_t ui_datagrid_base_bind_data(struct ui_datagrid_base *widget,
+                                      struct ui_computed *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

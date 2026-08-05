@@ -39,7 +39,7 @@ To receive dragged items, you configure a component as a "Drop Target".
 ```c
 #include "ui_drag_drop.h"
 
-enum ui_error on_drag_enter(struct ui_component *target, struct ui_drag_payload *payload, int *out_accepted) {
+ui_error_t on_drag_enter(struct ui_component *target, struct ui_drag_payload *payload, int *out_accepted) {
     // Set out_accepted to 1 if this target accepts the payload's MIME type
     if (ui_drag_payload_has(payload, "app/x-my-file")) {
         ui_css_set_class(target, "drop-target-active", 1); // Highlight visually
@@ -50,13 +50,13 @@ enum ui_error on_drag_enter(struct ui_component *target, struct ui_drag_payload 
     return UI_ERROR_NONE;
 }
 ```
-enum ui_error on_drag_leave(struct ui_component *target) {
+ui_error_t on_drag_leave(struct ui_component *target) {
     // Clean up visual highlight
     ui_css_set_class(target, "drop-target-active", 0);
     return UI_ERROR_NONE;
 }
 
-enum ui_error on_drop(struct ui_component *target, struct ui_drag_payload *payload) {
+ui_error_t on_drop(struct ui_component *target, struct ui_drag_payload *payload) {
     struct my_file *file = ui_drag_payload_get_pointer(payload, "app/x-my-file");
 
     // Process the drop logic (e.g., move the file to this folder)

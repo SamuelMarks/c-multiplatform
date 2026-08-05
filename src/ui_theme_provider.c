@@ -5,12 +5,11 @@
 #include <string.h>
 /* clang-format on */
 
-enum ui_error
-ui_theme_provider_create(struct ui_arena *arena,
-                         struct ui_design_token_dict *tokens,
-                         struct ui_theme_provider **out_provider) {
+ui_error_t ui_theme_provider_create(struct ui_arena *arena,
+                                    struct ui_design_token_dict *tokens,
+                                    struct ui_theme_provider **out_provider) {
   void *ptr;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!arena || !tokens || !out_provider) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -36,8 +35,8 @@ ui_theme_provider_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_theme_provider_mount(struct ui_theme_provider *provider,
-                                      struct ui_dom_node *node) {
+ui_error_t ui_theme_provider_mount(struct ui_theme_provider *provider,
+                                   struct ui_dom_node *node) {
   char ptr_str[64];
 
   if (!provider || !node) {
@@ -53,11 +52,11 @@ enum ui_error ui_theme_provider_mount(struct ui_theme_provider *provider,
   return ui_dom_node_set_attribute(node, "__ui_theme_ptr", ptr_str);
 }
 
-enum ui_error ui_theme_provider_get(struct ui_dom_node *node,
-                                    struct ui_design_token_dict **out_tokens) {
+ui_error_t ui_theme_provider_get(struct ui_dom_node *node,
+                                 struct ui_design_token_dict **out_tokens) {
   struct ui_dom_node *current = node;
   const char *attr_val;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!node || !out_tokens) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -65,7 +64,11 @@ enum ui_error ui_theme_provider_get(struct ui_dom_node *node,
 
   while (current) {
     err = ui_dom_node_get_attribute(current, "__ui_theme_ptr", &attr_val);
-    if (err == UI_ERROR_NONE && attr_val) {
+    if (err != UI_ERROR_NONE) {
+      if (err != UI_ERROR_NOT_FOUND) {
+        return err;
+      }
+    } else if (attr_val) {
       /* Parse pointer */
       void *ptr = NULL;
       /* Using sscanf safely */

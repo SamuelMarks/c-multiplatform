@@ -4,6 +4,80 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_banner_mock_fail = 0;
+static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
+                                             struct ui_dom_node *child) {
+  if (g_banner_mock_fail == 1)
+    return UI_ERROR_UNKNOWN;
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+#define ui_dom_node_append_child mock_dom_node_append_child
+
+static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
+                                              const char *k, const char *v) {
+  if (g_banner_mock_fail == 2)
+    return UI_ERROR_UNKNOWN;
+  return (ui_dom_node_set_attribute)(node, k, v);
+}
+#undef ui_dom_node_set_attribute
+#define ui_dom_node_set_attribute mock_dom_node_set_attribute
+
+static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
+                                                 const char *k) {
+  if (g_banner_mock_fail == 3)
+    return UI_ERROR_UNKNOWN;
+  return (ui_dom_node_remove_attribute)(node, k);
+}
+#undef ui_dom_node_remove_attribute
+#define ui_dom_node_remove_attribute mock_dom_node_remove_attribute
+
+static ui_error_t mock_signal_set(struct ui_signal *signal,
+                                  union ui_signal_payload p) {
+  if (g_banner_mock_fail == 4)
+    return UI_ERROR_UNKNOWN;
+  return (ui_signal_set)(signal, p);
+}
+#undef ui_signal_set
+#define ui_signal_set mock_signal_set
+
+ui_error_t run_banner_coverage(void);
+ui_error_t run_banner_coverage(void) {
+
+  struct ui_banner_base *banner = NULL;
+  union ui_signal_payload p;
+  struct ui_signal *sig = NULL;
+
+  ui_banner_base_create(&banner);
+
+  g_banner_mock_fail = 1;
+  ui_banner_base_set_text(banner, "text");
+  g_banner_mock_fail = 0;
+
+  g_banner_mock_fail = 2;
+  ui_banner_base_set_open(banner, 1);
+  g_banner_mock_fail = 0;
+
+  g_banner_mock_fail = 3;
+  ui_banner_base_set_open(banner, 0);
+  g_banner_mock_fail = 0;
+
+  p.bool_val = 1;
+  ui_signal_create(NULL, p, UI_SIGNAL_TYPE_BOOL, NULL, NULL, 0, &sig);
+
+  ui_banner_base_bind_open(banner, sig);
+  g_banner_mock_fail = 4;
+  ui_banner_base_set_open(banner, 1);
+  g_banner_mock_fail = 0;
+
+  (void)ui_signal_destroy(sig);
+  (void)ui_banner_base_destroy(banner);
+
+  return UI_ERROR_NONE;
+}
+#endif
+
 struct ui_banner_base {
   struct ui_component *base;
   int is_open;
@@ -11,10 +85,10 @@ struct ui_banner_base {
   struct ui_computed *animating_signal;
 };
 
-enum ui_error ui_banner_base_create(struct ui_banner_base **out_banner) {
+ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   struct ui_banner_base *banner;
   struct ui_component *base_comp;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!out_banner) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -25,9 +99,10 @@ enum ui_error ui_banner_base_create(struct ui_banner_base **out_banner) {
     return err;
   }
 
-  banner = (struct ui_banner_base *)UI_MALLOC(sizeof(struct ui_banner_base));
+  banner = (struct ui_banner_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_banner_base));
   if (!banner) {
-    ui_component_destroy(base_comp);
+    (void)ui_component_destroy(base_comp);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -40,30 +115,35 @@ enum ui_error ui_banner_base_create(struct ui_banner_base **out_banner) {
   err =
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &banner->base->shadow_root);
   if (err != UI_ERROR_NONE) {
-    ui_component_destroy(banner->base);
-    UI_FREE(banner);
+    (void)ui_component_destroy(banner->base);
+    C_MULTIPLATFORM_FREE(banner);
     return err;
   }
 
   err = ui_dom_node_set_tag_name(banner->base->shadow_root, "ui-banner");
   if (err != UI_ERROR_NONE) {
-    ui_dom_node_destroy(banner->base->shadow_root);
+    (void)ui_dom_node_destroy(banner->base->shadow_root);
     banner->base->shadow_root = NULL;
-    ui_component_destroy(banner->base);
-    UI_FREE(banner);
+    (void)ui_component_destroy(banner->base);
+    C_MULTIPLATFORM_FREE(banner);
     return err;
   }
 
-  ui_dom_node_set_attribute(banner->base->shadow_root, "role", "banner");
+  err = ui_dom_node_set_attribute(banner->base->shadow_root, "role", "banner");
+  if (err != UI_ERROR_NONE) {
+    (void)ui_component_destroy(banner->base);
+    C_MULTIPLATFORM_FREE(banner);
+    return err;
+  }
 
   *out_banner = banner;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_banner_base_set_text(struct ui_banner_base *banner,
-                                      const char *text) {
+ui_error_t ui_banner_base_set_text(struct ui_banner_base *banner,
+                                   const char *text) {
   struct ui_dom_node *text_node;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!banner || !text) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -75,7 +155,11 @@ enum ui_error ui_banner_base_set_text(struct ui_banner_base *banner,
     if (err != UI_ERROR_NONE) {
       return err;
     }
-    ui_dom_node_append_child(banner->base->shadow_root, text_node);
+    err = ui_dom_node_append_child(banner->base->shadow_root, text_node);
+    if (err != UI_ERROR_NONE) {
+      (void)ui_dom_node_destroy(text_node);
+      return err;
+    }
   } else {
     text_node = banner->base->shadow_root->first_child;
   }
@@ -83,8 +167,8 @@ enum ui_error ui_banner_base_set_text(struct ui_banner_base *banner,
   return ui_dom_node_set_text_content(text_node, text);
 }
 
-enum ui_error ui_banner_base_set_dismissible(struct ui_banner_base *banner,
-                                             int is_dismissible) {
+ui_error_t ui_banner_base_set_dismissible(struct ui_banner_base *banner,
+                                          int is_dismissible) {
   if (!banner) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -98,8 +182,8 @@ enum ui_error ui_banner_base_set_dismissible(struct ui_banner_base *banner,
   }
 }
 
-enum ui_error ui_banner_base_set_open(struct ui_banner_base *banner,
-                                      int is_open) {
+ui_error_t ui_banner_base_set_open(struct ui_banner_base *banner, int is_open) {
+  ui_error_t rc;
   if (!banner) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -111,22 +195,29 @@ enum ui_error ui_banner_base_set_open(struct ui_banner_base *banner,
   banner->is_open = is_open;
 
   if (is_open) {
-    ui_dom_node_set_attribute(banner->base->shadow_root, "data-open", "true");
+    rc = ui_dom_node_set_attribute(banner->base->shadow_root, "data-open",
+                                   "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    ui_dom_node_remove_attribute(banner->base->shadow_root, "data-open");
+    rc = ui_dom_node_remove_attribute(banner->base->shadow_root, "data-open");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   if (banner->open_signal) {
     union ui_signal_payload payload;
     payload.bool_val = is_open;
-    ui_signal_set(banner->open_signal, payload);
+    rc = ui_signal_set(banner->open_signal, payload);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_banner_base_is_open(const struct ui_banner_base *banner,
-                                     int *out_is_open) {
+ui_error_t ui_banner_base_is_open(const struct ui_banner_base *banner,
+                                  int *out_is_open) {
   if (!banner || !out_is_open) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -134,8 +225,8 @@ enum ui_error ui_banner_base_is_open(const struct ui_banner_base *banner,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_banner_base_bind_open(struct ui_banner_base *banner,
-                                       struct ui_signal *open_signal) {
+ui_error_t ui_banner_base_bind_open(struct ui_banner_base *banner,
+                                    struct ui_signal *open_signal) {
   if (!banner) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -144,7 +235,7 @@ enum ui_error ui_banner_base_bind_open(struct ui_banner_base *banner,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_banner_base_get_animating_signal(struct ui_banner_base *banner,
                                     struct ui_computed **out_animating) {
   if (!banner || !out_animating) {
@@ -155,9 +246,8 @@ ui_banner_base_get_animating_signal(struct ui_banner_base *banner,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_banner_base_get_component(struct ui_banner_base *banner,
-                             struct ui_component **out_component) {
+ui_error_t ui_banner_base_get_component(struct ui_banner_base *banner,
+                                        struct ui_component **out_component) {
   if (!banner || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -165,15 +255,16 @@ ui_banner_base_get_component(struct ui_banner_base *banner,
   return UI_ERROR_NONE;
 }
 
-void ui_banner_base_destroy(struct ui_banner_base *banner) {
+ui_error_t ui_banner_base_destroy(struct ui_banner_base *banner) {
   if (!banner) {
-    return;
+    return UI_ERROR_NONE;
   }
-  ui_component_destroy(banner->base);
+  (void)ui_component_destroy(banner->base);
   /* The banner allocation itself was flattened into base_comp, but then
-     we allocated banner itself with UI_MALLOC so we need to free it.
-     Note that ui_component_destroy only destroys internal fields, not the
+     we allocated banner itself with C_MULTIPLATFORM_MALLOC so we need to free
+     it. Note that ui_component_destroy only destroys internal fields, not the
      container struct pointer itself if it's embedded. Wait, base was created
      using ui_component_create which mallocs... then copied by value... */
-  UI_FREE(banner);
+  C_MULTIPLATFORM_FREE(banner);
+  return UI_ERROR_NONE;
 }

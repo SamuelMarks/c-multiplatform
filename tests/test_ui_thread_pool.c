@@ -10,7 +10,7 @@ extern int g_malloc_called;
 #define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
 #define ACCUM_FAIL(failed, expr) failed |= (expr)
 
-static enum ui_error test_callback(void *user_data) {
+static ui_error_t test_callback(void *user_data) {
   if (user_data) {
     int *val = (int *)user_data;
     *val = 1;
@@ -18,13 +18,13 @@ static enum ui_error test_callback(void *user_data) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_callback_fail(void *user_data) {
+static ui_error_t test_callback_fail(void *user_data) {
   return UI_ERROR_UNKNOWN;
 }
 
 static int run_normal_tests(void) {
   struct ui_thread_pool *pool = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int test_vals[100];
   int i;
   int sum = 0;
@@ -80,7 +80,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_thread_pool *pool = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int test_val = 0;
   int i;
   int failed = 0;
@@ -156,7 +156,7 @@ extern int g_mock_thread_fail;
 
 static int run_thread_fail_tests(void) {
   struct ui_thread_pool *pool = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int failed = 0;
 
   printf("Running thread creation failure tests...\n");

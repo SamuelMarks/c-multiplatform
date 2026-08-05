@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include "../include/ui_engine.h"
 #include "../include/ui_error.h"
+#include "../include/ui_reactor.h"
+#include "../include/ui_thread_pool.h"
+#include "../include/ui_timer.h"
+#include "../include/ui_tick_engine.h"
 #include "../src/ui_internal_mem.h"
 /* clang-format on */
 
@@ -10,7 +14,7 @@ extern int g_malloc_fail_countdown;
 static int run_normal_tests(void) {
   struct ui_engine *engine = NULL;
   struct ui_engine_config config;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Running normal ui_engine tests...\n");
 
@@ -73,7 +77,7 @@ static void run_extra_engine_tests(void) {
 static int run_oom_tests(void) {
   struct ui_engine *engine = NULL;
   struct ui_engine_config config;
-  enum ui_error rc;
+  ui_error_t rc;
   int countdown = 0;
   int i;
   int max_fails =
@@ -151,5 +155,35 @@ static int run_coverage_tests(void) {
 
   hack->tick_engine = tmp_tick;
   ui_engine_destroy(engine);
+
+  /* Test ui_engine_destroy with NULL components to hit branches */
+  struct ui_engine *null_engine = NULL;
+  ui_engine_create(&config, &null_engine);
+  hack = (struct ui_engine_hack *)null_engine;
+
+  tmp_reactor = hack->reactor;
+  tmp_tick = hack->tick_engine;
+  struct ui_timer *tmp_timer = hack->timer;
+  struct ui_thread_pool *tmp_pool = hack->thread_pool;
+
+  hack->reactor = NULL;
+  hack->tick_engine = NULL;
+  hack->timer = NULL;
+  hack->thread_pool = NULL;
+
+  ui_engine_destroy(null_engine);
+
+  /* Clean up the leaked components */
+  if (tmp_reactor)
+    ui_reactor_destroy(tmp_reactor);
+  if (tmp_tick)
+    ui_tick_engine_destroy(tmp_tick);
+  if (tmp_timer)
+    ui_timer_destroy(tmp_timer);
+#ifndef UI_SINGLE_THREADED
+  if (tmp_pool)
+    ui_thread_pool_destroy(tmp_pool);
+#endif
+
   return 0;
 }

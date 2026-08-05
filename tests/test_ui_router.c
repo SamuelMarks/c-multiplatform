@@ -12,9 +12,9 @@ extern int g_malloc_fail_countdown;
 /* MSVC Safe CRT */
 #endif
 
-static enum ui_error mock_factory_success(const struct ui_route_request *req,
-                                          void *user_data,
-                                          struct ui_component **out_screen) {
+static ui_error_t mock_factory_success(const struct ui_route_request *req,
+                                       void *user_data,
+                                       struct ui_component **out_screen) {
   int *call_count = (int *)user_data;
   const char *id;
   const char *tab;
@@ -42,9 +42,9 @@ static enum ui_error mock_factory_success(const struct ui_route_request *req,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error mock_factory_fail(const struct ui_route_request *req,
-                                       void *user_data,
-                                       struct ui_component **out_screen) {
+static ui_error_t mock_factory_fail(const struct ui_route_request *req,
+                                    void *user_data,
+                                    struct ui_component **out_screen) {
   return UI_ERROR_UNKNOWN;
   return UI_ERROR_NONE;
   return UI_ERROR_NONE;
@@ -57,7 +57,7 @@ static int run_normal_tests(void) {
   struct ui_component *screen3 = NULL;
   struct ui_component *current = NULL;
   struct ui_event ev;
-  enum ui_error rc;
+  ui_error_t rc;
   int factory_calls = 0;
 
   printf("Testing invalid arguments...\n");
@@ -288,14 +288,14 @@ static int run_normal_tests(void) {
   ui_router_install_os_hooks(router);
 
   printf("Testing ui_router_destroy...\n");
-  ui_router_destroy(router);
+  (void)ui_router_destroy(router);
 
   return 0;
 }
 
 static int run_oom_tests(void) {
   struct ui_router *router = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
   struct ui_component *screen = NULL;
 
@@ -309,7 +309,7 @@ static int run_oom_tests(void) {
     if (err == UI_ERROR_OUT_OF_MEMORY) {
       continue;
     } else if (err == UI_ERROR_NONE) {
-      ui_router_destroy(router);
+      (void)ui_router_destroy(router);
       break;
     } else {
       return 1;
@@ -372,16 +372,28 @@ static int run_oom_tests(void) {
     }
   }
 
-  ui_router_destroy(router);
+  (void)ui_router_destroy(router);
   /* Note screen was not successfully pushed, so we clean it up */
-  ui_component_destroy(screen);
+  (void)ui_component_destroy(screen);
 
   return 0;
 }
 
+void test_ui_router_coverage(void);
+void test_ui_router_coverage2(void);
+void test_ui_router_oom_add(void);
+void test_ui_router_stack_realloc(void);
+void test_ui_router_oom_add2(void);
+void test_ui_router_missing_param(void);
 int main(void) {
   int failed = 0;
   failed |= run_normal_tests();
+  test_ui_router_coverage();
+  test_ui_router_coverage2();
+  test_ui_router_missing_param();
+  test_ui_router_oom_add();
+  test_ui_router_oom_add2();
+  test_ui_router_stack_realloc();
   failed |= run_oom_tests();
 
   if (failed) {
@@ -390,4 +402,115 @@ int main(void) {
   }
   printf("All test_ui_router passed.\n");
   return 0;
+}
+static ui_error_t cov_factory(const struct ui_route_request *req,
+                              void *user_data,
+                              struct ui_component **out_screen) {
+  const char *path = NULL;
+  void *state = NULL;
+  ui_route_request_get_path(req, &path);
+  ui_route_request_get_state(req, &state);
+  return ui_component_create(out_screen);
+}
+
+void test_ui_router_coverage(void) {
+  struct ui_router *router = NULL;
+  const char *path = NULL;
+  void *state = NULL;
+  int i;
+  extern int g_malloc_fail_countdown;
+
+  ui_router_create(&router);
+  if (router) {
+    /* try_match edge cases: pattern longer than target */
+    ui_router_add_route(router, "/a/b", mock_factory_success, NULL);
+    ui_router_navigate(router, "/a");
+
+    /* try_match edge cases: target longer than pattern */
+    ui_router_add_route(router, "/c", mock_factory_success, NULL);
+    ui_router_navigate(router, "/c/d");
+
+    /* query parsing empty keys / values */
+    ui_router_add_route(router, "/q", mock_factory_success, NULL);
+    ui_router_navigate(router, "/q?=");
+    ui_router_navigate(router, "/q?key=");
+    ui_router_navigate(router, "/q?=val");
+    ui_router_navigate(router, "/q?a&b");
+
+    /* null checks */
+    ui_route_request_get_path(NULL, NULL);
+    ui_route_request_get_state(NULL, NULL);
+    ui_route_request_get_path(NULL, &path);
+    ui_route_request_get_state(NULL, &state);
+
+    (void)ui_router_destroy(router);
+  }
+}
+
+void test_ui_router_coverage2(void) {
+  struct ui_router *router = NULL;
+  ui_router_create(&router);
+  if (router) {
+    ui_router_add_route(router, "/cov", cov_factory, NULL);
+    ui_router_navigate_with_state(router, "/cov", (void *)0x123);
+    (void)ui_router_destroy(router);
+  }
+}
+
+void test_ui_router_oom_add(void) {
+  extern int g_malloc_fail_countdown;
+  struct ui_router *router = NULL;
+  ui_router_create(&router);
+  if (router) {
+    for (int i = 0; i < 5; i++) {
+      g_malloc_fail_countdown = i;
+      ui_router_add_route(router, "/my/route/pattern", NULL, NULL);
+    }
+    g_malloc_fail_countdown = -1;
+    (void)ui_router_destroy(router);
+  }
+}
+
+void test_ui_router_stack_realloc(void) {
+  struct ui_router *router = NULL;
+  ui_router_create(&router);
+  if (router) {
+    for (int i = 0; i < 30; i++) {
+      struct ui_component *cmp;
+      ui_component_create(&cmp);
+      ui_router_push(router, cmp);
+    }
+    (void)ui_router_destroy(router);
+  }
+}
+void test_ui_router_oom_add2(void) {
+  extern int g_malloc_fail_countdown;
+  struct ui_router *router = NULL;
+  ui_router_create(&router);
+  if (router) {
+    for (int i = 0; i < 5; i++) {
+      g_malloc_fail_countdown = i;
+      ui_router_add_route(router, "/my/route/pattern", mock_factory_success,
+                          NULL);
+    }
+    g_malloc_fail_countdown = -1;
+    (void)ui_router_destroy(router);
+  }
+}
+static ui_error_t cov_factory3(const struct ui_route_request *req,
+                               void *user_data,
+                               struct ui_component **out_screen) {
+  const char *val;
+  ui_route_request_get_param(req, "nonexistent", &val);
+  return ui_component_create(out_screen);
+}
+
+void test_ui_router_missing_param(void) {
+  struct ui_router *router = NULL;
+  ui_router_create(&router);
+  if (router) {
+    ui_router_add_route(router, "/missing/:id", cov_factory3, NULL);
+    ui_router_navigate(router, "/missing/123");
+    (void)ui_router_destroy(router);
+  }
 }

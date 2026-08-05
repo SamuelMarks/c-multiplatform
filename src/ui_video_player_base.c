@@ -2,9 +2,9 @@
 #include "ui_video_player_base.h"
 /* clang-format on */
 
-enum ui_error ui_video_player_base_init(struct ui_video_player_base *player,
-                                        struct ui_component *component,
-                                        struct ui_av_sync *av_sync) {
+ui_error_t ui_video_player_base_init(struct ui_video_player_base *player,
+                                     struct ui_component *component,
+                                     struct ui_av_sync *av_sync) {
   if (!player || !component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -21,7 +21,7 @@ enum ui_error ui_video_player_base_init(struct ui_video_player_base *player,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_video_player_base_toggle_play(struct ui_video_player_base *player) {
   if (player) {
     player->is_playing = !player->is_playing;
@@ -29,8 +29,8 @@ ui_video_player_base_toggle_play(struct ui_video_player_base *player) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_video_player_base_seek(struct ui_video_player_base *player,
-                                        float time) {
+ui_error_t ui_video_player_base_seek(struct ui_video_player_base *player,
+                                     float time) {
   if (player) {
     if (time < 0.0f) {
       time = 0.0f;
@@ -43,9 +43,8 @@ enum ui_error ui_video_player_base_seek(struct ui_video_player_base *player,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_video_player_base_set_volume(struct ui_video_player_base *player,
-                                float volume) {
+ui_error_t ui_video_player_base_set_volume(struct ui_video_player_base *player,
+                                           float volume) {
   if (player) {
     if (volume < 0.0f) {
       volume = 0.0f;
@@ -58,7 +57,7 @@ ui_video_player_base_set_volume(struct ui_video_player_base *player,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player) {
   if (player) {
     player->is_fullscreen = !player->is_fullscreen;
@@ -66,8 +65,8 @@ ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_video_player_base_bind_src(struct ui_video_player_base *widget,
-                                            struct ui_signal *signal) {
+ui_error_t ui_video_player_base_bind_src(struct ui_video_player_base *widget,
+                                         struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

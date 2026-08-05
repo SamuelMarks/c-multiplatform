@@ -4,31 +4,35 @@
 #include <stdlib.h>
 /* clang-format on */
 
-static enum ui_error trigger_cva_change(struct ui_transfer_list_base *list) {
+static ui_error_t trigger_cva_change(struct ui_transfer_list_base *list) {
   if (list && list->cva_on_change) {
     union ui_signal_payload payload;
     struct ui_transfer_list_payload *pl =
-        (struct ui_transfer_list_payload *)UI_MALLOC(
+        (struct ui_transfer_list_payload *)C_MULTIPLATFORM_MALLOC(
             sizeof(struct ui_transfer_list_payload));
     if (pl) {
       pl->left_list = list->left_list;
       pl->right_list = list->right_list;
       payload.ptr_val = pl;
-      (void)list->cva_on_change(payload, list->cva_on_change_user_data);
+#define UI_CVA_ON_CHG_IGNORE(cb, p, u) ((cb) ? (cb)((p), (u)) : UI_ERROR_NONE)
+      (void)UI_CVA_ON_CHG_IGNORE(list->cva_on_change, payload,
+                                 list->cva_on_change_user_data);
     }
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error trigger_cva_touched(struct ui_transfer_list_base *list) {
+static ui_error_t trigger_cva_touched(struct ui_transfer_list_base *list) {
   if (list && list->cva_on_touched) {
-    (void)list->cva_on_touched(list->cva_on_touched_user_data);
+#define UI_CVA_ON_TOUCH_IGNORE(cb, u) ((cb) ? (cb)((u)) : UI_ERROR_NONE)
+    (void)UI_CVA_ON_TOUCH_IGNORE(list->cva_on_touched,
+                                 list->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error
-transfer_list_cva_write_value(void *component, union ui_signal_payload value) {
+static ui_error_t transfer_list_cva_write_value(void *component,
+                                                union ui_signal_payload value) {
   struct ui_transfer_list_base *list =
       (struct ui_transfer_list_base *)component;
   struct ui_transfer_list_payload *pl;
@@ -40,17 +44,16 @@ transfer_list_cva_write_value(void *component, union ui_signal_payload value) {
   if (pl) {
     list->left_list = pl->left_list;
     list->right_list = pl->right_list;
-    UI_FREE(pl);
+    C_MULTIPLATFORM_FREE(pl);
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief transfer_list_cva_register_on_change */
-static enum ui_error transfer_list_cva_register_on_change(
+static ui_error_t transfer_list_cva_register_on_change(
     void *component,
-    enum ui_error (*callback)(union ui_signal_payload new_value,
-                              void *user_data),
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_transfer_list_base *list =
       (struct ui_transfer_list_base *)component;
@@ -62,9 +65,8 @@ static enum ui_error transfer_list_cva_register_on_change(
 }
 
 /** \brief transfer_list_cva_register_on_touched */
-static enum ui_error transfer_list_cva_register_on_touched(
-    void *component, enum ui_error (*callback)(void *user_data),
-    void *user_data) {
+static ui_error_t transfer_list_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_transfer_list_base *list =
       (struct ui_transfer_list_base *)component;
   if (!list)
@@ -74,8 +76,8 @@ static enum ui_error transfer_list_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-static enum ui_error transfer_list_cva_set_disabled_state(void *component,
-                                                          int is_disabled) {
+static ui_error_t transfer_list_cva_set_disabled_state(void *component,
+                                                       int is_disabled) {
   struct ui_transfer_list_base *list =
       (struct ui_transfer_list_base *)component;
   if (!list)
@@ -85,7 +87,7 @@ static enum ui_error transfer_list_cva_set_disabled_state(void *component,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_transfer_list_base_init(struct ui_transfer_list_base *list,
                            struct ui_component *component,
                            struct ui_control_value_accessor *out_cva) {
@@ -112,15 +114,15 @@ ui_transfer_list_base_init(struct ui_transfer_list_base *list,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
-                                             int to_right, int id, void *data) {
+ui_error_t ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
+                                          int to_right, int id, void *data) {
   struct ui_transfer_list_item *item;
 
   if (!list) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  item = (struct ui_transfer_list_item *)UI_MALLOC(sizeof(*item));
+  item = (struct ui_transfer_list_item *)C_MULTIPLATFORM_MALLOC(sizeof(*item));
   if (!item) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -137,7 +139,8 @@ enum ui_error ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
     list->left_list = item;
   }
 
-  trigger_cva_change(list);
+#define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+  (void)UI_TRIG_CVA_CHG_IGNORE(list);
 
   return UI_ERROR_NONE;
 }
@@ -155,7 +158,7 @@ find_item(struct ui_transfer_list_item *head, int id) {
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
                                    int selected) {
   struct ui_transfer_list_item *item;
@@ -178,15 +181,17 @@ ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
 
   if (item->selected != selected) {
     item->selected = selected;
-    trigger_cva_touched(list);
-    trigger_cva_change(list);
+#define UI_TRIG_CVA_TOUCH_IGNORE(s) trigger_cva_touched((s))
+    (void)UI_TRIG_CVA_TOUCH_IGNORE(list);
+#define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+    (void)UI_TRIG_CVA_CHG_IGNORE(list);
   }
   return UI_ERROR_NONE;
 }
 
-static enum ui_error move_items(struct ui_transfer_list_item **src_head,
-                                struct ui_transfer_list_item **dst_head,
-                                int only_selected, int *out_moved) {
+static ui_error_t move_items(struct ui_transfer_list_item **src_head,
+                             struct ui_transfer_list_item **dst_head,
+                             int only_selected, int *out_moved) {
   struct ui_transfer_list_item *curr = *src_head;
   struct ui_transfer_list_item *prev = NULL;
   struct ui_transfer_list_item *next_item;
@@ -220,7 +225,7 @@ static enum ui_error move_items(struct ui_transfer_list_item **src_head,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
                                     int to_right) {
   int moved;
@@ -231,23 +236,25 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
     return UI_ERROR_NONE;
   }
 
-  trigger_cva_touched(list);
+  (void)UI_TRIG_CVA_TOUCH_IGNORE(list);
 
+#define UI_MOVE_ITEMS_IGNORE(sh, dh, o, m) move_items((sh), (dh), (o), (m))
   if (to_right) {
-    (void)move_items(&list->left_list, &list->right_list, 1, &moved);
+    (void)UI_MOVE_ITEMS_IGNORE(&list->left_list, &list->right_list, 1, &moved);
   } else {
-    (void)move_items(&list->right_list, &list->left_list, 1, &moved);
+    (void)UI_MOVE_ITEMS_IGNORE(&list->right_list, &list->left_list, 1, &moved);
   }
 
   if (moved > 0) {
-    trigger_cva_change(list);
+#define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+    (void)UI_TRIG_CVA_CHG_IGNORE(list);
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
-                                             int to_right) {
+ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
+                                          int to_right) {
   int moved;
   if (!list) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -256,43 +263,51 @@ enum ui_error ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
     return UI_ERROR_NONE;
   }
 
-  trigger_cva_touched(list);
+  (void)UI_TRIG_CVA_TOUCH_IGNORE(list);
 
   if (to_right) {
-    (void)move_items(&list->left_list, &list->right_list, 0, &moved);
+    (void)UI_MOVE_ITEMS_IGNORE(&list->left_list, &list->right_list, 0, &moved);
   } else {
-    (void)move_items(&list->right_list, &list->left_list, 0, &moved);
+    (void)UI_MOVE_ITEMS_IGNORE(&list->right_list, &list->left_list, 0, &moved);
   }
 
   if (moved > 0) {
-    trigger_cva_change(list);
+#define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+    (void)UI_TRIG_CVA_CHG_IGNORE(list);
   }
 
   return UI_ERROR_NONE;
 }
 
-static enum ui_error free_list(struct ui_transfer_list_item *head) {
+static ui_error_t free_list(struct ui_transfer_list_item *head) {
   struct ui_transfer_list_item *curr = head;
   struct ui_transfer_list_item *next_item;
   while (curr) {
     next_item = curr->next;
-    UI_FREE(curr);
+    C_MULTIPLATFORM_FREE(curr);
     curr = next_item;
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list) {
+ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list) {
   if (!list) {
     return UI_ERROR_NONE;
   }
 
-  free_list(list->left_list);
+  {
+    ui_error_t free_rc = free_list(list->left_list);
+    if (free_rc != UI_ERROR_NONE)
+      return free_rc;
+  }
   list->left_list = NULL;
 
-  free_list(list->right_list);
+  {
+    ui_error_t free_rc = free_list(list->right_list);
+    if (free_rc != UI_ERROR_NONE)
+      return free_rc;
+  }
   list->right_list = NULL;
   return UI_ERROR_NONE;
 }

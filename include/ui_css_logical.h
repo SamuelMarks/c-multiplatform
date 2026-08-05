@@ -65,7 +65,7 @@ ui_css_logical_to_physical_edge(enum ui_css_logical_edge logical_edge,
  * @param writing_mode The current writing mode.
  * @return 1 if physical width, 0 if physical height.
  */
-enum ui_error ui_css_logical_to_physical_size(
+ui_error_t ui_css_logical_to_physical_size(
     int is_inline, enum ui_css_writing_mode writing_mode, int *out_is_width);
 
 #ifdef __cplusplus

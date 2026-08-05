@@ -21,7 +21,7 @@ struct ui_input_mask {
   int is_processing; /* guard against recursive updates */
 };
 
-static enum ui_error safe_strcpy(char *dst, size_t sz, const char *src) {
+static ui_error_t safe_strcpy(char *dst, size_t sz, const char *src) {
 #if defined(_MSC_VER)
   strcpy_s(dst, sz, src);
 #else
@@ -31,24 +31,25 @@ static enum ui_error safe_strcpy(char *dst, size_t sz, const char *src) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_input_change(struct ui_input_base *input,
-                                     const char *text, void *user_data) {
+static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
+                                  void *user_data) {
   struct ui_input_mask *mask = (struct ui_input_mask *)user_data;
   (void)input;
-  if (!mask || mask->is_processing) {
+  if (mask->is_processing) {
     return UI_ERROR_NONE;
   }
   return ui_input_mask_process_text(mask, text);
 }
 
-enum ui_error ui_input_mask_create(struct ui_input_mask **out_mask) {
+ui_error_t ui_input_mask_create(struct ui_input_mask **out_mask) {
   struct ui_input_mask *mask;
 
   if (!out_mask) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  mask = (struct ui_input_mask *)UI_MALLOC(sizeof(struct ui_input_mask));
+  mask = (struct ui_input_mask *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_input_mask));
   if (!mask) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -63,51 +64,63 @@ enum ui_error ui_input_mask_create(struct ui_input_mask **out_mask) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_mask_destroy(struct ui_input_mask *mask) {
+ui_error_t ui_input_mask_destroy(struct ui_input_mask *mask) {
   if (!mask) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (mask->input) {
-    ui_input_base_set_on_change(mask->input, NULL, NULL);
+    {
+      ui_error_t _ign_rc = ui_input_base_set_on_change(mask->input, NULL, NULL);
+      (void)_ign_rc;
+    }
   }
-  UI_FREE(mask);
+  C_MULTIPLATFORM_FREE(mask);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_mask_bind(struct ui_input_mask *mask,
-                                 struct ui_input_base *input) {
+ui_error_t ui_input_mask_bind(struct ui_input_mask *mask,
+                              struct ui_input_base *input) {
 
   if (!mask || !input) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   mask->input = input;
-  ui_input_base_set_on_change(input, on_input_change, mask);
+  {
+    ui_error_t set_rc =
+        ui_input_base_set_on_change(input, on_input_change, mask);
+    (void)set_rc;
+  }
 
   /* initial formatting */
   {
     const char *tmp_text;
-    ui_input_base_get_text(input, &tmp_text);
+    ui_error_t get_rc = ui_input_base_get_text(input, &tmp_text);
+    (void)get_rc;
     return ui_input_mask_process_text(mask, tmp_text);
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_mask_set_pattern(struct ui_input_mask *mask,
-                                        const char *pattern) {
+ui_error_t ui_input_mask_set_pattern(struct ui_input_mask *mask,
+                                     const char *pattern) {
   if (!mask || !pattern) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)safe_strcpy(mask->pattern, MAX_MASK_LEN, pattern);
+  {
+    ui_error_t cp_rc = safe_strcpy(mask->pattern, MAX_MASK_LEN, pattern);
+    (void)cp_rc;
+  }
 
   if (mask->input) {
-    ui_input_mask_process_text(mask, mask->raw_value);
+    ui_error_t proc_rc = ui_input_mask_process_text(mask, mask->raw_value);
+    (void)proc_rc;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_mask_get_raw_value(struct ui_input_mask *mask,
-                                          const char **out_raw) {
+ui_error_t ui_input_mask_get_raw_value(struct ui_input_mask *mask,
+                                       const char **out_raw) {
   if (!mask || !out_raw) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -115,8 +128,8 @@ enum ui_error ui_input_mask_get_raw_value(struct ui_input_mask *mask,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_input_mask_process_text(struct ui_input_mask *mask,
-                                         const char *text) {
+ui_error_t ui_input_mask_process_text(struct ui_input_mask *mask,
+                                      const char *text) {
   size_t p_idx = 0;
   size_t t_idx = 0;
   size_t r_idx = 0;
@@ -129,7 +142,7 @@ enum ui_error ui_input_mask_process_text(struct ui_input_mask *mask,
   mask->is_processing = 1;
 
   while (mask->pattern[p_idx] != '\0' && text[t_idx] != '\0' &&
-         f_idx < MAX_MASK_LEN - 1 && r_idx < MAX_MASK_LEN - 1) {
+         f_idx < MAX_MASK_LEN - 1) {
 
     char p_char = mask->pattern[p_idx];
     char t_char = text[t_idx];
@@ -175,7 +188,9 @@ enum ui_error ui_input_mask_process_text(struct ui_input_mask *mask,
   mask->formatted_value[f_idx] = '\0';
 
   if (mask->input) {
-    ui_input_base_set_text(mask->input, mask->formatted_value);
+    ui_error_t rc;
+    rc = ui_input_base_set_text(mask->input, mask->formatted_value);
+    (void)rc;
   }
 
   mask->is_processing = 0;

@@ -11,7 +11,7 @@ static int run_normal_tests(void) {
   struct ui_modifier *modifier = NULL;
   struct ui_component *component = NULL;
   struct ui_dom_node *root = NULL;
-  enum ui_error err;
+  ui_error_t err;
   const char *val;
 
   printf("Testing invalid arguments...\n");
@@ -43,7 +43,7 @@ static int run_normal_tests(void) {
     return 1; /* Shadow root missing */
 
   ui_modifier_destroy(modifier);
-  ui_component_destroy(component);
+  (void)ui_component_destroy(component);
   modifier = NULL;
   component = NULL;
 
@@ -113,7 +113,7 @@ static int run_normal_tests(void) {
   if (err != UI_ERROR_NONE)
     return 1;
 
-  ui_component_destroy(component);
+  (void)ui_component_destroy(component);
   ui_modifier_destroy(modifier);
 
   /* Test apply empty */
@@ -134,7 +134,7 @@ static int run_normal_tests(void) {
   if (err != UI_ERROR_NOT_FOUND)
     return 1;
 
-  ui_component_destroy(component);
+  (void)ui_component_destroy(component);
   ui_modifier_destroy(modifier);
 
   /* Test apply without existing */
@@ -158,7 +158,7 @@ static int run_normal_tests(void) {
   if (err != UI_ERROR_NONE || strcmp(val, "color: blue;") != 0)
     return 1;
 
-  ui_component_destroy(component);
+  (void)ui_component_destroy(component);
   ui_modifier_destroy(modifier);
 
   return 0;
@@ -168,7 +168,7 @@ static int run_oom_tests(void) {
   struct ui_modifier *modifier = NULL;
   struct ui_component *component = NULL;
   struct ui_dom_node *root = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
 
   printf("Running ui_modifier OOM tests...\n");
@@ -239,7 +239,7 @@ static int run_oom_tests(void) {
   if (err != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 
-  ui_component_destroy(component);
+  (void)ui_component_destroy(component);
   ui_modifier_destroy(modifier);
   return 0;
 }

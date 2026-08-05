@@ -14,7 +14,7 @@ extern int g_malloc_fail_countdown;
 static int test_ui_design_token_dict_init(void) {
   struct ui_arena *arena = NULL;
   struct ui_design_token_dict dict;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
 
@@ -31,14 +31,14 @@ static int test_ui_design_token_dict_init(void) {
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
 static int test_ui_design_token_dict_init_malloc_fail(void) {
   struct ui_arena *arena = NULL;
   struct ui_design_token_dict dict;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
 
@@ -46,11 +46,11 @@ static int test_ui_design_token_dict_init_malloc_fail(void) {
   rc = ui_design_token_dict_init(arena, &dict);
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     return 1;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -58,7 +58,7 @@ static int test_ui_design_token_set_get_color(void) {
   struct ui_arena *arena = NULL;
   struct ui_design_token_dict dict;
   ui_color_t color;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
   ui_design_token_dict_init(arena, &dict);
@@ -96,7 +96,7 @@ static int test_ui_design_token_set_get_color(void) {
   if (rc != UI_ERROR_NOT_FOUND)
     return 1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -104,7 +104,7 @@ static int test_ui_design_token_set_get_number(void) {
   struct ui_arena *arena = NULL;
   struct ui_design_token_dict dict;
   float number;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
   ui_design_token_dict_init(arena, &dict);
@@ -142,14 +142,14 @@ static int test_ui_design_token_set_get_number(void) {
   if (rc != UI_ERROR_NOT_FOUND)
     return 1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
 static int test_ui_design_token_set_string(void) {
   struct ui_arena *arena = NULL;
   struct ui_design_token_dict dict;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
   ui_design_token_dict_init(arena, &dict);
@@ -181,11 +181,11 @@ static int test_ui_design_token_set_string(void) {
   rc = ui_design_token_set_string(&dict, "str", "val");
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     return 1;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -194,7 +194,7 @@ static int test_ui_design_token_alias(void) {
   struct ui_design_token_dict dict;
   ui_color_t color;
   float number;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
   ui_design_token_dict_init(arena, &dict);
@@ -238,11 +238,11 @@ static int test_ui_design_token_alias(void) {
   rc = ui_design_token_set_alias(&dict, "a", "b");
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     return 1;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -250,7 +250,7 @@ static int test_ui_design_token_alias_cycle(void) {
   struct ui_arena *arena = NULL;
   struct ui_design_token_dict dict;
   ui_color_t color;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
   ui_design_token_dict_init(arena, &dict);
@@ -263,7 +263,7 @@ static int test_ui_design_token_alias_cycle(void) {
   if (rc != UI_ERROR_UNKNOWN)
     return 1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -272,7 +272,7 @@ static int test_ui_design_token_capacity_expansion(void) {
   struct ui_design_token_dict dict;
   char name[32];
   int i;
-  enum ui_error rc;
+  ui_error_t rc;
   float val;
 
   ui_arena_create(16, &arena);
@@ -295,7 +295,7 @@ static int test_ui_design_token_capacity_expansion(void) {
   if (val != 69.0f)
     return 1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
@@ -304,7 +304,7 @@ static int test_ui_design_token_capacity_expansion_fail(void) {
   struct ui_design_token_dict dict;
   char name[32];
   int i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
   ui_design_token_dict_init(arena, &dict);
@@ -325,18 +325,18 @@ static int test_ui_design_token_capacity_expansion_fail(void) {
   rc = ui_design_token_set_number(&dict, "token-64", 64.0f);
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     return 1;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 
 static int test_get_or_create_malloc_fail_name(void) {
   struct ui_arena *arena = NULL;
   struct ui_design_token_dict dict;
-  enum ui_error rc;
+  ui_error_t rc;
 
   ui_arena_create(16, &arena);
   ui_design_token_dict_init(arena, &dict);
@@ -350,13 +350,13 @@ static int test_get_or_create_malloc_fail_name(void) {
   rc = ui_design_token_set_number(&dict, "new_token", 1.0f);
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     printf("1\n");
     return 1;
   }
 
   if (dict.count != 0) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     printf("2\n");
     return 1;
   }
@@ -370,7 +370,7 @@ static int test_get_or_create_malloc_fail_name(void) {
   rc = ui_design_token_set_color(&dict, "new_color", 0xFF000000);
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     printf("3\n");
     return 1;
   }
@@ -384,7 +384,7 @@ static int test_get_or_create_malloc_fail_name(void) {
   rc = ui_design_token_set_string(&dict, "new_string_very_long_name", "val");
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     printf("4\n");
     return 1;
   }
@@ -398,12 +398,12 @@ static int test_get_or_create_malloc_fail_name(void) {
   rc = ui_design_token_set_alias(&dict, "new_alias_very_long_name", "target");
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
     printf("5\n");
     return 1;
   }
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
   return 0;
 }
 

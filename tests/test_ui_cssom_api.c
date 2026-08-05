@@ -23,7 +23,7 @@ int main(void) {
   struct ui_css_rule *rule = NULL;
   const char *val = NULL;
   int is_imp = 0;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_css_stylesheet_create(&sheet);
   TEST_ASSERT(rc == UI_ERROR_NONE);

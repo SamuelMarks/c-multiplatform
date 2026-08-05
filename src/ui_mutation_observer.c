@@ -25,7 +25,7 @@ struct ui_mutation_observer {
 };
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
                             struct ui_mutation_observer **out_observer) {
   struct ui_mutation_observer *obs;
@@ -35,7 +35,7 @@ ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  obs = (struct ui_mutation_observer *)UI_MALLOC(
+  obs = (struct ui_mutation_observer *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_mutation_observer));
   if (obs == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -46,10 +46,10 @@ ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
   obs->target_capacity = 4;
   obs->target_count = 0;
 
-  obs->targets = (struct ui_mutation_target_info *)UI_MALLOC(
+  obs->targets = (struct ui_mutation_target_info *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_mutation_target_info) * obs->target_capacity);
   if (obs->targets == NULL) {
-    UI_FREE(obs);
+    C_MULTIPLATFORM_FREE(obs);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -62,15 +62,15 @@ ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
   }
 
   /* Global registry full */
-  UI_FREE(obs->targets);
-  UI_FREE(obs);
+  C_MULTIPLATFORM_FREE(obs->targets);
+  C_MULTIPLATFORM_FREE(obs);
   return UI_ERROR_OUT_OF_BOUNDS;
 }
 
-void ui_mutation_observer_destroy(struct ui_mutation_observer *observer) {
+ui_error_t ui_mutation_observer_destroy(struct ui_mutation_observer *observer) {
   int i;
   if (observer == NULL) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   for (i = 0; i < MAX_GLOBAL_OBSERVERS; i++) {
@@ -81,14 +81,15 @@ void ui_mutation_observer_destroy(struct ui_mutation_observer *observer) {
   }
 
   if (observer->targets != NULL) {
-    UI_FREE(observer->targets);
+    C_MULTIPLATFORM_FREE(observer->targets);
   }
 
-  UI_FREE(observer);
+  C_MULTIPLATFORM_FREE(observer);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_mutation_observer_observe(struct ui_mutation_observer *observer,
                              struct ui_dom_node *target,
                              const struct ui_mutation_observer_init *options) {
@@ -108,14 +109,14 @@ ui_mutation_observer_observe(struct ui_mutation_observer *observer,
 
   if (observer->target_count >= observer->target_capacity) {
     observer->target_capacity *= 2;
-    new_targets = (struct ui_mutation_target_info *)UI_MALLOC(
+    new_targets = (struct ui_mutation_target_info *)C_MULTIPLATFORM_MALLOC(
         sizeof(struct ui_mutation_target_info) * observer->target_capacity);
     if (new_targets == NULL) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_targets, observer->targets,
            sizeof(struct ui_mutation_target_info) * observer->target_count);
-    UI_FREE(observer->targets);
+    C_MULTIPLATFORM_FREE(observer->targets);
     observer->targets = new_targets;
   }
 
@@ -127,7 +128,7 @@ ui_mutation_observer_observe(struct ui_mutation_observer *observer,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_mutation_observer_disconnect(struct ui_mutation_observer *observer) {
   if (observer == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -147,18 +148,23 @@ static int is_ancestor(struct ui_dom_node *ancestor, struct ui_dom_node *node) {
   return 0;
 }
 
-static enum ui_error dispatch_record(struct ui_mutation_observer *observer,
-                                     struct ui_mutation_record *record) {
-  observer->callback(observer, record, 1, observer->user_data);
-  return UI_ERROR_NONE;
+static ui_error_t dispatch_record(struct ui_mutation_observer *observer,
+                                  struct ui_mutation_record *record) {
+  ui_error_t cb_rc =
+      observer->callback(observer, record, 1, observer->user_data);
+  if (cb_rc != UI_ERROR_NONE) {
+    if (0)
+      return cb_rc;
+  }
+  return cb_rc;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
-                                       struct ui_dom_node *added,
-                                       struct ui_dom_node *removed) {
+ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
+                                                  struct ui_dom_node *added,
+                                                  struct ui_dom_node *removed) {
   int i, j;
+  ui_error_t rc;
   struct ui_mutation_record record;
 
   if (target == NULL) {
@@ -188,7 +194,9 @@ ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
           record.removed_nodes = &removed;
           record.removed_nodes_count = 1;
         }
-        (void)dispatch_record(obs, &record);
+        rc = dispatch_record(obs, &record);
+        if (rc != UI_ERROR_NONE)
+          return rc;
         break; /* Only dispatch once per observer per mutation */
       }
     }
@@ -196,10 +204,11 @@ ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
-                                                    const char *name,
-                                                    const char *old_value) {
+ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
+                                                 const char *name,
+                                                 const char *old_value) {
   int i, j;
+  ui_error_t rc;
   struct ui_mutation_record record;
   char *old_val_copy = NULL;
   size_t old_val_len;
@@ -227,7 +236,7 @@ enum ui_error ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
 #if defined(_MSC_VER)
         {
           size_t name_len = strlen(name);
-          record.attribute_name = (char *)UI_MALLOC(name_len + 1);
+          record.attribute_name = (char *)C_MULTIPLATFORM_MALLOC(name_len + 1);
           if (record.attribute_name != NULL) {
             strcpy_s(record.attribute_name, name_len + 1, name);
           }
@@ -235,7 +244,7 @@ enum ui_error ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
 #else
         {
           size_t name_len = strlen(name);
-          record.attribute_name = (char *)UI_MALLOC(name_len + 1);
+          record.attribute_name = (char *)C_MULTIPLATFORM_MALLOC(name_len + 1);
           if (record.attribute_name != NULL) {
             strcpy(record.attribute_name, name);
           }
@@ -244,7 +253,7 @@ enum ui_error ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
 
         if (tinfo->options.attribute_old_value && old_value != NULL) {
           old_val_len = strlen(old_value);
-          old_val_copy = (char *)UI_MALLOC(old_val_len + 1);
+          old_val_copy = (char *)C_MULTIPLATFORM_MALLOC(old_val_len + 1);
           if (old_val_copy != NULL) {
 #if defined(_MSC_VER)
             strcpy_s(old_val_copy, old_val_len + 1, old_value);
@@ -255,13 +264,15 @@ enum ui_error ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
           }
         }
 
-        (void)dispatch_record(obs, &record);
+        rc = dispatch_record(obs, &record);
+        if (rc != UI_ERROR_NONE)
+          return rc;
 
         if (record.attribute_name != NULL) {
-          UI_FREE(record.attribute_name);
+          C_MULTIPLATFORM_FREE(record.attribute_name);
         }
         if (record.old_value != NULL) {
-          UI_FREE(record.old_value);
+          C_MULTIPLATFORM_FREE(record.old_value);
         }
         break;
       }
@@ -271,10 +282,11 @@ enum ui_error ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
                                            const char *old_value) {
   int i, j;
+  ui_error_t rc;
   struct ui_mutation_record record;
   char *old_val_copy = NULL;
   size_t old_val_len;
@@ -301,7 +313,7 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
 
         if (old_value != NULL) {
           old_val_len = strlen(old_value);
-          old_val_copy = (char *)UI_MALLOC(old_val_len + 1);
+          old_val_copy = (char *)C_MULTIPLATFORM_MALLOC(old_val_len + 1);
           if (old_val_copy != NULL) {
 #if defined(_MSC_VER)
             strcpy_s(old_val_copy, old_val_len + 1, old_value);
@@ -312,10 +324,12 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
           }
         }
 
-        (void)dispatch_record(obs, &record);
+        rc = dispatch_record(obs, &record);
+        if (rc != UI_ERROR_NONE)
+          return rc;
 
         if (record.old_value != NULL) {
-          UI_FREE(record.old_value);
+          C_MULTIPLATFORM_FREE(record.old_value);
         }
         break;
       }

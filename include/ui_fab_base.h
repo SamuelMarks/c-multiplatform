@@ -34,14 +34,14 @@ struct ui_fab_action;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-enum ui_error ui_fab_base_create(struct ui_fab_base **out_fab);
+ui_error_t ui_fab_base_create(struct ui_fab_base **out_fab);
 
 /**
  * @brief Destroys a FAB base component and frees all internal actions.
  *
  * @param fab The FAB to destroy.
  */
-void ui_fab_base_destroy(struct ui_fab_base *fab);
+ui_error_t ui_fab_base_destroy(struct ui_fab_base *fab);
 
 /**
  * @brief Sets the main button of the FAB.
@@ -52,8 +52,8 @@ void ui_fab_base_destroy(struct ui_fab_base *fab);
  * @param button The main button component.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_fab_base_set_main_button(struct ui_fab_base *fab,
-                                          struct ui_button_base *button);
+ui_error_t ui_fab_base_set_main_button(struct ui_fab_base *fab,
+                                       struct ui_button_base *button);
 
 /**
  * @brief Gets the main button of the FAB.
@@ -62,8 +62,8 @@ enum ui_error ui_fab_base_set_main_button(struct ui_fab_base *fab,
  * @param out_button Pointer to receive the main button.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_fab_base_get_main_button(const struct ui_fab_base *fab,
-                                          struct ui_button_base **out_button);
+ui_error_t ui_fab_base_get_main_button(const struct ui_fab_base *fab,
+                                       struct ui_button_base **out_button);
 
 /**
  * @brief Adds a speed-dial action to the FAB.
@@ -75,8 +75,8 @@ enum ui_error ui_fab_base_get_main_button(const struct ui_fab_base *fab,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer,
  * UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-enum ui_error ui_fab_base_add_action(struct ui_fab_base *fab,
-                                     struct ui_button_base *action_button);
+ui_error_t ui_fab_base_add_action(struct ui_fab_base *fab,
+                                  struct ui_button_base *action_button);
 
 /**
  * @brief Gets the number of speed-dial actions.
@@ -85,8 +85,8 @@ enum ui_error ui_fab_base_add_action(struct ui_fab_base *fab,
  * @param out_count Pointer to receive the count.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_fab_base_get_action_count(const struct ui_fab_base *fab,
-                                           size_t *out_count);
+ui_error_t ui_fab_base_get_action_count(const struct ui_fab_base *fab,
+                                        size_t *out_count);
 
 /**
  * @brief Gets a speed-dial action button by index.
@@ -97,9 +97,8 @@ enum ui_error ui_fab_base_get_action_count(const struct ui_fab_base *fab,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer,
  * UI_ERROR_OUT_OF_BOUNDS if index is invalid.
  */
-enum ui_error ui_fab_base_get_action(const struct ui_fab_base *fab,
-                                     size_t index,
-                                     struct ui_button_base **out_button);
+ui_error_t ui_fab_base_get_action(const struct ui_fab_base *fab, size_t index,
+                                  struct ui_button_base **out_button);
 
 /**
  * @brief Toggles the expanded state of the FAB speed dial.
@@ -107,7 +106,7 @@ enum ui_error ui_fab_base_get_action(const struct ui_fab_base *fab,
  * @param fab The FAB.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_fab_base_toggle(struct ui_fab_base *fab);
+ui_error_t ui_fab_base_toggle(struct ui_fab_base *fab);
 
 /**
  * @brief Gets the current state of the FAB speed dial.
@@ -116,8 +115,8 @@ enum ui_error ui_fab_base_toggle(struct ui_fab_base *fab);
  * @param out_state Pointer to receive the state.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_fab_base_get_state(const struct ui_fab_base *fab,
-                                    enum ui_fab_state *out_state);
+ui_error_t ui_fab_base_get_state(const struct ui_fab_base *fab,
+                                 enum ui_fab_state *out_state);
 
 /**
  * @brief Advances the FAB animation state by the specified delta time.
@@ -128,7 +127,7 @@ enum ui_error ui_fab_base_get_state(const struct ui_fab_base *fab,
  * @param dt_ms Delta time in milliseconds.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_fab_base_tick(struct ui_fab_base *fab, float dt_ms);
+ui_error_t ui_fab_base_tick(struct ui_fab_base *fab, float dt_ms);
 
 /**
  * @brief Gets the current expansion progress [0.0, 1.0].
@@ -139,8 +138,8 @@ enum ui_error ui_fab_base_tick(struct ui_fab_base *fab, float dt_ms);
  * @param out_progress Pointer to receive the progress.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_fab_base_get_expansion_progress(const struct ui_fab_base *fab,
-                                                 float *out_progress);
+ui_error_t ui_fab_base_get_expansion_progress(const struct ui_fab_base *fab,
+                                              float *out_progress);
 
 /**
  * @brief Retrieves the ripple state for rendering touch feedback on the main
@@ -150,7 +149,7 @@ enum ui_error ui_fab_base_get_expansion_progress(const struct ui_fab_base *fab,
  * @param out_ripple_state Pointer to receive the ripple state.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_fab_base_get_ripple_state(const struct ui_fab_base *fab,
                              struct ui_ripple_state **out_ripple_state);
 
@@ -162,8 +161,8 @@ ui_fab_base_get_ripple_state(const struct ui_fab_base *fab,
  * @param origin_y Y coordinate of the ripple origin.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_fab_base_start_ripple(struct ui_fab_base *fab, float origin_x,
-                                       float origin_y);
+ui_error_t ui_fab_base_start_ripple(struct ui_fab_base *fab, float origin_x,
+                                    float origin_y);
 
 /**
  * @brief Binds the disabled state to a boolean signal.
@@ -172,8 +171,8 @@ enum ui_error ui_fab_base_start_ripple(struct ui_fab_base *fab, float origin_x,
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_fab_base_bind_disabled(struct ui_fab_base *widget,
-                                        struct ui_signal *disabled_signal);
+ui_error_t ui_fab_base_bind_disabled(struct ui_fab_base *widget,
+                                     struct ui_signal *disabled_signal);
 
 /**
  * @brief Binds the text content to a string signal for dynamic
@@ -183,8 +182,8 @@ enum ui_error ui_fab_base_bind_disabled(struct ui_fab_base *widget,
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_fab_base_bind_text(struct ui_fab_base *widget,
-                                    struct ui_signal *text_signal);
+ui_error_t ui_fab_base_bind_text(struct ui_fab_base *widget,
+                                 struct ui_signal *text_signal);
 
 #ifdef __cplusplus
 }

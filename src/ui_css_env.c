@@ -17,16 +17,15 @@ struct ui_css_env_manager {
 };
 
 /** \brief ui_error */
-enum ui_error
-ui_css_env_manager_create(struct ui_css_env_manager **out_manager) {
+ui_error_t ui_css_env_manager_create(struct ui_css_env_manager **out_manager) {
   struct ui_css_env_manager *manager;
 
   if (!out_manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  manager =
-      (struct ui_css_env_manager *)UI_MALLOC(sizeof(struct ui_css_env_manager));
+  manager = (struct ui_css_env_manager *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_css_env_manager));
   if (!manager) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -37,28 +36,29 @@ ui_css_env_manager_create(struct ui_css_env_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-void ui_css_env_manager_destroy(struct ui_css_env_manager *manager) {
+ui_error_t ui_css_env_manager_destroy(struct ui_css_env_manager *manager) {
   struct ui_css_env_entry *current;
   struct ui_css_env_entry *next;
 
   if (!manager) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   current = manager->head;
   while (current) {
     next = current->next;
     ui_css_value_ext_destroy(current->value);
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
-  UI_FREE(manager);
+  C_MULTIPLATFORM_FREE(manager);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_css_env_manager_set(struct ui_css_env_manager *manager,
-                                     const char *name,
-                                     struct ui_css_value_ext *value) {
+ui_error_t ui_css_env_manager_set(struct ui_css_env_manager *manager,
+                                  const char *name,
+                                  struct ui_css_value_ext *value) {
   struct ui_css_env_entry *current;
   struct ui_css_env_entry *new_entry;
 
@@ -78,8 +78,8 @@ enum ui_error ui_css_env_manager_set(struct ui_css_env_manager *manager,
   }
 
   /* Add new entry */
-  new_entry =
-      (struct ui_css_env_entry *)UI_MALLOC(sizeof(struct ui_css_env_entry));
+  new_entry = (struct ui_css_env_entry *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_css_env_entry));
   if (!new_entry) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -96,10 +96,9 @@ enum ui_error ui_css_env_manager_set(struct ui_css_env_manager *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_css_env_manager_get(const struct ui_css_env_manager *manager,
-                       const char *name,
-                       const struct ui_css_value_ext **out_value) {
+ui_error_t ui_css_env_manager_get(const struct ui_css_env_manager *manager,
+                                  const char *name,
+                                  const struct ui_css_value_ext **out_value) {
   struct ui_css_env_entry *current;
 
   if (!manager || !name || !out_value) {
@@ -118,8 +117,8 @@ ui_css_env_manager_get(const struct ui_css_env_manager *manager,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_css_env_manager_remove(struct ui_css_env_manager *manager,
-                                        const char *name) {
+ui_error_t ui_css_env_manager_remove(struct ui_css_env_manager *manager,
+                                     const char *name) {
   struct ui_css_env_entry *current;
   struct ui_css_env_entry *prev = NULL;
 
@@ -137,7 +136,7 @@ enum ui_error ui_css_env_manager_remove(struct ui_css_env_manager *manager,
       }
 
       ui_css_value_ext_destroy(current->value);
-      UI_FREE(current);
+      C_MULTIPLATFORM_FREE(current);
       return UI_ERROR_NONE;
     }
     prev = current;

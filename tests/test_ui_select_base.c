@@ -12,8 +12,8 @@ static int g_last_selected_index = -1;
 static int g_open_change_count = 0;
 static int g_last_open_state = 0;
 
-static enum ui_error on_select_change(struct ui_select_base *select, int index,
-                                      void *user_data) {
+static ui_error_t on_select_change(struct ui_select_base *select, int index,
+                                   void *user_data) {
   (void)select;
   (void)user_data;
   g_change_count++;
@@ -22,8 +22,8 @@ static enum ui_error on_select_change(struct ui_select_base *select, int index,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_select_open_change(struct ui_select_base *select,
-                                           int is_open, void *user_data) {
+static ui_error_t on_select_open_change(struct ui_select_base *select,
+                                        int is_open, void *user_data) {
   (void)select;
   (void)user_data;
   g_open_change_count++;
@@ -34,7 +34,7 @@ static enum ui_error on_select_open_change(struct ui_select_base *select,
 
 static int run_normal_tests(void) {
   struct ui_select_base *select = NULL;
-  enum ui_error err;
+  ui_error_t err;
   struct ui_event ev;
 
   printf("Testing invalid arguments...\n");
@@ -350,13 +350,13 @@ static int run_normal_tests(void) {
   ui_select_base_set_disabled(select, 1);
   ui_select_base_process_event(select, &ev, 0.0);
 
-  ui_select_base_destroy(select);
+  (void)ui_select_base_destroy(select);
   return 0;
 }
 
 static int run_oom_tests(void) {
   struct ui_select_base *select = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
 
   printf("Running select base OOM tests...\n");
@@ -367,7 +367,7 @@ static int run_oom_tests(void) {
     err = ui_select_base_create(&select);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      ui_select_base_destroy(select);
+      (void)ui_select_base_destroy(select);
       break;
     }
   }
@@ -390,11 +390,109 @@ static int run_oom_tests(void) {
   if (i == 100)
     return 1;
 
-  ui_select_base_destroy(select);
+  (void)ui_select_base_destroy(select);
   return 0;
 }
+static ui_error_t mock_cva_callback(union ui_signal_payload p,
+                                    void *user_data) {
+  int *called = (int *)user_data;
+  *called = p.int_val;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_cva_touched(void *user_data) {
+  int *called = (int *)user_data;
+  *called = 1;
+  return UI_ERROR_NONE;
+}
+
+static int test_cva_and_edge_cases(void) {
+  struct ui_select_base *select = NULL;
+  struct ui_control_value_accessor cva;
+  union ui_signal_payload p;
+  struct ui_event ev;
+  int cva_change_called = -1;
+  int cva_touched_called = 0;
+
+  if (ui_select_base_create(&select) != UI_ERROR_NONE)
+    return 1;
+
+  /* CVA */
+  if (ui_select_base_get_cva(NULL, &cva) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_select_base_get_cva(select, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_select_base_get_cva(select, &cva) != UI_ERROR_NONE)
+    return 1;
+
+  if (cva.register_on_change(NULL, mock_cva_callback, &cva_change_called) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  /* Test CVA OOM */
+  g_malloc_fail_countdown = 0;
+  if (cva.register_on_change(select, mock_cva_callback, &cva_change_called) !=
+      UI_ERROR_OUT_OF_MEMORY)
+    return 1;
+  g_malloc_fail_countdown = -1;
+
+  if (cva.register_on_change(select, mock_cva_callback, &cva_change_called) !=
+      UI_ERROR_NONE)
+    return 1;
+  if (cva.register_on_touched(select, mock_cva_touched, &cva_touched_called) !=
+      UI_ERROR_NONE)
+    return 1;
+
+  p.int_val = 0;
+  cva.write_value(select, p);
+  cva.set_disabled_state(select, 1);
+  cva.set_disabled_state(select, 0);
+
+  /* Add an option to trigger change */
+  ui_select_base_add_option(select, "1", "Option 1");
+  ui_select_base_set_selected_index(select, 0); /* triggers wrapper */
+  if (cva_change_called != 0)
+    return 1;
+
+  /* Edge cases for indices */
+  ui_select_base_set_highlighted_index(select, -2);
+  ui_select_base_set_selected_index(select, -2);
+  ui_select_base_set_highlighted_index(select, 10);
+  ui_select_base_set_selected_index(select, 10);
+
+  /* Empty options limit */
+  {
+    struct ui_select_base *empty_select = NULL;
+    ui_select_base_create(&empty_select);
+    ui_select_base_set_highlighted_index(empty_select, 0);
+    ui_select_base_set_selected_index(empty_select, 0);
+    (void)ui_select_base_destroy(empty_select);
+  }
+
+  /* Test ESCAPE and UP/DOWN key */
+  ui_select_base_set_open(select, 0);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  ui_select_base_process_event(select, &ev, 0.0); /* opens */
+
+  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+  ui_select_base_process_event(select, &ev, 0.0); /* closes */
+
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_select_base_process_event(select, &ev, 0.0); /* opens */
+
+  /* Unhandled key when closed */
+  ui_select_base_set_open(select, 0);
+  ev.event_data.keyboard.key_code = 0; /* Unhandled */
+  ui_select_base_process_event(select, &ev, 0.0);
+
+  (void)ui_select_base_destroy(select);
+  return 0;
+}
+
 int main(void) {
   int failed = 0;
+  failed |= test_cva_and_edge_cases();
   failed |= run_normal_tests();
   failed |= run_oom_tests();
 

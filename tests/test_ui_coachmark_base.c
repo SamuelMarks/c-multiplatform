@@ -10,11 +10,12 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error dummy_on_step_change(struct ui_coachmark_tour *tour,
-                                          int current_step, void *user_data) {
+static ui_error_t dummy_on_step_change(struct ui_coachmark_tour *tour,
+                                       int current_step, void *user_data) {
   (void)tour;
   (void)current_step;
-  (void)user_data;
+  if (user_data)
+    return UI_ERROR_INVALID_ARGUMENT; /* simulate error */
   return UI_ERROR_NONE;
 }
 
@@ -126,12 +127,31 @@ static int test_coachmark(void) {
 
   ui_coachmark_tour_skip(tour); /* Skips without callback */
 
+  /* Trigger error in callback */
+  ui_coachmark_tour_set_on_step_change(tour, dummy_on_step_change, (void *)1);
+  ui_coachmark_tour_start(tour);
+  ui_coachmark_tour_skip(tour);
+
+  ui_coachmark_tour_set_on_step_change(tour, NULL, NULL);
+  ui_coachmark_tour_start(tour);
+  ui_coachmark_tour_set_on_step_change(tour, dummy_on_step_change, (void *)1);
+  ui_coachmark_tour_next(tour);
+
+  ui_coachmark_tour_set_on_step_change(tour, NULL, NULL);
+  ui_coachmark_tour_start(tour);
+  ui_coachmark_tour_next(tour);
+  ui_coachmark_tour_set_on_step_change(tour, dummy_on_step_change, (void *)1);
+  ui_coachmark_tour_prev(tour);
+  ui_coachmark_tour_skip(tour);
+
+  ui_coachmark_tour_skip(tour); /* Skips without callback */
+
   ui_coachmark_tour_next(tour); /* Hits !is_active true branch */
   ui_coachmark_tour_prev(tour); /* Hits !is_active true branch */
 
   ui_coachmark_tour_bind_open(tour, NULL);
-  ui_signal_destroy(sig);
-  ui_arena_destroy(arena);
+  (void)ui_signal_destroy(sig);
+  (void)ui_arena_destroy(arena);
 
   /* Add dummy content component to test node appending */
   {
@@ -159,8 +179,8 @@ static int test_coachmark(void) {
   }
 
   ui_coachmark_tour_destroy(tour);
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root_node);
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root_node);
 
   /* Test NULLs */
   ui_coachmark_tour_create(NULL, NULL);
@@ -186,27 +206,84 @@ static int test_coachmark(void) {
   /* Test malloc fails */
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   ui_overlay_director_create(root_node, &director);
-
-  g_malloc_fail_countdown = 0;
-  ui_coachmark_tour_create(director, &tour);
-  g_malloc_fail_countdown = 1;
-  ui_coachmark_tour_create(director, &tour);
-  g_malloc_fail_countdown = 2;
-  ui_coachmark_tour_create(director, &tour);
-  g_malloc_fail_countdown = 3;
-  ui_coachmark_tour_create(director, &tour);
-  g_malloc_fail_countdown = 4;
-  ui_coachmark_tour_create(director, &tour);
-  g_malloc_fail_countdown = -1;
-
-  if (ui_coachmark_tour_create(director, &tour) == UI_ERROR_NONE) {
-    g_malloc_fail_countdown = 0;
-    ui_coachmark_tour_set_steps(tour, steps, 2);
+  {
+    int i;
+    for (i = 0; i < 30; i++) {
+      struct ui_coachmark_tour *temp_tour = NULL;
+      g_malloc_fail_countdown = i;
+      if (ui_coachmark_tour_create(director, &temp_tour) != UI_ERROR_NONE) {
+        g_malloc_fail_countdown = -1;
+        if (temp_tour)
+          ui_coachmark_tour_destroy(temp_tour);
+        continue;
+      }
+      g_malloc_fail_countdown = -1;
+      ui_coachmark_tour_destroy(temp_tour);
+      break;
+    }
+    for (i = 0; i < 30; i++) {
+      struct ui_coachmark_tour *temp_tour = NULL;
+      ui_coachmark_tour_create(director, &temp_tour);
+      g_malloc_fail_countdown = i;
+      if (ui_coachmark_tour_set_steps(temp_tour, steps, 2) != UI_ERROR_NONE) {
+        g_malloc_fail_countdown = -1;
+        ui_coachmark_tour_destroy(temp_tour);
+        continue;
+      }
+      g_malloc_fail_countdown = -1;
+      ui_coachmark_tour_destroy(temp_tour);
+      break;
+    }
+    for (i = 0; i < 30; i++) {
+      struct ui_coachmark_tour *temp_tour = NULL;
+      ui_coachmark_tour_create(director, &temp_tour);
+      ui_coachmark_tour_set_steps(temp_tour, steps, 2);
+      g_malloc_fail_countdown = i;
+      if (ui_coachmark_tour_start(temp_tour) != UI_ERROR_NONE) {
+        g_malloc_fail_countdown = -1;
+        ui_coachmark_tour_destroy(temp_tour);
+        continue;
+      }
+      g_malloc_fail_countdown = -1;
+      ui_coachmark_tour_destroy(temp_tour);
+      break;
+    }
+    for (i = 0; i < 50; i++) {
+      struct ui_coachmark_tour *temp_tour = NULL;
+      ui_coachmark_tour_create(director, &temp_tour);
+      ui_coachmark_tour_set_steps(temp_tour, steps, 2);
+      ui_coachmark_tour_start(temp_tour);
+      g_malloc_fail_countdown = i;
+      if (ui_coachmark_tour_next(temp_tour) != UI_ERROR_NONE) {
+        g_malloc_fail_countdown = -1;
+        ui_coachmark_tour_destroy(temp_tour);
+        continue;
+      }
+      g_malloc_fail_countdown = -1;
+      ui_coachmark_tour_destroy(temp_tour);
+      break;
+    }
+    for (i = 0; i < 50; i++) {
+      struct ui_coachmark_tour *temp_tour = NULL;
+      ui_coachmark_tour_create(director, &temp_tour);
+      ui_coachmark_tour_set_steps(temp_tour, steps, 2);
+      ui_coachmark_tour_start(temp_tour);
+      ui_coachmark_tour_next(temp_tour);
+      g_malloc_fail_countdown = i;
+      if (ui_coachmark_tour_prev(temp_tour) != UI_ERROR_NONE) {
+        g_malloc_fail_countdown = -1;
+        ui_coachmark_tour_destroy(temp_tour);
+        continue;
+      }
+      g_malloc_fail_countdown = -1;
+      ui_coachmark_tour_destroy(temp_tour);
+      break;
+    }
     g_malloc_fail_countdown = -1;
-    ui_coachmark_tour_destroy(tour);
   }
-  ui_overlay_director_destroy(director);
-  ui_dom_node_destroy(root_node);
+
+  (void)ui_overlay_director_destroy(director);
+  (void)ui_dom_node_destroy(root_node);
 
   return 0;
 }

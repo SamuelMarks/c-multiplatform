@@ -11,8 +11,8 @@ static int g_toggle_count = 0;
 static int g_last_expanded = 0;
 static int g_toggle_returns_error = 0;
 
-static enum ui_error on_disclosure_toggle(struct ui_disclosure_base *disclosure,
-                                          int is_expanded, void *user_data) {
+static ui_error_t on_disclosure_toggle(struct ui_disclosure_base *disclosure,
+                                       int is_expanded, void *user_data) {
   (void)disclosure;
   (void)user_data;
   g_toggle_count++;
@@ -25,7 +25,7 @@ static enum ui_error on_disclosure_toggle(struct ui_disclosure_base *disclosure,
 
 static int run_normal_tests(void) {
   struct ui_disclosure_base *disclosure = NULL;
-  enum ui_error err;
+  ui_error_t err;
   struct ui_event ev;
 
   printf("Testing invalid arguments...\n");
@@ -50,7 +50,14 @@ static int run_normal_tests(void) {
     if (ui_disclosure_base_is_expanded(disclosure, NULL) !=
         UI_ERROR_INVALID_ARGUMENT)
       return 1;
+    if (ui_disclosure_base_is_expanded(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
+      return 1;
   }
+
+  /* Trigger gesture state without ENDED */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_disclosure_base_process_event(disclosure, &ev, 0.0);
   if (ui_disclosure_base_set_on_toggle(NULL, on_disclosure_toggle, NULL) !=
       UI_ERROR_INVALID_ARGUMENT) {
     printf("FAILED AT LINE 42\n");
@@ -87,6 +94,13 @@ static int run_normal_tests(void) {
     }
   }
 
+  {
+    int is_expanded = 0;
+    if (ui_disclosure_base_is_expanded(disclosure, NULL) !=
+        UI_ERROR_INVALID_ARGUMENT)
+      return 1;
+  }
+
   if (ui_disclosure_base_bind_data(disclosure, (struct ui_signal *)1) !=
       UI_ERROR_NONE) {
     printf("FAILED BIND DATA VALID\n");
@@ -95,7 +109,11 @@ static int run_normal_tests(void) {
 
   if (ui_disclosure_base_process_event(disclosure, NULL, 0) !=
       UI_ERROR_INVALID_ARGUMENT) {
-    printf("FAILED AT LINE 60\n");
+    printf("FAILED AT LINE 79\n");
+    return 1;
+  }
+  if (ui_disclosure_base_process_event(NULL, NULL, 0) !=
+      UI_ERROR_INVALID_ARGUMENT) {
     return 1;
   }
 
@@ -317,13 +335,13 @@ static int run_normal_tests(void) {
   }
   g_toggle_returns_error = 0;
 
-  ui_disclosure_base_destroy(disclosure);
+  (void)ui_disclosure_base_destroy(disclosure);
   return 0;
 }
 
 static int run_oom_tests(void) {
   struct ui_disclosure_base *disclosure = NULL;
-  enum ui_error err;
+  ui_error_t err;
   int i;
 
   printf("Running disclosure base OOM tests...\n");
@@ -336,7 +354,7 @@ static int run_oom_tests(void) {
     if (err == UI_ERROR_OUT_OF_MEMORY) {
       continue;
     } else if (err == UI_ERROR_NONE) {
-      ui_disclosure_base_destroy(disclosure);
+      (void)ui_disclosure_base_destroy(disclosure);
       break;
     } else {
       return 1;
@@ -365,7 +383,7 @@ static int run_oom_tests(void) {
     }
   }
 
-  ui_disclosure_base_destroy(disclosure);
+  (void)ui_disclosure_base_destroy(disclosure);
   return 0;
 }
 

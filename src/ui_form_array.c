@@ -14,11 +14,11 @@ struct ui_form_array {
   size_t capacity;
 };
 
-enum ui_error ui_form_array_create(struct ui_arena *arena,
-                                   enum ui_signal_mode mode,
-                                   ui_form_array_t **out_array) {
+ui_error_t ui_form_array_create(struct ui_arena *arena,
+                                enum ui_signal_mode mode,
+                                ui_form_array_t **out_array) {
   struct ui_form_array *array;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!arena || !out_array) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -38,7 +38,7 @@ enum ui_error ui_form_array_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
+ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
   ui_form_node_t *new_nodes = NULL;
   size_t new_cap;
 
@@ -66,8 +66,8 @@ enum ui_error ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_array_insert_at(ui_form_array_t *array, size_t index,
-                                      ui_form_node_t node) {
+ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
+                                   ui_form_node_t node) {
   ui_form_node_t *new_nodes = NULL;
   size_t new_cap, i;
 
@@ -100,7 +100,7 @@ enum ui_error ui_form_array_insert_at(ui_form_array_t *array, size_t index,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_array_remove_at(ui_form_array_t *array, size_t index) {
+ui_error_t ui_form_array_remove_at(ui_form_array_t *array, size_t index) {
   size_t i;
   if (!array)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -115,15 +115,15 @@ enum ui_error ui_form_array_remove_at(ui_form_array_t *array, size_t index) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_array_clear(ui_form_array_t *array) {
+ui_error_t ui_form_array_clear(ui_form_array_t *array) {
   if (!array)
     return UI_ERROR_INVALID_ARGUMENT;
   array->count = 0;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_array_get_node(ui_form_array_t *array, size_t index,
-                                     ui_form_node_t *out_node) {
+ui_error_t ui_form_array_get_node(ui_form_array_t *array, size_t index,
+                                  ui_form_node_t *out_node) {
   if (!array || !out_node)
     return UI_ERROR_INVALID_ARGUMENT;
   if (index >= array->count)
@@ -134,14 +134,13 @@ enum ui_error ui_form_array_get_node(ui_form_array_t *array, size_t index,
 }
 
 /** \brief ui_error */
-enum ui_error
-_ui_form_array_get_status_internal(struct ui_form_array *array,
-                                   enum ui_form_status *out_status,
-                                   size_t depth) {
+ui_error_t _ui_form_array_get_status_internal(struct ui_form_array *array,
+                                              enum ui_form_status *out_status,
+                                              size_t depth) {
   size_t i;
   enum ui_form_status aggregated_status = UI_FORM_STATUS_VALID;
   enum ui_form_status child_status;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!array || !out_status)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -164,12 +163,12 @@ _ui_form_array_get_status_internal(struct ui_form_array *array,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_form_array_get_status(ui_form_array_t *array,
-                                       enum ui_form_status *out_status) {
+ui_error_t ui_form_array_get_status(ui_form_array_t *array,
+                                    enum ui_form_status *out_status) {
   return _ui_form_array_get_status_internal(array, out_status, 0);
 }
 
-enum ui_error ui_form_array_destroy(ui_form_array_t *array) {
+ui_error_t ui_form_array_destroy(ui_form_array_t *array) {
   if (!array)
     return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;

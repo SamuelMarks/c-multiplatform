@@ -24,8 +24,8 @@ struct ui_ring_buffer;
  * @param out_buffer Pointer to receive the ring buffer handle.
  * @return UI_ERROR_NONE on success, or an error discriminant.
  */
-enum ui_error ui_ring_buffer_create(size_t item_size, size_t capacity,
-                                    struct ui_ring_buffer **out_buffer);
+ui_error_t ui_ring_buffer_create(size_t item_size, size_t capacity,
+                                 struct ui_ring_buffer **out_buffer);
 
 /**
  * @brief Destroys a ring buffer and frees its memory.
@@ -33,7 +33,7 @@ enum ui_error ui_ring_buffer_create(size_t item_size, size_t capacity,
  * @param buffer The buffer to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_ring_buffer_destroy(struct ui_ring_buffer *buffer);
+ui_error_t ui_ring_buffer_destroy(struct ui_ring_buffer *buffer);
 
 /**
  * @brief Pushes an item into the ring buffer.
@@ -43,8 +43,7 @@ enum ui_error ui_ring_buffer_destroy(struct ui_ring_buffer *buffer);
  * @param item Pointer to the item data to copy into the buffer.
  * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_FULL if there is no space.
  */
-enum ui_error ui_ring_buffer_push(struct ui_ring_buffer *buffer,
-                                  const void *item);
+ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer, const void *item);
 
 /**
  * @brief Pops an item from the ring buffer.
@@ -55,10 +54,10 @@ enum ui_error ui_ring_buffer_push(struct ui_ring_buffer *buffer,
  * be copied.
  * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_EMPTY if there are no items.
  */
-enum ui_error ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item);
+ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item);
 
-enum ui_error ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
-                                     const void *item);
+ui_error_t ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
+                                  const void *item);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

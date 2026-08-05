@@ -1,3 +1,4 @@
+#define GL_SILENCE_DEPRECATION
 /* clang-format off */
 #include "../include/ui_renderer.h"
 #include "../include/ui_error.h"
@@ -17,7 +18,7 @@ struct cg_context {
   int current_height;
 };
 
-static int cg_begin_frame(void *ctx, int width, int height) {
+static ui_error_t cg_begin_frame(void *ctx, int width, int height) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGColorSpaceRef colorSpace;
 
@@ -51,7 +52,7 @@ static int cg_begin_frame(void *ctx, int width, int height) {
   return UI_ERROR_NONE;
 }
 
-static int cg_end_frame(void *ctx) {
+static ui_error_t cg_end_frame(void *ctx) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (cgc && cgc->context) {
     CGContextFlush(cgc->context);
@@ -59,8 +60,8 @@ static int cg_end_frame(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-static int cg_draw_rect(void *ctx, const struct ui_rect *r,
-                        const struct ui_color *c) {
+static ui_error_t cg_draw_rect(void *ctx, const struct ui_rect *r,
+                               const struct ui_color *c) {
   struct cg_context *cgc = (struct cg_context *)ctx;
 
   if (!cgc || !cgc->context || !r || !c)
@@ -72,8 +73,9 @@ static int cg_draw_rect(void *ctx, const struct ui_rect *r,
   return UI_ERROR_NONE;
 }
 
-static int cg_draw_text(void *ctx, const char *text, const struct ui_font *f,
-                        const struct ui_rect *r) {
+static ui_error_t cg_draw_text(void *ctx, const char *text,
+                               const struct ui_font *f,
+                               const struct ui_rect *r) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   const unsigned char *font_data = NULL;
   size_t font_size_bytes = 0;
@@ -168,8 +170,8 @@ static int cg_draw_text(void *ctx, const char *text, const struct ui_font *f,
   return UI_ERROR_NONE;
 }
 
-static int cg_draw_image(void *ctx, const struct ui_image *img,
-                         const struct ui_rect *r) {
+static ui_error_t cg_draw_image(void *ctx, const struct ui_image *img,
+                                const struct ui_rect *r) {
   (void)ctx;
   (void)img;
   (void)r;
@@ -177,8 +179,8 @@ static int cg_draw_image(void *ctx, const struct ui_image *img,
   return UI_ERROR_NONE;
 }
 
-static int cg_draw_gradient(void *ctx, const struct ui_rect *r,
-                            const struct ui_css_image *gradient) {
+static ui_error_t cg_draw_gradient(void *ctx, const struct ui_rect *r,
+                                   const struct ui_css_image *gradient) {
   (void)ctx;
   (void)r;
   (void)gradient;
@@ -186,8 +188,8 @@ static int cg_draw_gradient(void *ctx, const struct ui_rect *r,
   return UI_ERROR_NONE;
 }
 
-static int cg_draw_path(void *ctx, const struct ui_path *p,
-                        const struct ui_color *c) {
+static ui_error_t cg_draw_path(void *ctx, const struct ui_path *p,
+                               const struct ui_color *c) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGMutablePathRef path;
   int i;
@@ -225,7 +227,7 @@ static int cg_draw_path(void *ctx, const struct ui_path *p,
   return UI_ERROR_NONE;
 }
 
-static int cg_push_clip(void *ctx, const struct ui_rect *r) {
+static ui_error_t cg_push_clip(void *ctx, const struct ui_rect *r) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (!cgc || !cgc->context || !r)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -237,7 +239,7 @@ static int cg_push_clip(void *ctx, const struct ui_rect *r) {
   return UI_ERROR_NONE;
 }
 
-static int cg_pop_clip(void *ctx) {
+static ui_error_t cg_pop_clip(void *ctx) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (!cgc || !cgc->context)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -247,7 +249,7 @@ static int cg_pop_clip(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-static int cg_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
+static ui_error_t cg_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGBlendMode cg_mode = kCGBlendModeNormal;
   if (!cgc || !cgc->context)
@@ -310,7 +312,7 @@ static int cg_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   return UI_ERROR_NONE;
 }
 
-static int cg_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
+static ui_error_t cg_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGColorSpaceRef colorSpace;
   CGFloat components[4];
@@ -345,7 +347,7 @@ static int cg_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   return UI_ERROR_NONE;
 }
 
-static int cg_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
+static ui_error_t cg_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   void *data;
   size_t bytes_per_row;
@@ -375,13 +377,13 @@ static int cg_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   return UI_ERROR_NONE;
 }
 
-static int cg_destroy(void *ctx) {
+static ui_error_t cg_destroy(void *ctx) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (cgc) {
     if (cgc->context) {
       CGContextRelease(cgc->context);
     }
-    UI_FREE(cgc);
+    C_MULTIPLATFORM_FREE(cgc);
   }
   return UI_ERROR_NONE;
 }
@@ -392,13 +394,13 @@ static const struct ui_renderer_vtable cg_vtable = {
     cg_pop_clip,    cg_set_blend_mode, cg_set_shadow, cg_read_pixels,
     cg_destroy};
 
-enum ui_error ui_renderer_native_init(struct ui_renderer *renderer) {
+ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
   struct cg_context *cgc;
 
   if (!renderer)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  cgc = (struct cg_context *)UI_MALLOC(sizeof(struct cg_context));
+  cgc = (struct cg_context *)C_MULTIPLATFORM_MALLOC(sizeof(struct cg_context));
   if (!cgc) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

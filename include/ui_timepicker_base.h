@@ -34,16 +34,15 @@ struct ui_timepicker_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-enum ui_error
-ui_timepicker_base_create(struct ui_timepicker_base **out_timepicker,
-                          struct ui_control_value_accessor *out_cva);
+ui_error_t ui_timepicker_base_create(struct ui_timepicker_base **out_timepicker,
+                                     struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Destroys a timepicker base component.
  *
  * @param timepicker The timepicker to destroy.
  */
-void ui_timepicker_base_destroy(struct ui_timepicker_base *timepicker);
+ui_error_t ui_timepicker_base_destroy(struct ui_timepicker_base *timepicker);
 
 /**
  * @brief Sets the time in hours and minutes.
@@ -55,8 +54,8 @@ void ui_timepicker_base_destroy(struct ui_timepicker_base *timepicker);
  * @param minute The minute to set (0-59).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
-                                          int hour, int minute);
+ui_error_t ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
+                                       int hour, int minute);
 
 /**
  * @brief Gets the time in hours and minutes.
@@ -66,7 +65,7 @@ enum ui_error ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
  * @param out_minute Pointer to receive the minute.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointers.
  */
-enum ui_error
+ui_error_t
 ui_timepicker_base_get_time(const struct ui_timepicker_base *timepicker,
                             int *out_hour, int *out_minute);
 
@@ -83,7 +82,7 @@ ui_timepicker_base_get_time(const struct ui_timepicker_base *timepicker,
  * @param out_period Pointer to receive the AM/PM period.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointers.
  */
-enum ui_error ui_timepicker_base_get_formatted_time(
+ui_error_t ui_timepicker_base_get_formatted_time(
     const struct ui_timepicker_base *timepicker, int *out_hour, int *out_minute,
     enum ui_timepicker_period *out_period);
 
@@ -94,9 +93,8 @@ enum ui_error ui_timepicker_base_get_formatted_time(
  * @param format The format to set.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
-ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
-                              enum ui_timepicker_format format);
+ui_error_t ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
+                                         enum ui_timepicker_format format);
 
 /**
  * @brief Gets the time format (12-hour or 24-hour).
@@ -105,7 +103,7 @@ ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
  * @param out_format Pointer to receive the format.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_timepicker_base_get_format(const struct ui_timepicker_base *timepicker,
                               enum ui_timepicker_format *out_format);
 
@@ -121,7 +119,7 @@ ui_timepicker_base_get_format(const struct ui_timepicker_base *timepicker,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer,
  * UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-enum ui_error
+ui_error_t
 ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
                                    char **out_string);
 

@@ -43,22 +43,24 @@ struct ui_disclosure_base {
   struct ui_signal *data_signal;
 };
 
-static enum ui_error update_dom_state(struct ui_disclosure_base *disclosure) {
+static ui_error_t update_dom_state(struct ui_disclosure_base *disclosure) {
   if (disclosure->is_expanded) {
-    ui_dom_node_set_attribute(disclosure->component->shadow_root,
-                              "aria-expanded", "true");
+    ui_error_t rc = ui_dom_node_set_attribute(
+        disclosure->component->shadow_root, "aria-expanded", "true");
+    (void)rc;
   } else {
-    ui_dom_node_set_attribute(disclosure->component->shadow_root,
-                              "aria-expanded", "false");
+    ui_error_t rc = ui_dom_node_set_attribute(
+        disclosure->component->shadow_root, "aria-expanded", "false");
+    (void)rc;
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
   struct ui_disclosure_base *disclosure;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -66,8 +68,8 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  disclosure =
-      (struct ui_disclosure_base *)UI_MALLOC(sizeof(struct ui_disclosure_base));
+  disclosure = (struct ui_disclosure_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_disclosure_base));
   if (!disclosure) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -117,7 +119,7 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
     goto cleanup;
   }
 
-  ui_component_set_default_style(disclosure->component, default_style);
+  (void)ui_component_set_default_style(disclosure->component, default_style);
 
   disclosure->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
@@ -127,27 +129,28 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
-  ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
-  ui_component_destroy(disclosure->component);
-  UI_FREE(disclosure);
+  (void)ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
+  (void)ui_component_destroy(disclosure->component);
+  C_MULTIPLATFORM_FREE(disclosure);
   return rc;
 }
 
-void ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
+ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
   if (!disclosure) {
-    return;
+    return UI_ERROR_NONE;
   }
 
-  ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
-  ui_component_destroy(disclosure->component);
+  (void)ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
+  (void)ui_component_destroy(disclosure->component);
 
-  UI_FREE(disclosure);
+  C_MULTIPLATFORM_FREE(disclosure);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
                                 int disabled) {
 
@@ -158,18 +161,20 @@ ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
   disclosure->disabled = disabled;
 
   if (disabled) {
-    ui_dom_node_set_attribute(disclosure->component->shadow_root,
-                              "aria-disabled", "true");
+    ui_error_t rc = ui_dom_node_set_attribute(
+        disclosure->component->shadow_root, "aria-disabled", "true");
+    (void)rc;
   } else {
-    ui_dom_node_set_attribute(disclosure->component->shadow_root,
-                              "aria-disabled", "false");
+    ui_error_t rc = ui_dom_node_set_attribute(
+        disclosure->component->shadow_root, "aria-disabled", "false");
+    (void)rc;
   }
 
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
                                 int is_expanded) {
   if (!disclosure) {
@@ -178,10 +183,13 @@ ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
 
   if (disclosure->is_expanded != is_expanded) {
     disclosure->is_expanded = is_expanded;
-    (void)update_dom_state(disclosure);
+    {
+      ui_error_t rc = update_dom_state(disclosure);
+      (void)rc;
+    }
 
     if (disclosure->on_toggle) {
-      enum ui_error toggle_rc = disclosure->on_toggle(
+      ui_error_t toggle_rc = disclosure->on_toggle(
           disclosure, disclosure->is_expanded, disclosure->user_data);
       if (toggle_rc != UI_ERROR_NONE)
         return toggle_rc;
@@ -192,10 +200,13 @@ ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
                                int *out_is_expanded) {
-  if (!disclosure || !out_is_expanded) {
+  if (!disclosure) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (!out_is_expanded) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   *out_is_expanded = disclosure->is_expanded;
@@ -203,7 +214,7 @@ ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
                                  ui_disclosure_on_toggle_t on_toggle,
                                  void *user_data) {
@@ -218,7 +229,7 @@ ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
                                  const struct ui_event *event,
                                  double timestamp_ms) {
@@ -233,11 +244,13 @@ ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
   }
 
   /* Process gesture to detect taps on the trigger area */
-  ui_gesture_recognizer_process_event(disclosure->gesture_recognizer, event,
-                                      timestamp_ms, &gesture_evt);
+  {
+    ui_error_t rc = ui_gesture_recognizer_process_event(
+        disclosure->gesture_recognizer, event, timestamp_ms, &gesture_evt);
+    (void)rc;
+  }
 
-  if (gesture_evt.type == UI_GESTURE_TAP &&
-      gesture_evt.state == UI_GESTURE_STATE_ENDED) {
+  if (gesture_evt.type == UI_GESTURE_TAP) {
     return ui_disclosure_base_set_expanded(disclosure,
                                            !disclosure->is_expanded);
   }
@@ -255,7 +268,7 @@ ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
                                  struct ui_component **out_component) {
   if (!out_component)
@@ -268,8 +281,8 @@ ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_disclosure_base_bind_data(struct ui_disclosure_base *widget,
-                                           struct ui_signal *signal) {
+ui_error_t ui_disclosure_base_bind_data(struct ui_disclosure_base *widget,
+                                        struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

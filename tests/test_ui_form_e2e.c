@@ -35,9 +35,9 @@ int main(void) {
 
   /* Imagine simulating E2E events here checking validation blocking */
 
-  ui_form_builder_destroy(builder);
+  (void)ui_form_builder_destroy(builder);
   ui_form_group_destroy(group);
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 
   printf("test_ui_form_e2e passed\\n");
   return 0;

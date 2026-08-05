@@ -8,7 +8,7 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error thread_task_push_mp(void *user_data) {
+static ui_error_t thread_task_push_mp(void *user_data) {
   struct ui_ring_buffer *rb = (struct ui_ring_buffer *)user_data;
   int item = 1;
   while (ui_ring_buffer_push_mp(rb, &item) == UI_ERROR_QUEUE_FULL) {
@@ -17,7 +17,7 @@ static enum ui_error thread_task_push_mp(void *user_data) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error thread_task_push_spsc(void *user_data) {
+static ui_error_t thread_task_push_spsc(void *user_data) {
   struct ui_ring_buffer *rb = (struct ui_ring_buffer *)user_data;
   int i;
   for (i = 0; i < 20; i++) {
@@ -30,7 +30,7 @@ static enum ui_error thread_task_push_spsc(void *user_data) {
 
 static int run_normal_tests(void) {
   struct ui_ring_buffer *rb = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
   int test_val;
   int i;
 
@@ -187,7 +187,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_ring_buffer *rb = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Running ring buffer OOM tests...\n");
 

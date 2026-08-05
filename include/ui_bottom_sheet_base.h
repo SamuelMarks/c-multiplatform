@@ -24,7 +24,7 @@ struct ui_bottom_sheet_base;
  * @brief Callback invoked when the bottom sheet is closed via swipe down or
  * backdrop click.
  */
-typedef enum ui_error (*ui_bottom_sheet_on_close_t)(
+typedef ui_error_t (*ui_bottom_sheet_on_close_t)(
     struct ui_bottom_sheet_base *sheet, void *user_data);
 
 /**
@@ -33,15 +33,14 @@ typedef enum ui_error (*ui_bottom_sheet_on_close_t)(
  * @param out_sheet Pointer to receive the allocated bottom sheet instance.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_bottom_sheet_base_create(struct ui_bottom_sheet_base **out_sheet);
+ui_error_t ui_bottom_sheet_base_create(struct ui_bottom_sheet_base **out_sheet);
 
 /**
  * @brief Destroys a bottom sheet instance.
  *
  * @param sheet The bottom sheet.
  */
-void ui_bottom_sheet_base_destroy(struct ui_bottom_sheet_base *sheet);
+ui_error_t ui_bottom_sheet_base_destroy(struct ui_bottom_sheet_base *sheet);
 
 /**
  * @brief Sets the content component to render inside the bottom sheet.
@@ -50,9 +49,8 @@ void ui_bottom_sheet_base_destroy(struct ui_bottom_sheet_base *sheet);
  * @param content The component.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
-ui_bottom_sheet_base_set_content(struct ui_bottom_sheet_base *sheet,
-                                 struct ui_component *content);
+ui_error_t ui_bottom_sheet_base_set_content(struct ui_bottom_sheet_base *sheet,
+                                            struct ui_component *content);
 
 /**
  * @brief Toggles the open state of the bottom sheet.
@@ -61,8 +59,8 @@ ui_bottom_sheet_base_set_content(struct ui_bottom_sheet_base *sheet,
  * @param is_open 1 to open, 0 to close.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_bottom_sheet_base_set_open(struct ui_bottom_sheet_base *sheet,
-                                            int is_open);
+ui_error_t ui_bottom_sheet_base_set_open(struct ui_bottom_sheet_base *sheet,
+                                         int is_open);
 
 /**
  * @brief Checks if the bottom sheet is currently open.
@@ -70,7 +68,7 @@ enum ui_error ui_bottom_sheet_base_set_open(struct ui_bottom_sheet_base *sheet,
  * @param sheet The bottom sheet.
  * @return 1 if open, 0 if closed.
  */
-enum ui_error
+ui_error_t
 ui_bottom_sheet_base_is_open(const struct ui_bottom_sheet_base *sheet,
                              int *out_is_open);
 
@@ -81,7 +79,7 @@ ui_bottom_sheet_base_is_open(const struct ui_bottom_sheet_base *sheet,
  * @param director The overlay director.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_bottom_sheet_base_set_overlay_director(struct ui_bottom_sheet_base *sheet,
                                           struct ui_overlay_director *director);
 
@@ -93,7 +91,7 @@ ui_bottom_sheet_base_set_overlay_director(struct ui_bottom_sheet_base *sheet,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_bottom_sheet_base_set_on_close(struct ui_bottom_sheet_base *sheet,
                                   ui_bottom_sheet_on_close_t on_close,
                                   void *user_data);
@@ -107,7 +105,7 @@ ui_bottom_sheet_base_set_on_close(struct ui_bottom_sheet_base *sheet,
  * @param timestamp_ms The current timestamp.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_bottom_sheet_base_process_event(struct ui_bottom_sheet_base *sheet,
                                    const struct ui_event *event,
                                    double timestamp_ms);
@@ -120,8 +118,8 @@ ui_bottom_sheet_base_process_event(struct ui_bottom_sheet_base *sheet,
  * @param timestamp_ms The current timestamp.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_bottom_sheet_base_update(struct ui_bottom_sheet_base *sheet,
-                                          double timestamp_ms);
+ui_error_t ui_bottom_sheet_base_update(struct ui_bottom_sheet_base *sheet,
+                                       double timestamp_ms);
 
 /**
  * @brief Configures the interruptible, physics-based spring for gesture
@@ -131,7 +129,7 @@ enum ui_error ui_bottom_sheet_base_update(struct ui_bottom_sheet_base *sheet,
  * @param config The spring configuration.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_bottom_sheet_base_set_spring_config(struct ui_bottom_sheet_base *sheet,
                                        const struct ui_spring_config *config);
 
@@ -141,7 +139,7 @@ ui_bottom_sheet_base_set_spring_config(struct ui_bottom_sheet_base *sheet,
  * @param sheet The bottom sheet.
  * @return The component.
  */
-enum ui_error
+ui_error_t
 ui_bottom_sheet_base_get_component(struct ui_bottom_sheet_base *sheet,
                                    struct ui_component **out_component);
 
@@ -152,8 +150,8 @@ ui_bottom_sheet_base_get_component(struct ui_bottom_sheet_base *sheet,
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_bottom_sheet_base_bind_open(struct ui_bottom_sheet_base *sheet,
-                                             struct ui_signal *open_signal);
+ui_error_t ui_bottom_sheet_base_bind_open(struct ui_bottom_sheet_base *sheet,
+                                          struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the bottom sheet is
@@ -163,7 +161,7 @@ enum ui_error ui_bottom_sheet_base_bind_open(struct ui_bottom_sheet_base *sheet,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_bottom_sheet_base_get_animating_signal(struct ui_bottom_sheet_base *sheet,
                                           struct ui_computed **out_animating);
 

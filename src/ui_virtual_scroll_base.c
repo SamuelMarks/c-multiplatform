@@ -29,7 +29,7 @@ struct ui_virtual_scroll_base {
 };
 
 /** \brief ui_virtual_scroll_base_create */
-enum ui_error ui_virtual_scroll_base_create(
+ui_error_t ui_virtual_scroll_base_create(
     struct ui_virtual_scroll_base **out_virtual_scroll,
     const struct ui_virtual_scroll_config *config) {
   struct ui_virtual_scroll_base *vs;
@@ -48,7 +48,7 @@ enum ui_error ui_virtual_scroll_base_create(
   if (!config->create_node || !config->update_node)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  vs = (struct ui_virtual_scroll_base *)UI_MALLOC(
+  vs = (struct ui_virtual_scroll_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_virtual_scroll_base));
   if (!vs)
     return UI_ERROR_OUT_OF_MEMORY;
@@ -69,22 +69,23 @@ enum ui_error ui_virtual_scroll_base_create(
   return UI_ERROR_NONE;
 }
 
-void ui_virtual_scroll_base_destroy(struct ui_virtual_scroll_base *vs) {
+ui_error_t ui_virtual_scroll_base_destroy(struct ui_virtual_scroll_base *vs) {
   if (!vs)
-    return;
+    return UI_ERROR_NONE;
 
   if (vs->active_nodes)
-    UI_FREE(vs->active_nodes);
+    C_MULTIPLATFORM_FREE(vs->active_nodes);
   if (vs->active_node_indices)
-    UI_FREE(vs->active_node_indices);
+    C_MULTIPLATFORM_FREE(vs->active_node_indices);
   if (vs->cached_prefix_heights)
-    UI_FREE(vs->cached_prefix_heights);
+    C_MULTIPLATFORM_FREE(vs->cached_prefix_heights);
 
-  UI_FREE(vs);
+  C_MULTIPLATFORM_FREE(vs);
+  return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
                                       size_t count) {
   if (!vs)
@@ -93,8 +94,8 @@ ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
   vs->item_count = count;
 
   if (vs->config.strategy == UI_VIRTUAL_SCROLL_VARIABLE_SIZE) {
-    float *new_cache = (float *)UI_REALLOC(vs->cached_prefix_heights,
-                                           (count + 1) * sizeof(float));
+    float *new_cache = (float *)C_MULTIPLATFORM_REALLOC(
+        vs->cached_prefix_heights, (count + 1) * sizeof(float));
     if (!new_cache && count > 0)
       return UI_ERROR_OUT_OF_MEMORY;
     vs->cached_prefix_heights = new_cache;
@@ -115,7 +116,7 @@ ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_virtual_scroll_base_set_viewport_size(struct ui_virtual_scroll_base *vs,
                                          float width, float height) {
   if (!vs)
@@ -133,7 +134,7 @@ ui_virtual_scroll_base_set_viewport_size(struct ui_virtual_scroll_base *vs,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_virtual_scroll_base_get_total_height(const struct ui_virtual_scroll_base *vs,
                                         float *out_height) {
   if (!vs || !out_height)
@@ -158,7 +159,7 @@ ui_virtual_scroll_base_get_total_height(const struct ui_virtual_scroll_base *vs,
 }
 
 /** \brief ui_virtual_scroll_base_get_visible_range */
-enum ui_error ui_virtual_scroll_base_get_visible_range(
+ui_error_t ui_virtual_scroll_base_get_visible_range(
     const struct ui_virtual_scroll_base *vs, float scroll_y,
     size_t *out_start_index, size_t *out_end_index, float *out_offset_y) {
   size_t start = 0, end = 0;
@@ -229,11 +230,11 @@ enum ui_error ui_virtual_scroll_base_get_visible_range(
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
-                                            float scroll_y) {
+ui_error_t ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
+                                         float scroll_y) {
   size_t start, end, visible_count, i;
   float offset_y;
-  enum ui_error rc;
+  ui_error_t rc;
   char style_buf[128];
   struct ui_dom_node **new_nodes = NULL;
   size_t *new_indices = NULL;
@@ -255,14 +256,14 @@ enum ui_error ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
   visible_count = end - start + 1;
 
   if (visible_count > vs->max_active_nodes) {
-    new_nodes = (struct ui_dom_node **)UI_REALLOC(
+    new_nodes = (struct ui_dom_node **)C_MULTIPLATFORM_REALLOC(
         vs->active_nodes, visible_count * sizeof(struct ui_dom_node *));
     if (!new_nodes)
       return UI_ERROR_OUT_OF_MEMORY;
     vs->active_nodes = new_nodes;
 
-    new_indices = (size_t *)UI_REALLOC(vs->active_node_indices,
-                                       visible_count * sizeof(size_t));
+    new_indices = (size_t *)C_MULTIPLATFORM_REALLOC(
+        vs->active_node_indices, visible_count * sizeof(size_t));
     if (!new_indices)
       return UI_ERROR_OUT_OF_MEMORY;
     vs->active_node_indices = new_indices;
@@ -335,8 +336,8 @@ enum ui_error ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_virtual_scroll_base_mount(struct ui_virtual_scroll_base *vs,
-                                           struct ui_dom_node *container) {
+ui_error_t ui_virtual_scroll_base_mount(struct ui_virtual_scroll_base *vs,
+                                        struct ui_dom_node *container) {
   if (!vs || !container)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -345,7 +346,7 @@ enum ui_error ui_virtual_scroll_base_mount(struct ui_virtual_scroll_base *vs,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_virtual_scroll_base_bind_data(struct ui_virtual_scroll_base *widget,
                                  struct ui_computed *signal) {
   if (!widget) {

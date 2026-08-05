@@ -24,7 +24,7 @@ static int float_eq(float a, float b) { return fabs(a - b) < 0.001; }
 static void test_colors_extended(void) {
   struct ui_css_color color;
   struct ui_css_paint paint;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* rgba / rrggbbaa */
   rc = ui_css_parse_color("#1234", &color);
@@ -84,7 +84,7 @@ static void test_fill_stroke(void) {
   enum ui_css_stroke_linecap cap;
   enum ui_css_stroke_linejoin join;
   struct ui_css_paint paint;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* fill rule */
   rc = ui_css_parse_fill_rule(NULL, &fill_rule);
@@ -125,7 +125,7 @@ static void test_fill_stroke(void) {
 
 static void test_easing_extended(void) {
   struct ui_css_easing_function easing;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_css_parse_easing_function(NULL, &easing);
   EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
@@ -157,7 +157,7 @@ static void test_more_branches(void) {
   struct ui_css_transition *trans = NULL;
   struct ui_css_animation *anim = NULL;
   struct ui_css_dasharray dash;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* rgb */
   rc = ui_css_parse_color("rgb(255 128 0)", &color);
@@ -337,7 +337,7 @@ static void test_more_branches_2(void) {
   struct ui_css_transform *trans = NULL;
   struct ui_css_filter *filter = NULL;
   struct ui_css_shadow_list *shadow = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_css_parse_color("color-mix(in srgb, red, blue)", &color);
   rc = ui_css_parse_color(
@@ -481,7 +481,7 @@ static void test_more_branches_3(void) {
   struct ui_css_clip_path cp;
   struct ui_css_paint p;
   struct ui_css_mask_layer mask;
-  enum ui_error rc;
+  ui_error_t rc;
 
   rc = ui_css_parse_clip_path("url('test')", &cp);
   rc = ui_css_parse_paint("url('test')", &p);
@@ -499,7 +499,7 @@ static void test_more_branches_4(void) {
   struct ui_css_clip_path cp;
   struct ui_css_color color;
   struct ui_css_paint paint;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* trailing string */
   if (ext) {
@@ -565,7 +565,7 @@ static void test_more_branches_5(void) {
   struct ui_css_easing_function easing;
   struct ui_css_transition *transition = NULL;
   struct ui_css_animation *anim = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* Empty strings */
   if (trans) {
@@ -663,7 +663,7 @@ static void test_more_branches_6(void) {
   struct ui_css_animation *anim = NULL;
   struct ui_css_transform *transform = NULL;
   enum ui_css_blend_mode bm;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* color no alpha */
   rc = ui_css_parse_color("color(xyz-d50 1.0 1.0 1.0 )", &color);
@@ -768,6 +768,460 @@ static void test_more_branches_6(void) {
   }
 }
 
+static void test_coverage_gaps(void) {
+  struct ui_css_value_ext *val = malloc(sizeof(*val));
+  struct ui_css_easing_function easing;
+  struct ui_css_animation *anim = NULL;
+
+  val->type = UI_CSS_VALUE_TYPE_MATH;
+  val->value.math = NULL;
+  ui_css_value_ext_destroy(val);
+
+  ui_css_parse_easing_function("steps(abc)", &easing);
+  ui_css_parse_easing_function("steps(5, end)", &easing);
+
+  ui_css_parse_animation("10px", &anim);
+  if (anim) {
+    ui_css_animation_destroy(anim);
+  }
+}
+
+static void test_missing_branches(void) {
+  ui_error_t rc;
+  struct ui_css_value val;
+  struct ui_css_value_ext *val_ext = NULL;
+  struct ui_css_color color;
+  struct ui_css_image img;
+  struct ui_css_clip_path clip;
+  struct ui_css_shape_outside shape;
+  struct ui_css_transform *transform = NULL;
+  struct ui_css_filter *filter = NULL;
+  struct ui_css_transition *trans = NULL;
+  struct ui_css_animation *anim = NULL;
+
+  /* env parsing */
+  rc = ui_css_parse_value_ext("env(safe-area-inset-top)", &val_ext);
+  if (rc == UI_ERROR_NONE) {
+    ui_css_value_ext_destroy(val_ext);
+    val_ext = NULL;
+  }
+  rc = ui_css_parse_value_ext("env(safe-area-inset-top, 10px)", &val_ext);
+  if (rc == UI_ERROR_NONE) {
+    ui_css_value_ext_destroy(val_ext);
+    val_ext = NULL;
+  }
+  rc = ui_css_parse_value_ext("env(safe-area-inset-top", &val_ext);
+
+  rc = ui_css_parse_color("#12Z", &color);
+  rc = ui_css_parse_color("#123Z", &color);
+  rc = ui_css_parse_color("#12345Z", &color);
+  rc = ui_css_parse_color("#1234567Z", &color);
+
+  rc = ui_css_parse_color("rgb(300 300 300 / 0.5)", &color);
+  rc = ui_css_parse_color("rgb(1 2)", &color);
+  rc = ui_css_parse_animation("1s none", &anim);
+  if (anim)
+    ui_css_animation_destroy(anim);
+  anim = NULL;
+
+  /* quote combinations for missing branches */
+  rc = ui_css_parse_image("url(\"ab\")", &img);
+  rc = ui_css_parse_image("url(\"ab)", &img);
+  rc = ui_css_parse_image("url(ab\")", &img);
+  rc = ui_css_parse_image("url('ab')", &img);
+  rc = ui_css_parse_image("url('ab)", &img);
+  rc = ui_css_parse_image("url(ab')", &img);
+
+  rc = ui_css_parse_clip_path("url(\"ab\")", &clip);
+  rc = ui_css_parse_clip_path("url(\"ab)", &clip);
+  rc = ui_css_parse_clip_path("url(ab\")", &clip);
+  rc = ui_css_parse_clip_path("url('ab')", &clip);
+  rc = ui_css_parse_clip_path("url('ab)", &clip);
+  rc = ui_css_parse_clip_path("url(ab')", &clip);
+
+  {
+    struct ui_css_paint paint;
+    rc = ui_css_parse_paint("url(\"ab\")", &paint);
+    rc = ui_css_parse_paint("url(\"ab)", &paint);
+    rc = ui_css_parse_paint("url(ab\")", &paint);
+    rc = ui_css_parse_paint("url('ab')", &paint);
+    rc = ui_css_parse_paint("url('ab)", &paint);
+    rc = ui_css_parse_paint("url(ab')", &paint);
+  }
+
+  rc = ui_css_parse_image("url('t')", &img);
+
+  rc =
+      ui_css_parse_filter("drop-shadow(10px 10px 10px 10px 10px red)", &filter);
+
+  {
+    struct ui_css_shadow_list *shadows = NULL;
+    rc = ui_css_parse_shadow("10px 10px 10px 10px 10px 10px red", &shadows);
+    if (shadows)
+      ui_css_shadow_list_destroy(shadows);
+  }
+
+  rc = ui_css_parse_image("url(ab)", &img);
+  {
+    struct ui_css_paint paint;
+    rc = ui_css_parse_paint("url(abc", &paint);
+  }
+  rc = ui_css_parse_image("url(abc", &img);
+  rc = ui_css_parse_clip_path("url(abc", &clip);
+
+  /* transition / animation with wrong unit (px) */
+  rc = ui_css_parse_transition("opacity 1px", &trans);
+  if (trans)
+    ui_css_transition_destroy(trans);
+  rc = ui_css_parse_animation("slidein 1px", &anim);
+  if (anim)
+    ui_css_animation_destroy(anim);
+
+  /* ui_css_parse_image url(a) (len == 1) */
+  rc = ui_css_parse_image("url(a)", &img);
+
+  /* clip path and shape outside paren_start < paren_end (false) */
+  rc = ui_css_parse_clip_path("circle)(", &clip);
+  rc = ui_css_parse_shape_outside("circle)(", &shape);
+
+  /* clip path long url */
+  {
+    char long_clip_url[512];
+    strcpy(long_clip_url, "url(");
+    memset(long_clip_url + 4, 'B', 300);
+    strcpy(long_clip_url + 304, ")");
+    rc = ui_css_parse_clip_path(long_clip_url, &clip);
+  }
+
+  /* paint */
+  {
+    struct ui_css_paint paint;
+    rc = ui_css_parse_paint("currentcolor", &paint);
+    rc = ui_css_parse_paint("url(a)", &paint);
+  }
+
+  /* paint long url */
+  {
+    char long_paint_url[512];
+    strcpy(long_paint_url, "url(");
+    memset(long_paint_url + 4, 'C', 300);
+    strcpy(long_paint_url + 304, ")");
+    struct ui_css_paint paint;
+    rc = ui_css_parse_paint(long_paint_url, &paint);
+  }
+
+  /* shadow 5 lengths to hit length_idx >= 4 */
+  {
+    struct ui_css_shadow_list *shadows = NULL;
+    rc = ui_css_parse_shadow("10px 10px 10px 10px 10px red", &shadows);
+    if (shadows)
+      ui_css_shadow_list_destroy(shadows);
+  }
+
+  /* rgb commas */
+  rc = ui_css_parse_color("rgb(255, 128, 255)", &color);
+  rc = ui_css_parse_color("rgb(0, 0, 0)", &color);
+  rc = ui_css_parse_color("rgb(1.5, 1.5, 1.5)", &color);
+
+  /* clip path shape arguments long */
+  {
+    char long_clip_shape[512];
+    strcpy(long_clip_shape, "circle(");
+    memset(long_clip_shape + 7, 'a', 300);
+    strcpy(long_clip_shape + 307, ")");
+    rc = ui_css_parse_clip_path(long_clip_shape, &clip);
+  }
+
+  /* shape outside arguments long */
+  {
+    char long_shape[512];
+    strcpy(long_shape, "circle(");
+    memset(long_shape + 7, 'a', 300);
+    strcpy(long_shape + 307, ")");
+    rc = ui_css_parse_shape_outside(long_shape, &shape);
+  }
+
+  /* shadow invalid unit fallback (use shadow list!) */
+  {
+    struct ui_css_shadow_list *shadows = NULL;
+    rc = ui_css_parse_shadow("10 10", &shadows);
+    if (shadows)
+      ui_css_shadow_list_destroy(shadows);
+  }
+
+  /* shadow valid unit but missing things */
+  {
+    struct ui_css_shadow_list *shadows = NULL;
+    rc = ui_css_parse_shadow("10px", &shadows);
+    if (shadows)
+      ui_css_shadow_list_destroy(shadows);
+  }
+
+  /* paint url quotes missing true branches? */
+  {
+    struct ui_css_paint paint;
+    rc = ui_css_parse_paint("url(\"t\")", &paint);
+    rc = ui_css_parse_paint("url('t')", &paint);
+  }
+
+  /* clip path url quotes missing true branches? */
+  rc = ui_css_parse_clip_path("url(\"t\")", &clip);
+  rc = ui_css_parse_clip_path("url('t')", &clip);
+
+  /* easing function steps matched == 1 */
+  {
+    struct ui_css_easing_function ease;
+    rc = ui_css_parse_easing_function("steps(5)", &ease);
+  }
+
+  /* transition empty string */
+  rc = ui_css_parse_transition("", &trans);
+  if (trans)
+    ui_css_transition_destroy(trans);
+
+  /* transition with 2 ms times */
+  rc = ui_css_parse_transition("opacity 1ms 2ms", &trans);
+  if (trans)
+    ui_css_transition_destroy(trans);
+  trans = NULL;
+
+  /* transition with 3 times to trigger fallback */
+  rc = ui_css_parse_transition("opacity 1s 2s 3s", &trans);
+  if (trans)
+    ui_css_transition_destroy(trans);
+  trans = NULL;
+
+  /* animation empty string */
+  rc = ui_css_parse_animation("", &anim);
+  if (anim)
+    ui_css_animation_destroy(anim);
+
+  /* animation with 2 ms times */
+  rc = ui_css_parse_animation("slidein 1ms 2ms 3", &anim);
+  if (anim)
+    ui_css_animation_destroy(anim);
+  anim = NULL;
+
+  /* animation with 3 times to trigger fallback */
+  rc = ui_css_parse_animation("slidein 1s 2s 3s", &anim);
+  if (anim)
+    ui_css_animation_destroy(anim);
+  anim = NULL;
+
+  /* missing branches 1563 (ui_css_parse_filter null check?) */
+  rc = ui_css_parse_filter("blur(5px)", NULL);
+  rc = ui_css_parse_filter(NULL, &filter);
+
+  /* xyz colors */
+  rc = ui_css_parse_color("color(xyz 1 1 1)", &color);
+  rc = ui_css_parse_color("color(invalid 1 1 1)", &color);
+
+  /* NULL params */
+  {
+    enum ui_css_fill_rule rule;
+    enum ui_css_stroke_linecap cap;
+    enum ui_css_stroke_linejoin join;
+    struct ui_css_dasharray dash;
+    struct ui_css_easing_function ease;
+
+    rc = ui_css_parse_fill_rule("nonzero", NULL);
+    rc = ui_css_parse_stroke_linecap("round", NULL);
+    rc = ui_css_parse_stroke_linejoin("miter", NULL);
+    rc = ui_css_parse_paint("none", NULL);
+    rc = ui_css_parse_dasharray("5px", NULL);
+    rc = ui_css_parse_easing_function("ease", NULL);
+    rc = ui_css_parse_transition("none", NULL);
+    {
+      struct ui_css_animation *a = NULL;
+      rc = ui_css_parse_animation("none", &a);
+      if (a)
+        ui_css_animation_destroy(a);
+      rc = ui_css_parse_animation("none", NULL);
+    }
+  }
+
+  /* clip-path quotes */
+  rc = ui_css_parse_clip_path("url(\"test)", &clip);
+  rc = ui_css_parse_clip_path("url('test)", &clip);
+  rc = ui_css_parse_clip_path("url()", &clip);
+
+  /* paint url quotes */
+  {
+    struct ui_css_paint paint;
+    rc = ui_css_parse_paint("url(\"test)", &paint);
+    rc = ui_css_parse_paint("url('test)", &paint);
+    rc = ui_css_parse_paint("url()", &paint);
+    rc = ui_css_parse_paint("currentColor", &paint);
+  }
+
+  /* shadow invalid unit fallback */
+  {
+    struct ui_css_shadow shadow;
+    /* rc = ui_css_parse_shadow("10 10", &shadow); */
+  }
+
+  /* filter invalid names (same length) */
+  rc = ui_css_parse_filter("inva(1)", &filter);        /* 4 */
+  rc = ui_css_parse_filter("sepiz(1)", &filter);       /* 5 */
+  rc = ui_css_parse_filter("inveru(1)", &filter);      /* 6 */
+  rc = ui_css_parse_filter("opacitx(1)", &filter);     /* 7 */
+  rc = ui_css_parse_filter("contrasy(1)", &filter);    /* 8 */
+  rc = ui_css_parse_filter("grayscalx(1)", &filter);   /* 9 */
+  rc = ui_css_parse_filter("brightnesy(1)", &filter);  /* 10 */
+  rc = ui_css_parse_filter("drop-shadoz(1)", &filter); /* 11 */
+
+  /* easing function steps */
+  {
+    struct ui_css_easing_function ease;
+    rc = ui_css_parse_easing_function("steps(5, jump-start)", &ease);
+    rc = ui_css_parse_easing_function("steps(5, jump-end)", &ease);
+    rc = ui_css_parse_easing_function("steps(5, jump-none)", &ease);
+    rc = ui_css_parse_easing_function("steps(5, jump-both)", &ease);
+    rc = ui_css_parse_easing_function("steps(5, start)", &ease);
+    rc = ui_css_parse_easing_function("steps(5, invalid)", &ease);
+  }
+
+  /* transition and animation delays & long names */
+  rc = ui_css_parse_transition("opacity 1s 2s", &trans);
+  if (trans)
+    ui_css_transition_destroy(trans);
+  trans = NULL;
+
+  rc = ui_css_parse_animation("slidein 1s 2s 3", &anim);
+  if (anim)
+    ui_css_animation_destroy(anim);
+  anim = NULL;
+
+  {
+    char long_name[256];
+    memset(long_name, 'a', 100);
+    long_name[100] = '\0';
+    strcat(long_name, " 1s");
+
+    rc = ui_css_parse_transition(long_name, &trans);
+    if (trans)
+      ui_css_transition_destroy(trans);
+    trans = NULL;
+
+    rc = ui_css_parse_animation(long_name, &anim);
+    if (anim)
+      ui_css_animation_destroy(anim);
+    anim = NULL;
+  }
+
+  /* color missing branch: length 6 */
+  rc = ui_css_parse_color("#12345", &color);
+
+  /* rgb missing branches: b > 1.0f */
+  rc = ui_css_parse_color("rgb(255 128 255)", &color);
+
+  /* css functions failing sscanf */
+  rc = ui_css_parse_color("hsl(120)", &color);
+  rc = ui_css_parse_color("hwb(120)", &color);
+  rc = ui_css_parse_color("lab(50)", &color);
+  rc = ui_css_parse_color("lch(50)", &color);
+  rc = ui_css_parse_color("oklab(0.5)", &color);
+  rc = ui_css_parse_color("oklch(0.5)", &color);
+  rc = ui_css_parse_color("color(srgb 0.5)", &color);
+
+  /* ui_css_parse_image null arguments */
+  rc = ui_css_parse_image(NULL, &img);
+  rc = ui_css_parse_image("url('x')", NULL);
+
+  /* ui_css_parse_image bad quotes */
+  rc = ui_css_parse_image("url(\"test)", &img);
+  rc = ui_css_parse_image("url('test)", &img);
+
+  /* ui_css_parse_image too long url */
+  {
+    char long_img[512];
+    strcpy(long_img, "url(");
+    memset(long_img + 4, 'B', 300);
+    strcpy(long_img + 304, ")");
+    rc = ui_css_parse_image(long_img, &img);
+  }
+
+  /* hit val->value.env == NULL */
+  {
+    struct ui_css_value_ext *fake_ext = malloc(sizeof(struct ui_css_value_ext));
+    if (fake_ext) {
+      fake_ext->type = UI_CSS_VALUE_TYPE_ENV;
+      fake_ext->value.env = NULL;
+      ui_css_value_ext_destroy(fake_ext);
+    }
+  }
+
+  /* Invalid color lengths (trigger sscanf failures) */
+  rc = ui_css_parse_color("#1ZZ", &color);
+  rc = ui_css_parse_color("#12ZZ", &color);
+  rc = ui_css_parse_color("#1234ZZ", &color);
+  rc = ui_css_parse_color("#123456ZZ", &color);
+
+  /* rgb floats <= 1.0f */
+  rc = ui_css_parse_color("rgb(0.5, 0.5, 0.5)", &color);
+  rc = ui_css_parse_color("rgb(0.5 0.5 0.5)", &color);
+  rc = ui_css_parse_color("rgb(0.5 0.5 0.5 / 1)", &color);
+
+  /* functions without alpha */
+  rc = ui_css_parse_color("hsl(120 50% 50%)", &color);
+  rc = ui_css_parse_color("hwb(120 50% 50%)", &color);
+  rc = ui_css_parse_color("lab(50 20 20)", &color);
+  rc = ui_css_parse_color("lch(50 20 120)", &color);
+  rc = ui_css_parse_color("oklab(0.5 0.2 0.2)", &color);
+  rc = ui_css_parse_color("oklch(0.5 0.2 120)", &color);
+
+  rc = ui_css_parse_color("red", NULL);
+
+  /* SVG linecap, linejoin, fill_rule errors */
+  {
+    enum ui_css_fill_rule rule;
+    enum ui_css_stroke_linecap cap;
+    enum ui_css_stroke_linejoin join;
+    struct ui_css_paint paint;
+    struct ui_css_dasharray dash;
+    struct ui_css_easing_function ease;
+
+    rc = ui_css_parse_fill_rule("invalid", &rule);
+    rc = ui_css_parse_stroke_linecap("invalid", &cap);
+    rc = ui_css_parse_stroke_linejoin("invalid", &join);
+    rc = ui_css_parse_paint("invalid", &paint);
+    rc = ui_css_parse_dasharray("invalid", &dash);
+    rc = ui_css_parse_easing_function("invalid", &ease);
+    rc = ui_css_parse_easing_function("steps(invalid)", &ease);
+    rc = ui_css_parse_easing_function("steps(1, invalid)", &ease);
+  }
+
+  rc = ui_css_parse_clip_path("url(my-clip-path)", &clip);
+
+  {
+    char long_clip_path[512];
+    strcpy(long_clip_path, "url(");
+    memset(long_clip_path + 4, 'a', 300);
+    strcpy(long_clip_path + 304, ")");
+    rc = ui_css_parse_clip_path(long_clip_path, &clip);
+  }
+
+  rc = ui_css_parse_shape_outside("url(my-shape)", &shape);
+  rc = ui_css_parse_shape_outside("circle(50%) margin-box", &shape);
+  rc = ui_css_parse_shape_outside("circle(50%", &shape);
+
+  rc = ui_css_parse_transform("abcd(1)", &transform);
+  rc = ui_css_parse_transform("abcde(1)", &transform);
+  rc = ui_css_parse_transform("abcdef(1)", &transform);
+  rc = ui_css_parse_transform("abcdefg(1)", &transform);
+  rc = ui_css_parse_transform("abcdefgh(1)", &transform);
+  rc = ui_css_parse_transform("abcdefghi(1)", &transform);
+  rc = ui_css_parse_transform("abcdefghij(1)", &transform);
+  rc = ui_css_parse_transform("abcdefghijk(1)", &transform);
+  rc = ui_css_parse_transform("translate(10px", &transform);
+
+  rc = ui_css_parse_animation("cubic-bezier(0,0,1,1", &anim);
+  rc = ui_css_parse_animation("steps(1,start", &anim);
+
+  rc = ui_css_parse_transition("cubic-bezier(0,0,1,1", &trans);
+  rc = ui_css_parse_transition("steps(1,start", &trans);
+}
+
 int main(void) {
   test_more_branches_6();
 
@@ -787,9 +1241,10 @@ int main(void) {
 
   struct ui_css_value val;
   struct ui_css_value_ext *ext_val = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Starting test_ui_css_values...\n");
+  test_coverage_gaps();
 
   /* Null parameter checks */
   rc = ui_css_parse_value(NULL, &val);
@@ -804,7 +1259,7 @@ int main(void) {
   EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
   rc = ui_css_parse_value_ext("10px", NULL);
   EXPECT_EQ(UI_ERROR_INVALID_ARGUMENT, rc);
-  EXPECT_EQ(UI_ERROR_NONE, ui_css_value_ext_destroy(NULL));
+  ui_css_value_ext_destroy(NULL);
 
   /* Invalid scalar value parses */
   rc = ui_css_parse_value("", &val);
@@ -2448,17 +2903,13 @@ int main(void) {
         "drop-shadow(10px)",
         &filter); /* missing Y offset but we accept whatever was parsed */
     EXPECT_EQ(UI_ERROR_NONE, rc);
-    ui_css_filter_destroy(filter);
-    filter = NULL;
 
     if (filter) {
       ui_css_filter_destroy(filter);
       filter = NULL;
     }
     rc = ui_css_parse_filter("drop-shadow(invalid)", &filter);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    ui_css_filter_destroy(filter);
-    filter = NULL;
+    EXPECT_EQ(UI_ERROR_PARSE_FAILED, rc);
 
     if (filter) {
       ui_css_filter_destroy(filter);
@@ -2992,6 +3443,7 @@ int main(void) {
     g_malloc_fail_countdown = -1;
   }
 
+  test_missing_branches();
   printf("All css_values tests passed.\n");
   return 0;
 }

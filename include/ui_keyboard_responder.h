@@ -19,7 +19,7 @@ struct ui_keyboard_responder;
  * @param out_responder Pointer to receive the new responder.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder);
 
 /**
@@ -27,7 +27,8 @@ ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder);
  *
  * @param responder The responder.
  */
-void ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder);
+ui_error_t
+ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder);
 
 /**
  * @brief Binds a specific key to an action for a specific role or tag.
@@ -41,10 +42,10 @@ void ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder);
  * @param user_data Optional user data to pass to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_keyboard_responder_bind_key(
+ui_error_t ui_keyboard_responder_bind_key(
     struct ui_keyboard_responder *responder, const char *role_or_tag,
     enum ui_key_code key_code,
-    enum ui_error (*callback)(struct ui_dom_node *node, void *user_data),
+    ui_error_t (*callback)(struct ui_dom_node *node, void *user_data),
     void *user_data);
 
 /**
@@ -58,7 +59,7 @@ enum ui_error ui_keyboard_responder_bind_key(
  * otherwise.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_keyboard_responder_handle_event(
+ui_error_t ui_keyboard_responder_handle_event(
     struct ui_keyboard_responder *responder, struct ui_dom_node *focused_node,
     const struct ui_event *event, int *out_handled);
 

@@ -502,8 +502,8 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
 /* #define your own functions "STBTT_malloc" / "STBTT_free" to avoid malloc.h*/
 #ifndef STBTT_malloc
 #include <stdlib.h>
-#define STBTT_malloc(x, u) ((void)(u), UI_MALLOC(x))
-#define STBTT_free(x, u) ((void)(u), UI_FREE(x))
+#define STBTT_malloc(x, u) ((void)(u), C_MULTIPLATFORM_MALLOC(x))
+#define STBTT_free(x, u) ((void)(u), C_MULTIPLATFORM_FREE(x))
 #endif
 
 #ifndef STBTT_assert

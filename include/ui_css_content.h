@@ -66,8 +66,8 @@ struct ui_css_content {
  * @param out_content Pointer to receive the parsed content object.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_parse_content(const char *str,
-                                   struct ui_css_content *out_content);
+ui_error_t ui_css_parse_content(const char *str,
+                                struct ui_css_content *out_content);
 
 /**
  * @brief Destroys a parsed CSS content object, freeing any allocated strings or
@@ -76,7 +76,7 @@ enum ui_error ui_css_parse_content(const char *str,
  * @param content The content object to destroy.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_css_content_destroy(struct ui_css_content *content);
+void ui_css_content_destroy(struct ui_css_content *content);
 
 #ifdef __cplusplus
 }

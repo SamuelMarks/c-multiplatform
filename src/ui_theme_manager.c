@@ -11,17 +11,17 @@ struct ui_theme_manager {
   ui_signal_t *change_signal;
 };
 
-static enum ui_error theme_mode_equality(union ui_signal_payload a,
-                                         union ui_signal_payload b,
-                                         ui_bool_t *out_equal) {
+static ui_error_t theme_mode_equality(union ui_signal_payload a,
+                                      union ui_signal_payload b,
+                                      ui_bool_t *out_equal) {
   if (out_equal)
     *out_equal = a.int_val == b.int_val ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_theme_manager_create(struct ui_arena *arena,
-                                      struct ui_theme_manager **out_manager) {
-  enum ui_error err;
+ui_error_t ui_theme_manager_create(struct ui_arena *arena,
+                                   struct ui_theme_manager **out_manager) {
+  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -49,8 +49,8 @@ enum ui_error ui_theme_manager_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_theme_manager_destroy(struct ui_theme_manager *manager) {
-  enum ui_error err;
+ui_error_t ui_theme_manager_destroy(struct ui_theme_manager *manager) {
+  ui_error_t err;
 
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -66,9 +66,9 @@ enum ui_error ui_theme_manager_destroy(struct ui_theme_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_theme_manager_set_mode(struct ui_theme_manager *manager,
-                                        enum ui_theme_mode mode) {
-  enum ui_error err;
+ui_error_t ui_theme_manager_set_mode(struct ui_theme_manager *manager,
+                                     enum ui_theme_mode mode) {
+  ui_error_t err;
   union ui_signal_payload new_payload;
 
   if (!manager) {
@@ -86,8 +86,8 @@ enum ui_error ui_theme_manager_set_mode(struct ui_theme_manager *manager,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_theme_manager_get_mode(struct ui_theme_manager *manager,
-                                        enum ui_theme_mode *out_mode) {
+ui_error_t ui_theme_manager_get_mode(struct ui_theme_manager *manager,
+                                     enum ui_theme_mode *out_mode) {
   if (!manager || !out_mode) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -97,9 +97,8 @@ enum ui_error ui_theme_manager_get_mode(struct ui_theme_manager *manager,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_theme_manager_get_change_signal(struct ui_theme_manager *manager,
-                                   ui_signal_t **out_signal) {
+ui_error_t ui_theme_manager_get_change_signal(struct ui_theme_manager *manager,
+                                              ui_signal_t **out_signal) {
   if (!manager || !out_signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

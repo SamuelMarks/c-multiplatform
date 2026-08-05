@@ -346,12 +346,12 @@ static int run_tessellate_oom_branches(void) {
     g_malloc_fail_countdown = -1;
     geom.vertex_capacity = 64;
     geom.vertex_count = 64;
-    geom.vertices =
-        (struct ui_svg_point *)UI_MALLOC(64 * sizeof(struct ui_svg_point));
+    geom.vertices = (struct ui_svg_point *)C_MULTIPLATFORM_MALLOC(
+        64 * sizeof(struct ui_svg_point));
 
     geom.index_capacity = 128;
     geom.index_count = 128;
-    geom.indices = (ui_uint32 *)UI_MALLOC(128 * sizeof(ui_uint32));
+    geom.indices = (ui_uint32 *)C_MULTIPLATFORM_MALLOC(128 * sizeof(ui_uint32));
 
     if (force_realloc_at < 6) {
       geom.vertex_count = geom.vertex_capacity - force_realloc_at;
@@ -398,12 +398,12 @@ static int run_tessellate_stroke_oom_branches(void) {
     g_malloc_fail_countdown = -1;
     geom.vertex_capacity = 64;
     geom.vertex_count = 64;
-    geom.vertices =
-        (struct ui_svg_point *)UI_MALLOC(64 * sizeof(struct ui_svg_point));
+    geom.vertices = (struct ui_svg_point *)C_MULTIPLATFORM_MALLOC(
+        64 * sizeof(struct ui_svg_point));
 
     geom.index_capacity = 128;
     geom.index_count = 128;
-    geom.indices = (ui_uint32 *)UI_MALLOC(128 * sizeof(ui_uint32));
+    geom.indices = (ui_uint32 *)C_MULTIPLATFORM_MALLOC(128 * sizeof(ui_uint32));
 
     /* Adjust counts so the Nth append triggers reallocation */
     if (force_realloc_at < 4) {

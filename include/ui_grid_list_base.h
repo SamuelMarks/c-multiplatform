@@ -36,15 +36,15 @@ struct ui_grid_list_item {
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure, UI_ERROR_INVALID_ARGUMENT if columns < 1.
  */
-enum ui_error ui_grid_list_base_create(struct ui_grid_list_base **out_grid_list,
-                                       int columns);
+ui_error_t ui_grid_list_base_create(struct ui_grid_list_base **out_grid_list,
+                                    int columns);
 
 /**
  * @brief Destroys a grid list base component and frees all items.
  *
  * @param grid_list The grid list to destroy.
  */
-void ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list);
+ui_error_t ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list);
 
 /**
  * @brief Sets the number of columns in the grid.
@@ -54,8 +54,8 @@ void ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer
  * or columns < 1.
  */
-enum ui_error ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
-                                            int columns);
+ui_error_t ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
+                                         int columns);
 
 /**
  * @brief Gets the number of columns in the grid.
@@ -64,7 +64,7 @@ enum ui_error ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
  * @param out_columns Pointer to receive the number of columns.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
                               int *out_columns);
 
@@ -77,8 +77,8 @@ ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer
  * or invalid spans, UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-enum ui_error ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
-                                         int rowspan, int colspan);
+ui_error_t ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
+                                      int rowspan, int colspan);
 
 /**
  * @brief Gets the number of items in the grid list.
@@ -87,7 +87,7 @@ enum ui_error ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
  * @param out_count Pointer to receive the number of items.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-enum ui_error
+ui_error_t
 ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
                                  size_t *out_count);
 
@@ -100,7 +100,7 @@ ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer,
  * UI_ERROR_OUT_OF_BOUNDS if index is invalid.
  */
-enum ui_error
+ui_error_t
 ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
                            size_t index,
                            const struct ui_grid_list_item **out_item);
@@ -117,7 +117,7 @@ ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer,
  * UI_ERROR_OUT_OF_MEMORY on temporary allocation failure.
  */
-enum ui_error
+ui_error_t
 ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
                                  int *out_rows);
 
@@ -128,8 +128,8 @@ ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_grid_list_base_bind_data(struct ui_grid_list_base *widget,
-                                          struct ui_computed *signal);
+ui_error_t ui_grid_list_base_bind_data(struct ui_grid_list_base *widget,
+                                       struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

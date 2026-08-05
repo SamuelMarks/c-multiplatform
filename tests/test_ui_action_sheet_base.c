@@ -14,8 +14,8 @@ extern int g_malloc_fail_countdown;
 
 static int close_count = 0;
 
-static enum ui_error on_close(struct ui_action_sheet_base *sheet,
-                              void *user_data) {
+static ui_error_t on_close(struct ui_action_sheet_base *sheet,
+                           void *user_data) {
   (void)sheet;
   (void)user_data;
   close_count++;
@@ -29,7 +29,7 @@ static void test_action_sheet_edge_cases(void) {
   struct ui_computed *out_computed = NULL;
   int out_open = 0;
   int i;
-  enum ui_error rc;
+  ui_error_t rc;
 
   /* 1. NULL pointer args */
   assert(ui_action_sheet_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
@@ -65,7 +65,7 @@ static void test_action_sheet_edge_cases(void) {
   assert(ui_action_sheet_base_attach_focus_and_keyboard(NULL, NULL, NULL) ==
          UI_ERROR_INVALID_ARGUMENT);
   assert(ui_action_sheet_base_attach_focus_and_keyboard(sheet, NULL, NULL) ==
-         UI_ERROR_NONE); /* works with NULLs */
+         UI_ERROR_INVALID_ARGUMENT);
 
   assert(ui_action_sheet_base_process_event(NULL, NULL, 0.0) ==
          UI_ERROR_INVALID_ARGUMENT);
@@ -94,7 +94,7 @@ static void test_action_sheet_edge_cases(void) {
   assert(ui_action_sheet_base_get_animating_signal(sheet, &out_computed) ==
          UI_ERROR_NONE);
 
-  ui_action_sheet_base_destroy(sheet);
+  (void)ui_action_sheet_base_destroy(sheet);
 
   /* 2. OOM in create */
   for (i = 0; i < 1000; ++i) {
@@ -103,7 +103,7 @@ static void test_action_sheet_edge_cases(void) {
     if (rc == UI_ERROR_OUT_OF_MEMORY) {
       /* Expected */
     } else if (rc == UI_ERROR_NONE) {
-      ui_action_sheet_base_destroy(sheet);
+      (void)ui_action_sheet_base_destroy(sheet);
       break;
     } else {
       assert(0);
@@ -125,19 +125,24 @@ static void test_action_sheet_edge_cases(void) {
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel2->shadow_root);
   ui_action_sheet_base_set_cancel_action(sheet, cancel2);
 
-  ui_action_sheet_base_destroy(sheet);
+  (void)ui_action_sheet_base_destroy(sheet);
   /* cancel was removed from the tree, so its shadow_root is still valid and
    * needs to be freed */
-  ui_component_destroy(cancel);
+  (void)ui_component_destroy(cancel);
   cancel2->shadow_root = NULL;
-  ui_component_destroy(cancel2);
+  (void)ui_component_destroy(cancel2);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_action_sheet_coverage(void);
+  run_action_sheet_coverage();
+#endif
 }
 
 int main(void) {
   struct ui_action_sheet_base *sheet = NULL;
   struct ui_component *action1 = NULL;
   struct ui_component *cancel = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   struct ui_keyboard_responder *keyboard = NULL;
   struct ui_focus_manager *focus = NULL;
@@ -223,14 +228,14 @@ int main(void) {
   rc = ui_action_sheet_base_process_event(sheet, &ev, 100.0);
   assert(rc == UI_ERROR_NONE);
 
-  ui_action_sheet_base_destroy(sheet);
+  (void)ui_action_sheet_base_destroy(sheet);
   action1->shadow_root = NULL; /* was destroyed by action sheet */
   cancel->shadow_root = NULL;  /* was destroyed by action sheet */
-  ui_component_destroy(action1);
-  ui_component_destroy(cancel);
+  (void)ui_component_destroy(action1);
+  (void)ui_component_destroy(cancel);
 
-  ui_focus_manager_destroy(focus);
-  ui_keyboard_responder_destroy(keyboard);
+  (void)ui_focus_manager_destroy(focus);
+  (void)ui_keyboard_responder_destroy(keyboard);
 
   printf("test_ui_action_sheet_base passed\n");
   return 0;

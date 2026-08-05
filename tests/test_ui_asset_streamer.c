@@ -14,7 +14,7 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error sleep_ms(int ms) {
+static ui_error_t sleep_ms(int ms) {
 #if defined(_MSC_VER)
   Sleep(ms);
 #else
@@ -36,8 +36,7 @@ static int run_test(const char *name, int (*test_fn)(void)) {
   }
 }
 
-static enum ui_error on_resolve(void *result, void *user_data,
-                                void **out_result) {
+static ui_error_t on_resolve(void *result, void *user_data, void **out_result) {
   struct ui_asset *asset = (struct ui_asset *)result;
   int *completed = (int *)user_data;
   *completed = 1;
@@ -45,8 +44,8 @@ static enum ui_error on_resolve(void *result, void *user_data,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_reject(enum ui_error err, void *user_data,
-                               void **out_result) {
+static ui_error_t on_reject(ui_error_t err, void *user_data,
+                            void **out_result) {
   int *completed = (int *)user_data;
   *completed = -1; /* -1 means rejected */
   (void)err;
@@ -60,7 +59,7 @@ static int test_successful_load(void) {
   struct ui_promise *promise = NULL;
   int completed = 0;
   FILE *f = NULL;
-  enum ui_error err;
+  ui_error_t err;
 
   /* Create dummy file */
 #if defined(_MSC_VER)
@@ -85,7 +84,7 @@ static int test_successful_load(void) {
 
   err = ui_asset_streamer_create(pool, ctx, &streamer);
   if (err != UI_ERROR_NONE) {
-    ui_execution_context_destroy(ctx);
+    (void)ui_execution_context_destroy(ctx);
     ui_thread_pool_destroy(pool);
     return 1;
   }
@@ -93,8 +92,8 @@ static int test_successful_load(void) {
   err = ui_asset_streamer_request(streamer, "test_asset.txt",
                                   UI_ASSET_TYPE_TEXT, &promise);
   if (err != UI_ERROR_NONE) {
-    ui_asset_streamer_destroy(streamer);
-    ui_execution_context_destroy(ctx);
+    (void)ui_asset_streamer_destroy(streamer);
+    (void)ui_execution_context_destroy(ctx);
     ui_thread_pool_destroy(pool);
     return 1;
   }
@@ -109,9 +108,9 @@ static int test_successful_load(void) {
     sleep_ms(10);
   }
 
-  ui_promise_destroy(promise);
-  ui_asset_streamer_destroy(streamer);
-  ui_execution_context_destroy(ctx);
+  (void)ui_promise_destroy(promise);
+  (void)ui_asset_streamer_destroy(streamer);
+  (void)ui_execution_context_destroy(ctx);
   ui_thread_pool_destroy(pool);
 
   remove("test_asset.txt");
@@ -125,7 +124,7 @@ static int test_failed_load(void) {
   struct ui_asset_streamer *streamer = NULL;
   struct ui_promise *promise = NULL;
   int completed = 0;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_thread_pool_create(2, &pool);
   if (err != UI_ERROR_NONE)
@@ -139,7 +138,7 @@ static int test_failed_load(void) {
 
   err = ui_asset_streamer_create(pool, ctx, &streamer);
   if (err != UI_ERROR_NONE) {
-    ui_execution_context_destroy(ctx);
+    (void)ui_execution_context_destroy(ctx);
     ui_thread_pool_destroy(pool);
     return 1;
   }
@@ -147,8 +146,8 @@ static int test_failed_load(void) {
   err = ui_asset_streamer_request(streamer, "non_existent_file_12345.bin",
                                   UI_ASSET_TYPE_BINARY, &promise);
   if (err != UI_ERROR_NONE) {
-    ui_asset_streamer_destroy(streamer);
-    ui_execution_context_destroy(ctx);
+    (void)ui_asset_streamer_destroy(streamer);
+    (void)ui_execution_context_destroy(ctx);
     ui_thread_pool_destroy(pool);
     return 1;
   }
@@ -163,9 +162,9 @@ static int test_failed_load(void) {
     sleep_ms(10);
   }
 
-  ui_promise_destroy(promise);
-  ui_asset_streamer_destroy(streamer);
-  ui_execution_context_destroy(ctx);
+  (void)ui_promise_destroy(promise);
+  (void)ui_asset_streamer_destroy(streamer);
+  (void)ui_execution_context_destroy(ctx);
   ui_thread_pool_destroy(pool);
 
   return completed == -1 ? 0 : 1;
@@ -177,11 +176,11 @@ static int test_edge_cases(void) {
   struct ui_asset_streamer *streamer = NULL;
   struct ui_promise *promise = NULL;
   int i;
-  enum ui_error err;
+  ui_error_t err;
   FILE *f;
 
   /* NULL arguments */
-  ui_asset_streamer_destroy(NULL);
+  (void)ui_asset_streamer_destroy(NULL);
   ui_asset_destroy(NULL);
 
   assert(ui_asset_streamer_create(NULL, NULL, NULL) ==
@@ -213,7 +212,7 @@ static int test_edge_cases(void) {
     g_malloc_fail_countdown = i;
     err = ui_asset_streamer_create(pool, ctx, &test_streamer);
     if (err == UI_ERROR_NONE) {
-      ui_asset_streamer_destroy(test_streamer);
+      (void)ui_asset_streamer_destroy(test_streamer);
       break;
     } else {
       assert(err == UI_ERROR_OUT_OF_MEMORY);
@@ -260,7 +259,7 @@ static int test_edge_cases(void) {
           ticks++;
         }
       }
-      ui_promise_destroy(p);
+      (void)ui_promise_destroy(p);
       if (completed == 1) {
         break; /* OOM loop finished */
       }
@@ -272,7 +271,7 @@ static int test_edge_cases(void) {
 
   /* Mock IO failure tests */
   extern int g_mock_io_fail;
-  for (i = 1; i <= 4; i++) {
+  for (i = 1; i <= 5; i++) {
     struct ui_promise *p = NULL;
     int completed = 0;
 
@@ -288,7 +287,7 @@ static int test_edge_cases(void) {
           sleep_ms(10);
         }
       }
-      ui_promise_destroy(p);
+      (void)ui_promise_destroy(p);
       assert(completed == -1); /* Must reject */
     }
   }
@@ -307,7 +306,7 @@ static int test_edge_cases(void) {
         ui_execution_context_tick(ctx);
         sleep_ms(10);
       }
-      ui_promise_destroy(p);
+      (void)ui_promise_destroy(p);
     }
   }
 
@@ -339,16 +338,31 @@ static int test_edge_cases(void) {
                                     UI_ASSET_TYPE_TEXT, &p);
     if (err == UI_ERROR_NONE) {
       sleep_ms(50);
-      ui_promise_destroy(p);
+      (void)ui_promise_destroy(p);
     }
+
+    /* Do it again but with IO failure to test branches when asset is NULL */
+    g_mock_io_fail = 1;
+    err = ui_asset_streamer_request(streamer, "test_asset_sched_fail.txt",
+                                    UI_ASSET_TYPE_TEXT, &p);
+    if (err == UI_ERROR_NONE) {
+      sleep_ms(50);
+      (void)ui_promise_destroy(p);
+    }
+    g_mock_io_fail = 0;
+
     remove("test_asset_sched_fail.txt");
     hack->ctx = old_ctx;
   }
 
-  ui_asset_streamer_destroy(streamer);
-  ui_execution_context_destroy(ctx);
+  (void)ui_asset_streamer_destroy(streamer);
+  (void)ui_execution_context_destroy(ctx);
   ui_thread_pool_destroy(pool);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_asset_streamer_coverage(void);
+  run_asset_streamer_coverage();
+#endif
   return 0;
 }
 

@@ -60,7 +60,7 @@ static int test_form_node(void) {
   node.type = 99;
   _ui_form_node_get_status_internal(node, &status, 0);
 
-  ui_form_control_destroy(ctrl);
+  (void)ui_form_control_destroy(ctrl);
   ui_form_group_destroy(grp);
   ui_form_array_destroy(arr);
 
@@ -111,7 +111,7 @@ static int run_extra_form_node(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 
   return 0;
 }

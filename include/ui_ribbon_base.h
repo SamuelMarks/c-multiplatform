@@ -56,8 +56,8 @@ struct ui_ribbon_contextual_tab_config {
  * @param out_ribbon Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_ribbon_base_create(struct ui_arena *arena,
-                                    struct ui_ribbon_base **out_ribbon);
+ui_error_t ui_ribbon_base_create(struct ui_arena *arena,
+                                 struct ui_ribbon_base **out_ribbon);
 
 /**
  * @brief Destroys a ribbon base component.
@@ -65,7 +65,7 @@ enum ui_error ui_ribbon_base_create(struct ui_arena *arena,
  * @param ribbon The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon);
+ui_error_t ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon);
 
 /**
  * @brief Adds a command group configuration to the ribbon for width-based
@@ -75,7 +75,7 @@ enum ui_error ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon);
  * @param config The group configuration to add.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_ribbon_base_add_group_config(struct ui_ribbon_base *ribbon,
                                 const struct ui_ribbon_group_config *config);
 
@@ -88,8 +88,8 @@ ui_ribbon_base_add_group_config(struct ui_ribbon_base *ribbon,
  * @param available_width The total physical width available to the ribbon.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
-                                                  int available_width);
+ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
+                                               int available_width);
 
 /**
  * @brief Retrieves the calculated collapse state for a specific group.
@@ -99,7 +99,7 @@ enum ui_error ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
  * @param out_state Pointer to receive the collapse state.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
                                int group_id,
                                enum ui_ribbon_group_collapse_state *out_state);
@@ -112,7 +112,7 @@ ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_ribbon_base_get_group_state_changed_signal(struct ui_ribbon_base *ribbon,
                                               ui_signal_t **out_signal);
 
@@ -125,7 +125,7 @@ ui_ribbon_base_get_group_state_changed_signal(struct ui_ribbon_base *ribbon,
  * @param is_active True to show, false to hide.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_ribbon_base_set_contextual_tab_active(struct ui_ribbon_base *ribbon,
                                          int tab_id, ui_bool_t is_active);
 
@@ -137,7 +137,7 @@ ui_ribbon_base_set_contextual_tab_active(struct ui_ribbon_base *ribbon,
  * @param out_is_active Pointer to receive the boolean status.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error
+ui_error_t
 ui_ribbon_base_get_contextual_tab_active(const struct ui_ribbon_base *ribbon,
                                          int tab_id, ui_bool_t *out_is_active);
 

@@ -10,10 +10,10 @@ struct ui_component {
   int id;
 };
 
-static enum ui_error test_command_palette_init(void) {
+static ui_error_t test_command_palette_init(void) {
   struct ui_command_palette_base palette;
   struct ui_component comp;
-  enum ui_error err;
+  ui_error_t err;
 
   err = ui_command_palette_base_init(NULL, &comp, NULL, NULL, NULL);
   assert(err == UI_ERROR_INVALID_ARGUMENT);
@@ -28,7 +28,7 @@ static enum ui_error test_command_palette_init(void) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error test_command_palette_operations(void) {
+static ui_error_t test_command_palette_operations(void) {
   struct ui_command_palette_base palette;
   struct ui_component comp;
 

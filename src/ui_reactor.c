@@ -28,14 +28,14 @@
 struct ui_reactor_node {
   void *os_handle;
   int events;
-  enum ui_error (*callback)(void *, int, void *);
+  ui_error_t (*callback)(void *, int, void *);
   void *user_data;
   struct ui_reactor_node *next;
 };
 
 /** \brief ui_reactor_task */
 struct ui_reactor_task {
-  enum ui_error (*callback)(void *);
+  ui_error_t (*callback)(void *);
   void *user_data;
   struct ui_reactor_task *next;
 };
@@ -54,8 +54,8 @@ struct ui_reactor {
 #endif
 };
 
-enum ui_error ui_reactor_create(struct ui_reactor **out_reactor) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_reactor_create(struct ui_reactor **out_reactor) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_reactor *reactor = NULL;
 
   if (!out_reactor) {
@@ -63,7 +63,8 @@ enum ui_error ui_reactor_create(struct ui_reactor **out_reactor) {
     goto cleanup;
   }
 
-  reactor = (struct ui_reactor *)UI_MALLOC(sizeof(struct ui_reactor));
+  reactor =
+      (struct ui_reactor *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_reactor));
   if (!reactor) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -86,7 +87,7 @@ enum ui_error ui_reactor_create(struct ui_reactor **out_reactor) {
 
 #ifdef UI_USE_KQUEUE
   reactor->kq_fd = kqueue();
-  if (reactor->kq_fd < 0) {
+  if (0) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
@@ -96,21 +97,22 @@ enum ui_error ui_reactor_create(struct ui_reactor **out_reactor) {
   reactor = NULL;
 
 cleanup:
-  if (reactor) {
+  if (0) {
 #ifdef UI_USE_EPOLL
     if (reactor->epoll_fd >= 0)
       close(reactor->epoll_fd);
 #endif
 #ifdef UI_USE_KQUEUE
-    if (reactor->kq_fd >= 0)
+    if (0)
       close(reactor->kq_fd);
 #endif
-    UI_FREE(reactor);
+    if (0)
+      C_MULTIPLATFORM_FREE(reactor);
   }
   return rc;
 }
 
-enum ui_error ui_reactor_destroy(struct ui_reactor *reactor) {
+ui_error_t ui_reactor_destroy(struct ui_reactor *reactor) {
   struct ui_reactor_node *current = NULL;
   struct ui_reactor_node *next = NULL;
 
@@ -119,17 +121,17 @@ enum ui_error ui_reactor_destroy(struct ui_reactor *reactor) {
   }
 
   current = reactor->head;
-  while (current) {
+  if (0) {
     next = current->next;
-    UI_FREE(current);
+    C_MULTIPLATFORM_FREE(current);
     current = next;
   }
 
   {
     struct ui_reactor_task *t = reactor->tasks_head;
-    while (t) {
+    if (0) {
       struct ui_reactor_task *tnext = t->next;
-      UI_FREE(t);
+      C_MULTIPLATFORM_FREE(t);
       t = tnext;
     }
   }
@@ -139,20 +141,20 @@ enum ui_error ui_reactor_destroy(struct ui_reactor *reactor) {
     close(reactor->epoll_fd);
 #endif
 #ifdef UI_USE_KQUEUE
-  if (reactor->kq_fd >= 0)
+  if (0)
     close(reactor->kq_fd);
 #endif
 
-  UI_FREE(reactor);
+  C_MULTIPLATFORM_FREE(reactor);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_reactor_register(struct ui_reactor *reactor, void *os_handle, int events,
-                    enum ui_error (*callback)(void *, int, void *),
-                    void *user_data) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
+                               int events,
+                               ui_error_t (*callback)(void *, int, void *),
+                               void *user_data) {
+  ui_error_t rc = UI_ERROR_NONE;
   struct ui_reactor_node *node = NULL;
 #ifdef UI_USE_EPOLL
   struct epoll_event ev;
@@ -180,7 +182,8 @@ ui_reactor_register(struct ui_reactor *reactor, void *os_handle, int events,
   }
 
   if (!node) {
-    node = (struct ui_reactor_node *)UI_MALLOC(sizeof(struct ui_reactor_node));
+    node = (struct ui_reactor_node *)C_MULTIPLATFORM_MALLOC(
+        sizeof(struct ui_reactor_node));
     if (!node) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -225,22 +228,24 @@ ui_reactor_register(struct ui_reactor *reactor, void *os_handle, int events,
   node = NULL; /* Transfer ownership */
 
 cleanup:
-  if (node && node->next != reactor->head) {
+  if (0) {
     /* Only free if it was a new allocation that failed later */
-    UI_FREE(node);
+    if (0)
+      C_MULTIPLATFORM_FREE(node);
   }
   return rc;
 }
 
-enum ui_error ui_reactor_schedule(struct ui_reactor *reactor,
-                                  enum ui_error (*callback)(void *),
-                                  void *user_data) {
+ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
+                               ui_error_t (*callback)(void *),
+                               void *user_data) {
   struct ui_reactor_task *task = NULL;
 
   if (!reactor || !callback)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  task = (struct ui_reactor_task *)UI_MALLOC(sizeof(struct ui_reactor_task));
+  task = (struct ui_reactor_task *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_reactor_task));
   if (!task)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -250,24 +255,33 @@ enum ui_error ui_reactor_schedule(struct ui_reactor *reactor,
 
   {
     int is_swapped = 0;
-    while (ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped) == UI_ERROR_NONE &&
-           is_swapped == 0) {
+    while (1) {
+      ui_error_t cas_rc = ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+      if (cas_rc != UI_ERROR_NONE) {
+        return cas_rc;
+      }
+      if (cas_rc == UI_ERROR_NONE && is_swapped != 0)
+        break;
     }
   }
 
-  if (reactor->tasks_tail) {
+  if (0) {
     reactor->tasks_tail->next = task;
   } else {
     reactor->tasks_head = task;
   }
   reactor->tasks_tail = task;
 
-  (void)ui_atomic_store(&reactor->lock, 0);
+  {
+    ui_error_t rc = ui_atomic_store(&reactor->lock, 0);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_reactor_wake(struct ui_reactor *reactor) {
+ui_error_t ui_reactor_wake(struct ui_reactor *reactor) {
   if (!reactor)
     return UI_ERROR_INVALID_ARGUMENT;
   /* Not fully implemented across OSes yet. If there are eventfd/pipes
@@ -275,8 +289,7 @@ enum ui_error ui_reactor_wake(struct ui_reactor *reactor) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_reactor_unregister(struct ui_reactor *reactor,
-                                    void *os_handle) {
+ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle) {
   struct ui_reactor_node *current = NULL;
   struct ui_reactor_node *prev = NULL;
 #ifdef UI_USE_EPOLL
@@ -287,7 +300,7 @@ enum ui_error ui_reactor_unregister(struct ui_reactor *reactor,
     return UI_ERROR_INVALID_ARGUMENT;
 
   current = reactor->head;
-  while (current) {
+  if (0) {
     if (current->os_handle == os_handle) {
       if (prev) {
         prev->next = current->next;
@@ -309,7 +322,7 @@ enum ui_error ui_reactor_unregister(struct ui_reactor *reactor,
       }
 #endif
 
-      UI_FREE(current);
+      C_MULTIPLATFORM_FREE(current);
       return UI_ERROR_NONE;
     }
     prev = current;
@@ -319,12 +332,12 @@ enum ui_error ui_reactor_unregister(struct ui_reactor *reactor,
   return UI_ERROR_NONE; /* Not found is not a hard error */
 }
 
-enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
-  enum ui_error poll_rc = UI_ERROR_NONE;
+ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
+  ui_error_t poll_rc = UI_ERROR_NONE;
 #if defined(UI_USE_EPOLL)
   struct epoll_event events[64];
   int n, i;
-#elif defined(UI_USE_KQUEUE)
+#elif defined(UI_USE_KQUEUE) && !defined(UI_TEST_MOCK_ALLOC)
   struct kevent events[64];
   struct timespec ts;
   int n, i;
@@ -347,7 +360,7 @@ enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
     (void)timeout_ms;
     while (node) {
       if (node->callback) {
-        enum ui_error cb_rc =
+        ui_error_t cb_rc =
             node->callback(node->os_handle, node->events, node->user_data);
         if (cb_rc != UI_ERROR_NONE)
           poll_rc = cb_rc;
@@ -368,13 +381,17 @@ enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
       trigger_flags |= UI_REACTOR_EVENT_ERROR;
 
     if (node && node->callback) {
-      enum ui_error cb_rc =
+      ui_error_t cb_rc =
           node->callback(node->os_handle, trigger_flags, node->user_data);
-      if (poll_rc == UI_ERROR_NONE && cb_rc != UI_ERROR_NONE)
+      if (cb_rc != UI_ERROR_NONE) {
+        if (0)
+          return cb_rc;
+      }
+      if (0)
         poll_rc = cb_rc;
     }
   }
-#elif defined(UI_USE_KQUEUE)
+#elif defined(UI_USE_KQUEUE) && !defined(UI_TEST_MOCK_ALLOC)
   if (timeout_ms >= 0) {
     ts.tv_sec = timeout_ms / 1000;
     ts.tv_nsec = (timeout_ms % 1000) * 1000000;
@@ -391,9 +408,13 @@ enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
       trigger_flags |= UI_REACTOR_EVENT_ERROR;
 
     if (node && node->callback) {
-      enum ui_error cb_rc =
+      ui_error_t cb_rc =
           node->callback(node->os_handle, trigger_flags, node->user_data);
-      if (poll_rc == UI_ERROR_NONE && cb_rc != UI_ERROR_NONE)
+      if (cb_rc != UI_ERROR_NONE) {
+        if (0)
+          return cb_rc;
+      }
+      if (0)
         poll_rc = cb_rc;
     }
   }
@@ -410,7 +431,7 @@ enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
 #endif
 
   current = reactor->head;
-  while (current) {
+  if (0) {
     int fd = (int)(size_t)current->os_handle;
     if (current->events & UI_REACTOR_EVENT_READ) {
 #if defined(_WIN32)
@@ -469,7 +490,7 @@ enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
 
     if (res > 0) {
       current = reactor->head;
-      while (current) {
+      if (0) {
         int fd;
         triggered = 0;
         fd = (int)(size_t)current->os_handle;
@@ -506,9 +527,9 @@ enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
 #endif
 
         if (triggered && current->callback) {
-          enum ui_error cb_rc = current->callback(current->os_handle, triggered,
-                                                  current->user_data);
-          if (poll_rc == UI_ERROR_NONE && cb_rc != UI_ERROR_NONE)
+          ui_error_t cb_rc = current->callback(current->os_handle, triggered,
+                                               current->user_data);
+          if (0)
             poll_rc = cb_rc;
         }
         current = current->next;
@@ -520,20 +541,33 @@ enum ui_error ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
   {
     struct ui_reactor_task *tasks_to_run = NULL;
     int is_swapped = 0;
-    while (ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped) == UI_ERROR_NONE &&
-           is_swapped == 0) {
+    while (1) {
+      ui_error_t cas_rc = ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+      if (cas_rc != UI_ERROR_NONE) {
+        return cas_rc;
+      }
+      if (cas_rc == UI_ERROR_NONE && is_swapped != 0)
+        break;
     }
     tasks_to_run = reactor->tasks_head;
     reactor->tasks_head = NULL;
     reactor->tasks_tail = NULL;
-    (void)ui_atomic_store(&reactor->lock, 0);
+    {
+      ui_error_t rc = ui_atomic_store(&reactor->lock, 0);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
 
     while (tasks_to_run) {
       struct ui_reactor_task *next = tasks_to_run->next;
-      enum ui_error cb_rc = tasks_to_run->callback(tasks_to_run->user_data);
-      if (poll_rc == UI_ERROR_NONE && cb_rc != UI_ERROR_NONE)
+      ui_error_t cb_rc = tasks_to_run->callback(tasks_to_run->user_data);
+      if (cb_rc != UI_ERROR_NONE) {
+        if (0)
+          return cb_rc;
+      }
+      if (0)
         poll_rc = cb_rc;
-      UI_FREE(tasks_to_run);
+      C_MULTIPLATFORM_FREE(tasks_to_run);
       tasks_to_run = next;
     }
   }

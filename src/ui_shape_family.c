@@ -2,8 +2,8 @@
 #include "ui_shape_family.h"
 /* clang-format on */
 
-enum ui_error ui_shape_family_get_radius(enum ui_shape_family family,
-                                         float *out_radius) {
+ui_error_t ui_shape_family_get_radius(enum ui_shape_family family,
+                                      float *out_radius) {
   if (!out_radius) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

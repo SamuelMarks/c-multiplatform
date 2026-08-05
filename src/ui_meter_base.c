@@ -4,10 +4,10 @@
 #include <stdio.h>
 /* clang-format on */
 
-enum ui_error ui_meter_base_create(struct ui_meter_base **out_meter) {
+ui_error_t ui_meter_base_create(struct ui_meter_base **out_meter) {
   struct ui_meter_base *meter;
   struct ui_component *base_comp;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!out_meter) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -18,14 +18,15 @@ enum ui_error ui_meter_base_create(struct ui_meter_base **out_meter) {
     return err;
   }
 
-  meter = (struct ui_meter_base *)UI_MALLOC(sizeof(struct ui_meter_base));
+  meter = (struct ui_meter_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_meter_base));
   if (!meter) {
-    ui_component_destroy(base_comp);
+    (void)ui_component_destroy(base_comp);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   meter->base = *base_comp;
-  UI_FREE(base_comp);
+  C_MULTIPLATFORM_FREE(base_comp);
 
   meter->value = 0.0f;
   meter->min_val = 0.0f;
@@ -36,112 +37,153 @@ enum ui_error ui_meter_base_create(struct ui_meter_base **out_meter) {
 
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &meter->base.shadow_root);
   if (err != UI_ERROR_NONE) {
-    UI_FREE(meter);
+    C_MULTIPLATFORM_FREE(meter);
     return err;
   }
 
   err = ui_dom_node_set_tag_name(meter->base.shadow_root, "ui-meter");
   if (err != UI_ERROR_NONE) {
-    ui_dom_node_destroy(meter->base.shadow_root);
-    UI_FREE(meter);
+    (void)ui_dom_node_destroy(meter->base.shadow_root);
+    C_MULTIPLATFORM_FREE(meter);
     return err;
   }
 
-  ui_dom_node_set_attribute(meter->base.shadow_root, "role", "meter");
-  ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuemin", "0");
-  ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuemax", "1");
-  ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuenow", "0");
+  err = ui_dom_node_set_attribute(meter->base.shadow_root, "role", "meter");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err =
+      ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuemin", "0");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err =
+      ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuemax", "1");
+  if (err != UI_ERROR_NONE)
+    return err;
+  err =
+      ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuenow", "0");
+  if (err != UI_ERROR_NONE)
+    return err;
 
   *out_meter = meter;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error update_meter_attributes(struct ui_meter_base *meter) {
+static ui_error_t update_meter_attributes(struct ui_meter_base *meter) {
   char buf[32];
+  ui_error_t err;
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", meter->value);
 #else
   sprintf(buf, "%f", meter->value);
 #endif
-  ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuenow", buf);
-  ui_dom_node_set_attribute(meter->base.shadow_root, "value", buf);
+  err =
+      ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuenow", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(meter->base.shadow_root, "value", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", meter->min_val);
 #else
   sprintf(buf, "%f", meter->min_val);
 #endif
-  ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuemin", buf);
-  ui_dom_node_set_attribute(meter->base.shadow_root, "min", buf);
+  err =
+      ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuemin", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(meter->base.shadow_root, "min", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", meter->max_val);
 #else
   sprintf(buf, "%f", meter->max_val);
 #endif
-  ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuemax", buf);
-  ui_dom_node_set_attribute(meter->base.shadow_root, "max", buf);
+  err =
+      ui_dom_node_set_attribute(meter->base.shadow_root, "aria-valuemax", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
+  err = ui_dom_node_set_attribute(meter->base.shadow_root, "max", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", meter->low_val);
 #else
   sprintf(buf, "%f", meter->low_val);
 #endif
-  ui_dom_node_set_attribute(meter->base.shadow_root, "low", buf);
+  err = ui_dom_node_set_attribute(meter->base.shadow_root, "low", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", meter->high_val);
 #else
   sprintf(buf, "%f", meter->high_val);
 #endif
-  ui_dom_node_set_attribute(meter->base.shadow_root, "high", buf);
+  err = ui_dom_node_set_attribute(meter->base.shadow_root, "high", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", meter->optimum_val);
 #else
   sprintf(buf, "%f", meter->optimum_val);
 #endif
-  ui_dom_node_set_attribute(meter->base.shadow_root, "optimum", buf);
+  err = ui_dom_node_set_attribute(meter->base.shadow_root, "optimum", buf);
+  if (err != UI_ERROR_NONE)
+    return err;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_meter_base_set_value(struct ui_meter_base *meter,
-                                      float value) {
+ui_error_t ui_meter_base_set_value(struct ui_meter_base *meter, float value) {
+  ui_error_t err;
   if (!meter) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   meter->value = value;
-  (void)update_meter_attributes(meter);
+  err = update_meter_attributes(meter);
+  if (err != UI_ERROR_NONE)
+    return err;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_meter_base_set_bounds(struct ui_meter_base *meter,
-                                       float min_val, float max_val) {
+ui_error_t ui_meter_base_set_bounds(struct ui_meter_base *meter, float min_val,
+                                    float max_val) {
+  ui_error_t err;
   if (!meter) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   meter->min_val = min_val;
   meter->max_val = max_val;
-  (void)update_meter_attributes(meter);
+  err = update_meter_attributes(meter);
+  if (err != UI_ERROR_NONE)
+    return err;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_meter_base_set_thresholds(struct ui_meter_base *meter,
-                                           float low_val, float high_val,
-                                           float optimum_val) {
+ui_error_t ui_meter_base_set_thresholds(struct ui_meter_base *meter,
+                                        float low_val, float high_val,
+                                        float optimum_val) {
+  ui_error_t err;
   if (!meter) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   meter->low_val = low_val;
   meter->high_val = high_val;
   meter->optimum_val = optimum_val;
-  (void)update_meter_attributes(meter);
+  err = update_meter_attributes(meter);
+  if (err != UI_ERROR_NONE)
+    return err;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_meter_base_bind_value(struct ui_meter_base *widget,
-                                       struct ui_signal *signal) {
+ui_error_t ui_meter_base_bind_value(struct ui_meter_base *widget,
+                                    struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

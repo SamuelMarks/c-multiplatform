@@ -22,7 +22,7 @@ struct ui_window_manager_base;
  * @param out_window_manager Pointer to receive the allocated component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-enum ui_error ui_window_manager_base_create(
+ui_error_t ui_window_manager_base_create(
     struct ui_window_manager_base **out_window_manager);
 
 /**
@@ -30,8 +30,8 @@ enum ui_error ui_window_manager_base_create(
  *
  * @param window_manager The component to destroy.
  */
-void ui_window_manager_base_destroy(
-    struct ui_window_manager_base *window_manager);
+ui_error_t
+ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager);
 
 /**
  * @brief Gets the underlying component instance.
@@ -39,7 +39,7 @@ void ui_window_manager_base_destroy(
  * @param window_manager The window manager component.
  * @return The underlying component.
  */
-enum ui_error ui_window_manager_base_get_component(
+ui_error_t ui_window_manager_base_get_component(
     struct ui_window_manager_base *window_manager,
     struct ui_component **out_component);
 
@@ -50,7 +50,7 @@ enum ui_error ui_window_manager_base_get_component(
  * @param window_id Identifier for the internal window.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error ui_window_manager_base_bring_to_front(
+ui_error_t ui_window_manager_base_bring_to_front(
     struct ui_window_manager_base *window_manager, int window_id);
 
 /**
@@ -62,7 +62,7 @@ enum ui_error ui_window_manager_base_bring_to_front(
  * @param delta_y Y-axis drag delta.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
                             int window_id, float delta_x, float delta_y);
 
@@ -73,7 +73,7 @@ ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-enum ui_error
+ui_error_t
 ui_window_manager_base_bind_data(struct ui_window_manager_base *widget,
                                  struct ui_computed *signal);
 

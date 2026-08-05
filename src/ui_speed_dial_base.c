@@ -4,8 +4,8 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-enum ui_error ui_speed_dial_base_init(struct ui_speed_dial_base *speed_dial,
-                                      struct ui_component *component) {
+ui_error_t ui_speed_dial_base_init(struct ui_speed_dial_base *speed_dial,
+                                   struct ui_component *component) {
   if (!speed_dial || !component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -18,16 +18,16 @@ enum ui_error ui_speed_dial_base_init(struct ui_speed_dial_base *speed_dial,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_speed_dial_base_add_action(struct ui_speed_dial_base *speed_dial, int id,
-                              struct ui_fab_base *fab) {
+ui_error_t ui_speed_dial_base_add_action(struct ui_speed_dial_base *speed_dial,
+                                         int id, struct ui_fab_base *fab) {
   struct ui_speed_dial_action *action;
 
   if (!speed_dial || !fab) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  action = (struct ui_speed_dial_action *)UI_MALLOC(sizeof(*action));
+  action =
+      (struct ui_speed_dial_action *)C_MULTIPLATFORM_MALLOC(sizeof(*action));
   if (!action) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -40,7 +40,7 @@ ui_speed_dial_base_add_action(struct ui_speed_dial_base *speed_dial, int id,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_speed_dial_base_toggle(struct ui_speed_dial_base *speed_dial) {
+ui_error_t ui_speed_dial_base_toggle(struct ui_speed_dial_base *speed_dial) {
   if (!speed_dial)
     return UI_ERROR_INVALID_ARGUMENT;
   if (speed_dial) {
@@ -50,8 +50,7 @@ enum ui_error ui_speed_dial_base_toggle(struct ui_speed_dial_base *speed_dial) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_speed_dial_base_cleanup(struct ui_speed_dial_base *speed_dial) {
+ui_error_t ui_speed_dial_base_cleanup(struct ui_speed_dial_base *speed_dial) {
   struct ui_speed_dial_action *curr;
   struct ui_speed_dial_action *next_action;
 
@@ -62,7 +61,7 @@ ui_speed_dial_base_cleanup(struct ui_speed_dial_base *speed_dial) {
   curr = speed_dial->actions;
   while (curr) {
     next_action = curr->next;
-    UI_FREE(curr);
+    C_MULTIPLATFORM_FREE(curr);
     curr = next_action;
   }
 
@@ -72,9 +71,8 @@ ui_speed_dial_base_cleanup(struct ui_speed_dial_base *speed_dial) {
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_speed_dial_base_bind_disabled(struct ui_speed_dial_base *widget,
-                                 struct ui_signal *disabled_signal) {
+ui_error_t ui_speed_dial_base_bind_disabled(struct ui_speed_dial_base *widget,
+                                            struct ui_signal *disabled_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -82,8 +80,8 @@ ui_speed_dial_base_bind_disabled(struct ui_speed_dial_base *widget,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_speed_dial_base_bind_text(struct ui_speed_dial_base *widget,
-                                           struct ui_signal *text_signal) {
+ui_error_t ui_speed_dial_base_bind_text(struct ui_speed_dial_base *widget,
+                                        struct ui_signal *text_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -7,9 +7,9 @@
 
 extern int g_malloc_fail_countdown;
 
-static enum ui_error test_meter_base(void) {
+static ui_error_t test_meter_base(void) {
   struct ui_meter_base *meter;
-  enum ui_error err;
+  ui_error_t err;
   const char *attr_val;
 
   err = ui_meter_base_create(&meter);
@@ -45,7 +45,7 @@ static enum ui_error test_meter_base(void) {
     exit(1);
   }
 
-  ui_component_destroy((struct ui_component *)meter);
+  (void)ui_component_destroy((struct ui_component *)meter);
   return UI_ERROR_NONE;
 }
 
@@ -61,12 +61,12 @@ static int test_edge_cases(void) {
 
   ui_meter_base_create(&meter);
   ui_meter_base_bind_value(meter, (struct ui_signal *)1);
-  ui_component_destroy((struct ui_component *)meter);
+  (void)ui_component_destroy((struct ui_component *)meter);
 
   for (i = 0; i < 4; i++) {
     g_malloc_fail_countdown = i;
     if (ui_meter_base_create(&meter) == UI_ERROR_NONE) {
-      ui_component_destroy((struct ui_component *)meter);
+      (void)ui_component_destroy((struct ui_component *)meter);
     }
   }
   g_malloc_fail_countdown = -1;

@@ -18,8 +18,7 @@ struct dummy_user_data {
   int max_packets;
 };
 
-static enum ui_error dummy_open(struct ui_media_source *source,
-                                const char *uri) {
+static ui_error_t dummy_open(struct ui_media_source *source, const char *uri) {
   struct dummy_user_data *data;
   if (!source || !uri)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -43,8 +42,8 @@ static enum ui_error dummy_open(struct ui_media_source *source,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_read_packet(struct ui_media_source *source,
-                                       struct ui_media_packet *out_packet) {
+static ui_error_t dummy_read_packet(struct ui_media_source *source,
+                                    struct ui_media_packet *out_packet) {
   struct dummy_user_data *data;
   if (!source || !out_packet || !source->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -67,8 +66,8 @@ static enum ui_error dummy_read_packet(struct ui_media_source *source,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_seek(struct ui_media_source *source,
-                                ui_int64 timestamp_us) {
+static ui_error_t dummy_seek(struct ui_media_source *source,
+                             ui_int64 timestamp_us) {
   struct dummy_user_data *data;
   if (!source || !source->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -79,8 +78,8 @@ static enum ui_error dummy_seek(struct ui_media_source *source,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_get_duration(struct ui_media_source *source,
-                                        ui_int64 *out_duration_us) {
+static ui_error_t dummy_get_duration(struct ui_media_source *source,
+                                     ui_int64 *out_duration_us) {
   struct dummy_user_data *data;
   if (!source || !source->user_data || !out_duration_us)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -91,7 +90,7 @@ static enum ui_error dummy_get_duration(struct ui_media_source *source,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dummy_close(struct ui_media_source *source) {
+static ui_error_t dummy_close(struct ui_media_source *source) {
   if (!source)
     return UI_ERROR_INVALID_ARGUMENT;
   if (source->user_data) {
@@ -106,7 +105,7 @@ static int run_normal_tests(void) {
   struct ui_media_source source;
   struct ui_media_packet pkt;
   ui_int64 duration = 0;
-  enum ui_error err;
+  ui_error_t err;
 
   source.open = dummy_open;
   source.read_packet = dummy_read_packet;
@@ -192,7 +191,7 @@ static int run_normal_tests(void) {
 
 static int run_oom_tests(void) {
   struct ui_media_source source;
-  enum ui_error err;
+  ui_error_t err;
 
   source.open = dummy_open;
   source.read_packet = dummy_read_packet;

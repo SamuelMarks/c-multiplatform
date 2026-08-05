@@ -12,22 +12,28 @@
 struct task_data {
   ui_signal_t *sig;
 };
-
-static enum ui_error increment_task(void *user_data) {
+static ui_error_t increment_task(void *user_data) {
   struct task_data *data = (struct task_data *)user_data;
   int i;
+  ui_error_t rc = UI_ERROR_NONE;
   for (i = 0; i < INCREMENTS; i++) {
     union ui_signal_payload val;
     /* Spinlock or lock-free increment in real system, here we use update_fn if
      * available */
     /* For this prototype test, we just set and get wildly to stress the MT
      * mechanism */
-    if (ui_signal_get(data->sig, &val) == UI_ERROR_NONE) {
+    rc = ui_signal_get(data->sig, &val);
+    if (rc == UI_ERROR_NONE) {
       val.int_val += 1;
-      ui_signal_set(data->sig, val);
-      return UI_ERROR_NONE;
+      rc = ui_signal_set(data->sig, val);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    } else {
+      return rc;
     }
   }
+  return rc;
+}
 }
 
 int main(void) {
@@ -59,9 +65,9 @@ int main(void) {
     ui_thread_pool_tick(pool);
   }
 
-  ui_signal_destroy(sig);
+  (void)ui_signal_destroy(sig);
   ui_thread_pool_destroy(pool);
-  ui_arena_destroy(arena);
+  (void)ui_arena_destroy(arena);
 
   printf("test_ui_concurrency passed\\n");
   return 0;

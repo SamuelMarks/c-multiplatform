@@ -21,16 +21,17 @@ struct ui_fab_base {
   struct ui_signal *text_signal;
 };
 
-enum ui_error ui_fab_base_create(struct ui_fab_base **out_fab) {
+ui_error_t ui_fab_base_create(struct ui_fab_base **out_fab) {
   struct ui_fab_base *fab;
-  enum ui_error rc = UI_ERROR_NONE;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_fab) {
     rc = UI_ERROR_INVALID_ARGUMENT;
     goto cleanup;
   }
 
-  fab = (struct ui_fab_base *)UI_MALLOC(sizeof(struct ui_fab_base));
+  fab =
+      (struct ui_fab_base *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_fab_base));
   if (!fab) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -44,7 +45,11 @@ enum ui_error ui_fab_base_create(struct ui_fab_base **out_fab) {
   fab->state = UI_FAB_STATE_COLLAPSED;
   fab->expansion_progress = 0.0f;
 
-  ui_ripple_config_init(&fab->ripple_cfg);
+  rc = ui_ripple_config_init(&fab->ripple_cfg);
+  if (rc != UI_ERROR_NONE) {
+    C_MULTIPLATFORM_FREE(fab);
+    goto cleanup;
+  }
   fab->ripple_state.active = 0;
 
   *out_fab = fab;
@@ -53,42 +58,43 @@ cleanup:
   return rc;
 }
 
-void ui_fab_base_destroy(struct ui_fab_base *fab) {
+ui_error_t ui_fab_base_destroy(struct ui_fab_base *fab) {
   if (!fab) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (fab->main_button) {
-    ui_button_base_destroy(fab->main_button);
+    (void)ui_button_base_destroy(fab->main_button);
   }
 
   if (fab->action_buttons) {
     size_t i;
     for (i = 0; i < fab->action_count; i++) {
-      ui_button_base_destroy(fab->action_buttons[i]);
+      (void)ui_button_base_destroy(fab->action_buttons[i]);
     }
-    UI_FREE(fab->action_buttons);
+    C_MULTIPLATFORM_FREE(fab->action_buttons);
   }
 
-  UI_FREE(fab);
+  C_MULTIPLATFORM_FREE(fab);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_set_main_button(struct ui_fab_base *fab,
-                                          struct ui_button_base *button) {
+ui_error_t ui_fab_base_set_main_button(struct ui_fab_base *fab,
+                                       struct ui_button_base *button) {
   if (!fab || !button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (fab->main_button) {
-    ui_button_base_destroy(fab->main_button);
+    (void)ui_button_base_destroy(fab->main_button);
   }
 
   fab->main_button = button;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_get_main_button(const struct ui_fab_base *fab,
-                                          struct ui_button_base **out_button) {
+ui_error_t ui_fab_base_get_main_button(const struct ui_fab_base *fab,
+                                       struct ui_button_base **out_button) {
   if (!fab || !out_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -97,9 +103,9 @@ enum ui_error ui_fab_base_get_main_button(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_add_action(struct ui_fab_base *fab,
-                                     struct ui_button_base *action_button) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_fab_base_add_action(struct ui_fab_base *fab,
+                                  struct ui_button_base *action_button) {
+  ui_error_t rc = UI_ERROR_NONE;
   size_t new_cap;
   struct ui_button_base **new_actions;
   size_t i;
@@ -111,7 +117,7 @@ enum ui_error ui_fab_base_add_action(struct ui_fab_base *fab,
 
   if (fab->action_count == fab->action_capacity) {
     new_cap = fab->action_capacity == 0 ? 2 : fab->action_capacity * 2;
-    new_actions = (struct ui_button_base **)UI_MALLOC(
+    new_actions = (struct ui_button_base **)C_MULTIPLATFORM_MALLOC(
         new_cap * sizeof(struct ui_button_base *));
     if (!new_actions) {
       rc = UI_ERROR_OUT_OF_MEMORY;
@@ -122,7 +128,7 @@ enum ui_error ui_fab_base_add_action(struct ui_fab_base *fab,
       for (i = 0; i < fab->action_count; i++) {
         new_actions[i] = fab->action_buttons[i];
       }
-      UI_FREE(fab->action_buttons);
+      C_MULTIPLATFORM_FREE(fab->action_buttons);
     }
 
     fab->action_buttons = new_actions;
@@ -135,8 +141,8 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_fab_base_get_action_count(const struct ui_fab_base *fab,
-                                           size_t *out_count) {
+ui_error_t ui_fab_base_get_action_count(const struct ui_fab_base *fab,
+                                        size_t *out_count) {
   if (!fab || !out_count) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -145,9 +151,8 @@ enum ui_error ui_fab_base_get_action_count(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_get_action(const struct ui_fab_base *fab,
-                                     size_t index,
-                                     struct ui_button_base **out_button) {
+ui_error_t ui_fab_base_get_action(const struct ui_fab_base *fab, size_t index,
+                                  struct ui_button_base **out_button) {
   if (!fab || !out_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -160,7 +165,7 @@ enum ui_error ui_fab_base_get_action(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_toggle(struct ui_fab_base *fab) {
+ui_error_t ui_fab_base_toggle(struct ui_fab_base *fab) {
   if (!fab) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -175,8 +180,8 @@ enum ui_error ui_fab_base_toggle(struct ui_fab_base *fab) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_get_state(const struct ui_fab_base *fab,
-                                    enum ui_fab_state *out_state) {
+ui_error_t ui_fab_base_get_state(const struct ui_fab_base *fab,
+                                 enum ui_fab_state *out_state) {
   if (!fab || !out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -185,7 +190,7 @@ enum ui_error ui_fab_base_get_state(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_tick(struct ui_fab_base *fab, float dt_ms) {
+ui_error_t ui_fab_base_tick(struct ui_fab_base *fab, float dt_ms) {
   if (!fab) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -225,8 +230,8 @@ enum ui_error ui_fab_base_tick(struct ui_fab_base *fab, float dt_ms) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_get_expansion_progress(const struct ui_fab_base *fab,
-                                                 float *out_progress) {
+ui_error_t ui_fab_base_get_expansion_progress(const struct ui_fab_base *fab,
+                                              float *out_progress) {
   if (!fab || !out_progress) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -236,7 +241,7 @@ enum ui_error ui_fab_base_get_expansion_progress(const struct ui_fab_base *fab,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_fab_base_get_ripple_state(const struct ui_fab_base *fab,
                              struct ui_ripple_state **out_ripple_state) {
   if (!fab || !out_ripple_state) {
@@ -249,8 +254,8 @@ ui_fab_base_get_ripple_state(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_start_ripple(struct ui_fab_base *fab, float origin_x,
-                                       float origin_y) {
+ui_error_t ui_fab_base_start_ripple(struct ui_fab_base *fab, float origin_x,
+                                    float origin_y) {
   if (!fab) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -273,8 +278,8 @@ enum ui_error ui_fab_base_start_ripple(struct ui_fab_base *fab, float origin_x,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_bind_disabled(struct ui_fab_base *widget,
-                                        struct ui_signal *disabled_signal) {
+ui_error_t ui_fab_base_bind_disabled(struct ui_fab_base *widget,
+                                     struct ui_signal *disabled_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -282,8 +287,8 @@ enum ui_error ui_fab_base_bind_disabled(struct ui_fab_base *widget,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_fab_base_bind_text(struct ui_fab_base *widget,
-                                    struct ui_signal *text_signal) {
+ui_error_t ui_fab_base_bind_text(struct ui_fab_base *widget,
+                                 struct ui_signal *text_signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

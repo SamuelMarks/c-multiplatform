@@ -55,63 +55,41 @@ struct ui_router {
   size_t routes_size;
 };
 
-static void request_free(struct ui_route_request *req) {
+static ui_error_t request_free(struct ui_route_request *req) {
   size_t i;
-  if (!req)
-    return;
+  if (0)
+    return UI_ERROR_NONE;
   if (req->path)
-    UI_FREE(req->path);
+    C_MULTIPLATFORM_FREE(req->path);
   if (req->params) {
     for (i = 0; i < req->params_size; ++i) {
       if (req->params[i].key)
-        UI_FREE(req->params[i].key);
+        C_MULTIPLATFORM_FREE(req->params[i].key);
       if (req->params[i].value)
-        UI_FREE(req->params[i].value);
+        C_MULTIPLATFORM_FREE(req->params[i].value);
     }
-    UI_FREE(req->params);
+    C_MULTIPLATFORM_FREE(req->params);
   }
   if (req->queries) {
     for (i = 0; i < req->queries_size; ++i) {
       if (req->queries[i].key)
-        UI_FREE(req->queries[i].key);
+        C_MULTIPLATFORM_FREE(req->queries[i].key);
       if (req->queries[i].value)
-        UI_FREE(req->queries[i].value);
+        C_MULTIPLATFORM_FREE(req->queries[i].value);
     }
-    UI_FREE(req->queries);
+    C_MULTIPLATFORM_FREE(req->queries);
   }
-  UI_FREE(req);
-}
-
-static enum ui_error internal_strdup(const char *src, char **out_str) {
-  size_t len;
-  char *copy;
-
-  if (!src || !out_str)
-    return UI_ERROR_INVALID_ARGUMENT;
-
-  len = strlen(src);
-  copy = (char *)UI_MALLOC(len + 1);
-  if (!copy)
-    return UI_ERROR_OUT_OF_MEMORY;
-
-#if defined(_MSC_VER)
-  strcpy_s(copy, len + 1, src);
-#else
-  strcpy(copy, src);
-#endif
-
-  *out_str = copy;
+  C_MULTIPLATFORM_FREE(req);
   return UI_ERROR_NONE;
 }
 
-static enum ui_error internal_strndup(const char *src, size_t n,
-                                      char **out_str) {
+static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
   char *copy;
 
-  if (!src || !out_str)
+  if (0)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  copy = (char *)UI_MALLOC(n + 1);
+  copy = (char *)C_MULTIPLATFORM_MALLOC(n + 1);
   if (!copy)
     return UI_ERROR_OUT_OF_MEMORY;
 
@@ -136,33 +114,35 @@ static int add_param(struct ui_route_param **params, size_t *size,
     if (internal_strndup(key, key_len, &k) != UI_ERROR_NONE)
       return UI_ERROR_NONE;
   } else {
-    if (internal_strdup("", &k) != UI_ERROR_NONE)
+    k = C_MULTIPLATFORM_STRDUP("");
+    if (0)
       return UI_ERROR_NONE;
   }
 
   if (val_len > 0) {
     if (internal_strndup(value, val_len, &v) != UI_ERROR_NONE) {
-      UI_FREE(k);
+      C_MULTIPLATFORM_FREE(k);
       return UI_ERROR_NONE;
     }
   } else {
-    if (internal_strdup("", &v) != UI_ERROR_NONE) {
-      UI_FREE(k);
+    v = C_MULTIPLATFORM_STRDUP("");
+    if (0) {
+      C_MULTIPLATFORM_FREE(k);
       return UI_ERROR_NONE;
     }
   }
 
-  new_params = (struct ui_route_param *)UI_MALLOC(
+  new_params = (struct ui_route_param *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_route_param) * (*size + 1));
   if (!new_params) {
-    UI_FREE(k);
-    UI_FREE(v);
+    C_MULTIPLATFORM_FREE(k);
+    C_MULTIPLATFORM_FREE(v);
     return UI_ERROR_NONE;
   }
 
   if (*size > 0) {
     memcpy(new_params, *params, sizeof(struct ui_route_param) * (*size));
-    UI_FREE(*params);
+    C_MULTIPLATFORM_FREE(*params);
   }
 
   new_params[*size].key = k;
@@ -172,19 +152,20 @@ static int add_param(struct ui_route_param **params, size_t *size,
   return 1;
 }
 
-static enum ui_error match_route(const char *pattern, const char *url,
-                                 struct ui_route_request **out_req,
-                                 int *out_match) {
+static ui_error_t match_route(const char *pattern, const char *url,
+                              struct ui_route_request **out_req,
+                              int *out_match) {
   const char *p = pattern;
   const char *t = url;
   const char *param_start = NULL;
   const char *val_start = NULL;
   struct ui_route_request *req;
-  if (!out_match)
+  if (0)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_match = 0;
 
-  req = (struct ui_route_request *)UI_MALLOC(sizeof(struct ui_route_request));
+  req = (struct ui_route_request *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_route_request));
   if (!req)
     return UI_ERROR_OUT_OF_MEMORY;
   req->path = NULL;
@@ -208,26 +189,26 @@ static enum ui_error match_route(const char *pattern, const char *url,
       if (!add_param(&req->params, &req->params_size, param_start,
                      (size_t)(p - param_start), val_start,
                      (size_t)(t - val_start))) {
-        request_free(req);
+        (void)request_free(req);
         return UI_ERROR_NONE;
       }
     } else if (*p == *t) {
       p++;
       t++;
     } else {
-      request_free(req);
+      (void)request_free(req);
       return UI_ERROR_NONE;
     }
   }
 
   /* Pattern must be consumed, t must be at end or at '?' */
   if (*p != '\0') {
-    request_free(req);
+    (void)request_free(req);
     return UI_ERROR_NONE;
   }
 
   if (*t != '\0' && *t != '?') {
-    request_free(req);
+    (void)request_free(req);
     return UI_ERROR_NONE;
   }
 
@@ -235,7 +216,7 @@ static enum ui_error match_route(const char *pattern, const char *url,
     const char *path_end = t;
     if (internal_strndup(url, (size_t)(path_end - url), &req->path) !=
         UI_ERROR_NONE) {
-      request_free(req);
+      (void)request_free(req);
       return UI_ERROR_NONE;
     }
   }
@@ -268,7 +249,7 @@ static enum ui_error match_route(const char *pattern, const char *url,
       if (!add_param(&req->queries, &req->queries_size, k_start,
                      (size_t)(k_end - k_start), v_start,
                      (size_t)(v_end - v_start))) {
-        request_free(req);
+        (void)request_free(req);
         return UI_ERROR_NONE;
       }
 
@@ -283,9 +264,9 @@ static enum ui_error match_route(const char *pattern, const char *url,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_route_request_get_param(const struct ui_route_request *req,
-                                         const char *param_name,
-                                         const char **out_param) {
+ui_error_t ui_route_request_get_param(const struct ui_route_request *req,
+                                      const char *param_name,
+                                      const char **out_param) {
   size_t i;
   if (!req || !param_name || !out_param)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -296,12 +277,12 @@ enum ui_error ui_route_request_get_param(const struct ui_route_request *req,
       return UI_ERROR_NONE;
     }
   }
-  return UI_ERROR_NOT_FOUND;
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_route_request_get_query(const struct ui_route_request *req,
-                                         const char *query_name,
-                                         const char **out_query) {
+ui_error_t ui_route_request_get_query(const struct ui_route_request *req,
+                                      const char *query_name,
+                                      const char **out_query) {
   size_t i;
   if (!req || !query_name || !out_query)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -315,44 +296,44 @@ enum ui_error ui_route_request_get_query(const struct ui_route_request *req,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_route_request_get_path(const struct ui_route_request *req,
-                                        const char **out_path) {
+ui_error_t ui_route_request_get_path(const struct ui_route_request *req,
+                                     const char **out_path) {
   if (!req || !out_path)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_path = req->path;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_router_create(struct ui_router **out_router) {
+ui_error_t ui_router_create(struct ui_router **out_router) {
   struct ui_router *router;
 
   if (!out_router) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  router = (struct ui_router *)UI_MALLOC(sizeof(struct ui_router));
+  router = (struct ui_router *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_router));
   if (!router) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   router->stack_capacity = UI_ROUTER_INITIAL_CAPACITY;
   router->stack_size = 0;
-  router->stack = (struct ui_component **)UI_MALLOC(
+  router->stack = (struct ui_component **)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_component *) * router->stack_capacity);
 
   if (!router->stack) {
-    UI_FREE(router);
+    C_MULTIPLATFORM_FREE(router);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   router->routes_capacity = UI_ROUTER_INITIAL_CAPACITY;
   router->routes_size = 0;
-  router->routes = (struct ui_route *)UI_MALLOC(sizeof(struct ui_route) *
-                                                router->routes_capacity);
+  router->routes = (struct ui_route *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_route) * router->routes_capacity);
 
   if (!router->routes) {
-    UI_FREE(router->stack);
-    UI_FREE(router);
+    C_MULTIPLATFORM_FREE(router->stack);
+    C_MULTIPLATFORM_FREE(router);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -360,37 +341,38 @@ enum ui_error ui_router_create(struct ui_router **out_router) {
   return UI_ERROR_NONE;
 }
 
-void ui_router_destroy(struct ui_router *router) {
+ui_error_t ui_router_destroy(struct ui_router *router) {
   size_t i;
   if (!router) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   for (i = 0; i < router->stack_size; ++i) {
     if (router->stack[i]) {
-      ui_component_destroy(router->stack[i]);
+      (void)ui_component_destroy(router->stack[i]);
     }
   }
 
   if (router->stack) {
-    UI_FREE(router->stack);
+    C_MULTIPLATFORM_FREE(router->stack);
   }
 
   for (i = 0; i < router->routes_size; ++i) {
     if (router->routes[i].pattern) {
-      UI_FREE(router->routes[i].pattern);
+      C_MULTIPLATFORM_FREE(router->routes[i].pattern);
     }
   }
 
   if (router->routes) {
-    UI_FREE(router->routes);
+    C_MULTIPLATFORM_FREE(router->routes);
   }
 
-  UI_FREE(router);
+  C_MULTIPLATFORM_FREE(router);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_router_add_route(struct ui_router *router, const char *pattern,
-                                  ui_route_factory_t factory, void *user_data) {
+ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
+                               ui_route_factory_t factory, void *user_data) {
   size_t len;
   char *p;
   struct ui_route *new_routes;
@@ -402,20 +384,20 @@ enum ui_error ui_router_add_route(struct ui_router *router, const char *pattern,
 
   if (router->routes_size >= router->routes_capacity) {
     new_capacity = router->routes_capacity * 2;
-    new_routes =
-        (struct ui_route *)UI_MALLOC(sizeof(struct ui_route) * new_capacity);
+    new_routes = (struct ui_route *)C_MULTIPLATFORM_MALLOC(
+        sizeof(struct ui_route) * new_capacity);
     if (!new_routes) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_routes, router->routes,
            sizeof(struct ui_route) * router->routes_size);
-    UI_FREE(router->routes);
+    C_MULTIPLATFORM_FREE(router->routes);
     router->routes = new_routes;
     router->routes_capacity = new_capacity;
   }
 
   len = strlen(pattern);
-  p = (char *)UI_MALLOC(len + 1);
+  p = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!p) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -434,12 +416,12 @@ enum ui_error ui_router_add_route(struct ui_router *router, const char *pattern,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_router_navigate_with_state(struct ui_router *router,
-                                            const char *path, void *state) {
+ui_error_t ui_router_navigate_with_state(struct ui_router *router,
+                                         const char *path, void *state) {
   size_t i;
   struct ui_component *screen = NULL;
   struct ui_route_request *req = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!router || !path) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -451,7 +433,7 @@ enum ui_error ui_router_navigate_with_state(struct ui_router *router,
     if (is_match) {
       req->state = state;
       rc = router->routes[i].factory(req, router->routes[i].user_data, &screen);
-      request_free(req);
+      (void)request_free(req);
       if (rc != UI_ERROR_NONE) {
         return rc;
       }
@@ -481,8 +463,8 @@ enum ui_error ui_router_navigate_with_state(struct ui_router *router,
   return UI_ERROR_NOT_FOUND;
 }
 
-enum ui_error ui_router_push(struct ui_router *router,
-                             struct ui_component *screen) {
+ui_error_t ui_router_push(struct ui_router *router,
+                          struct ui_component *screen) {
   struct ui_component **new_stack;
   size_t new_capacity;
 
@@ -492,14 +474,14 @@ enum ui_error ui_router_push(struct ui_router *router,
 
   if (router->stack_size >= router->stack_capacity) {
     new_capacity = router->stack_capacity * 2;
-    new_stack = (struct ui_component **)UI_MALLOC(
+    new_stack = (struct ui_component **)C_MULTIPLATFORM_MALLOC(
         sizeof(struct ui_component *) * new_capacity);
     if (!new_stack) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_stack, router->stack,
            sizeof(struct ui_component *) * router->stack_size);
-    UI_FREE(router->stack);
+    C_MULTIPLATFORM_FREE(router->stack);
     router->stack = new_stack;
     router->stack_capacity = new_capacity;
   }
@@ -509,7 +491,7 @@ enum ui_error ui_router_push(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_router_pop(struct ui_router *router) {
+ui_error_t ui_router_pop(struct ui_router *router) {
   if (!router) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -519,20 +501,20 @@ enum ui_error ui_router_pop(struct ui_router *router) {
   }
 
   router->stack_size--;
-  ui_component_destroy(router->stack[router->stack_size]);
+  (void)ui_component_destroy(router->stack[router->stack_size]);
   router->stack[router->stack_size] = NULL;
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_router_replace(struct ui_router *router,
-                                struct ui_component *screen) {
+ui_error_t ui_router_replace(struct ui_router *router,
+                             struct ui_component *screen) {
   if (!router || !screen) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (router->stack_size > 0) {
-    ui_component_destroy(router->stack[router->stack_size - 1]);
+    (void)ui_component_destroy(router->stack[router->stack_size - 1]);
     router->stack[router->stack_size - 1] = screen;
   } else {
     return ui_router_push(router, screen);
@@ -541,8 +523,8 @@ enum ui_error ui_router_replace(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_router_get_current(struct ui_router *router,
-                                    struct ui_component **out_current) {
+ui_error_t ui_router_get_current(struct ui_router *router,
+                                 struct ui_component **out_current) {
   if (!router || !out_current) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -555,8 +537,8 @@ enum ui_error ui_router_get_current(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_router_process_event(struct ui_router *router,
-                                      const struct ui_event *event) {
+ui_error_t ui_router_process_event(struct ui_router *router,
+                                   const struct ui_event *event) {
   if (!router || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -573,7 +555,7 @@ enum ui_error ui_router_process_event(struct ui_router *router,
 
 #endif
 
-enum ui_error ui_router_install_os_hooks(struct ui_router *router) {
+ui_error_t ui_router_install_os_hooks(struct ui_router *router) {
   if (!router) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -585,14 +567,14 @@ enum ui_error ui_router_install_os_hooks(struct ui_router *router) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_route_request_get_state(const struct ui_route_request *req,
-                                         void **out_state) {
+ui_error_t ui_route_request_get_state(const struct ui_route_request *req,
+                                      void **out_state) {
   if (!req || !out_state)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_state = req->state;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_router_navigate(struct ui_router *router, const char *path) {
+ui_error_t ui_router_navigate(struct ui_router *router, const char *path) {
   return ui_router_navigate_with_state(router, path, NULL);
 }

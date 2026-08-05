@@ -8,16 +8,16 @@ extern int g_malloc_fail_countdown;
 
 static int g_share_success = 0;
 
-static enum ui_error on_share_resolved(void *result_ptr, void *user_data,
-                                       void **out_result) {
+static ui_error_t on_share_resolved(void *result_ptr, void *user_data,
+                                    void **out_result) {
   (void)result_ptr;
   (void)user_data;
   g_share_success = 1;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error on_share_rejected(enum ui_error err, void *user_data,
-                                       void **out_result) {
+static ui_error_t on_share_rejected(ui_error_t err, void *user_data,
+                                    void **out_result) {
   (void)err;
   (void)user_data;
   fprintf(stderr, "Share promise rejected\n");
@@ -27,7 +27,7 @@ static enum ui_error on_share_rejected(enum ui_error err, void *user_data,
 int main(void) {
   struct ui_promise *promise = NULL;
   struct ui_share_payload payload;
-  enum ui_error rc;
+  ui_error_t rc;
   int is_supported = 0;
 
   rc = ui_share_is_supported(&is_supported);
@@ -97,7 +97,7 @@ int main(void) {
     return 1;
   }
 
-  ui_promise_destroy(promise);
+  (void)ui_promise_destroy(promise);
 
   printf("test_ui_share passed\n");
   return 0;

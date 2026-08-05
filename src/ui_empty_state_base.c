@@ -4,11 +4,10 @@
 #include <stdio.h>
 /* clang-format on */
 
-enum ui_error
-ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
+ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
   struct ui_empty_state_base *state;
   struct ui_component *base_comp;
-  enum ui_error err;
+  ui_error_t err;
 
   if (!out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -19,26 +18,26 @@ ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
     return err;
   }
 
-  state = (struct ui_empty_state_base *)UI_MALLOC(
+  state = (struct ui_empty_state_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_empty_state_base));
   if (!state) {
-    ui_component_destroy(base_comp);
+    (void)ui_component_destroy(base_comp);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   state->base = *base_comp;
-  UI_FREE(base_comp);
+  C_MULTIPLATFORM_FREE(base_comp);
 
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &state->base.shadow_root);
   if (err != UI_ERROR_NONE) {
-    UI_FREE(state);
+    C_MULTIPLATFORM_FREE(state);
     return err;
   }
 
   err = ui_dom_node_set_tag_name(state->base.shadow_root, "ui-empty-state");
   if (err != UI_ERROR_NONE) {
-    ui_dom_node_destroy(state->base.shadow_root);
-    UI_FREE(state);
+    (void)ui_dom_node_destroy(state->base.shadow_root);
+    C_MULTIPLATFORM_FREE(state);
     return err;
   }
 
@@ -46,8 +45,8 @@ ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_empty_state_base_set_title(struct ui_empty_state_base *state,
-                                            const char *text) {
+ui_error_t ui_empty_state_base_set_title(struct ui_empty_state_base *state,
+                                         const char *text) {
   if (!state || !text) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -55,7 +54,7 @@ enum ui_error ui_empty_state_base_set_title(struct ui_empty_state_base *state,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_empty_state_base_set_description(struct ui_empty_state_base *state,
                                     const char *text) {
   if (!state || !text) {
@@ -65,8 +64,8 @@ ui_empty_state_base_set_description(struct ui_empty_state_base *state,
                                    text);
 }
 
-enum ui_error ui_empty_state_base_bind_data(struct ui_empty_state_base *widget,
-                                            struct ui_signal *signal) {
+ui_error_t ui_empty_state_base_bind_data(struct ui_empty_state_base *widget,
+                                         struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

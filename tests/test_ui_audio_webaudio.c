@@ -6,7 +6,7 @@
 /* clang-format on */
 
 #if defined(__EMSCRIPTEN__)
-extern enum ui_error
+extern ui_error_t
 ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend);
 
 int main(void) {

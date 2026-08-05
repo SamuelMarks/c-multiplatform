@@ -9,14 +9,44 @@
 #include "ui_dom_node.h"
 #include "ui_component.h"
 #include <stddef.h>
-/* clang-format on */
+#ifdef UI_TEST_MOCK_ALLOC
+
+int g_checkbox_mock_fail = 0;
+int g_checkbox_mock_target = 0;
+int g_checkbox_mock_current = 0;
+
+static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
+                                              const char *k, const char *v) {
+  if (g_checkbox_mock_fail == 5) {
+    if (++g_checkbox_mock_current == g_checkbox_mock_target)
+      return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_set_attribute)(node, k, v);
+}
+#undef ui_dom_node_set_attribute
+#define ui_dom_node_set_attribute mock_dom_node_set_attribute
+
+static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
+                                                 const char *k) {
+  if (g_checkbox_mock_fail == 5) {
+    if (++g_checkbox_mock_current == g_checkbox_mock_target)
+      return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_remove_attribute)(node, k);
+}
+#undef ui_dom_node_remove_attribute
+#define ui_dom_node_remove_attribute mock_dom_node_remove_attribute
+
+#endif
 
 struct ui_checkbox_base {
   struct ui_component *component;
   enum ui_checkbox_state state;
+  ui_signal_t *state_signal;
+  ui_signal_t *disabled_signal;
 };
 
-static enum ui_error update_dom_state(struct ui_checkbox_base *checkbox) {
+static ui_error_t update_dom_state(struct ui_checkbox_base *checkbox) {
 #if defined(__EMSCRIPTEN__)
   ui_web_bridge_set_property(
       (uint32_t)(uintptr_t)checkbox->component->shadow_root, "checked",
@@ -26,32 +56,46 @@ static enum ui_error update_dom_state(struct ui_checkbox_base *checkbox) {
       checkbox->state == UI_CHECKBOX_STATE_INDETERMINATE ? "true" : "false");
 #endif
   if (checkbox->state == UI_CHECKBOX_STATE_CHECKED) {
-    ui_dom_node_set_attribute(checkbox->component->shadow_root, "checked", "");
-    ui_dom_node_set_attribute(checkbox->component->shadow_root, "aria-checked",
-                              "true");
+    ui_error_t rc = ui_dom_node_set_attribute(checkbox->component->shadow_root,
+                                              "checked", "");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(checkbox->component->shadow_root,
+                                   "aria-checked", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else if (checkbox->state == UI_CHECKBOX_STATE_INDETERMINATE) {
-    ui_dom_node_remove_attribute(checkbox->component->shadow_root, "checked");
-    ui_dom_node_set_attribute(checkbox->component->shadow_root, "aria-checked",
-                              "mixed");
+    ui_error_t rc = ui_dom_node_remove_attribute(
+        checkbox->component->shadow_root, "checked");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(checkbox->component->shadow_root,
+                                   "aria-checked", "mixed");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    ui_dom_node_remove_attribute(checkbox->component->shadow_root, "checked");
-    ui_dom_node_set_attribute(checkbox->component->shadow_root, "aria-checked",
-                              "false");
+    ui_error_t rc = ui_dom_node_remove_attribute(
+        checkbox->component->shadow_root, "checked");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(checkbox->component->shadow_root,
+                                   "aria-checked", "false");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox) {
+ui_error_t ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox) {
   struct ui_checkbox_base *checkbox;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
 
   if (!out_checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  checkbox =
-      (struct ui_checkbox_base *)UI_MALLOC(sizeof(struct ui_checkbox_base));
+  checkbox = (struct ui_checkbox_base *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_checkbox_base));
   if (!checkbox) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -79,39 +123,45 @@ enum ui_error ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox) {
     goto cleanup;
   }
 
-  ui_dom_node_set_attribute(root_node, "role", "checkbox");
-  ui_dom_node_set_attribute(root_node, "tabindex", "0");
+  rc = ui_dom_node_set_attribute(root_node, "role", "checkbox");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(root_node, "tabindex", "0");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   checkbox->component->shadow_root = root_node;
   root_node = NULL;
 
-  update_dom_state(checkbox);
+  rc = update_dom_state(checkbox);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   *out_checkbox = checkbox;
   return UI_ERROR_NONE;
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (checkbox->component) {
-    ui_component_destroy(checkbox->component);
+    (void)ui_component_destroy(checkbox->component);
   }
-  UI_FREE(checkbox);
+  C_MULTIPLATFORM_FREE(checkbox);
   return rc;
 }
 
-enum ui_error ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox) {
+ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox) {
   if (!checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  ui_component_destroy(checkbox->component);
-  UI_FREE(checkbox);
+  (void)ui_component_destroy(checkbox->component);
+  C_MULTIPLATFORM_FREE(checkbox);
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
-                                         enum ui_checkbox_state *out_state) {
+ui_error_t ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
+                                      enum ui_checkbox_state *out_state) {
   if (!checkbox || !out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -119,8 +169,8 @@ enum ui_error ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
-                                         enum ui_checkbox_state state) {
+ui_error_t ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
+                                      enum ui_checkbox_state state) {
   if (!checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -132,20 +182,19 @@ enum ui_error ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
   }
 
   checkbox->state = state;
-  update_dom_state(checkbox);
-  return UI_ERROR_NONE;
+  return update_dom_state(checkbox);
 }
 
-static enum ui_error checkbox_cva_write_value(void *component,
-                                              union ui_signal_payload value) {
+static ui_error_t checkbox_cva_write_value(void *component,
+                                           union ui_signal_payload value) {
   struct ui_checkbox_base *checkbox = (struct ui_checkbox_base *)component;
   return ui_checkbox_base_set_state(checkbox,
                                     (enum ui_checkbox_state)value.int_val);
 }
 
 /* No change callback exposed in ui_checkbox_base.h yet! We will mock it */
-static enum ui_error checkbox_cva_register_on_change(
-    void *component, enum ui_error (*callback)(union ui_signal_payload, void *),
+static ui_error_t checkbox_cva_register_on_change(
+    void *component, ui_error_t (*callback)(union ui_signal_payload, void *),
     void *user_data) {
   (void)component;
   (void)callback;
@@ -154,34 +203,41 @@ static enum ui_error checkbox_cva_register_on_change(
 }
 
 /** \brief checkbox_cva_register_on_touched */
-static enum ui_error checkbox_cva_register_on_touched(
-    void *component, enum ui_error (*callback)(void *), void *user_data) {
+static ui_error_t checkbox_cva_register_on_touched(
+    void *component, ui_error_t (*callback)(void *), void *user_data) {
   (void)component;
   (void)callback;
   (void)user_data;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error checkbox_cva_set_disabled_state(void *component,
-                                                     ui_bool_t is_disabled) {
+static ui_error_t checkbox_cva_set_disabled_state(void *component,
+                                                  ui_bool_t is_disabled) {
   struct ui_checkbox_base *checkbox = (struct ui_checkbox_base *)component;
   if (!checkbox)
     return UI_ERROR_INVALID_ARGUMENT;
 
   if (is_disabled) {
-    ui_dom_node_set_attribute(checkbox->component->shadow_root, "disabled", "");
-    ui_dom_node_set_attribute(checkbox->component->shadow_root, "aria-disabled",
-                              "true");
+    ui_error_t rc = ui_dom_node_set_attribute(checkbox->component->shadow_root,
+                                              "disabled", "");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(checkbox->component->shadow_root,
+                                   "aria-disabled", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    ui_dom_node_remove_attribute(checkbox->component->shadow_root, "disabled");
+    ui_error_t rc = ui_dom_node_remove_attribute(
+        checkbox->component->shadow_root, "disabled");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
-                         struct ui_control_value_accessor *out_cva) {
+ui_error_t ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
+                                    struct ui_control_value_accessor *out_cva) {
   if (!checkbox || !out_cva)
     return UI_ERROR_INVALID_ARGUMENT;
   out_cva->write_value = checkbox_cva_write_value;
@@ -191,7 +247,7 @@ ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox) {
+ui_error_t ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox) {
   if (!checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -201,6 +257,5 @@ enum ui_error ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox) {
   } else {
     checkbox->state = UI_CHECKBOX_STATE_CHECKED;
   }
-  update_dom_state(checkbox);
-  return UI_ERROR_NONE;
+  return update_dom_state(checkbox);
 }

@@ -2,8 +2,8 @@
 #include "ui_ripple_base.h"
 /* clang-format on */
 
-enum ui_error ui_ripple_config_init(struct ui_ripple_config *out_config) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_ripple_config_init(struct ui_ripple_config *out_config) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_config) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -22,9 +22,9 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_ripple_start(const struct ui_ripple_config *config, float x,
-                              float y, struct ui_ripple_state *out_state) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_ripple_start(const struct ui_ripple_config *config, float x,
+                           float y, struct ui_ripple_state *out_state) {
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!config || !out_state) {
     rc = UI_ERROR_INVALID_ARGUMENT;
@@ -42,9 +42,9 @@ cleanup:
   return rc;
 }
 
-enum ui_error ui_ripple_update(const struct ui_ripple_config *config,
-                               float delta_ms, struct ui_ripple_state *state) {
-  enum ui_error rc = UI_ERROR_NONE;
+ui_error_t ui_ripple_update(const struct ui_ripple_config *config,
+                            float delta_ms, struct ui_ripple_state *state) {
+  ui_error_t rc = UI_ERROR_NONE;
   float progress;
 
   if (!config || !state) {

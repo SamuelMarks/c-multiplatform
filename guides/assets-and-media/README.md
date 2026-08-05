@@ -28,7 +28,7 @@ struct image_fetch_ctx {
 void background_decode_image(void *user_data, struct ui_promise_resolver *resolver) {
     struct image_fetch_ctx *ctx = (struct image_fetch_ctx*)user_data;
     struct ui_image *img = NULL;
-    enum ui_error err = UI_ERROR_NONE;
+    ui_error_t err = UI_ERROR_NONE;
 
     /* Perform heavy I/O and decoding (simulated via ui_image_decoder_load) */
     err = ui_image_decoder_load(ctx->engine, ctx->filepath, &img);

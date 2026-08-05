@@ -7,8 +7,8 @@
 #include <string.h>
 /* clang-format on */
 
-enum ui_error ui_image_base_init(struct ui_image_base *image,
-                                 struct ui_component *component) {
+ui_error_t ui_image_base_init(struct ui_image_base *image,
+                              struct ui_component *component) {
   if (!image || !component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -22,8 +22,8 @@ enum ui_error ui_image_base_init(struct ui_image_base *image,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_image_base_set_src(struct ui_image_base *image,
-                                    const char *src_url, int lazy_load) {
+ui_error_t ui_image_base_set_src(struct ui_image_base *image,
+                                 const char *src_url, int lazy_load) {
   size_t len;
 
   if (!image || !src_url) {
@@ -31,12 +31,12 @@ enum ui_error ui_image_base_set_src(struct ui_image_base *image,
   }
 
   if (image->src_url) {
-    UI_FREE(image->src_url);
+    C_MULTIPLATFORM_FREE(image->src_url);
     image->src_url = NULL;
   }
 
   len = strlen(src_url);
-  image->src_url = (char *)UI_MALLOC(len + 1);
+  image->src_url = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!image->src_url) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -52,18 +52,18 @@ enum ui_error ui_image_base_set_src(struct ui_image_base *image,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_image_base_cleanup(struct ui_image_base *image) {
+ui_error_t ui_image_base_cleanup(struct ui_image_base *image) {
   if (!image) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (image->src_url) {
-    UI_FREE(image->src_url);
+    C_MULTIPLATFORM_FREE(image->src_url);
     image->src_url = NULL;
   }
 
   if (image->alt_text) {
-    UI_FREE(image->alt_text);
+    C_MULTIPLATFORM_FREE(image->alt_text);
     image->alt_text = NULL;
   }
 
@@ -71,8 +71,8 @@ enum ui_error ui_image_base_cleanup(struct ui_image_base *image) {
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_image_base_bind_src(struct ui_image_base *widget,
-                                     struct ui_signal *signal) {
+ui_error_t ui_image_base_bind_src(struct ui_image_base *widget,
+                                  struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

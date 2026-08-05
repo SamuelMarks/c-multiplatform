@@ -12,8 +12,8 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-enum ui_error ui_css_parse_overflow(const char *str,
-                                    enum ui_css_overflow *out_overflow) {
+ui_error_t ui_css_parse_overflow(const char *str,
+                                 enum ui_css_overflow *out_overflow) {
   if (!str || !out_overflow)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -40,7 +40,7 @@ enum ui_error ui_css_parse_overflow(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_text_overflow(const char *str,
                            struct ui_css_text_overflow *out_overflow) {
   if (!str || !out_overflow)
@@ -75,7 +75,7 @@ ui_css_parse_text_overflow(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
+ui_error_t
 ui_css_parse_block_ellipsis(const char *str,
                             struct ui_css_block_ellipsis *out_ellipsis) {
   if (!str || !out_ellipsis)
@@ -109,8 +109,8 @@ ui_css_parse_block_ellipsis(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_parse_line_clamp(const char *str,
-                                      struct ui_css_line_clamp *out_clamp) {
+ui_error_t ui_css_parse_line_clamp(const char *str,
+                                   struct ui_css_line_clamp *out_clamp) {
   if (!str || !out_clamp)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -136,8 +136,8 @@ enum ui_error ui_css_parse_line_clamp(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-enum ui_error ui_css_parse_max_lines(const char *str,
-                                     struct ui_css_max_lines *out_max_lines) {
+ui_error_t ui_css_parse_max_lines(const char *str,
+                                  struct ui_css_max_lines *out_max_lines) {
   if (!str || !out_max_lines)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -164,9 +164,8 @@ enum ui_error ui_css_parse_max_lines(const char *str,
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_css_parse_overflow_clip_margin(const char *str,
-                                  struct ui_css_value *out_margin) {
+ui_error_t ui_css_parse_overflow_clip_margin(const char *str,
+                                             struct ui_css_value *out_margin) {
   if (!str || !out_margin)
     return UI_ERROR_INVALID_ARGUMENT;
 

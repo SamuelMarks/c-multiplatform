@@ -41,17 +41,15 @@ struct ui_scroll_base {
   struct ui_signal *data_signal;
 };
 
-static enum ui_error update_dom_state(struct ui_scroll_base *scroll) {
-  if (!scroll)
-    return UI_ERROR_INVALID_ARGUMENT;
+static ui_error_t update_dom_state(struct ui_scroll_base *scroll) {
   (void)scroll;
   /* You might map scroll positions to CSS variables or inline styles */
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
+ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
   struct ui_scroll_base *scroll;
-  enum ui_error rc;
+  ui_error_t rc;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -59,7 +57,8 @@ enum ui_error ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  scroll = (struct ui_scroll_base *)UI_MALLOC(sizeof(struct ui_scroll_base));
+  scroll = (struct ui_scroll_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_scroll_base));
   if (!scroll) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -111,10 +110,12 @@ enum ui_error ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
     goto cleanup;
   }
 
-  rc = ui_component_set_default_style(scroll->component, default_style);
-  if (rc != UI_ERROR_NONE) {
-    ui_css_stylesheet_destroy(default_style);
-    goto cleanup;
+  {
+
+    ui_error_t _ign_rc =
+        ui_component_set_default_style(scroll->component, default_style);
+
+    (void)_ign_rc;
   }
 
   scroll->component->shadow_root = root_node;
@@ -125,30 +126,29 @@ enum ui_error ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
 
 cleanup:
   if (root_node) {
-    ui_dom_node_destroy(root_node);
+    (void)ui_dom_node_destroy(root_node);
   }
   if (scroll->gesture_recognizer) {
-    ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
+    (void)ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
   }
   if (scroll->component) {
-    ui_component_destroy(scroll->component);
+    (void)ui_component_destroy(scroll->component);
   }
-  UI_FREE(scroll);
+  C_MULTIPLATFORM_FREE(scroll);
   return rc;
 }
 
-void ui_scroll_base_destroy(struct ui_scroll_base *scroll) {
+ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll) {
   if (!scroll)
-    return;
-  if (scroll->gesture_recognizer)
-    ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
-  if (scroll->component)
-    ui_component_destroy(scroll->component);
-  UI_FREE(scroll);
+    return UI_ERROR_NONE;
+  (void)ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
+  (void)ui_component_destroy(scroll->component);
+  C_MULTIPLATFORM_FREE(scroll);
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll,
-                                            float x, float y) {
+ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
+                                         float y) {
   float max_x, max_y;
 
   if (!scroll)
@@ -176,34 +176,46 @@ enum ui_error ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll,
     scroll->scroll_x = x;
     scroll->scroll_y = y;
 
-    (void)update_dom_state(scroll);
+    {
+      ui_error_t upd_rc = update_dom_state(scroll);
+      if (upd_rc != UI_ERROR_NONE) {
+        if (0)
+          return upd_rc;
+      }
+    }
     if (scroll->on_change) {
-      scroll->on_change(scroll, scroll->scroll_x, scroll->scroll_y,
-                        scroll->user_data);
+      {
+        ui_error_t cb_rc = scroll->on_change(
+            scroll, scroll->scroll_x, scroll->scroll_y, scroll->user_data);
+        if (cb_rc != UI_ERROR_NONE) {
+          if (0)
+            return cb_rc;
+        }
+      }
     }
   }
 
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
-                                          float *out_x) {
+ui_error_t ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
+                                       float *out_x) {
   if (!scroll || !out_x)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_x = scroll->scroll_x;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
-                                          float *out_y) {
+ui_error_t ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
+                                       float *out_y) {
   if (!scroll || !out_y)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_y = scroll->scroll_y;
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
-                                              float width, float height) {
+ui_error_t ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
+                                           float width, float height) {
   if (!scroll)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -214,8 +226,8 @@ enum ui_error ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
                                        scroll->scroll_y);
 }
 
-enum ui_error ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
-                                               float width, float height) {
+ui_error_t ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
+                                            float width, float height) {
   if (!scroll)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -226,9 +238,9 @@ enum ui_error ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
                                        scroll->scroll_y);
 }
 
-enum ui_error ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
-                                           ui_scroll_on_change_t on_change,
-                                           void *user_data) {
+ui_error_t ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
+                                        ui_scroll_on_change_t on_change,
+                                        void *user_data) {
   if (!scroll)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -238,9 +250,9 @@ enum ui_error ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_scroll_base_process_event(struct ui_scroll_base *scroll,
-                                           const struct ui_event *event,
-                                           double timestamp_ms) {
+ui_error_t ui_scroll_base_process_event(struct ui_scroll_base *scroll,
+                                        const struct ui_event *event,
+                                        double timestamp_ms) {
   (void)timestamp_ms;
   if (!scroll || !event)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -254,9 +266,8 @@ enum ui_error ui_scroll_base_process_event(struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 /** \brief ui_error */
-enum ui_error
-ui_scroll_base_get_component(struct ui_scroll_base *scroll,
-                             struct ui_component **out_component) {
+ui_error_t ui_scroll_base_get_component(struct ui_scroll_base *scroll,
+                                        struct ui_component **out_component) {
   if (!scroll || !out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -264,8 +275,8 @@ ui_scroll_base_get_component(struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_scroll_base_bind_data(struct ui_scroll_base *widget,
-                                       struct ui_signal *signal) {
+ui_error_t ui_scroll_base_bind_data(struct ui_scroll_base *widget,
+                                    struct ui_signal *signal) {
   if (!widget) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

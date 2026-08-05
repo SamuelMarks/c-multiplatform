@@ -10,7 +10,7 @@ A base component is an opaque C struct that holds a root `ui_dom_node` and its i
 /* ui_knob_base.h */
 struct ui_knob_base;
 
-enum ui_error ui_knob_base_create(
+ui_error_t ui_knob_base_create(
     struct ui_engine *engine,
     struct ui_knob_base **out_knob,
     struct ui_control_value_accessor **out_cva /* Only needed for form controls */
@@ -35,7 +35,7 @@ struct ui_knob_base {
 Base components are responsible for DOM creation and Accessibility (ARIA) roles.
 
 ```c
-enum ui_error ui_knob_base_create(struct ui_engine *engine, struct ui_knob_base **out_knob, struct ui_control_value_accessor **out_cva) {
+ui_error_t ui_knob_base_create(struct ui_engine *engine, struct ui_knob_base **out_knob, struct ui_control_value_accessor **out_cva) {
     struct ui_knob_base *knob = malloc(sizeof(struct ui_knob_base));
     if (!knob) return UI_ERROR_OUT_OF_MEMORY;
 
@@ -62,7 +62,7 @@ enum ui_error ui_knob_base_create(struct ui_engine *engine, struct ui_knob_base 
 A base component does not receive events automatically. The Design System wrapper (or the window root) explicitly forwards events to it via a `process_event` function.
 
 ```c
-enum ui_error ui_knob_base_process_event(struct ui_knob_base *knob, const struct ui_event *event, double timestamp_ms) {
+ui_error_t ui_knob_base_process_event(struct ui_knob_base *knob, const struct ui_event *event, double timestamp_ms) {
     if (event->type == UI_EVENT_KEY_DOWN) {
         if (event->event_data.keyboard.key_code == UI_KEY_UP) {
             /* Increment internal signal */

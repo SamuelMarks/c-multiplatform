@@ -6,18 +6,17 @@
 /* clang-format on */
 
 #if defined(__APPLE__)
-extern enum ui_error
-ui_renderer_coregraphics_create(struct ui_renderer *renderer);
+extern ui_error_t ui_renderer_native_init(struct ui_renderer *renderer);
 
 int main(void) {
   struct ui_renderer renderer;
 
-  if (ui_renderer_coregraphics_create(NULL) != UI_ERROR_INVALID_ARGUMENT) {
+  if (ui_renderer_native_init(NULL) != UI_ERROR_INVALID_ARGUMENT) {
     fprintf(stderr, "Expected UI_ERROR_INVALID_ARGUMENT for NULL renderer\n");
     return 1;
   }
 
-  if (ui_renderer_coregraphics_create(&renderer) != UI_ERROR_NONE) {
+  if (ui_renderer_native_init(&renderer) != UI_ERROR_NONE) {
     fprintf(stderr, "Expected UI_ERROR_NONE for CoreGraphics init\n");
     return 1;
   }

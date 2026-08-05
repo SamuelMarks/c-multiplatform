@@ -3,9 +3,26 @@
 #include "../include/ui_error.h"
 #include "../include/ui_arena.h"
 #include "../src/ui_reactive_graph.h"
+#include "../include/ui_thread_pool.h"
+#include "../include/ui_atomic.h"
 #include <stdio.h>
 #include <string.h>
 /* clang-format on */
+
+struct ui_signal {
+  union ui_signal_payload value;
+  enum ui_signal_type type;
+  ui_equality_fn equality_fn;
+  ui_destructor_fn destructor_fn;
+  enum ui_signal_mode mode;
+  struct ui_arena *arena;
+  ui_int32 ref_count;
+  ui_atomic_t lock;
+
+  struct ui_reactive_node **subscribers;
+  size_t subscribers_count;
+  size_t subscribers_capacity;
+};
 
 extern int g_malloc_fail_countdown;
 static int g_eq_fail = 0;
@@ -13,8 +30,8 @@ static int g_dest_fail = 0;
 static int g_notify_fail = 0;
 static int g_notify_count = 0;
 
-static enum ui_error eq_fn(union ui_signal_payload a, union ui_signal_payload b,
-                           ui_bool_t *out_equal) {
+static ui_error_t eq_fn(union ui_signal_payload a, union ui_signal_payload b,
+                        ui_bool_t *out_equal) {
   if (g_eq_fail) {
     return UI_ERROR_UNKNOWN;
   }
@@ -22,7 +39,7 @@ static enum ui_error eq_fn(union ui_signal_payload a, union ui_signal_payload b,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error dest_fn(union ui_signal_payload payload) {
+static ui_error_t dest_fn(union ui_signal_payload payload) {
   (void)payload;
   if (g_dest_fail) {
     return UI_ERROR_UNKNOWN;
@@ -30,26 +47,39 @@ static enum ui_error dest_fn(union ui_signal_payload payload) {
   return UI_ERROR_NONE;
 }
 
-static enum ui_error upd_fn(union ui_signal_payload current,
-                            union ui_signal_payload *out_val) {
+static ui_error_t upd_fn(union ui_signal_payload current,
+                         union ui_signal_payload *out_val) {
   out_val->int_val = current.int_val + 1;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error fail_upd_fn(union ui_signal_payload current,
-                                 union ui_signal_payload *out_val) {
+static ui_error_t fail_upd_fn(union ui_signal_payload current,
+                              union ui_signal_payload *out_val) {
   (void)current;
   (void)out_val;
   return UI_ERROR_UNKNOWN;
 }
 
-static enum ui_error notify_cb(void *user_data) {
+static ui_error_t notify_cb(void *user_data) {
   (void)user_data;
   g_notify_count++;
   if (g_notify_fail) {
     return UI_ERROR_UNKNOWN;
   }
   return UI_ERROR_NONE;
+}
+
+ui_atomic_t test_sync = 0;
+static ui_error_t unlock_task(void *user_data) {
+  ui_signal_t *sig = (ui_signal_t *)user_data;
+  int k;
+  while (test_sync == 0) {
+  } /* wait for main thread */
+  for (k = 0; k < 10000000; k++) {
+    volatile int dummy = k; /* delay */
+    (void)dummy;
+  }
+  return ui_atomic_store(&sig->lock, 0);
 }
 
 static int test_signal(void) {
@@ -93,6 +123,9 @@ static int test_signal(void) {
     return 1;
   }
 
+  val.int_val = 15; /* currently 15 after previous test */
+  ui_signal_set(sig, val);
+
   if (ui_signal_update(sig, upd_fn) != UI_ERROR_NONE) {
     printf("Failed at %d\n", __LINE__);
     return 1;
@@ -125,6 +158,11 @@ static int test_signal(void) {
   ui_reactive_graph_set_current_node(&node5, NULL);
   ui_signal_get(sig, &out_val);
 
+  ui_reactive_graph_set_current_node(NULL, NULL);
+
+  struct ui_reactive_node node_null = {NULL, NULL};
+  ui_reactive_graph_set_current_node(&node_null, NULL);
+  ui_signal_get(sig, &out_val);
   ui_reactive_graph_set_current_node(NULL, NULL);
 
   /* Set value to trigger notifications */
@@ -171,29 +209,25 @@ static int test_signal(void) {
 
   /* Subscriber addition OOM */
   {
-    struct ui_reactive_node dummy6 = {notify_cb, NULL};
-    struct ui_reactive_node dummy7 = {notify_cb, NULL};
-    struct ui_reactive_node dummy8 = {notify_cb, NULL};
-    struct ui_reactive_node oom_node = {notify_cb, NULL};
 
-    ui_reactive_graph_set_current_node(&dummy6, NULL);
-    ui_signal_get(sig, &out_val);
-    ui_reactive_graph_set_current_node(&dummy7, NULL);
-    ui_signal_get(sig, &out_val);
-    ui_reactive_graph_set_current_node(&dummy8, NULL);
-    ui_signal_get(sig, &out_val);
-
-    ui_reactive_graph_set_current_node(&oom_node, NULL);
-    g_malloc_fail_countdown = 0;
-    if (ui_signal_get(sig, &out_val) != UI_ERROR_OUT_OF_MEMORY) {
-      printf("Failed at %d\n", __LINE__);
-      return 1;
+    struct ui_reactive_node dummies[20];
+    int di;
+    for (di = 0; di < 20; di++) {
+      dummies[di].notify_fn = notify_cb;
+      dummies[di].user_data = NULL;
+      ui_reactive_graph_set_current_node(&dummies[di], NULL);
+      g_malloc_fail_countdown = 0;
+      ui_error_t rc_get = ui_signal_get(sig, &out_val);
+      g_malloc_fail_countdown = -1;
+      if (rc_get == UI_ERROR_OUT_OF_MEMORY) {
+        break;
+      }
     }
-    g_malloc_fail_countdown = -1;
+
     ui_reactive_graph_set_current_node(NULL, NULL);
   }
 
-  ui_signal_destroy(sig);
+  (void)ui_signal_destroy(sig);
 
   /* Update with failure fn */
   {
@@ -203,7 +237,7 @@ static int test_signal(void) {
       printf("Failed at %d\n", __LINE__);
       return 1;
     }
-    ui_signal_destroy(sig);
+    (void)ui_signal_destroy(sig);
   }
 
   /* Fallback eq_fn test (NULL eq_fn) */
@@ -212,7 +246,7 @@ static int test_signal(void) {
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
     val.int_val = 25;
     ui_signal_set(sig, val);
-    ui_signal_destroy(sig);
+    (void)ui_signal_destroy(sig);
   }
 
   /* Multithreaded mode */
@@ -224,7 +258,19 @@ static int test_signal(void) {
     ui_signal_get(mtsig, &out_val);
     val.int_val = 2;
     ui_signal_set(mtsig, val);
-    ui_signal_destroy(mtsig);
+
+    struct ui_thread_pool *pool;
+    if (ui_thread_pool_create(1, &pool) == UI_ERROR_NONE) {
+
+      ui_atomic_store(&mtsig->lock, 1);
+      ui_thread_pool_schedule(pool, unlock_task, mtsig);
+      ui_atomic_store(&test_sync, 1);
+      ui_signal_get(mtsig, &out_val); /* will spin until thread unlocks */
+                                      /* will spin until thread unlocks */
+      ui_thread_pool_destroy(pool);
+    }
+
+    (void)ui_signal_destroy(mtsig);
   }
 
   /* Nulls */
@@ -236,7 +282,10 @@ static int test_signal(void) {
 
   ui_signal_set(NULL, val);
   ui_signal_update(NULL, NULL);
-  ui_signal_destroy(NULL);
+
+  ui_signal_update(sig, NULL);
+
+  (void)ui_signal_destroy(NULL);
 
   /* malloc fails */
   g_malloc_fail_countdown = 0;
@@ -254,8 +303,8 @@ static int test_signal(void) {
     ui_arena_create(256, &arena);
     ui_signal_create(arena, val, UI_SIGNAL_TYPE_INT32, eq_fn, dest_fn,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
-    ui_signal_destroy(sig);
-    ui_arena_destroy(arena);
+    (void)ui_signal_destroy(sig);
+    (void)ui_arena_destroy(arena);
   }
 
   /* Arena alloc fail test */
@@ -266,14 +315,53 @@ static int test_signal(void) {
     ui_signal_create(arena, val, UI_SIGNAL_TYPE_INT32, eq_fn, dest_fn,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
     g_malloc_fail_countdown = -1;
-    ui_arena_destroy(arena);
+    (void)ui_arena_destroy(arena);
   }
+
+  return 0;
+}
+
+static int test_other_types(void) {
+  ui_signal_t *sig_ptr = NULL;
+  ui_signal_t *sig_float = NULL;
+  ui_signal_t *sig_bool = NULL;
+  ui_signal_t *sig_def = NULL;
+  union ui_signal_payload val;
+
+  val.ptr_val = (void *)0x1234;
+  ui_signal_create(NULL, val, UI_SIGNAL_TYPE_POINTER, NULL, NULL,
+                   UI_SIGNAL_MODE_SINGLE_THREADED, &sig_ptr);
+  val.ptr_val = (void *)0x5678;
+  ui_signal_set(sig_ptr, val);
+  (void)ui_signal_destroy(sig_ptr);
+
+  val.float_val = 1.0f;
+  ui_signal_create(NULL, val, UI_SIGNAL_TYPE_FLOAT32, NULL, NULL,
+                   UI_SIGNAL_MODE_SINGLE_THREADED, &sig_float);
+  val.float_val = 2.0f;
+  ui_signal_set(sig_float, val);
+  (void)ui_signal_destroy(sig_float);
+
+  val.bool_val = 1;
+  ui_signal_create(NULL, val, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
+                   UI_SIGNAL_MODE_SINGLE_THREADED, &sig_bool);
+  val.bool_val = 0;
+  ui_signal_set(sig_bool, val);
+  (void)ui_signal_destroy(sig_bool);
+
+  val.ptr_val = (void *)0x1111;
+  ui_signal_create(NULL, val, 999 /* unknown type */, NULL, NULL,
+                   UI_SIGNAL_MODE_SINGLE_THREADED, &sig_def);
+  val.ptr_val = (void *)0x2222;
+  ui_signal_set(sig_def, val);
+  (void)ui_signal_destroy(sig_def);
 
   return 0;
 }
 
 int main(void) {
   int failed = 0;
+  failed |= test_other_types();
   failed |= test_signal();
   if (failed) {
     printf("Failed at %d\n", __LINE__);

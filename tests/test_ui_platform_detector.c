@@ -10,7 +10,7 @@ static int run_normal_tests(void) {
   struct ui_platform_detector *detector = NULL;
   unsigned int caps = 0;
   int has_cap = 0;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing invalid arguments...\n");
   if (ui_platform_detector_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -60,7 +60,7 @@ static int run_normal_tests(void) {
 static int run_oom_tests(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   struct ui_platform_detector *detector = NULL;
-  enum ui_error rc;
+  ui_error_t rc;
 
   printf("Testing OOM...\n");
   g_malloc_fail_countdown = 0;

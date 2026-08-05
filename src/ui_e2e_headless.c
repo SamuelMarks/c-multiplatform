@@ -32,10 +32,10 @@ struct ui_e2e_headless_ctx {
   int event_tail;
 };
 
-static enum ui_error headless_create_window(struct ui_window_backend *backend,
-                                            const char *title, int width,
-                                            int height,
-                                            struct ui_window **out_window) {
+static ui_error_t headless_create_window(struct ui_window_backend *backend,
+                                         const char *title, int width,
+                                         int height,
+                                         struct ui_window **out_window) {
   struct ui_e2e_headless_ctx *ctx;
   (void)title;
   if (!backend || !out_window) {
@@ -49,15 +49,15 @@ static enum ui_error headless_create_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error headless_destroy_window(struct ui_window_backend *backend,
-                                             struct ui_window *window) {
+static ui_error_t headless_destroy_window(struct ui_window_backend *backend,
+                                          struct ui_window *window) {
   (void)backend;
   (void)window;
   return UI_ERROR_NONE;
 }
 
-static enum ui_error headless_show_window(struct ui_window_backend *backend,
-                                          struct ui_window *window) {
+static ui_error_t headless_show_window(struct ui_window_backend *backend,
+                                       struct ui_window *window) {
   struct ui_e2e_headless_ctx *ctx;
   (void)window;
   if (!backend) {
@@ -68,8 +68,8 @@ static enum ui_error headless_show_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error headless_hide_window(struct ui_window_backend *backend,
-                                          struct ui_window *window) {
+static ui_error_t headless_hide_window(struct ui_window_backend *backend,
+                                       struct ui_window *window) {
   struct ui_e2e_headless_ctx *ctx;
   (void)window;
   if (!backend) {
@@ -80,10 +80,10 @@ static enum ui_error headless_hide_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error headless_poll_events(struct ui_window_backend *backend,
-                                          struct ui_window *window,
-                                          struct ui_event *out_event,
-                                          int *out_has_event) {
+static ui_error_t headless_poll_events(struct ui_window_backend *backend,
+                                       struct ui_window *window,
+                                       struct ui_event *out_event,
+                                       int *out_has_event) {
   struct ui_e2e_headless_ctx *ctx;
   (void)window;
   if (!backend || !out_event || !out_has_event) {
@@ -103,19 +103,19 @@ static enum ui_error headless_poll_events(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-static enum ui_error headless_swap_buffers(struct ui_window_backend *backend,
-                                           struct ui_window *window) {
+static ui_error_t headless_swap_buffers(struct ui_window_backend *backend,
+                                        struct ui_window *window) {
   (void)backend;
   (void)window;
   /* Headless has no buffer to swap */
   return UI_ERROR_NONE;
 }
 
-static enum ui_error headless_push_deep_link(struct ui_window_backend *backend,
-                                             const char *uri) {
+static ui_error_t headless_push_deep_link(struct ui_window_backend *backend,
+                                          const char *uri) {
   struct ui_e2e_headless_ctx *ctx;
   struct ui_event ev;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!backend || !uri) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -134,16 +134,19 @@ static enum ui_error headless_push_deep_link(struct ui_window_backend *backend,
   ev.event_data.deep_link.uri[sizeof(ev.event_data.deep_link.uri) - 1] = '\0';
 
   rc = ui_e2e_headless_push_event(ctx, &ev);
-  return rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_e2e_headless_create(int width, int height,
-                                     struct ui_e2e_headless_ctx **out_ctx) {
+ui_error_t ui_e2e_headless_create(int width, int height,
+                                  struct ui_e2e_headless_ctx **out_ctx) {
   struct ui_e2e_headless_ctx *ctx;
   if (!out_ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  ctx = (struct ui_e2e_headless_ctx *)UI_MALLOC(
+  ctx = (struct ui_e2e_headless_ctx *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_e2e_headless_ctx));
   if (!ctx) {
     return UI_ERROR_OUT_OF_MEMORY;
@@ -166,18 +169,17 @@ enum ui_error ui_e2e_headless_create(int width, int height,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_e2e_headless_destroy(struct ui_e2e_headless_ctx *ctx) {
+ui_error_t ui_e2e_headless_destroy(struct ui_e2e_headless_ctx *ctx) {
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  UI_FREE(ctx);
+  C_MULTIPLATFORM_FREE(ctx);
   return UI_ERROR_NONE;
 }
 
 /** \brief ui_error */
-enum ui_error
-ui_e2e_headless_get_backend(struct ui_e2e_headless_ctx *ctx,
-                            struct ui_window_backend **out_backend) {
+ui_error_t ui_e2e_headless_get_backend(struct ui_e2e_headless_ctx *ctx,
+                                       struct ui_window_backend **out_backend) {
   if (!out_backend)
     return UI_ERROR_INVALID_ARGUMENT;
   if (!ctx) {
@@ -188,8 +190,8 @@ ui_e2e_headless_get_backend(struct ui_e2e_headless_ctx *ctx,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_e2e_headless_push_event(struct ui_e2e_headless_ctx *ctx,
-                                         const struct ui_event *event) {
+ui_error_t ui_e2e_headless_push_event(struct ui_e2e_headless_ctx *ctx,
+                                      const struct ui_event *event) {
   int next_tail;
   if (!ctx || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -207,10 +209,10 @@ enum ui_error ui_e2e_headless_push_event(struct ui_e2e_headless_ctx *ctx,
   return UI_ERROR_NONE;
 }
 
-enum ui_error ui_e2e_headless_click(struct ui_e2e_headless_ctx *ctx, int x,
-                                    int y) {
+ui_error_t ui_e2e_headless_click(struct ui_e2e_headless_ctx *ctx, int x,
+                                 int y) {
   struct ui_event ev;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -228,13 +230,16 @@ enum ui_error ui_e2e_headless_click(struct ui_e2e_headless_ctx *ctx, int x,
 
   ev.type = UI_EVENT_MOUSE_UP;
   rc = ui_e2e_headless_push_event(ctx, &ev);
-  return rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_e2e_headless_type_key(struct ui_e2e_headless_ctx *ctx,
-                                       int key_code, unsigned int modifiers) {
+ui_error_t ui_e2e_headless_type_key(struct ui_e2e_headless_ctx *ctx,
+                                    int key_code, unsigned int modifiers) {
   struct ui_event ev;
-  enum ui_error rc;
+  ui_error_t rc;
 
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -251,11 +256,14 @@ enum ui_error ui_e2e_headless_type_key(struct ui_e2e_headless_ctx *ctx,
 
   ev.type = UI_EVENT_KEY_UP;
   rc = ui_e2e_headless_push_event(ctx, &ev);
-  return rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  return UI_ERROR_NONE;
 }
 
-enum ui_error ui_e2e_advance_time(struct ui_e2e_headless_ctx *ctx,
-                                  double delta_ms) {
+ui_error_t ui_e2e_advance_time(struct ui_e2e_headless_ctx *ctx,
+                               double delta_ms) {
   /* This would integrate with a global mock clock or emit a synthetic tick
    * event */
   if (!ctx) {
