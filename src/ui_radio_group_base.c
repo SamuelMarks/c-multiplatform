@@ -50,18 +50,9 @@ static ui_error_t radio_group_cva_write_value(void *component,
   index = value.int_val;
 
   if (index >= 0 && index < (int)group->count) {
-    {
-      ui_error_t set_rc =
-          ui_radio_group_base_set_active(group, group->toggles[index]);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
-    }
+    (void)ui_radio_group_base_set_active(group, group->toggles[index]);
   } else {
-    {
-      ui_error_t set_rc = ui_radio_group_base_set_active(group, NULL);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
-    }
+    (void)ui_radio_group_base_set_active(group, NULL);
   }
 
   return UI_ERROR_NONE;
@@ -125,18 +116,9 @@ static ui_error_t on_child_toggle_change(struct ui_toggle_base *toggle,
   for (i = 0; i < group->count; ++i) {
     int is_checked = 0;
     if (group->toggles[i] != toggle) {
-      {
-        ui_error_t check_rc =
-            ui_toggle_base_is_checked(group->toggles[i], &is_checked);
-        if (check_rc != UI_ERROR_NONE)
-          return check_rc;
-      }
+      (void)ui_toggle_base_is_checked(group->toggles[i], &is_checked);
       if (is_checked) {
-        {
-          ui_error_t chk_rc = ui_toggle_base_set_checked(group->toggles[i], 0);
-          if (chk_rc != UI_ERROR_NONE)
-            return chk_rc;
-        }
+        (void)ui_toggle_base_set_checked(group->toggles[i], 0);
       }
     }
   }
@@ -203,12 +185,7 @@ ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group) {
 
   /* Unhook callbacks to prevent dangling pointers */
   for (i = 0; i < group->count; ++i) {
-    {
-      ui_error_t set_rc =
-          ui_toggle_base_set_on_change(group->toggles[i], NULL, NULL);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
-    }
+    (void)ui_toggle_base_set_on_change(group->toggles[i], NULL, NULL);
   }
 
   if (group->toggles) {
@@ -245,26 +222,13 @@ ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
   }
 
   group->toggles[group->count++] = toggle;
-  {
-    ui_error_t set_rc =
-        ui_toggle_base_set_on_change(toggle, on_child_toggle_change, group);
-    if (set_rc != UI_ERROR_NONE)
-      return set_rc;
-  }
+  (void)ui_toggle_base_set_on_change(toggle, on_child_toggle_change, group);
 
   {
     int is_checked = 0;
-    {
-      ui_error_t check_rc = ui_toggle_base_is_checked(toggle, &is_checked);
-      if (check_rc != UI_ERROR_NONE)
-        return check_rc;
-    }
+    (void)ui_toggle_base_is_checked(toggle, &is_checked);
     if (is_checked) {
-      {
-        ui_error_t on_rc = on_child_toggle_change(toggle, 1, group);
-        if (on_rc != UI_ERROR_NONE)
-          return on_rc;
-      }
+      (void)on_child_toggle_change(toggle, 1, group);
     }
   }
 
@@ -290,11 +254,7 @@ ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
   if (found < 0)
     return UI_ERROR_NOT_FOUND;
 
-  {
-    ui_error_t set_rc = ui_toggle_base_set_on_change(toggle, NULL, NULL);
-    if (set_rc != UI_ERROR_NONE)
-      return set_rc;
-  }
+  (void)ui_toggle_base_set_on_change(toggle, NULL, NULL);
 
   if (group->active_toggle == toggle) {
     group->active_toggle = NULL;
@@ -329,25 +289,12 @@ ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
 
   for (i = 0; i < group->count; ++i) {
     if (group->toggles[i] == toggle) {
-      {
-        ui_error_t chk_rc = ui_toggle_base_set_checked(group->toggles[i], 1);
-        if (chk_rc != UI_ERROR_NONE)
-          return chk_rc;
-      }
+      (void)ui_toggle_base_set_checked(group->toggles[i], 1);
     } else {
       int is_checked = 0;
-      {
-        ui_error_t check_rc =
-            ui_toggle_base_is_checked(group->toggles[i], &is_checked);
-        if (check_rc != UI_ERROR_NONE)
-          return check_rc;
-      }
+      (void)ui_toggle_base_is_checked(group->toggles[i], &is_checked);
       if (is_checked) {
-        {
-          ui_error_t chk_rc = ui_toggle_base_set_checked(group->toggles[i], 0);
-          if (chk_rc != UI_ERROR_NONE)
-            return chk_rc;
-        }
+        (void)ui_toggle_base_set_checked(group->toggles[i], 0);
       }
     }
   }
@@ -391,11 +338,7 @@ ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
   if (group->is_disabled)
     return UI_ERROR_NONE;
 
-  {
-    ui_error_t touch_rc = trigger_cva_touched(group);
-    if (touch_rc != UI_ERROR_NONE)
-      return touch_rc;
-  }
+  (void)trigger_cva_touched(group);
 
   if (group->count == 0)
     return UI_ERROR_NONE;
@@ -426,18 +369,8 @@ ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
           next_idx = 0;
       }
 
-      {
-        ui_error_t chk_rc =
-            ui_toggle_base_set_checked(group->toggles[next_idx], 1);
-        if (chk_rc != UI_ERROR_NONE)
-          return chk_rc;
-      }
-      {
-        ui_error_t on_rc =
-            on_child_toggle_change(group->toggles[next_idx], 1, group);
-        if (on_rc != UI_ERROR_NONE)
-          return on_rc;
-      }
+      (void)ui_toggle_base_set_checked(group->toggles[next_idx], 1);
+      (void)on_child_toggle_change(group->toggles[next_idx], 1, group);
     }
   }
 

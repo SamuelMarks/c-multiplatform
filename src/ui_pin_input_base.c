@@ -164,11 +164,7 @@ ui_error_t ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input,
     goto cleanup;
   }
 
-  rc = ui_component_set_default_style(pin_input->component, default_style);
-  if (rc != UI_ERROR_NONE) {
-    ui_css_stylesheet_destroy(default_style);
-    goto cleanup;
-  }
+  (void)ui_component_set_default_style(pin_input->component, default_style);
 
   pin_input->component->shadow_root = root_node;
   root_node = NULL;

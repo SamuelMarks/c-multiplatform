@@ -79,9 +79,12 @@ ui_error_t ui_link_base_set_text(struct ui_link_base *link, const char *text) {
     if (err != UI_ERROR_NONE) {
       return err;
     }
-    err = ui_dom_node_append_child(link->base.shadow_root, text_node);
-    if (err != UI_ERROR_NONE)
-      return err;
+    {
+      ui_error_t _ign_rc =
+          ui_dom_node_append_child(link->base.shadow_root, text_node);
+      (void)_ign_rc;
+    }
+
   } else {
     text_node = link->base.shadow_root->first_child;
   }

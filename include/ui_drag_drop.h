@@ -84,6 +84,7 @@ ui_error_t ui_drag_drop_create(struct ui_drag_drop_context **out_ctx);
 /**
  * @brief Destroys a drag and drop context.
  * @param ctx The context to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_drag_drop_destroy(struct ui_drag_drop_context *ctx);
 

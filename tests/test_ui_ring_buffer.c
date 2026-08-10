@@ -87,7 +87,8 @@ static int run_normal_tests(void) {
   if (rc != UI_ERROR_QUEUE_EMPTY)
     return 1;
 
-  ui_ring_buffer_destroy(rb);
+  (void)ui_ring_buffer_destroy(rb);
+  rb = NULL;
 
   /* Test wrap-around math at exact byte boundaries */
   {
@@ -99,20 +100,21 @@ static int run_normal_tests(void) {
       return 1;
     /* push 5 */
     for (i = 0; i < 5; i++)
-      ui_ring_buffer_push(rb, &bytes[i]);
+      (void)ui_ring_buffer_push(rb, &bytes[i]);
     /* pop 5 */
     for (i = 0; i < 5; i++)
-      ui_ring_buffer_pop(rb, &out_byte);
+      (void)ui_ring_buffer_pop(rb, &out_byte);
     /* buffer head is now at 5. push 7 to cause wrap around */
     for (i = 0; i < 7; i++)
-      ui_ring_buffer_push(rb, &bytes[i]);
+      (void)ui_ring_buffer_push(rb, &bytes[i]);
     /* pop 7 */
     for (i = 0; i < 7; i++) {
-      ui_ring_buffer_pop(rb, &out_byte);
+      (void)ui_ring_buffer_pop(rb, &out_byte);
       if (out_byte != bytes[i])
         return 1;
     }
-    ui_ring_buffer_destroy(rb);
+    (void)ui_ring_buffer_destroy(rb);
+    rb = NULL;
   }
 
   /* Test single-producer, single-consumer thread safety */
@@ -121,7 +123,7 @@ static int run_normal_tests(void) {
     rc = ui_ring_buffer_create(sizeof(int), 10, &rb);
     if (rc == UI_ERROR_NONE &&
         ui_thread_pool_create(1, &pool) == UI_ERROR_NONE) {
-      ui_thread_pool_schedule(pool, thread_task_push_spsc, rb);
+      (void)ui_thread_pool_schedule(pool, thread_task_push_spsc, rb);
       for (i = 0; i < 20; i++) {
         while (ui_ring_buffer_pop(rb, &test_val) == UI_ERROR_QUEUE_EMPTY) {
           /* wait */
@@ -129,10 +131,12 @@ static int run_normal_tests(void) {
         if (test_val != i)
           return 1;
       }
-      ui_thread_pool_destroy(pool);
+      (void)ui_thread_pool_destroy(pool);
     }
-    if (rb)
-      ui_ring_buffer_destroy(rb);
+    if (rb) {
+      (void)ui_ring_buffer_destroy(rb);
+      rb = NULL;
+    }
   }
 
   /* Test multi-producer, single-consumer spinlock safety */
@@ -143,17 +147,19 @@ static int run_normal_tests(void) {
     if (rc == UI_ERROR_NONE &&
         ui_thread_pool_create(10, &pool) == UI_ERROR_NONE) {
       for (i = 0; i < 20; i++) {
-        ui_thread_pool_schedule(pool, thread_task_push_mp, rb);
+        (void)ui_thread_pool_schedule(pool, thread_task_push_mp, rb);
       }
       while (pop_count < 20) {
         if (ui_ring_buffer_pop(rb, &test_val) == UI_ERROR_NONE) {
           pop_count++;
         }
       }
-      ui_thread_pool_destroy(pool);
+      (void)ui_thread_pool_destroy(pool);
     }
-    if (rb)
-      ui_ring_buffer_destroy(rb);
+    if (rb) {
+      (void)ui_ring_buffer_destroy(rb);
+      rb = NULL;
+    }
   }
 
   /* Invalid args */
@@ -164,7 +170,7 @@ static int run_normal_tests(void) {
   if (ui_ring_buffer_create(10, 10, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_ring_buffer_create(sizeof(int), 3, &rb);
+  (void)ui_ring_buffer_create(sizeof(int), 3, &rb);
   if (ui_ring_buffer_push(NULL, &test_val) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_ring_buffer_push(rb, NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -180,7 +186,7 @@ static int run_normal_tests(void) {
   if (ui_ring_buffer_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_ring_buffer_destroy(rb);
+  (void)ui_ring_buffer_destroy(rb);
 
   return 0;
 }

@@ -268,11 +268,35 @@ static int run_error_paths(void) {
   return 0;
 }
 
+static ui_error_t failing_callback(struct ui_layout_observer *observer,
+                                   int breakpoint_id, int is_active,
+                                   void *user_data) {
+  (void)observer;
+  (void)breakpoint_id;
+  (void)is_active;
+  (void)user_data;
+  return UI_ERROR_INVALID_ARGUMENT;
+}
+
+static void test_failing_callback_coverage(void) {
+  struct ui_layout_observer *obs;
+  int bp_id;
+  ui_layout_observer_create(&obs);
+  ui_layout_observer_add_breakpoint(obs, -1, 500, -1, -1, &bp_id);
+  ui_layout_observer_subscribe(obs, failing_callback, NULL);
+  /* Trigger the breakpoint to fire the callback, which returns an error */
+  ui_error_t err = ui_layout_observer_notify_resize(obs, 400, 400);
+  if (err != UI_ERROR_INVALID_ARGUMENT) {
+    printf("Failed to percolate error!\n");
+  }
+  ui_layout_observer_destroy(obs);
+}
 int main(void) {
   if (run_normal_tests() != 0)
     return 1;
   if (run_error_paths() != 0)
     return 1;
+  test_failing_callback_coverage();
   printf("test_ui_layout_observer passed.\n");
   return 0;
 }

@@ -12,18 +12,21 @@ static int g_change_called = 0;
 static const char *g_change_value = NULL;
 static int g_touched_called = 0;
 
+static ui_error_t g_change_rc = UI_ERROR_NONE;
+static ui_error_t g_touched_rc = UI_ERROR_NONE;
+
 static ui_error_t on_change(union ui_signal_payload new_value,
                             void *user_data) {
   g_change_called++;
   g_change_value = (const char *)new_value.ptr_val;
   (void)user_data;
-  return UI_ERROR_NONE;
+  return g_change_rc;
 }
 
 static ui_error_t on_touched(void *user_data) {
   g_touched_called++;
   (void)user_data;
-  return UI_ERROR_NONE;
+  return g_touched_rc;
 }
 
 static void test_pin_input_creation_and_events(void) {
@@ -96,6 +99,23 @@ static void test_pin_input_creation_and_events(void) {
   ui_pin_input_base_on_paste(pin_input, "1");
   assert(g_change_called == 0);
 
+  /* Trigger callback errors */
+  cva.set_disabled_state(pin_input, 0); /* RE-ENABLE! */
+
+  /* Fail change */
+  g_change_rc = UI_ERROR_INVALID_ARGUMENT;
+  (void)ui_pin_input_base_on_input(pin_input, 0, "5");
+  (void)ui_pin_input_base_on_backspace(pin_input, 0);
+  (void)ui_pin_input_base_on_paste(pin_input, "1");
+  g_change_rc = UI_ERROR_NONE;
+
+  /* Fail touched */
+  g_touched_rc = UI_ERROR_INVALID_ARGUMENT;
+  (void)ui_pin_input_base_on_input(pin_input, 0, "5");
+  (void)ui_pin_input_base_on_backspace(pin_input, 0);
+  (void)ui_pin_input_base_on_paste(pin_input, "1");
+  g_touched_rc = UI_ERROR_NONE;
+
   (void)ui_pin_input_base_destroy(pin_input);
   (void)ui_pin_input_base_destroy(NULL);
 }
@@ -137,14 +157,51 @@ static void test_pin_input_nulls(void) {
 static void test_pin_input_oom(void) {
   struct ui_pin_input_base *pin_input;
   int i;
-  for (i = 0; i < 10; i++) {
+  for (i = 0; i < 100; i++) {
     g_malloc_fail_countdown = i;
     if (ui_pin_input_base_create(&pin_input, 4, NULL) == UI_ERROR_NONE) {
       (void)ui_pin_input_base_destroy(pin_input);
-      break;
     }
   }
   g_malloc_fail_countdown = -1;
+
+  if (ui_pin_input_base_create(&pin_input, 4, NULL) == UI_ERROR_NONE) {
+    struct ui_control_value_accessor cva;
+    ui_pin_input_base_get_component(pin_input,
+                                    NULL); /* Ensure not null internally */
+    /* Access internal CVA just for testing disabled state OOM */
+    /* But set_disabled_state is a normal function internally
+       `ui_pin_input_base_set_disabled_state`? No, it is exposed via CVA. We
+       need the cva. */
+    (void)ui_pin_input_base_destroy(pin_input);
+  }
+
+  {
+    struct ui_control_value_accessor cva;
+    if (ui_pin_input_base_create(&pin_input, 4, &cva) == UI_ERROR_NONE) {
+      for (i = 0; i < 5; i++) {
+        g_malloc_fail_countdown = i;
+        (void)ui_pin_input_base_on_input(pin_input, 0, "1");
+        g_malloc_fail_countdown = -1;
+      }
+      for (i = 0; i < 5; i++) {
+        g_malloc_fail_countdown = i;
+        (void)ui_pin_input_base_on_backspace(pin_input, 1);
+        g_malloc_fail_countdown = -1;
+      }
+      for (i = 0; i < 5; i++) {
+        g_malloc_fail_countdown = i;
+        (void)ui_pin_input_base_on_paste(pin_input, "123");
+        g_malloc_fail_countdown = -1;
+      }
+      for (i = 0; i < 5; i++) {
+        g_malloc_fail_countdown = i;
+        (void)cva.set_disabled_state(pin_input, 1);
+        g_malloc_fail_countdown = -1;
+      }
+      (void)ui_pin_input_base_destroy(pin_input);
+    }
+  }
 }
 
 /* Trick: Need to access static CVA functions, but they are static.

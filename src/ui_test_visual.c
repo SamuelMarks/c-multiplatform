@@ -31,9 +31,9 @@
 #pragma GCC diagnostic pop
 #endif
 
-static ui_error_t rgb_to_lab(unsigned char r_in, unsigned char g_in,
-                             unsigned char b_in, double *L_out, double *a_out,
-                             double *b_out) {
+static void rgb_to_lab(unsigned char r_in, unsigned char g_in,
+                       unsigned char b_in, double *L_out, double *a_out,
+                       double *b_out) {
   double r, g, b, x, y, z;
   double x_ref = 95.047;
   double y_ref = 100.000;
@@ -66,27 +66,20 @@ static ui_error_t rgb_to_lab(unsigned char r_in, unsigned char g_in,
   *L_out = (116.0 * y) - 16.0;
   *a_out = 500.0 * (x - y);
   *b_out = 200.0 * (y - z);
-  return UI_ERROR_NONE;
 }
 
-static ui_error_t calculate_delta_e(unsigned char r1, unsigned char g1,
-                                    unsigned char b1, unsigned char r2,
-                                    unsigned char g2, unsigned char b2,
-                                    double *out_delta_e) {
+static void calculate_delta_e(unsigned char r1, unsigned char g1,
+                              unsigned char b1, unsigned char r2,
+                              unsigned char g2, unsigned char b2,
+                              double *out_delta_e) {
   double L1, a1, b_lab1;
   double L2, a2, b_lab2;
-  ui_error_t rc;
 
-  rc = rgb_to_lab(r1, g1, b1, &L1, &a1, &b_lab1);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = rgb_to_lab(r2, g2, b2, &L2, &a2, &b_lab2);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  rgb_to_lab(r1, g1, b1, &L1, &a1, &b_lab1);
+  rgb_to_lab(r2, g2, b2, &L2, &a2, &b_lab2);
 
   *out_delta_e =
       sqrt(pow(L1 - L2, 2.0) + pow(a1 - a2, 2.0) + pow(b_lab1 - b_lab2, 2.0));
-  return UI_ERROR_NONE;
 }
 
 ui_error_t ui_visual_fuzzy_match(const unsigned char *img_a,
@@ -127,14 +120,17 @@ ui_error_t ui_visual_fuzzy_match(const unsigned char *img_a,
 
     if (r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2) {
       double delta_e;
-      ui_error_t rc;
-      rc = calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      int is_mismatch = 0;
+      calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
       /* Include alpha difference conceptually in drift, although deltaE is RGB
        * only */
-      if (delta_e > config->delta_e_threshold ||
-          abs((int)a1 - (int)a2) > (int)(config->delta_e_threshold * 2.55)) {
+      if (delta_e > config->delta_e_threshold) {
+        is_mismatch = 1;
+      } else if (abs((int)a1 - (int)a2) >
+                 (int)(config->delta_e_threshold * 2.55)) {
+        is_mismatch = 1;
+      }
+      if (is_mismatch) {
         mismatched_pixels++;
       }
     }
@@ -145,13 +141,15 @@ ui_error_t ui_visual_fuzzy_match(const unsigned char *img_a,
     double drift_percentage =
         ((double)mismatched_pixels / (double)total_pixels) * 100.0;
 
-    if (rms > config->rms_threshold ||
-        drift_percentage > config->max_drift_percentage) {
-      return 1; /* Mismatch */
+    *out_matched = 1; /* Match */
+    if (rms > config->rms_threshold) {
+      *out_matched = 0; /* Mismatch */
+    } else if (drift_percentage > config->max_drift_percentage) {
+      *out_matched = 0; /* Mismatch */
     }
   }
 
-  return 0; /* Match */
+  return UI_ERROR_NONE;
 }
 
 ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
@@ -177,7 +175,18 @@ ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
     unsigned char b2 = img_b[idx + 2];
     unsigned char a2 = img_b[idx + 3];
 
-    if (r1 == r2 && g1 == g2 && b1 == b2 && a1 == a2) {
+    int identical = 0;
+    if (r1 == r2) {
+      if (g1 == g2) {
+        if (b1 == b2) {
+          if (a1 == a2) {
+            identical = 1;
+          }
+        }
+      }
+    }
+
+    if (identical) {
       output_heatmap[idx] = 0;     /* R */
       output_heatmap[idx + 1] = 0; /* G */
       output_heatmap[idx + 2] = 0; /* B */
@@ -185,10 +194,7 @@ ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
     } else {
       double delta_e;
       int intensity;
-      ui_error_t rc;
-      rc = calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
       /* Scale intensity based on difference */
       intensity = (int)((delta_e / 100.0) * 255.0);
       if (intensity > 255)
@@ -223,12 +229,12 @@ ui_error_t ui_visual_write_heatmap_to_disk(const char *filepath,
 
 #if defined(_MSC_VER)
   if (fopen_s(&f, filepath, "wb") != 0) {
-    return -1;
+    return UI_ERROR_IO_FAILED;
   }
 #else
   f = fopen(filepath, "wb");
   if (!f) {
-    return -1;
+    return UI_ERROR_IO_FAILED;
   }
 #endif
 
@@ -236,5 +242,5 @@ ui_error_t ui_visual_write_heatmap_to_disk(const char *filepath,
                               heatmap_data, width * 4);
   fclose(f);
 
-  return (rc == 0) ? -1 : 0;
+  return (rc == 0) ? UI_ERROR_IO_FAILED : UI_ERROR_NONE;
 }

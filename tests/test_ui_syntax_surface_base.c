@@ -6,7 +6,14 @@
 #include <stdio.h>
 /* clang-format on */
 
-#define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
+#define ACCUM_ERR(failed, expr)                                                \
+  do {                                                                         \
+    ui_error_t err__ = (expr);                                                 \
+    if (err__ != UI_ERROR_NONE) {                                              \
+      printf("Failed %d at %d\n", err__, __LINE__);                            \
+      failed = 1;                                                              \
+    }                                                                          \
+  } while (0)
 #define ACCUM_FAIL(failed, expr) failed |= (expr)
 
 int run_normal_tests(void) {
@@ -115,7 +122,17 @@ int run_normal_tests(void) {
                         surface, 15, &visual_index));
   failed |= (visual_index != -1);
 
-  /* After fold */
+  /* Open fold to test the is_collapsed false branch inside visual_line
+   * computation */
+  ACCUM_ERR(failed,
+            ui_syntax_surface_base_set_fold_region(surface, 10, 20, UI_FALSE));
+  ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
+                        surface, 25, &visual_index));
+  failed |= (visual_index != 25);
+
+  /* After fold (re-collapsed) */
+  ACCUM_ERR(failed,
+            ui_syntax_surface_base_set_fold_region(surface, 10, 20, UI_TRUE));
   ACCUM_ERR(failed, ui_syntax_surface_base_get_visual_line_index(
                         surface, 25, &visual_index));
   failed |= (visual_index != 15);

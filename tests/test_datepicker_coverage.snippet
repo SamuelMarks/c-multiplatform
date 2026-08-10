@@ -1,0 +1,111 @@
+extern int g_input_mock_fail;
+extern int g_popover_mock_fail;
+extern int g_calendar_mock_fail;
+
+static ui_error_t mock_dp_cva_change(union ui_signal_payload val, void *data) {
+  int *c = (int*)data;
+  if (c) (*c)++;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_dp_cva_touched(void *data) {
+  int *c = (int*)data;
+  if (c) (*c)++;
+  return UI_ERROR_NONE;
+}
+
+static int test_datepicker_coverage(void) {
+  struct ui_datepicker_base *dp = NULL;
+  struct ui_input_base *input = NULL;
+  struct ui_popover_base *popover = NULL;
+  struct ui_calendar_base *cal = NULL;
+  struct ui_control_value_accessor cva;
+  struct ui_date dt = {2024, 5, 10};
+  char text[32];
+
+  (void)ui_input_base_create(&input);
+  (void)ui_popover_base_create(&popover);
+  (void)ui_calendar_base_create(&cal, NULL);
+
+  /* null checks */
+  if (ui_datepicker_base_create(NULL, input, popover, cal, &cva) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  if (ui_datepicker_base_create(&dp, NULL, popover, cal, &cva) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  if (ui_datepicker_base_create(&dp, input, NULL, cal, &cva) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  if (ui_datepicker_base_create(&dp, input, popover, NULL, &cva) != UI_ERROR_INVALID_ARGUMENT) return 1;
+
+  /* OOM */
+  g_malloc_fail_countdown = 0;
+  if (ui_datepicker_base_create(&dp, input, popover, cal, &cva) != UI_ERROR_OUT_OF_MEMORY) return 1;
+  g_malloc_fail_countdown = -1;
+
+  (void)ui_datepicker_base_destroy(NULL);
+
+  if (ui_datepicker_parse_date(NULL, &dt) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  if (ui_datepicker_parse_date("2024-05-10", NULL) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  if (ui_datepicker_parse_date("not-a-date", &dt) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  if (ui_datepicker_parse_date("2024-13-10", &dt) != UI_ERROR_INVALID_ARGUMENT) return 1; /* invalid month */
+  if (ui_datepicker_parse_date("2024-05-32", &dt) != UI_ERROR_INVALID_ARGUMENT) return 1; /* invalid day */
+  /* days_in_month fail path */
+  /* We can't mock days_in_month easily unless we inject, but wait, it's just a calendar math function that only fails if out_days is NULL, which it isn't here. */
+
+  if (ui_datepicker_format_date(NULL, text, sizeof(text)) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  if (ui_datepicker_format_date(&dt, NULL, sizeof(text)) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  if (ui_datepicker_format_date(&dt, text, 10) != UI_ERROR_INVALID_ARGUMENT) return 1;
+
+  if (ui_datepicker_base_sync(NULL) != UI_ERROR_INVALID_ARGUMENT) return 1;
+
+  if (ui_datepicker_base_create(&dp, input, popover, cal, &cva) != UI_ERROR_NONE) return 1;
+
+  /* CVA Nulls */
+  {
+    union ui_signal_payload val; val.int_val = 0;
+    if (cva.write_value(NULL, val) != UI_ERROR_INVALID_ARGUMENT) return 1;
+    if (cva.register_on_change(NULL, mock_dp_cva_change, NULL) != UI_ERROR_INVALID_ARGUMENT) return 1;
+    if (cva.register_on_touched(NULL, mock_dp_cva_touched, NULL) != UI_ERROR_INVALID_ARGUMENT) return 1;
+    if (cva.set_disabled_state(NULL, 1) != UI_ERROR_INVALID_ARGUMENT) return 1;
+  }
+
+  /* CVA methods */
+  {
+    int changes = 0, touches = 0;
+    (void)cva.register_on_change(dp, mock_dp_cva_change, &changes);
+    (void)cva.register_on_touched(dp, mock_dp_cva_touched, &touches);
+    (void)cva.set_disabled_state(dp, 1);
+
+    union ui_signal_payload val;
+    val.int_val = (2024 << 9) | (5 << 5) | 10;
+    (void)cva.write_value(dp, val); /* writes value, triggers sync */
+
+    val.int_val = 0;
+    (void)cva.write_value(dp, val); /* clear */
+  }
+
+  /* Simulate user selecting a date in the calendar */
+  {
+    struct ui_date picked = {2024, 5, 20};
+    ui_calendar_base_select_date(cal, &picked); /* Should call on_calendar_select, updating input & closing popover */
+  }
+
+  /* Simulate user typing in input */
+  {
+    ui_input_base_set_text(input, "2024-06-15"); /* Should call on_input_change, selecting date in calendar */
+  }
+
+  /* Simulate user typing invalid in input */
+  {
+    ui_input_base_set_text(input, "invalid"); /* Should clear calendar selection */
+  }
+
+  /* Test sync manually */
+  {
+    ui_input_base_set_text(input, "2024-07-20");
+    ui_datepicker_base_sync(dp);
+  }
+
+  (void)ui_datepicker_base_destroy(dp);
+  (void)ui_calendar_base_destroy(cal);
+  (void)ui_popover_base_destroy(popover);
+  (void)ui_input_base_destroy(input);
+
+  return 0;
+}

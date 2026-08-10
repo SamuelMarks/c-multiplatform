@@ -22,12 +22,33 @@ static int test_oom(void) {
   g_malloc_fail_countdown = -1;
 
   ui_text_node_base_create(&node);
-  ui_text_node_base_set_font_family(node, "Font");
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    ui_text_node_base_set_font_family(node, "Font");
+  }
+  g_malloc_fail_countdown = -1;
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     ui_text_node_base_set_text(node, "Hello");
   }
   g_malloc_fail_countdown = -1;
+
+  ui_text_node_base_set_text(node, NULL);
+  for (i = 0; i < 2; i++) {
+    g_malloc_fail_countdown = i;
+    ui_text_node_base_update_layout(node);
+  }
+  g_malloc_fail_countdown = -1;
+
+  ui_text_node_base_set_text(node, "Hello World");
+  ui_text_node_base_set_overflow(node, UI_TEXT_NODE_OVERFLOW_ELLIPSIS);
+  ui_text_node_base_set_max_lines(node, 2);
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    ui_text_node_base_update_layout(node);
+  }
+  g_malloc_fail_countdown = -1;
+
   (void)ui_text_node_base_destroy(node);
 #endif
   return failed;
@@ -147,7 +168,20 @@ int main(void) {
   g_malloc_fail_countdown = -1;
 #endif
 
+  g_mock_font_fail = 4; /* shape fails during ellipsis */
+  ui_text_node_base_update_layout(node);
+
+  g_mock_font_fail = 5; /* get_bounds fails during ellipsis */
+  ui_text_node_base_update_layout(node);
+
+  g_mock_font_fail = 6; /* vmetrics fails */
+  ui_text_node_base_update_layout(node);
+
+  g_mock_font_fail = 3; /* get_bounds fails immediately */
+  ui_text_node_base_update_layout(node);
+
   ui_text_node_base_set_overflow(node, UI_TEXT_NODE_OVERFLOW_CLIP);
+  g_mock_font_fail = 0;
   rc = ui_text_node_base_update_layout(node); /* hits hard clip */
 
   g_mock_font_fail = 2; /* shape fails */

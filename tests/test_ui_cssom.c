@@ -53,6 +53,8 @@ int main(void) {
   TEST_ASSERT(rc == UI_ERROR_NONE);
   rc = ui_css_stylesheet_register_namespace(sheet, NULL, "http://default");
   TEST_ASSERT(rc == UI_ERROR_NONE);
+  rc = ui_css_stylesheet_register_namespace(sheet, "math", "http://math");
+  TEST_ASSERT(rc == UI_ERROR_NONE);
 
   /* Layers */
   TEST_ASSERT(ui_css_stylesheet_register_layer(NULL, "base", &order) ==
@@ -110,6 +112,7 @@ int main(void) {
   ui_css_rule_append_selector(nested_anon_layer, UI_CSS_SELECTOR_TYPE_TAG,
                               "div");
   ui_css_rule_append_declaration(nested_anon_layer, "color", "green", 0);
+  ui_css_rule_append_declaration(nested_anon_layer, "margin", "0", 0);
   anon_layer->nested_rules = nested_anon_layer;
 
   /* Nested rule inside LAYER */
@@ -172,6 +175,19 @@ int main(void) {
   prop_rule->property_initial_value = my_strdup("red");
   ui_css_stylesheet_append_rule(sheet, prop_rule);
 
+  struct ui_css_rule *prop_rule2;
+  ui_css_rule_create(UI_CSS_RULE_TYPE_PROPERTY, &prop_rule2);
+  prop_rule2->property_name = my_strdup("--my-var2");
+  prop_rule2->property_syntax = my_strdup("<color>");
+  prop_rule2->property_initial_value = my_strdup("red");
+  ui_css_rule_append_declaration(prop_rule2, "color", "blue", 0);
+  ui_css_rule_append_declaration(prop_rule2, "margin", "0", 0);
+  ui_css_rule_destroy(prop_rule2);
+
+  struct ui_css_rule *unknown_rule;
+  ui_css_rule_create((enum ui_css_rule_type)999, &unknown_rule);
+  ui_css_rule_destroy(unknown_rule);
+
   /* Selectors */
   TEST_ASSERT(ui_css_rule_append_selector(NULL, UI_CSS_SELECTOR_TYPE_TAG,
                                           "div") == UI_ERROR_INVALID_ARGUMENT);
@@ -191,12 +207,18 @@ int main(void) {
   TEST_ASSERT(ui_css_rule_append_selector_attr(NULL, "type",
                                                UI_CSS_ATTR_OP_EQUALS, "text") ==
               UI_ERROR_INVALID_ARGUMENT);
+  TEST_ASSERT(ui_css_rule_append_selector_attr(rule, NULL,
+                                               UI_CSS_ATTR_OP_EQUALS, "text") ==
+              UI_ERROR_INVALID_ARGUMENT);
   TEST_ASSERT(ui_css_rule_append_selector_attr(NULL, NULL,
                                                UI_CSS_ATTR_OP_EQUALS, "text") ==
               UI_ERROR_INVALID_ARGUMENT);
 
   rc = ui_css_rule_append_selector_attr(rule, "data-val", UI_CSS_ATTR_OP_NONE,
                                         NULL);
+  TEST_ASSERT(rc == UI_ERROR_NONE);
+  rc = ui_css_rule_append_selector_attr(rule, "data-val2", UI_CSS_ATTR_OP_NONE,
+                                        "val");
   TEST_ASSERT(rc == UI_ERROR_NONE);
   rc = ui_css_rule_append_selector_attr(rule, "type", UI_CSS_ATTR_OP_EQUALS,
                                         "text");
@@ -392,7 +414,6 @@ int main(void) {
   free(resolved);
 
   ui_css_variable_store_destroy(store);
-  ui_dom_node_destroy(node); /* Recursively frees child, grandchild */
 
   {
     /* Test evaluating condition parenthesis errors */
@@ -536,6 +557,7 @@ int main(void) {
     }
   }
 
+  ui_dom_node_destroy(node);
   ui_css_stylesheet_destroy(sheet);
 
   /* OOM Mocks - Very high coverage */
@@ -552,6 +574,12 @@ int main(void) {
               UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = 2;
   TEST_ASSERT(ui_css_stylesheet_register_namespace(sheet, "a", "b") ==
+              UI_ERROR_OUT_OF_MEMORY);
+  g_malloc_fail_countdown = 0;
+  TEST_ASSERT(ui_css_stylesheet_register_namespace(sheet, NULL, "b") ==
+              UI_ERROR_OUT_OF_MEMORY);
+  g_malloc_fail_countdown = 1;
+  TEST_ASSERT(ui_css_stylesheet_register_namespace(sheet, NULL, "b") ==
               UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
@@ -575,6 +603,9 @@ int main(void) {
   g_malloc_fail_countdown = 1;
   TEST_ASSERT(ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS,
                                           "a") == UI_ERROR_OUT_OF_MEMORY);
+  g_malloc_fail_countdown = 0;
+  TEST_ASSERT(ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_UNIVERSAL,
+                                          NULL) == UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
   g_malloc_fail_countdown = 0;
@@ -584,8 +615,16 @@ int main(void) {
   TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_EQUALS,
                                                "b") == UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = 2;
-  TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_EQUALS,
-                                               "b") == UI_ERROR_OUT_OF_MEMORY);
+  ui_error_t rc_debug =
+      ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_EQUALS, "b");
+  printf("DEBUG: rc_debug=%d\n", rc_debug);
+  TEST_ASSERT(rc_debug == UI_ERROR_OUT_OF_MEMORY);
+  g_malloc_fail_countdown = 0;
+  TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_NONE,
+                                               NULL) == UI_ERROR_OUT_OF_MEMORY);
+  g_malloc_fail_countdown = 1;
+  TEST_ASSERT(ui_css_rule_append_selector_attr(rule, "a", UI_CSS_ATTR_OP_NONE,
+                                               NULL) == UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
   g_malloc_fail_countdown = 0;
@@ -598,6 +637,9 @@ int main(void) {
   TEST_ASSERT(ui_css_rule_append_declaration(rule, "a", "b", 0) ==
               UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
+
+  ui_css_rule_append_declaration(rule, "prop1", "val1", 0);
+  ui_css_rule_append_declaration(rule, "prop2", "val2", 0);
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
   ui_css_stylesheet_append_rule(sheet, rule);
@@ -1036,9 +1078,29 @@ int main(void) {
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
 
     /* Cover class_list_contains missing branches */
-    ui_dom_node_set_attribute(node, "class", "  btn   \t\n");
     ui_css_rule_append_selector_attr(rule, "class", UI_CSS_ATTR_OP_INCLUDES,
                                      "btn");
+
+    struct ui_css_computed_style *test_style = NULL;
+    struct ui_css_stylesheet *sheet;
+    ui_css_stylesheet_create(&sheet);
+    ui_css_stylesheet_append_rule(sheet, rule);
+
+    ui_dom_node_set_attribute(node, "class", "btn\tother");
+    ui_css_resolve_style(sheet, node, &test_style);
+    ui_css_computed_style_destroy(test_style);
+
+    ui_dom_node_set_attribute(node, "class", "btn\rother");
+    ui_css_resolve_style(sheet, node, &test_style);
+    ui_css_computed_style_destroy(test_style);
+
+    ui_dom_node_set_attribute(node, "class", "btn\nother");
+    ui_css_resolve_style(sheet, node, &test_style);
+    ui_css_computed_style_destroy(test_style);
+
+    ui_dom_node_set_attribute(node, "class", "btn");
+    ui_css_resolve_style(sheet, node, &test_style);
+    ui_css_computed_style_destroy(test_style);
 
     /* Cover strings */
     ui_dom_node_set_attribute(node, "data-test", "val");
@@ -1046,10 +1108,6 @@ int main(void) {
                                      "value");
     ui_css_rule_append_selector_attr(rule, "data-test", UI_CSS_ATTR_OP_SUFFIX,
                                      "value");
-
-    struct ui_css_stylesheet *sheet;
-    ui_css_stylesheet_create(&sheet);
-    ui_css_stylesheet_append_rule(sheet, rule);
 
     struct ui_css_computed_style *style;
     ui_css_resolve_style(sheet, node, &style);
@@ -2311,15 +2369,30 @@ int main(void) {
     struct ui_dom_node *child1;
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
     ui_dom_node_set_attribute(child1, "class", "hole");
+
+    struct ui_dom_node *text_child;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_child);
+    ui_dom_node_append_child(child1, text_child);
+
     ui_dom_node_append_child(node, child1);
 
     struct ui_css_rule *rule_has;
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_has);
-    ui_css_rule_append_selector(rule_has, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
-                                "has(.hole)");
+    struct ui_css_selector *has_hole = calloc(1, sizeof(*has_hole));
+    has_hole->type = UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS;
+    has_hole->value = my_strdup("has");
+    struct ui_css_selector *nested_hole = calloc(1, sizeof(*nested_hole));
+    nested_hole->type = UI_CSS_SELECTOR_TYPE_CLASS;
+    nested_hole->value = my_strdup(".hole");
+    has_hole->nested_selector = nested_hole;
+    rule_has->selectors = has_hole;
     ui_css_stylesheet_append_rule(sheet, rule_has);
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
+
+    /* ui_dom_node_destroy(text_child); Since parent is freed, but let's make
+     * sure it's not a double free. Actually node frees its children. So we just
+     * need to wait for node destruction */
 
     {
       /* Test evaluating condition parenthesis errors */
@@ -2514,11 +2587,23 @@ int main(void) {
     ui_css_computed_style_destroy(style);
 
     /* Test dash mismatch */
+    ui_dom_node_set_attribute(node, "lang", "en");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+    ui_dom_node_remove_attribute(node, "lang");
     ui_dom_node_set_attribute(node, "lang", "es");
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
     ui_dom_node_remove_attribute(node, "lang");
     ui_dom_node_set_attribute(node, "lang", "eng");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+    ui_dom_node_remove_attribute(node, "lang");
+    ui_dom_node_set_attribute(node, "lang", "en-US");
+    ui_css_resolve_style(sheet, node, &style);
+    ui_css_computed_style_destroy(style);
+    ui_dom_node_remove_attribute(node, "lang");
+    ui_dom_node_set_attribute(node, "lang", "en-");
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
@@ -2642,13 +2727,29 @@ int main(void) {
     /* has(.container) */
     struct ui_css_rule *r6;
     ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r6);
-    ui_css_rule_append_selector(r6, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
-                                "has(.container)");
+    struct ui_css_selector *has_container = calloc(1, sizeof(*has_container));
+    has_container->type = UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS;
+    has_container->value = my_strdup("has");
+    struct ui_css_selector *nested_container =
+        calloc(1, sizeof(*nested_container));
+    nested_container->type =
+        UI_CSS_SELECTOR_TYPE_CLASS; /* Wait, earlier I set it to TAG, it should
+                                       be CLASS for .container to work properly
+                                       in the general logic, but my mock string
+                                       matcher uses strstr so it doesn't matter
+                                       too much, but let's change to CLASS */
+    nested_container->value = my_strdup(".container");
+    has_container->nested_selector = nested_container;
+    r6->selectors = has_container;
     ui_css_stylesheet_append_rule(sheet, r6);
 
     ui_dom_node_set_tag_name(node, "div");
     ui_dom_node_set_attribute(node, "checked", "");
-    ui_dom_node_set_attribute(node, "class", "container");
+
+    struct ui_dom_node *container_child;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container_child);
+    ui_dom_node_set_attribute(container_child, "class", "container");
+    ui_dom_node_append_child(node, container_child);
 
     struct ui_css_computed_style *style;
     ui_css_resolve_style(sheet, node, &style);
@@ -2716,8 +2817,34 @@ int main(void) {
     ui_css_resolve_style(sheet, node, &style);
     ui_css_computed_style_destroy(style);
 
+    struct ui_dom_node *parent;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &parent);
+
+    struct ui_dom_node *wrapper;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &wrapper);
+    ui_dom_node_append_child(wrapper, node);
+    ui_dom_node_append_child(parent, wrapper);
+
+    struct ui_css_rule *has_rule;
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &has_rule);
+
+    struct ui_css_selector *has_sel = calloc(1, sizeof(*has_sel));
+    has_sel->type = UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS;
+    has_sel->value = my_strdup("has");
+    struct ui_css_selector *nested_div = calloc(1, sizeof(*nested_div));
+    nested_div->type = UI_CSS_SELECTOR_TYPE_TAG;
+    nested_div->value = my_strdup("div");
+    has_sel->nested_selector = nested_div;
+    has_rule->selectors = has_sel;
+
+    ui_css_stylesheet_append_rule(sheet, has_rule);
+
+    ui_css_resolve_style(sheet, parent, &style);
+    ui_css_computed_style_destroy(style);
+
     ui_css_stylesheet_destroy(sheet);
-    ui_dom_node_destroy(node);
+    ui_dom_node_destroy(parent);
+    /* node is destroyed when parent is destroyed */
   }
   {
     /* Nested parens in supports condition */
@@ -2770,6 +2897,17 @@ int main(void) {
 
     if (rc_sheet == UI_ERROR_NONE && cov_sheet != NULL) {
       struct ui_css_rule *cov_rule = NULL;
+      struct ui_css_rule *rule_media = NULL;
+      struct ui_css_rule *rule_scope = NULL;
+      struct ui_css_rule *rule_scope2 = NULL;
+      struct ui_dom_node *container_node = NULL;
+      struct ui_css_computed_style *container_style = NULL;
+      struct ui_css_rule *rule_supports = NULL;
+      struct ui_css_rule *rule_container = NULL;
+      struct ui_css_rule *rule_property = NULL;
+      struct ui_css_rule *rule_layer = NULL;
+      int order2 = 2;
+
       if (ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &cov_rule) ==
           UI_ERROR_NONE) {
         ui_css_rule_append_selector(cov_rule, UI_CSS_SELECTOR_TYPE_CLASS,
@@ -2793,15 +2931,14 @@ int main(void) {
         ui_css_stylesheet_append_rule(cov_sheet, cov_rule);
       }
 
-      struct ui_css_rule *rule_media = NULL;
       if (ui_css_rule_create(UI_CSS_RULE_TYPE_MEDIA, &rule_media) ==
           UI_ERROR_NONE) {
         rule_media->media_condition = my_strdup("(max-width: 600px)");
         ui_css_rule_append_declaration(rule_media, "padding", "5px", 0);
+        ui_css_rule_append_declaration(rule_media, "margin", "2px", 0);
         ui_css_stylesheet_append_rule(cov_sheet, rule_media);
       }
 
-      struct ui_css_rule *rule_scope = NULL;
       if (ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &rule_scope) ==
           UI_ERROR_NONE) {
         rule_scope->scope_start = my_strdup(".card");
@@ -2809,7 +2946,6 @@ int main(void) {
         ui_css_stylesheet_append_rule(cov_sheet, rule_scope);
       }
 
-      struct ui_css_rule *rule_scope2 = NULL;
       if (ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &rule_scope2) ==
           UI_ERROR_NONE) {
         rule_scope2->scope_start = my_strdup(".container");
@@ -2817,21 +2953,27 @@ int main(void) {
         ui_css_stylesheet_append_rule(cov_sheet, rule_scope2);
       }
 
-      struct ui_css_rule *rule_supports = NULL;
+      if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container_node) ==
+          UI_ERROR_NONE) {
+        ui_dom_node_set_attribute(container_node, "class", "container");
+        ui_css_resolve_style(cov_sheet, container_node, &container_style);
+        ui_css_computed_style_destroy(container_style);
+        ui_dom_node_destroy(container_node);
+      }
+
       if (ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule_supports) ==
           UI_ERROR_NONE) {
-        rule_supports->supports_condition = my_strdup("(display: grid)");
+        rule_supports->supports_condition =
+            my_strdup("not (display: grid) and (color: red) or selector(div)");
         ui_css_stylesheet_append_rule(cov_sheet, rule_supports);
       }
 
-      struct ui_css_rule *rule_container = NULL;
       if (ui_css_rule_create(UI_CSS_RULE_TYPE_CONTAINER, &rule_container) ==
           UI_ERROR_NONE) {
         rule_container->container_condition = my_strdup("(min-width: 700px)");
         ui_css_stylesheet_append_rule(cov_sheet, rule_container);
       }
 
-      struct ui_css_rule *rule_property = NULL;
       if (ui_css_rule_create(UI_CSS_RULE_TYPE_PROPERTY, &rule_property) ==
           UI_ERROR_NONE) {
         rule_property->property_name = my_strdup("--my-prop");
@@ -2840,14 +2982,12 @@ int main(void) {
         ui_css_stylesheet_append_rule(cov_sheet, rule_property);
       }
 
-      struct ui_css_rule *rule_layer = NULL;
       if (ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &rule_layer) ==
           UI_ERROR_NONE) {
         rule_layer->layer_name = my_strdup("theme");
         ui_css_stylesheet_append_rule(cov_sheet, rule_layer);
       }
 
-      int order2 = 2;
       ui_css_stylesheet_register_layer(cov_sheet, "L2", &order2);
 
       ui_css_stylesheet_destroy(cov_sheet);

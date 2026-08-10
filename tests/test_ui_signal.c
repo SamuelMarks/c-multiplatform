@@ -9,6 +9,25 @@
 #include <string.h>
 /* clang-format on */
 
+static ui_error_t mock_update(union ui_signal_payload cur,
+                              union ui_signal_payload *out) {
+  out->int_val = cur.int_val + 1;
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_eq_fail(union ui_signal_payload a,
+                               union ui_signal_payload b,
+                               ui_bool_t *out_equal) {
+  (void)a;
+  (void)b;
+  (void)out_equal;
+  return UI_ERROR_INVALID_ARGUMENT;
+}
+static ui_error_t mock_destructor_fail(union ui_signal_payload val) {
+  (void)val;
+  return UI_ERROR_OUT_OF_MEMORY;
+}
+
 struct ui_signal {
   union ui_signal_payload value;
   enum ui_signal_type type;
@@ -318,6 +337,30 @@ static int test_signal(void) {
     (void)ui_arena_destroy(arena);
   }
 
+  /* Test ui_signal_update failure from set_value */
+  {
+    struct ui_signal *sig_upd = NULL;
+    union ui_signal_payload pv;
+    pv.int_val = 1;
+    ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail, NULL,
+                     UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
+    (void)ui_signal_update(sig_upd, mock_update);
+    (void)ui_signal_destroy(sig_upd);
+  }
+
+  /* Test both eq_fn and dest_fn failing together */
+  {
+    struct ui_signal *sig_both = NULL;
+    union ui_signal_payload pv;
+    pv.int_val = 1;
+    ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail,
+                     mock_destructor_fail, UI_SIGNAL_MODE_SINGLE_THREADED,
+                     &sig_both);
+    pv.int_val = 2;
+    (void)ui_signal_set(sig_both, pv);
+    (void)ui_signal_destroy(sig_both);
+  }
+
   return 0;
 }
 
@@ -334,6 +377,18 @@ static int test_other_types(void) {
   val.ptr_val = (void *)0x5678;
   ui_signal_set(sig_ptr, val);
   (void)ui_signal_destroy(sig_ptr);
+
+  /* Test destructor failure in set_value */
+  {
+    struct ui_signal *sig_fail = NULL;
+    union ui_signal_payload pv;
+    pv.int_val = 1;
+    ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, NULL, mock_destructor_fail,
+                     UI_SIGNAL_MODE_SINGLE_THREADED, &sig_fail);
+    pv.int_val = 2;
+    ui_signal_set(sig_fail, pv);
+    (void)ui_signal_destroy(sig_fail);
+  }
 
   val.float_val = 1.0f;
   ui_signal_create(NULL, val, UI_SIGNAL_TYPE_FLOAT32, NULL, NULL,
@@ -356,6 +411,30 @@ static int test_other_types(void) {
   ui_signal_set(sig_def, val);
   (void)ui_signal_destroy(sig_def);
 
+  /* Test ui_signal_update failure from set_value */
+  {
+    struct ui_signal *sig_upd = NULL;
+    union ui_signal_payload pv;
+    pv.int_val = 1;
+    ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail, NULL,
+                     UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
+    (void)ui_signal_update(sig_upd, mock_update);
+    (void)ui_signal_destroy(sig_upd);
+  }
+
+  /* Test both eq_fn and dest_fn failing together */
+  {
+    struct ui_signal *sig_both = NULL;
+    union ui_signal_payload pv;
+    pv.int_val = 1;
+    ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail,
+                     mock_destructor_fail, UI_SIGNAL_MODE_SINGLE_THREADED,
+                     &sig_both);
+    pv.int_val = 2;
+    (void)ui_signal_set(sig_both, pv);
+    (void)ui_signal_destroy(sig_both);
+  }
+
   return 0;
 }
 
@@ -367,5 +446,30 @@ int main(void) {
     printf("Failed at %d\n", __LINE__);
     return 1;
   }
+
+  /* Test ui_signal_update failure from set_value */
+  {
+    struct ui_signal *sig_upd = NULL;
+    union ui_signal_payload pv;
+    pv.int_val = 1;
+    ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail, NULL,
+                     UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
+    (void)ui_signal_update(sig_upd, mock_update);
+    (void)ui_signal_destroy(sig_upd);
+  }
+
+  /* Test both eq_fn and dest_fn failing together */
+  {
+    struct ui_signal *sig_both = NULL;
+    union ui_signal_payload pv;
+    pv.int_val = 1;
+    ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail,
+                     mock_destructor_fail, UI_SIGNAL_MODE_SINGLE_THREADED,
+                     &sig_both);
+    pv.int_val = 2;
+    (void)ui_signal_set(sig_both, pv);
+    (void)ui_signal_destroy(sig_both);
+  }
+
   return 0;
 }

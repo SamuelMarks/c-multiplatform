@@ -121,6 +121,20 @@ static void test_page_control_base_oom(void) {
     }
   }
   g_malloc_fail_countdown = -1;
+
+  if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {
+    for (countdown = 0; countdown < 10; countdown++) {
+      g_malloc_fail_countdown = countdown;
+      (void)ui_page_control_base_set_number_of_pages(control, 10);
+      g_malloc_fail_countdown = -1;
+    }
+    for (countdown = 0; countdown < 10; countdown++) {
+      g_malloc_fail_countdown = countdown;
+      (void)ui_page_control_base_set_current_page(control, 5);
+      g_malloc_fail_countdown = -1;
+    }
+    (void)ui_component_destroy((struct ui_component *)control);
+  }
 }
 
 int main(void) {

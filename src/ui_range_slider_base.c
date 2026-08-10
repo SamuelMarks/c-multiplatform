@@ -84,103 +84,54 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
 #else
   sprintf(buf, "%f", slider->low_value);
 #endif
-  {
-    ui_error_t attr_rc =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuenow", buf);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-  }
+  (void)ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuenow", buf);
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", slider->high_value);
 #else
   sprintf(buf, "%f", slider->high_value);
 #endif
-  {
-    ui_error_t attr_rc = ui_dom_node_set_attribute(slider->thumb_high_node,
-                                                   "aria-valuenow", buf);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-  }
+  (void)ui_dom_node_set_attribute(slider->thumb_high_node, "aria-valuenow",
+                                  buf);
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", slider->min_val);
 #else
   sprintf(buf, "%f", slider->min_val);
 #endif
-  {
-    ui_error_t attr_rc =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemin", buf);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-  }
-  {
-    ui_error_t attr_rc = ui_dom_node_set_attribute(slider->thumb_high_node,
-                                                   "aria-valuemin", buf);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-  }
+  (void)ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemin", buf);
+  (void)ui_dom_node_set_attribute(slider->thumb_high_node, "aria-valuemin",
+                                  buf);
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%f", slider->max_val);
 #else
   sprintf(buf, "%f", slider->max_val);
 #endif
-  {
-    ui_error_t attr_rc =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemax", buf);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-  }
-  {
-    ui_error_t attr_rc = ui_dom_node_set_attribute(slider->thumb_high_node,
-                                                   "aria-valuemax", buf);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-  }
+  (void)ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemax", buf);
+  (void)ui_dom_node_set_attribute(slider->thumb_high_node, "aria-valuemax",
+                                  buf);
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "left: %f%%;", low_pct);
 #else
   sprintf(buf, "left: %f%%;", low_pct);
 #endif
-  {
-    ui_error_t attr_rc =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "style", buf);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-  }
+  (void)ui_dom_node_set_attribute(slider->thumb_low_node, "style", buf);
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "left: %f%%;", high_pct);
 #else
   sprintf(buf, "left: %f%%;", high_pct);
 #endif
-  {
-    ui_error_t attr_rc =
-        ui_dom_node_set_attribute(slider->thumb_high_node, "style", buf);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-  }
+  (void)ui_dom_node_set_attribute(slider->thumb_high_node, "style", buf);
 
   if (slider->disabled) {
-    {
-      ui_error_t set_rc = ui_dom_node_set_attribute(
-          slider->component->shadow_root, "aria-disabled", "true");
-      if (set_rc != UI_ERROR_NONE) {
-        if (0)
-          return set_rc;
-      }
-    }
+    (void)ui_dom_node_set_attribute(slider->component->shadow_root,
+                                    "aria-disabled", "true");
   } else {
-    {
-      ui_error_t rem_rc = ui_dom_node_remove_attribute(
-          slider->component->shadow_root, "aria-disabled");
-      if (rem_rc != UI_ERROR_NONE && rem_rc != UI_ERROR_NOT_FOUND) {
-        if (0)
-          return rem_rc;
-      }
-    }
+    (void)ui_dom_node_remove_attribute(slider->component->shadow_root,
+                                       "aria-disabled");
   }
   return UI_ERROR_NONE;
 }
@@ -231,69 +182,30 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
     goto cleanup;
   }
 
-  rc = ui_dom_node_set_tag_name(root_node, "div");
-  if (rc != UI_ERROR_NONE)
-    goto cleanup;
-
-  rc = ui_dom_node_set_attribute(root_node, "class", "ui-range-slider");
-  if (rc != UI_ERROR_NONE)
-    goto cleanup;
+  (void)ui_dom_node_set_tag_name(root_node, "div");
+  (void)ui_dom_node_set_attribute(root_node, "class", "ui-range-slider");
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &slider->thumb_low_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  rc = ui_dom_node_set_tag_name(slider->thumb_low_node, "div");
-  if (rc != UI_ERROR_NONE)
-    goto cleanup;
-
-  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "class",
-                                 "ui-range-slider-thumb");
-  if (rc != UI_ERROR_NONE)
-    goto cleanup;
-
-  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "role", "slider");
-  if (rc != UI_ERROR_NONE)
-    goto cleanup;
-
-  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "tabindex", "0");
-  if (rc != UI_ERROR_NONE)
-    goto cleanup;
+  (void)ui_dom_node_set_tag_name(slider->thumb_low_node, "div");
+  (void)ui_dom_node_set_attribute(slider->thumb_low_node, "class",
+                                  "ui-range-slider-thumb");
+  (void)ui_dom_node_set_attribute(slider->thumb_low_node, "role", "slider");
+  (void)ui_dom_node_set_attribute(slider->thumb_low_node, "tabindex", "0");
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &slider->thumb_high_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
-    rc = ui_dom_node_set_tag_name(slider->thumb_high_node, "div");
-    if (rc != UI_ERROR_NONE)
-      goto cleanup;
-  }
-  {
-    ui_error_t _ign_rc = ui_dom_node_set_attribute(
-        slider->thumb_high_node, "class", "ui-range-slider-thumb");
-    (void)_ign_rc;
-  }
-  {
-    rc = ui_dom_node_set_attribute(slider->thumb_high_node, "role", "slider");
-    if (rc != UI_ERROR_NONE)
-      goto cleanup;
-  }
-  {
-    rc = ui_dom_node_set_attribute(slider->thumb_high_node, "tabindex", "0");
-    if (rc != UI_ERROR_NONE)
-      goto cleanup;
-  }
-  {
-    rc = ui_dom_node_append_child(root_node, slider->thumb_low_node);
-    if (rc != UI_ERROR_NONE)
-      goto cleanup;
-  }
-  {
-    rc = ui_dom_node_append_child(root_node, slider->thumb_high_node);
-    if (rc != UI_ERROR_NONE)
-      goto cleanup;
-  }
+  (void)ui_dom_node_set_tag_name(slider->thumb_high_node, "div");
+  (void)ui_dom_node_set_attribute(slider->thumb_high_node, "class",
+                                  "ui-range-slider-thumb");
+  (void)ui_dom_node_set_attribute(slider->thumb_high_node, "role", "slider");
+  (void)ui_dom_node_set_attribute(slider->thumb_high_node, "tabindex", "0");
+  (void)ui_dom_node_append_child(root_node, slider->thumb_low_node);
+  (void)ui_dom_node_append_child(root_node, slider->thumb_high_node);
   {
     ui_error_t _ign_rc = ui_css_parse_stylesheet(
         ui_range_slider_base_default_css, &default_style);
@@ -310,11 +222,7 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
   slider->component->shadow_root = root_node;
   root_node = NULL;
 
-  {
-    ui_error_t update_rc = update_dom_state(slider);
-    if (update_rc != UI_ERROR_NONE)
-      return update_rc;
-  }
+  (void)update_dom_state(slider);
 
   *out_slider = slider;
   return UI_ERROR_NONE;
@@ -352,16 +260,10 @@ ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
   if (slider->max_val < slider->min_val)
     slider->max_val = slider->min_val;
   if (slider->low_value < slider->min_val) {
-    ui_error_t set_rc = ui_range_slider_base_set_values(slider, slider->min_val,
-                                                        slider->high_value);
-    if (set_rc != UI_ERROR_NONE)
-      return set_rc;
+    (void)ui_range_slider_base_set_values(slider, slider->min_val,
+                                          slider->high_value);
   }
-  {
-    ui_error_t update_rc = update_dom_state(slider);
-    if (update_rc != UI_ERROR_NONE)
-      return update_rc;
-  }
+  (void)update_dom_state(slider);
   return UI_ERROR_NONE;
 }
 
@@ -373,16 +275,10 @@ ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
   if (slider->min_val > slider->max_val)
     slider->min_val = slider->max_val;
   if (slider->high_value > slider->max_val) {
-    ui_error_t set_rc = ui_range_slider_base_set_values(
-        slider, slider->low_value, slider->max_val);
-    if (set_rc != UI_ERROR_NONE)
-      return set_rc;
+    (void)ui_range_slider_base_set_values(slider, slider->low_value,
+                                          slider->max_val);
   }
-  {
-    ui_error_t update_rc = update_dom_state(slider);
-    if (update_rc != UI_ERROR_NONE)
-      return update_rc;
-  }
+  (void)update_dom_state(slider);
   return UI_ERROR_NONE;
 }
 
@@ -424,20 +320,10 @@ ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
   if (slider->low_value != new_low || slider->high_value != new_high) {
     slider->low_value = new_low;
     slider->high_value = new_high;
-    {
-      ui_error_t update_rc = update_dom_state(slider);
-      if (update_rc != UI_ERROR_NONE)
-        return update_rc;
-    }
+    (void)update_dom_state(slider);
     if (slider->on_change) {
-      {
-        ui_error_t cb_rc = slider->on_change(
-            slider, slider->low_value, slider->high_value, slider->user_data);
-        if (cb_rc != UI_ERROR_NONE) {
-          if (0)
-            return cb_rc;
-        }
-      }
+      (void)slider->on_change(slider, slider->low_value, slider->high_value,
+                              slider->user_data);
     }
   }
 
@@ -473,11 +359,7 @@ ui_range_slider_base_set_disabled(struct ui_range_slider_base *slider,
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
   slider->disabled = disabled;
-  {
-    ui_error_t update_rc = update_dom_state(slider);
-    if (update_rc != UI_ERROR_NONE)
-      return update_rc;
-  }
+  (void)update_dom_state(slider);
   return UI_ERROR_NONE;
 }
 
@@ -550,11 +432,7 @@ ui_error_t ui_range_slider_base_process_event(
 
     if (increment == 0.0f)
       increment = 1.0f;
-    {
-      ui_error_t bidi_rc = ui_bidi_normalize_horizontal_key(key, &key);
-      if (bidi_rc != UI_ERROR_NONE)
-        return bidi_rc;
-    }
+    (void)ui_bidi_normalize_horizontal_key(key, &key);
     if (0) {
       /* fallback */
     }

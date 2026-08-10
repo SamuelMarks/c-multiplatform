@@ -13,7 +13,7 @@ struct ui_selection_model {
 };
 
 static ui_error_t trigger_change(struct ui_selection_model *model) {
-  if (model && model->on_change) {
+  if (model->on_change) {
     return model->on_change(model, model->on_change_user_data);
   }
   return UI_ERROR_NONE;

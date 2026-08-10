@@ -46,37 +46,41 @@ ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout) {
   return UI_ERROR_NONE;
 }
 
-static ui_error_t decode_utf8(const char **text, int *out_codepoint) {
+static void decode_utf8(const char **text, int *out_codepoint) {
   const unsigned char *s = (const unsigned char *)*text;
   int c = *s++;
-  *out_codepoint = 0;
   if (c < 0x80) {
     *text = (const char *)s;
     *out_codepoint = c;
-    return UI_ERROR_NONE;
+    return;
   }
   if ((c & 0xE0) == 0xC0) {
     if (*s) {
       c = ((c & 0x1F) << 6) | (*s++ & 0x3F);
     }
   } else if ((c & 0xF0) == 0xE0) {
-    if (*s && *(s + 1)) {
-      c = ((c & 0x0F) << 12) | ((*s & 0x3F) << 6);
-      s++;
-      c |= (*s++ & 0x3F);
+    if (*s) {
+      if (*(s + 1)) {
+        c = ((c & 0x0F) << 12) | ((*s & 0x3F) << 6);
+        s++;
+        c |= (*s++ & 0x3F);
+      }
     }
   } else if ((c & 0xF8) == 0xF0) {
-    if (*s && *(s + 1) && *(s + 2)) {
-      c = ((c & 0x07) << 18) | ((*s & 0x3F) << 12);
-      s++;
-      c |= ((*s & 0x3F) << 6);
-      s++;
-      c |= (*s++ & 0x3F);
+    if (*s) {
+      if (*(s + 1)) {
+        if (*(s + 2)) {
+          c = ((c & 0x07) << 18) | ((*s & 0x3F) << 12);
+          s++;
+          c |= ((*s & 0x3F) << 6);
+          s++;
+          c |= (*s++ & 0x3F);
+        }
+      }
     }
   }
   *text = (const char *)s;
   *out_codepoint = c;
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t add_glyph(struct ui_text_layout *layout, int codepoint,
@@ -139,10 +143,7 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     int codepoint = 0;
     struct ui_glyph_metrics metrics;
     float kerning = 0.0f;
-    rc = decode_utf8(&text, &codepoint);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    decode_utf8(&text, &codepoint);
 
     if (codepoint == '\n') {
       x = 0.0f;

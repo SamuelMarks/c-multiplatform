@@ -239,7 +239,7 @@ static ui_error_t run_oom_tests(void) {
     return rc;
 
   printf("Testing OOM on create...\n");
-  for (i = 0; i < 30; i++) {
+  for (i = 0; i < 60; i++) {
     g_malloc_fail_countdown = i;
     bc = NULL;
     rc = ui_breadcrumbs_base_create(router, &bc);
@@ -266,7 +266,7 @@ static ui_error_t run_oom_tests(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
   printf("Testing OOM on set_path absolute...\n");
-  for (i = 0; i < 100; i++) {
+  for (i = 0; i < 300; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_breadcrumbs_base_set_path(bc, "/a/long/nested/path/to/test/oom");
     if (rc == UI_ERROR_NONE) {
@@ -282,7 +282,7 @@ static ui_error_t run_oom_tests(void) {
 
   /* Test OOM on set_path with relative path */
   printf("Testing OOM on set_path relative...\n");
-  for (i = 0; i < 100; i++) {
+  for (i = 0; i < 300; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_breadcrumbs_base_set_path(bc, "a/long/nested/path/to/test/oom");
     if (rc == UI_ERROR_NONE) {
@@ -401,6 +401,13 @@ int main(void) {
   extern ui_error_t run_bc_coverage(void);
   run_bc_coverage();
 #endif
+
+  /* Targeted test for breadcrumbs null bind */
+  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
+
+  /* Targeted test for breadcrumbs null bind */
+  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
+
   printf("All ui_breadcrumbs_base tests passed.\n");
   return 0;
 }

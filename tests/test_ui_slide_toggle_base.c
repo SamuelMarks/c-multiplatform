@@ -2,7 +2,9 @@
 #include "ui_slide_toggle_base.h"
 #include "ui_control_value_accessor.h"
 #include <stdio.h>
+#include <string.h>
 /* clang-format on */
+static void test_cva_errors(void);
 
 extern int g_malloc_fail_countdown;
 
@@ -243,7 +245,7 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.y = 0;
   ui_slide_toggle_base_process_event(toggle, &ev, 1300.0);
   ev.type = UI_EVENT_MOUSE_UP;
-  ui_slide_toggle_base_process_event(toggle, &ev, 1400.0);
+  ui_slide_toggle_base_process_event(toggle, &ev, 1600.0);
   ui_slide_toggle_base_get_checked(toggle, &state);
   if (state != 1) {
     printf("fail 5: state=%d\n", state);
@@ -255,20 +257,46 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.x = 20;
   ev.event_data.mouse.y = 0;
   ev.event_data.mouse.button = 0;
-  ui_slide_toggle_base_process_event(toggle, &ev, 1500.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 5;
-  ev.event_data.mouse.y = 0;
-  ui_slide_toggle_base_process_event(toggle, &ev, 1600.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 0;
-  ev.event_data.mouse.y = 0;
   ui_slide_toggle_base_process_event(toggle, &ev, 1700.0);
-  ev.type = UI_EVENT_MOUSE_UP;
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 5; /* Dist=15, triggers PAN BEGAN. delta_x=0 */
+  ev.event_data.mouse.y = 0;
   ui_slide_toggle_base_process_event(toggle, &ev, 1800.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x =
+      -4; /* Dist=9, triggers PAN CHANGED. delta_x=-9. drag_diff=-9. Not <-10 */
+  ev.event_data.mouse.y = 0;
+  ui_slide_toggle_base_process_event(toggle, &ev, 1900.0);
+  ev.type = UI_EVENT_MOUSE_UP;
+  ui_slide_toggle_base_process_event(toggle, &ev,
+                                     2200.0); /* >250ms prevents TAP */
   ui_slide_toggle_base_get_checked(toggle, &state);
   if (state != 1) { /* Should still be 1 */
     printf("fail 6: state=%d\n", state);
+    return 1;
+  }
+
+  /* Test dragging right not far enough */
+  ui_slide_toggle_base_set_checked(toggle, 0);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.x = 0;
+  ev.event_data.mouse.y = 0;
+  ev.event_data.mouse.button = 0;
+  ui_slide_toggle_base_process_event(toggle, &ev, 2300.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 15; /* Dist=15, triggers PAN BEGAN. */
+  ev.event_data.mouse.y = 0;
+  ui_slide_toggle_base_process_event(toggle, &ev, 2400.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 24; /* Dist=9, delta_x=9. drag_diff=9. Not >10 */
+  ev.event_data.mouse.y = 0;
+  ui_slide_toggle_base_process_event(toggle, &ev, 2500.0);
+  ev.type = UI_EVENT_MOUSE_UP;
+  ui_slide_toggle_base_process_event(toggle, &ev,
+                                     2800.0); /* >250ms prevents TAP */
+  ui_slide_toggle_base_get_checked(toggle, &state);
+  if (state != 0) { /* Should still be 0 */
+    printf("fail 6b: state=%d\n", state);
     return 1;
   }
 
@@ -280,15 +308,20 @@ static int run_normal_tests(void) {
   printf("Track color transition CSS targets map verified.\n");
 
   /* Test cancel state */
+  memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.x = 0;
   ev.event_data.mouse.y = 0;
+  ev.event_data.mouse.button = 0;
   ui_slide_toggle_base_process_event(toggle, &ev, 1900.0);
   ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.x = 25;
+  ev.event_data.mouse.x = 30;
+  ev.event_data.mouse.y = 0;
   ui_slide_toggle_base_process_event(toggle, &ev, 1950.0); /* Pan start */
   ev.type = UI_EVENT_TOUCH_CANCEL;
   ui_slide_toggle_base_process_event(toggle, &ev, 2000.0); /* Pan cancel */
+  ui_slide_toggle_base_is_dragging(toggle, &state);
+  printf("DEBUG: state after cancel=%d\n", state);
 
   /* Test NULL callbacks */
   cva.register_on_change(toggle, NULL, NULL);
@@ -346,11 +379,124 @@ static int run_oom_tests(void) {
   return 0;
 }
 
+static ui_error_t mock_cva_on_change_error(union ui_signal_payload val,
+                                           void *user_data) {
+  (void)val;
+  (void)user_data;
+  return UI_ERROR_INVALID_ARGUMENT;
+}
+
+static ui_error_t mock_cva_on_touched_error(void *user_data) {
+  (void)user_data;
+  return UI_ERROR_OUT_OF_MEMORY;
+}
+
+static void test_cva_errors(void) {
+  struct ui_event ev;
+  memset(&ev, 0, sizeof(ev));
+
+  /* --- TOUCHED ERROR TESTS --- */
+  {
+    struct ui_slide_toggle_base *toggle;
+    struct ui_control_value_accessor cva;
+    ui_slide_toggle_base_create(&toggle, &cva);
+    cva.register_on_change(toggle, NULL, NULL);
+    cva.register_on_touched(toggle, mock_cva_on_touched_error, NULL);
+
+    /* 1. Direct toggle */
+    ui_slide_toggle_base_toggle(toggle);
+
+    /* 2. Keyboard Toggle */
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_SPACE;
+    ui_slide_toggle_base_process_event(toggle, &ev, 3000.0);
+
+    /* 3. Click/Tap */
+    ev.type = UI_EVENT_MOUSE_DOWN;
+    ev.event_data.mouse.x = 10;
+    ui_slide_toggle_base_process_event(toggle, &ev, 3010.0);
+    ev.type = UI_EVENT_MOUSE_UP;
+    ui_slide_toggle_base_process_event(toggle, &ev, 3020.0);
+    ui_slide_toggle_base_destroy(toggle);
+  }
+
+  {
+    struct ui_slide_toggle_base *toggle;
+    struct ui_control_value_accessor cva;
+    ui_slide_toggle_base_create(&toggle, &cva);
+    cva.register_on_change(toggle, NULL, NULL);
+    cva.register_on_touched(toggle, mock_cva_on_touched_error, NULL);
+
+    /* 4. Pan Drag: checked is 0. Move RIGHT to toggle to 1. */
+    ev.type = UI_EVENT_MOUSE_DOWN;
+    ev.event_data.mouse.x = 0;
+    ui_slide_toggle_base_process_event(toggle, &ev, 4000.0);
+    ev.type = UI_EVENT_MOUSE_MOVE;
+    ev.event_data.mouse.x = 20;
+    ui_slide_toggle_base_process_event(toggle, &ev, 4100.0); /* BEGAN */
+    ev.type = UI_EVENT_MOUSE_MOVE;
+    ev.event_data.mouse.x = 100;
+    ui_slide_toggle_base_process_event(toggle, &ev, 6400.0); /* CHANGED */
+    ev.type = UI_EVENT_MOUSE_UP;
+    ui_slide_toggle_base_process_event(toggle, &ev, 7600.0); /* ENDED */
+    ui_slide_toggle_base_destroy(toggle);
+  }
+
+  /* --- CHANGE ERROR TESTS --- */
+  {
+    struct ui_slide_toggle_base *toggle;
+    struct ui_control_value_accessor cva;
+    ui_slide_toggle_base_create(&toggle, &cva);
+    cva.register_on_touched(toggle, NULL, NULL);
+    cva.register_on_change(toggle, mock_cva_on_change_error, NULL);
+
+    /* 1. Direct toggle */
+    ui_slide_toggle_base_toggle(toggle);
+
+    /* 2. Keyboard Toggle */
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_SPACE;
+    ui_slide_toggle_base_process_event(toggle, &ev, 5000.0);
+
+    /* 3. Click/Tap */
+    ev.type = UI_EVENT_MOUSE_DOWN;
+    ev.event_data.mouse.x = 10;
+    ui_slide_toggle_base_process_event(toggle, &ev, 5010.0);
+    ev.type = UI_EVENT_MOUSE_UP;
+    ui_slide_toggle_base_process_event(toggle, &ev, 5020.0);
+    ui_slide_toggle_base_destroy(toggle);
+  }
+
+  {
+    struct ui_slide_toggle_base *toggle;
+    struct ui_control_value_accessor cva;
+    ui_slide_toggle_base_create(&toggle, &cva);
+    cva.register_on_touched(toggle, NULL, NULL);
+    cva.register_on_change(toggle, mock_cva_on_change_error, NULL);
+
+    /* 4. Pan Drag: checked is 0. Move RIGHT to toggle to 1. */
+    ev.type = UI_EVENT_MOUSE_DOWN;
+    ev.event_data.mouse.x = 0;
+    ui_slide_toggle_base_process_event(toggle, &ev, 6000.0);
+    ev.type = UI_EVENT_MOUSE_MOVE;
+    ev.event_data.mouse.x = 20;
+    ui_slide_toggle_base_process_event(toggle, &ev, 6100.0); /* BEGAN */
+    ev.type = UI_EVENT_MOUSE_MOVE;
+    ev.event_data.mouse.x = 100;
+    ui_slide_toggle_base_process_event(toggle, &ev, 8400.0); /* CHANGED */
+    ev.type = UI_EVENT_MOUSE_UP;
+    ui_slide_toggle_base_process_event(toggle, &ev, 9600.0); /* ENDED */
+    ui_slide_toggle_base_destroy(toggle);
+  }
+}
+
+static void test_cva_errors(void);
 int main(void) {
   if (run_normal_tests() != 0) {
     printf("Normal tests failed.\n");
     return 1;
   }
+  test_cva_errors();
 
   if (run_oom_tests() != 0) {
     printf("OOM tests failed.\n");

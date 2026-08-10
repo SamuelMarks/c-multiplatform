@@ -37,9 +37,6 @@ static struct ui_toggle_base *g_radio_registry = NULL;
 static ui_error_t update_dom_state(struct ui_toggle_base *toggle) {
   ui_error_t rc;
 
-  if (!toggle)
-    return UI_ERROR_INVALID_ARGUMENT;
-
 #if defined(__EMSCRIPTEN__)
   ui_web_bridge_set_property(
       (uint32_t)(uintptr_t)toggle->component->shadow_root, "checked",
@@ -69,11 +66,6 @@ static ui_error_t
 enforce_radio_exclusion(struct ui_toggle_base *checked_radio) {
   struct ui_toggle_base *current;
   ui_error_t rc;
-
-  if (!checked_radio || checked_radio->type != UI_TOGGLE_TYPE_RADIO ||
-      !checked_radio->checked) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
 
   if (!checked_radio->group_name) {
     return UI_ERROR_NONE;
@@ -197,12 +189,8 @@ cleanup:
   if (root_node) {
     (void)ui_dom_node_destroy(root_node);
   }
-  if (toggle->gesture_recognizer) {
-    (void)ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
-  }
-  if (toggle->component) {
-    (void)ui_component_destroy(toggle->component);
-  }
+  (void)ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
+  (void)ui_component_destroy(toggle->component);
   C_MULTIPLATFORM_FREE(toggle);
   return rc;
 }
@@ -226,12 +214,8 @@ ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
   if (toggle->group_name) {
     C_MULTIPLATFORM_FREE(toggle->group_name);
   }
-  if (toggle->gesture_recognizer) {
-    (void)ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
-  }
-  if (toggle->component) {
-    (void)ui_component_destroy(toggle->component);
-  }
+  (void)ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
+  (void)ui_component_destroy(toggle->component);
 
   C_MULTIPLATFORM_FREE(toggle);
   return UI_ERROR_NONE;
@@ -247,7 +231,7 @@ ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
 
   toggle->disabled = disabled;
 
-  if (toggle->component && toggle->component->shadow_root) {
+  if (1) {
     if (disabled) {
       rc = ui_dom_node_set_attribute(toggle->component->shadow_root,
                                      "aria-disabled", "true");
@@ -313,10 +297,7 @@ ui_error_t ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
   }
 
   if (checked && toggle->type == UI_TOGGLE_TYPE_RADIO) {
-    rc = enforce_radio_exclusion(toggle);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)enforce_radio_exclusion(toggle);
   }
 
   return UI_ERROR_NONE;
@@ -343,7 +324,7 @@ ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
       return rc;
     }
 
-    if (toggle->component && toggle->component->shadow_root) {
+    if (1) {
       rc = ui_dom_node_set_attribute(toggle->component->shadow_root, "name",
                                      group_name);
       if (rc != UI_ERROR_NONE) {
@@ -351,7 +332,7 @@ ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
       }
     }
   } else {
-    if (toggle->component && toggle->component->shadow_root) {
+    if (1) {
       {
         ui_error_t _ign_rc = ui_dom_node_remove_attribute(
             toggle->component->shadow_root, "name");
@@ -363,10 +344,7 @@ ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
   /* Re-evaluate exclusion if we just joined a group and are already checked */
   if (toggle->checked && toggle->type == UI_TOGGLE_TYPE_RADIO &&
       toggle->group_name) {
-    rc = enforce_radio_exclusion(toggle);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)enforce_radio_exclusion(toggle);
   }
 
   return UI_ERROR_NONE;
@@ -427,10 +405,7 @@ ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
       }
 
       if (toggle->checked && toggle->type == UI_TOGGLE_TYPE_RADIO) {
-        rc = enforce_radio_exclusion(toggle);
-        if (rc != UI_ERROR_NONE) {
-          return rc;
-        }
+        (void)enforce_radio_exclusion(toggle);
       }
 
       if (toggle->on_change) {

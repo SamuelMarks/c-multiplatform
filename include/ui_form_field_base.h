@@ -33,6 +33,7 @@ ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field);
  * @brief Destroys a form field instance.
  *
  * @param field The form field.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_field_base_destroy(struct ui_form_field_base *field);
 
@@ -117,14 +118,6 @@ ui_error_t ui_form_field_base_set_focused(struct ui_form_field_base *field,
 ui_error_t ui_form_field_base_set_has_value(struct ui_form_field_base *field,
                                             int has_value);
 
-/**
- * @brief Retrieves the underlying component instance for style injection and
- * DOM mounting.
- *
- * @param field The form field.
- * @return The underlying component.
- */
-
 struct ui_form_control;
 struct ui_reactor;
 
@@ -141,7 +134,14 @@ ui_form_field_base_bind_form_control(struct ui_form_field_base *field,
                                      struct ui_form_control *form_control,
                                      struct ui_reactor *reactor);
 
-/** \brief ui_error */
+/**
+ * @brief Retrieves the underlying component instance for style injection and
+ * DOM mounting.
+ *
+ * @param field The form field.
+ * @param out_component Pointer to receive the component.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_form_field_base_get_component(struct ui_form_field_base *field,
                                  struct ui_component **out_component);

@@ -31,13 +31,6 @@ static ui_error_t layout_observer_callback(struct ui_layout_observer *observer,
   (void)breakpoint_id;
   (void)is_active;
 
-  if (0)
-    return UI_ERROR_INVALID_ARGUMENT;
-  if (0)
-    return UI_ERROR_INVALID_ARGUMENT;
-  if (0)
-    return UI_ERROR_INVALID_ARGUMENT;
-
   info.scroll_x = 0.0f;
   info.scroll_y = 0.0f;
   info.delta_x = 0.0f;
@@ -47,8 +40,7 @@ static ui_error_t layout_observer_callback(struct ui_layout_observer *observer,
   {
     ui_error_t n_rc = ui_scroll_dispatcher_notify(dispatcher, &info);
     if (n_rc != UI_ERROR_NONE) {
-      if (0)
-        return n_rc;
+      return n_rc;
     }
   }
   return UI_ERROR_NONE;
@@ -89,9 +81,6 @@ ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher) {
 
 cleanup:
   if (dispatcher) {
-    if (0) {
-      C_MULTIPLATFORM_FREE(dispatcher->subscribers);
-    }
     C_MULTIPLATFORM_FREE(dispatcher);
   }
   return rc;
@@ -107,10 +96,8 @@ ui_scroll_dispatcher_destroy(struct ui_scroll_dispatcher *dispatcher) {
     goto cleanup;
   }
 
-  if (0) {
-    C_MULTIPLATFORM_FREE(dispatcher->subscribers);
-    dispatcher->subscribers = NULL;
-  }
+  C_MULTIPLATFORM_FREE(dispatcher->subscribers);
+  dispatcher->subscribers = NULL;
 
   C_MULTIPLATFORM_FREE(dispatcher);
 
@@ -132,11 +119,8 @@ ui_scroll_dispatcher_register(struct ui_scroll_dispatcher *dispatcher,
     goto cleanup;
   }
 
-  if (0) {
+  if (dispatcher->count >= dispatcher->capacity) {
     new_capacity = dispatcher->capacity * 2;
-    if (new_capacity == 0) {
-      new_capacity = INITIAL_SUBSCRIBER_CAPACITY;
-    }
     new_array = (struct ui_scroll_subscriber *)C_MULTIPLATFORM_REALLOC(
         dispatcher->subscribers,
         sizeof(struct ui_scroll_subscriber) * new_capacity);
@@ -200,9 +184,11 @@ ui_error_t ui_scroll_dispatcher_notify(struct ui_scroll_dispatcher *dispatcher,
   }
 
   for (i = 0; i < dispatcher->count; ++i) {
-    if (dispatcher->subscribers[i].callback) {
-      dispatcher->subscribers[i].callback(dispatcher, info,
-                                          dispatcher->subscribers[i].user_data);
+    ui_error_t cb_rc = dispatcher->subscribers[i].callback(
+        dispatcher, info, dispatcher->subscribers[i].user_data);
+    if (cb_rc != UI_ERROR_NONE) {
+      rc = cb_rc;
+      goto cleanup;
     }
   }
 
@@ -224,8 +210,6 @@ ui_error_t ui_scroll_dispatcher_bind_layout_observer(
   rc = ui_layout_observer_subscribe(layout_observer, layout_observer_callback,
                                     dispatcher);
   if (rc != UI_ERROR_NONE) {
-    if (0)
-      return rc;
     goto cleanup;
   }
 

@@ -66,6 +66,25 @@ static int test_normal(void) {
   ACCUM_ERR(failed, ui_titlebar_base_hit_test(tb, 105.0f, 10.0f, &res));
   ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_MINIMIZE_BTN);
 
+  /* Miss buttons logic testing (branch coverage) */
+  ACCUM_ERR(failed, ui_titlebar_base_hit_test(tb, 99.0f, 10.0f,
+                                              &res)); /* x < curr->x */
+  ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_DRAG_AREA);
+
+  ACCUM_ERR(failed, ui_titlebar_base_hit_test(tb, 105.0f, 4.0f,
+                                              &res)); /* y < curr->y */
+  ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_DRAG_AREA);
+
+  ACCUM_ERR(failed, ui_titlebar_base_hit_test(
+                        tb, 105.0f, 30.0f, &res)); /* y > curr->y + curr->h */
+  ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_DRAG_AREA);
+
+  ACCUM_ERR(failed,
+            ui_titlebar_base_hit_test(
+                tb, 125.0f, 10.0f,
+                &res)); /* x > curr->x + curr->w, but misses next button */
+  ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_DRAG_AREA);
+
   ACCUM_ERR(failed, ui_titlebar_base_hit_test(tb, 135.0f, 10.0f, &res));
   ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_MAXIMIZE_BTN);
 

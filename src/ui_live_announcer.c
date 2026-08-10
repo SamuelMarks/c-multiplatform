@@ -47,9 +47,6 @@ ui_error_t ui_live_announcer_create(struct ui_live_announcer **out_announcer) {
 ui_error_t ui_live_announcer_destroy(struct ui_live_announcer *announcer) {
   if (announcer) {
     ui_error_t rc = ui_live_announcer_clear(announcer);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
     C_MULTIPLATFORM_FREE(announcer);
   }
   return UI_ERROR_NONE;
@@ -59,19 +56,16 @@ ui_error_t ui_live_announce(struct ui_live_announcer *announcer,
                             const char *message,
                             enum ui_live_politeness politeness) {
   struct ui_live_message *msg;
-  size_t len;
   char *text_copy;
 
   if (!announcer || !message) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  len = strlen(message);
-  text_copy = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+  text_copy = (char *)C_MULTIPLATFORM_STRDUP(message);
   if (!text_copy) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
-  UI_STRCPY(text_copy, len + 1, message);
 
   msg = (struct ui_live_message *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_live_message));

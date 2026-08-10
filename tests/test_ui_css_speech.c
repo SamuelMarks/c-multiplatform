@@ -190,13 +190,25 @@ int main(void) {
   /* Basic valid coverage */
   test_properties("speak", "never", verify_speak_never);
   test_properties("speak", "always", verify_speak_always);
+  test_properties("speak", "auto", NULL);
   test_properties("speak-as", "literal-punctuation no-punctuation",
                   verify_speak_as);
+  test_properties("pause-before", "250ms", NULL);
+  test_properties("pause-before", "1s", NULL);
   test_properties("pause-before", "10px",
                   NULL); /* invalid unit falls to keyword parsing */
   test_properties("voice-volume", "10px", NULL);
   test_properties("voice-rate", "10px", NULL);
   test_properties("voice-pitch", "10px", NULL);
+
+  /* Missing coverage tests */
+  test_properties("cue-after", "url(a.wav", NULL);
+  test_properties("cue-after", "url(a.wav) x", NULL);
+  test_properties("voice-pitch", "10khz", NULL);
+  test_properties("voice-pitch", "10xyz", NULL);
+  test_properties("voice-duration", "auto", NULL);
+  test_properties("voice-duration", "unknown", NULL);
+  test_properties("voice-stress", "unknown", NULL);
   test_properties("pause-before", "none", NULL);
   test_properties("pause-after", "x-weak", verify_pause);
   test_properties("pause-before", "weak", NULL);

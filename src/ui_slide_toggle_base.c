@@ -22,7 +22,7 @@ struct ui_slide_toggle_base {
 };
 
 static ui_error_t trigger_cva_change(struct ui_slide_toggle_base *toggle) {
-  if (toggle && toggle->cva_on_change) {
+  if (toggle->cva_on_change) {
     union ui_signal_payload payload;
     payload.bool_val = toggle->checked;
     return toggle->cva_on_change(payload, toggle->cva_on_change_user_data);
@@ -31,7 +31,7 @@ static ui_error_t trigger_cva_change(struct ui_slide_toggle_base *toggle) {
 }
 
 static ui_error_t trigger_cva_touched(struct ui_slide_toggle_base *toggle) {
-  if (toggle && toggle->cva_on_touched) {
+  if (toggle->cva_on_touched) {
     return toggle->cva_on_touched(toggle->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
@@ -138,9 +138,7 @@ ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle) {
   if (!toggle) {
     return UI_ERROR_NONE;
   }
-  if (toggle->recognizer) {
-    (void)ui_gesture_recognizer_destroy(toggle->recognizer);
-  }
+  (void)ui_gesture_recognizer_destroy(toggle->recognizer);
   C_MULTIPLATFORM_FREE(toggle);
   return UI_ERROR_NONE;
 }
@@ -235,8 +233,7 @@ ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
     goto cleanup;
   }
 
-  if (gesture_event.type == UI_GESTURE_TAP &&
-      gesture_event.state == UI_GESTURE_STATE_ENDED) {
+  if (gesture_event.type == UI_GESTURE_TAP) {
     toggle->checked = !toggle->checked;
     toggle->is_dragging = 0;
     toggle->drag_offset_x = 0.0f;
@@ -258,24 +255,28 @@ ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
       toggle->drag_offset_x = toggle->drag_start_offset_x;
     } else if (gesture_event.state == UI_GESTURE_STATE_CHANGED) {
       toggle->drag_offset_x += gesture_event.delta_x;
-    } else if (gesture_event.state == UI_GESTURE_STATE_ENDED ||
-               gesture_event.state == UI_GESTURE_STATE_CANCELLED) {
+    } else if (gesture_event.state == UI_GESTURE_STATE_ENDED) {
       toggle->drag_offset_x += gesture_event.delta_x;
       toggle->is_dragging = 0;
 
       /* If dragged past halfway point (10px), flip state based on drag
        * direction */
-      if (gesture_event.state == UI_GESTURE_STATE_ENDED) {
+      {
         int changed = 0;
-        if (toggle->checked &&
-            (toggle->drag_offset_x - toggle->drag_start_offset_x) < -10.0f) {
-          toggle->checked = 0;
-          changed = 1;
-        } else if (!toggle->checked && (toggle->drag_offset_x -
-                                        toggle->drag_start_offset_x) > 10.0f) {
-          toggle->checked = 1;
-          changed = 1;
+        float drag_diff = toggle->drag_offset_x - toggle->drag_start_offset_x;
+
+        if (toggle->checked) {
+          if (drag_diff < -10.0f) {
+            toggle->checked = 0;
+            changed = 1;
+          }
+        } else {
+          if (drag_diff > 10.0f) {
+            toggle->checked = 1;
+            changed = 1;
+          }
         }
+
         if (changed) {
           {
             ui_error_t rc1 = trigger_cva_touched(toggle);
@@ -289,6 +290,11 @@ ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
           }
         }
       }
+      toggle->drag_offset_x = 0.0f;
+    } else {
+      /* UI_GESTURE_STATE_CANCELLED */
+      toggle->drag_offset_x += gesture_event.delta_x;
+      toggle->is_dragging = 0;
       toggle->drag_offset_x = 0.0f;
     }
   }

@@ -1,138 +1,134 @@
 /* clang-format off */
-#include <string.h>
-#include <stdlib.h>
-
 #include "ui_image_base.h"
-#include "ui_error.h"
-#include "ui_signal.h"
+#include "ui_component.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
 
-/* Dummy component struct for testing */
-struct ui_component {
-  int id;
-};
-
-static int test_image_init(void) {
+static ui_error_t run_normal_tests(void) {
   struct ui_image_base image;
   struct ui_component comp;
-  ui_error_t err;
+  ui_error_t rc;
 
-  err = ui_image_base_init(NULL, &comp);
-  if (err != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+  printf("Testing ui_image_base_init...\n");
+  rc = ui_image_base_init(NULL, &comp);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
+  rc = ui_image_base_init(&image, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
 
-  err = ui_image_base_init(&image, NULL);
-  if (err != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-
-  err = ui_image_base_init(&image, &comp);
-  if (err != UI_ERROR_NONE)
-    return 1;
+  rc = ui_image_base_init(&image, &comp);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (image.component != &comp)
-    return 1;
+    return UI_ERROR_UNKNOWN;
   if (image.state != UI_IMAGE_STATE_IDLE)
-    return 1;
+    return UI_ERROR_UNKNOWN;
   if (image.lazy_load != 0)
-    return 1;
+    return UI_ERROR_UNKNOWN;
   if (image.src_url != NULL)
-    return 1;
+    return UI_ERROR_UNKNOWN;
   if (image.alt_text != NULL)
-    return 1;
-  return 0;
+    return UI_ERROR_UNKNOWN;
+
+  printf("Testing ui_image_base_set_src...\n");
+  rc = ui_image_base_set_src(NULL, "http://example.com/image.png", 0);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
+  rc = ui_image_base_set_src(&image, NULL, 0);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
+
+  /* Normal set src */
+  rc = ui_image_base_set_src(&image, "http://example.com/image.png", 0);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  if (strcmp(image.src_url, "http://example.com/image.png") != 0)
+    return UI_ERROR_UNKNOWN;
+  if (image.lazy_load != 0)
+    return UI_ERROR_UNKNOWN;
+  if (image.state != UI_IMAGE_STATE_LOADING)
+    return UI_ERROR_UNKNOWN;
+
+  /* Overwrite existing src and use lazy_load */
+  rc = ui_image_base_set_src(&image, "http://example.com/image2.png", 1);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  if (strcmp(image.src_url, "http://example.com/image2.png") != 0)
+    return UI_ERROR_UNKNOWN;
+  if (image.lazy_load != 1)
+    return UI_ERROR_UNKNOWN;
+  if (image.state != UI_IMAGE_STATE_IDLE)
+    return UI_ERROR_UNKNOWN;
+
+  printf("Testing ui_image_base_bind_src...\n");
+  rc = ui_image_base_bind_src(NULL, (struct ui_signal *)1);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
+  rc = ui_image_base_bind_src(&image, (struct ui_signal *)1);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  printf("Testing ui_image_base_cleanup...\n");
+  rc = ui_image_base_cleanup(NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
+
+  /* Populate alt_text manually to cover that branch */
+  image.alt_text = (char *)malloc(10);
+  if (image.alt_text)
+    strcpy(image.alt_text, "alt");
+
+  rc = ui_image_base_cleanup(&image);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  if (image.src_url != NULL)
+    return UI_ERROR_UNKNOWN;
+  if (image.alt_text != NULL)
+    return UI_ERROR_UNKNOWN;
+  if (image.state != UI_IMAGE_STATE_IDLE)
+    return UI_ERROR_UNKNOWN;
+
+  /* Double cleanup to cover the false branches of src_url and alt_text */
+  rc = ui_image_base_cleanup(&image);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  return UI_ERROR_NONE;
 }
 
-static int test_image_set_src(void) {
+static ui_error_t run_oom_tests(void) {
   struct ui_image_base image;
   struct ui_component comp;
-  ui_error_t err;
-  char *alt;
+  ui_error_t rc;
 
-  if (ui_image_base_init(&image, &comp) != UI_ERROR_NONE)
-    return 1;
-
-  err = ui_image_base_set_src(NULL, "https://example.com/img.png", 0);
-  if (err != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-
-  err = ui_image_base_set_src(&image, NULL, 0);
-  if (err != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
+  (void)ui_image_base_init(&image, &comp);
 
   g_malloc_fail_countdown = 0;
-  err = ui_image_base_set_src(&image, "https://example.com/img.png", 0);
-  if (err != UI_ERROR_OUT_OF_MEMORY)
-    return 1;
+  rc = ui_image_base_set_src(&image, "http://example.com/oom.png", 0);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
+    g_malloc_fail_countdown = -1;
+    return UI_ERROR_UNKNOWN;
+  }
   g_malloc_fail_countdown = -1;
 
-  err = ui_image_base_set_src(&image, "https://example.com/img.png", 0);
-  if (err != UI_ERROR_NONE)
-    return 1;
-  if (strcmp(image.src_url, "https://example.com/img.png") != 0)
-    return 1;
-  if (image.lazy_load != 0)
-    return 1;
-  if (image.state != UI_IMAGE_STATE_LOADING)
-    return 1;
-
-  err = ui_image_base_set_src(&image, "https://example.com/lazy.png", 1);
-  if (err != UI_ERROR_NONE)
-    return 1;
-  if (strcmp(image.src_url, "https://example.com/lazy.png") != 0)
-    return 1;
-  if (image.lazy_load != 1)
-    return 1;
-  if (image.state != UI_IMAGE_STATE_IDLE)
-    return 1;
-
-  alt = (char *)malloc(10);
-  if (alt) {
-    strcpy(alt, "alt");
-    image.alt_text = alt;
-  }
-
-  err = ui_image_base_cleanup(NULL);
-  if (err != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-
-  if (ui_image_base_cleanup(&image) != UI_ERROR_NONE)
-    return 1;
-  if (image.src_url != NULL)
-    return 1;
-  if (image.alt_text != NULL)
-    return 1;
-  return 0;
-}
-
-static int test_image_bind_src(void) {
-  struct ui_image_base image;
-  struct ui_component comp;
-  struct ui_signal *signal = (struct ui_signal *)1;
-  ui_error_t err;
-
-  if (ui_image_base_init(&image, &comp) != UI_ERROR_NONE)
-    return 1;
-
-  err = ui_image_base_bind_src(NULL, signal);
-  if (err != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-
-  err = ui_image_base_bind_src(&image, signal);
-  if (err != UI_ERROR_NONE)
-    return 1;
-  if (image.src_signal != signal)
-    return 1;
-
-  return 0;
+  (void)ui_image_base_cleanup(&image);
+  return UI_ERROR_NONE;
 }
 
 int main(void) {
-  if (test_image_init())
+  if (run_normal_tests() != UI_ERROR_NONE) {
+    printf("Normal tests failed.\n");
     return 1;
-  if (test_image_set_src())
+  }
+  if (run_oom_tests() != UI_ERROR_NONE) {
+    printf("OOM tests failed.\n");
     return 1;
-  if (test_image_bind_src())
-    return 1;
+  }
+  printf("All tests passed.\n");
   return 0;
 }

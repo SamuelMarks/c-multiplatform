@@ -66,10 +66,7 @@ on_intersection(struct ui_intersection_observer *observer,
     payload.int_val = best_id;
     {
       ui_error_t s_rc = ui_signal_set(spy->active_signal, payload);
-      if (s_rc != UI_ERROR_NONE) {
-        if (0)
-          return s_rc;
-      }
+      (void)s_rc;
     }
   }
   return UI_ERROR_NONE;
@@ -139,10 +136,7 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
   {
     ui_error_t sub_rc =
         ui_intersection_observer_subscribe(spy->observer, on_intersection, spy);
-    if (sub_rc != UI_ERROR_NONE) {
-      if (0)
-        return sub_rc;
-    }
+    (void)sub_rc;
   }
 
   /* Re-observe existing targets */
@@ -151,8 +145,7 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
       ui_error_t obs_rc =
           ui_intersection_observer_observe(spy->observer, spy->targets[i].node);
       if (obs_rc != UI_ERROR_NONE) {
-        if (0)
-          return obs_rc;
+        return obs_rc;
       }
     }
   }
@@ -181,10 +174,7 @@ ui_error_t ui_scroll_spy_add_target(struct ui_scroll_spy *spy,
     {
       ui_error_t ob_rc =
           ui_intersection_observer_observe(spy->observer, target);
-      if (ob_rc != UI_ERROR_NONE) {
-        if (0)
-          return ob_rc;
-      }
+      (void)ob_rc;
     }
   }
 
@@ -205,10 +195,7 @@ ui_error_t ui_scroll_spy_remove_target(struct ui_scroll_spy *spy,
         {
           ui_error_t un_rc =
               ui_intersection_observer_unobserve(spy->observer, target);
-          if (un_rc != UI_ERROR_NONE) {
-            if (0)
-              return un_rc;
-          }
+          (void)un_rc;
         }
       }
       spy->targets[i] = spy->targets[spy->target_count - 1];

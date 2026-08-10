@@ -5,6 +5,8 @@
 #include <string.h>
 /* clang-format on */
 
+extern int g_mock_append_child_fail;
+
 static ui_error_t test_scaffold_base(void) {
   struct ui_scaffold_base *scaffold;
   struct ui_component *top_bar, *main_content;
@@ -65,6 +67,8 @@ int main(void) {
 }
 int test_scaffold_base_extra(void) {
   struct ui_scaffold_base *scaffold = NULL;
+  struct ui_dom_node *dummy_slot = NULL;
+
   ui_scaffold_base_create(NULL);
   ui_scaffold_base_create(&scaffold);
   if (scaffold) {
@@ -76,6 +80,7 @@ int test_scaffold_base_extra(void) {
     ui_scaffold_base_bind_data(scaffold, NULL);
     (void)ui_component_destroy((struct ui_component *)scaffold);
   }
+
   return 0;
 }
 

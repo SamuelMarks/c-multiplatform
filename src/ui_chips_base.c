@@ -144,7 +144,10 @@ ui_error_t ui_chips_base_add(struct ui_chips_base *chips, const char *token) {
   if (!new_token) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
-  UI_STRCPY(new_token, len + 1, token);
+  if (UI_STRCPY(new_token, len + 1, token) != 0) {
+    C_MULTIPLATFORM_FREE(new_token);
+    return UI_ERROR_UNKNOWN;
+  }
 
   chips->tokens[chips->count++] = new_token;
   return trigger_cva_change(chips);

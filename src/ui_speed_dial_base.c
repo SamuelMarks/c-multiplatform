@@ -43,9 +43,8 @@ ui_error_t ui_speed_dial_base_add_action(struct ui_speed_dial_base *speed_dial,
 ui_error_t ui_speed_dial_base_toggle(struct ui_speed_dial_base *speed_dial) {
   if (!speed_dial)
     return UI_ERROR_INVALID_ARGUMENT;
-  if (speed_dial) {
-    speed_dial->is_open = !speed_dial->is_open;
-  }
+
+  speed_dial->is_open = !speed_dial->is_open;
   return UI_ERROR_NONE;
 }
 

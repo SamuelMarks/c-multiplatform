@@ -155,11 +155,7 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     ribbon->groups[i].current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_NORMAL;
   }
 
-  {
-    ui_error_t sort_rc = sort_indices_by_priority(ribbon, indices);
-    if (sort_rc != UI_ERROR_NONE)
-      return sort_rc;
-  }
+  (void)sort_indices_by_priority(ribbon, indices);
 
   /* Step 1: Collapse low-priority groups to COMPACT if we overflow */
   for (i = 0; i < ribbon->num_groups && current_width > available_width; ++i) {
@@ -169,12 +165,7 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     gs->current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_COMPACT;
 
     payload.int_val = gs->config.group_id;
-    {
-      ui_error_t set_rc =
-          ui_signal_set(ribbon->group_state_changed_signal, payload);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
-    }
+    (void)ui_signal_set(ribbon->group_state_changed_signal, payload);
   }
 
   /* Step 2: If we still overflow, collapse low-priority groups entirely */
@@ -186,12 +177,7 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     gs->current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_COLLAPSED;
 
     payload.int_val = gs->config.group_id;
-    {
-      ui_error_t set_rc =
-          ui_signal_set(ribbon->group_state_changed_signal, payload);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
-    }
+    (void)ui_signal_set(ribbon->group_state_changed_signal, payload);
   }
 
   return UI_ERROR_NONE;
@@ -208,11 +194,7 @@ ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t find_rc = find_group_state(ribbon, group_id, &gs);
-    if (find_rc != UI_ERROR_NONE)
-      return find_rc;
-  }
+  (void)find_group_state(ribbon, group_id, &gs);
   if (!gs) {
     return UI_ERROR_NOT_FOUND;
   }

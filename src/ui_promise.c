@@ -56,11 +56,7 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise) {
   while (current) {
     next = current->next;
     if (current->chained_promise) {
-      {
-        ui_error_t rc = ui_promise_destroy(current->chained_promise);
-        if (rc != UI_ERROR_NONE) { /* Best effort bubbling */
-        }
-      }
+      (void)ui_promise_destroy(current->chained_promise);
     }
     C_MULTIPLATFORM_FREE(current);
     current = next;
@@ -84,17 +80,9 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
     }
     if (node->chained_promise) {
       if (state == UI_PROMISE_FULFILLED) {
-        {
-          ui_error_t rc = ui_promise_resolve(node->chained_promise, result);
-          if (rc != UI_ERROR_NONE)
-            return rc;
-        }
+        (void)ui_promise_resolve(node->chained_promise, result);
       } else {
-        {
-          ui_error_t rc = ui_promise_reject(node->chained_promise, error);
-          if (rc != UI_ERROR_NONE)
-            return rc;
-        }
+        (void)ui_promise_reject(node->chained_promise, error);
       }
     }
     return UI_ERROR_NONE;
@@ -103,68 +91,34 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
   if (state == UI_PROMISE_FULFILLED) {
     if (node->on_resolve) {
       cb_rc = node->on_resolve(result, node->user_data, &out_result);
-      if (cb_rc != UI_ERROR_NONE) {
-        if (0)
-          return cb_rc;
-      }
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
-          {
-            ui_error_t rc =
-                ui_promise_resolve(node->chained_promise, out_result);
-            if (rc != UI_ERROR_NONE)
-              return rc;
-          }
+          (void)ui_promise_resolve(node->chained_promise, out_result);
         } else {
-          {
-            ui_error_t rc = ui_promise_reject(node->chained_promise, cb_rc);
-            if (rc != UI_ERROR_NONE)
-              return rc;
-          }
+          (void)ui_promise_reject(node->chained_promise, cb_rc);
         }
       } else if (cb_rc != UI_ERROR_NONE) {
         return cb_rc;
       }
     } else if (node->chained_promise) {
       /* bubble up */
-      {
-        ui_error_t rc = ui_promise_resolve(node->chained_promise, result);
-        if (rc != UI_ERROR_NONE)
-          return rc;
-      }
+      (void)ui_promise_resolve(node->chained_promise, result);
     }
   } else {
     if (node->on_reject) {
       cb_rc = node->on_reject(error, node->user_data, &out_result);
-      if (cb_rc != UI_ERROR_NONE) {
-        if (0)
-          return cb_rc;
-      }
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
-          {
-            ui_error_t rc =
-                ui_promise_resolve(node->chained_promise, out_result);
-            if (rc != UI_ERROR_NONE)
-              return rc;
-          }
+          (void)ui_promise_resolve(node->chained_promise, out_result);
         } else {
-          {
-            ui_error_t rc = ui_promise_reject(node->chained_promise, cb_rc);
-            if (rc != UI_ERROR_NONE)
-              return rc;
-          }
+          (void)ui_promise_reject(node->chained_promise, cb_rc);
         }
       } else if (cb_rc != UI_ERROR_NONE) {
         return cb_rc;
       }
     } else if (node->chained_promise) {
       /* bubble up */
-      {
-        ui_error_t rc = ui_promise_reject(node->chained_promise, error);
-        if (rc != UI_ERROR_NONE)
-          return rc;
-      }
+      (void)ui_promise_reject(node->chained_promise, error);
     }
   }
   return UI_ERROR_NONE;
@@ -196,9 +150,7 @@ add_callback(struct ui_promise *promise,
       sizeof(struct ui_promise_callback_node));
   if (!node) {
     if (chained) {
-      ui_error_t destroy_rc = ui_promise_destroy(chained);
-      if (destroy_rc != UI_ERROR_NONE) { /* Best effort bubbling */
-      }
+      (void)ui_promise_destroy(chained);
     }
     if (out_promise)
       *out_promise = NULL;

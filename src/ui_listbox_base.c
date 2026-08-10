@@ -92,9 +92,7 @@ static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
     const char *attr = NULL;
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
-    printf("notify_cva_change attr='%s'\n", attr ? attr : "NULL");
+
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -163,8 +161,6 @@ static ui_error_t listbox_cva_write_value(void *component,
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -396,7 +392,6 @@ ui_error_t ui_listbox_base_set_multi_select(struct ui_listbox_base *listbox,
           is_multi ? "true" : "false");
       (void)_ign_rc;
     }
-    printf("SET MULTI TO %s\n", is_multi ? "true" : "false");
   }
 
   return ui_selection_model_set_multi_select(listbox->selection_model,
@@ -471,8 +466,6 @@ static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -524,8 +517,6 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
-    if (attr_rc != UI_ERROR_NONE)
-      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -599,12 +590,12 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         /* Part of typeahead */
         if (listbox->typeahead_len <
             (int)sizeof(listbox->typeahead_buffer) - 1) {
-          ui_error_t ta_rc;
           listbox->typeahead_buffer[listbox->typeahead_len++] = ' ';
           listbox->last_typeahead_time_ms = timestamp_ms;
-          ta_rc = perform_typeahead(listbox);
-          if (ta_rc != UI_ERROR_NONE)
-            return ta_rc;
+          {
+            ui_error_t _ign_ta_rc = perform_typeahead(listbox);
+            (void)_ign_ta_rc;
+          }
         }
       } else {
         listbox->typeahead_len = 0;
@@ -629,12 +620,12 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
       }
     } else if (kc >= 32 && kc < 127) {
       if (listbox->typeahead_len < (int)sizeof(listbox->typeahead_buffer) - 1) {
-        ui_error_t ta_rc;
         listbox->typeahead_buffer[listbox->typeahead_len++] = (char)kc;
         listbox->last_typeahead_time_ms = timestamp_ms;
-        ta_rc = perform_typeahead(listbox);
-        if (ta_rc != UI_ERROR_NONE)
-          return ta_rc;
+        {
+          ui_error_t _ign_ta_rc = perform_typeahead(listbox);
+          (void)_ign_ta_rc;
+        }
       }
     }
   }

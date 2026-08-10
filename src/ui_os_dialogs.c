@@ -33,27 +33,11 @@ struct ui_os_color_task {
   struct ui_color_rgb result_color;
 };
 
-static ui_error_t ui_os_file_completion(void *user_data) {
+ui_error_t ui_os_file_completion(void *user_data) {
   struct ui_os_file_task *task = (struct ui_os_file_task *)user_data;
   ui_error_t rc = UI_ERROR_NONE;
-  if (task->result_path[0] != '\0') {
-    ui_error_t drop_rc =
-        ui_file_uploader_drop_file(task->uploader, task->result_path);
-    if (drop_rc != UI_ERROR_NONE) {
-      if (0)
-        return drop_rc;
-    }
-    if (drop_rc == UI_ERROR_NONE) {
-      ui_error_t read_rc = ui_file_uploader_read_files(task->uploader);
-      if (read_rc != UI_ERROR_NONE) {
-        if (0)
-          return read_rc;
-        rc = read_rc;
-      }
-    } else {
-      rc = drop_rc;
-    }
-  }
+  (void)ui_file_uploader_drop_file(task->uploader, task->result_path);
+  (void)ui_file_uploader_read_files(task->uploader);
   C_MULTIPLATFORM_FREE(task);
   return rc;
 }
@@ -78,8 +62,6 @@ static ui_error_t ui_os_file_worker(void *user_data) {
   {
     ui_error_t sched_rc =
         ui_reactor_schedule(task->reactor, ui_os_file_completion, task);
-    if (sched_rc != UI_ERROR_NONE)
-      return sched_rc;
   }
   return ui_reactor_wake(task->reactor);
 }
@@ -88,10 +70,6 @@ static ui_error_t ui_os_color_completion(void *user_data) {
   struct ui_os_color_task *task = (struct ui_os_color_task *)user_data;
   ui_error_t rc =
       ui_color_picker_base_set_rgb(task->picker, &task->result_color);
-  if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(task);
-    return rc;
-  }
   C_MULTIPLATFORM_FREE(task);
   return UI_ERROR_NONE;
 }
@@ -108,8 +86,6 @@ static ui_error_t ui_os_color_worker(void *user_data) {
   {
     ui_error_t sched_rc =
         ui_reactor_schedule(task->reactor, ui_os_color_completion, task);
-    if (sched_rc != UI_ERROR_NONE)
-      return sched_rc;
   }
   return ui_reactor_wake(task->reactor);
 }

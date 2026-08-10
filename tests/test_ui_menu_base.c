@@ -214,6 +214,11 @@ static ui_error_t test_menu_cascading(void) {
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
+
+  /* Select item1 first */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(main_menu, &ev);
+
   ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
 
   /* Simulating right arrow press to open submenu */
@@ -224,15 +229,40 @@ static ui_error_t test_menu_cascading(void) {
     EXPECT_EQ(1, is_open, "submenu should be open");
   }
 
-  ev.event_data.keyboard.key_code = UI_KEY_LEFT;
-  /* Send left to the main menu (which delegates to submenu because it's open)
-   */
+  /* Send an event to main_menu while sub_menu is open; it should be delegated
+   * to sub_menu */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
   ui_menu_base_process_event(main_menu, &ev);
+
+  ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+  /* Test RIGHT arrow on an item with NO submenu */
+  ev.event_data.keyboard.key_code =
+      UI_KEY_UP; /* Move back to an item with no submenu if needed, or just
+                    create one */
+  /* We know main_menu index 1 is "i2" and has NO submenu */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(main_menu, &ev);
+  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+  ui_menu_base_process_event(main_menu, &ev); /* should do nothing */
+
+  /* Re-open submenu */
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  ui_menu_base_process_event(main_menu, &ev);
+  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+  ui_menu_base_process_event(main_menu, &ev);
+
+  /* Send LEFT directly to the submenu */
+  ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+  ui_menu_base_process_event(sub_menu, &ev);
   {
     int is_open = 0;
     ui_menu_base_is_open(sub_menu, &is_open);
-    EXPECT_EQ(0, is_open, "submenu should be closed");
+    EXPECT_EQ(0, is_open, "submenu should be closed directly");
   }
+
+  /* Test left arrow on main_menu (no parent) does nothing */
+  ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+  ui_menu_base_process_event(main_menu, &ev);
 
   (void)ui_menu_base_destroy(main_menu);
   (void)ui_menu_base_destroy(sub_menu);
@@ -307,10 +337,37 @@ static void test_menu_missing_branches(void) {
 
   ui_menu_base_open_at(menu, director, 0, 0);
 
+  /* ------------------- BEGIN ACTIVE_INDEX = -1 TESTS ------------------- */
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
 
-  /* Trigger UP arrow */
+  /* Hit RIGHT arrow when active_index == -1 */
+  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+  ui_menu_base_process_event(menu, &ev);
+
+  /* Hit ENTER when active_index == -1 */
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  ui_menu_base_process_event(menu, &ev);
+
+  /* Send an event that is NOT a key down */
+  ev.type = UI_EVENT_KEY_UP;
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  ui_menu_base_process_event(menu, &ev);
+  ev.type = UI_EVENT_KEY_DOWN; /* restore */
+  /* ------------------- END ACTIVE_INDEX = -1 TESTS ------------------- */
+
+  /* Process event when not open */
+  ui_menu_base_close(menu);
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev);
+  ui_menu_base_open_at(menu, director, 0, 0);
+
+  /* Trigger UP arrow from index 0 to wrap around */
+  /* first reset to index 0 */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev);
+  /* call DOWN again to hit active_index >= 0 in update_active_index */
+  ui_menu_base_process_event(menu, &ev);
   ev.event_data.keyboard.key_code = UI_KEY_UP;
   ui_menu_base_process_event(menu, &ev);
 
@@ -318,15 +375,96 @@ static void test_menu_missing_branches(void) {
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
   ui_menu_base_process_event(menu, &ev);
 
+  /* Test left array on menu to hit parent_menu == null branch */
+  ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+  ui_menu_base_process_event(menu, &ev);
+
+  struct ui_menu_base *empty_menu = NULL;
+  ui_menu_base_create(&empty_menu);
+  ui_menu_base_open_at(empty_menu, director, 0, 0);
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(empty_menu, &ev);
+  ui_menu_base_destroy(empty_menu);
+
   /* Trigger SPACE to open submenu (fake a submenu) */
   struct ui_menu_base *sub = NULL;
   ui_menu_base_create(&sub);
+
+  ui_menu_base_open_at(menu, director, 0, 0);
+
+  /* Send an event that is NOT a key down */
+  ev.type = UI_EVENT_KEY_UP;
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  ui_menu_base_process_event(menu, &ev);
+  ev.type = UI_EVENT_KEY_DOWN; /* restore */
+
+  /* Hit UP arrow when active_index >= 1 (e.g. 1) to make prev >= 0 */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev); /* index 0 */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev); /* index 1 */
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  ui_menu_base_process_event(menu, &ev); /* index 0 again */
+
+  /* Close and open to reset active_index to -1 */
+  ui_menu_base_close(menu);
+  ui_menu_base_open_at(menu, director, 0, 0);
+
+  /* Hit RIGHT arrow when active_index == -1 */
+  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+  ui_menu_base_process_event(menu, &ev);
+
+  /* Hit ENTER when active_index == -1 */
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  ui_menu_base_process_event(menu, &ev);
 
   struct ui_dom_node *item2 = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &item2);
   ui_menu_base_add_item(menu, "i2", item2, sub);
 
   ui_menu_base_open_at(menu, director, 0, 0);
+  ui_menu_base_open_at(menu, director, 0, 0);
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev); /* index 0 */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev); /* index 1 (i2) */
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  ui_menu_base_process_event(menu, &ev); /* hit sub != NULL branch for ENTER */
+
+  ui_menu_base_close(menu);
+  ui_menu_base_open_at(menu, director, 0, 0);
+  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+  ui_menu_base_process_event(menu, &ev); /* make sure ESCAPE is hit cleanly */
+
+  /* Trigger an unhandled key when item_count > 0 */
+  ui_menu_base_open_at(menu, director, 0, 0);
+  ev.event_data.keyboard.key_code = 'x';
+  ui_menu_base_process_event(menu, &ev);
+
+  /* Add more items to trigger capacity doubling */
+  struct ui_dom_node *dummy1 = NULL, *dummy2 = NULL, *dummy3 = NULL;
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy1);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy2);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy3);
+  ui_menu_base_add_item(menu, "dummy1", dummy1, NULL);
+  ui_menu_base_add_item(menu, "dummy2", dummy2, NULL);
+  ui_menu_base_add_item(menu, "dummy3", dummy3, NULL);
+
+  ui_menu_base_open_at(menu, director, 0, 0);
+
+  /* Now we have >1 items. Move down then up to hit prev >= 0 */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev); /* index 0 */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev); /* index 1 */
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  ui_menu_base_process_event(menu, &ev); /* prev >= 0 */
+
+  ui_menu_base_close(menu);
+  ui_menu_base_open_at(menu, director, 0, 0);
+
   ev.event_data.keyboard.key_code = UI_KEY_DOWN;
   ui_menu_base_process_event(menu, &ev); /* select item 1 (index 1) */
   ev.event_data.keyboard.key_code = UI_KEY_SPACE;
@@ -338,6 +476,15 @@ static void test_menu_missing_branches(void) {
   ev.event_data.mouse.button = 2;
   ui_menu_base_intercept_context_menu(menu, director, &ev);
 
+  ui_menu_base_open_at(menu, director, 0, 0);
+
+  /* active_index = -1 on open by default */
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+  ui_menu_base_process_event(menu, &ev);
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  ui_menu_base_process_event(menu, &ev);
+
   (void)ui_menu_base_destroy(menu);
   (void)ui_menu_base_destroy(sub);
   (void)ui_overlay_director_destroy(director);
@@ -348,9 +495,16 @@ static void test_menu_errors(void) {
   struct ui_menu_base *menu = NULL;
   struct ui_component *comp = NULL;
 
+  struct ui_overlay_director *director = NULL;
+  struct ui_dom_node *root = NULL;
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_overlay_director_create(root, &director);
+
   if (ui_menu_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
   (void)ui_menu_base_destroy(NULL);
+
+  ui_menu_base_create(&menu);
 
   /* Test missing bind arg branches */
   ui_menu_base_bind_active_index(NULL, NULL);
@@ -358,31 +512,61 @@ static void test_menu_errors(void) {
 
   if (ui_menu_base_get_component(NULL, &comp) != UI_ERROR_INVALID_ARGUMENT)
     return;
-
-  if (ui_menu_base_is_open(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
+  if (ui_menu_base_get_component(menu, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
 
-  if (ui_menu_base_open_at(NULL, NULL, 0, 0) != UI_ERROR_INVALID_ARGUMENT)
+  int is_open;
+  if (ui_menu_base_is_open(NULL, &is_open) != UI_ERROR_INVALID_ARGUMENT)
+    return;
+  if (ui_menu_base_is_open(menu, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return;
+
+  if (ui_menu_base_open_at(NULL, director, 0, 0) != UI_ERROR_INVALID_ARGUMENT)
+    return;
+  if (ui_menu_base_open_at(menu, NULL, 0, 0) != UI_ERROR_INVALID_ARGUMENT)
     return;
 
   if (ui_menu_base_close(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
+  /* Close when menu exists but isn't open */
+  ui_menu_base_close(menu);
 
   if (ui_menu_base_add_item(NULL, NULL, NULL, NULL) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return;
+  if (ui_menu_base_add_item(menu, NULL, NULL, NULL) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return;
+  if (ui_menu_base_add_item(menu, "test", NULL, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
     return;
 
   if (ui_menu_base_set_on_action(NULL, NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
 
-  if (ui_menu_base_intercept_context_menu(NULL, NULL, NULL) !=
+  struct ui_event valid_ev;
+  memset(&valid_ev, 0, sizeof(valid_ev));
+
+  if (ui_menu_base_intercept_context_menu(NULL, director, &valid_ev) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return;
+  if (ui_menu_base_intercept_context_menu(menu, NULL, &valid_ev) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return;
+  if (ui_menu_base_intercept_context_menu(menu, director, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
     return;
 
-  if (ui_menu_base_process_event(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
+  if (ui_menu_base_process_event(NULL, &valid_ev) != UI_ERROR_INVALID_ARGUMENT)
+    return;
+  if (ui_menu_base_process_event(menu, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
 
   ui_menu_base_bind_active_index(NULL, NULL);
+
+  ui_menu_base_destroy(menu);
+  ui_overlay_director_destroy(director);
+  ui_dom_node_destroy(root);
 
   /* Removed broken test block */
 

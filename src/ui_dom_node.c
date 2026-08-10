@@ -126,7 +126,24 @@ ui_error_t ui_dom_node_append_child(struct ui_dom_node *parent,
     parent->last_child = child;
   }
 
-  ui_mutation_observer_notify_child_list(parent, child, NULL);
+  {
+    ui_error_t mut_rc =
+        ui_mutation_observer_notify_child_list(parent, child, NULL);
+    if (mut_rc != UI_ERROR_NONE) {
+      /* Revert appending if mutation observer fails */
+      if (child->previous_sibling) {
+        child->previous_sibling->next_sibling = NULL;
+        parent->last_child = child->previous_sibling;
+      } else {
+        parent->first_child = NULL;
+        parent->last_child = NULL;
+      }
+      child->parent = NULL;
+      child->previous_sibling = NULL;
+      child->next_sibling = NULL;
+      return mut_rc;
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -207,7 +224,8 @@ ui_error_t ui_dom_node_set_attribute(struct ui_dom_node *node, const char *name,
         ui_error_t mut_rc =
             ui_mutation_observer_notify_attribute(node, name, old_val_ptr);
         if (mut_rc != UI_ERROR_NONE) {
-          C_MULTIPLATFORM_FREE(old_val_ptr);
+          attr->value = old_val_ptr;
+          C_MULTIPLATFORM_FREE(value_copy);
           return mut_rc;
         }
       }
@@ -252,8 +270,13 @@ ui_error_t ui_dom_node_set_attribute(struct ui_dom_node *node, const char *name,
 #endif
 
   err = ui_mutation_observer_notify_attribute(node, name, NULL);
-  if (err != UI_ERROR_NONE)
+  if (err != UI_ERROR_NONE) {
+    node->attributes = new_attr->next;
+    C_MULTIPLATFORM_FREE(name_copy);
+    C_MULTIPLATFORM_FREE(value_copy);
+    C_MULTIPLATFORM_FREE(new_attr);
     return err;
+  }
 
   return UI_ERROR_NONE;
 
@@ -323,8 +346,15 @@ ui_error_t ui_dom_node_remove_attribute(struct ui_dom_node *node,
       {
         ui_error_t mut_rc =
             ui_mutation_observer_notify_attribute(node, name, old_val_ptr);
-        if (mut_rc != UI_ERROR_NONE)
+        if (mut_rc != UI_ERROR_NONE) {
+          /* Rollback */
+          if (prev) {
+            prev->next = attr;
+          } else {
+            node->attributes = attr;
+          }
           return mut_rc;
+        }
       }
       C_MULTIPLATFORM_FREE(attr->name);
       C_MULTIPLATFORM_FREE(old_val_ptr);
@@ -391,6 +421,8 @@ ui_error_t ui_dom_node_set_text_content(struct ui_dom_node *node,
 
   err = ui_mutation_observer_notify_character_data(node, old_val_ptr);
   if (err != UI_ERROR_NONE) { /* mock can fail before free */
+    node->text_content = old_val_ptr;
+    C_MULTIPLATFORM_FREE(text_copy);
     return err;
   }
 

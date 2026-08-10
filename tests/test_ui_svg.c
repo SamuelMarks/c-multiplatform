@@ -124,6 +124,14 @@ static int test_parse_curves(void) {
              path.commands[5].type != UI_SVG_CMD_ARC);
 
   ui_svg_path_destroy(&path);
+  ui_svg_path_init(&path);
+  ACCUM_ERR(
+      failed,
+      ui_svg_path_parse(
+          &path,
+          "m 0 0 c 1 1 2 1 3 0 s 5 1 6 0 q 7 1 8 0 t 10 0 a 1 1 0 0 1 1 0"));
+
+  ui_svg_path_destroy(&path);
   return failed;
 }
 
@@ -431,7 +439,8 @@ static int run_targeted_flatten_oom(void) {
 
   /* Target implicit subpath */
   ui_svg_path_init(&path);
-  ui_svg_path_parse(&path, "L 10 10");
+  ui_svg_path_parse(&path, "M 0 0 L 10 10 M 20 20 L 30 30 M 40 40 L 50 50 M 60 "
+                           "60 L 70 70 M 80 80 L 90 90");
   for (i = 0; i < 5; i++) {
     ui_svg_flattened_path_init(&flat);
     g_malloc_fail_countdown = i;
@@ -479,6 +488,16 @@ static int run_targeted_flatten_oom(void) {
   }
   ui_svg_path_destroy(&path);
 
+  /* Implicit reflection branches with NO valid prior command (last_cmd is M or
+   * L) */
+  ui_svg_path_init(&path);
+  ui_svg_path_parse(
+      &path, "M 0 0 S 1 1 2 2 s 1 1 2 2 T 1 1 t 1 1 M 0 0 C 1 1 2 2 3 3 S 1 1 "
+             "2 2 Q 1 1 2 2 T 1 1 M 0 0 s 1 1 2 2 S 1 1 2 2 t 1 1 T 1 1");
+  ui_svg_path_flatten(&flat, &path, 0.01f);
+  ui_svg_flattened_path_destroy(&flat);
+  ui_svg_path_destroy(&path);
+
   /* Target close path */
   ui_svg_path_init(&path);
   ui_svg_path_parse(&path,
@@ -491,6 +510,23 @@ static int run_targeted_flatten_oom(void) {
     g_malloc_fail_countdown = -1;
     ui_svg_flattened_path_destroy(&flat);
   }
+  ui_svg_path_destroy(&path);
+
+  /* Force depth > 10 in CUBIC by using an incredibly fine tolerance that won't
+   * OOM */
+  ui_svg_path_init(&path);
+  ui_svg_path_parse(&path, "M 0 0 C 0 10000 10000 10000 10000 0");
+  ui_svg_flattened_path_init(&flat);
+  ui_svg_path_flatten(&flat, &path, 0.00000001f);
+  ui_svg_flattened_path_destroy(&flat);
+  ui_svg_path_destroy(&path);
+
+  /* Force depth > 10 in QUADRATIC */
+  ui_svg_path_init(&path);
+  ui_svg_path_parse(&path, "M 0 0 Q 5000 10000 10000 0");
+  ui_svg_flattened_path_init(&flat);
+  ui_svg_path_flatten(&flat, &path, 0.00000001f);
+  ui_svg_flattened_path_destroy(&flat);
   ui_svg_path_destroy(&path);
 
 #endif
@@ -656,9 +692,54 @@ static int run_edge_cases(void) {
   ui_svg_path_destroy(&p);
   ui_svg_flattened_path_destroy(&f);
   ui_svg_geometry_destroy(&geom);
-  return failed;
-}
 
+  /* Add a path that does NOT close exactly and has more points to trigger the
+   * false branches of the UI_SVG_ABS checks */
+  ui_svg_path_init(&p);
+  ui_svg_flattened_path_init(&f);
+  ui_svg_geometry_init(&geom);
+  ui_svg_path_parse(&p, "M 0 0 L 100 0 L 100 100 L 0 50");
+  ui_svg_path_flatten(&f, &p, 1.0f);
+  ui_svg_tessellate_fill(&geom, &f);
+  ui_svg_path_destroy(&p);
+  ui_svg_flattened_path_destroy(&f);
+  ui_svg_geometry_destroy(&geom);
+
+  ui_svg_path_init(&p);
+  ui_svg_flattened_path_init(&f);
+  /* Trigger arc small radius (rad_chk > 1.0f) and negative sqrt (sq < 0.0f)
+   * branches */
+  ui_svg_path_parse(&p, "M 0 0 A 1 1 0 0 0 100 100");
+  ui_svg_path_flatten(&f, &p, 1.0f);
+  ui_svg_path_destroy(&p);
+  ui_svg_flattened_path_destroy(&f);
+
+  ui_svg_path_init(&p);
+  ui_svg_flattened_path_init(&f);
+  /* Force a mathematically negative sq inside the parameter calculation */
+  ui_svg_path_parse(&p, "M 0 0 A 10 10 0 0 0 100 0");
+  ui_svg_path_flatten(&f, &p, 1.0f);
+  ui_svg_path_destroy(&p);
+  ui_svg_flattened_path_destroy(&f);
+
+  ui_svg_path_init(&p);
+  ui_svg_flattened_path_init(&f);
+  /* Force negative radii */
+  ui_svg_path_parse(&p, "M 0 0 A -10 -10 0 0 0 100 0");
+  ui_svg_path_flatten(&f, &p, 1.0f);
+  ui_svg_path_destroy(&p);
+  ui_svg_flattened_path_destroy(&f);
+
+  ui_svg_path_init(&p);
+  ui_svg_flattened_path_init(&f);
+  /* Force ry to be too small */
+  ui_svg_path_parse(&p, "M 0 0 A 10 0.000001 0 0 0 100 0");
+  ui_svg_path_flatten(&f, &p, 1.0f);
+  ui_svg_path_destroy(&p);
+  ui_svg_flattened_path_destroy(&f);
+
+  return 0;
+}
 int main(void) {
   int failed = 0;
   failed += run_test("test_parse_basic_commands", test_parse_basic_commands);

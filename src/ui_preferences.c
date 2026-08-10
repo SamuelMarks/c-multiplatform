@@ -177,9 +177,7 @@ ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
   }
 #else
   /* Native implementation stub */
-  rc = ui_promise_reject(promise, UI_ERROR_UNSUPPORTED);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  (void)ui_promise_reject(promise, UI_ERROR_UNSUPPORTED);
 #endif
 
   *out_promise = promise;

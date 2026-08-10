@@ -75,7 +75,42 @@ static int test_os_dialogs(void) {
   return 0;
 }
 
+#include <stdlib.h>
+#include <string.h>
+
+struct ui_os_file_task {
+  struct ui_file_uploader_base *uploader;
+  char result_path[256];
+  struct ui_reactor *reactor;
+  struct ui_os_file_picker_config config;
+};
+
+extern ui_error_t ui_os_file_completion(void *user_data);
+
+static int test_os_file_completion(void) {
+  struct ui_os_file_task *task;
+  struct ui_file_uploader_base uploader;
+
+  ui_file_uploader_init(&uploader, 1, 0, 0, 100, 100, NULL);
+
+  task = malloc(sizeof(struct ui_os_file_task));
+  task->uploader = &uploader;
+  task->result_path[0] = '\0';
+  ui_os_file_completion(task);
+
+  task = malloc(sizeof(struct ui_os_file_task));
+  task->uploader = &uploader;
+  strcpy(task->result_path, "mock_path.txt");
+  ui_os_file_completion(task);
+
+  ui_file_uploader_destroy(&uploader);
+  return 0;
+}
+
 int main(void) {
+  if (test_os_file_completion() != 0)
+    return 1;
+
   if (test_os_dialogs())
     return 1;
   return 0;

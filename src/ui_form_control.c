@@ -145,7 +145,7 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
        For long-lived, we can just alloc from arena. */
     alloc_rc = ui_arena_alloc(control->arena, new_cap * sizeof(ui_validator_t),
                               8, (void **)&new_validators);
-    if (alloc_rc != UI_ERROR_NONE || !new_validators)
+    if (alloc_rc != UI_ERROR_NONE)
       return UI_ERROR_OUT_OF_MEMORY;
 
     if (control->sync_validators_count > 0) {
@@ -191,7 +191,7 @@ ui_error_t ui_form_control_add_async_validator(
     alloc_rc =
         ui_arena_alloc(control->arena, new_cap * sizeof(ui_async_validator_t),
                        8, (void **)&new_validators);
-    if (alloc_rc != UI_ERROR_NONE || !new_validators)
+    if (alloc_rc != UI_ERROR_NONE)
       return UI_ERROR_OUT_OF_MEMORY;
 
     if (control->async_validators_count > 0) {

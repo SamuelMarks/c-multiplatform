@@ -96,9 +96,7 @@ ui_error_t ui_table_base_create(struct ui_table_base **out_table,
 ui_error_t ui_table_base_destroy(struct ui_table_base *table) {
   if (!table)
     return UI_ERROR_NONE;
-  if (table->selection_model) {
-    ui_selection_model_destroy(table->selection_model);
-  }
+  ui_selection_model_destroy(table->selection_model);
   if (table->col_configs) {
     C_MULTIPLATFORM_FREE(table->col_configs);
   }
@@ -344,8 +342,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
   return UI_ERROR_NONE;
 
 cleanup:
-  if (table_root)
-    (void)ui_dom_node_destroy(table_root);
+  (void)ui_dom_node_destroy(table_root);
   return rc;
 }
 

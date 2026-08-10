@@ -25,6 +25,7 @@
   } while (0)
 
 void test_extra_node_graph_more(void);
+void test_extra_node_graph(void);
 void test_extra_node_graph_error(void);
 void test_extra_node_graph_errors(void);
 void test_extra_node_graph_errors2(void);
@@ -32,6 +33,49 @@ void test_extra_node_graph_error_matrix(void);
 void test_node_graph_oom_2(void);
 void test_node_graph_oom_3(void);
 void test_node_graph_update_camera_matrix_err(void);
+void test_node_graph_no_bounds(void) {
+  struct ui_arena *arena;
+  struct ui_node_graph_base *graph = NULL;
+  struct ui_node_graph_camera_config config;
+
+  if (ui_arena_create(1024 * 16, &arena) != UI_ERROR_NONE) {
+    return;
+  }
+  config.min_zoom = 0.1f;
+  config.max_zoom = 5.0f;
+  config.bounds.width = 1.0f; /* Disable bounds partially */
+  config.bounds.height = 0.0f;
+
+  ui_node_graph_base_create(arena, &config, &graph);
+  ui_node_graph_base_pan(graph, 100000.0f, 100000.0f);
+  ui_node_graph_base_zoom(graph, 2.0f, NULL);
+
+  ui_node_graph_base_destroy(graph);
+
+  /* Now reverse */
+  config.bounds.width = 0.0f;
+  config.bounds.height = 1.0f;
+  ui_node_graph_base_create(arena, &config, &graph);
+  ui_node_graph_base_pan(graph, 100000.0f, 100000.0f);
+  ui_node_graph_base_zoom(graph, 2.0f, NULL);
+
+  /* Test focal_point with old_zoom = 0.0f */
+  ui_node_graph_base_destroy(graph);
+
+  config.min_zoom = 0.0f;
+  ui_node_graph_base_create(arena, &config, &graph);
+  {
+    struct ui_dom_point focal;
+    focal.x = 0;
+    focal.y = 0;
+    ui_node_graph_base_zoom(graph, 0.0f, NULL);
+    ui_node_graph_base_zoom(graph, 2.0f, &focal);
+  }
+
+  ui_node_graph_base_destroy(graph);
+  ui_arena_destroy(arena);
+}
+
 int main(void) {
   struct ui_arena *arena;
   struct ui_node_graph_base *graph = NULL;
@@ -173,6 +217,17 @@ int main(void) {
   ASSERT_SUCCESS(ui_node_graph_base_destroy(graph));
   (void)ui_arena_destroy(arena);
 
+  test_extra_node_graph_more();
+  test_extra_node_graph_error();
+  test_extra_node_graph_errors();
+  test_extra_node_graph_errors2();
+  test_extra_node_graph_error_matrix();
+  test_node_graph_oom_2();
+  test_node_graph_oom_3();
+  test_node_graph_update_camera_matrix_err();
+  test_extra_node_graph();
+  test_node_graph_no_bounds();
+
   printf("All tests passed!\n");
   return 0;
 }
@@ -245,27 +300,25 @@ void test_node_graph_oom_3(void) {
   struct ui_node_graph_base *graph = NULL;
   struct ui_node_graph_camera_config config;
   int i;
-  if (ui_arena_create(1024 * 16, &arena) != UI_ERROR_NONE) {
-    return;
-  }
-  config.min_zoom = 0.1f;
-  config.max_zoom = 5.0f;
-  config.bounds.left = -1000.0f;
-  config.bounds.top = -1000.0f;
-  config.bounds.right = 1000.0f;
-  config.bounds.bottom = 1000.0f;
-  config.bounds.width = 2000.0f;
-  config.bounds.height = 2000.0f;
-
   for (i = 0; i < 10; ++i) {
-    g_malloc_fail_countdown = i;
-    ui_node_graph_base_create(arena, &config, &graph);
+    if (ui_arena_create(16, &arena) == UI_ERROR_NONE) {
+      g_malloc_fail_countdown = i;
+      if (ui_node_graph_base_create(arena, &config, &graph) != UI_ERROR_NONE) {
+        if (graph)
+          (void)ui_node_graph_base_destroy(graph);
+      }
+      g_malloc_fail_countdown = -1;
+      (void)ui_arena_destroy(arena);
+    }
   }
-  g_malloc_fail_countdown = -1;
-  (void)ui_arena_destroy(arena);
 }
 void test_node_graph_update_camera_matrix_err(void) {
   /* update_camera_matrix checks graph, but we can't send graph=NULL from
      outside We'll just have to sed that check away safely.
   */
+}
+#include "ui_node_graph_base.h"
+
+void test_extra_node_graph(void) {
+  ui_node_graph_base_add_connection(NULL, NULL);
 }

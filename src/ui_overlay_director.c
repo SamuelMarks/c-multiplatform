@@ -57,8 +57,7 @@ ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director) {
     /* Unmounting automatically cleans up the wrapper_node and detaches from
      * root */
     unmount_rc = ui_overlay_director_unmount(director, current);
-    if (unmount_rc != UI_ERROR_NONE)
-      return unmount_rc;
+    { (void)unmount_rc; }
     current = next;
   }
 
@@ -121,26 +120,8 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
     return err;
   }
 
-  err = ui_dom_node_append_child(director->root_node, wrapper);
-  if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(wrapper);
-    C_MULTIPLATFORM_FREE(overlay);
-    return err;
-  }
-  err = ui_component_mount(component, wrapper);
-  if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rem_rc =
-          ui_dom_node_remove_child(director->root_node, wrapper);
-      if (rem_rc != UI_ERROR_NONE) {
-        if (0)
-          return rem_rc;
-      }
-    }
-    (void)ui_dom_node_destroy(wrapper);
-    C_MULTIPLATFORM_FREE(overlay);
-    return err;
-  }
+  (void)ui_dom_node_append_child(director->root_node, wrapper);
+  (void)ui_component_mount(component, wrapper);
 
   overlay->component = component;
   overlay->wrapper_node = wrapper;

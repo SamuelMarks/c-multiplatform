@@ -29,52 +29,34 @@ struct ui_pull_to_refresh_base {
 };
 
 static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
-  if (ptr && ptr->component && ptr->component->shadow_root) {
-    char buf[64];
-    float progress = 0.0f;
-    {
-      ui_error_t get_rc = ui_pull_to_refresh_base_get_progress(ptr, &progress);
-      if (get_rc != UI_ERROR_NONE)
-        return get_rc;
-    }
+  char buf[64];
+  float progress = 0.0f;
+  (void)ui_pull_to_refresh_base_get_progress(ptr, &progress);
 #if defined(_MSC_VER)
-    sprintf_s(buf, sizeof(buf), "%.2f", progress);
+  sprintf_s(buf, sizeof(buf), "%.2f", progress);
 #else
-    sprintf(buf, "%.2f", progress);
+  sprintf(buf, "%.2f", progress);
 #endif
-    {
-      ui_error_t set_rc = ui_dom_node_set_attribute(ptr->component->shadow_root,
-                                                    "data-progress", buf);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
-    }
+  (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-progress",
+                                  buf);
 
-    switch (ptr->state) {
-    case UI_PULL_TO_REFRESH_RESTING: {
-      ui_error_t set_rc0 = ui_dom_node_set_attribute(
-          ptr->component->shadow_root, "data-state", "resting");
-      if (set_rc0 != UI_ERROR_NONE)
-        return set_rc0;
-    } break;
-    case UI_PULL_TO_REFRESH_PULLING: {
-      ui_error_t set_rc1 = ui_dom_node_set_attribute(
-          ptr->component->shadow_root, "data-state", "pulling");
-      if (set_rc1 != UI_ERROR_NONE)
-        return set_rc1;
-    } break;
-    case UI_PULL_TO_REFRESH_REFRESHING: {
-      ui_error_t set_rc2 = ui_dom_node_set_attribute(
-          ptr->component->shadow_root, "data-state", "refreshing");
-      if (set_rc2 != UI_ERROR_NONE)
-        return set_rc2;
-    } break;
-    case UI_PULL_TO_REFRESH_COMPLETING: {
-      ui_error_t set_rc3 = ui_dom_node_set_attribute(
-          ptr->component->shadow_root, "data-state", "completing");
-      if (set_rc3 != UI_ERROR_NONE)
-        return set_rc3;
-    } break;
-    }
+  switch (ptr->state) {
+  case UI_PULL_TO_REFRESH_RESTING:
+    (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
+                                    "resting");
+    break;
+  case UI_PULL_TO_REFRESH_PULLING:
+    (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
+                                    "pulling");
+    break;
+  case UI_PULL_TO_REFRESH_REFRESHING:
+    (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
+                                    "refreshing");
+    break;
+  case UI_PULL_TO_REFRESH_COMPLETING:
+    (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
+                                    "completing");
+    break;
   }
   return UI_ERROR_NONE;
 }
@@ -112,13 +94,7 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
     return rc;
   }
 
-  {
-    ui_error_t set_rc = ui_dom_node_set_tag_name(root_node, "div");
-    if (set_rc != UI_ERROR_NONE) {
-      if (0)
-        return set_rc;
-    }
-  }
+  (void)ui_dom_node_set_tag_name(root_node, "div");
   ptr->component->shadow_root = root_node;
 
   rc = ui_gesture_recognizer_create(&ptr->gesture_recognizer);
@@ -130,11 +106,7 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
     return rc;
   }
 
-  {
-    ui_error_t update_rc = update_dom_state(ptr);
-    if (update_rc != UI_ERROR_NONE)
-      return update_rc;
-  }
+  (void)update_dom_state(ptr);
 
   *out_ptr = ptr;
   return UI_ERROR_NONE;
@@ -147,17 +119,13 @@ ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr) {
     return UI_ERROR_NONE;
   }
 
-  if (ptr->gesture_recognizer) {
-    (void)ui_gesture_recognizer_destroy(ptr->gesture_recognizer);
-  }
+  (void)ui_gesture_recognizer_destroy(ptr->gesture_recognizer);
 
-  if (ptr->component) {
-    if (ptr->component->shadow_root) {
-      (void)ui_dom_node_destroy(ptr->component->shadow_root);
-      ptr->component->shadow_root = NULL;
-    }
-    (void)ui_component_destroy(ptr->component);
+  if (ptr->component->shadow_root) {
+    (void)ui_dom_node_destroy(ptr->component->shadow_root);
+    ptr->component->shadow_root = NULL;
   }
+  (void)ui_component_destroy(ptr->component);
 
   C_MULTIPLATFORM_FREE(ptr);
   return UI_ERROR_NONE;
@@ -185,11 +153,7 @@ ui_pull_to_refresh_base_complete(struct ui_pull_to_refresh_base *ptr) {
   if (ptr->state == UI_PULL_TO_REFRESH_REFRESHING) {
     ptr->state = UI_PULL_TO_REFRESH_COMPLETING;
     ptr->completion_timer_ms = 0.0f;
-    {
-      ui_error_t update_rc = update_dom_state(ptr);
-      if (update_rc != UI_ERROR_NONE)
-        return update_rc;
-    }
+    (void)update_dom_state(ptr);
   }
 
   return UI_ERROR_NONE;
@@ -243,11 +207,7 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
     if (ge.state == UI_GESTURE_STATE_BEGAN) {
       if (ptr->state == UI_PULL_TO_REFRESH_RESTING) {
         ptr->state = UI_PULL_TO_REFRESH_PULLING;
-        {
-          ui_error_t update_rc = update_dom_state(ptr);
-          if (update_rc != UI_ERROR_NONE)
-            return update_rc;
-        }
+        (void)update_dom_state(ptr);
       }
     } else if (ge.state == UI_GESTURE_STATE_CHANGED) {
       if (ptr->state == UI_PULL_TO_REFRESH_PULLING) {
@@ -258,20 +218,14 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
           if (resistance < 0.1f)
             resistance = 0.1f;
           ptr->pull_distance += ge.delta_y * resistance;
-          {
-            ui_error_t update_rc = update_dom_state(ptr);
-            if (update_rc != UI_ERROR_NONE)
-              return update_rc;
-          }
+          (void)update_dom_state(ptr);
         } else {
           ptr->pull_distance += ge.delta_y; /* pushing back up */
-          if (ptr->pull_distance < 0.0f)
+          if (ptr->pull_distance < 0.0f) {
+            printf("BINGO! pull_distance < 0.0f\n");
             ptr->pull_distance = 0.0f;
-          {
-            ui_error_t update_rc = update_dom_state(ptr);
-            if (update_rc != UI_ERROR_NONE)
-              return update_rc;
           }
+          (void)update_dom_state(ptr);
         }
       }
     } else if (ge.state == UI_GESTURE_STATE_ENDED ||
@@ -280,18 +234,9 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
         if (ptr->pull_distance >= UI_PTR_THRESHOLD) {
           ptr->state = UI_PULL_TO_REFRESH_REFRESHING;
           ptr->pull_distance = UI_PTR_THRESHOLD; /* lock to target threshold */
-          {
-            ui_error_t update_rc = update_dom_state(ptr);
-            if (update_rc != UI_ERROR_NONE)
-              return update_rc;
-          }
+          (void)update_dom_state(ptr);
           if (ptr->on_refresh) {
-            {
-              ui_error_t ref_rc =
-                  ptr->on_refresh(ptr, ptr->on_refresh_user_data);
-              if (ref_rc != UI_ERROR_NONE)
-                return ref_rc;
-            }
+            (void)ptr->on_refresh(ptr, ptr->on_refresh_user_data);
           }
         } else {
           /* Did not reach threshold, let the tick loop spring it back */
@@ -330,11 +275,7 @@ ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
         ptr->pull_distance = 0.0f;
         ptr->state = UI_PULL_TO_REFRESH_RESTING;
       }
-      {
-        ui_error_t update_rc = update_dom_state(ptr);
-        if (update_rc != UI_ERROR_NONE)
-          return update_rc;
-      }
+      (void)update_dom_state(ptr);
     }
   } else if (ptr->state == UI_PULL_TO_REFRESH_COMPLETING) {
     ptr->completion_timer_ms += (float)delta_ms;
@@ -346,17 +287,9 @@ ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
         ptr->pull_distance < 1.0f) {
       ptr->state = UI_PULL_TO_REFRESH_RESTING;
       ptr->pull_distance = 0.0f;
-      {
-        ui_error_t update_rc = update_dom_state(ptr);
-        if (update_rc != UI_ERROR_NONE)
-          return update_rc;
-      }
+      (void)update_dom_state(ptr);
     } else {
-      {
-        ui_error_t update_rc = update_dom_state(ptr);
-        if (update_rc != UI_ERROR_NONE)
-          return update_rc;
-      }
+      (void)update_dom_state(ptr);
     }
   }
 
@@ -383,10 +316,8 @@ ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
   }
   ptr->spinner_comp = spinner_comp;
   if (spinner_comp) {
-    ui_error_t ap_rc = ui_dom_node_append_child(ptr->component->shadow_root,
-                                                spinner_comp->shadow_root);
-    if (ap_rc != UI_ERROR_NONE)
-      return ap_rc;
+    (void)ui_dom_node_append_child(ptr->component->shadow_root,
+                                   spinner_comp->shadow_root);
   }
   return UI_ERROR_NONE;
 }

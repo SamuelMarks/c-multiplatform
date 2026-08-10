@@ -45,62 +45,47 @@ static ui_error_t update_dom_state(struct ui_select_base *select) {
   if (select && select->component && select->component->host_node) {
   }
 #endif
-  if (select && select->component && select->component->shadow_root) {
-
-    if (select->is_open) {
-      {
-        ui_error_t set_rc1 = ui_dom_node_set_attribute(
-            select->component->shadow_root, "aria-expanded", "true");
-        if (set_rc1 != UI_ERROR_NONE) {
-          if (0)
-            return set_rc1;
-        }
-      }
-    } else {
-      {
-        ui_error_t set_rc2 = ui_dom_node_set_attribute(
-            select->component->shadow_root, "aria-expanded", "false");
-        if (set_rc2 != UI_ERROR_NONE) {
-          if (0)
-            return set_rc2;
-        }
+  if (select->is_open) {
+    {
+      ui_error_t set_rc1 = ui_dom_node_set_attribute(
+          select->component->shadow_root, "aria-expanded", "true");
+      if (set_rc1 != UI_ERROR_NONE) {
+        return set_rc1;
       }
     }
+  } else {
+    {
+      ui_error_t set_rc2 = ui_dom_node_set_attribute(
+          select->component->shadow_root, "aria-expanded", "false");
+      if (set_rc2 != UI_ERROR_NONE) {
+        return set_rc2;
+      }
+    }
+  }
 
-    if (select->disabled) {
-      {
-        ui_error_t set_rc3 = ui_dom_node_set_attribute(
-            select->component->shadow_root, "disabled", "");
-        if (set_rc3 != UI_ERROR_NONE) {
-          if (0)
-            return set_rc3;
-        }
+  if (select->disabled) {
+    {
+      ui_error_t set_rc3 = ui_dom_node_set_attribute(
+          select->component->shadow_root, "disabled", "");
+      if (set_rc3 != UI_ERROR_NONE) {
+        return set_rc3;
       }
-      {
-        ui_error_t set_rc4 = ui_dom_node_set_attribute(
-            select->component->shadow_root, "aria-disabled", "true");
-        if (set_rc4 != UI_ERROR_NONE) {
-          if (0)
-            return set_rc4;
-        }
+    }
+    {
+      ui_error_t set_rc4 = ui_dom_node_set_attribute(
+          select->component->shadow_root, "aria-disabled", "true");
+      if (set_rc4 != UI_ERROR_NONE) {
+        return set_rc4;
       }
-    } else {
-      {
-        ui_error_t rem_rc1 = ui_dom_node_remove_attribute(
-            select->component->shadow_root, "disabled");
-        if (rem_rc1 != UI_ERROR_NONE && rem_rc1 != UI_ERROR_NOT_FOUND) {
-          if (0)
-            return rem_rc1;
-        }
-      }
-      {
-        ui_error_t rem_rc2 = ui_dom_node_remove_attribute(
-            select->component->shadow_root, "aria-disabled");
-        if (rem_rc2 != UI_ERROR_NONE && rem_rc2 != UI_ERROR_NOT_FOUND) {
-          if (0)
-            return rem_rc2;
-        }
-      }
+    }
+  } else {
+    {
+      (void)ui_dom_node_remove_attribute(select->component->shadow_root,
+                                         "disabled");
+    }
+    {
+      (void)ui_dom_node_remove_attribute(select->component->shadow_root,
+                                         "aria-disabled");
     }
   }
   return UI_ERROR_NONE;
@@ -135,22 +120,19 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
 
   rc = ui_component_create(&sel->component);
   if (rc != UI_ERROR_NONE) {
-    if (0)
-      return rc;
+    return rc;
     goto cleanup;
   }
 
   rc = ui_gesture_recognizer_create(&sel->gesture_recognizer);
   if (rc != UI_ERROR_NONE) {
-    if (0)
-      return rc;
+    return rc;
     goto cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    if (0)
-      return rc;
+    return rc;
     goto cleanup;
   }
 
@@ -166,8 +148,7 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
 
   rc = ui_css_parse_stylesheet(ui_select_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE) {
-    if (0)
-      return rc;
+    return rc;
     goto cleanup;
   }
 
@@ -185,8 +166,7 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
   {
     ui_error_t upd_rc = update_dom_state(sel);
     if (upd_rc != UI_ERROR_NONE) {
-      if (0)
-        return upd_rc;
+      return upd_rc;
     }
   }
 
@@ -225,20 +205,10 @@ ui_error_t ui_select_base_set_disabled(struct ui_select_base *select,
   select->disabled = disabled;
   if (disabled && select->is_open) {
     {
-      ui_error_t set_rc = ui_select_base_set_open(select, 0);
-      if (set_rc != UI_ERROR_NONE) {
-        if (0)
-          return set_rc;
-      }
+      (void)ui_select_base_set_open(select, 0);
     }
   } else {
-    {
-      ui_error_t upd_rc = update_dom_state(select);
-      if (upd_rc != UI_ERROR_NONE) {
-        if (0)
-          return upd_rc;
-      }
-    }
+    { (void)update_dom_state(select); }
   }
   return UI_ERROR_NONE;
 }
@@ -282,8 +252,7 @@ ui_error_t ui_select_base_set_open(struct ui_select_base *select, int is_open) {
     {
       ui_error_t upd_rc2 = update_dom_state(select);
       if (upd_rc2 != UI_ERROR_NONE) {
-        if (0)
-          return upd_rc2;
+        return upd_rc2;
       }
     }
     if (select->on_open_change) {
@@ -291,8 +260,7 @@ ui_error_t ui_select_base_set_open(struct ui_select_base *select, int is_open) {
         ui_error_t cb_rc = select->on_open_change(
             select, select->is_open, select->open_change_user_data);
         if (cb_rc != UI_ERROR_NONE) {
-          if (0)
-            return cb_rc;
+          return cb_rc;
         }
       }
     }
@@ -302,7 +270,7 @@ ui_error_t ui_select_base_set_open(struct ui_select_base *select, int is_open) {
 
 ui_error_t ui_select_base_is_open(const struct ui_select_base *select,
                                   int *out_is_open) {
-  if (!select || !out_is_open)
+  if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_is_open = select->is_open;
   return UI_ERROR_NONE;
@@ -328,7 +296,7 @@ ui_error_t ui_select_base_set_highlighted_index(struct ui_select_base *select,
 ui_error_t
 ui_select_base_get_highlighted_index(const struct ui_select_base *select,
                                      int *out_index) {
-  if (!select || !out_index)
+  if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_index = select->highlighted_index;
   return UI_ERROR_NONE;
@@ -367,8 +335,7 @@ ui_error_t ui_select_base_set_selected_index(struct ui_select_base *select,
         ui_error_t cb_rc2 = select->on_change(select, select->selected_index,
                                               select->change_user_data);
         if (cb_rc2 != UI_ERROR_NONE) {
-          if (0)
-            return cb_rc2;
+          return cb_rc2;
         }
       }
     }
@@ -380,7 +347,7 @@ ui_error_t ui_select_base_set_selected_index(struct ui_select_base *select,
 ui_error_t
 ui_select_base_get_selected_index(const struct ui_select_base *select,
                                   int *out_index) {
-  if (!select || !out_index)
+  if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_index = select->selected_index;
   return UI_ERROR_NONE;
@@ -435,8 +402,7 @@ ui_error_t ui_select_base_process_event(struct ui_select_base *select,
             ui_error_t set_rc = ui_select_base_set_selected_index(
                 select, select->highlighted_index);
             if (set_rc != UI_ERROR_NONE) {
-              if (0)
-                return set_rc;
+              return set_rc;
             }
           }
         }
@@ -483,13 +449,7 @@ static ui_error_t select_on_change_wrapper(struct ui_select_base *select,
   if (wrap && wrap->callback) {
     union ui_signal_payload p;
     p.int_val = index;
-    {
-      ui_error_t cb_rc = wrap->callback(p, wrap->user_data);
-      if (cb_rc != UI_ERROR_NONE) {
-        if (0)
-          return cb_rc;
-      }
-    }
+    { (void)wrap->callback(p, wrap->user_data); }
   }
   return UI_ERROR_NONE;
 }

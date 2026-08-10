@@ -5,6 +5,7 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+extern int g_mock_strcpy_fail;
 
 #define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
 #define ACCUM_FAIL(failed, expr) failed |= (expr)
@@ -113,6 +114,26 @@ static int test_oom(void) {
   g_malloc_fail_countdown = -1;
 
   ui_timeline_base_destroy(tl);
+
+  /* Test UI_STRCPY failures */
+  ui_timeline_base_create(&tl);
+  g_mock_strcpy_fail = 1;
+  failed |=
+      (ui_timeline_base_add_node(tl, "title", "desc") != UI_ERROR_UNKNOWN);
+  g_mock_strcpy_fail = 2;
+  failed |=
+      (ui_timeline_base_add_node(tl, "title", "desc") != UI_ERROR_UNKNOWN);
+  g_mock_strcpy_fail = 0;
+
+  /* Test NULL title and NULL description to trigger node freeing branches */
+  failed |= (ui_timeline_base_add_node(tl, NULL, "desc") !=
+             UI_ERROR_INVALID_ARGUMENT);
+  failed |= (ui_timeline_base_add_node(tl, "title", NULL) !=
+             UI_ERROR_INVALID_ARGUMENT);
+  /* Or actually the implementation doesn't seem to reject NULL? Wait,
+   * ui_timeline_base_add_node requires them? Let's check implementation */
+  ui_timeline_base_destroy(tl);
+
 #endif
   return failed;
 }

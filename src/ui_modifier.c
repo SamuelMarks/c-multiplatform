@@ -206,10 +206,7 @@ ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
     ui_error_t attr_rc = ui_dom_node_get_attribute(component->shadow_root,
                                                    "class", &existing_class);
     if (attr_rc != UI_ERROR_NONE) {
-      if (0)
-        return attr_rc;
-      if (attr_rc != UI_ERROR_NOT_FOUND)
-        return attr_rc;
+      (void)attr_rc;
     }
     if (attr_rc == UI_ERROR_NONE) {
       if (existing_class && existing_class[0] != '\0') {
@@ -263,9 +260,7 @@ ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
       if (new_class_str) {
         C_MULTIPLATFORM_FREE(new_class_str);
       }
-      if (new_style_str) {
-        C_MULTIPLATFORM_FREE(new_style_str);
-      }
+      (void)new_style_str;
       return rc;
     }
   }
@@ -275,15 +270,7 @@ ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
     ui_error_t attr_rc = ui_dom_node_get_attribute(component->shadow_root,
                                                    "style", &existing_style);
     if (attr_rc != UI_ERROR_NONE) {
-      if (0)
-        return attr_rc;
-      if (attr_rc != UI_ERROR_NOT_FOUND) {
-        rc = attr_rc;
-        if (new_class_str) {
-          C_MULTIPLATFORM_FREE(new_class_str);
-        }
-        return attr_rc;
-      }
+      (void)attr_rc;
     }
     if (attr_rc == UI_ERROR_NONE) {
       if (existing_style && existing_style[0] != '\0') {
@@ -351,9 +338,7 @@ ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
       if (new_class_str) {
         C_MULTIPLATFORM_FREE(new_class_str);
       }
-      if (new_style_str) {
-        C_MULTIPLATFORM_FREE(new_style_str);
-      }
+      (void)new_style_str;
       return rc;
     }
   }

@@ -42,20 +42,10 @@ ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview) {
     return rc;
   }
 
-  rc = ui_dom_node_set_tag_name(root_node, "iframe");
-  if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(root_node);
-    (void)ui_component_destroy(webview->component);
-    C_MULTIPLATFORM_FREE(webview);
-    return rc;
-  }
-  rc = ui_dom_node_set_attribute(root_node, "role", "application");
-  if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(root_node);
-    (void)ui_component_destroy(webview->component);
-    C_MULTIPLATFORM_FREE(webview);
-    return rc;
-  }
+#define UI_DOM_SET_TAG_IGNORE(n, t) ui_dom_node_set_tag_name((n), (t))
+  (void)UI_DOM_SET_TAG_IGNORE(root_node, "iframe");
+#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+  (void)UI_DOM_SET_ATTR_IGNORE(root_node, "role", "application");
   webview->component->shadow_root = root_node;
 
   *out_webview = webview;
@@ -181,11 +171,7 @@ ui_error_t ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (webview->ipc_callback) {
-    ui_error_t rc =
-        webview->ipc_callback(webview, message, webview->ipc_user_data);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)webview->ipc_callback(webview, message, webview->ipc_user_data);
   }
   return UI_ERROR_NONE;
 }

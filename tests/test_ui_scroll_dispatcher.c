@@ -23,6 +23,15 @@ static ui_error_t test_callback(struct ui_scroll_dispatcher *dispatcher,
   return UI_ERROR_NONE;
 }
 
+static ui_error_t test_callback_fail(struct ui_scroll_dispatcher *dispatcher,
+                                     const struct ui_scroll_info *info,
+                                     void *user_data) {
+  (void)dispatcher;
+  (void)info;
+  (void)user_data;
+  return UI_ERROR_UNKNOWN;
+}
+
 void test_ui_scroll_dispatcher_oom(void);
 int main(void) {
   ui_error_t rc;
@@ -48,9 +57,16 @@ int main(void) {
   }
 
   rc = ui_scroll_dispatcher_register(NULL, test_callback, NULL, &reg_id1);
-  if (rc != UI_ERROR_INVALID_ARGUMENT) {
-    printf("Test failed: expected INVALID_ARGUMENT from register\n");
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
     test_failed = 1;
+  rc = ui_scroll_dispatcher_register(dispatcher, NULL, NULL, &reg_id1);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    test_failed = 1;
+  rc = ui_scroll_dispatcher_register(dispatcher, test_callback, NULL, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    test_failed = 1;
+  if (test_failed) {
+    printf("Test failed: expected INVALID_ARGUMENT from register\n");
     goto cleanup;
   }
 
@@ -78,9 +94,13 @@ int main(void) {
 
   g_callback_called = 0;
   rc = ui_scroll_dispatcher_notify(NULL, &info);
-  if (rc != UI_ERROR_INVALID_ARGUMENT) {
-    printf("Test failed: expected INVALID_ARGUMENT from notify\n");
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
     test_failed = 1;
+  rc = ui_scroll_dispatcher_notify(dispatcher, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    test_failed = 1;
+  if (test_failed) {
+    printf("Test failed: expected INVALID_ARGUMENT from notify\n");
     goto cleanup;
   }
 
@@ -117,6 +137,20 @@ int main(void) {
     goto cleanup;
   }
 
+  /* Test callback failure */
+  {
+    int fail_reg_id;
+    ui_scroll_dispatcher_register(dispatcher, test_callback_fail, NULL,
+                                  &fail_reg_id);
+    rc = ui_scroll_dispatcher_notify(dispatcher, &info);
+    if (rc != UI_ERROR_UNKNOWN) {
+      printf("Test failed: expected UNKNOWN from failing callback\n");
+      test_failed = 1;
+      goto cleanup;
+    }
+    ui_scroll_dispatcher_unregister(dispatcher, fail_reg_id);
+  }
+
   /* Layout observer binding test */
   rc = ui_layout_observer_create(&layout_obs);
   if (rc != UI_ERROR_NONE) {
@@ -126,9 +160,13 @@ int main(void) {
   }
 
   rc = ui_scroll_dispatcher_bind_layout_observer(NULL, layout_obs);
-  if (rc != UI_ERROR_INVALID_ARGUMENT) {
-    printf("Test failed: expected INVALID_ARGUMENT from bind\n");
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
     test_failed = 1;
+  rc = ui_scroll_dispatcher_bind_layout_observer(dispatcher, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    test_failed = 1;
+  if (test_failed) {
+    printf("Test failed: expected INVALID_ARGUMENT from bind\n");
     goto cleanup;
   }
 
@@ -168,6 +206,22 @@ int main(void) {
     goto cleanup;
   }
 
+  /* Test layout observer percolating callback failure */
+  {
+    int fail_reg_id;
+    ui_scroll_dispatcher_register(dispatcher, test_callback_fail, NULL,
+                                  &fail_reg_id);
+    rc = ui_layout_observer_notify_resize(layout_obs, 1200, 1200);
+    if (rc != UI_ERROR_UNKNOWN) {
+      printf("Test failed: layout notify resize didn't percolate callback "
+             "failure (got %d)\n",
+             rc);
+      test_failed = 1;
+      goto cleanup;
+    }
+    ui_scroll_dispatcher_unregister(dispatcher, fail_reg_id);
+  }
+
   rc = ui_scroll_dispatcher_destroy(dispatcher);
   dispatcher = NULL;
   if (rc != UI_ERROR_NONE) {
@@ -204,24 +258,38 @@ void test_ui_scroll_dispatcher_oom(void) {
 
   ui_scroll_dispatcher_create(&dispatcher);
   if (dispatcher) {
-    for (i = 0; i < 5; ++i) {
-      g_malloc_fail_countdown = i;
+    /* Fill up to capacity (INITIAL_SUBSCRIBER_CAPACITY = 8) */
+    for (i = 0; i < 8; ++i) {
       int reg_id;
-      ui_scroll_dispatcher_register(dispatcher, NULL, NULL, &reg_id);
-    }
-    g_malloc_fail_countdown = -1;
-
-    /* force reallocation */
-    for (i = 0; i < 20; ++i) {
-      int reg_id;
-      ui_scroll_dispatcher_register(dispatcher, NULL, NULL, &reg_id);
+      ui_scroll_dispatcher_register(dispatcher, test_callback, NULL, &reg_id);
     }
 
-    /* force OOM during realloc */
+    /* Force a successful realloc */
+    {
+      int reg_id;
+      ui_scroll_dispatcher_register(dispatcher, test_callback, NULL, &reg_id);
+    }
+
+    /* force OOM during NEXT realloc (now capacity is 16, count is 9, so we need
+     * to fill it to 16) */
+    for (i = 9; i < 16; ++i) {
+      int reg_id;
+      ui_scroll_dispatcher_register(dispatcher, test_callback, NULL, &reg_id);
+    }
+
     g_malloc_fail_countdown = 0;
     int r;
-    ui_scroll_dispatcher_register(dispatcher, NULL, NULL, &r);
+    ui_scroll_dispatcher_register(dispatcher, test_callback, NULL, &r);
     g_malloc_fail_countdown = -1;
+
+    struct ui_layout_observer *obs = NULL;
+    ui_layout_observer_create(&obs);
+    for (i = 0; i < 5; ++i) {
+      g_malloc_fail_countdown = i;
+      ui_scroll_dispatcher_bind_layout_observer(dispatcher, obs);
+    }
+    g_malloc_fail_countdown = -1;
+    ui_layout_observer_destroy(obs);
 
     (void)ui_scroll_dispatcher_destroy(dispatcher);
   }

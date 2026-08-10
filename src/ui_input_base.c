@@ -42,54 +42,52 @@ struct ui_input_base {
 };
 
 static ui_error_t update_dom_state(struct ui_input_base *input) {
-  if (input->component && input->component->shadow_root) {
 #if defined(__EMSCRIPTEN__)
-    if (input->text) {
-      ui_error_t wb_rc = ui_web_bridge_set_property(
-          (uint32_t)(uintptr_t)input->component->shadow_root, "value",
-          input->text);
-      if (wb_rc != UI_ERROR_NONE)
-        return wb_rc;
-    }
+  if (input->text) {
+    ui_error_t wb_rc = ui_web_bridge_set_property(
+        (uint32_t)(uintptr_t)input->component->shadow_root, "value",
+        input->text);
+    if (wb_rc != UI_ERROR_NONE)
+      return wb_rc;
+  }
 #endif
-    if (input->text) {
-      ui_error_t rc1 = ui_dom_node_set_attribute(input->component->shadow_root,
-                                                 "value", input->text);
-      (void)rc1;
-    } else {
-      ui_error_t rc2 =
-          ui_dom_node_remove_attribute(input->component->shadow_root, "value");
-      (void)rc2;
-    }
+  if (input->text) {
+    ui_error_t rc1 = ui_dom_node_set_attribute(input->component->shadow_root,
+                                               "value", input->text);
+    (void)rc1;
+  } else {
+    ui_error_t rc2 =
+        ui_dom_node_remove_attribute(input->component->shadow_root, "value");
+    (void)rc2;
+  }
 
-    if (input->placeholder) {
-      ui_error_t rc3 = ui_dom_node_set_attribute(
-          input->component->shadow_root, "placeholder", input->placeholder);
-      (void)rc3;
-    } else {
-      ui_error_t rc4 = ui_dom_node_remove_attribute(
-          input->component->shadow_root, "placeholder");
-      (void)rc4;
-    }
+  if (input->placeholder) {
+    ui_error_t rc3 = ui_dom_node_set_attribute(
+        input->component->shadow_root, "placeholder", input->placeholder);
+    (void)rc3;
+  } else {
+    ui_error_t rc4 = ui_dom_node_remove_attribute(input->component->shadow_root,
+                                                  "placeholder");
+    (void)rc4;
+  }
 
-    if (input->disabled) {
-      ui_error_t rc5 = ui_dom_node_set_attribute(input->component->shadow_root,
-                                                 "disabled", "");
-      (void)rc5;
-      {
-        ui_error_t rc6 = ui_dom_node_set_attribute(
-            input->component->shadow_root, "aria-disabled", "true");
-        (void)rc6;
-      }
-    } else {
-      ui_error_t rc7 = ui_dom_node_remove_attribute(
-          input->component->shadow_root, "disabled");
-      (void)rc7;
-      {
-        ui_error_t rc8 = ui_dom_node_remove_attribute(
-            input->component->shadow_root, "aria-disabled");
-        (void)rc8;
-      }
+  if (input->disabled) {
+    ui_error_t rc5 = ui_dom_node_set_attribute(input->component->shadow_root,
+                                               "disabled", "");
+    (void)rc5;
+    {
+      ui_error_t rc6 = ui_dom_node_set_attribute(input->component->shadow_root,
+                                                 "aria-disabled", "true");
+      (void)rc6;
+    }
+  } else {
+    ui_error_t rc7 =
+        ui_dom_node_remove_attribute(input->component->shadow_root, "disabled");
+    (void)rc7;
+    {
+      ui_error_t rc8 = ui_dom_node_remove_attribute(
+          input->component->shadow_root, "aria-disabled");
+      (void)rc8;
     }
   }
   return UI_ERROR_NONE;
@@ -191,10 +189,8 @@ ui_error_t ui_input_base_destroy(struct ui_input_base *input) {
   C_MULTIPLATFORM_FREE(input->placeholder);
   if (input->on_change == input_cva_on_change_wrapper)
     C_MULTIPLATFORM_FREE(input->user_data);
-  if (input->gesture_recognizer)
-    (void)ui_gesture_recognizer_destroy(input->gesture_recognizer);
-  if (input->component)
-    (void)ui_component_destroy(input->component);
+  (void)ui_gesture_recognizer_destroy(input->gesture_recognizer);
+  (void)ui_component_destroy(input->component);
   C_MULTIPLATFORM_FREE(input);
   return UI_ERROR_NONE;
 }
@@ -408,7 +404,7 @@ static ui_error_t input_cva_on_change_wrapper(struct ui_input_base *input,
                                               void *user_data) {
   struct input_cva_wrapper *wrap = (struct input_cva_wrapper *)user_data;
   (void)input;
-  if (wrap && wrap->callback) {
+  if (wrap->callback) {
     union ui_signal_payload p;
     p.ptr_val = (void *)text;
     return wrap->callback(p, wrap->user_data);

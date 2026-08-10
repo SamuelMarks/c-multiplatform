@@ -50,6 +50,33 @@ static int test_theme_provider(void) {
   err = ui_theme_provider_get(grandchild, &resolved_dict);
   FAIL_CHECK(__LINE__, err != UI_ERROR_NONE || resolved_dict != &dict);
 
+  /* Test with a TEXT node to hit the UI_ERROR_INVALID_ARGUMENT branch from
+   * ui_dom_node_get_attribute */
+  {
+    struct ui_dom_node *text_node;
+    err = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+    FAIL_CHECK(__LINE__, err != UI_ERROR_NONE);
+    ui_dom_node_append_child(root, text_node);
+    err = ui_theme_provider_get(text_node, &resolved_dict);
+    FAIL_CHECK(__LINE__, err != UI_ERROR_INVALID_ARGUMENT);
+    /* No need to destroy text_node directly since it's a child of root, but
+     * ui_dom_node_destroy on root will clean it up */
+  }
+
+  /* Test with an invalid pointer string in the attribute to hit the sscanf
+   * failure branch */
+  {
+    struct ui_dom_node *bad_node;
+    err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &bad_node);
+    FAIL_CHECK(__LINE__, err != UI_ERROR_NONE);
+    err =
+        ui_dom_node_set_attribute(bad_node, "__ui_theme_ptr", "not_a_pointer");
+    FAIL_CHECK(__LINE__, err != UI_ERROR_NONE);
+    err = ui_theme_provider_get(bad_node, &resolved_dict);
+    FAIL_CHECK(__LINE__, err != UI_ERROR_NOT_FOUND);
+    (void)ui_dom_node_destroy(bad_node);
+  }
+
   /* Test ui_theme_provider_get NOT_FOUND branch by getting from an unmounted
    * tree */
   {

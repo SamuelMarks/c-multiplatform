@@ -33,6 +33,7 @@ static ui_error_t mock_on_close(struct ui_side_sheet_base *sheet,
 
 extern int g_malloc_fail_countdown;
 
+void test_ui_side_sheet_errs(void);
 int main(void) {
   struct ui_side_sheet_base *sheet = NULL;
   struct ui_component *comp = NULL;
@@ -133,6 +134,47 @@ int main(void) {
 
   (void)ui_side_sheet_base_destroy(sheet);
 
+  test_ui_side_sheet_errs();
   printf("All tests passed.\n");
   return 0;
+}
+
+static ui_error_t mock_on_close_fail(struct ui_side_sheet_base *sheet,
+                                     void *user_data) {
+  (void)sheet;
+  (void)user_data;
+  return UI_ERROR_UNKNOWN;
+}
+
+void test_ui_side_sheet_errs(void) {
+  struct ui_side_sheet_base *sheet = NULL;
+  struct ui_event ev;
+  (void)ui_side_sheet_base_create(&sheet);
+
+  (void)ui_side_sheet_base_set_on_close(sheet, mock_on_close_fail, NULL);
+  (void)ui_side_sheet_base_set_open(sheet, 1);
+  /* Triggers the if (rc != UI_ERROR_NONE) return rc; inside set_open */
+  (void)ui_side_sheet_base_set_open(sheet, 0);
+
+  (void)ui_side_sheet_base_set_open(sheet, 1);
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+  /* Triggers set_open failing from process_event -> returns rc */
+  (void)ui_side_sheet_base_process_event(sheet, &ev, 0.0);
+
+  /* Add missing branches for set_open */
+  (void)ui_side_sheet_base_set_open(sheet, 0); /* set to same state */
+  (void)ui_side_sheet_base_set_on_close(sheet, NULL,
+                                        NULL); /* no on_close callback */
+  (void)ui_side_sheet_base_set_open(sheet, 1);
+  (void)ui_side_sheet_base_set_open(sheet, 1); /* set to same state */
+  (void)ui_side_sheet_base_set_open(sheet, 0); /* close without callback */
+
+  /* Add missing branch for process_event: keydown but not escape */
+  (void)ui_side_sheet_base_set_open(sheet, 1);
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = 'A'; /* not escape */
+  (void)ui_side_sheet_base_process_event(sheet, &ev, 0.0);
+
+  (void)ui_side_sheet_base_destroy(sheet);
 }

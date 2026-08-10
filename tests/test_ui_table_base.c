@@ -73,6 +73,21 @@ static int test_null_args(void) {
   failed |=
       (ui_table_base_create(&table, &bad_model) != UI_ERROR_INVALID_ARGUMENT);
 
+  bad_model = model;
+  bad_model.get_column_count = NULL;
+  failed |=
+      (ui_table_base_create(&table, &bad_model) != UI_ERROR_INVALID_ARGUMENT);
+
+  bad_model = model;
+  bad_model.render_cell = NULL;
+  failed |=
+      (ui_table_base_create(&table, &bad_model) != UI_ERROR_INVALID_ARGUMENT);
+
+  bad_model = model;
+  bad_model.render_header = NULL;
+  failed |=
+      (ui_table_base_create(&table, &bad_model) != UI_ERROR_INVALID_ARGUMENT);
+
   failed |= (ui_table_base_create(NULL, &model) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_table_base_create(&table, NULL) != UI_ERROR_INVALID_ARGUMENT);
 
@@ -166,6 +181,11 @@ static int test_table_pagination(void) {
   ACCUM_ERR(failed, ui_table_base_set_pagination_config(table, &page_cfg));
 
   ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
+  ACCUM_ERR(failed, ui_table_base_render(table, container));
+
+  /* Page that does not exceed bounds (e.g. page 0) */
+  page_cfg.current_page = 0;
+  ACCUM_ERR(failed, ui_table_base_set_pagination_config(table, &page_cfg));
   ACCUM_ERR(failed, ui_table_base_render(table, container));
 
   /* Page past the end */

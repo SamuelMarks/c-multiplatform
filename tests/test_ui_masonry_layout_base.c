@@ -44,10 +44,11 @@ static void test_masonry_errors(void) {
   if (ui_masonry_layout_base_reflow(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
 
+  masonry = NULL;
   if (ui_masonry_layout_base_get_component(NULL, &comp) !=
       UI_ERROR_INVALID_ARGUMENT)
     return;
-  if (ui_masonry_layout_base_get_component(masonry, NULL) !=
+  if (ui_masonry_layout_base_get_component(NULL, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
     return;
 
@@ -55,18 +56,19 @@ static void test_masonry_errors(void) {
     return;
 
   ui_masonry_layout_base_create(&masonry);
+  if (ui_masonry_layout_base_get_component(masonry, NULL) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return;
   ui_masonry_layout_base_get_component(masonry, &comp);
   ui_masonry_layout_base_bind_data(masonry, NULL);
   (void)ui_masonry_layout_base_destroy(masonry);
 
-#ifdef UI_TEST_MOCK_ALLOC
   int i;
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
     ui_masonry_layout_base_create(&masonry);
     g_malloc_fail_countdown = -1;
   }
-#endif
 }
 
 int main(void) {

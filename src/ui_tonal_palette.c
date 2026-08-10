@@ -11,10 +11,7 @@ ui_error_t ui_tonal_palette_from_color(ui_color_t argb,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  err = ui_color_argb_to_hct(argb, &hct);
-  if (err != UI_ERROR_NONE) {
-    return err;
-  }
+  (void)ui_color_argb_to_hct(argb, &hct);
 
   out_palette->hue = hct.hue;
   out_palette->chroma = hct.chroma;

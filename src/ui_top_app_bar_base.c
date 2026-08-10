@@ -15,16 +15,14 @@ struct ui_top_app_bar_base {
 static ui_error_t state_equality(union ui_signal_payload a,
                                  union ui_signal_payload b,
                                  ui_bool_t *out_equal) {
-  if (out_equal)
-    *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
+  *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t height_equality(union ui_signal_payload a,
                                   union ui_signal_payload b,
                                   ui_bool_t *out_equal) {
-  if (out_equal)
-    *out_equal = (a.float_val == b.float_val) ? UI_TRUE : UI_FALSE;
+  *out_equal = (a.float_val == b.float_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
@@ -76,18 +74,13 @@ ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar) {
   if (!bar)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  if (bar->state_signal) {
-    {
-      ui_error_t _ign_rc = ui_signal_destroy(bar->state_signal);
-      (void)_ign_rc;
-    }
+  {
+    ui_error_t _ign_rc = ui_signal_destroy(bar->state_signal);
+    (void)_ign_rc;
   }
-
-  if (bar->height_signal) {
-    {
-      ui_error_t _ign_rc = ui_signal_destroy(bar->height_signal);
-      (void)_ign_rc;
-    }
+  {
+    ui_error_t _ign_rc = ui_signal_destroy(bar->height_signal);
+    (void)_ign_rc;
   }
 
   return UI_ERROR_NONE;

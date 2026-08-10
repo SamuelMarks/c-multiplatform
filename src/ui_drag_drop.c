@@ -142,17 +142,16 @@ ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
   *new_list = *list;
   new_list->items = NULL;
 
-  if (list->item_count > 0)
-    if (list->items) {
-      new_list->items = (struct ui_drag_item *)C_MULTIPLATFORM_MALLOC(
-          sizeof(struct ui_drag_item) * list->item_count);
-      if (!new_list->items) {
-        ctx->list_count--; /* Revert count on failure */
-        return UI_ERROR_OUT_OF_MEMORY;
-      }
-      memcpy(new_list->items, list->items,
-             sizeof(struct ui_drag_item) * list->item_count);
+  if (list->item_count > 0 && list->items) {
+    new_list->items = (struct ui_drag_item *)C_MULTIPLATFORM_MALLOC(
+        sizeof(struct ui_drag_item) * list->item_count);
+    if (!new_list->items) {
+      ctx->list_count--; /* Revert count on failure */
+      return UI_ERROR_OUT_OF_MEMORY;
     }
+    memcpy(new_list->items, list->items,
+           sizeof(struct ui_drag_item) * list->item_count);
+  }
 
   return UI_ERROR_NONE;
 }
@@ -266,9 +265,6 @@ static void handle_pointer_move(struct ui_drag_drop_context *ctx,
                                 int pointer_id, int x, int y) {
   if (ctx->active_pointer_id != pointer_id)
     return;
-  if (!ctx->pointer_is_down) {
-    return;
-  }
 
   ctx->current_x = x;
   ctx->current_y = y;

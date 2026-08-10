@@ -73,6 +73,9 @@ static int run_normal_tests(void) {
   EXPECT(ui_input_base_process_event(input, NULL, 0) ==
          UI_ERROR_INVALID_ARGUMENT);
 
+  EXPECT(ui_input_base_get_text(input, NULL) == UI_ERROR_INVALID_ARGUMENT);
+  EXPECT(ui_input_base_get_component(input, NULL) == UI_ERROR_INVALID_ARGUMENT);
+
   {
     struct ui_component *tmp_comp;
     EXPECT(ui_input_base_get_component(input, &tmp_comp) == UI_ERROR_NONE);
@@ -82,6 +85,15 @@ static int run_normal_tests(void) {
   /* Test set_text */
   g_change_count = 0;
   memset(g_last_text, 0, sizeof(g_last_text));
+
+  /* Test backspace and other keys when on_change is NULL */
+  ui_input_base_set_text(input, "a");
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_BACKSPACE;
+  ui_input_base_process_event(input, &ev, 0.0);
+  ev.event_data.keyboard.key_code = 'x';
+  ui_input_base_process_event(input, &ev, 0.0);
+
   err = ui_input_base_set_on_change(input, on_input_change, NULL);
   EXPECT(err == UI_ERROR_NONE);
 
@@ -164,6 +176,11 @@ static int run_normal_tests(void) {
   ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
   ui_input_base_process_event(input, &ev, 0.0);
 
+  /* RIGHT on empty text */
+  ui_input_base_set_text(input, NULL);
+  ui_input_base_process_event(input, &ev, 0.0);
+  ui_input_base_set_text(input, "ab");
+
   /* Go left again to insert in middle */
   ev.event_data.keyboard.key_code = UI_KEY_LEFT;
   ui_input_base_process_event(input, &ev, 0.0);
@@ -185,6 +202,12 @@ static int run_normal_tests(void) {
     EXPECT(ui_input_base_get_text(input, &tmp_text) == UI_ERROR_NONE);
     EXPECT(strcmp(tmp_text, "ab") == 0);
   }
+
+  /* Backspace on empty text */
+  ui_input_base_set_text(input, NULL);
+  ev.event_data.keyboard.key_code = UI_KEY_BACKSPACE;
+  ui_input_base_process_event(input, &ev, 0.0);
+  ui_input_base_set_text(input, "ab");
 
   /* Backspace at beginning */
   ev.event_data.keyboard.key_code = UI_KEY_LEFT;
@@ -208,11 +231,18 @@ static int run_normal_tests(void) {
   /* Try typing unprintable char */
   ev.event_data.keyboard.key_code = 10;
   ui_input_base_process_event(input, &ev, 0.0);
+  ev.event_data.keyboard.key_code = 127;
+  ui_input_base_process_event(input, &ev, 0.0);
   {
     const char *tmp_text;
     EXPECT(ui_input_base_get_text(input, &tmp_text) == UI_ERROR_NONE);
     EXPECT(strcmp(tmp_text, "ab") == 0);
   }
+
+  /* Try non-key down event */
+  ev.type = UI_EVENT_KEY_UP;
+  ev.event_data.keyboard.key_code = 'a';
+  ui_input_base_process_event(input, &ev, 0.0);
 
   /* CVA */
   EXPECT(ui_input_base_get_cva(NULL, &cva) == UI_ERROR_INVALID_ARGUMENT);

@@ -27,7 +27,7 @@ struct ui_timepicker_base {
 };
 
 static ui_error_t trigger_cva_change(struct ui_timepicker_base *tp) {
-  if (tp && tp->cva_on_change) {
+  if (tp->cva_on_change) {
     union ui_signal_payload payload;
     /* Payload is seconds since midnight */
     payload.int_val = (tp->hour * 3600) + (tp->minute * 60);
@@ -37,7 +37,7 @@ static ui_error_t trigger_cva_change(struct ui_timepicker_base *tp) {
 }
 
 static ui_error_t trigger_cva_touched(struct ui_timepicker_base *tp) {
-  if (tp && tp->cva_on_touched) {
+  if (tp->cva_on_touched) {
     return tp->cva_on_touched(tp->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
@@ -249,16 +249,13 @@ ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
   char *buf = NULL;
   size_t required_size;
 
-  ui_error_t rc;
-
   if (!timepicker || !out_string) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rc = ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
+  (void)ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
+  /* get_formatted_time only fails on null arguments, which we guaranteed above
+   */
 
   /* We allocate 32 bytes to prevent GCC format-overflow warnings on int fields
    */

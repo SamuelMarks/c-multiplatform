@@ -52,15 +52,17 @@ static void run_basic_tests(void) {
   /* Set error */
   rc = ui_form_field_base_set_error(NULL, "Error");
   assert(rc == UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_form_field_base_set_error(field, "");
+  assert(rc == UI_ERROR_NONE);
   rc = ui_form_field_base_set_error(field, "Error");
   assert(rc == UI_ERROR_NONE);
   rc = ui_form_field_base_set_error(field, NULL);
   assert(rc == UI_ERROR_NONE);
 
   /* Set components */
-  ui_component_create(&prefix);
-  ui_component_create(&suffix);
-  ui_component_create(&control_comp);
+  (void)ui_component_create(&prefix);
+  (void)ui_component_create(&suffix);
+  (void)ui_component_create(&control_comp);
 
   rc = ui_form_field_base_set_prefix(NULL, prefix);
   assert(rc == UI_ERROR_INVALID_ARGUMENT);
@@ -118,11 +120,11 @@ static void run_binding_tests(void) {
   union ui_signal_payload val = {0};
   ui_error_t rc;
 
-  ui_arena_create(1024, &arena);
-  ui_reactor_create(&reactor);
-  ui_form_control_create(arena, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
-                         UI_SIGNAL_MODE_SINGLE_THREADED, &control);
-  ui_form_field_base_create(&field);
+  (void)ui_arena_create(1024, &arena);
+  (void)ui_reactor_create(&reactor);
+  (void)ui_form_control_create(arena, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+                               UI_SIGNAL_MODE_SINGLE_THREADED, &control);
+  (void)ui_form_field_base_create(&field);
 
   rc = ui_form_field_base_bind_form_control(NULL, control, reactor);
   assert(rc == UI_ERROR_INVALID_ARGUMENT);
@@ -135,14 +137,14 @@ static void run_binding_tests(void) {
   assert(rc == UI_ERROR_NONE);
 
   /* Trigger error signal */
-  ui_form_control_set_error(control, "Test error");
+  (void)ui_form_control_set_error(control, "Test error");
   g_malloc_fail_countdown =
       0; /* fail ui_signal_get or ui_form_field_base_set_error inside effect */
-  ui_reactor_poll(reactor, 100);
+  (void)ui_reactor_poll(reactor, 100);
 
   g_malloc_fail_countdown = -1;
-  ui_form_control_set_error(control, "Test error 2");
-  ui_reactor_poll(reactor, 100);
+  (void)ui_form_control_set_error(control, "Test error 2");
+  (void)ui_reactor_poll(reactor, 100);
 
   /* Second bind does nothing but returns UI_ERROR_NONE */
   rc = ui_form_field_base_bind_form_control(field, control, reactor);
@@ -150,7 +152,7 @@ static void run_binding_tests(void) {
 
   (void)ui_form_field_base_destroy(field);
   (void)ui_form_control_destroy(control);
-  ui_reactor_destroy(reactor);
+  (void)ui_reactor_destroy(reactor);
   (void)ui_arena_destroy(arena);
 }
 
@@ -173,7 +175,7 @@ void run_oom_tests_form_field_base(void) {
     }
   }
 
-  ui_form_field_base_create(&field);
+  (void)ui_form_field_base_create(&field);
 
   for (i = 0; i < 50; i++) {
     g_malloc_fail_countdown = i;
@@ -211,10 +213,10 @@ void run_oom_tests_form_field_base(void) {
       break;
   }
 
-  ui_arena_create(1024, &arena);
-  ui_reactor_create(&reactor);
-  ui_form_control_create(arena, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
-                         UI_SIGNAL_MODE_SINGLE_THREADED, &control);
+  (void)ui_arena_create(1024, &arena);
+  (void)ui_reactor_create(&reactor);
+  (void)ui_form_control_create(arena, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+                               UI_SIGNAL_MODE_SINGLE_THREADED, &control);
 
   for (i = 0; i < 10; i++) {
     ui_error_t bind_rc;
@@ -228,7 +230,7 @@ void run_oom_tests_form_field_base(void) {
 
   (void)ui_form_field_base_destroy(field);
   (void)ui_form_control_destroy(control);
-  ui_reactor_destroy(reactor);
+  (void)ui_reactor_destroy(reactor);
   (void)ui_arena_destroy(arena);
 }
 

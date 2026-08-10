@@ -71,6 +71,8 @@ ui_os_dialog_open_color_picker_async(struct ui_color_picker_base *picker,
                                      struct ui_reactor *reactor,
                                      struct ui_thread_pool *pool);
 
+ui_error_t ui_os_file_completion(void *user_data);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

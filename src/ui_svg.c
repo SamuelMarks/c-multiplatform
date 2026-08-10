@@ -6,23 +6,17 @@
 #include <string.h>
 #include <math.h>
 /* clang-format on */
+#define UI_SVG_ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-static ui_error_t skip_whitespace_and_commas(const char **ptr) {
-  while (**ptr) {
-    if (isspace((unsigned char)**ptr) || **ptr == ',') {
-      (*ptr)++;
-    } else {
-      break;
-    }
+static void skip_whitespace_and_commas(const char **ptr) {
+  while (**ptr && (isspace((unsigned char)**ptr) || **ptr == ',')) {
+    (*ptr)++;
   }
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t parse_float(const char **ptr, float *out_val) {
   char *end;
-  ui_error_t skip_rc = skip_whitespace_and_commas(ptr);
-  if (skip_rc != UI_ERROR_NONE)
-    return skip_rc;
+  skip_whitespace_and_commas(ptr);
   if (!**ptr) {
     return UI_ERROR_PARSE_FAILED;
   }
@@ -49,12 +43,11 @@ static ui_error_t ensure_capacity(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
-static ui_error_t reflect_point(struct ui_svg_point *out_p,
-                                const struct ui_svg_point *p,
-                                const struct ui_svg_point *ref) {
+static void reflect_point(struct ui_svg_point *out_p,
+                          const struct ui_svg_point *p,
+                          const struct ui_svg_point *ref) {
   out_p->x = ref->x * 2.0f - p->x;
   out_p->y = ref->y * 2.0f - p->y;
-  return UI_ERROR_NONE;
 }
 
 ui_error_t ui_svg_path_init(struct ui_svg_path *path) {
@@ -105,10 +98,7 @@ ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
   last_cp.y = 0.0f;
 
   while (*ptr) {
-    ui_error_t skip_rc = skip_whitespace_and_commas(&ptr);
-    if (skip_rc != UI_ERROR_NONE) {
-      return skip_rc;
-    }
+    skip_whitespace_and_commas(&ptr);
     if (!*ptr) {
       break;
     }
@@ -180,8 +170,7 @@ ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
         goto cleanup;
       }
 
-      switch (upper_cmd) {
-      case 'M':
+      if (upper_cmd == 'M') {
         new_cmd.type = UI_SVG_CMD_MOVE_TO;
         new_cmd.data.move_to.p.x = is_relative ? cx + args[0] : args[0];
         new_cmd.data.move_to.p.y = is_relative ? cy + args[1] : args[1];
@@ -191,8 +180,7 @@ ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
         cy = start_y;
         last_cp.x = cx;
         last_cp.y = cy;
-        break;
-      case 'L':
+      } else if (upper_cmd == 'L') {
         new_cmd.type = UI_SVG_CMD_LINE_TO;
         new_cmd.data.line_to.p.x = is_relative ? cx + args[0] : args[0];
         new_cmd.data.line_to.p.y = is_relative ? cy + args[1] : args[1];
@@ -200,100 +188,95 @@ ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
         cy = new_cmd.data.line_to.p.y;
         last_cp.x = cx;
         last_cp.y = cy;
-        break;
-      case 'H':
+      } else if (upper_cmd == 'H') {
         new_cmd.type = UI_SVG_CMD_LINE_TO;
         new_cmd.data.line_to.p.x = is_relative ? cx + args[0] : args[0];
         new_cmd.data.line_to.p.y = cy;
         cx = new_cmd.data.line_to.p.x;
         last_cp.x = cx;
         last_cp.y = cy;
-        break;
-      case 'V':
+      } else if (upper_cmd == 'V') {
         new_cmd.type = UI_SVG_CMD_LINE_TO;
         new_cmd.data.line_to.p.x = cx;
         new_cmd.data.line_to.p.y = is_relative ? cy + args[0] : args[0];
         cy = new_cmd.data.line_to.p.y;
         last_cp.x = cx;
         last_cp.y = cy;
-        break;
-      case 'C':
+      } else if (upper_cmd == 'C' || upper_cmd == 'S') {
         new_cmd.type = UI_SVG_CMD_CUBIC_BEZIER;
-        new_cmd.data.cubic_bezier.cp1.x = is_relative ? cx + args[0] : args[0];
-        new_cmd.data.cubic_bezier.cp1.y = is_relative ? cy + args[1] : args[1];
-        new_cmd.data.cubic_bezier.cp2.x = is_relative ? cx + args[2] : args[2];
-        new_cmd.data.cubic_bezier.cp2.y = is_relative ? cy + args[3] : args[3];
-        new_cmd.data.cubic_bezier.p.x = is_relative ? cx + args[4] : args[4];
-        new_cmd.data.cubic_bezier.p.y = is_relative ? cy + args[5] : args[5];
+        if (upper_cmd == 'C') {
+          new_cmd.data.cubic_bezier.cp1.x =
+              is_relative ? cx + args[0] : args[0];
+          new_cmd.data.cubic_bezier.cp1.y =
+              is_relative ? cy + args[1] : args[1];
+          new_cmd.data.cubic_bezier.cp2.x =
+              is_relative ? cx + args[2] : args[2];
+          new_cmd.data.cubic_bezier.cp2.y =
+              is_relative ? cy + args[3] : args[3];
+          new_cmd.data.cubic_bezier.p.x = is_relative ? cx + args[4] : args[4];
+          new_cmd.data.cubic_bezier.p.y = is_relative ? cy + args[5] : args[5];
+        } else {
+          if (last_cmd == 'c' || last_cmd == 'C') {
+            struct ui_svg_point current_p;
+            current_p.x = cx;
+            current_p.y = cy;
+            reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp, &current_p);
+          } else if (last_cmd == 's' || last_cmd == 'S') {
+            struct ui_svg_point current_p;
+            current_p.x = cx;
+            current_p.y = cy;
+            reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp, &current_p);
+          } else {
+            new_cmd.data.cubic_bezier.cp1.x = cx;
+            new_cmd.data.cubic_bezier.cp1.y = cy;
+          }
+          new_cmd.data.cubic_bezier.cp2.x =
+              is_relative ? cx + args[0] : args[0];
+          new_cmd.data.cubic_bezier.cp2.y =
+              is_relative ? cy + args[1] : args[1];
+          new_cmd.data.cubic_bezier.p.x = is_relative ? cx + args[2] : args[2];
+          new_cmd.data.cubic_bezier.p.y = is_relative ? cy + args[3] : args[3];
+        }
         cx = new_cmd.data.cubic_bezier.p.x;
         cy = new_cmd.data.cubic_bezier.p.y;
         last_cp = new_cmd.data.cubic_bezier.cp2;
-        break;
-      case 'S':
-        new_cmd.type = UI_SVG_CMD_CUBIC_BEZIER;
-        if (last_cmd == 'c' || last_cmd == 'C' || last_cmd == 's' ||
-            last_cmd == 'S') {
-          struct ui_svg_point current_p;
-          ui_error_t refl_rc;
-          current_p.x = cx;
-          current_p.y = cy;
-          refl_rc = reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp,
-                                  &current_p);
-          if (refl_rc != UI_ERROR_NONE) {
-            return refl_rc;
-          }
-        } else {
-          new_cmd.data.cubic_bezier.cp1.x = cx;
-          new_cmd.data.cubic_bezier.cp1.y = cy;
-        }
-        new_cmd.data.cubic_bezier.cp2.x = is_relative ? cx + args[0] : args[0];
-        new_cmd.data.cubic_bezier.cp2.y = is_relative ? cy + args[1] : args[1];
-        new_cmd.data.cubic_bezier.p.x = is_relative ? cx + args[2] : args[2];
-        new_cmd.data.cubic_bezier.p.y = is_relative ? cy + args[3] : args[3];
-        cx = new_cmd.data.cubic_bezier.p.x;
-        cy = new_cmd.data.cubic_bezier.p.y;
-        last_cp = new_cmd.data.cubic_bezier.cp2;
-        break;
-      case 'Q':
+      } else if (upper_cmd == 'Q' || upper_cmd == 'T') {
         new_cmd.type = UI_SVG_CMD_QUADRATIC_BEZIER;
-        new_cmd.data.quadratic_bezier.cp.x =
-            is_relative ? cx + args[0] : args[0];
-        new_cmd.data.quadratic_bezier.cp.y =
-            is_relative ? cy + args[1] : args[1];
-        new_cmd.data.quadratic_bezier.p.x =
-            is_relative ? cx + args[2] : args[2];
-        new_cmd.data.quadratic_bezier.p.y =
-            is_relative ? cy + args[3] : args[3];
+        if (upper_cmd == 'Q') {
+          new_cmd.data.quadratic_bezier.cp.x =
+              is_relative ? cx + args[0] : args[0];
+          new_cmd.data.quadratic_bezier.cp.y =
+              is_relative ? cy + args[1] : args[1];
+          new_cmd.data.quadratic_bezier.p.x =
+              is_relative ? cx + args[2] : args[2];
+          new_cmd.data.quadratic_bezier.p.y =
+              is_relative ? cy + args[3] : args[3];
+        } else {
+          if (last_cmd == 'q' || last_cmd == 'Q') {
+            struct ui_svg_point current_p;
+            current_p.x = cx;
+            current_p.y = cy;
+            reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
+                          &current_p);
+          } else if (last_cmd == 't' || last_cmd == 'T') {
+            struct ui_svg_point current_p;
+            current_p.x = cx;
+            current_p.y = cy;
+            reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
+                          &current_p);
+          } else {
+            new_cmd.data.quadratic_bezier.cp.x = cx;
+            new_cmd.data.quadratic_bezier.cp.y = cy;
+          }
+          new_cmd.data.quadratic_bezier.p.x =
+              is_relative ? cx + args[0] : args[0];
+          new_cmd.data.quadratic_bezier.p.y =
+              is_relative ? cy + args[1] : args[1];
+        }
         cx = new_cmd.data.quadratic_bezier.p.x;
         cy = new_cmd.data.quadratic_bezier.p.y;
         last_cp = new_cmd.data.quadratic_bezier.cp;
-        break;
-      case 'T':
-        new_cmd.type = UI_SVG_CMD_QUADRATIC_BEZIER;
-        if (last_cmd == 'q' || last_cmd == 'Q' || last_cmd == 't' ||
-            last_cmd == 'T') {
-          struct ui_svg_point current_p;
-          ui_error_t refl_rc;
-          current_p.x = cx;
-          current_p.y = cy;
-          refl_rc = reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
-                                  &current_p);
-          if (refl_rc != UI_ERROR_NONE) {
-            return refl_rc;
-          }
-        } else {
-          new_cmd.data.quadratic_bezier.cp.x = cx;
-          new_cmd.data.quadratic_bezier.cp.y = cy;
-        }
-        new_cmd.data.quadratic_bezier.p.x =
-            is_relative ? cx + args[0] : args[0];
-        new_cmd.data.quadratic_bezier.p.y =
-            is_relative ? cy + args[1] : args[1];
-        cx = new_cmd.data.quadratic_bezier.p.x;
-        cy = new_cmd.data.quadratic_bezier.p.y;
-        last_cp = new_cmd.data.quadratic_bezier.cp;
-        break;
-      case 'A':
+      } else if (upper_cmd == 'A') {
         new_cmd.type = UI_SVG_CMD_ARC;
         new_cmd.data.arc.rx = args[0];
         new_cmd.data.arc.ry = args[1];
@@ -306,14 +289,12 @@ ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
         cy = new_cmd.data.arc.p.y;
         last_cp.x = cx;
         last_cp.y = cy;
-        break;
-      case 'Z':
+      } else {
         new_cmd.type = UI_SVG_CMD_CLOSE_PATH;
         cx = start_x;
         cy = start_y;
         last_cp.x = cx;
         last_cp.y = cy;
-        break;
       }
 
       path->commands[path->count++] = new_cmd;
@@ -391,10 +372,11 @@ ui_error_t ui_svg_geometry_destroy(struct ui_svg_geometry *geom) {
 static ui_error_t append_subpath(struct ui_svg_flattened_path *path,
                                  struct ui_svg_subpath **out_subpath) {
   if (path->count >= path->capacity) {
-    ui_uint32 new_cap = path->capacity == 0 ? 4 : path->capacity * 2;
-    struct ui_svg_subpath *new_arr =
-        (struct ui_svg_subpath *)C_MULTIPLATFORM_REALLOC(
-            path->subpaths, new_cap * sizeof(struct ui_svg_subpath));
+    ui_uint32 new_cap = path->capacity + 4;
+    struct ui_svg_subpath *new_arr;
+
+    new_arr = (struct ui_svg_subpath *)C_MULTIPLATFORM_REALLOC(
+        path->subpaths, new_cap * sizeof(struct ui_svg_subpath));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     path->subpaths = new_arr;
@@ -443,8 +425,10 @@ flatten_cubic_recursive(struct ui_svg_subpath *subpath, struct ui_svg_point p0,
   float d2 = (float)fabs((p2.x - p3.x) * dy - (p2.y - p3.y) * dx);
   ui_error_t rc;
 
-  if (depth > 10 ||
-      (d1 + d2) * (d1 + d2) < tolerance_sq * (dx * dx + dy * dy)) {
+  if (depth > 10) {
+    return append_point(subpath, p3.x, p3.y);
+  }
+  if ((d1 + d2) * (d1 + d2) < tolerance_sq * (dx * dx + dy * dy)) {
     return append_point(subpath, p3.x, p3.y);
   }
 
@@ -482,7 +466,10 @@ static ui_error_t flatten_quadratic_recursive(struct ui_svg_subpath *subpath,
   float d = (float)fabs((p1.x - p2.x) * dy - (p1.y - p2.y) * dx);
   ui_error_t rc;
 
-  if (depth > 10 || d * d < tolerance_sq * (dx * dx + dy * dy)) {
+  if (depth > 10) {
+    return append_point(subpath, p2.x, p2.y);
+  }
+  if (d * d < tolerance_sq * (dx * dx + dy * dy)) {
     return append_point(subpath, p2.x, p2.y);
   }
 
@@ -526,10 +513,10 @@ static ui_error_t arc_to_lines(struct ui_svg_subpath *subpath,
 
   (void)tolerance;
 
-  rx = (float)fabs(rx);
-  ry = (float)fabs(ry);
+  rx = UI_SVG_ABS(rx);
+  ry = UI_SVG_ABS(ry);
 
-  if (rx == 0.0f || ry == 0.0f) {
+  if (rx < 1e-5f || ry < 1e-5f) {
     return append_point(subpath, p.x, p.y);
   }
 
@@ -549,7 +536,7 @@ static ui_error_t arc_to_lines(struct ui_svg_subpath *subpath,
   sign = (large_arc_flag == sweep_flag) ? -1.0f : 1.0f;
   sq = ((rx_sq * ry_sq) - (rx_sq * y1p_sq) - (ry_sq * x1p_sq)) /
        ((rx_sq * y1p_sq) + (ry_sq * x1p_sq));
-  sq = (sq < 0.0f) ? 0.0f : sq;
+  /* rad_chk above ensures that sq >= 0.0f */
   coef = sign * (float)sqrt(sq);
   cxp = coef * ((rx * y1p) / ry);
   cyp = coef * (-(ry * x1p) / rx);
@@ -635,12 +622,8 @@ ui_error_t ui_svg_path_flatten(struct ui_svg_flattened_path *flattened,
       start_point = current_point;
     } else if (current_subpath == NULL) {
       /* Path starts without a move_to. Implicitly move to 0,0. */
-      rc = append_subpath(flattened, &current_subpath);
-      if (rc != UI_ERROR_NONE)
-        goto cleanup;
-      rc = append_point(current_subpath, 0.0f, 0.0f);
-      if (rc != UI_ERROR_NONE)
-        goto cleanup;
+      append_subpath(flattened, &current_subpath);
+      append_point(current_subpath, 0.0f, 0.0f);
     }
 
     if (cmd->type == UI_SVG_CMD_LINE_TO) {
@@ -730,34 +713,24 @@ static ui_error_t append_index(struct ui_svg_geometry *geom, ui_uint32 index) {
   return UI_ERROR_NONE;
 }
 
-static ui_error_t triangle_area(struct ui_svg_point a, struct ui_svg_point b,
-                                struct ui_svg_point c, float *out_area) {
+static void triangle_area(struct ui_svg_point a, struct ui_svg_point b,
+                          struct ui_svg_point c, float *out_area) {
   *out_area = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t is_point_in_triangle(struct ui_svg_point p,
                                        struct ui_svg_point a,
                                        struct ui_svg_point b,
                                        struct ui_svg_point c, int *out_match) {
-  ui_error_t rc;
   float area = 0.0f;
   float w1 = 0.0f, w2 = 0.0f, w3 = 0.0f;
   *out_match = 0;
-  rc = triangle_area(a, b, c, &area);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = triangle_area(b, c, p, &w1);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  triangle_area(a, b, c, &area);
+  triangle_area(b, c, p, &w1);
   w1 /= area;
-  rc = triangle_area(c, a, p, &w2);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  triangle_area(c, a, p, &w2);
   w2 /= area;
-  rc = triangle_area(a, b, p, &w3);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  triangle_area(a, b, p, &w3);
   w3 /= area;
   *out_match = (w1 >= 0.0f && w2 >= 0.0f && w3 >= 0.0f);
   return UI_ERROR_NONE;
@@ -777,16 +750,17 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
     struct ui_svg_subpath *subpath = &flattened->subpaths[i];
     ui_uint32 *linked = NULL;
     ui_uint32 n = subpath->count;
-    ui_uint32 original_n;
     ui_uint32 j, prev, curr, next;
     int ears_found;
 
-    if (n > 1 &&
-        fabs(subpath->points[0].x - subpath->points[n - 1].x) < 1e-5f &&
-        fabs(subpath->points[0].y - subpath->points[n - 1].y) < 1e-5f) {
-      n--;
+    if (n > 1) {
+      if (UI_SVG_ABS(subpath->points[0].x - subpath->points[n - 1].x) < 1e-5f) {
+        if (UI_SVG_ABS(subpath->points[0].y - subpath->points[n - 1].y) <
+            1e-5f) {
+          n--;
+        }
+      }
     }
-    original_n = n;
 
     if (n < 3)
       continue;
@@ -833,29 +807,22 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
       do {
         /* Find prev */
         float area = 0.0f;
-        ui_error_t tri_rc;
-        for (prev = 0; prev < original_n; prev++) {
-          if (linked[prev] == curr)
-            break;
+        prev = linked[curr];
+        while (linked[prev] != curr) {
+          prev = linked[prev];
         }
         next = linked[curr];
-        tri_rc = triangle_area(subpath->points[prev], subpath->points[curr],
-                               subpath->points[next], &area);
-        if (tri_rc != UI_ERROR_NONE) {
-          return tri_rc;
-        }
+        triangle_area(subpath->points[prev], subpath->points[curr],
+                      subpath->points[next], &area);
         if (area > 0.0f) {
           /* Convex, test if any other point is inside */
           int is_ear = 1;
           ui_uint32 test_pt = linked[next];
           while (test_pt != prev) {
             int is_in = 0;
-            ui_error_t in_rc = is_point_in_triangle(
-                subpath->points[test_pt], subpath->points[prev],
-                subpath->points[curr], subpath->points[next], &is_in);
-            if (in_rc != UI_ERROR_NONE) {
-              return in_rc;
-            }
+            is_point_in_triangle(subpath->points[test_pt],
+                                 subpath->points[prev], subpath->points[curr],
+                                 subpath->points[next], &is_in);
             if (is_in) {
               is_ear = 0;
               break;

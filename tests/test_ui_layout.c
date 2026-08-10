@@ -183,7 +183,187 @@ static void test_extra_coverage(void) {
 
 void test_more_layout(void);
 void test_coverage_layout(void);
+static int test_overflow_violation(void) {
+  struct ui_dom_node *root, *child;
+  struct ui_css_stylesheet *sheet;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *r1, *r2;
+  ui_error_t rc;
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "ov-root");
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child);
+  ui_dom_node_set_tag_name(child, "div");
+  ui_dom_node_set_attribute(child, "class", "ov-child");
+  ui_dom_node_append_child(root, child);
+
+  ui_css_stylesheet_create(&sheet);
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r1);
+  ui_css_rule_append_selector(r1, UI_CSS_SELECTOR_TYPE_CLASS, "ov-root");
+  ui_css_rule_append_declaration(r1, "display", "block", 0);
+  ui_css_rule_append_declaration(r1, "width", "100px", 0);
+  ui_css_rule_append_declaration(r1, "height", "100px", 0);
+  ui_css_rule_append_declaration(r1, "overflow", "hidden", 0);
+  ui_css_stylesheet_append_rule(sheet, r1);
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r2);
+  ui_css_rule_append_selector(r2, UI_CSS_SELECTOR_TYPE_CLASS, "ov-child");
+  ui_css_rule_append_declaration(r2, "display", "block", 0);
+  ui_css_rule_append_declaration(r2, "width", "200px", 0); /* bleeds! */
+  ui_css_rule_append_declaration(r2, "height", "200px", 0);
+  ui_css_stylesheet_append_rule(sheet, r2);
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  ui_layout_compute(lroot, 800, 600);
+
+  rc = ui_layout_sanity_check(lroot);
+  if (rc != UI_ERROR_LAYOUT_VIOLATION) {
+    printf("Expected UI_ERROR_LAYOUT_VIOLATION for bleeding overflow hidden\n");
+    return 1;
+  }
+
+  /* Now fix X and bleed Y */
+  ui_css_rule_append_declaration(r2, "width", "50px", 0);
+  ui_css_rule_append_declaration(r2, "height", "200px", 0);
+  ui_layout_compute(lroot, 800, 600);
+  rc = ui_layout_sanity_check(lroot);
+  if (rc != UI_ERROR_LAYOUT_VIOLATION) {
+    printf("Expected UI_ERROR_LAYOUT_VIOLATION for Y bleeding\n");
+    return 1;
+  }
+
+  ui_layout_tree_destroy(lroot);
+  ui_css_stylesheet_destroy(sheet);
+  ui_dom_node_destroy(root);
+  return 0;
+}
+
+static void test_extra_coverage_2(void) {
+  struct ui_dom_node *root = NULL, *child1 = NULL, *child2 = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_css_rule *rule1 = NULL, *rule2 = NULL, *rule3 = NULL;
+  struct ui_layout_node *lroot = NULL;
+
+  /* ui_layout_solve_viewport(NULL) */
+  ui_layout_solve_viewport(NULL, 100.0f, 100.0f);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child2);
+  ui_dom_node_append_child(root, child1);
+  ui_dom_node_append_child(root, child2);
+
+  ui_css_stylesheet_create(&sheet);
+
+  /* root */
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule1);
+  ui_css_rule_append_selector(rule1, UI_CSS_SELECTOR_TYPE_TAG, "div");
+  ui_css_rule_append_declaration(rule1, "width", "100px", 0);
+  ui_css_stylesheet_append_rule(sheet, rule1);
+  ui_dom_node_set_tag_name(root, "div");
+
+  /* child1: inline */
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule2);
+  ui_css_rule_append_selector(rule2, UI_CSS_SELECTOR_TYPE_TAG, "span");
+  ui_css_rule_append_declaration(rule2, "display", "inline", 0);
+  ui_css_stylesheet_append_rule(sheet, rule2);
+  ui_dom_node_set_tag_name(child1, "span");
+
+  /* child2: block */
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule3);
+  ui_css_rule_append_selector(rule3, UI_CSS_SELECTOR_TYPE_TAG, "p");
+  ui_css_rule_append_declaration(rule3, "display", "block", 0);
+  ui_css_stylesheet_append_rule(sheet, rule3);
+  ui_dom_node_set_tag_name(child2, "p");
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  ui_layout_solve_viewport(lroot, 100.0f, 100.0f);
+  ui_layout_tree_destroy(lroot);
+  ui_dom_node_destroy(root);
+  ui_css_stylesheet_destroy(sheet);
+
+  /* fit-content test */
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
+  ui_dom_node_append_child(root, child1);
+  ui_css_stylesheet_create(&sheet);
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule1);
+  ui_css_rule_append_selector(rule1, UI_CSS_SELECTOR_TYPE_TAG, "div");
+  ui_css_rule_append_declaration(rule1, "width", "fit-content", 0);
+  ui_css_stylesheet_append_rule(sheet, rule1);
+  ui_dom_node_set_tag_name(root, "div");
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  /* Force a small viewport to trigger fit > available and fit < min-content */
+  ui_layout_solve_viewport(lroot, 5.0f, 100.0f);
+  ui_layout_tree_destroy(lroot);
+  ui_dom_node_destroy(root);
+
+  ui_css_stylesheet_destroy(sheet);
+}
+
+static void test_extra_coverage_3(void) {
+  struct ui_dom_node *root = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_css_rule *rule1 = NULL;
+  struct ui_layout_node *lroot = NULL;
+
+  /* ui_layout_compute(NULL) */
+  ui_layout_compute(NULL, 100.0f, 100.0f);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_css_stylesheet_create(&sheet);
+
+  /* root with various edge cases */
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule1);
+  ui_css_rule_append_selector(rule1, UI_CSS_SELECTOR_TYPE_TAG, "div");
+  /* width < min-width */
+  ui_css_rule_append_declaration(rule1, "width", "10px", 0);
+  ui_css_rule_append_declaration(rule1, "min-width", "50px", 0);
+  /* aspect-ratio with large padding -> content_height < 0 */
+  ui_css_rule_append_declaration(rule1, "aspect-ratio", "1", 0);
+  ui_css_rule_append_declaration(rule1, "padding", "100px", 0);
+  /* column-width and column-count clipping */
+  ui_css_rule_append_declaration(rule1, "column-width", "10px", 0);
+  ui_css_rule_append_declaration(rule1, "column-count", "2", 0);
+  /* max-height */
+  ui_css_rule_append_declaration(rule1, "max-height", "5px", 0);
+
+  ui_css_stylesheet_append_rule(sheet, rule1);
+  ui_dom_node_set_tag_name(root, "div");
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  ui_layout_compute(lroot, 100.0f, 100.0f);
+
+  /* empty block with padding -> content_height < 0 without children */
+  /* since it has width 10px, aspect-ratio will compute height, so let's
+   * override height to 0 to test implicit height clamping */
+  /* wait, aspect-ratio already overrides height if it was 0. */
+  ui_layout_tree_destroy(lroot);
+
+  /* Test implicit height < 0 */
+  ui_css_rule_append_declaration(rule1, "aspect-ratio", "auto", 0);
+  ui_css_rule_append_declaration(rule1, "height", "auto", 0);
+  ui_layout_tree_generate(root, sheet, &lroot);
+  ui_layout_compute(lroot, 100.0f, 100.0f);
+  ui_layout_tree_destroy(lroot);
+
+  ui_dom_node_destroy(root);
+  ui_css_stylesheet_destroy(sheet);
+}
+
 int main(void) {
+  test_extra_coverage_3();
+
+  test_extra_coverage_2();
+
+  if (test_overflow_violation() != 0)
+    return 1;
+  test_all_invalid_properties();
   struct ui_dom_node *root = NULL;
   struct ui_dom_node *child1 = NULL;
   struct ui_dom_node *child2 = NULL;
@@ -954,6 +1134,7 @@ int main(void) {
   test_extra_coverage();
   test_more_layout();
   test_coverage_layout();
+  test_all_invalid_properties();
   printf("All layout tree tests passed.\n");
   return 0;
 }
@@ -1088,4 +1269,523 @@ void test_coverage_layout(void) {
 
   (void)ui_dom_node_destroy(root);
   ui_css_stylesheet_destroy(sheet);
+}
+/* clang-format off */
+#include "../include/ui_cssom.h"
+#include "../include/ui_dom_node.h"
+#include "../include/ui_layout.h"
+#include <stdio.h>
+#include <string.h>
+
+/* clang-format on */
+void test_bounds(void) {
+  struct ui_dom_node *root, *c1, *c2, *c3;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *rule, *r1, *r2, *r3;
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "root");
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1);
+  ui_dom_node_set_tag_name(c1, "div");
+  ui_dom_node_set_attribute(c1, "class", "c1");
+  ui_dom_node_append_child(root, c1);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c2);
+  ui_dom_node_set_tag_name(c2, "div");
+  ui_dom_node_set_attribute(c2, "class", "c2");
+  ui_dom_node_append_child(root, c2);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c3);
+  ui_dom_node_set_tag_name(c3, "div");
+  ui_dom_node_set_attribute(c3, "class", "c3");
+  ui_dom_node_append_child(root, c3);
+
+  ui_css_stylesheet_create(&sheet);
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+  ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS, "root");
+  ui_css_rule_append_declaration(rule, "display", "block", 0);
+  ui_css_rule_append_declaration(rule, "wrap-through", "invalid-value", 0);
+  ui_css_rule_append_declaration(rule, "hyphens", "invalid-value", 0);
+  ui_css_rule_append_declaration(rule, "aspect-ratio", "1/0",
+                                 0); /* hit div by 0 */
+  rule->next = sheet->rules;
+  sheet->rules = rule;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r1);
+  ui_css_rule_append_selector(r1, UI_CSS_SELECTOR_TYPE_CLASS, "c1");
+  ui_css_rule_append_declaration(r1, "display", "block", 0);
+  ui_css_rule_append_declaration(r1, "width", "10px", 0);
+  ui_css_rule_append_declaration(r1, "padding", "20px", 0); /* 10 - 40 < 0 */
+  ui_css_rule_append_declaration(r1, "height", "10px", 0);
+  ui_css_rule_append_declaration(r1, "min-width", "50px", 0);
+  ui_css_rule_append_declaration(r1, "max-width", "5px", 0); /* max < min */
+  ui_css_rule_append_declaration(r1, "min-height", "50px", 0);
+  ui_css_rule_append_declaration(r1, "max-height", "5px", 0);
+  r1->next = sheet->rules;
+  sheet->rules = r1;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r2);
+  ui_css_rule_append_selector(r2, UI_CSS_SELECTOR_TYPE_CLASS, "c2");
+  ui_css_rule_append_declaration(r2, "display", "flex", 0);
+  ui_css_rule_append_declaration(r2, "flex-direction", "column", 0);
+  ui_css_rule_append_declaration(r2, "align-items", "center", 0);
+  ui_css_rule_append_declaration(r2, "justify-content", "space-around", 0);
+  ui_css_rule_append_declaration(r2, "width", "10px", 0);
+  ui_css_rule_append_declaration(r2, "padding", "20px", 0);
+  ui_css_rule_append_declaration(r2, "height", "10px", 0);
+  ui_css_rule_append_declaration(r2, "overflow-x", "scroll", 0);
+  r2->next = sheet->rules;
+  sheet->rules = r2;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r3);
+  ui_css_rule_append_selector(r3, UI_CSS_SELECTOR_TYPE_CLASS, "c3");
+  ui_css_rule_append_declaration(r3, "display", "flex", 0);
+  ui_css_rule_append_declaration(r3, "flex-direction", "column", 0);
+  ui_css_rule_append_declaration(r3, "justify-content", "space-between", 0);
+  ui_css_rule_append_declaration(r3, "height", "100px", 0);
+  ui_css_rule_append_declaration(r3, "padding", "100px", 0);
+  r3->next = sheet->rules;
+  sheet->rules = r3;
+
+  /* Trigger NULL args */
+  ui_layout_compute(NULL, 100, 100);
+  ui_layout_solve_viewport(NULL, 100, 100);
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  if (lroot) {
+    ui_layout_compute(lroot, 100, 100);
+    ui_layout_tree_destroy(lroot);
+  }
+
+  ui_css_stylesheet_destroy(sheet);
+  (void)ui_dom_node_destroy(root);
+}
+
+void test_sequences_and_overflow(void) {
+  struct ui_dom_node *root, *i1, *b1, *i2, *b2, *i3;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *rule, *r_inline, *r_block;
+
+  /* "block", "inline" sequence -> hits new_first = curr; */
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "seq-root");
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &b1);
+  ui_dom_node_set_tag_name(b1, "div");
+  ui_dom_node_set_attribute(b1, "class", "blk");
+  ui_dom_node_append_child(root, b1);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &i1);
+  ui_dom_node_set_tag_name(i1, "span");
+  ui_dom_node_set_attribute(i1, "class", "inl");
+  ui_dom_node_append_child(root, i1);
+
+  /* "inline", "block", "inline" sequence -> hits else block of anon */
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &i2);
+  ui_dom_node_set_tag_name(i2, "span");
+  ui_dom_node_set_attribute(i2, "class", "inl");
+  ui_dom_node_append_child(root, i2);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &b2);
+  ui_dom_node_set_tag_name(b2, "div");
+  ui_dom_node_set_attribute(b2, "class", "blk");
+  ui_dom_node_append_child(root, b2);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &i3);
+  ui_dom_node_set_tag_name(i3, "span");
+  ui_dom_node_set_attribute(i3, "class", "inl");
+  ui_dom_node_append_child(root, i3);
+
+  ui_css_stylesheet_create(&sheet);
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+  ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS, "seq-root");
+  ui_css_rule_append_declaration(rule, "display", "block", 0);
+  rule->next = sheet->rules;
+  sheet->rules = rule;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_inline);
+  ui_css_rule_append_selector(r_inline, UI_CSS_SELECTOR_TYPE_CLASS, "inl");
+  ui_css_rule_append_declaration(r_inline, "display", "inline", 0);
+  r_inline->next = sheet->rules;
+  sheet->rules = r_inline;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r_block);
+  ui_css_rule_append_selector(r_block, UI_CSS_SELECTOR_TYPE_CLASS, "blk");
+  ui_css_rule_append_declaration(r_block, "display", "block", 0);
+  r_block->next = sheet->rules;
+  sheet->rules = r_block;
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  if (lroot) {
+    ui_layout_compute(lroot, 800, 600); /* compute anon boxes to hit line 766 */
+    ui_layout_tree_destroy(lroot);
+  }
+
+  /* Horizontal Scrollbar Overflow */
+  struct ui_dom_node *oroot, *oc1;
+  struct ui_css_rule *orule, *orc1;
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &oroot);
+  ui_dom_node_set_tag_name(oroot, "div");
+  ui_dom_node_set_attribute(oroot, "class", "oroot");
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &oc1);
+  ui_dom_node_set_tag_name(oc1, "div");
+  ui_dom_node_set_attribute(oc1, "class", "oc1");
+  ui_dom_node_append_child(oroot, oc1);
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &orule);
+  ui_css_rule_append_selector(orule, UI_CSS_SELECTOR_TYPE_CLASS, "oroot");
+  ui_css_rule_append_declaration(orule, "display", "block", 0);
+  ui_css_rule_append_declaration(orule, "width", "100px", 0);
+  ui_css_rule_append_declaration(orule, "overflow-x", "scroll", 0);
+  orule->next = sheet->rules;
+  sheet->rules = orule;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &orc1);
+  ui_css_rule_append_selector(orc1, UI_CSS_SELECTOR_TYPE_CLASS, "oc1");
+  ui_css_rule_append_declaration(orc1, "display", "block", 0);
+  ui_css_rule_append_declaration(orc1, "width", "200px",
+                                 0); /* Force overflow */
+  orc1->next = sheet->rules;
+  sheet->rules = orc1;
+
+  ui_layout_tree_generate(oroot, sheet, &lroot);
+  if (lroot) {
+    ui_layout_compute(lroot, 800, 600);
+    ui_layout_tree_destroy(lroot);
+  }
+
+  ui_css_stylesheet_destroy(sheet);
+  (void)ui_dom_node_destroy(root);
+  (void)ui_dom_node_destroy(oroot);
+}
+
+void test_null_api_calls(void) {
+  struct ui_layout_node lnode;
+  memset(&lnode, 0, sizeof(lnode));
+  ui_layout_tree_generate(NULL, NULL, NULL);
+
+  /* NULL tests for compute_box_model */
+  ui_layout_compute(NULL, 100, 100);
+  ui_layout_solve_viewport(NULL, 100, 100);
+}
+
+void test_percentage_negative(void) {
+  struct ui_dom_node *root, *c1;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *rule, *r1;
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "pct-root");
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1);
+  ui_dom_node_set_tag_name(c1, "div");
+  ui_dom_node_set_attribute(c1, "class", "pct-c1");
+  ui_dom_node_append_child(root, c1);
+
+  ui_css_stylesheet_create(&sheet);
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+  ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS, "pct-root");
+  ui_css_rule_append_declaration(rule, "display", "flex", 0);
+  rule->next = sheet->rules;
+  sheet->rules = rule;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r1);
+  ui_css_rule_append_selector(r1, UI_CSS_SELECTOR_TYPE_CLASS, "pct-c1");
+  ui_css_rule_append_declaration(r1, "display", "flex", 0);
+  ui_css_rule_append_declaration(r1, "width", "10%", 0);
+  ui_css_rule_append_declaration(r1, "margin", "100px", 0); /* Force < 0 */
+  r1->next = sheet->rules;
+  sheet->rules = r1;
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  if (lroot) {
+    ui_layout_compute(lroot, 100, 100);
+    ui_layout_tree_destroy(lroot);
+  }
+
+  ui_css_stylesheet_destroy(sheet);
+  (void)ui_dom_node_destroy(root);
+}
+
+void test_percentage_negative_block(void) {
+  struct ui_dom_node *root, *c1;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *rule, *r1;
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "pct-root2");
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1);
+  ui_dom_node_set_tag_name(c1, "div");
+  ui_dom_node_set_attribute(c1, "class", "pct-c2");
+  ui_dom_node_append_child(root, c1);
+
+  ui_css_stylesheet_create(&sheet);
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+  ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS, "pct-root2");
+  ui_css_rule_append_declaration(rule, "display", "block", 0);
+  rule->next = sheet->rules;
+  sheet->rules = rule;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r1);
+  ui_css_rule_append_selector(r1, UI_CSS_SELECTOR_TYPE_CLASS, "pct-c2");
+  ui_css_rule_append_declaration(r1, "display", "block", 0);
+  ui_css_rule_append_declaration(r1, "width", "10%", 0);
+  ui_css_rule_append_declaration(r1, "margin", "20px", 0);
+  r1->next = sheet->rules;
+  sheet->rules = r1;
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  if (lroot) {
+    ui_layout_compute(lroot, 100, 100);
+    ui_layout_tree_destroy(lroot);
+  }
+
+  ui_css_stylesheet_destroy(sheet);
+  (void)ui_dom_node_destroy(root);
+}
+
+void test_content_negative(void) {
+  struct ui_dom_node *root, *c1, *c2;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *rule, *r1, *r2;
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_dom_node_set_tag_name(root, "div");
+  ui_dom_node_set_attribute(root, "class", "cnt-root");
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1);
+  ui_dom_node_set_tag_name(c1, "div");
+  ui_dom_node_set_attribute(c1, "class", "cnt-c1");
+  ui_dom_node_append_child(root, c1);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c2);
+  ui_dom_node_set_tag_name(c2, "div");
+  ui_dom_node_set_attribute(c2, "class", "cnt-c2");
+  ui_dom_node_append_child(root, c2);
+
+  ui_css_stylesheet_create(&sheet);
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+  ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS, "cnt-root");
+  ui_css_rule_append_declaration(rule, "display", "block", 0);
+  rule->next = sheet->rules;
+  sheet->rules = rule;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r1);
+  ui_css_rule_append_selector(r1, UI_CSS_SELECTOR_TYPE_CLASS, "cnt-c1");
+  ui_css_rule_append_declaration(r1, "display", "block", 0);
+  ui_css_rule_append_declaration(r1, "width", "10px", 0);
+  ui_css_rule_append_declaration(r1, "height", "10px", 0);
+  ui_css_rule_append_declaration(r1, "padding", "20px", 0);
+  ui_css_rule_append_declaration(r1, "border-width", "20px", 0);
+  r1->next = sheet->rules;
+  sheet->rules = r1;
+
+  ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r2);
+  ui_css_rule_append_selector(r2, UI_CSS_SELECTOR_TYPE_CLASS, "cnt-c2");
+  ui_css_rule_append_declaration(r2, "display", "flex", 0);
+  ui_css_rule_append_declaration(r2, "width", "10px", 0);
+  ui_css_rule_append_declaration(r2, "height", "10px", 0);
+  ui_css_rule_append_declaration(r2, "padding", "20px", 0);
+  ui_css_rule_append_declaration(r2, "border-width", "20px", 0);
+  r2->next = sheet->rules;
+  sheet->rules = r2;
+
+  ui_layout_tree_generate(root, sheet, &lroot);
+  if (lroot) {
+    ui_layout_compute(lroot, 100, 100);
+    ui_layout_tree_destroy(lroot);
+  }
+
+  ui_css_stylesheet_destroy(sheet);
+  (void)ui_dom_node_destroy(root);
+}
+#include "../include/ui_cssom.h"
+#include "../include/ui_dom_node.h"
+#include "../include/ui_layout.h"
+
+void test_all_invalid_properties(void) {
+  const char *props[] = {"align-content",
+                         "align-items",
+                         "align-self",
+                         "aspect-ratio",
+                         "background-color",
+                         "background-image",
+                         "background-repeat",
+                         "background-size",
+                         "block-step-align",
+                         "block-step-insert",
+                         "block-step-round",
+                         "block-step-size",
+                         "border-bottom-color",
+                         "border-bottom-left-radius",
+                         "border-bottom-right-radius",
+                         "border-bottom-width",
+                         "border-image",
+                         "border-image-source",
+                         "border-left-color",
+                         "border-left-width",
+                         "border-radius",
+                         "border-right-color",
+                         "border-right-width",
+                         "border-top-color",
+                         "border-top-left-radius",
+                         "border-top-right-radius",
+                         "border-top-width",
+                         "border-width",
+                         "bottom",
+                         "box-decoration-break",
+                         "box-shadow",
+                         "box-sizing",
+                         "box-snap",
+                         "break-after",
+                         "break-before",
+                         "break-inside",
+                         "color",
+                         "color-scheme",
+                         "column-count",
+                         "column-gap",
+                         "column-width",
+                         "direction",
+                         "display",
+                         "flex-basis",
+                         "flex-direction",
+                         "flex-grow",
+                         "flex-shrink",
+                         "flex-wrap",
+                         "flow-from",
+                         "flow-into",
+                         "font-family",
+                         "font-feature-settings",
+                         "font-size",
+                         "font-stretch",
+                         "font-style",
+                         "font-variant",
+                         "font-variation-settings",
+                         "font-weight",
+                         "forced-color-adjust",
+                         "height",
+                         "hyphens",
+                         "justify-content",
+                         "left",
+                         "line-grid",
+                         "line-snap",
+                         "margin",
+                         "margin-bottom",
+                         "margin-left",
+                         "margin-right",
+                         "margin-top",
+                         "margin-trim",
+                         "max-height",
+                         "max-width",
+                         "min-height",
+                         "min-width",
+                         "opacity",
+                         "orphans",
+                         "overflow",
+                         "overflow-x",
+                         "overflow-y",
+                         "padding",
+                         "padding-bottom",
+                         "padding-left",
+                         "padding-right",
+                         "padding-top",
+                         "page-break-after",
+                         "page-break-before",
+                         "page-break-inside",
+                         "position",
+                         "print-color-adjust",
+                         "right",
+                         "text-align",
+                         "text-decoration",
+                         "text-decoration-color",
+                         "text-decoration-line",
+                         "text-decoration-style",
+                         "text-emphasis-color",
+                         "text-emphasis-position",
+                         "text-emphasis-style",
+                         "text-orientation",
+                         "text-shadow",
+                         "text-size-adjust",
+                         "top",
+                         "transform",
+                         "unicode-bidi",
+                         "white-space",
+                         "widows",
+                         "width",
+                         "word-break",
+                         "wrap-flow",
+                         "wrap-through",
+                         "writing-mode",
+                         "z-index"};
+
+  size_t i;
+  for (i = 0; i < sizeof(props) / sizeof(props[0]); i++) {
+    const char *edge_cases[] = {
+        "invalid-value", "10px", "10px ",       "10%",         "contain",
+        "cover",         "auto", "min-content", "max-content", "fit-content"};
+    size_t j;
+    for (j = 0; j < sizeof(edge_cases) / sizeof(edge_cases[0]); j++) {
+      struct ui_dom_node *root;
+      struct ui_css_stylesheet *sheet;
+      struct ui_layout_node *lroot = NULL;
+      struct ui_css_rule *rule;
+
+      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+      ui_dom_node_set_tag_name(root, "div");
+
+      ui_css_stylesheet_create(&sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      ui_css_rule_append_declaration(rule, props[i], edge_cases[j], 0);
+      ui_dom_node_set_attribute(root, props[i], edge_cases[j]);
+
+      ui_layout_tree_generate(root, sheet, &lroot);
+
+      if (lroot) {
+        ui_layout_tree_destroy(lroot);
+      }
+      ui_css_stylesheet_destroy(sheet);
+      ui_dom_node_destroy(root);
+
+      /* Negative auto sizes test */
+      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+      ui_dom_node_set_tag_name(root, "div");
+      ui_dom_node_set_attribute(root, "class", "neg-auto");
+
+      ui_css_stylesheet_create(&sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS, "neg-auto");
+      ui_css_rule_append_declaration(rule, "display", "block", 0);
+      ui_css_rule_append_declaration(rule, "width", "auto", 0);
+      ui_css_rule_append_declaration(rule, "height", "auto", 0);
+      ui_css_rule_append_declaration(rule, "margin", "100px", 0);
+      ui_css_stylesheet_append_rule(sheet, rule);
+
+      ui_layout_tree_generate(root, sheet, &lroot);
+      if (lroot) {
+        ui_layout_compute(lroot, 50, 50);
+        ui_layout_tree_destroy(lroot);
+      }
+      ui_css_stylesheet_destroy(sheet);
+      ui_dom_node_destroy(root);
+    }
+  }
 }

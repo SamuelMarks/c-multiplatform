@@ -166,12 +166,7 @@ ui_error_t ui_resizable_behavior_process_event(
 
     if (behavior->on_resize &&
         (new_w != current_width || new_h != current_height)) {
-      {
-        ui_error_t cb_rc =
-            behavior->on_resize(new_w, new_h, behavior->user_data);
-        if (cb_rc != UI_ERROR_NONE)
-          return cb_rc;
-      }
+      (void)behavior->on_resize(new_w, new_h, behavior->user_data);
     }
   } else if (is_up) {
     behavior->is_dragging = 0;

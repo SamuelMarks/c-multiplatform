@@ -16,10 +16,14 @@ static int g_change_called = 0;
 static int g_change_val = -1;
 static int g_touched_called = 0;
 
+static int g_mock_cb_fail = 0;
+
 static ui_error_t on_change(struct ui_toggle_base *toggle, int checked,
                             void *user) {
   (void)toggle;
   (void)user;
+  if (g_mock_cb_fail == 1)
+    return UI_ERROR_UNKNOWN;
   g_change_called++;
   g_change_val = checked;
   return UI_ERROR_NONE;
@@ -27,6 +31,8 @@ static ui_error_t on_change(struct ui_toggle_base *toggle, int checked,
 
 static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
   (void)user;
+  if (g_mock_cb_fail == 2)
+    return UI_ERROR_UNKNOWN;
   g_change_called++;
   g_change_val = val.int_val;
   return UI_ERROR_NONE;
@@ -34,6 +40,8 @@ static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
 
 static ui_error_t on_cva_touched(void *user) {
   (void)user;
+  if (g_mock_cb_fail == 3)
+    return UI_ERROR_UNKNOWN;
   g_touched_called++;
   return UI_ERROR_NONE;
 }
@@ -160,6 +168,15 @@ static int test_normal(void) {
   ACCUM_ERR(failed, ui_toggle_base_is_checked(rad2, &is_checked));
   ACCUM_FAIL(failed, is_checked != 1);
 
+  /* Check rad3 (has different group) */
+  ACCUM_ERR(failed, ui_toggle_base_set_checked(rad3, 1));
+
+  /* Create rad4 without a group, and check it */
+  struct ui_toggle_base *rad4;
+  ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &rad4));
+  ACCUM_ERR(failed, ui_toggle_base_set_checked(rad4, 1));
+  (void)ui_toggle_base_destroy(rad4);
+
   /* Tap rad2 again (already checked, radio does nothing) */
   g_change_called = 0;
   ev.type = UI_EVENT_MOUSE_DOWN;
@@ -167,6 +184,39 @@ static int test_normal(void) {
   ev.type = UI_EVENT_MOUSE_UP;
   ACCUM_ERR(failed, ui_toggle_base_process_event(rad2, &ev, 3.1));
   ACCUM_FAIL(failed, g_change_called != 0);
+
+  /* Test cb failures on checkbox */
+  g_mock_cb_fail = 1;
+  ui_toggle_base_set_checked(chk1, 0);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_toggle_base_process_event(chk1, &ev, 5.0);
+  ev.type = UI_EVENT_MOUSE_UP;
+  failed |= (ui_toggle_base_process_event(chk1, &ev, 5.1) != UI_ERROR_UNKNOWN);
+
+  g_mock_cb_fail = 2;
+  ui_toggle_base_set_checked(chk1, 0);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_toggle_base_process_event(chk1, &ev, 5.2);
+  ev.type = UI_EVENT_MOUSE_UP;
+  failed |= (ui_toggle_base_process_event(chk1, &ev, 5.3) != UI_ERROR_UNKNOWN);
+
+  g_mock_cb_fail = 3;
+  ui_toggle_base_set_checked(chk1, 0);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_toggle_base_process_event(chk1, &ev, 5.4);
+  ev.type = UI_EVENT_MOUSE_UP;
+  failed |= (ui_toggle_base_process_event(chk1, &ev, 5.5) != UI_ERROR_UNKNOWN);
+  g_mock_cb_fail = 0;
+
+  /* Test cb failures on radio during exclusion updates */
+  g_mock_cb_fail = 1;
+  ui_toggle_base_set_checked(rad1, 0);
+  ui_toggle_base_set_checked(rad2, 1);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_toggle_base_process_event(rad1, &ev, 6.0);
+  ev.type = UI_EVENT_MOUSE_UP;
+  failed |= (ui_toggle_base_process_event(rad1, &ev, 6.1) != UI_ERROR_UNKNOWN);
+  g_mock_cb_fail = 0;
 
   /* Change group name of rad1 to NULL */
   ACCUM_ERR(failed, ui_toggle_base_set_group_name(rad1, NULL));
@@ -278,4 +328,31 @@ int main(void) {
   return failed;
 }
 
-static int run_dom_oom(void) { return 0; }
+static int run_dom_oom(void) {
+  int failed = 0;
+#ifdef UI_TEST_MOCK_ALLOC
+  struct ui_toggle_base *toggle;
+  int i;
+  ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    ui_toggle_base_set_checked(toggle, 1);
+  }
+  g_malloc_fail_countdown = -1;
+
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    ui_toggle_base_set_disabled(toggle, 1);
+  }
+  g_malloc_fail_countdown = -1;
+
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    ui_toggle_base_set_disabled(toggle, 0);
+  }
+  g_malloc_fail_countdown = -1;
+
+  ui_toggle_base_destroy(toggle);
+#endif
+  return failed;
+}

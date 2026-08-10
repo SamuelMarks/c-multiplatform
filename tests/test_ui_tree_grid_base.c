@@ -262,6 +262,18 @@ static int test_tree_grid_key_events(void) {
   EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
   EXPECT_EQ(tree_grid->active_col, 0);
 
+  /* Fill expanded array to force OUT_OF_BOUNDS on RIGHT key */
+  {
+    int j;
+    for (j = 0; j < 256; j++) {
+      ui_tree_grid_base_set_expanded(tree_grid, (void *)((size_t)0x200 + j), 1);
+    }
+  }
+  tree_grid->active_node = (void *)0xdeadbeef;
+  ev.key_code = UI_KEY_RIGHT;
+  EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev),
+            UI_ERROR_OUT_OF_BOUNDS);
+
   (void)ui_tree_grid_base_destroy(tree_grid);
   return failed;
 }

@@ -614,6 +614,182 @@ static int test_datepicker_base(void) {
   return 0;
 }
 
+static struct ui_datepicker_base *g_mock_dp_for_reentrancy = NULL;
+static struct ui_control_value_accessor g_mock_cva_for_reentrancy;
+
+static ui_error_t mock_dp_cva_change(union ui_signal_payload val, void *data) {
+  int *c = (int *)data;
+  if (c)
+    (*c)++;
+
+  if (g_mock_dp_for_reentrancy) {
+    union ui_signal_payload dummy;
+    dummy.int_val = 0;
+    (void)g_mock_cva_for_reentrancy.write_value(g_mock_dp_for_reentrancy,
+                                                dummy);
+    (void)g_mock_cva_for_reentrancy.register_on_change(g_mock_dp_for_reentrancy,
+                                                       NULL, NULL);
+    (void)g_mock_cva_for_reentrancy.register_on_touched(
+        g_mock_dp_for_reentrancy, NULL, NULL);
+    (void)g_mock_cva_for_reentrancy.set_disabled_state(g_mock_dp_for_reentrancy,
+                                                       1);
+  }
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_dp_cva_touched(void *data) {
+  int *c = (int *)data;
+  if (c)
+    (*c)++;
+  return UI_ERROR_NONE;
+}
+
+static int test_datepicker_coverage(void) {
+  struct ui_datepicker_base *dp = NULL;
+  struct ui_input_base *input = NULL;
+  struct ui_popover_base *popover = NULL;
+  struct ui_calendar_base *cal = NULL;
+  struct ui_control_value_accessor cva;
+  struct ui_date dt = {2024, 5, 10};
+  char text[32];
+  int changes = 0, touches = 0;
+  union ui_signal_payload val;
+
+  (void)ui_input_base_create(&input);
+  (void)ui_popover_base_create(&popover);
+  (void)ui_calendar_base_create(&cal, NULL);
+
+  /* null checks */
+  if (ui_datepicker_base_create(NULL, input, popover, cal, &cva) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_base_create(&dp, NULL, popover, cal, &cva) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_base_create(&dp, input, NULL, cal, &cva) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_base_create(&dp, input, popover, NULL, &cva) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  /* OOM */
+  g_malloc_fail_countdown = 0;
+  if (ui_datepicker_base_create(&dp, input, popover, cal, &cva) !=
+      UI_ERROR_OUT_OF_MEMORY)
+    return 1;
+  g_malloc_fail_countdown = -1;
+
+  (void)ui_datepicker_base_destroy(NULL);
+
+  if (ui_datepicker_parse_date(NULL, &dt) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_parse_date("2024-05-10", NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_parse_date("not-a-date", &dt) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_parse_date("2024-13-10", &dt) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_parse_date("2024-05-32", &dt) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  if (ui_datepicker_format_date(NULL, text, sizeof(text)) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_format_date(&dt, NULL, sizeof(text)) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (ui_datepicker_format_date(&dt, text, 10) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  if (ui_datepicker_base_sync(NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  if (ui_datepicker_base_create(&dp, input, popover, cal, &cva) !=
+      UI_ERROR_NONE)
+    return 1;
+
+  /* Trigger change BEFORE CVA is registered to hit return UI_ERROR_NONE path */
+  {
+    struct ui_date picked = {2024, 1, 1};
+    (void)ui_calendar_base_select_date(cal, &picked);
+  }
+
+  val.int_val = 0;
+  if (cva.write_value(NULL, val) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (cva.register_on_change(NULL, mock_dp_cva_change, NULL) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (cva.register_on_touched(NULL, mock_dp_cva_touched, NULL) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (cva.set_disabled_state(NULL, 1) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+
+  (void)cva.register_on_change(dp, mock_dp_cva_change, &changes);
+  (void)cva.register_on_touched(dp, mock_dp_cva_touched, &touches);
+  (void)cva.set_disabled_state(dp, 1);
+
+  g_mock_dp_for_reentrancy = dp;
+  g_mock_cva_for_reentrancy = cva;
+
+  val.int_val = (2024 << 9) | (5 << 5) | 10;
+  (void)cva.write_value(dp, val);
+  val.int_val = 0;
+  (void)cva.write_value(dp, val);
+
+  {
+    struct ui_date picked = {2024, 5, 20};
+    (void)ui_calendar_base_select_date(cal, &picked);
+  }
+
+  g_mock_dp_for_reentrancy = NULL;
+
+  (void)ui_input_base_set_text(input, "2024-06-15");
+  (void)ui_input_base_set_text(input, "invalid");
+  (void)ui_input_base_set_text(input, "2024-07-20");
+  (void)ui_datepicker_base_sync(dp);
+
+  /* Error paths for set_text allocations inside on_calendar_select / cva_write
+   */
+  {
+    struct ui_date picked = {2024, 5, 21};
+    g_malloc_fail_countdown = 0;
+    (void)ui_calendar_base_select_date(cal, &picked);
+    g_malloc_fail_countdown = -1;
+  }
+  {
+    val.int_val = (2024 << 9) | (5 << 5) | 10;
+    g_malloc_fail_countdown = 0;
+    (void)cva.write_value(dp, val);
+    g_malloc_fail_countdown = -1;
+  }
+  {
+    val.int_val = 0;
+    g_malloc_fail_countdown = 0;
+    (void)cva.write_value(dp, val);
+    g_malloc_fail_countdown = -1;
+  }
+  /* Error path for select_date due to out of bounds */
+  {
+    struct ui_date max_dt = {2024, 8, 1};
+    (void)ui_calendar_base_set_max_date(cal, &max_dt);
+    (void)ui_input_base_set_text(input, "2024-09-01");
+    (void)ui_datepicker_base_sync(dp);
+
+    val.int_val = (2024 << 9) | (9 << 5) | 1;
+    (void)cva.write_value(dp, val);
+  }
+
+  (void)ui_datepicker_base_destroy(dp);
+  (void)ui_calendar_base_destroy(cal);
+  (void)ui_popover_base_destroy(popover);
+  (void)ui_input_base_destroy(input);
+
+  return 0;
+}
+
 static int test_calendar_missing_branches(void) {
   int count;
   int days;
@@ -735,6 +911,7 @@ int main(void) {
   failed |= test_calendar_base();
   failed |= test_calendar_coverage();
   failed |= test_datepicker_base();
+  failed |= test_datepicker_coverage();
 
   if (failed) {
     printf("Tests failed.\n");

@@ -8,6 +8,7 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+extern int g_mock_strcpy_fail;
 
 #define EXPECT_EQ(expected, actual)                                            \
   do {                                                                         \
@@ -1706,16 +1707,45 @@ int main(void) {
     EXPECT_EQ(UI_ERROR_NONE, rc);
     EXPECT_EQ(UI_CSS_IMAGE_IMAGE_SET, img.type);
 
+    g_mock_strcpy_fail = 1;
+    rc = ui_css_parse_image("image-set(url(test.png) 1x)", &img);
+    EXPECT_EQ(UI_ERROR_NONE, rc);
+    g_mock_strcpy_fail = 0;
+
+    g_mock_strcpy_fail = 2;
+    rc = ui_css_parse_image("image-set(url(test.png) 1x)", &img);
+    EXPECT_EQ(UI_ERROR_NONE, rc);
+    g_mock_strcpy_fail = 0;
+
     rc = ui_css_parse_image("-webkit-image-set(url(test.png) 1x)", &img);
     EXPECT_EQ(UI_ERROR_NONE, rc);
     EXPECT_EQ(UI_CSS_IMAGE_IMAGE_SET, img.type);
 
     rc = ui_css_parse_image("invalid-image", &img);
-    /* removed check */
+    EXPECT_EQ(UI_ERROR_PARSE_FAILED, rc);
 
-    rc = ui_css_parse_image("url()", &img);
-    EXPECT_EQ(UI_ERROR_NONE, rc);
-    EXPECT_EQ(UI_CSS_IMAGE_URL, img.type);
+    g_mock_strcpy_fail = 1;
+    rc = ui_css_parse_image("-webkit-image-set(url(test.png) 1x)", &img);
+    EXPECT_EQ(
+        UI_ERROR_NONE,
+        rc); /* the macro fails silently and sets to \0 if we handled it */
+    g_mock_strcpy_fail = 0;
+
+    struct ui_css_transition *trans_temp = NULL;
+    g_mock_strcpy_fail = 1;
+    rc = ui_css_parse_transition("all 1s", &trans_temp);
+    if (trans_temp) {
+      ui_css_transition_destroy(trans_temp);
+    }
+    g_mock_strcpy_fail = 0;
+
+    struct ui_css_animation *anim_temp = NULL;
+    g_mock_strcpy_fail = 1;
+    rc = ui_css_parse_animation("fadein 1s", &anim_temp);
+    if (anim_temp) {
+      ui_css_animation_destroy(anim_temp);
+    }
+    g_mock_strcpy_fail = 0;
 
     rc = ui_css_parse_image("url(test.png", &img);
     /* removed check */

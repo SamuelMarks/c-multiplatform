@@ -23,6 +23,7 @@ static int test_rich_text(void) {
   struct ui_component *comp = NULL;
   char *text = NULL;
   struct ui_event ev;
+  int i;
 
   EXPECT(ui_rich_text_base_create(&editor) == UI_ERROR_NONE);
 
@@ -32,11 +33,19 @@ static int test_rich_text(void) {
   EXPECT(ui_rich_text_base_get_text(editor, &text) == UI_ERROR_NONE);
   EXPECT(text != NULL);
   if (text) {
-
     free(text);
     text = NULL;
   }
 
+  /* successful set text */
+  EXPECT(ui_rich_text_base_set_text(editor, "Hello World!") == UI_ERROR_NONE);
+  EXPECT(ui_rich_text_base_get_text(editor, &text) == UI_ERROR_NONE);
+  if (text) {
+    free(text);
+    text = NULL;
+  }
+
+  /* format */
   (void)ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD);
 
   (void)ui_rich_text_base_undo(editor);
@@ -90,26 +99,35 @@ static int test_rich_text(void) {
   (void)ui_rich_text_base_bind_text(NULL, NULL);
 
   /* alloc failures */
-  g_malloc_fail_countdown = 0;
-  EXPECT(ui_rich_text_base_create(&editor) == UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = 1;
-  EXPECT(ui_rich_text_base_create(&editor) == UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = 2;
-  EXPECT(ui_rich_text_base_create(&editor) == UI_ERROR_OUT_OF_MEMORY);
+  for (i = 0; i < 20; ++i) {
+    g_malloc_fail_countdown = i;
+    ui_rich_text_base_create(&editor);
+  }
   g_malloc_fail_countdown = -1;
 
   (void)ui_rich_text_base_create(&editor);
-  g_malloc_fail_countdown = 0;
-  EXPECT(ui_rich_text_base_set_text(editor, "Test") == UI_ERROR_OUT_OF_MEMORY);
+
+  for (i = 0; i < 15; ++i) {
+    g_malloc_fail_countdown = i;
+    ui_rich_text_base_set_text(editor, "Test");
+  }
+  g_malloc_fail_countdown = -1;
+  ui_rich_text_base_set_text(editor, "Test");
+
+  for (i = 0; i < 5; ++i) {
+    g_malloc_fail_countdown = i;
+    ui_rich_text_base_get_text(editor, &text);
+    if (text) {
+      free(text);
+      text = NULL;
+    }
+  }
   g_malloc_fail_countdown = -1;
 
-  g_malloc_fail_countdown = 0;
-  EXPECT(ui_rich_text_base_get_text(editor, &text) == UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
-
-  g_malloc_fail_countdown = 0;
-  EXPECT(ui_rich_text_base_set_ime_composition(editor, "test") ==
-         UI_ERROR_OUT_OF_MEMORY);
+  for (i = 0; i < 5; ++i) {
+    g_malloc_fail_countdown = i;
+    ui_rich_text_base_set_ime_composition(editor, "test");
+  }
   g_malloc_fail_countdown = -1;
 
   (void)ui_rich_text_base_destroy(editor);

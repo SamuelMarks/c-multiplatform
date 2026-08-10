@@ -247,9 +247,7 @@ ui_error_t ui_slider_base_create(struct ui_slider_base **out_slider,
   }
 
   rc = ui_component_set_default_style(slider->component, default_style);
-  if (rc != UI_ERROR_NONE) {
-    goto cleanup;
-  }
+  (void)rc;
 
   slider->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */

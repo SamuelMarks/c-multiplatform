@@ -16,9 +16,13 @@ static int g_change_called = 0;
 static int g_touched_called = 0;
 static int g_last_seconds = -1;
 
+static int g_mock_cb_fail = 0;
+
 static ui_error_t on_change(union ui_signal_payload new_value,
                             void *user_data) {
   (void)user_data;
+  if (g_mock_cb_fail == 1)
+    return UI_ERROR_UNKNOWN;
   g_change_called++;
   g_last_seconds = new_value.int_val;
   return UI_ERROR_NONE;
@@ -26,6 +30,8 @@ static ui_error_t on_change(union ui_signal_payload new_value,
 
 static ui_error_t on_touched(void *user_data) {
   (void)user_data;
+  if (g_mock_cb_fail == 2)
+    return UI_ERROR_UNKNOWN;
   g_touched_called++;
   return UI_ERROR_NONE;
 }
@@ -147,9 +153,16 @@ static int test_normal(void) {
   failed |= (g_change_called != 1 || g_touched_called != 1);
   failed |= (g_last_seconds != (11 * 3600 + 15 * 60));
 
+  /* Test cb failures */
+  g_mock_cb_fail = 2; /* touched fails */
+  failed |= (ui_timepicker_base_set_time(tp, 12, 15) != UI_ERROR_UNKNOWN);
+  g_mock_cb_fail = 1; /* change fails */
+  failed |= (ui_timepicker_base_set_time(tp, 12, 16) != UI_ERROR_UNKNOWN);
+  g_mock_cb_fail = 0;
+
   /* No change */
-  ui_timepicker_base_set_time(tp, 11, 15);
-  failed |= (g_change_called != 1 || g_touched_called != 1);
+  ui_timepicker_base_set_time(tp, 12, 16);
+  failed |= (g_change_called != 1 || g_touched_called != 2);
 
   /* CVA write value */
   val.int_val = -100;

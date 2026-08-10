@@ -29,18 +29,30 @@ static ui_error_t mock_ui_text_layout_shape(struct ui_text_layout *layout,
   (void)layout;
   (void)font;
   (void)size;
-  (void)text;
   (void)max_width;
   (void)dir;
   if (g_mock_font_fail == 2)
     return UI_ERROR_UNKNOWN;
+  if (g_mock_font_fail == 4 && strstr(text, "..."))
+    return UI_ERROR_UNKNOWN; /* Fail specifically during ellipsis truncation */
   return UI_ERROR_NONE;
 }
 #define ui_text_layout_shape mock_ui_text_layout_shape
 
 static ui_error_t mock_ui_text_layout_get_bounds(struct ui_text_layout *layout,
                                                  float *w, float *h) {
+  static int calls = 0;
   (void)layout;
+  if (g_mock_font_fail == 3)
+    return UI_ERROR_UNKNOWN;
+  if (g_mock_font_fail == 5) {
+    if (++calls == 2) {
+      calls = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  } else {
+    calls = 0;
+  }
   *w = 100.0f;
   *h = 50.0f; /* Make it large enough to trigger overflow (e.g. line height 10,
                  max lines 2 -> 20) */
@@ -53,6 +65,8 @@ static ui_error_t mock_ui_font_get_vmetrics(struct ui_font *font, float size,
                                             float *line_gap) {
   (void)font;
   (void)size;
+  if (g_mock_font_fail == 6)
+    return UI_ERROR_UNKNOWN;
   *ascent = 10.0f;
   *descent = 0.0f;
   *line_gap = 0.0f;

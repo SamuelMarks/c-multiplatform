@@ -35,7 +35,7 @@ static ui_error_t
 trigger_cva_change(struct ui_segmented_control_base *control,
                    struct ui_segmented_button_base *active_button) {
   (void)active_button;
-  if (control && control->cva_on_change) {
+  if (control->cva_on_change) {
     union ui_signal_payload payload;
     int i;
     int active_idx = -1;
@@ -54,7 +54,7 @@ trigger_cva_change(struct ui_segmented_control_base *control,
 
 static ui_error_t
 trigger_cva_touched(struct ui_segmented_control_base *control) {
-  if (control && control->cva_on_touched) {
+  if (control->cva_on_touched) {
     return control->cva_on_touched(control->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;

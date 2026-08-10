@@ -230,8 +230,7 @@ ui_section_index_base_set_active_section(struct ui_section_index_base *index,
       ui_error_t rm_rc = ui_dom_node_remove_attribute(
           index->item_nodes[index->active_idx], "data-active");
       if (rm_rc != UI_ERROR_NONE && rm_rc != UI_ERROR_NOT_FOUND) {
-        if (0)
-          return rm_rc;
+        return rm_rc;
       }
     }
   }
@@ -243,8 +242,7 @@ ui_section_index_base_set_active_section(struct ui_section_index_base *index,
       ui_error_t sa_rc = ui_dom_node_set_attribute(
           index->item_nodes[index->active_idx], "data-active", "true");
       if (sa_rc != UI_ERROR_NONE) {
-        if (0)
-          return sa_rc;
+        return sa_rc;
       }
     }
   }

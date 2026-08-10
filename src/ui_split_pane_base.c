@@ -143,28 +143,24 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
   }
 
   if (split_pane->orientation == UI_SPLIT_PANE_ORIENTATION_HORIZONTAL) {
-    if (event->type == UI_EVENT_MOUSE_DOWN ||
-        event->type == UI_EVENT_MOUSE_MOVE ||
-        event->type == UI_EVENT_MOUSE_UP) {
-      coord = event->event_data.mouse.x;
-    } else if (event->type == UI_EVENT_TOUCH_START ||
-               event->type == UI_EVENT_TOUCH_MOVE ||
-               event->type == UI_EVENT_TOUCH_END) {
+    if (event->type == UI_EVENT_TOUCH_START ||
+        event->type == UI_EVENT_TOUCH_MOVE ||
+        event->type == UI_EVENT_TOUCH_END) {
       if (event->event_data.touch.num_points > 0) {
         coord = event->event_data.touch.points[0].x;
       }
+    } else {
+      coord = event->event_data.mouse.x;
     }
   } else {
-    if (event->type == UI_EVENT_MOUSE_DOWN ||
-        event->type == UI_EVENT_MOUSE_MOVE ||
-        event->type == UI_EVENT_MOUSE_UP) {
-      coord = event->event_data.mouse.y;
-    } else if (event->type == UI_EVENT_TOUCH_START ||
-               event->type == UI_EVENT_TOUCH_MOVE ||
-               event->type == UI_EVENT_TOUCH_END) {
+    if (event->type == UI_EVENT_TOUCH_START ||
+        event->type == UI_EVENT_TOUCH_MOVE ||
+        event->type == UI_EVENT_TOUCH_END) {
       if (event->event_data.touch.num_points > 0) {
         coord = event->event_data.touch.points[0].y;
       }
+    } else {
+      coord = event->event_data.mouse.y;
     }
   }
 
@@ -189,13 +185,9 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
       break;
     }
     if (split_pane->is_dragging) {
-      ui_error_t rc;
       delta = coord - split_pane->drag_start_coord;
       new_pos = split_pane->drag_start_pos + delta;
-      rc = ui_split_pane_base_set_position(split_pane, new_pos);
-      if (rc != UI_ERROR_NONE) {
-        return rc;
-      }
+      (void)ui_split_pane_base_set_position(split_pane, new_pos);
     }
     break;
 

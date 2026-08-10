@@ -24,6 +24,14 @@ static int test_web_bridge(void) {
   ui_web_bridge_set_attribute(1, "id", "my-div");
   ui_web_bridge_set_property(1, "value", "text");
 
+  /* Fill buffer to trigger flush in ensure_buffer */
+  {
+    int i;
+    for (i = 0; i < 700; i++) {
+      ui_web_bridge_create_node((ui_uint32)i, "span");
+    }
+  }
+
   ui_web_bridge_push_state("/path");
   ui_web_bridge_replace_state("/path");
 

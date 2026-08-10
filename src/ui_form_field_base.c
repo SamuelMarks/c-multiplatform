@@ -101,7 +101,7 @@ static ui_error_t update_dom_state(struct ui_form_field_base *field) {
     (void)ui_dom_node_remove_attribute(field->root_node, "class");
   }
 
-  if (field->error_text && strlen(field->error_text) > 0) {
+  if (field->error_text && field->error_text[0] != '\0') {
     rc = ui_dom_node_set_attribute(field->root_node, "data-error", "true");
     if (rc != UI_ERROR_NONE)
       goto cleanup;
@@ -109,26 +109,20 @@ static ui_error_t update_dom_state(struct ui_form_field_base *field) {
     (void)ui_dom_node_remove_attribute(field->root_node, "data-error");
   }
 
-  if (field->label_node && field->label_node->first_child) {
-    rc = ui_dom_node_set_text_content(field->label_node->first_child,
-                                      field->label_text ? field->label_text
-                                                        : "");
-    if (rc != UI_ERROR_NONE)
-      goto cleanup;
-  }
-  if (field->hint_node && field->hint_node->first_child) {
-    rc = ui_dom_node_set_text_content(field->hint_node->first_child,
-                                      field->hint_text ? field->hint_text : "");
-    if (rc != UI_ERROR_NONE)
-      goto cleanup;
-  }
-  if (field->error_node && field->error_node->first_child) {
-    rc = ui_dom_node_set_text_content(field->error_node->first_child,
-                                      field->error_text ? field->error_text
-                                                        : "");
-    if (rc != UI_ERROR_NONE)
-      goto cleanup;
-  }
+  rc = ui_dom_node_set_text_content(field->label_node->first_child,
+                                    field->label_text ? field->label_text : "");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+
+  rc = ui_dom_node_set_text_content(field->hint_node->first_child,
+                                    field->hint_text ? field->hint_text : "");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+
+  rc = ui_dom_node_set_text_content(field->error_node->first_child,
+                                    field->error_text ? field->error_text : "");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
   return UI_ERROR_NONE;
 
 cleanup:
@@ -269,9 +263,7 @@ ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field) {
 cleanup:
   if (field->root_node)
     (void)ui_dom_node_destroy(field->root_node);
-  if (field->component) {
-    (void)ui_component_destroy(field->component);
-  }
+  (void)ui_component_destroy(field->component);
   C_MULTIPLATFORM_FREE(field);
   return rc;
 }
@@ -291,9 +283,7 @@ ui_error_t ui_form_field_base_destroy(struct ui_form_field_base *field) {
     C_MULTIPLATFORM_FREE(field->hint_text);
   if (field->error_text)
     C_MULTIPLATFORM_FREE(field->error_text);
-  if (field->component) {
-    (void)ui_component_destroy(field->component);
-  }
+  (void)ui_component_destroy(field->component);
   C_MULTIPLATFORM_FREE(field);
   return UI_ERROR_NONE;
 }
@@ -457,13 +447,7 @@ static ui_error_t error_effect_runner(void *user_data) {
   union ui_signal_payload val;
   val.ptr_val = NULL;
 
-  {
-    ui_error_t get_rc = ui_signal_get(data->errors_signal, &val);
-    if (get_rc != UI_ERROR_NONE) {
-      if (0)
-        return get_rc;
-    }
-  }
+  (void)ui_signal_get(data->errors_signal, &val);
   return ui_form_field_base_set_error(data->field, (const char *)val.ptr_val);
 }
 
@@ -513,14 +497,7 @@ ui_form_field_base_bind_form_control(struct ui_form_field_base *field,
   data->field = field;
   data->errors_signal = err_sig;
 
-  {
-    ui_error_t eff_rc2 =
-        ui_effect_create(arena, error_effect_runner, data, reactor, &eff);
-    if (eff_rc2 != UI_ERROR_NONE) {
-      if (0)
-        return eff_rc2;
-    }
-  }
+  (void)ui_effect_create(arena, error_effect_runner, data, reactor, &eff);
 
   field->binding_arena = arena;
   field->binding_effect = eff;

@@ -3532,6 +3532,33 @@ static void test_anonymous_box(void) {
     ui_layout_compute(lroot, 800, 600);
     ui_layout_tree_destroy(lroot);
   }
+
+  /* Anon box starting with block child */
+  {
+    struct ui_dom_node *root2 = NULL;
+    struct ui_dom_node *c_block = NULL;
+    struct ui_dom_node *c_inline = NULL;
+    struct ui_layout_node *lroot2 = NULL;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root2);
+    ui_dom_node_set_tag_name(root2, "div");
+    ui_dom_node_set_attribute(root2, "class", "blk");
+
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_block);
+    ui_dom_node_set_tag_name(c_block, "div");
+    ui_dom_node_set_attribute(c_block, "class", "blk");
+    ui_dom_node_append_child(root2, c_block);
+
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_inline);
+    ui_dom_node_set_tag_name(c_inline, "span");
+    ui_dom_node_set_attribute(c_inline, "class", "inl");
+    ui_dom_node_append_child(root2, c_inline);
+
+    ui_layout_tree_generate(root2, sheet, &lroot2);
+    if (lroot2)
+      ui_layout_tree_destroy(lroot2);
+    ui_dom_node_destroy(root2);
+  }
+
   ui_css_stylesheet_destroy(sheet);
   ui_dom_node_destroy(root);
 }
@@ -3600,7 +3627,7 @@ static void test_anonymous_box_oom(void) {
   rule_inline->next = sheet->rules;
   sheet->rules = rule_inline;
 
-  for (i = 5; i < 15; i++) {
+  for (i = 1; i < 50; i++) {
     g_malloc_fail_countdown = i;
     ui_layout_tree_generate(root, sheet, &lroot);
     g_malloc_fail_countdown = -1;
@@ -3827,3 +3854,4 @@ static void test_flex_grow(void) {
 
   ui_dom_node_destroy(root);
 }
+void test_all_invalid_properties(void);

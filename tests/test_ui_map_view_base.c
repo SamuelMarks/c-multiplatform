@@ -176,7 +176,32 @@ static void test_map_errors_and_methods(void) {
 #endif
 }
 
+static void test_map_math_errors(void) {
+  struct ui_map_view_base *map = NULL;
+  struct ui_map_coordinate coord;
+  double out_x, out_y;
+
+  ui_map_view_base_create(&map);
+
+  /* Try to convert coord to pixel out of bounds */
+  (void)ui_map_view_base_project(map, &(struct ui_map_coordinate){2000.0, 0.0},
+                                 &out_x, &out_y);
+  (void)ui_map_view_base_project(map, &(struct ui_map_coordinate){0.0, 2000.0},
+                                 &out_x, &out_y);
+
+  /* Try to convert pixel to coord out of bounds */
+  (void)ui_map_view_base_unproject(map, 1000000000.0, 0.0, &coord);
+  (void)ui_map_view_base_unproject(map, 0.0, 1000000000.0, &coord);
+
+  /* Pan by huge amounts to trigger errors during handle_pan */
+  (void)ui_map_view_base_handle_pan(map, -1000000000.0, 0.0);
+  (void)ui_map_view_base_handle_pan(map, 0.0, -1000000000.0);
+
+  ui_map_view_base_destroy(map);
+}
+
 int main(void) {
+  test_map_math_errors();
   test_missing_map_coverage();
   test_map_errors_and_methods();
   struct ui_map_view_base *map = NULL;

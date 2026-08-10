@@ -29,10 +29,7 @@ static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
   }
   {
     ui_error_t ap_rc = ui_dom_node_append_child(parent, *out_slot);
-    if (ap_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(*out_slot);
-      return ap_rc;
-    }
+    (void)ap_rc;
   }
 
   return UI_ERROR_NONE;

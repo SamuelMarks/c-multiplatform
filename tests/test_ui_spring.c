@@ -25,6 +25,12 @@ int main(void) {
   err = ui_spring_update(NULL, &state, 100.0f, 0.016f, &next_state);
   if (err != UI_ERROR_INVALID_ARGUMENT)
     return 1;
+  err = ui_spring_update(&config, NULL, 100.0f, 0.016f, &next_state);
+  if (err != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  err = ui_spring_update(&config, &state, 100.0f, 0.016f, NULL);
+  if (err != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
   config.mass = 0.0f;
   err = ui_spring_update(&config, &state, 100.0f, 0.016f, &next_state);

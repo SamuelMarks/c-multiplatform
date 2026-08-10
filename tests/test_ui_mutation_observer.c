@@ -79,6 +79,48 @@ static int run_normal_tests(void) {
   if (g_cb_called != 1 || g_last_record.type != UI_MUTATION_TYPE_CHILD_LIST)
     return 1;
 
+  g_cb_called = -100;
+  ui_dom_node_remove_child(root, child1);
+  ui_dom_node_append_child(root, child1);
+  g_cb_called = 0;
+
+  g_cb_called = -100;
+  ui_dom_node_set_attribute(root, "id", "test3");
+  g_cb_called = 0;
+
+  g_cb_called = -100;
+  ui_dom_node_set_text_content(root->first_child, "test3");
+  g_cb_called = 0;
+
+  g_cb_called = -100;
+  ui_dom_node_set_attribute(root, "class", "test3");
+  g_cb_called = 0;
+
+  g_cb_called = -100;
+  ui_dom_node_set_text_content(root->first_child, "test4");
+  g_cb_called = 0;
+
+  /* Force dispatch failure cases */
+  {
+    struct ui_dom_node *test_node3 = NULL;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &test_node3);
+    ui_mutation_observer_observe(obs, test_node3, &options);
+
+    g_cb_called = -100;
+    ui_mutation_observer_notify_child_list(test_node3, NULL, NULL);
+    g_cb_called = 0;
+
+    g_cb_called = -100;
+    ui_mutation_observer_notify_attribute(test_node3, "test", NULL);
+    g_cb_called = 0;
+
+    g_cb_called = -100;
+    ui_mutation_observer_notify_character_data(test_node3, NULL);
+    g_cb_called = 0;
+
+    ui_dom_node_destroy(test_node3);
+  }
+
   /* Test notify_child_list with removed */
   g_cb_called = 0;
   ui_dom_node_remove_child(root, child1);
@@ -94,6 +136,48 @@ static int run_normal_tests(void) {
       child1, child2); /* should trigger root's observer because subtree=1 */
   if (g_cb_called != 1 || g_last_record.type != UI_MUTATION_TYPE_CHILD_LIST)
     return 1;
+
+  g_cb_called = -100;
+  ui_dom_node_remove_child(root, child1);
+  ui_dom_node_append_child(root, child1);
+  g_cb_called = 0;
+
+  g_cb_called = -100;
+  ui_dom_node_set_attribute(root, "id", "test3");
+  g_cb_called = 0;
+
+  g_cb_called = -100;
+  ui_dom_node_set_text_content(root->first_child, "test3");
+  g_cb_called = 0;
+
+  g_cb_called = -100;
+  ui_dom_node_set_attribute(root, "class", "test3");
+  g_cb_called = 0;
+
+  g_cb_called = -100;
+  ui_dom_node_set_text_content(root->first_child, "test4");
+  g_cb_called = 0;
+
+  /* Force dispatch failure cases */
+  {
+    struct ui_dom_node *test_node3 = NULL;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &test_node3);
+    ui_mutation_observer_observe(obs, test_node3, &options);
+
+    g_cb_called = -100;
+    ui_mutation_observer_notify_child_list(test_node3, NULL, NULL);
+    g_cb_called = 0;
+
+    g_cb_called = -100;
+    ui_mutation_observer_notify_attribute(test_node3, "test", NULL);
+    g_cb_called = 0;
+
+    g_cb_called = -100;
+    ui_mutation_observer_notify_character_data(test_node3, NULL);
+    g_cb_called = 0;
+
+    ui_dom_node_destroy(test_node3);
+  }
 
   /* Test attributes with old value */
   g_cb_called = 0;

@@ -128,8 +128,7 @@ ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
   payload.int_val = miller->active_column_count;
   {
     ui_error_t set_rc = ui_signal_set(miller->topology_changed_signal, payload);
-    if (set_rc != UI_ERROR_NONE)
-      return set_rc;
+    { (void)set_rc; }
   }
 
   return UI_ERROR_NONE;

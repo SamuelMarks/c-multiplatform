@@ -8,11 +8,11 @@
 extern int g_malloc_fail_countdown;
 static void test_missing_coverage(void) {
   struct ui_drag_drop_context *d_ctx_empty;
-  ui_drag_drop_create(&d_ctx_empty);
-  (void)ui_drag_drop_destroy(d_ctx_empty);
+  (void)ui_drag_drop_create(&d_ctx_empty);
+  (void)(void)ui_drag_drop_destroy(d_ctx_empty);
 
   struct ui_drag_drop_context *d_ctx;
-  ui_drag_drop_create(&d_ctx);
+  (void)ui_drag_drop_create(&d_ctx);
 
   struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
@@ -21,12 +21,19 @@ static void test_missing_coverage(void) {
   d_list_v_empty.width = 100;
   d_list_v_empty.height = 100;
   d_list_v_empty.orientation = UI_DRAG_LIST_ORIENTATION_VERTICAL;
-  ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
 
   struct ui_drag_list d_list_invalid = d_list_v_empty;
+  struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
-  ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  d_list_invalid.item_count = 0;
+  d_list_invalid.items = &dummy_item;
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  d_list_invalid.item_count = 1;
+  d_list_invalid.items = &dummy_item;
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
 
   struct ui_drag_list d_list_v = {0};
   d_list_v.list_id = 1;
@@ -43,95 +50,96 @@ static void test_missing_coverage(void) {
   d_item.height = 10;
   d_list_v.items = &d_item;
   d_list_v.item_count = 1;
-  ui_drag_drop_add_list(d_ctx, &d_list_v);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_v);
 
   struct ui_event ev = {0};
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 250;
   ev.event_data.mouse.y = 250;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   /* PENDING */
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 5;
   ev.event_data.mouse.y = 5;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
   /* AGAIN -> early return */
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 5;
   ev.event_data.mouse.y = 5;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   /* Start drag */
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 50;
   ev.event_data.mouse.y = 50;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   /* Move to nowhere (x=900) to hit update_placeholder return */
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 900;
   ev.event_data.mouse.y = 900;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   /* Missing item -> early return at bottom */
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 250;
   ev.event_data.mouse.y = 250;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 900;
   ev.event_data.mouse.y = 900;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   ev.type = (enum ui_event_type)999;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
   ev.event_data.touch.points[0].x = 250;
   ev.event_data.touch.points[0].y = 250;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 0;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
   ev.type = UI_EVENT_TOUCH_MOVE;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
   ev.type = UI_EVENT_TOUCH_END;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
   ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
   ev.type = UI_EVENT_TOUCH_END;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 2;
-  ui_drag_drop_process_event(d_ctx, &ev);
+  (void)ui_drag_drop_process_event(d_ctx, &ev);
 
-  (void)ui_drag_drop_destroy(d_ctx);
+  (void)(void)ui_drag_drop_destroy(d_ctx);
 }
 
 static int run_normal_tests(void) {
   struct ui_drag_drop_context *ctx = NULL;
   ui_error_t rc;
+  (void)rc;
   enum ui_drag_state state;
   struct ui_drag_list list;
   struct ui_drag_item items[2];
@@ -202,11 +210,11 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.x = 50;
   ev.event_data.mouse.y = 25;
 
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   if (ui_drag_drop_get_state(NULL, &state) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_drag_drop_get_state(ctx, &state);
+  (void)ui_drag_drop_get_state(ctx, &state);
   if (state != UI_DRAG_STATE_PENDING) {
     printf("State not PENDING after mouse down.\n");
     return 1;
@@ -216,9 +224,9 @@ static int run_normal_tests(void) {
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 52;
   ev.event_data.mouse.y = 27;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
-  ui_drag_drop_get_state(ctx, &state);
+  (void)ui_drag_drop_get_state(ctx, &state);
   if (state != UI_DRAG_STATE_PENDING) {
     printf("State should still be PENDING.\n");
     return 1;
@@ -230,9 +238,9 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 50;
   ev.event_data.mouse.y = 100;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
-  ui_drag_drop_get_state(ctx, &state);
+  (void)ui_drag_drop_get_state(ctx, &state);
   if (state != UI_DRAG_STATE_DRAGGING) {
     printf("State not DRAGGING after move.\n");
     return 1;
@@ -276,9 +284,9 @@ static int run_normal_tests(void) {
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
-  ui_drag_drop_get_state(ctx, &state);
+  (void)ui_drag_drop_get_state(ctx, &state);
   if (state != UI_DRAG_STATE_IDLE) {
     printf("State not IDLE after drop.\n");
     return 1;
@@ -344,7 +352,7 @@ static int run_normal_tests(void) {
   ev.event_data.touch.points[0].id = 1;
   ev.event_data.touch.points[0].x = 50;
   ev.event_data.touch.points[0].y = 25;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_MOVE;
@@ -352,15 +360,15 @@ static int run_normal_tests(void) {
   ev.event_data.touch.points[0].id = 1;
   ev.event_data.touch.points[0].x = 50;
   ev.event_data.touch.points[0].y = 100;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Cancel event */
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_CANCEL;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
-  ui_drag_drop_process_event(ctx, &ev);
-  ui_drag_drop_get_state(ctx, &state);
+  (void)ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_get_state(ctx, &state);
   if (state != UI_DRAG_STATE_IDLE)
     return 1;
 
@@ -369,8 +377,8 @@ static int run_normal_tests(void) {
   ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
-  ui_drag_drop_process_event(ctx, &ev);
-  ui_drag_drop_get_state(ctx, &state);
+  (void)ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_get_state(ctx, &state);
   if (state != UI_DRAG_STATE_PENDING)
     return 1;
 
@@ -379,8 +387,8 @@ static int run_normal_tests(void) {
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 2; /* Wrong pointer id */
   ev.event_data.touch.points[0].y = 200;
-  ui_drag_drop_process_event(ctx, &ev);
-  ui_drag_drop_get_state(ctx, &state);
+  (void)ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_get_state(ctx, &state);
   if (state != UI_DRAG_STATE_PENDING)
     return 1; /* Did not drag */
 
@@ -388,19 +396,19 @@ static int run_normal_tests(void) {
   ev.type = UI_EVENT_TOUCH_END;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 2;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_CANCEL;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 2;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_END;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Test Horizontal List */
   struct ui_drag_list hlist;
@@ -427,7 +435,7 @@ static int run_normal_tests(void) {
   hlist.items = hitems;
   hlist.item_count = 2;
 
-  ui_drag_drop_add_list(ctx, &hlist);
+  (void)ui_drag_drop_add_list(ctx, &hlist);
 
   /* Start dragging an item into the horizontal list */
   memset(&ev, 0, sizeof(ev));
@@ -435,66 +443,66 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 210;
   ev.event_data.mouse.y = 250;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 260;
   ev.event_data.mouse.y = 250;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
-  ui_drag_drop_get_placeholder(ctx, &placeholder);
+  (void)ui_drag_drop_get_placeholder(ctx, &placeholder);
   if (!placeholder.active || placeholder.list_id != 2)
     return 1;
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Horizontal list empty */
   hlist.item_count = 0;
   hlist.list_id = 3;
-  ui_drag_drop_add_list(ctx, &hlist);
+  (void)ui_drag_drop_add_list(ctx, &hlist);
 
   /* Vertical list empty */
   list.item_count = 0;
   list.list_id = 4;
-  ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 210; /* item 301 x */
   ev.event_data.mouse.y = 250; /* item 301 y */
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 200; /* hlist x */
   ev.event_data.mouse.y = 200; /* hlist y */
-  ui_drag_drop_process_event(ctx, &ev);
-  ui_drag_drop_get_placeholder(ctx, &placeholder);
+  (void)ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_get_placeholder(ctx, &placeholder);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 0; /* vlist x */
   ev.event_data.mouse.y = 0; /* vlist y */
-  ui_drag_drop_process_event(ctx, &ev);
-  ui_drag_drop_get_placeholder(ctx, &placeholder);
+  (void)ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_get_placeholder(ctx, &placeholder);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Re-alloc limits tests */
   int i;
   for (i = 0; i < 10; i++) {
-    ui_drag_drop_add_list(ctx, &list);
+    (void)ui_drag_drop_add_list(ctx, &list);
   }
 
   /* Test clear and destruction */
@@ -503,8 +511,8 @@ static int run_normal_tests(void) {
   if (ui_drag_drop_clear_lists(ctx) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_drag_drop_destroy(NULL);
-  (void)ui_drag_drop_destroy(ctx);
+  (void)(void)ui_drag_drop_destroy(NULL);
+  (void)(void)ui_drag_drop_destroy(ctx);
 
   return 0;
 }
@@ -526,7 +534,7 @@ static int run_error_paths(void) {
   g_malloc_fail_countdown = -1;
 
   /* Just checking normal create destroys correctly */
-  ui_drag_drop_create(&ctx);
+  (void)ui_drag_drop_create(&ctx);
 
   list.list_id = 2;
   list.x = 0;
@@ -549,26 +557,26 @@ static int run_error_paths(void) {
 
   list.item_count = 0;
 
-  ui_drag_drop_add_list(ctx, &list);
-  ui_drag_drop_add_list(ctx, &list);
-  ui_drag_drop_add_list(ctx, &list);
-  ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
 
   g_malloc_fail_countdown = 0;
   if (ui_drag_drop_add_list(ctx, &list) != UI_ERROR_OUT_OF_MEMORY)
     return 1;
   g_malloc_fail_countdown = -1;
 
-  (void)ui_drag_drop_destroy(ctx);
+  (void)(void)ui_drag_drop_destroy(ctx);
 
   return 0;
 }
 
 static void test_dragged_item_idle(void) {
   struct ui_drag_drop_context *d_ctx;
-  ui_drag_drop_create(&d_ctx);
+  (void)ui_drag_drop_create(&d_ctx);
   int i, s, x, y;
-  ui_drag_drop_get_dragged_item(d_ctx, &i, &s, &x, &y);
+  (void)ui_drag_drop_get_dragged_item(d_ctx, &i, &s, &x, &y);
 
   struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
@@ -577,12 +585,19 @@ static void test_dragged_item_idle(void) {
   d_list_v_empty.width = 100;
   d_list_v_empty.height = 100;
   d_list_v_empty.orientation = UI_DRAG_LIST_ORIENTATION_VERTICAL;
-  ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
 
   struct ui_drag_list d_list_invalid = d_list_v_empty;
+  struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
-  ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  d_list_invalid.item_count = 0;
+  d_list_invalid.items = &dummy_item;
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  d_list_invalid.item_count = 1;
+  d_list_invalid.items = &dummy_item;
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
 
   struct ui_drag_list d_list_h_empty = {0};
   d_list_h_empty.list_id = 3;
@@ -591,14 +606,14 @@ static void test_dragged_item_idle(void) {
   d_list_h_empty.width = 100;
   d_list_h_empty.height = 100;
   d_list_h_empty.orientation = UI_DRAG_LIST_ORIENTATION_HORIZONTAL;
-  ui_drag_drop_add_list(d_ctx, &d_list_h_empty);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_h_empty);
 
-  (void)ui_drag_drop_destroy(d_ctx);
+  (void)(void)ui_drag_drop_destroy(d_ctx);
 }
 
 static void test_drag_drop_coverage(void) {
   struct ui_drag_drop_context *d_ctx;
-  ui_drag_drop_create(&d_ctx);
+  (void)ui_drag_drop_create(&d_ctx);
 
   struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
@@ -607,12 +622,19 @@ static void test_drag_drop_coverage(void) {
   d_list_v_empty.width = 100;
   d_list_v_empty.height = 100;
   d_list_v_empty.orientation = UI_DRAG_LIST_ORIENTATION_VERTICAL;
-  ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
 
   struct ui_drag_list d_list_invalid = d_list_v_empty;
+  struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
-  ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  d_list_invalid.item_count = 0;
+  d_list_invalid.items = &dummy_item;
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  d_list_invalid.item_count = 1;
+  d_list_invalid.items = &dummy_item;
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
 
   struct ui_drag_list d_list_h_empty = {0};
   d_list_h_empty.list_id = 3;
@@ -621,7 +643,7 @@ static void test_drag_drop_coverage(void) {
   d_list_h_empty.width = 100;
   d_list_h_empty.height = 100;
   d_list_h_empty.orientation = UI_DRAG_LIST_ORIENTATION_HORIZONTAL;
-  ui_drag_drop_add_list(d_ctx, &d_list_h_empty);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_h_empty);
 
   struct ui_drag_list d_list_v = {0};
   d_list_v.list_id = 1;
@@ -638,33 +660,33 @@ static void test_drag_drop_coverage(void) {
   d_item.height = 10;
   d_list_v.items = &d_item;
   d_list_v.item_count = 1;
-  ui_drag_drop_add_list(d_ctx, &d_list_v);
+  (void)ui_drag_drop_add_list(d_ctx, &d_list_v);
 
   struct ui_event m_ev = {0};
   m_ev.type = UI_EVENT_MOUSE_DOWN;
   m_ev.event_data.mouse.x = 5;
   m_ev.event_data.mouse.y = 5;
-  ui_drag_drop_process_event(d_ctx, &m_ev);
+  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
 
   m_ev.type = UI_EVENT_MOUSE_MOVE;
   m_ev.event_data.mouse.x = 250;
   m_ev.event_data.mouse.y = 250;
-  ui_drag_drop_process_event(d_ctx, &m_ev);
+  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
 
   m_ev.event_data.mouse.x = 450;
   m_ev.event_data.mouse.y = 450;
-  ui_drag_drop_process_event(d_ctx, &m_ev);
+  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
 
   m_ev.type = UI_EVENT_MOUSE_UP;
-  ui_drag_drop_process_event(d_ctx, &m_ev);
+  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
 
   /* Mouse down without move */
   m_ev.type = UI_EVENT_MOUSE_DOWN;
   m_ev.event_data.mouse.x = 5;
   m_ev.event_data.mouse.y = 5;
-  ui_drag_drop_process_event(d_ctx, &m_ev);
+  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
 
-  (void)ui_drag_drop_destroy(d_ctx);
+  (void)(void)ui_drag_drop_destroy(d_ctx);
 }
 
 static void test_extra_branches(void);
@@ -698,14 +720,14 @@ static void test_extra_branches(void) {
   int drop_item_id, drop_from_list, drop_to_list, drop_to_index;
   int dropped = 0;
 
-  ui_drag_drop_create(&ctx);
+  (void)ui_drag_drop_create(&ctx);
 
   memset(&list, 0, sizeof(list));
   list.item_count = 1;
   item.item_id = 99;
   list.items = &item;
   g_malloc_fail_countdown = 1;
-  ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
   g_malloc_fail_countdown = -1;
 
   memset(&list, 0, sizeof(list));
@@ -720,42 +742,46 @@ static void test_extra_branches(void) {
   item.width = 100;
   item.height = 100;
   list.items = &item;
-  ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 20;
   ev.event_data.mouse.y = 200;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   ev.event_data.mouse.x = 200;
   ev.event_data.mouse.y = 20;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   ev.event_data.mouse.x = 200;
   ev.event_data.mouse.y = 200;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   ev.event_data.mouse.button = 1;
   ev.event_data.mouse.x = 20;
   ev.event_data.mouse.y = 20;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
   ev.type = UI_EVENT_MOUSE_UP;
-  ev.event_data.mouse.button = 0;
-  ui_drag_drop_process_event(ctx, &ev);
+  ev.event_data.mouse.button = 1; /* Non-zero button mouse up */
+  (void)ui_drag_drop_process_event(ctx, &ev);
+  ev.event_data.mouse.button = 0; /* Zero button mouse up */
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 30;
   ev.event_data.mouse.y = 30;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
-  ui_drag_drop_get_drop_event(ctx, &dropped, &drop_item_id, &drop_from_list,
-                              &drop_to_list, &drop_to_index);
-  ui_drag_drop_get_drop_event(NULL, &dropped, &drop_item_id, &drop_from_list,
-                              &drop_to_list, &drop_to_index);
+  (void)ui_drag_drop_get_drop_event(ctx, &dropped, &drop_item_id,
+                                    &drop_from_list, &drop_to_list,
+                                    &drop_to_index);
+  (void)ui_drag_drop_get_drop_event(NULL, &dropped, &drop_item_id,
+                                    &drop_from_list, &drop_to_list,
+                                    &drop_to_index);
 
-  ui_drag_drop_destroy(ctx);
+  (void)ui_drag_drop_destroy(ctx);
 }
 
 static void test_bounds_exhaustive(void) {
@@ -765,7 +791,7 @@ static void test_bounds_exhaustive(void) {
   struct ui_event ev;
   int state;
 
-  ui_drag_drop_create(&ctx);
+  (void)ui_drag_drop_create(&ctx);
 
   memset(&list, 0, sizeof(list));
   list.x = 100;
@@ -779,11 +805,11 @@ static void test_bounds_exhaustive(void) {
   item.width = 50;
   item.height = 50;
   list.items = &item;
-  ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
 
   /* 1. Item count > 0 but items == NULL */
   list.items = NULL;
-  ui_drag_drop_add_list(ctx, &list);
+  (void)ui_drag_drop_add_list(ctx, &list);
 
   /* Pointer Down Bounds Checks */
   memset(&ev, 0, sizeof(ev));
@@ -793,38 +819,38 @@ static void test_bounds_exhaustive(void) {
   /* Fail x >= item->x */
   ev.event_data.mouse.x = 105;
   ev.event_data.mouse.y = 120;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Fail x < item->x + item->width */
   ev.event_data.mouse.x = 165;
   ev.event_data.mouse.y = 120;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Fail y >= item->y */
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 105;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Fail y < item->y + item->height */
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 165;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Success */
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 120;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Pointer Move Bounds Checks (Placeholder update) */
   /* Start drag */
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 120; /* threshold not reached */
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   ev.event_data.mouse.x = 500;
   ev.event_data.mouse.y = 500; /* reach threshold */
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Now we are dragging. Update placeholder does bounds checks on lists.
      drag_center_x/y is current_x/y - offset + width/2.
@@ -835,44 +861,54 @@ static void test_bounds_exhaustive(void) {
   /* Fail drag_center_x >= list->x */
   ev.event_data.mouse.x = -1000;
   ev.event_data.mouse.y = 150;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Fail drag_center_x < list->x + list->width */
   ev.event_data.mouse.x = 1000;
   ev.event_data.mouse.y = 150;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Fail drag_center_y >= list->y */
   ev.event_data.mouse.x = 150;
   ev.event_data.mouse.y = -1000;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Fail drag_center_y < list->y + list->height */
   ev.event_data.mouse.x = 150;
   ev.event_data.mouse.y = 1000;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* Pointer cancel */
   ev.type = UI_EVENT_TOUCH_CANCEL;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 0;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
+
+  /* And handle_pointer_move when pointer down is false */
+  /* This happens naturally after a pointer cancel because active_pointer_id
+     isn't reset in some scenarios or a mouse move occurs while active pointer
+     is still zero but down is false */
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.button = 0;
+  ev.event_data.mouse.x = 120;
+  ev.event_data.mouse.y = 120;
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
   /* And handle_pointer_move when pointer down is true but id doesn't match */
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 120;
-  ui_drag_drop_process_event(ctx, &ev); /* pointer is down, id is 0 */
+  (void)ui_drag_drop_process_event(ctx, &ev); /* pointer is down, id is 0 */
 
   ev.type = UI_EVENT_TOUCH_MOVE; /* moves pointer 1 */
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
   ev.event_data.touch.points[0].x = 150;
   ev.event_data.touch.points[0].y = 150;
-  ui_drag_drop_process_event(ctx, &ev);
+  (void)ui_drag_drop_process_event(ctx, &ev);
 
-  ui_drag_drop_get_state(ctx, NULL); /* missing get_state branch */
+  (void)ui_drag_drop_get_state(ctx, NULL); /* missing get_state branch */
 
-  ui_drag_drop_destroy(ctx);
+  (void)ui_drag_drop_destroy(ctx);
 }

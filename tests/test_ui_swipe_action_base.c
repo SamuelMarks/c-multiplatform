@@ -42,6 +42,10 @@ int main(void) {
   ACCUM_ERR(failed, ui_swipe_action_base_commit(&swipe));
   failed |= (swipe.state != UI_SWIPE_ACTION_REVEALED_LEFT);
 
+  /* Transition from REVEALED_LEFT to SWIPING */
+  ACCUM_ERR(failed, ui_swipe_action_base_update(&swipe, 10.0f));
+  failed |= (swipe.state != UI_SWIPE_ACTION_SWIPING);
+
   /* Reset */
   ACCUM_ERR(failed, ui_swipe_action_base_reset(&swipe));
   failed |= (swipe.state != UI_SWIPE_ACTION_IDLE || swipe.offset_x != 0.0f);

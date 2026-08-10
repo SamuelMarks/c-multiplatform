@@ -16,6 +16,8 @@ static ui_error_t test_callback(void *user_data) {
   return UI_ERROR_NONE;
 }
 
+static ui_error_t failing_callback(void *user_data) { return UI_ERROR_UNKNOWN; }
+
 static ui_error_t test_cancel_callback(void *user_data) {
   int *val = (int *)user_data;
   *val = 99; /* Should not be executed */
@@ -49,13 +51,23 @@ static int run_normal_tests(void) {
 
   rc = ui_execution_context_tick(ctx);
   if (rc != UI_ERROR_NONE) {
-    printf("Failed to tick\n");
+    printf("Failed to execute tick\n");
     return 1;
   }
 
   if (test_val != 42) {
     printf("Task was not executed correctly\n");
     return 1;
+  }
+
+  /* Test failure case */
+  rc = ui_execution_context_schedule(ctx, failing_callback, NULL);
+  if (rc == UI_ERROR_NONE) {
+    rc = ui_execution_context_tick(ctx);
+    if (rc == UI_ERROR_NONE) {
+      printf("Failed to propagate error from task\n");
+      return 1;
+    }
   }
 
   /* Test cancellation */

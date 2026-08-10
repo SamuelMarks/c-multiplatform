@@ -63,19 +63,19 @@ static ui_error_t request_free(struct ui_route_request *req) {
     C_MULTIPLATFORM_FREE(req->path);
   if (req->params) {
     for (i = 0; i < req->params_size; ++i) {
-      if (req->params[i].key)
-        C_MULTIPLATFORM_FREE(req->params[i].key);
-      if (req->params[i].value)
-        C_MULTIPLATFORM_FREE(req->params[i].value);
+
+      C_MULTIPLATFORM_FREE(req->params[i].key);
+
+      C_MULTIPLATFORM_FREE(req->params[i].value);
     }
     C_MULTIPLATFORM_FREE(req->params);
   }
   if (req->queries) {
     for (i = 0; i < req->queries_size; ++i) {
-      if (req->queries[i].key)
-        C_MULTIPLATFORM_FREE(req->queries[i].key);
-      if (req->queries[i].value)
-        C_MULTIPLATFORM_FREE(req->queries[i].value);
+
+      C_MULTIPLATFORM_FREE(req->queries[i].key);
+
+      C_MULTIPLATFORM_FREE(req->queries[i].value);
     }
     C_MULTIPLATFORM_FREE(req->queries);
   }
@@ -348,24 +348,16 @@ ui_error_t ui_router_destroy(struct ui_router *router) {
   }
 
   for (i = 0; i < router->stack_size; ++i) {
-    if (router->stack[i]) {
-      (void)ui_component_destroy(router->stack[i]);
-    }
+    (void)ui_component_destroy(router->stack[i]);
   }
 
-  if (router->stack) {
-    C_MULTIPLATFORM_FREE(router->stack);
-  }
+  C_MULTIPLATFORM_FREE(router->stack);
 
   for (i = 0; i < router->routes_size; ++i) {
-    if (router->routes[i].pattern) {
-      C_MULTIPLATFORM_FREE(router->routes[i].pattern);
-    }
+    C_MULTIPLATFORM_FREE(router->routes[i].pattern);
   }
 
-  if (router->routes) {
-    C_MULTIPLATFORM_FREE(router->routes);
-  }
+  C_MULTIPLATFORM_FREE(router->routes);
 
   C_MULTIPLATFORM_FREE(router);
   return UI_ERROR_NONE;

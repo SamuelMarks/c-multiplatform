@@ -35,11 +35,11 @@ static void test_chat_bubble_missing_branches(void) {
   /* Test 87: destroy without signal */
   {
     struct ui_arena *arena;
-    ui_arena_create(1024 * 16, &arena);
+    (void)ui_arena_create(1024 * 16, &arena);
     struct ui_chat_bubble_base *bubble = NULL;
     struct ui_chat_bubble_config cfg = {0};
 
-    ui_chat_bubble_base_create(arena, &cfg, &bubble);
+    (void)ui_chat_bubble_base_create(arena, &cfg, &bubble);
     /* Don't cast internals. Just skip the 87 branch. It's too fragile. */
     (void)ui_chat_bubble_base_destroy(bubble);
     (void)ui_arena_destroy(arena);
@@ -113,11 +113,26 @@ int main(void) {
 
   /* Test 3: Calculate text bounds with No Tail */
   config.tail_placement = UI_CHAT_BUBBLE_TAIL_TOP_LEFT;
-  ui_chat_bubble_base_set_config(bubble, &config);
-  ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds, &text_bounds);
+  (void)ui_chat_bubble_base_set_config(bubble, &config);
+  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
+                                                  &text_bounds);
   config.tail_placement = UI_CHAT_BUBBLE_TAIL_TOP_RIGHT;
-  ui_chat_bubble_base_set_config(bubble, &config);
-  ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds, &text_bounds);
+  (void)ui_chat_bubble_base_set_config(bubble, &config);
+  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
+                                                  &text_bounds);
+
+  /* Set an invalid value using internal mock pattern to trigger default */
+  {
+#ifdef UI_TEST_MOCK_ALLOC
+    extern void ui_chat_bubble_base_mock_config(
+        struct ui_chat_bubble_base * bubble, int tail_placement);
+    ui_chat_bubble_base_mock_config(NULL, 100);
+    ui_chat_bubble_base_mock_config(bubble, 100);
+    (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
+                                                    &text_bounds);
+    ui_chat_bubble_base_mock_config(bubble, UI_CHAT_BUBBLE_TAIL_TOP_RIGHT);
+#endif
+  }
   /* Test bounds checks for tail_placement and group_position */
   struct ui_chat_bubble_base *dummy_bubble = NULL;
   config.tail_placement = (enum ui_chat_bubble_tail_placement) - 1;
@@ -145,7 +160,8 @@ int main(void) {
     FAIL();
 
   config.group_position = UI_CHAT_BUBBLE_GROUP_SINGLE;
-  ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds, &text_bounds);
+  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
+                                                  &text_bounds);
   config.tail_placement = UI_CHAT_BUBBLE_TAIL_NONE;
   err = ui_chat_bubble_base_set_config(bubble, &config);
   if (err != UI_ERROR_NONE)
@@ -166,7 +182,8 @@ int main(void) {
   /* Test negative bounds clamping */
   raw_bounds.width = 1.0;
   raw_bounds.height = 1.0;
-  ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds, &text_bounds);
+  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
+                                                  &text_bounds);
 
   /* Test Invalid Arguments */
   if (ui_chat_bubble_base_create(NULL, &config, &bubble) !=
@@ -187,11 +204,12 @@ int main(void) {
   if (ui_chat_bubble_base_create(arena, NULL, &bubble) !=
       UI_ERROR_INVALID_ARGUMENT)
     FAIL();
-  ui_chat_bubble_base_get_config_signal(NULL, &signal);
-  ui_chat_bubble_base_get_config_signal(bubble, NULL);
-  ui_chat_bubble_base_calculate_text_bounds(NULL, &raw_bounds, &text_bounds);
-  ui_chat_bubble_base_calculate_text_bounds(bubble, NULL, &text_bounds);
-  ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds, NULL);
+  (void)ui_chat_bubble_base_get_config_signal(NULL, &signal);
+  (void)ui_chat_bubble_base_get_config_signal(bubble, NULL);
+  (void)ui_chat_bubble_base_calculate_text_bounds(NULL, &raw_bounds,
+                                                  &text_bounds);
+  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, NULL, &text_bounds);
+  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds, NULL);
 
   err = ui_chat_bubble_base_destroy(bubble);
   if (err != UI_ERROR_NONE) {

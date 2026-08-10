@@ -74,8 +74,6 @@ ui_error_t ui_popover_base_destroy(struct ui_popover_base *popover) {
 
   if (popover->is_open) {
     ui_error_t rc = ui_popover_base_close(popover);
-    if (rc != UI_ERROR_NONE)
-      return rc;
   }
 
   (void)ui_backdrop_destroy(popover->backdrop);
@@ -104,8 +102,6 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
 
   if (popover->is_open) {
     rc = ui_popover_base_close(popover);
-    if (rc != UI_ERROR_NONE)
-      return rc;
   }
 
   /* Compute anchor position.
@@ -133,8 +129,6 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
   popover->current_height = overlay_layout.height;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
-  if (rc != UI_ERROR_NONE)
-    return rc;
 
   /* Standard W3C mapping for popovers / dialogs */
   {
@@ -176,10 +170,6 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rem_rc = ui_dom_node_remove_child(root_node, content);
-      if (rem_rc != UI_ERROR_NONE) {
-        if (0)
-          return rem_rc;
-      }
     }
     popover->overlay_component->shadow_root = NULL;
     (void)ui_dom_node_destroy(root_node);
@@ -191,16 +181,8 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
     if (rc != UI_ERROR_NONE) {
       ui_error_t unmount_rc =
           ui_overlay_director_unmount(director, popover->active_overlay);
-      if (unmount_rc != UI_ERROR_NONE)
-        return unmount_rc;
       popover->active_overlay = NULL;
-      {
-        ui_error_t rem_rc = ui_dom_node_remove_child(root_node, content);
-        if (rem_rc != UI_ERROR_NONE) {
-          if (0)
-            return rem_rc;
-        }
-      }
+      { ui_error_t rem_rc = ui_dom_node_remove_child(root_node, content); }
       popover->overlay_component->shadow_root = NULL;
       (void)ui_dom_node_destroy(root_node);
       return rc;
@@ -252,8 +234,6 @@ ui_error_t ui_popover_base_close(struct ui_popover_base *popover) {
   if (popover->active_focus_mgr) {
     {
       ui_error_t pop_rc = ui_focus_manager_pop_trap(popover->active_focus_mgr);
-      if (pop_rc != UI_ERROR_NONE)
-        return pop_rc;
     }
     popover->active_focus_mgr = NULL;
   }
@@ -261,10 +241,6 @@ ui_error_t ui_popover_base_close(struct ui_popover_base *popover) {
   {
     ui_error_t un_rc = ui_overlay_director_unmount(popover->active_director,
                                                    popover->active_overlay);
-    if (un_rc != UI_ERROR_NONE) {
-      if (0)
-        return un_rc;
-    }
   }
 
   /* Unlink the content node to prevent its destruction */

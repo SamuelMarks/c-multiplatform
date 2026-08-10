@@ -221,11 +221,6 @@ ui_breadcrumbs_base_create(struct ui_router *router,
 
 cleanup:
   if (bc->nav_node) {
-    if (bc->component) {
-      if (bc->component->shadow_root == bc->nav_node) {
-        bc->component->shadow_root = NULL;
-      }
-    }
     (void)ui_dom_node_destroy(bc->nav_node);
   }
   if (bc->component)
@@ -252,14 +247,10 @@ static ui_error_t free_segments(struct ui_breadcrumbs_base *bc) {
        mid-creation, we might have unparented nodes. */
     if (bc->segments[i].li_node) {
       if (bc->segments[i].li_node->parent) {
-        tmp_rc = ui_dom_node_remove_child(bc->segments[i].li_node->parent,
-                                          bc->segments[i].li_node);
-        if (tmp_rc != UI_ERROR_NONE)
-          rc = tmp_rc;
+        (void)ui_dom_node_remove_child(bc->segments[i].li_node->parent,
+                                       bc->segments[i].li_node);
       }
-      tmp_rc = ui_dom_node_destroy(bc->segments[i].li_node);
-      if (tmp_rc != UI_ERROR_NONE)
-        rc = tmp_rc;
+      (void)ui_dom_node_destroy(bc->segments[i].li_node);
     }
   }
   C_MULTIPLATFORM_FREE(bc->segments);
@@ -274,16 +265,7 @@ ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs) {
   if (!breadcrumbs)
     return UI_ERROR_NONE;
 
-  rc = free_segments(breadcrumbs);
-  if (rc != UI_ERROR_NONE) {
-    ui_error_t destroy_rc = ui_component_destroy(breadcrumbs->component);
-    if (destroy_rc != UI_ERROR_NONE) {
-      C_MULTIPLATFORM_FREE(breadcrumbs);
-      return destroy_rc;
-    }
-    C_MULTIPLATFORM_FREE(breadcrumbs);
-    return rc;
-  }
+  (void)free_segments(breadcrumbs);
   rc = ui_component_destroy(breadcrumbs->component);
   if (rc != UI_ERROR_NONE) {
     C_MULTIPLATFORM_FREE(breadcrumbs);
@@ -458,12 +440,7 @@ fail:
     C_MULTIPLATFORM_FREE(accumulated_path);
   bc->segments = new_segments;
   bc->segment_count = (count < segment_capacity) ? count + 1 : count;
-  {
-    ui_error_t free_rc = free_segments(bc);
-    if (free_rc != UI_ERROR_NONE) {
-      return free_rc;
-    }
-  }
+  (void)free_segments(bc);
   return rc;
 }
 

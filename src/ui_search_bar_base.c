@@ -126,17 +126,11 @@ ui_error_t ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
 
   {
     ui_error_t tc_rc = trigger_cva_change(search_bar);
-    if (tc_rc != UI_ERROR_NONE) {
-      if (0)
-        return tc_rc;
-    }
+    (void)tc_rc;
   }
   {
     ui_error_t tt_rc = trigger_cva_touched(search_bar);
-    if (tt_rc != UI_ERROR_NONE) {
-      if (0)
-        return tt_rc;
-    }
+    (void)tt_rc;
   }
 
   return UI_ERROR_NONE;

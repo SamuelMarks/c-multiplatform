@@ -66,15 +66,45 @@ static int test_text_layout(void) {
   int failed = 0;
 
   ACCUM_ERR(failed, ui_text_layout_create(&layout));
+  ACCUM_ERR(failed, ui_text_layout_destroy(layout));
+
+  ACCUM_ERR(failed, ui_text_layout_create(&layout));
 
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_text, 100.0f,
                                          UI_TEXT_DIRECTION_LTR));
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_complex,
                                          5.0f, UI_TEXT_DIRECTION_LTR));
 
+  /* Invalid/incomplete UTF-8 */
+  const char *utf8_invalid = "\xC2\xE2\x82\xF0\x90\x8D";
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_invalid,
+                                         100.0f, UI_TEXT_DIRECTION_LTR));
+  const char *utf8_inc_1 = "\xC2";
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_1,
+                                         100.0f, UI_TEXT_DIRECTION_LTR));
+  const char *utf8_inc_2 = "\xE2";
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_2,
+                                         100.0f, UI_TEXT_DIRECTION_LTR));
+  const char *utf8_inc_3 = "\xE2\x82";
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_3,
+                                         100.0f, UI_TEXT_DIRECTION_LTR));
+  const char *utf8_inc_4 = "\xF0";
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_4,
+                                         100.0f, UI_TEXT_DIRECTION_LTR));
+  const char *utf8_inc_5 = "\xF0\x90";
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_5,
+                                         100.0f, UI_TEXT_DIRECTION_LTR));
+  const char *utf8_inc_6 = "\xF0\x90\x8D";
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_6,
+                                         100.0f, UI_TEXT_DIRECTION_LTR));
+
   /* Test reallocation */
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, long_string,
                                          1000.0f, UI_TEXT_DIRECTION_LTR));
+
+  /* Test zero max_width */
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_text, 0.0f,
+                                         UI_TEXT_DIRECTION_LTR));
 
   /* Test font metrics failure */
   g_mock_font_fail = 1;

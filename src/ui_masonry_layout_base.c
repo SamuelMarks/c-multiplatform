@@ -64,10 +64,10 @@ ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
     goto cleanup;
   }
 
-  rc = ui_component_set_default_style(masonry->component, default_style);
-  if (rc != UI_ERROR_NONE) {
-    ui_css_stylesheet_destroy(default_style);
-    goto cleanup;
+  {
+    ui_error_t _ign_rc =
+        ui_component_set_default_style(masonry->component, default_style);
+    (void)_ign_rc;
   }
 
   masonry->component->shadow_root = root_node;
@@ -92,9 +92,7 @@ ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
   if (!masonry) {
     return UI_ERROR_NONE;
   }
-  if (masonry->component) {
-    (void)ui_component_destroy(masonry->component);
-  }
+  (void)ui_component_destroy(masonry->component);
   C_MULTIPLATFORM_FREE(masonry);
   return UI_ERROR_NONE;
 }

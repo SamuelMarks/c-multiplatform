@@ -176,3 +176,15 @@ ui_error_t ui_chat_bubble_base_calculate_text_bounds(
 
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+void ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
+                                     int tail_placement);
+void ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
+                                     int tail_placement) {
+  if (bubble) {
+    bubble->config.tail_placement =
+        (enum ui_chat_bubble_tail_placement)tail_placement;
+  }
+}
+#endif

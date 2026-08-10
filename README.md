@@ -3,7 +3,7 @@ c-multiplatform
 
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Doc Coverage](https://img.shields.io/badge/docs-29%25-red.svg)](#)
-[![Test Coverage](https://img.shields.io/badge/coverage-46%25-red.svg)](#)
+[![Test Coverage](https://img.shields.io/badge/coverage-47%25-red.svg)](#)
 
 The universal, ultra-lightweight UI and media engine for the next generation of cross-platform applications.
 
@@ -84,53 +84,66 @@ Customize the computational model and platform features via CMake:
 
 ## Getting Started
 
-Writing UI in pure C is straightforward using the CDK and Signal APIs. Here is a simple example of creating a window with a reactive button counter:
+Writing UI in pure C is straightforward using the CDK and Signal APIs. Here is a simple example of creating a declarative "Sign up" input form directly in native C:
 
 ```c
 #include "ui_engine.h"
+#include "ui_label_base.h"
+#include "ui_input_base.h"
 #include "ui_button_base.h"
 #include "ui_layout.h"
 
-// A reactive signal to hold counter state
-ui_signal_t* counter_signal;
-
-// Click handler
-void on_button_click(ui_event_t* event) {
-    int current_val = ui_signal_get_int(counter_signal);
-    ui_signal_set_int(counter_signal, current_val + 1);
+/* Form submission handler */
+void on_signup_click(ui_event_t* event) {
+    /* Handle form data */
 }
 
 int main(int argc, char** argv) {
-    // Initialize the engine (automatically selects optimal threading/memory model)
+    ui_window_t* window;
+    ui_node_t* form_container;
+    ui_node_t* title_label;
+    ui_node_t* first_name_input;
+    ui_node_t* last_name_input;
+    ui_node_t* signup_button;
+
+    /* Initialize the engine (automatically selects optimal threading/memory model) */
     ui_engine_init();
 
-    // Create a new window
-    ui_window_t* window = ui_window_create("c-multiplatform Example", 800, 600);
+    /* Create a new window */
+    window = ui_window_create("Sign Up", 800, 600);
 
-    // Initialize state
-    counter_signal = ui_signal_create_int(0);
+    /* Create a container with Flexbox layout */
+    form_container = ui_node_create();
+    ui_node_set_style(form_container,
+        "display: flex; flex-direction: column; "
+        "justify-content: center; align-items: stretch; "
+        "padding: 40px; gap: 16px; max-width: 400px; margin: auto;");
 
-    // Create a container with Flexbox layout
-    ui_node_t* container = ui_node_create();
-    ui_node_set_style(container, "display: flex; justify-content: center; align-items: center; height: 100%;");
+    /* Create form components from the CDK */
+    title_label = ui_label_create("Sign up");
+    ui_node_set_style(title_label, "font-size: 24px; font-weight: bold; margin-bottom: 24px;");
 
-    // Create a button component from the CDK
-    ui_node_t* button = ui_button_create("Click Me!");
+    first_name_input = ui_input_create("First name");
+    last_name_input = ui_input_create("Last name");
 
-    // Bind the button text to the signal
-    ui_button_bind_text_format(button, "Clicks: %d", counter_signal);
+    signup_button = ui_button_create("Sign up");
+    ui_node_set_style(signup_button, "background-color: #007AFF; color: white; padding: 12px;");
 
-    // Attach event listener
-    ui_node_on(button, "click", on_button_click);
+    /* Attach event listener */
+    ui_node_on(signup_button, "click", on_signup_click);
 
-    // Assemble the tree
-    ui_node_append_child(container, button);
-    ui_window_set_root(window, container);
+    /* Assemble the tree */
+    ui_node_append_child(form_container, title_label);
+    ui_node_append_child(form_container, first_name_input);
+    ui_node_append_child(form_container, last_name_input);
+    ui_node_append_child(form_container, signup_button);
 
-    // Start the main event loop
+    ui_window_set_root(window, form_container);
+
+    /* Start the main event loop */
     ui_engine_run(window);
 
-    // Cleanup
+    /* Cleanup */
     ui_engine_cleanup();
     return 0;
 }

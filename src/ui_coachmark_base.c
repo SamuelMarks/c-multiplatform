@@ -121,8 +121,6 @@ cleanup:
     (void)ui_component_destroy(tour->backdrop_comp);
   if (container_node)
     (void)ui_dom_node_destroy(container_node);
-  if (tour->coachmark_container)
-    (void)ui_component_destroy(tour->coachmark_container);
   C_MULTIPLATFORM_FREE(tour);
   return rc;
 }
@@ -181,6 +179,11 @@ ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_coachmark_signal_mock_fail = 0;
+int g_coachmark_dom_mock_fail = 0;
+#endif
+
 static ui_error_t render_current_step(struct ui_coachmark_tour *tour) {
   struct ui_dom_node *container_node;
   ui_error_t rc = UI_ERROR_NONE;
@@ -192,9 +195,14 @@ static ui_error_t render_current_step(struct ui_coachmark_tour *tour) {
   /* For now we just replace the content conceptually. */
   if (tour->steps[tour->current_step].content_component &&
       tour->steps[tour->current_step].content_component->shadow_root) {
-    rc = ui_dom_node_append_child(
-        container_node,
-        tour->steps[tour->current_step].content_component->shadow_root);
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_coachmark_dom_mock_fail)
+      rc = UI_ERROR_UNKNOWN;
+    else
+#endif
+      rc = ui_dom_node_append_child(
+          container_node,
+          tour->steps[tour->current_step].content_component->shadow_root);
     if (rc != UI_ERROR_NONE)
       return rc;
   }
@@ -253,7 +261,12 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
   if (tour->open_signal) {
     union ui_signal_payload payload;
     payload.bool_val = 1;
-    rc = ui_signal_set(tour->open_signal, payload);
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_coachmark_signal_mock_fail)
+      rc = UI_ERROR_UNKNOWN;
+    else
+#endif
+      rc = ui_signal_set(tour->open_signal, payload);
     if (rc != UI_ERROR_NONE)
       return rc;
   }
@@ -324,7 +337,12 @@ ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
     union ui_signal_payload payload;
     ui_error_t rc;
     payload.bool_val = 0;
-    rc = ui_signal_set(tour->open_signal, payload);
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_coachmark_signal_mock_fail)
+      rc = UI_ERROR_UNKNOWN;
+    else
+#endif
+      rc = ui_signal_set(tour->open_signal, payload);
     if (rc != UI_ERROR_NONE)
       return rc;
   }

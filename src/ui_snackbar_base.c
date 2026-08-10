@@ -313,10 +313,13 @@ ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar) {
 
   if (snackbar->is_active) {
     if (snackbar->overlay_handle) {
+      ui_error_t unmount_rc;
 #define ui_overlay_director_unmount(d, o) ui_overlay_director_unmount((d), (o))
-      (void)ui_overlay_director_unmount(snackbar->director,
-                                        snackbar->overlay_handle);
+      unmount_rc = ui_overlay_director_unmount(snackbar->director,
+                                               snackbar->overlay_handle);
       snackbar->overlay_handle = NULL;
+      if (unmount_rc != UI_ERROR_NONE)
+        return unmount_rc;
     }
 
     if (snackbar->current.message)

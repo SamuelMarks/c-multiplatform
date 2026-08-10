@@ -547,9 +547,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     target_link_libraries(test_ui_vibrancy ui_engine_test)
     add_test(NAME test_ui_vibrancy COMMAND test_ui_vibrancy)
 
-    add_executable(test_ui_image_base tests/test_ui_image_base.c tests/ui_test_mock_mem.c)
-    target_link_libraries(test_ui_image_base ui_engine_test)
-    add_test(NAME test_ui_image_base COMMAND test_ui_image_base)
 
     add_executable(test_ui_transfer_list_base tests/test_ui_transfer_list_base.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_transfer_list_base ui_engine_test)
@@ -1276,6 +1273,11 @@ add_test(NAME test_ui_breakpoint_observer COMMAND test_ui_breakpoint_observer)
     target_link_libraries(test_ui_renderer_coregraphics ui_engine_test)
     add_test(NAME test_ui_renderer_coregraphics COMMAND test_ui_renderer_coregraphics)
 
+    add_executable(test_ui_image_base tests/test_ui_image_base.c tests/ui_test_mock_mem.c)
+    target_link_libraries(test_ui_image_base ui_engine_test)
+    add_test(NAME test_ui_image_base COMMAND test_ui_image_base)
+
+
     add_executable(test_ui_renderer_gdiplus tests/test_ui_renderer_gdiplus.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_renderer_gdiplus ui_engine_test)
     add_test(NAME test_ui_renderer_gdiplus COMMAND test_ui_renderer_gdiplus)
@@ -1283,3 +1285,5 @@ endif()
 
 
 add_subdirectory(examples)
+add_executable(test_ui_layout_internal tests/test_ui_layout_internal.c tests/ui_test_mock_mem.c)
+target_link_libraries(test_ui_layout_internal PRIVATE ui_engine)

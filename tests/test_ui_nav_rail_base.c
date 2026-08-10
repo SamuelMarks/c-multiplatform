@@ -5,6 +5,16 @@
 #include <string.h>
 /* clang-format on */
 
+struct ui_nav_rail_base {
+  struct ui_component *component;
+  struct ui_signal *active_index_signal;
+};
+
+struct ui_nav_rail_item_base {
+  struct ui_component *component;
+  int active;
+};
+
 extern int g_malloc_fail_countdown;
 
 static int run_normal_tests(void) {
@@ -89,6 +99,20 @@ static int run_normal_tests(void) {
   (void)ui_nav_rail_base_destroy(rail);
   ui_nav_rail_item_base_destroy(NULL);
   (void)ui_nav_rail_base_destroy(NULL);
+
+  {
+    struct ui_nav_rail_base *empty_rail;
+    struct ui_nav_rail_item_base *empty_item;
+    ui_nav_rail_base_create(&empty_rail);
+    ui_component_destroy(empty_rail->component);
+    empty_rail->component = NULL;
+    ui_nav_rail_base_destroy(empty_rail);
+
+    ui_nav_rail_item_base_create(&empty_item);
+    ui_component_destroy(empty_item->component);
+    empty_item->component = NULL;
+    ui_nav_rail_item_base_destroy(empty_item);
+  }
 
   return 0;
 }

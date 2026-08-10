@@ -170,6 +170,10 @@ static ui_error_t test_oom(void) {
 
   /* Mount OOM with existing child */
   ui_overlay_director_mount_component(dir, comp, 1, &overlay);
+  g_malloc_fail_countdown = -100;
+  ui_overlay_director_unmount(dir, overlay);
+  g_malloc_fail_countdown = -1;
+  ui_overlay_director_mount_component(dir, comp, 1, &overlay);
   for (i = 0; i < 20; i++) {
     struct ui_overlay *overlay2 = NULL;
     g_malloc_fail_countdown = i;
@@ -186,6 +190,7 @@ static ui_error_t test_oom(void) {
   (void)ui_overlay_director_destroy(dir);
   (void)ui_dom_node_destroy(root);
   (void)ui_component_destroy(comp);
+  return UI_ERROR_NONE;
 }
 
 int main(void) {

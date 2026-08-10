@@ -461,6 +461,33 @@ static int run_oom_tests(void) {
   return 0;
 }
 
+static ui_error_t mock_on_change_fail(struct ui_slider_base *slider, float val,
+                                      void *user_data) {
+  (void)slider;
+  (void)val;
+  (void)user_data;
+  return UI_ERROR_OUT_OF_MEMORY;
+}
+
+static void test_on_change_error() {
+  struct ui_slider_base *slider;
+  ui_slider_base_create(&slider, NULL);
+  ui_slider_base_set_on_change(slider, mock_on_change_fail, NULL);
+
+  /* Trigger on_change error in set_value */
+  ui_slider_base_set_value(slider, 50.0f);
+
+  /* Trigger set_value error in set_min */
+  ui_slider_base_set_value(slider, 20.0f);
+  ui_slider_base_set_min(slider, 30.0f);
+
+  /* Trigger set_value error in set_max */
+  ui_slider_base_set_value(slider, 80.0f);
+  ui_slider_base_set_max(slider, 60.0f);
+
+  ui_slider_base_destroy(slider);
+}
+
 int main(void) {
   int failed = 0;
   if (run_normal_tests() != 0) {
@@ -472,6 +499,7 @@ int main(void) {
     failed = 1;
   }
 
+  test_on_change_error();
   if (failed) {
     printf("Tests failed.\n");
     return 1;

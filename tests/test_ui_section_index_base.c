@@ -144,12 +144,26 @@ static int test_ui_section_index_base_sections(void) {
   return 0;
 }
 
+#include "ui_dom_node.h"
+
+struct ui_section_index_base {
+  struct ui_component *component;
+  struct ui_dom_node **item_nodes;
+  size_t count;
+  int active_idx;
+  struct ui_computed *data_signal;
+};
+
+void test_ui_section_index_errs(void);
+void test_ui_section_index_remove_attr_err(void);
 int main(void) {
   int failed = 0;
   printf("Running ui_section_index_base tests...\n");
 
   failed |= test_ui_section_index_base_init();
   failed |= test_ui_section_index_base_sections();
+  test_ui_section_index_errs();
+  test_ui_section_index_remove_attr_err();
 
   if (failed) {
     printf("Tests failed.\n");
@@ -158,4 +172,36 @@ int main(void) {
 
   printf("All tests passed.\n");
   return 0;
+}
+
+void test_ui_section_index_errs(void) {
+  extern int g_malloc_fail_countdown;
+  struct ui_section_index_base *index = NULL;
+  const char *sections[] = {"A", "B", "C"};
+  ui_error_t rc;
+  int i;
+
+  rc = ui_section_index_base_create(&index);
+  (void)ui_section_index_base_set_sections(index, sections, 3);
+  (void)ui_section_index_base_set_active_section(index, 1);
+  g_malloc_fail_countdown = 0;
+  (void)ui_section_index_base_set_active_section(index, 2);
+  g_malloc_fail_countdown = -1;
+
+  g_malloc_fail_countdown = 0;
+  (void)ui_section_index_base_set_active_section(index, 1);
+  g_malloc_fail_countdown = -1;
+  (void)ui_section_index_base_destroy(index);
+}
+void test_ui_section_index_remove_attr_err(void) {
+  struct ui_section_index_base *index = NULL;
+  const char *sections[] = {"A", "B", "C"};
+  (void)ui_section_index_base_create(&index);
+  (void)ui_section_index_base_set_sections(index, sections, 3);
+  (void)ui_section_index_base_set_active_section(index, 1);
+  /* corrupt node to fail remove_attribute */
+  index->item_nodes[1]->type = UI_DOM_NODE_TYPE_TEXT;
+  (void)ui_section_index_base_set_active_section(index, 2);
+  index->item_nodes[1]->type = UI_DOM_NODE_TYPE_ELEMENT;
+  (void)ui_section_index_base_destroy(index);
 }

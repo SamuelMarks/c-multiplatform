@@ -5,7 +5,7 @@
 /* clang-format on */
 
 static ui_error_t trigger_cva_change(struct ui_transfer_list_base *list) {
-  if (list && list->cva_on_change) {
+  if (list->cva_on_change) {
     union ui_signal_payload payload;
     struct ui_transfer_list_payload *pl =
         (struct ui_transfer_list_payload *)C_MULTIPLATFORM_MALLOC(
@@ -14,19 +14,15 @@ static ui_error_t trigger_cva_change(struct ui_transfer_list_base *list) {
       pl->left_list = list->left_list;
       pl->right_list = list->right_list;
       payload.ptr_val = pl;
-#define UI_CVA_ON_CHG_IGNORE(cb, p, u) ((cb) ? (cb)((p), (u)) : UI_ERROR_NONE)
-      (void)UI_CVA_ON_CHG_IGNORE(list->cva_on_change, payload,
-                                 list->cva_on_change_user_data);
+      (void)list->cva_on_change(payload, list->cva_on_change_user_data);
     }
   }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t trigger_cva_touched(struct ui_transfer_list_base *list) {
-  if (list && list->cva_on_touched) {
-#define UI_CVA_ON_TOUCH_IGNORE(cb, u) ((cb) ? (cb)((u)) : UI_ERROR_NONE)
-    (void)UI_CVA_ON_TOUCH_IGNORE(list->cva_on_touched,
-                                 list->cva_on_touched_user_data);
+  if (list->cva_on_touched) {
+    (void)list->cva_on_touched(list->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
@@ -296,18 +292,10 @@ ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list) {
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t free_rc = free_list(list->left_list);
-    if (free_rc != UI_ERROR_NONE)
-      return free_rc;
-  }
+  { (void)free_list(list->left_list); }
   list->left_list = NULL;
 
-  {
-    ui_error_t free_rc = free_list(list->right_list);
-    if (free_rc != UI_ERROR_NONE)
-      return free_rc;
-  }
+  { (void)free_list(list->right_list); }
   list->right_list = NULL;
   return UI_ERROR_NONE;
 }

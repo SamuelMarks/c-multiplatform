@@ -19,6 +19,14 @@ static ui_error_t dummy_on_step_change(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
+static ui_error_t dummy_on_step_change_fail(struct ui_coachmark_tour *tour,
+                                            int step_index, void *user_data) {
+  (void)tour;
+  (void)step_index;
+  (void)user_data;
+  return UI_ERROR_UNKNOWN;
+}
+
 static int test_coachmark(void) {
   struct ui_coachmark_tour *tour = NULL;
   struct ui_overlay_director *director = NULL;
@@ -66,6 +74,7 @@ static int test_coachmark(void) {
   ui_coachmark_tour_next(tour); /* Should skip */
 
   ui_coachmark_tour_start(tour);
+  ui_coachmark_tour_update_layout(tour, 800, 600); /* Layout while active */
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
   ui_coachmark_tour_process_event(tour, &ev); /* Skip */
@@ -90,9 +99,24 @@ static int test_coachmark(void) {
   ui_coachmark_tour_skip(tour);
 
   /* Test branching inside process_event */
-  ui_coachmark_tour_process_event(tour, &ev); /* Not active */
+  (void)ui_coachmark_tour_process_event(tour, &ev); /* Not active */
 
-  ui_coachmark_tour_start(tour);
+  /* Mock set_signal failure */
+  {
+#ifdef UI_TEST_MOCK_ALLOC
+    extern int g_coachmark_signal_mock_fail;
+    g_coachmark_signal_mock_fail = 1;
+    (void)ui_coachmark_tour_start(tour);
+    g_coachmark_signal_mock_fail = 0;
+
+    (void)ui_coachmark_tour_start(tour);
+    g_coachmark_signal_mock_fail = 1;
+    (void)ui_coachmark_tour_skip(tour);
+    g_coachmark_signal_mock_fail = 0;
+#endif
+  }
+
+  (void)ui_coachmark_tour_start(tour);
 
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ENTER;
@@ -128,8 +152,8 @@ static int test_coachmark(void) {
   ui_coachmark_tour_skip(tour); /* Skips without callback */
 
   /* Trigger error in callback */
-  ui_coachmark_tour_set_on_step_change(tour, dummy_on_step_change, (void *)1);
   ui_coachmark_tour_start(tour);
+  ui_coachmark_tour_set_on_step_change(tour, dummy_on_step_change_fail, NULL);
   ui_coachmark_tour_skip(tour);
 
   ui_coachmark_tour_set_on_step_change(tour, NULL, NULL);
@@ -145,6 +169,12 @@ static int test_coachmark(void) {
   ui_coachmark_tour_skip(tour);
 
   ui_coachmark_tour_skip(tour); /* Skips without callback */
+
+  ui_coachmark_tour_set_on_step_change(tour, NULL,
+                                       NULL); /* clear it so start succeeds */
+  ui_coachmark_tour_start(tour);
+  ui_coachmark_tour_set_on_step_change(tour, dummy_on_step_change_fail, NULL);
+  ui_coachmark_tour_skip(tour);
 
   ui_coachmark_tour_next(tour); /* Hits !is_active true branch */
   ui_coachmark_tour_prev(tour); /* Hits !is_active true branch */
@@ -167,11 +197,24 @@ static int test_coachmark(void) {
         UI_ERROR_NONE) {
       dummy_comp.shadow_root = dummy_root;
       dummy_comp2.shadow_root = NULL; /* Hits the NULL shadow root branch */
-      ui_coachmark_tour_set_steps(tour, steps, 2);
-      ui_coachmark_tour_start(tour);
-      ui_coachmark_tour_update_layout(tour, 800, 600); /* Layout while active */
-      ui_coachmark_tour_next(tour); /* Renders step 1 with NULL shadow root */
-      ui_coachmark_tour_skip(tour);
+      (void)ui_coachmark_tour_set_steps(tour, steps, 2);
+
+      /* Trigger ui_dom_node_append_child failure */
+#ifdef UI_TEST_MOCK_ALLOC
+      {
+        extern int g_coachmark_dom_mock_fail;
+        g_coachmark_dom_mock_fail = 1;
+        (void)ui_coachmark_tour_start(tour);
+        g_coachmark_dom_mock_fail = 0;
+      }
+#endif
+
+      (void)ui_coachmark_tour_start(tour);
+      (void)ui_coachmark_tour_update_layout(tour, 800,
+                                            600); /* Layout while active */
+      (void)ui_coachmark_tour_next(
+          tour); /* Renders step 1 with NULL shadow root */
+      (void)ui_coachmark_tour_skip(tour);
       /* dummy_root is destroyed by the tour's container destruction, do not
        * double-free it */
       dummy_comp.shadow_root = NULL;
@@ -208,7 +251,7 @@ static int test_coachmark(void) {
   ui_overlay_director_create(root_node, &director);
   {
     int i;
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < 100; i++) {
       struct ui_coachmark_tour *temp_tour = NULL;
       g_malloc_fail_countdown = i;
       if (ui_coachmark_tour_create(director, &temp_tour) != UI_ERROR_NONE) {

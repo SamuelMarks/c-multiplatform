@@ -176,29 +176,19 @@ static ui_error_t emit_rotation(struct ui_map_view_base *map) {
 }
 
 /* Note: Simple Web Mercator implementation */
-static ui_error_t mercator_lon_to_x(double lon, double *out_x) {
-  *out_x = (lon + 180.0) / 360.0;
-  return UI_ERROR_NONE;
+static double mercator_lon_to_x(double lon) { return (lon + 180.0) / 360.0; }
+
+static double mercator_lat_to_y(double lat) {
+  double rad = lat * M_PI / 180.0;
+  double y = log(tan(M_PI / 4.0 + rad / 2.0));
+  return 0.5 - (y / (2.0 * M_PI));
 }
 
-static ui_error_t mercator_lat_to_y(double lat, double *out_y) {
-  double rad, y;
-  rad = lat * M_PI / 180.0;
-  y = log(tan(M_PI / 4.0 + rad / 2.0));
-  *out_y = 0.5 - (y / (2.0 * M_PI));
-  return UI_ERROR_NONE;
-}
+static double mercator_x_to_lon(double x) { return x * 360.0 - 180.0; }
 
-static ui_error_t mercator_x_to_lon(double x, double *out_lon) {
-  *out_lon = x * 360.0 - 180.0;
-  return UI_ERROR_NONE;
-}
-
-static ui_error_t mercator_y_to_lat(double y, double *out_lat) {
-  double rad;
-  rad = atan(exp(M_PI * (1.0 - 2.0 * y))) * 2.0 - M_PI / 2.0;
-  *out_lat = rad * 180.0 / M_PI;
-  return UI_ERROR_NONE;
+static double mercator_y_to_lat(double y) {
+  double n = M_PI - 2.0 * M_PI * y;
+  return (180.0 / M_PI) * atan(0.5 * (exp(n) - exp(-n)));
 }
 
 ui_error_t ui_map_view_base_handle_pan(struct ui_map_view_base *map,
@@ -217,22 +207,14 @@ ui_error_t ui_map_view_base_handle_pan(struct ui_map_view_base *map,
   rdx = delta_x * cos_r - delta_y * sin_r;
   rdy = delta_x * sin_r + delta_y * cos_r;
 
-  rc = mercator_lon_to_x(map->center.longitude, &cx);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = mercator_lat_to_y(map->center.latitude, &cy);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  cx = mercator_lon_to_x(map->center.longitude);
+  cy = mercator_lat_to_y(map->center.latitude);
 
   cx -= rdx / map_size;
   cy -= rdy / map_size;
 
-  rc = mercator_x_to_lon(cx, &map->center.longitude);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = mercator_y_to_lat(cy, &map->center.latitude);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  map->center.longitude = mercator_x_to_lon(cx);
+  map->center.latitude = mercator_y_to_lat(cy);
 
   rc = emit_center(map);
   if (rc != UI_ERROR_NONE)
@@ -281,24 +263,15 @@ ui_error_t ui_map_view_base_project(struct ui_map_view_base *map,
                                     const struct ui_map_coordinate *coord,
                                     double *out_x, double *out_y) {
   double mx, my, cx, cy, map_size, dx, dy, cos_r, sin_r;
-  ui_error_t rc;
 
   if (!map || !coord || !out_x || !out_y) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rc = mercator_lon_to_x(coord->longitude, &mx);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = mercator_lat_to_y(coord->latitude, &my);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = mercator_lon_to_x(map->center.longitude, &cx);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = mercator_lat_to_y(map->center.latitude, &cy);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  mx = mercator_lon_to_x(coord->longitude);
+  my = mercator_lat_to_y(coord->latitude);
+  cx = mercator_lon_to_x(map->center.longitude);
+  cy = mercator_lat_to_y(map->center.latitude);
 
   map_size = 256.0 * pow(2.0, map->zoom);
 
@@ -319,8 +292,6 @@ ui_error_t ui_map_view_base_unproject(struct ui_map_view_base *map, double x,
                                       struct ui_map_coordinate *out_coord) {
   double dx, dy, cos_r, sin_r, cx, cy, mx, my, map_size;
 
-  ui_error_t rc;
-
   if (!map || !out_coord) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -333,22 +304,14 @@ ui_error_t ui_map_view_base_unproject(struct ui_map_view_base *map, double x,
 
   map_size = 256.0 * pow(2.0, map->zoom);
 
-  rc = mercator_lon_to_x(map->center.longitude, &cx);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = mercator_lat_to_y(map->center.latitude, &cy);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  cx = mercator_lon_to_x(map->center.longitude);
+  cy = mercator_lat_to_y(map->center.latitude);
 
   mx = cx + (dx / map_size);
   my = cy + (dy / map_size);
 
-  rc = mercator_x_to_lon(mx, &out_coord->longitude);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  rc = mercator_y_to_lat(my, &out_coord->latitude);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  out_coord->longitude = mercator_x_to_lon(mx);
+  out_coord->latitude = mercator_y_to_lat(my);
 
   return UI_ERROR_NONE;
 }

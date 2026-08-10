@@ -50,3 +50,5 @@ char *ui_mock_strdup(const char *src) {
 int g_mock_gles2_create_fail = 0;
 int g_native_init_fail = 0;
 int g_gles_init_fail = 0;
+int g_mock_append_child_fail = 0;
+int g_mock_strcpy_fail = 0;

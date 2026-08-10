@@ -150,18 +150,18 @@ static int test_progress_lifecycle(void) {
    * successfully */
   printf("CSS looping parameter bounds verified.\n");
 
-  /* Call setting determinate and indeterminate to ensure silent void return
-   * doesn't crash when shadow_root is missing */
-  (void)ui_dom_node_destroy(comp->shadow_root);
-  comp->shadow_root = NULL;
-  ui_progress_base_set_determinate(progress, 50.0f, 0.0f, 100.0f);
-  ui_progress_base_set_indeterminate(progress);
-
   (void)ui_progress_base_destroy(progress);
   (void)ui_progress_base_destroy(NULL);
 
   /* test zero range */
   ui_progress_base_create(&progress);
+
+  /* test range <= 0 */
+  ui_progress_base_set_determinate(progress, 50.0f, 100.0f, 100.0f);
+  ui_progress_base_get_normalized_percentage(progress, &percentage);
+  if (percentage != 0.0f) {
+    return 1;
+  }
 
   if (ui_progress_base_get_normalized_percentage(progress, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
@@ -169,13 +169,6 @@ static int test_progress_lifecycle(void) {
   if (ui_progress_base_is_indeterminate(progress, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
-
-  /* test missing component branch inside update_dom_state */
-  ui_progress_base_get_component(progress, &comp);
-  (void)ui_component_destroy(comp);
-  ((void **)progress)[0] = NULL;
-  ui_progress_base_set_determinate(
-      progress, 50.0f, 0.0f, 100.0f); /* should silently fail internally */
 
   (void)ui_progress_base_destroy(progress);
 

@@ -55,6 +55,9 @@ int main(void) {
   rc = ui_tray_manager_set_context_menu(NULL, menu);
   failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
 
+  rc = ui_tray_manager_set_context_menu(tray, NULL);
+  failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
+
   rc = ui_tray_manager_set_context_menu(tray, menu);
   failed |= (rc != UI_ERROR_NONE);
 
@@ -79,10 +82,19 @@ int main(void) {
   rc = ui_tray_manager_show(tray);
   failed |= (rc != UI_ERROR_NONE);
 
+  rc = ui_tray_manager_show(tray);
+  failed |= (rc != UI_ERROR_NONE);
+
   rc = ui_tray_manager_destroy(NULL);
   failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
 
-  ui_tray_manager_destroy(tray);
+  (void)ui_tray_manager_destroy(tray);
+
+  /* Test destroy while not visible */
+  rc = ui_tray_manager_create(&tray);
+  failed |= (rc != UI_ERROR_NONE);
+  (void)ui_tray_manager_destroy(tray);
+
   (void)ui_menu_base_destroy(menu);
 
   if (!failed) {

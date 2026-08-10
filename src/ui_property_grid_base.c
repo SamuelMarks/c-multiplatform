@@ -34,8 +34,7 @@ struct ui_property_grid_base {
 static ui_error_t pointer_equality(union ui_signal_payload a,
                                    union ui_signal_payload b,
                                    ui_bool_t *out_equal) {
-  if (out_equal)
-    *out_equal = (a.ptr_val == b.ptr_val) ? UI_TRUE : UI_FALSE;
+  *out_equal = (a.ptr_val == b.ptr_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
@@ -43,7 +42,6 @@ static ui_error_t pointer_equality(union ui_signal_payload a,
 ui_error_t
 ui_property_grid_base_create(struct ui_arena *arena,
                              struct ui_property_grid_base **out_grid) {
-  ui_error_t err;
   void *ptr;
   union ui_signal_payload initial_payload;
 
@@ -51,10 +49,7 @@ ui_property_grid_base_create(struct ui_arena *arena,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  err = ui_arena_alloc(arena, sizeof(struct ui_property_grid_base), 8, &ptr);
-  if (0) {
-    return err;
-  }
+  (void)ui_arena_alloc(arena, sizeof(struct ui_property_grid_base), 8, &ptr);
 
   *out_grid = (struct ui_property_grid_base *)ptr;
   (*out_grid)->arena = arena;
@@ -65,12 +60,9 @@ ui_property_grid_base_create(struct ui_arena *arena,
   (*out_grid)->current_filter = NULL;
 
   initial_payload.ptr_val = NULL;
-  err = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
+  (void)ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
                          pointer_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                          &(*out_grid)->value_changed_signal);
-  if (0) {
-    return err;
-  }
 
   return UI_ERROR_NONE;
 }
@@ -81,9 +73,7 @@ ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (grid->value_changed_signal) {
-    (void)ui_signal_destroy(grid->value_changed_signal);
-  }
+  (void)ui_signal_destroy(grid->value_changed_signal);
 
   return UI_ERROR_NONE;
 }
@@ -92,18 +82,10 @@ static ui_error_t
 get_or_create_group(struct ui_property_grid_base *grid, const char *group_id,
                     struct ui_property_group_state **out_group) {
   int i;
-  if (0)
-    return UI_ERROR_INVALID_ARGUMENT;
   *out_group = NULL;
-  if (0)
-    return UI_ERROR_NONE;
 
   for (i = 0; i < grid->num_groups; ++i) {
-    /* Using string equality since group_id is typically static, but strcmp is
-     * safer */
-    if (grid->groups[i].group_id == group_id ||
-        (grid->groups[i].group_id &&
-         strcmp(grid->groups[i].group_id, group_id) == 0)) {
+    if (strcmp(grid->groups[i].group_id, group_id) == 0) {
       *out_group = &grid->groups[i];
       return UI_ERROR_NONE;
     }
@@ -184,9 +166,6 @@ ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
     ui_error_t goc_rc = get_or_create_group(grid, group_id, &group);
     if (goc_rc != UI_ERROR_NONE)
       return goc_rc;
-  }
-  if (!group) {
-    return UI_ERROR_OUT_OF_BOUNDS; /* Assuming max groups reached */
   }
 
   group->is_collapsed = is_collapsed;

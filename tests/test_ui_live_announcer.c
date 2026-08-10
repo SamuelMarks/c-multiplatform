@@ -5,6 +5,7 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+extern int g_mock_strcpy_fail;
 
 static int test_live_announcer_lifecycle(void) {
   struct ui_live_announcer *announcer = NULL;
@@ -50,6 +51,11 @@ static int test_live_announcer_edge_cases(void) {
   (void)ui_live_announce(announcer, "a", UI_LIVE_POLITE);
   g_malloc_fail_countdown = 1;
   (void)ui_live_announce(announcer, "b", UI_LIVE_POLITE);
+
+  g_malloc_fail_countdown = -1;
+  g_mock_strcpy_fail = 1;
+  ui_error_t mock_rc = ui_live_announce(announcer, "c", UI_LIVE_POLITE);
+  printf("Mock rc: %d\n", mock_rc);
 
   (void)ui_live_announcer_destroy(announcer);
   g_malloc_fail_countdown = -1;

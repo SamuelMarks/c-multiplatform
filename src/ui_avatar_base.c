@@ -167,7 +167,6 @@ ui_error_t ui_avatar_base_destroy(struct ui_avatar_base *avatar) {
 ui_error_t ui_avatar_base_set_name(struct ui_avatar_base *avatar,
                                    const char *name) {
   ui_error_t rc = UI_ERROR_NONE;
-  size_t len;
   char *new_name = NULL;
 
   if (!avatar || !name) {
@@ -175,14 +174,11 @@ ui_error_t ui_avatar_base_set_name(struct ui_avatar_base *avatar,
     goto cleanup;
   }
 
-  len = strlen(name);
-  new_name = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+  new_name = (char *)C_MULTIPLATFORM_STRDUP(name);
   if (!new_name) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
-
-  UI_STRCPY(new_name, len + 1, name);
 
   C_MULTIPLATFORM_FREE(avatar->name);
 
@@ -216,7 +212,6 @@ ui_error_t ui_avatar_base_get_initials(const struct ui_avatar_base *avatar,
 ui_error_t ui_avatar_base_set_image_url(struct ui_avatar_base *avatar,
                                         const char *image_url) {
   ui_error_t rc = UI_ERROR_NONE;
-  size_t len;
   char *new_url = NULL;
 
   if (!avatar || !image_url) {
@@ -224,14 +219,11 @@ ui_error_t ui_avatar_base_set_image_url(struct ui_avatar_base *avatar,
     goto cleanup;
   }
 
-  len = strlen(image_url);
-  new_url = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+  new_url = (char *)C_MULTIPLATFORM_STRDUP(image_url);
   if (!new_url) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
-
-  UI_STRCPY(new_url, len + 1, image_url);
 
   C_MULTIPLATFORM_FREE(avatar->image_url);
 

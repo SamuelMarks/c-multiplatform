@@ -23,6 +23,15 @@ static ui_error_t on_scroll_change(struct ui_scroll_base *scroll, float x,
   return UI_ERROR_NONE;
 }
 
+static ui_error_t on_scroll_change_fail(struct ui_scroll_base *scroll, float x,
+                                        float y, void *user_data) {
+  (void)scroll;
+  (void)x;
+  (void)y;
+  (void)user_data;
+  return UI_ERROR_UNKNOWN;
+}
+
 static int run_normal_tests(void) {
   struct ui_scroll_base *scroll = NULL;
   ui_error_t err;
@@ -117,6 +126,14 @@ static int run_normal_tests(void) {
   /* Try setting scroll pos without on_change set */
   ui_scroll_base_set_on_change(scroll, NULL, NULL);
   ui_scroll_base_set_scroll_pos(scroll, 50.0f, 50.0f);
+
+  /* Test callback failure */
+  ui_scroll_base_set_on_change(scroll, on_scroll_change_fail, NULL);
+  if (ui_scroll_base_set_scroll_pos(scroll, 60.0f, 60.0f) != UI_ERROR_UNKNOWN) {
+    printf("Callback failure not percolated\n");
+    return 1;
+  }
+
   ui_scroll_base_set_on_change(scroll, on_scroll_change, NULL);
 
   /* Try to scroll negative */

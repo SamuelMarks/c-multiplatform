@@ -77,6 +77,14 @@ static ui_error_t mock_on_change(struct ui_tabs_base *tabs, int new_index,
   return UI_ERROR_NONE;
 }
 
+static ui_error_t mock_on_change_fail(struct ui_tabs_base *tabs, int new_index,
+                                      void *user_data) {
+  (void)tabs;
+  (void)new_index;
+  (void)user_data;
+  return UI_ERROR_UNKNOWN;
+}
+
 static int test_ui_tabs_base_add_and_navigate(void) {
   struct ui_tabs_base *tabs = NULL;
   struct ui_dom_node *h1 = NULL, *c1 = NULL, *h2 = NULL, *c2 = NULL, *h3 = NULL,
@@ -180,6 +188,23 @@ static int test_ui_tabs_base_add_and_navigate(void) {
     ASSERT_SUCCESS(ui_tabs_base_process_event(tabs, &ev, 0.0));
     ASSERT_SUCCESS(ui_tabs_base_get_active_index(tabs, &index));
     ASSERT_INT_EQ(index, 4);
+
+    /* Process Event Navigation with failing on_change */
+    ASSERT_SUCCESS(ui_tabs_base_set_on_change(tabs, mock_on_change_fail, NULL));
+    ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+    ASSERT_EQ(ui_tabs_base_process_event(tabs, &ev, 0.0), UI_ERROR_UNKNOWN);
+
+    ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+    ASSERT_EQ(ui_tabs_base_process_event(tabs, &ev, 0.0), UI_ERROR_UNKNOWN);
+
+    ev.event_data.keyboard.key_code = UI_KEY_HOME;
+    ASSERT_EQ(ui_tabs_base_process_event(tabs, &ev, 0.0), UI_ERROR_UNKNOWN);
+
+    ev.event_data.keyboard.key_code = UI_KEY_END;
+    ASSERT_EQ(ui_tabs_base_process_event(tabs, &ev, 0.0), UI_ERROR_UNKNOWN);
+
+    /* Restore on_change */
+    ASSERT_SUCCESS(ui_tabs_base_set_on_change(tabs, mock_on_change, NULL));
 
     /* Edge cases for process_event */
     ev.event_data.keyboard.key_code = UI_KEY_UP; /* Ignore */

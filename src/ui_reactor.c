@@ -256,11 +256,8 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
   {
     int is_swapped = 0;
     while (1) {
-      ui_error_t cas_rc = ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
-      if (cas_rc != UI_ERROR_NONE) {
-        return cas_rc;
-      }
-      if (cas_rc == UI_ERROR_NONE && is_swapped != 0)
+      (void)ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+      if (is_swapped != 0)
         break;
     }
   }
@@ -272,11 +269,7 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
   }
   reactor->tasks_tail = task;
 
-  {
-    ui_error_t rc = ui_atomic_store(&reactor->lock, 0);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-  }
+  (void)ui_atomic_store(&reactor->lock, 0);
 
   return UI_ERROR_NONE;
 }
@@ -542,21 +535,14 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
     struct ui_reactor_task *tasks_to_run = NULL;
     int is_swapped = 0;
     while (1) {
-      ui_error_t cas_rc = ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
-      if (cas_rc != UI_ERROR_NONE) {
-        return cas_rc;
-      }
-      if (cas_rc == UI_ERROR_NONE && is_swapped != 0)
+      (void)ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+      if (is_swapped != 0)
         break;
     }
     tasks_to_run = reactor->tasks_head;
     reactor->tasks_head = NULL;
     reactor->tasks_tail = NULL;
-    {
-      ui_error_t rc = ui_atomic_store(&reactor->lock, 0);
-      if (rc != UI_ERROR_NONE)
-        return rc;
-    }
+    (void)ui_atomic_store(&reactor->lock, 0);
 
     while (tasks_to_run) {
       struct ui_reactor_task *next = tasks_to_run->next;

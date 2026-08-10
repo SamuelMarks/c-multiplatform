@@ -77,7 +77,7 @@ static int test_search_bar_operations(void) {
   struct ui_component comp;
   ui_error_t err;
 
-  ui_search_bar_base_init(&sb, &comp, NULL);
+  (void)ui_search_bar_base_init(&sb, &comp, NULL);
 
   err = ui_search_bar_base_set_query(NULL, "hello");
   if (err != UI_ERROR_INVALID_ARGUMENT)
@@ -109,7 +109,9 @@ static int test_search_bar_operations(void) {
   if (sb.is_loading != 1)
     return 1;
 
-  ui_search_bar_base_set_loading(&sb, 0);
+  err = ui_search_bar_base_set_loading(&sb, 0);
+  if (err != UI_ERROR_NONE)
+    return 1;
   if (sb.is_loading != 0)
     return 1;
 
@@ -124,14 +126,14 @@ static int test_search_bar_operations(void) {
     return 1;
 
   /* Test OOM */
-  ui_search_bar_base_init(&sb, &comp, NULL);
+  (void)ui_search_bar_base_init(&sb, &comp, NULL);
   g_malloc_fail_countdown = 0;
   err = ui_search_bar_base_set_query(&sb, "oom text");
   if (err != UI_ERROR_OUT_OF_MEMORY)
     return 1;
   g_malloc_fail_countdown = -1;
 
-  ui_search_bar_base_cleanup(&sb);
+  (void)ui_search_bar_base_cleanup(&sb);
 
   return 0;
 }
@@ -145,7 +147,7 @@ static int test_search_bar_cva(void) {
   void *ud1 = (void *)0x111;
   void *ud2 = (void *)0x222;
 
-  ui_search_bar_base_init(&sb, &comp, &cva);
+  (void)ui_search_bar_base_init(&sb, &comp, &cva);
 
   /* Test invalid args to CVA functions */
   err = cva.write_value(NULL, val);
@@ -207,7 +209,7 @@ static int test_search_bar_cva(void) {
   if (strcmp(sb.query, "") != 0)
     return 1;
 
-  ui_search_bar_base_cleanup(&sb);
+  (void)ui_search_bar_base_cleanup(&sb);
   return 0;
 }
 

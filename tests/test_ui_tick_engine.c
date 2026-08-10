@@ -148,10 +148,48 @@ static int run_oom_tests(void) {
   return 0;
 }
 
+static ui_error_t test_callback_fail(void *user_data) {
+  return UI_ERROR_UNKNOWN;
+}
+
+static ui_error_t test_callback_fail_other(void *user_data) {
+  return UI_ERROR_OUT_OF_MEMORY;
+}
+
+static int run_error_callback_tests(void) {
+  struct ui_tick_engine *engine = NULL;
+  ui_error_t rc;
+
+  printf("Running error callback tick engine tests...\n");
+
+  rc = ui_tick_engine_create(&engine);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  ui_tick_engine_schedule(engine, test_callback_fail, NULL);
+  rc = ui_tick_engine_tick(engine);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Expected UI_ERROR_UNKNOWN from tick\n");
+    return 1;
+  }
+
+  ui_tick_engine_schedule(engine, test_callback_fail, NULL);
+  ui_tick_engine_schedule(engine, test_callback_fail_other, NULL);
+  rc = ui_tick_engine_tick(engine);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Expected UI_ERROR_UNKNOWN (first error) from tick\n");
+    return 1;
+  }
+
+  ui_tick_engine_destroy(engine);
+  return 0;
+}
+
 int main(void) {
   int failed = 0;
   failed |= run_normal_tests();
   failed |= run_oom_tests();
+  failed |= run_error_callback_tests();
 
   if (failed) {
     printf("Tests failed.\n");

@@ -50,6 +50,9 @@ static void test_ptr_basic(void) {
     assert(progress == 0.0f);
   }
 
+  /* Call complete when not refreshing */
+  ui_pull_to_refresh_base_complete(ptr);
+
   /* Send Gesture Pan Began */
   struct ui_event ev;
   memset(&ev, 0, sizeof(ev));
@@ -65,9 +68,27 @@ static void test_ptr_basic(void) {
   rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
   assert(rc == UI_ERROR_NONE);
 
+  /* Now state is PULLING. Try to trigger PAN BEGAN again (which is tricky with
+     the same recognizer). Actually, if we send a new MOUSE_DOWN it will reset
+     and send BEGAN again. Let's do that. */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.y = 50;
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
+
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 100;
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1300.0);
+
   /* State should now be pulling because it moved enough to trigger a pan
    * gesture */
   assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_PULLING);
+
+  /* Send a negative delta_y to push back up, hitting the ge.delta_y <= 0.0f
+     branch inside the PULLING state */
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 80; /* moved up by 20 */
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1400.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* Pull some more past threshold */
   ev.event_data.mouse.y = 200;
@@ -100,6 +121,11 @@ static void test_ptr_basic(void) {
   assert(rc == UI_ERROR_NONE);
 
   /* Tick until resting */
+  /* Hit else branch in completing */
+  ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+
+  /* Hit pull_distance < 1.0f or completion_timer_ms >=
+   * UI_PTR_COMPLETION_DELAY_MS */
   ui_pull_to_refresh_base_on_tick(ptr, 100.0);
   ui_pull_to_refresh_base_on_tick(ptr, 100.0);
   ui_pull_to_refresh_base_on_tick(ptr, 150.0);
@@ -135,9 +161,9 @@ static void test_ptr_spring_back(void) {
   assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_PULLING);
 
   /* Tick should spring it back to resting */
-  ui_pull_to_refresh_base_on_tick(ptr, 100.0);
-  ui_pull_to_refresh_base_on_tick(ptr, 100.0);
-  ui_pull_to_refresh_base_on_tick(ptr, 100.0);
+  ui_pull_to_refresh_base_on_tick(
+      ptr, 10.0); /* Hit the spring condition once before loop */
+
   /* Wait, 100 ticks is not a loop, we might need multiple ticks.
      Spring rate is 0.85, 20 * 0.85^n < 1.0.
      20 * 0.85^20 < 1.0 */
@@ -153,28 +179,36 @@ static void test_ptr_spring_back(void) {
 static void test_ptr_push_up(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
   struct ui_event ev;
+  float progress = 0.0f;
   memset(&ev, 0, sizeof(ev));
 
   ui_pull_to_refresh_base_create(&ptr);
 
   ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.x = 0;
+  ev.event_data.mouse.y = 0;
   ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
 
-  /* Pull down */
+  /* Trigger BEGAN (pull_distance = 0) */
   ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 0;
   ev.event_data.mouse.y = 50;
   ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
 
-  /* Push back up past 0 */
-  ev.event_data.mouse.y = -100;
+  /* Trigger CHANGED down way past threshold to hit resistance < 0.1f */
+  ev.event_data.mouse.y = 1000;
   ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
 
-  /* Pull way down to hit resistance < 0.1 */
-  ev.event_data.mouse.y = 1000;
+  /* Trigger CHANGED up slightly (delta_y = -10, pull_distance >= 0 branch) */
+  ev.event_data.mouse.y = 990;
   ui_pull_to_refresh_base_process_event(ptr, &ev, 1300.0);
 
-  ev.event_data.mouse.y = 1100;
+  /* Trigger CHANGED up massively to go negative (< 0 branch) */
+  ev.event_data.mouse.y = -500;
   ui_pull_to_refresh_base_process_event(ptr, &ev, 1400.0);
+
+  ev.type = UI_EVENT_TOUCH_CANCEL;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1500.0);
 
   (void)ui_pull_to_refresh_base_destroy(ptr);
 }
@@ -199,10 +233,30 @@ static void test_ptr_cancel(void) {
   ev.type = UI_EVENT_TOUCH_CANCEL; /* mapped to gesture cancel */
   ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
 
-  /* wait, our gesture recognizer maps TOUCH_CANCEL to GESTURE_STATE_CANCELLED
+  /* Wait, our gesture recognizer maps TOUCH_CANCEL to GESTURE_STATE_CANCELLED
+   * The logic in ui_pull_to_refresh_base.c treats ENDED and CANCELLED
+   * identically so if we cross the threshold it goes to REFRESHING. If we
+   * wanted to test the CANCEL fallback, we'd need to NOT cross the threshold.
    */
   assert(ui_pull_to_refresh_base_get_state(ptr) ==
          UI_PULL_TO_REFRESH_REFRESHING);
+
+  (void)ui_pull_to_refresh_base_destroy(ptr);
+
+  /* Now do it without crossing the threshold to hit the else branch */
+  ui_pull_to_refresh_base_create(&ptr);
+
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 10; /* start pan, not past threshold */
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+
+  ev.type = UI_EVENT_TOUCH_CANCEL;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
+
+  assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_PULLING);
 
   (void)ui_pull_to_refresh_base_destroy(ptr);
 }
@@ -261,6 +315,10 @@ static void test_ptr_nulls(void) {
   assert(ui_pull_to_refresh_base_get_refreshing_signal(ptr, &comp_sig) ==
          UI_ERROR_NONE);
 
+  if (comp) {
+    (void)ui_dom_node_destroy(comp->shadow_root);
+    comp->shadow_root = NULL;
+  }
   (void)ui_pull_to_refresh_base_destroy(ptr);
 }
 

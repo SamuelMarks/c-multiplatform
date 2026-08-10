@@ -253,7 +253,7 @@ ui_error_t ui_css_parse_cursor(const char *str,
             token = UI_STRTOK(NULL, ",", &next_token);
             continue;
           }
-          if (img_rc == UI_ERROR_NONE) {
+          {
             char *coords = close_paren + 1;
             while (isspace((unsigned char)*coords))
               coords++;

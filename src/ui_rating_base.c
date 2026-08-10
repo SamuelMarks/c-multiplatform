@@ -45,11 +45,7 @@ static ui_error_t rating_cva_write_value(void *component,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t set_rc = ui_rating_base_set_value(rating, value.float_val);
-    if (set_rc != UI_ERROR_NONE)
-      return set_rc;
-  }
+  (void)ui_rating_base_set_value(rating, value.float_val);
   return UI_ERROR_NONE;
 }
 
@@ -203,16 +199,8 @@ ui_error_t ui_rating_base_set_value(struct ui_rating_base *rating,
   }
 
   if (rating->value != old_val) {
-    {
-      ui_error_t chg_rc = trigger_cva_change(rating);
-      if (chg_rc != UI_ERROR_NONE)
-        return chg_rc;
-    }
-    {
-      ui_error_t t_rc = trigger_cva_touched(rating);
-      if (t_rc != UI_ERROR_NONE)
-        return t_rc;
-    }
+    (void)trigger_cva_change(rating);
+    (void)trigger_cva_touched(rating);
   }
 
   return UI_ERROR_NONE;

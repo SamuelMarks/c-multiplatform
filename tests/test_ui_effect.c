@@ -9,10 +9,12 @@
 #include "../src/ui_reactive_graph.h"
 
 int g_mock_graph_set_fail = 0;
-#define ui_reactive_graph_set_current_node(n, p) \
-  (g_mock_graph_set_fail == 1 && (p) != NULL ? UI_ERROR_INVALID_ARGUMENT : \
-   g_mock_graph_set_fail == 2 && (p) == NULL ? UI_ERROR_INVALID_ARGUMENT : \
-   (ui_reactive_graph_set_current_node)(n, p))
+static ui_error_t mock_graph_set(struct ui_reactive_node *n, struct ui_reactive_node **p) {
+  if (g_mock_graph_set_fail == 1 && p != NULL) return UI_ERROR_INVALID_ARGUMENT;
+  if (g_mock_graph_set_fail == 2 && p == NULL) return UI_ERROR_INVALID_ARGUMENT;
+  return ui_reactive_graph_set_current_node(n, p);
+}
+#define ui_reactive_graph_set_current_node mock_graph_set
 
 #include "../src/ui_effect.c"
 

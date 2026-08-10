@@ -107,9 +107,8 @@ ui_error_t ui_handle_manager_destroy(struct ui_handle_manager *manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (manager->entries) {
-    C_MULTIPLATFORM_FREE(manager->entries);
-  }
+  C_MULTIPLATFORM_FREE(manager->entries);
+
   C_MULTIPLATFORM_FREE(manager);
   return UI_ERROR_NONE;
 }

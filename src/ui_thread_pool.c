@@ -52,8 +52,6 @@ struct ui_thread_pool {
   pthread_mutex_t mutex;
   pthread_cond_t cond;
   pthread_t *threads;
-  int mutex_initialized;
-  int cond_initialized;
 #endif
 #endif
 };
@@ -84,10 +82,8 @@ static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
     ReleaseMutex(pool->mutex);
 
     if (task) {
-      if (task->callback) {
 #define UI_EXECUTE_TASK_CB(t) (t)->callback((t)->user_data)
-        (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
-      }
+      (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
       C_MULTIPLATFORM_FREE(task);
       task = NULL;
     } else {
@@ -116,22 +112,16 @@ static void *ui_worker_thread(void *arg) {
     }
 
     task = pool->head;
-    if (task) {
-      pool->head = task->next;
-      if (!pool->head) {
-        pool->tail = NULL;
-      }
+    pool->head = task->next;
+    if (!pool->head) {
+      pool->tail = NULL;
     }
     pthread_mutex_unlock(&pool->mutex);
 
-    if (task) {
-      if (task->callback) {
 #define UI_EXECUTE_TASK_CB(t) (t)->callback((t)->user_data)
-        (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
-      }
-      C_MULTIPLATFORM_FREE(task);
-      task = NULL;
-    }
+    (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
+    C_MULTIPLATFORM_FREE(task);
+    task = NULL;
   }
   return NULL;
 }
@@ -211,16 +201,11 @@ ui_error_t ui_thread_pool_create(int num_threads,
   }
 #else
   pool->threads = NULL;
-  pool->mutex_initialized = 0;
-  pool->cond_initialized = 0;
 
   /* We cannot easily mock pthread init failures securely across platforms so
    * they are not tested */
   (void)pthread_mutex_init(&pool->mutex, NULL);
-  pool->mutex_initialized = 1;
-
   (void)pthread_cond_init(&pool->cond, NULL);
-  pool->cond_initialized = 1;
 
   pool->threads =
       (pthread_t *)C_MULTIPLATFORM_MALLOC(sizeof(pthread_t) * num_threads);
@@ -274,23 +259,19 @@ cleanup:
       CloseHandle(pool->mutex);
 #else
     pool->shutdown = 1;
-    if (pool->cond_initialized && pool->mutex_initialized) {
+    if (1) {
       pthread_mutex_lock(&pool->mutex);
       pthread_cond_broadcast(&pool->cond);
       pthread_mutex_unlock(&pool->mutex);
     }
     if (pool->threads) {
       for (i = 0; i < threads_started; i++) {
-        if (pool->threads[i]) {
-          (void)pthread_join(pool->threads[i], NULL);
-        }
+        (void)pthread_join(pool->threads[i], NULL);
       }
       C_MULTIPLATFORM_FREE(pool->threads);
     }
-    if (pool->cond_initialized)
-      pthread_cond_destroy(&pool->cond);
-    if (pool->mutex_initialized)
-      pthread_mutex_destroy(&pool->mutex);
+    pthread_cond_destroy(&pool->cond);
+    pthread_mutex_destroy(&pool->mutex);
 #endif
 #endif
     C_MULTIPLATFORM_FREE(pool);

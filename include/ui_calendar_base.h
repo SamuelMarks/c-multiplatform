@@ -48,13 +48,15 @@ ui_error_t ui_calendar_base_create(struct ui_calendar_base **out_calendar,
  * @brief Destroys a calendar base component.
  *
  * @param calendar The calendar to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_calendar_base_destroy(struct ui_calendar_base *calendar);
 
 /**
  * @brief Checks if a year is a leap year.
  * @param year The year to check.
- * @return 1 if leap year, 0 otherwise.
+ * @param out_is_leap Pointer to receive 1 if leap year, 0 otherwise.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_calendar_is_leap_year(int year, int *out_is_leap);
 
@@ -62,7 +64,9 @@ ui_error_t ui_calendar_is_leap_year(int year, int *out_is_leap);
  * @brief Gets the number of days in a month for a specific year.
  * @param year The year.
  * @param month The month (1-12).
- * @return Number of days (28-31) or 0 if invalid month.
+ * @param out_days Pointer to receive the number of days (28-31) or 0 if invalid
+ * month.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days);
 
@@ -72,7 +76,8 @@ ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days);
  * @param year The year.
  * @param month The month (1-12).
  * @param day The day (1-31).
- * @return The day of the week, where 0 = Sunday.
+ * @param out_dow Pointer to receive the day of the week, where 0 = Sunday.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_calendar_get_day_of_week(int year, int month, int day,
                                        enum ui_day_of_week *out_dow);

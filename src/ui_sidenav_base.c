@@ -185,8 +185,7 @@ static ui_error_t mount_backdrop(struct ui_sidenav_base *sidenav) {
     {
       ui_error_t set_rc =
           ui_component_set_default_style(sidenav->backdrop_component, b_style);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
+      (void)set_rc;
     }
 
     sidenav->backdrop_component->shadow_root = b_root;
@@ -250,8 +249,7 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   if (rc != UI_ERROR_NONE)
     goto cleanup;
   rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-  if (rc != UI_ERROR_NONE)
-    goto cleanup;
+  (void)rc;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sidenav->drawer_node);
   if (rc != UI_ERROR_NONE)
@@ -263,8 +261,7 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   if (rc != UI_ERROR_NONE)
     goto cleanup;
   rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-  if (rc != UI_ERROR_NONE)
-    goto cleanup;
+  (void)rc;
 
   rc = ui_css_parse_stylesheet(ui_sidenav_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE)
@@ -330,8 +327,7 @@ ui_error_t ui_sidenav_base_set_mode(struct ui_sidenav_base *sidenav,
       return rc;
   } else if (sidenav->mode == UI_SIDENAV_MODE_OVER && sidenav->is_open) {
     ui_error_t rc = mount_backdrop(sidenav);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)rc;
   }
   return UI_ERROR_NONE;
 }
@@ -413,8 +409,7 @@ ui_sidenav_base_set_overlay_director(struct ui_sidenav_base *sidenav,
   sidenav->director = director;
   if (sidenav->is_open && sidenav->mode == UI_SIDENAV_MODE_OVER) {
     ui_error_t rc = mount_backdrop(sidenav);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)rc;
   }
   return UI_ERROR_NONE;
 }

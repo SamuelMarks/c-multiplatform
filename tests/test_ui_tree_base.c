@@ -357,6 +357,35 @@ static int test_tree_navigation(void) {
   ev.key_code = UI_KEY_TAB;
   ui_tree_base_handle_key_event(tree, &ev);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  /* Test allocation failures in navigation handling */
+  {
+    int j;
+    for (j = 0; j < 3; j++) {
+      struct ui_tree_base *mock_tree;
+      g_malloc_fail_countdown = -1; /* Reset for tree creation */
+      (void)ui_tree_base_create(&mock_tree, &model);
+
+      g_malloc_fail_countdown = j;
+      ui_tree_base_set_active_node(mock_tree, &root1);
+      ev.key_code = UI_KEY_RIGHT;
+      (void)ui_tree_base_handle_key_event(mock_tree, &ev);
+
+      g_malloc_fail_countdown = -1; /* Reset to allow cleanup */
+      (void)ui_tree_base_destroy(mock_tree);
+
+      (void)ui_tree_base_create(&mock_tree, &model);
+      g_malloc_fail_countdown = j;
+      ui_tree_base_set_active_node(mock_tree, &root1);
+      ev.key_code = UI_KEY_ENTER;
+      (void)ui_tree_base_handle_key_event(mock_tree, &ev);
+
+      g_malloc_fail_countdown = -1;
+      (void)ui_tree_base_destroy(mock_tree);
+    }
+  }
+#endif
+
   /* Trigger line 167: search for non-existent node */
   ui_tree_base_set_active_node(tree, (void *)0xdeadbeef);
 

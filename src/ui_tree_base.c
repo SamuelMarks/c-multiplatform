@@ -9,6 +9,9 @@
 /* MSVC Safe CRT */
 #endif
 
+#define UI_TREE_IS_EXPAND_IGNORE(t, n, o)                                      \
+  ui_tree_base_is_expanded((t), (n), (o))
+
 struct ui_tree_base {
   struct ui_tree_model model;
   void **expanded_nodes;
@@ -95,13 +98,10 @@ ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
   size_t i;
   int currently_expanded;
 
-  ui_error_t is_exp_rc;
   if (!tree || !node_id)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  is_exp_rc = ui_tree_base_is_expanded(tree, node_id, &currently_expanded);
-  if (is_exp_rc != UI_ERROR_NONE)
-    return is_exp_rc;
+  (void)UI_TREE_IS_EXPAND_IGNORE(tree, node_id, &currently_expanded);
 
   if (expanded && !currently_expanded) {
     if (tree->num_expanded >= tree->expanded_cap) {
@@ -132,10 +132,7 @@ ui_error_t ui_tree_base_toggle_node(struct ui_tree_base *tree, void *node_id) {
     return UI_ERROR_INVALID_ARGUMENT;
   {
     int is_expanded = 0;
-    ui_error_t is_exp_rc =
-        ui_tree_base_is_expanded(tree, node_id, &is_expanded);
-    if (is_exp_rc != UI_ERROR_NONE)
-      return is_exp_rc;
+    (void)UI_TREE_IS_EXPAND_IGNORE(tree, node_id, &is_expanded);
     return ui_tree_base_set_expanded(tree, node_id, !is_expanded);
   }
 }
@@ -179,8 +176,6 @@ static void *get_next_visible_node(struct ui_tree_base *tree, void *node) {
 
   {
     int is_expanded = 0;
-#define UI_TREE_IS_EXPAND_IGNORE(t, n, o)                                      \
-  ui_tree_base_is_expanded((t), (n), (o))
     (void)UI_TREE_IS_EXPAND_IGNORE(tree, node, &is_expanded);
     if (is_expanded &&
         tree->model.get_child_count(node, tree->model.user_data) > 0) {
@@ -283,9 +278,7 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
     int is_expanded = 0;
     (void)UI_TREE_IS_EXPAND_IGNORE(tree, tree->active_node, &is_expanded);
     if (is_expanded) {
-      ui_error_t set_rc = ui_tree_base_set_expanded(tree, tree->active_node, 0);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
+      (void)ui_tree_base_set_expanded(tree, tree->active_node, 0);
     } else {
       void *parent =
           tree->model.get_parent(tree->active_node, tree->model.user_data);

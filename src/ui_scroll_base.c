@@ -41,10 +41,9 @@ struct ui_scroll_base {
   struct ui_signal *data_signal;
 };
 
-static ui_error_t update_dom_state(struct ui_scroll_base *scroll) {
+static void update_dom_state(struct ui_scroll_base *scroll) {
   (void)scroll;
   /* You might map scroll positions to CSS variables or inline styles */
-  return UI_ERROR_NONE;
 }
 
 ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
@@ -176,20 +175,13 @@ ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
     scroll->scroll_x = x;
     scroll->scroll_y = y;
 
-    {
-      ui_error_t upd_rc = update_dom_state(scroll);
-      if (upd_rc != UI_ERROR_NONE) {
-        if (0)
-          return upd_rc;
-      }
-    }
+    update_dom_state(scroll);
     if (scroll->on_change) {
       {
         ui_error_t cb_rc = scroll->on_change(
             scroll, scroll->scroll_x, scroll->scroll_y, scroll->user_data);
         if (cb_rc != UI_ERROR_NONE) {
-          if (0)
-            return cb_rc;
+          return cb_rc;
         }
       }
     }

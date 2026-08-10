@@ -113,6 +113,18 @@ static ui_error_t test_chips_basic(void) {
   rc = ui_chips_base_add(chips, "apple");
   if (rc != UI_ERROR_NONE)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_mock_strcpy_fail;
+    g_mock_strcpy_fail = 1;
+    rc = ui_chips_base_add(chips, "fail");
+    if (rc != UI_ERROR_UNKNOWN)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+    g_mock_strcpy_fail = 0;
+  }
+#endif
+
   rc = ui_chips_base_add(chips, "banana");
   if (rc != UI_ERROR_NONE)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;

@@ -14,8 +14,7 @@ struct ui_theme_manager {
 static ui_error_t theme_mode_equality(union ui_signal_payload a,
                                       union ui_signal_payload b,
                                       ui_bool_t *out_equal) {
-  if (out_equal)
-    *out_equal = a.int_val == b.int_val ? UI_TRUE : UI_FALSE;
+  *out_equal = a.int_val == b.int_val ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 

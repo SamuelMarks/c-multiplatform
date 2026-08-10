@@ -25,6 +25,7 @@ static void test_dom_node_mutation_failure(void) {
   ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
 
   /* Set initial values so the update/remove paths are hit! */
+  ui_dom_node_set_attribute(node, "other_attr", "other");
   ui_dom_node_set_attribute(node, "class", "initial");
   ui_dom_node_set_text_content(text_node, "initial_text");
 
@@ -36,17 +37,41 @@ static void test_dom_node_mutation_failure(void) {
   init.subtree = 1;
   init.attribute_old_value = 1;
 
+  /* These will fail because the callback returns UI_ERROR_UNKNOWN */
+  ui_error_t rc;
+
+  /* Hit append failure for empty parent */
+  ui_mutation_observer_observe(obs, node, &init);
+  rc = ui_dom_node_append_child(node, text_node); /* hits append failure */
+  if (rc == UI_ERROR_NONE) {
+    /* Handle unexpected success, though it shouldn't happen */
+  }
+  ui_mutation_observer_disconnect(obs);
+
+  /* Hit append failure for non-empty parent */
+  struct ui_dom_node *dummy_child = NULL;
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy_child);
+  ui_dom_node_append_child(node, dummy_child);
+
   ui_mutation_observer_observe(obs, node, &init);
   ui_mutation_observer_observe(obs, text_node, &init);
 
-  /* These will fail because the callback returns UI_ERROR_UNKNOWN */
-  ui_dom_node_set_attribute(node, "new_attr",
-                            "val"); /* hits creation failure (line 251) */
-  ui_dom_node_set_attribute(node, "class",
-                            "box"); /* hits update failure (line 208) */
-  ui_dom_node_remove_attribute(node,
-                               "class"); /* hits remove failure (line 322) */
-  ui_dom_node_set_text_content(
+  struct ui_dom_node *dummy_child2 = NULL;
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy_child2);
+  rc = ui_dom_node_append_child(
+      node, dummy_child2); /* hits append failure with previous_sibling */
+  if (rc == UI_ERROR_NONE) {
+    /* Handle unexpected success, though it shouldn't happen */
+  }
+  rc = ui_dom_node_set_attribute(node, "new_attr",
+                                 "val"); /* hits creation failure (line 251) */
+  rc = ui_dom_node_set_attribute(node, "class",
+                                 "box"); /* hits update failure (line 208) */
+  rc = ui_dom_node_remove_attribute(
+      node, "class"); /* hits remove failure (line 322) without prev */
+  rc = ui_dom_node_remove_attribute(
+      node, "other_attr"); /* hits remove failure with prev */
+  rc = ui_dom_node_set_text_content(
       text_node, "hello"); /* hits text content failure (line 387) */
 
   ui_mutation_observer_destroy(obs);

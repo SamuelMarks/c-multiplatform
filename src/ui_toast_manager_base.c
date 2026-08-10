@@ -132,10 +132,7 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
     size_t len = strlen(config->message);
     entry->message = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
     if (!entry->message) {
-      ui_error_t free_rc = free_toast_entry(entry);
-      if (free_rc != UI_ERROR_NONE) {
-        return free_rc;
-      }
+      (void)free_toast_entry(entry);
       return UI_ERROR_OUT_OF_MEMORY;
     }
 #if defined(_MSC_VER)
@@ -147,10 +144,7 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
 
   rc = ui_component_create(&entry->overlay_component);
   if (rc != UI_ERROR_NONE) {
-    ui_error_t free_rc = free_toast_entry(entry);
-    if (free_rc != UI_ERROR_NONE) {
-      return free_rc;
-    }
+    (void)free_toast_entry(entry);
     return rc;
   }
 
@@ -161,10 +155,7 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
         (struct ui_toast_entry **)C_MULTIPLATFORM_REALLOC(
             stack->toasts, new_cap * sizeof(struct ui_toast_entry *));
     if (!new_arr) {
-      ui_error_t free_rc = free_toast_entry(entry);
-      if (free_rc != UI_ERROR_NONE) {
-        return free_rc;
-      }
+      (void)free_toast_entry(entry);
       return UI_ERROR_OUT_OF_MEMORY;
     }
     stack->toasts = new_arr;

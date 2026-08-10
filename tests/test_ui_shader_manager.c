@@ -136,6 +136,17 @@ int main(void) {
     }
   }
 
+  /* Uniform failing location lookup */
+  {
+    float matrix[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    (void)ui_shader_manager_set_uniform_matrix(manager, program_id1,
+                                               "invalid_u", matrix);
+    (void)ui_shader_manager_set_uniform_color(manager, program_id1, "invalid_u",
+                                              1.0f, 0.0f, 0.0f, 1.0f);
+    (void)ui_shader_manager_set_uniform_float(manager, program_id1, "invalid_u",
+                                              1.5f);
+  }
+
   rc = ui_shader_manager_destroy(manager);
   if (rc != UI_ERROR_NONE) {
     printf("Failed to destroy shader manager.\n");

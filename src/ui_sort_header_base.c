@@ -66,17 +66,16 @@ ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
-static ui_error_t find_state_index(struct ui_sort_header_base *sort_header,
-                                   void *id, int *out_index) {
+static void find_state_index(struct ui_sort_header_base *sort_header, void *id,
+                             int *out_index) {
   size_t i;
   *out_index = -1;
   for (i = 0; i < sort_header->count; ++i) {
     if (sort_header->states[i].id == id) {
       *out_index = (int)i;
-      return UI_ERROR_NONE;
+      return;
     }
   }
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t remove_state_at(struct ui_sort_header_base *sort_header,
@@ -95,11 +94,8 @@ static ui_error_t
 insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
                        enum ui_sort_direction direction) {
   int existing_index;
-
   if (direction == UI_SORT_NONE) {
-    ui_error_t find_rc = find_state_index(sort_header, id, &existing_index);
-    if (find_rc != UI_ERROR_NONE)
-      return find_rc;
+    find_state_index(sort_header, id, &existing_index);
     if (existing_index >= 0) {
       return remove_state_at(sort_header, existing_index);
     }
@@ -109,9 +105,7 @@ insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
   if (!sort_header->is_multi) {
     sort_header->count = 0; /* Clear previous */
   } else {
-    ui_error_t find_rc = find_state_index(sort_header, id, &existing_index);
-    if (find_rc != UI_ERROR_NONE)
-      return find_rc;
+    find_state_index(sort_header, id, &existing_index);
     if (existing_index >= 0) {
       sort_header->states[existing_index].direction = direction;
       return UI_ERROR_NONE;
@@ -145,14 +139,11 @@ ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
   enum ui_sort_direction current_dir = UI_SORT_NONE;
   enum ui_sort_direction next_dir;
 
-  ui_error_t find_rc;
   if (!sort_header) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  find_rc = find_state_index(sort_header, id, &index);
-  if (find_rc != UI_ERROR_NONE)
-    return find_rc;
+  find_state_index(sort_header, id, &index);
   if (index >= 0) {
     current_dir = sort_header->states[index].direction;
   }

@@ -55,8 +55,7 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
 static ui_error_t
 ui_spin_button_base_update_aria(struct ui_spin_button_base *spin_button) {
   char buf[64];
-  if (!spin_button || !spin_button->component ||
-      !spin_button->component->shadow_root)
+  if (!spin_button->component || !spin_button->component->shadow_root)
     return UI_ERROR_INVALID_ARGUMENT;
 
 #if defined(_MSC_VER)
@@ -90,10 +89,10 @@ ui_spin_button_base_update_aria(struct ui_spin_button_base *spin_button) {
 #define UI_TRIG_CVA_TOUCH_IGNORE(s) trigger_cva_touched((s))
 
 static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button) {
-  if (spin_button && spin_button->cva_on_change) {
+  if (spin_button->cva_on_change) {
     union ui_signal_payload payload;
     payload.float_val = (float)spin_button->value;
-#define UI_CVA_ON_CHG_IGNORE(cb, p, u) ((cb) ? (cb)((p), (u)) : UI_ERROR_NONE)
+#define UI_CVA_ON_CHG_IGNORE(cb, p, u) ((cb)((p), (u)))
     (void)UI_CVA_ON_CHG_IGNORE(spin_button->cva_on_change, payload,
                                spin_button->cva_on_change_user_data);
   }
@@ -101,8 +100,8 @@ static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button) {
 }
 
 static ui_error_t trigger_cva_touched(struct ui_spin_button_base *spin_button) {
-  if (spin_button && spin_button->cva_on_touched) {
-#define UI_CVA_ON_TOUCH_IGNORE(cb, u) ((cb) ? (cb)((u)) : UI_ERROR_NONE)
+  if (spin_button->cva_on_touched) {
+#define UI_CVA_ON_TOUCH_IGNORE(cb, u) ((cb)((u)))
     (void)UI_CVA_ON_TOUCH_IGNORE(spin_button->cva_on_touched,
                                  spin_button->cva_on_touched_user_data);
   }
@@ -240,9 +239,7 @@ ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button) {
   if (!spin_button) {
     return UI_ERROR_NONE;
   }
-  if (spin_button->component) {
-    (void)ui_component_destroy(spin_button->component);
-  }
+  (void)ui_component_destroy(spin_button->component);
   C_MULTIPLATFORM_FREE(spin_button);
   return UI_ERROR_NONE;
 }
@@ -348,14 +345,11 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
 
   spin_button->disabled = disabled;
   if (disabled) {
-    ui_error_t stop_rc;
     (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
                                  "aria-disabled", "true");
     (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,
                                  "tabindex");
-    stop_rc = ui_spin_button_base_stop_continuous(spin_button);
-    if (stop_rc != UI_ERROR_NONE)
-      return stop_rc;
+    (void)ui_spin_button_base_stop_continuous(spin_button);
   } else {
     (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,
                                  "aria-disabled");
@@ -461,7 +455,7 @@ ui_error_t ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
       ui_error_t inc_rc = ui_spin_button_base_increment(spin_button);
       if (inc_rc != UI_ERROR_NONE)
         return inc_rc;
-    } else if (spin_button->continuous_dir == UI_SPIN_BUTTON_DIR_DEC) {
+    } else {
       ui_error_t dec_rc = ui_spin_button_base_decrement(spin_button);
       if (dec_rc != UI_ERROR_NONE)
         return dec_rc;

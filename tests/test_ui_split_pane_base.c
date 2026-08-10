@@ -151,8 +151,34 @@ static int run_normal_tests(void) {
 
   ASSERT_SUCCESS(ui_split_pane_base_set_orientation(
       pane, UI_SPLIT_PANE_ORIENTATION_VERTICAL));
-  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.type = UI_EVENT_KEY_UP;
+  ASSERT_SUCCESS(ui_split_pane_base_process_event(pane, &ev));
+
+  ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.y = 10;
+  ASSERT_SUCCESS(ui_split_pane_base_process_event(pane, &ev));
+
+  /* Unhandled mouse event */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.type = 9999; /* Unknown type */
+  ASSERT_SUCCESS(ui_split_pane_base_process_event(pane, &ev));
+
+  ASSERT_SUCCESS(ui_split_pane_base_set_orientation(
+      pane, UI_SPLIT_PANE_ORIENTATION_HORIZONTAL));
+  ev.type = UI_EVENT_TOUCH_END;
+  ev.event_data.touch.num_points = 1;
+  ev.event_data.touch.points[0].x = 10;
+  ASSERT_SUCCESS(ui_split_pane_base_process_event(pane, &ev));
+  ASSERT_SUCCESS(ui_split_pane_base_set_orientation(
+      pane, UI_SPLIT_PANE_ORIENTATION_VERTICAL));
+
+  ev.type = UI_EVENT_TOUCH_END;
+  ev.event_data.touch.num_points = 1;
+  ev.event_data.touch.points[0].y = 10;
+  ASSERT_SUCCESS(ui_split_pane_base_process_event(pane, &ev));
+
+  ev.type = UI_EVENT_TOUCH_START;
+  ev.event_data.touch.num_points = 0;
   ASSERT_SUCCESS(ui_split_pane_base_process_event(pane, &ev));
 
   /* Unhandled events or no touch points */

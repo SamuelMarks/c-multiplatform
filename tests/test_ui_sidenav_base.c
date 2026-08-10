@@ -1,12 +1,37 @@
 /* clang-format off */
 #include "ui_sidenav_base.h"
 #include "ui_error.h"
+
+struct ui_sidenav_base {
+  struct ui_component *component;
+  struct ui_dom_node *root_node;
+  struct ui_dom_node *drawer_node;
+  struct ui_dom_node *main_node;
+  struct ui_component *drawer_content;
+  struct ui_component *main_content;
+  enum ui_sidenav_mode mode;
+  enum ui_sidenav_position position;
+  int is_open;
+  struct ui_overlay_director *director;
+  struct ui_backdrop *backdrop_logic;
+  struct ui_component *backdrop_component;
+  struct ui_overlay *backdrop_overlay;
+  ui_sidenav_on_close_t on_close;
+  void *user_data;
+};
+
 #include "ui_event.h"
 #include <stdio.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
 
+static ui_error_t mock_on_close_error(struct ui_sidenav_base *sidenav,
+                                      void *user_data) {
+  (void)sidenav;
+  (void)user_data;
+  return UI_ERROR_OUT_OF_MEMORY;
+}
 static ui_error_t mock_on_close(struct ui_sidenav_base *sidenav,
                                 void *user_data) {
   int *called = (int *)user_data;
@@ -164,10 +189,87 @@ int main(void) {
   /* Close when already closed */
   ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 0));
 
+  /* Trigger unmount_backdrop errors by manually unmounting */
+  ASSERT_SUCCESS(ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_OVER));
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 1));
+  ui_overlay_director_unmount(sidenav->director, sidenav->backdrop_overlay);
+  /* This should now fail because unmount_backdrop fails */
+  ui_sidenav_base_set_open(sidenav, 0);
+
+  ASSERT_SUCCESS(ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_OVER));
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 1));
+  ui_overlay_director_unmount(sidenav->director, sidenav->backdrop_overlay);
+  ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_PUSH);
+
+  ASSERT_SUCCESS(ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_OVER));
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 1));
+  ui_overlay_director_unmount(sidenav->director, sidenav->backdrop_overlay);
+  /* test destroy path */
+  ui_sidenav_base_destroy(sidenav);
+  sidenav = NULL;
+
+  /* Need a new sidenav for remaining tests */
+  ui_sidenav_base_create(&sidenav);
+  ui_sidenav_base_set_overlay_director(sidenav, director);
+
+  /* Test mount_backdrop error on open by mocking director error?
+     Actually mount_backdrop fails if we can't allocate inside
+     ui_component_create or something. We can trigger it with
+     g_malloc_fail_countdown */
+
+  /* Test event processing failures */
+  ui_sidenav_base_set_open(sidenav, 1);
+  ui_sidenav_base_set_on_close(sidenav, mock_on_close_error, NULL);
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+  ui_sidenav_base_process_event(sidenav, &ev, 0.0);
+
+  /* Fallback close failure */
+  ui_sidenav_base_set_on_close(sidenav, NULL, NULL);
+  /* Make unmount fail to cause set_open(0) to fail */
+  ui_overlay_director_unmount(sidenav->director, sidenav->backdrop_overlay);
+  ui_sidenav_base_process_event(sidenav, &ev, 0.0);
+  ui_sidenav_base_set_open(sidenav, 0); /* will fail, clean up manually */
+  sidenav->is_open = 0;
+
+  /* Test mount_backdrop failure in set_overlay_director */
+  ui_sidenav_base_set_open(sidenav, 1);
+  sidenav->director = NULL; /* remove director so it's ready to be set */
+  if (sidenav->backdrop_component) {
+    ui_component_destroy(sidenav->backdrop_component);
+    sidenav->backdrop_component = NULL;
+  }
+  g_malloc_fail_countdown = 0;
+  ui_sidenav_base_set_overlay_director(sidenav, director);
+  g_malloc_fail_countdown = -1;
+  sidenav->director = director;
+
+  /* Test mount_backdrop failure in update_dom_state */
+  ui_sidenav_base_set_open(sidenav, 0);
+  if (sidenav->backdrop_component) {
+    ui_component_destroy(sidenav->backdrop_component);
+    sidenav->backdrop_component = NULL;
+  }
+  g_malloc_fail_countdown = 0;
+  ui_sidenav_base_set_open(sidenav, 1);
+  g_malloc_fail_countdown = -1;
+
+  /* Trigger update_dom_state mount_backdrop failure */
+  ui_sidenav_base_set_open(sidenav, 1);
+  if (sidenav->backdrop_component) {
+    ui_overlay_director_unmount(sidenav->director, sidenav->backdrop_overlay);
+    ui_component_destroy(sidenav->backdrop_component);
+    sidenav->backdrop_component = NULL;
+    sidenav->backdrop_overlay = NULL;
+  }
+  g_malloc_fail_countdown = 0;
+  ui_sidenav_base_set_position(sidenav, UI_SIDENAV_POSITION_END);
+  g_malloc_fail_countdown = -1;
+
   printf("Testing OOM on create...\n");
   {
     int i;
-    for (i = 0; i < 50; i++) {
+    for (i = 0; i < 200; i++) {
       g_malloc_fail_countdown = i;
       if (ui_sidenav_base_create(&sidenav) == UI_ERROR_NONE) {
         (void)ui_sidenav_base_destroy(sidenav);
@@ -179,7 +281,7 @@ int main(void) {
 
   {
     int i;
-    for (i = 0; i < 30; i++) {
+    for (i = 0; i < 200; i++) {
       ui_sidenav_base_create(&sidenav);
       ui_sidenav_base_set_overlay_director(sidenav, director);
       g_malloc_fail_countdown = i;

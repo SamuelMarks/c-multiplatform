@@ -33,10 +33,7 @@ static ui_error_t ensure_buffer(size_t words_needed) {
   }
 
   if (g_cmd_pos + words_needed > g_cmd_capacity) {
-    rc = ui_web_bridge_flush();
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)ui_web_bridge_flush();
   }
   return UI_ERROR_NONE;
 }

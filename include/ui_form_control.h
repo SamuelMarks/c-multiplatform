@@ -133,6 +133,8 @@ ui_error_t ui_form_control_get_touched_signal(ui_form_control_t *control,
  * @param out_signal The pointer to store the signal.
  * @return ui_error_t
  */
+ui_error_t ui_form_control_get_dirty_signal(ui_form_control_t *control,
+                                            ui_signal_t **out_signal);
 
 /**
  * @brief Gets the errors signal of the form control.
@@ -154,9 +156,6 @@ ui_error_t ui_form_control_get_errors_signal(ui_form_control_t *control,
  */
 ui_error_t ui_form_control_set_error(ui_form_control_t *control,
                                      const char *error_msg);
-
-ui_error_t ui_form_control_get_dirty_signal(ui_form_control_t *control,
-                                            ui_signal_t **out_signal);
 
 /**
  * @brief Destroys the form control.

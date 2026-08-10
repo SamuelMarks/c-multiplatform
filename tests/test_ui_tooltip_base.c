@@ -192,8 +192,12 @@ static int test_oom(void) {
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   ui_overlay_director_create(root_node, &director);
 
-  /* Force visible */
-  ev.type = UI_EVENT_MOUSE_MOVE;
+  /* Force default switch case in events */
+  ev.type = UI_EVENT_NONE;
+  ui_tooltip_base_handle_event(tt, &ev, 0.0);
+
+  /* Force default switch case in tick by ticking while visible */
+  ui_tooltip_base_tick(tt, 10.0);
   ui_tooltip_base_handle_event(tt, &ev, 0.0);
   ui_tooltip_base_tick(tt, 1.0);
 

@@ -152,10 +152,7 @@ static ui_error_t dispatch_record(struct ui_mutation_observer *observer,
                                   struct ui_mutation_record *record) {
   ui_error_t cb_rc =
       observer->callback(observer, record, 1, observer->user_data);
-  if (cb_rc != UI_ERROR_NONE) {
-    if (0)
-      return cb_rc;
-  }
+  { (void)cb_rc; }
   return cb_rc;
 }
 
@@ -195,8 +192,9 @@ ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
           record.removed_nodes_count = 1;
         }
         rc = dispatch_record(obs, &record);
-        if (rc != UI_ERROR_NONE)
+        if (rc != UI_ERROR_NONE) {
           return rc;
+        }
         break; /* Only dispatch once per observer per mutation */
       }
     }
@@ -265,14 +263,15 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
         }
 
         rc = dispatch_record(obs, &record);
-        if (rc != UI_ERROR_NONE)
-          return rc;
 
         if (record.attribute_name != NULL) {
           C_MULTIPLATFORM_FREE(record.attribute_name);
         }
         if (record.old_value != NULL) {
           C_MULTIPLATFORM_FREE(record.old_value);
+        }
+        if (rc != UI_ERROR_NONE) {
+          return rc;
         }
         break;
       }
@@ -325,11 +324,12 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
         }
 
         rc = dispatch_record(obs, &record);
-        if (rc != UI_ERROR_NONE)
-          return rc;
 
         if (record.old_value != NULL) {
           C_MULTIPLATFORM_FREE(record.old_value);
+        }
+        if (rc != UI_ERROR_NONE) {
+          return rc;
         }
         break;
       }

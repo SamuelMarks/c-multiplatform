@@ -57,6 +57,13 @@ static void test_handle_manager_basic(void) {
   assert(rc == UI_ERROR_NONE);
   assert(out_data == data2);
 
+  /* Forged handle (unallocated index but correct generation) */
+  rc = ui_handle_manager_get(mgr, (((ui_uint64)1) << 32) | 9, &out_data);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  rc = ui_handle_manager_free(mgr, (((ui_uint64)1) << 32) | 9);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
   /* Free invalid */
   rc = ui_handle_manager_free(NULL, handle2);
   assert(rc == UI_ERROR_INVALID_ARGUMENT);

@@ -43,11 +43,7 @@ ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
   }
 
   if (manager->is_running) {
-    ui_error_t rc = ui_sensor_manager_stop(manager);
-    if (rc != UI_ERROR_NONE) {
-      C_MULTIPLATFORM_FREE(manager);
-      return rc;
-    }
+    (void)ui_sensor_manager_stop(manager);
   }
 
   /* Unbind from signals if necessary */
@@ -141,13 +137,9 @@ ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
 
   if (manager->orientation_signal) {
     union ui_signal_payload payload;
-    ui_error_t rc;
     payload.ptr_val = &manager->current_quat;
     /* Send the pointer to current quat into the reactive graph */
-    rc = ui_signal_set(manager->orientation_signal, payload);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)ui_signal_set(manager->orientation_signal, payload);
   }
 
   return UI_ERROR_NONE;

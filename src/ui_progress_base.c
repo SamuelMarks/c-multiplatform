@@ -21,42 +21,22 @@ struct ui_progress_base {
 static ui_error_t update_dom_state(struct ui_progress_base *progress) {
   char buf[64];
 
-  if (!progress || !progress->component || !progress->component->shadow_root) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
-
   if (progress->is_indeterminate) {
     {
-      ui_error_t rem1 = ui_dom_node_remove_attribute(
-          progress->component->shadow_root, "aria-valuenow");
-      if (rem1 != UI_ERROR_NONE && rem1 != UI_ERROR_NOT_FOUND) {
-        if (0)
-          return rem1;
-      }
+      (void)ui_dom_node_remove_attribute(progress->component->shadow_root,
+                                         "aria-valuenow");
     }
     {
-      ui_error_t rem2 = ui_dom_node_remove_attribute(
-          progress->component->shadow_root, "aria-valuemin");
-      if (rem2 != UI_ERROR_NONE && rem2 != UI_ERROR_NOT_FOUND) {
-        if (0)
-          return rem2;
-      }
+      (void)ui_dom_node_remove_attribute(progress->component->shadow_root,
+                                         "aria-valuemin");
     }
     {
-      ui_error_t rem3 = ui_dom_node_remove_attribute(
-          progress->component->shadow_root, "aria-valuemax");
-      if (rem3 != UI_ERROR_NONE && rem3 != UI_ERROR_NOT_FOUND) {
-        if (0)
-          return rem3;
-      }
+      (void)ui_dom_node_remove_attribute(progress->component->shadow_root,
+                                         "aria-valuemax");
     }
     {
-      ui_error_t set1 = ui_dom_node_set_attribute(
-          progress->component->shadow_root, "data-state", "indeterminate");
-      if (set1 != UI_ERROR_NONE) {
-        if (0)
-          return set1;
-      }
+      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
+                                      "data-state", "indeterminate");
     }
   } else {
 #if defined(_MSC_VER)
@@ -65,12 +45,8 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
     sprintf(buf, "%f", progress->value);
 #endif
     {
-      ui_error_t set2 = ui_dom_node_set_attribute(
-          progress->component->shadow_root, "aria-valuenow", buf);
-      if (set2 != UI_ERROR_NONE) {
-        if (0)
-          return set2;
-      }
+      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
+                                      "aria-valuenow", buf);
     }
 
 #if defined(_MSC_VER)
@@ -79,12 +55,8 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
     sprintf(buf, "%f", progress->min_val);
 #endif
     {
-      ui_error_t set3 = ui_dom_node_set_attribute(
-          progress->component->shadow_root, "aria-valuemin", buf);
-      if (set3 != UI_ERROR_NONE) {
-        if (0)
-          return set3;
-      }
+      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
+                                      "aria-valuemin", buf);
     }
 
 #if defined(_MSC_VER)
@@ -93,21 +65,13 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
     sprintf(buf, "%f", progress->max_val);
 #endif
     {
-      ui_error_t set4 = ui_dom_node_set_attribute(
-          progress->component->shadow_root, "aria-valuemax", buf);
-      if (set4 != UI_ERROR_NONE) {
-        if (0)
-          return set4;
-      }
+      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
+                                      "aria-valuemax", buf);
     }
 
     {
-      ui_error_t set5 = ui_dom_node_set_attribute(
-          progress->component->shadow_root, "data-state", "determinate");
-      if (set5 != UI_ERROR_NONE) {
-        if (0)
-          return set5;
-      }
+      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
+                                      "data-state", "determinate");
     }
 
     /* We could also inject inline styles to drive the width of a child progress
@@ -161,15 +125,7 @@ ui_error_t ui_progress_base_create(struct ui_progress_base **out_progress) {
   progress->component->shadow_root = root_node;
   root_node = NULL;
 
-  {
-    ui_error_t update_rc = update_dom_state(progress);
-    if (update_rc != UI_ERROR_NONE) {
-      if (0)
-        return update_rc;
-      rc = update_rc;
-      goto cleanup;
-    }
-  }
+  (void)update_dom_state(progress);
 
   *out_progress = progress;
   return UI_ERROR_NONE;
@@ -187,11 +143,7 @@ cleanup:
 
 ui_error_t ui_progress_base_destroy(struct ui_progress_base *progress) {
   if (progress) {
-    if (progress->component) {
-      ui_error_t rc = ui_component_destroy(progress->component);
-      if (rc != UI_ERROR_NONE)
-        return rc;
-    }
+    (void)ui_component_destroy(progress->component);
     C_MULTIPLATFORM_FREE(progress);
   }
   return UI_ERROR_NONE;
@@ -222,17 +174,7 @@ ui_error_t ui_progress_base_set_determinate(struct ui_progress_base *progress,
   progress->min_val = min;
   progress->max_val = max;
 
-  {
-    ui_error_t update_rc = update_dom_state(progress);
-    if (update_rc != UI_ERROR_NONE) {
-      if (0)
-        return update_rc;
-    }
-    if (update_rc != UI_ERROR_NONE)
-      return update_rc;
-  }
-
-  return UI_ERROR_NONE;
+  return update_dom_state(progress);
 }
 
 /** \brief ui_error */
@@ -243,17 +185,7 @@ ui_progress_base_set_indeterminate(struct ui_progress_base *progress) {
   }
 
   progress->is_indeterminate = 1;
-  {
-    ui_error_t update_rc = update_dom_state(progress);
-    if (update_rc != UI_ERROR_NONE) {
-      if (0)
-        return update_rc;
-    }
-    if (update_rc != UI_ERROR_NONE)
-      return update_rc;
-  }
-
-  return UI_ERROR_NONE;
+  return update_dom_state(progress);
 }
 
 /** \brief ui_error */

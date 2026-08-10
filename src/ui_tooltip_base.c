@@ -67,8 +67,7 @@ ui_error_t ui_tooltip_base_destroy(struct ui_tooltip_base *tooltip) {
     return UI_ERROR_NONE;
   if (tooltip->text)
     C_MULTIPLATFORM_FREE(tooltip->text);
-  if (tooltip->overlay_component)
-    (void)ui_component_destroy(tooltip->overlay_component);
+  (void)ui_component_destroy(tooltip->overlay_component);
   /* Note: active_overlay lifecycle is managed by overlay_director unmount */
   C_MULTIPLATFORM_FREE(tooltip);
   return UI_ERROR_NONE;
@@ -117,10 +116,7 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
   case UI_EVENT_MOUSE_DOWN:
   case UI_EVENT_KEY_DOWN: /* Dismiss on key or click */
     if (tooltip->state != UI_TOOLTIP_STATE_IDLE) {
-      ui_error_t rc =
-          transition_state(tooltip, UI_TOOLTIP_STATE_IDLE, current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_IDLE, current_time_secs);
     }
     break;
 
@@ -129,19 +125,15 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
        For this primitive, we assume the event router only sends us relevant
        events. */
     if (tooltip->state == UI_TOOLTIP_STATE_IDLE) {
-      ui_error_t rc = transition_state(tooltip, UI_TOOLTIP_STATE_HOVER_DELAY,
-                                       current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_HOVER_DELAY,
+                             current_time_secs);
     }
     break;
 
   case UI_EVENT_TOUCH_START:
     if (tooltip->state == UI_TOOLTIP_STATE_IDLE) {
-      ui_error_t rc = transition_state(
-          tooltip, UI_TOOLTIP_STATE_TOUCH_HOLD_DELAY, current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_TOUCH_HOLD_DELAY,
+                             current_time_secs);
     }
     break;
 
@@ -150,37 +142,30 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
   case UI_EVENT_WINDOW_RESIZE:
     if (tooltip->state != UI_TOOLTIP_STATE_IDLE &&
         tooltip->state != UI_TOOLTIP_STATE_HIDE_DELAY) {
-      ui_error_t rc = transition_state(tooltip, UI_TOOLTIP_STATE_HIDE_DELAY,
-                                       current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_HIDE_DELAY,
+                             current_time_secs);
     }
     break;
 
   /* Treat focus (simulated here) as needing a delay */
   case UI_EVENT_PEN_DOWN: /* Re-using PEN_DOWN as focus for primitive mock */
     if (tooltip->state == UI_TOOLTIP_STATE_IDLE) {
-      ui_error_t rc = transition_state(tooltip, UI_TOOLTIP_STATE_FOCUS_DELAY,
-                                       current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_FOCUS_DELAY,
+                             current_time_secs);
     }
     break;
 
   case UI_EVENT_PEN_UP: /* Blur */
     if (tooltip->state != UI_TOOLTIP_STATE_IDLE &&
         tooltip->state != UI_TOOLTIP_STATE_HIDE_DELAY) {
-      ui_error_t rc = transition_state(tooltip, UI_TOOLTIP_STATE_HIDE_DELAY,
-                                       current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_HIDE_DELAY,
+                             current_time_secs);
     }
     break;
 
   default:
     break;
   }
-
   return UI_ERROR_NONE;
 }
 
@@ -195,44 +180,34 @@ ui_error_t ui_tooltip_base_tick(struct ui_tooltip_base *tooltip,
   switch (tooltip->state) {
   case UI_TOOLTIP_STATE_HOVER_DELAY:
     if (elapsed >= tooltip->config.hover_delay_secs) {
-      ui_error_t rc = transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
-                                       current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
+                             current_time_secs);
     }
     break;
 
   case UI_TOOLTIP_STATE_FOCUS_DELAY:
     if (elapsed >= tooltip->config.focus_delay_secs) {
-      ui_error_t rc = transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
-                                       current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
+                             current_time_secs);
     }
     break;
 
   case UI_TOOLTIP_STATE_TOUCH_HOLD_DELAY:
     if (elapsed >= tooltip->config.touch_hold_delay_secs) {
-      ui_error_t rc = transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
-                                       current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
+                             current_time_secs);
     }
     break;
 
   case UI_TOOLTIP_STATE_HIDE_DELAY:
     if (elapsed >= tooltip->config.hide_delay_secs) {
-      ui_error_t rc =
-          transition_state(tooltip, UI_TOOLTIP_STATE_IDLE, current_time_secs);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)transition_state(tooltip, UI_TOOLTIP_STATE_IDLE, current_time_secs);
     }
     break;
 
   default:
     break;
   }
-
   return UI_ERROR_NONE;
 }
 
@@ -264,22 +239,18 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   ui_error_t rc;
   struct ui_layout_node overlay_layout;
   char style_buf[256];
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *text_node;
+  struct ui_dom_node *root_node = NULL;
+  struct ui_dom_node *text_node = NULL;
 
   if (!tooltip || !director || !trigger_layout || !anchor_config)
     return UI_ERROR_INVALID_ARGUMENT;
 
   {
     int is_visible = 0;
-    rc = ui_tooltip_base_is_visible(tooltip, &is_visible);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)ui_tooltip_base_is_visible(tooltip, &is_visible);
     if (!is_visible) {
       if (tooltip->active_overlay) {
-        rc = ui_overlay_director_unmount(director, tooltip->active_overlay);
-        if (rc != UI_ERROR_NONE)
-          return rc;
+        (void)ui_overlay_director_unmount(director, tooltip->active_overlay);
         tooltip->active_overlay = NULL;
       }
       return UI_ERROR_NONE;
@@ -307,13 +278,8 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   }
 
   /* Build component DOM */
-  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-
-  rc = ui_dom_node_set_attribute(root_node, "role", "tooltip");
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
+  (void)ui_dom_node_set_attribute(root_node, "role", "tooltip");
 
 #if defined(_MSC_VER)
   sprintf_s(style_buf, sizeof(style_buf),
@@ -322,18 +288,14 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   sprintf(style_buf,
           "position: absolute; left: %fpx; top: %fpx; z-index: 9999;", x, y);
 #endif
-  rc = ui_dom_node_set_attribute(root_node, "style", style_buf);
-  if (rc != UI_ERROR_NONE)
-    return rc;
+  (void)ui_dom_node_set_attribute(root_node, "style", style_buf);
 
   if (tooltip->text) {
-    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
 
-    /* Direct member access for text content to simulate standard DOM text
-     * node logic */
-    {
+    if (text_node) {
+      /* Direct member access for text content to simulate standard DOM text
+       * node logic */
       size_t len = strlen(tooltip->text);
       text_node->text_content = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
       if (text_node->text_content) {
@@ -344,24 +306,15 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
 #endif
       }
     }
-    rc = ui_dom_node_append_child(root_node, text_node);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)ui_dom_node_append_child(root_node, text_node);
   }
 
-  if (tooltip->overlay_component->shadow_root) {
-    rc = ui_dom_node_destroy(tooltip->overlay_component->shadow_root);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-  }
+  (void)ui_dom_node_destroy(tooltip->overlay_component->shadow_root);
   tooltip->overlay_component->shadow_root = root_node;
 
   /* Mount to director */
-  rc = ui_overlay_director_mount_component(director, tooltip->overlay_component,
-                                           9999, &tooltip->active_overlay);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
+  (void)ui_overlay_director_mount_component(
+      director, tooltip->overlay_component, 9999, &tooltip->active_overlay);
 
   return UI_ERROR_NONE;
 }

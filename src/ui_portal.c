@@ -37,10 +37,8 @@ ui_error_t ui_portal_destroy(struct ui_portal *portal) {
   if (portal->content_node) {
     /* Unmount from physical target if attached */
     if (portal->content_node->parent == portal->physical_target) {
-      ui_error_t rc = ui_dom_node_remove_child(portal->physical_target,
-                                               portal->content_node);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)ui_dom_node_remove_child(portal->physical_target,
+                                     portal->content_node);
     }
     (void)ui_dom_node_destroy(portal->content_node);
   }
@@ -59,12 +57,8 @@ ui_error_t ui_portal_set_content(struct ui_portal *portal,
 
   if (portal->content_node) {
     if (portal->content_node->parent == portal->physical_target) {
-      {
-        ui_error_t rm_rc = ui_dom_node_remove_child(portal->physical_target,
-                                                    portal->content_node);
-        if (rm_rc != UI_ERROR_NONE)
-          return rm_rc;
-      }
+      (void)ui_dom_node_remove_child(portal->physical_target,
+                                     portal->content_node);
     }
     (void)ui_dom_node_destroy(portal->content_node);
   }

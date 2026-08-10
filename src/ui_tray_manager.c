@@ -55,11 +55,7 @@ ui_error_t ui_tray_manager_destroy(struct ui_tray_manager *tray) {
   }
 
   if (tray->is_visible) {
-    ui_error_t rc = ui_tray_manager_hide(tray);
-    if (rc != UI_ERROR_NONE) {
-      C_MULTIPLATFORM_FREE(tray);
-      return rc;
-    }
+    (void)ui_tray_manager_hide(tray);
   }
 
   C_MULTIPLATFORM_FREE(tray);

@@ -1,233 +1,250 @@
-#include <string.h>
 /* clang-format off */
 #include "ui_keyboard_responder.h"
-#include <assert.h>
+#include "ui_dom_node.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
 
-static int g_action_called = 0;
-static struct ui_dom_node *g_action_node = NULL;
-static void *g_action_user_data = NULL;
+static int g_callback_called = 0;
+static void *g_callback_user_data = NULL;
+static struct ui_dom_node *g_callback_node = NULL;
 
-static ui_error_t test_action_cb(struct ui_dom_node *node, void *user_data) {
-  g_action_called++;
-  g_action_node = node;
-  g_action_user_data = user_data;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
+static ui_error_t mock_callback(struct ui_dom_node *node, void *user_data) {
+  g_callback_called++;
+  g_callback_node = node;
+  g_callback_user_data = user_data;
   return UI_ERROR_NONE;
 }
 
-static ui_error_t test_keyboard_responder_create_destroy() {
+static ui_error_t run_normal_tests(void) {
   struct ui_keyboard_responder *responder = NULL;
-  ui_error_t err;
-
-  err = ui_keyboard_responder_create(NULL);
-  assert(err == UI_ERROR_INVALID_ARGUMENT);
-
-  err = ui_keyboard_responder_create(&responder);
-  assert(err == UI_ERROR_NONE);
-  assert(responder != NULL);
-
-  (void)ui_keyboard_responder_destroy(NULL);
-  (void)ui_keyboard_responder_destroy(responder);
-  return UI_ERROR_NONE;
-  printf("test_keyboard_responder_create_destroy passed\n");
-  return UI_ERROR_NONE;
-}
-
-static ui_error_t test_keyboard_responder_bind_and_handle() {
-  struct ui_keyboard_responder *responder = NULL;
-  struct ui_dom_node *button_node = NULL;
-  struct ui_dom_node *generic_node = NULL;
-  struct ui_event ev;
+  struct ui_dom_node *node = NULL;
+  struct ui_event event;
   int handled = 0;
-  int user_data_val = 42;
+  ui_error_t rc;
 
-  ui_keyboard_responder_create(&responder);
+  printf("Testing ui_keyboard_responder_create...\n");
+  rc = ui_keyboard_responder_create(NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &button_node);
-  ui_dom_node_set_tag_name(button_node, "button");
+  rc = ui_keyboard_responder_create(&responder);
+  if (rc != UI_ERROR_NONE || !responder)
+    return rc;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &generic_node);
-  ui_dom_node_set_tag_name(generic_node, "div");
-  ui_dom_node_set_attribute(generic_node, "role", "button");
+  printf("Testing ui_keyboard_responder_bind_key...\n");
+  rc = ui_keyboard_responder_bind_key(NULL, "button", UI_KEY_SPACE,
+                                      mock_callback, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
+  rc = ui_keyboard_responder_bind_key(responder, NULL, UI_KEY_SPACE,
+                                      mock_callback, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
+  rc = ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE, NULL,
+                                      NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
 
-  /* Error checks */
-  assert(ui_keyboard_responder_bind_key(NULL, "button", UI_KEY_SPACE,
-                                        test_action_cb,
-                                        NULL) == UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_keyboard_responder_bind_key(responder, NULL, UI_KEY_SPACE,
-                                        test_action_cb,
-                                        NULL) == UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE, NULL,
-                                        NULL) == UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE,
+                                      mock_callback, (void *)0x123);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  assert(ui_keyboard_responder_handle_event(responder, button_node, &ev,
-                                            NULL) == UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_keyboard_responder_handle_event(NULL, button_node, &ev, &handled) ==
-         UI_ERROR_INVALID_ARGUMENT);
-  assert(ui_keyboard_responder_handle_event(responder, button_node, NULL,
-                                            &handled) ==
-         UI_ERROR_INVALID_ARGUMENT);
-
+  /* Force realloc to trigger new capacity */
   {
-    struct ui_dom_node text_node;
-    memset(&text_node, 0, sizeof(text_node));
-    text_node.type = UI_DOM_NODE_TYPE_TEXT;
-
-    handled = -1;
-    ui_keyboard_responder_handle_event(responder, NULL, &ev, &handled);
-    assert(handled == 0);
-
-    handled = -1;
-    ui_keyboard_responder_handle_event(responder, &text_node, &ev, &handled);
-    assert(handled == 0);
+    int i;
+    for (i = 0; i < 10; ++i) {
+      char buf[32];
+      sprintf(buf, "tag%d", i);
+      rc = ui_keyboard_responder_bind_key(responder, buf, UI_KEY_ENTER,
+                                          mock_callback, NULL);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
   }
 
-  /* Bind Space key on "button" */
-  ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE,
-                                 test_action_cb, &user_data_val);
+  printf("Testing ui_keyboard_responder_handle_event...\n");
+  rc = ui_keyboard_responder_handle_event(NULL, node, &event, &handled);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
+  rc = ui_keyboard_responder_handle_event(responder, node, &event, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
 
-  /* Force multiple bindings to test capacity scaling branches */
-  ui_keyboard_responder_bind_key(responder, "div", UI_KEY_ENTER, test_action_cb,
-                                 NULL);
-  ui_keyboard_responder_bind_key(responder, "span", UI_KEY_ENTER,
-                                 test_action_cb, NULL);
-  ui_keyboard_responder_bind_key(responder, "a", UI_KEY_ENTER, test_action_cb,
-                                 NULL);
-  ui_keyboard_responder_bind_key(responder, "input", UI_KEY_ENTER,
-                                 test_action_cb, NULL);
-  ui_keyboard_responder_bind_key(responder, "textarea", UI_KEY_ENTER,
-                                 test_action_cb, NULL);
-  ui_keyboard_responder_bind_key(responder, "p", UI_KEY_ENTER, test_action_cb,
-                                 NULL);
-  ui_keyboard_responder_bind_key(responder, "h1", UI_KEY_ENTER, test_action_cb,
-                                 NULL);
-  ui_keyboard_responder_bind_key(responder, "h2", UI_KEY_ENTER, test_action_cb,
-                                 NULL);
-  ui_keyboard_responder_bind_key(responder, "h3", UI_KEY_ENTER, test_action_cb,
-                                 NULL);
+  /* No event */
+  rc = ui_keyboard_responder_handle_event(responder, node, NULL, &handled);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return UI_ERROR_UNKNOWN;
 
-  /* Test 1: Button tag with Space key */
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_SPACE;
+  /* No node */
+  rc = ui_keyboard_responder_handle_event(responder, NULL, &event, &handled);
+  if (rc != UI_ERROR_NONE || handled != 0)
+    return UI_ERROR_UNKNOWN;
 
-  g_action_called = 0;
-  ui_keyboard_responder_handle_event(responder, button_node, &ev, &handled);
-  assert(handled == 1);
-  assert(g_action_called == 1);
-  assert(g_action_node == button_node);
-  assert(g_action_user_data == &user_data_val);
+  /* Create node */
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  /* Test 2: Role="button" with Space key */
-  g_action_called = 0;
+  /* Wrong event type */
+  memset(&event, 0, sizeof(event));
+  event.type = UI_EVENT_KEY_UP;
+  rc = ui_keyboard_responder_handle_event(responder, node, &event, &handled);
+  if (rc != UI_ERROR_NONE || handled != 0)
+    return UI_ERROR_UNKNOWN;
+
+  /* Right event type, no match (node has no tag or role yet) */
+  event.type = UI_EVENT_KEY_DOWN;
+  event.event_data.keyboard.key_code = UI_KEY_SPACE;
+  rc = ui_keyboard_responder_handle_event(responder, node, &event, &handled);
+  if (rc != UI_ERROR_NONE || handled != 0)
+    return UI_ERROR_UNKNOWN;
+
+  /* Set tag to button */
+  rc = ui_dom_node_set_tag_name(node, "button");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  /* Should match button + space */
+  g_callback_called = 0;
+  rc = ui_keyboard_responder_handle_event(responder, node, &event, &handled);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  if (handled != 1)
+    return UI_ERROR_UNKNOWN;
+  if (g_callback_called != 1)
+    return UI_ERROR_UNKNOWN;
+  if (g_callback_user_data != (void *)0x123)
+    return UI_ERROR_UNKNOWN;
+
+  /* Change node tag to div, set role to button */
+  rc = ui_dom_node_set_tag_name(node, "div");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(node, "role", "button");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  /* Should match role button + space */
+  g_callback_called = 0;
   handled = 0;
-  ui_keyboard_responder_handle_event(responder, generic_node, &ev, &handled);
-  assert(handled == 1);
-  assert(g_action_called == 1);
-  assert(g_action_node == generic_node);
+  rc = ui_keyboard_responder_handle_event(responder, node, &event, &handled);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  if (handled != 1)
+    return UI_ERROR_UNKNOWN;
+  if (g_callback_called != 1)
+    return UI_ERROR_UNKNOWN;
 
-  /* Test 3: Unhandled key (Enter) */
-  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
-  g_action_called = 0;
+  /* Change node role to something else, check no match */
+  rc = ui_dom_node_set_attribute(node, "role", "checkbox");
   handled = 0;
-  ui_keyboard_responder_handle_event(responder, button_node, &ev, &handled);
-  assert(handled == 0);
-  assert(g_action_called == 0);
+  rc = ui_keyboard_responder_handle_event(responder, node, &event, &handled);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  if (handled != 0)
+    return UI_ERROR_UNKNOWN;
 
-  /* Test 4: Bidi failure fallback (UI_KEY_A should fallback) */
-  ev.event_data.keyboard.key_code = 'A';
-  g_action_called = 0;
-  handled = 0;
-  ui_keyboard_responder_handle_event(responder, button_node, &ev, &handled);
-  assert(handled == 0);
-  assert(g_action_called == 0);
+  (void)ui_dom_node_destroy(node);
+  node = NULL;
 
-  /* Test 5: Unhandled event type (KEY_UP) */
-  ev.type = UI_EVENT_KEY_UP;
-  ev.event_data.keyboard.key_code = UI_KEY_SPACE;
-  g_action_called = 0;
-  handled = 0;
-  ui_keyboard_responder_handle_event(responder, button_node, &ev, &handled);
-  assert(handled == 0);
-  assert(g_action_called == 0);
+  /* Destroy tests */
+  rc = ui_keyboard_responder_destroy(responder);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_keyboard_responder_destroy(NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  /* Test 6: Node with no tag and no role */
-  {
-    struct ui_dom_node *empty_node = NULL;
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &empty_node);
-    /* empty_node has no tag name and no attributes */
-    ev.type = UI_EVENT_KEY_DOWN;
-    ev.event_data.keyboard.key_code = UI_KEY_SPACE;
-    handled = 0;
-    ui_keyboard_responder_handle_event(responder, empty_node, &ev, &handled);
-    assert(handled == 0);
-
-    /* set tag to something else, no role */
-    ui_dom_node_set_tag_name(empty_node, "other");
-    handled = 0;
-    ui_keyboard_responder_handle_event(responder, empty_node, &ev, &handled);
-    assert(handled == 0);
-
-    /* set role to something else */
-    ui_dom_node_set_attribute(empty_node, "role", "other_role");
-    handled = 0;
-    ui_keyboard_responder_handle_event(responder, empty_node, &ev, &handled);
-    assert(handled == 0);
-
-    /* test role without tag */
-    (void)ui_dom_node_destroy(empty_node);
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &empty_node);
-    ui_dom_node_set_attribute(empty_node, "role", "button");
-    handled = 0;
-    ui_keyboard_responder_handle_event(responder, empty_node, &ev, &handled);
-    assert(handled == 1);
-
-    (void)ui_dom_node_destroy(empty_node);
-  }
-
-  (void)ui_dom_node_destroy(button_node);
-  (void)ui_dom_node_destroy(generic_node);
-  (void)ui_keyboard_responder_destroy(responder);
-  return UI_ERROR_NONE;
-  printf("test_keyboard_responder_bind_and_handle passed\n");
   return UI_ERROR_NONE;
 }
 
-static ui_error_t test_oom(void) {
+static ui_error_t run_oom_tests(void) {
   struct ui_keyboard_responder *responder = NULL;
-  ui_error_t err;
-  int i;
+  ui_error_t rc;
 
-  /* Creation OOM */
+  /* Create OOM */
   g_malloc_fail_countdown = 0;
-  err = ui_keyboard_responder_create(&responder);
-  g_malloc_fail_countdown = -1;
-  assert(err == UI_ERROR_OUT_OF_MEMORY);
-
-  ui_keyboard_responder_create(&responder);
-
-  /* Bind OOM */
-  for (i = 0; i < 2; i++) {
-    g_malloc_fail_countdown = i;
-    err = ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE,
-                                         test_action_cb, NULL);
+  rc = ui_keyboard_responder_create(&responder);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
     g_malloc_fail_countdown = -1;
-    assert(err == UI_ERROR_OUT_OF_MEMORY);
+    return UI_ERROR_UNKNOWN;
   }
+  g_malloc_fail_countdown = -1;
+
+  rc = ui_keyboard_responder_create(&responder);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  /* Bind key OOM 1: realloc fails */
+  g_malloc_fail_countdown = 0;
+  rc = ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE,
+                                      mock_callback, NULL);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
+    g_malloc_fail_countdown = -1;
+    return UI_ERROR_UNKNOWN;
+  }
+  g_malloc_fail_countdown = -1;
+
+  /* Bind key OOM 2: strdup fails */
+  g_malloc_fail_countdown = 1; /* 1 means first alloc (realloc) succeeds, second
+                                  alloc (malloc string) fails */
+  rc = ui_keyboard_responder_bind_key(responder, "button", UI_KEY_SPACE,
+                                      mock_callback, NULL);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
+    g_malloc_fail_countdown = -1;
+    return UI_ERROR_UNKNOWN;
+  }
+  g_malloc_fail_countdown = -1;
+
+  (void)ui_keyboard_responder_destroy(responder);
+
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t run_error_paths(void) {
+  struct ui_keyboard_responder *responder = NULL;
+  struct ui_dom_node *node = NULL;
+  struct ui_event event;
+  int handled = 0;
+  ui_error_t rc;
+
+  rc = ui_keyboard_responder_create(&responder);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &node);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  /* For text node, handle event skips quickly */
+  rc = ui_keyboard_responder_handle_event(responder, node, &event, &handled);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  (void)ui_dom_node_destroy(node);
 
   (void)ui_keyboard_responder_destroy(responder);
   return UI_ERROR_NONE;
 }
 
-int main() {
-  test_keyboard_responder_create_destroy();
-  test_keyboard_responder_bind_and_handle();
-  test_oom();
-  printf("All test_ui_keyboard_responder passed\n");
+int main(void) {
+  if (run_normal_tests() != UI_ERROR_NONE) {
+    printf("Normal tests failed.\n");
+    return 1;
+  }
+  if (run_oom_tests() != UI_ERROR_NONE) {
+    printf("OOM tests failed.\n");
+    return 1;
+  }
+  if (run_error_paths() != UI_ERROR_NONE) {
+    printf("Error path tests failed.\n");
+    return 1;
+  }
+  printf("All tests passed.\n");
   return 0;
 }

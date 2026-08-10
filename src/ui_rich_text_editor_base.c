@@ -117,8 +117,7 @@ static ui_error_t rte_cva_set_disabled_state(void *component, int is_disabled) {
         rte->component->shadow_root, "contenteditable",
         is_disabled ? "false" : "true");
     if (s_rc1 != UI_ERROR_NONE) {
-      if (0)
-        return s_rc1;
+      return s_rc1;
     }
   }
   {
@@ -126,8 +125,7 @@ static ui_error_t rte_cva_set_disabled_state(void *component, int is_disabled) {
         ui_dom_node_set_attribute(rte->component->shadow_root, "aria-disabled",
                                   is_disabled ? "true" : "false");
     if (s_rc2 != UI_ERROR_NONE) {
-      if (0)
-        return s_rc2;
+      return s_rc2;
     }
   }
   return UI_ERROR_NONE;
@@ -193,11 +191,7 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
     goto cleanup;
   }
 
-  rc = ui_component_set_default_style(rte->component, default_style);
-  if (0) {
-    ui_css_stylesheet_destroy(default_style);
-    goto cleanup;
-  }
+  (void)ui_component_set_default_style(rte->component, default_style);
 
   rte->component->shadow_root = root_node;
   root_node = NULL;

@@ -27,16 +27,14 @@ static ui_error_t void_equality(union ui_signal_payload a,
                                 ui_bool_t *out_equal) {
   (void)a;
   (void)b;
-  if (out_equal)
-    *out_equal = UI_FALSE; /* Always trigger fold signal */
+  *out_equal = UI_FALSE; /* Always trigger fold signal */
   return UI_ERROR_NONE;
 }
 
 static ui_error_t int_equality(union ui_signal_payload a,
                                union ui_signal_payload b,
                                ui_bool_t *out_equal) {
-  if (out_equal)
-    *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
+  *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
@@ -90,10 +88,8 @@ ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  if (surface->fold_changed_signal)
-    (void)ui_signal_destroy(surface->fold_changed_signal);
-  if (surface->active_line_signal)
-    (void)ui_signal_destroy(surface->active_line_signal);
+  (void)ui_signal_destroy(surface->fold_changed_signal);
+  (void)ui_signal_destroy(surface->active_line_signal);
 
   return UI_ERROR_NONE;
 }
@@ -134,8 +130,8 @@ ui_syntax_surface_base_set_fold_region(struct ui_syntax_surface_base *surface,
 
   /* Find existing fold */
   for (i = 0; i < surface->num_folds; ++i) {
-    if (surface->folds[i].start_line == start_line &&
-        surface->folds[i].end_line == end_line) {
+    if (surface->folds[i].start_line == start_line) {
+      surface->folds[i].end_line = end_line;
       surface->folds[i].is_collapsed = collapse;
       payload.ptr_val = NULL;
       return ui_signal_set(surface->fold_changed_signal, payload);

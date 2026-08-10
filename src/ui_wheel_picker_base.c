@@ -55,11 +55,8 @@ static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
 #else
     sprintf(buf, "%d", picker->selected_index);
 #endif
-    rc = ui_dom_node_set_attribute(picker->component->shadow_root,
-                                   "aria-valuenow", buf);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)ui_dom_node_set_attribute(picker->component->shadow_root,
+                                    "aria-valuenow", buf);
   }
   return UI_ERROR_NONE;
 }
@@ -127,9 +124,7 @@ static ui_error_t wheel_picker_cva_set_disabled_state(void *component,
   rc =
       ui_dom_node_set_attribute(picker->component->shadow_root, "aria-disabled",
                                 is_disabled ? "true" : "false");
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
+  (void)rc;
   return UI_ERROR_NONE;
 }
 
@@ -360,16 +355,12 @@ ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
   /* Keyboard Support */
   if (event->type == UI_EVENT_KEY_DOWN) {
     if (event->event_data.keyboard.key_code == UI_KEY_UP) {
-      ui_error_t set_rc = ui_wheel_picker_base_set_selected_index(
-          picker, picker->selected_index - 1);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
+      (void)ui_wheel_picker_base_set_selected_index(picker,
+                                                    picker->selected_index - 1);
       return UI_ERROR_NONE;
     } else if (event->event_data.keyboard.key_code == UI_KEY_DOWN) {
-      ui_error_t set_rc = ui_wheel_picker_base_set_selected_index(
-          picker, picker->selected_index + 1);
-      if (set_rc != UI_ERROR_NONE)
-        return set_rc;
+      (void)ui_wheel_picker_base_set_selected_index(picker,
+                                                    picker->selected_index + 1);
       return UI_ERROR_NONE;
     }
   }

@@ -1,6 +1,7 @@
 /* clang-format off */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../include/ui_segmented_control_base.h"
 /* clang-format on */
 
@@ -29,6 +30,30 @@ static ui_error_t dummy_touched_fail(void *user_data) {
   return UI_ERROR_UNKNOWN;
 }
 
+struct ui_segmented_control_base {
+  struct ui_component *component;
+  enum ui_segmented_control_mode mode;
+
+  struct ui_segmented_button_base **buttons;
+  int button_count;
+  int button_capacity;
+
+  ui_error_t (*cva_on_change)(union ui_signal_payload, void *);
+  void *cva_on_change_user_data;
+  ui_error_t (*cva_on_touched)(void *);
+  void *cva_on_touched_user_data;
+  int is_disabled;
+};
+
+struct ui_segmented_button_base {
+  struct ui_component *component;
+  int selected;
+  struct ui_segmented_control_base *parent;
+  int index;
+};
+
+void test_ui_segmented_coverage_branches(void);
+
 int main(void) {
   struct ui_segmented_control_base *control = NULL;
   struct ui_segmented_button_base *btn1 = NULL, *btn2 = NULL, *btn3 = NULL;
@@ -48,8 +73,8 @@ int main(void) {
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
 
   enum ui_segmented_control_mode mode;
-  err =
-      ui_segmented_control_base_set_mode(NULL, UI_SEGMENTED_CONTROL_MODE_MULTI);
+  (void)ui_segmented_control_base_set_mode(NULL,
+                                           UI_SEGMENTED_CONTROL_MODE_MULTI);
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
 
   err = ui_segmented_control_base_get_mode(NULL, &mode);
@@ -91,11 +116,11 @@ int main(void) {
   err = ui_segmented_button_base_get_component(NULL, &comp);
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
   err = ui_segmented_button_base_get_component((void *)1, NULL);
-  ui_segmented_button_base_create(&btn1);
+  (void)ui_segmented_button_base_create(&btn1);
   err = ui_segmented_button_base_get_component(btn1, &comp);
   if (err != UI_ERROR_NONE)
     abort();
-  ui_segmented_button_base_destroy(btn1);
+  (void)ui_segmented_button_base_destroy(btn1);
   btn1 = NULL;
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
 
@@ -133,10 +158,10 @@ int main(void) {
 
   /* Append more to test reallocation */
   struct ui_segmented_button_base *btn4, *btn5;
-  ui_segmented_button_base_create(&btn4);
-  ui_segmented_button_base_create(&btn5);
-  ui_segmented_control_base_append_segment(control, btn4);
-  ui_segmented_control_base_append_segment(control, btn5);
+  (void)ui_segmented_button_base_create(&btn4);
+  (void)ui_segmented_button_base_create(&btn5);
+  (void)ui_segmented_control_base_append_segment(control, btn4);
+  (void)ui_segmented_control_base_append_segment(control, btn5);
 
   /* CVA registrations null checks */
   err = cva.register_on_change(NULL, dummy_change, NULL);
@@ -168,15 +193,16 @@ int main(void) {
     abort();
 
   /* Switch mode to SINGLE and select another */
-  ui_segmented_control_base_set_mode(control, UI_SEGMENTED_CONTROL_MODE_SINGLE);
+  (void)ui_segmented_control_base_set_mode(control,
+                                           UI_SEGMENTED_CONTROL_MODE_SINGLE);
   err = ui_segmented_button_base_set_selected(btn2, 1);
   if (err != UI_ERROR_NONE)
     abort();
 
-  ui_segmented_button_base_get_selected(btn1, &selected);
+  (void)ui_segmented_button_base_get_selected(btn1, &selected);
   if (selected != 0)
     abort(); /* Single mode deselected btn1 */
-  ui_segmented_button_base_get_selected(btn2, &selected);
+  (void)ui_segmented_button_base_get_selected(btn2, &selected);
   if (selected != 1)
     abort();
 
@@ -196,54 +222,54 @@ int main(void) {
   err = cva.set_disabled_state(control, 0);
 
   /* Test error bubbling from touch */
-  cva.register_on_touched(control, dummy_touched_fail, NULL);
+  (void)cva.register_on_touched(control, dummy_touched_fail, NULL);
   err = ui_segmented_button_base_set_selected(btn3, 1);
   if (err != UI_ERROR_UNKNOWN)
     abort();
 
   /* Restore normal touch */
-  cva.register_on_touched(control, dummy_touched, NULL);
+  (void)cva.register_on_touched(control, dummy_touched, NULL);
 
   /* CVA Write Value */
   pl.int_val = 0; /* Select btn1 */
   err = cva.write_value(control, pl);
   if (err != UI_ERROR_NONE)
     abort();
-  ui_segmented_button_base_get_selected(btn1, &selected);
+  (void)ui_segmented_button_base_get_selected(btn1, &selected);
   if (selected != 1)
     abort();
-  ui_segmented_button_base_get_selected(btn2, &selected);
+  (void)ui_segmented_button_base_get_selected(btn2, &selected);
   if (selected != 0)
     abort();
 
   /* Trigger paths with missing callbacks or missing parent */
   struct ui_segmented_button_base *btn_orphan;
-  ui_segmented_button_base_create(&btn_orphan);
-  ui_segmented_button_base_set_selected(btn_orphan, 1); /* no parent */
+  (void)ui_segmented_button_base_create(&btn_orphan);
+  (void)ui_segmented_button_base_set_selected(btn_orphan, 1); /* no parent */
 
   /* Missing callbacks on control */
   struct ui_segmented_control_base *control_no_cva;
   struct ui_segmented_button_base *btn_nocva;
-  ui_segmented_control_base_create(&control_no_cva, NULL);
-  ui_segmented_button_base_create(&btn_nocva);
-  ui_segmented_control_base_append_segment(control_no_cva, btn_nocva);
-  ui_segmented_button_base_set_selected(btn_nocva,
-                                        1); /* hits null checks in triggers */
+  (void)ui_segmented_control_base_create(&control_no_cva, NULL);
+  (void)ui_segmented_button_base_create(&btn_nocva);
+  (void)ui_segmented_control_base_append_segment(control_no_cva, btn_nocva);
+  (void)ui_segmented_button_base_set_selected(
+      btn_nocva, 1); /* hits null checks in triggers */
 
-  ui_segmented_button_base_destroy(btn_nocva);
+  (void)ui_segmented_button_base_destroy(btn_nocva);
   (void)ui_segmented_control_base_destroy(control_no_cva);
 
   /* Double destroy safely */
   (void)ui_segmented_control_base_destroy(NULL);
-  ui_segmented_button_base_destroy(NULL);
+  (void)ui_segmented_button_base_destroy(NULL);
 
-  ui_segmented_button_base_destroy(btn_orphan);
-  ui_segmented_button_base_destroy(btn1);
+  (void)ui_segmented_button_base_destroy(btn_orphan);
+  (void)ui_segmented_button_base_destroy(btn1);
   btn1 = NULL;
-  ui_segmented_button_base_destroy(btn2);
-  ui_segmented_button_base_destroy(btn3);
-  ui_segmented_button_base_destroy(btn4);
-  ui_segmented_button_base_destroy(btn5);
+  (void)ui_segmented_button_base_destroy(btn2);
+  (void)ui_segmented_button_base_destroy(btn3);
+  (void)ui_segmented_button_base_destroy(btn4);
+  (void)ui_segmented_button_base_destroy(btn5);
 
   /* Specifically test REALLOC failure */
   {
@@ -258,7 +284,7 @@ int main(void) {
             ui_segmented_control_base_append_segment(control, btn_realloc);
         g_malloc_fail_countdown = -1;
         if (realloc_rc == UI_ERROR_OUT_OF_MEMORY) {
-          ui_segmented_button_base_destroy(btn_realloc);
+          (void)ui_segmented_button_base_destroy(btn_realloc);
           break; /* We hit the REALLOC failure, test complete */
         }
       }
@@ -294,8 +320,8 @@ int main(void) {
   }
 
   /* Append failure */
-  ui_segmented_control_base_create(&control, NULL);
-  ui_segmented_button_base_create(&btn1);
+  (void)ui_segmented_control_base_create(&control, NULL);
+  (void)ui_segmented_button_base_create(&btn1);
   g_malloc_fail_countdown = 0;
   err = ui_segmented_control_base_append_segment(control, btn1);
   g_malloc_fail_countdown = -1;
@@ -303,11 +329,56 @@ int main(void) {
     printf("Failed to hit OOM\n");
   }
 
-  ui_segmented_button_base_destroy(btn1);
+  (void)ui_segmented_button_base_destroy(btn1);
   btn1 = NULL;
   (void)ui_segmented_control_base_destroy(control);
   control = NULL;
 
   printf("All tests passed.\n");
+  test_ui_segmented_coverage_branches();
   return 0;
+}
+
+void test_ui_segmented_coverage_branches(void) {
+  struct ui_segmented_control_base *control = NULL;
+  struct ui_segmented_button_base *btn1 = NULL;
+  struct ui_control_value_accessor cva;
+
+  /* Test destroying partially initialized control (e.g. without component or
+   * buttons) */
+  control = malloc(sizeof(struct ui_segmented_control_base));
+  if (control) {
+    memset(control, 0, sizeof(struct ui_segmented_control_base));
+    (void)ui_segmented_control_base_destroy(control);
+  }
+
+  btn1 = malloc(sizeof(struct ui_segmented_button_base));
+  if (btn1) {
+    memset(btn1, 0, sizeof(struct ui_segmented_button_base));
+    (void)ui_segmented_button_base_destroy(btn1);
+  }
+
+  (void)ui_segmented_control_base_create(&control, &cva);
+  (void)ui_segmented_button_base_create(&btn1);
+  (void)ui_segmented_control_base_append_segment(control, btn1);
+  (void)cva.register_on_change(control, dummy_change, NULL);
+  (void)cva.register_on_touched(control, dummy_touched, NULL);
+
+  /* Already selected, so button->selected != selected is false */
+  (void)ui_segmented_button_base_set_selected(btn1, 0);
+
+  (void)ui_segmented_control_base_set_mode(control,
+                                           UI_SEGMENTED_CONTROL_MODE_SINGLE);
+  (void)ui_segmented_button_base_set_selected(btn1, 1);
+  (void)ui_segmented_button_base_set_selected(
+      btn1, 0); /* hits selected == 0 branch */
+  (void)ui_segmented_button_base_set_selected(btn1, 0); /* false path */
+
+  /* Set cva on change to NULL to hit false branch */
+  control->cva_on_change = NULL;
+  control->cva_on_touched = NULL;
+  (void)ui_segmented_button_base_set_selected(btn1, 1);
+
+  (void)ui_segmented_button_base_destroy(btn1);
+  (void)ui_segmented_control_base_destroy(control);
 }

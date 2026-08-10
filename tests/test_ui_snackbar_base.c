@@ -2,9 +2,41 @@
 #include "ui_snackbar_base.h"
 #include "ui_timer.h"
 #include "ui_overlay_director.h"
+#include "ui_ring_buffer.h"
+#include "ui_component.h"
+#include "ui_dom_node.h"
+#include "ui_signal.h"
+#include "ui_computed.h"
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
+
+struct internal_snackbar {
+  char *message;
+  char *action_label;
+  ui_error_t (*action_callback)(struct ui_snackbar_base *, void *);
+  void *action_user_data;
+  double duration_secs;
+};
+
+struct ui_snackbar_base {
+  struct ui_timer *timer;
+  struct ui_overlay_director *director;
+  struct ui_ring_buffer *queue;
+  struct ui_component *component;
+  struct ui_dom_node *root_node;
+  struct ui_dom_node *wrapper_node;
+  struct ui_dom_node *message_node;
+  struct ui_dom_node *message_text_node;
+  struct ui_dom_node *action_node;
+  struct ui_dom_node *action_text_node;
+  struct ui_overlay *overlay_handle;
+  int is_active;
+  struct internal_snackbar current;
+  double show_time;
+  struct ui_signal *open_signal;
+  struct ui_computed *animating_signal;
+};
 
 extern int g_malloc_fail_countdown;
 
@@ -26,8 +58,13 @@ static ui_error_t mock_action_cb(struct ui_snackbar_base *snackbar,
   (void)user_data;
   action_called = 1;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_action_cb_fail(struct ui_snackbar_base *snackbar,
+                                      void *user_data) {
+  (void)snackbar;
+  (void)user_data;
+  return UI_ERROR_UNKNOWN;
 }
 
 static int run_normal_tests(void) {
@@ -166,6 +203,116 @@ static int run_normal_tests(void) {
   /* Activate fourth (which is sconfig with action_label=NULL) */
   ui_snackbar_base_tick(snackbar);
   ui_snackbar_base_dismiss_current(snackbar); /* Dismiss fourth */
+
+  /* TEST ERROR BRANCHES */
+  /* 1. ui_snackbar_base_process_event -> action_callback fails */
+  sconfig.action_label = "FAIL";
+  sconfig.action_callback = mock_action_cb_fail;
+  rc = ui_snackbar_base_enqueue(snackbar, &sconfig);
+  rc = ui_snackbar_base_tick(snackbar);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  rc = ui_snackbar_base_process_event(snackbar, &ev, 1.0);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Test 1 failed, rc=%d\n", rc);
+    return 1;
+  }
+  ui_snackbar_base_dismiss_current(snackbar);
+
+  /* 2. ui_snackbar_base_process_event -> dismiss fails */
+  sconfig.action_label = "DIS_FAIL";
+  sconfig.action_callback = mock_action_cb;
+  rc = ui_snackbar_base_enqueue(snackbar, &sconfig);
+  rc = ui_snackbar_base_tick(snackbar);
+  if (rc != UI_ERROR_NONE || snackbar->overlay_handle == NULL) {
+    printf("Test 2 tick failed, rc=%d handle=%p\n", rc,
+           snackbar->overlay_handle);
+    return 1;
+  }
+  {
+    struct ui_overlay_director *orig = snackbar->director;
+    snackbar->director = NULL; /* Force unmount to fail */
+    rc = ui_snackbar_base_process_event(snackbar, &ev, 1.0);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      printf("Test 2 process failed, rc=%d\n", rc);
+      return 1;
+    }
+    snackbar->director = orig;
+    ui_snackbar_base_dismiss_current(snackbar); /* Actually dismiss it */
+  }
+
+  /* 3. ui_snackbar_base_tick -> dismiss fails on timeout */
+  sconfig.action_label = "TICK_FAIL";
+  sconfig.action_callback = NULL;
+  rc = ui_snackbar_base_enqueue(snackbar, &sconfig);
+  rc = ui_snackbar_base_tick(snackbar);
+  if (rc != UI_ERROR_NONE || snackbar->overlay_handle == NULL) {
+    printf("Test 3 tick failed, rc=%d handle=%p\n", rc,
+           snackbar->overlay_handle);
+    return 1;
+  }
+  g_mock_time = 100.0; /* Force timeout */
+  {
+    struct ui_overlay_director *orig = snackbar->director;
+    snackbar->director = NULL; /* Force unmount to fail */
+    rc = ui_snackbar_base_tick(snackbar);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      printf("Test 3 tick timeout failed, rc=%d\n", rc);
+      return 1;
+    }
+    snackbar->director = orig;
+    ui_snackbar_base_dismiss_current(snackbar);
+  }
+
+  /* 4. ui_snackbar_base_dismiss_current -> unmount fails directly */
+  sconfig.action_label = "DIS_DIR_FAIL";
+  rc = ui_snackbar_base_enqueue(snackbar, &sconfig);
+  rc = ui_snackbar_base_tick(snackbar);
+  if (rc != UI_ERROR_NONE || snackbar->overlay_handle == NULL) {
+    printf("Test 4 tick failed, rc=%d handle=%p\n", rc,
+           snackbar->overlay_handle);
+    return 1;
+  }
+  {
+    struct ui_overlay_director *orig = snackbar->director;
+    snackbar->director = NULL; /* Force unmount to fail */
+    rc = ui_snackbar_base_dismiss_current(snackbar);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      printf("Test 4 dismiss failed, rc=%d\n", rc);
+      return 1;
+    }
+    snackbar->director = orig;
+    ui_snackbar_base_dismiss_current(snackbar);
+  }
+
+  /* 5. ui_snackbar_base_destroy -> unmount fails */
+  sconfig.action_label = "DEST_FAIL";
+  rc = ui_snackbar_base_enqueue(snackbar, &sconfig);
+  rc = ui_snackbar_base_tick(snackbar);
+  if (rc != UI_ERROR_NONE || snackbar->overlay_handle == NULL) {
+    printf("Test 5 tick failed\n");
+    return 1;
+  }
+  {
+    struct ui_overlay_director *orig = snackbar->director;
+    snackbar->director = NULL; /* Force unmount to fail */
+    rc = ui_snackbar_base_destroy(snackbar);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      printf("Test 5 destroy failed, rc=%d\n", rc);
+      return 1;
+    }
+    snackbar->director = orig;
+    /* Note: snackbar is leaked here because destroy failed, but we can call it
+       again to really destroy it if needed, or we just reconstruct. Wait,
+       ui_snackbar_base_destroy might have freed some things before failing? No,
+       unmount is the first thing. Let's just call it again to clean up.
+    */
+    ui_snackbar_base_destroy(snackbar);
+    /* But wait, we need `snackbar` for the rest of the tests! Let's re-create
+     * it. */
+    rc = ui_snackbar_base_create(timer, director, &snackbar);
+    if (rc != UI_ERROR_NONE)
+      return 1;
+  }
 
   /* Enqueue another one to test destruction of active and queue */
   sconfig.action_label = "L";

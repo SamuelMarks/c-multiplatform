@@ -86,7 +86,8 @@ static ui_error_t mock_glDeleteProgram(unsigned int program) {
 }
 static int mock_glGetUniformLocation(unsigned int program, const char *name) {
   (void)program;
-  (void)name;
+  if (name[0] == 'i')
+    return -1;
   return 1;
 }
 static ui_error_t mock_glUniformMatrix4fv(int location, int count,

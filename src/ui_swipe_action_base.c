@@ -59,10 +59,9 @@ ui_error_t
 ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action) {
   if (!swipe_action)
     return UI_ERROR_INVALID_ARGUMENT;
-  if (swipe_action) {
-    swipe_action->state = UI_SWIPE_ACTION_IDLE;
-    swipe_action->offset_x = 0.0f;
-  }
+
+  swipe_action->state = UI_SWIPE_ACTION_IDLE;
+  swipe_action->offset_x = 0.0f;
   return UI_ERROR_NONE;
 }
 

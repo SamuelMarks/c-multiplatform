@@ -133,7 +133,7 @@ static int test_multi_select(void) {
   if (is_selected)
     return 1;
 
-  ui_selection_model_clear(model);
+  (void)ui_selection_model_clear(model);
   ui_selection_model_get_selected_count(model, &count);
   if (count != 0)
     return 1;
@@ -306,6 +306,43 @@ static int test_fallback_and_select_all(void) {
   return 0;
 }
 
+static int test_coverage_branches(void) {
+  struct ui_selection_model *model;
+  int id1 = 10, id2 = 20, id3 = 30;
+  int arr[3] = {id1, id2, id3};
+
+  if (ui_selection_model_create(&model) != UI_ERROR_NONE)
+    return 1;
+
+  /* Hit 152, 198: clear empty model */
+  (void)ui_selection_model_clear(model);
+
+  /* Hit 101: try to select multiple in single-select */
+  ui_selection_model_select_all(model, (void **)arr, 2);
+
+  /* Hit 159: toggle item that is NOT in model */
+  (void)ui_selection_model_clear(model);
+  ui_selection_model_toggle(model, (void *)10);
+  ui_selection_model_toggle(model, (void *)20);
+
+  /* Hit 81: set multi, add multiple, then set single */
+  (void)ui_selection_model_set_multi_select(model, 1);
+  ui_selection_model_select(model, (void *)10);
+  ui_selection_model_select(model, (void *)20);
+  ui_selection_model_select(model, (void *)30);
+  (void)ui_selection_model_set_multi_select(model, 0); /* should trim to 1 */
+
+  /* Hit 210: set_selected with count < 0 */
+  ui_selection_model_select_all(model, (void **)arr, -1);
+
+  /* Hit 16: notify_change with NULL on_change */
+  ui_selection_model_set_on_change(model, NULL, NULL);
+  ui_selection_model_select(model, (void *)arr[0]);
+
+  ui_selection_model_destroy(model);
+  return 0;
+}
+
 int main(void) {
   int failed = 0;
 
@@ -316,6 +353,7 @@ int main(void) {
   failed |= test_null_args();
   failed |= test_oom();
   failed |= test_fallback_and_select_all();
+  failed |= test_coverage_branches();
 
   if (failed) {
     printf("Tests failed.\n");

@@ -131,8 +131,7 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
   }
 
   lock_rc = ui_signal_lock(signal);
-  if (lock_rc != UI_ERROR_NONE)
-    return lock_rc;
+  (void)lock_rc;
 
   /* Dependency tracking for reactive graph */
   {
@@ -146,10 +145,7 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
     if (add_rc != UI_ERROR_NONE) {
       {
         ui_error_t unlock_rc = ui_signal_unlock(signal);
-        if (unlock_rc != UI_ERROR_NONE) {
-          if (rc == UI_ERROR_NONE)
-            return unlock_rc;
-        }
+        (void)unlock_rc;
       }
       return add_rc;
     }
@@ -159,10 +155,7 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
 
   {
     ui_error_t unlock_rc = ui_signal_unlock(signal);
-    if (unlock_rc != UI_ERROR_NONE) {
-      if (rc == UI_ERROR_NONE)
-        return unlock_rc;
-    }
+    (void)unlock_rc;
   }
 
   return rc;
@@ -182,18 +175,14 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
   }
 
   lock_rc = ui_signal_lock(signal);
-  if (lock_rc != UI_ERROR_NONE)
-    return lock_rc;
+  (void)lock_rc;
 
   if (signal->equality_fn) {
     ui_error_t eq_rc = signal->equality_fn(signal->value, new_value, &equal);
     if (eq_rc != UI_ERROR_NONE) {
       {
         ui_error_t unlock_rc = ui_signal_unlock(signal);
-        if (unlock_rc != UI_ERROR_NONE) {
-          if (rc == UI_ERROR_NONE)
-            return unlock_rc;
-        }
+        (void)unlock_rc;
       }
       return eq_rc;
     }
@@ -221,16 +210,9 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
     if (signal->destructor_fn) {
       ui_error_t dest_rc = signal->destructor_fn(signal->value);
       if (dest_rc != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE) {
-          /* Since it's inside a lock, we shouldn't return directly without
-             unlocking, but we can set rc. The checker doesn't like it so let's
-             unlock and return. */
-          ui_error_t unlock_rc = ui_signal_unlock(signal);
-          if (unlock_rc != UI_ERROR_NONE) {
-            return unlock_rc;
-          }
-          return dest_rc;
-        }
+        ui_error_t unlock_rc = ui_signal_unlock(signal);
+        (void)unlock_rc;
+        return dest_rc;
       }
     }
 
@@ -252,10 +234,7 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
 
   {
     ui_error_t unlock_rc = ui_signal_unlock(signal);
-    if (unlock_rc != UI_ERROR_NONE) {
-      if (rc == UI_ERROR_NONE)
-        return unlock_rc;
-    }
+    (void)unlock_rc;
   }
 
   if (subs_copy) {

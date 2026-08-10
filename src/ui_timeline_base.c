@@ -55,12 +55,8 @@ ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline) {
 
   if (timeline->nodes) {
     for (i = 0; i < timeline->node_count; i++) {
-      if (timeline->nodes[i].title) {
-        C_MULTIPLATFORM_FREE(timeline->nodes[i].title);
-      }
-      if (timeline->nodes[i].description) {
-        C_MULTIPLATFORM_FREE(timeline->nodes[i].description);
-      }
+      C_MULTIPLATFORM_FREE(timeline->nodes[i].title);
+      C_MULTIPLATFORM_FREE(timeline->nodes[i].description);
     }
     C_MULTIPLATFORM_FREE(timeline->nodes);
   }
