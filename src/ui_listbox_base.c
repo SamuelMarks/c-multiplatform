@@ -347,14 +347,10 @@ ui_error_t ui_listbox_base_destroy(struct ui_listbox_base *listbox) {
   if (!listbox)
     return UI_ERROR_NONE;
 
-  if (listbox->selection_model) {
-    ui_selection_model_destroy(listbox->selection_model);
-  }
-  if (listbox->component) {
-    {
-      ui_error_t _ign_rc = ui_component_destroy(listbox->component);
-      (void)_ign_rc;
-    }
+  (void)ui_selection_model_destroy(listbox->selection_model);
+  {
+    ui_error_t _ign_rc = ui_component_destroy(listbox->component);
+    (void)_ign_rc;
   }
   C_MULTIPLATFORM_FREE(listbox);
   return UI_ERROR_NONE;
@@ -385,7 +381,7 @@ ui_error_t ui_listbox_base_set_multi_select(struct ui_listbox_base *listbox,
   if (!listbox)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  if (listbox->component && listbox->component->shadow_root) {
+  if (listbox->component->shadow_root) {
     {
       ui_error_t _ign_rc = ui_dom_node_set_attribute(
           listbox->component->shadow_root, "aria-multiselectable",
@@ -458,8 +454,7 @@ static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
   int is_multi = 0;
   const char *attr = NULL;
 
-  if (!listbox->text_provider || listbox->typeahead_len == 0 ||
-      listbox->num_items == 0) {
+  if (!listbox->text_provider || listbox->num_items == 0) {
     return UI_ERROR_NONE;
   }
 
@@ -599,8 +594,7 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         }
       } else {
         listbox->typeahead_len = 0;
-        if (listbox->active_index >= 0 &&
-            listbox->active_index < listbox->num_items) {
+        if (listbox->active_index >= 0) {
           if (is_multi && kc == UI_KEY_SPACE) {
             {
               ui_error_t _ign_rc = ui_selection_model_toggle(

@@ -43,7 +43,10 @@ static int test_range_slider_basic(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 20.0f || high != 40.0f) {
     fprintf(stderr, "Values not set correctly\n");
     return 1;
@@ -60,7 +63,10 @@ static int test_range_slider_basic(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 30.0f || high != 40.0f) {
     fprintf(stderr, "Normalized value low not set correctly %f %f\n", low,
             high);
@@ -69,76 +75,131 @@ static int test_range_slider_basic(void) {
 
   rc = ui_range_slider_base_set_normalized_value(
       slider, UI_RANGE_SLIDER_THUMB_HIGH, 0.8f); /* range=40, +10 = 42 */
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (high != 42.0f) {
     fprintf(stderr, "high != 42: %f\n", high);
     return 1;
   }
 
   /* normalized clamping */
-  ui_range_slider_base_set_normalized_value(slider, UI_RANGE_SLIDER_THUMB_LOW,
-                                            -1.0f);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_normalized_value(
+        slider, UI_RANGE_SLIDER_THUMB_LOW, -1.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 10.0f) {
     fprintf(stderr, "low != 10: %f\n", low);
     return 1;
   }
 
-  ui_range_slider_base_set_normalized_value(slider, UI_RANGE_SLIDER_THUMB_HIGH,
-                                            2.0f);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_normalized_value(
+        slider, UI_RANGE_SLIDER_THUMB_HIGH, 2.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (high != 50.0f) {
     fprintf(stderr, "high != 50: %f\n", high);
     return 1;
   }
 
   /* Thumb collision with normalized values */
-  ui_range_slider_base_set_values(slider, 20.0f, 40.0f);
-  ui_range_slider_base_set_normalized_value(
-      slider, UI_RANGE_SLIDER_THUMB_LOW,
-      0.9f); /* sets to 46.0f, which pushes high, actually wait, code says "if
-                (new_value > slider->high_value) new_value =
-                slider->high_value;" so it sets to 40.0f */
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 20.0f, 40.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_normalized_value(
+        slider, UI_RANGE_SLIDER_THUMB_LOW, 0.9f);
+    (void)_ign;
+  } /* sets to 46.0f, which pushes high, actually wait, code says "if
+(new_value > slider->high_value) new_value =
+slider->high_value;" so it sets to 40.0f */
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 40.0f) {
     fprintf(stderr, "low != 40: %f\n", low);
     return 1;
   }
 
-  ui_range_slider_base_set_values(slider, 20.0f, 40.0f);
-  ui_range_slider_base_set_normalized_value(
-      slider, UI_RANGE_SLIDER_THUMB_HIGH,
-      0.1f); /* sets to 14.0f, but low is 20.0, so clamped to 20.0 */
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 20.0f, 40.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_normalized_value(
+        slider, UI_RANGE_SLIDER_THUMB_HIGH, 0.1f);
+    (void)_ign;
+  } /* sets to 14.0f, but low is 20.0, so clamped to 20.0 */
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (high != 20.0f) {
     fprintf(stderr, "high != 20: %f\n", high);
     return 1;
   }
 
   /* Set normalized on NONE */
-  ui_range_slider_base_set_normalized_value(slider, UI_RANGE_SLIDER_THUMB_NONE,
-                                            0.5f);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_normalized_value(
+        slider, UI_RANGE_SLIDER_THUMB_NONE, 0.5f);
+    (void)_ign;
+  }
 
   /* Simulate clamping validation logic */
   /* Validating min thumb correctly forces max thumb tracking */
-  ui_range_slider_base_set_values(slider, 35.0f, 30.0f);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 35.0f, 30.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (high < low) {
     printf("Clamp pushing verification failed\n");
     return 1;
   }
 
   /* Test range limits clamping */
-  ui_range_slider_base_set_values(slider, 5.0f, 60.0f);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 5.0f, 60.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 10.0f || high != 50.0f) {
     fprintf(stderr, "limits clamping failed: %f %f\n", low, high);
     return 1;
   }
 
-  ui_range_slider_base_set_step(slider, 2.0f);
-  ui_range_slider_base_set_values(slider, 15.5f, 23.3f);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_step(slider, 2.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 15.5f, 23.3f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   /* 15.5 - 10 = 5.5 / 2 = 2.75 -> 3 * 2 + 10 = 16.0
      23.3 - 10 = 13.3 / 2 = 6.65 -> 7 * 2 + 10 = 24.0 */
   if (low != 16.0f || high != 24.0f) {
@@ -147,19 +208,38 @@ static int test_range_slider_basic(void) {
   }
 
   /* Test Step bounds */
-  ui_range_slider_base_set_values(slider, 49.5f, 49.5f);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 49.5f, 49.5f);
+    (void)_ign;
+  }
 
-  ui_range_slider_base_set_step(slider, -1.0f); /* sets to 0.0 */
+  {
+    ui_error_t _ign = ui_range_slider_base_set_step(slider, -1.0f);
+    (void)_ign;
+  } /* sets to 0.0 */
 
-  ui_range_slider_base_set_disabled(slider, 1);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_disabled(slider, 1);
+    (void)_ign;
+  }
   /* process event and normalize should ignore when disabled */
-  ui_range_slider_base_set_normalized_value(slider, UI_RANGE_SLIDER_THUMB_LOW,
-                                            0.2f);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_normalized_value(
+        slider, UI_RANGE_SLIDER_THUMB_LOW, 0.2f);
+    (void)_ign;
+  }
   struct ui_event ev;
   ev.type = UI_EVENT_KEY_DOWN;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+    (void)_ign;
+  }
 
-  ui_range_slider_base_set_disabled(slider, 0);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_disabled(slider, 0);
+    (void)_ign;
+  }
 
   (void)ui_range_slider_base_destroy(slider);
   return 0;
@@ -168,28 +248,53 @@ static int test_range_slider_basic(void) {
 static int test_range_slider_bounds(void) {
   struct ui_range_slider_base *slider = NULL;
   float low, high;
-  ui_range_slider_base_create(&slider);
+  {
+    ui_error_t _ign = ui_range_slider_base_create(&slider);
+    (void)_ign;
+  }
 
-  ui_range_slider_base_set_min(slider, 10.0f);
-  ui_range_slider_base_set_max(slider,
-                               5.0f); /* invalid max, should clamp to min */
+  {
+    ui_error_t _ign = ui_range_slider_base_set_min(slider, 10.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_max(slider, 5.0f);
+    (void)_ign;
+  } /* invalid max, should clamp to min */
 
   /* We can't access max_val directly, but setting high value above min should
    * clamp to max */
-  ui_range_slider_base_set_values(slider, 10.0f, 100.0f);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 10.0f, 100.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (high != 5.0f) {
     fprintf(stderr, "test_range_slider_bounds high clamp fail: %f\n", high);
     return 1;
   }
 
-  ui_range_slider_base_set_max(slider, 100.0f);
-  ui_range_slider_base_set_min(slider,
-                               200.0f); /* invalid min, should push max */
+  {
+    ui_error_t _ign = ui_range_slider_base_set_max(slider, 100.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_min(slider, 200.0f);
+    (void)_ign;
+  } /* invalid min, should push max */
 
   /* Setting values should clamp to min and max */
-  ui_range_slider_base_set_values(slider, 0.0f, 1000.0f);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 0.0f, 1000.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 200.0f || high != 200.0f) {
     fprintf(stderr, "test_range_slider_bounds low/high mismatch: %f, %f\n", low,
             high);
@@ -205,90 +310,196 @@ static int test_range_slider_events(void) {
   struct ui_event ev;
   float low, high;
 
-  ui_range_slider_base_create(&slider);
-  ui_range_slider_base_set_values(slider, 20.0f, 80.0f);
-  ui_range_slider_base_set_step(slider, 0.0f);
+  {
+    ui_error_t _ign = ui_range_slider_base_create(&slider);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 20.0f, 80.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_step(slider, 0.0f);
+    (void)_ign;
+  }
 
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_LEFT;
 
   /* Low Thumb */
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
-  ui_range_slider_base_get_values(slider, &low, &high);
-  if (low != 10.0f) {
-    fprintf(stderr, "test_range_slider_events low left: %f\n", low);
-    return 1; /* 20 - (100-0)*0.1 = 10 */
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+    (void)_ign;
+  }
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
+  if (low != 0.0f) {
+    fprintf(stderr, "test_range_slider_events low left/down: %f\n", low);
+    return 1; /* 20 - 10 - 10 = 0 */
   }
 
   ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+    (void)_ign;
+  }
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 20.0f) {
-    fprintf(stderr, "test_range_slider_events low right: %f\n", low);
+    fprintf(stderr, "test_range_slider_events low right/up: %f\n", low);
     return 1;
   }
 
   ev.event_data.keyboard.key_code = UI_KEY_HOME;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 0.0f) {
     fprintf(stderr, "test_range_slider_events low home: %f\n", low);
     return 1;
   }
 
   ev.event_data.keyboard.key_code = UI_KEY_END;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (low != 80.0f) {
     fprintf(stderr, "test_range_slider_events low end: %f\n", low);
     return 1; /* bounded by high thumb */
   }
 
   /* High Thumb */
-  ui_range_slider_base_set_values(slider, 20.0f, 80.0f);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 20.0f, 80.0f);
+    (void)_ign;
+  }
   ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH,
-                                     0);
-  ui_range_slider_base_get_values(slider, &low, &high);
-  if (high != 90.0f) {
-    fprintf(stderr, "test_range_slider_events high right: %f\n", high);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH, 0);
+    (void)_ign;
+  }
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH, 0);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
+  if (high != 100.0f) {
+    fprintf(stderr, "test_range_slider_events high right/up: %f\n", high);
     return 1;
   }
 
   /* Trigger 0.0 increment branch */
-  ui_range_slider_base_set_min(slider, 1.0f);
-  ui_range_slider_base_set_max(slider, 1.0f);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_min(slider, 1.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_max(slider, 1.0f);
+    (void)_ign;
+  }
   ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH,
-                                     0);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH, 0);
+    (void)_ign;
+  }
 
   /* Restore bounds */
-  ui_range_slider_base_set_max(slider, 100.0f);
-  ui_range_slider_base_set_min(slider, 0.0f);
-  ui_range_slider_base_set_values(slider, 20.0f, 80.0f);
+  {
+    ui_error_t _ign = ui_range_slider_base_set_max(slider, 100.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_min(slider, 0.0f);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_set_values(slider, 20.0f, 80.0f);
+    (void)_ign;
+  }
 
   ev.event_data.keyboard.key_code = UI_KEY_LEFT;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH,
-                                     0);
-  ui_range_slider_base_get_values(slider, &low, &high);
-  if (high != 70.0f) {
-    fprintf(stderr, "test_range_slider_events high left: %f\n", high);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH, 0);
+    (void)_ign;
+  }
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH, 0);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
+  if (high != 60.0f) {
+    fprintf(stderr, "test_range_slider_events high left/down: %f\n", high);
     return 1;
   }
 
   ev.event_data.keyboard.key_code = UI_KEY_HOME;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH,
-                                     0);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH, 0);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (high != 20.0f) {
     fprintf(stderr, "test_range_slider_events high home: %f\n", high);
     return 1;
   }
 
   ev.event_data.keyboard.key_code = UI_KEY_END;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH,
-                                     0);
-  ui_range_slider_base_get_values(slider, &low, &high);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH, 0);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_range_slider_base_get_values(slider, &low, &high);
+    (void)_ign;
+  }
   if (high != 100.0f) {
     fprintf(stderr, "test_range_slider_events high end: %f\n", high);
     return 1;
@@ -296,12 +507,19 @@ static int test_range_slider_events(void) {
 
   /* Thumb None */
   ev.event_data.keyboard.key_code = UI_KEY_LEFT;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_NONE,
-                                     0);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_NONE, 0);
+    (void)_ign;
+  }
 
   /* Unknown event */
   ev.type = UI_EVENT_KEY_UP;
-  ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+  {
+    ui_error_t _ign = ui_range_slider_base_process_event(
+        slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0);
+    (void)_ign;
+  }
 
   (void)ui_range_slider_base_destroy(slider);
   return 0;
@@ -313,7 +531,10 @@ static int test_range_slider_nulls(void) {
   struct ui_event ev;
   struct ui_component *comp;
 
-  ui_range_slider_base_create(&slider);
+  {
+    ui_error_t _ign = ui_range_slider_base_create(&slider);
+    (void)_ign;
+  }
 
   if (ui_range_slider_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -409,43 +630,73 @@ int main(void) {
 
 void test_extra_range(void) {
   struct ui_range_slider_base *slider = NULL;
-  ui_range_slider_base_create(&slider);
+  {
+    ui_error_t _ign = ui_range_slider_base_create(&slider);
+    (void)_ign;
+  }
   if (slider) {
-    ui_range_slider_base_set_step(slider, 0.0f);
-    ui_range_slider_base_set_max(slider, 100.0f);
+    {
+      ui_error_t _ign = ui_range_slider_base_set_step(slider, 0.0f);
+      (void)_ign;
+    }
+    {
+      ui_error_t _ign = ui_range_slider_base_set_max(slider, 100.0f);
+      (void)_ign;
+    }
     struct ui_event ev;
     ev.type = UI_EVENT_KEY_DOWN;
     ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-    ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW,
-                                       0.0);
+    {
+      ui_error_t _ign = ui_range_slider_base_process_event(
+          slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0.0);
+      (void)_ign;
+    }
 
     /* Cover key_code not handled */
     ev.event_data.keyboard.key_code = UI_KEY_UNKNOWN;
-    ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW,
-                                       0.0);
+    {
+      ui_error_t _ign = ui_range_slider_base_process_event(
+          slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0.0);
+      (void)_ign;
+    }
 
     /* Also try active_thumb high */
     ev.event_data.keyboard.key_code = UI_KEY_UNKNOWN;
-    ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH,
-                                       0.0);
+    {
+      ui_error_t _ign = ui_range_slider_base_process_event(
+          slider, &ev, UI_RANGE_SLIDER_THUMB_HIGH, 0.0);
+      (void)_ign;
+    }
 
     (void)ui_range_slider_base_destroy(slider);
   }
 }
 void test_extra_range_more(void) {
   struct ui_range_slider_base *slider = NULL;
-  ui_range_slider_base_create(&slider);
+  {
+    ui_error_t _ign = ui_range_slider_base_create(&slider);
+    (void)_ign;
+  }
   if (slider) {
-    ui_range_slider_base_set_step(slider, 2.0f);
+    {
+      ui_error_t _ign = ui_range_slider_base_set_step(slider, 2.0f);
+      (void)_ign;
+    }
     struct ui_event ev;
     ev.type = UI_EVENT_KEY_DOWN;
     ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
-    ui_range_slider_base_process_event(slider, &ev, UI_RANGE_SLIDER_THUMB_LOW,
-                                       0.0);
+    {
+      ui_error_t _ign = ui_range_slider_base_process_event(
+          slider, &ev, UI_RANGE_SLIDER_THUMB_LOW, 0.0);
+      (void)_ign;
+    }
 
     /* Cover invalid active_thumb */
-    ui_range_slider_base_process_event(slider, &ev,
-                                       (enum ui_range_slider_thumb)99, 0.0);
+    {
+      ui_error_t _ign = ui_range_slider_base_process_event(
+          slider, &ev, (enum ui_range_slider_thumb)99, 0.0);
+      (void)_ign;
+    }
 
     (void)ui_range_slider_base_destroy(slider);
   }

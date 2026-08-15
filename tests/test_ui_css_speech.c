@@ -333,10 +333,56 @@ int main(void) {
   TEST_ASSERT(ui_css_speech_parse(style, NULL) == UI_ERROR_INVALID_ARGUMENT);
   TEST_ASSERT(ui_css_speech_cleanup(NULL) == UI_ERROR_INVALID_ARGUMENT);
 
+  /* OOM injections for speech parse specifically */
+  {
+    g_malloc_fail_countdown = -1;
+    rc = ui_css_stylesheet_create(&sheet);
+    if (rc == UI_ERROR_NONE) {
+      rc = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc == UI_ERROR_NONE) {
+        (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG,
+                                          "div");
+        (void)ui_css_rule_append_declaration(rule, "cue-before",
+                                             "url('test.wav')", 0);
+        (void)ui_css_rule_append_declaration(rule, "voice-family", "male", 0);
+        (void)ui_css_rule_append_declaration(rule, "pause-before", "250ms", 0);
+        (void)ui_css_rule_append_declaration(rule, "rest-after", "strong", 0);
+        (void)ui_css_rule_append_declaration(rule, "voice-pitch",
+                                             "absolute 500Hz", 0);
+        (void)ui_css_rule_append_declaration(rule, "voice-rate", "x-fast", 0);
+        (void)ui_css_rule_append_declaration(rule, "voice-volume", "loud", 0);
+        (void)ui_css_stylesheet_append_rule(sheet, rule);
+      }
+
+      rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+      if (rc == UI_ERROR_NONE) {
+        (void)ui_dom_node_set_tag_name(node, "div");
+        rc = ui_css_resolve_style(sheet, node, &style);
+        if (rc == UI_ERROR_NONE) {
+          int j;
+          for (j = 0; j < 15; j++) {
+            g_malloc_fail_countdown = j;
+            rc = ui_css_speech_parse(style, &props);
+            if (rc == UI_ERROR_NONE) {
+              ui_css_speech_cleanup(&props);
+              break;
+            } else {
+              ui_css_speech_cleanup(&props);
+            }
+          }
+          g_malloc_fail_countdown = -1;
+          ui_css_computed_style_destroy(style);
+        }
+        (void)ui_dom_node_destroy(node);
+      }
+      ui_css_stylesheet_destroy(sheet);
+    }
+  }
+
   /* OOM injections */
   {
     int i;
-    for (i = 0; i < 50; i++) {
+    for (i = 0; i < 1000; i++) {
       g_malloc_fail_countdown = i;
 
       rc = ui_css_stylesheet_create(&sheet);
@@ -347,6 +393,12 @@ int main(void) {
           ui_css_rule_append_declaration(rule, "cue-before", "url('test.wav')",
                                          0);
           ui_css_rule_append_declaration(rule, "voice-family", "male", 0);
+          ui_css_rule_append_declaration(rule, "pause-before", "250ms", 0);
+          ui_css_rule_append_declaration(rule, "rest-after", "strong", 0);
+          ui_css_rule_append_declaration(rule, "voice-pitch", "absolute 500Hz",
+                                         0);
+          ui_css_rule_append_declaration(rule, "voice-rate", "x-fast", 0);
+          ui_css_rule_append_declaration(rule, "voice-volume", "loud", 0);
           ui_css_stylesheet_append_rule(sheet, rule);
         }
 
@@ -355,10 +407,6 @@ int main(void) {
           ui_dom_node_set_tag_name(node, "div");
           rc = ui_css_resolve_style(sheet, node, &style);
           if (rc == UI_ERROR_NONE) {
-            rc = ui_css_speech_parse(style, &props);
-            if (rc == UI_ERROR_NONE) {
-              ui_css_speech_cleanup(&props);
-            }
             ui_css_computed_style_destroy(style);
           }
           (void)ui_dom_node_destroy(node);

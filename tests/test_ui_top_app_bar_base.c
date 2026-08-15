@@ -138,6 +138,10 @@ static int test_top_app_bar_scroll(void) {
   rc = ui_top_app_bar_base_handle_scroll(bar, 100.0f, 90.0f);
   failed |= (rc != UI_ERROR_NONE);
 
+  /* Scroll with no change to cover unchanged branches */
+  rc = ui_top_app_bar_base_handle_scroll(bar, 100.0f, 0.0f);
+  failed |= (rc != UI_ERROR_NONE);
+
   rc = ui_signal_get(height_signal, &payload);
   failed |= (rc != UI_ERROR_NONE || payload.float_val != 64.0f);
 

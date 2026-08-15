@@ -130,9 +130,12 @@ ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
   ui_error_t rc;
   struct ui_css_stylesheet *default_style = NULL;
 
-  if (!timer || !director || !out_snackbar) {
+  if (!timer)
     return UI_ERROR_INVALID_ARGUMENT;
-  }
+  if (!director)
+    return UI_ERROR_INVALID_ARGUMENT;
+  if (!out_snackbar)
+    return UI_ERROR_INVALID_ARGUMENT;
 
   sb = (struct ui_snackbar_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_snackbar_base));
@@ -273,9 +276,12 @@ ui_error_t ui_snackbar_base_enqueue(struct ui_snackbar_base *snackbar,
   struct internal_snackbar item;
   ui_error_t rc;
 
-  if (!snackbar || !config || !config->message) {
+  if (!snackbar)
     return UI_ERROR_INVALID_ARGUMENT;
-  }
+  if (!config)
+    return UI_ERROR_INVALID_ARGUMENT;
+  if (!config->message)
+    return UI_ERROR_INVALID_ARGUMENT;
 
   memset(&item, 0, sizeof(struct internal_snackbar));
 
@@ -348,11 +354,13 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
   }
 
   /* Check auto-dismissal */
-  if (snackbar->is_active && snackbar->current.duration_secs > 0.0) {
-    if (now - snackbar->show_time >= snackbar->current.duration_secs) {
-      ui_error_t dis_rc = ui_snackbar_base_dismiss_current(snackbar);
-      if (dis_rc != UI_ERROR_NONE)
-        return dis_rc;
+  if (snackbar->is_active) {
+    if (snackbar->current.duration_secs > 0.0) {
+      if (now - snackbar->show_time >= snackbar->current.duration_secs) {
+        ui_error_t dis_rc = ui_snackbar_base_dismiss_current(snackbar);
+        if (dis_rc != UI_ERROR_NONE)
+          return dis_rc;
+      }
     }
   }
 
@@ -397,6 +405,7 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
 ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
                                           const struct ui_event *event,
                                           double timestamp_ms) {
+  int is_down = 0;
   (void)timestamp_ms;
   if (!snackbar || !event)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -410,8 +419,12 @@ ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
    * typically be dispatched down the DOM tree, but we'll assume a direct
    * click event fires this.
    */
-  if (event->type == UI_EVENT_MOUSE_DOWN ||
-      event->type == UI_EVENT_TOUCH_START) {
+  if (event->type == UI_EVENT_MOUSE_DOWN)
+    is_down = 1;
+  else if (event->type == UI_EVENT_TOUCH_START)
+    is_down = 1;
+
+  if (is_down) {
     /* If action callback exists and label exists, and we pretend it hit the
        action node. Normally you would do bounds checking here against
        action_node bounds. Since we lack the full layout context here, we just

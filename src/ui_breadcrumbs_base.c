@@ -60,9 +60,32 @@ extern int g_breadcrumbs_mock_fail;
 
 static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
+  static int append_count = 0;
+  int should_fail = 0;
   if (g_breadcrumbs_mock_fail == 130 || g_breadcrumbs_mock_fail == 397 ||
-      g_breadcrumbs_mock_fail == 413 || g_breadcrumbs_mock_fail == 427)
+      g_breadcrumbs_mock_fail == 413 || g_breadcrumbs_mock_fail == 427 ||
+      g_breadcrumbs_mock_fail == 1) {
+    append_count++;
+
+    if (g_breadcrumbs_mock_fail == 130) {
+      should_fail = (append_count == 1) ? 1 : 0;
+    } else if (g_breadcrumbs_mock_fail == 397) {
+      should_fail = (append_count == 1) ? 1 : 0;
+    } else if (g_breadcrumbs_mock_fail == 413) {
+      should_fail = (append_count == 2) ? 1 : 0;
+    } else if (g_breadcrumbs_mock_fail == 427) {
+      should_fail = (append_count == 3) ? 1 : 0;
+    } else {
+      /* must be 1 */
+      should_fail = (append_count == 1) ? 1 : 0;
+    }
+  } else {
+    append_count = 0;
+  }
+
+  if (should_fail)
     return UI_ERROR_UNKNOWN;
+
   return ui_dom_node_append_child(parent, child);
 }
 #define ui_dom_node_append_child mock_dom_node_append_child
@@ -246,11 +269,23 @@ static ui_error_t free_segments(struct ui_breadcrumbs_base *bc) {
        destroy it. ui_dom_node_destroy is recursive. If OOM happened
        mid-creation, we might have unparented nodes. */
     if (bc->segments[i].li_node) {
+      int should_destroy = 1;
       if (bc->segments[i].li_node->parent) {
-        (void)ui_dom_node_remove_child(bc->segments[i].li_node->parent,
-                                       bc->segments[i].li_node);
+        tmp_rc = ui_dom_node_remove_child(bc->segments[i].li_node->parent,
+                                          bc->segments[i].li_node);
+        if (tmp_rc != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE) {
+            rc = tmp_rc;
+          }
+          should_destroy = 0;
+        }
       }
-      (void)ui_dom_node_destroy(bc->segments[i].li_node);
+      if (should_destroy) {
+        tmp_rc = ui_dom_node_destroy(bc->segments[i].li_node);
+        if (tmp_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+          rc = tmp_rc;
+        }
+      }
     }
   }
   C_MULTIPLATFORM_FREE(bc->segments);
@@ -523,38 +558,68 @@ ui_error_t run_bc_coverage(void) {
 
   /* component fail */
   ui_breadcrumbs_base_create(dummy_router, &bc);
-  if (bc) {
-    ui_breadcrumbs_base_set_path(bc, "/test");
-    g_breadcrumbs_mock_fail = 5;
-    ui_breadcrumbs_base_destroy(bc);
-    g_breadcrumbs_mock_fail = 0;
-  }
+  ui_breadcrumbs_base_set_path(bc, "/test");
+  g_breadcrumbs_mock_fail = 5;
+  ui_breadcrumbs_base_destroy(bc);
+  g_breadcrumbs_mock_fail = 0;
 
   /* free_segments fail */
   ui_breadcrumbs_base_create(dummy_router, &bc);
-  if (bc) {
-    ui_breadcrumbs_base_set_path(bc, "/test");
-    g_breadcrumbs_mock_fail = 4; /* free segments fail */
-    ui_breadcrumbs_base_set_path(bc, "/test2");
-    g_breadcrumbs_mock_fail = 0;
-    ui_breadcrumbs_base_destroy(bc);
-  }
+  ui_breadcrumbs_base_set_path(bc, "/test/a/b");
+  g_breadcrumbs_mock_fail = 4; /* free segments fail (destroy) */
+  ui_breadcrumbs_base_set_path(bc, "/test2");
+  g_breadcrumbs_mock_fail = 0;
+  ui_breadcrumbs_base_destroy(bc);
 
   ui_breadcrumbs_base_create(dummy_router, &bc);
-  if (bc) {
-    g_breadcrumbs_mock_fail = 2; /* component default style */
-    ui_breadcrumbs_base_create(dummy_router, &bc);
-    g_breadcrumbs_mock_fail = 0;
-    ui_breadcrumbs_base_destroy(bc);
-  }
+  ui_breadcrumbs_base_set_path(bc, "/test/a/b");
+  g_breadcrumbs_mock_fail = 3; /* free segments fail (remove child) */
+  ui_breadcrumbs_base_set_path(bc, "/test2");
+  g_breadcrumbs_mock_fail = 0;
+  ui_breadcrumbs_base_destroy(bc);
 
   ui_breadcrumbs_base_create(dummy_router, &bc);
-  if (bc) {
-    g_breadcrumbs_mock_fail = 1; /* append child */
-    ui_breadcrumbs_base_set_path(bc, "/test");
-    g_breadcrumbs_mock_fail = 0;
-    ui_breadcrumbs_base_destroy(bc);
-  }
+  g_breadcrumbs_mock_fail = 2; /* component default style */
+  ui_breadcrumbs_base_create(dummy_router, &bc);
+  g_breadcrumbs_mock_fail = 0;
+  ui_breadcrumbs_base_destroy(bc);
+
+  ui_breadcrumbs_base_create(dummy_router, &bc);
+  g_breadcrumbs_mock_fail = 130;
+  mock_dom_node_append_child(NULL, NULL); /* count=1 -> fail */
+  mock_dom_node_append_child(NULL, NULL); /* count=2 -> won't fail */
+  g_breadcrumbs_mock_fail = 0;
+  mock_dom_node_append_child(NULL, NULL);
+
+  g_breadcrumbs_mock_fail = 397;
+  mock_dom_node_append_child(NULL, NULL); /* count=1 */
+  mock_dom_node_append_child(NULL, NULL); /* count=2 */
+  g_breadcrumbs_mock_fail = 0;
+  mock_dom_node_append_child(NULL, NULL);
+
+  g_breadcrumbs_mock_fail = 413;
+  mock_dom_node_append_child(NULL, NULL); /* count=1 */
+  mock_dom_node_append_child(NULL, NULL); /* count=2 */
+  mock_dom_node_append_child(NULL, NULL); /* count=3 */
+  g_breadcrumbs_mock_fail = 0;
+  mock_dom_node_append_child(NULL, NULL);
+
+  g_breadcrumbs_mock_fail = 427;
+  mock_dom_node_append_child(NULL, NULL); /* count=1 */
+  mock_dom_node_append_child(NULL, NULL); /* count=2 */
+  mock_dom_node_append_child(NULL, NULL); /* count=3 */
+  mock_dom_node_append_child(NULL, NULL); /* count=4 */
+  g_breadcrumbs_mock_fail = 0;
+  mock_dom_node_append_child(NULL, NULL);
+
+  g_breadcrumbs_mock_fail = 1;            /* append child */
+  mock_dom_node_append_child(NULL, NULL); /* count=1 */
+  mock_dom_node_append_child(NULL, NULL); /* count=2 */
+  g_breadcrumbs_mock_fail = 0;
+  mock_dom_node_append_child(NULL, NULL);
+  ui_breadcrumbs_base_set_path(bc, "/test");
+  g_breadcrumbs_mock_fail = 0;
+  ui_breadcrumbs_base_destroy(bc);
 
   ui_router_destroy(dummy_router);
 

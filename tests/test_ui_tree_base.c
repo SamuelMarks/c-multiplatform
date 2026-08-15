@@ -7,6 +7,9 @@
 #include <string.h>
 /* clang-format on */
 
+struct ui_computed;
+extern ui_error_t ui_computed_destroy(struct ui_computed *node);
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -23,6 +26,8 @@ static struct mock_node root2;
 static struct mock_node child1_1;
 static struct mock_node child1_2;
 
+static struct mock_node child2_1;
+
 static struct mock_node *roots[] = {&root1, &root2};
 
 static ui_error_t setup_mock_tree(void) {
@@ -35,8 +40,9 @@ static ui_error_t setup_mock_tree(void) {
 
   root2.id = 2;
   root2.parent = NULL;
-  root2.child_count = 0;
-  root2.children = NULL;
+  root2.child_count = 1;
+  root2.children = (struct mock_node **)malloc(1 * sizeof(struct mock_node *));
+  root2.children[0] = &child2_1;
 
   child1_1.id = 11;
   child1_1.parent = &root1;
@@ -47,18 +53,30 @@ static ui_error_t setup_mock_tree(void) {
   child1_2.parent = &root1;
   child1_2.child_count = 0;
   child1_2.children = NULL;
+
+  child2_1.id = 21;
+  child2_1.parent = &root2;
+  child2_1.child_count = 0;
+  child2_1.children = NULL;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t teardown_mock_tree(void) {
   if (root1.children)
     free(root1.children);
+  if (root2.children)
+    free(root2.children);
   return UI_ERROR_NONE;
 }
 
 static size_t mock_get_root_count(void *user_data) {
   (void)user_data;
   return 2;
+}
+
+static size_t mock_get_root_count_empty(void *user_data) {
+  (void)user_data;
+  return 0;
 }
 
 static void *mock_get_root_node(size_t index, void *user_data) {
@@ -134,10 +152,73 @@ static int test_tree_render(void) {
   /* NULL checks */
   EXPECT_EQ(ui_tree_base_create(NULL, &model), UI_ERROR_INVALID_ARGUMENT);
   EXPECT_EQ(ui_tree_base_create(&tree, NULL), UI_ERROR_INVALID_ARGUMENT);
+
+  {
+    struct ui_tree_model bad_model = model;
+    bad_model.get_root_count = NULL;
+    EXPECT_EQ(ui_tree_base_create(&tree, &bad_model),
+              UI_ERROR_INVALID_ARGUMENT);
+    bad_model.get_root_count = model.get_root_count;
+
+    bad_model.get_root_node = NULL;
+    EXPECT_EQ(ui_tree_base_create(&tree, &bad_model),
+              UI_ERROR_INVALID_ARGUMENT);
+    bad_model.get_root_node = model.get_root_node;
+
+    bad_model.get_parent = NULL;
+    EXPECT_EQ(ui_tree_base_create(&tree, &bad_model),
+              UI_ERROR_INVALID_ARGUMENT);
+    bad_model.get_parent = model.get_parent;
+
+    bad_model.get_child_count = NULL;
+    EXPECT_EQ(ui_tree_base_create(&tree, &bad_model),
+              UI_ERROR_INVALID_ARGUMENT);
+    bad_model.get_child_count = model.get_child_count;
+
+    bad_model.get_child = NULL;
+    EXPECT_EQ(ui_tree_base_create(&tree, &bad_model),
+              UI_ERROR_INVALID_ARGUMENT);
+    bad_model.get_child = model.get_child;
+
+    bad_model.render_node = NULL;
+    EXPECT_EQ(ui_tree_base_create(&tree, &bad_model),
+              UI_ERROR_INVALID_ARGUMENT);
+  }
+
   EXPECT_EQ(ui_tree_base_destroy(NULL), UI_ERROR_NONE);
   EXPECT_EQ(ui_tree_base_get_selection_model(NULL, NULL),
             UI_ERROR_INVALID_ARGUMENT);
   EXPECT_EQ(ui_tree_base_bind_data(NULL, NULL), UI_ERROR_INVALID_ARGUMENT);
+
+  {
+    /* Redeclare ui_tree_base to mock missing destroy coverage */
+    struct ui_tree_base_mock {
+      struct ui_tree_model model;
+      void **expanded_nodes;
+      size_t num_expanded;
+      size_t expanded_cap;
+      void *active_node;
+      struct ui_selection_model *selection_model;
+      struct ui_computed *data_signal;
+    };
+    struct ui_tree_base *mock_tree = NULL;
+    if (ui_tree_base_create(&mock_tree, &model) == UI_ERROR_NONE) {
+      struct ui_tree_base_mock *m = (struct ui_tree_base_mock *)mock_tree;
+      if (m->selection_model) {
+        ui_selection_model_destroy(m->selection_model);
+        m->selection_model = NULL;
+      }
+      if (m->expanded_nodes) {
+        free(m->expanded_nodes);
+        m->expanded_nodes = NULL;
+      }
+      if (m->data_signal) {
+        ui_computed_destroy(m->data_signal);
+        m->data_signal = NULL;
+      }
+      ui_tree_base_destroy(mock_tree);
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   int i;
@@ -163,6 +244,34 @@ static int test_tree_render(void) {
 #endif
 
   ui_tree_base_set_expanded(tree, &root1, 1);
+  ui_tree_base_set_expanded(tree, &root2, 1);
+  ui_tree_base_set_expanded(tree, &root2, 0);
+
+  /* NULL checks for coverage */
+  {
+    int is_exp;
+    struct ui_selection_model *sm;
+    EXPECT_EQ(ui_tree_base_get_selection_model(tree, NULL),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_is_expanded(NULL, &root1, &is_exp),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_is_expanded(tree, NULL, &is_exp),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_is_expanded(tree, &root1, NULL),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_set_expanded(NULL, &root1, 1),
+              UI_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(ui_tree_base_set_expanded(tree, NULL, 1),
+              UI_ERROR_INVALID_ARGUMENT);
+  }
+
+  /* Trigger reallocation of expanded_nodes (cap > 8) */
+  {
+    size_t k;
+    for (k = 0; k < 20; k++) {
+      ui_tree_base_set_expanded(tree, (void *)((size_t)(100 + k)), 1);
+    }
+  }
 
   /* Select a node */
   {
@@ -197,6 +306,9 @@ static int test_tree_render(void) {
   }
   g_malloc_fail_countdown = -1;
 #endif
+
+  /* Unexpand root2 to test rendering of a collapsed node */
+  ui_tree_base_set_expanded(tree, &root2, 0);
 
   rc = ui_tree_base_render(tree, container);
   EXPECT_EQ(rc, UI_ERROR_NONE);
@@ -245,6 +357,7 @@ static int test_tree_navigation(void) {
 
   /* Set active node back to root1 for next key right test */
   ui_tree_base_set_active_node(tree, &root1);
+  ui_tree_base_set_expanded(tree, &root1, 1);
   ui_tree_base_set_expanded(tree, &root1, 0);
 
   ev.key_code = UI_KEY_RIGHT;
@@ -264,6 +377,11 @@ static int test_tree_navigation(void) {
     EXPECT_EQ(ui_tree_base_get_active_node(tree, &tmp_node), UI_ERROR_NONE);
     EXPECT_EQ(tmp_node, &child1_1);
   }
+
+  /* Test RIGHT on leaf node */
+  ui_tree_base_set_active_node(tree, &child1_1);
+  ev.key_code = UI_KEY_RIGHT;
+  ui_tree_base_handle_key_event(tree, &ev);
 
   /* Test Enter key */
   ev.key_code = UI_KEY_ENTER;
@@ -317,6 +435,31 @@ static int test_tree_navigation(void) {
   /* Trigger line 223: press left on unexpanded root */
   ui_tree_base_handle_key_event(tree, &ev);
 
+  /* Try UP from root2 to hit unexpanded root1 */
+  ui_tree_base_set_active_node(tree, &root2);
+  ev.key_code = UI_KEY_UP;
+  ui_tree_base_handle_key_event(tree, &ev);
+
+  /* Try UP from child1_2 to hit child1_1 which is expanded but has 0 children
+   */
+  ui_tree_base_set_expanded(tree, &child1_1, 1);
+  ui_tree_base_set_active_node(tree, &child1_2);
+  ev.key_code = UI_KEY_UP;
+  ui_tree_base_handle_key_event(tree, &ev);
+  {
+    EXPECT_EQ(ui_tree_base_get_active_node(tree, &tmp_node), UI_ERROR_NONE);
+    EXPECT_EQ(tmp_node, &child1_1);
+  }
+
+  /* Try DOWN from child1_1 to hit is_expanded && child_count > 0 == false */
+  ui_tree_base_set_active_node(tree, &child1_1);
+  ev.key_code = UI_KEY_DOWN;
+  ui_tree_base_handle_key_event(tree, &ev);
+  {
+    EXPECT_EQ(ui_tree_base_get_active_node(tree, &tmp_node), UI_ERROR_NONE);
+    EXPECT_EQ(tmp_node, &child1_2);
+  }
+
   /* Trigger line 223: press UP on first root */
   ui_tree_base_set_active_node(tree, &root1);
   ev.key_code = UI_KEY_UP;
@@ -328,11 +471,22 @@ static int test_tree_navigation(void) {
   fake_node.parent = &root1;
   fake_node.children = NULL;
   fake_node.child_count = 0;
-
   ui_tree_base_set_active_node(tree, &fake_node);
-  ev.key_code = UI_KEY_DOWN;
+  ev.key_code = UI_KEY_UP;
   ui_tree_base_handle_key_event(tree, &ev);
 
+  /* Test DOWN on empty tree */
+  {
+    struct ui_tree_base *empty_tree;
+    struct ui_tree_model empty_model = model;
+    empty_model.get_root_count = mock_get_root_count_empty;
+    ui_tree_base_create(&empty_tree, &empty_model);
+    ev.key_code = UI_KEY_DOWN;
+    ui_tree_base_handle_key_event(empty_tree, &ev);
+    ui_tree_base_destroy(empty_tree);
+  }
+
+  /* Test toggle with mock alloc */
   rc = ui_tree_base_toggle_node(tree, &root1);
   {
     is_expanded = 0;
@@ -399,6 +553,13 @@ static int test_tree_navigation(void) {
   EXPECT_EQ(ui_tree_base_set_expanded(NULL, &root1, 1),
             UI_ERROR_INVALID_ARGUMENT);
   EXPECT_EQ(ui_tree_base_toggle_node(NULL, &root1), UI_ERROR_INVALID_ARGUMENT);
+  EXPECT_EQ(ui_tree_base_toggle_node(tree, NULL), UI_ERROR_INVALID_ARGUMENT);
+  EXPECT_EQ(ui_tree_base_get_active_node(tree, NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+  EXPECT_EQ(ui_tree_base_handle_key_event(NULL, &ev),
+            UI_ERROR_INVALID_ARGUMENT);
+  EXPECT_EQ(ui_tree_base_handle_key_event(tree, NULL),
+            UI_ERROR_INVALID_ARGUMENT);
   EXPECT_EQ(ui_tree_base_render(NULL, NULL), UI_ERROR_INVALID_ARGUMENT);
   EXPECT_EQ(ui_tree_base_render(tree, NULL), UI_ERROR_INVALID_ARGUMENT);
 

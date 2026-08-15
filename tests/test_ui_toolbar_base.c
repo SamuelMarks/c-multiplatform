@@ -6,6 +6,9 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_mock_strcpy_fail;
+#endif
 
 static int run_normal_tests(void) {
   struct ui_toolbar_base *tb = NULL;
@@ -54,6 +57,13 @@ static int run_normal_tests(void) {
   failed |=
       (ui_toolbar_base_get_title(NULL, &title) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_toolbar_base_get_title(tb, NULL) != UI_ERROR_INVALID_ARGUMENT);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  /* trigger UI_STRCPY fail if mock alloc enabled */
+  g_mock_strcpy_fail = 1;
+  (void)ui_toolbar_base_set_title(tb, "Test fail");
+  g_mock_strcpy_fail = 0;
+#endif
 
   failed |= (ui_toolbar_base_set_title(tb, "My Toolbar") != UI_ERROR_NONE);
 

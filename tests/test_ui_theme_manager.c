@@ -90,12 +90,6 @@ static int test_theme_manager_nulls(void) {
       (ui_theme_manager_get_mode(NULL, &mode) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_theme_manager_get_change_signal(NULL, &signal) !=
              UI_ERROR_INVALID_ARGUMENT);
-  failed |=
-      (ui_theme_manager_get_mode(manager, NULL) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_theme_manager_get_change_signal(manager, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_theme_manager_create(arena, NULL) != UI_ERROR_INVALID_ARGUMENT);
-
   ui_arena_create(1, &arena);
 
   g_malloc_fail_countdown = 0;
@@ -109,6 +103,13 @@ static int test_theme_manager_nulls(void) {
   g_malloc_fail_countdown = -1;
 
   ui_theme_manager_create(arena, &manager);
+
+  /* Test second arguments being NULL when first is valid */
+  failed |= (ui_theme_manager_create(arena, NULL) != UI_ERROR_INVALID_ARGUMENT);
+  failed |=
+      (ui_theme_manager_get_mode(manager, NULL) != UI_ERROR_INVALID_ARGUMENT);
+  failed |= (ui_theme_manager_get_change_signal(manager, NULL) !=
+             UI_ERROR_INVALID_ARGUMENT);
 
   if (manager) {
     ui_signal_t *old_signal = manager->change_signal;

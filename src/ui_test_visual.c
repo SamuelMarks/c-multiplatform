@@ -1,5 +1,7 @@
 /* clang-format off */
 #include "../include/ui_test_visual.h"
+extern int g_mock_stbi_write_png_fail;
+
 #include <math.h>
 #include <stdlib.h>
 #include "ui_internal_mem.h"
@@ -21,7 +23,7 @@
 #pragma GCC diagnostic ignored "-Wcomment"
 #endif
 
-#define STB_IMAGE_WRITE_IMPLEMENTATION
+/* #define STB_IMAGE_WRITE_IMPLEMENTATION */
 #include "../include/stb_image_write.h"
 /* clang-format on */
 
@@ -238,8 +240,11 @@ ui_error_t ui_visual_write_heatmap_to_disk(const char *filepath,
   }
 #endif
 
-  rc = stbi_write_png_to_func(log_stbi_write_c_file, f, width, height, 4,
-                              heatmap_data, width * 4);
+  if (g_mock_stbi_write_png_fail)
+    rc = 0;
+  else
+    rc = stbi_write_png_to_func(log_stbi_write_c_file, f, width, height, 4,
+                                heatmap_data, width * 4);
   fclose(f);
 
   return (rc == 0) ? UI_ERROR_IO_FAILED : UI_ERROR_NONE;

@@ -318,7 +318,12 @@ static void main_loop_step(void) {
 }
 #endif
 
+#ifndef OMIT_MAIN
 int main(void) {
+#else
+int example_responsive_main(void) {
+#endif
+
   struct ui_engine_config config;
   struct ui_engine *engine = NULL;
   struct ui_window_backend *window_backend = NULL;
@@ -350,13 +355,15 @@ int main(void) {
 #elif defined(_WIN32) || defined(__CYGWIN__)
   err = ui_window_backend_win32_create(&window_backend);
 #elif defined(__APPLE__)
-  err = ui_window_backend_macos_create(&window_backend);
+err = ui_window_backend_macos_create(&window_backend);
 #elif defined(__linux__) || defined(__unix__)
-  err = ui_window_backend_linux_create(&window_backend);
+err = ui_window_backend_linux_create(&window_backend);
 #else
-  printf("Unsupported platform.\n");
-  return 1;
+printf("Unsupported platform.\n");
+return 1;
 #endif
+  if (err != UI_ERROR_NONE)
+    goto cleanup;
 
   /* 3. Create Window */
   err = window_backend->create_window(
@@ -402,7 +409,12 @@ int main(void) {
   }
   emscripten_set_main_loop(main_loop_step, 0, 1);
 #else
+  int frame_count = 0;
+  const char *ci_test = getenv("CI_TEST_RUN");
   while (running) {
+    if (ci_test && frame_count++ > 2)
+      break;
+
     struct ui_event event;
     int has_event = 0;
 
@@ -446,9 +458,9 @@ cleanup:
 #elif defined(_WIN32) || defined(__CYGWIN__)
     ui_window_backend_win32_destroy(window_backend);
 #elif defined(__APPLE__)
-    ui_window_backend_macos_destroy(window_backend);
+  ui_window_backend_macos_destroy(window_backend);
 #elif defined(__linux__) || defined(__unix__)
-    ui_window_backend_linux_destroy(window_backend);
+  ui_window_backend_linux_destroy(window_backend);
 #endif
   }
   if (engine)

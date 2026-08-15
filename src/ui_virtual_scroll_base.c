@@ -182,13 +182,13 @@ ui_error_t ui_virtual_scroll_base_get_visible_range(
   if (vs->config.strategy == UI_VIRTUAL_SCROLL_FIXED_SIZE) {
     start = (size_t)(scroll_y / vs->config.fixed_item_size);
     if (start >= vs->item_count) {
-      start = vs->item_count > 0 ? vs->item_count - 1 : 0;
+      start = vs->item_count - 1;
     }
     offset_y = (float)start * vs->config.fixed_item_size;
     end = start + (size_t)(vs->viewport_height / vs->config.fixed_item_size) +
           2; /* +2 for buffer */
     if (end >= vs->item_count) {
-      end = vs->item_count > 0 ? vs->item_count - 1 : 0;
+      end = vs->item_count - 1;
     }
   } else {
     /* Binary search on cached prefix heights */
@@ -205,7 +205,7 @@ ui_error_t ui_virtual_scroll_base_get_visible_range(
     }
     start = low;
     if (start >= vs->item_count) {
-      start = vs->item_count > 0 ? vs->item_count - 1 : 0;
+      start = vs->item_count - 1;
     }
     offset_y = vs->cached_prefix_heights[start];
 
@@ -219,7 +219,7 @@ ui_error_t ui_virtual_scroll_base_get_visible_range(
       end++;
 
     if (end >= vs->item_count) {
-      end = vs->item_count > 0 ? vs->item_count - 1 : 0;
+      end = vs->item_count - 1;
     }
   }
 

@@ -68,7 +68,7 @@ ui_error_t ui_theme_provider_get(struct ui_dom_node *node,
       if (err != UI_ERROR_NOT_FOUND) {
         return err;
       }
-    } else if (attr_val) {
+    } else {
       /* Parse pointer */
       void *ptr = NULL;
       /* Using sscanf safely */

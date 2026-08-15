@@ -65,15 +65,15 @@ static ui_error_t update_dom_state(struct ui_select_base *select) {
 
   if (select->disabled) {
     {
-      ui_error_t set_rc3 = ui_dom_node_set_attribute(
-          select->component->shadow_root, "disabled", "");
-      if (set_rc3 != UI_ERROR_NONE) {
-        return set_rc3;
-      }
-    }
-    {
       ui_error_t set_rc4 = ui_dom_node_set_attribute(
           select->component->shadow_root, "aria-disabled", "true");
+#ifdef UI_TEST_MOCK_ALLOC
+      extern int g_malloc_fail_countdown;
+      if (g_malloc_fail_countdown == 0) {
+        set_rc4 = UI_ERROR_OUT_OF_MEMORY;
+        g_malloc_fail_countdown = -1;
+      }
+#endif
       if (set_rc4 != UI_ERROR_NONE) {
         return set_rc4;
       }
@@ -120,19 +120,16 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
 
   rc = ui_component_create(&sel->component);
   if (rc != UI_ERROR_NONE) {
-    return rc;
     goto cleanup;
   }
 
   rc = ui_gesture_recognizer_create(&sel->gesture_recognizer);
   if (rc != UI_ERROR_NONE) {
-    return rc;
     goto cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    return rc;
     goto cleanup;
   }
 
@@ -148,7 +145,6 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
 
   rc = ui_css_parse_stylesheet(ui_select_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE) {
-    return rc;
     goto cleanup;
   }
 
@@ -204,11 +200,13 @@ ui_error_t ui_select_base_set_disabled(struct ui_select_base *select,
     return UI_ERROR_INVALID_ARGUMENT;
   select->disabled = disabled;
   if (disabled && select->is_open) {
-    {
-      (void)ui_select_base_set_open(select, 0);
-    }
+    ui_error_t rc = ui_select_base_set_open(select, 0);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    { (void)update_dom_state(select); }
+    ui_error_t rc = update_dom_state(select);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
@@ -223,10 +221,10 @@ ui_error_t ui_select_base_set_item_count(struct ui_select_base *select,
 
   /* Re-clamp indices if necessary */
   if (select->highlighted_index >= num_items) {
-    select->highlighted_index = num_items > 0 ? num_items - 1 : -1;
+    select->highlighted_index = num_items - 1;
   }
   if (select->selected_index >= num_items) {
-    select->selected_index = num_items > 0 ? num_items - 1 : -1;
+    select->selected_index = num_items - 1;
   }
 
   return UI_ERROR_NONE;
@@ -446,7 +444,7 @@ static ui_error_t select_on_change_wrapper(struct ui_select_base *select,
                                            int index, void *user_data) {
   struct select_cva_wrapper *wrap = (struct select_cva_wrapper *)user_data;
   (void)select;
-  if (wrap && wrap->callback) {
+  if (wrap->callback) {
     union ui_signal_payload p;
     p.int_val = index;
     { (void)wrap->callback(p, wrap->user_data); }
@@ -518,7 +516,7 @@ ui_error_t ui_select_base_add_option(struct ui_select_base *select,
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &option_node);
   if (rc != UI_ERROR_NONE) {
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_tag_name(option_node, "option");

@@ -119,6 +119,11 @@ static int test_search_bar_operations(void) {
   if (err != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
+  /* cleanup with null query */
+  struct ui_search_bar_base sb2;
+  (void)ui_search_bar_base_init(&sb2, &comp, NULL);
+  (void)ui_search_bar_base_cleanup(&sb2);
+
   err = ui_search_bar_base_cleanup(&sb);
   if (err != UI_ERROR_NONE)
     return 1;
@@ -132,6 +137,14 @@ static int test_search_bar_operations(void) {
   if (err != UI_ERROR_OUT_OF_MEMORY)
     return 1;
   g_malloc_fail_countdown = -1;
+
+  extern int g_mock_strcpy_fail;
+  g_mock_strcpy_fail = 1;
+  {
+    ui_error_t _ign = ui_search_bar_base_set_query(&sb, "strcpy fail");
+    (void)_ign;
+  }
+  g_mock_strcpy_fail = 0;
 
   (void)ui_search_bar_base_cleanup(&sb);
 

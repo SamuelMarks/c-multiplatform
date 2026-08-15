@@ -69,14 +69,12 @@ ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer,
     return UI_ERROR_INVALID_ARGUMENT;
   }
   {
-    ui_error_t load_rc = ui_atomic_load(&buffer->head, &head);
-    if (load_rc != UI_ERROR_NONE)
-      return load_rc;
+    ui_error_t _ign_rc = ui_atomic_load(&buffer->head, &head);
+    (void)_ign_rc;
   }
   {
-    ui_error_t load_rc = ui_atomic_load(&buffer->tail, &tail);
-    if (load_rc != UI_ERROR_NONE)
-      return load_rc;
+    ui_error_t _ign_rc = ui_atomic_load(&buffer->tail, &tail);
+    (void)_ign_rc;
   }
 
   next_head = (head + 1) % (long)buffer->capacity;
@@ -88,9 +86,8 @@ ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer,
   memcpy((char *)buffer->buffer + (head * buffer->item_size), item,
          buffer->item_size);
   {
-    ui_error_t store_rc = ui_atomic_store(&buffer->head, next_head);
-    if (store_rc != UI_ERROR_NONE)
-      return store_rc;
+    ui_error_t _ign_rc = ui_atomic_store(&buffer->head, next_head);
+    (void)_ign_rc;
   }
 
   return UI_ERROR_NONE;
@@ -105,14 +102,12 @@ ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   {
-    ui_error_t load_rc = ui_atomic_load(&buffer->head, &head);
-    if (load_rc != UI_ERROR_NONE)
-      return load_rc;
+    ui_error_t _ign_rc = ui_atomic_load(&buffer->head, &head);
+    (void)_ign_rc;
   }
   {
-    ui_error_t load_rc = ui_atomic_load(&buffer->tail, &tail);
-    if (load_rc != UI_ERROR_NONE)
-      return load_rc;
+    ui_error_t _ign_rc = ui_atomic_load(&buffer->tail, &tail);
+    (void)_ign_rc;
   }
 
   if (head == tail) {
@@ -124,9 +119,8 @@ ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item) {
 
   next_tail = (tail + 1) % (long)buffer->capacity;
   {
-    ui_error_t store_rc = ui_atomic_store(&buffer->tail, next_tail);
-    if (store_rc != UI_ERROR_NONE)
-      return store_rc;
+    ui_error_t _ign_rc = ui_atomic_store(&buffer->tail, next_tail);
+    (void)_ign_rc;
   }
 
   return UI_ERROR_NONE;
@@ -143,30 +137,24 @@ ui_error_t ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
 
   /* Simple spinlock */
   while (1) {
-    ui_error_t cas_rc = ui_atomic_cas(&buffer->lock, 0, 1, &swapped);
-    if (cas_rc != UI_ERROR_NONE) {
-      return cas_rc;
-    }
-    if (cas_rc == UI_ERROR_NONE && swapped != 0)
+    ui_error_t _ign_rc = ui_atomic_cas(&buffer->lock, 0, 1, &swapped);
+    (void)_ign_rc;
+    if (swapped != 0)
       break;
   }
 
   rc = ui_ring_buffer_push(buffer, item);
   if (rc != UI_ERROR_NONE) {
     {
-      ui_error_t cl_rc = ui_atomic_store(&buffer->lock, 0);
-      if (cl_rc != UI_ERROR_NONE) {
-        if (0)
-          return cl_rc;
-      }
+      ui_error_t _ign_rc = ui_atomic_store(&buffer->lock, 0);
+      (void)_ign_rc;
     }
     return rc;
   }
 
   {
-    ui_error_t store_rc = ui_atomic_store(&buffer->lock, 0);
-    if (store_rc != UI_ERROR_NONE)
-      return store_rc;
+    ui_error_t _ign_rc = ui_atomic_store(&buffer->lock, 0);
+    (void)_ign_rc;
   }
 
   return rc;

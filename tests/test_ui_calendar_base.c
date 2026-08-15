@@ -887,17 +887,14 @@ static int test_calendar_missing_branches(void) {
   (void)ui_calendar_get_day_of_week(2023, 1, 32, &dow);
 
   /* 184: start_day > 6 */
+  (void)ui_calendar_base_create(&cal, NULL);
   (void)ui_calendar_base_set_start_of_week(cal, (enum ui_day_of_week)7);
 
   /* 365: !out_count in get_month_grid */
+  struct ui_date real_grid[42];
+  (void)ui_calendar_base_get_month_grid(cal, real_grid, NULL);
 
-  (void)ui_calendar_base_get_month_grid(NULL, NULL, NULL);
-  (void)ui_calendar_base_get_month_grid(cal, NULL, NULL);
-  (void)ui_calendar_base_get_month_grid(NULL, grid, NULL);
-  (void)ui_calendar_base_get_month_grid(NULL, NULL, &count);
-  (void)ui_calendar_base_get_month_grid(cal, grid, NULL);
-  (void)ui_calendar_base_get_month_grid(cal, NULL, &count);
-  (void)ui_calendar_base_get_month_grid(NULL, grid, &count);
+  (void)ui_calendar_base_destroy(cal);
   return 0;
 }
 

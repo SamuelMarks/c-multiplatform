@@ -84,6 +84,17 @@ static void test_handle_manager_basic(void) {
   rc = ui_handle_manager_get(mgr, handle2, &out_data);
   assert(rc == UI_ERROR_INVALID_ARGUMENT);
 
+  /* Test NULL data allocation */
+  {
+    ui_uint64 handle_null;
+    rc = ui_handle_manager_alloc(mgr, NULL, &handle_null);
+    assert(rc == UI_ERROR_NONE);
+    rc = ui_handle_manager_get(mgr, handle_null, &out_data);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
+    rc = ui_handle_manager_free(mgr, handle_null);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
+  }
+
   /* Destroy */
   rc = ui_handle_manager_destroy(NULL);
   assert(rc == UI_ERROR_INVALID_ARGUMENT);

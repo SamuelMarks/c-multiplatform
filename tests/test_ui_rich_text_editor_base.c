@@ -104,6 +104,58 @@ void test_ui_rte_errors3(void) {
   ui_rich_text_editor_base_insert_text(NULL, NULL);
   ui_rich_text_editor_base_insert_text(NULL, "a");
 
+  {
+    struct ui_rich_text_editor_base *rte = NULL;
+    ui_rich_text_editor_base_create(&rte, NULL);
+    if (rte) {
+      ui_rich_text_editor_base_get_component(rte, NULL);
+      ui_rich_text_editor_base_insert_text(rte, NULL);
+
+      /* Allocate buffer with a string */
+      ui_rich_text_editor_base_insert_text(rte, "A");
+
+      /* Insert another to hit existing buffer and capacity check */
+      ui_rich_text_editor_base_insert_text(rte, "B");
+
+      /* Mock CVA write to clear buffer, then insert to hit cur_len == 0 &&
+       * html_buffer != NULL */
+      {
+        struct ui_control_value_accessor cva;
+        struct ui_rich_text_editor_base *rte2 = NULL;
+        ui_rich_text_editor_base_create(&rte2, &cva);
+        if (rte2) {
+          union ui_signal_payload val;
+          val.ptr_val = "init";
+          cva.write_value(rte2, val);
+          val.ptr_val = "";
+          cva.write_value(rte2, val);
+          ui_rich_text_editor_base_insert_text(rte2, "C");
+          ui_rich_text_editor_base_destroy(rte2);
+        }
+      }
+
+      /* Mock NULL component branches */
+      {
+        struct ui_rich_text_editor_base_mock {
+          struct ui_component *component;
+        };
+        struct ui_rich_text_editor_base_mock *mrte =
+            (struct ui_rich_text_editor_base_mock *)rte;
+        struct ui_component *saved_comp = mrte->component;
+        mrte->component = NULL;
+        ui_rich_text_editor_base_destroy(
+            rte); /* Hits component == NULL in destroy */
+
+        ui_rich_text_editor_base_create(&rte, NULL);
+        mrte = (struct ui_rich_text_editor_base_mock *)rte;
+        saved_comp = mrte->component;
+        mrte->component = NULL;
+        ui_rich_text_editor_base_insert_text(rte, "Hits null component update");
+        ui_rich_text_editor_base_destroy(rte);
+      }
+    }
+  }
+
   ui_rich_text_editor_base_set_caret_from_point(NULL, 0, 0);
   ui_rich_text_editor_base_undo(NULL);
   ui_rich_text_editor_base_redo(NULL);
@@ -170,6 +222,9 @@ void test_ui_rte_coverage_errs4(void) {
         0; /* this should trigger the REALLOC failure if countdown hits it */
     cva.write_value(rte, val);
     g_malloc_fail_countdown = -1;
+
+    /* Pre-allocate small capacity to test reallocation branch */
+    ui_rich_text_editor_base_insert_text(rte, "A");
 
     g_malloc_fail_countdown = 0;
     ui_rich_text_editor_base_insert_text(

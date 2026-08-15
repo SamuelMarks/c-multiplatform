@@ -224,6 +224,14 @@ static int run_normal_tests(void) {
      * failure */
     struct ui_rating_base *rating2 = NULL;
     struct ui_rating_base *rating3 = NULL;
+    struct ui_rating_base *rating4 = NULL;
+
+    /* Successful create with NULL CVA */
+    ui_rating_base_create(&rating4, NULL);
+    /* Test setting to same value */
+    ui_rating_base_set_value(rating4, 0.0f);
+    ui_rating_base_destroy(rating4);
+
     g_malloc_fail_countdown = 2; /* Fails on third icon */
     ui_rating_base_create(&rating2, NULL);
     g_malloc_fail_countdown = -1;

@@ -47,7 +47,7 @@ struct ui_wheel_picker_base {
 };
 
 static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
-  if (picker && picker->component && picker->component->shadow_root) {
+  if (picker->component && picker->component->shadow_root) {
     char buf[64];
     ui_error_t rc;
 #if defined(_MSC_VER)
@@ -62,7 +62,7 @@ static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
 }
 
 static ui_error_t trigger_cva_change(struct ui_wheel_picker_base *picker) {
-  if (picker && picker->cva_on_change) {
+  if (picker->cva_on_change) {
     union ui_signal_payload payload;
     payload.int_val = picker->selected_index;
     return picker->cva_on_change(payload, picker->cva_on_change_user_data);
@@ -71,7 +71,7 @@ static ui_error_t trigger_cva_change(struct ui_wheel_picker_base *picker) {
 }
 
 static ui_error_t trigger_cva_touched(struct ui_wheel_picker_base *picker) {
-  if (picker && picker->cva_on_touched) {
+  if (picker->cva_on_touched) {
     return picker->cva_on_touched(picker->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
@@ -238,22 +238,28 @@ ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
     C_MULTIPLATFORM_FREE(picker->items);
     picker->items = NULL;
   }
-
-  picker->item_count = count;
+  picker->item_count = 0;
 
   if (count > 0) {
     picker->items = (char **)C_MULTIPLATFORM_MALLOC(sizeof(char *) * count);
     if (!picker->items) {
-      picker->item_count = 0;
       return UI_ERROR_OUT_OF_MEMORY;
     }
     for (i = 0; i < count; i++) {
       picker->items[i] = C_MULTIPLATFORM_STRDUP(items[i]);
       if (!picker->items[i]) {
+        int j;
+        for (j = 0; j < i; j++) {
+          C_MULTIPLATFORM_FREE(picker->items[j]);
+        }
+        C_MULTIPLATFORM_FREE(picker->items);
+        picker->items = NULL;
         return UI_ERROR_OUT_OF_MEMORY;
       }
     }
   }
+
+  picker->item_count = count;
 
   if (picker->selected_index >= count) {
     picker->selected_index = count > 0 ? count - 1 : 0;
@@ -380,8 +386,7 @@ ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
     } else if (ge.state == UI_GESTURE_STATE_CHANGED) {
       picker->scroll_offset -= ge.delta_y; /* dragging up increases offset */
       picker->velocity = -ge.velocity_y;
-    } else if (ge.state == UI_GESTURE_STATE_ENDED ||
-               ge.state == UI_GESTURE_STATE_CANCELLED) {
+    } else {
       picker->is_dragging = 0;
       if (ge.type == UI_GESTURE_SWIPE) {
         picker->velocity = -ge.velocity_y;

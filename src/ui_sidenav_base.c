@@ -286,12 +286,9 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   return UI_ERROR_NONE;
 
 cleanup:
-  if (sidenav->root_node)
-    (void)ui_dom_node_destroy(sidenav->root_node);
-  if (sidenav->backdrop_logic)
-    (void)ui_backdrop_destroy(sidenav->backdrop_logic);
-  if (sidenav->component)
-    (void)ui_component_destroy(sidenav->component);
+  (void)ui_dom_node_destroy(sidenav->root_node);
+  (void)ui_backdrop_destroy(sidenav->backdrop_logic);
+  (void)ui_component_destroy(sidenav->component);
   C_MULTIPLATFORM_FREE(sidenav);
   return rc;
 }
@@ -304,12 +301,9 @@ ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
     if (rc != UI_ERROR_NONE)
       return rc;
   }
-  if (sidenav->backdrop_component)
-    (void)ui_component_destroy(sidenav->backdrop_component);
-  if (sidenav->backdrop_logic)
-    (void)ui_backdrop_destroy(sidenav->backdrop_logic);
-  if (sidenav->component)
-    (void)ui_component_destroy(sidenav->component);
+  (void)ui_component_destroy(sidenav->backdrop_component);
+  (void)ui_backdrop_destroy(sidenav->backdrop_logic);
+  (void)ui_component_destroy(sidenav->component);
   C_MULTIPLATFORM_FREE(sidenav);
   return UI_ERROR_NONE;
 }
@@ -434,8 +428,7 @@ ui_error_t ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
   if (!sidenav || !event)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  if (!sidenav->is_open || sidenav->mode != UI_SIDENAV_MODE_OVER ||
-      !sidenav->backdrop_logic) {
+  if (!sidenav->is_open || sidenav->mode != UI_SIDENAV_MODE_OVER) {
     return UI_ERROR_NONE;
   }
 

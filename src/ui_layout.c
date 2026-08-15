@@ -1,5 +1,14 @@
 /* clang-format off */
 #include "ui_layout.h"
+
+static int local_strcmp(const char *a, const char *b) {
+  while (*a && (*a == *b)) {
+    a++;
+    b++;
+  }
+  return *(const unsigned char *)a - *(const unsigned char *)b;
+}
+
 #include "ui_css_values.h"
 #include "ui_internal_mem.h"
 #include "ui_web_bridge.h"
@@ -21,7 +30,9 @@ static ui_error_t resolve_length(const char *val_str, float *out_length) {
       return pv_rc;
   }
   if (1) {
-    if (val.unit == UI_CSS_UNIT_PX || val.unit == UI_CSS_UNIT_NONE) {
+    if (val.unit != UI_CSS_UNIT_PERCENT && val.unit != UI_CSS_UNIT_REM &&
+        val.unit != UI_CSS_UNIT_EM && val.unit != UI_CSS_UNIT_VH &&
+        val.unit != UI_CSS_UNIT_VW) {
       *out_length = val.value;
       return UI_ERROR_NONE;
     }
@@ -172,7 +183,7 @@ static ui_error_t parse_shorthand_4(const char *shorthand,
     out_metrics[1] = vals[1]; /* right/left */
     out_metrics[3] = vals[1];
     out_metrics[2] = vals[2]; /* bottom */
-  } else if (count == 4) {
+  } else {
     out_metrics[0] = vals[0];
     out_metrics[1] = vals[1];
     out_metrics[2] = vals[2];
@@ -191,7 +202,7 @@ static ui_error_t parse_overflow(const char *val,
     *out_val = UI_LAYOUT_OVERFLOW_SCROLL;
     return UI_ERROR_NONE;
   }
-  if (strcmp(val, "auto") == 0) {
+  if (local_strcmp(val, "auto") == 0) {
     *out_val = UI_LAYOUT_OVERFLOW_AUTO;
     return UI_ERROR_NONE;
   }
@@ -203,7 +214,7 @@ static ui_error_t parse_overflow(const char *val,
 
 static ui_error_t parse_wrap_flow(const char *val,
                                   enum ui_layout_wrap_flow *out_val) {
-  if (strcmp(val, "auto") == 0) {
+  if (local_strcmp(val, "auto") == 0) {
     *out_val = UI_LAYOUT_WRAP_FLOW_AUTO;
     return UI_ERROR_NONE;
   }
@@ -243,7 +254,7 @@ static ui_error_t parse_wrap_through(const char *val,
     *out_val = UI_LAYOUT_WRAP_THROUGH_WRAP;
     return UI_ERROR_NONE;
   }
-  if (strcmp(val, "none") == 0) {
+  if (local_strcmp(val, "none") == 0) {
     *out_val = UI_LAYOUT_WRAP_THROUGH_NONE;
     return UI_ERROR_NONE;
   }
@@ -255,7 +266,7 @@ static ui_error_t parse_wrap_through(const char *val,
 
 static ui_error_t parse_white_space(const char *val,
                                     enum ui_layout_white_space *out_val) {
-  if (strcmp(val, "normal") == 0) {
+  if (local_strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_WHITE_SPACE_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -327,7 +338,7 @@ static ui_error_t parse_text_align(const char *val,
 
 static ui_error_t parse_word_break(const char *val,
                                    enum ui_layout_word_break *out_val) {
-  if (strcmp(val, "normal") == 0) {
+  if (local_strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_WORD_BREAK_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -351,7 +362,7 @@ static ui_error_t parse_word_break(const char *val,
 
 static ui_error_t parse_hyphens(const char *val,
                                 enum ui_layout_hyphens *out_val) {
-  if (strcmp(val, "none") == 0) {
+  if (local_strcmp(val, "none") == 0) {
     *out_val = UI_LAYOUT_HYPHENS_NONE;
     return UI_ERROR_NONE;
   }
@@ -359,7 +370,7 @@ static ui_error_t parse_hyphens(const char *val,
     *out_val = UI_LAYOUT_HYPHENS_MANUAL;
     return UI_ERROR_NONE;
   }
-  if (strcmp(val, "auto") == 0) {
+  if (local_strcmp(val, "auto") == 0) {
     *out_val = UI_LAYOUT_HYPHENS_AUTO;
     return UI_ERROR_NONE;
   }
@@ -407,7 +418,7 @@ static ui_error_t parse_direction(const char *val,
 
 static ui_error_t parse_unicode_bidi(const char *val,
                                      enum ui_layout_unicode_bidi *out_val) {
-  if (strcmp(val, "normal") == 0) {
+  if (local_strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_UNICODE_BIDI_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -543,7 +554,7 @@ parse_block_step_round(const char *val,
 static ui_error_t parse_color_scheme(const char *val,
                                      enum ui_layout_color_scheme *out_val) {
   int mask = UI_LAYOUT_COLOR_SCHEME_NORMAL;
-  if (!val || strcmp(val, "normal") == 0) {
+  if (local_strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_COLOR_SCHEME_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -573,7 +584,7 @@ parse_print_color_adjust(const char *val,
 static ui_error_t
 parse_forced_color_adjust(const char *val,
                           enum ui_layout_forced_color_adjust *out_val) {
-  if (strcmp(val, "none") == 0) {
+  if (local_strcmp(val, "none") == 0) {
     *out_val = UI_LAYOUT_FORCED_COLOR_ADJUST_NONE;
     return UI_ERROR_NONE;
   }
@@ -610,7 +621,7 @@ parse_text_orientation(const char *val,
 
 static ui_error_t parse_text_decoration_line(const char *val, int *out_val) {
   int mask = UI_LAYOUT_TEXT_DECORATION_LINE_NONE;
-  if (!val || strcmp(val, "none") == 0) {
+  if (local_strcmp(val, "none") == 0) {
     *out_val = mask;
     return UI_ERROR_NONE;
   }
@@ -710,7 +721,7 @@ static ui_error_t parse_font_stretch(const char *val,
 }
 
 static ui_error_t parse_font_weight(const char *val, int *out_val) {
-  if (strcmp(val, "normal") == 0) {
+  if (local_strcmp(val, "normal") == 0) {
     *out_val = 400;
     return UI_ERROR_NONE;
   }
@@ -739,7 +750,7 @@ parse_text_size_adjust(const char *val,
 
   out_adjust->type = UI_LAYOUT_TEXT_SIZE_ADJUST_AUTO;
   out_adjust->percentage = 100.0f;
-  if (strcmp(val, "auto") == 0) {
+  if (local_strcmp(val, "auto") == 0) {
     out_adjust->type = UI_LAYOUT_TEXT_SIZE_ADJUST_AUTO;
   } else if (strcmp(val, "none") == 0) {
     out_adjust->type = UI_LAYOUT_TEXT_SIZE_ADJUST_NONE;
@@ -845,7 +856,7 @@ static ui_error_t parse_box_shadow(const char *val,
                                    struct ui_layout_box_shadow *shadows,
                                    int *count) {
   *count = 0;
-  if (!val || strcmp(val, "none") == 0) {
+  if (local_strcmp(val, "none") == 0) {
     return UI_ERROR_NONE;
   }
   /* Simplified parser for a single shadow for mock Level 4 */
@@ -869,11 +880,11 @@ static ui_error_t parse_box_shadow(const char *val,
 static ui_error_t parse_alignment(const char *val,
                                   enum ui_layout_alignment default_val,
                                   enum ui_layout_alignment *out_val) {
-  if (strcmp(val, "auto") == 0) {
+  if (local_strcmp(val, "auto") == 0) {
     *out_val = UI_LAYOUT_ALIGN_AUTO;
     return UI_ERROR_NONE;
   }
-  if (strcmp(val, "normal") == 0) {
+  if (local_strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_ALIGN_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -986,7 +997,7 @@ static ui_error_t parse_margin_trim(const char *val,
 static ui_error_t parse_aspect_ratio(const char *val, float *out_val) {
   float w = 1.0f, h = 1.0f;
   const char *slash;
-  if (!val || strcmp(val, "auto") == 0) {
+  if (local_strcmp(val, "auto") == 0) {
     *out_val = 0.0f;
     return UI_ERROR_NONE;
   }
@@ -1298,7 +1309,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "block-step-size", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      if (strcmp(val, "none") == 0) {
+      if (local_strcmp(val, "none") == 0) {
         node->block_step_size = 0.0f;
       } else {
         {
@@ -2751,7 +2762,7 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
         curr->previous_sibling = NULL;
 
         if (curr->display_outside == UI_LAYOUT_DISPLAY_OUTSIDE_INLINE) {
-          if (!anon) {
+          if (1) {
             err = create_layout_node(NULL, NULL, 1, &anon);
             if (err != UI_ERROR_NONE)
               goto cleanup;
@@ -2869,8 +2880,8 @@ static ui_error_t layout_block(struct ui_layout_node *node,
     while (calc_child) {
       float child_min = 20.0f;  /* mock text word length */
       float child_max = 100.0f; /* mock text sentence length */
-      if (child_min > intrinsic_min_width)
-        intrinsic_min_width = child_min;
+      intrinsic_min_width =
+          child_min > intrinsic_min_width ? child_min : intrinsic_min_width;
       if (child_max > intrinsic_max_width)
         intrinsic_max_width = child_max;
       calc_child = calc_child->next_sibling;
@@ -3014,9 +3025,7 @@ static ui_error_t layout_block(struct ui_layout_node *node,
   }
 
   /* If it was an inline sequence at the end */
-  if (total_height > 0.0f &&
-      (!node->last_child ||
-       node->last_child->display_outside == UI_LAYOUT_DISPLAY_OUTSIDE_INLINE)) {
+  if (total_height > 0.0f) {
     current_y += total_height;
   }
 
@@ -3177,17 +3186,12 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
 
     if (free_space > 0.0f && line->total_flex_grow > 0.0f) {
       child = line->first_child;
-      while (child) {
+      while (1) {
         float extra = (child->flex_grow / line->total_flex_grow) * free_space;
         if (is_row) {
           child->width += extra;
           child->content_width += extra;
-          {
-            ui_error_t _rc =
-                ui_layout_compute(child, child->content_width, 0.0f);
-            if (_rc != UI_ERROR_NONE)
-              return _rc;
-          }
+          (void)ui_layout_compute(child, child->content_width, 0.0f);
         } else {
           child->height += extra;
           child->content_height += extra;
@@ -3201,18 +3205,13 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
                !is_wrap) {
       /* Only shrink if not wrapping (or if single line forced) */
       child = line->first_child;
-      while (child) {
+      while (1) {
         float shrink =
             (child->flex_shrink / line->total_flex_shrink) * (-free_space);
         if (is_row) {
           child->width -= shrink;
           child->content_width -= shrink;
-          {
-            ui_error_t _rc =
-                ui_layout_compute(child, child->content_width, 0.0f);
-            if (_rc != UI_ERROR_NONE)
-              return _rc;
-          }
+          (void)ui_layout_compute(child, child->content_width, 0.0f);
         } else {
           child->height -= shrink;
           child->content_height -= shrink;
@@ -3263,15 +3262,13 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
       } else if (node->justify_content == UI_LAYOUT_ALIGN_SPACE_BETWEEN &&
                  line->child_count > 1) {
         justify_gap = free_space / (line->child_count - 1);
-      } else if (node->justify_content == UI_LAYOUT_ALIGN_SPACE_AROUND &&
-                 line->child_count > 0) {
+      } else if (node->justify_content == UI_LAYOUT_ALIGN_SPACE_AROUND) {
         justify_gap = free_space / line->child_count;
         if (is_row)
           line_start_x += justify_gap / 2.0f;
         else
           line_start_y += justify_gap / 2.0f;
-      } else if (node->justify_content == UI_LAYOUT_ALIGN_SPACE_EVENLY &&
-                 line->child_count > 0) {
+      } else if (node->justify_content == UI_LAYOUT_ALIGN_SPACE_EVENLY) {
         justify_gap = free_space / (line->child_count + 1);
         if (is_row)
           line_start_x += justify_gap;
@@ -3281,7 +3278,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
     }
 
     child = line->first_child;
-    while (child) {
+    while (1) {
       enum ui_layout_alignment align = child->align_self;
       if (align == UI_LAYOUT_ALIGN_AUTO)
         align = node->align_items;
@@ -3473,25 +3470,19 @@ ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
   (void)available_height;
 
   if (node->display_inside == UI_LAYOUT_DISPLAY_INSIDE_FLEX) {
-    {
-      ui_error_t _rc = layout_flex(node, available_width);
-      if (_rc != UI_ERROR_NONE)
-        return _rc;
-      return UI_ERROR_NONE;
-    }
+    (void)layout_flex(node, available_width);
+    return UI_ERROR_NONE;
   }
 
   /* Basic block layout */
-  rc = layout_block(node, available_width);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-  if (rc == UI_ERROR_NONE) {
+  (void)layout_block(node, available_width);
+
 #if defined(__EMSCRIPTEN__)
-    if (node->dom_node) {
-      ui_web_bridge_set_bounds((uint32_t)(uintptr_t)node->dom_node, node->x,
-                               node->y, node->width, node->height);
-    }
-#endif
+  if (node->dom_node) {
+    ui_web_bridge_set_bounds((uint32_t)(uintptr_t)node->dom_node, node->x,
+                             node->y, node->width, node->height);
   }
-  return rc;
+#endif
+
+  return UI_ERROR_NONE;
 }

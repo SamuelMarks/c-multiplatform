@@ -359,6 +359,11 @@ static ui_error_t run_oom_tests(void) {
 int main(void) {
   ui_error_t rc;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_avatar_coverage(void);
+  run_avatar_coverage();
+#endif
+
   if (run_normal_tests() != UI_ERROR_NONE) {
     printf("Normal tests failed.\n");
     return 1;

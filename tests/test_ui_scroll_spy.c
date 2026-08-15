@@ -4,6 +4,7 @@
 #include "../include/ui_dom_node.h"
 #include "../include/ui_signal.h"
 #include "../include/ui_effect.h"
+#include "../include/ui_intersection_observer.h"
 #include <stdio.h>
 /* clang-format on */
 
@@ -12,7 +13,10 @@ extern int g_malloc_fail_countdown;
 static ui_error_t failing_effect_fn(void *user_data) {
   ui_signal_t *sig = (ui_signal_t *)user_data;
   union ui_signal_payload val;
-  ui_signal_get(sig, &val);
+  {
+    ui_error_t _ign = ui_signal_get(sig, &val);
+    (void)_ign;
+  }
 
   printf("failing_effect_fn called with val %d\n", val.int_val);
   if (val.int_val != -1) {
@@ -81,11 +85,6 @@ static int test_scroll_spy_targets(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  /* Test OOM during observer creation in set_root */
-  /* Actually observer creation requires allocs which we mock. But we can't
-   * reliably mock IO's inner allocs without deeper integration, wait IO mock
-   * fails if we set g_malloc_fail_countdown here */
-
   /* Test add_target invalid args */
   rc = ui_scroll_spy_add_target(NULL, target1, 1);
   if (rc != UI_ERROR_INVALID_ARGUMENT)
@@ -105,7 +104,10 @@ static int test_scroll_spy_targets(void) {
   /* Test OOM in add_target */
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
-    ui_scroll_spy_add_target(spy, target3, 3);
+    {
+      ui_error_t _ign = ui_scroll_spy_add_target(spy, target3, 3);
+      (void)_ign;
+    }
   }
   g_malloc_fail_countdown = -1;
 
@@ -142,9 +144,29 @@ static int test_scroll_spy_targets(void) {
   /* Test OOM in set_root */
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
-    ui_scroll_spy_set_root(spy, NULL, -10);
+    {
+      ui_error_t _ign = ui_scroll_spy_set_root(spy, NULL, -10);
+      (void)_ign;
+    }
   }
   g_malloc_fail_countdown = -1;
+
+  /* Force spy->observer = NULL by failing set_root explicitly */
+  g_malloc_fail_countdown = 0;
+  (void)ui_scroll_spy_set_root(spy, NULL, 0);
+  g_malloc_fail_countdown = -1;
+
+  struct ui_scroll_spy_internal {
+    void *obs;
+  };
+  printf("OBS SERVER: %p\n", ((struct ui_scroll_spy_internal *)spy)->obs);
+
+  /* Now add and remove with observer == NULL to hit missing branches */
+  (void)ui_scroll_spy_add_target(spy, target3, 3);
+  (void)ui_scroll_spy_remove_target(spy, target3);
+
+  /* Restore observer so rest of test doesn't crash if it needs it */
+  (void)ui_scroll_spy_set_root(spy, NULL, 0);
 
   /* Test remove_target */
   rc = ui_scroll_spy_remove_target(NULL, target1);
@@ -203,6 +225,50 @@ static int test_scroll_spy_signal(void) {
   rc = ui_scroll_spy_set_root(spy, NULL, 0);
   if (rc != UI_ERROR_NONE)
     return 1;
+
+  /* Evaluate with no targets to hit best_id == -1 branch while signal is bound
+   */
+  rc = ui_scroll_spy_evaluate(spy);
+  if (rc != UI_ERROR_NONE) {
+    printf("Expected NONE from empty scroll evaluate, got %d\n", rc);
+    return 1;
+  }
+
+  /* Force observer to evaluate a target not in spy->targets */
+  {
+    struct ui_dom_node *ghost = (struct ui_dom_node *)0x111;
+    struct ui_scroll_spy_internal {
+      void *observer;
+      void *active_signal;
+    };
+    struct ui_scroll_spy_internal *internal =
+        (struct ui_scroll_spy_internal *)spy;
+
+    void *saved_obs = internal->observer;
+    internal->observer = NULL;
+    (void)ui_scroll_spy_add_target(spy, ghost, 4);
+
+    /* This removes ghost from spy->targets but NOT from the observer...
+     * actually if we added it when observer was NULL, it was NEVER added to the
+     * observer! */
+    (void)ui_scroll_spy_remove_target(spy, ghost);
+
+    /* Wait! If we want it in the observer but not in targets, we must add it
+     * when observer is NOT NULL, then remove it when observer IS NULL! */
+    internal->observer = saved_obs;
+    (void)ui_scroll_spy_add_target(spy, ghost, 4);
+    internal->observer = NULL;
+    (void)ui_scroll_spy_remove_target(spy, ghost);
+    internal->observer = saved_obs;
+    /* Observer still tracks ghost, but spy doesn't know about it. Evaluates it
+     * -> hits loop finish AND best_id == -1 with active_signal */
+    (void)ui_scroll_spy_evaluate(spy);
+
+    /* Clean up observer so it doesn't crash */
+    (void)ui_intersection_observer_unobserve(
+        (struct ui_intersection_observer *)internal->observer, ghost);
+  }
+
   rc = ui_scroll_spy_add_target(spy, target1, 1);
   if (rc != UI_ERROR_NONE)
     return 1;
@@ -225,16 +291,18 @@ static int test_scroll_spy_signal(void) {
 
 int main(void) {
   int failed = 0;
+  int f2;
+  int f3;
   printf("Running ui_scroll_spy tests...\n");
 
   failed |= test_scroll_spy_lifecycle();
   if (failed)
     printf("test_scroll_spy_lifecycle failed\n");
-  int f2 = test_scroll_spy_targets();
+  f2 = test_scroll_spy_targets();
   if (f2)
     printf("test_scroll_spy_targets failed\n");
   failed |= f2;
-  int f3 = test_scroll_spy_signal();
+  f3 = test_scroll_spy_signal();
   if (f3)
     printf("test_scroll_spy_signal failed\n");
   failed |= f3;
@@ -246,168 +314,4 @@ int main(void) {
 
   printf("All tests passed.\n");
   return 0;
-}
-void test_ui_scroll_spy_extra3(void) {
-  /* let's mock it safely using the same technique as oom */
-  extern int g_malloc_fail_countdown;
-  struct ui_scroll_spy *spy = NULL;
-  int i;
-  for (i = 0; i < 5; ++i) {
-    g_malloc_fail_countdown = i;
-    ui_scroll_spy_create(&spy);
-  }
-  g_malloc_fail_countdown = -1;
-
-  ui_scroll_spy_create(&spy);
-  if (spy) {
-    for (i = 0; i < 20; ++i) {
-      ui_scroll_spy_add_target(spy, (struct ui_dom_node *)(size_t)(0x10 + i),
-                               i);
-    }
-    /* trigger out of bounds */
-    ui_scroll_spy_add_target(spy, (struct ui_dom_node *)0x1, 1);
-
-    /* observer memory fail */
-    for (i = 0; i < 5; ++i) {
-      g_malloc_fail_countdown = i;
-      ui_scroll_spy_set_root(spy, NULL, 0);
-    }
-    g_malloc_fail_countdown = -1;
-
-    ui_scroll_spy_set_root(spy, NULL, 0); /* creates observer */
-    ui_scroll_spy_set_root(spy, NULL, 0); /* observer destruction path */
-
-    (void)ui_scroll_spy_destroy(spy);
-  }
-}
-
-void test_ui_scroll_spy_err_nulls(void) {
-  ui_scroll_spy_create(NULL);
-  (void)ui_scroll_spy_destroy(NULL);
-  ui_scroll_spy_set_root(NULL, NULL, 0);
-  ui_scroll_spy_add_target(NULL, NULL, 0);
-  ui_scroll_spy_remove_target(NULL, NULL);
-  ui_scroll_spy_bind_active_section(NULL, NULL);
-  ui_scroll_spy_evaluate(NULL);
-
-  struct ui_scroll_spy *spy = NULL;
-  ui_scroll_spy_create(&spy);
-  if (spy) {
-    ui_scroll_spy_add_target(spy, NULL, 0);
-    ui_scroll_spy_remove_target(spy, NULL);
-    /* remove non existent */
-    ui_scroll_spy_remove_target(spy, (struct ui_dom_node *)0x1);
-    ui_scroll_spy_bind_active_section(spy, NULL);
-    (void)ui_scroll_spy_destroy(spy);
-  }
-}
-void test_ui_scroll_spy_nulls2(void) {
-  /* need to safely hit null check in evaluate */
-  ui_scroll_spy_evaluate(NULL);
-  (void)ui_scroll_spy_destroy(NULL);
-
-  /* out of bounds */
-  struct ui_scroll_spy *spy = NULL;
-  ui_scroll_spy_create(&spy);
-  if (spy) {
-    int i;
-    for (i = 0; i < 32; ++i) { /* MAX_SPY_TARGETS is 32 */
-      ui_scroll_spy_add_target(spy, (struct ui_dom_node *)(size_t)(0x10 + i),
-                               i);
-    }
-    ui_scroll_spy_add_target(spy, (struct ui_dom_node *)0x10,
-                             99); /* should hit out of bounds */
-
-    (void)ui_scroll_spy_destroy(spy);
-  }
-}
-void test_ui_scroll_spy_err_nulls_real(void) {
-  ui_scroll_spy_create(NULL);
-  (void)ui_scroll_spy_destroy(NULL);
-  ui_scroll_spy_set_root(NULL, NULL, 0);
-  ui_scroll_spy_add_target(NULL, NULL, 0);
-  ui_scroll_spy_remove_target(NULL, NULL);
-  ui_scroll_spy_bind_active_section(NULL, NULL);
-  ui_scroll_spy_evaluate(NULL);
-}
-void test_ui_scroll_spy_err_nulls_real2(void) {
-  struct ui_scroll_spy *spy = NULL;
-  ui_scroll_spy_create(&spy);
-  if (spy) {
-    ui_scroll_spy_add_target(spy, NULL, 0);
-    ui_scroll_spy_remove_target(spy, NULL);
-    /* remove non existent */
-    ui_scroll_spy_remove_target(spy, (struct ui_dom_node *)0x1);
-    ui_scroll_spy_bind_active_section(spy, NULL);
-    (void)ui_scroll_spy_destroy(spy);
-  }
-}
-void test_ui_scroll_spy_err_nulls_real3(void) {
-  (void)ui_scroll_spy_destroy(NULL);
-  ui_scroll_spy_evaluate(NULL);
-}
-void test_ui_scroll_spy_extra(void) {
-  struct ui_scroll_spy *spy = NULL;
-  ui_scroll_spy_create(&spy);
-  if (spy) {
-    ui_scroll_spy_set_root(NULL, NULL, 0);
-    struct ui_dom_node *target1 = (struct ui_dom_node *)0x10;
-
-    ui_scroll_spy_add_target(NULL, target1, 1);
-    ui_scroll_spy_add_target(spy, NULL, 1);
-
-    ui_scroll_spy_remove_target(NULL, target1);
-    ui_scroll_spy_remove_target(spy, NULL);
-
-    /* Cover remove target not found */
-    ui_scroll_spy_remove_target(spy, target1);
-
-    ui_scroll_spy_evaluate(NULL);
-    (void)ui_scroll_spy_destroy(NULL);
-
-    ui_scroll_spy_bind_active_section(NULL, NULL);
-    ui_scroll_spy_bind_active_section(spy, NULL);
-    ui_scroll_spy_bind_active_section(spy, (struct ui_signal *)0x1);
-
-    int i;
-    for (i = 0; i < 20; ++i) {
-      ui_scroll_spy_add_target(spy, (struct ui_dom_node *)(size_t)(0x10 + i),
-                               i);
-    }
-
-    /* test out of bounds */
-    ui_scroll_spy_add_target(spy, target1, 99);
-
-    /* to test UI_ERROR_OUT_OF_MEMORY we mock via countdown */
-    (void)ui_scroll_spy_destroy(spy);
-  }
-}
-
-void test_ui_scroll_spy_oom(void) {
-  extern int g_malloc_fail_countdown;
-  struct ui_scroll_spy *spy = NULL;
-  int i;
-  for (i = 0; i < 5; ++i) {
-    g_malloc_fail_countdown = i;
-    ui_scroll_spy_create(&spy);
-  }
-  g_malloc_fail_countdown = -1;
-
-  ui_scroll_spy_create(&spy);
-  if (spy) {
-    ui_scroll_spy_add_target(spy, (struct ui_dom_node *)0x10, 1);
-    /* set_root creates intersection observer, so it can fail */
-    for (i = 0; i < 5; ++i) {
-      g_malloc_fail_countdown = i;
-      ui_scroll_spy_set_root(spy, NULL, 0);
-    }
-    g_malloc_fail_countdown = -1;
-
-    /* observer destruction is hit inside set_root */
-    ui_scroll_spy_set_root(spy, NULL, 0);
-    ui_scroll_spy_set_root(spy, NULL,
-                           0); /* hits spy->observer != NULL branch */
-
-    (void)ui_scroll_spy_destroy(spy);
-  }
 }

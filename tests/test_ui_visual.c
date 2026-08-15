@@ -48,6 +48,7 @@ static ui_error_t test_render_scene(struct ui_renderer *renderer) {
   return renderer->vtable->end_frame(renderer->ctx);
 }
 
+int g_mock_stbi_write_png_fail = 0;
 int main(void) {
   struct ui_renderer *native_renderer = NULL;
   struct ui_renderer *gles_renderer = NULL;
@@ -139,8 +140,10 @@ int main(void) {
         if (heatmap) {
           ui_visual_generate_heatmap(native_pixels, gles_pixels, width, height,
                                      heatmap);
-          ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", heatmap,
-                                          width, height);
+          g_mock_stbi_write_png_fail = 1;
+          (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png",
+                                                heatmap, width, height);
+          g_mock_stbi_write_png_fail = 0;
           free(heatmap);
         }
       }
@@ -176,14 +179,13 @@ int main(void) {
                                  native_pixels);
       ui_visual_generate_heatmap(native_pixels, gles_pixels, width, 0,
                                  native_pixels);
-
-      ui_visual_write_heatmap_to_disk(NULL, native_pixels, width, height);
-      ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", NULL, width,
-                                      height);
-      ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", native_pixels,
-                                      0, height);
-      ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", native_pixels,
-                                      width, 0);
+      (void)ui_visual_write_heatmap_to_disk(NULL, native_pixels, width, height);
+      (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", NULL,
+                                            width, height);
+      (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png",
+                                            native_pixels, 0, height);
+      (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png",
+                                            native_pixels, width, 0);
 
       /* Make an exact match test case just for coverage */
       ui_visual_fuzzy_match(native_pixels, native_pixels, width, height,
@@ -192,19 +194,43 @@ int main(void) {
                                  gles_pixels);
 
       /* Test writing failure */
-      ui_visual_write_heatmap_to_disk(
+      (void)ui_visual_write_heatmap_to_disk(
           "/invalid/path/that/does/not/exist/heatmap.png", native_pixels, width,
           height);
 
       /* Intentionally cause an RMS mismatch */
       memset(gles_pixels, 255, width * height * 4);
+      /* explicitly make them differ in RGB */
+      gles_pixels[0] = 120;
+      gles_pixels[1] = 130;
+      gles_pixels[2] = 140;
+      native_pixels[0] = 50;
+      native_pixels[1] = 50;
+      native_pixels[2] = 50;
+      gles_pixels[4] = 10;
+      gles_pixels[5] = 10;
+      gles_pixels[6] = 10;
+      native_pixels[4] = 11;
+      native_pixels[5] = 11;
+      native_pixels[6] = 11;
+      gles_pixels[8] = 2;
+      gles_pixels[9] = 2;
+      gles_pixels[10] = 2;
+      native_pixels[8] = 2;
+      native_pixels[9] = 2;
+      native_pixels[10] = 2;
+      ui_visual_fuzzy_match(native_pixels, gles_pixels, width, height, &config,
+                            &matched);
+
       if (ui_visual_fuzzy_match(native_pixels, gles_pixels, width, height,
                                 &config, &matched)) {
         unsigned char *heatmap = (unsigned char *)malloc(width * height * 4);
         ui_visual_generate_heatmap(native_pixels, gles_pixels, width, height,
                                    heatmap);
-        ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", heatmap,
-                                        width, height);
+        g_mock_stbi_write_png_fail = 1;
+        (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png",
+                                              heatmap, width, height);
+        g_mock_stbi_write_png_fail = 0;
         free(heatmap);
       }
 
@@ -222,16 +248,70 @@ int main(void) {
         unsigned char p2[16] = {255, 0, 255, 255, 0,   0,   0,   255,
                                 2,   2, 2,   255, 253, 253, 253, 255};
         ui_visual_generate_heatmap(p1, p2, 2, 2, h);
+        /* Also fuzzy match to trigger calculate_delta_e */
+        ui_visual_fuzzy_match(p1, p2, 2, 2, &config, &matched);
+        /* explicitly make them differ in RGB */
+        p1[0] = 50;
+        p1[1] = 50;
+        p1[2] = 50;
+        p2[0] = 120;
+        p2[1] = 130;
+        p2[2] = 140;
+        ui_visual_fuzzy_match(p1, p2, 2, 2, &config, &matched);
+
+        /* Test G differing */
+        p2[0] = p1[0];
+        p2[1] = p1[1] + 1;
+        p2[2] = p1[2];
+        p2[3] = p1[3];
+        ui_visual_generate_heatmap(p1, p2, 2, 2, h);
+        ui_visual_fuzzy_match(p1, p2, 2, 2, &config, &matched);
+        /* Test B differing */
+        p2[0] = p1[0];
+        p2[1] = p1[1];
+        p2[2] = p1[2] + 1;
+        p2[3] = p1[3];
+        ui_visual_generate_heatmap(p1, p2, 2, 2, h);
+        ui_visual_fuzzy_match(p1, p2, 2, 2, &config, &matched);
+        /* Test A differing */
+        p2[0] = p1[0];
+        p2[1] = p1[1];
+        p2[2] = p1[2];
+        p2[3] = p1[3] + 1;
+        ui_visual_generate_heatmap(p1, p2, 2, 2, h);
+        ui_visual_fuzzy_match(p1, p2, 2, 2, &config, &matched);
         free(h);
       }
-
-      /* Alpha threshold trigger */
       gles_pixels[3] = (gles_pixels[3] + 20) % 255;
       ui_visual_fuzzy_match(native_pixels, gles_pixels, width, height, &config,
                             &matched);
 
       /* Small drift threshold */
       config.max_drift_percentage = 99.0;
+      ui_visual_fuzzy_match(native_pixels, gles_pixels, width, height, &config,
+                            &matched);
+      /* Max drift threshold mismatch */
+      config.rms_threshold = 0.5;
+      config.max_drift_percentage = 0.0001;
+      gles_pixels[1] = (gles_pixels[1] + 1) % 255;
+      ui_visual_fuzzy_match(native_pixels, gles_pixels, width, height, &config,
+                            &matched);
+      /* Test stbi write success */
+      ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", native_pixels,
+                                      10, 10);
+
+      /* Max drift threshold mismatch */
+      config.max_drift_percentage = 0.0001;
+      gles_pixels[1] = (gles_pixels[1] + 1) % 255;
+      ui_visual_fuzzy_match(native_pixels, gles_pixels, width, height, &config,
+                            &matched);
+      /* Test stbi write success */
+      ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", native_pixels,
+                                      10, 10);
+
+      /* Max drift threshold mismatch */
+      config.max_drift_percentage = 0.0001;
+      gles_pixels[1] = (gles_pixels[1] + 1) % 255;
       ui_visual_fuzzy_match(native_pixels, gles_pixels, width, height, &config,
                             &matched);
     }

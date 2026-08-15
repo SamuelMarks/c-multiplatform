@@ -225,6 +225,12 @@ static ui_error_t compile_shader(unsigned int type, const char *source,
 
 static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_mock_gles2_flush_fail;
+  if (g_mock_gles2_flush_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   if (!backend || !backend->user_data) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -240,17 +246,24 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   if (data->program) {
 #endif
     glUseProgram(data->program);
-    glUniform2f(data->u_resolution, data->viewport_width,
-                data->viewport_height);
+    {
+      float w = data->viewport_width;
+      float h = data->viewport_height;
+      glUniform2f(data->u_resolution, w, h);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, data->vbo);
-    glBufferData(GL_ARRAY_BUFFER, data->vertex_count * sizeof(struct ui_vertex),
-                 data->vertices, GL_DYNAMIC_DRAW);
+    {
+      GLsizeiptr vsz = data->vertex_count * sizeof(struct ui_vertex);
+      glBufferData(GL_ARRAY_BUFFER, vsz, data->vertices, GL_DYNAMIC_DRAW);
+    }
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 data->index_count * sizeof(unsigned short), data->indices,
-                 GL_DYNAMIC_DRAW);
+    {
+      GLsizeiptr isz = data->index_count * sizeof(unsigned short);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, isz, data->indices,
+                   GL_DYNAMIC_DRAW);
+    }
 
     glEnableVertexAttribArray(data->a_position);
     glVertexAttribPointer(data->a_position, 2, GL_FLOAT, 0,
@@ -436,6 +449,12 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
 
 static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_mock_gles2_destroy_fail;
+  if (g_mock_gles2_destroy_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -489,29 +508,31 @@ struct gles2_texture {
 
 static ui_error_t gles2_push_clip(struct ui_renderer_backend *backend, float x,
                                   float y, float width, float height) {
+  ui_error_t rc;
   (void)x;
   (void)y;
   (void)width;
   (void)height;
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-  {
-    ui_error_t rc = gles2_flush(backend);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-  }
+
+  rc = gles2_flush(backend);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
   /* glScissor logic would go here. We mock it for the test. */
   return UI_ERROR_NONE;
 }
 
 static ui_error_t gles2_pop_clip(struct ui_renderer_backend *backend) {
+  ui_error_t rc;
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-  {
-    ui_error_t rc = gles2_flush(backend);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-  }
+
+  rc = gles2_flush(backend);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
   return UI_ERROR_NONE;
 }
 
@@ -520,32 +541,31 @@ static ui_error_t gles2_push_stencil_clip(struct ui_renderer_backend *backend,
                                           int vertex_count,
                                           const unsigned short *indices,
                                           int index_count) {
+  ui_error_t rc;
   (void)vertices;
   (void)vertex_count;
   (void)indices;
   (void)index_count;
-  (void)vertices;
-  (void)vertex_count;
-  (void)indices;
-  (void)index_count;
+
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-  {
-    ui_error_t rc = gles2_flush(backend);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-  }
+
+  rc = gles2_flush(backend);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
   return UI_ERROR_NONE;
 }
 
 static ui_error_t gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
+  ui_error_t rc;
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-  {
-    ui_error_t rc = gles2_flush(backend);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-  }
+
+  rc = gles2_flush(backend);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
   return UI_ERROR_NONE;
 }
 static ui_error_t gles2_create_texture(struct ui_renderer_backend *backend,
@@ -657,6 +677,12 @@ ui_error_t ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
 }
 
 ui_error_t ui_renderer_gles2_destroy(struct ui_renderer_backend *backend) {
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_mock_gles2_destroy_fail;
+  if (g_mock_gles2_destroy_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

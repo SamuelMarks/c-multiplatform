@@ -1,3 +1,4 @@
+#if defined(__APPLE__)
 #define GL_SILENCE_DEPRECATION
 /* clang-format off */
 #include "../include/ui_renderer.h"
@@ -9,6 +10,18 @@
 #include <CoreGraphics/CoreGraphics.h>
 #include <CoreText/CoreText.h>
 #include <CoreFoundation/CoreFoundation.h>
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_mock_cg_fail;
+#define CGDataProviderCreateWithData(a, b, c, d) (g_mock_cg_fail == 1 ? NULL : CGDataProviderCreateWithData(a, b, c, d))
+#define CGFontCreateWithDataProvider(a) (g_mock_cg_fail == 2 ? NULL : CGFontCreateWithDataProvider(a))
+#define CTFontCreateWithGraphicsFont(a, b, c, d) (g_mock_cg_fail == 3 ? NULL : CTFontCreateWithGraphicsFont(a, b, c, d))
+#define CFStringCreateWithCString(a, b, c) (g_mock_cg_fail == 4 ? NULL : CFStringCreateWithCString(a, b, c))
+#define CGPathCreateMutable() (g_mock_cg_fail == 5 ? NULL : CGPathCreateMutable())
+#define CFAttributedStringCreate(a, b, c) (g_mock_cg_fail == 6 ? NULL : CFAttributedStringCreate(a, b, c))
+#define CTLineCreateWithAttributedString(a) (g_mock_cg_fail == 7 ? NULL : CTLineCreateWithAttributedString(a))
+#define ui_font_get_data(f, d, s) (g_mock_cg_fail == 8 ? (*(d) = (const unsigned char*)1, *(s) = 0, UI_ERROR_NONE) : ui_font_get_data(f, d, s))
+#endif
 /* clang-format on */
 
 /* CoreGraphics Renderer Context */
@@ -24,6 +37,10 @@ static ui_error_t cg_begin_frame(void *ctx, int width, int height) {
 
   if (!cgc)
     return UI_ERROR_INVALID_ARGUMENT;
+
+#include <stdio.h>
+  printf("begin_frame: cw=%d w=%d ch=%d h=%d ctx=%p\n", cgc->current_width,
+         width, cgc->current_height, height, (void *)cgc->context);
 
   /* Recreate offscreen context if dimensions change */
   if (cgc->current_width != width || cgc->current_height != height ||
@@ -93,7 +110,7 @@ static ui_error_t cg_draw_text(void *ctx, const char *text,
   CGFloat components[4];
   CGColorRef cgColor = NULL;
 
-  if (!cgc || !cgc->context || !text || !f || !r)
+  if (!cgc || !cgc->context || !text || !r)
     return UI_ERROR_INVALID_ARGUMENT;
 
   ui_font_get_data((struct ui_font *)f, &font_data, &font_size_bytes);
@@ -163,6 +180,7 @@ static ui_error_t cg_draw_text(void *ctx, const char *text,
   CGContextScaleCTM(cgc->context, 1.0, -1.0);
   CGContextSetTextPosition(cgc->context, 0, 0);
   CTLineDraw(line, cgc->context);
+
   CGContextRestoreGState(cgc->context);
 
   CFRelease(line);
@@ -252,6 +270,7 @@ static ui_error_t cg_pop_clip(void *ctx) {
 static ui_error_t cg_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGBlendMode cg_mode = kCGBlendModeNormal;
+  (void)cg_mode;
   if (!cgc || !cgc->context)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -324,11 +343,15 @@ static ui_error_t cg_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
 
   if (!shadow) {
     /* Clear shadow by setting a clear color or 0 offset/blur */
+
     CGContextSetShadowWithColor(cgc->context, CGSizeMake(0, 0), 0, NULL);
+
+    return UI_ERROR_NONE;
     return UI_ERROR_NONE;
   }
 
   offset = CGSizeMake(shadow->offset_x.value, shadow->offset_y.value);
+  (void)offset;
 
   colorSpace = CGColorSpaceCreateDeviceRGB();
   /* Convert sRGB 0-1 values from ui_css_color to CG components */
@@ -380,6 +403,7 @@ static ui_error_t cg_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
 static ui_error_t cg_destroy(void *ctx) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (cgc) {
+    printf("cg_destroy: cgc->context = %p\n", (void *)cgc->context);
     if (cgc->context) {
       CGContextRelease(cgc->context);
     }
@@ -414,4 +438,5 @@ ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
 
   return UI_ERROR_NONE;
 }
+#endif
 #endif

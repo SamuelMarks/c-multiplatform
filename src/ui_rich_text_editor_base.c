@@ -31,7 +31,7 @@ struct ui_rich_text_editor_base {
 };
 
 static ui_error_t trigger_cva_change(struct ui_rich_text_editor_base *rte) {
-  if (rte && rte->cva_on_change) {
+  if (rte->cva_on_change) {
     union ui_signal_payload payload;
     payload.ptr_val = rte->html_buffer;
     return rte->cva_on_change(payload, rte->cva_on_change_user_data);
@@ -40,7 +40,7 @@ static ui_error_t trigger_cva_change(struct ui_rich_text_editor_base *rte) {
 }
 
 static ui_error_t trigger_cva_touched(struct ui_rich_text_editor_base *rte) {
-  if (rte && rte->cva_on_touched) {
+  if (rte->cva_on_touched) {
     return rte->cva_on_touched(rte->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
@@ -210,7 +210,7 @@ cleanup:
   if (root_node) {
     (void)ui_dom_node_destroy(root_node);
   }
-  if (rte && rte->component) {
+  if (rte->component) {
     (void)ui_component_destroy(rte->component);
   }
   C_MULTIPLATFORM_FREE(rte);
@@ -280,7 +280,7 @@ ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
   }
 
   /* Note: Simple append for now, ignoring caret position in this stub */
-  if (cur_len == 0 && rte->html_buffer) {
+  if (cur_len == 0) {
     rte->html_buffer[0] = '\0';
   }
   strcat(rte->html_buffer, text);

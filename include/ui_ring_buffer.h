@@ -56,6 +56,15 @@ ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer, const void *item);
  */
 ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item);
 
+/**
+ * @brief Pushes an item into the ring buffer safely from multiple threads.
+ *        Uses a spinlock to ensure thread-safe multi-producer access.
+ *
+ * @param buffer The ring buffer.
+ * @param item Pointer to the item data to copy into the buffer.
+ * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_FULL if there is no space,
+ *         or other error codes.
+ */
 ui_error_t ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
                                   const void *item);
 #ifdef __cplusplus

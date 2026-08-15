@@ -278,10 +278,9 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
     node->computed_height = 0.0f;
     if (node->component && node->component->shadow_root) {
       rc = ui_dom_node_set_text_content(node->component->shadow_root, "");
-      if (rc != UI_ERROR_NONE)
-        return rc;
     }
-    return UI_ERROR_NONE; /* Not an error to be empty or unfonted */
+    return rc; /* Not an error to be empty or unfonted unless set_text_content
+                  fails */
   }
 
   rc = ui_text_layout_shape(node->layout, font, node->font_size, node->text,
@@ -313,7 +312,7 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
         size_t len = strlen(node->text);
         size_t target_len =
             (size_t)((float)len * (max_allowed_height / node->computed_height));
-        if (target_len > 3 && target_len < len) {
+        if (target_len > 3) {
           char *trunc_str = (char *)C_MULTIPLATFORM_MALLOC(target_len + 4);
           if (trunc_str) {
             /* use strncpy_s or strncpy safely */
@@ -342,19 +341,15 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
         }
       }
       /* Hard clip */
-      if (node->computed_height > max_allowed_height) {
-        node->computed_height = max_allowed_height;
-      }
+      node->computed_height = max_allowed_height;
     }
   }
 
   if (node->component && node->component->shadow_root) {
     rc = ui_dom_node_set_text_content(node->component->shadow_root, node->text);
-    if (rc != UI_ERROR_NONE)
-      return rc;
   }
 
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t ui_text_node_base_get_layout(struct ui_text_node_base *node,

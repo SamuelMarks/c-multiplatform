@@ -44,9 +44,11 @@ static int test_web_bridge(void) {
   ui_web_bridge_dispatch_event(2, 0, 0, 1);       /* MOUSE_UP */
   ui_web_bridge_dispatch_event(3, 0, 0, 0);       /* MOUSE_MOVE */
   ui_web_bridge_dispatch_event(5, 10.0, 20.0, 0); /* MOUSE_WHEEL */
-  ui_web_bridge_dispatch_event(30, 1.0f, 0, 0);   /* DEEP_LINK */
-  ui_web_bridge_dispatch_event(99, 0.0f, 0, 0);   /* Unknown type */
-  ui_web_bridge_dispatch_event(0, 0.0f, 0, 0);    /* Zero type */
+  ui_web_bridge_dispatch_event(30, (ui_uintptr) "test://app", 0,
+                               0);              /* DEEP_LINK */
+  ui_web_bridge_dispatch_event(30, 0, 0, 0);    /* DEEP_LINK NULL */
+  ui_web_bridge_dispatch_event(99, 0.0f, 0, 0); /* Unknown type */
+  ui_web_bridge_dispatch_event(0, 0.0f, 0, 0);  /* Zero type */
 
   ui_web_bridge_dispatch_resize(800, 600, 1.0f);
   ui_web_bridge_dispatch_key(10, "A", 0); /* KEY_DOWN */

@@ -75,6 +75,7 @@ static int test_single_select(void) {
 
   /* Deselect */
   ui_selection_model_deselect(model, (void *)10);
+  ui_selection_model_deselect(model, (void *)99); /* Not selected */
   ui_selection_model_get_selected_count(model, &count);
   if (count != 0)
     return 1;

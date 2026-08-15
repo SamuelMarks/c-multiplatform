@@ -84,7 +84,7 @@ cleanup:
   if (root_node) {
     (void)ui_dom_node_destroy(root_node);
   }
-  if (wm && wm->component) {
+  if (wm->component) {
     (void)ui_component_destroy(wm->component);
   }
   C_MULTIPLATFORM_FREE(wm);

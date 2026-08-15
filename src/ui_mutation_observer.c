@@ -175,14 +175,26 @@ ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
 
     for (j = 0; j < obs->target_count; j++) {
       struct ui_mutation_target_info *tinfo = &obs->targets[j];
+      int is_match = 0;
       if (!tinfo->options.child_list)
         continue;
 
-      if (tinfo->target == target ||
-          (tinfo->options.subtree && is_ancestor(tinfo->target, target))) {
-        memset(&record, 0, sizeof(record));
+      if (tinfo->target == target) {
+        is_match = 1;
+      } else if (tinfo->options.subtree) {
+        if (is_ancestor(tinfo->target, target)) {
+          is_match = 1;
+        }
+      }
+      if (is_match) {
         record.type = UI_MUTATION_TYPE_CHILD_LIST;
         record.target = target;
+        record.added_nodes = NULL;
+        record.added_nodes_count = 0;
+        record.removed_nodes = NULL;
+        record.removed_nodes_count = 0;
+        record.attribute_name = NULL;
+        record.old_value = NULL;
         if (added != NULL) {
           record.added_nodes = &added;
           record.added_nodes_count = 1;
@@ -222,14 +234,26 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
 
     for (j = 0; j < obs->target_count; j++) {
       struct ui_mutation_target_info *tinfo = &obs->targets[j];
+      int is_match = 0;
       if (!tinfo->options.attributes)
         continue;
 
-      if (tinfo->target == target ||
-          (tinfo->options.subtree && is_ancestor(tinfo->target, target))) {
-        memset(&record, 0, sizeof(record));
+      if (tinfo->target == target) {
+        is_match = 1;
+      } else if (tinfo->options.subtree) {
+        if (is_ancestor(tinfo->target, target)) {
+          is_match = 1;
+        }
+      }
+      if (is_match) {
         record.type = UI_MUTATION_TYPE_ATTRIBUTES;
         record.target = target;
+        record.added_nodes = NULL;
+        record.added_nodes_count = 0;
+        record.removed_nodes = NULL;
+        record.removed_nodes_count = 0;
+        record.attribute_name = NULL;
+        record.old_value = NULL;
 
 #if defined(_MSC_VER)
         {
@@ -301,14 +325,26 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
 
     for (j = 0; j < obs->target_count; j++) {
       struct ui_mutation_target_info *tinfo = &obs->targets[j];
+      int is_match = 0;
       if (!tinfo->options.character_data)
         continue;
 
-      if (tinfo->target == target ||
-          (tinfo->options.subtree && is_ancestor(tinfo->target, target))) {
-        memset(&record, 0, sizeof(record));
+      if (tinfo->target == target) {
+        is_match = 1;
+      } else if (tinfo->options.subtree) {
+        if (is_ancestor(tinfo->target, target)) {
+          is_match = 1;
+        }
+      }
+      if (is_match) {
         record.type = UI_MUTATION_TYPE_CHARACTER_DATA;
         record.target = target;
+        record.added_nodes = NULL;
+        record.added_nodes_count = 0;
+        record.removed_nodes = NULL;
+        record.removed_nodes_count = 0;
+        record.attribute_name = NULL;
+        record.old_value = NULL;
 
         if (old_value != NULL) {
           old_val_len = strlen(old_value);

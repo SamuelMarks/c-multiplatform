@@ -88,6 +88,9 @@ static ui_error_t test_chips_basic(void) {
   if (cva.set_disabled_state(NULL, 1) != UI_ERROR_INVALID_ARGUMENT)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
 
+  /* Explicitly trigger untouched dummy to cover line */
+  dummy_cva_on_touched(NULL);
+
   rc = cva.register_on_change(chips, dummy_cva_on_change, NULL);
   if (rc != UI_ERROR_NONE)
     return rc;

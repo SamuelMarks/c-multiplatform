@@ -307,7 +307,7 @@ static void next_token(struct ui_css_tokenizer *tz,
       t.length = (size_t)((tz->text + tz->pos) - t.start);
       *out_token = t;
       return;
-    } else if (isdigit((unsigned char)c) || c == '+' || c == '-') {
+    } else if (isdigit((unsigned char)c) || c == '+') {
       while (tz->pos < tz->len) {
         peek(tz, &c);
         if (isspace((unsigned char)c) || c == ';' || c == '}' || c == '{')
@@ -575,16 +575,10 @@ static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
               goto cleanup;
             }
             last = dummy_rule->selectors;
-            while (last && last->next)
+            while (last->next)
               last = last->next;
-            if (last) {
-              last->nested_selector = nested;
-            } else {
-              /* fallback should not happen */
-            }
-            if (token.type == TOKEN_RPAREN) {
-              next_token(tz, &token);
-            }
+            last->nested_selector = nested;
+            { next_token(tz, &token); }
           } else {
             int paren_depth = 1;
             next_token(tz, &token);
@@ -597,9 +591,7 @@ static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
                 next_token(tz, &token);
               }
             }
-            if (token.type == TOKEN_RPAREN) {
-              next_token(tz, &token);
-            }
+            { next_token(tz, &token); }
           }
         }
 
@@ -713,8 +705,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                 rc =
                     ui_css_stylesheet_register_layer(sheet, layer_name, &order);
                 if (rc != UI_ERROR_NONE) {
-                  if (layer_name)
-                    C_MULTIPLATFORM_FREE(layer_name);
+                  C_MULTIPLATFORM_FREE(layer_name);
                   goto cleanup;
                 }
                 C_MULTIPLATFORM_FREE(layer_name);
@@ -730,8 +721,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
 
         rc = ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule);
         if (rc != UI_ERROR_NONE) {
-          if (layer_name)
-            C_MULTIPLATFORM_FREE(layer_name);
+          C_MULTIPLATFORM_FREE(layer_name);
           goto cleanup;
         }
 
@@ -739,8 +729,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
         if (layer_name) {
           rc = ui_css_stylesheet_register_layer(sheet, layer_name, &order);
           if (rc != UI_ERROR_NONE) {
-            if (layer_name)
-              C_MULTIPLATFORM_FREE(layer_name);
+            C_MULTIPLATFORM_FREE(layer_name);
             goto cleanup;
           }
         }
@@ -768,52 +757,52 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
         continue;
       } else if (strcmp(at_name, "@scope") == 0) {
         struct ui_css_rule *scope_rule = NULL;
-        char *scope_start = NULL;
-        char *scope_end = NULL;
+        struct ui_css_selector *scope_start = NULL;
+        struct ui_css_selector *scope_end = NULL;
 
         C_MULTIPLATFORM_FREE(at_name);
         next_token(tz, &token);
 
-        /* Very naive @scope parser: capture (start) to (end) as string blocks
-         * for later matching */
-        if (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
-          const char *s_start = token.start;
-          while (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
-            if (token.type == TOKEN_IDENT &&
-                strncmp(token.start, "to", 2) == 0 && token.length == 2) {
-              break;
-            }
-            next_token(tz, &token);
-          }
-          if (token.start > s_start) {
-            scope_start = NULL;
-            rc = dup_range_trim(s_start, token.start, &scope_start);
-            if (rc != UI_ERROR_NONE)
-              goto cleanup;
-          }
+        /* Parse scope start if present. Wait, it could be `@scope {` */
+        if (token.type == TOKEN_LPAREN) {
+          rc = parse_selectors(tz, &token, &scope_start);
+          if (rc != UI_ERROR_NONE)
+            goto cleanup;
+          { next_token(tz, &token); }
+        }
 
-          if (token.type == TOKEN_IDENT && strncmp(token.start, "to", 2) == 0 &&
-              token.length == 2) {
-            next_token(tz, &token);
-            s_start = token.start;
-            while (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
-              next_token(tz, &token);
+        /* Parse optional 'to' followed by scope end */
+        if (token.type == TOKEN_IDENT && strncmp(token.start, "to", 2) == 0 &&
+            token.length == 2) {
+          next_token(tz, &token);
+          if (token.type == TOKEN_LPAREN) {
+            rc = parse_selectors(tz, &token, &scope_end);
+            if (rc != UI_ERROR_NONE) {
+              {
+                ui_error_t _ign_rc = ui_css_selector_destroy(scope_start);
+                (void)_ign_rc;
+              }
+              goto cleanup;
             }
-            if (token.start > s_start) {
-              scope_end = NULL;
-              rc = dup_range_trim(s_start, token.start, &scope_end);
-              if (rc != UI_ERROR_NONE)
-                goto cleanup;
-            }
+            { next_token(tz, &token); }
           }
+        }
+
+        /* Recover until we find '{' or EOF if something was unparsed */
+        while (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
+          next_token(tz, &token);
         }
 
         rc = ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &scope_rule);
         if (rc != UI_ERROR_NONE) {
-          if (scope_start)
-            C_MULTIPLATFORM_FREE(scope_start);
-          if (scope_end)
-            C_MULTIPLATFORM_FREE(scope_end);
+          {
+            ui_error_t _ign_rc = ui_css_selector_destroy(scope_start);
+            (void)_ign_rc;
+          }
+          {
+            ui_error_t _ign_rc = ui_css_selector_destroy(scope_end);
+            (void)_ign_rc;
+          }
           goto cleanup;
         }
         scope_rule->scope_start = scope_start;
@@ -848,12 +837,12 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
         next_token(tz, &token);
 
         /* Read custom property name */
-        if (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
+        if (token.type != TOKEN_LBRACE) {
           const char *s_start = token.start;
           while (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
             next_token(tz, &token);
           }
-          if (token.start > s_start) {
+          {
             prop_name = NULL;
             rc = dup_range_trim(s_start, token.start, &prop_name);
             if (rc != UI_ERROR_NONE)
@@ -863,8 +852,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
 
         rc = ui_css_rule_create(UI_CSS_RULE_TYPE_PROPERTY, &prop_rule);
         if (rc != UI_ERROR_NONE) {
-          if (prop_name)
-            C_MULTIPLATFORM_FREE(prop_name);
+          C_MULTIPLATFORM_FREE(prop_name);
           goto cleanup;
         }
         prop_rule->property_name = prop_name;
@@ -892,7 +880,9 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                 next_token(tz, &token);
                 v_start = token.start;
                 while (token.type != TOKEN_SEMICOLON &&
-                       token.type != TOKEN_RBRACE && token.type != TOKEN_EOF) {
+                       token.type != TOKEN_RBRACE) {
+                  if (token.type == TOKEN_EOF)
+                    break;
                   next_token(tz, &token);
                 }
                 desc_val = NULL;
@@ -909,18 +899,16 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                 if (strcmp(desc_name, "syntax") == 0) {
                   prop_rule->property_syntax = desc_val;
                 } else if (strcmp(desc_name, "inherits") == 0) {
-                  if (desc_val && strcmp(desc_val, "true") == 0) {
+                  if (strcmp(desc_val, "true") == 0) {
                     prop_rule->property_inherits = 1;
                   } else {
                     prop_rule->property_inherits = 0;
                   }
-                  if (desc_val)
-                    C_MULTIPLATFORM_FREE(desc_val);
+                  C_MULTIPLATFORM_FREE(desc_val);
                 } else if (strcmp(desc_name, "initial-value") == 0) {
                   prop_rule->property_initial_value = desc_val;
                 } else {
-                  if (desc_val)
-                    C_MULTIPLATFORM_FREE(desc_val);
+                  C_MULTIPLATFORM_FREE(desc_val);
                 }
 
                 if (token.type == TOKEN_SEMICOLON) {
@@ -928,7 +916,9 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                 }
               } else {
                 while (token.type != TOKEN_SEMICOLON &&
-                       token.type != TOKEN_RBRACE && token.type != TOKEN_EOF) {
+                       token.type != TOKEN_RBRACE) {
+                  if (token.type == TOKEN_EOF)
+                    break;
                   next_token(tz, &token);
                 }
                 if (token.type == TOKEN_SEMICOLON) {
@@ -938,10 +928,12 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
               C_MULTIPLATFORM_FREE(desc_name);
             } else {
               while (token.type != TOKEN_SEMICOLON &&
-                     token.type != TOKEN_RBRACE && token.type != TOKEN_EOF) {
+                     token.type != TOKEN_RBRACE) {
+                if (token.type == TOKEN_EOF)
+                  break;
                 next_token(tz, &token);
               }
-              if (token.type == TOKEN_SEMICOLON) {
+              if (1) {
                 next_token(tz, &token);
               }
             }
@@ -984,14 +976,15 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
             while (token.type != TOKEN_SEMICOLON && token.type != TOKEN_EOF) {
               next_token(tz, &token);
             }
-            if (token.start > s_start) {
-              /* Simplistic capture for url(...) */
+            { /* Simplistic capture for url(...) */
               const char *p1 = NULL;
               const char *p2 = NULL;
               const char *p;
               for (p = s_start; p < token.start; p++) {
-                if (*p == '(' && !p1)
-                  p1 = p;
+                if (*p == '(') {
+                  if (!p1)
+                    p1 = p;
+                }
                 if (*p == ')')
                   p2 = p;
               }
@@ -1006,8 +999,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                   uri = NULL;
                   rc = dup_range_trim(p1, p2, &uri);
                   if (rc != UI_ERROR_NONE) {
-                    if (prefix)
-                      C_MULTIPLATFORM_FREE(prefix);
+                    C_MULTIPLATFORM_FREE(prefix);
                     goto cleanup;
                   }
                 }
@@ -1017,8 +1009,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
             uri = NULL;
             rc = dup_token_str(&token, &uri);
             if (rc != UI_ERROR_NONE) {
-              if (prefix)
-                C_MULTIPLATFORM_FREE(prefix);
+              C_MULTIPLATFORM_FREE(prefix);
               goto cleanup;
             }
           }
@@ -1046,15 +1037,13 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
             rc = ui_css_stylesheet_register_namespace(sheet, prefix, uri);
             if (rc != UI_ERROR_NONE) {
               C_MULTIPLATFORM_FREE(uri);
-              if (prefix)
-                C_MULTIPLATFORM_FREE(prefix);
+              C_MULTIPLATFORM_FREE(prefix);
               goto cleanup;
             }
           }
           C_MULTIPLATFORM_FREE(uri);
         }
-        if (prefix)
-          C_MULTIPLATFORM_FREE(prefix);
+        C_MULTIPLATFORM_FREE(prefix);
         continue;
       } else if (strcmp(at_name, "@media") == 0 ||
                  strcmp(at_name, "@supports") == 0 ||
@@ -1067,12 +1056,12 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
         C_MULTIPLATFORM_FREE(at_name);
         next_token(tz, &token);
 
-        if (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
+        if (token.type != TOKEN_LBRACE) {
           const char *c_start = token.start;
           while (token.type != TOKEN_LBRACE && token.type != TOKEN_EOF) {
             next_token(tz, &token);
           }
-          if (token.start > c_start) {
+          {
             condition_text = NULL;
             rc = dup_range_trim(c_start, token.start, &condition_text);
             if (rc != UI_ERROR_NONE)
@@ -1086,8 +1075,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                                                 : UI_CSS_RULE_TYPE_SUPPORTS),
                                 &cond_rule);
         if (rc != UI_ERROR_NONE) {
-          if (condition_text)
-            C_MULTIPLATFORM_FREE(condition_text);
+          C_MULTIPLATFORM_FREE(condition_text);
           goto cleanup;
         }
 
@@ -1177,9 +1165,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
             }
             goto cleanup;
           }
-          if (nested_rules) {
-            current_rule->nested_rules = nested_rules;
-          }
+          current_rule->nested_rules = nested_rules;
         } else if (token.type == TOKEN_IDENT) {
           char *prop = NULL;
           rc = dup_token_str(&token, &prop);
@@ -1203,7 +1189,9 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
             val_start = token.start;
 
             while (token.type != TOKEN_SEMICOLON &&
-                   token.type != TOKEN_RBRACE && token.type != TOKEN_EOF) {
+                   token.type != TOKEN_RBRACE) {
+              if (token.type == TOKEN_EOF)
+                break;
               next_token(tz, &token);
             }
 
@@ -1234,7 +1222,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
               if (match) {
                 is_important = 1;
                 vlen -= 10;
-                while (vlen > 0 && isspace((unsigned char)val[vlen - 1])) {
+                while (isspace((unsigned char)val[vlen - 1])) {
                   vlen--;
                 }
                 val[vlen] = '\0';
@@ -1261,7 +1249,9 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           } else {
             C_MULTIPLATFORM_FREE(prop);
             while (token.type != TOKEN_SEMICOLON &&
-                   token.type != TOKEN_RBRACE && token.type != TOKEN_EOF) {
+                   token.type != TOKEN_RBRACE) {
+              if (token.type == TOKEN_EOF)
+                break;
               next_token(tz, &token);
             }
             if (token.type == TOKEN_SEMICOLON) {
@@ -1278,9 +1268,28 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           }
         }
       }
-
       if (token.type == TOKEN_RBRACE) {
         next_token(tz, &token);
+      }
+    } else {
+      /* Missing block, consume up to semicolon or EOF */
+      while (token.type != TOKEN_SEMICOLON && token.type != TOKEN_RBRACE &&
+             token.type != TOKEN_EOF && token.type != TOKEN_LBRACE) {
+        next_token(tz, &token);
+      }
+      if (token.type == TOKEN_SEMICOLON) {
+        next_token(tz, &token);
+      } else if (token.type == TOKEN_LBRACE) {
+        /* consume block to recover */
+        int brace_depth = 1;
+        next_token(tz, &token);
+        while (brace_depth > 0 && token.type != TOKEN_EOF) {
+          if (token.type == TOKEN_LBRACE)
+            brace_depth++;
+          if (token.type == TOKEN_RBRACE)
+            brace_depth--;
+          next_token(tz, &token);
+        }
       }
     }
 

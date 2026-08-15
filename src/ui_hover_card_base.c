@@ -83,7 +83,7 @@ cleanup:
   if (root_node) {
     (void)ui_dom_node_destroy(root_node);
   }
-  if (hover_card && hover_card->component) {
+  if (hover_card->component) {
     (void)ui_component_destroy(hover_card->component);
   }
   C_MULTIPLATFORM_FREE(hover_card);

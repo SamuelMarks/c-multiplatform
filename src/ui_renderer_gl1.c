@@ -52,6 +52,12 @@ ui_error_t ui_renderer_gl1_create(struct ui_renderer_backend **out_backend) {
 }
 
 ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_mock_gles2_destroy_fail;
+  if (g_mock_gles2_destroy_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   (void)backend;
   return UI_ERROR_NONE;
 }
@@ -83,6 +89,12 @@ struct gl1_renderer_data {
 static ui_error_t gl1_flush(struct ui_renderer_backend *backend) {
   struct gl1_renderer_data *data;
   int i;
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_mock_gles2_flush_fail;
+  if (g_mock_gles2_flush_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   if (!backend || !backend->user_data) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -407,6 +419,12 @@ ui_error_t ui_renderer_gl1_create(struct ui_renderer_backend **out_backend) {
 }
 
 ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_mock_gles2_destroy_fail;
+  if (g_mock_gles2_destroy_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

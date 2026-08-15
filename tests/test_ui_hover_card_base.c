@@ -77,6 +77,26 @@ static ui_error_t run_normal_tests(void) {
     comp->shadow_root = saved_root;
   }
 
+  /* Hit the false branch for component == NULL */
+  {
+    struct mock_card {
+      void *comp;
+      void *sig1;
+      void *sig2;
+    };
+    struct mock_card m;
+    m.comp = NULL;
+    m.sig1 = NULL;
+    m.sig2 = NULL;
+    rc = ui_hover_card_base_on_mouse_enter((struct ui_hover_card_base *)&m);
+    if (rc != UI_ERROR_NONE)
+      return UI_ERROR_UNKNOWN;
+    rc = ui_hover_card_base_on_mouse_leave((struct ui_hover_card_base *)&m,
+                                           0.0f, 0.0f);
+    if (rc != UI_ERROR_NONE)
+      return UI_ERROR_UNKNOWN;
+  }
+
   printf("Testing ui_hover_card_base_bind_open...\n");
   rc = ui_hover_card_base_bind_open(NULL, (struct ui_signal *)1);
   if (rc != UI_ERROR_INVALID_ARGUMENT)

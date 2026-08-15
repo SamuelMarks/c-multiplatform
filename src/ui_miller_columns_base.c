@@ -2,7 +2,9 @@
 #include "ui_miller_columns_base.h"
 #include "ui_arena.h"
 #include "ui_error.h"
+#include "ui_internal_mem.h"
 #include <stddef.h>
+#include <string.h>
 /* clang-format on */
 
 #define UI_MILLER_MAX_DEPTH 32
@@ -22,8 +24,7 @@ struct ui_miller_columns_base {
 static ui_error_t topology_equality(union ui_signal_payload a,
                                     union ui_signal_payload b,
                                     ui_bool_t *out_equal) {
-  if (out_equal)
-    *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
+  *out_equal = (a.int_val == b.int_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
 
@@ -43,6 +44,7 @@ ui_error_t ui_miller_columns_base_create(
   if (err != UI_ERROR_NONE) {
     return err;
   }
+  memset(ptr, 0, sizeof(struct ui_miller_columns_base));
 
   *out_miller = (struct ui_miller_columns_base *)ptr;
   (*out_miller)->arena = arena;

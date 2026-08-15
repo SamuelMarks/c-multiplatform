@@ -17,7 +17,10 @@ static int run_normal_tests(void) {
   printf("Testing invalid arguments...\n");
   if (ui_modifier_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  ui_modifier_destroy(NULL); /* should not crash */
+  {
+    ui_error_t _ign = ui_modifier_destroy(NULL);
+    (void)_ign;
+  } /* should not crash */
   if (ui_modifier_add_class(NULL, "c") != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_modifier_add_style(NULL, "p", "v") != UI_ERROR_INVALID_ARGUMENT)
@@ -34,7 +37,10 @@ static int run_normal_tests(void) {
   if (ui_modifier_add_style(modifier, "p", NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_component_create(&component);
+  {
+    ui_error_t _ign = ui_component_create(&component);
+    (void)_ign;
+  }
   if (ui_modifier_apply(NULL, component) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_modifier_apply(modifier, NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -42,7 +48,10 @@ static int run_normal_tests(void) {
   if (ui_modifier_apply(modifier, component) != UI_ERROR_INVALID_ARGUMENT)
     return 1; /* Shadow root missing */
 
-  ui_modifier_destroy(modifier);
+  {
+    ui_error_t _ign = ui_modifier_destroy(modifier);
+    (void)_ign;
+  }
   (void)ui_component_destroy(component);
   modifier = NULL;
   component = NULL;
@@ -76,12 +85,22 @@ static int run_normal_tests(void) {
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   if (err != UI_ERROR_NONE)
     return 1;
-  ui_dom_node_set_tag_name(root, "div");
+  {
+    ui_error_t _ign = ui_dom_node_set_tag_name(root, "div");
+    (void)_ign;
+  }
   component->shadow_root = root;
 
   /* Pre-existing class/style */
-  ui_dom_node_set_attribute(root, "class", "existing-class");
-  ui_dom_node_set_attribute(root, "style", "margin: 5px;");
+  {
+    ui_error_t _ign =
+        ui_dom_node_set_attribute(root, "class", "existing-class");
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_dom_node_set_attribute(root, "style", "margin: 5px;");
+    (void)_ign;
+  }
 
   /* Apply modifier */
   err = ui_modifier_apply(modifier, component);
@@ -107,19 +126,33 @@ static int run_normal_tests(void) {
   }
 
   /* Apply again to test append without semicolon on existing */
-  ui_dom_node_set_attribute(root, "style",
-                            "margin: 5px"); /* Missing trailing ; */
+  {
+    ui_error_t _ign = ui_dom_node_set_attribute(root, "style", "margin: 5px");
+    (void)_ign;
+  }
   err = ui_modifier_apply(modifier, component);
   if (err != UI_ERROR_NONE)
     return 1;
 
   (void)ui_component_destroy(component);
-  ui_modifier_destroy(modifier);
+  {
+    ui_error_t _ign = ui_modifier_destroy(modifier);
+    (void)_ign;
+  }
 
   /* Test apply empty */
-  ui_modifier_create(&modifier);
-  ui_component_create(&component);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  {
+    ui_error_t _ign = ui_modifier_create(&modifier);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_component_create(&component);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+    (void)_ign;
+  }
   component->shadow_root = root;
 
   err = ui_modifier_apply(modifier, component);
@@ -135,15 +168,33 @@ static int run_normal_tests(void) {
     return 1;
 
   (void)ui_component_destroy(component);
-  ui_modifier_destroy(modifier);
+  {
+    ui_error_t _ign = ui_modifier_destroy(modifier);
+    (void)_ign;
+  }
 
   /* Test apply without existing */
-  ui_modifier_create(&modifier);
-  ui_modifier_add_class(modifier, "test-class");
-  ui_modifier_add_style(modifier, "color", "blue");
+  {
+    ui_error_t _ign = ui_modifier_create(&modifier);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_modifier_add_class(modifier, "test-class");
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_modifier_add_style(modifier, "color", "blue");
+    (void)_ign;
+  }
 
-  ui_component_create(&component);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  {
+    ui_error_t _ign = ui_component_create(&component);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+    (void)_ign;
+  }
   component->shadow_root = root;
 
   err = ui_modifier_apply(modifier, component);
@@ -158,8 +209,60 @@ static int run_normal_tests(void) {
   if (err != UI_ERROR_NONE || strcmp(val, "color: blue;") != 0)
     return 1;
 
+  /* Apply modifier with empty pre-existing strings and EMPTY modifier lists to
+   * hit the other side of the branch */
+  {
+    struct ui_modifier *empty_mod;
+    {
+      ui_error_t _ign = ui_modifier_create(&empty_mod);
+      (void)_ign;
+    }
+    {
+      ui_error_t _ign = ui_dom_node_set_attribute(root, "class", "");
+      (void)_ign;
+    }
+    {
+      ui_error_t _ign = ui_dom_node_set_attribute(root, "style", "");
+      (void)_ign;
+    }
+    {
+      ui_error_t _ign = ui_modifier_apply(empty_mod, component);
+      (void)_ign;
+    }
+    {
+      ui_error_t _ign = ui_modifier_destroy(empty_mod);
+      (void)_ign;
+    }
+  }
+
+  /* Apply modifier with empty pre-existing strings to hit the \0 checks */
+  {
+    ui_error_t _ign = ui_modifier_add_class(modifier, "test");
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_modifier_add_style(modifier, "color", "blue");
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_dom_node_set_attribute(root, "class", "");
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_dom_node_set_attribute(root, "style", "");
+    (void)_ign;
+  }
+  err = ui_modifier_apply(modifier, component);
+  if (err != UI_ERROR_NONE) {
+    printf("ui_modifier_apply (empty) failed: %d\n", err);
+    return 1;
+  }
+
   (void)ui_component_destroy(component);
-  ui_modifier_destroy(modifier);
+  {
+    ui_error_t _ign = ui_modifier_destroy(modifier);
+    (void)_ign;
+  }
 
   return 0;
 }
@@ -180,7 +283,10 @@ static int run_oom_tests(void) {
   if (err != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 
-  ui_modifier_create(&modifier);
+  {
+    ui_error_t _ign = ui_modifier_create(&modifier);
+    (void)_ign;
+  }
 
   /* Add class OOM */
   for (i = 0; i < 2; i++) {
@@ -189,6 +295,47 @@ static int run_oom_tests(void) {
     g_malloc_fail_countdown = -1;
     if (err != UI_ERROR_OUT_OF_MEMORY)
       return 1;
+  }
+
+  /* Simulate NULL name/property on destroy */
+  {
+    struct ui_modifier_class {
+      char *name;
+      void *next;
+    };
+    struct ui_modifier_style {
+      char *property;
+      char *value;
+      void *next;
+    };
+    struct ui_modifier_internal {
+      struct ui_modifier_class *first_class;
+      void *last_class;
+      struct ui_modifier_style *first_style;
+      void *last_style;
+    };
+
+    struct ui_modifier *null_test_mod = NULL;
+    {
+      ui_error_t _ign = ui_modifier_create(&null_test_mod);
+      (void)_ign;
+    }
+
+    struct ui_modifier_internal *internal =
+        (struct ui_modifier_internal *)null_test_mod;
+    internal->first_class = malloc(sizeof(struct ui_modifier_class));
+    internal->first_class->name = NULL;
+    internal->first_class->next = NULL;
+
+    internal->first_style = malloc(sizeof(struct ui_modifier_style));
+    internal->first_style->property = NULL;
+    internal->first_style->value = NULL;
+    internal->first_style->next = NULL;
+
+    {
+      ui_error_t _ign = ui_modifier_destroy(null_test_mod);
+      (void)_ign;
+    }
   }
 
   /* Add style OOM */
@@ -201,12 +348,27 @@ static int run_oom_tests(void) {
   }
 
   /* Prepare for apply OOM */
-  ui_modifier_add_class(modifier, "btn");
-  ui_modifier_add_style(modifier, "color", "red");
+  {
+    ui_error_t _ign = ui_modifier_add_class(modifier, "btn");
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_modifier_add_style(modifier, "color", "red");
+    (void)_ign;
+  }
 
-  ui_component_create(&component);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-  ui_dom_node_set_tag_name(root, "div");
+  {
+    ui_error_t _ign = ui_component_create(&component);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_dom_node_set_tag_name(root, "div");
+    (void)_ign;
+  }
   component->shadow_root = root;
 
   /* Apply OOM for new string allocations */
@@ -225,22 +387,25 @@ static int run_oom_tests(void) {
     return 1;
 
   /* new_style_str allocation */
-  g_malloc_fail_countdown = 4; /* 1 for class string, 3 for class attribute set,
-                                  next is style string */
+  g_malloc_fail_countdown = 4; /* 1 class str, 3 for class attribute set */
   err = ui_modifier_apply(modifier, component);
   g_malloc_fail_countdown = -1;
   if (err != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 
   /* style set_attribute OOM */
-  g_malloc_fail_countdown = 5;
+  g_malloc_fail_countdown =
+      5; /* 1 class str, 3 class attr, 1 style str, 1 style attr */
   err = ui_modifier_apply(modifier, component);
   g_malloc_fail_countdown = -1;
   if (err != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 
   (void)ui_component_destroy(component);
-  ui_modifier_destroy(modifier);
+  {
+    ui_error_t _ign = ui_modifier_destroy(modifier);
+    (void)_ign;
+  }
   return 0;
 }
 

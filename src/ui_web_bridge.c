@@ -356,13 +356,11 @@ ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
   } else if (type == 30) {
     const char *uri_ptr = (const char *)(ui_uintptr)x;
     if (uri_ptr) {
-#ifndef UI_TEST_MOCK_ALLOC
       /* Use strncpy since uri is a char[1024] array */
       strncpy(event.event_data.deep_link.uri, uri_ptr,
               sizeof(event.event_data.deep_link.uri) - 1);
       event.event_data.deep_link
           .uri[sizeof(event.event_data.deep_link.uri) - 1] = '\0';
-#endif
     }
   }
 

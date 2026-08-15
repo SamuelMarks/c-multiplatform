@@ -103,23 +103,28 @@ ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
 
   (void)UI_TREE_IS_EXPAND_IGNORE(tree, node_id, &currently_expanded);
 
-  if (expanded && !currently_expanded) {
-    if (tree->num_expanded >= tree->expanded_cap) {
-      size_t new_cap = tree->expanded_cap == 0 ? 8 : tree->expanded_cap * 2;
-      void **new_arr = (void **)C_MULTIPLATFORM_REALLOC(
-          tree->expanded_nodes, new_cap * sizeof(void *));
-      if (!new_arr)
-        return UI_ERROR_OUT_OF_MEMORY;
-      tree->expanded_nodes = new_arr;
-      tree->expanded_cap = new_cap;
+  if (expanded) {
+    if (!currently_expanded) {
+      if (tree->num_expanded >= tree->expanded_cap) {
+        size_t new_cap = tree->expanded_cap == 0 ? 8 : tree->expanded_cap * 2;
+        void **new_arr = (void **)C_MULTIPLATFORM_REALLOC(
+            tree->expanded_nodes, new_cap * sizeof(void *));
+        if (!new_arr)
+          return UI_ERROR_OUT_OF_MEMORY;
+        tree->expanded_nodes = new_arr;
+        tree->expanded_cap = new_cap;
+      }
+      tree->expanded_nodes[tree->num_expanded++] = node_id;
     }
-    tree->expanded_nodes[tree->num_expanded++] = node_id;
-  } else if (!expanded && currently_expanded) {
-    for (i = 0; i < tree->num_expanded; i++) {
-      if (tree->expanded_nodes[i] == node_id) {
-        tree->expanded_nodes[i] = tree->expanded_nodes[tree->num_expanded - 1];
-        tree->num_expanded--;
-        break;
+  } else {
+    if (currently_expanded) {
+      for (i = 0;; i++) {
+        if (tree->expanded_nodes[i] == node_id) {
+          tree->expanded_nodes[i] =
+              tree->expanded_nodes[tree->num_expanded - 1];
+          tree->num_expanded--;
+          break;
+        }
       }
     }
   }
@@ -416,8 +421,7 @@ ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
     void *root_node = tree->model.get_root_node(i, tree->model.user_data);
     rc = render_recursive(tree, root_node, tree_root, 1, i + 1, root_count);
     if (rc != UI_ERROR_NONE) {
-      if (tree_root)
-        (void)ui_dom_node_destroy(tree_root);
+      (void)ui_dom_node_destroy(tree_root);
       return rc;
     }
   }

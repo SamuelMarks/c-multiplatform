@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 /* clang-format on */
 
 #define UI_TAP_MAX_DURATION_MS 300.0

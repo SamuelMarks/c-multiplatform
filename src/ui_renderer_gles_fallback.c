@@ -154,12 +154,10 @@ static ui_error_t gles_fallback_destroy(void *ctx) {
     if (gctx->backend) {
       /* We can safely call the backend's own destroy function pointer since it
        * was initialized properly */
-      if (gctx->backend->destroy) {
-        {
-          ui_error_t d_rc = gctx->backend->destroy(gctx->backend);
-          if (d_rc != UI_ERROR_NONE)
-            return d_rc;
-        }
+      {
+        ui_error_t d_rc = gctx->backend->destroy(gctx->backend);
+        if (d_rc != UI_ERROR_NONE)
+          return d_rc;
       }
       C_MULTIPLATFORM_FREE(gctx->backend);
     }
@@ -194,10 +192,6 @@ ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *renderer) {
 #ifdef UI_TEST_MOCK_ALLOC
   }
 #endif
-  if (err != UI_ERROR_NONE) {
-    if (0)
-      return err;
-  }
   if (err == UI_ERROR_NONE) {
     err = backend->init(backend, NULL, NULL);
     if (err != UI_ERROR_NONE) {
@@ -223,14 +217,11 @@ ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *renderer) {
   gctx = (struct gles_fallback_context *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct gles_fallback_context));
   if (!gctx) {
-    if (backend->destroy) {
-      {
-        ui_error_t d_rc = backend->destroy(backend);
-        if (d_rc != UI_ERROR_NONE)
-          return d_rc;
-      }
+    {
+      ui_error_t d_rc = backend->destroy(backend);
+      if (d_rc != UI_ERROR_NONE)
+        return d_rc;
     }
-    C_MULTIPLATFORM_FREE(backend);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 

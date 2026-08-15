@@ -23,7 +23,7 @@
 #pragma warning(push, 0)
 #endif
 
-#define STB_TRUETYPE_IMPLEMENTATION
+/* #define STB_TRUETYPE_IMPLEMENTATION */
 #define STBTT_malloc(x,u)  ((void)(u),C_MULTIPLATFORM_MALLOC(x))
 #define STBTT_free(x,u)    ((void)(u),C_MULTIPLATFORM_FREE(x))
 #include "../include/stb_truetype.h"

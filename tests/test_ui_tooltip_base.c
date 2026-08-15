@@ -146,6 +146,75 @@ static int test_normal(void) {
   ev.type = UI_EVENT_KEY_UP;
   ui_tooltip_base_handle_event(tt, &ev, 7.0);
 
+  /* KEYBOARD NAVIGATION */
+  /* Ignore key down when already idle */
+  ev.type = UI_EVENT_KEY_DOWN;
+  ui_tooltip_base_handle_event(tt, &ev, 8.0);
+
+  /* Focus out while already idle */
+  ev.type = UI_EVENT_MOUSE_UP; /* Substitute */
+  ui_tooltip_base_handle_event(tt, &ev, 8.0);
+
+  /* Missing focus events */
+  ev.type = UI_EVENT_MOUSE_DOWN; /* Substitute */
+  ui_tooltip_base_handle_event(tt, &ev, 9.0);
+
+  /* Touch events */
+  ui_tooltip_base_hide(tt);
+  ev.type = UI_EVENT_TOUCH_START;
+  ui_tooltip_base_handle_event(tt, &ev, 10.0);
+  ev.type = UI_EVENT_TOUCH_END;
+  ui_tooltip_base_handle_event(tt, &ev, 11.0);
+  ui_tooltip_base_hide(tt);
+  ev.type = UI_EVENT_TOUCH_END;
+  ui_tooltip_base_handle_event(tt, &ev, 12.0);
+
+  /* Tick when elapsed exactly hits boundaries */
+  ev.type = UI_EVENT_TOUCH_START;
+  ui_tooltip_base_handle_event(tt, &ev, 13.0);
+  ui_tooltip_base_tick(tt, 13.0); /* elapsed = 0 */
+  ui_tooltip_base_tick(tt, 13.5); /* elapsed = 0.5 */
+
+  ui_tooltip_base_hide(tt);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ui_tooltip_base_handle_event(tt, &ev, 14.0);
+  /* Handle it again while already in HOVER_DELAY to hit the false branch */
+  ui_tooltip_base_handle_event(tt, &ev, 14.1);
+  ui_tooltip_base_tick(tt, 14.1);
+  ui_tooltip_base_tick(tt, 14.3);
+  ui_tooltip_base_tick(tt, 14.7);
+
+  ui_tooltip_base_hide(tt);
+  ev.type = UI_EVENT_PEN_DOWN;
+  ui_tooltip_base_handle_event(tt, &ev, 15.0);
+  /* Handle it again while in FOCUS_DELAY */
+  ui_tooltip_base_handle_event(tt, &ev, 15.1);
+  ui_tooltip_base_tick(tt, 15.1);
+  ui_tooltip_base_tick(tt, 15.4);
+
+  ev.type = UI_EVENT_PEN_UP;
+  ui_tooltip_base_handle_event(tt, &ev, 16.0);
+  /* And test PEN_UP when already hiding */
+  ui_tooltip_base_handle_event(tt, &ev, 16.1);
+  ui_tooltip_base_tick(tt, 16.0);
+  ui_tooltip_base_tick(tt, 16.3);
+  /* And test PEN_UP when completely idle */
+  ui_tooltip_base_handle_event(tt, &ev, 16.4);
+
+  ui_tooltip_base_hide(tt);
+  ev.type = UI_EVENT_TOUCH_START;
+  ui_tooltip_base_handle_event(tt, &ev, 17.0);
+  /* Handle it again while in TOUCH_HOLD_DELAY */
+  ui_tooltip_base_handle_event(tt, &ev, 17.1);
+  ev.type = UI_EVENT_TOUCH_END;
+  ui_tooltip_base_handle_event(tt, &ev, 17.2);
+  /* And test TOUCH_END when already hiding */
+  ui_tooltip_base_handle_event(tt, &ev, 17.3);
+  ui_tooltip_base_tick(tt, 17.2);
+  ui_tooltip_base_tick(tt, 17.6);
+  /* And test TOUCH_END when completely idle */
+  ui_tooltip_base_handle_event(tt, &ev, 17.7);
+
   failed |=
       (ui_tooltip_base_bind_open(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT);
   ACCUM_ERR(failed, ui_tooltip_base_bind_open(tt, (struct ui_signal *)1));
@@ -201,11 +270,28 @@ static int test_oom(void) {
   ui_tooltip_base_handle_event(tt, &ev, 0.0);
   ui_tooltip_base_tick(tt, 1.0);
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < 30; i++) {
+    /* Make tooltip visible for render tests */
+    ev.type = UI_EVENT_MOUSE_MOVE;
+    ui_tooltip_base_handle_event(tt, &ev, 0.0);
+    ui_tooltip_base_tick(tt, 1.0);
+
     g_malloc_fail_countdown = i;
+    ui_tooltip_base_render(tt, director, &trig_layout, &anchor, 800, 600);
+
+    /* Hide and reset state */
+    g_malloc_fail_countdown = -1;
+    ui_tooltip_base_hide(tt);
     ui_tooltip_base_render(tt, director, &trig_layout, &anchor, 800, 600);
   }
   g_malloc_fail_countdown = -1;
+
+  /* Try render with no text */
+  ui_tooltip_base_set_text(tt, NULL);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ui_tooltip_base_handle_event(tt, &ev, 0.0);
+  ui_tooltip_base_tick(tt, 1.0);
+  ui_tooltip_base_render(tt, director, &trig_layout, &anchor, 800, 600);
 
   /* Render clean up */
   ui_tooltip_base_hide(tt);

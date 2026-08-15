@@ -99,8 +99,8 @@ struct ui_css_rule {
   char *layer_name;
 
   /* For SCOPE rules */
-  char *scope_start;
-  char *scope_end;
+  struct ui_css_selector *scope_start;
+  struct ui_css_selector *scope_end;
 
   /* For PROPERTY rules (@property) */
   char *property_name;
@@ -227,6 +227,11 @@ ui_error_t ui_css_rule_create(enum ui_css_rule_type type,
  * @param rule The rule to destroy.
  */
 ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule);
+
+/**
+ * @brief Destroys a CSS selector and its linked elements.
+ */
+ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel);
 
 /**
  * @brief Appends a selector to a rule.

@@ -83,6 +83,11 @@ static int test_fixed_size_math(void) {
                                                 &offset_y);
   failed |= (rc != UI_ERROR_NONE || start != 99 || end != 99);
 
+  ui_virtual_scroll_base_set_item_count(vs, 0);
+  rc = ui_virtual_scroll_base_get_visible_range(vs, 10.0f, &start, &end,
+                                                &offset_y);
+  failed |= (rc != UI_ERROR_NONE || start != 0 || end != 0);
+
   (void)ui_virtual_scroll_base_destroy(vs);
   if (failed)
     printf("test_fixed_size_math failed\n");
@@ -124,6 +129,15 @@ static int test_variable_size_math(void) {
   rc = ui_virtual_scroll_base_get_visible_range(vs, 10000.0f, &start, &end,
                                                 &offset_y);
   failed |= (rc != UI_ERROR_NONE || start != 99 || end != 99);
+
+  rc = ui_virtual_scroll_base_get_visible_range(vs, -10.0f, &start, &end,
+                                                &offset_y);
+  failed |= (rc != UI_ERROR_NONE || start != 0 || end < 2);
+
+  ui_virtual_scroll_base_set_item_count(vs, 0);
+  rc = ui_virtual_scroll_base_get_visible_range(vs, 10.0f, &start, &end,
+                                                &offset_y);
+  failed |= (rc != UI_ERROR_NONE || start != 0 || end != 0);
 
   (void)ui_virtual_scroll_base_destroy(vs);
   if (failed)
@@ -283,17 +297,28 @@ static int test_error_handling(void) {
              UI_ERROR_INVALID_ARGUMENT);
   CHECK_FAIL(ui_virtual_scroll_base_get_visible_range(
                  vs, 0.0f, NULL, &end, &offset) != UI_ERROR_INVALID_ARGUMENT);
+  CHECK_FAIL(ui_virtual_scroll_base_get_visible_range(
+                 vs, 0.0f, &start, NULL, &offset) != UI_ERROR_INVALID_ARGUMENT);
+  CHECK_FAIL(ui_virtual_scroll_base_get_visible_range(
+                 vs, 0.0f, &start, &end, NULL) != UI_ERROR_INVALID_ARGUMENT);
 
   CHECK_FAIL(ui_virtual_scroll_base_render(NULL, 0.0f) !=
              UI_ERROR_INVALID_ARGUMENT);
+  CHECK_FAIL(ui_virtual_scroll_base_render(vs, 0.0f) !=
+             UI_ERROR_INVALID_ARGUMENT); /* container is NULL since mount wasn't
+                                            called */
 
   CHECK_FAIL(ui_virtual_scroll_base_bind_data(NULL, NULL) !=
              UI_ERROR_INVALID_ARGUMENT);
 
   CHECK_FAIL(ui_virtual_scroll_base_bind_data(vs, NULL) != UI_ERROR_NONE);
 
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+  CHECK_FAIL(ui_virtual_scroll_base_mount(NULL, container) !=
+             UI_ERROR_INVALID_ARGUMENT);
   CHECK_FAIL(ui_virtual_scroll_base_mount(vs, NULL) !=
              UI_ERROR_INVALID_ARGUMENT);
+  ui_dom_node_destroy(container);
 
   (void)ui_virtual_scroll_base_destroy(vs);
 
@@ -318,12 +343,36 @@ static int test_error_handling(void) {
   CHECK_FAIL(ui_virtual_scroll_base_render(vs, 0.0f) != UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
+  th = -1.0f;
   ui_virtual_scroll_base_set_item_count(vs, 0);
+
+  /* Test when new_cache == NULL and count == 0 */
   g_malloc_fail_countdown = 0;
-  CHECK_FAIL(ui_virtual_scroll_base_set_item_count(vs, 10) !=
-             UI_ERROR_OUT_OF_MEMORY);
+  ui_virtual_scroll_base_set_item_count(vs, 0);
   g_malloc_fail_countdown = -1;
-  CHECK_FAIL(ui_virtual_scroll_base_get_total_height(vs, &th) != UI_ERROR_NONE);
+
+  /* Setup a non-NULL cache */
+  ui_virtual_scroll_base_set_item_count(vs, 1);
+
+  /* Test when cached_prefix_heights_count <= item_count */
+  g_malloc_fail_countdown = 0;
+  ui_virtual_scroll_base_set_item_count(vs, 200);
+  g_malloc_fail_countdown = -1;
+  ui_virtual_scroll_base_get_total_height(vs, &th);
+
+  /* Test when cached_prefix_heights == NULL */
+  {
+    struct ui_virtual_scroll_base *vs_empty = NULL;
+    struct ui_virtual_scroll_config cfg2 = config;
+    cfg2.strategy = UI_VIRTUAL_SCROLL_VARIABLE_SIZE;
+    ui_virtual_scroll_base_create(&vs_empty, &cfg2);
+    g_malloc_fail_countdown = 0;
+    ui_virtual_scroll_base_set_item_count(vs_empty, 10);
+    g_malloc_fail_countdown = -1;
+    ui_virtual_scroll_base_get_total_height(vs_empty, &th);
+    ui_virtual_scroll_base_destroy(vs_empty);
+  }
+
   (void)ui_virtual_scroll_base_destroy(vs);
   (void)ui_dom_node_destroy(container);
 #endif

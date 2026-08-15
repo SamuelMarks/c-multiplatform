@@ -22,7 +22,7 @@ struct ui_rating_base {
 };
 
 static ui_error_t trigger_cva_change(struct ui_rating_base *rating) {
-  if (rating && rating->cva_on_change) {
+  if (rating->cva_on_change) {
     union ui_signal_payload payload;
     payload.float_val = rating->value;
     return rating->cva_on_change(payload, rating->cva_on_change_user_data);
@@ -31,7 +31,7 @@ static ui_error_t trigger_cva_change(struct ui_rating_base *rating) {
 }
 
 static ui_error_t trigger_cva_touched(struct ui_rating_base *rating) {
-  if (rating && rating->cva_on_touched) {
+  if (rating->cva_on_touched) {
     return rating->cva_on_touched(rating->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
@@ -133,13 +133,7 @@ ui_error_t ui_rating_base_create(struct ui_rating_base **out_rating,
   return UI_ERROR_NONE;
 
 cleanup:
-  if (rating->full_icon) {
-    (void)ui_icon_base_destroy(rating->full_icon);
-  }
-  if (rating->half_icon) {
-    (void)ui_icon_base_destroy(rating->half_icon);
-  }
-  C_MULTIPLATFORM_FREE(rating);
+  (void)ui_rating_base_destroy(rating);
   return rc;
 }
 

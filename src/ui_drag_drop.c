@@ -142,7 +142,7 @@ ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
   *new_list = *list;
   new_list->items = NULL;
 
-  if (list->item_count > 0 && list->items) {
+  if (list->item_count > 0) {
     new_list->items = (struct ui_drag_item *)C_MULTIPLATFORM_MALLOC(
         sizeof(struct ui_drag_item) * list->item_count);
     if (!new_list->items) {

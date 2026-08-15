@@ -17,6 +17,29 @@ extern int g_malloc_fail_countdown;
     }                                                                          \
   } while (0)
 
+struct ui_rich_text_run_mock {
+  char *text;
+  int format_flags;
+  struct ui_rich_text_run_mock *next;
+};
+
+struct ui_rich_text_history_entry_mock {
+  char *state_snapshot;
+  struct ui_rich_text_history_entry_mock *next;
+  struct ui_rich_text_history_entry_mock *prev;
+};
+
+struct ui_rich_text_base_mock {
+  struct ui_component *component;
+  struct ui_rich_text_run_mock *document_head;
+  int selection_start;
+  int selection_end;
+  struct ui_rich_text_history_entry_mock *history_head;
+  struct ui_rich_text_history_entry_mock *history_current;
+  char *ime_composition;
+  struct ui_signal *text_signal;
+};
+
 static int test_rich_text(void) {
   int failed = 0;
   struct ui_rich_text_base *editor = NULL;
@@ -73,6 +96,108 @@ static int test_rich_text(void) {
 
   (void)ui_rich_text_base_bind_text(editor, NULL);
 
+  /* Test non-keydown event (line 290) */
+  ev.type = UI_EVENT_MOUSE_UP;
+  (void)ui_rich_text_base_process_event(editor, &ev);
+
+  /* Test toggle_format with document_head == NULL (line 258) */
+  {
+    struct ui_rich_text_base_mock *meditor =
+        (struct ui_rich_text_base_mock *)editor;
+    struct ui_rich_text_run_mock *saved_head = meditor->document_head;
+    meditor->document_head = NULL;
+    (void)ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD);
+    meditor->document_head = saved_head;
+  }
+
+  /* Test get_text and free_runs with current->text == NULL (lines 114, 227,
+   * 239) */
+  {
+    struct ui_rich_text_base_mock *meditor =
+        (struct ui_rich_text_base_mock *)editor;
+    struct ui_rich_text_run_mock *new_run =
+        malloc(sizeof(struct ui_rich_text_run_mock));
+    new_run->text = NULL;
+    new_run->format_flags = 0;
+    new_run->next = meditor->document_head;
+    meditor->document_head = new_run;
+
+    char *txt = NULL;
+    (void)ui_rich_text_base_get_text(editor, &txt);
+    if (txt)
+      free(txt);
+  }
+
+  /* Test set_text with NULL text (line 179) */
+  (void)ui_rich_text_base_set_text(editor, NULL);
+  (void)ui_rich_text_base_set_text(editor, "");
+
+  /* Test set_text with NULL component/shadow_root (line 194) */
+  {
+    struct ui_rich_text_base_mock *meditor =
+        (struct ui_rich_text_base_mock *)editor;
+    struct ui_dom_node *saved_sr = meditor->component->shadow_root;
+    meditor->component->shadow_root = NULL;
+    (void)ui_rich_text_base_set_text(editor, "NoShadowRoot");
+
+    struct ui_component *saved_comp = meditor->component;
+    meditor->component = NULL;
+    (void)ui_rich_text_base_set_text(editor, "NoComponent");
+
+    meditor->component = saved_comp;
+    meditor->component->shadow_root = saved_sr;
+  }
+
+  /* Test undo with no prev, redo with no next (lines 267, 277) */
+  {
+    /* Normal undo/redo boundary hitting */
+    ui_rich_text_base_undo(editor);
+    ui_rich_text_base_undo(editor);
+    ui_rich_text_base_undo(editor);
+    ui_rich_text_base_undo(editor); /* definitely hits prev == NULL */
+
+    ui_rich_text_base_redo(editor);
+    ui_rich_text_base_redo(editor);
+    ui_rich_text_base_redo(editor);
+    ui_rich_text_base_redo(editor); /* hits next == NULL */
+
+    struct ui_rich_text_base_mock *meditor =
+        (struct ui_rich_text_base_mock *)editor;
+    struct ui_rich_text_history_entry_mock *saved_hist =
+        meditor->history_current;
+
+    meditor->history_current = NULL;
+    (void)ui_rich_text_base_undo(editor);
+    (void)ui_rich_text_base_redo(editor);
+
+    meditor->history_current = saved_hist;
+  }
+
+  /* Test OOM on history entry creation (line 294) */
+  g_malloc_fail_countdown = 0;
+  ev.type = UI_EVENT_KEY_DOWN;
+  (void)ui_rich_text_base_process_event(editor, &ev);
+  g_malloc_fail_countdown = -1;
+
+  /* Test destroy with ime_composition, NULL component, NULL shadow_root (lines
+   * 140, 144, 145) */
+  {
+    struct ui_rich_text_base_mock *meditor =
+        (struct ui_rich_text_base_mock *)editor;
+    ui_rich_text_base_set_ime_composition(editor, "composed");
+    ui_dom_node_destroy(meditor->component->shadow_root);
+    meditor->component->shadow_root = NULL;
+  }
+  (void)ui_rich_text_base_destroy(editor);
+
+  /* Also test destroy with NULL component entirely */
+  ui_rich_text_base_create(&editor);
+  {
+    struct ui_rich_text_base_mock *meditor =
+        (struct ui_rich_text_base_mock *)editor;
+    ui_component_destroy(meditor->component);
+    meditor->component = NULL;
+  }
   (void)ui_rich_text_base_destroy(editor);
 
   /* nulls */

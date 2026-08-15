@@ -17,12 +17,18 @@ void test_oom(void) {
   for (i = 0; i < 4000; i++) {
     struct ui_css_stylesheet *sheet = NULL;
     const char *css =
-        "@namespace svg url(\"http://www.w3.org/2000/svg\"); div, .class, #id, "
+        "@import \"test.css\"; @import url(; @import url)(; @namespace svg "
+        "url(\"http://www.w3.org/2000/svg\"); div, .class, #id, "
         "[href^=\"https\"], ::before, :hover { color: red !important; margin: "
         "10px; font-family: 'Arial', sans-serif; background: url('img.png'); } "
         "@media screen { div { width: 100px; } } @layer base { p { margin: 0; "
-        "} } @property --my-color { syntax: \"<color>\"; inherits: false; "
-        "initial-value: #c0ffee; }";
+        "} } @layer single; @layer foo, bar; @property --my-color { syntax: "
+        "\"<color>\"; inherits: false; "
+        "initial-value: #c0ffee; } @property --my-other { syntax: \"<color>\"; "
+        "inherits: true; } "
+        "@property --my-bad { inherits: ; } "
+        ".test2 { color:!important; } div unknown; @keyframes foo invalid { } "
+        "@media { div unknown } div eof";
     g_malloc_fail_countdown = i;
     ui_css_parse_stylesheet(css, &sheet);
     g_malloc_fail_countdown = -1;
@@ -32,6 +38,757 @@ void test_oom(void) {
       break;
     }
   }
+}
+
+static void test_parser_branches(void) {
+  struct ui_css_stylesheet *sheet = NULL;
+
+  /* Unclosed string at EOF */
+  /* Coverage for EOF breaks */
+  ui_css_parse_stylesheet("@property --foo { myprop ", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --foo { 123 ", &sheet);
+  ui_css_parse_stylesheet("@property --foo { * ", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { color ", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+  ui_css_parse_stylesheet("\"", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Unclosed string with escape at EOF */
+  ui_css_parse_stylesheet("\"\\", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Ident at EOF */
+  ui_css_parse_stylesheet("ident", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* At-keyword at EOF */
+  ui_css_parse_stylesheet("@media", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Number at EOF */
+  ui_css_parse_stylesheet("12345", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Number with sign at EOF */
+  ui_css_parse_stylesheet("+123", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Dot at EOF */
+  ui_css_parse_stylesheet(".", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Hash at EOF */
+  ui_css_parse_stylesheet("#", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Colon at EOF */
+  ui_css_parse_stylesheet(":", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Double colon at EOF */
+  ui_css_parse_stylesheet("::", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Comment at EOF */
+  ui_css_parse_stylesheet("/*", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("/* hello *", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Selector incomplete bracket */
+  ui_css_parse_stylesheet("[", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("[attr", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("[attr=", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("[attr=\"", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("[attr=\"\"]", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Empty string in attr */
+  ui_css_parse_stylesheet("[attr=\"a", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":first-letter {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("::first-line {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":host-context {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":host {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* is_ident_start branches */
+  ui_css_parse_stylesheet("_ident {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("-ident {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("1ident {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("1 {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("+1 {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("-1 {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* is_nested_rule branches */
+  ui_css_parse_stylesheet("* { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a, b { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { b }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { @media {} }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* parse_rule_list branches */
+  ui_css_parse_stylesheet("@layer ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@layer name, name2 ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@layer name { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope to (b) {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) to {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) to (b) {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(
+      "@property --var { inherits: false; syntax: \"*\"; initial-value: a;}",
+      &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var2 { inherits: true; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var3 { inherits: other; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@media { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@media condition", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@supports cond { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@container cond { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace url(  http://test.com  ) ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace \"uri\" ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace prefix \"uri\" ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace prefix url(http);", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace url();", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@unknown ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@unknown { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("{ a: b !important; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("{ a: b!important; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("{ a: b !IMPORTANT; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("{ { { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { prop }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { prop ; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { prop: }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { : }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { 123 }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { a:    ; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { a: ; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("123{", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("123}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("::after {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) too {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) not_to {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var { inherits: false; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace \"", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace prefix \"", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { [attr] {} }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { :hover {} }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { #id {} }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { , {} }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* @layer missing comma or ident */
+  ui_css_parse_stylesheet("@layer name , ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* @property missing components */
+  ui_css_parse_stylesheet("@property --var { syntax: ; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var { inherits: ; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var { initial-value: ; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var { syntax }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Missing namespace uri */
+  ui_css_parse_stylesheet("@namespace ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace prefix ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* unclosed block without content */
+  ui_css_parse_stylesheet("@media (all) {", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@layer {", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope {", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var {", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* attr variations */
+  ui_css_parse_stylesheet("[attr=\"a\"]", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("[attr=]", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("/", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("/-", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("/* hello *-", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":before {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":after {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":first-line {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":first-letter {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":host(a) {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":host-context(a) {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("::host-context(a) {}", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":is(a", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet(":host-context(a", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { { { } } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@layer name name2;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) something_else {", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) something_else ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) something_else { .b { } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) extra ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) extra ; extra_extra", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) extra { {} }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) extra { {", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) extra { ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) { { { } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) bad_block { { { } } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) bad_block ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* The following will hit LBRACE while recovering: */
+  ui_css_parse_stylesheet("@scope (a) bad_block { { } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Force semicolon hit at 1287: while recovering after missing scope block,
+   * find semicolon and consume it */
+  ui_css_parse_stylesheet("@scope (a) invalid_no_block ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { prop missing value }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { prop invalid ; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { prop invalid { { nested } } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { prop missing colon { nested } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { prop missing colon { { double_nested } } }",
+                          &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  /* Triggering missing LBRACE in style rule error recovery (1280+) */
+  ui_css_parse_stylesheet("div ) ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div ) { { } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div ) { { { } } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) ; trailing", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) something ; next_rule { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) something { nested { } }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) \"to\" (b)", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a) ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --var { inherits: true }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace \"\" ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace \"a\" ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace a ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace a b ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace url() ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace url(a) ;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("a { b: c }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
 }
 
 int main(void) {
@@ -560,7 +1317,37 @@ int main(void) {
                                    */
       "div { color: red \n"       /* missing semicolon/brace EOF */
       "*= \n $= \n |= \n ^= \n ~= \n = \n $ \n | \n ^ \n ~ \n"
-      "/* comment at eof "; /* unclosed comment at EOF to hit peek() */
+      "/* comment at eof \n"    /* unclosed comment at EOF to hit peek() */
+      "/*\n"                    /* short unclosed comment */
+      "/* hello *\n"            /* star at eof */
+      "div { color: red } .\n"  /* dot at EOF */
+      "div { color: red } #\n"  /* hash at EOF */
+      "div { color: red } ::\n" /* double colon at EOF */
+      "div { color: red } :\n"  /* colon at EOF */
+      "div { color: red } @\n"  /* at at EOF */
+      "div { color: red } [\n"  /* LBRACKET at EOF */
+      "div { color: red } [attr=\"\n"    /* unclosed string at EOF */
+      "div { color: red } [attr=\"\" \n" /* LBRACKET unclosed EOF */
+      "div { color: red } :first-letter { }\n"
+      "div { color: red } :host-context { }\n"
+      "--var-name { }\n"
+      "_ident { }\n"
+      "\"unclosed string\n"
+      "123.45\n"
+      "+123\n"
+      "-123\n"
+      "@layer name, name2 ;\n"
+      "@scope to (b) { }\n"
+      "@media { }\n"
+      "@media condition\n"
+      "@layer oom, oom2 ;\n"
+      "@scope (oom) { }\n"
+      "@property --oom { inherits: false; }\n"
+      "@property --oom2 { inherits: true; }\n"
+      "@namespace prefix \"url\";\n"
+      "@media cond { } @media cond2 { } @media cond3 { }\n"
+      "{ a: b !important }\n"
+      "{ { { }\n";
 
   {
     /* tests where a specific rule is first to hit rule_head = ... */
@@ -729,6 +1516,233 @@ int main(void) {
   }
 
   test_oom();
+  test_parser_branches();
+  /* branch coverage */
+  {
+    struct ui_css_stylesheet *sheet = NULL;
+    ui_css_parse_stylesheet(":hover(", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("div { * {} }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@layer a, b {", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@layer a, b;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@layer a {", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@layer a, b;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@layer a b c;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@scope (a { }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@property --a { bad: syntax garbage", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@namespace url((bad));", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@namespace url(test) garbage", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("div { color:   ; }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@unknown", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+  }
+
+  ui_css_parse_stylesheet("@layer a, b;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@layer a b c;", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@scope (a { }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@property --a { bad: syntax garbage", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace url((bad));", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@namespace url(test) garbage", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { color:   ; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("@unknown", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+
+  ui_css_parse_stylesheet("div { color: !important; }", &sheet);
+  if (sheet)
+    ui_css_stylesheet_destroy(sheet);
+  sheet = NULL;
+  {
+    struct ui_css_stylesheet *sheet = NULL;
+
+    ui_css_parse_stylesheet("@layer a, b;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@layer a b c;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@scope (a { }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@property --a { bad: syntax garbage", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@namespace url((bad));", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@namespace url(test) garbage", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("div { color:   ; }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("div { color: !important; }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@unknown", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@layer single;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@property --my-other { inherits: true; }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@property --my-bad { inherits: ; }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@namespace url ;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@namespace url( ;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@namespace url)( ;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@import url(;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@import url)(;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("div { color:!important; }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@keyframes foo invalid { }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("div ) ;", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("div ) }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+
+    ui_css_parse_stylesheet("@media { div unknown }", &sheet);
+    if (sheet)
+      ui_css_stylesheet_destroy(sheet);
+    sheet = NULL;
+  }
   printf("All parser tests passed.\n");
   return 0;
 }

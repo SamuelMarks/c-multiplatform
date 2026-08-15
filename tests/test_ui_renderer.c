@@ -236,6 +236,19 @@ int main(void) {
     }
   }
 
+  {
+    struct ui_renderer *r1 = NULL;
+    struct ui_renderer *r2 = NULL;
+    struct ui_renderer_vtable vtable_no_destroy = {0};
+
+    ui_renderer_create(&r1);
+    r1->vtable = NULL;
+    ui_renderer_destroy(r1);
+
+    ui_renderer_create(&r2);
+    r2->vtable = &vtable_no_destroy;
+    ui_renderer_destroy(r2);
+  }
   printf("ui_renderer tests passed.\n");
   return 0;
 }

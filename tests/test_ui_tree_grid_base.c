@@ -246,6 +246,12 @@ static int test_tree_grid_key_events(void) {
   ui_tree_grid_base_is_expanded(tree_grid, node1, &expanded);
   EXPECT_EQ(expanded, 1);
 
+  /* Test right key with no active node */
+  tree_grid->active_node = NULL;
+  ev.key_code = UI_KEY_RIGHT;
+  EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
+  tree_grid->active_node = node1;
+
   /* Test right key on expanded */
   ev.key_code = UI_KEY_RIGHT;
   EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
@@ -257,10 +263,26 @@ static int test_tree_grid_key_events(void) {
   ui_tree_grid_base_is_expanded(tree_grid, node1, &expanded);
   EXPECT_EQ(expanded, 0);
 
-  /* Test left key on unexpanded */
+  /* Test left key on unexpanded with col > 0 */
+  tree_grid->active_col = 1;
   ev.key_code = UI_KEY_LEFT;
   EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
   EXPECT_EQ(tree_grid->active_col, 0);
+
+  /* Test left key on unexpanded with col == 0 */
+  ev.key_code = UI_KEY_LEFT;
+  EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
+  EXPECT_EQ(tree_grid->active_col, 0);
+
+  /* Test left key with no active node */
+  tree_grid->active_node = NULL;
+  ev.key_code = UI_KEY_LEFT;
+  EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
+  tree_grid->active_node = node1;
+
+  /* Test unknown key */
+  ev.key_code = UI_KEY_DOWN;
+  EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
 
   /* Fill expanded array to force OUT_OF_BOUNDS on RIGHT key */
   {

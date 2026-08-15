@@ -48,15 +48,11 @@ ui_error_t ui_renderer_create(struct ui_renderer **out_renderer) {
                                             : ui_renderer_native_init(renderer);
     if (init_rc != UI_ERROR_NONE) {
       /* 2. Seamless fallback to GLES 2.0 */
-      if (0)
-        return init_rc;
       {
         ui_error_t fb_rc = g_gles_init_fail
                                ? UI_ERROR_UNKNOWN
                                : ui_renderer_gles_fallback_init(renderer);
         if (fb_rc != UI_ERROR_NONE) {
-          if (0)
-            return fb_rc;
           C_MULTIPLATFORM_FREE(renderer);
           return UI_ERROR_UNKNOWN;
         }

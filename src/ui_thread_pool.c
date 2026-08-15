@@ -187,13 +187,12 @@ ui_error_t ui_thread_pool_create(int num_threads,
     extern int g_mock_thread_fail;
     if (g_mock_thread_fail == i + 1) {
       pool->threads[i] = NULL;
-    } else {
+    } else
+#endif
+    {
       pool->threads[i] = CreateThread(NULL, 0, ui_worker_thread, pool, 0, NULL);
     }
-#else
-    pool->threads[i] = CreateThread(NULL, 0, ui_worker_thread, pool, 0, NULL);
-#endif
-    if (!pool->threads[i]) {
+    if (pool->threads[i] == NULL) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
     }
@@ -218,12 +217,13 @@ ui_error_t ui_thread_pool_create(int num_threads,
     int prc;
 #ifdef UI_TEST_MOCK_ALLOC
     extern int g_mock_thread_fail;
-    prc = (g_mock_thread_fail == i + 1)
-              ? -1
-              : pthread_create(&pool->threads[i], NULL, ui_worker_thread, pool);
-#else
-    prc = pthread_create(&pool->threads[i], NULL, ui_worker_thread, pool);
+    if (g_mock_thread_fail == i + 1) {
+      prc = -1;
+    } else
 #endif
+    {
+      prc = pthread_create(&pool->threads[i], NULL, ui_worker_thread, pool);
+    }
     if (prc != 0) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;

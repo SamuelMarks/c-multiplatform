@@ -145,6 +145,10 @@ int main(void) {
   /* Change mode to SIDE while open */
   ASSERT_SUCCESS(ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_SIDE));
 
+  /* Set open while in SIDE mode to hit branch */
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 0));
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 1));
+
   /* Change position while open */
   ASSERT_SUCCESS(
       ui_sidenav_base_set_position(sidenav, UI_SIDENAV_POSITION_START));
@@ -153,11 +157,22 @@ int main(void) {
    * shouldn't crash) */
   ASSERT_SUCCESS(ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_OVER));
 
+  /* Process event while OVER mode is active but no director/backdrop is mounted
+   */
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+  ASSERT_SUCCESS(ui_sidenav_base_process_event(sidenav, &ev, 0.0));
+
   /* Set director while open in OVER mode (should attempt to mount backdrop) */
   struct ui_overlay_director *director = NULL;
   struct ui_dom_node *root = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_overlay_director_create(root, &director);
+  ASSERT_SUCCESS(ui_sidenav_base_set_overlay_director(sidenav, director));
+
+  /* Change mode to PUSH, set director again to hit branch where is_open && mode
+   * != OVER */
+  ASSERT_SUCCESS(ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_PUSH));
   ASSERT_SUCCESS(ui_sidenav_base_set_overlay_director(sidenav, director));
 
   /* Change mode to PUSH while open to test backdrop unmount */
@@ -169,6 +184,32 @@ int main(void) {
   ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 0));
   ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 1));
 
+  /* Test process_event branches */
+  /* is_open == 0 */
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 0));
+  ASSERT_SUCCESS(ui_sidenav_base_process_event(sidenav, &ev, 0.0));
+
+  /* is_open == 1, mode != OVER */
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 1));
+  ASSERT_SUCCESS(ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_PUSH));
+  ASSERT_SUCCESS(ui_sidenav_base_process_event(sidenav, &ev, 0.0));
+
+  /* is_open == 1, mode == OVER, backdrop == NULL */
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 0));
+  ASSERT_SUCCESS(ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_OVER));
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 1));
+  /* Wait, opening in OVER mode automatically mounts the backdrop IF the
+   * director is set! */
+  /* We must set director to NULL first so it doesn't mount. */
+  ASSERT_SUCCESS(ui_sidenav_base_set_overlay_director(sidenav, NULL));
+  ASSERT_SUCCESS(ui_sidenav_base_process_event(sidenav, &ev, 0.0));
+
+  /* Restore director for the rest of tests */
+  ASSERT_SUCCESS(ui_sidenav_base_set_overlay_director(sidenav, director));
+  /* And remount backdrop by toggling open */
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 0));
+  ASSERT_SUCCESS(ui_sidenav_base_set_open(sidenav, 1));
+
   /* Send escape when open in OVER mode (should trigger on_close) */
   close_called = 0;
   ev.type = UI_EVENT_KEY_DOWN;
@@ -177,8 +218,14 @@ int main(void) {
   if (!close_called)
     return 1;
 
+  /* Send enter to hit should_dismiss == 0 branch */
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  ASSERT_SUCCESS(ui_sidenav_base_process_event(sidenav, &ev, 0.0));
+
   /* Now disable on_close to test default behavior */
   ASSERT_SUCCESS(ui_sidenav_base_set_on_close(sidenav, NULL, NULL));
+  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
   ASSERT_SUCCESS(ui_sidenav_base_process_event(sidenav, &ev, 0.0));
 
   /* Should be closed now */

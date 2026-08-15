@@ -79,54 +79,58 @@ struct ui_slider_base {
 static ui_error_t update_dom_state(struct ui_slider_base *slider);
 
 static ui_error_t update_dom_state(struct ui_slider_base *slider) {
-  if (slider && slider->component && slider->component->shadow_root) {
-    char buf[64];
+  if (slider->component) {
+    if (slider->component->shadow_root) {
+      char buf[64];
 
-    /* In a real implementation we'd use robust string formatting macros.
-       For this structural example, we rely on standard sprintf/snprintf. */
+      /* In a real implementation we'd use robust string formatting macros.
+         For this structural example, we rely on standard sprintf/snprintf. */
 #if defined(_MSC_VER)
-    sprintf_s(buf, sizeof(buf), "%f", slider->value);
+      sprintf_s(buf, sizeof(buf), "%f", slider->value);
 #else
-    sprintf(buf, "%f", slider->value);
+      sprintf(buf, "%f", slider->value);
 #endif
-    (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
-                                 "aria-valuenow", buf);
-    (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "value", buf);
-
-#if defined(_MSC_VER)
-    sprintf_s(buf, sizeof(buf), "%f", slider->min_val);
-#else
-    sprintf(buf, "%f", slider->min_val);
-#endif
-    (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
-                                 "aria-valuemin", buf);
-    (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "min", buf);
-
-#if defined(_MSC_VER)
-    sprintf_s(buf, sizeof(buf), "%f", slider->max_val);
-#else
-    sprintf(buf, "%f", slider->max_val);
-#endif
-    (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
-                                 "aria-valuemax", buf);
-    (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "max", buf);
-
-    if (slider->disabled) {
-      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "disabled",
-                                   "");
       (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
-                                   "aria-disabled", "true");
-    } else {
-      (void)UI_DOM_REM_ATTR_IGNORE(slider->component->shadow_root, "disabled");
-      (void)UI_DOM_REM_ATTR_IGNORE(slider->component->shadow_root,
-                                   "aria-disabled");
+                                   "aria-valuenow", buf);
+      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "value",
+                                   buf);
+
+#if defined(_MSC_VER)
+      sprintf_s(buf, sizeof(buf), "%f", slider->min_val);
+#else
+      sprintf(buf, "%f", slider->min_val);
+#endif
+      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
+                                   "aria-valuemin", buf);
+      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "min", buf);
+
+#if defined(_MSC_VER)
+      sprintf_s(buf, sizeof(buf), "%f", slider->max_val);
+#else
+      sprintf(buf, "%f", slider->max_val);
+#endif
+      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
+                                   "aria-valuemax", buf);
+      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "max", buf);
+
+      if (slider->disabled) {
+        (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "disabled",
+                                     "");
+        (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
+                                     "aria-disabled", "true");
+      } else {
+        (void)UI_DOM_REM_ATTR_IGNORE(slider->component->shadow_root,
+                                     "disabled");
+        (void)UI_DOM_REM_ATTR_IGNORE(slider->component->shadow_root,
+                                     "aria-disabled");
+      }
     }
   }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t trigger_cva_change(struct ui_slider_base *slider) {
-  if (slider && slider->cva_on_change) {
+  if (slider->cva_on_change) {
     union ui_signal_payload payload;
     payload.float_val = slider->value;
     return slider->cva_on_change(payload, slider->cva_on_change_user_data);

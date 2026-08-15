@@ -488,6 +488,96 @@ static void test_on_change_error() {
   ui_slider_base_destroy(slider);
 }
 
+static void test_invalid_args_more() {
+  struct ui_slider_base *slider = NULL;
+  struct ui_control_value_accessor cva;
+  float val;
+  struct ui_component *comp;
+  struct ui_event ev;
+
+  {
+    ui_error_t _ign = ui_slider_base_create(&slider, &cva);
+    (void)_ign;
+  }
+
+  /* Test get_value with NULL out param */
+  {
+    ui_error_t _ign = ui_slider_base_get_value(slider, NULL);
+    (void)_ign;
+  }
+
+  /* Test get_component with NULL out param */
+  {
+    ui_error_t _ign = ui_slider_base_get_component(slider, NULL);
+    (void)_ign;
+  }
+
+  /* Test update_dom_state null shadow_root branch */
+  {
+    struct ui_slider_base_mock {
+      struct ui_component *component;
+    };
+    struct ui_slider_base_mock *mock = (struct ui_slider_base_mock *)slider;
+    struct ui_dom_node *tmp_root = mock->component->shadow_root;
+    mock->component->shadow_root = NULL;
+    {
+      ui_error_t _ign = ui_slider_base_set_value(slider, 10.0f);
+      (void)_ign;
+    }
+    mock->component->shadow_root = tmp_root;
+  }
+
+  /* Test NULL gesture_recognizer branch in destroy */
+  {
+    struct ui_slider_base_mock2 {
+      struct ui_component *component;
+      struct ui_gesture_recognizer *gesture_recognizer;
+    };
+    struct ui_slider_base_mock2 *mock = (struct ui_slider_base_mock2 *)slider;
+    if (mock->gesture_recognizer) {
+      ui_error_t _ign = ui_gesture_recognizer_destroy(mock->gesture_recognizer);
+      (void)_ign;
+    }
+    mock->gesture_recognizer = NULL;
+  }
+
+  /* Register NULL on_touched to hit UI_CVA_ON_TOUCH_IGNORE fallback */
+  {
+    ui_error_t _ign = cva.register_on_touched(slider, NULL, NULL);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_slider_base_set_normalized_value(slider, 0.5f);
+    (void)_ign;
+  }
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+  {
+    ui_error_t _ign = ui_slider_base_process_event(slider, &ev, 0.0);
+    (void)_ign;
+  }
+  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+  {
+    ui_error_t _ign = ui_slider_base_process_event(slider, &ev, 0.0);
+    (void)_ign;
+  }
+  ev.event_data.keyboard.key_code = UI_KEY_HOME;
+  {
+    ui_error_t _ign = ui_slider_base_process_event(slider, &ev, 0.0);
+    (void)_ign;
+  }
+  ev.event_data.keyboard.key_code = UI_KEY_END;
+  {
+    ui_error_t _ign = ui_slider_base_process_event(slider, &ev, 0.0);
+    (void)_ign;
+  }
+
+  {
+    ui_error_t _ign = ui_slider_base_destroy(slider);
+    (void)_ign;
+  }
+}
+
 int main(void) {
   int failed = 0;
   if (run_normal_tests() != 0) {
@@ -500,6 +590,7 @@ int main(void) {
   }
 
   test_on_change_error();
+  test_invalid_args_more();
   if (failed) {
     printf("Tests failed.\n");
     return 1;

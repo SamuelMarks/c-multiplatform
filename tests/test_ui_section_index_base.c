@@ -84,6 +84,10 @@ static int test_ui_section_index_base_sections(void) {
     return 1;
 
   /* Test set zero sections */
+  {
+    ui_error_t _ign = ui_section_index_base_set_sections(index, NULL, 0);
+    (void)_ign;
+  }
   rc = ui_section_index_base_set_sections(index, sections, 0);
   if (rc != UI_ERROR_NONE)
     return 1;
@@ -121,6 +125,22 @@ static int test_ui_section_index_base_sections(void) {
   rc = ui_section_index_base_set_active_section(index, 1);
   if (rc != UI_ERROR_NONE)
     return 1;
+
+  /* Test shrinking sections causing active_idx to be out of bounds for removal
+   */
+  {
+    const char *s3[] = {"1"};
+    {
+      ui_error_t _ign = ui_section_index_base_set_sections(index, s3, 1);
+      (void)_ign;
+    }
+    /* now active_idx is 1, count is 1. next set_active_section will see old
+     * active_idx >= count */
+    {
+      ui_error_t _ign = ui_section_index_base_set_active_section(index, 0);
+      (void)_ign;
+    }
+  }
 
   /* Set again to test clearing previous active section */
   rc = ui_section_index_base_set_active_section(index, 0);
@@ -194,6 +214,35 @@ void test_ui_section_index_errs(void) {
   (void)ui_section_index_base_destroy(index);
 }
 void test_ui_section_index_remove_attr_err(void) {
+  struct ui_section_index_base *index2 = NULL;
+  const char *sections2[] = {"A", "B", "C"};
+  {
+    ui_error_t _ign = ui_section_index_base_create(&index2);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_section_index_base_set_sections(index2, sections2, 3);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_section_index_base_set_active_section(index2, 1);
+    (void)_ign;
+  }
+  /* manually remove to trigger NOT_FOUND during next set_active_section */
+  {
+    ui_error_t _ign =
+        ui_dom_node_remove_attribute(index2->item_nodes[1], "data-active");
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_section_index_base_set_active_section(index2, 2);
+    (void)_ign;
+  }
+  {
+    ui_error_t _ign = ui_section_index_base_destroy(index2);
+    (void)_ign;
+  }
+
   struct ui_section_index_base *index = NULL;
   const char *sections[] = {"A", "B", "C"};
   (void)ui_section_index_base_create(&index);

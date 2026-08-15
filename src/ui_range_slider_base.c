@@ -433,9 +433,6 @@ ui_error_t ui_range_slider_base_process_event(
     if (increment == 0.0f)
       increment = 1.0f;
     (void)ui_bidi_normalize_horizontal_key(key, &key);
-    if (0) {
-      /* fallback */
-    }
 
     if (active_thumb == UI_RANGE_SLIDER_THUMB_LOW) {
       if (key == UI_KEY_LEFT || key == UI_KEY_DOWN) {

@@ -4,7 +4,7 @@
 /* clang-format on */
 
 static ui_error_t trigger_cva_change(struct ui_search_bar_base *search_bar) {
-  if (search_bar && search_bar->cva_on_change) {
+  if (search_bar->cva_on_change) {
     union ui_signal_payload payload;
     payload.ptr_val = search_bar->query;
     return search_bar->cva_on_change(payload,
@@ -14,7 +14,7 @@ static ui_error_t trigger_cva_change(struct ui_search_bar_base *search_bar) {
 }
 
 static ui_error_t trigger_cva_touched(struct ui_search_bar_base *search_bar) {
-  if (search_bar && search_bar->cva_on_touched) {
+  if (search_bar->cva_on_touched) {
     return search_bar->cva_on_touched(search_bar->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;

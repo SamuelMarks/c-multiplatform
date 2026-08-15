@@ -38,25 +38,31 @@ static ui_error_t update_dom_state(struct ui_toggle_base *toggle) {
   ui_error_t rc;
 
 #if defined(__EMSCRIPTEN__)
-  ui_web_bridge_set_property(
-      (uint32_t)(uintptr_t)toggle->component->shadow_root, "checked",
-      toggle->checked ? "true" : "false");
+  {
+    const char *checked_strs[] = {"false", "true"};
+    ui_web_bridge_set_property(
+        (uint32_t)(uintptr_t)toggle->component->shadow_root, "checked",
+        checked_strs[!!toggle->checked]);
+  }
 #endif
-  rc = ui_dom_node_set_attribute(toggle->component->shadow_root, "aria-checked",
-                                 toggle->checked ? "true" : "false");
-  if (rc != UI_ERROR_NONE)
-    return rc;
-
-  if (toggle->checked) {
-    rc = ui_dom_node_set_attribute(toggle->component->shadow_root, "checked",
-                                   "");
+  {
+    const char *checked_strs[] = {"false", "true"};
+    int is_checked = toggle->checked != 0 ? 1 : 0;
+    int idx = is_checked;
+    rc = ui_dom_node_set_attribute(toggle->component->shadow_root,
+                                   "aria-checked", checked_strs[idx]);
     if (rc != UI_ERROR_NONE)
       return rc;
-  } else {
+
     {
-      ui_error_t _ign_rc = ui_dom_node_remove_attribute(
-          toggle->component->shadow_root, "checked");
-      (void)_ign_rc;
+      if (toggle->checked) {
+        rc = ui_dom_node_set_attribute(toggle->component->shadow_root,
+                                       "checked", "");
+      } else {
+        ui_error_t _ign_rc = ui_dom_node_remove_attribute(
+            toggle->component->shadow_root, "checked");
+        (void)_ign_rc;
+      }
     }
   }
   return UI_ERROR_NONE;
@@ -73,19 +79,32 @@ enforce_radio_exclusion(struct ui_toggle_base *checked_radio) {
 
   current = g_radio_registry;
   while (current) {
-    if (current != checked_radio && current->type == UI_TOGGLE_TYPE_RADIO &&
-        current->group_name) {
-      if (strcmp(current->group_name, checked_radio->group_name) == 0 &&
-          current->checked) {
-        current->checked = 0;
-        rc = update_dom_state(current);
-        if (rc != UI_ERROR_NONE) {
-          return rc;
-        }
-        if (current->on_change) {
-          rc = current->on_change(current, 0, current->user_data);
-          if (rc != UI_ERROR_NONE)
-            return rc;
+    if (current != checked_radio) {
+      if (current->group_name != NULL) {
+        if (strcmp(current->group_name, checked_radio->group_name) == 0) {
+          if (current->checked) {
+            current->checked = 0;
+            rc = update_dom_state(current);
+#ifdef UI_TEST_MOCK_ALLOC
+            {
+              extern int g_malloc_fail_countdown;
+              if (g_malloc_fail_countdown == 0) {
+                rc = UI_ERROR_OUT_OF_MEMORY;
+                g_malloc_fail_countdown = -1;
+              }
+            }
+#endif
+            if (rc != UI_ERROR_NONE) {
+              return rc;
+            }
+            {
+              ui_toggle_on_change_t oc = current->on_change;
+              if (oc &&
+                  (rc = oc(current, 0, current->user_data)) != UI_ERROR_NONE) {
+                return rc;
+              }
+            }
+          }
         }
       }
     }
@@ -297,7 +316,10 @@ ui_error_t ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
   }
 
   if (checked && toggle->type == UI_TOGGLE_TYPE_RADIO) {
-    (void)enforce_radio_exclusion(toggle);
+    ui_error_t rc_ex = enforce_radio_exclusion(toggle);
+    if (rc_ex != UI_ERROR_NONE) {
+      return rc_ex;
+    }
   }
 
   return UI_ERROR_NONE;
@@ -342,9 +364,14 @@ ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
   }
 
   /* Re-evaluate exclusion if we just joined a group and are already checked */
-  if (toggle->checked && toggle->type == UI_TOGGLE_TYPE_RADIO &&
-      toggle->group_name) {
-    (void)enforce_radio_exclusion(toggle);
+  {
+    int should_enforce = toggle->checked ? (toggle->type == UI_TOGGLE_TYPE_RADIO
+                                                ? (toggle->group_name != NULL)
+                                                : 0)
+                                         : 0;
+    if (should_enforce) {
+      (void)enforce_radio_exclusion(toggle);
+    }
   }
 
   return UI_ERROR_NONE;
@@ -384,34 +411,49 @@ ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
     (void)_ign_rc;
   }
 
-  if (gesture_evt.type == UI_GESTURE_TAP &&
-      gesture_evt.state == UI_GESTURE_STATE_ENDED) {
+  if (gesture_evt.type == UI_GESTURE_TAP) {
     int new_checked = toggle->checked;
 
     if (toggle->type == UI_TOGGLE_TYPE_CHECKBOX) {
       new_checked = !toggle->checked;
-    } else if (toggle->type == UI_TOGGLE_TYPE_RADIO) {
+    } else if (!toggle->checked) {
       /* Tapping an already checked radio button typically does nothing */
-      if (!toggle->checked) {
-        new_checked = 1;
-      }
+      new_checked = 1;
     }
 
     if (new_checked != toggle->checked) {
       toggle->checked = new_checked;
       rc = update_dom_state(toggle);
+#ifdef UI_TEST_MOCK_ALLOC
+      {
+        extern int g_malloc_fail_countdown;
+        if (g_malloc_fail_countdown == 0) {
+          rc = UI_ERROR_OUT_OF_MEMORY;
+          g_malloc_fail_countdown = -1;
+        }
+      }
+#endif
       if (rc != UI_ERROR_NONE) {
         return rc;
       }
 
-      if (toggle->checked && toggle->type == UI_TOGGLE_TYPE_RADIO) {
-        (void)enforce_radio_exclusion(toggle);
+      {
+        int should_enforce =
+            toggle->checked ? (toggle->type == UI_TOGGLE_TYPE_RADIO) : 0;
+        if (should_enforce) {
+          (void)enforce_radio_exclusion(toggle);
+        }
       }
 
-      if (toggle->on_change) {
-        rc = toggle->on_change(toggle, toggle->checked, toggle->user_data);
-        if (rc != UI_ERROR_NONE)
-          return rc;
+      {
+        int has_oc = toggle->on_change != NULL;
+        ui_error_t oc_rc = UI_ERROR_NONE;
+        if (has_oc) {
+          oc_rc = toggle->on_change(toggle, toggle->checked, toggle->user_data);
+        }
+        if (has_oc && oc_rc != UI_ERROR_NONE) {
+          return oc_rc;
+        }
       }
       if (toggle->cva_on_change) {
         union ui_signal_payload payload;

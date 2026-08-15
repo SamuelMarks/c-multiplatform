@@ -5,6 +5,11 @@
 #include <stdlib.h>
 /* clang-format on */
 
+struct ui_window_manager_base {
+  struct ui_component *component;
+  struct ui_computed *data_signal;
+};
+
 extern int g_malloc_fail_countdown;
 
 #define CHECK_FAIL(cond)                                                       \
@@ -87,10 +92,26 @@ static int test_oom(void) {
   int i;
   for (i = 0; i < 15; i++) {
     g_malloc_fail_countdown = i;
-    ui_window_manager_base_create(&wm);
+    (void)ui_window_manager_base_create(&wm);
   }
   g_malloc_fail_countdown = -1;
 #endif
+  return failed;
+}
+
+static int test_missing_coverage(void) {
+  struct ui_window_manager_base *wm = NULL;
+  ui_error_t rc = ui_window_manager_base_create(&wm);
+  int failed = 0;
+  if (rc == UI_ERROR_NONE) {
+    /* Manually destroy component and set to NULL for coverage */
+    extern ui_error_t ui_component_destroy(struct ui_component *);
+    (void)ui_component_destroy(wm->component);
+    wm->component = NULL;
+    (void)ui_window_manager_base_destroy(wm);
+  } else {
+    failed = 1;
+  }
   return failed;
 }
 
@@ -100,6 +121,7 @@ int main(void) {
   failed |= test_window_manager_operations();
   failed |= test_invalid_args();
   failed |= test_oom();
+  failed |= test_missing_coverage();
   if (!failed) {
     printf("All window manager base tests passed\n");
   }

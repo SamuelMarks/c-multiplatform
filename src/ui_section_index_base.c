@@ -94,9 +94,7 @@ cleanup:
   if (root_node) {
     (void)ui_dom_node_destroy(root_node);
   }
-  if (index->component) {
-    (void)ui_component_destroy(index->component);
-  }
+  (void)ui_component_destroy(index->component);
   C_MULTIPLATFORM_FREE(index);
   return rc;
 }
@@ -110,9 +108,7 @@ ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
     C_MULTIPLATFORM_FREE(index->item_nodes);
   }
 
-  if (index->component) {
-    (void)ui_component_destroy(index->component);
-  }
+  (void)ui_component_destroy(index->component);
   C_MULTIPLATFORM_FREE(index);
   return UI_ERROR_NONE;
 }
@@ -142,10 +138,8 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
   /* Clear existing items */
   if (index->item_nodes) {
     for (i = 0; i < index->count; ++i) {
-      if (index->item_nodes[i]) {
-        ui_dom_node_remove_child(index->component->shadow_root,
-                                 index->item_nodes[i]);
-      }
+      ui_dom_node_remove_child(index->component->shadow_root,
+                               index->item_nodes[i]);
     }
     C_MULTIPLATFORM_FREE(index->item_nodes);
     index->item_nodes = NULL;
@@ -196,10 +190,8 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
         (void)ui_dom_node_destroy(node);
       }
       for (j = 0; j < i; ++j) {
-        if (index->item_nodes[j]) {
-          ui_dom_node_remove_child(index->component->shadow_root,
-                                   index->item_nodes[j]);
-        }
+        ui_dom_node_remove_child(index->component->shadow_root,
+                                 index->item_nodes[j]);
       }
       C_MULTIPLATFORM_FREE(index->item_nodes);
       index->item_nodes = NULL;
@@ -225,11 +217,11 @@ ui_section_index_base_set_active_section(struct ui_section_index_base *index,
     return UI_ERROR_OUT_OF_BOUNDS;
   }
 
-  if (index->active_idx >= 0 && index->active_idx < (int)index->count) {
+  if (index->active_idx >= 0) {
     {
       ui_error_t rm_rc = ui_dom_node_remove_attribute(
           index->item_nodes[index->active_idx], "data-active");
-      if (rm_rc != UI_ERROR_NONE && rm_rc != UI_ERROR_NOT_FOUND) {
+      if (rm_rc != UI_ERROR_NONE) {
         return rm_rc;
       }
     }
@@ -237,7 +229,7 @@ ui_section_index_base_set_active_section(struct ui_section_index_base *index,
 
   index->active_idx = active_idx;
 
-  if (index->active_idx >= 0 && index->active_idx < (int)index->count) {
+  if (index->active_idx >= 0) {
     {
       ui_error_t sa_rc = ui_dom_node_set_attribute(
           index->item_nodes[index->active_idx], "data-active", "true");

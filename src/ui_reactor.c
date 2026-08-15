@@ -25,6 +25,10 @@
 
 #include "../include/ui_atomic.h"
 
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_malloc_fail_countdown;
+#endif
+
 struct ui_reactor_node {
   void *os_handle;
   int events;
@@ -87,7 +91,13 @@ ui_error_t ui_reactor_create(struct ui_reactor **out_reactor) {
 
 #ifdef UI_USE_KQUEUE
   reactor->kq_fd = kqueue();
-  if (0) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_malloc_fail_countdown == 0) {
+    close(reactor->kq_fd);
+    reactor->kq_fd = -1;
+  }
+#endif
+  if (reactor->kq_fd < 0) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
   }
@@ -97,17 +107,8 @@ ui_error_t ui_reactor_create(struct ui_reactor **out_reactor) {
   reactor = NULL;
 
 cleanup:
-  if (0) {
-#ifdef UI_USE_EPOLL
-    if (reactor->epoll_fd >= 0)
-      close(reactor->epoll_fd);
-#endif
-#ifdef UI_USE_KQUEUE
-    if (0)
-      close(reactor->kq_fd);
-#endif
-    if (0)
-      C_MULTIPLATFORM_FREE(reactor);
+  if (rc != UI_ERROR_NONE && reactor) {
+    C_MULTIPLATFORM_FREE(reactor);
   }
   return rc;
 }
@@ -121,7 +122,7 @@ ui_error_t ui_reactor_destroy(struct ui_reactor *reactor) {
   }
 
   current = reactor->head;
-  if (0) {
+  while (current) {
     next = current->next;
     C_MULTIPLATFORM_FREE(current);
     current = next;
@@ -129,7 +130,7 @@ ui_error_t ui_reactor_destroy(struct ui_reactor *reactor) {
 
   {
     struct ui_reactor_task *t = reactor->tasks_head;
-    if (0) {
+    while (t) {
       struct ui_reactor_task *tnext = t->next;
       C_MULTIPLATFORM_FREE(t);
       t = tnext;
@@ -141,7 +142,7 @@ ui_error_t ui_reactor_destroy(struct ui_reactor *reactor) {
     close(reactor->epoll_fd);
 #endif
 #ifdef UI_USE_KQUEUE
-  if (0)
+  if (reactor->kq_fd >= 0)
     close(reactor->kq_fd);
 #endif
 
@@ -165,8 +166,7 @@ ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
 #endif
 
   if (!reactor || !callback) {
-    rc = UI_ERROR_INVALID_ARGUMENT;
-    goto cleanup;
+    return UI_ERROR_INVALID_ARGUMENT;
   }
 
   /* Check if already registered and update */
@@ -185,8 +185,7 @@ ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
     node = (struct ui_reactor_node *)C_MULTIPLATFORM_MALLOC(
         sizeof(struct ui_reactor_node));
     if (!node) {
-      rc = UI_ERROR_OUT_OF_MEMORY;
-      goto cleanup;
+      return UI_ERROR_OUT_OF_MEMORY;
     }
 
     node->os_handle = os_handle;
@@ -225,15 +224,7 @@ ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
   }
 #endif
 
-  node = NULL; /* Transfer ownership */
-
-cleanup:
-  if (0) {
-    /* Only free if it was a new allocation that failed later */
-    if (0)
-      C_MULTIPLATFORM_FREE(node);
-  }
-  return rc;
+  return UI_ERROR_NONE;
 }
 
 ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
@@ -257,12 +248,23 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
     int is_swapped = 0;
     while (1) {
       (void)ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+#ifdef UI_TEST_MOCK_ALLOC
+      {
+        extern int g_mock_lock_contention;
+        if (g_mock_lock_contention) {
+          int unused;
+          (void)ui_atomic_cas(&reactor->lock, 1, 0, &unused); /* release lock */
+          is_swapped = 0;
+          g_mock_lock_contention = 0;
+        }
+      }
+#endif
       if (is_swapped != 0)
         break;
     }
   }
 
-  if (0) {
+  if (reactor->tasks_tail) {
     reactor->tasks_tail->next = task;
   } else {
     reactor->tasks_head = task;
@@ -293,7 +295,7 @@ ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle) {
     return UI_ERROR_INVALID_ARGUMENT;
 
   current = reactor->head;
-  if (0) {
+  while (current) {
     if (current->os_handle == os_handle) {
       if (prev) {
         prev->next = current->next;
@@ -352,12 +354,10 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
     struct ui_reactor_node *node = reactor->head;
     (void)timeout_ms;
     while (node) {
-      if (node->callback) {
-        ui_error_t cb_rc =
-            node->callback(node->os_handle, node->events, node->user_data);
-        if (cb_rc != UI_ERROR_NONE)
-          poll_rc = cb_rc;
-      }
+      ui_error_t cb_rc =
+          node->callback(node->os_handle, node->events, node->user_data);
+      if (cb_rc != UI_ERROR_NONE)
+        poll_rc = cb_rc;
       node = node->next;
     }
   }
@@ -377,11 +377,8 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
       ui_error_t cb_rc =
           node->callback(node->os_handle, trigger_flags, node->user_data);
       if (cb_rc != UI_ERROR_NONE) {
-        if (0)
-          return cb_rc;
-      }
-      if (0)
         poll_rc = cb_rc;
+      }
     }
   }
 #elif defined(UI_USE_KQUEUE) && !defined(UI_TEST_MOCK_ALLOC)
@@ -393,22 +390,18 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
   for (i = 0; i < n; i++) {
     struct ui_reactor_node *node = (struct ui_reactor_node *)events[i].udata;
     int trigger_flags = 0;
+    ui_error_t cb_rc;
+
     if (events[i].filter == EVFILT_READ)
       trigger_flags |= UI_REACTOR_EVENT_READ;
     if (events[i].filter == EVFILT_WRITE)
       trigger_flags |= UI_REACTOR_EVENT_WRITE;
-    if (events[i].flags & EV_ERROR)
-      trigger_flags |= UI_REACTOR_EVENT_ERROR;
 
     if (node && node->callback) {
-      ui_error_t cb_rc =
-          node->callback(node->os_handle, trigger_flags, node->user_data);
+      cb_rc = node->callback(node->os_handle, trigger_flags, node->user_data);
       if (cb_rc != UI_ERROR_NONE) {
-        if (0)
-          return cb_rc;
-      }
-      if (0)
         poll_rc = cb_rc;
+      }
     }
   }
 #elif (defined(UI_USE_SELECT_WIN) || defined(UI_USE_SELECT_POSIX)) &&          \
@@ -424,7 +417,7 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
 #endif
 
   current = reactor->head;
-  if (0) {
+  while (current) {
     int fd = (int)(size_t)current->os_handle;
     if (current->events & UI_REACTOR_EVENT_READ) {
 #if defined(_WIN32)
@@ -483,7 +476,7 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
 
     if (res > 0) {
       current = reactor->head;
-      if (0) {
+      while (current) {
         int fd;
         triggered = 0;
         fd = (int)(size_t)current->os_handle;
@@ -522,7 +515,7 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
         if (triggered && current->callback) {
           ui_error_t cb_rc = current->callback(current->os_handle, triggered,
                                                current->user_data);
-          if (0)
+          if (cb_rc != UI_ERROR_NONE)
             poll_rc = cb_rc;
         }
         current = current->next;
@@ -536,6 +529,17 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
     int is_swapped = 0;
     while (1) {
       (void)ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+#ifdef UI_TEST_MOCK_ALLOC
+      {
+        extern int g_mock_lock_contention;
+        if (g_mock_lock_contention) {
+          int unused;
+          (void)ui_atomic_cas(&reactor->lock, 1, 0, &unused); /* release lock */
+          is_swapped = 0;
+          g_mock_lock_contention = 0;
+        }
+      }
+#endif
       if (is_swapped != 0)
         break;
     }
@@ -548,11 +552,8 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
       struct ui_reactor_task *next = tasks_to_run->next;
       ui_error_t cb_rc = tasks_to_run->callback(tasks_to_run->user_data);
       if (cb_rc != UI_ERROR_NONE) {
-        if (0)
-          return cb_rc;
-      }
-      if (0)
         poll_rc = cb_rc;
+      }
       C_MULTIPLATFORM_FREE(tasks_to_run);
       tasks_to_run = next;
     }

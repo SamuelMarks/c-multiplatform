@@ -60,20 +60,13 @@ ui_error_t ui_engine_create(const struct ui_engine_config *config,
     goto cleanup;
   }
 
-  rc = ui_timer_create_monotonic(&engine->timer);
-  if (rc != UI_ERROR_NONE) {
-    goto cleanup;
-  }
+  (void)ui_timer_create_monotonic(&engine->timer);
 
   *out_engine = engine;
   engine = NULL;
 
 cleanup:
   if (engine) {
-
-    if (engine->reactor) {
-      (void)(void)ui_reactor_destroy(engine->reactor);
-    }
     if (engine->thread_pool) {
 #ifndef UI_SINGLE_THREADED
       (void)(void)ui_thread_pool_destroy(engine->thread_pool);

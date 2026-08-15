@@ -40,23 +40,18 @@ static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
   (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-progress",
                                   buf);
 
-  switch (ptr->state) {
-  case UI_PULL_TO_REFRESH_RESTING:
+  if (ptr->state == UI_PULL_TO_REFRESH_RESTING) {
     (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
                                     "resting");
-    break;
-  case UI_PULL_TO_REFRESH_PULLING:
+  } else if (ptr->state == UI_PULL_TO_REFRESH_PULLING) {
     (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
                                     "pulling");
-    break;
-  case UI_PULL_TO_REFRESH_REFRESHING:
+  } else if (ptr->state == UI_PULL_TO_REFRESH_REFRESHING) {
     (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
                                     "refreshing");
-    break;
-  case UI_PULL_TO_REFRESH_COMPLETING:
+  } else {
     (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
                                     "completing");
-    break;
   }
   return UI_ERROR_NONE;
 }
@@ -222,14 +217,12 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
         } else {
           ptr->pull_distance += ge.delta_y; /* pushing back up */
           if (ptr->pull_distance < 0.0f) {
-            printf("BINGO! pull_distance < 0.0f\n");
             ptr->pull_distance = 0.0f;
           }
           (void)update_dom_state(ptr);
         }
       }
-    } else if (ge.state == UI_GESTURE_STATE_ENDED ||
-               ge.state == UI_GESTURE_STATE_CANCELLED) {
+    } else {
       if (ptr->state == UI_PULL_TO_REFRESH_PULLING) {
         if (ptr->pull_distance >= UI_PTR_THRESHOLD) {
           ptr->state = UI_PULL_TO_REFRESH_REFRESHING;

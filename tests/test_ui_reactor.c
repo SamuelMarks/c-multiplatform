@@ -7,7 +7,22 @@
 #endif
 /* clang-format on */
 
+struct ui_reactor {
+  void *head;
+  void *tasks_head;
+  void *tasks_tail;
+  int lock;
+#if defined(__linux__)
+  int epoll_fd;
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||    \
+    defined(__NetBSD__) || defined(__DragonFly__)
+  int kq_fd;
+#endif
+};
+
 extern int g_malloc_fail_countdown;
+extern int g_mock_lock_contention;
+
 static ui_error_t test_callback(void *os_handle, int events, void *user_data) {
   if (user_data) {
     int *val = (int *)user_data;
@@ -63,6 +78,25 @@ static ui_error_t run_normal_tests(void) {
                            test_callback, &test_val);
   if (rc != UI_ERROR_NONE)
     return rc;
+
+  rc = ui_reactor_register(reactor, (void *)99, UI_REACTOR_EVENT_WRITE,
+                           test_callback, &test_val);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  rc = ui_reactor_register(reactor, (void *)98, 0, test_callback, &test_val);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  rc = ui_reactor_register(reactor, (void *)100,
+                           UI_REACTOR_EVENT_READ | UI_REACTOR_EVENT_WRITE |
+                               UI_REACTOR_EVENT_ERROR,
+                           test_callback, &test_val);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  rc = ui_reactor_unregister(reactor, (void *)99);
+  rc = ui_reactor_unregister(reactor, (void *)100);
 
   rc = ui_reactor_register(reactor, fake_handle3, UI_REACTOR_EVENT_READ,
                            test_callback, &test_val);
@@ -165,9 +199,11 @@ static ui_error_t run_normal_tests(void) {
   rc = ui_reactor_schedule(reactor, NULL, NULL);
   if (rc == UI_ERROR_NONE)
     return UI_ERROR_UNKNOWN;
+  g_mock_lock_contention = 1;
   rc = ui_reactor_schedule(reactor, test_schedule_callback, NULL);
   if (rc != UI_ERROR_NONE)
     return rc;
+  g_mock_lock_contention = 1;
   rc = ui_reactor_poll(reactor, 1);
   if (rc != UI_ERROR_UNKNOWN)
     return rc;
@@ -233,6 +269,13 @@ static ui_error_t run_oom_tests(void) {
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   }
 
+  g_malloc_fail_countdown = 1;
+  rc = ui_reactor_create(&reactor);
+  if (rc != UI_ERROR_OUT_OF_MEMORY) {
+    printf("Expected OOM on create 2\n");
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  }
+
   g_malloc_fail_countdown = -1;
   rc = ui_reactor_create(&reactor);
   if (rc != UI_ERROR_NONE) {
@@ -267,6 +310,11 @@ int main(void) {
   if (run_oom_tests() != UI_ERROR_NONE)
     failed = 1;
 
+  test_ui_reactor_oom();
+  test_ui_reactor_oom_loop();
+  test_ui_reactor_destroy_populated();
+  test_ui_reactor_poll_error2();
+
   if (failed) {
     printf("Tests failed.\n");
     return 1;
@@ -300,6 +348,15 @@ void test_ui_reactor_oom(void) {
     (void)rc;
     rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
     (void)rc;
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
+    defined(__NetBSD__) || defined(__DragonFly__)
+    if (reactor)
+      reactor->kq_fd = -1;
+#endif
+#if defined(__linux__)
+    if (reactor)
+      reactor->epoll_fd = -1;
+#endif
     rc = ui_reactor_destroy(reactor);
     (void)rc;
   }
@@ -320,6 +377,15 @@ void test_ui_reactor_destroy_populated(void) {
     (void)rc;
     rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
     (void)rc;
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
+    defined(__NetBSD__) || defined(__DragonFly__)
+    if (reactor)
+      reactor->kq_fd = -1;
+#endif
+#if defined(__linux__)
+    if (reactor)
+      reactor->epoll_fd = -1;
+#endif
     rc = ui_reactor_destroy(reactor);
     (void)rc;
   }
@@ -348,6 +414,15 @@ void test_ui_reactor_poll_error2(void) {
     (void)rc;
     rc = ui_reactor_poll(reactor, 0);
     (void)rc;
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
+    defined(__NetBSD__) || defined(__DragonFly__)
+    if (reactor)
+      reactor->kq_fd = -1;
+#endif
+#if defined(__linux__)
+    if (reactor)
+      reactor->epoll_fd = -1;
+#endif
     rc = ui_reactor_destroy(reactor);
     (void)rc;
   }

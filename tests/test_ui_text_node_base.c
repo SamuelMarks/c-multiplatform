@@ -8,6 +8,21 @@
 extern int g_malloc_fail_countdown;
 int g_mock_font_fail = 0;
 
+struct ui_text_node_base {
+  struct ui_component *component;
+  struct ui_text_layout *layout;
+  struct ui_font_manager *font_manager;
+  char *text;
+  char *font_family;
+  float font_size;
+  float max_width;
+  int max_lines;
+  enum ui_text_node_overflow overflow;
+  float computed_width;
+  float computed_height;
+  struct ui_signal *text_signal;
+};
+
 static int test_oom(void) {
   int failed = 0;
 #ifdef UI_TEST_MOCK_ALLOC
@@ -184,6 +199,34 @@ int main(void) {
   g_mock_font_fail = 0;
   rc = ui_text_node_base_update_layout(node); /* hits hard clip */
 
+  ui_text_node_base_set_overflow(node, UI_TEXT_NODE_OVERFLOW_ELLIPSIS);
+
+  /* Triggers target_len <= 3 */
+  ui_text_node_base_set_text(node, "A");
+  ui_text_node_base_set_max_lines(node, 1);
+  rc = ui_text_node_base_update_layout(node);
+
+  /* Triggers target_len >= len by hacking mock bounds */
+  ui_text_node_base_set_text(node, "Hello World Hello World Hello World Hello "
+                                   "World Hello World Hello World");
+  ui_text_node_base_set_max_lines(node, 4);
+  rc = ui_text_node_base_update_layout(node);
+
+  /* Target hard clip in clip mode */
+  ui_text_node_base_set_overflow(node, UI_TEXT_NODE_OVERFLOW_CLIP);
+  ui_text_node_base_set_text(node,
+                             "Hello World Hello World Hello World Hello World "
+                             "Hello World Hello World Hello World Hello World");
+  ui_text_node_base_set_max_lines(node, 1);
+  rc = ui_text_node_base_update_layout(node);
+
+  ui_text_node_base_set_max_lines(node, 0); /* skip truncation block */
+  rc = ui_text_node_base_update_layout(node);
+
+  ui_text_node_base_set_max_lines(
+      node, 20); /* large enough so height < max allowed */
+  rc = ui_text_node_base_update_layout(node);
+
   g_mock_font_fail = 2; /* shape fails */
   rc = ui_text_node_base_update_layout(node);
 
@@ -208,6 +251,49 @@ int main(void) {
     failed |= 1;
 
   (void)ui_text_node_base_destroy(node);
+
+  ui_text_node_base_create(&node);
+  if (node) {
+    struct ui_component *comp = NULL;
+    ui_text_node_base_get_component(node, &comp);
+    ui_text_node_base_set_font_manager(node, font_mgr);
+    ui_text_node_base_set_text(node, "A component update");
+    ui_text_node_base_set_font_family(node, "Arial");
+    g_mock_font_fail = 0;
+    ui_text_node_base_update_layout(node);
+    ui_text_node_base_set_text(node, NULL);
+    ui_text_node_base_update_layout(node);
+
+    /* Test missing component branches */
+    ui_dom_node_destroy(node->component->shadow_root);
+    node->component->shadow_root = NULL;
+    ui_text_node_base_set_text(node, "Shadow root missing");
+    ui_text_node_base_update_layout(node); /* hits 348 */
+    ui_text_node_base_set_text(node, NULL);
+    ui_text_node_base_update_layout(node); /* hits 279 */
+
+    ui_component_destroy(node->component);
+    node->component = NULL;
+    ui_text_node_base_set_text(node, "Component missing");
+    ui_text_node_base_update_layout(node); /* hits 348 */
+    ui_text_node_base_set_text(node, NULL);
+    ui_text_node_base_update_layout(node); /* hits 279 */
+
+    ui_text_node_base_set_font_family(node, NULL);
+    ui_text_layout_destroy(node->layout);
+    node->layout = NULL;
+
+    ui_text_node_base_destroy(node); /* hits 160, 154, etc. */
+  }
+
+  /* Test missing shadow root branch in destroy */
+  ui_text_node_base_create(&node);
+  if (node) {
+    ui_dom_node_destroy(node->component->shadow_root);
+    node->component->shadow_root = NULL;
+    ui_text_node_base_destroy(node);
+  }
+
   (void)ui_font_manager_destroy(font_mgr);
 
   (void)ui_text_node_base_destroy(NULL);
