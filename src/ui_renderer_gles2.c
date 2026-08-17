@@ -151,13 +151,12 @@ static ui_error_t load_gl_extensions(void) {
 #define glReadPixels(x, y, w, h, f, t, d) do { (void)(x); (void)(y); (void)(w); (void)(h); (void)(f); (void)(t); (void)(d); } while(0)
 #endif
 
-/* clang-format off */
 #include "ui_renderer_gles2.h"
 #include "ui_window_backend.h"
 #ifndef _WIN32
 #include "ui_internal_mem.h"
-#endif
 /* clang-format on */
+#endif
 
 #ifndef GL_COLOR_BUFFER_BIT
 /** \brief Fallback GL_COLOR_BUFFER_BIT */

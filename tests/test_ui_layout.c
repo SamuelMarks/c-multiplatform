@@ -5,7 +5,6 @@
 #include "../include/ui_dom_node.h"
 #include "../include/ui_cssom.h"
 #include "../src/ui_internal_mem.h"
-/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
@@ -1570,14 +1569,12 @@ void test_coverage_layout(void) {
   (void)ui_dom_node_destroy(root);
   ui_css_stylesheet_destroy(sheet);
 }
-/* clang-format off */
 #include "../include/ui_cssom.h"
 #include "../include/ui_dom_node.h"
 #include "../include/ui_layout.h"
 #include <stdio.h>
 #include <string.h>
 
-/* clang-format on */
 void test_bounds(void) {
   struct ui_dom_node *root, *c1, *c2, *c3;
   struct ui_css_stylesheet *sheet = NULL;
@@ -1918,6 +1915,7 @@ void test_content_negative(void) {
 #include "../include/ui_cssom.h"
 #include "../include/ui_dom_node.h"
 #include "../include/ui_layout.h"
+/* clang-format on */
 
 static void test_flex_grow_shrink(void) {
   struct ui_dom_node *root, *c1, *c2;

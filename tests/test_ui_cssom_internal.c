@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "../src/ui_cssom.c"
 #include "../src/ui_internal_mem.h"
 #include <stdio.h>
+/* clang-format on */
 
 static void test_cascade_internal(void) {
   struct ui_css_computed_style *style;

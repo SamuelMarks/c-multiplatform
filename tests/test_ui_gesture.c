@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+/* clang-format on */
 
 struct ui_gesture_recognizer {
   int is_tracking;
@@ -251,7 +252,8 @@ static void test_gesture_pan(void) {
   (void)ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev); /* move */
 
   ev.event_data.mouse.x = 130;
-  (void)ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev); /* 0 time delta move */
+  (void)ui_gesture_recognizer_process_event(r, &ev, 10.0,
+                                            &gev); /* 0 time delta move */
 
   (void)ui_gesture_recognizer_destroy(r);
 }
@@ -414,14 +416,18 @@ static void test_gesture_pan_long_press(void) {
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 100;
-  (void)ui_gesture_recognizer_process_event(r, &ev, 650.0, &gev); /* sets has_moved_significantly */
+  (void)ui_gesture_recognizer_process_event(
+      r, &ev, 650.0, &gev); /* sets has_moved_significantly */
 
-  (void)ui_gesture_recognizer_update(r, 680.0, &gev); /* Hit branch where tracking but has moved */
-  printf("After 680: tracking=%d moved=%d long_press=%d\n", r->is_tracking, r->has_moved_significantly, r->long_press_triggered);
+  (void)ui_gesture_recognizer_update(
+      r, 680.0, &gev); /* Hit branch where tracking but has moved */
+  printf("After 680: tracking=%d moved=%d long_press=%d\n", r->is_tracking,
+         r->has_moved_significantly, r->long_press_triggered);
 
   /* Cancel */
   ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_error_t leave_rc = ui_gesture_recognizer_process_event(r, &ev, 700.0, &gev);
+  ui_error_t leave_rc =
+      ui_gesture_recognizer_process_event(r, &ev, 700.0, &gev);
   printf("Cancel gev.type = %d rc=%d\n", gev.type, leave_rc);
   assert(gev.type == UI_GESTURE_LONG_PRESS);
 

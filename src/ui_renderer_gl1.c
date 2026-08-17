@@ -41,7 +41,6 @@
 #define glReadPixels(x, y, w, h, f, t, d) do { (void)(x); (void)(y); (void)(w); (void)(h); (void)(f); (void)(t); (void)(d); } while(0)
 #endif
 
-/* clang-format off */
 #include "ui_renderer_gl1.h"
 #include "ui_window_backend.h"
 #include "ui_internal_mem.h"

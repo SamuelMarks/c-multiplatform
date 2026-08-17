@@ -9,6 +9,7 @@
 #include "ui_dom_node.h"
 #include "ui_component.h"
 #include <stddef.h>
+/* clang-format on */
 #ifdef UI_TEST_MOCK_ALLOC
 
 int g_checkbox_mock_fail = 0;
@@ -95,7 +96,8 @@ ui_error_t ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  checkbox = (struct ui_checkbox_base *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_checkbox_base));
+  checkbox = (struct ui_checkbox_base *)C_MULTIPLATFORM_MALLOC(
+      sizeof(struct ui_checkbox_base));
   if (!checkbox) {
     return UI_ERROR_OUT_OF_MEMORY;
   }

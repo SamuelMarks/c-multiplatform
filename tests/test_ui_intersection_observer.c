@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "ui_intersection_observer.h"
 #include <stdio.h>
 #include <stdlib.h>
+/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 static int g_cb_called = 0;

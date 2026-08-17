@@ -1,3 +1,4 @@
+/* clang-format off */
 #include <stdio.h>
 #include <string.h>
 
@@ -21,6 +22,7 @@ ui_error_t
 mock_ui_css_computed_style_destroy(struct ui_css_computed_style *style);
 
 #include "../src/ui_layout.c"
+/* clang-format on */
 #undef ui_css_computed_style_get_property
 #undef ui_css_resolve_style
 #undef ui_css_computed_style_destroy

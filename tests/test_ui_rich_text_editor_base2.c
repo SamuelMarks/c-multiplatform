@@ -1,7 +1,9 @@
+/* clang-format off */
 #include "ui_rich_text_editor_base.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+/* clang-format on */
 
 static ui_error_t failing_cva_on_change(union ui_signal_payload payload,
                                         void *user_data) {

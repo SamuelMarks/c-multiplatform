@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "../include/ui_dom_node.h"
 #include "../include/ui_error.h"
 #include "../include/ui_event.h"
@@ -5,6 +6,7 @@
 #include "../include/ui_layout.h"
 #include <stdio.h>
 #include <string.h>
+/* clang-format on */
 
 struct test_state {
   int enter_count;

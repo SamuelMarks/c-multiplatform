@@ -1,6 +1,10 @@
 /* clang-format off */
 #include <stddef.h>
+#if !defined(_MSC_VER) || _MSC_VER >= 1600
 #include <stdint.h>
+#else
+typedef unsigned char uint8_t;
+#endif
 #include <string.h>
 #include <stdio.h>
 #include "../include/ui_design_tokens.h"

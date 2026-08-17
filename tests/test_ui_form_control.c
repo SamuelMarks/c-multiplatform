@@ -8,7 +8,7 @@
 #ifndef _WIN32
 #include <unistd.h>
 #else
-#include <windows.h>
+__declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #define usleep(x) Sleep((x)/1000)
 #endif
 /* clang-format on */

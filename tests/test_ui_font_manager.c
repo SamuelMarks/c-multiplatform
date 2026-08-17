@@ -67,12 +67,12 @@ static void run_font_methods_coverage(void) {
   ui_font_manager_find_font(manager, "Test", 300, 1, &found);
   ui_font_manager_find_font(manager, "Other", 400, 1, &found);
 
-  // ui_font_create_variable_from_memory(manager, tests_tiny_ttf,
-  // sizeof(tests_tiny_ttf), 1, NULL, &font);
+  /* ui_font_create_variable_from_memory(manager, tests_tiny_ttf, */
+  /* sizeof(tests_tiny_ttf), 1, NULL, &font); */
 
   g_malloc_fail_countdown = 1;
-  // ui_font_create_variable_from_memory(manager, tests_tiny_ttf,
-  // sizeof(tests_tiny_ttf), 1, axes, &font);
+  /* ui_font_create_variable_from_memory(manager, tests_tiny_ttf, */
+  /* sizeof(tests_tiny_ttf), 1, axes, &font); */
   g_malloc_fail_countdown = -1;
 
   g_malloc_fail_countdown = 0;
@@ -87,9 +87,9 @@ static void run_font_methods_coverage(void) {
   ui_font_manager_load_font_memory(manager, tests_tiny_ttf,
                                    sizeof(tests_tiny_ttf), &font);
 
-  // ui_mock_free(font->data);
+  /* ui_mock_free(font->data); */
 
-  // font->data = NULL;
+  /* font->data = NULL; */
   ui_font_manager_destroy(manager);
 }
 

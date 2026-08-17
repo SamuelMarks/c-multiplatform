@@ -1,6 +1,8 @@
+/* clang-format off */
 #include "ui_layout_observer.h"
 #include <stdio.h>
 #include <stdlib.h>
+/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 

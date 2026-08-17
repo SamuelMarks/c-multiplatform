@@ -2,7 +2,7 @@ c-multiplatform
 ===============
 
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Doc Coverage](https://img.shields.io/badge/docs-88%25-green.svg)](#)
+[![Doc Coverage](https://img.shields.io/badge/docs-17%25-red.svg)](#)
 [![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](#)
 
 Multiplatform UIs—in ANSI C (C89)—with native FFI support; for:

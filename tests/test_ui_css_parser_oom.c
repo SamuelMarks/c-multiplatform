@@ -1,3 +1,4 @@
+/* clang-format off */
 #include "../include/ui_css_parser.h"
 #include "../include/ui_css_ui.h"
 #include "../include/ui_css_values.h"
@@ -5,6 +6,7 @@
 #include "../include/ui_dom_node.h"
 #include <stdio.h>
 #include <string.h>
+/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 
