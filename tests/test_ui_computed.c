@@ -7,7 +7,7 @@
 /* clang-format on */
 
 #include "../include/ui_atomic.h"
-#include "../src/ui_reactive_graph.h"
+#include <ui_reactive_graph.h>
 
 extern int g_malloc_fail_countdown;
 

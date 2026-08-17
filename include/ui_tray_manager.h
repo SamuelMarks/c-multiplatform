@@ -1,3 +1,7 @@
+/**
+ * @file ui_tray_manager.h
+ * @brief System tray / app indicator manager component.
+ */
 #ifndef UI_TRAY_MANAGER_H
 #define UI_TRAY_MANAGER_H
 

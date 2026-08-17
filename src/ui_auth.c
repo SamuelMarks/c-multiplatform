@@ -21,8 +21,9 @@
 int g_auth_mock_fail = 0;
 static ui_error_t mock_promise_resolve(struct ui_promise *promise,
                                        void *value) {
-  if (g_auth_mock_fail == 1)
+  if (g_auth_mock_fail == 1) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_promise_resolve)(promise, value);
 }
 #undef ui_promise_resolve
@@ -30,16 +31,23 @@ static ui_error_t mock_promise_resolve(struct ui_promise *promise,
 
 static ui_error_t mock_promise_reject(struct ui_promise *promise,
                                       ui_error_t error) {
-  if (g_auth_mock_fail == 2)
+  if (g_auth_mock_fail == 2) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_promise_reject)(promise, error);
 }
 #undef ui_promise_reject
 #define ui_promise_reject mock_promise_reject
 #endif
 
+/**
+ * @struct ui_auth_task
+ * @brief Internal representation of an asynchronous authentication request.
+ */
 struct ui_auth_task {
+  /** @brief The promise to resolve or reject when complete. */
   struct ui_promise *promise;
+  /** @brief The result of the authentication attempt. */
   enum ui_auth_result result;
 };
 
@@ -120,14 +128,14 @@ ui_error_t run_auth_coverage(void) {
   (void)ui_promise_create(&promise);
 
   g_auth_mock_fail = 1;
-  ui_auth_request_async(&config, promise);
+  (void)ui_auth_request_async(&config, promise);
   g_auth_mock_fail = 0;
   (void)ui_promise_destroy(promise);
 
   (void)ui_promise_create(&promise);
   g_malloc_fail_countdown = 1;
   g_auth_mock_fail = 2;
-  ui_auth_request_async(&config, promise);
+  (void)ui_auth_request_async(&config, promise);
   g_malloc_fail_countdown = -1;
   g_auth_mock_fail = 0;
   (void)ui_promise_destroy(promise);

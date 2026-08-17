@@ -29,19 +29,28 @@ int g_color_picker_mock_current = 0;
 
 #endif
 
-/** \brief ui_color_picker_base */
+/**
+ * @struct ui_color_picker_base
+ * @brief Internal representation of a color picker.
+ */
 struct ui_color_picker_base {
-  struct ui_color_rgb rgb;
-  struct ui_color_hsv hsv;
+  struct ui_color_rgb rgb; /**< Current RGB state */
+  struct ui_color_hsv hsv; /**< Current HSV state */
 
+  /**
+   * @brief CVA: Callback fired when value changes
+   */
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
                               void *user_data);
-  void *cva_on_change_user_data;
+  void *cva_on_change_user_data; /**< CVA: User data for on_change callback */
 
+  /**
+   * @brief CVA: Callback fired when input is touched
+   */
   ui_error_t (*cva_on_touched)(void *user_data);
-  void *cva_on_touched_user_data;
+  void *cva_on_touched_user_data; /**< CVA: User data for on_touched callback */
 
-  int is_disabled;
+  int is_disabled; /**< 1 if disabled, 0 otherwise */
 };
 
 static ui_error_t trigger_cva_change(struct ui_color_picker_base *picker) {
@@ -64,8 +73,9 @@ static ui_error_t color_picker_cva_write_value(void *component,
   struct ui_color_rgb rgb;
   int color_int;
 
-  if (!picker)
+  if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   color_int = value.int_val;
   rgb.r = (unsigned char)((color_int >> 24) & 0xFF);
@@ -75,15 +85,15 @@ static ui_error_t color_picker_cva_write_value(void *component,
   return ui_color_picker_base_set_rgb(picker, &rgb);
 }
 
-/** \brief color_picker_cva_register_on_change */
 static ui_error_t color_picker_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_color_picker_base *picker =
       (struct ui_color_picker_base *)component;
-  if (!picker)
+  if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   picker->cva_on_change = callback;
   picker->cva_on_change_user_data = user_data;
   return UI_ERROR_NONE;
@@ -93,8 +103,9 @@ static ui_error_t color_picker_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_color_picker_base *picker =
       (struct ui_color_picker_base *)component;
-  if (!picker)
+  if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   picker->cva_on_touched = callback;
   picker->cva_on_touched_user_data = user_data;
   return UI_ERROR_NONE;
@@ -104,13 +115,13 @@ static ui_error_t color_picker_cva_set_disabled_state(void *component,
                                                       int is_disabled) {
   struct ui_color_picker_base *picker =
       (struct ui_color_picker_base *)component;
-  if (!picker)
+  if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   picker->is_disabled = is_disabled;
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
                             struct ui_control_value_accessor *out_cva) {
@@ -151,7 +162,6 @@ ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_color_picker_base_destroy(struct ui_color_picker_base *picker) {
   if (picker) {
     C_MULTIPLATFORM_FREE(picker);
@@ -308,14 +318,18 @@ ui_error_t ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
   out_hsv->h = hue;
 
   /* Clamp x and y to [0, width] and [0, height] */
-  if (x < 0.0)
+  if (x < 0.0) {
     x = 0.0;
-  if (x > width)
+  }
+  if (x > width) {
     x = width;
-  if (y < 0.0)
+  }
+  if (y < 0.0) {
     y = 0.0;
-  if (y > height)
+  }
+  if (y > height) {
     y = height;
+  }
 
   /* x maps directly to saturation */
   out_hsv->s = x / width;
@@ -326,7 +340,6 @@ ui_error_t ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_color_picker_base_get_rgb(const struct ui_color_picker_base *picker,
                              struct ui_color_rgb *out_rgb) {

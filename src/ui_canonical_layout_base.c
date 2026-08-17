@@ -5,14 +5,25 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @struct ui_canonical_layout_base
+ * @brief Internal implementation of the canonical layout.
+ */
 struct ui_canonical_layout_base {
+  /** @brief Pointer to the arena used for allocation. */
   struct ui_arena *arena;
+  /** @brief Current layout size class. */
   enum ui_window_size_class size_class;
+  /** @brief Signal dispatched on size class change. */
   ui_signal_t *layout_changed_signal;
 
+  /** @brief Central body component. */
   struct ui_component *body;
+  /** @brief Left/start side pane. */
   struct ui_component *leading_pane;
+  /** @brief Right/end side pane. */
   struct ui_component *trailing_pane;
+  /** @brief Bottom bar component. */
   struct ui_component *bottom_bar;
 };
 
@@ -24,7 +35,6 @@ static ui_error_t size_class_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_canonical_layout_base_create(struct ui_arena *arena,
                                 const struct ui_canonical_layout_config *config,
@@ -61,7 +71,6 @@ ui_canonical_layout_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout) {
   if (!layout) {
@@ -73,7 +82,6 @@ ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_canonical_layout_base_set_size_class(struct ui_canonical_layout_base *layout,
                                         enum ui_window_size_class size_class) {
@@ -95,7 +103,6 @@ ui_canonical_layout_base_set_size_class(struct ui_canonical_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_canonical_layout_base_get_size_class */
 ui_error_t ui_canonical_layout_base_get_size_class(
     const struct ui_canonical_layout_base *layout,
     enum ui_window_size_class *out_size_class) {
@@ -106,7 +113,6 @@ ui_error_t ui_canonical_layout_base_get_size_class(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_canonical_layout_base_set_body(struct ui_canonical_layout_base *layout,
                                   struct ui_component *body) {
@@ -117,7 +123,6 @@ ui_canonical_layout_base_set_body(struct ui_canonical_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_canonical_layout_base_set_leading_pane */
 ui_error_t ui_canonical_layout_base_set_leading_pane(
     struct ui_canonical_layout_base *layout,
     struct ui_component *leading_pane) {
@@ -128,7 +133,6 @@ ui_error_t ui_canonical_layout_base_set_leading_pane(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_canonical_layout_base_set_trailing_pane */
 ui_error_t ui_canonical_layout_base_set_trailing_pane(
     struct ui_canonical_layout_base *layout,
     struct ui_component *trailing_pane) {
@@ -139,7 +143,6 @@ ui_error_t ui_canonical_layout_base_set_trailing_pane(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_canonical_layout_base_set_bottom_bar(struct ui_canonical_layout_base *layout,
                                         struct ui_component *bottom_bar) {
@@ -150,7 +153,6 @@ ui_canonical_layout_base_set_bottom_bar(struct ui_canonical_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_canonical_layout_base_get_layout_changed_signal */
 ui_error_t ui_canonical_layout_base_get_layout_changed_signal(
     struct ui_canonical_layout_base *layout, ui_signal_t **out_signal) {
   if (!layout || !out_signal) {

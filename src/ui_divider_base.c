@@ -29,12 +29,20 @@ static const char *ui_divider_base_css =
     "margin-left: 72px; "
     "}";
 
-/** \brief ui_divider_base */
+/**
+ * @struct ui_divider_base
+ * @brief Internal representation of a divider base component.
+ */
 struct ui_divider_base {
+  /** @brief The base component. */
   struct ui_component *component;
+  /** @brief The DOM node. */
   struct ui_dom_node *root_node;
+  /** @brief The orientation of the divider. */
   enum ui_divider_orientation orientation;
+  /** @brief 1 if the divider has an inset, 0 otherwise. */
   int inset;
+  /** @brief Signal bound for data. */
   struct ui_signal *data_signal;
 };
 
@@ -109,7 +117,9 @@ cleanup:
   if (divider->root_node) {
     (void)ui_dom_node_destroy(divider->root_node);
   }
-  (void)ui_component_destroy(divider->component);
+  if (divider->component) {
+    (void)ui_component_destroy(divider->component);
+  }
   C_MULTIPLATFORM_FREE(divider);
   return rc;
 }
@@ -123,7 +133,6 @@ ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_divider_base_set_orientation(struct ui_divider_base *divider,
                                 enum ui_divider_orientation orientation) {
@@ -143,7 +152,6 @@ ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
   return update_dom_state(divider);
 }
 
-/** \brief ui_error */
 ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
                                          struct ui_component **out_component) {
   if (!divider || !out_component) {

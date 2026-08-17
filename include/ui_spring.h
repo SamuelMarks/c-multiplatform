@@ -10,19 +10,26 @@ extern "C" {
 /* clang-format on */
 
 /**
+ * @struct ui_spring_config
  * @brief Spring configuration based on damping ratio and frequency.
  */
 struct ui_spring_config {
-  float damping;   /**< Damping ratio (zeta). 1.0 is critically damped. */
-  float stiffness; /**< Stiffness (k). */
-  float mass;      /**< Mass (m). */
+  /** @brief Damping ratio (zeta). 1.0 is critically damped. */
+  float damping;
+  /** @brief Stiffness (k). */
+  float stiffness;
+  /** @brief Mass (m). */
+  float mass;
 };
 
 /**
+ * @struct ui_spring_state
  * @brief Current state of the spring.
  */
 struct ui_spring_state {
+  /** @brief The current value/position. */
   float value;
+  /** @brief The current velocity. */
   float velocity;
 };
 
@@ -35,7 +42,7 @@ struct ui_spring_state {
  * @param target The target rest value.
  * @param delta_time_s Time elapsed since last update in seconds.
  * @param out_state Pointer to receive the new state.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_spring_update(const struct ui_spring_config *config,
                             const struct ui_spring_state *current, float target,

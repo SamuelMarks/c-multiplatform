@@ -14,19 +14,24 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_miller_columns_base
  * @brief Opaque handle for the Miller Columns component.
  */
 struct ui_miller_columns_base;
 
 /**
+ * @struct ui_miller_column_state
  * @brief Represents a specific column in the cascading view.
  */
 struct ui_miller_column_state {
+  /** @brief The index of this column in the sequence. */
   int column_index;
-  void *parent_node_id; /**< The node ID from the tree model that this column is
-                           displaying children of. NULL if root column. */
-  void *selected_child_id; /**< The currently selected node in this column,
-                              which triggers the next column. */
+  /** @brief The node ID from the tree model that this column is
+             displaying children of. NULL if root column. */
+  void *parent_node_id;
+  /** @brief The currently selected node in this column,
+             which triggers the next column. */
+  void *selected_child_id;
 };
 
 /**

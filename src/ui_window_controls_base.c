@@ -1,3 +1,8 @@
+/**
+ * @file ui_window_controls_base.c
+ * @brief Implementation of the window controls base component.
+ */
+
 /* clang-format off */
 #include "ui_window_controls_base.h"
 #include "ui_arena.h"
@@ -15,7 +20,10 @@ struct ui_region_rect {
 
 #define UI_MAX_WINDOW_REGIONS 16
 
-/** \brief ui_window_controls_base */
+/**
+ * @struct ui_window_controls_base
+ * @brief Internal state for the window controls component.
+ */
 struct ui_window_controls_base {
   struct ui_arena *arena;
   enum ui_window_state state;
@@ -32,7 +40,6 @@ static ui_error_t state_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_window_controls_base_create(struct ui_arena *arena,
                                struct ui_window_controls_base **out_controls) {
@@ -65,7 +72,6 @@ ui_window_controls_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_window_controls_base_destroy(struct ui_window_controls_base *controls) {
   if (!controls) {
@@ -77,7 +83,6 @@ ui_window_controls_base_destroy(struct ui_window_controls_base *controls) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
                                   enum ui_window_state state) {
@@ -99,7 +104,6 @@ ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_window_controls_base_get_state_signal */
 ui_error_t ui_window_controls_base_get_state_signal(
     struct ui_window_controls_base *controls, ui_signal_t **out_signal) {
   if (!controls || !out_signal) {
@@ -109,7 +113,6 @@ ui_error_t ui_window_controls_base_get_state_signal(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_window_controls_base_hit_test */
 ui_error_t ui_window_controls_base_hit_test(
     struct ui_window_controls_base *controls, int x, int y,
     enum ui_window_control_hit_region *out_region) {
@@ -132,7 +135,6 @@ ui_error_t ui_window_controls_base_hit_test(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_window_controls_base_set_region_rect */
 ui_error_t ui_window_controls_base_set_region_rect(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region, int x, int y, int width,
@@ -170,7 +172,6 @@ ui_error_t ui_window_controls_base_set_region_rect(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_window_controls_base_trigger_hover_intent */
 ui_error_t ui_window_controls_base_trigger_hover_intent(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region) {

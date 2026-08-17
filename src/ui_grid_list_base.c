@@ -1,9 +1,17 @@
+/**
+ * \file ui_grid_list_base.c
+ * \brief Implementation of the grid list base widget.
+ */
 /* clang-format off */
 #include "ui_grid_list_base.h"
 #include "ui_internal_mem.h"
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * \struct ui_grid_list_base
+ * \brief Represents the internal state and properties of a grid list widget.
+ */
 struct ui_grid_list_base {
   int columns;
   struct ui_grid_list_item *items;
@@ -12,6 +20,12 @@ struct ui_grid_list_base {
   struct ui_computed *data_signal;
 };
 
+/**
+ * \brief Creates a new grid list base widget.
+ * \param[out] out_grid_list Pointer to store the created grid list.
+ * \param[in] columns The number of columns in the grid.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_grid_list_base_create(struct ui_grid_list_base **out_grid_list,
                                     int columns) {
   struct ui_grid_list_base *gl;
@@ -40,6 +54,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a grid list base widget.
+ * \param[in,out] grid_list The grid list to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list) {
   if (!grid_list) {
     return UI_ERROR_NONE;
@@ -51,6 +70,12 @@ ui_error_t ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the number of columns in the grid list.
+ * \param[in,out] grid_list The grid list widget.
+ * \param[in] columns The new number of columns.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
                                          int columns) {
   if (!grid_list || columns < 1) {
@@ -60,7 +85,12 @@ ui_error_t ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the number of columns in the grid list.
+ * \param[in] grid_list The grid list widget.
+ * \param[out] out_columns Pointer to store the column count.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
                               int *out_columns) {
@@ -71,6 +101,13 @@ ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Adds an item to the grid list with specified span.
+ * \param[in,out] grid_list The grid list widget.
+ * \param[in] rowspan The row span of the item.
+ * \param[in] colspan The column span of the item.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
                                       int rowspan, int colspan) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -111,7 +148,19 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the number of items in the grid list.
+ * \param[in] grid_list The grid list widget.
+ * \param[out] out_count Pointer to store the item count.
+ * \return UI_ERROR_NONE on success.
+ */
+/**
+ * \brief Gets a specific item from the grid list by index.
+ * \param[in] grid_list The grid list widget.
+ * \param[in] index The index of the item.
+ * \param[out] out_item Pointer to store the retrieved item.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
                                  size_t *out_count) {
@@ -122,7 +171,13 @@ ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets a specific item from the grid list by index.
+ * \param[in] grid_list The grid list widget.
+ * \param[in] index The index of the item.
+ * \param[out] out_item Pointer to store the retrieved item.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
                            size_t index,
@@ -137,7 +192,12 @@ ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Calculates the total number of rows required by the grid list.
+ * \param[in] grid_list The grid list widget.
+ * \param[out] out_rows Pointer to store the calculated row count.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
                                  int *out_rows) {
@@ -215,6 +275,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Binds arbitrary computed data to the grid list.
+ * \param[in,out] widget The grid list widget.
+ * \param[in,out] signal The computed data signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_grid_list_base_bind_data(struct ui_grid_list_base *widget,
                                        struct ui_computed *signal) {
   if (!widget) {

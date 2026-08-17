@@ -16,10 +16,10 @@ extern "C" {
  * @brief Represents an unstyled button group container.
  */
 struct ui_button_group_base {
-  struct ui_component base;
-  int is_vertical;
-  struct ui_signal *disabled_signal;
-  struct ui_signal *text_signal;
+  struct ui_component base;          /**< The base UI component */
+  int is_vertical;                   /**< 1 if vertical, 0 if horizontal */
+  struct ui_signal *disabled_signal; /**< Signal bound to the disabled state */
+  struct ui_signal *text_signal; /**< Signal bound to the group text content */
 };
 
 /**

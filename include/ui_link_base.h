@@ -13,11 +13,15 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_link_base
  * @brief Represents an unstyled base link/hyperlink component.
  */
 struct ui_link_base {
+  /** @brief The base component. */
   struct ui_component base;
+  /** @brief The signal controlling the disabled state. */
   struct ui_signal *disabled_signal;
+  /** @brief The signal containing the text content. */
   struct ui_signal *text_signal;
 };
 
@@ -25,7 +29,7 @@ struct ui_link_base {
  * @brief Creates a new base link component.
  *
  * @param out_link Pointer to output the initialized link.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_link_base_create(struct ui_link_base **out_link);
 
@@ -34,7 +38,7 @@ ui_error_t ui_link_base_create(struct ui_link_base **out_link);
  *
  * @param link The link component.
  * @param url The destination URL.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_link_base_set_href(struct ui_link_base *link, const char *url);
 
@@ -43,7 +47,7 @@ ui_error_t ui_link_base_set_href(struct ui_link_base *link, const char *url);
  *
  * @param link The link component.
  * @param text The text to display.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_link_base_set_text(struct ui_link_base *link, const char *text);
 
@@ -52,7 +56,7 @@ ui_error_t ui_link_base_set_text(struct ui_link_base *link, const char *text);
  *
  * @param widget The widget.
  * @param disabled_signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_link_base_bind_disabled(struct ui_link_base *widget,
                                       struct ui_signal *disabled_signal);
@@ -63,7 +67,7 @@ ui_error_t ui_link_base_bind_disabled(struct ui_link_base *widget,
  *
  * @param widget The widget.
  * @param text_signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_link_base_bind_text(struct ui_link_base *widget,
                                   struct ui_signal *text_signal);

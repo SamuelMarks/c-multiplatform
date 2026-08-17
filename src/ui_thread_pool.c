@@ -1,3 +1,7 @@
+/**
+ * @file ui_thread_pool.c
+ * @brief Implementation of the thread pool task executor.
+ */
 /* clang-format off */
 #include "../include/ui_thread_pool.h"
 #include "ui_internal_mem.h"
@@ -30,27 +34,47 @@ extern int UI_WINAPI CloseHandle(ui_win_handle);
 /* clang-format on */
 #endif
 
+/**
+ * @struct ui_task_node
+ * @brief Internal representation of a queued task.
+ */
 struct ui_task_node {
+  /** @brief The callback function to execute. */
   ui_error_t (*callback)(void *);
+  /** @brief Opaque user data for the callback. */
   void *user_data;
+  /** @brief Pointer to the next task in the queue. */
   struct ui_task_node *next;
 };
 
-/** \brief ui_thread_pool */
+/**
+ * @struct ui_thread_pool
+ * @brief Internal implementation of the thread pool.
+ */
 struct ui_thread_pool {
+  /** @brief Head of the task queue. */
   struct ui_task_node *head;
+  /** @brief Tail of the task queue. */
   struct ui_task_node *tail;
+  /** @brief Shutdown flag. */
   int shutdown;
+  /** @brief Number of threads. */
   int num_threads;
 
 #ifndef UI_SINGLE_THREADED
 #ifdef _WIN32
+  /** @brief Windows mutex. */
   ui_win_handle mutex;
+  /** @brief Windows semaphore. */
   ui_win_handle semaphore;
+  /** @brief Array of Windows thread handles. */
   ui_win_handle *threads;
 #else
+  /** @brief POSIX mutex. */
   pthread_mutex_t mutex;
+  /** @brief POSIX condition variable. */
   pthread_cond_t cond;
+  /** @brief Array of POSIX threads. */
   pthread_t *threads;
 #endif
 #endif
@@ -58,6 +82,11 @@ struct ui_thread_pool {
 
 #ifndef UI_SINGLE_THREADED
 #ifdef _WIN32
+/**
+ * @brief Thread worker function for Windows.
+ * @param arg Pointer to the thread pool.
+ * @return Thread exit code.
+ */
 static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
   /* EM_JS */
   struct ui_thread_pool *pool = (struct ui_thread_pool *)arg;
@@ -95,6 +124,11 @@ static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
   return 0;
 }
 #else
+/**
+ * @brief Thread worker function for POSIX.
+ * @param arg Pointer to the thread pool.
+ * @return NULL.
+ */
 static void *ui_worker_thread(void *arg) {
   /* EM_JS */
   struct ui_thread_pool *pool = (struct ui_thread_pool *)arg;

@@ -29,8 +29,9 @@ static ui_error_t mock_ui_gesture_recognizer_process_event(
 
 static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
-  if (g_bottom_sheet_mock_fail == 1)
+  if (g_bottom_sheet_mock_fail == 1) {
     return UI_ERROR_UNKNOWN;
+  }
   if (g_bottom_sheet_mock_fail == 2) {
     g_bottom_sheet_mock_fail = 1;
     return (ui_dom_node_append_child)(parent, child);
@@ -47,8 +48,9 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *name,
                                               const char *value) {
-  if (g_bottom_sheet_mock_fail == 4)
+  if (g_bottom_sheet_mock_fail == 4) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_set_attribute)(node, name, value);
 }
 #undef ui_dom_node_set_attribute
@@ -56,8 +58,9 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
 
 static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
                                                  const char *name) {
-  if (g_bottom_sheet_mock_fail == 5)
+  if (g_bottom_sheet_mock_fail == 5) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_remove_attribute)(node, name);
 }
 #undef ui_dom_node_remove_attribute
@@ -66,8 +69,9 @@ static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
 static ui_error_t
 mock_ui_component_set_default_style(struct ui_component *component,
                                     struct ui_css_stylesheet *style) {
-  if (g_bottom_sheet_mock_fail == 6)
+  if (g_bottom_sheet_mock_fail == 6) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_component_set_default_style)(component, style);
 }
 #undef ui_component_set_default_style
@@ -76,8 +80,9 @@ mock_ui_component_set_default_style(struct ui_component *component,
 static ui_error_t
 mock_ui_overlay_director_unmount(struct ui_overlay_director *director,
                                  struct ui_overlay *overlay) {
-  if (g_bottom_sheet_mock_fail == 7)
+  if (g_bottom_sheet_mock_fail == 7) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_overlay_director_unmount)(director, overlay);
 }
 #undef ui_overlay_director_unmount
@@ -85,24 +90,27 @@ mock_ui_overlay_director_unmount(struct ui_overlay_director *director,
 
 static ui_error_t
 mock_ui_gesture_recognizer_destroy(struct ui_gesture_recognizer *recognizer) {
-  if (g_bottom_sheet_mock_fail == 8)
+  if (g_bottom_sheet_mock_fail == 8) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_gesture_recognizer_destroy)(recognizer);
 }
 #undef ui_gesture_recognizer_destroy
 #define ui_gesture_recognizer_destroy mock_ui_gesture_recognizer_destroy
 
 static ui_error_t mock_ui_backdrop_destroy(struct ui_backdrop *backdrop) {
-  if (g_bottom_sheet_mock_fail == 9)
+  if (g_bottom_sheet_mock_fail == 9) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_backdrop_destroy)(backdrop);
 }
 #undef ui_backdrop_destroy
 #define ui_backdrop_destroy mock_ui_backdrop_destroy
 
 static ui_error_t mock_ui_component_destroy(struct ui_component *component) {
-  if (g_bottom_sheet_mock_fail == 10)
+  if (g_bottom_sheet_mock_fail == 10) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_component_destroy)(component);
 }
 #undef ui_component_destroy
@@ -110,8 +118,9 @@ static ui_error_t mock_ui_component_destroy(struct ui_component *component) {
 
 static ui_error_t mock_ui_signal_set(struct ui_signal *signal,
                                      union ui_signal_payload value) {
-  if (g_bottom_sheet_mock_fail == 11)
+  if (g_bottom_sheet_mock_fail == 11) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_signal_set)(signal, value);
 }
 #undef ui_signal_set
@@ -121,8 +130,9 @@ static ui_error_t mock_ui_spring_update(struct ui_spring_config *config,
                                         struct ui_spring_state *state,
                                         float target, float dt,
                                         struct ui_spring_state *out) {
-  if (g_bottom_sheet_mock_fail == 12)
+  if (g_bottom_sheet_mock_fail == 12) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_spring_update)(config, state, target, dt, out);
 }
 #undef ui_spring_update
@@ -130,8 +140,9 @@ static ui_error_t mock_ui_spring_update(struct ui_spring_config *config,
 
 static ui_error_t mock_ui_css_parse_stylesheet(const char *css,
                                                struct ui_css_stylesheet **out) {
-  if (g_bottom_sheet_mock_fail == 13)
+  if (g_bottom_sheet_mock_fail == 13) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_css_parse_stylesheet)(css, out);
 }
 #undef ui_css_parse_stylesheet
@@ -139,8 +150,9 @@ static ui_error_t mock_ui_css_parse_stylesheet(const char *css,
 
 static ui_error_t mock_ui_dom_node_create(enum ui_dom_node_type type,
                                           struct ui_dom_node **out) {
-  if (g_bottom_sheet_mock_fail == 14)
+  if (g_bottom_sheet_mock_fail == 14) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_create)(type, out);
 }
 #undef ui_dom_node_create
@@ -148,8 +160,9 @@ static ui_error_t mock_ui_dom_node_create(enum ui_dom_node_type type,
 
 static ui_error_t mock_ui_dom_node_set_tag_name(struct ui_dom_node *node,
                                                 const char *tag_name) {
-  if (g_bottom_sheet_mock_fail == 15)
+  if (g_bottom_sheet_mock_fail == 15) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_set_tag_name)(node, tag_name);
 }
 #undef ui_dom_node_set_tag_name
@@ -160,8 +173,9 @@ static ui_error_t mock_ui_backdrop_process_event(struct ui_backdrop *backdrop,
                                                  float x, float y, float w,
                                                  float h,
                                                  int *out_should_dismiss) {
-  if (g_bottom_sheet_mock_fail == 16)
+  if (g_bottom_sheet_mock_fail == 16) {
     return UI_ERROR_UNKNOWN;
+  }
   if (g_bottom_sheet_mock_fail == 17) {
     *out_should_dismiss = 1;
     g_bottom_sheet_mock_fail = 5;
@@ -181,45 +195,45 @@ ui_error_t run_bottom_sheet_coverage(void) {
   struct ui_dom_node *dn3 = NULL;
   memset(&dummy_payload, 0, sizeof(dummy_payload));
   g_bottom_sheet_mock_fail = 1;
-  mock_dom_node_append_child(NULL, NULL);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn1);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn2);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn3);
+  (void)mock_dom_node_append_child(NULL, NULL);
+  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn1);
+  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn2);
+  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn3);
   g_bottom_sheet_mock_fail = 2;
-  mock_dom_node_append_child(dn1, dn2);
+  (void)mock_dom_node_append_child(dn1, dn2);
   g_bottom_sheet_mock_fail = 3;
-  mock_dom_node_append_child(dn1, dn3);
+  (void)mock_dom_node_append_child(dn1, dn3);
 
   g_bottom_sheet_mock_fail = 4;
-  mock_dom_node_set_attribute(NULL, NULL, NULL);
+  (void)mock_dom_node_set_attribute(NULL, NULL, NULL);
   g_bottom_sheet_mock_fail = 5;
-  mock_dom_node_remove_attribute(NULL, NULL);
+  (void)mock_dom_node_remove_attribute(NULL, NULL);
   g_bottom_sheet_mock_fail = 6;
-  mock_ui_component_set_default_style(NULL, NULL);
+  (void)mock_ui_component_set_default_style(NULL, NULL);
   g_bottom_sheet_mock_fail = 7;
-  mock_ui_overlay_director_unmount(NULL, NULL);
+  (void)mock_ui_overlay_director_unmount(NULL, NULL);
   g_bottom_sheet_mock_fail = 8;
-  mock_ui_gesture_recognizer_destroy(NULL);
+  (void)mock_ui_gesture_recognizer_destroy(NULL);
   g_bottom_sheet_mock_fail = 9;
-  mock_ui_backdrop_destroy(NULL);
+  (void)mock_ui_backdrop_destroy(NULL);
   g_bottom_sheet_mock_fail = 10;
-  mock_ui_component_destroy(NULL);
+  (void)mock_ui_component_destroy(NULL);
   g_bottom_sheet_mock_fail = 11;
-  mock_ui_signal_set(NULL, dummy_payload);
+  (void)mock_ui_signal_set(NULL, dummy_payload);
   g_bottom_sheet_mock_fail = 12;
-  mock_ui_spring_update(NULL, NULL, 0, 0, NULL);
+  (void)mock_ui_spring_update(NULL, NULL, 0, 0, NULL);
   g_bottom_sheet_mock_fail = 13;
-  mock_ui_css_parse_stylesheet(NULL, NULL);
+  (void)mock_ui_css_parse_stylesheet(NULL, NULL);
   g_bottom_sheet_mock_fail = 14;
-  mock_ui_dom_node_create(0, NULL);
+  (void)mock_ui_dom_node_create(0, NULL);
   g_bottom_sheet_mock_fail = 15;
-  mock_ui_dom_node_set_tag_name(NULL, NULL);
+  (void)mock_ui_dom_node_set_tag_name(NULL, NULL);
   g_bottom_sheet_mock_fail = 16;
-  mock_ui_backdrop_process_event(NULL, NULL, 0, 0, 0, 0, NULL);
+  (void)mock_ui_backdrop_process_event(NULL, NULL, 0, 0, 0, 0, NULL);
 
   g_bottom_sheet_mock_fail = 0;
 
-  ui_dom_node_destroy(dn1);
+  (void)ui_dom_node_destroy(dn1);
 
   (void)mock_ui_backdrop_destroy;
   (void)mock_ui_component_destroy;
@@ -286,7 +300,10 @@ static const char ui_bottom_sheet_base_default_css[] = {
     32,  50,  112, 120, 59,  32,  109, 97,  114, 103, 105, 110, 58,  32,  56,
     112, 120, 32,  97,  117, 116, 111, 59,  32,  125, 0};
 
-/** \brief ui_bottom_sheet_base */
+/**
+ * @struct ui_bottom_sheet_base
+ * @brief Internal representation of a bottom sheet component.
+ */
 struct ui_bottom_sheet_base {
   struct ui_component *component;
 
@@ -321,18 +338,19 @@ static ui_error_t update_dom_state(struct ui_bottom_sheet_base *sheet) {
   if (sheet->is_open) {
     ui_error_t rc =
         ui_dom_node_set_attribute(sheet->sheet_node, "data-open", "true");
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   } else {
     ui_error_t rc =
         ui_dom_node_remove_attribute(sheet->sheet_node, "data-open");
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_sheet_base_create(struct ui_bottom_sheet_base **out_sheet) {
   struct ui_bottom_sheet_base *sheet;
@@ -340,80 +358,100 @@ ui_bottom_sheet_base_create(struct ui_bottom_sheet_base **out_sheet) {
   struct ui_css_stylesheet *default_style = NULL;
   (void)rc;
 
-  if (!out_sheet)
+  if (!out_sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   sheet = (struct ui_bottom_sheet_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_bottom_sheet_base));
-  if (!sheet)
+  if (!sheet) {
     return UI_ERROR_OUT_OF_MEMORY;
+  }
 
   memset(sheet, 0, sizeof(struct ui_bottom_sheet_base));
 
   rc = ui_component_create(&sheet->component);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   rc = ui_backdrop_create(&sheet->backdrop_logic);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   rc = ui_gesture_recognizer_create(&sheet->gesture_recognizer);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sheet->root_node);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_set_tag_name(sheet->root_node, "div");
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sheet->sheet_node);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_set_tag_name(sheet->sheet_node, "div");
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_set_attribute(sheet->sheet_node, "class", "sheet");
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_append_child(sheet->root_node, sheet->sheet_node);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sheet->drag_handle_node);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_set_tag_name(sheet->drag_handle_node, "div");
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_set_attribute(sheet->drag_handle_node, "class",
                                  "drag-handle");
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_append_child(sheet->sheet_node, sheet->drag_handle_node);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sheet->content_node);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_set_tag_name(sheet->content_node, "div");
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
   rc = ui_dom_node_append_child(sheet->sheet_node, sheet->content_node);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   rc =
       ui_css_parse_stylesheet(ui_bottom_sheet_base_default_css, &default_style);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   rc = ui_component_set_default_style(sheet->component, default_style);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   sheet->component->shadow_root = sheet->root_node;
 
@@ -427,8 +465,9 @@ ui_bottom_sheet_base_create(struct ui_bottom_sheet_base **out_sheet) {
   sheet->animating_signal = NULL;
 
   rc = update_dom_state(sheet);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     goto cleanup;
+  }
 
   *out_sheet = sheet;
   return UI_ERROR_NONE;
@@ -440,46 +479,54 @@ cleanup:
     }
     (void)ui_dom_node_destroy(sheet->root_node);
   }
-  if (sheet->gesture_recognizer)
+  if (sheet->gesture_recognizer) {
     (void)ui_gesture_recognizer_destroy(sheet->gesture_recognizer);
-  if (sheet->backdrop_logic)
+  }
+  if (sheet->backdrop_logic) {
     (void)ui_backdrop_destroy(sheet->backdrop_logic);
-  if (sheet->component)
+  }
+  if (sheet->component) {
     (void)ui_component_destroy(sheet->component);
+  }
   C_MULTIPLATFORM_FREE(sheet);
   return rc;
 }
 
 ui_error_t ui_bottom_sheet_base_destroy(struct ui_bottom_sheet_base *sheet) {
   ui_error_t rc = UI_ERROR_NONE;
-  if (!sheet)
+  if (!sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   if (sheet->director && sheet->overlay) {
     rc = ui_overlay_director_unmount(sheet->director, sheet->overlay);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
 
   rc = ui_gesture_recognizer_destroy(sheet->gesture_recognizer);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
   rc = ui_backdrop_destroy(sheet->backdrop_logic);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
   rc = ui_component_destroy(sheet->component);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
 
   C_MULTIPLATFORM_FREE(sheet);
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_bottom_sheet_base_set_content(struct ui_bottom_sheet_base *sheet,
                                             struct ui_component *content) {
-  if (!sheet)
+  if (!sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   sheet->content_component = content;
   if (content) {
     return ui_component_mount(content, sheet->content_node);
@@ -491,76 +538,81 @@ ui_error_t ui_bottom_sheet_base_set_open(struct ui_bottom_sheet_base *sheet,
                                          int is_open) {
   ui_error_t rc = UI_ERROR_NONE;
 
-  if (!sheet)
+  if (!sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
-  if (sheet->is_open == is_open)
+  }
+  if (sheet->is_open == is_open) {
     return UI_ERROR_NONE;
+  }
 
   if (is_open) {
     if (sheet->director) {
       /* High z-index to overlay app content */
       rc = ui_overlay_director_mount_component(
           sheet->director, sheet->component, 1000, &sheet->overlay);
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
     }
   } else {
     if (sheet->director && sheet->overlay) {
       rc = ui_overlay_director_unmount(sheet->director, sheet->overlay);
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
       sheet->overlay = NULL;
     }
   }
 
   sheet->is_open = is_open;
   rc = update_dom_state(sheet);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
 
   if (sheet->open_signal) {
     union ui_signal_payload payload;
     payload.bool_val = is_open;
     rc = ui_signal_set(sheet->open_signal, payload);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_sheet_base_is_open(const struct ui_bottom_sheet_base *sheet,
                              int *out_is_open) {
-  if (!sheet || !out_is_open)
+  if (!sheet || !out_is_open) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   *out_is_open = sheet->is_open;
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_bottom_sheet_base_set_overlay_director */
 ui_error_t ui_bottom_sheet_base_set_overlay_director(
     struct ui_bottom_sheet_base *sheet, struct ui_overlay_director *director) {
-  if (!sheet)
+  if (!sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   sheet->director = director;
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_sheet_base_set_on_close(struct ui_bottom_sheet_base *sheet,
                                   ui_bottom_sheet_on_close_t on_close,
                                   void *user_data) {
-  if (!sheet)
+  if (!sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   sheet->on_close = on_close;
   sheet->user_data = user_data;
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_sheet_base_process_event(struct ui_bottom_sheet_base *sheet,
                                    const struct ui_event *event,
@@ -570,26 +622,31 @@ ui_bottom_sheet_base_process_event(struct ui_bottom_sheet_base *sheet,
   struct ui_gesture_event gesture_ev;
   (void)rc;
 
-  if (!sheet || !event)
+  if (!sheet || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
-  if (!sheet->is_open)
+  }
+  if (!sheet->is_open) {
     return UI_ERROR_NONE;
+  }
 
   /* Process Backdrop Dismissal */
   rc = ui_backdrop_process_event(sheet->backdrop_logic, event, 0.0f, 0.0f,
                                  100.0f, 100.0f, &should_dismiss);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
 
   if (should_dismiss) {
     if (sheet->on_close) {
       ui_error_t close_rc = sheet->on_close(sheet, sheet->user_data);
-      if (close_rc != UI_ERROR_NONE)
+      if (close_rc != UI_ERROR_NONE) {
         return close_rc;
+      }
     } else {
       rc = ui_bottom_sheet_base_set_open(sheet, 0);
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
     }
     return UI_ERROR_NONE; /* Event consumed via dismissal */
   }
@@ -597,20 +654,23 @@ ui_bottom_sheet_base_process_event(struct ui_bottom_sheet_base *sheet,
   /* Process Swipe Down Dismissal */
   rc = ui_gesture_recognizer_process_event(sheet->gesture_recognizer, event,
                                            timestamp_ms, &gesture_ev);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
 
   if (gesture_ev.type == UI_GESTURE_SWIPE) {
     /* Check if it's a downward swipe */
     if (gesture_ev.delta_y > 0.0f && gesture_ev.velocity_y > 300.0f) {
       if (sheet->on_close) {
         ui_error_t close_rc = sheet->on_close(sheet, sheet->user_data);
-        if (close_rc != UI_ERROR_NONE)
+        if (close_rc != UI_ERROR_NONE) {
           return close_rc;
+        }
       } else {
         rc = ui_bottom_sheet_base_set_open(sheet, 0);
-        if (rc != UI_ERROR_NONE)
+        if (rc != UI_ERROR_NONE) {
           return rc;
+        }
       }
     }
   }
@@ -628,8 +688,9 @@ ui_error_t ui_bottom_sheet_base_update(struct ui_bottom_sheet_base *sheet,
   float dt = 0.016f;
   ui_error_t rc;
 
-  if (!sheet)
+  if (!sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   if (sheet->is_open) {
     target = 100.0f; /* 100% open */
@@ -639,17 +700,19 @@ ui_error_t ui_bottom_sheet_base_update(struct ui_bottom_sheet_base *sheet,
 
   rc = ui_spring_update(&sheet->spring_config, &sheet->spring_state, target, dt,
                         &next_state);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
   sheet->spring_state = next_state;
 
-  if (!sheet->is_open)
+  if (!sheet->is_open) {
     return UI_ERROR_NONE;
+  }
 
   return ui_gesture_recognizer_update(sheet->gesture_recognizer, timestamp_ms,
                                       &gesture_ev);
 }
-/** \brief ui_error */
+
 ui_error_t
 ui_bottom_sheet_base_get_component(struct ui_bottom_sheet_base *sheet,
                                    struct ui_component **out_component) {
@@ -660,7 +723,6 @@ ui_bottom_sheet_base_get_component(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_sheet_base_set_spring_config(struct ui_bottom_sheet_base *sheet,
                                        const struct ui_spring_config *config) {
@@ -680,7 +742,6 @@ ui_error_t ui_bottom_sheet_base_bind_open(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_sheet_base_get_animating_signal(struct ui_bottom_sheet_base *sheet,
                                           struct ui_computed **out_animating) {

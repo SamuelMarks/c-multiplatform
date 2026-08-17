@@ -15,25 +15,44 @@ struct ui_signal;
 extern "C" {
 #endif
 
+/**
+ * @struct ui_snackbar_base
+ * @brief Opaque handle for a snackbar base component instance.
+ */
 struct ui_snackbar_base;
+
+/**
+ * @struct ui_overlay_director
+ * @brief Opaque handle for the overlay director responsible for presenting
+ * snackbars.
+ */
 struct ui_overlay_director;
 
 /**
  * @brief Signature for the inline action callback.
+ *
+ * @param snackbar The snackbar instance calling the action.
+ * @param user_data User data passed in the configuration.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_snackbar_action_cb)(struct ui_snackbar_base *snackbar,
                                             void *user_data);
 
 /**
+ * @struct ui_snackbar_config
  * @brief Configuration for a single snackbar notification.
  */
 struct ui_snackbar_config {
+  /** @brief The message to display. */
   const char *message;
+  /** @brief The text label for the action button, or NULL if none. */
   const char *action_label;
+  /** @brief Callback executed when the action button is clicked. */
   ui_snackbar_action_cb action_callback;
+  /** @brief User data to pass to the action callback. */
   void *action_user_data;
-  double duration_secs; /* Time to stay visible before auto-dismiss (0 for
-                           infinite) */
+  /** @brief Time to stay visible before auto-dismiss (0 for infinite). */
+  double duration_secs;
 };
 
 /**
@@ -53,6 +72,7 @@ ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
  * @brief Destroys a snackbar instance and frees its resources.
  *
  * @param snackbar The snackbar instance to destroy. If null, does nothing.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar);
 
@@ -70,7 +90,7 @@ ui_error_t ui_snackbar_base_enqueue(struct ui_snackbar_base *snackbar,
  * @brief Dismisses the currently active snackbar.
  *
  * @param snackbar The snackbar base manager.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar);
 
@@ -78,7 +98,7 @@ ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar);
  * @brief Ticks the snackbar logic to handle timers and queue progression.
  *
  * @param snackbar The snackbar base manager.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar);
 
@@ -87,8 +107,8 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar);
  *
  * @param snackbar The snackbar base manager.
  * @param event The event to process.
- * @param timestamp_ms Event timestamp.
- * @return UI_ERROR_NONE on success.
+ * @param timestamp_ms Event timestamp in milliseconds.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
                                           const struct ui_event *event,
@@ -99,7 +119,7 @@ ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
  *
  * @param widget The widget.
  * @param open_signal The boolean signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_snackbar_base_bind_open(struct ui_snackbar_base *widget,
                                       struct ui_signal *open_signal);
@@ -109,7 +129,7 @@ ui_error_t ui_snackbar_base_bind_open(struct ui_snackbar_base *widget,
  *
  * @param widget The widget.
  * @param out_animating Pointer to receive the computed signal.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_snackbar_base_get_animating_signal(struct ui_snackbar_base *widget,

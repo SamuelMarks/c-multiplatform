@@ -5,11 +5,20 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @struct ui_compositor_material_base
+ * @brief Internal representation of a compositor material.
+ */
 struct ui_compositor_material_base {
+  /** @brief Arena for internal allocations. */
   struct ui_arena *arena;
+  /** @brief Material type. */
   enum ui_compositor_material_type type;
+  /** @brief Fallback mode. */
   enum ui_compositor_fallback_mode fallback_mode;
+  /** @brief Opacity level. */
   float opacity;
+  /** @brief Signal emitted on type change. */
   ui_signal_t *type_signal;
 };
 
@@ -20,7 +29,6 @@ static ui_error_t type_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_compositor_material_base_create */
 ui_error_t ui_compositor_material_base_create(
     struct ui_arena *arena, const struct ui_compositor_material_config *config,
     struct ui_compositor_material_base **out_material) {
@@ -54,7 +62,6 @@ ui_error_t ui_compositor_material_base_create(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_compositor_material_base_destroy */
 ui_error_t ui_compositor_material_base_destroy(
     struct ui_compositor_material_base *material) {
   if (!material) {
@@ -66,7 +73,6 @@ ui_error_t ui_compositor_material_base_destroy(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_compositor_material_base_set_type */
 ui_error_t ui_compositor_material_base_set_type(
     struct ui_compositor_material_base *material,
     enum ui_compositor_material_type type) {
@@ -84,7 +90,6 @@ ui_error_t ui_compositor_material_base_set_type(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_compositor_material_base_set_fallback_mode */
 ui_error_t ui_compositor_material_base_set_fallback_mode(
     struct ui_compositor_material_base *material,
     enum ui_compositor_fallback_mode fallback_mode) {
@@ -95,7 +100,6 @@ ui_error_t ui_compositor_material_base_set_fallback_mode(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_compositor_material_base_set_opacity */
 ui_error_t ui_compositor_material_base_set_opacity(
     struct ui_compositor_material_base *material, float opacity) {
   if (!material) {
@@ -112,7 +116,6 @@ ui_error_t ui_compositor_material_base_set_opacity(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_compositor_material_base_get_type_signal */
 ui_error_t ui_compositor_material_base_get_type_signal(
     struct ui_compositor_material_base *material, ui_signal_t **out_signal) {
   if (!material || !out_signal) {

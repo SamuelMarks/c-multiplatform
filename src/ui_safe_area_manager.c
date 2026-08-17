@@ -1,16 +1,33 @@
+/**
+ * \file ui_safe_area_manager.c
+ * \brief Implementation of the UI Safe Area Manager component.
+ */
+
 /* clang-format off */
 #include "ui_safe_area_manager.h"
 #include "ui_internal_mem.h"
 #include "ui_arena.h"
 #include <stddef.h>
+#include <string.h>
 /* clang-format on */
 
+/**
+ * \brief Internal structure representing a safe area manager.
+ */
 struct ui_safe_area_manager {
-  struct ui_arena *arena;
-  struct ui_safe_area_insets current_insets;
-  ui_signal_t *change_signal;
+  struct ui_arena *arena;                    /**< Memory arena */
+  struct ui_safe_area_insets current_insets; /**< Current applied insets */
+  ui_signal_t *change_signal;                /**< Signal for inset changes */
 };
 
+/**
+ * \brief Evaluates equality of two safe area inset signal payloads.
+ *
+ * \param a First payload.
+ * \param b Second payload.
+ * \param out_equal Pointer to receive the equality result.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t insets_equality(union ui_signal_payload a,
                                   union ui_signal_payload b,
                                   ui_bool_t *out_equal) {
@@ -26,7 +43,13 @@ static ui_error_t insets_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Creates a safe area manager.
+ *
+ * \param arena The memory arena to use for allocation.
+ * \param out_manager Output pointer for the created manager.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_safe_area_manager_create(struct ui_arena *arena,
                             struct ui_safe_area_manager **out_manager) {
@@ -81,7 +104,12 @@ ui_safe_area_manager_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Destroys a safe area manager.
+ *
+ * \param manager The safe area manager to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager) {
   ui_error_t err;
 
@@ -107,7 +135,13 @@ ui_error_t ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the current safe area insets (usually called by window backends).
+ *
+ * \param manager The safe area manager.
+ * \param insets The new insets to apply.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
                                 const struct ui_safe_area_insets *insets) {
@@ -139,7 +173,13 @@ ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the current safe area insets.
+ *
+ * \param manager The safe area manager.
+ * \param out_insets Output pointer to receive the current insets.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
                                 struct ui_safe_area_insets *out_insets) {
@@ -151,7 +191,14 @@ ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the signal emitted when insets change.
+ * Payload is a pointer to a struct ui_safe_area_insets.
+ *
+ * \param manager The manager.
+ * \param out_signal Output pointer for the signal.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_safe_area_manager_get_change_signal(struct ui_safe_area_manager *manager,
                                        ui_signal_t **out_signal) {

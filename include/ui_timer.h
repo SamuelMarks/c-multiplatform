@@ -1,3 +1,7 @@
+/**
+ * @file ui_timer.h
+ * @brief Defines the timer logic for abstract and monotonic timers.
+ */
 #ifndef UI_TIMER_H
 #define UI_TIMER_H
 
@@ -10,15 +14,26 @@ extern "C" {
 /* clang-format on */
 
 /**
+ * @struct ui_timer
  * @brief Opaque handle representing an abstract timer.
  */
 struct ui_timer;
 
 /**
+ * @struct ui_timer_config
  * @brief Configuration for a custom timer source.
  */
 struct ui_timer_config {
+  /**
+   * @brief Callback function to retrieve the current time.
+   *
+   * @param user_data Opaque user data provided during creation.
+   * @param out_time_secs Pointer to receive the current time in seconds.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
+   */
   ui_error_t (*time_source)(void *user_data, double *out_time_secs);
+
+  /** @brief Opaque user data passed to the time_source callback. */
   void *user_data;
 };
 

@@ -1,3 +1,7 @@
+/**
+ * \file ui_i18n.c
+ * \brief Implementation of Internationalization (i18n) routines.
+ */
 #ifdef _MSC_VER
 #pragma warning(disable : 4702)
 #endif
@@ -13,13 +17,28 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * \def MAX_LOCALE_LEN
+ * \brief Maximum length for a locale string (e.g. "en-US").
+ */
 #define MAX_LOCALE_LEN 32
 
+/**
+ * \struct ui_i18n
+ * \brief State and configuration for internationalization.
+ */
 struct ui_i18n {
   char locale[MAX_LOCALE_LEN];
   struct ui_signal *locale_signal;
 };
 
+/**
+ * \brief Safely copies a string, guaranteeing null termination.
+ * \param[out] dst The destination buffer.
+ * \param[in] sz The size of the destination buffer.
+ * \param[in] src The source string.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t safe_strcpy(char *dst, size_t sz, const char *src) {
 #if defined(_MSC_VER)
   strcpy_s(dst, sz, src);
@@ -30,6 +49,11 @@ static ui_error_t safe_strcpy(char *dst, size_t sz, const char *src) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new i18n context.
+ * \param[out] out_i18n Pointer to store the created context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_create(struct ui_i18n **out_i18n) {
   struct ui_i18n *i18n;
 
@@ -49,6 +73,11 @@ ui_error_t ui_i18n_create(struct ui_i18n **out_i18n) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys an i18n context.
+ * \param[in,out] i18n The context to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_destroy(struct ui_i18n *i18n) {
   if (!i18n) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -57,6 +86,12 @@ ui_error_t ui_i18n_destroy(struct ui_i18n *i18n) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the current locale and updates bidi direction if necessary.
+ * \param[in,out] i18n The i18n context.
+ * \param[in] locale The locale string (e.g. "ar-EG").
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_set_locale(struct ui_i18n *i18n, const char *locale) {
   if (!i18n || !locale) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -84,6 +119,12 @@ ui_error_t ui_i18n_set_locale(struct ui_i18n *i18n, const char *locale) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the current locale string.
+ * \param[in] i18n The i18n context.
+ * \param[out] out_locale Pointer to store the locale string.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_get_locale(struct ui_i18n *i18n, const char **out_locale) {
   if (!i18n || !out_locale) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -92,6 +133,12 @@ ui_error_t ui_i18n_get_locale(struct ui_i18n *i18n, const char **out_locale) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the current locale to a reactive signal.
+ * \param[in,out] i18n The i18n context.
+ * \param[in,out] locale_signal The signal to bind.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_bind_locale_signal(struct ui_i18n *i18n,
                                       struct ui_signal *locale_signal) {
   if (!i18n || !locale_signal) {
@@ -101,6 +148,15 @@ ui_error_t ui_i18n_bind_locale_signal(struct ui_i18n *i18n,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Formats a floating point number to a string.
+ * \param[in] i18n The i18n context.
+ * \param[in] value The numeric value to format.
+ * \param[in] decimals Number of decimal places to include.
+ * \param[out] out_str The output buffer.
+ * \param[in] out_len The size of the output buffer.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_format_number(struct ui_i18n *i18n, double value,
                                  int decimals, char *out_str, size_t out_len) {
   char format_str[16];
@@ -125,6 +181,15 @@ ui_error_t ui_i18n_format_number(struct ui_i18n *i18n, double value,
 #endif
 }
 
+/**
+ * \brief Formats an amount as currency.
+ * \param[in] i18n The i18n context.
+ * \param[in] amount The amount to format.
+ * \param[in] currency_code The currency code (e.g. "USD").
+ * \param[out] out_str The output buffer.
+ * \param[in] out_len The size of the output buffer.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_format_currency(struct ui_i18n *i18n, double amount,
                                    const char *currency_code, char *out_str,
                                    size_t out_len) {
@@ -150,6 +215,15 @@ ui_error_t ui_i18n_format_currency(struct ui_i18n *i18n, double amount,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Formats a timestamp as a date string.
+ * \param[in] i18n The i18n context.
+ * \param[in] timestamp_ms The timestamp in milliseconds.
+ * \param[in] format_str The date format string.
+ * \param[out] out_str The output buffer.
+ * \param[in] out_len The size of the output buffer.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_format_date(struct ui_i18n *i18n, double timestamp_ms,
                                const char *format_str, char *out_str,
                                size_t out_len) {
@@ -165,6 +239,17 @@ ui_error_t ui_i18n_format_date(struct ui_i18n *i18n, double timestamp_ms,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Selects the correct pluralized string based on a count.
+ * \param[in] i18n The i18n context.
+ * \param[in] count The count.
+ * \param[in] zero The string to use if count is 0.
+ * \param[in] one The string to use if count is 1.
+ * \param[in] other The string to use if count > 1.
+ * \param[out] out_str The output buffer.
+ * \param[in] out_len The size of the output buffer.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_pluralize(struct ui_i18n *i18n, int count, const char *zero,
                              const char *one, const char *other, char *out_str,
                              size_t out_len) {
@@ -185,6 +270,17 @@ ui_error_t ui_i18n_pluralize(struct ui_i18n *i18n, int count, const char *zero,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Interpolates variables into a template string (e.g. "Hello {{name}}").
+ * \param[in] i18n The i18n context.
+ * \param[in] template_str The template string containing placeholders.
+ * \param[in] keys The array of placeholder keys.
+ * \param[in] values The array of replacement values.
+ * \param[in] count The number of key-value pairs.
+ * \param[out] out_str The output buffer.
+ * \param[in] out_len The size of the output buffer.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_i18n_interpolate(struct ui_i18n *i18n, const char *template_str,
                                const char **keys, const char **values,
                                size_t count, char *out_str, size_t out_len) {

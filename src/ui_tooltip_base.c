@@ -1,3 +1,7 @@
+/**
+ * @file ui_tooltip_base.c
+ * @brief Implementation of the tooltip base component.
+ */
 /* clang-format off */
 #include "ui_tooltip_base.h"
 #include "ui_internal_mem.h"
@@ -11,25 +15,46 @@
 /* MSVC Safe CRT */
 #endif
 
+/**
+ * @enum ui_tooltip_state
+ * @brief Internal state machine for the tooltip.
+ */
 enum ui_tooltip_state {
+  /** @brief Tooltip is hidden and inactive. */
   UI_TOOLTIP_STATE_IDLE,
+  /** @brief Waiting for hover delay to expire. */
   UI_TOOLTIP_STATE_HOVER_DELAY,
+  /** @brief Waiting for focus delay to expire. */
   UI_TOOLTIP_STATE_FOCUS_DELAY,
+  /** @brief Waiting for touch-and-hold delay to expire. */
   UI_TOOLTIP_STATE_TOUCH_HOLD_DELAY,
+  /** @brief Tooltip is fully visible. */
   UI_TOOLTIP_STATE_VISIBLE,
+  /** @brief Waiting for hide delay to expire. */
   UI_TOOLTIP_STATE_HIDE_DELAY
 };
 
-/** \brief ui_tooltip_base */
+/**
+ * @struct ui_tooltip_base
+ * @brief Internal implementation of the tooltip component.
+ */
 struct ui_tooltip_base {
+  /** @brief The tooltip configuration. */
   struct ui_tooltip_config config;
+  /** @brief The current state. */
   enum ui_tooltip_state state;
+  /** @brief Time when the current state was entered. */
   double state_enter_time;
+  /** @brief The tooltip text. */
   char *text;
 
+  /** @brief The overlay component for rendering. */
   struct ui_component *overlay_component;
+  /** @brief The active overlay instance. */
   struct ui_overlay *active_overlay;
+  /** @brief Signal for the open state. */
   struct ui_signal *open_signal;
+  /** @brief Signal for the animating state. */
   struct ui_computed *animating_signal;
 };
 
@@ -98,6 +123,13 @@ ui_error_t ui_tooltip_base_set_text(struct ui_tooltip_base *tooltip,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Helper function to transition the tooltip state machine.
+ * @param tooltip The tooltip instance.
+ * @param new_state The new state to transition to.
+ * @param time_secs The current time in seconds.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t transition_state(struct ui_tooltip_base *tooltip,
                                    enum ui_tooltip_state new_state,
                                    double time_secs) {
@@ -228,7 +260,6 @@ ui_error_t ui_tooltip_base_hide(struct ui_tooltip_base *tooltip) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
                                   struct ui_overlay_director *director,
                                   const struct ui_layout_node *trigger_layout,
@@ -328,7 +359,6 @@ ui_error_t ui_tooltip_base_bind_open(struct ui_tooltip_base *widget,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_tooltip_base_get_animating_signal(struct ui_tooltip_base *widget,
                                      struct ui_computed **out_animating) {

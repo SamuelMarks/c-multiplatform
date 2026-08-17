@@ -31,12 +31,14 @@ enum ui_carousel_orientation {
  * @brief Configuration for the carousel.
  */
 struct ui_carousel_config {
-  enum ui_carousel_orientation orientation;
-  ui_virtual_scroll_create_node_fn create_node;
-  ui_virtual_scroll_update_node_fn update_node;
-  void *user_data;
-  size_t initial_item_count;
-  float item_size; /* width if horiz, height if vert */
+  enum ui_carousel_orientation orientation; /**< Carousel flow orientation */
+  ui_virtual_scroll_create_node_fn
+      create_node; /**< Callback to create a node */
+  ui_virtual_scroll_update_node_fn
+      update_node;           /**< Callback to update a node */
+  void *user_data;           /**< Opaque pointer passed to callbacks */
+  size_t initial_item_count; /**< Initial total count of items */
+  float item_size;           /**< width if horiz, height if vert */
 };
 
 /**

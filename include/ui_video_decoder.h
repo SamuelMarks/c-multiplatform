@@ -13,32 +13,45 @@ extern "C" {
 /* clang-format on */
 
 /**
+ * @struct ui_video_decoder
  * @brief Opaque handle representing an active video decoder.
  */
 struct ui_video_decoder;
 
 /**
+ * @struct ui_video_decoder_config
  * @brief Configuration for creating a video decoder.
  */
 struct ui_video_decoder_config {
+  /** @brief The width of the video. */
   int width;
+  /** @brief The height of the video. */
   int height;
-  int codec_id; /* Generic codec ID, e.g., H264, HEVC, VP9 */
+  /** @brief Generic codec ID, e.g., H264, HEVC, VP9. */
+  int codec_id;
 };
 
 /**
+ * @struct ui_video_frame
  * @brief Represents a decoded video frame.
  */
 struct ui_video_frame {
-  void *data[3];   /* Planar data pointers (e.g., Y, U, V or RGBA) */
-  int linesize[3]; /* Stride for each plane */
+  /** @brief Planar data pointers (e.g., Y, U, V or RGBA). */
+  void *data[3];
+  /** @brief Stride for each plane. */
+  int linesize[3];
+  /** @brief Width of the frame. */
   int width;
+  /** @brief Height of the frame. */
   int height;
-  int format;   /* Pixel format enum */
-  ui_int64 pts; /* Presentation timestamp in microseconds */
+  /** @brief Pixel format enum. */
+  int format;
+  /** @brief Presentation timestamp in microseconds. */
+  ui_int64 pts;
 };
 
 /**
+ * @struct ui_video_decoder_backend
  * @brief Abstract vtable for platform-specific hardware video decoding.
  */
 struct ui_video_decoder_backend {
@@ -48,7 +61,7 @@ struct ui_video_decoder_backend {
    * @param backend The backend instance.
    * @param config The desired decoder configuration.
    * @param out_decoder Pointer to receive the allocated decoder handle.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*create_decoder)(struct ui_video_decoder_backend *backend,
                                const struct ui_video_decoder_config *config,
@@ -59,7 +72,7 @@ struct ui_video_decoder_backend {
    *
    * @param backend The backend instance.
    * @param decoder The decoder to destroy.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*destroy_decoder)(struct ui_video_decoder_backend *backend,
                                 struct ui_video_decoder *decoder);
@@ -72,7 +85,7 @@ struct ui_video_decoder_backend {
    * @param packet_data Pointer to the compressed data.
    * @param packet_size Size of the compressed data.
    * @param pts Presentation timestamp in microseconds.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*decode_packet)(struct ui_video_decoder_backend *backend,
                               struct ui_video_decoder *decoder,
@@ -98,7 +111,7 @@ struct ui_video_decoder_backend {
    * @param backend The backend instance.
    * @param decoder The decoder.
    * @param frame The frame to release.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*release_frame)(struct ui_video_decoder_backend *backend,
                               struct ui_video_decoder *decoder,
@@ -114,7 +127,7 @@ struct ui_video_decoder_backend {
  * @brief Gets the platform-appropriate hardware video decoder backend.
  *
  * @param out_backend Pointer to receive the backend struct.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_video_decoder_get_default_backend(
     struct ui_video_decoder_backend *out_backend);

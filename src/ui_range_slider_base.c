@@ -1,3 +1,8 @@
+/**
+ * \file ui_range_slider_base.c
+ * \brief Implementation of the UI Range Slider Base component.
+ */
+
 /* clang-format off */
 #include "ui_range_slider_base.h"
 #include "ui_bidi_manager.h"
@@ -12,6 +17,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** \brief Default CSS stylesheet for the range slider */
 static const char ui_range_slider_base_default_css[] = {
     46,  117, 105, 45,  114, 97,  110, 103, 101, 45,  115, 108, 105, 100, 101,
     114, 32,  123, 32,  112, 111, 115, 105, 116, 105, 111, 110, 58,  32,  114,
@@ -52,22 +58,30 @@ static const char ui_range_slider_base_default_css[] = {
     114, 115, 111, 114, 58,  32,  112, 111, 105, 110, 116, 101, 114, 59,  32,
     125, 0};
 
-/** \brief ui_range_slider_base */
+/**
+ * \brief Internal structure representing a range slider.
+ */
 struct ui_range_slider_base {
-  struct ui_component *component;
-  struct ui_gesture_recognizer *gesture_recognizer;
-  struct ui_dom_node *thumb_low_node;
-  struct ui_dom_node *thumb_high_node;
-  float min_val;
-  float max_val;
-  float low_value;
-  float high_value;
-  float step;
-  int disabled;
-  ui_range_slider_on_change_t on_change;
-  void *user_data;
+  struct ui_component *component; /**< Underlying DOM container */
+  struct ui_gesture_recognizer *gesture_recognizer; /**< Gesture recognizer */
+  struct ui_dom_node *thumb_low_node;    /**< Node for the low thumb */
+  struct ui_dom_node *thumb_high_node;   /**< Node for the high thumb */
+  float min_val;                         /**< Minimum possible value */
+  float max_val;                         /**< Maximum possible value */
+  float low_value;                       /**< Current low value */
+  float high_value;                      /**< Current high value */
+  float step;                            /**< Step increment */
+  int disabled;                          /**< Non-zero if disabled */
+  ui_range_slider_on_change_t on_change; /**< Change callback */
+  void *user_data;                       /**< Callback user data */
 };
 
+/**
+ * \brief Updates DOM attributes and styles for the slider.
+ *
+ * \param slider The component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   char buf[64];
   float low_pct = 0.0f;
@@ -136,7 +150,12 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new unstyled range slider base component.
+ *
+ * \param out_slider Pointer to receive the allocated range slider base.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
   struct ui_range_slider_base *slider;
@@ -242,7 +261,12 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Destroys a range slider base component.
+ *
+ * \param slider The range slider to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_range_slider_base_destroy(struct ui_range_slider_base *slider) {
   if (!slider)
     return UI_ERROR_NONE;
@@ -252,6 +276,13 @@ ui_error_t ui_range_slider_base_destroy(struct ui_range_slider_base *slider) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the minimum value of the range slider.
+ *
+ * \param slider The range slider component.
+ * \param min The new minimum value.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
                                         float min) {
   if (!slider)
@@ -267,6 +298,13 @@ ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the maximum value of the range slider.
+ *
+ * \param slider The range slider component.
+ * \param max The new maximum value.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
                                         float max) {
   if (!slider)
@@ -282,7 +320,14 @@ ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the current values of the range slider.
+ *
+ * \param slider The range slider component.
+ * \param low_value The new low value (clamped to bounds).
+ * \param high_value The new high value (clamped to bounds).
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
                                            float low_value, float high_value) {
   float new_low, new_high;
@@ -330,7 +375,14 @@ ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the current values of the range slider.
+ *
+ * \param slider The range slider component.
+ * \param out_low Pointer to receive the low value.
+ * \param out_high Pointer to receive the high value.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_range_slider_base_get_values(const struct ui_range_slider_base *slider,
                                 float *out_low, float *out_high) {
@@ -341,6 +393,13 @@ ui_range_slider_base_get_values(const struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the step increment. If 0.0, the slider is continuous.
+ *
+ * \param slider The range slider component.
+ * \param step The step increment value.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_range_slider_base_set_step(struct ui_range_slider_base *slider,
                                          float step) {
   if (!slider)
@@ -352,7 +411,13 @@ ui_error_t ui_range_slider_base_set_step(struct ui_range_slider_base *slider,
                                          slider->high_value);
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the disabled state of the range slider.
+ *
+ * \param slider The range slider component.
+ * \param disabled Non-zero to disable, 0 to enable.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_range_slider_base_set_disabled(struct ui_range_slider_base *slider,
                                   int disabled) {
@@ -363,7 +428,14 @@ ui_range_slider_base_set_disabled(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the change handler for the range slider.
+ *
+ * \param slider The range slider component.
+ * \param on_change The callback invoked on value change.
+ * \param user_data Opaque pointer passed to the callback.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_range_slider_base_set_on_change(struct ui_range_slider_base *slider,
                                    ui_range_slider_on_change_t on_change,
@@ -375,7 +447,16 @@ ui_range_slider_base_set_on_change(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Processes an incoming input event to trigger slider interactions based
+ * on normalized pointer position.
+ *
+ * \param slider The range slider component.
+ * \param thumb Which thumb is active.
+ * \param normalized_position The normalized position along the track (0.0
+ * to 1.0).
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_range_slider_base_set_normalized_value(struct ui_range_slider_base *slider,
                                           enum ui_range_slider_thumb thumb,
@@ -414,7 +495,16 @@ ui_range_slider_base_set_normalized_value(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_range_slider_base_process_event */
+/**
+ * \brief Processes an incoming input event (e.g., keyboard interactions like
+ * Arrow Keys).
+ *
+ * \param slider The range slider component.
+ * \param event The input event.
+ * \param active_thumb Which thumb is active for the keyboard event.
+ * \param timestamp_ms Event timestamp in milliseconds.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_range_slider_base_process_event(
     struct ui_range_slider_base *slider, const struct ui_event *event,
     enum ui_range_slider_thumb active_thumb, double timestamp_ms) {
@@ -467,7 +557,15 @@ ui_error_t ui_range_slider_base_process_event(
 
   return UI_ERROR_NONE;
 }
-/** \brief ui_error */
+
+/**
+ * \brief Gets the underlying component instance for style injection and DOM
+ * mounting.
+ *
+ * \param slider The range slider component.
+ * \param out_component Pointer to receive the underlying component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_range_slider_base_get_component(struct ui_range_slider_base *slider,
                                    struct ui_component **out_component) {

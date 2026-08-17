@@ -1,3 +1,7 @@
+/**
+ * @file test_ui_tree_grid_base.c
+ * @brief Tests for the tree grid base component.
+ */
 /* clang-format off */
 #include "../include/ui_tree_grid_base.h"
 #include "../include/ui_error.h"

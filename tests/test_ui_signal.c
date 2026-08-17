@@ -2,7 +2,7 @@
 #include "../include/ui_signal.h"
 #include "../include/ui_error.h"
 #include "../include/ui_arena.h"
-#include "../src/ui_reactive_graph.h"
+#include <ui_reactive_graph.h>
 #include "../include/ui_thread_pool.h"
 #include "../include/ui_atomic.h"
 #include <stdio.h>

@@ -6,6 +6,11 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * \file ui_sidenav_base.c
+ * \brief Sidenav base component implementation.
+ */
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -82,7 +87,10 @@ static const char *ui_sidenav_backdrop_css =
     "z-index: 5; "
     "}";
 
-/** \brief ui_sidenav_base */
+/**
+ * \brief ui_sidenav_base structure.
+ * \details Internal state for the sidenav base component.
+ */
 struct ui_sidenav_base {
   struct ui_component *component;
 
@@ -107,6 +115,11 @@ struct ui_sidenav_base {
   struct ui_signal *active_index_signal;
 };
 
+/**
+ * \brief Updates the DOM state for the sidenav.
+ * \param sidenav The sidenav component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
   const char *mode_str = "over";
   const char *pos_str = "start";
@@ -157,6 +170,11 @@ static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Mounts the backdrop for the sidenav.
+ * \param sidenav The sidenav component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t mount_backdrop(struct ui_sidenav_base *sidenav) {
   ui_error_t rc;
   if (!sidenav->director || sidenav->backdrop_overlay)
@@ -198,6 +216,11 @@ static ui_error_t mount_backdrop(struct ui_sidenav_base *sidenav) {
                                              &sidenav->backdrop_overlay);
 }
 
+/**
+ * \brief Unmounts the backdrop for the sidenav.
+ * \param sidenav The sidenav component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t unmount_backdrop(struct ui_sidenav_base *sidenav) {
   if (sidenav->director && sidenav->backdrop_overlay) {
     ui_error_t rc = ui_overlay_director_unmount(sidenav->director,
@@ -209,6 +232,11 @@ static ui_error_t unmount_backdrop(struct ui_sidenav_base *sidenav) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new sidenav base component.
+ * \param out_sidenav Pointer to store the created component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   struct ui_sidenav_base *sidenav;
   ui_error_t rc;
@@ -293,6 +321,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a sidenav base component.
+ * \param sidenav The component to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
   if (!sidenav)
     return UI_ERROR_NONE;
@@ -308,6 +341,12 @@ ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the mode of the sidenav.
+ * \param sidenav The sidenav component.
+ * \param mode The mode to set.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_set_mode(struct ui_sidenav_base *sidenav,
                                     enum ui_sidenav_mode mode) {
   if (!sidenav)
@@ -326,6 +365,12 @@ ui_error_t ui_sidenav_base_set_mode(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the position of the sidenav.
+ * \param sidenav The sidenav component.
+ * \param position The position to set.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_set_position(struct ui_sidenav_base *sidenav,
                                         enum ui_sidenav_position position) {
   if (!sidenav)
@@ -336,7 +381,12 @@ ui_error_t ui_sidenav_base_set_position(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the drawer content component.
+ * \param sidenav The sidenav component.
+ * \param content The drawer content component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_set_drawer_content(struct ui_sidenav_base *sidenav,
                                               struct ui_component *content) {
   if (!sidenav)
@@ -348,6 +398,12 @@ ui_error_t ui_sidenav_base_set_drawer_content(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the main content component.
+ * \param sidenav The sidenav component.
+ * \param content The main content component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_set_main_content(struct ui_sidenav_base *sidenav,
                                             struct ui_component *content) {
   if (!sidenav)
@@ -359,6 +415,12 @@ ui_error_t ui_sidenav_base_set_main_content(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets whether the sidenav is open.
+ * \param sidenav The sidenav component.
+ * \param is_open 1 to open, 0 to close.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_set_open(struct ui_sidenav_base *sidenav,
                                     int is_open) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -386,6 +448,12 @@ ui_error_t ui_sidenav_base_set_open(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Checks if the sidenav is open.
+ * \param sidenav The sidenav component.
+ * \param out_is_open Pointer to store the result.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_is_open(const struct ui_sidenav_base *sidenav,
                                    int *out_is_open) {
   if (!sidenav || !out_is_open)
@@ -394,7 +462,12 @@ ui_error_t ui_sidenav_base_is_open(const struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the overlay director.
+ * \param sidenav The sidenav component.
+ * \param director The overlay director.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_sidenav_base_set_overlay_director(struct ui_sidenav_base *sidenav,
                                      struct ui_overlay_director *director) {
@@ -408,6 +481,13 @@ ui_sidenav_base_set_overlay_director(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the on close callback.
+ * \param sidenav The sidenav component.
+ * \param on_close The callback function.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_set_on_close(struct ui_sidenav_base *sidenav,
                                         ui_sidenav_on_close_t on_close,
                                         void *user_data) {
@@ -418,6 +498,13 @@ ui_error_t ui_sidenav_base_set_on_close(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Processes an event for the sidenav.
+ * \param sidenav The sidenav component.
+ * \param event The event to process.
+ * \param timestamp_ms The timestamp.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
                                          const struct ui_event *event,
                                          double timestamp_ms) {
@@ -455,7 +542,12 @@ ui_error_t ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
 
   return UI_ERROR_NONE;
 }
-/** \brief ui_error */
+/**
+ * \brief Gets the base component for the sidenav.
+ * \param sidenav The sidenav component.
+ * \param out_component Pointer to store the component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_get_component(struct ui_sidenav_base *sidenav,
                                          struct ui_component **out_component) {
   if (!sidenav || !out_component) {
@@ -465,6 +557,12 @@ ui_error_t ui_sidenav_base_get_component(struct ui_sidenav_base *sidenav,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the active index to a signal.
+ * \param widget The sidenav component.
+ * \param signal The signal to bind.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sidenav_base_bind_active_index(struct ui_sidenav_base *widget,
                                              struct ui_signal *signal) {
   if (!widget) {

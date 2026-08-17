@@ -11,9 +11,14 @@ static const char *ui_datagrid_base_default_css = ".datagrid-container { "
                                                   "position: relative; "
                                                   "}";
 
-/** \brief ui_datagrid_base */
+/**
+ * @struct ui_datagrid_base
+ * @brief Internal representation of a datagrid component.
+ */
 struct ui_datagrid_base {
+  /** @brief The base component. */
   struct ui_component *component;
+  /** @brief Signal bound for data. */
   struct ui_computed *data_signal;
 };
 
@@ -93,7 +98,6 @@ ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
                                           struct ui_component **out_component) {
   if (!datagrid || !out_component) {
@@ -107,8 +111,9 @@ ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
                                           int col_index, float new_width) {
   (void)col_index;
   (void)new_width;
-  if (!datagrid)
+  if (!datagrid) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   return UI_ERROR_NONE;
 }
 
@@ -116,8 +121,9 @@ ui_error_t ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
                                        int row_delta, int col_delta) {
   (void)row_delta;
   (void)col_delta;
-  if (!datagrid)
+  if (!datagrid) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   return UI_ERROR_NONE;
 }
 

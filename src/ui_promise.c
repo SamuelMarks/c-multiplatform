@@ -1,26 +1,42 @@
+/**
+ * \file ui_promise.c
+ * \brief Implementation of the UI Promise component.
+ */
+
 /* clang-format off */
-#include "../include/ui_promise.h"
+#include "ui_promise.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \brief Node in the callback chain of a promise.
+ */
 struct ui_promise_callback_node {
-  ui_error_t (*on_resolve)(void *, void *, void **);
-  ui_error_t (*on_reject)(ui_error_t, void *, void **);
-  ui_error_t (*on_finally)(void *);
-  void *user_data;
-  struct ui_promise *chained_promise;
-  struct ui_promise_callback_node *next;
+  ui_error_t (*on_resolve)(void *, void *, void **);    /**< Resolve callback */
+  ui_error_t (*on_reject)(ui_error_t, void *, void **); /**< Reject callback */
+  ui_error_t (*on_finally)(void *);                     /**< Finally callback */
+  void *user_data;                       /**< User data for callbacks */
+  struct ui_promise *chained_promise;    /**< Next promise in the chain */
+  struct ui_promise_callback_node *next; /**< Next node in the list */
 };
 
-/** \brief ui_promise */
+/**
+ * \brief Internal structure representing a promise.
+ */
 struct ui_promise {
-  enum ui_promise_state state;
-  void *result;
-  ui_error_t error;
-  struct ui_promise_callback_node *head;
-  struct ui_promise_callback_node *tail;
+  enum ui_promise_state state;           /**< Current state of the promise */
+  void *result;                          /**< Result value if fulfilled */
+  ui_error_t error;                      /**< Error discriminant if rejected */
+  struct ui_promise_callback_node *head; /**< Head of callback list */
+  struct ui_promise_callback_node *tail; /**< Tail of callback list */
 };
 
+/**
+ * \brief Creates a new pending promise.
+ *
+ * \param out_promise Pointer to receive the new promise handle.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_promise_create(struct ui_promise **out_promise) {
   struct ui_promise *promise = NULL;
 
@@ -44,6 +60,12 @@ ui_error_t ui_promise_create(struct ui_promise **out_promise) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a promise and frees its resources.
+ *
+ * \param promise The promise to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_destroy(struct ui_promise *promise) {
   struct ui_promise_callback_node *current = NULL;
   struct ui_promise_callback_node *next = NULL;
@@ -66,6 +88,15 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Triggers a callback node based on the promise state.
+ *
+ * \param node The callback node to trigger.
+ * \param state The current state of the promise.
+ * \param result The result value if fulfilled.
+ * \param error The error discriminant if rejected.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
                                    enum ui_promise_state state, void *result,
                                    ui_error_t error) {
@@ -124,6 +155,17 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Internal function to add a callback to the promise.
+ *
+ * \param promise The promise.
+ * \param on_resolve Callback invoked if the promise is fulfilled.
+ * \param on_reject Callback invoked if the promise is rejected.
+ * \param on_finally Callback invoked regardless of outcome.
+ * \param user_data Opaque pointer passed to the callbacks.
+ * \param out_promise Pointer to receive the chained promise.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t
 add_callback(struct ui_promise *promise,
              ui_error_t (*on_resolve)(void *, void *, void **),
@@ -183,7 +225,17 @@ add_callback(struct ui_promise *promise,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Adds callbacks to be executed when the promise is settled.
+ *        If already settled, the callback is invoked immediately.
+ *
+ * \param promise The promise.
+ * \param on_resolve Callback invoked if the promise is fulfilled.
+ * \param on_reject Callback invoked if the promise is rejected.
+ * \param user_data Opaque pointer passed to the callbacks.
+ * \param out_promise Pointer to receive the chained promise.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_then(struct ui_promise *promise,
                            ui_error_t (*on_resolve)(void *, void *, void **),
                            ui_error_t (*on_reject)(ui_error_t, void *, void **),
@@ -192,7 +244,15 @@ ui_error_t ui_promise_then(struct ui_promise *promise,
                       out_promise);
 }
 
-/** \brief ui_error */
+/**
+ * \brief Adds a rejection callback to the promise.
+ *
+ * \param promise The promise.
+ * \param on_reject Callback invoked if the promise is rejected.
+ * \param user_data Opaque pointer passed to the callback.
+ * \param out_promise Pointer to receive the chained promise.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_catch(struct ui_promise *promise,
                             ui_error_t (*on_reject)(ui_error_t, void *,
                                                     void **),
@@ -200,12 +260,28 @@ ui_error_t ui_promise_catch(struct ui_promise *promise,
   return add_callback(promise, NULL, on_reject, NULL, user_data, out_promise);
 }
 
+/**
+ * \brief Adds a finally callback to the promise.
+ *
+ * \param promise The promise.
+ * \param on_finally Callback invoked regardless of outcome.
+ * \param user_data Opaque pointer passed to the callback.
+ * \param out_promise Pointer to receive the chained promise.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_finally(struct ui_promise *promise,
                               ui_error_t (*on_finally)(void *), void *user_data,
                               struct ui_promise **out_promise) {
   return add_callback(promise, NULL, NULL, on_finally, user_data, out_promise);
 }
 
+/**
+ * \brief Resolves the promise with a value, triggering on_resolve callbacks.
+ *
+ * \param promise The promise to resolve.
+ * \param result The result value (cast to void*).
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_resolve(struct ui_promise *promise, void *result) {
   struct ui_promise_callback_node *current = NULL;
   struct ui_promise_callback_node *next = NULL;
@@ -236,6 +312,13 @@ ui_error_t ui_promise_resolve(struct ui_promise *promise, void *result) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Rejects the promise with an error, triggering on_reject callbacks.
+ *
+ * \param promise The promise to reject.
+ * \param error The error discriminant.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_reject(struct ui_promise *promise, ui_error_t error) {
   struct ui_promise_callback_node *current = NULL;
   struct ui_promise_callback_node *next = NULL;
@@ -265,6 +348,13 @@ ui_error_t ui_promise_reject(struct ui_promise *promise, ui_error_t error) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the current state of the promise.
+ *
+ * \param promise The promise.
+ * \param out_state Pointer to receive the current state.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_get_state(struct ui_promise *promise,
                                 enum ui_promise_state *out_state) {
   if (!promise || !out_state) {

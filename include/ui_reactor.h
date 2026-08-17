@@ -1,6 +1,15 @@
 #ifndef UI_REACTOR_H
 #define UI_REACTOR_H
 
+/**
+ * \file ui_reactor.h
+ * \brief UI Reactor component.
+ *
+ * This file contains definitions for a multi-reactor event loop,
+ * providing cross-platform event dispatch for OS handles (fds, sockets)
+ * and thread-safe task scheduling.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,9 +26,9 @@ struct ui_reactor;
 /**
  * @brief Event flags for reactor registration.
  */
-#define UI_REACTOR_EVENT_READ 1
-#define UI_REACTOR_EVENT_WRITE 2
-#define UI_REACTOR_EVENT_ERROR 4
+#define UI_REACTOR_EVENT_READ 1  /**< Monitor for readability */
+#define UI_REACTOR_EVENT_WRITE 2 /**< Monitor for writability */
+#define UI_REACTOR_EVENT_ERROR 4 /**< Monitor for error states */
 
 /**
  * @brief Creates a new reactor instance.
@@ -58,7 +67,7 @@ ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
  *
  * @param reactor The reactor.
  * @param os_handle The OS handle to unregister.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle);
 
@@ -67,7 +76,7 @@ ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle);
  *
  * @param reactor The reactor to poll.
  * @param timeout_ms Maximum time to wait in milliseconds (-1 for infinite).
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms);
 
@@ -77,7 +86,7 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms);
  * @param reactor The reactor.
  * @param callback The function to execute.
  * @param user_data Opaque pointer passed to the callback.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
                                ui_error_t (*callback)(void *), void *user_data);
@@ -86,7 +95,7 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
  * @brief Wakes up a reactor blocked in polling.
  *
  * @param reactor The reactor to wake.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_reactor_wake(struct ui_reactor *reactor);
 

@@ -1,8 +1,16 @@
+/**
+ * @file ui_empty_state_base.h
+ * @brief Base logic and state management for empty state components.
+ *
+ * This header defines the structure and functions for creating and manipulating
+ * an unstyled empty state component, typically used to display placeholders
+ * when no data is available.
+ */
+
 #ifndef UI_EMPTY_STATE_BASE_H
 #define UI_EMPTY_STATE_BASE_H
 
 struct ui_computed;
-
 struct ui_signal;
 
 /* clang-format off */
@@ -18,24 +26,25 @@ extern "C" {
  * @brief Represents an unstyled empty state container.
  */
 struct ui_empty_state_base {
-  struct ui_component base;
-  struct ui_signal *data_signal;
+  struct ui_component base; /**< The base UI component structure. */
+  struct ui_signal
+      *data_signal; /**< Signal to observe for data availability. */
 };
 
 /**
  * @brief Creates a new base empty state component.
  *
- * @param out_state Pointer to output the initialized empty state.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @param out_state Pointer to output the initialized empty state structure.
+ * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
 ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state);
 
 /**
  * @brief Sets the title text of the empty state.
  *
- * @param state The empty state component.
- * @param text The title text.
- * @return UI_ERROR_NONE on success.
+ * @param state Pointer to the empty state component.
+ * @param text The title text to set.
+ * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
 ui_error_t ui_empty_state_base_set_title(struct ui_empty_state_base *state,
                                          const char *text);
@@ -43,20 +52,20 @@ ui_error_t ui_empty_state_base_set_title(struct ui_empty_state_base *state,
 /**
  * @brief Sets the description text of the empty state.
  *
- * @param state The empty state component.
- * @param text The description text.
- * @return UI_ERROR_NONE on success.
+ * @param state Pointer to the empty state component.
+ * @param text The description text to set.
+ * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
 ui_error_t
 ui_empty_state_base_set_description(struct ui_empty_state_base *state,
                                     const char *text);
 
 /**
- * @brief Binds the data property.
+ * @brief Binds a data signal to the empty state.
  *
- * @param widget The widget.
- * @param signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @param widget Pointer to the empty state component.
+ * @param signal Pointer to the signal to bind to.
+ * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
 ui_error_t ui_empty_state_base_bind_data(struct ui_empty_state_base *widget,
                                          struct ui_signal *signal);

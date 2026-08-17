@@ -15,14 +15,21 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_scaffold_base
  * @brief Represents an unstyled application scaffold/shell.
  */
 struct ui_scaffold_base {
+  /** @brief The base component. */
   struct ui_component base;
+  /** @brief Pointer to the top bar slot node. */
   struct ui_dom_node *slot_top_bar;
+  /** @brief Pointer to the bottom bar slot node. */
   struct ui_dom_node *slot_bottom_bar;
+  /** @brief Pointer to the side navigation slot node. */
   struct ui_dom_node *slot_side_nav;
+  /** @brief Pointer to the main content slot node. */
   struct ui_dom_node *slot_main_content;
+  /** @brief The signal controlling the scaffold data. */
   struct ui_signal *data_signal;
 };
 
@@ -30,7 +37,7 @@ struct ui_scaffold_base {
  * @brief Creates a new base scaffold component.
  *
  * @param out_scaffold Pointer to output the initialized scaffold.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold);
 
@@ -39,7 +46,7 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold);
  *
  * @param scaffold The scaffold component.
  * @param top_bar The top bar component.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_scaffold_base_set_top_bar(struct ui_scaffold_base *scaffold,
                                         struct ui_component *top_bar);
@@ -49,7 +56,7 @@ ui_error_t ui_scaffold_base_set_top_bar(struct ui_scaffold_base *scaffold,
  *
  * @param scaffold The scaffold component.
  * @param content The main content component.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_scaffold_base_set_main_content(struct ui_scaffold_base *scaffold,
                                              struct ui_component *content);
@@ -59,7 +66,7 @@ ui_error_t ui_scaffold_base_set_main_content(struct ui_scaffold_base *scaffold,
  *
  * @param widget The widget.
  * @param signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_scaffold_base_bind_data(struct ui_scaffold_base *widget,
                                       struct ui_signal *signal);

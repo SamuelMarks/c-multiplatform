@@ -1,3 +1,7 @@
+/**
+ * @file ui_tick_engine.h
+ * @brief Defines the single-threaded tick engine for task scheduling.
+ */
 #ifndef UI_TICK_ENGINE_H
 #define UI_TICK_ENGINE_H
 

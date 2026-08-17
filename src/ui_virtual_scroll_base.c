@@ -1,3 +1,8 @@
+/**
+ * @file ui_virtual_scroll_base.c
+ * @brief Implementation of the virtual scroll base component.
+ */
+
 /* clang-format off */
 #include "ui_virtual_scroll_base.h"
 #include "ui_internal_mem.h"
@@ -11,6 +16,10 @@
 /* MSVC Safe CRT */
 #endif
 
+/**
+ * @struct ui_virtual_scroll_base
+ * @brief Internal state for the virtual scroll base component.
+ */
 struct ui_virtual_scroll_base {
   struct ui_virtual_scroll_config config;
   size_t item_count;
@@ -28,7 +37,6 @@ struct ui_virtual_scroll_base {
   struct ui_computed *data_signal;
 };
 
-/** \brief ui_virtual_scroll_base_create */
 ui_error_t ui_virtual_scroll_base_create(
     struct ui_virtual_scroll_base **out_virtual_scroll,
     const struct ui_virtual_scroll_config *config) {
@@ -84,7 +92,6 @@ ui_error_t ui_virtual_scroll_base_destroy(struct ui_virtual_scroll_base *vs) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
                                       size_t count) {
@@ -115,7 +122,6 @@ ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_virtual_scroll_base_set_viewport_size(struct ui_virtual_scroll_base *vs,
                                          float width, float height) {
@@ -133,7 +139,6 @@ ui_virtual_scroll_base_set_viewport_size(struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_virtual_scroll_base_get_total_height(const struct ui_virtual_scroll_base *vs,
                                         float *out_height) {
@@ -158,7 +163,6 @@ ui_virtual_scroll_base_get_total_height(const struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_virtual_scroll_base_get_visible_range */
 ui_error_t ui_virtual_scroll_base_get_visible_range(
     const struct ui_virtual_scroll_base *vs, float scroll_y,
     size_t *out_start_index, size_t *out_end_index, float *out_offset_y) {
@@ -345,7 +349,6 @@ ui_error_t ui_virtual_scroll_base_mount(struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_virtual_scroll_base_bind_data(struct ui_virtual_scroll_base *widget,
                                  struct ui_computed *signal) {

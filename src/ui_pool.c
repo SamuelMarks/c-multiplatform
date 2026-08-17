@@ -1,3 +1,7 @@
+/**
+ * \file ui_pool.c
+ * \brief Implementation of fixed-size block memory pooling.
+ */
 /* clang-format off */
 #include <stddef.h>
 #include "../include/ui_pool.h"
@@ -71,6 +75,13 @@ static ui_error_t allocate_chunk(struct ui_pool *pool) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new memory pool.
+ * \param[in] element_size The size in bytes of each element.
+ * \param[in] chunk_capacity The number of elements allocated per chunk.
+ * \param[out] out_pool Pointer to store the created pool.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pool_create(size_t element_size, size_t chunk_capacity,
                           struct ui_pool **out_pool) {
   struct ui_pool *pool = NULL;
@@ -106,6 +117,11 @@ ui_error_t ui_pool_create(size_t element_size, size_t chunk_capacity,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a memory pool and frees all its chunks.
+ * \param[in,out] pool The pool to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pool_destroy(struct ui_pool *pool) {
   struct ui_pool_chunk *current = NULL;
   struct ui_pool_chunk *next = NULL;
@@ -125,6 +141,12 @@ ui_error_t ui_pool_destroy(struct ui_pool *pool) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Allocates an element from the pool.
+ * \param[in,out] pool The pool.
+ * \param[out] out_ptr Pointer to store the allocated element address.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pool_alloc(struct ui_pool *pool, void **out_ptr) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -146,6 +168,12 @@ ui_error_t ui_pool_alloc(struct ui_pool *pool, void **out_ptr) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Frees an element back to the pool.
+ * \param[in,out] pool The pool.
+ * \param[in] ptr The pointer to free.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pool_free(struct ui_pool *pool, void *ptr) {
   struct ui_pool_free_node *node = NULL;
 
@@ -161,6 +189,15 @@ ui_error_t ui_pool_free(struct ui_pool *pool, void *ptr) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Retrieves current metrics for the memory pool.
+ * \param[in] pool The pool.
+ * \param[out] out_free_count Pointer to store the number of currently free
+ * elements.
+ * \param[out] out_total_capacity Pointer to store the total capacity across all
+ * chunks.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pool_get_metrics(struct ui_pool *pool, size_t *out_free_count,
                                size_t *out_total_capacity) {
   if (!pool) {

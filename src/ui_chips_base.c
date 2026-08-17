@@ -4,18 +4,30 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @struct ui_chips_base
+ * @brief Internal representation of a chips/tags base component.
+ */
 struct ui_chips_base {
+  /** @brief Array of string tokens/chips. */
   char **tokens;
+  /** @brief Current number of tokens. */
   size_t count;
+  /** @brief Capacity of the tokens array. */
   size_t capacity;
 
+  /** @brief CVA: Callback fired when value changes. */
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
                               void *user_data);
+  /** @brief CVA: User data for on_change callback. */
   void *cva_on_change_user_data;
 
+  /** @brief CVA: Callback fired when input is touched. */
   ui_error_t (*cva_on_touched)(void *user_data);
+  /** @brief CVA: User data for on_touched callback. */
   void *cva_on_touched_user_data;
 
+  /** @brief 1 if disabled, 0 otherwise. */
   int is_disabled;
 };
 
@@ -42,14 +54,14 @@ static ui_error_t chips_cva_write_value(void *component,
   return UI_ERROR_NONE; /* Ignored for now */
 }
 
-/** \brief chips_cva_register_on_change */
 static ui_error_t chips_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
     void *user_data) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
-  if (!chips)
+  if (!chips) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   chips->cva_on_change = callback;
   chips->cva_on_change_user_data = user_data;
   return UI_ERROR_NONE;
@@ -58,8 +70,9 @@ static ui_error_t chips_cva_register_on_change(
 static ui_error_t chips_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
-  if (!chips)
+  if (!chips) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   chips->cva_on_touched = callback;
   chips->cva_on_touched_user_data = user_data;
   return UI_ERROR_NONE;
@@ -68,8 +81,9 @@ static ui_error_t chips_cva_register_on_touched(
 static ui_error_t chips_cva_set_disabled_state(void *component,
                                                ui_bool_t is_disabled) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
-  if (!chips)
+  if (!chips) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   chips->is_disabled = is_disabled;
   return UI_ERROR_NONE;
 }

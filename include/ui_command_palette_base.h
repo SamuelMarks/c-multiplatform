@@ -21,13 +21,13 @@ struct ui_virtual_scroll_base;
  * @brief Base state for a Command Palette widget.
  */
 struct ui_command_palette_base {
-  struct ui_component *component;
-  struct ui_autocomplete_base *autocomplete;
-  struct ui_dialog_base *dialog;
-  struct ui_virtual_scroll_base *list;
-  int is_open;
-  struct ui_signal *open_signal;
-  struct ui_computed *animating_signal;
+  struct ui_component *component;            /**< Main component */
+  struct ui_autocomplete_base *autocomplete; /**< Autocomplete behavior */
+  struct ui_dialog_base *dialog;             /**< Container dialog */
+  struct ui_virtual_scroll_base *list;       /**< Virtualized result list */
+  int is_open;                               /**< Open state flag */
+  struct ui_signal *open_signal;             /**< Signal for open state */
+  struct ui_computed *animating_signal;      /**< Computed animating state */
 };
 
 /**

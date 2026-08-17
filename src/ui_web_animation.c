@@ -1,3 +1,8 @@
+/**
+ * @file ui_web_animation.c
+ * @brief Implementation of the Web Animation API component.
+ */
+
 /* clang-format off */
 #include "ui_web_animation.h"
 #include "ui_internal_mem.h"
@@ -14,7 +19,6 @@ struct ui_web_animation_effect {
   struct ui_web_animation_timing timing;
 };
 
-/** \brief ui_web_animation_timeline */
 struct ui_web_animation_timeline {
   enum ui_web_animation_timeline_type type;
   struct ui_dom_node *target;
@@ -22,7 +26,6 @@ struct ui_web_animation_timeline {
   double current_time;
 };
 
-/** \brief ui_web_animation */
 struct ui_web_animation {
   struct ui_web_animation_effect *effect;
   struct ui_web_animation_timeline *timeline;
@@ -31,7 +34,6 @@ struct ui_web_animation {
   double playback_rate;
 };
 
-/** \brief ui_web_animation_effect_create_keyframe_effect */
 ui_error_t ui_web_animation_effect_create_keyframe_effect(
     struct ui_dom_node *target, struct ui_web_animation_keyframe *keyframes,
     const struct ui_web_animation_timing *timing,
@@ -56,7 +58,6 @@ ui_error_t ui_web_animation_effect_create_keyframe_effect(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_web_animation_effect_destroy(struct ui_web_animation_effect *effect) {
   struct ui_web_animation_keyframe *kf;
@@ -89,7 +90,6 @@ ui_web_animation_effect_destroy(struct ui_web_animation_effect *effect) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_web_animation_timeline_create_document_timeline */
 ui_error_t ui_web_animation_timeline_create_document_timeline(
     struct ui_web_animation_timeline **out_timeline) {
   struct ui_web_animation_timeline *timeline;
@@ -112,7 +112,6 @@ ui_error_t ui_web_animation_timeline_create_document_timeline(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_web_animation_timeline_create_scroll_timeline */
 ui_error_t ui_web_animation_timeline_create_scroll_timeline(
     struct ui_dom_node *source, enum ui_web_animation_scroll_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
@@ -136,7 +135,6 @@ ui_error_t ui_web_animation_timeline_create_scroll_timeline(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_web_animation_timeline_create_view_timeline */
 ui_error_t ui_web_animation_timeline_create_view_timeline(
     struct ui_dom_node *subject, enum ui_web_animation_scroll_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
@@ -160,7 +158,6 @@ ui_error_t ui_web_animation_timeline_create_view_timeline(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_web_animation_timeline_create_pointer_timeline */
 ui_error_t ui_web_animation_timeline_create_pointer_timeline(
     struct ui_dom_node *target, enum ui_web_animation_pointer_axis axis,
     struct ui_web_animation_timeline **out_timeline) {
@@ -184,7 +181,6 @@ ui_error_t ui_web_animation_timeline_create_pointer_timeline(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_web_animation_timeline_set_current_time */
 ui_error_t ui_web_animation_timeline_set_current_time(
     struct ui_web_animation_timeline *timeline, double time) {
   if (!timeline) {
@@ -194,7 +190,6 @@ ui_error_t ui_web_animation_timeline_set_current_time(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_web_animation_timeline_destroy(struct ui_web_animation_timeline *timeline) {
   if (!timeline) {
@@ -204,7 +199,6 @@ ui_web_animation_timeline_destroy(struct ui_web_animation_timeline *timeline) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_web_animation_create(struct ui_web_animation_effect *effect,
                                    struct ui_web_animation_timeline *timeline,
                                    struct ui_web_animation **out_animation) {
@@ -338,7 +332,6 @@ ui_error_t ui_web_animation_finish(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_web_animation_get_play_state(const struct ui_web_animation *animation,
                                 enum ui_web_animation_play_state *out_state) {
@@ -350,7 +343,6 @@ ui_web_animation_get_play_state(const struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_web_animation_get_current_time(const struct ui_web_animation *animation,
                                   double *out_time) {
@@ -362,7 +354,6 @@ ui_web_animation_get_current_time(const struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_web_animation_set_current_time(struct ui_web_animation *animation,
                                              double time) {
   double active_duration;
@@ -390,7 +381,6 @@ ui_error_t ui_web_animation_set_current_time(struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_web_animation_get_playback_rate(const struct ui_web_animation *animation,
                                    double *out_rate) {
@@ -402,7 +392,6 @@ ui_web_animation_get_playback_rate(const struct ui_web_animation *animation,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_web_animation_set_playback_rate(struct ui_web_animation *animation,
                                    double rate) {

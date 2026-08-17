@@ -1,3 +1,7 @@
+/**
+ * @file ui_wheel_picker_base.h
+ * @brief Wheel picker component for selecting values from a spinning list.
+ */
 #ifndef UI_WHEEL_PICKER_BASE_H
 #define UI_WHEEL_PICKER_BASE_H
 

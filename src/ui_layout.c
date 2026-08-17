@@ -1,3 +1,7 @@
+/**
+ * \file ui_layout.c
+ * \brief Implementation of the UI layout engine (Flexbox & Block).
+ */
 /* clang-format off */
 #include "ui_layout.h"
 
@@ -2847,6 +2851,12 @@ ui_error_t ui_layout_tree_destroy(struct ui_layout_node *node) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Computes basic block layout for a node and its children.
+ * \param[in,out] node The layout node to compute.
+ * \param[in] available_width The width available for this node.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t layout_block(struct ui_layout_node *node,
                                float available_width) {
   struct ui_layout_node *child;
@@ -3075,6 +3085,12 @@ struct ui_flex_line {
   int child_count;
 };
 
+/**
+ * \brief Computes flexbox layout for a node and its children.
+ * \param[in,out] node The flex container node.
+ * \param[in] available_width The width available for this flex container.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t layout_flex(struct ui_layout_node *node,
                               float available_width) {
   struct ui_layout_node *child;
@@ -3334,6 +3350,13 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Solves the layout for the entire viewport starting from the root.
+ * \param[in,out] root The root layout node.
+ * \param[in] window_width The width of the viewport window.
+ * \param[in] window_height The height of the viewport window.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_layout_solve_viewport(struct ui_layout_node *root,
                                     float window_width, float window_height) {
   if (!root) {
@@ -3387,6 +3410,12 @@ ui_error_t ui_layout_solve_viewport(struct ui_layout_node *root,
   return ui_layout_compute(root, window_width, window_height);
 }
 
+/**
+ * \brief Checks the computed layout tree for bounding box violations.
+ * \param[in] node The layout node to check recursively.
+ * \return UI_ERROR_NONE if valid, UI_ERROR_LAYOUT_VIOLATION if elements
+ * improperly exceed bounds.
+ */
 ui_error_t ui_layout_sanity_check(const struct ui_layout_node *node) {
   struct ui_layout_node *child;
 
@@ -3458,6 +3487,13 @@ ui_error_t ui_layout_sanity_check(const struct ui_layout_node *node) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Computes layout for a node based on its display properties.
+ * \param[in,out] node The layout node.
+ * \param[in] available_width The available width.
+ * \param[in] available_height The available height.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
                              float available_height) {
   ui_error_t rc;

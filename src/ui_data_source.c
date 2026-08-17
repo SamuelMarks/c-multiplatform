@@ -5,15 +5,27 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @struct ui_data_source
+ * @brief Internal representation of a data source.
+ */
 struct ui_data_source {
+  /** @brief Function to fetch a page of data. */
   ui_data_source_fetch_page_fn fetch_page;
+  /** @brief User data for fetch_page callback. */
   void *fetch_page_user_data;
+  /** @brief Function to apply a sort operation. */
   ui_data_source_apply_sort_fn apply_sort;
+  /** @brief User data for apply_sort callback. */
   void *apply_sort_user_data;
+  /** @brief Function to apply a filter operation. */
   ui_data_source_apply_filter_fn apply_filter;
+  /** @brief User data for apply_filter callback. */
   void *apply_filter_user_data;
 
+  /** @brief Signal for data source state changes. */
   struct ui_signal *state_signal;
+  /** @brief Signal for data source data updates. */
   struct ui_signal *data_signal;
 };
 
@@ -51,7 +63,6 @@ ui_error_t ui_data_source_destroy(struct ui_data_source *ds) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_data_source_set_fetch_page_callback(struct ui_data_source *ds,
                                        ui_data_source_fetch_page_fn fetch_page,
@@ -64,7 +75,6 @@ ui_data_source_set_fetch_page_callback(struct ui_data_source *ds,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_data_source_set_apply_sort_callback(struct ui_data_source *ds,
                                        ui_data_source_apply_sort_fn apply_sort,
@@ -77,7 +87,6 @@ ui_data_source_set_apply_sort_callback(struct ui_data_source *ds,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_data_source_set_apply_filter_callback */
 ui_error_t ui_data_source_set_apply_filter_callback(
     struct ui_data_source *ds, ui_data_source_apply_filter_fn apply_filter,
     void *user_data) {
@@ -99,8 +108,9 @@ ui_error_t ui_data_source_fetch_page(struct ui_data_source *ds,
     return UI_ERROR_UNSUPPORTED;
   }
   rc = ds->fetch_page(ds, offset, limit, ds->fetch_page_user_data);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
   return UI_ERROR_NONE;
 }
 
@@ -115,12 +125,12 @@ ui_error_t ui_data_source_apply_sort(struct ui_data_source *ds,
     return UI_ERROR_UNSUPPORTED;
   }
   rc = ds->apply_sort(ds, sorts, num_sorts, ds->apply_sort_user_data);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_data_source_apply_filter(struct ui_data_source *ds,
                             const struct ui_filter_descriptor *filters,
@@ -133,8 +143,9 @@ ui_data_source_apply_filter(struct ui_data_source *ds,
     return UI_ERROR_UNSUPPORTED;
   }
   rc = ds->apply_filter(ds, filters, num_filters, ds->apply_filter_user_data);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
   return UI_ERROR_NONE;
 }
 

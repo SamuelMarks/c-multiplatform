@@ -7,10 +7,18 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * \file ui_select_base.c
+ * \brief Select base component implementation.
+ */
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
 
+/**
+ * \brief Default CSS for select base.
+ */
 static const char *ui_select_base_default_css =
     "select { "
     "background: var(--select-bg, #fff); "
@@ -24,7 +32,10 @@ static const char *ui_select_base_default_css =
     "cursor: not-allowed; "
     "}";
 
-/** \brief ui_select_base */
+/**
+ * \brief ui_select_base structure.
+ * \details Internal state for the select base component.
+ */
 struct ui_select_base {
   struct ui_component *component;
   struct ui_gesture_recognizer *gesture_recognizer;
@@ -39,6 +50,11 @@ struct ui_select_base {
   void *open_change_user_data;
 };
 
+/**
+ * \brief Updates the DOM state of the select component.
+ * \param select The select base component.
+ * \return UI_ERROR_NONE on success, or an error code.
+ */
 static ui_error_t update_dom_state(struct ui_select_base *select) {
 
 #if defined(__EMSCRIPTEN__)
@@ -91,6 +107,11 @@ static ui_error_t update_dom_state(struct ui_select_base *select) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new select base component.
+ * \param out_select Pointer to store the created component.
+ * \return UI_ERROR_NONE on success, or an error code.
+ */
 ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
   struct ui_select_base *sel;
   ui_error_t rc;
@@ -183,6 +204,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a select base component.
+ * \param select The select base component to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_destroy(struct ui_select_base *select) {
   if (!select)
     return UI_ERROR_NONE;
@@ -194,6 +220,12 @@ ui_error_t ui_select_base_destroy(struct ui_select_base *select) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the disabled state of the select.
+ * \param select The select component.
+ * \param disabled The disabled state (1 for disabled, 0 for enabled).
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_set_disabled(struct ui_select_base *select,
                                        int disabled) {
   if (!select)
@@ -211,6 +243,12 @@ ui_error_t ui_select_base_set_disabled(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the item count of the select.
+ * \param select The select component.
+ * \param num_items The number of items.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_set_item_count(struct ui_select_base *select,
                                          int num_items) {
   if (!select)
@@ -230,6 +268,12 @@ ui_error_t ui_select_base_set_item_count(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets whether the select is open.
+ * \param select The select component.
+ * \param is_open 1 to open, 0 to close.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_set_open(struct ui_select_base *select, int is_open) {
   if (!select)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -266,6 +310,12 @@ ui_error_t ui_select_base_set_open(struct ui_select_base *select, int is_open) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Checks if the select is open.
+ * \param select The select component.
+ * \param out_is_open Pointer to store the result.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_is_open(const struct ui_select_base *select,
                                   int *out_is_open) {
   if (!select)
@@ -274,7 +324,12 @@ ui_error_t ui_select_base_is_open(const struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the highlighted index.
+ * \param select The select component.
+ * \param index The index to highlight.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_set_highlighted_index(struct ui_select_base *select,
                                                 int index) {
   if (!select)
@@ -290,7 +345,12 @@ ui_error_t ui_select_base_set_highlighted_index(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the highlighted index.
+ * \param select The select component.
+ * \param out_index Pointer to store the index.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_select_base_get_highlighted_index(const struct ui_select_base *select,
                                      int *out_index) {
@@ -300,6 +360,12 @@ ui_select_base_get_highlighted_index(const struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the selected index.
+ * \param select The select component.
+ * \param index The selected index.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_set_selected_index(struct ui_select_base *select,
                                              int index) {
   if (!select)
@@ -341,7 +407,12 @@ ui_error_t ui_select_base_set_selected_index(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the selected index.
+ * \param select The select component.
+ * \param out_index Pointer to store the index.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_select_base_get_selected_index(const struct ui_select_base *select,
                                   int *out_index) {
@@ -351,6 +422,13 @@ ui_select_base_get_selected_index(const struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the on change callback.
+ * \param select The select component.
+ * \param on_change The callback function.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_set_on_change(struct ui_select_base *select,
                                         ui_select_on_change_t on_change,
                                         void *user_data) {
@@ -361,7 +439,13 @@ ui_error_t ui_select_base_set_on_change(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the on open change callback.
+ * \param select The select component.
+ * \param on_open_change The callback.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_select_base_set_on_open_change(struct ui_select_base *select,
                                   ui_select_on_open_change_t on_open_change,
@@ -373,6 +457,13 @@ ui_select_base_set_on_open_change(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Processes an event for the select.
+ * \param select The select component.
+ * \param event The event to process.
+ * \param timestamp_ms The event timestamp.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_process_event(struct ui_select_base *select,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
@@ -428,18 +519,34 @@ ui_error_t ui_select_base_process_event(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Writes a value to the select component (CVA).
+ * \param component The select component.
+ * \param value The value to write.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t select_cva_write_value(void *component,
                                          union ui_signal_payload value) {
   struct ui_select_base *select = (struct ui_select_base *)component;
   return ui_select_base_set_selected_index(select, value.int_val);
 }
 
-/** \brief select_cva_wrapper */
+/**
+ * \brief select_cva_wrapper structure.
+ * \details Wrapper for CVA change callbacks.
+ */
 struct select_cva_wrapper {
   ui_error_t (*callback)(union ui_signal_payload, void *);
   void *user_data;
 };
 
+/**
+ * \brief Wrapper for on change callback.
+ * \param select The select component.
+ * \param index The new index.
+ * \param user_data User data containing the wrapper.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t select_on_change_wrapper(struct ui_select_base *select,
                                            int index, void *user_data) {
   struct select_cva_wrapper *wrap = (struct select_cva_wrapper *)user_data;
@@ -452,7 +559,13 @@ static ui_error_t select_on_change_wrapper(struct ui_select_base *select,
   return UI_ERROR_NONE;
 }
 
-/** \brief select_cva_register_on_change */
+/**
+ * \brief Registers an on change callback for CVA.
+ * \param component The select component.
+ * \param callback The callback to register.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t select_cva_register_on_change(
     void *component, ui_error_t (*callback)(union ui_signal_payload, void *),
     void *user_data) {
@@ -468,7 +581,13 @@ static ui_error_t select_cva_register_on_change(
   return ui_select_base_set_on_change(select, select_on_change_wrapper, wrap);
 }
 
-/** \brief select_cva_register_on_touched */
+/**
+ * \brief Registers an on touched callback for CVA.
+ * \param component The select component.
+ * \param callback The callback to register.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t select_cva_register_on_touched(void *component,
                                                  ui_error_t (*callback)(void *),
                                                  void *user_data) {
@@ -478,13 +597,24 @@ static ui_error_t select_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the disabled state for CVA.
+ * \param component The select component.
+ * \param is_disabled The disabled state.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t select_cva_set_disabled_state(void *component,
                                                 ui_bool_t is_disabled) {
   return ui_select_base_set_disabled((struct ui_select_base *)component,
                                      is_disabled);
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the Control Value Accessor for the select.
+ * \param select The select component.
+ * \param out_cva Pointer to store the CVA.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_get_cva(struct ui_select_base *select,
                                   struct ui_control_value_accessor *out_cva) {
   if (!select || !out_cva)
@@ -495,7 +625,12 @@ ui_error_t ui_select_base_get_cva(struct ui_select_base *select,
   out_cva->set_disabled_state = select_cva_set_disabled_state;
   return UI_ERROR_NONE;
 }
-/** \brief ui_error */
+/**
+ * \brief Gets the base component for the select.
+ * \param select The select component.
+ * \param out_component Pointer to store the component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_get_component(struct ui_select_base *select,
                                         struct ui_component **out_component) {
   if (!select || !out_component) {
@@ -504,6 +639,13 @@ ui_error_t ui_select_base_get_component(struct ui_select_base *select,
   *out_component = select->component;
   return UI_ERROR_NONE;
 }
+/**
+ * \brief Adds an option to the select.
+ * \param select The select component.
+ * \param label The option label.
+ * \param value The option value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_add_option(struct ui_select_base *select,
                                      const char *label, const char *value) {
   struct ui_dom_node *option_node = NULL;

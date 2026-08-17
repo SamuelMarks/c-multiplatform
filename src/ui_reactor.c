@@ -1,5 +1,10 @@
+/**
+ * \file ui_reactor.c
+ * \brief Implementation of the UI Reactor component.
+ */
+
 /* clang-format off */
-#include "../include/ui_reactor.h"
+#include "ui_reactor.h"
 #include "ui_internal_mem.h"
 #include <stddef.h>
 
@@ -23,41 +28,54 @@
 #endif
 /* clang-format on */
 
-#include "../include/ui_atomic.h"
+#include "ui_atomic.h"
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
 
+/**
+ * \brief Internal structure representing a registered OS handle.
+ */
 struct ui_reactor_node {
-  void *os_handle;
-  int events;
-  ui_error_t (*callback)(void *, int, void *);
-  void *user_data;
-  struct ui_reactor_node *next;
+  void *os_handle; /**< OS handle */
+  int events;      /**< Bitmask of monitored events */
+  ui_error_t (*callback)(void *, int, void *); /**< Event callback */
+  void *user_data;                             /**< Callback user data */
+  struct ui_reactor_node *next;                /**< Linked list next pointer */
 };
 
-/** \brief ui_reactor_task */
+/**
+ * \brief Internal structure representing a scheduled task.
+ */
 struct ui_reactor_task {
-  ui_error_t (*callback)(void *);
-  void *user_data;
-  struct ui_reactor_task *next;
+  ui_error_t (*callback)(void *); /**< Task callback */
+  void *user_data;                /**< Callback user data */
+  struct ui_reactor_task *next;   /**< Linked list next pointer */
 };
 
-/** \brief ui_reactor */
+/**
+ * \brief Internal structure representing the reactor itself.
+ */
 struct ui_reactor {
-  struct ui_reactor_node *head;
-  struct ui_reactor_task *tasks_head;
-  struct ui_reactor_task *tasks_tail;
-  ui_atomic_t lock;
+  struct ui_reactor_node *head;       /**< Head of registered nodes */
+  struct ui_reactor_task *tasks_head; /**< Head of scheduled tasks queue */
+  struct ui_reactor_task *tasks_tail; /**< Tail of scheduled tasks queue */
+  ui_atomic_t lock;                   /**< Atomic lock for thread safety */
 #ifdef UI_USE_EPOLL
-  int epoll_fd;
+  int epoll_fd; /**< Epoll file descriptor */
 #endif
 #ifdef UI_USE_KQUEUE
-  int kq_fd;
+  int kq_fd; /**< Kqueue file descriptor */
 #endif
 };
 
+/**
+ * \brief Creates a new reactor instance.
+ *
+ * \param out_reactor Pointer to receive the new reactor handle.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_reactor_create(struct ui_reactor **out_reactor) {
   ui_error_t rc = UI_ERROR_NONE;
   struct ui_reactor *reactor = NULL;
@@ -113,6 +131,13 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a reactor instance.
+ *
+ * \param reactor The reactor to destroy.
+ * \return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if reactor is
+ * NULL.
+ */
 ui_error_t ui_reactor_destroy(struct ui_reactor *reactor) {
   struct ui_reactor_node *current = NULL;
   struct ui_reactor_node *next = NULL;
@@ -150,12 +175,20 @@ ui_error_t ui_reactor_destroy(struct ui_reactor *reactor) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Registers an OS handle (fd or SOCKET) with the reactor.
+ *
+ * \param reactor The reactor to register with.
+ * \param os_handle The OS handle to monitor (cast to void*).
+ * \param events Bitmask of UI_REACTOR_EVENT_* flags.
+ * \param callback The function to execute when events occur.
+ * \param user_data Opaque pointer passed to the callback.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
                                int events,
                                ui_error_t (*callback)(void *, int, void *),
                                void *user_data) {
-  ui_error_t rc = UI_ERROR_NONE;
   struct ui_reactor_node *node = NULL;
 #ifdef UI_USE_EPOLL
   struct epoll_event ev;
@@ -227,6 +260,14 @@ ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Schedules a callback to be executed on the reactor's thread.
+ *
+ * \param reactor The reactor.
+ * \param callback The function to execute.
+ * \param user_data Opaque pointer passed to the callback.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
                                ui_error_t (*callback)(void *),
                                void *user_data) {
@@ -276,6 +317,12 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Wakes up a reactor blocked in polling.
+ *
+ * \param reactor The reactor to wake.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_reactor_wake(struct ui_reactor *reactor) {
   if (!reactor)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -284,6 +331,13 @@ ui_error_t ui_reactor_wake(struct ui_reactor *reactor) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Unregisters an OS handle from the reactor.
+ *
+ * \param reactor The reactor.
+ * \param os_handle The OS handle to unregister.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle) {
   struct ui_reactor_node *current = NULL;
   struct ui_reactor_node *prev = NULL;
@@ -327,6 +381,13 @@ ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle) {
   return UI_ERROR_NONE; /* Not found is not a hard error */
 }
 
+/**
+ * \brief Polls the reactor for events and dispatches callbacks.
+ *
+ * \param reactor The reactor to poll.
+ * \param timeout_ms Maximum time to wait in milliseconds (-1 for infinite).
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
   ui_error_t poll_rc = UI_ERROR_NONE;
 #if defined(UI_USE_EPOLL)

@@ -7,12 +7,19 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @struct ui_bottom_nav_base
+ * @brief Internal representation of a bottom navigation bar base.
+ */
 struct ui_bottom_nav_base {
   struct ui_component *component;
   struct ui_signal *active_index_signal;
 };
 
-/** \brief ui_bottom_nav_item_base */
+/**
+ * @struct ui_bottom_nav_item_base
+ * @brief Internal representation of a bottom navigation item.
+ */
 struct ui_bottom_nav_item_base {
   struct ui_component *component;
   int active;
@@ -53,7 +60,6 @@ ui_error_t ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_nav_base_get_component(struct ui_bottom_nav_base *nav,
                                  struct ui_component **out_component) {
@@ -64,7 +70,6 @@ ui_bottom_nav_base_get_component(struct ui_bottom_nav_base *nav,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_nav_base_append_item(struct ui_bottom_nav_base *nav,
                                struct ui_bottom_nav_item_base *item) {
@@ -75,7 +80,6 @@ ui_bottom_nav_base_append_item(struct ui_bottom_nav_base *nav,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item) {
   struct ui_bottom_nav_item_base *item;
@@ -112,7 +116,6 @@ ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_nav_item_base_get_component(struct ui_bottom_nav_item_base *item,
                                       struct ui_component **out_component) {
@@ -123,7 +126,6 @@ ui_bottom_nav_item_base_get_component(struct ui_bottom_nav_item_base *item,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
                                    int active) {
@@ -134,7 +136,6 @@ ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_nav_item_base_get_active(struct ui_bottom_nav_item_base *item,
                                    int *out_active) {
@@ -145,7 +146,6 @@ ui_bottom_nav_item_base_get_active(struct ui_bottom_nav_item_base *item,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_nav_base_bind_active_index(struct ui_bottom_nav_base *widget,
                                      struct ui_signal *signal) {

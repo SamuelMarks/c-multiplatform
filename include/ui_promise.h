@@ -1,6 +1,13 @@
 #ifndef UI_PROMISE_H
 #define UI_PROMISE_H
 
+/**
+ * \file ui_promise.h
+ * \brief UI Promise component.
+ *
+ * This file contains the definitions for an asynchronous promise API.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,9 +25,9 @@ struct ui_promise;
  * @brief Represents the current state of a promise.
  */
 enum ui_promise_state {
-  UI_PROMISE_PENDING = 0,
-  UI_PROMISE_FULFILLED = 1,
-  UI_PROMISE_REJECTED = 2
+  UI_PROMISE_PENDING = 0,   /**< The promise is pending. */
+  UI_PROMISE_FULFILLED = 1, /**< The promise is fulfilled. */
+  UI_PROMISE_REJECTED = 2   /**< The promise is rejected. */
 };
 
 /**
@@ -47,16 +54,37 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise);
  * @param on_resolve Callback invoked if the promise is fulfilled.
  * @param on_reject Callback invoked if the promise is rejected.
  * @param user_data Opaque pointer passed to the callbacks.
+ * @param out_promise Pointer to receive the chained promise.
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_promise_then(struct ui_promise *promise,
                            ui_error_t (*on_resolve)(void *, void *, void **),
                            ui_error_t (*on_reject)(ui_error_t, void *, void **),
                            void *user_data, struct ui_promise **out_promise);
+
+/**
+ * @brief Adds a rejection callback to the promise.
+ *
+ * @param promise The promise.
+ * @param on_reject Callback invoked if the promise is rejected.
+ * @param user_data Opaque pointer passed to the callback.
+ * @param out_promise Pointer to receive the chained promise.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_catch(struct ui_promise *promise,
                             ui_error_t (*on_reject)(ui_error_t, void *,
                                                     void **),
                             void *user_data, struct ui_promise **out_promise);
+
+/**
+ * @brief Adds a finally callback to the promise.
+ *
+ * @param promise The promise.
+ * @param on_finally Callback invoked regardless of outcome.
+ * @param user_data Opaque pointer passed to the callback.
+ * @param out_promise Pointer to receive the chained promise.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_promise_finally(struct ui_promise *promise,
                               ui_error_t (*on_finally)(void *), void *user_data,
                               struct ui_promise **out_promise);

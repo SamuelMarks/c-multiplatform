@@ -1,4 +1,8 @@
 /* clang-format off */
+/**
+ * @file ui_tree_grid_base.h
+ * @brief Tree grid base component for displaying tabular hierarchical data.
+ */
 #ifndef UI_TREE_GRID_BASE_H
 #define UI_TREE_GRID_BASE_H
 
@@ -14,37 +18,80 @@ extern "C" {
 
 /* clang-format on */
 
+/**
+ * @struct ui_tree_grid_base
+ * @brief Opaque handle for a tree grid base component.
+ */
 struct ui_tree_grid_base;
+
 struct ui_dom_node;
 struct ui_signal;
 
 /**
+ * @struct ui_tree_grid_model
  * @brief Data model interface for a tree grid.
  * The implementation MUST guarantee stable void* identifiers for each node.
  */
 struct ui_tree_grid_model {
-  /** Retrieves the number of root nodes. */
+  /**
+   * @brief Retrieves the number of root nodes.
+   * @param user_data User data.
+   * @return The number of root nodes.
+   */
   size_t (*get_root_count)(void *user_data);
 
-  /** Retrieves a root node by index. */
+  /**
+   * @brief Retrieves a root node by index.
+   * @param index The index.
+   * @param user_data User data.
+   * @return A stable identifier for the node.
+   */
   void *(*get_root_node)(size_t index, void *user_data);
 
-  /** Retrieves the parent of a node. Returns NULL for root nodes. */
+  /**
+   * @brief Retrieves the parent of a node. Returns NULL for root nodes.
+   * @param node_id The node identifier.
+   * @param user_data User data.
+   * @return A stable identifier for the parent node, or NULL.
+   */
   void *(*get_parent)(void *node_id, void *user_data);
 
-  /** Retrieves the number of children for a given node. */
+  /**
+   * @brief Retrieves the number of children for a given node.
+   * @param node_id The node identifier.
+   * @param user_data User data.
+   * @return The number of children.
+   */
   size_t (*get_child_count)(void *node_id, void *user_data);
 
-  /** Retrieves a child node by index. */
+  /**
+   * @brief Retrieves a child node by index.
+   * @param node_id The parent node identifier.
+   * @param index The child index.
+   * @param user_data User data.
+   * @return A stable identifier for the child node.
+   */
   void *(*get_child)(void *node_id, size_t index, void *user_data);
 
-  /** Retrieves the number of columns in the grid. */
+  /**
+   * @brief Retrieves the number of columns in the grid.
+   * @param user_data User data.
+   * @return The number of columns.
+   */
   size_t (*get_column_count)(void *user_data);
 
-  /** Renders the user-facing content of the specific cell into cell_node. */
+  /**
+   * @brief Renders the user-facing content of the specific cell into cell_node.
+   * @param node_id The node identifier.
+   * @param col_index The column index.
+   * @param cell_node The cell node to render into.
+   * @param user_data User data.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
+   */
   ui_error_t (*render_cell)(void *node_id, size_t col_index,
                             struct ui_dom_node *cell_node, void *user_data);
 
+  /** @brief Opaque user data for the model callbacks. */
   void *user_data;
 };
 
@@ -53,7 +100,7 @@ struct ui_tree_grid_model {
  *
  * @param out_tree_grid Pointer to receive the allocated component.
  * @param model Data model providing dimensions, traversal, and rendering.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
                                     const struct ui_tree_grid_model *model);
@@ -62,6 +109,7 @@ ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
  * @brief Destroys a tree grid component.
  *
  * @param tree_grid The tree grid.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid);
 
@@ -69,7 +117,8 @@ ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid);
  * @brief Gets the underlying component instance for DOM mounting.
  *
  * @param tree_grid The tree grid.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tree_grid_base_get_component(struct ui_tree_grid_base *tree_grid,
                                            struct ui_component **out_component);
@@ -80,7 +129,7 @@ ui_error_t ui_tree_grid_base_get_component(struct ui_tree_grid_base *tree_grid,
  * @param tree_grid The tree grid.
  * @param node_id The stable node identifier.
  * @param expanded 1 to expand, 0 to collapse.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
                                           void *node_id, int expanded);
@@ -90,7 +139,7 @@ ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
  *
  * @param tree_grid The tree grid.
  * @param node_id The stable node identifier.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
                                          void *node_id);
@@ -100,8 +149,9 @@ ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
  *
  * @param tree_grid The tree grid.
  * @param node_id The stable node identifier.
- * @param out_is_expanded Pointer to store result.
- * @return UI_ERROR_NONE on success.
+ * @param out_is_expanded Pointer to store result (1 if expanded, 0 if
+ * collapsed).
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
@@ -113,7 +163,7 @@ ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
  *
  * @param tree_grid The tree grid.
  * @param event The keyboard event.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
@@ -124,7 +174,7 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
  *
  * @param tree_grid The tree grid.
  * @param container The container DOM node.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tree_grid_base_render(struct ui_tree_grid_base *tree_grid,
                                     struct ui_dom_node *container);

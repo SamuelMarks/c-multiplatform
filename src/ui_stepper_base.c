@@ -8,6 +8,11 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \file ui_stepper_base.c
+ * \brief Stepper base component implementation.
+ */
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -17,7 +22,10 @@ static const char *ui_stepper_base_default_css =
     ".ui-stepper-header { display: flex; flex-direction: row; } "
     ".ui-stepper-content { display: flex; flex-direction: column; flex: 1; }";
 
-/** \brief ui_stepper_step_entry */
+/**
+ * \brief ui_stepper_step_entry structure.
+ * \details Internal state for a stepper step.
+ */
 struct ui_stepper_step_entry {
   char *id;
   struct ui_dom_node *header_node;
@@ -25,7 +33,10 @@ struct ui_stepper_step_entry {
   enum ui_stepper_step_state explicit_state;
 };
 
-/** \brief ui_stepper_base */
+/**
+ * \brief ui_stepper_base structure.
+ * \details Internal state for the stepper base component.
+ */
 struct ui_stepper_base {
   struct ui_component *component;
   struct ui_dom_node *header_container_node;
@@ -43,6 +54,11 @@ struct ui_stepper_base {
   struct ui_signal *active_index_signal;
 };
 
+/**
+ * \brief Creates a new stepper base component.
+ * \param out_stepper Pointer to store the component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_create(struct ui_stepper_base **out_stepper) {
   struct ui_stepper_base *stepper;
   ui_error_t rc;
@@ -171,6 +187,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a stepper base component.
+ * \param stepper The component to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_destroy(struct ui_stepper_base *stepper) {
   int i;
   if (!stepper)
@@ -187,6 +208,12 @@ ui_error_t ui_stepper_base_destroy(struct ui_stepper_base *stepper) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the mode of the stepper.
+ * \param stepper The stepper component.
+ * \param mode The mode to set.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_set_mode(struct ui_stepper_base *stepper,
                                     enum ui_stepper_mode mode) {
   if (!stepper)
@@ -195,6 +222,13 @@ ui_error_t ui_stepper_base_set_mode(struct ui_stepper_base *stepper,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the validation hook for the stepper.
+ * \param stepper The stepper component.
+ * \param hook The hook function.
+ * \param user_data User data for the hook.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_set_validate_hook(struct ui_stepper_base *stepper,
                                              ui_stepper_validate_t hook,
                                              void *user_data) {
@@ -205,6 +239,12 @@ ui_error_t ui_stepper_base_set_validate_hook(struct ui_stepper_base *stepper,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Duplicates a string.
+ * \param src The source string.
+ * \param out_copy Pointer to store the copy.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t duplicate_string(const char *src, char **out_copy) {
   size_t len;
   char *dst;
@@ -222,6 +262,14 @@ static ui_error_t duplicate_string(const char *src, char **out_copy) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Formats an ID string.
+ * \param buf The buffer to write to.
+ * \param buf_size The size of the buffer.
+ * \param prefix The prefix.
+ * \param suffix The suffix.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t format_id(char *buf, size_t buf_size, const char *prefix,
                             const char *suffix) {
   (void)buf_size;
@@ -233,6 +281,12 @@ static ui_error_t format_id(char *buf, size_t buf_size, const char *prefix,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Applies state attributes to a step.
+ * \param stepper The stepper component.
+ * \param index The step index.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t apply_step_state_attributes(struct ui_stepper_base *stepper,
                                               int index) {
   struct ui_stepper_step_entry *entry = &stepper->steps[index];
@@ -283,6 +337,14 @@ static ui_error_t apply_step_state_attributes(struct ui_stepper_base *stepper,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Adds a step to the stepper.
+ * \param stepper The stepper component.
+ * \param step_id The ID of the step.
+ * \param header_node The header node.
+ * \param content_node The content node.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
                                     const char *step_id,
                                     struct ui_dom_node *header_node,
@@ -355,6 +417,12 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the active step index.
+ * \param stepper The stepper component.
+ * \param index The index to activate.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_set_active_index(struct ui_stepper_base *stepper,
                                             int index) {
   int i;
@@ -391,7 +459,12 @@ ui_error_t ui_stepper_base_set_active_index(struct ui_stepper_base *stepper,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the current active step index.
+ * \param stepper The stepper component.
+ * \param out_index Pointer to store the index.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_stepper_base_get_active_index(const struct ui_stepper_base *stepper,
                                  int *out_index) {
@@ -401,6 +474,13 @@ ui_stepper_base_get_active_index(const struct ui_stepper_base *stepper,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the state of a step.
+ * \param stepper The stepper component.
+ * \param index The step index.
+ * \param state The state to set.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_set_step_state(struct ui_stepper_base *stepper,
                                           int index,
                                           enum ui_stepper_step_state state) {
@@ -415,7 +495,13 @@ ui_error_t ui_stepper_base_set_step_state(struct ui_stepper_base *stepper,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the current state of a step.
+ * \param stepper The stepper component.
+ * \param index The step index.
+ * \param out_state Pointer to store the state.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_stepper_base_get_step_state(const struct ui_stepper_base *stepper, int index,
                                enum ui_stepper_step_state *out_state) {
@@ -433,6 +519,11 @@ ui_stepper_base_get_step_state(const struct ui_stepper_base *stepper, int index,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Moves to the next step.
+ * \param stepper The stepper component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_next_step(struct ui_stepper_base *stepper) {
   if (!stepper)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -443,6 +534,11 @@ ui_error_t ui_stepper_base_next_step(struct ui_stepper_base *stepper) {
   return ui_stepper_base_set_active_index(stepper, stepper->active_index + 1);
 }
 
+/**
+ * \brief Moves to the previous step.
+ * \param stepper The stepper component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_prev_step(struct ui_stepper_base *stepper) {
   if (!stepper)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -452,7 +548,12 @@ ui_error_t ui_stepper_base_prev_step(struct ui_stepper_base *stepper) {
 
   return ui_stepper_base_set_active_index(stepper, stepper->active_index - 1);
 }
-/** \brief ui_error */
+/**
+ * \brief Gets the base component for the stepper.
+ * \param stepper The stepper component.
+ * \param out_component Pointer to store the component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_get_component(struct ui_stepper_base *stepper,
                                          struct ui_component **out_component) {
   if (!stepper || !out_component) {
@@ -462,6 +563,12 @@ ui_error_t ui_stepper_base_get_component(struct ui_stepper_base *stepper,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the active index state to a signal.
+ * \param widget The stepper component.
+ * \param signal The signal to bind.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_stepper_base_bind_active_index(struct ui_stepper_base *widget,
                                              struct ui_signal *signal) {
   if (!widget) {

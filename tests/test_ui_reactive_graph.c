@@ -1,6 +1,6 @@
 /* clang-format off */
-#include "../src/ui_reactive_graph.h"
-#include "../include/ui_error.h"
+#include "ui_reactive_graph.h"
+#include "ui_error.h"
 #include <stdio.h>
 /* clang-format on */
 

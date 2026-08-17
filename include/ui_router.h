@@ -1,6 +1,15 @@
 #ifndef UI_ROUTER_H
 #define UI_ROUTER_H
 
+/**
+ * \file ui_router.h
+ * \brief UI Router component.
+ *
+ * This file contains definitions for a navigation router, mapping string paths
+ * to dynamically instantiated screen components, supporting route parameters,
+ * query strings, and state passing.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -11,7 +20,14 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque handle representing a navigation router.
+ */
 struct ui_router;
+
+/**
+ * @brief Opaque handle representing an incoming route request.
+ */
 struct ui_route_request;
 
 /**
@@ -19,7 +35,9 @@ struct ui_route_request;
  *
  * @param req The route request.
  * @param param_name The name of the parameter (e.g. "id").
- * @return The parameter value, or NULL if not found.
+ * @param out_param Pointer to receive the parameter value, or NULL if not
+ * found.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_route_request_get_param(const struct ui_route_request *req,
                                       const char *param_name,
@@ -30,7 +48,9 @@ ui_error_t ui_route_request_get_param(const struct ui_route_request *req,
  *
  * @param req The route request.
  * @param query_name The name of the query parameter (e.g. "tab").
- * @return The query value, or NULL if not found.
+ * @param out_query Pointer to receive the query value, or NULL if not found.
+ * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if not present,
+ *         or an appropriate error code.
  */
 ui_error_t ui_route_request_get_query(const struct ui_route_request *req,
                                       const char *query_name,
@@ -41,7 +61,8 @@ ui_error_t ui_route_request_get_query(const struct ui_route_request *req,
  * string).
  *
  * @param req The route request.
- * @return The path string.
+ * @param out_path Pointer to receive the path string.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_route_request_get_path(const struct ui_route_request *req,
                                      const char **out_path);
@@ -71,6 +92,7 @@ ui_error_t ui_router_create(struct ui_router **out_router);
  * @brief Destroys a router and all screens in its stack.
  *
  * @param router The router to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_router_destroy(struct ui_router *router);
 
@@ -101,7 +123,8 @@ ui_error_t ui_router_navigate(struct ui_router *router, const char *path);
  * @brief Gets the custom state pointer passed during navigation.
  *
  * @param req The route request.
- * @return The state pointer, or NULL if none.
+ * @param out_state Pointer to receive the state, or NULL if none.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_route_request_get_state(const struct ui_route_request *req,
                                       void **out_state);
@@ -112,7 +135,8 @@ ui_error_t ui_route_request_get_state(const struct ui_route_request *req,
  * @param router The router instance.
  * @param path The URL path to navigate to.
  * @param state Opaque user state (e.g. form group pointer).
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if no matching route is
+ * found, or an appropriate error code.
  */
 ui_error_t ui_router_navigate_with_state(struct ui_router *router,
                                          const char *path, void *state);
@@ -149,11 +173,14 @@ ui_error_t ui_router_replace(struct ui_router *router,
  * @brief Gets the current top screen from the navigation stack.
  *
  * @param router The router.
- * @return The current screen component, or NULL if the stack is empty.
+ * @param out_current Pointer to receive the current screen component, or NULL
+ * if the stack is empty.
+ * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if empty.
  */
 ui_error_t ui_router_get_current(struct ui_router *router,
                                  struct ui_component **out_current);
 
+/** \brief Forward declaration of ui_event */
 struct ui_event;
 
 /**
@@ -162,7 +189,7 @@ struct ui_event;
  *
  * @param router The router instance.
  * @param event The event to process.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_router_process_event(struct ui_router *router,
                                    const struct ui_event *event);
@@ -172,7 +199,7 @@ ui_error_t ui_router_process_event(struct ui_router *router,
  * for Emscripten).
  *
  * @param router The router instance.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_router_install_os_hooks(struct ui_router *router);
 

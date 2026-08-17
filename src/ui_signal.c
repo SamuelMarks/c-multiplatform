@@ -8,6 +8,15 @@
 #include "ui_reactive_graph.h"
 /* clang-format on */
 
+/**
+ * \file ui_signal.c
+ * \brief Signal implementation.
+ */
+
+/**
+ * \brief ui_signal structure.
+ * \details Internal state for a signal.
+ */
 struct ui_signal {
   union ui_signal_payload value;
   enum ui_signal_type type;
@@ -23,6 +32,11 @@ struct ui_signal {
   size_t subscribers_capacity;
 };
 
+/**
+ * \brief Locks a signal.
+ * \param sig The signal to lock.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_signal_lock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     int is_swapped = 0;
@@ -36,6 +50,11 @@ static ui_error_t ui_signal_lock(ui_signal_t *sig) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Unlocks a signal.
+ * \param sig The signal to unlock.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     {
@@ -46,6 +65,12 @@ static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Adds a subscriber to a signal.
+ * \param sig The signal.
+ * \param node The subscriber node.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_signal_add_subscriber(ui_signal_t *sig,
                                            struct ui_reactive_node *node) {
   size_t i;
@@ -74,7 +99,17 @@ static ui_error_t ui_signal_add_subscriber(ui_signal_t *sig,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new signal.
+ * \param arena The arena to allocate from.
+ * \param initial_value The initial value.
+ * \param type The signal type.
+ * \param equality_fn The equality function.
+ * \param destructor_fn The destructor function.
+ * \param mode The signal mode.
+ * \param out_signal Pointer to store the created signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
                  enum ui_signal_type type, ui_equality_fn equality_fn,
@@ -120,6 +155,12 @@ ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the value of a signal.
+ * \param signal The signal.
+ * \param out_value Pointer to store the value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_signal_get(ui_signal_t *signal,
                          union ui_signal_payload *out_value) {
   struct ui_reactive_node *current_node = NULL;
@@ -161,6 +202,12 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
   return rc;
 }
 
+/**
+ * \brief Sets the value of a signal.
+ * \param signal The signal.
+ * \param new_value The new value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_signal_set(ui_signal_t *signal,
                          union ui_signal_payload new_value) {
   ui_bool_t equal = UI_FALSE;
@@ -252,6 +299,12 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
   return rc;
 }
 
+/**
+ * \brief Updates the value of a signal using a callback.
+ * \param signal The signal.
+ * \param update_fn The update function.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
   union ui_signal_payload new_val;
   ui_error_t rc = UI_ERROR_NONE;
@@ -274,6 +327,11 @@ ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a signal.
+ * \param signal The signal to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_signal_destroy(ui_signal_t *signal) {
   if (!signal) {
     return UI_ERROR_INVALID_ARGUMENT;

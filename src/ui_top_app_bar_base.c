@@ -1,3 +1,7 @@
+/**
+ * @file ui_top_app_bar_base.c
+ * @brief Implementation of the top app bar base component.
+ */
 /* clang-format off */
 #include "ui_top_app_bar_base.h"
 #include "ui_arena.h"
@@ -5,13 +9,28 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @struct ui_top_app_bar_base
+ * @brief Internal implementation of the top app bar base component.
+ */
 struct ui_top_app_bar_base {
+  /** @brief Memory arena for allocations. */
   struct ui_arena *arena;
+  /** @brief The top app bar configuration. */
   struct ui_top_app_bar_config config;
+  /** @brief Signal for the current state. */
   ui_signal_t *state_signal;
+  /** @brief Signal for the current height. */
   ui_signal_t *height_signal;
 };
 
+/**
+ * @brief Equality function for state signals.
+ * @param a The first payload.
+ * @param b The second payload.
+ * @param out_equal Pointer to store the equality result.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t state_equality(union ui_signal_payload a,
                                  union ui_signal_payload b,
                                  ui_bool_t *out_equal) {
@@ -19,6 +38,13 @@ static ui_error_t state_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Equality function for height signals.
+ * @param a The first payload.
+ * @param b The second payload.
+ * @param out_equal Pointer to store the equality result.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t height_equality(union ui_signal_payload a,
                                   union ui_signal_payload b,
                                   ui_bool_t *out_equal) {
@@ -26,7 +52,6 @@ static ui_error_t height_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_top_app_bar_base_create(struct ui_arena *arena,
                            const struct ui_top_app_bar_config *config,
@@ -153,7 +178,6 @@ ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
                                                 ui_signal_t **out_signal) {
   if (!bar || !out_signal)
@@ -162,7 +186,6 @@ ui_error_t ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_top_app_bar_base_get_height_signal(struct ui_top_app_bar_base *bar,
                                       ui_signal_t **out_signal) {

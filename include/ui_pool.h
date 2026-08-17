@@ -11,6 +11,7 @@ extern "C" {
 /* clang-format on */
 
 /**
+ * @struct ui_pool
  * @brief Opaque handle representing an object pool.
  */
 struct ui_pool;
@@ -24,7 +25,6 @@ struct ui_pool;
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_pool_create(size_t element_size, size_t chunk_capacity,
-                          /** \brief ui_pool */
                           struct ui_pool **out_pool);
 
 /**
@@ -61,7 +61,7 @@ ui_error_t ui_pool_free(struct ui_pool *pool, void *ptr);
  * @param out_free_count Pointer to receive the number of free elements.
  * @param out_total_capacity Pointer to receive the total capacity across all
  * chunks.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_pool_get_metrics(struct ui_pool *pool, size_t *out_free_count,
                                size_t *out_total_capacity);

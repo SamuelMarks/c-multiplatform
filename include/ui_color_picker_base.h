@@ -16,9 +16,9 @@ extern "C" {
  * Values are in the range [0, 255].
  */
 struct ui_color_rgb {
-  unsigned char r;
-  unsigned char g;
-  unsigned char b;
+  unsigned char r; /**< Red channel */
+  unsigned char g; /**< Green channel */
+  unsigned char b; /**< Blue channel */
 };
 
 /**
@@ -28,9 +28,9 @@ struct ui_color_rgb {
  * v is in the range [0.0, 1.0].
  */
 struct ui_color_hsv {
-  double h;
-  double s;
-  double v;
+  double h; /**< Hue */
+  double s; /**< Saturation */
+  double v; /**< Value */
 };
 
 /**

@@ -1,3 +1,7 @@
+/**
+ * \file ui_effect.c
+ * \brief Implementation of reactive effects.
+ */
 /* clang-format off */
 #include "../include/ui_effect.h"
 #include "../include/ui_types.h"
@@ -8,6 +12,10 @@
 #include "ui_reactive_graph.h"
 /* clang-format on */
 
+/**
+ * \struct ui_effect
+ * \brief Represents a reactive effect.
+ */
 struct ui_effect {
   ui_effect_fn effect_fn;
   void *user_data;
@@ -16,6 +24,11 @@ struct ui_effect {
   struct ui_reactive_node self_node;
 };
 
+/**
+ * \brief Evaluates the reactive effect.
+ * \param[in,out] user_data Pointer to the ui_effect instance.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_effect_evaluate(void *user_data) {
   ui_effect_t *eff = (ui_effect_t *)user_data;
   struct ui_reactive_node *prev_node = NULL;
@@ -37,6 +50,11 @@ static ui_error_t ui_effect_evaluate(void *user_data) {
   return rc;
 }
 
+/**
+ * \brief Callback triggered when the effect is notified of a change.
+ * \param[in,out] user_data Pointer to the ui_effect instance.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_effect_on_notify(void *user_data) {
   ui_effect_t *eff = (ui_effect_t *)user_data;
 
@@ -53,6 +71,15 @@ static ui_error_t ui_effect_on_notify(void *user_data) {
   return ui_effect_evaluate(eff);
 }
 
+/**
+ * \brief Creates a new reactive effect.
+ * \param[in,out] arena Optional arena for memory allocation.
+ * \param[in] effect_fn The function to execute for the effect.
+ * \param[in] user_data User data for the effect function.
+ * \param[in,out] target_reactor The reactor to schedule the effect on.
+ * \param[out] out_effect Pointer to store the created effect.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
                             void *user_data, struct ui_reactor *target_reactor,
                             ui_effect_t **out_effect) {
@@ -94,6 +121,11 @@ ui_error_t ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a reactive effect.
+ * \param[in,out] effect The effect to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_effect_destroy(ui_effect_t *effect) {
   if (!effect) {
     return UI_ERROR_INVALID_ARGUMENT;

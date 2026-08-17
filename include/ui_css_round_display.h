@@ -1,3 +1,12 @@
+/**
+ * @file ui_css_round_display.h
+ * @brief CSS Round Display parsing.
+ *
+ * This header defines structures and functions for handling CSS Round
+ * Display features, including the `shape-inside` and `border-boundary`
+ * properties.
+ */
+
 #ifndef UI_CSS_ROUND_DISPLAY_H
 #define UI_CSS_ROUND_DISPLAY_H
 
@@ -14,20 +23,21 @@ extern "C" {
  * @brief Represents the shape-inside property.
  */
 struct ui_css_shape_inside {
-  enum ui_css_geometry_box box;
-  struct ui_css_basic_shape shape;
-  int is_display; /* 1 if 'display' keyword was used (meaning same shape as
-                     display bounds) */
-  int is_outside_shape; /* 1 if 'outside-shape' was used */
+  enum ui_css_geometry_box box;    /**< The reference box for the shape. */
+  struct ui_css_basic_shape shape; /**< The basic shape defined. */
+  int is_display; /**< 1 if 'display' keyword was used (meaning same shape as
+                     display bounds), 0 otherwise. */
+  int is_outside_shape; /**< 1 if 'outside-shape' was used, 0 otherwise. */
 };
 
 /**
  * @brief Represents the border-boundary property.
  */
 enum ui_css_border_boundary {
-  UI_CSS_BORDER_BOUNDARY_NONE,
-  UI_CSS_BORDER_BOUNDARY_PARENT,
-  UI_CSS_BORDER_BOUNDARY_DISPLAY
+  UI_CSS_BORDER_BOUNDARY_NONE,   /**< No border boundary. */
+  UI_CSS_BORDER_BOUNDARY_PARENT, /**< Border boundary based on the parent. */
+  UI_CSS_BORDER_BOUNDARY_DISPLAY /**< Border boundary based on the display
+                                    shape. */
 };
 
 /**
@@ -35,7 +45,7 @@ enum ui_css_border_boundary {
  *
  * @param str The string to parse.
  * @param out_shape Pointer to receive the parsed shape.
- * @return UI_ERROR_NONE on success.
+ * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
 ui_error_t ui_css_parse_shape_inside(const char *str,
                                      struct ui_css_shape_inside *out_shape);
@@ -45,7 +55,7 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
  *
  * @param str The string to parse.
  * @param out_boundary Pointer to receive the parsed boundary value.
- * @return UI_ERROR_NONE on success.
+ * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
 ui_error_t
 ui_css_parse_border_boundary(const char *str,

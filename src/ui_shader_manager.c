@@ -13,6 +13,11 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \file ui_shader_manager.c
+ * \brief Shader manager implementation.
+ */
+
 #ifndef GL_VERTEX_SHADER
 #define GL_VERTEX_SHADER 0x8B31
 #endif
@@ -146,18 +151,29 @@ static ui_error_t mock_glUniform1f(int location, float v0) {
 #define UI_GL_UNIFORM1F glUniform1f
 #endif
 
-/** \brief ui_shader_entry */
+/**
+ * \brief ui_shader_entry structure.
+ * \details Internal state for a cached shader.
+ */
 struct ui_shader_entry {
   char name[64];
   unsigned int program_id;
   struct ui_shader_entry *next;
 };
 
-/** \brief ui_shader_manager */
+/**
+ * \brief ui_shader_manager structure.
+ * \details Internal state for the shader manager.
+ */
 struct ui_shader_manager {
   struct ui_shader_entry *head;
 };
 
+/**
+ * \brief Creates a new shader manager.
+ * \param out_manager Pointer to store the manager.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager) {
   struct ui_shader_manager *manager;
 
@@ -177,6 +193,11 @@ ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a shader manager.
+ * \param manager The manager to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager) {
   struct ui_shader_entry *current;
   struct ui_shader_entry *next;
@@ -197,6 +218,15 @@ ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets or compiles a shader program.
+ * \param manager The shader manager.
+ * \param name The name of the shader.
+ * \param vertex_source The vertex shader source.
+ * \param fragment_source The fragment shader source.
+ * \param out_program_id Pointer to store the program ID.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
                                          const char *name,
                                          const char *vertex_source,
@@ -280,7 +310,14 @@ ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_shader_manager_set_uniform_matrix */
+/**
+ * \brief Sets a uniform matrix for a shader.
+ * \param manager The shader manager.
+ * \param program_id The program ID.
+ * \param uniform_name The uniform name.
+ * \param matrix4x4 The matrix data.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_shader_manager_set_uniform_matrix(
     struct ui_shader_manager *manager, unsigned int program_id,
     const char *uniform_name, const float *matrix4x4) {
@@ -294,7 +331,17 @@ ui_error_t ui_shader_manager_set_uniform_matrix(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_shader_manager_set_uniform_color */
+/**
+ * \brief Sets a uniform color for a shader.
+ * \param manager The shader manager.
+ * \param program_id The program ID.
+ * \param uniform_name The uniform name.
+ * \param r Red value.
+ * \param g Green value.
+ * \param b Blue value.
+ * \param a Alpha value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_shader_manager_set_uniform_color(
     struct ui_shader_manager *manager, unsigned int program_id,
     const char *uniform_name, float r, float g, float b, float a) {
@@ -308,7 +355,14 @@ ui_error_t ui_shader_manager_set_uniform_color(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets a uniform float for a shader.
+ * \param manager The shader manager.
+ * \param program_id The program ID.
+ * \param uniform_name The uniform name.
+ * \param value The float value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_shader_manager_set_uniform_float(struct ui_shader_manager *manager,
                                     unsigned int program_id,

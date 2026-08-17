@@ -1,3 +1,8 @@
+/**
+ * @file ui_tray_manager.c
+ * @brief Implementation of the system tray manager component.
+ */
+
 /* clang-format off */
 #include "../include/ui_tray_manager.h"
 #include "ui_internal_mem.h"
@@ -16,6 +21,10 @@
 #endif
 /* clang-format on */
 
+/**
+ * @struct ui_tray_manager
+ * @brief Internal state for the system tray / app indicator instance.
+ */
 struct ui_tray_manager {
   struct ui_image_base *icon;
   char tooltip[256];

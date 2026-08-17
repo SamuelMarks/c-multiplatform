@@ -28,11 +28,11 @@ typedef ui_error_t (*ui_coachmark_on_step_change_t)(
  * @brief Represents a single step in a coachmark tour.
  */
 struct ui_coachmark_step {
-  /** \brief ui_component */
   struct ui_component
-      *target_component; /* The element to anchor to and elevate */
-  struct ui_component *content_component; /* The content inside the coachmark */
-  int allow_skip;
+      *target_component; /**< The element to anchor to and elevate */
+  struct ui_component
+      *content_component; /**< The content inside the coachmark */
+  int allow_skip;         /**< 1 if this step can be skipped, 0 otherwise */
 };
 
 /**

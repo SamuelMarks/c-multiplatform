@@ -1,31 +1,51 @@
+/**
+ * \file ui_scroll_spy.c
+ * \brief Implementation of the UI Scroll Spy component.
+ */
+
 /* clang-format off */
-#include "../include/ui_scroll_spy.h"
-#include "../include/ui_intersection_observer.h"
-#include "../src/ui_internal_mem.h"
+#include "ui_scroll_spy.h"
+#include "ui_intersection_observer.h"
+#include "ui_internal_mem.h"
 #include <stdlib.h>
 /* clang-format on */
 
+/** \brief Maximum number of targets a scroll spy can track */
 #define MAX_SPY_TARGETS 64
 
+/**
+ * \brief Internal structure representing a tracked target section.
+ */
 struct spy_target {
-  struct ui_dom_node *node;
-  int section_id;
-  int is_intersecting;
-  float intersection_ratio;
+  struct ui_dom_node *node; /**< Tracked DOM node */
+  int section_id;           /**< User-defined section ID */
+  int is_intersecting;      /**< True if currently intersecting */
+  float intersection_ratio; /**< Current intersection ratio */
 };
 
-/** \brief ui_scroll_spy */
+/**
+ * \brief Internal structure representing the scroll spy instance.
+ */
 struct ui_scroll_spy {
-  struct ui_intersection_observer *observer;
-  struct ui_signal *active_signal;
+  struct ui_intersection_observer *observer; /**< Intersection observer */
+  struct ui_signal *active_signal;           /**< Bound active signal */
 
-  struct spy_target targets[MAX_SPY_TARGETS];
-  int target_count;
+  struct spy_target targets[MAX_SPY_TARGETS]; /**< Tracked targets array */
+  int target_count;                           /**< Current number of targets */
 
-  struct ui_dom_node *root;
-  int root_margin_px;
+  struct ui_dom_node *root; /**< Root scrolling container */
+  int root_margin_px;       /**< Root margin in pixels */
 };
 
+/**
+ * \brief Intersection observer callback to handle visibility changes.
+ *
+ * \param observer The intersection observer.
+ * \param entries The changed entries.
+ * \param entry_count Number of entries.
+ * \param user_data Opaque pointer to the scroll spy instance.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t
 on_intersection(struct ui_intersection_observer *observer,
                 const struct ui_intersection_observer_entry *entries,
@@ -72,6 +92,12 @@ on_intersection(struct ui_intersection_observer *observer,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new scroll spy behavior instance.
+ *
+ * \param out_spy Pointer to receive the allocated scroll spy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_spy_create(struct ui_scroll_spy **out_spy) {
   struct ui_scroll_spy *spy;
 
@@ -95,18 +121,33 @@ ui_error_t ui_scroll_spy_create(struct ui_scroll_spy **out_spy) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a scroll spy instance.
+ *
+ * \param spy The scroll spy to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_spy_destroy(struct ui_scroll_spy *spy) {
   if (!spy) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (spy->observer) {
-    ui_intersection_observer_destroy(spy->observer);
+    (void)ui_intersection_observer_destroy(spy->observer);
   }
   C_MULTIPLATFORM_FREE(spy);
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the root scrolling container and its observation margin.
+ *
+ * \param spy The scroll spy.
+ * \param root The scrolling container DOM node (or NULL for viewport).
+ * \param root_margin_px Margin to apply to the root bounds (usually negative to
+ * trigger early).
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
                                   struct ui_dom_node *root,
                                   int root_margin_px) {
@@ -122,7 +163,7 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
   spy->root_margin_px = root_margin_px;
 
   if (spy->observer) {
-    ui_intersection_observer_destroy(spy->observer);
+    (void)ui_intersection_observer_destroy(spy->observer);
     spy->observer = NULL;
   }
 
@@ -153,6 +194,14 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Adds a target section to be tracked by the scroll spy.
+ *
+ * \param spy The scroll spy.
+ * \param target The target DOM node representing the content section.
+ * \param section_id The unique user-defined ID for this section.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_spy_add_target(struct ui_scroll_spy *spy,
                                     struct ui_dom_node *target,
                                     int section_id) {
@@ -181,6 +230,14 @@ ui_error_t ui_scroll_spy_add_target(struct ui_scroll_spy *spy,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Removes a target section from the scroll spy.
+ *
+ * \param spy The scroll spy.
+ * \param target The target DOM node to stop tracking.
+ * \return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND, or an appropriate error
+ * code.
+ */
 ui_error_t ui_scroll_spy_remove_target(struct ui_scroll_spy *spy,
                                        struct ui_dom_node *target) {
   int i;
@@ -207,6 +264,14 @@ ui_error_t ui_scroll_spy_remove_target(struct ui_scroll_spy *spy,
   return UI_ERROR_NOT_FOUND;
 }
 
+/**
+ * \brief Binds a signal that will receive the active section ID.
+ * The payload of the signal should be castable to (int).
+ *
+ * \param spy The scroll spy.
+ * \param active_signal The signal to update when the active section changes.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_spy_bind_active_section(struct ui_scroll_spy *spy,
                                              struct ui_signal *active_signal) {
   if (!spy || !active_signal) {
@@ -216,6 +281,13 @@ ui_error_t ui_scroll_spy_bind_active_section(struct ui_scroll_spy *spy,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Triggers an evaluation of the underlying intersection observer.
+ * Typically called during a layout or scroll event.
+ *
+ * \param spy The scroll spy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_spy_evaluate(struct ui_scroll_spy *spy) {
   if (!spy) {
     return UI_ERROR_INVALID_ARGUMENT;

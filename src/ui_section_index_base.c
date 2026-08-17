@@ -1,3 +1,8 @@
+/**
+ * \file ui_section_index_base.c
+ * \brief Implementation of the UI Section Index Base component.
+ */
+
 /* clang-format off */
 #include "ui_section_index_base.h"
 #include "ui_internal_mem.h"
@@ -5,6 +10,7 @@
 #include <stddef.h>
 /* clang-format on */
 
+/** \brief Default CSS stylesheet for the section index base */
 static const char *ui_section_index_default_css =
     "div.section-index { "
     "display: flex; "
@@ -19,16 +25,23 @@ static const char *ui_section_index_default_css =
     "user-select: none; "
     "}";
 
-/** \brief ui_section_index_base */
+/**
+ * \brief Internal structure representing a section index component.
+ */
 struct ui_section_index_base {
-  struct ui_component *component;
-  struct ui_dom_node **item_nodes;
-  size_t count;
-  int active_idx;
-  struct ui_computed *data_signal;
+  struct ui_component *component;  /**< Underlying UI component */
+  struct ui_dom_node **item_nodes; /**< Array of child DOM nodes */
+  size_t count;                    /**< Number of items */
+  int active_idx;                  /**< Current active index */
+  struct ui_computed *data_signal; /**< Bound data signal */
 };
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new unstyled section index base component.
+ *
+ * \param out_index Pointer to receive the allocated section index base.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_section_index_base_create(struct ui_section_index_base **out_index) {
   struct ui_section_index_base *index;
@@ -77,10 +90,8 @@ ui_section_index_base_create(struct ui_section_index_base **out_index) {
   }
 
   {
-
     ui_error_t _ign_rc =
         ui_component_set_default_style(index->component, default_style);
-
     (void)_ign_rc;
   }
 
@@ -94,11 +105,21 @@ cleanup:
   if (root_node) {
     (void)ui_dom_node_destroy(root_node);
   }
-  (void)ui_component_destroy(index->component);
-  C_MULTIPLATFORM_FREE(index);
+  if (index && index->component) {
+    (void)ui_component_destroy(index->component);
+  }
+  if (index) {
+    C_MULTIPLATFORM_FREE(index);
+  }
   return rc;
 }
 
+/**
+ * \brief Destroys a section index component.
+ *
+ * \param index The section index to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
   if (!index) {
     return UI_ERROR_NONE;
@@ -113,7 +134,14 @@ ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the underlying component instance for style injection and DOM
+ * mounting.
+ *
+ * \param index The section index.
+ * \param out_component Pointer to receive the underlying component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_section_index_base_get_component(struct ui_section_index_base *index,
                                     struct ui_component **out_component) {
@@ -124,7 +152,16 @@ ui_section_index_base_get_component(struct ui_section_index_base *index,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the sections (labels) for the index.
+ *
+ * This will create child nodes for each label.
+ *
+ * \param index The section index.
+ * \param sections Array of string labels (e.g., "A", "B").
+ * \param count Number of sections in the array.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_section_index_base_set_sections(struct ui_section_index_base *index,
                                    const char **sections, size_t count) {
@@ -205,7 +242,13 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Highlights the active section index visually.
+ *
+ * \param index The section index.
+ * \param active_idx The index in the array to set active, or -1 to clear.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_section_index_base_set_active_section(struct ui_section_index_base *index,
                                          int active_idx) {
@@ -242,7 +285,13 @@ ui_section_index_base_set_active_section(struct ui_section_index_base *index,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Binds the data property.
+ *
+ * \param widget The widget component.
+ * \param signal The signal to bind to.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_section_index_base_bind_data(struct ui_section_index_base *widget,
                                            struct ui_computed *signal) {
   if (!widget) {

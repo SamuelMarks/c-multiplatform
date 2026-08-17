@@ -1,3 +1,7 @@
+/**
+ * @file ui_timeline_base.c
+ * @brief Implementation of the timeline UI component base logic.
+ */
 /* clang-format off */
 #include "ui_timeline_base.h"
 #include "ui_internal_mem.h"
@@ -5,17 +9,31 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @struct ui_timeline_node
+ * @brief Internal representation of a single node in the timeline.
+ */
 struct ui_timeline_node {
+  /** @brief The title of the node. */
   char *title;
+  /** @brief The description of the node. */
   char *description;
 };
 
-/** \brief ui_timeline_base */
+/**
+ * @struct ui_timeline_base
+ * @brief Internal implementation of the timeline base component.
+ */
 struct ui_timeline_base {
+  /** @brief Alignment mode of the timeline. */
   enum ui_timeline_alignment alignment;
+  /** @brief Array of timeline nodes. */
   struct ui_timeline_node *nodes;
+  /** @brief Number of nodes currently in the timeline. */
   size_t node_count;
+  /** @brief Allocated capacity for timeline nodes. */
   size_t node_capacity;
+  /** @brief Bound data signal. */
   struct ui_computed *data_signal;
 };
 
@@ -65,7 +83,6 @@ ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
                                enum ui_timeline_alignment alignment) {
@@ -76,7 +93,6 @@ ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
                                enum ui_timeline_alignment *out_alignment) {
@@ -164,7 +180,6 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
                                 size_t *out_count) {

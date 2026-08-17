@@ -1,3 +1,8 @@
+/**
+ * @file ui_wheel_picker_base.c
+ * @brief Implementation of the wheel picker base component.
+ */
+
 /* clang-format off */
 #include "ui_wheel_picker_base.h"
 #include "ui_gesture.h"
@@ -19,7 +24,10 @@ static ui_error_t ui_roundf_fallback(float number, float *out_val) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_wheel_picker_base */
+/**
+ * @struct ui_wheel_picker_base
+ * @brief Internal state for the wheel picker component.
+ */
 struct ui_wheel_picker_base {
   struct ui_component *component;
   struct ui_gesture_recognizer *gesture_recognizer;
@@ -88,7 +96,6 @@ static ui_error_t wheel_picker_cva_write_value(void *component,
   return ui_wheel_picker_base_set_selected_index(picker, value.int_val);
 }
 
-/** \brief wheel_picker_cva_register_on_change */
 static ui_error_t wheel_picker_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -128,7 +135,6 @@ static ui_error_t wheel_picker_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
                             struct ui_control_value_accessor *out_cva) {
@@ -223,7 +229,6 @@ ui_error_t ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
                                           const char *const *items, int count) {
   int i;
@@ -273,7 +278,6 @@ ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
                                             int is_looping) {
   if (!picker) {
@@ -283,7 +287,6 @@ ui_error_t ui_wheel_picker_base_set_looping(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
                                         int index) {
@@ -328,7 +331,6 @@ ui_error_t ui_wheel_picker_base_get_selected_index(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_wheel_picker_base_set_on_change(struct ui_wheel_picker_base *picker,
                                    ui_wheel_picker_on_change_t on_change,
@@ -341,7 +343,6 @@ ui_wheel_picker_base_set_on_change(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
                                    const struct ui_event *event,
@@ -482,7 +483,6 @@ ui_error_t ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_wheel_picker_base_get_component(struct ui_wheel_picker_base *picker,
                                    struct ui_component **out_component) {

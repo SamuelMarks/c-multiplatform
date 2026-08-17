@@ -1,9 +1,18 @@
+/**
+ * \file ui_intersection_observer.c
+ * \brief Implementation of intersection observer for viewport visibility
+ * tracking.
+ */
 /* clang-format off */
 #include "ui_intersection_observer.h"
 #include "ui_internal_mem.h"
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \struct ui_intersection_observer_target
+ * \brief Represents a target node being observed for intersection changes.
+ */
 struct ui_intersection_observer_target {
   struct ui_dom_node *node;
   int is_intersecting;
@@ -141,7 +150,12 @@ ui_intersection_observer_observe(struct ui_intersection_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Stops observing a target node for intersection changes.
+ * \param[in,out] observer The intersection observer.
+ * \param[in,out] target The DOM node to stop observing.
+ * \return UI_ERROR_NONE on success, or UI_ERROR_NOT_FOUND if not observed.
+ */
 ui_error_t
 ui_intersection_observer_unobserve(struct ui_intersection_observer *observer,
                                    struct ui_dom_node *target) {
@@ -164,7 +178,11 @@ ui_intersection_observer_unobserve(struct ui_intersection_observer *observer,
   return UI_ERROR_NOT_FOUND;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Stops observing all target nodes.
+ * \param[in,out] observer The intersection observer.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_intersection_observer_disconnect(struct ui_intersection_observer *observer) {
   if (observer == NULL) {
@@ -174,7 +192,13 @@ ui_intersection_observer_disconnect(struct ui_intersection_observer *observer) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Subscribes a callback to receive intersection events.
+ * \param[in,out] observer The intersection observer.
+ * \param[in] callback The callback function to invoke on intersection changes.
+ * \param[in] user_data Optional user data passed to the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
                                    ui_intersection_observer_cb_t callback,
@@ -190,7 +214,11 @@ ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Evaluates intersections for all observed targets against thresholds.
+ * \param[in,out] observer The intersection observer.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_intersection_observer_evaluate(struct ui_intersection_observer *observer) {
   /* For a fully robust implementation, this would require querying ui_layout

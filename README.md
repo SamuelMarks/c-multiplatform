@@ -2,10 +2,16 @@ c-multiplatform
 ===============
 
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Doc Coverage](https://img.shields.io/badge/docs-29%25-red.svg)](#)
+[![Doc Coverage](https://img.shields.io/badge/docs-88%25-green.svg)](#)
 [![Test Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](#)
 
-The universal, ultra-lightweight UI and media engine for the next generation of cross-platform applications.
+Multiplatform UIs—in ANSI C (C89)—with native FFI support; for:
+- Windows
+- Linux
+- macOS
+- iOS
+- Android
+- web
 
 ---
 

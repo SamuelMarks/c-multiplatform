@@ -1,8 +1,16 @@
+/**
+ * \file ui_focus_trap.c
+ * \brief Implementation of focus trap mechanisms.
+ */
 /* clang-format off */
 #include "ui_focus_trap.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \struct ui_focus_trap
+ * \brief Context for an active focus trap.
+ */
 struct ui_focus_trap {
   struct ui_dom_node *root;
   struct ui_focus_manager *manager;
@@ -10,6 +18,12 @@ struct ui_focus_trap {
   int is_active;
 };
 
+/**
+ * \brief Keyboard event handler for a focus trap.
+ * \param[in] node The node receiving the event.
+ * \param[in,out] user_data Pointer to the focus trap context.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t trap_keyboard_handler(struct ui_dom_node *node,
                                         void *user_data) {
   struct ui_focus_trap *trap = (struct ui_focus_trap *)user_data;
@@ -25,6 +39,11 @@ static ui_error_t trap_keyboard_handler(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new focus trap.
+ * \param[out] out_trap Pointer to store the created trap.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_focus_trap_create(struct ui_focus_trap **out_trap) {
   struct ui_focus_trap *trap;
 
@@ -47,6 +66,11 @@ ui_error_t ui_focus_trap_create(struct ui_focus_trap **out_trap) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a focus trap and deactivates it if active.
+ * \param[in,out] trap The trap to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_focus_trap_destroy(struct ui_focus_trap *trap) {
   ui_error_t rc = UI_ERROR_NONE;
   if (trap != NULL) {
@@ -60,6 +84,13 @@ ui_error_t ui_focus_trap_destroy(struct ui_focus_trap *trap) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Activates a focus trap.
+ * \param[in,out] trap The trap to activate.
+ * \param[in,out] manager The focus manager.
+ * \param[in] root The root node for the trap.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_focus_trap_activate(struct ui_focus_trap *trap,
                                   struct ui_focus_manager *manager,
                                   struct ui_dom_node *root) {
@@ -84,6 +115,12 @@ ui_error_t ui_focus_trap_activate(struct ui_focus_trap *trap,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Deactivates a focus trap.
+ * \param[in,out] trap The trap to deactivate.
+ * \param[in,out] manager The focus manager.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_focus_trap_deactivate(struct ui_focus_trap *trap,
                                     struct ui_focus_manager *manager) {
   ui_error_t rc;
@@ -107,7 +144,12 @@ ui_error_t ui_focus_trap_deactivate(struct ui_focus_trap *trap,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Attaches keyboard responders to the focus trap for Tab cycling.
+ * \param[in,out] trap The trap to attach to.
+ * \param[in,out] responder The keyboard responder context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_focus_trap_attach_keyboard(struct ui_focus_trap *trap,
                               struct ui_keyboard_responder *responder) {

@@ -6,10 +6,14 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief Internal representation of a chat bubble component.
+ */
 struct ui_chat_bubble_base {
-  struct ui_arena *arena;
-  struct ui_chat_bubble_config config;
-  ui_signal_t *config_signal;
+  struct ui_arena *arena;              /**< Memory arena for allocations */
+  struct ui_chat_bubble_config config; /**< Structural configuration */
+  ui_signal_t
+      *config_signal; /**< Signal dispatched when configuration changes */
 };
 
 static ui_error_t int_equality(union ui_signal_payload a,

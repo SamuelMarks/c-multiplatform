@@ -14,18 +14,33 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @struct ui_sort_header_base
+ * @brief Opaque handle for a sort header base manager.
+ */
 struct ui_sort_header_base;
 
 /**
+ * @enum ui_sort_direction
  * @brief Represents the tri-state sort direction.
  */
-enum ui_sort_direction { UI_SORT_NONE, UI_SORT_ASCENDING, UI_SORT_DESCENDING };
+enum ui_sort_direction {
+  /** @brief No active sorting. */
+  UI_SORT_NONE,
+  /** @brief Ascending sort order. */
+  UI_SORT_ASCENDING,
+  /** @brief Descending sort order. */
+  UI_SORT_DESCENDING
+};
 
 /**
+ * @struct ui_sort_state
  * @brief Represents a sort configuration for a specific column/id.
  */
 struct ui_sort_state {
+  /** @brief Opaque identifier for the column/header. */
   void *id;
+  /** @brief The current sort direction. */
   enum ui_sort_direction direction;
 };
 
@@ -33,7 +48,7 @@ struct ui_sort_state {
  * @brief Creates a new sort header base manager.
  *
  * @param out_sort_header Pointer to receive the allocated sort header base.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_sort_header_base_create(struct ui_sort_header_base **out_sort_header);
@@ -42,6 +57,7 @@ ui_sort_header_base_create(struct ui_sort_header_base **out_sort_header);
  * @brief Destroys a sort header base manager.
  *
  * @param sort_header The sort header manager.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header);
 
@@ -51,7 +67,7 @@ ui_error_t ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header);
  *
  * @param sort_header The sort header manager.
  * @param is_multi 1 for multi-column sort, 0 for single-column sort.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
@@ -64,7 +80,7 @@ ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
  *
  * @param sort_header The sort header manager.
  * @param id The identifier for the column/header being sorted.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
                                       void *id);
@@ -75,7 +91,7 @@ ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
  * @param sort_header The sort header manager.
  * @param id The identifier for the column/header.
  * @param direction The desired sort direction.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_sort_header_base_set_direction(struct ui_sort_header_base *sort_header,
@@ -88,7 +104,7 @@ ui_sort_header_base_set_direction(struct ui_sort_header_base *sort_header,
  * @param id The identifier for the column/header.
  * @param out_direction Pointer to receive the sort direction. Will be
  * UI_SORT_NONE if not found.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_sort_header_base_get_direction(const struct ui_sort_header_base *sort_header,
@@ -104,7 +120,7 @@ ui_sort_header_base_get_direction(const struct ui_sort_header_base *sort_header,
  * @param out_states Array to be filled with the sort states.
  * @param capacity Maximum number of states the out_states array can hold.
  * @param out_count Pointer to receive the actual number of populated states.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_sort_header_base_get_active_sorts(
     const struct ui_sort_header_base *sort_header,
@@ -114,7 +130,7 @@ ui_error_t ui_sort_header_base_get_active_sorts(
  * @brief Clears all active sorts, resetting them to NONE.
  *
  * @param sort_header The sort header manager.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header);
 
@@ -157,7 +173,7 @@ ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header);
  *
  * @param widget The widget.
  * @param signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_sort_header_base_bind_direction(struct ui_sort_header_base *widget,

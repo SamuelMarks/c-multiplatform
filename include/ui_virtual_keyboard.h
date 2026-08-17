@@ -1,4 +1,8 @@
 /* clang-format off */
+/**
+ * @file ui_virtual_keyboard.h
+ * @brief Virtual keyboard manager component.
+ */
 #ifndef UI_VIRTUAL_KEYBOARD_H
 #define UI_VIRTUAL_KEYBOARD_H
 

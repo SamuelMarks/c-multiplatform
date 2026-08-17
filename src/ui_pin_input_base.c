@@ -1,3 +1,7 @@
+/**
+ * \file ui_pin_input_base.c
+ * \brief Implementation of the UI PIN/OTP input component.
+ */
 /* clang-format off */
 #include "ui_pin_input_base.h"
 #include "ui_internal_mem.h"
@@ -12,6 +16,10 @@ static const char *ui_pin_input_base_default_css = ".pin-input-container { "
                                                    "}";
 
 /** \brief ui_pin_input_base */
+/**
+ * \struct ui_pin_input_base
+ * \brief State and DOM mapping for a multi-character PIN input widget.
+ */
 struct ui_pin_input_base {
   struct ui_component *component;
   int length;
@@ -27,6 +35,11 @@ struct ui_pin_input_base {
   int is_disabled;
 };
 
+/**
+ * \brief Internal helper to trigger the CVA on_change callback.
+ * \param[in,out] pin_input The PIN input widget.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t trigger_change(struct ui_pin_input_base *pin_input) {
   if (pin_input->cva_on_change) {
     union ui_signal_payload payload;
@@ -37,6 +50,11 @@ static ui_error_t trigger_change(struct ui_pin_input_base *pin_input) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Internal helper to trigger the CVA on_touched callback.
+ * \param[in,out] pin_input The PIN input widget.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t trigger_touched(struct ui_pin_input_base *pin_input) {
   if (pin_input->cva_on_touched) {
     return pin_input->cva_on_touched(pin_input->cva_on_touched_user_data);
@@ -44,6 +62,12 @@ static ui_error_t trigger_touched(struct ui_pin_input_base *pin_input) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief CVA interface function to update the PIN input's value from code.
+ * \param[in,out] component The PIN input widget.
+ * \param[in] value The payload string.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t pin_input_cva_write_value(void *component,
                                             union ui_signal_payload value) {
   struct ui_pin_input_base *pin_input = (struct ui_pin_input_base *)component;
@@ -70,7 +94,13 @@ static ui_error_t pin_input_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/** \brief pin_input_cva_register_on_change */
+/**
+ * \brief CVA interface function to register the change callback.
+ * \param[in,out] component The PIN input widget.
+ * \param[in] callback The callback function.
+ * \param[in] user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t pin_input_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -83,6 +113,13 @@ static ui_error_t pin_input_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief CVA interface function to register the touched callback.
+ * \param[in,out] component The PIN input widget.
+ * \param[in] callback The callback function.
+ * \param[in] user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t pin_input_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_pin_input_base *pin_input = (struct ui_pin_input_base *)component;
@@ -93,6 +130,12 @@ static ui_error_t pin_input_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief CVA interface function to set the disabled state.
+ * \param[in,out] component The PIN input widget.
+ * \param[in] is_disabled Non-zero if disabled.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t pin_input_cva_set_disabled_state(void *component,
                                                    int is_disabled) {
   struct ui_pin_input_base *pin_input = (struct ui_pin_input_base *)component;
@@ -109,7 +152,13 @@ static ui_error_t pin_input_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new PIN input base widget.
+ * \param[out] out_pin_input Pointer to store the created widget.
+ * \param[in] length The number of characters in the PIN.
+ * \param[out] out_cva Optional pointer to receive the CVA interface.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input,
                                     int length,
                                     struct ui_control_value_accessor *out_cva) {
@@ -191,6 +240,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a PIN input base widget.
+ * \param[in,out] pin_input The widget to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pin_input_base_destroy(struct ui_pin_input_base *pin_input) {
   if (!pin_input) {
     return UI_ERROR_NONE;
@@ -201,7 +255,12 @@ ui_error_t ui_pin_input_base_destroy(struct ui_pin_input_base *pin_input) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the underlying DOM component for the PIN input.
+ * \param[in,out] pin_input The PIN input widget.
+ * \param[out] out_component Pointer to store the DOM component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_pin_input_base_get_component(struct ui_pin_input_base *pin_input,
                                 struct ui_component **out_component) {
@@ -215,6 +274,13 @@ ui_pin_input_base_get_component(struct ui_pin_input_base *pin_input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Handles input of a single character at a specific index.
+ * \param[in,out] pin_input The PIN input widget.
+ * \param[in] index The zero-based index of the input box.
+ * \param[in] c A string containing the character typed.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pin_input_base_on_input(struct ui_pin_input_base *pin_input,
                                       int index, const char *c) {
   if (!pin_input || !c) {
@@ -242,7 +308,12 @@ ui_error_t ui_pin_input_base_on_input(struct ui_pin_input_base *pin_input,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Handles backspace/deletion at a specific index.
+ * \param[in,out] pin_input The PIN input widget.
+ * \param[in] index The zero-based index of the input box.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pin_input_base_on_backspace(struct ui_pin_input_base *pin_input,
                                           int index) {
   if (!pin_input) {
@@ -270,6 +341,12 @@ ui_error_t ui_pin_input_base_on_backspace(struct ui_pin_input_base *pin_input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Handles pasting a string into the PIN input.
+ * \param[in,out] pin_input The PIN input widget.
+ * \param[in] pasted_text The text string pasted by the user.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pin_input_base_on_paste(struct ui_pin_input_base *pin_input,
                                       const char *pasted_text) {
   size_t pasted_len;

@@ -81,24 +81,28 @@ static const char ui_carousel_base_css[] =
     "}";
 
 /** \brief ui_carousel_base */
+/**
+ * @brief Internal representation of a carousel base component.
+ */
 struct ui_carousel_base {
-  struct ui_component *component;
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *track_node;
+  struct ui_component *component; /**< The base component struct */
+  struct ui_dom_node *root_node;  /**< The DOM root for the carousel */
+  struct ui_dom_node *track_node; /**< The inner track node that scrolls */
 
-  struct ui_virtual_scroll_base *virtual_scroll;
-  struct ui_gesture_recognizer *gesture;
+  struct ui_virtual_scroll_base
+      *virtual_scroll;                   /**< Underlying virtual scroller */
+  struct ui_gesture_recognizer *gesture; /**< Gesture recognizer for paging */
 
-  enum ui_carousel_orientation orientation;
-  size_t item_count;
-  float item_size;
+  enum ui_carousel_orientation orientation; /**< Orientation of flow */
+  size_t item_count;                        /**< Total number of items */
+  float item_size;                          /**< Fixed size per item */
 
-  float current_scroll;
-  float target_scroll;
-  int is_animating;
+  float current_scroll; /**< Current absolute scroll position */
+  float target_scroll;  /**< Target scroll position for animation */
+  int is_animating;     /**< 1 if actively animating to a snap point */
 
-  float scroll_start_value;
-  struct ui_computed *data_signal;
+  float scroll_start_value;        /**< Scroll offset at start of gesture */
+  struct ui_computed *data_signal; /**< Optional bound data signal */
 };
 
 ui_error_t ui_carousel_base_create(struct ui_carousel_base **out_carousel,

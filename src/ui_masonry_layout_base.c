@@ -1,3 +1,7 @@
+/**
+ * \file ui_masonry_layout_base.c
+ * \brief Implementation of the UI masonry layout base component.
+ */
 /* clang-format off */
 #include "ui_masonry_layout_base.h"
 #include "ui_internal_mem.h"
@@ -13,6 +17,10 @@ static const char *ui_masonry_layout_base_default_css =
     "}";
 
 /** \brief ui_masonry_layout_base */
+/**
+ * \struct ui_masonry_layout_base
+ * \brief Represents a masonry (waterfall) style layout container.
+ */
 struct ui_masonry_layout_base {
   struct ui_component *component;
   struct ui_computed *data_signal;
@@ -87,6 +95,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a masonry layout base component.
+ * \param[in,out] masonry The masonry layout to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
   if (!masonry) {

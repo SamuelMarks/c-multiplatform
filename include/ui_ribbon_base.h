@@ -1,6 +1,14 @@
 #ifndef UI_RIBBON_BASE_H
 #define UI_RIBBON_BASE_H
 
+/**
+ * \file ui_ribbon_base.h
+ * \brief UI Ribbon Base component.
+ *
+ * This file contains definitions for a Microsoft Office-style ribbon UI
+ * component, managing groups, overflow collapsing states, and contextual tabs.
+ */
+
 /* clang-format off */
 #include "ui_types.h"
 #include "ui_error.h"
@@ -13,39 +21,49 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_ribbon_base
  * @brief Opaque handle for the ribbon component.
  */
 struct ui_ribbon_base;
 
 /**
+ * @enum ui_ribbon_group_collapse_state
  * @brief Represents the display state of a ribbon group based on available
  * width.
  */
 enum ui_ribbon_group_collapse_state {
-  UI_RIBBON_GROUP_COLLAPSE_STATE_NORMAL =
-      0, /**< All actions fully visible with labels */
-  UI_RIBBON_GROUP_COLLAPSE_STATE_COMPACT =
-      1, /**< Actions shown as icons only, labels hidden */
-  UI_RIBBON_GROUP_COLLAPSE_STATE_COLLAPSED =
-      2 /**< Group collapsed into a single dropdown button */
+  /** @brief All actions fully visible with labels. */
+  UI_RIBBON_GROUP_COLLAPSE_STATE_NORMAL = 0,
+  /** @brief Actions shown as icons only, labels hidden. */
+  UI_RIBBON_GROUP_COLLAPSE_STATE_COMPACT = 1,
+  /** @brief Group collapsed into a single dropdown button. */
+  UI_RIBBON_GROUP_COLLAPSE_STATE_COLLAPSED = 2
 };
 
 /**
+ * @struct ui_ribbon_group_config
  * @brief Configuration for a single command group within a ribbon tab.
  */
 struct ui_ribbon_group_config {
+  /** @brief The ID of the group. */
   int group_id;
-  int min_width_normal;  /**< Minimum width required to show in NORMAL state */
-  int min_width_compact; /**< Minimum width required to show in COMPACT state */
-  int priority; /**< Lower priority groups collapse first during resize */
+  /** @brief Minimum width required to show in NORMAL state. */
+  int min_width_normal;
+  /** @brief Minimum width required to show in COMPACT state. */
+  int min_width_compact;
+  /** @brief Lower priority groups collapse first during resize. */
+  int priority;
 };
 
 /**
+ * @struct ui_ribbon_contextual_tab_config
  * @brief Configuration for a contextual tab that only appears during specific
  * selections.
  */
 struct ui_ribbon_contextual_tab_config {
+  /** @brief The ID of the contextual tab. */
   int tab_id;
+  /** @brief True if the tab is currently active/visible. */
   ui_bool_t is_active;
 };
 

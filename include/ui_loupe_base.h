@@ -19,14 +19,19 @@ extern "C" {
 struct ui_loupe_base;
 
 /**
+ * @struct ui_loupe_config
  * @brief Configuration for a loupe/magnifier.
  */
 struct ui_loupe_config {
+  /** @brief The magnification factor. */
   float magnification_level;
+  /** @brief The width of the loupe viewing area. */
   float loupe_width;
+  /** @brief The height of the loupe viewing area. */
   float loupe_height;
-  float y_offset; /**< Vertical offset from the focal point to prevent the
-                     finger from obscuring the loupe */
+  /** @brief Vertical offset from the focal point to prevent the finger from
+   * obscuring the loupe. */
+  float y_offset;
 };
 
 /**

@@ -1,3 +1,8 @@
+/**
+ * \file ui_scroll_base.c
+ * \brief Implementation of the UI Scroll Base component.
+ */
+
 /* clang-format off */
 #include "ui_scroll_base.h"
 #include "ui_internal_mem.h"
@@ -9,6 +14,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** \brief Default CSS stylesheet for the scroll base */
 static const char *ui_scroll_base_default_css =
     "div { "
     "overflow: auto; "
@@ -26,26 +32,39 @@ static const char *ui_scroll_base_default_css =
     "border-radius: var(--scroll-thumb-radius, 4px); "
     "}";
 
-/** \brief ui_scroll_base */
+/**
+ * \brief Internal structure representing a scroll base component.
+ */
 struct ui_scroll_base {
-  struct ui_component *component;
-  struct ui_gesture_recognizer *gesture_recognizer;
-  float scroll_x;
-  float scroll_y;
-  float content_width;
-  float content_height;
-  float viewport_width;
-  float viewport_height;
-  ui_scroll_on_change_t on_change;
-  void *user_data;
-  struct ui_signal *data_signal;
+  struct ui_component *component; /**< Underlying DOM container */
+  struct ui_gesture_recognizer *gesture_recognizer; /**< Gesture recognizer */
+  float scroll_x;                  /**< Current horizontal scroll */
+  float scroll_y;                  /**< Current vertical scroll */
+  float content_width;             /**< Content width */
+  float content_height;            /**< Content height */
+  float viewport_width;            /**< Viewport width */
+  float viewport_height;           /**< Viewport height */
+  ui_scroll_on_change_t on_change; /**< Scroll change callback */
+  void *user_data;                 /**< Callback user data */
+  struct ui_signal *data_signal;   /**< Bound data signal */
 };
 
+/**
+ * \brief Updates DOM state to reflect the scroll position.
+ *
+ * \param scroll The scroll area component.
+ */
 static void update_dom_state(struct ui_scroll_base *scroll) {
   (void)scroll;
   /* You might map scroll positions to CSS variables or inline styles */
 }
 
+/**
+ * \brief Creates a new unstyled scroll area base component.
+ *
+ * \param out_scroll Pointer to receive the allocated scroll base.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
   struct ui_scroll_base *scroll;
   ui_error_t rc;
@@ -110,10 +129,8 @@ ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
   }
 
   {
-
     ui_error_t _ign_rc =
         ui_component_set_default_style(scroll->component, default_style);
-
     (void)_ign_rc;
   }
 
@@ -137,6 +154,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a scroll area component.
+ *
+ * \param scroll The scroll area to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll) {
   if (!scroll)
     return UI_ERROR_NONE;
@@ -146,6 +169,14 @@ ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the scroll position.
+ *
+ * \param scroll The scroll area.
+ * \param x The horizontal scroll position.
+ * \param y The vertical scroll position.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
                                          float y) {
   float max_x, max_y;
@@ -190,6 +221,13 @@ ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the horizontal scroll position.
+ *
+ * \param scroll The scroll area.
+ * \param out_x Pointer to receive the horizontal scroll position.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
                                        float *out_x) {
   if (!scroll || !out_x)
@@ -198,6 +236,13 @@ ui_error_t ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the vertical scroll position.
+ *
+ * \param scroll The scroll area.
+ * \param out_y Pointer to receive the vertical scroll position.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
                                        float *out_y) {
   if (!scroll || !out_y)
@@ -206,6 +251,14 @@ ui_error_t ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the content dimensions for overflow calculations.
+ *
+ * \param scroll The scroll area.
+ * \param width The content width.
+ * \param height The content height.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
                                            float width, float height) {
   if (!scroll)
@@ -218,6 +271,14 @@ ui_error_t ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
                                        scroll->scroll_y);
 }
 
+/**
+ * \brief Sets the viewport dimensions for overflow calculations.
+ *
+ * \param scroll The scroll area.
+ * \param width The viewport width.
+ * \param height The viewport height.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
                                             float width, float height) {
   if (!scroll)
@@ -230,6 +291,14 @@ ui_error_t ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
                                        scroll->scroll_y);
 }
 
+/**
+ * \brief Sets the change handler for the scroll area.
+ *
+ * \param scroll The scroll area.
+ * \param on_change The callback to invoke when scrolling occurs.
+ * \param user_data Opaque user data passed to the callback.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
                                         ui_scroll_on_change_t on_change,
                                         void *user_data) {
@@ -242,6 +311,15 @@ ui_error_t ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Processes an incoming input event to trigger scrolling (e.g., mouse
+ * wheel, touch drag).
+ *
+ * \param scroll The scroll area.
+ * \param event The input event.
+ * \param timestamp_ms Current time in milliseconds.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_process_event(struct ui_scroll_base *scroll,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
@@ -257,7 +335,15 @@ ui_error_t ui_scroll_base_process_event(struct ui_scroll_base *scroll,
 
   return UI_ERROR_NONE;
 }
-/** \brief ui_error */
+
+/**
+ * \brief Gets the underlying component instance for style injection and DOM
+ * mounting.
+ *
+ * \param scroll The scroll area.
+ * \param out_component Pointer to receive the underlying component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_get_component(struct ui_scroll_base *scroll,
                                         struct ui_component **out_component) {
   if (!scroll || !out_component) {
@@ -267,6 +353,13 @@ ui_error_t ui_scroll_base_get_component(struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the data property.
+ *
+ * \param widget The scroll area component.
+ * \param signal The signal to bind to.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_scroll_base_bind_data(struct ui_scroll_base *widget,
                                     struct ui_signal *signal) {
   if (!widget) {

@@ -1,3 +1,7 @@
+/**
+ * @file ui_toggle_base.h
+ * @brief Defines the base logic for toggle UI components (checkbox and radio).
+ */
 #ifndef UI_TOGGLE_BASE_H
 #define UI_TOGGLE_BASE_H
 

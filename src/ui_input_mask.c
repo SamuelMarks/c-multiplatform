@@ -1,3 +1,7 @@
+/**
+ * \file ui_input_mask.c
+ * \brief Implementation of input masking logic.
+ */
 #ifdef _MSC_VER
 #pragma warning(disable : 4702)
 #endif
@@ -11,8 +15,16 @@
 #include <ctype.h>
 /* clang-format on */
 
+/**
+ * \def MAX_MASK_LEN
+ * \brief Maximum length for an input mask string.
+ */
 #define MAX_MASK_LEN 256
 
+/**
+ * \struct ui_input_mask
+ * \brief Internal state for an input mask processor.
+ */
 struct ui_input_mask {
   struct ui_input_base *input;
   char pattern[MAX_MASK_LEN];
@@ -21,6 +33,13 @@ struct ui_input_mask {
   int is_processing; /* guard against recursive updates */
 };
 
+/**
+ * \brief Safely copies a string, guaranteeing null termination.
+ * \param[out] dst The destination buffer.
+ * \param[in] sz The size of the destination buffer.
+ * \param[in] src The source string.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t safe_strcpy(char *dst, size_t sz, const char *src) {
 #if defined(_MSC_VER)
   strcpy_s(dst, sz, src);
@@ -31,6 +50,13 @@ static ui_error_t safe_strcpy(char *dst, size_t sz, const char *src) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Callback triggered when the bound input's text changes.
+ * \param[in,out] input The bound input widget.
+ * \param[in] text The new text value.
+ * \param[in,out] user_data Pointer to the input mask context.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
                                   void *user_data) {
   struct ui_input_mask *mask = (struct ui_input_mask *)user_data;
@@ -41,6 +67,11 @@ static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
   return ui_input_mask_process_text(mask, text);
 }
 
+/**
+ * \brief Creates a new input mask context.
+ * \param[out] out_mask Pointer to store the created mask context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_mask_create(struct ui_input_mask **out_mask) {
   struct ui_input_mask *mask;
 
@@ -64,6 +95,11 @@ ui_error_t ui_input_mask_create(struct ui_input_mask **out_mask) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys an input mask context.
+ * \param[in,out] mask The mask context to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_mask_destroy(struct ui_input_mask *mask) {
   if (!mask) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -78,6 +114,12 @@ ui_error_t ui_input_mask_destroy(struct ui_input_mask *mask) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds an input mask to an input base widget.
+ * \param[in,out] mask The mask context.
+ * \param[in,out] input The input widget to bind to.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_mask_bind(struct ui_input_mask *mask,
                               struct ui_input_base *input) {
 
@@ -102,6 +144,12 @@ ui_error_t ui_input_mask_bind(struct ui_input_mask *mask,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the formatting pattern for the input mask.
+ * \param[in,out] mask The mask context.
+ * \param[in] pattern The mask pattern string (e.g. "999-999-9999").
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_mask_set_pattern(struct ui_input_mask *mask,
                                      const char *pattern) {
   if (!mask || !pattern) {
@@ -119,6 +167,12 @@ ui_error_t ui_input_mask_set_pattern(struct ui_input_mask *mask,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the unformatted raw value entered by the user.
+ * \param[in] mask The mask context.
+ * \param[out] out_raw Pointer to store the raw value string.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_mask_get_raw_value(struct ui_input_mask *mask,
                                        const char **out_raw) {
   if (!mask || !out_raw) {
@@ -128,6 +182,12 @@ ui_error_t ui_input_mask_get_raw_value(struct ui_input_mask *mask,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Processes a new text string against the mask pattern.
+ * \param[in,out] mask The mask context.
+ * \param[in] text The input text string to process.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_mask_process_text(struct ui_input_mask *mask,
                                       const char *text) {
   size_t p_idx = 0;

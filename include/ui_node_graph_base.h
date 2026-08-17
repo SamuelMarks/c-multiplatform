@@ -14,37 +14,51 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_node_graph_base
  * @brief Opaque handle for the node graph component.
  */
 struct ui_node_graph_base;
 
 /**
+ * @struct ui_node_graph_port
  * @brief Represents a port on a node where connections can be made.
  */
 struct ui_node_graph_port {
+  /** @brief The ID of the node owning this port. */
   const char *node_id;
+  /** @brief The unique ID of the port. */
   const char *port_id;
+  /** @brief Non-zero if this is an input port, 0 if output. */
   ui_bool_t is_input;
-  struct ui_dom_point center; /**< Absolute position in graph space */
+  /** @brief Absolute position in graph space. */
+  struct ui_dom_point center;
 };
 
 /**
+ * @struct ui_node_graph_connection
  * @brief Represents a connection (spline) between two ports.
  */
 struct ui_node_graph_connection {
+  /** @brief The unique ID of this connection. */
   const char *connection_id;
+  /** @brief The source port of the connection. */
   struct ui_node_graph_port source;
+  /** @brief The target port of the connection. */
   struct ui_node_graph_port target;
 };
 
 /**
+ * @struct ui_node_graph_camera_config
  * @brief Configuration for the 2D Camera constraints.
  */
 struct ui_node_graph_camera_config {
+  /** @brief The minimum allowed zoom level. */
   float min_zoom;
+  /** @brief The maximum allowed zoom level. */
   float max_zoom;
-  struct ui_dom_rect bounds; /**< Bounding box constraints for panning. Use 0
-                                width/height for infinite. */
+  /** @brief Bounding box constraints for panning. Use 0 width/height for
+   * infinite. */
+  struct ui_dom_rect bounds;
 };
 
 /**

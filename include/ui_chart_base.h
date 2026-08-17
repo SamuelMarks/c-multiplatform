@@ -34,11 +34,11 @@ enum ui_chart_scale_type {
  * @brief Abstract representation of an axis scale configuration.
  */
 struct ui_chart_scale_config {
-  enum ui_chart_scale_type type;
-  double domain_min; /**< Minimum data value */
-  double domain_max; /**< Maximum data value */
-  double range_min;  /**< Minimum physical pixel mapping */
-  double range_max;  /**< Maximum physical pixel mapping */
+  enum ui_chart_scale_type type; /**< Type of scale */
+  double domain_min;             /**< Minimum data value */
+  double domain_max;             /**< Maximum data value */
+  double range_min;              /**< Minimum physical pixel mapping */
+  double range_max;              /**< Maximum physical pixel mapping */
 };
 
 /**

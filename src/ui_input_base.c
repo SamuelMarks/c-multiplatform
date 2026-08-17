@@ -1,3 +1,7 @@
+/**
+ * \file ui_input_base.c
+ * \brief Implementation of the generic input base component.
+ */
 /* clang-format off */
 #include "ui_input_base.h"
 #include "ui_internal_mem.h"
@@ -30,6 +34,10 @@ static const char *ui_input_base_default_css =
     "}";
 
 /** \brief ui_input_base */
+/**
+ * \struct ui_input_base
+ * \brief Internal state for a generic input component (e.g. textbox).
+ */
 struct ui_input_base {
   struct ui_component *component;
   struct ui_gesture_recognizer *gesture_recognizer;
@@ -41,6 +49,11 @@ struct ui_input_base {
   void *user_data;
 };
 
+/**
+ * \brief Updates the underlying DOM to reflect the input base state.
+ * \param[in,out] input The input base widget.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t update_dom_state(struct ui_input_base *input) {
 #if defined(__EMSCRIPTEN__)
   if (input->text) {
@@ -93,6 +106,11 @@ static ui_error_t update_dom_state(struct ui_input_base *input) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new input base widget.
+ * \param[out] out_input Pointer to store the created widget.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_create(struct ui_input_base **out_input) {
   struct ui_input_base *input;
   ui_error_t rc;
@@ -177,10 +195,22 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Internal wrapper for CVA on-change events.
+ * \param[in,out] input The input base widget.
+ * \param[in] value The new string value.
+ * \param[in] user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t input_cva_on_change_wrapper(struct ui_input_base *input,
                                               const char *value,
                                               void *user_data);
 
+/**
+ * \brief Destroys an input base widget.
+ * \param[in,out] input The widget to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_destroy(struct ui_input_base *input) {
   if (!input)
     return UI_ERROR_NONE;
@@ -195,6 +225,12 @@ ui_error_t ui_input_base_destroy(struct ui_input_base *input) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the current text of the input widget.
+ * \param[in,out] input The input widget.
+ * \param[in] text The new text string.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_set_text(struct ui_input_base *input,
                                   const char *text) {
   char *new_text = NULL;
@@ -230,6 +266,12 @@ ui_error_t ui_input_base_set_text(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the current text of the input widget.
+ * \param[in] input The input widget.
+ * \param[out] out_text Pointer to store the text string.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_get_text(const struct ui_input_base *input,
                                   const char **out_text) {
   if (!input || !out_text)
@@ -238,6 +280,12 @@ ui_error_t ui_input_base_get_text(const struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the HTML type attribute (e.g. "text", "password").
+ * \param[in,out] input The input widget.
+ * \param[in] type The type string.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_set_type(struct ui_input_base *input,
                                   const char *type) {
   if (!input || !type) {
@@ -247,6 +295,12 @@ ui_error_t ui_input_base_set_type(struct ui_input_base *input,
   return ui_dom_node_set_attribute(input->component->shadow_root, "type", type);
 }
 
+/**
+ * \brief Sets the placeholder text for the input widget.
+ * \param[in,out] input The input widget.
+ * \param[in] placeholder The placeholder text.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_set_placeholder(struct ui_input_base *input,
                                          const char *placeholder) {
   char *new_ph = NULL;
@@ -274,6 +328,12 @@ ui_error_t ui_input_base_set_placeholder(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the disabled state of the input widget.
+ * \param[in,out] input The input widget.
+ * \param[in] disabled 1 to disable, 0 to enable.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_set_disabled(struct ui_input_base *input,
                                       int disabled) {
   if (!input)
@@ -286,6 +346,13 @@ ui_error_t ui_input_base_set_disabled(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the change callback for the input widget.
+ * \param[in,out] input The input widget.
+ * \param[in] on_change The callback function.
+ * \param[in] user_data Optional user data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_set_on_change(struct ui_input_base *input,
                                        ui_input_on_change_t on_change,
                                        void *user_data) {
@@ -296,6 +363,14 @@ ui_error_t ui_input_base_set_on_change(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Processes an incoming UI event (like keypresses) to update the input
+ * state.
+ * \param[in,out] input The input widget.
+ * \param[in] event The UI event.
+ * \param[in] timestamp_ms Event timestamp in ms.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_process_event(struct ui_input_base *input,
                                        const struct ui_event *event,
                                        double timestamp_ms) {
@@ -385,6 +460,12 @@ ui_error_t ui_input_base_process_event(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief CVA interface function to write a value to the input.
+ * \param[in,out] component The input component.
+ * \param[in] value The payload value to write.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t input_cva_write_value(void *component,
                                         union ui_signal_payload value) {
   struct ui_input_base *input = (struct ui_input_base *)component;
@@ -399,6 +480,13 @@ struct input_cva_wrapper {
   void *user_data;
 };
 
+/**
+ * \brief Internal wrapper for CVA on-change events.
+ * \param[in,out] input The input base widget.
+ * \param[in] value The new string value.
+ * \param[in] user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t input_cva_on_change_wrapper(struct ui_input_base *input,
                                               const char *text,
                                               void *user_data) {
@@ -438,6 +526,12 @@ static ui_error_t input_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief CVA interface function to set the disabled state.
+ * \param[in,out] component The input component.
+ * \param[in] is_disabled The disabled state boolean.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t input_cva_set_disabled_state(void *component,
                                                ui_bool_t is_disabled) {
   struct ui_input_base *input = (struct ui_input_base *)component;
@@ -446,6 +540,12 @@ static ui_error_t input_cva_set_disabled_state(void *component,
   return ui_input_base_set_disabled(input, is_disabled ? 1 : 0);
 }
 
+/**
+ * \brief Gets the Control Value Accessor (CVA) interface for the input.
+ * \param[in,out] input The input widget.
+ * \param[out] out_cva Pointer to store the populated CVA struct.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_get_cva(struct ui_input_base *input,
                                  struct ui_control_value_accessor *out_cva) {
   if (!input || !out_cva)
@@ -457,6 +557,12 @@ ui_error_t ui_input_base_get_cva(struct ui_input_base *input,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Retrieves the underlying generic DOM component.
+ * \param[in] input The input widget.
+ * \param[out] out_component Pointer to store the DOM component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_get_component(struct ui_input_base *input,
                                        struct ui_component **out_component) {
   if (!input || !out_component)

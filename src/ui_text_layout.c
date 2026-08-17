@@ -1,13 +1,26 @@
+/**
+ * @file ui_text_layout.c
+ * @brief Implementation of text layout components.
+ */
 /* clang-format off */
 #include "../include/ui_text_layout.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @struct ui_text_layout
+ * @brief Internal representation of a text layout.
+ */
 struct ui_text_layout {
+  /** @brief Array of positioned glyphs. */
   struct ui_positioned_glyph *glyphs;
+  /** @brief Allocated capacity for glyphs. */
   size_t capacity;
+  /** @brief Number of active glyphs. */
   size_t count;
+  /** @brief Width of the bounds. */
   float bounds_width;
+  /** @brief Height of the bounds. */
   float bounds_height;
 };
 
@@ -46,13 +59,19 @@ ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout) {
   return UI_ERROR_NONE;
 }
 
-static void decode_utf8(const char **text, int *out_codepoint) {
+/**
+ * @brief Helper function to decode a UTF-8 character.
+ * @param text Pointer to the text string, updated to the next character.
+ * @param out_codepoint Pointer to receive the decoded codepoint.
+ * @return UI_ERROR_NONE on success.
+ */
+static ui_error_t decode_utf8(const char **text, int *out_codepoint) {
   const unsigned char *s = (const unsigned char *)*text;
   int c = *s++;
   if (c < 0x80) {
     *text = (const char *)s;
     *out_codepoint = c;
-    return;
+    return UI_ERROR_NONE;
   }
   if ((c & 0xE0) == 0xC0) {
     if (*s) {
@@ -81,8 +100,18 @@ static void decode_utf8(const char **text, int *out_codepoint) {
   }
   *text = (const char *)s;
   *out_codepoint = c;
+  return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Helper function to add a glyph to the layout.
+ * @param layout The layout instance.
+ * @param codepoint The codepoint to add.
+ * @param x The X coordinate.
+ * @param y The Y coordinate.
+ * @param advance The glyph's advance width.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t add_glyph(struct ui_text_layout *layout, int codepoint,
                             float x, float y, float advance) {
   if (layout->count >= layout->capacity) {
@@ -143,7 +172,10 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     int codepoint = 0;
     struct ui_glyph_metrics metrics;
     float kerning = 0.0f;
-    decode_utf8(&text, &codepoint);
+    rc = decode_utf8(&text, &codepoint);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
 
     if (codepoint == '\n') {
       x = 0.0f;
@@ -193,7 +225,6 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_text_layout_get_glyphs(struct ui_text_layout *layout,
                           const struct ui_positioned_glyph **out_glyphs,

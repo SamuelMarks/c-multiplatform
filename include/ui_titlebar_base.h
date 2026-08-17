@@ -1,3 +1,7 @@
+/**
+ * @file ui_titlebar_base.h
+ * @brief Defines the base logic for a custom titlebar UI component.
+ */
 #ifndef UI_TITLEBAR_BASE_H
 #define UI_TITLEBAR_BASE_H
 
@@ -10,25 +14,39 @@ extern "C" {
 #include "ui_signal.h"
 /* clang-format on */
 
+/**
+ * @struct ui_titlebar_base
+ * @brief Opaque handle for a custom titlebar base component.
+ */
 struct ui_titlebar_base;
+
 struct ui_arena;
 
 /**
+ * @enum ui_titlebar_hit_test_result
  * @brief Results for hit testing in the titlebar area.
  */
 enum ui_titlebar_hit_test_result {
+  /** @brief No active area was hit. */
   UI_TITLEBAR_HIT_TEST_NONE,
+  /** @brief The draggable area of the titlebar was hit. */
   UI_TITLEBAR_HIT_TEST_DRAG_AREA,
+  /** @brief The minimize button was hit. */
   UI_TITLEBAR_HIT_TEST_MINIMIZE_BTN,
+  /** @brief The maximize/restore button was hit. */
   UI_TITLEBAR_HIT_TEST_MAXIMIZE_BTN,
+  /** @brief The close window button was hit. */
   UI_TITLEBAR_HIT_TEST_CLOSE_BTN
 };
 
 /**
+ * @struct ui_titlebar_config
  * @brief Configuration for a custom titlebar.
  */
 struct ui_titlebar_config {
+  /** @brief True if the titlebar can be dragged to move the window. */
   ui_bool_t draggable;
+  /** @brief The defined height of the titlebar. */
   float height;
 };
 
@@ -38,7 +56,7 @@ struct ui_titlebar_config {
  * @param arena The memory arena.
  * @param config The configuration.
  * @param out_titlebar Output pointer for the created component.
- * @return ui_error_t
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_titlebar_base_create(struct ui_arena *arena,
                                    const struct ui_titlebar_config *config,
@@ -48,7 +66,7 @@ ui_error_t ui_titlebar_base_create(struct ui_arena *arena,
  * @brief Destroys a custom titlebar component.
  *
  * @param titlebar The component.
- * @return ui_error_t
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar);
 
@@ -59,7 +77,7 @@ ui_error_t ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar);
  * @param x The X coordinate.
  * @param y The Y coordinate.
  * @param out_result Output pointer for the hit test result.
- * @return ui_error_t
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_titlebar_base_hit_test(struct ui_titlebar_base *titlebar, float x, float y,
@@ -74,7 +92,7 @@ ui_titlebar_base_hit_test(struct ui_titlebar_base *titlebar, float x, float y,
  * @param y The Y coordinate of the rect.
  * @param w The width of the rect.
  * @param h The height of the rect.
- * @return ui_error_t
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_titlebar_base_add_button_rect(struct ui_titlebar_base *titlebar,

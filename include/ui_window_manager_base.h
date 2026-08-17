@@ -1,3 +1,7 @@
+/**
+ * @file ui_window_manager_base.h
+ * @brief Window manager base component for MDI interface elements.
+ */
 #ifndef UI_WINDOW_MANAGER_BASE_H
 #define UI_WINDOW_MANAGER_BASE_H
 

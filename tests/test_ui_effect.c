@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 /* Pre-include headers so include guards trigger */
-#include "../src/ui_reactive_graph.h"
+#include <ui_reactive_graph.h>
 
 int g_mock_graph_set_fail = 0;
 static ui_error_t mock_graph_set(struct ui_reactive_node *n, struct ui_reactive_node **p) {

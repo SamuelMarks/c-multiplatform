@@ -4,17 +4,30 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @struct ui_date_range_picker_base
+ * @brief Internal representation of a date range picker component.
+ */
 struct ui_date_range_picker_base {
+  /** @brief Associated UI component. */
   struct ui_component *component;
+  /** @brief Current state of the picker. */
   enum ui_date_range_picker_state state;
+  /** @brief Start date of the range. */
   struct ui_date start_date;
+  /** @brief End date of the range. */
   struct ui_date end_date;
+  /** @brief Date currently hovered. */
   struct ui_date hover_date;
 
+  /** @brief Predicate callback to disable certain dates. */
   ui_date_predicate_cb predicate_cb;
+  /** @brief User data for the predicate callback. */
   void *predicate_user_data;
 
+  /** @brief Callback fired when the selected range changes. */
   ui_date_range_on_change_cb on_change_cb;
+  /** @brief User data for the on_change callback. */
   void *on_change_user_data;
 };
 
@@ -62,7 +75,6 @@ ui_error_t ui_date_is_valid(const struct ui_date *date,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_date_range_picker_base_create */
 ui_error_t ui_date_range_picker_base_create(
     struct ui_date_range_picker_base **out_picker) {
   struct ui_date_range_picker_base *picker;
@@ -91,7 +103,6 @@ ui_error_t ui_date_range_picker_base_create(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_date_range_picker_base_destroy(struct ui_date_range_picker_base *picker) {
   if (!picker) {
@@ -102,7 +113,6 @@ ui_date_range_picker_base_destroy(struct ui_date_range_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_date_range_picker_base_set_disable_predicate */
 ui_error_t ui_date_range_picker_base_set_disable_predicate(
     struct ui_date_range_picker_base *picker, ui_date_predicate_cb predicate,
     void *user_data) {
@@ -114,7 +124,6 @@ ui_error_t ui_date_range_picker_base_set_disable_predicate(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_date_range_picker_base_set_on_change */
 ui_error_t ui_date_range_picker_base_set_on_change(
     struct ui_date_range_picker_base *picker,
     ui_date_range_on_change_cb on_change, void *user_data) {
@@ -175,7 +184,6 @@ static ui_error_t check_range_validity(struct ui_date_range_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
                                       const struct ui_date *date) {
@@ -246,7 +254,6 @@ ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_date_range_picker_base_set_hover_date */
 ui_error_t ui_date_range_picker_base_set_hover_date(
     struct ui_date_range_picker_base *picker, const struct ui_date *date) {
   ui_bool_t is_valid;
@@ -270,7 +277,6 @@ ui_error_t ui_date_range_picker_base_set_hover_date(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_date_range_picker_base_get_state */
 ui_error_t ui_date_range_picker_base_get_state(
     const struct ui_date_range_picker_base *picker,
     enum ui_date_range_picker_state *out_state) {
@@ -281,7 +287,6 @@ ui_error_t ui_date_range_picker_base_get_state(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_date_range_picker_base_get_range */
 ui_error_t ui_date_range_picker_base_get_range(
     const struct ui_date_range_picker_base *picker,
     struct ui_date_range *out_range) {
@@ -313,7 +318,6 @@ ui_error_t ui_date_range_picker_base_get_range(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_date_range_picker_base_clear(struct ui_date_range_picker_base *picker) {
   if (!picker) {

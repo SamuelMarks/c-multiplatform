@@ -1,9 +1,18 @@
+/**
+ * @file ui_virtual_keyboard.c
+ * @brief Implementation of the virtual keyboard manager component.
+ */
+
 /* clang-format off */
 #include "ui_virtual_keyboard.h"
 #include <stdlib.h>
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @struct ui_virtual_keyboard
+ * @brief Internal state for the virtual keyboard manager.
+ */
 struct ui_virtual_keyboard {
   float height;
   struct ui_signal *height_signal;
@@ -45,7 +54,6 @@ ui_error_t ui_virtual_keyboard_destroy(struct ui_virtual_keyboard *vk) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_virtual_keyboard_bind_safe_area */
 ui_error_t ui_virtual_keyboard_bind_safe_area(
     struct ui_virtual_keyboard *vk,
     struct ui_safe_area_manager *safe_area_manager) {
@@ -74,7 +82,6 @@ ui_error_t ui_virtual_keyboard_set_height(struct ui_virtual_keyboard *vk,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_virtual_keyboard_get_height(const struct ui_virtual_keyboard *vk,
                                           float *out_height) {
   if (!vk || !out_height) {
@@ -84,7 +91,6 @@ ui_error_t ui_virtual_keyboard_get_height(const struct ui_virtual_keyboard *vk,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_virtual_keyboard_bind_height_signal(struct ui_virtual_keyboard *vk,
                                        struct ui_signal *height_signal) {

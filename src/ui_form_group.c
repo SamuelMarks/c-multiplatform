@@ -1,3 +1,7 @@
+/**
+ * \file ui_form_group.c
+ * \brief Implementation of form group nodes.
+ */
 /* clang-format off */
 #include "ui_form_group.h"
 #include "ui_form_node_internal.h"
@@ -5,12 +9,19 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \struct ui_form_group_entry
+ * \brief An entry mapping a name to a form node within a group.
+ */
 struct ui_form_group_entry {
   char *name;
   ui_form_node_t node;
 };
 
-/** \brief ui_form_group */
+/**
+ * \struct ui_form_group
+ * \brief Represents a group of named form nodes.
+ */
 struct ui_form_group {
   struct ui_arena *arena;
   enum ui_signal_mode mode;
@@ -20,6 +31,13 @@ struct ui_form_group {
   size_t capacity;
 };
 
+/**
+ * \brief Creates a new form group.
+ * \param[in,out] arena The memory arena.
+ * \param[in] mode The signaling mode.
+ * \param[out] out_group Pointer to store the created form group.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_group_create(struct ui_arena *arena,
                                 enum ui_signal_mode mode,
                                 ui_form_group_t **out_group) {
@@ -44,6 +62,13 @@ ui_error_t ui_form_group_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Duplicates a string using an arena allocator.
+ * \param[in,out] arena The arena to allocate from.
+ * \param[in] str The string to copy.
+ * \param[out] out_str Pointer to store the copied string.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t strdup_arena(struct ui_arena *arena, const char *str,
                                char **out_str) {
   size_t len = strlen(str);
@@ -56,6 +81,13 @@ static ui_error_t strdup_arena(struct ui_arena *arena, const char *str,
   return rc;
 }
 
+/**
+ * \brief Adds a form node to the group with a specified name.
+ * \param[in,out] group The form group.
+ * \param[in] name The name for the node.
+ * \param[in] node The form node to add.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
                                   ui_form_node_t node) {
   ui_error_t rc;
@@ -91,6 +123,13 @@ ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Adds a form control directly to the group.
+ * \param[in,out] group The form group.
+ * \param[in] name The name for the control.
+ * \param[in,out] control The form control to add.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_group_add_control(ui_form_group_t *group, const char *name,
                                      ui_form_control_t *control) {
   ui_form_node_t node = {0};
@@ -99,6 +138,13 @@ ui_error_t ui_form_group_add_control(ui_form_group_t *group, const char *name,
   return ui_form_group_add_node(group, name, node);
 }
 
+/**
+ * \brief Gets a form node by name from the group.
+ * \param[in] group The form group.
+ * \param[in] name The name of the node.
+ * \param[out] out_node Pointer to store the retrieved node.
+ * \return UI_ERROR_NONE on success, or UI_ERROR_NOT_FOUND.
+ */
 ui_error_t ui_form_group_get_node(ui_form_group_t *group, const char *name,
                                   ui_form_node_t *out_node) {
   size_t i;
@@ -115,6 +161,13 @@ ui_error_t ui_form_group_get_node(ui_form_group_t *group, const char *name,
   return UI_ERROR_NOT_FOUND;
 }
 
+/**
+ * \brief Gets a form control by name from the group.
+ * \param[in] group The form group.
+ * \param[in] name The name of the control.
+ * \param[out] out_control Pointer to store the retrieved control.
+ * \return UI_ERROR_NONE on success, or UI_ERROR_NOT_FOUND.
+ */
 ui_error_t ui_form_group_get_control(ui_form_group_t *group, const char *name,
                                      ui_form_control_t **out_control) {
   ui_form_node_t node = {0};
@@ -129,7 +182,13 @@ ui_error_t ui_form_group_get_control(ui_form_group_t *group, const char *name,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Internal function to recursively get the status of a form group.
+ * \param[in] group The form group.
+ * \param[out] out_status Pointer to store the aggregated status.
+ * \param[in] depth The current recursion depth.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t _ui_form_group_get_status_internal(struct ui_form_group *group,
                                               enum ui_form_status *out_status,
                                               size_t depth) {
@@ -159,11 +218,23 @@ ui_error_t _ui_form_group_get_status_internal(struct ui_form_group *group,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the overall validation status of the form group.
+ * \param[in] group The form group.
+ * \param[out] out_status Pointer to store the status.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_group_get_status(ui_form_group_t *group,
                                     enum ui_form_status *out_status) {
   return _ui_form_group_get_status_internal(group, out_status, 0);
 }
 
+/**
+ * \brief Checks if the entire form group is valid.
+ * \param[in] group The form group.
+ * \param[out] out_valid Set to UI_TRUE if valid, UI_FALSE otherwise.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_group_is_valid(ui_form_group_t *group,
                                   ui_bool_t *out_valid) {
   enum ui_form_status status;
@@ -174,6 +245,11 @@ ui_error_t ui_form_group_is_valid(ui_form_group_t *group,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a form group.
+ * \param[in,out] group The form group to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_group_destroy(ui_form_group_t *group) {
   if (!group)
     return UI_ERROR_INVALID_ARGUMENT;

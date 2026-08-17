@@ -1,6 +1,15 @@
 #ifndef UI_RATING_BASE_H
 #define UI_RATING_BASE_H
 
+/**
+ * \file ui_rating_base.h
+ * \brief UI Rating Base component.
+ *
+ * This file contains definitions for a rating component
+ * allowing selection and display of a fractional rating value (e.g., star
+ * rating).
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,6 +40,7 @@ ui_error_t ui_rating_base_create(struct ui_rating_base **out_rating,
  * @brief Destroys a rating component and frees all resources.
  *
  * @param rating The rating component to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_rating_base_destroy(struct ui_rating_base *rating);
 

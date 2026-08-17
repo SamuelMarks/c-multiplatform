@@ -1,3 +1,7 @@
+/**
+ * @file ui_window_controls_base.h
+ * @brief Window controls base component for client-side window decorations.
+ */
 #ifndef UI_WINDOW_CONTROLS_BASE_H
 #define UI_WINDOW_CONTROLS_BASE_H
 

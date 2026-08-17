@@ -1,3 +1,7 @@
+/**
+ * @file ui_timepicker_base.h
+ * @brief Defines the base logic for a timepicker UI component.
+ */
 #ifndef UI_TIMEPICKER_BASE_H
 #define UI_TIMEPICKER_BASE_H
 

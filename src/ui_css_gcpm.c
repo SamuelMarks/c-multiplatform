@@ -91,9 +91,10 @@ ui_error_t ui_css_gcpm_parse(const struct ui_css_computed_style *style,
 }
 
 /** \brief ui_error */
-void ui_css_gcpm_properties_cleanup(struct ui_css_gcpm_properties *props) {
+ui_error_t
+ui_css_gcpm_properties_cleanup(struct ui_css_gcpm_properties *props) {
   if (!props)
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
   if (props->string_set) {
     C_MULTIPLATFORM_FREE(props->string_set);
     props->string_set = NULL;
@@ -102,4 +103,5 @@ void ui_css_gcpm_properties_cleanup(struct ui_css_gcpm_properties *props) {
     C_MULTIPLATFORM_FREE(props->bookmark_label);
     props->bookmark_label = NULL;
   }
+  return UI_ERROR_NONE;
 }

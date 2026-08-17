@@ -4,6 +4,15 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \file ui_sensor_manager.c
+ * \brief Sensor manager implementation.
+ */
+
+/**
+ * \brief ui_sensor_manager structure.
+ * \details Internal state for the sensor manager.
+ */
 struct ui_sensor_manager {
   int is_running;
   struct ui_signal *orientation_signal;
@@ -12,6 +21,11 @@ struct ui_sensor_manager {
   struct ui_sensor_quaternion current_quat;
 };
 
+/**
+ * \brief Creates a new sensor manager.
+ * \param out_manager Pointer to store the manager.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sensor_manager_create(struct ui_sensor_manager **out_manager) {
   struct ui_sensor_manager *mgr = NULL;
 
@@ -37,6 +51,11 @@ ui_error_t ui_sensor_manager_create(struct ui_sensor_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a sensor manager.
+ * \param manager The manager to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -52,6 +71,11 @@ ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Starts the sensor manager.
+ * \param manager The manager to start.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sensor_manager_start(struct ui_sensor_manager *manager) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -70,6 +94,11 @@ ui_error_t ui_sensor_manager_start(struct ui_sensor_manager *manager) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Stops the sensor manager.
+ * \param manager The manager to stop.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sensor_manager_stop(struct ui_sensor_manager *manager) {
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -86,7 +115,12 @@ ui_error_t ui_sensor_manager_stop(struct ui_sensor_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Binds a signal for orientation updates.
+ * \param manager The sensor manager.
+ * \param signal The signal to bind.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
                                               struct ui_signal *signal) {
   if (!manager || !signal) {
@@ -97,7 +131,12 @@ ui_error_t ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the current accelerometer data.
+ * \param manager The sensor manager.
+ * \param out_accel Pointer to store the vector.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
                                     struct ui_sensor_vector3 *out_accel) {
@@ -109,7 +148,12 @@ ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the current gyroscope data.
+ * \param manager The sensor manager.
+ * \param out_gyro Pointer to store the vector.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
                                            struct ui_sensor_vector3 *out_gyro) {
   if (!manager || !out_gyro) {
@@ -121,9 +165,18 @@ ui_error_t ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
 }
 
 /* Forward declarations */
+/**
+ * \brief Mocks a tick for the sensor manager.
+ * \param manager The manager.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager);
 
-/* Mock function to simulate a sensor tick, pushing data to signals */
+/**
+ * \brief Mocks a tick for the sensor manager.
+ * \param manager The manager.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
   if (!manager || !manager->is_running) {
     return UI_ERROR_INVALID_ARGUMENT;

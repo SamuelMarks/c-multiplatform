@@ -6,8 +6,17 @@
 #include <math.h>
 /* clang-format on */
 
+/**
+ * \file ui_syntax_surface_base.c
+ * \brief Syntax surface base component implementation.
+ */
+
 #define UI_SYNTAX_MAX_FOLDS 256
 
+/**
+ * \brief ui_syntax_surface_base structure.
+ * \details Internal state for the syntax surface base component.
+ */
 struct ui_syntax_surface_base {
   struct ui_arena *arena;
   struct ui_rich_text_base *base_rich_text;
@@ -22,6 +31,13 @@ struct ui_syntax_surface_base {
   ui_signal_t *active_line_signal;
 };
 
+/**
+ * \brief Equality function for void pointers.
+ * \param a First payload.
+ * \param b Second payload.
+ * \param out_equal Pointer to store the result.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t void_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
                                 ui_bool_t *out_equal) {
@@ -31,6 +47,13 @@ static ui_error_t void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Equality function for integers.
+ * \param a First payload.
+ * \param b Second payload.
+ * \param out_equal Pointer to store the result.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t int_equality(union ui_signal_payload a,
                                union ui_signal_payload b,
                                ui_bool_t *out_equal) {
@@ -38,7 +61,13 @@ static ui_error_t int_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new syntax surface base component.
+ * \param arena The arena to allocate from.
+ * \param base_rich_text The base rich text component.
+ * \param out_surface Pointer to store the component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_syntax_surface_base_create(struct ui_arena *arena,
                               struct ui_rich_text_base *base_rich_text,
@@ -81,7 +110,11 @@ ui_syntax_surface_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Destroys a syntax surface base component.
+ * \param surface The component to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface) {
   if (!surface) {
@@ -94,7 +127,14 @@ ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_syntax_surface_base_calculate_gutter_width */
+/**
+ * \brief Calculates the width of the line number gutter.
+ * \param surface The syntax surface component.
+ * \param total_lines The total number of lines.
+ * \param char_width The width of a single character.
+ * \param out_width Pointer to store the calculated width.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_syntax_surface_base_calculate_gutter_width(
     const struct ui_syntax_surface_base *surface, int total_lines,
     float char_width, float *out_width) {
@@ -116,7 +156,14 @@ ui_error_t ui_syntax_surface_base_calculate_gutter_width(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets a fold region.
+ * \param surface The syntax surface component.
+ * \param start_line The start line of the fold.
+ * \param end_line The end line of the fold.
+ * \param collapse Whether the fold is collapsed.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_syntax_surface_base_set_fold_region(struct ui_syntax_surface_base *surface,
                                        int start_line, int end_line,
@@ -152,7 +199,12 @@ ui_syntax_surface_base_set_fold_region(struct ui_syntax_surface_base *surface,
   return ui_signal_set(surface->fold_changed_signal, payload);
 }
 
-/** \brief ui_syntax_surface_base_get_fold_changed_signal */
+/**
+ * \brief Gets the fold changed signal.
+ * \param surface The syntax surface component.
+ * \param out_signal Pointer to store the signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_syntax_surface_base_get_fold_changed_signal(
     struct ui_syntax_surface_base *surface, ui_signal_t **out_signal) {
   if (!surface || !out_signal)
@@ -161,7 +213,13 @@ ui_error_t ui_syntax_surface_base_get_fold_changed_signal(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_syntax_surface_base_get_visual_line_index */
+/**
+ * \brief Gets the visual line index for a given absolute line.
+ * \param surface The syntax surface component.
+ * \param absolute_line The absolute line number.
+ * \param out_visual_index Pointer to store the visual line index.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_syntax_surface_base_get_visual_line_index(
     const struct ui_syntax_surface_base *surface, int absolute_line,
     int *out_visual_index) {
@@ -197,7 +255,12 @@ ui_error_t ui_syntax_surface_base_get_visual_line_index(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the active line.
+ * \param surface The syntax surface component.
+ * \param absolute_line The absolute line number.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_syntax_surface_base_set_active_line(struct ui_syntax_surface_base *surface,
                                        int absolute_line) {
@@ -212,7 +275,12 @@ ui_syntax_surface_base_set_active_line(struct ui_syntax_surface_base *surface,
   return ui_signal_set(surface->active_line_signal, payload);
 }
 
-/** \brief ui_syntax_surface_base_get_active_line_signal */
+/**
+ * \brief Gets the active line signal.
+ * \param surface The syntax surface component.
+ * \param out_signal Pointer to store the signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_syntax_surface_base_get_active_line_signal(
     struct ui_syntax_surface_base *surface, ui_signal_t **out_signal) {
   if (!surface || !out_signal)
@@ -221,7 +289,12 @@ ui_error_t ui_syntax_surface_base_get_active_line_signal(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_syntax_surface_base_set_bracket_match */
+/**
+ * \brief Sets the bracket match region.
+ * \param surface The syntax surface component.
+ * \param match The bracket match info.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_syntax_surface_base_set_bracket_match(
     struct ui_syntax_surface_base *surface,
     const struct ui_syntax_bracket_match *match) {

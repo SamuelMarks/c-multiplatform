@@ -14,35 +14,35 @@ extern "C" {
  * @brief Standard ARIA roles for FFI synchronization to OS screen readers.
  */
 enum ui_aria_role {
-  UI_ARIA_ROLE_NONE = 0,
-  UI_ARIA_ROLE_BUTTON,
-  UI_ARIA_ROLE_CHECKBOX,
-  UI_ARIA_ROLE_DIALOG,
-  UI_ARIA_ROLE_ALERT,
-  UI_ARIA_ROLE_STATUS,
-  UI_ARIA_ROLE_SLIDER,
-  UI_ARIA_ROLE_PROGRESSBAR,
-  UI_ARIA_ROLE_HEADING,
-  UI_ARIA_ROLE_LINK,
-  UI_ARIA_ROLE_TEXTBOX,
-  UI_ARIA_ROLE_SEPARATOR,
-  UI_ARIA_ROLE_LIST,
-  UI_ARIA_ROLE_LISTITEM,
-  UI_ARIA_ROLE_RADIOGROUP,
-  UI_ARIA_ROLE_TABLIST,
-  UI_ARIA_ROLE_NAVIGATION,
-  UI_ARIA_ROLE_GROUP
+  UI_ARIA_ROLE_NONE = 0,    /**< No role specified */
+  UI_ARIA_ROLE_BUTTON,      /**< Button role */
+  UI_ARIA_ROLE_CHECKBOX,    /**< Checkbox role */
+  UI_ARIA_ROLE_DIALOG,      /**< Dialog role */
+  UI_ARIA_ROLE_ALERT,       /**< Alert role */
+  UI_ARIA_ROLE_STATUS,      /**< Status role */
+  UI_ARIA_ROLE_SLIDER,      /**< Slider role */
+  UI_ARIA_ROLE_PROGRESSBAR, /**< Progressbar role */
+  UI_ARIA_ROLE_HEADING,     /**< Heading role */
+  UI_ARIA_ROLE_LINK,        /**< Link role */
+  UI_ARIA_ROLE_TEXTBOX,     /**< Textbox role */
+  UI_ARIA_ROLE_SEPARATOR,   /**< Separator role */
+  UI_ARIA_ROLE_LIST,        /**< List role */
+  UI_ARIA_ROLE_LISTITEM,    /**< Listitem role */
+  UI_ARIA_ROLE_RADIOGROUP,  /**< Radiogroup role */
+  UI_ARIA_ROLE_TABLIST,     /**< Tablist role */
+  UI_ARIA_ROLE_NAVIGATION,  /**< Navigation role */
+  UI_ARIA_ROLE_GROUP        /**< Group role */
 };
 
 /**
  * @brief Computed semantic state for OS accessibility synchronization.
  */
 struct ui_aria_state {
-  enum ui_aria_role role;
-  int is_hidden;   /**< 1 if aria-hidden="true" */
-  int is_disabled; /**< 1 if disabled or aria-disabled="true" */
-  int is_expanded; /**< -1 = unset, 0 = false, 1 = true */
-  int is_checked;  /**< -1 = unset, 0 = false, 1 = true, 2 = mixed */
+  enum ui_aria_role role; /**< The computed ARIA role */
+  int is_hidden;          /**< 1 if aria-hidden="true" */
+  int is_disabled;        /**< 1 if disabled or aria-disabled="true" */
+  int is_expanded;        /**< -1 = unset, 0 = false, 1 = true */
+  int is_checked;         /**< -1 = unset, 0 = false, 1 = true, 2 = mixed */
   char *label; /**< Accessible label (from aria-label), allocated, must be freed
                 */
   char *description; /**< Accessible description (from aria-description),
@@ -53,7 +53,8 @@ struct ui_aria_state {
  * @brief Maps a string role (e.g., "button") to the ui_aria_role enum.
  *
  * @param role_str The role string.
- * @return The corresponding enum ui_aria_role, or UI_ARIA_ROLE_NONE.
+ * @param out_role Pointer to receive the mapped role enum.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_aria_role_from_string(const char *role_str,
                                     enum ui_aria_role *out_role);

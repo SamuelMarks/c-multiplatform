@@ -1,3 +1,7 @@
+/**
+ * \file ui_icon_base.c
+ * \brief Implementation of the generic icon base component.
+ */
 /* clang-format off */
 #include "ui_icon_base.h"
 #include "ui_internal_mem.h"
@@ -5,6 +9,10 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \struct ui_icon_base
+ * \brief Internal state for a generic icon (SVG or Font-based).
+ */
 struct ui_icon_base {
   enum ui_icon_type type;
   char *data;
@@ -12,6 +20,11 @@ struct ui_icon_base {
   struct ui_signal *name_signal;
 };
 
+/**
+ * \brief Creates a new icon base component.
+ * \param[out] out_icon Pointer to store the created icon.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_icon_base_create(struct ui_icon_base **out_icon) {
   struct ui_icon_base *icon;
   ui_error_t rc = UI_ERROR_NONE;
@@ -38,6 +51,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys an icon base component.
+ * \param[in,out] icon The icon to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_icon_base_destroy(struct ui_icon_base *icon) {
   if (!icon) {
     return UI_ERROR_NONE;
@@ -49,6 +67,13 @@ ui_error_t ui_icon_base_destroy(struct ui_icon_base *icon) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the icon to use a font glyph.
+ * \param[in,out] icon The icon widget.
+ * \param[in] font The font containing the glyph.
+ * \param[in] glyph_name_or_code The glyph name or code.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_icon_base_set_font_glyph(struct ui_icon_base *icon,
                                        struct ui_font *font,
                                        const char *glyph_name_or_code) {
@@ -90,6 +115,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Sets the icon to use an SVG path.
+ * \param[in,out] icon The icon widget.
+ * \param[in] svg_path_data The raw SVG path data.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_icon_base_set_svg_path(struct ui_icon_base *icon,
                                      const char *svg_path_data) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -130,6 +161,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Retrieves the underlying type of the icon.
+ * \param[in] icon The icon widget.
+ * \param[out] out_type Pointer to store the icon type.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_icon_base_get_type(const struct ui_icon_base *icon,
                                  enum ui_icon_type *out_type) {
   if (!icon || !out_type) {
@@ -139,6 +176,12 @@ ui_error_t ui_icon_base_get_type(const struct ui_icon_base *icon,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Retrieves the raw data (glyph code or SVG path) for the icon.
+ * \param[in] icon The icon widget.
+ * \param[out] out_data Pointer to store the data string.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_icon_base_get_data(const struct ui_icon_base *icon,
                                  const char **out_data) {
   if (!icon || !out_data) {
@@ -148,6 +191,12 @@ ui_error_t ui_icon_base_get_data(const struct ui_icon_base *icon,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the name of the icon to a reactive signal.
+ * \param[in,out] widget The icon widget.
+ * \param[in,out] signal The signal providing the icon name.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_icon_base_bind_name(struct ui_icon_base *widget,
                                   struct ui_signal *signal) {
   if (!widget) {

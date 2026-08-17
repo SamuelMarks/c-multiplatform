@@ -1,3 +1,8 @@
+/**
+ * \file ui_ribbon_base.c
+ * \brief Implementation of the UI Ribbon Base component.
+ */
+
 /* clang-format off */
 #include "ui_ribbon_base.h"
 #include "ui_arena.h"
@@ -5,29 +10,46 @@
 #include <stddef.h>
 /* clang-format on */
 
+/** \brief Maximum number of ribbon groups */
 #define UI_RIBBON_MAX_GROUPS 32
+/** \brief Maximum number of contextual tabs */
 #define UI_RIBBON_MAX_CONTEXTUAL_TABS 16
 
+/**
+ * \brief Internal state of a specific ribbon group.
+ */
 struct ui_ribbon_group_state {
-  struct ui_ribbon_group_config config;
-  enum ui_ribbon_group_collapse_state current_state;
+  struct ui_ribbon_group_config config; /**< Group configuration */
+  enum ui_ribbon_group_collapse_state
+      current_state; /**< Current collapse state */
 };
 
-/** \brief ui_ribbon_base */
+/**
+ * \brief Internal structure representing the ribbon base component.
+ */
 struct ui_ribbon_base {
-  struct ui_arena *arena;
+  struct ui_arena *arena; /**< Memory arena */
 
-  struct ui_ribbon_group_state groups[UI_RIBBON_MAX_GROUPS];
-  int num_groups;
+  struct ui_ribbon_group_state
+      groups[UI_RIBBON_MAX_GROUPS]; /**< Configured groups */
+  int num_groups;                   /**< Current number of groups */
 
-  /** \brief ui_ribbon_contextual_tab_config */
   struct ui_ribbon_contextual_tab_config
-      contextual_tabs[UI_RIBBON_MAX_CONTEXTUAL_TABS];
-  int num_contextual_tabs;
+      contextual_tabs[UI_RIBBON_MAX_CONTEXTUAL_TABS]; /**< Configured contextual
+                                                         tabs */
+  int num_contextual_tabs; /**< Current number of contextual tabs */
 
-  ui_signal_t *group_state_changed_signal;
+  ui_signal_t *group_state_changed_signal; /**< Signal for state changes */
 };
 
+/**
+ * \brief Evaluates equality of two integer signal payloads (group IDs).
+ *
+ * \param a First payload.
+ * \param b Second payload.
+ * \param out_equal Pointer to receive the equality result.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t group_id_equality(union ui_signal_payload a,
                                     union ui_signal_payload b,
                                     ui_bool_t *out_equal) {
@@ -35,6 +57,13 @@ static ui_error_t group_id_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a ribbon base component.
+ *
+ * \param arena The memory arena to use for allocation.
+ * \param out_ribbon Pointer to receive the created component handle.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_ribbon_base_create(struct ui_arena *arena,
                                  struct ui_ribbon_base **out_ribbon) {
 
@@ -46,10 +75,8 @@ ui_error_t ui_ribbon_base_create(struct ui_arena *arena,
   }
 
   {
-
     ui_error_t _ign_rc =
         ui_arena_alloc(arena, sizeof(struct ui_ribbon_base), 8, &ptr);
-
     (void)_ign_rc;
   }
 
@@ -70,6 +97,12 @@ ui_error_t ui_ribbon_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a ribbon base component.
+ *
+ * \param ribbon The component to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon) {
   if (!ribbon) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -80,7 +113,14 @@ ui_error_t ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Adds a command group configuration to the ribbon for width-based
+ * collapse calculations.
+ *
+ * \param ribbon The component.
+ * \param config The group configuration to add.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_ribbon_base_add_group_config(struct ui_ribbon_base *ribbon,
                                 const struct ui_ribbon_group_config *config) {
@@ -101,7 +141,14 @@ ui_ribbon_base_add_group_config(struct ui_ribbon_base *ribbon,
   return UI_ERROR_NONE;
 }
 
-/* Helper to find a group by ID */
+/**
+ * \brief Helper to find a group by ID.
+ *
+ * \param ribbon The component.
+ * \param group_id The group ID to find.
+ * \param out_state Pointer to receive the group state.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t find_group_state(const struct ui_ribbon_base *ribbon,
                                    int group_id,
                                    struct ui_ribbon_group_state **out_state) {
@@ -116,21 +163,44 @@ static ui_error_t find_group_state(const struct ui_ribbon_base *ribbon,
   return UI_ERROR_NONE;
 }
 
-/* Helper to sort indices by group priority (ascending) for overflow calculation
+/**
+ * \brief Helper to sort indices by group priority (ascending) for overflow
+ * calculation.
+ *
+ * \param ribbon The component.
+ * \param indices Array of indices to sort.
+ * \return UI_ERROR_NONE on success.
  */
 static ui_error_t sort_indices_by_priority(const struct ui_ribbon_base *ribbon,
                                            int *indices) {
   int i, j, temp;
   for (i = 0; i < ribbon->num_groups - 1; i++) {
     for (j = 0; j < ribbon->num_groups - i - 1; j++) {
-      temp = indices[j];
-      indices[j] = indices[j + 1];
-      indices[j + 1] = temp;
+      /* Compare priorities. Wait, if we want lower priority to collapse first,
+         we should process lower priority first. So ascending sort by priority.
+         Assuming lower int = lower priority (0 is lower priority than 1).
+         If priorities are equal, what? Preserve order or something.
+      */
+      if (ribbon->groups[indices[j]].config.priority >
+          ribbon->groups[indices[j + 1]].config.priority) {
+        temp = indices[j];
+        indices[j] = indices[j + 1];
+        indices[j + 1] = temp;
+      }
     }
   }
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Calculates and updates the collapse states for all groups based on the
+ * available width. This should be called by the layout pass during window
+ * resize.
+ *
+ * \param ribbon The component.
+ * \param available_width The total physical width available to the ribbon.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
                                                int available_width) {
   int indices[UI_RIBBON_MAX_GROUPS];
@@ -169,7 +239,7 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
   }
 
   /* Step 2: If we still overflow, collapse low-priority groups entirely */
-  for (i = 0; current_width > available_width; ++i) {
+  for (i = 0; i < ribbon->num_groups && current_width > available_width; ++i) {
     struct ui_ribbon_group_state *gs = &ribbon->groups[indices[i]];
     /* Assuming a completely collapsed dropdown button takes ~32px */
     int collapsed_width = 32;
@@ -183,7 +253,14 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Retrieves the calculated collapse state for a specific group.
+ *
+ * \param ribbon The component.
+ * \param group_id The ID of the group.
+ * \param out_state Pointer to receive the collapse state.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
                                int group_id,
@@ -203,7 +280,14 @@ ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Retrieves the signal emitted when a group's collapse state changes.
+ * The payload contains the int group_id that changed.
+ *
+ * \param ribbon The component.
+ * \param out_signal Pointer to receive the signal handle.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_ribbon_base_get_group_state_changed_signal(struct ui_ribbon_base *ribbon,
                                               ui_signal_t **out_signal) {
@@ -214,7 +298,14 @@ ui_ribbon_base_get_group_state_changed_signal(struct ui_ribbon_base *ribbon,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the active status of a contextual tab.
+ *
+ * \param ribbon The component.
+ * \param tab_id The contextual tab ID.
+ * \param is_active True to show, false to hide.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_ribbon_base_set_contextual_tab_active(struct ui_ribbon_base *ribbon,
                                          int tab_id, ui_bool_t is_active) {
@@ -244,7 +335,14 @@ ui_ribbon_base_set_contextual_tab_active(struct ui_ribbon_base *ribbon,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Retrieves the active status of a contextual tab.
+ *
+ * \param ribbon The component.
+ * \param tab_id The contextual tab ID.
+ * \param out_is_active Pointer to receive the boolean status.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_ribbon_base_get_contextual_tab_active(const struct ui_ribbon_base *ribbon,
                                          int tab_id, ui_bool_t *out_is_active) {

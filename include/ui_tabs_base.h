@@ -1,3 +1,7 @@
+/**
+ * @file ui_tabs_base.h
+ * @brief Defines the tabs base component and related operations.
+ */
 #ifndef UI_TABS_BASE_H
 #define UI_TABS_BASE_H
 

@@ -7,35 +7,62 @@
 
 #define UI_DRAG_DROP_DEFAULT_THRESHOLD 5
 
+/**
+ * @struct ui_drag_drop_context
+ * @brief Internal representation of a drag and drop context.
+ */
 struct ui_drag_drop_context {
+  /** @brief Threshold in pixels before a drag is initiated. */
   int drag_threshold;
+  /** @brief Current drag state. */
   enum ui_drag_state state;
 
+  /** @brief X coordinate where pointer went down. */
   int start_x;
+  /** @brief Y coordinate where pointer went down. */
   int start_y;
+  /** @brief Current X coordinate of the pointer. */
   int current_x;
+  /** @brief Current Y coordinate of the pointer. */
   int current_y;
 
+  /** @brief ID of the item being dragged. */
   int drag_item_id;
+  /** @brief ID of the list the item originated from. */
   int drag_source_list_id;
+  /** @brief Width of the dragged item. */
   int drag_item_width;
+  /** @brief Height of the dragged item. */
   int drag_item_height;
+  /** @brief Pointer offset X within the dragged item. */
   int drag_item_offset_x;
+  /** @brief Pointer offset Y within the dragged item. */
   int drag_item_offset_y;
 
+  /** @brief Array of registered drop lists. */
   struct ui_drag_list *lists;
+  /** @brief Capacity of the lists array. */
   int list_capacity;
+  /** @brief Number of active lists. */
   int list_count;
 
+  /** @brief 1 if a drop occurred since the last event poll. */
   int drop_occurred;
+  /** @brief ID of the item that was dropped. */
   int drop_item_id;
+  /** @brief Source list ID of the dropped item. */
   int drop_from_list;
+  /** @brief Destination list ID of the dropped item. */
   int drop_to_list;
+  /** @brief Destination index where the item was dropped. */
   int drop_to_index;
 
+  /** @brief Current visual placeholder information. */
   struct ui_drag_placeholder placeholder;
 
+  /** @brief Active pointer/touch ID tracking the drag. */
   int active_pointer_id;
+  /** @brief 1 if pointer is down, 0 otherwise. */
   int pointer_is_down;
 };
 
@@ -58,7 +85,7 @@ ui_error_t ui_drag_drop_create(struct ui_drag_drop_context **out_ctx) {
   ctx->list_capacity = 4;
 
   ctx->lists = (struct ui_drag_list *)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_drag_list) * ctx->list_capacity);
+      sizeof(struct ui_drag_list) * (size_t)ctx->list_capacity);
   if (!ctx->lists) {
     C_MULTIPLATFORM_FREE(ctx);
     return UI_ERROR_OUT_OF_MEMORY;
@@ -130,7 +157,7 @@ ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
     int new_cap = ctx->list_capacity * 2;
     struct ui_drag_list *new_lists =
         (struct ui_drag_list *)C_MULTIPLATFORM_REALLOC(
-            ctx->lists, sizeof(struct ui_drag_list) * new_cap);
+            ctx->lists, sizeof(struct ui_drag_list) * (size_t)new_cap);
     if (!new_lists) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -144,13 +171,13 @@ ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
 
   if (list->item_count > 0) {
     new_list->items = (struct ui_drag_item *)C_MULTIPLATFORM_MALLOC(
-        sizeof(struct ui_drag_item) * list->item_count);
+        sizeof(struct ui_drag_item) * (size_t)list->item_count);
     if (!new_list->items) {
       ctx->list_count--; /* Revert count on failure */
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_list->items, list->items,
-           sizeof(struct ui_drag_item) * list->item_count);
+           sizeof(struct ui_drag_item) * (size_t)list->item_count);
   }
 
   return UI_ERROR_NONE;
@@ -263,8 +290,9 @@ static void handle_pointer_down(struct ui_drag_drop_context *ctx,
 
 static void handle_pointer_move(struct ui_drag_drop_context *ctx,
                                 int pointer_id, int x, int y) {
-  if (ctx->active_pointer_id != pointer_id)
+  if (ctx->active_pointer_id != pointer_id) {
     return;
+  }
 
   ctx->current_x = x;
   ctx->current_y = y;
@@ -378,7 +406,6 @@ ui_error_t ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
                                          int *out_item_id,
                                          int *out_source_list_id,
@@ -402,7 +429,6 @@ ui_error_t ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_drag_drop_get_placeholder(const struct ui_drag_drop_context *ctx,
                              struct ui_drag_placeholder *out_placeholder) {

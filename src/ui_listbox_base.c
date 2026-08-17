@@ -1,3 +1,7 @@
+/**
+ * \file ui_listbox_base.c
+ * \brief Implementation of the UI listbox base component.
+ */
 /* clang-format off */
 #include "ui_listbox_base.h"
 #include "ui_internal_mem.h"
@@ -40,12 +44,25 @@ struct ui_listbox_base {
   int is_disabled;
 };
 
+/**
+ * \brief Converts an ASCII character to lowercase.
+ * \param[in] c The character.
+ * \return The lowercase character.
+ */
 static int char_tolower(int c) {
   if (c >= 'A' && c <= 'Z')
     return c + ('a' - 'A');
   return c;
 }
 
+/**
+ * \brief Checks if a string case-insensitively starts with a specific prefix.
+ * \param[in] str The string to check.
+ * \param[in] prefix The prefix to match.
+ * \param[in] prefix_len The length of the prefix.
+ * \param[out] out_match Set to 1 if it matches, 0 otherwise.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t prefix_match(const char *str, const char *prefix,
                                int prefix_len, int *out_match) {
   int i;
@@ -65,6 +82,11 @@ static ui_error_t prefix_match(const char *str, const char *prefix,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Triggers the CVA on-change callback based on current selection.
+ * \param[in,out] listbox The listbox component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
   union ui_signal_payload payload;
   int count;
@@ -142,6 +164,12 @@ static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Callback fired when the selection model changes.
+ * \param[in,out] model The selection model.
+ * \param[in,out] user_data Pointer to the listbox context.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t on_selection_change(struct ui_selection_model *model,
                                       void *user_data) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)user_data;
@@ -149,6 +177,12 @@ static ui_error_t on_selection_change(struct ui_selection_model *model,
   return listbox_trigger_cva_change(listbox);
 }
 
+/**
+ * \brief CVA interface function to write a value into the listbox selection.
+ * \param[in,out] component The listbox component.
+ * \param[in] value The payload value to write.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t listbox_cva_write_value(void *component,
                                           union ui_signal_payload value) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
@@ -204,6 +238,13 @@ static ui_error_t listbox_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief CVA interface function to register a touched callback.
+ * \param[in,out] component The listbox component.
+ * \param[in] callback The callback function.
+ * \param[in] user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t listbox_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
@@ -214,6 +255,12 @@ static ui_error_t listbox_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief CVA interface function to set the disabled state.
+ * \param[in,out] component The listbox component.
+ * \param[in] is_disabled Non-zero to disable.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t listbox_cva_set_disabled_state(void *component,
                                                  int is_disabled) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
@@ -343,6 +390,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a listbox base component.
+ * \param[in,out] listbox The listbox to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_listbox_base_destroy(struct ui_listbox_base *listbox) {
   if (!listbox)
     return UI_ERROR_NONE;
@@ -376,6 +428,12 @@ ui_listbox_base_get_selection_model(struct ui_listbox_base *listbox,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets whether the listbox allows multiple selections.
+ * \param[in,out] listbox The listbox component.
+ * \param[in] is_multi Non-zero to enable multi-select.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_listbox_base_set_multi_select(struct ui_listbox_base *listbox,
                                             int is_multi) {
   if (!listbox)
@@ -394,6 +452,12 @@ ui_error_t ui_listbox_base_set_multi_select(struct ui_listbox_base *listbox,
                                              is_multi);
 }
 
+/**
+ * \brief Informs the listbox of the total number of items it contains.
+ * \param[in,out] listbox The listbox component.
+ * \param[in] num_items The total number of items.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_listbox_base_set_item_count(struct ui_listbox_base *listbox,
                                           int num_items) {
   if (!listbox || num_items < 0)
@@ -427,6 +491,12 @@ ui_listbox_base_set_item_text_provider(struct ui_listbox_base *listbox,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Explicitly sets the currently active (focused) item index.
+ * \param[in,out] listbox The listbox component.
+ * \param[in] index The item index.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_listbox_base_set_active_index(struct ui_listbox_base *listbox,
                                             int index) {
   if (!listbox)
@@ -448,6 +518,11 @@ ui_listbox_base_get_active_index(const struct ui_listbox_base *listbox,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Performs a typeahead search and updates selection if a match is found.
+ * \param[in,out] listbox The listbox component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
   int start_index = listbox->active_index >= 0 ? listbox->active_index : 0;
   int i;
@@ -490,6 +565,14 @@ static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Processes an incoming UI event (like keypresses) for listbox
+ * navigation and selection.
+ * \param[in,out] listbox The listbox component.
+ * \param[in] event The UI event.
+ * \param[in] timestamp_ms Event timestamp in milliseconds.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
                                          const struct ui_event *event,
                                          double timestamp_ms) {

@@ -3,6 +3,15 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \file ui_sort_header_base.c
+ * \brief Sort header base component implementation.
+ */
+
+/**
+ * \brief ui_sort_header_base structure.
+ * \details Internal state for the sort header base component.
+ */
 struct ui_sort_header_base {
   int is_multi;
   struct ui_sort_state *states;
@@ -11,7 +20,11 @@ struct ui_sort_header_base {
   struct ui_signal *direction_signal;
 };
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new sort header base component.
+ * \param out_sort_header Pointer to store the component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_sort_header_base_create(struct ui_sort_header_base **out_sort_header) {
   struct ui_sort_header_base *manager;
@@ -35,6 +48,11 @@ ui_sort_header_base_create(struct ui_sort_header_base **out_sort_header) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a sort header component.
+ * \param sort_header The component to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header) {
   if (!sort_header) {
@@ -48,7 +66,12 @@ ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets whether multiple columns can be sorted at once.
+ * \param sort_header The sort header.
+ * \param is_multi 1 to allow multiple, 0 to allow only one.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
                                    int is_multi) {
@@ -66,6 +89,12 @@ ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Finds the index of a state by ID.
+ * \param sort_header The sort header.
+ * \param id The ID to look for.
+ * \param out_index Pointer to store the result.
+ */
 static void find_state_index(struct ui_sort_header_base *sort_header, void *id,
                              int *out_index) {
   size_t i;
@@ -78,6 +107,12 @@ static void find_state_index(struct ui_sort_header_base *sort_header, void *id,
   }
 }
 
+/**
+ * \brief Removes a state at a given index.
+ * \param sort_header The sort header.
+ * \param index The index to remove.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t remove_state_at(struct ui_sort_header_base *sort_header,
                                   int index) {
   size_t i;
@@ -90,6 +125,13 @@ static ui_error_t remove_state_at(struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Inserts or updates a sort state.
+ * \param sort_header The sort header.
+ * \param id The ID of the item.
+ * \param direction The sort direction.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t
 insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
                        enum ui_sort_direction direction) {
@@ -132,7 +174,12 @@ insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Toggles the sort direction for a given column ID.
+ * \param sort_header The sort header.
+ * \param id The column ID.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
                                       void *id) {
   int index;
@@ -164,7 +211,13 @@ ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
   return insert_or_update_state(sort_header, id, next_dir);
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the sort direction for a given column ID.
+ * \param sort_header The sort header.
+ * \param id The column ID.
+ * \param direction The sort direction.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_sort_header_base_set_direction(struct ui_sort_header_base *sort_header,
                                   void *id, enum ui_sort_direction direction) {
@@ -175,7 +228,13 @@ ui_sort_header_base_set_direction(struct ui_sort_header_base *sort_header,
   return insert_or_update_state(sort_header, id, direction);
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the current sort direction for a given column ID.
+ * \param sort_header The sort header.
+ * \param id The column ID.
+ * \param out_direction Pointer to store the direction.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_sort_header_base_get_direction(const struct ui_sort_header_base *sort_header,
                                   void *id,
@@ -197,7 +256,14 @@ ui_sort_header_base_get_direction(const struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_sort_header_base_get_active_sorts */
+/**
+ * \brief Gets all active sorts.
+ * \param sort_header The sort header.
+ * \param out_states Array to store the states.
+ * \param capacity The maximum number of states to retrieve.
+ * \param out_count Pointer to store the number of active states retrieved.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sort_header_base_get_active_sorts(
     const struct ui_sort_header_base *sort_header,
     struct ui_sort_state *out_states, size_t capacity, size_t *out_count) {
@@ -218,7 +284,11 @@ ui_error_t ui_sort_header_base_get_active_sorts(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Clears all active sorts.
+ * \param sort_header The sort header.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header) {
   if (!sort_header) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -228,7 +298,12 @@ ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Binds the direction state to a signal.
+ * \param widget The sort header component.
+ * \param signal The signal to bind.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_sort_header_base_bind_direction(struct ui_sort_header_base *widget,
                                    struct ui_signal *signal) {

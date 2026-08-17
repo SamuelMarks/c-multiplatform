@@ -1,17 +1,33 @@
+/**
+ * @file ui_tick_engine.c
+ * @brief Implementation of the single-threaded tick engine.
+ */
 /* clang-format off */
 #include "../include/ui_tick_engine.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @struct ui_task_node
+ * @brief Internal representation of a queued task for the tick engine.
+ */
 struct ui_task_node {
+  /** @brief The callback function to execute. */
   ui_error_t (*callback)(void *);
+  /** @brief Opaque user data for the callback. */
   void *user_data;
+  /** @brief Pointer to the next task in the queue. */
   struct ui_task_node *next;
 };
 
-/** \brief ui_tick_engine */
+/**
+ * @struct ui_tick_engine
+ * @brief Internal implementation of the single-threaded tick engine.
+ */
 struct ui_tick_engine {
+  /** @brief Head of the task queue. */
   struct ui_task_node *head;
+  /** @brief Tail of the task queue. */
   struct ui_task_node *tail;
 };
 

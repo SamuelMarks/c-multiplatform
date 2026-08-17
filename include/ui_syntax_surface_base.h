@@ -15,27 +15,38 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_syntax_surface_base
  * @brief Opaque handle for the syntax surface component.
  */
 struct ui_syntax_surface_base;
 
 /**
+ * @struct ui_syntax_fold_region
  * @brief Configuration for a single folding region.
  */
 struct ui_syntax_fold_region {
+  /** @brief The starting line of the fold region (0-indexed). */
   int start_line;
+  /** @brief The ending line of the fold region (0-indexed). */
   int end_line;
+  /** @brief True if the region is currently collapsed. */
   ui_bool_t is_collapsed;
 };
 
 /**
+ * @struct ui_syntax_bracket_match
  * @brief Represents a bracket match result.
  */
 struct ui_syntax_bracket_match {
+  /** @brief True if a match was found. */
   ui_bool_t has_match;
+  /** @brief The line of the opening bracket. */
   int open_line;
+  /** @brief The column of the opening bracket. */
   int open_col;
+  /** @brief The line of the closing bracket. */
   int close_line;
+  /** @brief The column of the closing bracket. */
   int close_col;
 };
 

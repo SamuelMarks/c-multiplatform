@@ -8,8 +8,9 @@
 int g_banner_mock_fail = 0;
 static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
-  if (g_banner_mock_fail == 1)
+  if (g_banner_mock_fail == 1) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_append_child)(parent, child);
 }
 #undef ui_dom_node_append_child
@@ -17,8 +18,9 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
 
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *k, const char *v) {
-  if (g_banner_mock_fail == 2)
+  if (g_banner_mock_fail == 2) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_set_attribute)(node, k, v);
 }
 #undef ui_dom_node_set_attribute
@@ -26,8 +28,9 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
 
 static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
                                                  const char *k) {
-  if (g_banner_mock_fail == 3)
+  if (g_banner_mock_fail == 3) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_remove_attribute)(node, k);
 }
 #undef ui_dom_node_remove_attribute
@@ -35,8 +38,9 @@ static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
 
 static ui_error_t mock_signal_set(struct ui_signal *signal,
                                   union ui_signal_payload p) {
-  if (g_banner_mock_fail == 4)
+  if (g_banner_mock_fail == 4) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_signal_set)(signal, p);
 }
 #undef ui_signal_set
@@ -49,26 +53,26 @@ ui_error_t run_banner_coverage(void) {
   union ui_signal_payload p;
   struct ui_signal *sig = NULL;
 
-  ui_banner_base_create(&banner);
+  (void)ui_banner_base_create(&banner);
 
   g_banner_mock_fail = 1;
-  ui_banner_base_set_text(banner, "text");
+  (void)ui_banner_base_set_text(banner, "text");
   g_banner_mock_fail = 0;
 
   g_banner_mock_fail = 2;
-  ui_banner_base_set_open(banner, 1);
+  (void)ui_banner_base_set_open(banner, 1);
   g_banner_mock_fail = 0;
 
   g_banner_mock_fail = 3;
-  ui_banner_base_set_open(banner, 0);
+  (void)ui_banner_base_set_open(banner, 0);
   g_banner_mock_fail = 0;
 
   p.bool_val = 1;
-  ui_signal_create(NULL, p, UI_SIGNAL_TYPE_BOOL, NULL, NULL, 0, &sig);
+  (void)ui_signal_create(NULL, p, UI_SIGNAL_TYPE_BOOL, NULL, NULL, 0, &sig);
 
-  ui_banner_base_bind_open(banner, sig);
+  (void)ui_banner_base_bind_open(banner, sig);
   g_banner_mock_fail = 4;
-  ui_banner_base_set_open(banner, 1);
+  (void)ui_banner_base_set_open(banner, 1);
   g_banner_mock_fail = 0;
 
   (void)ui_signal_destroy(sig);
@@ -78,6 +82,10 @@ ui_error_t run_banner_coverage(void) {
 }
 #endif
 
+/**
+ * @struct ui_banner_base
+ * @brief Internal state for a banner component.
+ */
 struct ui_banner_base {
   struct ui_component *base;
   int is_open;
@@ -197,20 +205,23 @@ ui_error_t ui_banner_base_set_open(struct ui_banner_base *banner, int is_open) {
   if (is_open) {
     rc = ui_dom_node_set_attribute(banner->base->shadow_root, "data-open",
                                    "true");
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   } else {
     rc = ui_dom_node_remove_attribute(banner->base->shadow_root, "data-open");
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
 
   if (banner->open_signal) {
     union ui_signal_payload payload;
     payload.bool_val = is_open;
     rc = ui_signal_set(banner->open_signal, payload);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
 
   return UI_ERROR_NONE;
@@ -234,7 +245,6 @@ ui_error_t ui_banner_base_bind_open(struct ui_banner_base *banner,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_banner_base_get_animating_signal(struct ui_banner_base *banner,
                                     struct ui_computed **out_animating) {
@@ -245,7 +255,6 @@ ui_banner_base_get_animating_signal(struct ui_banner_base *banner,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_banner_base_get_component(struct ui_banner_base *banner,
                                         struct ui_component **out_component) {
   if (!banner || !out_component) {

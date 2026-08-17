@@ -1,3 +1,7 @@
+/**
+ * @file ui_theme_manager.c
+ * @brief Implementation of the theme manager.
+ */
 /* clang-format off */
 #include "ui_theme_manager.h"
 #include "ui_web_bridge.h"
@@ -5,12 +9,26 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @struct ui_theme_manager
+ * @brief Internal implementation of the theme manager.
+ */
 struct ui_theme_manager {
+  /** @brief The arena used for allocations. */
   struct ui_arena *arena;
+  /** @brief The current theme mode. */
   enum ui_theme_mode current_mode;
+  /** @brief Signal emitted when the theme mode changes. */
   ui_signal_t *change_signal;
 };
 
+/**
+ * @brief Equality function for theme mode signals.
+ * @param a The first payload.
+ * @param b The second payload.
+ * @param out_equal Pointer to store the equality result.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t theme_mode_equality(union ui_signal_payload a,
                                       union ui_signal_payload b,
                                       ui_bool_t *out_equal) {
@@ -95,7 +113,6 @@ ui_error_t ui_theme_manager_get_mode(struct ui_theme_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_theme_manager_get_change_signal(struct ui_theme_manager *manager,
                                               ui_signal_t **out_signal) {
   if (!manager || !out_signal) {

@@ -20,18 +20,32 @@ static const char *ui_dialog_base_default_css =
     "z-index: 100; "
     "}";
 
-/** \brief ui_dialog_base */
+/**
+ * @struct ui_dialog_base
+ * @brief Internal representation of a dialog component.
+ */
 struct ui_dialog_base {
+  /** @brief The base component. */
   struct ui_component *component;
+  /** @brief The content component mounted inside. */
   struct ui_component *content_component;
+  /** @brief The overlay director handling layering. */
   struct ui_overlay_director *director;
+  /** @brief Focus manager to trap focus when open. */
   struct ui_focus_manager *focus_manager;
+  /** @brief Backdrop component. */
   struct ui_backdrop *backdrop;
+  /** @brief The mounted overlay for the dialog. */
   struct ui_overlay *overlay;
+  /** @brief 1 if the dialog is open, 0 otherwise. */
   int is_open;
+  /** @brief Callback for dialog close events. */
   ui_dialog_on_close_t on_close;
+  /** @brief User data for the close callback. */
   void *user_data;
+  /** @brief Signal bound to the open state. */
   struct ui_signal *open_signal;
+  /** @brief Computed signal for animation state. */
   struct ui_computed *animating_signal;
 };
 
@@ -164,7 +178,6 @@ ui_error_t ui_dialog_base_set_content(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
                                     struct ui_overlay_director *director) {
@@ -175,7 +188,6 @@ ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_dialog_base_set_focus_manager(struct ui_dialog_base *dialog,
                                  struct ui_focus_manager *focus_manager) {
@@ -294,7 +306,6 @@ ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_dialog_base_get_component(struct ui_dialog_base *dialog,
                                         struct ui_component **out_component) {
   if (!dialog || !out_component) {
@@ -313,7 +324,6 @@ ui_error_t ui_dialog_base_bind_open(struct ui_dialog_base *widget,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_dialog_base_get_animating_signal(struct ui_dialog_base *widget,
                                     struct ui_computed **out_animating) {

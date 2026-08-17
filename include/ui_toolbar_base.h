@@ -1,3 +1,7 @@
+/**
+ * @file ui_toolbar_base.h
+ * @brief Defines the base logic for a toolbar UI component.
+ */
 #ifndef UI_TOOLBAR_BASE_H
 #define UI_TOOLBAR_BASE_H
 

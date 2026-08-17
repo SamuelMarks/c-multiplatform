@@ -1,3 +1,7 @@
+/**
+ * @file ui_toast_manager_base.c
+ * @brief Implementation of the global toast notification manager.
+ */
 /* clang-format off */
 #include "ui_toast_manager_base.h"
 #include "ui_internal_mem.h"
@@ -12,35 +16,60 @@
 /* MSVC Safe CRT */
 #endif
 
+/**
+ * @struct ui_toast_entry
+ * @brief Internal representation of an active toast notification.
+ */
 struct ui_toast_entry {
+  /** @brief Unique identifier for the toast. */
   ui_toast_id id;
+  /** @brief Configuration for the toast. */
   struct ui_toast_config config;
+  /** @brief Current animation state. */
   enum ui_toast_anim_state anim_state;
+  /** @brief Time when the toast was shown. */
   double show_time;
+  /** @brief Total time the toast has been paused. */
   double total_paused_time;
+  /** @brief Time when the current pause started. */
   double pause_start_time;
+  /** @brief Flag indicating if the toast is currently paused. */
   int is_paused;
+  /** @brief The message string to display. */
   char *message;
 
+  /** @brief The overlay component for rendering. */
   struct ui_component *overlay_component;
+  /** @brief The active overlay instance. */
   struct ui_overlay *active_overlay;
 };
 
-/** \brief ui_toast_region_stack */
+/**
+ * @struct ui_toast_region_stack
+ * @brief Represents a stack of toasts in a specific region.
+ */
 struct ui_toast_region_stack {
+  /** @brief Array of toast entries. */
   struct ui_toast_entry **toasts;
+  /** @brief Number of toasts in the stack. */
   size_t count;
+  /** @brief Allocated capacity of the toasts array. */
   size_t capacity;
 };
 
-/** \brief ui_toast_manager_base */
+/**
+ * @struct ui_toast_manager_base
+ * @brief Internal implementation of the global toast manager.
+ */
 struct ui_toast_manager_base {
+  /** @brief Array of toast region stacks. */
   struct ui_toast_region_stack regions[UI_TOAST_REGION_COUNT];
+  /** @brief Next available toast ID. */
   ui_toast_id next_id;
-  int is_hovered; /* Simple global hover state for primitive */
+  /** @brief Simple global hover state for primitive pause logic. */
+  int is_hovered;
 };
 
-/** \brief ui_error */
 ui_error_t
 ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
   struct ui_toast_manager_base *manager;
@@ -67,6 +96,11 @@ ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Helper function to free a single toast entry.
+ * @param entry The entry to free.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t free_toast_entry(struct ui_toast_entry *entry) {
   if (entry->message)
     C_MULTIPLATFORM_FREE(entry->message);
@@ -168,7 +202,6 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_toast_manager_base_dismiss(struct ui_toast_manager_base *manager,
                                          ui_toast_id id) {
   int i;
@@ -266,7 +299,6 @@ ui_error_t ui_toast_manager_base_tick(struct ui_toast_manager_base *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
                                    const struct ui_event *event,
@@ -342,7 +374,6 @@ static ui_error_t get_region_style(enum ui_toast_region region,
   }
 }
 
-/** \brief ui_error */
 ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
                                         struct ui_overlay_director *director) {
   int i;

@@ -9,6 +9,11 @@
 #include <math.h>
 /* clang-format on */
 
+/**
+ * \file ui_slider_base.c
+ * \brief Slider base component implementation.
+ */
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -52,7 +57,10 @@ static const char ui_slider_base_default_css[] = {
     32,  48,  46,  53,  41,  59,  32,  99,  117, 114, 115, 111, 114, 58,  32,
     110, 111, 116, 45,  97,  108, 108, 111, 119, 101, 100, 59,  32,  125, 0};
 
-/** \brief ui_slider_base */
+/**
+ * \brief ui_slider_base structure.
+ * \details Internal state for the slider base component.
+ */
 struct ui_slider_base {
   struct ui_component *component;
   struct ui_gesture_recognizer *gesture_recognizer;
@@ -76,8 +84,18 @@ struct ui_slider_base {
 #define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
 #define UI_CVA_ON_TOUCH_IGNORE(cb, u) ((cb) ? (cb)((u)) : UI_ERROR_NONE)
 
+/**
+ * \brief Updates the DOM state for the slider.
+ * \param slider The slider component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t update_dom_state(struct ui_slider_base *slider);
 
+/**
+ * \brief Updates the DOM state for the slider.
+ * \param slider The slider component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t update_dom_state(struct ui_slider_base *slider) {
   if (slider->component) {
     if (slider->component->shadow_root) {
@@ -129,6 +147,11 @@ static ui_error_t update_dom_state(struct ui_slider_base *slider) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Triggers a CVA change event.
+ * \param slider The slider component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t trigger_cva_change(struct ui_slider_base *slider) {
   if (slider->cva_on_change) {
     union ui_signal_payload payload;
@@ -138,6 +161,12 @@ static ui_error_t trigger_cva_change(struct ui_slider_base *slider) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Writes a value from CVA.
+ * \param component The slider component.
+ * \param value The value to write.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t slider_cva_write_value(void *component,
                                          union ui_signal_payload value) {
   struct ui_slider_base *slider = (struct ui_slider_base *)component;
@@ -148,7 +177,13 @@ static ui_error_t slider_cva_write_value(void *component,
   return ui_slider_base_set_value(slider, value.float_val);
 }
 
-/** \brief slider_cva_register_on_change */
+/**
+ * \brief Registers an on-change callback for CVA.
+ * \param component The slider component.
+ * \param callback The callback to register.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t slider_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -161,6 +196,13 @@ static ui_error_t slider_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Registers an on-touched callback for CVA.
+ * \param component The slider component.
+ * \param callback The callback to register.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t slider_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_slider_base *slider = (struct ui_slider_base *)component;
@@ -171,6 +213,12 @@ static ui_error_t slider_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the disabled state from CVA.
+ * \param component The slider component.
+ * \param is_disabled The disabled state.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t slider_cva_set_disabled_state(void *component,
                                                 int is_disabled) {
   struct ui_slider_base *slider = (struct ui_slider_base *)component;
@@ -179,6 +227,12 @@ static ui_error_t slider_cva_set_disabled_state(void *component,
   return ui_slider_base_set_disabled(slider, is_disabled);
 }
 
+/**
+ * \brief Creates a new slider base component.
+ * \param out_slider Pointer to store the component.
+ * \param out_cva Optional pointer to store the CVA.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_create(struct ui_slider_base **out_slider,
                                  struct ui_control_value_accessor *out_cva) {
   struct ui_slider_base *slider;
@@ -283,6 +337,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a slider base component.
+ * \param slider The component to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_destroy(struct ui_slider_base *slider) {
   if (!slider)
     return UI_ERROR_NONE;
@@ -294,6 +353,12 @@ ui_error_t ui_slider_base_destroy(struct ui_slider_base *slider) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the minimum value.
+ * \param slider The slider component.
+ * \param min The minimum value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_set_min(struct ui_slider_base *slider, float min) {
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -309,6 +374,12 @@ ui_error_t ui_slider_base_set_min(struct ui_slider_base *slider, float min) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the maximum value.
+ * \param slider The slider component.
+ * \param max The maximum value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_set_max(struct ui_slider_base *slider, float max) {
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -324,6 +395,12 @@ ui_error_t ui_slider_base_set_max(struct ui_slider_base *slider, float max) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the current value.
+ * \param slider The slider component.
+ * \param value The value to set.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_set_value(struct ui_slider_base *slider,
                                     float value) {
   if (!slider)
@@ -358,6 +435,12 @@ ui_error_t ui_slider_base_set_value(struct ui_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the current value.
+ * \param slider The slider component.
+ * \param out_value Pointer to store the value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_get_value(const struct ui_slider_base *slider,
                                     float *out_value) {
   if (!slider || !out_value)
@@ -366,6 +449,12 @@ ui_error_t ui_slider_base_get_value(const struct ui_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the step value.
+ * \param slider The slider component.
+ * \param step The step value.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_set_step(struct ui_slider_base *slider, float step) {
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -376,6 +465,12 @@ ui_error_t ui_slider_base_set_step(struct ui_slider_base *slider, float step) {
                                   slider->value); /* Re-snap if necessary */
 }
 
+/**
+ * \brief Sets the disabled state.
+ * \param slider The slider component.
+ * \param disabled The disabled state.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_set_disabled(struct ui_slider_base *slider,
                                        int disabled) {
   if (!slider)
@@ -385,6 +480,13 @@ ui_error_t ui_slider_base_set_disabled(struct ui_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the on change callback.
+ * \param slider The slider component.
+ * \param on_change The callback function.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_set_on_change(struct ui_slider_base *slider,
                                         ui_slider_on_change_t on_change,
                                         void *user_data) {
@@ -395,6 +497,12 @@ ui_error_t ui_slider_base_set_on_change(struct ui_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the value based on a normalized position (0.0 to 1.0).
+ * \param slider The slider component.
+ * \param normalized_position The normalized position.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_set_normalized_value(struct ui_slider_base *slider,
                                                float normalized_position) {
   float range;
@@ -418,6 +526,13 @@ ui_error_t ui_slider_base_set_normalized_value(struct ui_slider_base *slider,
   return ui_slider_base_set_value(slider, new_value);
 }
 
+/**
+ * \brief Processes an event.
+ * \param slider The slider component.
+ * \param event The event.
+ * \param timestamp_ms The timestamp.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_process_event(struct ui_slider_base *slider,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
@@ -460,7 +575,12 @@ ui_error_t ui_slider_base_process_event(struct ui_slider_base *slider,
 
   return UI_ERROR_NONE;
 }
-/** \brief ui_error */
+/**
+ * \brief Gets the base component for the slider.
+ * \param slider The slider component.
+ * \param out_component Pointer to store the component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_slider_base_get_component(struct ui_slider_base *slider,
                                         struct ui_component **out_component) {
   if (!slider || !out_component) {

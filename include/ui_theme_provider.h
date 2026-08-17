@@ -12,10 +12,13 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_theme_provider
  * @brief Represents a theme context in the UI tree.
  */
 struct ui_theme_provider {
+  /** @brief The base component structure. */
   struct ui_component base;
+  /** @brief Pointer to the design token dictionary for this theme. */
   struct ui_design_token_dict *tokens;
 };
 
@@ -25,7 +28,7 @@ struct ui_theme_provider {
  * @param arena The memory arena to allocate from.
  * @param tokens The design token dictionary to provide to children.
  * @param out_provider Pointer to output the initialized provider.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_theme_provider_create(struct ui_arena *arena,
                                     struct ui_design_token_dict *tokens,
@@ -37,7 +40,7 @@ ui_error_t ui_theme_provider_create(struct ui_arena *arena,
  *
  * @param provider The theme provider.
  * @param node The DOM node to mount to.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_theme_provider_mount(struct ui_theme_provider *provider,
                                    struct ui_dom_node *node);

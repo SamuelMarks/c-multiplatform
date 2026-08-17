@@ -13,39 +13,60 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_property_grid_base
  * @brief Opaque handle for the Property Grid component.
  */
 struct ui_property_grid_base;
 
 /**
+ * @enum ui_property_value_type
  * @brief Identifies the expected abstract type of a property value, allowing
  * the grid to automatically delegate to the correct inline editor (e.g. text
  * input vs color picker).
  */
 enum ui_property_value_type {
+  /** @brief A string property value. */
   UI_PROPERTY_VALUE_TYPE_STRING = 0,
+  /** @brief An integer property value. */
   UI_PROPERTY_VALUE_TYPE_INT = 1,
+  /** @brief A floating-point property value. */
   UI_PROPERTY_VALUE_TYPE_FLOAT = 2,
+  /** @brief A boolean property value. */
   UI_PROPERTY_VALUE_TYPE_BOOLEAN = 3,
+  /** @brief A color property value. */
   UI_PROPERTY_VALUE_TYPE_COLOR = 4,
+  /** @brief An enum property value. */
   UI_PROPERTY_VALUE_TYPE_ENUM = 5,
+  /** @brief A custom property value. */
   UI_PROPERTY_VALUE_TYPE_CUSTOM = 6
 };
 
 /**
+ * @struct ui_property_row
  * @brief Abstract definition of a single row in the property grid.
  */
 struct ui_property_row {
+  /** @brief The unique ID of the property row. */
   const char *id;
+  /** @brief The display label for the property. */
   const char *label;
-  const char *group_id; /**< Optional group this property belongs to */
+  /** @brief Optional group this property belongs to. */
+  const char *group_id;
+  /** @brief The abstract value type for the property. */
   enum ui_property_value_type type;
+  /** @brief True if the property is read-only. */
   ui_bool_t is_read_only;
 };
 
 /**
  * @brief Callback signature for providing custom component editors for specific
  * properties.
+ *
+ * @param row The property row requesting an editor.
+ * @param user_data Opaque data provided when setting the factory.
+ * @param out_editor_component Pointer to receive the instanced editor
+ * component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_property_editor_factory_fn)(
     const struct ui_property_row *row, void *user_data,

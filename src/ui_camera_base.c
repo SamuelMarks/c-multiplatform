@@ -9,6 +9,10 @@ void EMSCRIPTEN_KEEPALIVE ui_camera_base_mock_permission_response_js(struct ui_c
 #endif
 /* clang-format on */
 
+/**
+ * @struct ui_camera_base
+ * @brief Internal representation of a camera base component.
+ */
 struct ui_camera_base {
   struct ui_component *component;
   enum ui_camera_state state;
@@ -50,15 +54,15 @@ ui_error_t ui_camera_base_create(struct ui_camera_base **out_camera) {
   /* Represent the camera unstyled boundary as a video tag internally */
   rc = ui_dom_node_set_tag_name(root_node, "video");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(root_node);
-    ui_component_destroy(camera->component);
+    (void)ui_dom_node_destroy(root_node);
+    (void)ui_component_destroy(camera->component);
     C_MULTIPLATFORM_FREE(camera);
     return rc;
   }
   rc = ui_dom_node_set_attribute(root_node, "autoplay", "true");
   if (rc != UI_ERROR_NONE) {
-    ui_dom_node_destroy(root_node);
-    ui_component_destroy(camera->component);
+    (void)ui_dom_node_destroy(root_node);
+    (void)ui_component_destroy(camera->component);
     C_MULTIPLATFORM_FREE(camera);
     return rc;
   }
@@ -69,7 +73,6 @@ ui_error_t ui_camera_base_create(struct ui_camera_base **out_camera) {
 }
 
 ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera) {
-  ui_error_t rc = UI_ERROR_NONE;
   if (!camera) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -83,7 +86,6 @@ ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_camera_base_get_component(struct ui_camera_base *camera,
                                         struct ui_component **out_component) {
   if (!camera || !out_component) {
@@ -137,7 +139,6 @@ ui_error_t ui_camera_base_get_state(struct ui_camera_base *camera,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_camera_base_set_frame_callback(struct ui_camera_base *camera,
                                              ui_camera_frame_callback callback,
                                              void *user_data) {
@@ -160,13 +161,13 @@ ui_error_t ui_camera_base_mock_frame(struct ui_camera_base *camera) {
   if (camera->frame_callback) {
     ui_error_t rc = camera->frame_callback(camera, mock_data, sizeof(mock_data),
                                            1, 1, camera->frame_user_data);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_camera_base_mock_permission_response(struct ui_camera_base *camera,
                                         int granted) {

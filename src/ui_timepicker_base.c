@@ -1,3 +1,7 @@
+/**
+ * @file ui_timepicker_base.c
+ * @brief Implementation of the timepicker base component.
+ */
 /* clang-format off */
 #include "ui_timepicker_base.h"
 #include "ui_internal_mem.h"
@@ -11,21 +15,37 @@
 #define NUM_FORMAT "%02d:%02d"
 #endif
 
-/** \brief ui_timepicker_base */
+/**
+ * @struct ui_timepicker_base
+ * @brief Internal implementation of the timepicker base component.
+ */
 struct ui_timepicker_base {
+  /** @brief The current hour. */
   int hour;
+  /** @brief The current minute. */
   int minute;
+  /** @brief The current time format. */
   enum ui_timepicker_format format;
+  /** @brief Disabled state flag. */
   int disabled;
 
+  /** @brief CVA on-change callback. */
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
                               void *user_data);
+  /** @brief User data for CVA on-change callback. */
   void *cva_on_change_user_data;
 
+  /** @brief CVA on-touched callback. */
   ui_error_t (*cva_on_touched)(void *user_data);
+  /** @brief User data for CVA on-touched callback. */
   void *cva_on_touched_user_data;
 };
 
+/**
+ * @brief Triggers the CVA change callback.
+ * @param tp The timepicker component.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t trigger_cva_change(struct ui_timepicker_base *tp) {
   if (tp->cva_on_change) {
     union ui_signal_payload payload;
@@ -36,6 +56,11 @@ static ui_error_t trigger_cva_change(struct ui_timepicker_base *tp) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Triggers the CVA touched callback.
+ * @param tp The timepicker component.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t trigger_cva_touched(struct ui_timepicker_base *tp) {
   if (tp->cva_on_touched) {
     return tp->cva_on_touched(tp->cva_on_touched_user_data);
@@ -43,6 +68,12 @@ static ui_error_t trigger_cva_touched(struct ui_timepicker_base *tp) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Handles writing a value to the CVA.
+ * @param component The timepicker component.
+ * @param value The value to write.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t timepicker_cva_write_value(void *component,
                                              union ui_signal_payload value) {
   struct ui_timepicker_base *tp = (struct ui_timepicker_base *)component;
@@ -62,7 +93,13 @@ static ui_error_t timepicker_cva_write_value(void *component,
   return ui_timepicker_base_set_time(tp, h, m);
 }
 
-/** \brief timepicker_cva_register_on_change */
+/**
+ * @brief Registers the CVA on-change callback.
+ * @param component The timepicker component.
+ * @param callback The callback function.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t timepicker_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -75,6 +112,13 @@ static ui_error_t timepicker_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Registers the CVA on-touched callback.
+ * @param component The timepicker component.
+ * @param callback The callback function.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t timepicker_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_timepicker_base *tp = (struct ui_timepicker_base *)component;
@@ -85,6 +129,12 @@ static ui_error_t timepicker_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the CVA disabled state.
+ * @param component The timepicker component.
+ * @param is_disabled The disabled state flag.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t timepicker_cva_set_disabled_state(void *component,
                                                     int is_disabled) {
   struct ui_timepicker_base *tp = (struct ui_timepicker_base *)component;
@@ -94,7 +144,6 @@ static ui_error_t timepicker_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_timepicker_base_create(struct ui_timepicker_base **out_timepicker,
                           struct ui_control_value_accessor *out_cva) {
@@ -173,7 +222,6 @@ ui_error_t ui_timepicker_base_set_time(struct ui_timepicker_base *timepicker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_timepicker_base_get_time(const struct ui_timepicker_base *timepicker,
                             int *out_hour, int *out_minute) {
@@ -187,7 +235,6 @@ ui_timepicker_base_get_time(const struct ui_timepicker_base *timepicker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_timepicker_base_get_formatted_time */
 ui_error_t ui_timepicker_base_get_formatted_time(
     const struct ui_timepicker_base *timepicker, int *out_hour, int *out_minute,
     enum ui_timepicker_period *out_period) {
@@ -219,7 +266,6 @@ ui_error_t ui_timepicker_base_get_formatted_time(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
                                          enum ui_timepicker_format format) {
   if (!timepicker) {
@@ -229,7 +275,6 @@ ui_error_t ui_timepicker_base_set_format(struct ui_timepicker_base *timepicker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_timepicker_base_get_format(const struct ui_timepicker_base *timepicker,
                               enum ui_timepicker_format *out_format) {
@@ -240,7 +285,6 @@ ui_timepicker_base_get_format(const struct ui_timepicker_base *timepicker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
                                    char **out_string) {

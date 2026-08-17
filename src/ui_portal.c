@@ -1,13 +1,28 @@
+/**
+ * \file ui_portal.c
+ * \brief Implementation of DOM portaling (mounting content in a different part
+ * of the tree).
+ */
 /* clang-format off */
 #include "ui_portal.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \struct ui_portal
+ * \brief Maintains state for portaling a DOM node to a different target.
+ */
 struct ui_portal {
   struct ui_dom_node *physical_target;
   struct ui_dom_node *content_node;
 };
 
+/**
+ * \brief Creates a new portal anchored to a specific physical target node.
+ * \param[out] out_portal Pointer to store the created portal.
+ * \param[in,out] physical_target The destination node in the DOM tree.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_portal_create(struct ui_portal **out_portal,
                             struct ui_dom_node *physical_target) {
   struct ui_portal *portal;
@@ -28,6 +43,11 @@ ui_error_t ui_portal_create(struct ui_portal **out_portal,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a portal and unmounts its content.
+ * \param[in,out] portal The portal to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_portal_destroy(struct ui_portal *portal) {
   if (!portal) {
     return UI_ERROR_NONE;
@@ -47,6 +67,12 @@ ui_error_t ui_portal_destroy(struct ui_portal *portal) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the content node to be portaled to the target.
+ * \param[in,out] portal The portal.
+ * \param[in,out] content_node The DOM node to portal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_portal_set_content(struct ui_portal *portal,
                                  struct ui_dom_node *content_node) {
   ui_error_t rc;
@@ -75,6 +101,12 @@ ui_error_t ui_portal_set_content(struct ui_portal *portal,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the current content node portaled by this portal.
+ * \param[in] portal The portal.
+ * \param[out] out_content Pointer to store the content node.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_portal_get_content(const struct ui_portal *portal,
                                  struct ui_dom_node **out_content) {
   if (!portal || !out_content) {

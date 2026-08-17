@@ -16,9 +16,10 @@ extern "C" {
  * Drives the renderer clock using Audio PTS as the master clock.
  */
 struct ui_av_sync {
-  ui_int64 master_clock_us;
-  ui_int64 last_update_sys_us;
-  int has_audio;
+  ui_int64 master_clock_us; /**< Current master clock time in microseconds */
+  ui_int64
+      last_update_sys_us; /**< System time at last update in microseconds */
+  int has_audio; /**< Non-zero if audio is present and driving the clock */
 };
 
 /**

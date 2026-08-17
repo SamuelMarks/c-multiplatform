@@ -1,3 +1,7 @@
+/**
+ * @file ui_toolbar_base.c
+ * @brief Implementation of the toolbar base component.
+ */
 /* clang-format off */
 #include "ui_toolbar_base.h"
 #include "ui_internal_mem.h"
@@ -5,10 +9,18 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @struct ui_toolbar_base
+ * @brief Internal implementation of the toolbar component.
+ */
 struct ui_toolbar_base {
+  /** @brief The toolbar title string. */
   char *title;
+  /** @brief The toolbar layout mode. */
   enum ui_toolbar_mode mode;
+  /** @brief The alignment mode. */
   enum ui_toolbar_alignment alignment;
+  /** @brief Data signal bound to the toolbar. */
   struct ui_signal *data_signal;
 };
 
@@ -123,7 +135,6 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
 ui_error_t ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
                                          enum ui_toolbar_alignment alignment) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -139,7 +150,6 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_toolbar_base_get_alignment(const struct ui_toolbar_base *toolbar,
                               enum ui_toolbar_alignment *out_alignment) {

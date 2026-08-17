@@ -1,28 +1,41 @@
+/**
+ * \file ui_resizable_behavior.c
+ * \brief Implementation of the UI Resizable Behavior component.
+ */
+
 /* clang-format off */
 #include "ui_resizable_behavior.h"
 #include <stdlib.h>
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \brief Internal structure representing a resizable behavior instance.
+ */
 struct ui_resizable_behavior {
-  unsigned int allowed_edges;
-  int min_w;
-  int min_h;
-  int max_w;
-  int max_h;
+  unsigned int allowed_edges; /**< Edges allowed to be resized */
+  int min_w;                  /**< Minimum width (-1 for none) */
+  int min_h;                  /**< Minimum height (-1 for none) */
+  int max_w;                  /**< Maximum width (-1 for none) */
+  int max_h;                  /**< Maximum height (-1 for none) */
 
-  ui_resizable_on_resize_t on_resize;
-  void *user_data;
+  ui_resizable_on_resize_t on_resize; /**< Callback for size change */
+  void *user_data;                    /**< Callback user data */
 
-  int is_dragging;
-  unsigned int active_edges;
-  int start_x;
-  int start_y;
-  int start_w;
-  int start_h;
+  int is_dragging;           /**< 1 if currently dragging */
+  unsigned int active_edges; /**< Edges being dragged */
+  int start_x;               /**< Drag start X */
+  int start_y;               /**< Drag start Y */
+  int start_w;               /**< Start width */
+  int start_h;               /**< Start height */
 };
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new resizable behavior.
+ *
+ * \param out_behavior Pointer to receive the allocated behavior.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior) {
   struct ui_resizable_behavior *b;
@@ -56,6 +69,12 @@ ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a resizable behavior.
+ *
+ * \param behavior The behavior to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior) {
   if (!behavior)
@@ -64,7 +83,17 @@ ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Configures the resizable constraints and allowed edges.
+ *
+ * \param behavior The resizable behavior.
+ * \param edges Bitmask of edges that can be dragged.
+ * \param min_width Minimum width (or -1 for none).
+ * \param min_height Minimum height (or -1 for none).
+ * \param max_width Maximum width (or -1 for none).
+ * \param max_height Maximum height (or -1 for none).
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
                                 unsigned int edges, int min_width,
@@ -79,7 +108,14 @@ ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the callback to be invoked when a resize is requested.
+ *
+ * \param behavior The resizable behavior.
+ * \param on_resize The callback function.
+ * \param user_data Opaque user data for the callback.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
                                     ui_resizable_on_resize_t on_resize,
@@ -91,7 +127,16 @@ ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_resizable_behavior_process_event */
+/**
+ * \brief Processes input events to handle drag-to-resize logic.
+ *
+ * \param behavior The resizable behavior.
+ * \param event The input event.
+ * \param current_width The current width of the container.
+ * \param current_height The current height of the container.
+ * \param hit_test_thickness Thickness of the draggable edge area in pixels.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_resizable_behavior_process_event(
     struct ui_resizable_behavior *behavior, const struct ui_event *event,
     int current_width, int current_height, int hit_test_thickness) {

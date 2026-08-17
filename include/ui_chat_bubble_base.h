@@ -48,8 +48,10 @@ enum ui_chat_bubble_group_position {
  * @brief Configuration defining the topological layout of a single chat bubble.
  */
 struct ui_chat_bubble_config {
-  enum ui_chat_bubble_tail_placement tail_placement;
-  enum ui_chat_bubble_group_position group_position;
+  enum ui_chat_bubble_tail_placement
+      tail_placement; /**< Placement of the chat bubble tail */
+  enum ui_chat_bubble_group_position
+      group_position; /**< Position of the bubble within a group */
 };
 
 /**

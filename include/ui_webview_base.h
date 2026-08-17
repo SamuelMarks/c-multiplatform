@@ -1,3 +1,7 @@
+/**
+ * @file ui_webview_base.h
+ * @brief Webview base component for embedding browser contexts.
+ */
 #ifndef UI_WEBVIEW_BASE_H
 #define UI_WEBVIEW_BASE_H
 

@@ -13,8 +13,14 @@
 /* clang-format on */
 #endif
 
+/**
+ * @struct ui_e2e_headful_ctx
+ * @brief Internal representation of an end-to-end headful test context.
+ */
 struct ui_e2e_headful_ctx {
+  /** @brief OS window backend to interact with. */
   struct ui_window_backend *backend;
+  /** @brief Window handle to interact with. */
   struct ui_window *window;
 };
 

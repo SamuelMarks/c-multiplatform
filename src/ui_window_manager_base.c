@@ -1,3 +1,8 @@
+/**
+ * @file ui_window_manager_base.c
+ * @brief Implementation of the window manager base component.
+ */
+
 /* clang-format off */
 #include "ui_window_manager_base.h"
 #include "ui_internal_mem.h"
@@ -13,13 +18,15 @@ static const char *ui_window_manager_base_default_css =
     "height: 100%; "
     "}";
 
-/** \brief ui_window_manager_base */
+/**
+ * @struct ui_window_manager_base
+ * @brief Internal state for the window manager base component.
+ */
 struct ui_window_manager_base {
   struct ui_component *component;
   struct ui_computed *data_signal;
 };
 
-/** \brief ui_window_manager_base_create */
 ui_error_t ui_window_manager_base_create(
     struct ui_window_manager_base **out_window_manager) {
   struct ui_window_manager_base *wm;
@@ -91,7 +98,6 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_window_manager_base_destroy */
 ui_error_t
 ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager) {
   if (!window_manager) {
@@ -104,7 +110,6 @@ ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_window_manager_base_get_component */
 ui_error_t ui_window_manager_base_get_component(
     struct ui_window_manager_base *window_manager,
     struct ui_component **out_component) {
@@ -115,7 +120,6 @@ ui_error_t ui_window_manager_base_get_component(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_window_manager_base_bring_to_front */
 ui_error_t ui_window_manager_base_bring_to_front(
     struct ui_window_manager_base *window_manager, int window_id) {
   (void)window_id;
@@ -126,7 +130,6 @@ ui_error_t ui_window_manager_base_bring_to_front(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
                             int window_id, float delta_x, float delta_y) {
@@ -140,7 +143,6 @@ ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_window_manager_base_bind_data(struct ui_window_manager_base *widget,
                                  struct ui_computed *signal) {

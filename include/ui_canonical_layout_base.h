@@ -30,10 +30,12 @@ struct ui_canonical_layout_base;
  * @brief Configuration for creating a canonical layout.
  */
 struct ui_canonical_layout_config {
-  enum ui_window_size_class initial_size_class;
-  ui_bool_t has_leading_pane;
-  ui_bool_t has_trailing_pane;
-  ui_bool_t has_bottom_bar;
+  enum ui_window_size_class
+      initial_size_class;     /**< Initial size class of the window */
+  ui_bool_t has_leading_pane; /**< Set to UI_TRUE to enable the leading pane */
+  ui_bool_t
+      has_trailing_pane;    /**< Set to UI_TRUE to enable the trailing pane */
+  ui_bool_t has_bottom_bar; /**< Set to UI_TRUE to enable the bottom bar */
 };
 
 /**

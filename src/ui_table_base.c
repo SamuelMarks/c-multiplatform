@@ -1,3 +1,7 @@
+/**
+ * @file ui_table_base.c
+ * @brief Implementation of the table base component.
+ */
 /* clang-format off */
 #include "ui_table_base.h"
 #include "ui_internal_mem.h"
@@ -26,13 +30,24 @@ static ui_error_t mock_ui_dom_node_append_child(struct ui_dom_node *parent,
 /* MSVC Safe CRT */
 #endif
 
+/**
+ * @struct ui_table_base
+ * @brief Internal implementation of the table base component.
+ */
 struct ui_table_base {
+  /** @brief Data model containing rows, columns, and rendering logic. */
   struct ui_table_model model;
+  /** @brief Array of column configurations. */
   struct ui_table_column_config *col_configs;
+  /** @brief Number of columns. */
   size_t num_cols;
+  /** @brief Active sort configuration. */
   struct ui_table_sort_config sort_config;
+  /** @brief Active pagination configuration. */
   struct ui_table_pagination_config pagination_config;
+  /** @brief Associated selection model. */
   struct ui_selection_model *selection_model;
+  /** @brief Bound data signal. */
   struct ui_computed *data_signal;
 };
 
@@ -104,7 +119,6 @@ ui_error_t ui_table_base_destroy(struct ui_table_base *table) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_table_base_get_selection_model(struct ui_table_base *table,
                                   struct ui_selection_model **out_model) {
@@ -114,7 +128,6 @@ ui_table_base_get_selection_model(struct ui_table_base *table,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
                                 const struct ui_table_column_config *config) {
@@ -127,7 +140,6 @@ ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_table_base_set_sort_config(struct ui_table_base *table,
                               const struct ui_table_sort_config *config) {
@@ -141,7 +153,6 @@ ui_table_base_set_sort_config(struct ui_table_base *table,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_table_base_set_pagination_config */
 ui_error_t ui_table_base_set_pagination_config(
     struct ui_table_base *table,
     const struct ui_table_pagination_config *config) {
@@ -151,6 +162,11 @@ ui_error_t ui_table_base_set_pagination_config(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Helper function to get ARIA string for sort direction.
+ * @param dir The sort direction.
+ * @return The corresponding ARIA string.
+ */
 static const char *get_aria_sort_string(enum ui_table_sort_direction dir) {
   switch (dir) {
   case UI_TABLE_SORT_ASCENDING:

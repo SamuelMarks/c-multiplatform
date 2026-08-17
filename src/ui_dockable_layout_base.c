@@ -9,22 +9,28 @@
 
 #define MAX_PANELS 128
 
+/**
+ * @struct layout_node
+ * @brief Internal node representation for a docked panel.
+ */
 struct layout_node {
-  int panel_id;
-  int target_panel_id;
-  enum ui_dock_edge edge;
-  int in_use;
+  int panel_id;           /**< ID of the panel */
+  int target_panel_id;    /**< ID of the target panel it is docked to */
+  enum ui_dock_edge edge; /**< Edge it is docked to */
+  int in_use;             /**< 1 if node is in use */
 };
 
-/** \brief ui_dockable_layout_base */
+/**
+ * @struct ui_dockable_layout_base
+ * @brief Internal representation of a dockable layout.
+ */
 struct ui_dockable_layout_base {
-  struct ui_component *component;
-  struct ui_drag_drop_context *drag_ctx;
+  struct ui_component *component;        /**< The base component */
+  struct ui_drag_drop_context *drag_ctx; /**< Drag and drop context */
 
-  struct layout_node nodes[MAX_PANELS];
+  struct layout_node nodes[MAX_PANELS]; /**< Array of layout nodes */
 };
 
-/** \brief ui_error */
 ui_error_t
 ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout) {
   struct ui_dockable_layout_base *layout;
@@ -67,7 +73,6 @@ ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
                                       struct ui_component **out_component) {
@@ -78,7 +83,6 @@ ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
                                    int panel_id, int target_panel_id,
@@ -113,7 +117,6 @@ ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
                                      int panel_id) {
@@ -132,7 +135,6 @@ ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
                                   char *out_buffer, size_t buffer_size) {
@@ -167,7 +169,6 @@ ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
                                     const char *buffer) {
@@ -210,7 +211,6 @@ ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_dockable_layout_base_integrate_drag_drop */
 ui_error_t ui_dockable_layout_base_integrate_drag_drop(
     struct ui_dockable_layout_base *layout,
     struct ui_drag_drop_context *drag_ctx) {

@@ -1,3 +1,7 @@
+/**
+ * @file ui_tabs_base.c
+ * @brief Implementation of the tabs base component.
+ */
 /* clang-format off */
 #include "ui_tabs_base.h"
 #include "ui_aria.h"
@@ -17,26 +21,45 @@ static const char *ui_tabs_base_default_css =
     ".ui-tablist { display: flex; flex-direction: row; } "
     ".ui-tabpanels { display: flex; flex-direction: column; flex: 1; }";
 
-/** \brief ui_tab_entry */
+/**
+ * @struct ui_tab_entry
+ * @brief Internal representation of a single tab.
+ */
 struct ui_tab_entry {
+  /** @brief The tab identifier. */
   char *id;
+  /** @brief The DOM node for the tab header. */
   struct ui_dom_node *header_node;
+  /** @brief The DOM node for the tab panel. */
   struct ui_dom_node *panel_node;
 };
 
-/** \brief ui_tabs_base */
+/**
+ * @struct ui_tabs_base
+ * @brief Internal implementation of the tabs base component.
+ */
 struct ui_tabs_base {
+  /** @brief The underlying UI component. */
   struct ui_component *component;
+  /** @brief The tab list container DOM node. */
   struct ui_dom_node *tablist_node;
+  /** @brief The panels container DOM node. */
   struct ui_dom_node *panels_node;
 
+  /** @brief Array of tab entries. */
   struct ui_tab_entry *tabs;
+  /** @brief Number of active tabs. */
   int tab_count;
+  /** @brief Allocated capacity for tabs. */
   int tab_capacity;
 
+  /** @brief The active tab index. */
   int active_index;
+  /** @brief On change callback. */
   ui_tabs_on_change_t on_change;
+  /** @brief User data for callback. */
   void *user_data;
+  /** @brief Signal bound for active index. */
   struct ui_signal *active_index_signal;
 };
 
@@ -190,6 +213,12 @@ ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Duplicates a string using multiplatform malloc.
+ * @param src The source string.
+ * @param out_str Pointer to receive the duplicated string.
+ * @return UI_ERROR_NONE on success, or an error code.
+ */
 static ui_error_t duplicate_string(const char *src, char **out_str) {
   size_t len;
   char *dst;
@@ -207,6 +236,14 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Formats an identifier by combining a prefix and a suffix.
+ * @param buf The output buffer.
+ * @param buf_size The size of the output buffer.
+ * @param prefix The prefix string.
+ * @param suffix The suffix string.
+ * @return UI_ERROR_NONE on success, or an error code.
+ */
 static ui_error_t format_id(char *buf, size_t buf_size, const char *prefix,
                             const char *suffix) {
   (void)buf_size;

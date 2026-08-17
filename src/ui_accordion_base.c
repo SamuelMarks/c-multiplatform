@@ -22,6 +22,11 @@ static ui_error_t mock_set_expanded(struct ui_disclosure_base *d, int val) {
 #endif
 /* clang-format on */
 
+/**
+ * @struct ui_accordion_base
+ * @brief Represents an accordion manager that synchronizes a group of
+ * disclosures.
+ */
 struct ui_accordion_base {
   struct ui_disclosure_base **disclosures;
   size_t count;
@@ -44,8 +49,9 @@ on_child_disclosure_toggle(struct ui_disclosure_base *disclosure,
       accordion->active_disclosure = NULL;
       if (accordion->on_change) {
         rc = accordion->on_change(accordion, NULL, accordion->user_data);
-        if (rc != UI_ERROR_NONE)
+        if (rc != UI_ERROR_NONE) {
           return rc;
+        }
       }
     }
     return rc;
@@ -61,30 +67,27 @@ on_child_disclosure_toggle(struct ui_disclosure_base *disclosure,
     if (accordion->disclosures[i] != disclosure) {
       rc = ui_disclosure_base_is_expanded(accordion->disclosures[i],
                                           &check_expanded);
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
       if (check_expanded) {
         rc = ui_disclosure_base_set_expanded(accordion->disclosures[i], 0);
-        if (rc != UI_ERROR_NONE)
+        if (rc != UI_ERROR_NONE) {
           return rc;
+        }
       }
     }
   }
 
   if (accordion->on_change) {
     rc = accordion->on_change(accordion, disclosure, accordion->user_data);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
   return rc;
 }
 
-/**
- * @brief Creates a new accordion base manager.
- *
- * @param out_accordion Pointer to receive the allocated accordion.
- * @return UI_ERROR_NONE on success.
- */
 ui_error_t ui_accordion_base_create(struct ui_accordion_base **out_accordion) {
   struct ui_accordion_base *accordion;
 
@@ -104,29 +107,26 @@ ui_error_t ui_accordion_base_create(struct ui_accordion_base **out_accordion) {
   accordion->active_disclosure = NULL;
   accordion->on_change = NULL;
   accordion->user_data = NULL;
+  accordion->data_signal = NULL;
 
   *out_accordion = accordion;
   return UI_ERROR_NONE;
 }
 
-/**
- * @brief Destroys an accordion base manager.
- * Note: This does not destroy the individual ui_disclosure_base components.
- *
- * @param accordion The accordion to destroy.
- */
 ui_error_t ui_accordion_base_destroy(struct ui_accordion_base *accordion) {
   size_t i;
   ui_error_t rc;
-  if (!accordion)
+  if (!accordion) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   /* Unhook callbacks to prevent dangling pointers */
   for (i = 0; i < accordion->count; ++i) {
     rc =
         ui_disclosure_base_set_on_toggle(accordion->disclosures[i], NULL, NULL);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
 
   C_MULTIPLATFORM_FREE(accordion->disclosures);
@@ -134,25 +134,20 @@ ui_error_t ui_accordion_base_destroy(struct ui_accordion_base *accordion) {
   return UI_ERROR_NONE;
 }
 
-/**
- * @brief Adds a disclosure to the accordion group.
- *
- * @param accordion The accordion manager.
- * @param disclosure The disclosure component to add.
- * @return UI_ERROR_NONE on success.
- */
 ui_error_t
 ui_accordion_base_add_disclosure(struct ui_accordion_base *accordion,
                                  struct ui_disclosure_base *disclosure) {
   size_t i;
   ui_error_t rc;
 
-  if (!accordion || !disclosure)
+  if (!accordion || !disclosure) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   for (i = 0; i < accordion->count; ++i) {
-    if (accordion->disclosures[i] == disclosure)
+    if (accordion->disclosures[i] == disclosure) {
       return UI_ERROR_NONE; /* Already added */
+    }
   }
 
   if (accordion->count >= accordion->capacity) {
@@ -161,8 +156,9 @@ ui_accordion_base_add_disclosure(struct ui_accordion_base *accordion,
         (struct ui_disclosure_base **)C_MULTIPLATFORM_REALLOC(
             accordion->disclosures,
             new_cap * sizeof(struct ui_disclosure_base *));
-    if (!new_arr)
+    if (!new_arr) {
       return UI_ERROR_OUT_OF_MEMORY;
+    }
     accordion->disclosures = new_arr;
     accordion->capacity = new_cap;
   }
@@ -170,31 +166,27 @@ ui_accordion_base_add_disclosure(struct ui_accordion_base *accordion,
   accordion->disclosures[accordion->count++] = disclosure;
   rc = ui_disclosure_base_set_on_toggle(disclosure, on_child_disclosure_toggle,
                                         accordion);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
 
   {
     int check_expanded = 0;
     rc = ui_disclosure_base_is_expanded(disclosure, &check_expanded);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
     if (check_expanded) {
       rc = on_child_disclosure_toggle(disclosure, 1, accordion);
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
     }
   }
 
   return UI_ERROR_NONE;
 }
 
-/**
- * @brief Removes a disclosure from the accordion group.
- *
- * @param accordion The accordion manager.
- * @param disclosure The disclosure component to remove.
- * @return UI_ERROR_NONE on success.
- */
 ui_error_t
 ui_accordion_base_remove_disclosure(struct ui_accordion_base *accordion,
                                     struct ui_disclosure_base *disclosure) {
@@ -202,8 +194,9 @@ ui_accordion_base_remove_disclosure(struct ui_accordion_base *accordion,
   int found = -1;
   ui_error_t rc;
 
-  if (!accordion || !disclosure)
+  if (!accordion || !disclosure) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   for (i = 0; i < accordion->count; ++i) {
     if (accordion->disclosures[i] == disclosure) {
@@ -212,12 +205,14 @@ ui_accordion_base_remove_disclosure(struct ui_accordion_base *accordion,
     }
   }
 
-  if (found == -1)
+  if (found == -1) {
     return UI_ERROR_NOT_FOUND;
+  }
 
   rc = ui_disclosure_base_set_on_toggle(disclosure, NULL, NULL);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
 
   if (accordion->active_disclosure == disclosure) {
     accordion->active_disclosure = NULL;
@@ -231,22 +226,15 @@ ui_accordion_base_remove_disclosure(struct ui_accordion_base *accordion,
   return UI_ERROR_NONE;
 }
 
-/**
- * @brief Sets the currently active (expanded) disclosure in the group.
- * Unexpands all other disclosures in this group.
- *
- * @param accordion The accordion manager.
- * @param disclosure The disclosure to set as active. If NULL, collapses all.
- * @return UI_ERROR_NONE on success.
- */
 ui_error_t ui_accordion_base_set_active(struct ui_accordion_base *accordion,
                                         struct ui_disclosure_base *disclosure) {
   size_t i;
   int valid_disclosure = 0;
   ui_error_t rc;
 
-  if (!accordion)
+  if (!accordion) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   if (disclosure) {
     for (i = 0; i < accordion->count; ++i) {
@@ -255,28 +243,26 @@ ui_error_t ui_accordion_base_set_active(struct ui_accordion_base *accordion,
         break;
       }
     }
-    if (!valid_disclosure)
+    if (!valid_disclosure) {
       return UI_ERROR_NOT_FOUND;
+    }
 
     rc = ui_disclosure_base_set_expanded(disclosure, 1);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   } else {
     for (i = 0; i < accordion->count; ++i) {
       rc = ui_disclosure_base_set_expanded(accordion->disclosures[i], 0);
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
     }
   }
 
   return UI_ERROR_NONE;
 }
-/**
- * @brief Retrieves the currently active (expanded) disclosure in the group.
- *
- * @param accordion The accordion manager.
- * @return The active disclosure, or NULL if none are expanded.
- */
+
 ui_error_t
 ui_accordion_base_get_active(const struct ui_accordion_base *accordion,
                              struct ui_disclosure_base **out_active) {
@@ -287,31 +273,17 @@ ui_accordion_base_get_active(const struct ui_accordion_base *accordion,
   return UI_ERROR_NONE;
 }
 
-/**
- * @brief Sets the callback for when the active disclosure changes.
- *
- * @param accordion The accordion manager.
- * @param on_change The callback to invoke.
- * @param user_data Opaque user data.
- * @return UI_ERROR_NONE on success.
- */
 ui_error_t ui_accordion_base_set_on_change(struct ui_accordion_base *accordion,
                                            ui_accordion_on_change_t on_change,
                                            void *user_data) {
-  if (!accordion)
+  if (!accordion) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   accordion->on_change = on_change;
   accordion->user_data = user_data;
   return UI_ERROR_NONE;
 }
 
-/**
- * @brief Binds the data property.
- *
- * @param widget The widget.
- * @param signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
- */
 ui_error_t ui_accordion_base_bind_data(struct ui_accordion_base *widget,
                                        struct ui_computed *signal) {
   if (!widget) {
@@ -320,6 +292,7 @@ ui_error_t ui_accordion_base_bind_data(struct ui_accordion_base *widget,
   widget->data_signal = signal;
   return UI_ERROR_NONE;
 }
+
 #ifdef UI_TEST_MOCK_ALLOC
 static ui_error_t mock_accordion_fail_cb(struct ui_accordion_base *a,
                                          struct ui_disclosure_base *d,
@@ -335,6 +308,7 @@ ui_error_t run_accordion_methods_coverage(void) {
   struct ui_accordion_base *accordion = NULL;
   struct ui_disclosure_base *d1 = NULL;
   struct ui_disclosure_base *d2 = NULL;
+  struct ui_disclosure_base *d3 = NULL;
 
   ui_accordion_base_create(&accordion);
   ui_disclosure_base_create(&d1);
@@ -390,7 +364,6 @@ ui_error_t run_accordion_methods_coverage(void) {
 
   /* Line 163: on_child_disclosure_toggle fails in add_disclosure */
   {
-    struct ui_disclosure_base *d3 = NULL;
     ui_disclosure_base_create(&d3);
     ui_disclosure_base_set_expanded(d3, 1);
     accordion->on_change = mock_accordion_fail_cb;

@@ -1,3 +1,7 @@
+/**
+ * @file ui_text_node_base.c
+ * @brief Implementation of the typography text node base component.
+ */
 /* clang-format off */
 #include "ui_text_node_base.h"
 #include "ui_internal_mem.h"
@@ -76,21 +80,36 @@ static ui_error_t mock_ui_font_get_vmetrics(struct ui_font *font, float size,
 
 #endif
 
-/** \brief ui_text_node_base */
+/**
+ * @struct ui_text_node_base
+ * @brief Internal implementation of the text node component.
+ */
 struct ui_text_node_base {
+  /** @brief Underlying UI component. */
   struct ui_component *component;
+  /** @brief Text layout object. */
   struct ui_text_layout *layout;
+  /** @brief Font manager. */
   struct ui_font_manager *font_manager;
 
+  /** @brief Text string. */
   char *text;
+  /** @brief Font family string. */
   char *font_family;
+  /** @brief Font size. */
   float font_size;
+  /** @brief Maximum width. */
   float max_width;
+  /** @brief Maximum lines. */
   int max_lines;
+  /** @brief Overflow behavior. */
   enum ui_text_node_overflow overflow;
 
+  /** @brief Computed layout width. */
   float computed_width;
+  /** @brief Computed layout height. */
   float computed_height;
+  /** @brief Signal for text binding. */
   struct ui_signal *text_signal;
 };
 
@@ -190,7 +209,6 @@ ui_error_t ui_text_node_base_get_text(const struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_text_node_base_set_font_manager(struct ui_text_node_base *node,
                                    struct ui_font_manager *font_manager) {
@@ -238,7 +256,6 @@ ui_error_t ui_text_node_base_set_max_lines(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_text_node_base_set_overflow(struct ui_text_node_base *node,
                                           enum ui_text_node_overflow overflow) {
   if (!node)
@@ -359,7 +376,7 @@ ui_error_t ui_text_node_base_get_layout(struct ui_text_node_base *node,
   *out_layout = node->layout;
   return UI_ERROR_NONE;
 }
-/** \brief ui_error */
+
 ui_error_t
 ui_text_node_base_get_component(struct ui_text_node_base *node,
                                 struct ui_component **out_component) {

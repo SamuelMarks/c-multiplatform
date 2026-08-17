@@ -48,9 +48,9 @@ struct ui_compositor_material_base;
  * @brief Configuration for a compositor material.
  */
 struct ui_compositor_material_config {
-  enum ui_compositor_material_type initial_type;
-  enum ui_compositor_fallback_mode fallback_mode;
-  float initial_opacity;
+  enum ui_compositor_material_type initial_type;  /**< Initial material type */
+  enum ui_compositor_fallback_mode fallback_mode; /**< Fallback mode */
+  float initial_opacity;                          /**< Initial opacity level */
 };
 
 /**

@@ -1,3 +1,7 @@
+/**
+ * \file ui_platform_detector.c
+ * \brief Implementation of platform capability detection.
+ */
 /* clang-format off */
 #include "ui_platform_detector.h"
 #include "ui_internal_mem.h"
@@ -13,11 +17,19 @@
 /* Linux capability macros */
 #endif
 
+/**
+ * \struct ui_platform_detector
+ * \brief Maintains state for queried platform capabilities (touch, mouse, etc).
+ */
 struct ui_platform_detector {
   unsigned int current_capabilities;
 };
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new platform detector and queries initial capabilities.
+ * \param[out] out_detector Pointer to store the created detector.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_platform_detector_create(struct ui_platform_detector **out_detector) {
   struct ui_platform_detector *detector;
@@ -48,6 +60,11 @@ ui_platform_detector_create(struct ui_platform_detector **out_detector) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a platform detector.
+ * \param[in,out] detector The detector to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_platform_detector_destroy(struct ui_platform_detector *detector) {
   if (detector != NULL) {
     C_MULTIPLATFORM_FREE(detector);
@@ -55,7 +72,12 @@ ui_error_t ui_platform_detector_destroy(struct ui_platform_detector *detector) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Retrieves the complete bitmask of current platform capabilities.
+ * \param[in] detector The platform detector.
+ * \param[out] out_capabilities Pointer to store the capabilities bitmask.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_platform_detector_get_capabilities(struct ui_platform_detector *detector,
                                       unsigned int *out_capabilities) {
@@ -67,7 +89,13 @@ ui_platform_detector_get_capabilities(struct ui_platform_detector *detector,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Checks if a specific capability flag is present.
+ * \param[in] detector The platform detector.
+ * \param[in] capability The capability flag to test.
+ * \param[out] out_has_capability Set to 1 if present, 0 otherwise.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_platform_detector_has_capability(struct ui_platform_detector *detector,
                                     unsigned int capability,

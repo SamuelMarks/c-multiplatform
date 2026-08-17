@@ -17,23 +17,23 @@ extern "C" {
  * @brief Represents the types of assets that can be streamed.
  */
 enum ui_asset_type {
-  UI_ASSET_TYPE_UNKNOWN = 0,
-  UI_ASSET_TYPE_IMAGE,
-  UI_ASSET_TYPE_FONT,
-  UI_ASSET_TYPE_VIDEO,
-  UI_ASSET_TYPE_AUDIO,
-  UI_ASSET_TYPE_TEXT,
-  UI_ASSET_TYPE_BINARY
+  UI_ASSET_TYPE_UNKNOWN = 0, /**< Unknown asset type */
+  UI_ASSET_TYPE_IMAGE,       /**< Image asset */
+  UI_ASSET_TYPE_FONT,        /**< Font asset */
+  UI_ASSET_TYPE_VIDEO,       /**< Video asset */
+  UI_ASSET_TYPE_AUDIO,       /**< Audio asset */
+  UI_ASSET_TYPE_TEXT,        /**< Text asset */
+  UI_ASSET_TYPE_BINARY       /**< Binary asset */
 };
 
 /**
  * @brief Represents a loaded asset.
  */
 struct ui_asset {
-  char *url;
-  enum ui_asset_type type;
-  void *data;
-  ui_uint32 size;
+  char *url; /**< The URL or path from which the asset was loaded */
+  enum ui_asset_type type; /**< The type of the loaded asset */
+  void *data;              /**< Pointer to the asset data */
+  ui_uint32 size;          /**< Size of the asset data in bytes */
 };
 
 /**

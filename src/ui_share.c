@@ -17,11 +17,25 @@
 #endif
 /* clang-format on */
 
+/**
+ * \file ui_share.c
+ * \brief Share sheet implementation.
+ */
+
+/**
+ * \brief ui_share_task structure.
+ * \details Internal state for a share task.
+ */
 struct ui_share_task {
   struct ui_promise *promise;
   struct ui_share_payload payload_copy;
 };
 
+/**
+ * \brief Checks if sharing is supported.
+ * \param out_is_available Pointer to store the result.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_share_is_supported(int *out_is_available) {
   if (!out_is_available) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -32,6 +46,12 @@ ui_error_t ui_share_is_supported(int *out_is_available) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Requests a share operation asynchronously.
+ * \param payload The payload to share.
+ * \param promise The promise to resolve when done.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_share_request_async(const struct ui_share_payload *payload,
                                   struct ui_promise *promise) {
   struct ui_share_task *task;

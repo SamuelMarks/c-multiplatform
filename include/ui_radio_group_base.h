@@ -1,6 +1,14 @@
 #ifndef UI_RADIO_GROUP_BASE_H
 #define UI_RADIO_GROUP_BASE_H
 
+/**
+ * \file ui_radio_group_base.h
+ * \brief UI Radio Group Base component.
+ *
+ * This file contains the definitions for managing a group of mutually exclusive
+ * toggles.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -11,7 +19,10 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/** \brief Opaque handle representing a radio group manager. */
 struct ui_radio_group_base;
+
+/** \brief Forward declaration of ui_toggle_base */
 struct ui_toggle_base;
 
 /**
@@ -19,7 +30,7 @@ struct ui_toggle_base;
  *
  * @param out_group Pointer to receive the allocated radio group.
  * @param out_cva Optional pointer to receive the CVA interface.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_radio_group_base_create(struct ui_radio_group_base **out_group,
@@ -30,7 +41,7 @@ ui_radio_group_base_create(struct ui_radio_group_base **out_group,
  * Note: This does not destroy the individual ui_toggle_base components.
  *
  * @param group The radio group manager to destroy.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group);
 
@@ -39,7 +50,7 @@ ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group);
  *
  * @param group The radio group manager.
  * @param toggle The toggle component to add.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
                                           struct ui_toggle_base *toggle);
@@ -61,7 +72,7 @@ ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
  *
  * @param group The radio group manager.
  * @param toggle The toggle to set as active. If NULL, unchecks all.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
                                           struct ui_toggle_base *toggle);
@@ -70,7 +81,8 @@ ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
  * @brief Retrieves the currently active (checked) toggle in the group.
  *
  * @param group The radio group manager.
- * @return The active toggle, or NULL if none are active.
+ * @param out_toggle Pointer to receive the active toggle, or NULL if none.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_radio_group_base_get_active(const struct ui_radio_group_base *group,
@@ -78,6 +90,11 @@ ui_radio_group_base_get_active(const struct ui_radio_group_base *group,
 
 /**
  * @brief Callback invoked when the active toggle in the radio group changes.
+ *
+ * @param group The radio group manager.
+ * @param active_toggle The newly active toggle.
+ * @param user_data Opaque pointer passed to the callback.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_radio_group_on_change_t)(
     struct ui_radio_group_base *group, struct ui_toggle_base *active_toggle,
@@ -89,7 +106,7 @@ typedef ui_error_t (*ui_radio_group_on_change_t)(
  * @param group The radio group manager.
  * @param on_change The callback to invoke when the active radio changes.
  * @param user_data Opaque user data passed to the callback.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_radio_group_base_set_on_change(struct ui_radio_group_base *group,
@@ -103,7 +120,7 @@ ui_radio_group_base_set_on_change(struct ui_radio_group_base *group,
  *
  * @param group The radio group manager.
  * @param event The input event.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
                                              const struct ui_event *event);

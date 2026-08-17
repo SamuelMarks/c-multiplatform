@@ -10,8 +10,9 @@ int g_bottom_app_bar_mock_fail = 0;
 static ui_error_t
 mock_component_set_default_style(struct ui_component *comp,
                                  struct ui_css_stylesheet *style) {
-  if (g_bottom_app_bar_mock_fail == 1)
+  if (g_bottom_app_bar_mock_fail == 1) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_component_set_default_style)(comp, style);
 }
 #undef ui_component_set_default_style
@@ -19,8 +20,9 @@ mock_component_set_default_style(struct ui_component *comp,
 
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *k, const char *v) {
-  if (g_bottom_app_bar_mock_fail == 2)
+  if (g_bottom_app_bar_mock_fail == 2) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_set_attribute)(node, k, v);
 }
 #undef ui_dom_node_set_attribute
@@ -32,23 +34,23 @@ ui_error_t run_bottom_app_bar_coverage(void) {
   struct ui_bottom_app_bar_base *bar = NULL;
 
   g_bottom_app_bar_mock_fail = 1;
-  ui_bottom_app_bar_base_create(&bar);
+  (void)ui_bottom_app_bar_base_create(&bar);
   g_bottom_app_bar_mock_fail = 0;
 
-  ui_bottom_app_bar_base_create(&bar);
+  (void)ui_bottom_app_bar_base_create(&bar);
 
   g_bottom_app_bar_mock_fail = 2;
-  ui_bottom_app_bar_base_set_fab(bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER);
-  g_bottom_app_bar_mock_fail = 0;
-
-  g_bottom_app_bar_mock_fail = 2;
-  ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
-                                 UI_BOTTOM_APP_BAR_FAB_CENTER);
+  (void)ui_bottom_app_bar_base_set_fab(bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER);
   g_bottom_app_bar_mock_fail = 0;
 
   g_bottom_app_bar_mock_fail = 2;
-  ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
-                                 UI_BOTTOM_APP_BAR_FAB_END);
+  (void)ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
+                                       UI_BOTTOM_APP_BAR_FAB_CENTER);
+  g_bottom_app_bar_mock_fail = 0;
+
+  g_bottom_app_bar_mock_fail = 2;
+  (void)ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
+                                       UI_BOTTOM_APP_BAR_FAB_END);
   g_bottom_app_bar_mock_fail = 0;
 
   (void)ui_bottom_app_bar_base_destroy(bar);
@@ -74,7 +76,10 @@ static const char *ui_bottom_app_bar_default_css =
     "clip-path: var(--bottom-app-bar-cutout, none); "
     "}";
 
-/** \brief ui_bottom_app_bar_base */
+/**
+ * @struct ui_bottom_app_bar_base
+ * @brief Internal implementation of the bottom app bar base component.
+ */
 struct ui_bottom_app_bar_base {
   struct ui_component *component;
   struct ui_fab_base *fab;
@@ -82,7 +87,6 @@ struct ui_bottom_app_bar_base {
   struct ui_signal *active_index_signal;
 };
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar) {
   struct ui_bottom_app_bar_base *bar;
@@ -160,7 +164,6 @@ ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
                                      struct ui_component **out_component) {
@@ -171,7 +174,6 @@ ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
                                struct ui_fab_base *fab,
@@ -192,26 +194,28 @@ ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
       rc = ui_dom_node_set_attribute(
           bar->component->shadow_root, "style",
           "--bottom-app-bar-cutout: circle(50% at 50% 0);");
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
     } else {
       rc = ui_dom_node_set_attribute(
           bar->component->shadow_root, "style",
           "--bottom-app-bar-cutout: circle(50% at 90% 0);");
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
     }
   } else {
     rc = ui_dom_node_set_attribute(bar->component->shadow_root, "style",
                                    "--bottom-app-bar-cutout: none;");
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
 
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_bottom_app_bar_base_bind_active_index(struct ui_bottom_app_bar_base *widget,
                                          struct ui_signal *signal) {

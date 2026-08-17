@@ -46,27 +46,52 @@ To achieve zero-overhead performance on subsequent runs, the runtime format must
 - [ ] **C Code Emission:** For each node in the AST, output the exact C API calls as strings to a file (`.c` and `.h`).
   - *Example output for instantiation:*
     ```c
+    ui_error_t rc;
     struct ui_input_base *input_email = NULL;
     struct ui_control_value_accessor *cva_email = NULL;
+    struct ui_form_control *ctrl_email = NULL;
 
     /* Engine standard goto cleanup enforcement */
-    if (ui_input_base_create(&input_email, &cva_email) != UI_SUCCESS) goto cleanup;
+    rc = ui_input_base_create(&input_email, &cva_email);
+    if (rc != UI_ERROR_NONE) goto cleanup;
 
-    struct ui_form_control *ctrl_email = ui_form_group_get_control(form, "email");
-    ui_form_control_bind_cva(ctrl_email, cva_email);
-    ui_dom_append_child(parent_node, input_email->node);
+    rc = ui_form_group_get_control(&ctrl_email, form, "email");
+    if (rc != UI_ERROR_NONE) goto cleanup;
+
+    rc = ui_form_control_bind_cva(ctrl_email, cva_email);
+    if (rc != UI_ERROR_NONE) goto cleanup;
+
+    rc = ui_dom_append_child(parent_node, input_email->node);
+    if (rc != UI_ERROR_NONE) goto cleanup;
     ```
   - *Example output for Conditional Logic (Skip Logic):*
     ```c
     /* Emitting reactive bindings for conditional visibility */
-    struct ui_computed *show_q2 = ui_computed_create(engine, ...); /* logic extracted from schema */
-    ui_component_bind_visibility(q2_container, show_q2);
+    ui_error_t rc;
+    struct ui_computed *show_q2 = NULL;
+
+    rc = ui_computed_create(&show_q2, engine, ...); /* logic extracted from schema */
+    if (rc != UI_ERROR_NONE) goto cleanup;
+
+    rc = ui_component_bind_visibility(q2_container, show_q2);
+    if (rc != UI_ERROR_NONE) goto cleanup;
     ```
   - *Example output for Validation:*
     ```c
     /* Emitting native validator mappings */
-    ui_form_control_add_validator(ctrl_email, ui_validators_required());
-    ui_form_control_add_validator(ctrl_email, ui_validators_pattern("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"));
+    ui_error_t rc;
+    struct ui_validator *req_val = NULL;
+    struct ui_validator *pat_val = NULL;
+
+    rc = ui_validators_required(&req_val);
+    if (rc != UI_ERROR_NONE) goto cleanup;
+    rc = ui_form_control_add_validator(ctrl_email, req_val);
+    if (rc != UI_ERROR_NONE) goto cleanup;
+
+    rc = ui_validators_pattern(&pat_val, "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
+    if (rc != UI_ERROR_NONE) goto cleanup;
+    rc = ui_form_control_add_validator(ctrl_email, pat_val);
+    if (rc != UI_ERROR_NONE) goto cleanup;
     ```
 - [ ] **Identifier Generation:** Generate unique, safe C variable names based on the schema's IDs or hierarchy depth to prevent symbol collisions in the generated code.
 - [ ] **Memory & Error Handling Emission:** Ensure the generated code strictly adheres to the engine's `goto cleanup` error percolation strategy. Every generated `_create` call must check for `NULL` or failure enum and jump to a generated cleanup block, ensuring safe memory management under the Arena/Pool models.
@@ -141,3 +166,39 @@ To satisfy the 100% coverage and architectural mandates outlined in `PLAN_QUALIT
 - [ ] **Parser Error Path & Fuzzing (Zero-Leak):** The dynamic JSON/XML schema parser must undergo strict error path stress testing (mocking `malloc` failures during string parsing, supplying malformed JSON structures, providing invalid component names) to mathematically prove the Arena allocator and `goto cleanup` percolation prevents memory leaks (verified via ASAN and Valgrind).
 - [ ] **Dynamic Context Memory Safety:** The `ui_dynamic_context` bridging dictionary must be exhaustively tested to ensure dynamically bound form controls and signals correctly sever their references during unmount, preventing dangling pointers when navigating between pages in Runtime mode.
 - [ ] **FFI Bindings for Schema Injection:** The unified `ui_app_load` function must be safely exposed via automated FFI bindings (Rust's `sys` crate, C#'s `DllImport`, Python/Go extensions). This allows host applications written in managed languages to push JSON schema payloads or pre-compiled C function pointers down into the native engine seamlessly across the language boundary.
+
+## 11. Core Quality, Architecture & Build Mandates
+To ensure the highest level of robustness and cross-platform compatibility, the following mandates must be strictly adhered to across all implementations (Runtime, AoT, and Core Engine):
+
+- **Core Workflow:**
+  - Use `FetchContent_MakeAvailable` instead of `FetchContent_Populate`.
+  - Identify and fix any current CI, test, or build failures locally.
+  - If `vcpkg` is needed, use `DCMAKE_TOOLCHAIN_FILE="~/repos/vcpkg/scripts/buildsystems/vcpkg.cmake"` rather than a new vcpkg install to save disk space.
+  - Ensure changes are incremental, idempotent, and leave the workspace in a clean, compilable state.
+  - Always use `master` (no specific git commit hash) anytime you depend on specific external projects: `c-fs`, `c-abstract-http`, `c-orm`, `cdd-c`.
+
+- **Standards & Architecture:**
+  - **Strict C89 Compliance:** The entire codebase must strictly conform to ISO C90 (C89). No C99/C11 features (e.g., no `//` comments, variables must be declared at the top of scopes).
+  - **Function Signatures:** Every non-void, non-math function MUST return an error enum. Output values must be passed via pointer arguments.
+  - **Error Percolation:** Percolate errors assertively. Example: `enum error_type rc; rc = f(); if (rc != NO_ERROR) /* handle error */; rc = g();`
+  - **Coverage:** Maintain exactly 100% Doxygen-style documentation coverage and 100% test coverage across the codebase.
+  - **Header Guards:** Carefully guard any POSIX/C99 headers (like `<stdint.h>`, `<stdbool.h>`, `<unistd.h>`) that are unavailable on older MSVC versions to prevent compilation errors.
+  - **C++ Interop:** Every public header should be wrapped in `#ifdef __cplusplus` and `#endif /* __cplusplus */` (maximum one time per file).
+
+- **Platform & CMake Support:**
+  - **Target Environments:** MSVC 2005, MSVC 2022, MSVC 2026, MinGW, Cygwin, Clang, and GCC. On Windows, macOS, Linux.
+  - **CMake Options:** The build system and codebase must flawlessly support toggling:
+    - CRT Linkage: Static (`/MT`, `/MTd`) and Shared (`/MD`, `/MDd`).
+    - Charsets: UNICODE and ANSI.
+    - Threading: Multi-threaded and Single-threaded.
+    - Linking: Link-Time Optimization (LTO), Static library, and Shared library targets.
+    - MSVC Runtime Checks: `/RTC1`, `/RTCs`, and `/RTCu`.
+
+- **Windows & MSVC Optimizations:**
+  - **No `windows.h`:** Do NOT `#include <windows.h>` anywhere to prevent binary bloat. Use specific headers (like `<winsock2.h>`) or forward-declare what you need.
+  - **Safe CRT:** Litter the codebase with MSVC "Safe CRT" functions (e.g., `sprintf_s`, `strcpy_s`) for added buffer safety. These MUST be carefully guarded via `#if defined(_MSC_VER)`, seamlessly falling back to standard C89 functions for GCC/Clang/MinGW.
+  - **Format Specifiers:** Abstract `printf`/formatting strings via macros (e.g., `#define NUM_FORMAT "%I64d"` for MSVC vs `"%lld"`/`"%ld"` for others) guarded by compiler checks.
+
+- **Formatting:**
+  - **Clang-Format Safety:** Every `#include` block should be wrapped in `/* clang-format off */` and `/* clang-format on */` to preserve strict include ordering, ensuring casual runs of `clang-format` do not break header dependencies. Maximum one occurrence of `/* clang-format off */` and `/* clang-format on */` per file.
+  - **Post-Edit Formatting:** Run `fd -eh -ec -x clang-format -i --style=LLVM` when modifications are done.

@@ -1,3 +1,7 @@
+/**
+ * \file ui_engine_core.c
+ * \brief Core UI engine implementation.
+ */
 /* clang-format off */
 #include <stddef.h>
 #include "../include/ui_engine.h"
@@ -12,6 +16,10 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \struct ui_engine
+ * \brief The main UI engine structure.
+ */
 struct ui_engine {
   struct ui_tick_engine *tick_engine;
   struct ui_thread_pool *thread_pool;
@@ -19,6 +27,12 @@ struct ui_engine {
   struct ui_timer *timer;
 };
 
+/**
+ * \brief Creates the UI engine.
+ * \param[in] config Configuration for the engine.
+ * \param[out] out_engine Pointer to store the created engine.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_engine_create(const struct ui_engine_config *config,
                             struct ui_engine **out_engine) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -80,6 +94,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys the UI engine.
+ * \param[in,out] engine The engine to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   if (!engine) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -104,6 +123,11 @@ ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Ticks the UI engine, advancing its state.
+ * \param[in,out] engine The engine to tick.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_engine_tick(struct ui_engine *engine) {
   ui_error_t rc = UI_ERROR_NONE;
 

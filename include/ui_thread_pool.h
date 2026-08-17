@@ -1,3 +1,7 @@
+/**
+ * @file ui_thread_pool.h
+ * @brief Defines the thread pool task executor.
+ */
 #ifndef UI_THREAD_POOL_H
 #define UI_THREAD_POOL_H
 

@@ -1,3 +1,8 @@
+/**
+ * \file ui_os_dialogs.c
+ * \brief Implementation of OS-native dialogs (file pickers, color pickers,
+ * message boxes).
+ */
 /* clang-format off */
 #include "../include/ui_os_dialogs.h"
 #include "ui_internal_mem.h"
@@ -19,6 +24,10 @@ extern int UI_WINAPI MessageBoxA(void *hWnd, const char *lpText, const char *lpC
 #endif
 /* clang-format on */
 
+/**
+ * \struct ui_os_file_task
+ * \brief Asynchronous task context for an OS file picker dialog.
+ */
 struct ui_os_file_task {
   struct ui_file_uploader_base *uploader;
   struct ui_os_file_picker_config config;
@@ -33,6 +42,11 @@ struct ui_os_color_task {
   struct ui_color_rgb result_color;
 };
 
+/**
+ * \brief Reactor callback triggered when the file picker completes.
+ * \param[in,out] user_data Pointer to the file task context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_os_file_completion(void *user_data) {
   struct ui_os_file_task *task = (struct ui_os_file_task *)user_data;
   ui_error_t rc = UI_ERROR_NONE;
@@ -42,6 +56,11 @@ ui_error_t ui_os_file_completion(void *user_data) {
   return rc;
 }
 
+/**
+ * \brief Background thread worker that actually invokes the OS file picker.
+ * \param[in,out] user_data Pointer to the file task context.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_os_file_worker(void *user_data) {
   struct ui_os_file_task *task = (struct ui_os_file_task *)user_data;
 
@@ -66,6 +85,11 @@ static ui_error_t ui_os_file_worker(void *user_data) {
   return ui_reactor_wake(task->reactor);
 }
 
+/**
+ * \brief Reactor callback triggered when the color picker completes.
+ * \param[in,out] user_data Pointer to the color task context.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_os_color_completion(void *user_data) {
   struct ui_os_color_task *task = (struct ui_os_color_task *)user_data;
   ui_error_t rc =
@@ -74,6 +98,11 @@ static ui_error_t ui_os_color_completion(void *user_data) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Background thread worker that actually invokes the OS color picker.
+ * \param[in,out] user_data Pointer to the color task context.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_os_color_worker(void *user_data) {
   struct ui_os_color_task *task = (struct ui_os_color_task *)user_data;
 
@@ -90,6 +119,13 @@ static ui_error_t ui_os_color_worker(void *user_data) {
   return ui_reactor_wake(task->reactor);
 }
 
+/**
+ * \brief Shows a native OS message box (blocking).
+ * \param[in] title The dialog title.
+ * \param[in] message The dialog message.
+ * \param[in] type The style/icon of the message box.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_os_dialog_show_message_box(const char *title, const char *message,
                                          enum ui_os_message_box_type type) {
   if (!title || !message) {
@@ -124,6 +160,15 @@ ui_error_t ui_os_dialog_show_message_box(const char *title, const char *message,
 }
 
 /** \brief ui_os_dialog_open_file_picker_async */
+/**
+ * \brief Asynchronously opens a native OS file picker.
+ * \param[in,out] uploader The file uploader base widget to receive the result.
+ * \param[in] config Optional configuration (filters, multi-select).
+ * \param[in,out] reactor The reactor to handle the result callback on the main
+ * thread.
+ * \param[in,out] pool The thread pool to execute the blocking OS call.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_os_dialog_open_file_picker_async(
     struct ui_file_uploader_base *uploader,
     const struct ui_os_file_picker_config *config, struct ui_reactor *reactor,
@@ -153,7 +198,13 @@ ui_error_t ui_os_dialog_open_file_picker_async(
   return ui_thread_pool_schedule(pool, ui_os_file_worker, task);
 }
 
-/** \brief ui_error */
+/**
+ * \brief Asynchronously opens a native OS color picker.
+ * \param[in,out] picker The color picker base widget to receive the result.
+ * \param[in,out] reactor The reactor to handle the result callback.
+ * \param[in,out] pool The thread pool to execute the blocking OS call.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_os_dialog_open_color_picker_async(struct ui_color_picker_base *picker,
                                      struct ui_reactor *reactor,

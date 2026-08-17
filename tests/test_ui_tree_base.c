@@ -1,3 +1,7 @@
+/**
+ * @file test_ui_tree_base.c
+ * @brief Tests for the tree base component.
+ */
 /* clang-format off */
 #include "ui_tree_base.h"
 #include "ui_dom_node.h"

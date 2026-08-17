@@ -1,3 +1,7 @@
+/**
+ * @file test_ui_tray_manager.c
+ * @brief Tests for the tray manager component.
+ */
 /* clang-format off */
 #include "../include/ui_image_base.h"
 #include "../include/ui_menu_base.h"

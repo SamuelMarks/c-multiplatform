@@ -292,10 +292,12 @@ ui_css_parse_counter_action(const char *str,
 }
 
 /** \brief ui_error */
-void ui_css_counter_action_destroy(struct ui_css_counter_action *actions) {
+ui_error_t
+ui_css_counter_action_destroy(struct ui_css_counter_action *actions) {
   while (actions) {
     struct ui_css_counter_action *next = actions->next;
     C_MULTIPLATFORM_FREE(actions);
     actions = next;
   }
+  return UI_ERROR_NONE;
 }

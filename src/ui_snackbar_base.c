@@ -8,6 +8,11 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * \file ui_snackbar_base.c
+ * \brief Snackbar base component implementation.
+ */
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -90,7 +95,10 @@ static const char ui_snackbar_base_css[] = {
     115, 111, 114, 58,  32,  112, 111, 105, 110, 116, 101, 114, 59,  32,  125,
     0};
 
-/* Internal representation of a queued snackbar */
+/**
+ * \brief internal_snackbar structure.
+ * \details Internal representation of a queued snackbar.
+ */
 struct internal_snackbar {
   char *message;
   char *action_label;
@@ -99,7 +107,10 @@ struct internal_snackbar {
   double duration_secs;
 };
 
-/** \brief ui_snackbar_base */
+/**
+ * \brief ui_snackbar_base structure.
+ * \details Internal state for the snackbar base component.
+ */
 struct ui_snackbar_base {
   struct ui_timer *timer;
   struct ui_overlay_director *director;
@@ -123,6 +134,13 @@ struct ui_snackbar_base {
   struct ui_computed *animating_signal;
 };
 
+/**
+ * \brief Creates a new snackbar base component.
+ * \param timer The timer instance.
+ * \param director The overlay director.
+ * \param out_snackbar Pointer to store the component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
                                    struct ui_overlay_director *director,
                                    struct ui_snackbar_base **out_snackbar) {
@@ -229,6 +247,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a snackbar base component.
+ * \param snackbar The component to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
   struct internal_snackbar pop_item;
   if (!snackbar)
@@ -270,7 +293,12 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Enqueues a new snackbar message.
+ * \param snackbar The snackbar component.
+ * \param config The configuration for the message.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_snackbar_base_enqueue(struct ui_snackbar_base *snackbar,
                                     const struct ui_snackbar_config *config) {
   struct internal_snackbar item;
@@ -312,7 +340,11 @@ ui_error_t ui_snackbar_base_enqueue(struct ui_snackbar_base *snackbar,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Dismisses the currently active snackbar message.
+ * \param snackbar The snackbar component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar) {
   if (!snackbar)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -339,6 +371,11 @@ ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Ticks the snackbar base component.
+ * \param snackbar The component to tick.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
   double now;
   ui_error_t rc;
@@ -402,6 +439,13 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Processes an event.
+ * \param snackbar The component.
+ * \param event The event.
+ * \param timestamp_ms The timestamp.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
                                           const struct ui_event *event,
                                           double timestamp_ms) {
@@ -448,6 +492,12 @@ ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the open state to a signal.
+ * \param widget The snackbar component.
+ * \param open_signal The signal to bind.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_snackbar_base_bind_open(struct ui_snackbar_base *widget,
                                       struct ui_signal *open_signal) {
   if (!widget) {
@@ -457,7 +507,12 @@ ui_error_t ui_snackbar_base_bind_open(struct ui_snackbar_base *widget,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the animating signal.
+ * \param widget The snackbar component.
+ * \param out_animating Pointer to store the computed signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_snackbar_base_get_animating_signal(struct ui_snackbar_base *widget,
                                       struct ui_computed **out_animating) {

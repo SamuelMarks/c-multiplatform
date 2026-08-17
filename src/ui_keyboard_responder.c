@@ -1,3 +1,7 @@
+/**
+ * \file ui_keyboard_responder.c
+ * \brief Implementation of keyboard event delegation and binding.
+ */
 /* clang-format off */
 #include "ui_keyboard_responder.h"
 #include "ui_bidi_manager.h"
@@ -6,6 +10,10 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \struct ui_keyboard_binding
+ * \brief Internal record of a keyboard binding for a specific role or tag.
+ */
 struct ui_keyboard_binding {
   char *role_or_tag;
   enum ui_key_code key_code;
@@ -43,6 +51,11 @@ ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a keyboard responder.
+ * \param[in,out] responder The keyboard responder to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder) {
   size_t i;

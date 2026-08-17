@@ -11,16 +11,19 @@
 int g_chart_mock_fail = -1;
 #endif
 
+/**
+ * @brief Internal representation of a chart base component.
+ */
 struct ui_chart_base {
-  struct ui_arena *arena;
-  enum ui_chart_coordinate_system coord_system;
+  struct ui_arena *arena; /**< Arena for internal allocations */
+  enum ui_chart_coordinate_system coord_system; /**< Cartesian or Polar */
 
-  struct ui_chart_scale_config x_scale;
-  struct ui_chart_scale_config y_scale;
+  struct ui_chart_scale_config x_scale; /**< Primary X (or Angle) scale */
+  struct ui_chart_scale_config y_scale; /**< Primary Y (or Radius) scale */
 
-  struct ui_dom_rect draw_bounds;
+  struct ui_dom_rect draw_bounds; /**< Physical area for drawing data */
 
-  ui_signal_t *topology_signal;
+  ui_signal_t *topology_signal; /**< Signal fired when scales/bounds change */
 };
 
 static ui_error_t void_equality(union ui_signal_payload a,

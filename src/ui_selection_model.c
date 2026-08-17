@@ -3,6 +3,15 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \file ui_selection_model.c
+ * \brief Selection model implementation.
+ */
+
+/**
+ * \brief ui_selection_model structure.
+ * \details Internal state for the selection model.
+ */
 struct ui_selection_model {
   int is_multi;
   void **selected_ids;
@@ -12,6 +21,11 @@ struct ui_selection_model {
   void *on_change_user_data;
 };
 
+/**
+ * \brief Triggers a change event on the model.
+ * \param model The selection model.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t trigger_change(struct ui_selection_model *model) {
   if (model->on_change) {
     return model->on_change(model, model->on_change_user_data);
@@ -19,6 +33,11 @@ static ui_error_t trigger_change(struct ui_selection_model *model) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new selection model.
+ * \param out_model Pointer to store the model.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_selection_model_create(struct ui_selection_model **out_model) {
   struct ui_selection_model *model;
 
@@ -43,7 +62,13 @@ ui_error_t ui_selection_model_create(struct ui_selection_model **out_model) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the on change callback.
+ * \param model The selection model.
+ * \param callback The callback function.
+ * \param user_data User data for the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_selection_model_set_on_change(struct ui_selection_model *model,
                                  ui_selection_model_on_change_t callback,
@@ -57,6 +82,11 @@ ui_selection_model_set_on_change(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a selection model.
+ * \param model The model to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_selection_model_destroy(struct ui_selection_model *model) {
   if (!model) {
     return UI_ERROR_NONE;
@@ -69,7 +99,12 @@ ui_error_t ui_selection_model_destroy(struct ui_selection_model *model) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets whether the model allows multiple selections.
+ * \param model The selection model.
+ * \param is_multi 1 for multi-select, 0 for single-select.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_selection_model_set_multi_select(struct ui_selection_model *model,
                                                int is_multi) {
   if (!model) {
@@ -87,6 +122,12 @@ ui_error_t ui_selection_model_set_multi_select(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Selects an item.
+ * \param model The selection model.
+ * \param id The item ID to select.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_selection_model_select(struct ui_selection_model *model,
                                      void *id) {
   int i;
@@ -140,6 +181,12 @@ ui_error_t ui_selection_model_select(struct ui_selection_model *model,
   return trigger_change(model);
 }
 
+/**
+ * \brief Deselects an item.
+ * \param model The selection model.
+ * \param id The item ID to deselect.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_selection_model_deselect(struct ui_selection_model *model,
                                        void *id) {
   int i;
@@ -167,6 +214,12 @@ ui_error_t ui_selection_model_deselect(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Toggles the selection state of an item.
+ * \param model The selection model.
+ * \param id The item ID to toggle.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_selection_model_toggle(struct ui_selection_model *model,
                                      void *id) {
   int i;
@@ -190,6 +243,11 @@ ui_error_t ui_selection_model_toggle(struct ui_selection_model *model,
   }
 }
 
+/**
+ * \brief Clears all selections.
+ * \param model The selection model.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_selection_model_clear(struct ui_selection_model *model) {
   if (!model) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -202,6 +260,13 @@ ui_error_t ui_selection_model_clear(struct ui_selection_model *model) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Selects multiple items.
+ * \param model The selection model.
+ * \param ids Array of item IDs to select.
+ * \param count The number of items in the array.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_selection_model_select_all(struct ui_selection_model *model,
                                          void **ids, int count) {
   int i;
@@ -240,7 +305,14 @@ ui_error_t ui_selection_model_select_all(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Checks if an item is selected.
+ * \param model The selection model.
+ * \param id The item ID.
+ * \param out_is_selected Pointer to store the result (1 if selected, 0
+ * otherwise).
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_selection_model_is_selected(const struct ui_selection_model *model, void *id,
                                int *out_is_selected) {
@@ -261,7 +333,12 @@ ui_selection_model_is_selected(const struct ui_selection_model *model, void *id,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the number of selected items.
+ * \param model The selection model.
+ * \param out_count Pointer to store the count.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_selection_model_get_selected_count(const struct ui_selection_model *model,
                                       int *out_count) {
@@ -273,7 +350,13 @@ ui_selection_model_get_selected_count(const struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the selected items.
+ * \param model The selection model.
+ * \param out_ids Array to store the selected IDs.
+ * \param capacity The capacity of the array.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_selection_model_get_selected(const struct ui_selection_model *model,
                                 void **out_ids, int capacity) {

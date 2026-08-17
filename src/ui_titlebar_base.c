@@ -1,22 +1,42 @@
+/**
+ * @file ui_titlebar_base.c
+ * @brief Implementation of the custom titlebar base component logic.
+ */
 /* clang-format off */
 #include "ui_titlebar_base.h"
 #include "ui_arena.h"
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @struct ui_titlebar_btn_rect
+ * @brief Internal representation of a button hit area in the titlebar.
+ */
 struct ui_titlebar_btn_rect {
+  /** @brief The type of button for this rect. */
   enum ui_titlebar_hit_test_result btn_type;
+  /** @brief X coordinate of the rect. */
   float x;
+  /** @brief Y coordinate of the rect. */
   float y;
+  /** @brief Width of the rect. */
   float w;
+  /** @brief Height of the rect. */
   float h;
+  /** @brief Pointer to the next button rect in the linked list. */
   struct ui_titlebar_btn_rect *next;
 };
 
-/** \brief ui_titlebar_base */
+/**
+ * @struct ui_titlebar_base
+ * @brief Internal implementation of the titlebar base component.
+ */
 struct ui_titlebar_base {
+  /** @brief Memory arena for allocations. */
   struct ui_arena *arena;
+  /** @brief The titlebar configuration. */
   struct ui_titlebar_config config;
+  /** @brief Linked list of button hit areas. */
   struct ui_titlebar_btn_rect *buttons;
 };
 
@@ -45,7 +65,6 @@ ui_error_t ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_titlebar_base_add_button_rect(struct ui_titlebar_base *titlebar,
                                  enum ui_titlebar_hit_test_result btn_type,
@@ -71,7 +90,6 @@ ui_titlebar_base_add_button_rect(struct ui_titlebar_base *titlebar,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_titlebar_base_hit_test(struct ui_titlebar_base *titlebar, float x, float y,
                           enum ui_titlebar_hit_test_result *out_result) {

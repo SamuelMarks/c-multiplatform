@@ -1,19 +1,35 @@
+/**
+ * \file ui_ring_buffer.c
+ * \brief Implementation of the UI Ring Buffer component.
+ */
+
 /* clang-format off */
-#include "../include/ui_ring_buffer.h"
-#include "../include/ui_atomic.h"
+#include "ui_ring_buffer.h"
+#include "ui_atomic.h"
 #include "ui_internal_mem.h"
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \brief Internal structure representing a ring buffer.
+ */
 struct ui_ring_buffer {
-  ui_atomic_t head;
-  ui_atomic_t tail;
-  ui_atomic_t lock;
-  size_t capacity; /* internally capacity + 1 */
-  size_t item_size;
-  void *buffer;
+  ui_atomic_t head; /**< Head index (write position) */
+  ui_atomic_t tail; /**< Tail index (read position) */
+  ui_atomic_t lock; /**< Spinlock for multi-producer writes */
+  size_t capacity;  /**< Actual capacity + 1 for empty/full distinction */
+  size_t item_size; /**< Size of each item in bytes */
+  void *buffer;     /**< Pointer to backing memory array */
 };
 
+/**
+ * \brief Creates a new lock-free ring buffer.
+ *
+ * \param item_size Size of each element in bytes.
+ * \param capacity Maximum number of elements the buffer can hold.
+ * \param out_buffer Pointer to receive the ring buffer handle.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_ring_buffer_create(size_t item_size, size_t capacity,
                                  struct ui_ring_buffer **out_buffer) {
   struct ui_ring_buffer *rb = NULL;
@@ -49,6 +65,12 @@ ui_error_t ui_ring_buffer_create(size_t item_size, size_t capacity,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a ring buffer and frees its memory.
+ *
+ * \param buffer The buffer to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_ring_buffer_destroy(struct ui_ring_buffer *buffer) {
   if (!buffer) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -59,6 +81,15 @@ ui_error_t ui_ring_buffer_destroy(struct ui_ring_buffer *buffer) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Pushes an item into the ring buffer.
+ *        Safe to call from a single producer thread.
+ *
+ * \param buffer The ring buffer.
+ * \param item Pointer to the item data to copy into the buffer.
+ * \return UI_ERROR_NONE on success, UI_ERROR_QUEUE_FULL if there is no space,
+ *         or another appropriate error code.
+ */
 ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer,
                                const void *item) {
   long head;
@@ -93,6 +124,16 @@ ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Pops an item from the ring buffer.
+ *        Safe to call from a single consumer thread.
+ *
+ * \param buffer The ring buffer.
+ * \param out_item Pointer to a pre-allocated buffer where the popped item will
+ * be copied.
+ * \return UI_ERROR_NONE on success, UI_ERROR_QUEUE_EMPTY if there are no items,
+ *         or another appropriate error code.
+ */
 ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item) {
   long head;
   long tail;
@@ -126,6 +167,15 @@ ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Pushes an item into the ring buffer safely from multiple threads.
+ *        Uses a spinlock to ensure thread-safe multi-producer access.
+ *
+ * \param buffer The ring buffer.
+ * \param item Pointer to the item data to copy into the buffer.
+ * \return UI_ERROR_NONE on success, UI_ERROR_QUEUE_FULL if there is no space,
+ *         or another appropriate error code.
+ */
 ui_error_t ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
                                   const void *item) {
   int swapped = 0;

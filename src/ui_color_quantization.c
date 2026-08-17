@@ -4,9 +4,24 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @struct ui_cluster
+ * @brief Internal representation of a color cluster for K-Means quantization.
+ */
 struct ui_cluster {
-  int r, g, b;
-  int64_t sum_r, sum_g, sum_b;
+  /** @brief Current cluster center Red component. */
+  int r;
+  /** @brief Current cluster center Green component. */
+  int g;
+  /** @brief Current cluster center Blue component. */
+  int b;
+  /** @brief Accumulated Red for centroid recalculation. */
+  int64_t sum_r;
+  /** @brief Accumulated Green for centroid recalculation. */
+  int64_t sum_g;
+  /** @brief Accumulated Blue for centroid recalculation. */
+  int64_t sum_b;
+  /** @brief Number of pixels assigned to this cluster. */
   int count;
 };
 
@@ -17,7 +32,6 @@ static int calc_color_distance(int r1, int g1, int b1, int r2, int g2, int b2) {
   return dr * dr + dg * dg + db * db;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
                          size_t height, int channels,
@@ -52,15 +66,15 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
   }
 
   clusters = (struct ui_cluster *)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_cluster) * k);
+      sizeof(struct ui_cluster) * (size_t)k);
   if (!clusters) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
   /* Initialize clusters with distinct colors from the image */
-  for (y = 0; y < height; y += step) {
-    for (x = 0; x < width; x += step) {
-      size_t idx = (y * width + x) * channels;
+  for (y = 0; y < height; y += (size_t)step) {
+    for (x = 0; x < width; x += (size_t)step) {
+      size_t idx = (y * width + x) * (size_t)channels;
       int r = pixels[idx];
       int g = pixels[idx + 1];
       int b = pixels[idx + 2];
@@ -104,8 +118,8 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
    * pixel if available */
   if (num_clusters == 0) {
     size_t idx = 0;
-    for (; idx < width * height * channels; idx += channels) {
-      if (pixels[idx + 3] >= 128) {
+    for (; idx < width * height * (size_t)channels; idx += (size_t)channels) {
+      if (channels < 4 || pixels[idx + 3] >= 128) {
         clusters[0].r = pixels[idx];
         clusters[0].g = pixels[idx + 1];
         clusters[0].b = pixels[idx + 2];
@@ -133,9 +147,9 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
       clusters[c].count = 0;
     }
 
-    for (y = 0; y < height; y += step) {
-      for (x = 0; x < width; x += step) {
-        size_t idx = (y * width + x) * channels;
+    for (y = 0; y < height; y += (size_t)step) {
+      for (x = 0; x < width; x += (size_t)step) {
+        size_t idx = (y * width + x) * (size_t)channels;
         int r = pixels[idx];
         int g = pixels[idx + 1];
         int b = pixels[idx + 2];

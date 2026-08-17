@@ -1,6 +1,15 @@
 #ifndef UI_SCROLL_DISPATCHER_H
 #define UI_SCROLL_DISPATCHER_H
 
+/**
+ * \file ui_scroll_dispatcher.h
+ * \brief UI Scroll Dispatcher component.
+ *
+ * This file contains definitions for a central dispatcher of scroll events.
+ * It allows multiple UI components to react to scrolling regardless of the
+ * scrolling container that triggered it.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -11,7 +20,9 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/** \brief Forward declaration of ui_layout_observer */
 struct ui_layout_observer;
+/** \brief Opaque handle representing a scroll dispatcher */
 struct ui_scroll_dispatcher;
 
 /**
@@ -32,6 +43,7 @@ struct ui_scroll_info {
  * @param dispatcher The scroll dispatcher emitting the event.
  * @param info Information about the scroll event.
  * @param user_data Opaque user data provided during registration.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_scroll_dispatcher_cb_t)(
     struct ui_scroll_dispatcher *dispatcher, const struct ui_scroll_info *info,
@@ -41,7 +53,7 @@ typedef ui_error_t (*ui_scroll_dispatcher_cb_t)(
  * @brief Creates a new scroll dispatcher instance.
  *
  * @param out_dispatcher Pointer to receive the created dispatcher.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher);
@@ -50,7 +62,7 @@ ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher);
  * @brief Destroys a scroll dispatcher and frees its resources.
  *
  * @param dispatcher The dispatcher to destroy.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_scroll_dispatcher_destroy(struct ui_scroll_dispatcher *dispatcher);
@@ -62,7 +74,7 @@ ui_scroll_dispatcher_destroy(struct ui_scroll_dispatcher *dispatcher);
  * @param callback The function to call when a scroll event occurs.
  * @param user_data Opaque user data to pass to the callback.
  * @param out_registration_id Pointer to receive a unique registration ID.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_scroll_dispatcher_register(struct ui_scroll_dispatcher *dispatcher,
@@ -75,7 +87,7 @@ ui_scroll_dispatcher_register(struct ui_scroll_dispatcher *dispatcher,
  * @param dispatcher The scroll dispatcher.
  * @param registration_id The ID of the callback to unregister.
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if ID doesn't exist, or
- * an error code.
+ * an appropriate error code.
  */
 ui_error_t
 ui_scroll_dispatcher_unregister(struct ui_scroll_dispatcher *dispatcher,
@@ -86,7 +98,7 @@ ui_scroll_dispatcher_unregister(struct ui_scroll_dispatcher *dispatcher,
  *
  * @param dispatcher The scroll dispatcher.
  * @param info Information about the scroll event.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_scroll_dispatcher_notify(struct ui_scroll_dispatcher *dispatcher,
                                        const struct ui_scroll_info *info);
@@ -99,7 +111,7 @@ ui_error_t ui_scroll_dispatcher_notify(struct ui_scroll_dispatcher *dispatcher,
  *
  * @param dispatcher The scroll dispatcher.
  * @param layout_observer The layout observer to integrate with.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_scroll_dispatcher_bind_layout_observer(
     struct ui_scroll_dispatcher *dispatcher,

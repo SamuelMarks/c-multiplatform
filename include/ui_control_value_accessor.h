@@ -63,10 +63,14 @@ typedef ui_error_t (*ui_cva_set_disabled_state_fn)(void *component,
  * Bridges a UI component and a form control.
  */
 struct ui_control_value_accessor {
-  ui_cva_write_value_fn write_value;
-  ui_cva_register_on_change_fn register_on_change;
-  ui_cva_register_on_touched_fn register_on_touched;
-  ui_cva_set_disabled_state_fn set_disabled_state;
+  ui_cva_write_value_fn
+      write_value; /**< Function to write a value to the component */
+  ui_cva_register_on_change_fn
+      register_on_change; /**< Function to register an on-change callback */
+  ui_cva_register_on_touched_fn
+      register_on_touched; /**< Function to register an on-touched callback */
+  ui_cva_set_disabled_state_fn
+      set_disabled_state; /**< Function to set the disabled state */
 };
 
 #ifdef __cplusplus

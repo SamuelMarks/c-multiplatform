@@ -1,9 +1,17 @@
+/**
+ * \file ui_predictive_back.c
+ * \brief Implementation of predictive back swipe gesture tracking.
+ */
 /* clang-format off */
 #include "ui_predictive_back.h"
 #include <stdlib.h>
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \struct ui_predictive_back
+ * \brief State tracker for a predictive back gesture.
+ */
 struct ui_predictive_back {
   int edge_width_px;
   int screen_width_px;
@@ -16,7 +24,11 @@ struct ui_predictive_back {
   float current_progress;
 };
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new predictive back tracker.
+ * \param[out] out_tracker Pointer to store the created tracker.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_predictive_back_create(struct ui_predictive_back **out_tracker) {
   struct ui_predictive_back *t;
 
@@ -43,6 +55,11 @@ ui_error_t ui_predictive_back_create(struct ui_predictive_back **out_tracker) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a predictive back tracker.
+ * \param[in,out] tracker The tracker to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_predictive_back_destroy(struct ui_predictive_back *tracker) {
   if (!tracker)
     return UI_ERROR_NONE;
@@ -50,6 +67,14 @@ ui_error_t ui_predictive_back_destroy(struct ui_predictive_back *tracker) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Configures the gesture thresholds for predictive back.
+ * \param[in,out] tracker The tracker to configure.
+ * \param[in] edge_width_px The width of the screen edge triggering the gesture.
+ * \param[in] screen_width_px The total width of the screen for progress
+ * calculation.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_predictive_back_configure(struct ui_predictive_back *tracker,
                                         int edge_width_px,
                                         int screen_width_px) {
@@ -60,7 +85,12 @@ ui_error_t ui_predictive_back_configure(struct ui_predictive_back *tracker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Binds the gesture progress (0.0 to 1.0) to a reactive signal.
+ * \param[in,out] tracker The tracker widget.
+ * \param[in,out] progress_signal The signal representing gesture progress.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_predictive_back_bind_progress(struct ui_predictive_back *tracker,
                                             struct ui_signal *progress_signal) {
   if (!tracker || !progress_signal)
@@ -69,6 +99,13 @@ ui_error_t ui_predictive_back_bind_progress(struct ui_predictive_back *tracker,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the gesture commit event (boolean) to a reactive signal.
+ * \param[in,out] tracker The tracker widget.
+ * \param[in,out] commit_signal The signal representing a committed back
+ * navigation.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_predictive_back_bind_commit(struct ui_predictive_back *tracker,
                                           struct ui_signal *commit_signal) {
   if (!tracker || !commit_signal)
@@ -77,7 +114,12 @@ ui_error_t ui_predictive_back_bind_commit(struct ui_predictive_back *tracker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Processes touch events to track a potential predictive back swipe.
+ * \param[in,out] tracker The tracker widget.
+ * \param[in] event The touch event to process.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_predictive_back_process_event(struct ui_predictive_back *tracker,
                                             const struct ui_event *event) {
   int tx = 0;

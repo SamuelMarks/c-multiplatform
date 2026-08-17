@@ -1,3 +1,7 @@
+/**
+ * \file ui_form_array.c
+ * \brief Implementation of form array nodes.
+ */
 /* clang-format off */
 #include "ui_form_array.h"
 #include "ui_form_node_internal.h"
@@ -5,6 +9,10 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \struct ui_form_array
+ * \brief Represents an array of form nodes.
+ */
 struct ui_form_array {
   struct ui_arena *arena;
   enum ui_signal_mode mode;
@@ -14,6 +22,13 @@ struct ui_form_array {
   size_t capacity;
 };
 
+/**
+ * \brief Creates a new form array.
+ * \param[in,out] arena The memory arena.
+ * \param[in] mode The signaling mode.
+ * \param[out] out_array Pointer to store the created form array.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_array_create(struct ui_arena *arena,
                                 enum ui_signal_mode mode,
                                 ui_form_array_t **out_array) {
@@ -38,6 +53,12 @@ ui_error_t ui_form_array_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Pushes a form node to the end of the array.
+ * \param[in,out] array The form array.
+ * \param[in] node The form node to push.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
   ui_form_node_t *new_nodes = NULL;
   size_t new_cap;
@@ -66,6 +87,13 @@ ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Inserts a form node at a specific index.
+ * \param[in,out] array The form array.
+ * \param[in] index The index to insert at.
+ * \param[in] node The form node to insert.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
                                    ui_form_node_t node) {
   ui_form_node_t *new_nodes = NULL;
@@ -100,6 +128,12 @@ ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Removes a form node at a specific index.
+ * \param[in,out] array The form array.
+ * \param[in] index The index to remove from.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_array_remove_at(ui_form_array_t *array, size_t index) {
   size_t i;
   if (!array)
@@ -115,6 +149,11 @@ ui_error_t ui_form_array_remove_at(ui_form_array_t *array, size_t index) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Clears all form nodes from the array.
+ * \param[in,out] array The form array.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_array_clear(ui_form_array_t *array) {
   if (!array)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -122,6 +161,13 @@ ui_error_t ui_form_array_clear(ui_form_array_t *array) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets a form node at a specific index.
+ * \param[in] array The form array.
+ * \param[in] index The index of the node.
+ * \param[out] out_node Pointer to store the retrieved node.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_array_get_node(ui_form_array_t *array, size_t index,
                                   ui_form_node_t *out_node) {
   if (!array || !out_node)
@@ -133,7 +179,14 @@ ui_error_t ui_form_array_get_node(ui_form_array_t *array, size_t index,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Internal function to get the validation status of a form array
+ * recursively.
+ * \param[in] array The form array.
+ * \param[out] out_status Pointer to store the aggregated status.
+ * \param[in] depth The current recursion depth.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t _ui_form_array_get_status_internal(struct ui_form_array *array,
                                               enum ui_form_status *out_status,
                                               size_t depth) {
@@ -163,11 +216,22 @@ ui_error_t _ui_form_array_get_status_internal(struct ui_form_array *array,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the aggregated validation status of a form array.
+ * \param[in] array The form array.
+ * \param[out] out_status Pointer to store the status.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_array_get_status(ui_form_array_t *array,
                                     enum ui_form_status *out_status) {
   return _ui_form_array_get_status_internal(array, out_status, 0);
 }
 
+/**
+ * \brief Destroys a form array.
+ * \param[in,out] array The form array to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_array_destroy(ui_form_array_t *array) {
   if (!array)
     return UI_ERROR_INVALID_ARGUMENT;

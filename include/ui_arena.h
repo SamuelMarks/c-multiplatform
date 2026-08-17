@@ -54,9 +54,12 @@ ui_error_t ui_arena_alloc(struct ui_arena *arena, size_t size, size_t alignment,
  */
 ui_error_t ui_arena_reset(struct ui_arena *arena);
 
+/**
+ * @brief Represents a savepoint in the arena for rollback.
+ */
 struct ui_arena_savepoint {
-  struct ui_arena_block *block;
-  size_t used;
+  struct ui_arena_block *block; /**< The block active at the savepoint. */
+  size_t used; /**< The amount of memory used in the block at the savepoint. */
 };
 /**
  * @brief Saves the current allocation state of the arena.

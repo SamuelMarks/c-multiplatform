@@ -1,3 +1,7 @@
+/**
+ * \file ui_label_base.c
+ * \brief Implementation of the UI label base component.
+ */
 /* clang-format off */
 #include "ui_label_base.h"
 #include "ui_internal_mem.h"
@@ -7,6 +11,10 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \struct ui_label_base
+ * \brief Represents a label component, capable of targeting another DOM node.
+ */
 struct ui_label_base {
   struct ui_component *component;
   char *target_id;
@@ -14,6 +22,11 @@ struct ui_label_base {
   struct ui_signal *text_signal;
 };
 
+/**
+ * \brief Creates a new label base component.
+ * \param[out] out_label Pointer to store the created label.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_label_base_create(struct ui_label_base **out_label) {
   struct ui_label_base *lbl;
   ui_error_t rc;
@@ -65,6 +78,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a label base component.
+ * \param[in,out] label The label component to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_label_base_destroy(struct ui_label_base *label) {
   if (!label) {
     return UI_ERROR_NONE;
@@ -80,6 +98,13 @@ ui_error_t ui_label_base_destroy(struct ui_label_base *label) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the "for" attribute of the label, identifying the target element
+ * by ID.
+ * \param[in,out] label The label component.
+ * \param[in] target_id The ID of the target element.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_label_base_set_for(struct ui_label_base *label,
                                  const char *target_id) {
   size_t len;
@@ -118,6 +143,12 @@ ui_error_t ui_label_base_set_for(struct ui_label_base *label,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Directly associates the label with a target DOM node.
+ * \param[in,out] label The label component.
+ * \param[in,out] target_node The target DOM node.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_label_base_set_target_node(struct ui_label_base *label,
                                          struct ui_dom_node *target_node) {
   if (!label) {
@@ -128,6 +159,14 @@ ui_error_t ui_label_base_set_target_node(struct ui_label_base *label,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Processes UI events for the label (e.g., clicking the label to focus
+ * the target).
+ * \param[in,out] label The label component.
+ * \param[in] event The UI event.
+ * \param[in] timestamp_ms Event timestamp in milliseconds.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_label_base_process_event(struct ui_label_base *label,
                                        const struct ui_event *event,
                                        double timestamp_ms) {
@@ -144,6 +183,12 @@ ui_error_t ui_label_base_process_event(struct ui_label_base *label,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the underlying DOM component of the label.
+ * \param[in] label The label component.
+ * \param[out] out_component Pointer to store the DOM component.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_label_base_get_component(struct ui_label_base *label,
                                        struct ui_component **out_component) {
   if (!label || !out_component) {
@@ -153,6 +198,12 @@ ui_error_t ui_label_base_get_component(struct ui_label_base *label,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the label's text content to a reactive signal.
+ * \param[in,out] widget The label component.
+ * \param[in,out] signal The signal providing the text.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_label_base_bind_text(struct ui_label_base *widget,
                                    struct ui_signal *signal) {
   if (!widget) {

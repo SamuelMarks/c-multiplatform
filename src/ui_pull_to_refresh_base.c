@@ -1,3 +1,8 @@
+/**
+ * \file ui_pull_to_refresh_base.c
+ * \brief Implementation of the UI Pull-to-Refresh Base component.
+ */
+
 /* clang-format off */
 #include "ui_pull_to_refresh_base.h"
 #include "ui_gesture.h"
@@ -8,26 +13,38 @@
 #include <math.h>
 /* clang-format on */
 
+/** \brief Distance threshold to trigger a refresh */
 #define UI_PTR_THRESHOLD 100.0f
+/** \brief Spring rate for returning to idle */
 #define UI_PTR_SPRING_RATE 0.85f
+/** \brief Delay before completing the refresh visual state */
 #define UI_PTR_COMPLETION_DELAY_MS 300.0f
 
-/** \brief ui_pull_to_refresh_base */
+/**
+ * \brief Internal structure representing a pull-to-refresh component.
+ */
 struct ui_pull_to_refresh_base {
-  struct ui_component *component;
-  struct ui_component *spinner_comp;
-  struct ui_gesture_recognizer *gesture_recognizer;
+  struct ui_component *component;    /**< Underlying DOM container */
+  struct ui_component *spinner_comp; /**< Child spinner component */
+  struct ui_gesture_recognizer *gesture_recognizer; /**< Gesture recognizer */
 
-  enum ui_pull_to_refresh_state state;
-  float pull_distance;
-  float completion_timer_ms;
+  enum ui_pull_to_refresh_state state; /**< Current state */
+  float pull_distance;                 /**< Current tracked pull distance */
+  float completion_timer_ms;           /**< Timer for completion state */
 
-  ui_pull_to_refresh_on_refresh_t on_refresh;
-  void *on_refresh_user_data;
-  struct ui_signal *refreshing_signal;
-  struct ui_computed *computed_refreshing_signal;
+  ui_pull_to_refresh_on_refresh_t on_refresh; /**< Refresh callback */
+  void *on_refresh_user_data;                 /**< Callback user data */
+  struct ui_signal *refreshing_signal;        /**< Signal bound for state */
+  struct ui_computed
+      *computed_refreshing_signal; /**< Computed refreshing state */
 };
 
+/**
+ * \brief Updates DOM attributes based on internal pull state.
+ *
+ * \param ptr The component.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
   char buf[64];
   float progress = 0.0f;
@@ -56,7 +73,12 @@ static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Creates a pull-to-refresh base component.
+ *
+ * \param out_ptr Pointer to receive the allocated component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
   ui_error_t rc;
@@ -107,7 +129,12 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Destroys a pull-to-refresh base component.
+ *
+ * \param ptr The component to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr) {
   if (!ptr) {
@@ -126,7 +153,14 @@ ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_pull_to_refresh_base_set_on_refresh */
+/**
+ * \brief Sets the callback for when the refresh action is fully triggered.
+ *
+ * \param ptr The component.
+ * \param on_refresh The callback to invoke.
+ * \param user_data Opaque pointer passed to the callback.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_pull_to_refresh_base_set_on_refresh(
     struct ui_pull_to_refresh_base *ptr,
     ui_pull_to_refresh_on_refresh_t on_refresh, void *user_data) {
@@ -138,7 +172,12 @@ ui_error_t ui_pull_to_refresh_base_set_on_refresh(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Marks the refresh as complete.
+ *
+ * \param ptr The component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_pull_to_refresh_base_complete(struct ui_pull_to_refresh_base *ptr) {
   if (!ptr) {
@@ -154,7 +193,12 @@ ui_pull_to_refresh_base_complete(struct ui_pull_to_refresh_base *ptr) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_pull_to_refresh_state */
+/**
+ * \brief Gets the current state of the pull-to-refresh mechanism.
+ *
+ * \param ptr The component.
+ * \return The current state enum.
+ */
 enum ui_pull_to_refresh_state
 ui_pull_to_refresh_base_get_state(const struct ui_pull_to_refresh_base *ptr) {
   if (!ptr) {
@@ -163,7 +207,13 @@ ui_pull_to_refresh_base_get_state(const struct ui_pull_to_refresh_base *ptr) {
   return ptr->state;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Gets the current pull progress (0.0 to 1.0+).
+ *
+ * \param ptr The component.
+ * \param out_progress Pointer to receive the progress value.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_pull_to_refresh_base_get_progress(const struct ui_pull_to_refresh_base *ptr,
                                      float *out_progress) {
@@ -174,7 +224,14 @@ ui_pull_to_refresh_base_get_progress(const struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Processes an incoming input event (gesture/pan tracking).
+ *
+ * \param ptr The component.
+ * \param event The incoming event.
+ * \param timestamp_ms The timestamp in milliseconds.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
                                       const struct ui_event *event,
@@ -241,7 +298,13 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Integrates physics and timers (springing back, state transitions).
+ *
+ * \param ptr The component.
+ * \param delta_ms The time delta in milliseconds.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
                                            double delta_ms) {
   if (!ptr) {
@@ -289,7 +352,13 @@ ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Retrieves the underlying container component.
+ *
+ * \param ptr The component.
+ * \param out_component Pointer to receive the underlying component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_pull_to_refresh_base_get_component(struct ui_pull_to_refresh_base *ptr,
                                       struct ui_component **out_component) {
@@ -300,7 +369,13 @@ ui_pull_to_refresh_base_get_component(struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the spinner component that visually represents the progress.
+ *
+ * \param ptr The component.
+ * \param spinner_comp The spinner component to attach.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
                                     struct ui_component *spinner_comp) {
@@ -315,7 +390,13 @@ ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Binds the refreshing state to a signal.
+ *
+ * \param widget The widget.
+ * \param refreshing_signal The boolean signal to bind to.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_pull_to_refresh_base_bind_refreshing(struct ui_pull_to_refresh_base *widget,
                                         struct ui_signal *refreshing_signal) {
@@ -326,7 +407,13 @@ ui_pull_to_refresh_base_bind_refreshing(struct ui_pull_to_refresh_base *widget,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_pull_to_refresh_base_get_refreshing_signal */
+/**
+ * \brief Retrieves the computed signal indicating if the widget is refreshing.
+ *
+ * \param widget The widget.
+ * \param out_refreshing Pointer to receive the computed signal.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_pull_to_refresh_base_get_refreshing_signal(
     struct ui_pull_to_refresh_base *widget,
     struct ui_computed **out_refreshing) {

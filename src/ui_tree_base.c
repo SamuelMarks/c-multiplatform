@@ -1,3 +1,8 @@
+/**
+ * @file ui_tree_base.c
+ * @brief Implementation of the tree base component.
+ */
+
 /* clang-format off */
 #include "ui_tree_base.h"
 #include "ui_internal_mem.h"
@@ -12,6 +17,10 @@
 #define UI_TREE_IS_EXPAND_IGNORE(t, n, o)                                      \
   ui_tree_base_is_expanded((t), (n), (o))
 
+/**
+ * @struct ui_tree_base
+ * @brief Internal state for the tree base component.
+ */
 struct ui_tree_base {
   struct ui_tree_model model;
   void **expanded_nodes;
@@ -67,7 +76,6 @@ ui_error_t ui_tree_base_destroy(struct ui_tree_base *tree) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_tree_base_get_selection_model(struct ui_tree_base *tree,
                                  struct ui_selection_model **out_model) {
@@ -159,7 +167,13 @@ ui_error_t ui_tree_base_get_active_node(const struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
-/* Helper to find a node's index among its siblings */
+/**
+ * @brief Helper to find a node's index among its siblings.
+ * @param tree The tree instance.
+ * @param parent The parent node identifier.
+ * @param node The node identifier to find.
+ * @return The 0-based index of the node, or 0 if not found.
+ */
 static size_t get_node_index(struct ui_tree_base *tree, void *parent,
                              void *node) {
   size_t count =
@@ -175,6 +189,12 @@ static size_t get_node_index(struct ui_tree_base *tree, void *parent,
   return 0;
 }
 
+/**
+ * @brief Gets the next visible node in a pre-order traversal.
+ * @param tree The tree instance.
+ * @param node The current node identifier.
+ * @return The next visible node, or NULL if none.
+ */
 static void *get_next_visible_node(struct ui_tree_base *tree, void *node) {
   void *parent;
   size_t idx, count;
@@ -204,6 +224,12 @@ static void *get_next_visible_node(struct ui_tree_base *tree, void *node) {
   return NULL;
 }
 
+/**
+ * @brief Gets the previous visible node in a pre-order traversal.
+ * @param tree The tree instance.
+ * @param node The current node identifier.
+ * @return The previous visible node, or NULL if none.
+ */
 static void *get_prev_visible_node(struct ui_tree_base *tree, void *node) {
   void *parent = tree->model.get_parent(node, tree->model.user_data);
   size_t idx = get_node_index(tree, parent, node);
@@ -231,7 +257,6 @@ static void *get_prev_visible_node(struct ui_tree_base *tree, void *node) {
   return parent;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_tree_base_handle_key_event(struct ui_tree_base *tree,
                               const struct ui_keyboard_event *event) {
@@ -311,6 +336,16 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Recursively renders tree nodes to the DOM.
+ * @param tree The tree instance.
+ * @param node The current node identifier.
+ * @param parent_container The parent DOM container to append to.
+ * @param level The ARIA hierarchy level.
+ * @param posinset The ARIA position in set.
+ * @param setsize The ARIA set size.
+ * @return UI_ERROR_NONE on success, or an error code.
+ */
 static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
                                    struct ui_dom_node *parent_container,
                                    size_t level, size_t posinset,

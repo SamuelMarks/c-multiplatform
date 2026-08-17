@@ -1,3 +1,8 @@
+/**
+ * \file ui_renderer_gles2.c
+ * \brief Implementation of the UI Renderer GLES2 backend.
+ */
+
 #define GL_SILENCE_DEPRECATION
 #if defined(_WIN32) || defined(__CYGWIN__)
 /* clang-format off */
@@ -146,49 +151,58 @@ static ui_error_t load_gl_extensions(void) {
 #define glReadPixels(x, y, w, h, f, t, d) do { (void)(x); (void)(y); (void)(w); (void)(h); (void)(f); (void)(t); (void)(d); } while(0)
 #endif
 
-#include "../include/ui_renderer_gles2.h"
-#include "../include/ui_window_backend.h"
+/* clang-format off */
+#include "ui_renderer_gles2.h"
+#include "ui_window_backend.h"
 #ifndef _WIN32
 #include "ui_internal_mem.h"
 #endif
 /* clang-format on */
 
 #ifndef GL_COLOR_BUFFER_BIT
+/** \brief Fallback GL_COLOR_BUFFER_BIT */
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #endif
 
-#define GLES2_MAX_VERTICES 8192
-#define GLES2_MAX_INDICES 24576
-
 #ifndef GL_FLOAT
+/** \brief Fallback GL_FLOAT */
 #define GL_FLOAT 0x1406
+/** \brief Fallback GL_UNSIGNED_SHORT */
 #define GL_UNSIGNED_SHORT 0x1403
+/** \brief Fallback GL_TRIANGLES */
 #define GL_TRIANGLES 0x0004
+/** \brief Fallback GL_RGBA */
 #define GL_RGBA 0x1908
+/** \brief Fallback GL_UNSIGNED_BYTE */
 #define GL_UNSIGNED_BYTE 0x1401
 #endif
 
+/** \brief Maximum vertices per batch */
 #define GLES2_MAX_VERTICES 8192
+/** \brief Maximum indices per batch */
 #define GLES2_MAX_INDICES 24576
 
-/** \brief gles2_renderer_data */
+/**
+ * \brief Internal state for the GLES2 renderer.
+ */
 struct gles2_renderer_data {
-  struct ui_vertex vertices[GLES2_MAX_VERTICES];
-  unsigned short indices[GLES2_MAX_INDICES];
-  int vertex_count;
-  int index_count;
+  struct ui_vertex vertices[GLES2_MAX_VERTICES]; /**< Batch vertices */
+  unsigned short indices[GLES2_MAX_INDICES];     /**< Batch indices */
+  int vertex_count;                              /**< Current vertex count */
+  int index_count;                               /**< Current index count */
 
-  unsigned int program;
-  int a_position;
-  int a_color;
-  int u_resolution;
-  unsigned int vbo;
-  unsigned int ibo;
+  unsigned int program; /**< Shader program */
+  int a_position;       /**< Position attribute loc */
+  int a_color;          /**< Color attribute loc */
+  int u_resolution;     /**< Resolution uniform loc */
+  unsigned int vbo;     /**< Vertex buffer object */
+  unsigned int ibo;     /**< Index buffer object */
 
-  float viewport_width;
-  float viewport_height;
+  float viewport_width;  /**< Viewport width */
+  float viewport_height; /**< Viewport height */
 };
 
+/** \brief Simple passthrough vertex shader */
 static const char *vertex_shader_source =
     "attribute vec2 a_position;\n"
     "attribute vec4 a_color;\n"
@@ -202,12 +216,21 @@ static const char *vertex_shader_source =
     "  v_color = a_color;\n"
     "}\n";
 
+/** \brief Simple passthrough fragment shader */
 static const char *fragment_shader_source = "precision mediump float;\n"
                                             "varying vec4 v_color;\n"
                                             "void main() {\n"
                                             "  gl_FragColor = v_color;\n"
                                             "}\n";
 
+/**
+ * \brief Compiles a shader.
+ *
+ * \param type Shader type.
+ * \param source Source code.
+ * \param out_shader Pointer to receive the shader ID.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t compile_shader(unsigned int type, const char *source,
                                  unsigned int *out_shader) {
   unsigned int shader;
@@ -223,6 +246,12 @@ static ui_error_t compile_shader(unsigned int type, const char *source,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Flushes the batched geometry to the GPU.
+ *
+ * \param backend The renderer backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
 #ifdef UI_TEST_MOCK_ALLOC
@@ -284,6 +313,16 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Submits arbitrary triangulated geometry (e.g. SVG paths) to the batch.
+ *
+ * \param backend The renderer backend.
+ * \param vertices Array of vertices.
+ * \param vertex_count Number of vertices.
+ * \param indices Array of indices defining triangles.
+ * \param index_count Number of indices.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_draw_triangles(struct ui_renderer_backend *backend,
                                        const struct ui_vertex *vertices,
                                        int vertex_count,
@@ -327,6 +366,17 @@ static ui_error_t gles2_draw_triangles(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Submits a UI rectangle to the geometry batch.
+ *
+ * \param backend The renderer backend.
+ * \param x X origin.
+ * \param y Y origin.
+ * \param width Rectangle width.
+ * \param height Rectangle height.
+ * \param color Fill color.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_draw_rect(struct ui_renderer_backend *backend, float x,
                                   float y, float width, float height,
                                   struct ui_color color) {
@@ -364,6 +414,18 @@ static ui_error_t gles2_draw_rect(struct ui_renderer_backend *backend, float x,
   return gles2_draw_triangles(backend, vertices, 4, indices, 6);
 }
 
+/**
+ * \brief Submits a UI border (hollow rectangle) to the geometry batch.
+ *
+ * \param backend The renderer backend.
+ * \param x X origin.
+ * \param y Y origin.
+ * \param width Rectangle width.
+ * \param height Rectangle height.
+ * \param thickness Border thickness.
+ * \param color Border color.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_draw_border(struct ui_renderer_backend *backend,
                                     float x, float y, float width, float height,
                                     float thickness, struct ui_color color) {
@@ -392,6 +454,14 @@ static ui_error_t gles2_draw_border(struct ui_renderer_backend *backend,
   return rc;
 }
 
+/**
+ * \brief Initializes the renderer for the given window.
+ *
+ * \param backend The renderer backend.
+ * \param window_backend The window backend.
+ * \param window The window instance.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_init(struct ui_renderer_backend *backend,
                              struct ui_window_backend *window_backend,
                              struct ui_window *window) {
@@ -447,6 +517,12 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys the renderer backend internal state.
+ *
+ * \param backend The renderer backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
 #ifdef UI_TEST_MOCK_ALLOC
@@ -475,6 +551,16 @@ static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the rendering viewport.
+ *
+ * \param backend The renderer backend.
+ * \param x X origin.
+ * \param y Y origin.
+ * \param width Viewport width.
+ * \param height Viewport height.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_set_viewport(struct ui_renderer_backend *backend, int x,
                                      int y, int width, int height) {
   struct gles2_renderer_data *data;
@@ -490,6 +576,13 @@ static ui_error_t gles2_set_viewport(struct ui_renderer_backend *backend, int x,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Clears the screen with the specified color.
+ *
+ * \param backend The renderer backend.
+ * \param color The clear color.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_clear(struct ui_renderer_backend *backend,
                               struct ui_color color) {
   (void)backend;
@@ -498,14 +591,26 @@ static ui_error_t gles2_clear(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/** \brief gles2_texture */
+/**
+ * \brief Internal structure representing a GLES2 texture.
+ */
 struct gles2_texture {
-  unsigned int fbo_id;
-  unsigned int tex_id;
-  int width;
-  int height;
+  unsigned int fbo_id; /**< FBO ID */
+  unsigned int tex_id; /**< Texture ID */
+  int width;           /**< Texture width */
+  int height;          /**< Texture height */
 };
 
+/**
+ * \brief Pushes a clipping rect.
+ *
+ * \param backend The renderer backend.
+ * \param x X origin.
+ * \param y Y origin.
+ * \param width Width.
+ * \param height Height.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_push_clip(struct ui_renderer_backend *backend, float x,
                                   float y, float width, float height) {
   ui_error_t rc;
@@ -524,6 +629,12 @@ static ui_error_t gles2_push_clip(struct ui_renderer_backend *backend, float x,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Pops a clipping rect.
+ *
+ * \param backend The renderer backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_pop_clip(struct ui_renderer_backend *backend) {
   ui_error_t rc;
   if (!backend || !backend->user_data)
@@ -536,6 +647,16 @@ static ui_error_t gles2_pop_clip(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Pushes a stencil clip from triangulated geometry.
+ *
+ * \param backend The renderer backend.
+ * \param vertices Array of vertices defining the stencil.
+ * \param vertex_count Number of vertices.
+ * \param indices Array of indices defining triangles.
+ * \param index_count Number of indices.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_push_stencil_clip(struct ui_renderer_backend *backend,
                                           const struct ui_vertex *vertices,
                                           int vertex_count,
@@ -557,6 +678,12 @@ static ui_error_t gles2_push_stencil_clip(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Pops a stencil clip.
+ *
+ * \param backend The renderer backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
   ui_error_t rc;
   if (!backend || !backend->user_data)
@@ -568,6 +695,16 @@ static ui_error_t gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
 
   return UI_ERROR_NONE;
 }
+
+/**
+ * \brief Creates an offscreen texture (FBO) for rendering.
+ *
+ * \param backend The renderer backend.
+ * \param width Texture width.
+ * \param height Texture height.
+ * \param out_texture_handle Pointer to receive the texture handle.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_create_texture(struct ui_renderer_backend *backend,
                                        int width, int height,
                                        void **out_texture_handle) {
@@ -591,6 +728,13 @@ static ui_error_t gles2_create_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys an offscreen texture (FBO).
+ *
+ * \param backend The renderer backend.
+ * \param texture_handle The texture handle to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_destroy_texture(struct ui_renderer_backend *backend,
                                         void *texture_handle) {
   if (!backend || !texture_handle) {
@@ -600,6 +744,13 @@ static ui_error_t gles2_destroy_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the render target to a specific texture (FBO).
+ *
+ * \param backend The renderer backend.
+ * \param texture_handle The texture handle, or NULL for screen.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_set_render_target(struct ui_renderer_backend *backend,
                                           void *texture_handle) {
   (void)texture_handle;
@@ -609,6 +760,18 @@ static ui_error_t gles2_set_render_target(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Draws a previously rendered offscreen texture.
+ *
+ * \param backend The renderer backend.
+ * \param texture_handle The texture to draw.
+ * \param x Dest X origin.
+ * \param y Dest Y origin.
+ * \param width Dest width.
+ * \param height Dest height.
+ * \param opacity Alpha opacity modifier.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
                                      void *texture_handle, float x, float y,
                                      float width, float height, float opacity) {
@@ -629,6 +792,15 @@ static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
   return gles2_draw_rect(backend, x, y, width, height, color);
 }
 
+/**
+ * \brief Reads pixels from the current render target.
+ *
+ * \param backend The renderer backend.
+ * \param width Width of region to read.
+ * \param height Height of region to read.
+ * \param out_rgba_buffer Pre-allocated buffer to receive RGBA pixels.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gles2_read_pixels(struct ui_renderer_backend *backend,
                                     int width, int height,
                                     unsigned char *out_rgba_buffer) {
@@ -639,7 +811,13 @@ static ui_error_t gles2_read_pixels(struct ui_renderer_backend *backend,
   glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, out_rgba_buffer);
   return UI_ERROR_NONE;
 }
-/** \brief ui_error */
+
+/**
+ * \brief Creates a GLES 2.0 / WebGL 1.0 renderer backend.
+ *
+ * \param out_backend Pointer to receive the allocated backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
   struct ui_renderer_backend *backend;
 
@@ -676,6 +854,12 @@ ui_error_t ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a GLES 2.0 renderer backend.
+ *
+ * \param backend The backend to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_renderer_gles2_destroy(struct ui_renderer_backend *backend) {
 #ifdef UI_TEST_MOCK_ALLOC
   extern int g_mock_gles2_destroy_fail;

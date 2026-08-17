@@ -1,9 +1,17 @@
+/**
+ * \file ui_layout_observer.c
+ * \brief Implementation of responsive layout observations and breakpoints.
+ */
 /* clang-format off */
 #include "ui_layout_observer.h"
 #include "ui_internal_mem.h"
 #include <string.h>
 /* clang-format on */
 
+/**
+ * \struct ui_layout_breakpoint
+ * \brief Defines a dimensional range for triggering layout changes.
+ */
 struct ui_layout_breakpoint {
   int id;
   int min_width;
@@ -57,6 +65,11 @@ ui_error_t ui_layout_observer_create(struct ui_layout_observer **out_observer) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a layout observer.
+ * \param[in,out] observer The observer to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_layout_observer_destroy(struct ui_layout_observer *observer) {
   if (!observer) {
     return UI_ERROR_NONE;
@@ -126,6 +139,13 @@ ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Subscribes a callback to layout breakpoint changes.
+ * \param[in,out] observer The layout observer.
+ * \param[in] callback The function to call when a breakpoint triggers.
+ * \param[in] user_data Optional user data to pass to the callback.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_layout_observer_subscribe(struct ui_layout_observer *observer,
                                         ui_layout_observer_cb_t callback,
                                         void *user_data) {

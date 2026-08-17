@@ -1,3 +1,8 @@
+/**
+ * \file ui_node_graph_base.c
+ * \brief Implementation of the UI node graph component for visual programming
+ * or flow charts.
+ */
 /* clang-format off */
 #include "ui_node_graph_base.h"
 #include "ui_arena.h"
@@ -5,8 +10,16 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * \def UI_NODE_GRAPH_MAX_CONNECTIONS
+ * \brief Maximum allowed number of connections in the graph.
+ */
 #define UI_NODE_GRAPH_MAX_CONNECTIONS 256
 
+/**
+ * \struct ui_node_graph_base
+ * \brief Core state and camera context for a node graph widget.
+ */
 struct ui_node_graph_base {
   struct ui_arena *arena;
   struct ui_node_graph_camera_config camera_config;
@@ -26,6 +39,13 @@ struct ui_node_graph_base {
   ui_signal_t *topology_signal;
 };
 
+/**
+ * \brief Equality check for pointer payloads.
+ * \param[in] a First payload.
+ * \param[in] b Second payload.
+ * \param[out] out_equal True if equal.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t pointer_equality(union ui_signal_payload a,
                                    union ui_signal_payload b,
                                    ui_bool_t *out_equal) {
@@ -33,6 +53,14 @@ static ui_error_t pointer_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Equality check that always returns false (for triggering signals
+ * unconditionally).
+ * \param[in] a First payload.
+ * \param[in] b Second payload.
+ * \param[out] out_equal Always set to UI_FALSE.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t void_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
                                 ui_bool_t *out_equal) {
@@ -42,6 +70,12 @@ static ui_error_t void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Updates the internal camera matrix based on pan and zoom and triggers
+ * its signal.
+ * \param[in,out] graph The node graph widget.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t update_camera_matrix(struct ui_node_graph_base *graph) {
   union ui_signal_payload payload;
   ui_error_t rc;
@@ -112,6 +146,11 @@ ui_error_t ui_node_graph_base_create(
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a node graph widget.
+ * \param[in,out] graph The node graph widget to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
   if (!graph)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -122,6 +161,13 @@ ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Pans the camera view.
+ * \param[in,out] graph The node graph widget.
+ * \param[in] delta_x X pan delta.
+ * \param[in] delta_y Y pan delta.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
                                   float delta_x, float delta_y) {
   ui_error_t rc;
@@ -149,6 +195,13 @@ ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Zooms the camera view, optionally towards a specific focal point.
+ * \param[in,out] graph The node graph widget.
+ * \param[in] zoom The new zoom level.
+ * \param[in] focal_point Optional focal point for the zoom operation.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
                                    const struct ui_dom_point *focal_point) {
   float old_zoom;

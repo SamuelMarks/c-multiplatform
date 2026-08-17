@@ -13,22 +13,26 @@ int g_append_fail_countdown = -1;
 
 static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
-  if (g_action_sheet_mock_fail == 6)
+  if (g_action_sheet_mock_fail == 6) {
     return UI_ERROR_UNKNOWN;
-  if (g_action_sheet_mock_fail == 7) {
-    if (parent && parent->first_child != child)
-      return UI_ERROR_UNKNOWN;
   }
-  if (g_action_sheet_mock_fail == 11)
+  if (g_action_sheet_mock_fail == 7) {
+    if (parent && parent->first_child != child) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (g_action_sheet_mock_fail == 11) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_remove_child)(parent, child);
 }
 #undef ui_dom_node_remove_child
 #define ui_dom_node_remove_child mock_dom_node_remove_child
 
 static ui_error_t mock_focus_trap_create(struct ui_focus_trap **ft) {
-  if (g_action_sheet_mock_fail == 6 || g_action_sheet_mock_fail == 7)
+  if (g_action_sheet_mock_fail == 6 || g_action_sheet_mock_fail == 7) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_focus_trap_create)(ft);
 }
 #undef ui_focus_trap_create
@@ -36,12 +40,15 @@ static ui_error_t mock_focus_trap_create(struct ui_focus_trap **ft) {
 
 static ui_error_t mock_dom_node_append_child2(struct ui_dom_node *parent,
                                               struct ui_dom_node *child) {
-  if (g_append_fail_countdown == 0)
+  if (g_append_fail_countdown == 0) {
     return UI_ERROR_UNKNOWN;
-  if (g_append_fail_countdown > 0)
+  }
+  if (g_append_fail_countdown > 0) {
     g_append_fail_countdown--;
-  if (g_action_sheet_mock_fail == 1)
+  }
+  if (g_action_sheet_mock_fail == 1) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_dom_node_append_child)(parent, child);
 }
 #undef ui_dom_node_append_child
@@ -50,8 +57,9 @@ static ui_error_t mock_dom_node_append_child2(struct ui_dom_node *parent,
 static ui_error_t
 mock_bottom_sheet_set_content(struct ui_bottom_sheet_base *sheet,
                               struct ui_component *content) {
-  if (g_action_sheet_mock_fail == 5)
+  if (g_action_sheet_mock_fail == 5) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_bottom_sheet_base_set_content)(sheet, content);
 }
 #undef ui_bottom_sheet_base_set_content
@@ -59,8 +67,9 @@ mock_bottom_sheet_set_content(struct ui_bottom_sheet_base *sheet,
 
 static ui_error_t
 mock_bottom_sheet_is_open(const struct ui_bottom_sheet_base *sheet, int *out) {
-  if (g_action_sheet_mock_fail == 8)
+  if (g_action_sheet_mock_fail == 8) {
     return UI_ERROR_UNKNOWN;
+  }
   if (g_action_sheet_mock_fail == 10 || g_action_sheet_mock_fail == 12 ||
       g_action_sheet_mock_fail == 13) {
     *out = 1;
@@ -89,8 +98,9 @@ static ui_error_t
 mock_bottom_sheet_set_on_close2(struct ui_bottom_sheet_base *sheet,
                                 ui_bottom_sheet_on_close_t cb, void *u) {
   captured_close_cb = cb;
-  if (g_action_sheet_mock_fail == 3)
+  if (g_action_sheet_mock_fail == 3) {
     return UI_ERROR_UNKNOWN;
+  }
   return (ui_bottom_sheet_base_set_on_close)(sheet, cb, u);
 }
 
@@ -99,10 +109,12 @@ mock_bottom_sheet_set_on_close2(struct ui_bottom_sheet_base *sheet,
 
 static ui_error_t mock_focus_trap_deactivate(struct ui_focus_trap *ft,
                                              struct ui_focus_manager *fm) {
-  if (g_action_sheet_mock_fail == 4)
+  if (g_action_sheet_mock_fail == 4) {
     return UI_ERROR_UNKNOWN;
-  if (fm == (struct ui_focus_manager *)1)
+  }
+  if (fm == (struct ui_focus_manager *)1) {
     return UI_ERROR_NONE;
+  }
   return (ui_focus_trap_deactivate)(ft, fm);
 }
 #undef ui_focus_trap_deactivate
@@ -122,19 +134,33 @@ static ui_error_t mock_on_close_success(struct ui_action_sheet_base *sheet,
 }
 #endif
 
+/**
+ * @struct ui_action_sheet_base
+ * @brief Internal implementation of the action sheet base.
+ */
 struct ui_action_sheet_base {
+  /** @brief Underlying bottom sheet component. */
   struct ui_bottom_sheet_base *bottom_sheet;
+  /** @brief Container for the entire sheet. */
   struct ui_component *container;
+  /** @brief Container for the main actions. */
   struct ui_component *actions_container;
+  /** @brief Container for the cancel action. */
   struct ui_component *cancel_container;
 
+  /** @brief Trap to keep focus within the sheet when open. */
   struct ui_focus_trap *focus_trap;
+  /** @brief Focus manager reference. */
   struct ui_focus_manager *focus_manager;
+  /** @brief Keyboard responder reference. */
   struct ui_keyboard_responder *keyboard_responder;
 
+  /** @brief Callback invoked when the sheet closes. */
   ui_action_sheet_on_close_t on_close;
+  /** @brief User data for the close callback. */
   void *on_close_user_data;
 };
+
 static ui_error_t on_bottom_sheet_close(struct ui_bottom_sheet_base *bs,
                                         void *user_data) {
   struct ui_action_sheet_base *sheet = (struct ui_action_sheet_base *)user_data;
@@ -142,18 +168,19 @@ static ui_error_t on_bottom_sheet_close(struct ui_bottom_sheet_base *bs,
   (void)bs;
   if (sheet->focus_manager) {
     rc = ui_focus_trap_deactivate(sheet->focus_trap, sheet->focus_manager);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
   if (sheet->on_close) {
     rc = sheet->on_close(sheet, sheet->on_close_user_data);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
   return rc;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -344,10 +371,11 @@ ui_error_t ui_action_sheet_base_destroy(struct ui_action_sheet_base *sheet) {
   }
   if (sheet->focus_manager) {
     rc = ui_focus_trap_deactivate(sheet->focus_trap, sheet->focus_manager);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
-  ui_focus_trap_destroy(sheet->focus_trap);
+  (void)ui_focus_trap_destroy(sheet->focus_trap);
 
   (void)ui_dom_node_destroy(sheet->container->shadow_root);
   sheet->container->shadow_root = NULL;
@@ -364,7 +392,6 @@ ui_error_t ui_action_sheet_base_destroy(struct ui_action_sheet_base *sheet) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_action_sheet_base_add_action(struct ui_action_sheet_base *sheet,
                                            struct ui_component *action_comp) {
   if (!sheet || !action_comp) {
@@ -374,7 +401,6 @@ ui_error_t ui_action_sheet_base_add_action(struct ui_action_sheet_base *sheet,
                                   action_comp->shadow_root);
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_action_sheet_base_set_cancel_action(struct ui_action_sheet_base *sheet,
                                        struct ui_component *cancel_comp) {
@@ -388,8 +414,9 @@ ui_action_sheet_base_set_cancel_action(struct ui_action_sheet_base *sheet,
     rc = ui_dom_node_remove_child(
         sheet->cancel_container->shadow_root,
         sheet->cancel_container->shadow_root->first_child);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
   return ui_dom_node_append_child(sheet->cancel_container->shadow_root,
                                   cancel_comp->shadow_root);
@@ -405,18 +432,19 @@ ui_error_t ui_action_sheet_base_set_open(struct ui_action_sheet_base *sheet,
   if (is_open) {
     rc = ui_focus_trap_activate(sheet->focus_trap, sheet->focus_manager,
                                 sheet->container->shadow_root);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   } else {
     rc = ui_focus_trap_deactivate(sheet->focus_trap, sheet->focus_manager);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
 
   return ui_bottom_sheet_base_set_open(sheet->bottom_sheet, is_open);
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_action_sheet_base_is_open(const struct ui_action_sheet_base *sheet,
                              int *out_is_open) {
@@ -426,7 +454,6 @@ ui_action_sheet_base_is_open(const struct ui_action_sheet_base *sheet,
   return ui_bottom_sheet_base_is_open(sheet->bottom_sheet, out_is_open);
 }
 
-/** \brief ui_action_sheet_base_set_overlay_director */
 ui_error_t ui_action_sheet_base_set_overlay_director(
     struct ui_action_sheet_base *sheet, struct ui_overlay_director *director) {
   if (!sheet) {
@@ -436,7 +463,6 @@ ui_error_t ui_action_sheet_base_set_overlay_director(
                                                    director);
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_action_sheet_base_set_on_close(struct ui_action_sheet_base *sheet,
                                   ui_action_sheet_on_close_t on_close,
@@ -449,7 +475,6 @@ ui_action_sheet_base_set_on_close(struct ui_action_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_action_sheet_base_attach_focus_and_keyboard */
 ui_error_t ui_action_sheet_base_attach_focus_and_keyboard(
     struct ui_action_sheet_base *sheet, struct ui_focus_manager *focus_manager,
     struct ui_keyboard_responder *keyboard_responder) {
@@ -460,12 +485,12 @@ ui_error_t ui_action_sheet_base_attach_focus_and_keyboard(
   sheet->focus_manager = focus_manager;
   sheet->keyboard_responder = keyboard_responder;
   rc = ui_focus_trap_attach_keyboard(sheet->focus_trap, keyboard_responder);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_action_sheet_base_process_event(struct ui_action_sheet_base *sheet,
                                    const struct ui_event *event,
@@ -480,15 +505,18 @@ ui_action_sheet_base_process_event(struct ui_action_sheet_base *sheet,
     if (event->event_data.keyboard.key_code == UI_KEY_ESCAPE) {
       int is_open = 0;
       rc = ui_action_sheet_base_is_open(sheet, &is_open);
-      if (rc != UI_ERROR_NONE)
+      if (rc != UI_ERROR_NONE) {
         return rc;
+      }
       if (is_open) {
         rc = ui_action_sheet_base_set_open(sheet, 0);
-        if (rc != UI_ERROR_NONE)
+        if (rc != UI_ERROR_NONE) {
           return rc;
+        }
         rc = on_bottom_sheet_close(sheet->bottom_sheet, sheet);
-        if (rc != UI_ERROR_NONE)
+        if (rc != UI_ERROR_NONE) {
           return rc;
+        }
         return UI_ERROR_NONE;
       }
     }
@@ -506,7 +534,6 @@ ui_error_t ui_action_sheet_base_update(struct ui_action_sheet_base *sheet,
   return ui_bottom_sheet_base_update(sheet->bottom_sheet, timestamp_ms);
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_action_sheet_base_get_component(struct ui_action_sheet_base *sheet,
                                    struct ui_component **out_component) {
@@ -524,7 +551,6 @@ ui_error_t ui_action_sheet_base_bind_open(struct ui_action_sheet_base *sheet,
   return ui_bottom_sheet_base_bind_open(sheet->bottom_sheet, open_signal);
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_action_sheet_base_get_animating_signal(struct ui_action_sheet_base *sheet,
                                           struct ui_computed **out_animating) {
@@ -546,43 +572,44 @@ ui_error_t run_action_sheet_coverage(void) {
 
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
-  ui_component_create(&action1);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &action1->shadow_root);
-  ui_component_create(&cancel);
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel->shadow_root);
+  (void)ui_component_create(&action1);
+  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &action1->shadow_root);
+  (void)ui_component_create(&cancel);
+  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel->shadow_root);
 
   g_append_fail_countdown = 0;
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 1;
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 2;
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 3;
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   g_append_fail_countdown = -1;
 
   g_action_sheet_mock_fail = 3;
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 5;
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   g_action_sheet_mock_fail = 0;
 
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
 
   sheet->focus_manager = (struct ui_focus_manager *)1;
   g_action_sheet_mock_fail = 4;
   captured_close_cb = (ui_bottom_sheet_on_close_t)mock_on_close_fail;
   for (i = 0; i < 2; i++) {
-    if (captured_close_cb)
+    if (captured_close_cb) {
       captured_close_cb(sheet->bottom_sheet, sheet);
+    }
     captured_close_cb = NULL;
   }
   g_action_sheet_mock_fail = 0;
@@ -590,37 +617,38 @@ ui_error_t run_action_sheet_coverage(void) {
   sheet->on_close = mock_on_close_fail;
   captured_close_cb = (ui_bottom_sheet_on_close_t)mock_on_close_fail;
   for (i = 0; i < 2; i++) {
-    if (captured_close_cb)
+    if (captured_close_cb) {
       captured_close_cb(sheet->bottom_sheet, sheet);
+    }
     captured_close_cb = NULL;
   }
   sheet->on_close = NULL;
   sheet->focus_manager = NULL;
 
   g_append_fail_countdown = 0;
-  ui_action_sheet_base_add_action(sheet, action1);
+  (void)ui_action_sheet_base_add_action(sheet, action1);
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 0;
-  ui_action_sheet_base_set_cancel_action(sheet, cancel);
+  (void)ui_action_sheet_base_set_cancel_action(sheet, cancel);
   g_append_fail_countdown = -1;
 
-  ui_action_sheet_base_set_cancel_action(sheet, cancel);
+  (void)ui_action_sheet_base_set_cancel_action(sheet, cancel);
 
   g_action_sheet_mock_fail = 2;
-  ui_action_sheet_base_set_open(sheet, 1);
-  ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  (void)ui_action_sheet_base_set_open(sheet, 1);
+  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 8;
-  ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
   g_action_sheet_mock_fail = 0;
 
-  ui_action_sheet_base_set_open(sheet, 1);
+  (void)ui_action_sheet_base_set_open(sheet, 1);
   g_action_sheet_mock_fail = 2;
-  ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
   g_action_sheet_mock_fail = 0;
-  ui_action_sheet_base_set_open(sheet, 0);
+  (void)ui_action_sheet_base_set_open(sheet, 0);
 
   sheet->focus_manager = (struct ui_focus_manager *)1;
   g_action_sheet_mock_fail = 4;
@@ -630,60 +658,61 @@ ui_error_t run_action_sheet_coverage(void) {
   (void)ui_action_sheet_base_destroy(sheet);
 
   g_action_sheet_mock_fail = 7;
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   g_action_sheet_mock_fail = 0;
 
   /* Additional tests for remaining branches */
 
   /* mock_dom_node_append_child2 mock 1 */
   g_action_sheet_mock_fail = 1;
-  ui_dom_node_append_child(NULL, NULL);
+  (void)ui_dom_node_append_child(NULL, NULL);
   g_action_sheet_mock_fail = 0;
 
   /* mock_bottom_sheet_set_open mock 2 */
   g_action_sheet_mock_fail = 2;
-  ui_bottom_sheet_base_set_open(NULL, 0);
+  (void)ui_bottom_sheet_base_set_open(NULL, 0);
   g_action_sheet_mock_fail = 0;
 
   /* Line 384: set_cancel_action remove_child success and fail */
-  ui_action_sheet_base_create(&sheet);
-  ui_action_sheet_base_set_cancel_action(sheet, cancel); /* no children yet */
-  ui_action_sheet_base_set_cancel_action(
+  (void)ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_set_cancel_action(sheet,
+                                               cancel); /* no children yet */
+  (void)ui_action_sheet_base_set_cancel_action(
       sheet, action1); /* removes cancel successfully */
   g_action_sheet_mock_fail = 6;
-  ui_action_sheet_base_set_cancel_action(sheet,
-                                         cancel); /* remove_child fails */
+  (void)ui_action_sheet_base_set_cancel_action(sheet,
+                                               cancel); /* remove_child fails */
   g_action_sheet_mock_fail = 0;
   (void)ui_action_sheet_base_destroy(sheet);
 
   /* add_action remove_child fails */
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   g_append_fail_countdown = 0;
-  ui_action_sheet_base_add_action(sheet, action1);
+  (void)ui_action_sheet_base_add_action(sheet, action1);
   g_append_fail_countdown = -1;
   (void)ui_action_sheet_base_destroy(sheet);
 
   /* process_event paths */
-  ui_action_sheet_base_create(&sheet);
-  ui_action_sheet_base_set_open(sheet, 1);
+  (void)ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_set_open(sheet, 1);
   sheet->focus_manager = (struct ui_focus_manager *)1;
 
   g_action_sheet_mock_fail = 10;
   sheet->on_close = mock_on_close_fail;
-  ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
 
   g_action_sheet_mock_fail = 12;
   sheet->on_close = mock_on_close_fail;
-  ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
 
   g_action_sheet_mock_fail = 13;
   sheet->on_close = mock_on_close_success;
-  ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
 
   /* explicit path to hit line 489 */
   g_action_sheet_mock_fail = 0;
   sheet->on_close = mock_on_close_fail;
-  ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
 
   g_action_sheet_mock_fail = 0;
   sheet->on_close = NULL;
@@ -691,30 +720,30 @@ ui_error_t run_action_sheet_coverage(void) {
   (void)ui_action_sheet_base_destroy(sheet);
 
   /* on_bottom_sheet_close paths */
-  ui_action_sheet_base_create(&sheet);
+  (void)ui_action_sheet_base_create(&sheet);
   sheet->focus_manager = (struct ui_focus_manager *)1;
   g_action_sheet_mock_fail = 4;
-  on_bottom_sheet_close(sheet->bottom_sheet, sheet);
+  (void)on_bottom_sheet_close(sheet->bottom_sheet, sheet);
   g_action_sheet_mock_fail = 0;
-  on_bottom_sheet_close(sheet->bottom_sheet, sheet);
+  (void)on_bottom_sheet_close(sheet->bottom_sheet, sheet);
   sheet->focus_manager = NULL;
-  on_bottom_sheet_close(sheet->bottom_sheet, sheet);
+  (void)on_bottom_sheet_close(sheet->bottom_sheet, sheet);
 
   sheet->on_close = mock_on_close_fail;
-  on_bottom_sheet_close(sheet->bottom_sheet, sheet);
+  (void)on_bottom_sheet_close(sheet->bottom_sheet, sheet);
   sheet->on_close = mock_on_close_success;
-  on_bottom_sheet_close(sheet->bottom_sheet, sheet);
+  (void)on_bottom_sheet_close(sheet->bottom_sheet, sheet);
   sheet->on_close = NULL;
   (void)ui_action_sheet_base_destroy(sheet);
 
   /* mock_dom_node_remove_child 6 */
   g_action_sheet_mock_fail = 6;
-  ui_dom_node_remove_child(NULL, NULL);
+  (void)ui_dom_node_remove_child(NULL, NULL);
   g_action_sheet_mock_fail = 0;
 
   /* mock_dom_node_remove_child 7 */
   g_action_sheet_mock_fail = 7;
-  ui_dom_node_remove_child(NULL, NULL);
+  (void)ui_dom_node_remove_child(NULL, NULL);
   g_action_sheet_mock_fail = 0;
 
   {
@@ -723,26 +752,26 @@ ui_error_t run_action_sheet_coverage(void) {
     struct ui_dom_node child2 = {0};
     parent.first_child = &child1;
     g_action_sheet_mock_fail = 7;
-    ui_dom_node_remove_child(&parent, &child2);
-    ui_dom_node_remove_child(&parent, &child1);
+    (void)ui_dom_node_remove_child(&parent, &child2);
+    (void)ui_dom_node_remove_child(&parent, &child1);
     g_action_sheet_mock_fail = 0;
   }
 
   g_action_sheet_mock_fail = 11;
-  ui_dom_node_remove_child(NULL, NULL);
+  (void)ui_dom_node_remove_child(NULL, NULL);
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 12;
-  ui_bottom_sheet_base_set_open(NULL, 0);
+  (void)ui_bottom_sheet_base_set_open(NULL, 0);
   g_action_sheet_mock_fail = 13;
-  ui_bottom_sheet_base_set_open(NULL, 0);
+  (void)ui_bottom_sheet_base_set_open(NULL, 0);
   g_action_sheet_mock_fail = 0;
 
   /* mock_focus_trap_create 6 and 7 */
   g_action_sheet_mock_fail = 6;
-  ui_focus_trap_create(NULL);
+  (void)ui_focus_trap_create(NULL);
   g_action_sheet_mock_fail = 7;
-  ui_focus_trap_create(NULL);
+  (void)ui_focus_trap_create(NULL);
   g_action_sheet_mock_fail = 0;
 
   action1->shadow_root = NULL;

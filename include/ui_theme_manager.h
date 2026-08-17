@@ -1,3 +1,7 @@
+/**
+ * @file ui_theme_manager.h
+ * @brief Defines the theme manager and built-in theme modes.
+ */
 #ifndef UI_THEME_MANAGER_H
 #define UI_THEME_MANAGER_H
 

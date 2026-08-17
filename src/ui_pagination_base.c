@@ -1,8 +1,16 @@
+/**
+ * \file ui_pagination_base.c
+ * \brief Implementation of pagination logic state management.
+ */
 /* clang-format off */
 #include "ui_pagination_base.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * \struct ui_pagination_base
+ * \brief Core state for pagination, including current page and total items.
+ */
 struct ui_pagination_base {
   size_t total_items;
   size_t page_size;
@@ -10,7 +18,11 @@ struct ui_pagination_base {
   struct ui_signal *current_page_signal;
 };
 
-/** \brief ui_error */
+/**
+ * \brief Creates a new pagination base context.
+ * \param[out] out_pagination Pointer to store the created context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_pagination_base_create(struct ui_pagination_base **out_pagination) {
   struct ui_pagination_base *p;
@@ -33,6 +45,11 @@ ui_pagination_base_create(struct ui_pagination_base **out_pagination) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a pagination base context.
+ * \param[in,out] pagination The context to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pagination_base_destroy(struct ui_pagination_base *pagination) {
   if (!pagination) {
     return UI_ERROR_NONE;
@@ -41,7 +58,13 @@ ui_error_t ui_pagination_base_destroy(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Configures the total items and page size for pagination.
+ * \param[in,out] pagination The pagination context.
+ * \param[in] total_items Total number of items.
+ * \param[in] page_size Number of items per page.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pagination_base_set_config(struct ui_pagination_base *pagination,
                                          size_t total_items, size_t page_size) {
   size_t total_pages;
@@ -63,7 +86,12 @@ ui_error_t ui_pagination_base_set_config(struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Computes the total number of pages based on config.
+ * \param[in] pagination The pagination context.
+ * \param[out] out_total_pages Pointer to store the calculated total pages.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_pagination_base_get_total_pages(const struct ui_pagination_base *pagination,
                                    size_t *out_total_pages) {
@@ -81,7 +109,12 @@ ui_pagination_base_get_total_pages(const struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the current active page index (0-based).
+ * \param[in,out] pagination The pagination context.
+ * \param[in] page_index The requested page index.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_pagination_base_set_current_page(struct ui_pagination_base *pagination,
                                     size_t page_index) {
@@ -108,7 +141,12 @@ ui_pagination_base_set_current_page(struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Retrieves the current active page index.
+ * \param[in] pagination The pagination context.
+ * \param[out] out_current_page Pointer to store the current page index.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_pagination_base_get_current_page(const struct ui_pagination_base *pagination,
                                     size_t *out_current_page) {
@@ -120,6 +158,11 @@ ui_pagination_base_get_current_page(const struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Advances to the next page if possible.
+ * \param[in,out] pagination The pagination context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pagination_base_next(struct ui_pagination_base *pagination) {
   size_t total_pages;
 
@@ -141,7 +184,11 @@ ui_error_t ui_pagination_base_next(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Retreats to the previous page if possible.
+ * \param[in,out] pagination The pagination context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pagination_base_previous(struct ui_pagination_base *pagination) {
   if (!pagination) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -154,6 +201,11 @@ ui_error_t ui_pagination_base_previous(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Jumps to the first page.
+ * \param[in,out] pagination The pagination context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pagination_base_first(struct ui_pagination_base *pagination) {
   if (!pagination) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -163,6 +215,11 @@ ui_error_t ui_pagination_base_first(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Jumps to the last page.
+ * \param[in,out] pagination The pagination context.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_pagination_base_last(struct ui_pagination_base *pagination) {
   size_t total_pages;
 
@@ -182,7 +239,13 @@ ui_error_t ui_pagination_base_last(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Calculates the item index bounds for the current page.
+ * \param[in] pagination The pagination context.
+ * \param[out] out_start_index Pointer to store the start item index.
+ * \param[out] out_end_index Pointer to store the end item index (exclusive).
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_pagination_base_get_bounds(const struct ui_pagination_base *pagination,
                               size_t *out_start_index, size_t *out_end_index) {
@@ -211,7 +274,12 @@ ui_pagination_base_get_bounds(const struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Binds the current page index to a reactive signal.
+ * \param[in,out] widget The pagination context.
+ * \param[in,out] signal The signal to bind.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_pagination_base_bind_current_page(struct ui_pagination_base *widget,
                                      struct ui_signal *signal) {

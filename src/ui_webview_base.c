@@ -1,9 +1,18 @@
+/**
+ * @file ui_webview_base.c
+ * @brief Implementation of the webview base component.
+ */
+
 /* clang-format off */
 #include "ui_webview_base.h"
 #include "ui_internal_mem.h"
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @struct ui_webview_base
+ * @brief Internal state for the webview base component.
+ */
 struct ui_webview_base {
   struct ui_component *component;
   struct ui_signal *url_signal;
@@ -67,7 +76,6 @@ ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
                                          struct ui_component **out_component) {
   if (!webview || !out_component) {
@@ -164,7 +172,6 @@ ui_error_t ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
                                                 const char *message) {
   if (!webview || !message) {

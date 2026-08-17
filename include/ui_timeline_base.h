@@ -1,3 +1,7 @@
+/**
+ * @file ui_timeline_base.h
+ * @brief Defines the base logic for a timeline UI component.
+ */
 #ifndef UI_TIMELINE_BASE_H
 #define UI_TIMELINE_BASE_H
 

@@ -2,7 +2,7 @@
 #include "ui_window_controls_base.h"
 #include "ui_arena.h"
 #include "ui_error.h"
-#include "../src/ui_reactive_graph.h"
+#include <ui_reactive_graph.h>
 #include <stdio.h>
 /* clang-format on */
 

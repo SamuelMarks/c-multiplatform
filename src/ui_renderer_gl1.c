@@ -1,3 +1,8 @@
+/**
+ * \file ui_renderer_gl1.c
+ * \brief Implementation of the UI Renderer GL1 backend.
+ */
+
 #define GL_SILENCE_DEPRECATION
 #ifndef __EMSCRIPTEN__
 #if defined(_WIN32) || defined(__CYGWIN__)
@@ -36,13 +41,20 @@
 #define glReadPixels(x, y, w, h, f, t, d) do { (void)(x); (void)(y); (void)(w); (void)(h); (void)(f); (void)(t); (void)(d); } while(0)
 #endif
 
-#include "../include/ui_renderer_gl1.h"
-#include "../include/ui_window_backend.h"
+/* clang-format off */
+#include "ui_renderer_gl1.h"
+#include "ui_window_backend.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
 
 #ifdef __EMSCRIPTEN__
 
+/**
+ * \brief Creates a legacy OpenGL 1.1 renderer backend. Emscripten stub.
+ *
+ * \param out_backend Pointer to receive the allocated backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_renderer_gl1_create(struct ui_renderer_backend **out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -51,6 +63,12 @@ ui_error_t ui_renderer_gl1_create(struct ui_renderer_backend **out_backend) {
   return UI_ERROR_UNSUPPORTED; /* Or whatever error code */
 }
 
+/**
+ * \brief Destroys a legacy OpenGL 1.1 renderer backend. Emscripten stub.
+ *
+ * \param backend The backend to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
 #ifdef UI_TEST_MOCK_ALLOC
   extern int g_mock_gles2_destroy_fail;
@@ -65,18 +83,23 @@ ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
 #else
 
 #ifndef GL_COLOR_BUFFER_BIT
+/** \brief Fallback GL_COLOR_BUFFER_BIT */
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #endif
 
+/** \brief Maximum vertices per batch */
 #define GL1_MAX_VERTICES 8192
+/** \brief Maximum indices per batch */
 #define GL1_MAX_INDICES 24576
 
-/** \brief gl1_renderer_data */
+/**
+ * \brief Internal state for the GL1 renderer.
+ */
 struct gl1_renderer_data {
-  struct ui_vertex vertices[GL1_MAX_VERTICES];
-  unsigned short indices[GL1_MAX_INDICES];
-  int vertex_count;
-  int index_count;
+  struct ui_vertex vertices[GL1_MAX_VERTICES]; /**< Batch vertices */
+  unsigned short indices[GL1_MAX_INDICES];     /**< Batch indices */
+  int vertex_count;                            /**< Current vertex count */
+  int index_count;                             /**< Current index count */
   /* In a real implementation, we would hold VBO, IBO, and Shader IDs here */
 };
 
@@ -86,6 +109,12 @@ struct gl1_renderer_data {
    Wait, let's assume glViewport, glClearColor, glClear are present in whatever
    GL header is included. */
 
+/**
+ * \brief Flushes the batched geometry to the GPU.
+ *
+ * \param backend The renderer backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_flush(struct ui_renderer_backend *backend) {
   struct gl1_renderer_data *data;
   int i;
@@ -120,6 +149,16 @@ static ui_error_t gl1_flush(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Submits arbitrary triangulated geometry (e.g. SVG paths) to the batch.
+ *
+ * \param backend The renderer backend.
+ * \param vertices Array of vertices.
+ * \param vertex_count Number of vertices.
+ * \param indices Array of indices defining triangles.
+ * \param index_count Number of indices.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_draw_triangles(struct ui_renderer_backend *backend,
                                      const struct ui_vertex *vertices,
                                      int vertex_count,
@@ -166,6 +205,17 @@ static ui_error_t gl1_draw_triangles(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Submits a UI rectangle to the geometry batch.
+ *
+ * \param backend The renderer backend.
+ * \param x X origin.
+ * \param y Y origin.
+ * \param width Rectangle width.
+ * \param height Rectangle height.
+ * \param color Fill color.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_draw_rect(struct ui_renderer_backend *backend, float x,
                                 float y, float width, float height,
                                 struct ui_color color) {
@@ -203,6 +253,18 @@ static ui_error_t gl1_draw_rect(struct ui_renderer_backend *backend, float x,
   return gl1_draw_triangles(backend, vertices, 4, indices, 6);
 }
 
+/**
+ * \brief Submits a UI border (hollow rectangle) to the geometry batch.
+ *
+ * \param backend The renderer backend.
+ * \param x X origin.
+ * \param y Y origin.
+ * \param width Rectangle width.
+ * \param height Rectangle height.
+ * \param thickness Border thickness.
+ * \param color Border color.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_draw_border(struct ui_renderer_backend *backend, float x,
                                   float y, float width, float height,
                                   float thickness, struct ui_color color) {
@@ -227,6 +289,14 @@ static ui_error_t gl1_draw_border(struct ui_renderer_backend *backend, float x,
   return rc;
 }
 
+/**
+ * \brief Initializes the renderer for the given window.
+ *
+ * \param backend The renderer backend.
+ * \param window_backend The window backend.
+ * \param window The window instance.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_init(struct ui_renderer_backend *backend,
                            struct ui_window_backend *window_backend,
                            struct ui_window *window) {
@@ -253,6 +323,12 @@ static ui_error_t gl1_init(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys the renderer backend internal state.
+ *
+ * \param backend The renderer backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_destroy(struct ui_renderer_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -264,6 +340,16 @@ static ui_error_t gl1_destroy(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the rendering viewport.
+ *
+ * \param backend The renderer backend.
+ * \param x X origin.
+ * \param y Y origin.
+ * \param width Viewport width.
+ * \param height Viewport height.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_set_viewport(struct ui_renderer_backend *backend, int x,
                                    int y, int width, int height) {
   (void)backend;
@@ -285,6 +371,13 @@ static ui_error_t gl1_set_viewport(struct ui_renderer_backend *backend, int x,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Clears the screen with the specified color.
+ *
+ * \param backend The renderer backend.
+ * \param color The clear color.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_clear(struct ui_renderer_backend *backend,
                             struct ui_color color) {
   (void)backend;
@@ -293,14 +386,25 @@ static ui_error_t gl1_clear(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/** \brief gl1_texture */
+/**
+ * \brief Internal structure representing a GL1 texture.
+ */
 struct gl1_texture {
-  unsigned int fbo_id;
-  unsigned int tex_id;
-  int width;
-  int height;
+  unsigned int fbo_id; /**< FBO ID */
+  unsigned int tex_id; /**< Texture ID */
+  int width;           /**< Texture width */
+  int height;          /**< Texture height */
 };
 
+/**
+ * \brief Creates an offscreen texture (FBO) for rendering.
+ *
+ * \param backend The renderer backend.
+ * \param width Texture width.
+ * \param height Texture height.
+ * \param out_texture_handle Pointer to receive the texture handle.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_create_texture(struct ui_renderer_backend *backend,
                                      int width, int height,
                                      void **out_texture_handle) {
@@ -324,6 +428,13 @@ static ui_error_t gl1_create_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys an offscreen texture (FBO).
+ *
+ * \param backend The renderer backend.
+ * \param texture_handle The texture handle to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_destroy_texture(struct ui_renderer_backend *backend,
                                       void *texture_handle) {
   if (!backend || !texture_handle) {
@@ -333,6 +444,13 @@ static ui_error_t gl1_destroy_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the render target to a specific texture (FBO).
+ *
+ * \param backend The renderer backend.
+ * \param texture_handle The texture handle, or NULL for screen.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_set_render_target(struct ui_renderer_backend *backend,
                                         void *texture_handle) {
   (void)texture_handle;
@@ -347,6 +465,18 @@ static ui_error_t gl1_set_render_target(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Draws a previously rendered offscreen texture.
+ *
+ * \param backend The renderer backend.
+ * \param texture_handle The texture to draw.
+ * \param x Dest X origin.
+ * \param y Dest Y origin.
+ * \param width Dest width.
+ * \param height Dest height.
+ * \param opacity Alpha opacity modifier.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_draw_texture(struct ui_renderer_backend *backend,
                                    void *texture_handle, float x, float y,
                                    float width, float height, float opacity) {
@@ -372,6 +502,15 @@ static ui_error_t gl1_draw_texture(struct ui_renderer_backend *backend,
   return gl1_draw_rect(backend, x, y, width, height, color);
 }
 
+/**
+ * \brief Reads pixels from the current render target.
+ *
+ * \param backend The renderer backend.
+ * \param width Width of region to read.
+ * \param height Height of region to read.
+ * \param out_rgba_buffer Pre-allocated buffer to receive RGBA pixels.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t gl1_read_pixels(struct ui_renderer_backend *backend,
                                   int width, int height,
                                   unsigned char *out_rgba_buffer) {
@@ -386,6 +525,12 @@ static ui_error_t gl1_read_pixels(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a legacy OpenGL 1.1 renderer backend.
+ *
+ * \param out_backend Pointer to receive the allocated backend.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_renderer_gl1_create(struct ui_renderer_backend **out_backend) {
   struct ui_renderer_backend *backend;
 
@@ -418,6 +563,12 @@ ui_error_t ui_renderer_gl1_create(struct ui_renderer_backend **out_backend) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a legacy OpenGL 1.1 renderer backend.
+ *
+ * \param backend The backend to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
 #ifdef UI_TEST_MOCK_ALLOC
   extern int g_mock_gles2_destroy_fail;

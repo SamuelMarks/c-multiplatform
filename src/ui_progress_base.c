@@ -1,3 +1,8 @@
+/**
+ * \file ui_progress_base.c
+ * \brief Implementation of the UI Progress Base component.
+ */
+
 /* clang-format off */
 #include "ui_progress_base.h"
 #include "ui_internal_mem.h"
@@ -5,19 +10,24 @@
 #include <string.h>
 /* clang-format on */
 
-#if defined(_MSC_VER)
-/* MSVC Safe CRT */
-#endif
-
+/**
+ * \brief Internal structure representing a progress component.
+ */
 struct ui_progress_base {
-  struct ui_component *component;
-  int is_indeterminate;
-  float value;
-  float min_val;
-  float max_val;
-  struct ui_signal *value_signal;
+  struct ui_component *component; /**< Underlying component */
+  int is_indeterminate;           /**< Non-zero if in indeterminate mode */
+  float value;                    /**< Current value */
+  float min_val;                  /**< Minimum value */
+  float max_val;                  /**< Maximum value */
+  struct ui_signal *value_signal; /**< Signal bound to the value */
 };
 
+/**
+ * \brief Updates the DOM node attributes according to the progress state.
+ *
+ * \param progress The progress component to update.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 static ui_error_t update_dom_state(struct ui_progress_base *progress) {
   char buf[64];
 
@@ -81,6 +91,12 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Creates a new progress base component.
+ *
+ * \param out_progress Pointer to receive the allocated progress component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_progress_base_create(struct ui_progress_base **out_progress) {
   struct ui_progress_base *progress;
   ui_error_t rc;
@@ -101,6 +117,7 @@ ui_error_t ui_progress_base_create(struct ui_progress_base **out_progress) {
   progress->value = 0.0f;
   progress->min_val = 0.0f;
   progress->max_val = 100.0f;
+  progress->value_signal = NULL;
 
   rc = ui_component_create(&progress->component);
   if (rc != UI_ERROR_NONE) {
@@ -141,6 +158,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * \brief Destroys a progress component.
+ *
+ * \param progress The progress component to destroy.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_progress_base_destroy(struct ui_progress_base *progress) {
   if (progress) {
     (void)ui_component_destroy(progress->component);
@@ -149,7 +172,15 @@ ui_error_t ui_progress_base_destroy(struct ui_progress_base *progress) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the component to determinate mode and updates the value.
+ *
+ * \param progress The progress component.
+ * \param value The progress value (will be clamped between min and max).
+ * \param min The minimum possible value (e.g., 0.0f).
+ * \param max The maximum possible value (e.g., 100.0f).
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_progress_base_set_determinate(struct ui_progress_base *progress,
                                             float value, float min, float max) {
   if (!progress) {
@@ -177,7 +208,12 @@ ui_error_t ui_progress_base_set_determinate(struct ui_progress_base *progress,
   return update_dom_state(progress);
 }
 
-/** \brief ui_error */
+/**
+ * \brief Sets the component to indeterminate mode.
+ *
+ * \param progress The progress component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_progress_base_set_indeterminate(struct ui_progress_base *progress) {
   if (!progress) {
@@ -188,7 +224,13 @@ ui_progress_base_set_indeterminate(struct ui_progress_base *progress) {
   return update_dom_state(progress);
 }
 
-/** \brief ui_error */
+/**
+ * \brief Retrieves the underlying UI component.
+ *
+ * \param progress The progress component.
+ * \param out_component Pointer to receive the underlying component.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_progress_base_get_component(struct ui_progress_base *progress,
                                           struct ui_component **out_component) {
   if (!progress || !out_component) {
@@ -198,7 +240,14 @@ ui_error_t ui_progress_base_get_component(struct ui_progress_base *progress,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_progress_base_get_normalized_percentage */
+/**
+ * \brief Gets the current normalized percentage [0.0, 1.0].
+ * If the progress is indeterminate, this returns 0.0.
+ *
+ * \param progress The progress component.
+ * \param out_percentage Pointer to receive the normalized percentage.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_progress_base_get_normalized_percentage(
     const struct ui_progress_base *progress, float *out_percentage) {
   float range;
@@ -216,7 +265,13 @@ ui_error_t ui_progress_base_get_normalized_percentage(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Checks if the progress is currently indeterminate.
+ *
+ * \param progress The progress component.
+ * \param out_is_indeterminate Pointer to receive the indeterminate state.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_progress_base_is_indeterminate(const struct ui_progress_base *progress,
                                   int *out_is_indeterminate) {
@@ -227,6 +282,13 @@ ui_progress_base_is_indeterminate(const struct ui_progress_base *progress,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Binds the value property.
+ *
+ * \param widget The progress component.
+ * \param signal The signal to bind to.
+ * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_progress_base_bind_value(struct ui_progress_base *widget,
                                        struct ui_signal *signal) {
   if (!widget) {

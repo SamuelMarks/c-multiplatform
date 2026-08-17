@@ -13,10 +13,13 @@ extern "C" {
 #endif
 
 /**
+ * @struct ui_menubar_base
  * @brief Represents an unstyled desktop-style menubar component.
  */
 struct ui_menubar_base {
+  /** @brief The base component. */
   struct ui_component base;
+  /** @brief The signal controlling the active index of the menu. */
   struct ui_signal *active_index_signal;
 };
 
@@ -24,7 +27,7 @@ struct ui_menubar_base {
  * @brief Creates a new base menubar component.
  *
  * @param out_menubar Pointer to output the initialized menubar.
- * @return UI_ERROR_NONE on success, or an error code.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar);
 
@@ -33,7 +36,7 @@ ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar);
  *
  * @param menubar The menubar component.
  * @param item The menu item to append.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_menubar_base_append_item(struct ui_menubar_base *menubar,
                                        struct ui_component *item);
@@ -43,7 +46,7 @@ ui_error_t ui_menubar_base_append_item(struct ui_menubar_base *menubar,
  *
  * @param widget The widget.
  * @param signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_menubar_base_bind_active_index(struct ui_menubar_base *widget,
                                              struct ui_signal *signal);

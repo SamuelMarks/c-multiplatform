@@ -1,3 +1,7 @@
+/**
+ * \file ui_miller_columns_base.c
+ * \brief Implementation of Miller Columns for hierarchical browsing.
+ */
 /* clang-format off */
 #include "ui_miller_columns_base.h"
 #include "ui_arena.h"
@@ -9,6 +13,10 @@
 
 #define UI_MILLER_MAX_DEPTH 32
 
+/**
+ * \struct ui_miller_columns_base
+ * \brief State and tree context for a Miller Columns navigation widget.
+ */
 struct ui_miller_columns_base {
   struct ui_arena *arena;
   struct ui_tree_model tree_model;
@@ -21,6 +29,13 @@ struct ui_miller_columns_base {
   ui_signal_t *topology_changed_signal;
 };
 
+/**
+ * \brief Signal equality callback for column topology changes.
+ * \param[in] a The first payload.
+ * \param[in] b The second payload.
+ * \param[out] out_equal Pointer to store the boolean equality result.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t topology_equality(union ui_signal_payload a,
                                     union ui_signal_payload b,
                                     ui_bool_t *out_equal) {
@@ -29,6 +44,14 @@ static ui_error_t topology_equality(union ui_signal_payload a,
 }
 
 /** \brief ui_miller_columns_base_create */
+/**
+ * \brief Creates a new Miller columns base widget.
+ * \param[in,out] arena The memory arena.
+ * \param[in] tree_model The hierarchical tree model.
+ * \param[in] model_user_data User data for the tree model.
+ * \param[out] out_miller Pointer to store the created widget.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_miller_columns_base_create(
     struct ui_arena *arena, const struct ui_tree_model *tree_model,
     void *model_user_data, struct ui_miller_columns_base **out_miller) {
@@ -70,7 +93,11 @@ ui_error_t ui_miller_columns_base_create(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Destroys a Miller columns base widget.
+ * \param[in,out] miller The widget to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_miller_columns_base_destroy(struct ui_miller_columns_base *miller) {
   if (!miller) {
@@ -84,7 +111,14 @@ ui_miller_columns_base_destroy(struct ui_miller_columns_base *miller) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Selects an item in a specific column, dynamically spawning child
+ * columns if necessary.
+ * \param[in,out] miller The Miller columns widget.
+ * \param[in] column_index The index of the column where the selection occurred.
+ * \param[in] node_id The ID of the selected node.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
                                    int column_index, void *node_id) {
@@ -136,7 +170,11 @@ ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Navigates focus to the column on the left (parent level).
+ * \param[in,out] miller The Miller columns widget.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_miller_columns_base_navigate_left(struct ui_miller_columns_base *miller) {
   if (!miller) {
@@ -151,7 +189,11 @@ ui_miller_columns_base_navigate_left(struct ui_miller_columns_base *miller) {
   return UI_ERROR_OUT_OF_BOUNDS;
 }
 
-/** \brief ui_error */
+/**
+ * \brief Navigates focus to the column on the right (child level).
+ * \param[in,out] miller The Miller columns widget.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_miller_columns_base_navigate_right(struct ui_miller_columns_base *miller) {
   if (!miller) {
@@ -169,6 +211,12 @@ ui_miller_columns_base_navigate_right(struct ui_miller_columns_base *miller) {
 }
 
 /** \brief ui_miller_columns_base_get_column_count */
+/**
+ * \brief Gets the current number of active columns.
+ * \param[in] miller The Miller columns widget.
+ * \param[out] out_count Pointer to store the column count.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_miller_columns_base_get_column_count(
     const struct ui_miller_columns_base *miller, int *out_count) {
   if (!miller || !out_count) {
@@ -179,6 +227,12 @@ ui_error_t ui_miller_columns_base_get_column_count(
 }
 
 /** \brief ui_miller_columns_base_get_topology_changed_signal */
+/**
+ * \brief Gets the reactive signal that emits when the column topology changes.
+ * \param[in,out] miller The Miller columns widget.
+ * \param[out] out_signal Pointer to store the signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_miller_columns_base_get_topology_changed_signal(
     struct ui_miller_columns_base *miller, ui_signal_t **out_signal) {
   if (!miller || !out_signal) {

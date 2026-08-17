@@ -1,3 +1,7 @@
+/**
+ * @file ui_timer.c
+ * @brief Implementation of the abstract and monotonic timer logic.
+ */
 #if !defined(_WIN32)
 #if !defined(_POSIX_C_SOURCE)
 #define _POSIX_C_SOURCE 199309L
@@ -48,13 +52,20 @@ extern int g_ui_timer_clock_gettime_fail;
 
 enum ui_timer_type { UI_TIMER_CUSTOM, UI_TIMER_MONOTONIC };
 
-/** \brief ui_timer */
+/**
+ * @struct ui_timer
+ * @brief Internal implementation of the timer object.
+ */
 struct ui_timer {
+  /** @brief Type of the timer. */
   enum ui_timer_type type;
+  /** @brief Custom time source callback. */
   ui_error_t (*custom_time_source)(void *, double *);
+  /** @brief User data for the custom time source. */
   void *custom_user_data;
 
 #if defined(_WIN32)
+  /** @brief Windows QueryPerformanceFrequency value. */
   UI_TIMER_INT64 qpf;
 #endif
 };

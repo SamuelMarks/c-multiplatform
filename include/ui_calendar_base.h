@@ -16,9 +16,9 @@ struct ui_calendar_base;
  * @brief Represents a simple Date.
  */
 struct ui_date {
-  int year;
-  int month; /* 1-12 */
-  int day;   /* 1-31 */
+  int year;  /**< The year (e.g., 2026) */
+  int month; /**< 1-12 */
+  int day;   /**< 1-31 */
 };
 
 /**

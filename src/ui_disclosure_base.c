@@ -32,14 +32,24 @@ static const char *ui_disclosure_base_default_css =
     "opacity: 0.5; "
     "}";
 
-/** \brief ui_disclosure_base */
+/**
+ * @struct ui_disclosure_base
+ * @brief Internal representation of a disclosure base component.
+ */
 struct ui_disclosure_base {
+  /** @brief The base component. */
   struct ui_component *component;
+  /** @brief Recognizer for tap gestures. */
   struct ui_gesture_recognizer *gesture_recognizer;
+  /** @brief 1 if the disclosure is expanded, 0 otherwise. */
   int is_expanded;
+  /** @brief 1 if the disclosure is disabled. */
   int disabled;
+  /** @brief Callback for toggle events. */
   ui_disclosure_on_toggle_t on_toggle;
+  /** @brief User data for the toggle callback. */
   void *user_data;
+  /** @brief Signal to bind data. */
   struct ui_signal *data_signal;
 };
 
@@ -56,7 +66,6 @@ static ui_error_t update_dom_state(struct ui_disclosure_base *disclosure) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
   struct ui_disclosure_base *disclosure;
@@ -149,7 +158,6 @@ ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
                                 int disabled) {
@@ -173,7 +181,6 @@ ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
                                 int is_expanded) {
@@ -191,15 +198,15 @@ ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
     if (disclosure->on_toggle) {
       ui_error_t toggle_rc = disclosure->on_toggle(
           disclosure, disclosure->is_expanded, disclosure->user_data);
-      if (toggle_rc != UI_ERROR_NONE)
+      if (toggle_rc != UI_ERROR_NONE) {
         return toggle_rc;
+      }
     }
   }
 
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
                                int *out_is_expanded) {
@@ -213,7 +220,6 @@ ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
                                  ui_disclosure_on_toggle_t on_toggle,
@@ -228,7 +234,6 @@ ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
                                  const struct ui_event *event,
@@ -267,12 +272,12 @@ ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
                                  struct ui_component **out_component) {
-  if (!out_component)
+  if (!out_component) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (!disclosure) {
     *out_component = NULL;
     return UI_ERROR_INVALID_ARGUMENT;

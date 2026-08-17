@@ -1,3 +1,7 @@
+/**
+ * @file ui_tooltip_base.h
+ * @brief Defines the base logic for a tooltip UI component.
+ */
 #ifndef UI_TOOLTIP_BASE_H
 #define UI_TOOLTIP_BASE_H
 struct ui_computed;
@@ -13,17 +17,27 @@ extern "C" {
 #include "ui_event.h"
 /* clang-format on */
 
+/**
+ * @struct ui_tooltip_base
+ * @brief Opaque handle for a tooltip base component.
+ */
 struct ui_tooltip_base;
+
 struct ui_dom_node;
 struct ui_overlay_director;
 
 /**
+ * @struct ui_tooltip_config
  * @brief Configuration for a tooltip interaction state machine.
  */
 struct ui_tooltip_config {
+  /** @brief Delay before showing on mouse hover. */
   double hover_delay_secs;
+  /** @brief Delay before showing on keyboard focus. */
   double focus_delay_secs;
+  /** @brief Delay before showing on touch and hold. */
   double touch_hold_delay_secs;
+  /** @brief Delay before hiding after interaction ends. */
   double hide_delay_secs;
 };
 
@@ -32,7 +46,7 @@ struct ui_tooltip_config {
  *
  * @param out_tooltip Pointer to receive the allocated tooltip base.
  * @param config Configuration for the interaction delays.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_create(struct ui_tooltip_base **out_tooltip,
                                   const struct ui_tooltip_config *config);
@@ -41,6 +55,7 @@ ui_error_t ui_tooltip_base_create(struct ui_tooltip_base **out_tooltip,
  * @brief Destroys a tooltip component.
  *
  * @param tooltip The tooltip to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_destroy(struct ui_tooltip_base *tooltip);
 
@@ -49,7 +64,7 @@ ui_error_t ui_tooltip_base_destroy(struct ui_tooltip_base *tooltip);
  *
  * @param tooltip The tooltip.
  * @param text The text content.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_set_text(struct ui_tooltip_base *tooltip,
                                     const char *text);
@@ -61,7 +76,7 @@ ui_error_t ui_tooltip_base_set_text(struct ui_tooltip_base *tooltip,
  * @param event The input event (mouse hover, touch start/end, focus, etc.).
  * @param current_time_secs Current monotonic time in seconds, used for
  * evaluating delays.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
                                         const struct ui_event *event,
@@ -73,7 +88,7 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
  *
  * @param tooltip The tooltip.
  * @param current_time_secs Current monotonic time in seconds.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_tick(struct ui_tooltip_base *tooltip,
                                 double current_time_secs);
@@ -83,7 +98,9 @@ ui_error_t ui_tooltip_base_tick(struct ui_tooltip_base *tooltip,
  * have passed).
  *
  * @param tooltip The tooltip.
- * @return 1 if visible, 0 if hidden.
+ * @param out_is_visible Pointer to receive the boolean result (1 if visible, 0
+ * if hidden).
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_is_visible(const struct ui_tooltip_base *tooltip,
                                       int *out_is_visible);
@@ -92,7 +109,7 @@ ui_error_t ui_tooltip_base_is_visible(const struct ui_tooltip_base *tooltip,
  * @brief Programmatically forces the tooltip to hide, overriding delays.
  *
  * @param tooltip The tooltip.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_hide(struct ui_tooltip_base *tooltip);
 
@@ -109,7 +126,7 @@ ui_error_t ui_tooltip_base_hide(struct ui_tooltip_base *tooltip);
  * @param viewport_width Total width of the screen/viewport for collision math.
  * @param viewport_height Total height of the screen/viewport for collision
  * math.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
                                   struct ui_overlay_director *director,
@@ -122,7 +139,7 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
  *
  * @param widget The widget.
  * @param open_signal The boolean signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tooltip_base_bind_open(struct ui_tooltip_base *widget,
                                      struct ui_signal *open_signal);
@@ -132,7 +149,7 @@ ui_error_t ui_tooltip_base_bind_open(struct ui_tooltip_base *widget,
  *
  * @param widget The widget.
  * @param out_animating Pointer to receive the computed signal.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_tooltip_base_get_animating_signal(struct ui_tooltip_base *widget,

@@ -1,3 +1,7 @@
+/**
+ * \file ui_form_control.c
+ * \brief Implementation of individual form controls.
+ */
 /* clang-format off */
 #include "ui_form_control.h"
 #include "ui_internal_mem.h"
@@ -6,6 +10,10 @@
 #include <stdlib.h>
 /* clang-format on */
 
+/**
+ * \struct ui_form_control_async_task
+ * \brief Context for an asynchronous validation task.
+ */
 struct ui_form_control_async_task {
   ui_form_control_t *control;
   ui_async_validator_fn validator;
@@ -16,7 +24,10 @@ struct ui_form_control_async_task {
   ui_bool_t is_valid;
 };
 
-/** \brief ui_form_control */
+/**
+ * \struct ui_form_control
+ * \brief Represents an individual UI form control and its state.
+ */
 struct ui_form_control {
   struct ui_arena *arena;
   ui_signal_t *value_signal;
@@ -42,8 +53,24 @@ struct ui_form_control {
 };
 
 /* Forward declarations */
+/**
+ * \brief Runs all validators (sync and async) for a form control.
+ * \param[in,out] control The form control.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_form_control_run_validation(ui_form_control_t *control);
 
+/**
+ * \brief Creates a new form control.
+ * \param[in,out] arena The memory arena.
+ * \param[in] initial_value The initial value payload.
+ * \param[in] type The signal type for the control.
+ * \param[in] equality_fn Function to test payload equality.
+ * \param[in] destructor_fn Function to destruct payloads.
+ * \param[in] mode The signaling mode.
+ * \param[out] out_control Pointer to store the created control.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_create(struct ui_arena *arena,
                                   union ui_signal_payload initial_value,
                                   enum ui_signal_type type,
@@ -127,6 +154,13 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Adds a synchronous validator to a form control.
+ * \param[in,out] control The form control.
+ * \param[in] validator The validator function.
+ * \param[in] user_data User data for the validator.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
                                          ui_validator_fn validator,
                                          void *user_data) {
@@ -168,7 +202,15 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_form_control_add_async_validator */
+/**
+ * \brief Adds an asynchronous validator to a form control.
+ * \param[in,out] control The form control.
+ * \param[in] validator The async validator function.
+ * \param[in] user_data User data for the validator.
+ * \param[in,out] thread_pool The thread pool for async execution.
+ * \param[in,out] reactor The reactor to handle the result.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_add_async_validator(
     ui_form_control_t *control, ui_async_validator_fn validator,
     void *user_data, struct ui_thread_pool *thread_pool,
@@ -214,6 +256,11 @@ ui_error_t ui_form_control_add_async_validator(
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Callback triggered when an async validation task completes.
+ * \param[in,out] user_data Pointer to the task context.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_form_control_async_result_cb(void *user_data) {
   struct ui_form_control_async_task *task =
       (struct ui_form_control_async_task *)user_data;
@@ -274,6 +321,11 @@ static ui_error_t ui_form_control_async_worker(void *user_data) {
   }
 }
 
+/**
+ * \brief Runs all validators (sync and async) for a form control.
+ * \param[in,out] control The form control.
+ * \return UI_ERROR_NONE on success.
+ */
 static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
   size_t i;
   ui_bool_t is_valid = UI_TRUE;
@@ -381,6 +433,12 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Sets the value of a form control, marking it dirty and re-validating.
+ * \param[in,out] control The form control.
+ * \param[in] value The new value payload.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_set_value(ui_form_control_t *control,
                                      union ui_signal_payload new_value) {
 
@@ -438,6 +496,18 @@ ui_error_t ui_form_control_enable(ui_form_control_t *control) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Retrieves the current value of a form control.
+ * \param[in] control The form control.
+ * \param[out] out_value Pointer to store the value payload.
+ * \return UI_ERROR_NONE on success.
+ */
+/**
+ * \brief Gets the signal representing the control's value.
+ * \param[in] control The form control.
+ * \param[out] out_signal Pointer to store the signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_get_value_signal(ui_form_control_t *control,
                                             ui_signal_t **out_signal) {
   if (!control || !out_signal) {
@@ -447,6 +517,18 @@ ui_error_t ui_form_control_get_value_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Retrieves the validation status of a form control.
+ * \param[in] control The form control.
+ * \param[out] out_status Pointer to store the status.
+ * \return UI_ERROR_NONE on success.
+ */
+/**
+ * \brief Gets the signal representing the control's validation status.
+ * \param[in] control The form control.
+ * \param[out] out_signal Pointer to store the signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_get_status_signal(ui_form_control_t *control,
                                              ui_signal_t **out_signal) {
   if (!control || !out_signal) {
@@ -456,6 +538,12 @@ ui_error_t ui_form_control_get_status_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the signal representing whether the control is touched.
+ * \param[in] control The form control.
+ * \param[out] out_signal Pointer to store the signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_get_touched_signal(ui_form_control_t *control,
                                               ui_signal_t **out_signal) {
   if (!control || !out_signal) {
@@ -465,6 +553,12 @@ ui_error_t ui_form_control_get_touched_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Gets the signal representing whether the control is dirty.
+ * \param[in] control The form control.
+ * \param[out] out_signal Pointer to store the signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_get_dirty_signal(ui_form_control_t *control,
                                             ui_signal_t **out_signal) {
   if (!control || !out_signal) {
@@ -474,6 +568,11 @@ ui_error_t ui_form_control_get_dirty_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Destroys a form control.
+ * \param[in,out] control The form control to destroy.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_destroy(ui_form_control_t *control) {
 
   if (!control) {
@@ -491,6 +590,19 @@ ui_error_t ui_form_control_destroy(ui_form_control_t *control) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * \brief Retrieves the current error string for a form control.
+ * \param[in] control The form control.
+ * \param[out] out_error_str Pointer to store the error string, or NULL if
+ * valid.
+ * \return UI_ERROR_NONE on success.
+ */
+/**
+ * \brief Gets the signal representing the control's current error string.
+ * \param[in] control The form control.
+ * \param[out] out_signal Pointer to store the signal.
+ * \return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_form_control_get_errors_signal(ui_form_control_t *control,
                                              ui_signal_t **out_signal) {
   if (!control || !out_signal)
