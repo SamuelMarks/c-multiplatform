@@ -13,6 +13,12 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
+/**
+ * @brief parse_snap_type.
+ * @param str Parameter str.
+ * @param out_type Parameter out_type.
+ * @return Return value.
+ */
 static ui_error_t parse_snap_type(const char *str,
                                   struct ui_css_scroll_snap_type *out_type) {
   char token_buf[128];
@@ -62,6 +68,12 @@ static ui_error_t parse_snap_type(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_align_keyword.
+ * @param str Parameter str.
+ * @param out_keyword Parameter out_keyword.
+ * @return Return value.
+ */
 static ui_error_t
 parse_align_keyword(const char *str,
                     enum ui_css_scroll_snap_align_keyword *out_keyword) {
@@ -75,6 +87,12 @@ parse_align_keyword(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_snap_align.
+ * @param str Parameter str.
+ * @param out_align Parameter out_align.
+ * @return Return value.
+ */
 static ui_error_t parse_snap_align(const char *str,
                                    struct ui_css_scroll_snap_align *out_align) {
   ui_error_t rc;
@@ -98,7 +116,9 @@ static ui_error_t parse_snap_align(const char *str,
   token = UI_STRTOK(token_buf, " ", &next_token);
   if (token) {
     {
-      (void)parse_align_keyword(token, &out_align->block);
+      rc = parse_align_keyword(token, &out_align->block);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     out_align->inline_axis = out_align->block; /* default to 1st value */
   }
@@ -106,12 +126,22 @@ static ui_error_t parse_snap_align(const char *str,
   token = UI_STRTOK(NULL, " ", &next_token);
   if (token) {
     {
-      (void)parse_align_keyword(token, &out_align->inline_axis);
+      rc = parse_align_keyword(token, &out_align->inline_axis);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief set_quad_default.
+ * @param top Parameter top.
+ * @param right Parameter right.
+ * @param bottom Parameter bottom.
+ * @param left Parameter left.
+ * @return Return value.
+ */
 static ui_error_t set_quad_default(struct ui_css_value *top,
                                    struct ui_css_value *right,
                                    struct ui_css_value *bottom,
@@ -128,6 +158,15 @@ static ui_error_t set_quad_default(struct ui_css_value *top,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_quad_shorthand.
+ * @param str Parameter str.
+ * @param top Parameter top.
+ * @param right Parameter right.
+ * @param bottom Parameter bottom.
+ * @param left Parameter left.
+ * @return Return value.
+ */
 static ui_error_t parse_quad_shorthand(const char *str,
                                        struct ui_css_value *top,
                                        struct ui_css_value *right,
@@ -201,12 +240,16 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
 
   {
     ui_error_t quad_rc2;
-    (void)set_quad_default(&out_props->padding.top, &out_props->padding.right,
-                           &out_props->padding.bottom,
-                           &out_props->padding.left);
-    /* fix below */ (void)set_quad_default(
-        &out_props->margin.top, &out_props->margin.right,
-        &out_props->margin.bottom, &out_props->margin.left);
+    quad_rc2 =
+        set_quad_default(&out_props->padding.top, &out_props->padding.right,
+                         &out_props->padding.bottom, &out_props->padding.left);
+    if (quad_rc2 != UI_ERROR_NONE)
+      return quad_rc2;
+    quad_rc2 =
+        set_quad_default(&out_props->margin.top, &out_props->margin.right,
+                         &out_props->margin.bottom, &out_props->margin.left);
+    if (quad_rc2 != UI_ERROR_NONE)
+      return quad_rc2;
   }
 
   {

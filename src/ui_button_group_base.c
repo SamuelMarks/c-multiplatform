@@ -8,6 +8,11 @@
 int g_button_group_mock_fail = 0;
 #endif
 
+/**
+ * @brief ui_button_group_base_create.
+ * @param out_group Parameter out_group.
+ * @return Return value.
+ */
 ui_error_t
 ui_button_group_base_create(struct ui_button_group_base **out_group) {
   struct ui_button_group_base *group;

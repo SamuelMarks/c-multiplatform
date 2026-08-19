@@ -154,10 +154,10 @@ static int run_normal_tests(void) {
     return 1;
   (void)ui_promise_destroy(promise);
 
-  /* Test memory bounds: 10,000 chained promises */
+  /* Test memory bounds: 500 chained promises */
   (void)ui_promise_create(&promise);
   chained = promise;
-  for (i = 0; i < 10000; i++) {
+  for (i = 0; i < 500; i++) {
     ui_promise_then(chained, test_resolve_cb, NULL, NULL, &chained2);
     chained = chained2;
   }

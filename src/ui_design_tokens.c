@@ -6,6 +6,12 @@
 #define UI_MAX_ALIAS_DEPTH 32
 #define UI_TOKEN_INITIAL_CAPACITY 64
 
+/**
+ * @brief ui_design_token_dict_init.
+ * @param arena Parameter arena.
+ * @param out_dict Parameter out_dict.
+ * @return Return value.
+ */
 ui_error_t ui_design_token_dict_init(struct ui_arena *arena,
                                      struct ui_design_token_dict *out_dict) {
   void *ptr;
@@ -29,6 +35,12 @@ ui_error_t ui_design_token_dict_init(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief find_token.
+ * @param dict Parameter dict.
+ * @param name Parameter name.
+ * @return Return value.
+ */
 static struct ui_design_token *
 find_token(const struct ui_design_token_dict *dict, const char *name) {
   ui_uint32 i;
@@ -40,6 +52,13 @@ find_token(const struct ui_design_token_dict *dict, const char *name) {
   return NULL;
 }
 
+/**
+ * @brief duplicate_string.
+ * @param arena Parameter arena.
+ * @param str Parameter str.
+ * @param out_copy Parameter out_copy.
+ * @return Return value.
+ */
 static ui_error_t duplicate_string(struct ui_arena *arena, const char *str,
                                    const char **out_copy) {
   size_t len = strlen(str);
@@ -63,6 +82,11 @@ static ui_error_t duplicate_string(struct ui_arena *arena, const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ensure_capacity.
+ * @param dict Parameter dict.
+ * @return Return value.
+ */
 static ui_error_t ensure_capacity(struct ui_design_token_dict *dict) {
   ui_uint32 new_capacity;
   struct ui_design_token *new_tokens;
@@ -93,6 +117,13 @@ static ui_error_t ensure_capacity(struct ui_design_token_dict *dict) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief get_or_create_token.
+ * @param dict Parameter dict.
+ * @param name Parameter name.
+ * @param out_token Parameter out_token.
+ * @return Return value.
+ */
 static ui_error_t get_or_create_token(struct ui_design_token_dict *dict,
                                       const char *name,
                                       struct ui_design_token **out_token) {
@@ -123,6 +154,13 @@ static ui_error_t get_or_create_token(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_design_token_set_color.
+ * @param dict Parameter dict.
+ * @param name Parameter name.
+ * @param color Parameter color.
+ * @return Return value.
+ */
 ui_error_t ui_design_token_set_color(struct ui_design_token_dict *dict,
                                      const char *name, ui_color_t color) {
   ui_error_t err;
@@ -143,6 +181,13 @@ ui_error_t ui_design_token_set_color(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_design_token_set_number.
+ * @param dict Parameter dict.
+ * @param name Parameter name.
+ * @param number Parameter number.
+ * @return Return value.
+ */
 ui_error_t ui_design_token_set_number(struct ui_design_token_dict *dict,
                                       const char *name, float number) {
   ui_error_t err;
@@ -163,6 +208,13 @@ ui_error_t ui_design_token_set_number(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_design_token_set_string.
+ * @param dict Parameter dict.
+ * @param name Parameter name.
+ * @param str Parameter str.
+ * @return Return value.
+ */
 ui_error_t ui_design_token_set_string(struct ui_design_token_dict *dict,
                                       const char *name, const char *str) {
   ui_error_t err;
@@ -189,6 +241,13 @@ ui_error_t ui_design_token_set_string(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_design_token_set_alias.
+ * @param dict Parameter dict.
+ * @param name Parameter name.
+ * @param target Parameter target.
+ * @return Return value.
+ */
 ui_error_t ui_design_token_set_alias(struct ui_design_token_dict *dict,
                                      const char *name, const char *target) {
   ui_error_t err;
@@ -215,6 +274,13 @@ ui_error_t ui_design_token_set_alias(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief resolve_token.
+ * @param dict Parameter dict.
+ * @param name Parameter name.
+ * @param out_token Parameter out_token.
+ * @return Return value.
+ */
 static ui_error_t resolve_token(const struct ui_design_token_dict *dict,
                                 const char *name,
                                 struct ui_design_token **out_token) {
@@ -242,6 +308,13 @@ static ui_error_t resolve_token(const struct ui_design_token_dict *dict,
   return UI_ERROR_UNKNOWN; /* Cycle or max depth reached */
 }
 
+/**
+ * @brief ui_design_token_get_color.
+ * @param dict Parameter dict.
+ * @param name Parameter name.
+ * @param out_color Parameter out_color.
+ * @return Return value.
+ */
 ui_error_t ui_design_token_get_color(const struct ui_design_token_dict *dict,
                                      const char *name, ui_color_t *out_color) {
   ui_error_t err;

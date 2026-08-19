@@ -1,3 +1,8 @@
+/**
+ * @file ui_aspect_ratio_base.c
+ * @brief Implementation of the aspect ratio container base component.
+ */
+
 /* clang-format off */
 #include "ui_aspect_ratio_base.h"
 #include "ui_internal_mem.h"
@@ -52,9 +57,9 @@ static const char *ui_aspect_ratio_base_default_css =
  * @brief Internal representation of an aspect ratio container.
  */
 struct ui_aspect_ratio_base {
-  struct ui_component *component;
-  float ratio;
-  struct ui_signal *ratio_signal;
+  struct ui_component *component; /**< The core UI component */
+  float ratio;                    /**< The defined width/height ratio */
+  struct ui_signal *ratio_signal; /**< Optional signal for binding the ratio */
 };
 
 ui_error_t

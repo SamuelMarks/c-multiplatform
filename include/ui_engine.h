@@ -1,3 +1,8 @@
+/**
+ * @file ui_engine.h
+ * @brief Root UI engine definitions and handles.
+ */
+
 #ifndef UI_ENGINE_H
 #define UI_ENGINE_H
 

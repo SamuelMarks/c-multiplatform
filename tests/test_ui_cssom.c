@@ -3715,6 +3715,8 @@ int main(void) {
 
   /* Branch coverage for nested parens in media */
   {
+    struct ui_dom_node *node_tmp = NULL;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node_tmp);
     struct ui_css_stylesheet *sheet_tmp = NULL;
     ui_css_stylesheet_create(&sheet_tmp);
     struct ui_css_rule *media_tmp;
@@ -3723,9 +3725,10 @@ int main(void) {
     ui_css_stylesheet_append_rule(sheet_tmp, media_tmp);
 
     struct ui_css_computed_style *style_tmp;
-    ui_css_resolve_style(sheet_tmp, node, &style_tmp);
+    ui_css_resolve_style(sheet_tmp, node_tmp, &style_tmp);
     ui_css_computed_style_destroy(style_tmp);
     ui_css_stylesheet_destroy(sheet_tmp);
+    ui_dom_node_destroy(node_tmp);
   }
 
   /* Branch coverage for variable resolution without var() or missing ) */
@@ -3742,6 +3745,8 @@ int main(void) {
 
   /* Branch coverage for specificity */
   {
+    struct ui_dom_node *node_tmp = NULL;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node_tmp);
     struct ui_css_stylesheet *sheet_tmp = NULL;
     ui_css_stylesheet_create(&sheet_tmp);
     struct ui_css_rule *style_tmp;
@@ -3760,10 +3765,11 @@ int main(void) {
     ui_css_stylesheet_append_rule(sheet_tmp, style_tmp);
 
     struct ui_css_computed_style *c_style;
-    ui_css_resolve_style(sheet_tmp, node, &c_style);
+    ui_css_resolve_style(sheet_tmp, node_tmp, &c_style);
 
     ui_css_computed_style_destroy(c_style);
     ui_css_stylesheet_destroy(sheet_tmp);
+    ui_dom_node_destroy(node_tmp);
   }
 
   /* Test @scope without scope_start on a child node */

@@ -1,3 +1,8 @@
+/**
+ * @file ui_focus_ring.h
+ * @brief Focus ring properties and styling for UI components.
+ */
+
 #ifndef UI_FOCUS_RING_H
 #define UI_FOCUS_RING_H
 

@@ -1,3 +1,8 @@
+/**
+ * @file ui_css_parser.h
+ * @brief CSS text parser and AST generator.
+ */
+
 #ifndef UI_CSS_PARSER_H
 #define UI_CSS_PARSER_H
 

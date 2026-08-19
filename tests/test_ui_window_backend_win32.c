@@ -58,7 +58,9 @@ int main(void) {
     failed |= (rc != UI_ERROR_NONE);
 
     if (backend->get_os_handle) {
-      void *handle = backend->get_os_handle(backend, win);
+      void *handle = NULL;
+      ui_error_t handle_rc = backend->get_os_handle(backend, win, &handle);
+      failed |= (handle_rc != UI_ERROR_NONE);
       failed |= (handle == NULL);
     }
 

@@ -1,17 +1,32 @@
+/**
+ * @file ui_types.h
+ * @brief Standard boolean and integer types for the UI engine.
+ */
+
 #ifndef UI_TYPES_H
 #define UI_TYPES_H
-
-/* clang-format off */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * @addtogroup ui_types Standard Types
+ * @brief Cross-platform integer and boolean definitions.
+ * @{
+ */
+
+/**
  * @brief Standard boolean type.
  */
 typedef int ui_bool_t;
+/**
+ * @brief Boolean true value.
+ */
 #define UI_TRUE 1
+/**
+ * @brief Boolean false value.
+ */
 #define UI_FALSE 0
 
 /**
@@ -152,10 +167,10 @@ typedef ui_uint32 ui_uintptr;
 #error "Thread local storage not supported on this compiler."
 #endif
 
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-/* clang-format on */
 
 #endif /* UI_TYPES_H */

@@ -13,12 +13,23 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
 }
 
+/**
+ * @brief ui_css_parse_offset_path.
+ * @param str Parameter str.
+ * @param out_path Parameter out_path.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_offset_path(const char *str,
                                     struct ui_css_offset_path *out_path) {
   ui_error_t rc;
@@ -95,6 +106,12 @@ ui_error_t ui_css_parse_offset_path(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_parse_offset_distance.
+ * @param str Parameter str.
+ * @param out_distance Parameter out_distance.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_offset_distance(const char *str,
                                         struct ui_css_value *out_distance) {
   if (!str || !out_distance)

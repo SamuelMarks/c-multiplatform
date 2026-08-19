@@ -1,3 +1,8 @@
+/**
+ * @file ui_asset_streamer.h
+ * @brief Asynchronous asset loading and streaming.
+ */
+
 #ifndef UI_ASSET_STREAMER_H
 #define UI_ASSET_STREAMER_H
 
@@ -80,6 +85,7 @@ ui_error_t ui_asset_streamer_request(struct ui_asset_streamer *streamer,
  * @brief Frees a loaded asset.
  *
  * @param asset The asset to free.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_asset_destroy(struct ui_asset *asset);
 

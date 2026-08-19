@@ -5,6 +5,11 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
@@ -15,7 +20,6 @@ static void skip_whitespace(const char **p_str) {
 ui_error_t
 ui_css_parse_scrollbar_width(const char *str,
                              enum ui_css_scrollbar_width *out_width) {
-  ui_error_t rc;
   if (!str || !out_width)
     return UI_ERROR_INVALID_ARGUMENT;
 

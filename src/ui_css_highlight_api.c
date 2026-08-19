@@ -13,6 +13,13 @@ struct ui_css_highlight {
   size_t range_capacity;
 };
 
+/**
+ * @brief ui_css_highlight_create.
+ * @param type Parameter type.
+ * @param custom_name Parameter custom_name.
+ * @param out_highlight Parameter out_highlight.
+ * @return Return value.
+ */
 ui_error_t ui_css_highlight_create(enum ui_css_highlight_type type,
                                    const char *custom_name,
                                    struct ui_css_highlight **out_highlight) {
@@ -67,6 +74,13 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_css_highlight_add_range.
+ * @param highlight Parameter highlight.
+ * @param start_offset Parameter start_offset.
+ * @param end_offset Parameter end_offset.
+ * @return Return value.
+ */
 ui_error_t ui_css_highlight_add_range(struct ui_css_highlight *highlight,
                                       size_t start_offset, size_t end_offset) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -106,6 +120,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_css_highlight_destroy.
+ * @param highlight Parameter highlight.
+ * @return Return value.
+ */
 ui_error_t ui_css_highlight_destroy(struct ui_css_highlight *highlight) {
   if (highlight) {
     if (highlight->custom_name) {

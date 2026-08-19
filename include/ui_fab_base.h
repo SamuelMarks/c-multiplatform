@@ -1,3 +1,8 @@
+/**
+ * @file ui_fab_base.h
+ * @brief Floating Action Button (FAB) component definitions.
+ */
+
 #ifndef UI_FAB_BASE_H
 #define UI_FAB_BASE_H
 

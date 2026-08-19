@@ -3,6 +3,17 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief ui_geometry_anchor_compute.
+ * @param target Parameter target.
+ * @param overlay Parameter overlay.
+ * @param config Parameter config.
+ * @param viewport_width Parameter viewport_width.
+ * @param viewport_height Parameter viewport_height.
+ * @param out_x Parameter out_x.
+ * @param out_y Parameter out_y.
+ * @return Return value.
+ */
 ui_error_t ui_geometry_anchor_compute(const struct ui_layout_node *target,
                                       const struct ui_layout_node *overlay,
                                       const struct ui_anchor_config *config,

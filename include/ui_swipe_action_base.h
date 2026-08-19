@@ -1,6 +1,18 @@
+/**
+ * @file ui_swipe_action_base.h
+ * @brief Swipe action base component declarations.
+ *
+ * @defgroup SwipeActionBase Swipe Action Base
+ * @brief Base implementation for swipeable list actions.
+ * @{
+ */
+
 #ifndef UI_SWIPE_ACTION_BASE_H
 #define UI_SWIPE_ACTION_BASE_H
 
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -12,6 +24,9 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a UI component.
+ */
 struct ui_component;
 
 /**
@@ -93,7 +108,7 @@ ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action);
 /**
  * @brief Binds the disabled state to a boolean signal.
  *
- * @param widget The widget.
+ * @param widget The swipe action widget.
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
@@ -105,7 +120,7 @@ ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
  * @brief Binds the text content to a string signal for dynamic
  * internationalization.
  *
- * @param widget The widget.
+ * @param widget The swipe action widget.
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
@@ -117,3 +132,5 @@ ui_error_t ui_swipe_action_base_bind_text(struct ui_swipe_action_base *widget,
 #endif /* __cplusplus */
 
 #endif /* UI_SWIPE_ACTION_BASE_H */
+
+/** @} */

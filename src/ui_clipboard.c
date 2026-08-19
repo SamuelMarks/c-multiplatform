@@ -52,9 +52,13 @@ extern int (*g_mock_pclose_fn)(FILE *);
 #define PCLOSE_CMD(stream) pclose(stream)
 #endif
 
+/**
+ * @brief ui_clipboard_set_text.
+ * @param text Parameter text.
+ * @return Return value.
+ */
 ui_error_t ui_clipboard_set_text(const char *text) {
   size_t len;
-  FILE *p = NULL;
   if (!text) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -96,11 +100,13 @@ ui_error_t ui_clipboard_set_text(const char *text) {
     return UI_ERROR_NONE;
   }
 #elif defined(__APPLE__)
-  p = POPEN_CMD("pbcopy", "w");
-  if (p) {
-    fputs(text, p);
-    PCLOSE_CMD(p);
-    return UI_ERROR_NONE;
+  {
+    FILE *p = POPEN_CMD("pbcopy", "w");
+    if (p) {
+      fputs(text, p);
+      PCLOSE_CMD(p);
+      return UI_ERROR_NONE;
+    }
   }
 #elif defined(__linux__) || defined(__unix__)
   {
@@ -138,6 +144,11 @@ fallback:
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_clipboard_get_text.
+ * @param out_text Parameter out_text.
+ * @return Return value.
+ */
 ui_error_t ui_clipboard_get_text(char **out_text) {
   if (!out_text) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -278,6 +289,11 @@ fallback:
   return UI_ERROR_UNSUPPORTED;
 }
 
+/**
+ * @brief ui_clipboard_free_text.
+ * @param text Parameter text.
+ * @return Return value.
+ */
 ui_error_t ui_clipboard_free_text(char *text) {
   if (text) {
     C_MULTIPLATFORM_FREE(text);
@@ -285,6 +301,10 @@ ui_error_t ui_clipboard_free_text(char *text) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_clipboard_cleanup.
+ * @return Return value.
+ */
 ui_error_t ui_clipboard_cleanup(void) {
   if (s_fallback_clipboard) {
     C_MULTIPLATFORM_FREE(s_fallback_clipboard);

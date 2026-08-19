@@ -1,20 +1,30 @@
+/**
+ * @file ui_window_backend_win32.h
+ * @brief Win32 HWND + WGL window backend.
+ */
+
 #ifndef UI_WINDOW_BACKEND_WIN32_H
 #define UI_WINDOW_BACKEND_WIN32_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* clang-format off */
 #include "ui_error.h"
 #include "ui_window_backend.h"
 /* clang-format on */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @addtogroup ui_window_backend Window Backend
+ * @{
+ */
+
 /**
  * @brief Creates a Win32 HWND + WGL backend instance.
  *
  * @param out_backend Pointer to receive the allocated backend instance.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_window_backend_win32_create(struct ui_window_backend **out_backend);
@@ -23,9 +33,11 @@ ui_window_backend_win32_create(struct ui_window_backend **out_backend);
  * @brief Destroys a Win32 HWND + WGL backend instance.
  *
  * @param backend The backend instance to destroy.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_window_backend_win32_destroy(struct ui_window_backend *backend);
+
+/** @} */
 
 #ifdef __cplusplus
 }

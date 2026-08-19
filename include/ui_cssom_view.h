@@ -1,3 +1,8 @@
+/**
+ * @file ui_cssom_view.h
+ * @brief CSSOM View Module layout queries (`getBoundingClientRect`, etc.).
+ */
+
 #ifndef UI_CSSOM_VIEW_H
 #define UI_CSSOM_VIEW_H
 

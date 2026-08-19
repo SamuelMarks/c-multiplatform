@@ -57,7 +57,6 @@ struct ui_wheel_picker_base {
 static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
   if (picker->component && picker->component->shadow_root) {
     char buf[64];
-    ui_error_t rc;
 #if defined(_MSC_VER)
     sprintf_s(buf, sizeof(buf), "%d", picker->selected_index);
 #else

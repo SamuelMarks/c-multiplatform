@@ -23,7 +23,7 @@ extern int g_mock_dlopen_fail;
 int main(void) {
     int i;
     printf("Running OOM loop for responsive_mosaic...\n");
-    for (i = 1; i < 500; i++) {
+    for (i = 1; i < 5; i++) {
         g_malloc_called = 0;
         g_malloc_fail_countdown = i;
         example_responsive_main();

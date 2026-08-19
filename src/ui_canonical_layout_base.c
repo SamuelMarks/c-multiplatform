@@ -1,3 +1,8 @@
+/**
+ * @file ui_canonical_layout_base.c
+ * @brief Implementation of the canonical layout.
+ */
+
 /* clang-format off */
 #include "ui_canonical_layout_base.h"
 #include "ui_arena.h"

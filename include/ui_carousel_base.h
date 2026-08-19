@@ -1,8 +1,15 @@
+/**
+ * @file ui_carousel_base.h
+ * @brief Carousel base component for swipeable lists.
+ */
+
 #ifndef UI_CAROUSEL_BASE_H
 #define UI_CAROUSEL_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -17,14 +24,15 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief Opaque handle to a carousel base component. */
 struct ui_carousel_base;
 
 /**
  * @brief Orientation of the carousel.
  */
 enum ui_carousel_orientation {
-  UI_CAROUSEL_ORIENTATION_HORIZONTAL = 0,
-  UI_CAROUSEL_ORIENTATION_VERTICAL = 1
+  UI_CAROUSEL_ORIENTATION_HORIZONTAL = 0, /**< Horizontal scrolling */
+  UI_CAROUSEL_ORIENTATION_VERTICAL = 1    /**< Vertical scrolling */
 };
 
 /**
@@ -56,6 +64,7 @@ ui_error_t ui_carousel_base_create(struct ui_carousel_base **out_carousel,
  * @brief Destroys the carousel.
  *
  * @param carousel The carousel to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_carousel_base_destroy(struct ui_carousel_base *carousel);
 
@@ -84,7 +93,8 @@ ui_error_t ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
  * @brief Gets the underlying component.
  *
  * @param carousel The carousel instance.
- * @return The component, or NULL if null.
+ * @param out_component Pointer to receive the component.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
 ui_error_t ui_carousel_base_get_component(struct ui_carousel_base *carousel,
                                           struct ui_component **out_component);

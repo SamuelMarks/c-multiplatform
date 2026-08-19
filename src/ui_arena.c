@@ -1,3 +1,8 @@
+/**
+ * @file ui_arena.c
+ * @brief Implementation of arena allocator.
+ */
+
 /* clang-format off */
 #include <stddef.h>
 #include "../include/ui_arena.h"

@@ -5,6 +5,11 @@
 
 #define INITIAL_CAPACITY 8
 
+/**
+ * @brief ui_key_manager_init.
+ * @param manager Parameter manager.
+ * @return Return value.
+ */
 ui_error_t ui_key_manager_init(struct ui_key_manager *manager) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -27,6 +32,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_key_manager_cleanup.
+ * @param manager Parameter manager.
+ * @return Return value.
+ */
 ui_error_t ui_key_manager_cleanup(struct ui_key_manager *manager) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -46,6 +56,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_key_manager_register.
+ * @param manager Parameter manager.
+ * @param hotkey Parameter hotkey.
+ * @return Return value.
+ */
 ui_error_t ui_key_manager_register(struct ui_key_manager *manager,
                                    const struct ui_hotkey *hotkey) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -82,6 +98,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_key_manager_unregister.
+ * @param manager Parameter manager.
+ * @param id Parameter id.
+ * @return Return value.
+ */
 ui_error_t ui_key_manager_unregister(struct ui_key_manager *manager, int id) {
   ui_error_t rc = UI_ERROR_NOT_FOUND;
   size_t i;
@@ -137,6 +159,13 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_key_manager_format_hotkey.
+ * @param hotkey Parameter hotkey.
+ * @param out_buffer Parameter out_buffer.
+ * @param buffer_size Parameter buffer_size.
+ * @return Return value.
+ */
 ui_error_t ui_key_manager_format_hotkey(const struct ui_hotkey *hotkey,
                                         char *out_buffer, size_t buffer_size) {
   ui_error_t rc = UI_ERROR_NONE;

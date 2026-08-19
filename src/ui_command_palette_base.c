@@ -2,6 +2,15 @@
 #include "ui_command_palette_base.h"
 /* clang-format on */
 
+/**
+ * @brief ui_command_palette_base_init.
+ * @param palette Parameter palette.
+ * @param component Parameter component.
+ * @param autocomplete Parameter autocomplete.
+ * @param dialog Parameter dialog.
+ * @param list Parameter list.
+ * @return Return value.
+ */
 ui_error_t ui_command_palette_base_init(
     struct ui_command_palette_base *palette, struct ui_component *component,
     struct ui_autocomplete_base *autocomplete, struct ui_dialog_base *dialog,

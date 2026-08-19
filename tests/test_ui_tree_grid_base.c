@@ -295,7 +295,7 @@ static int test_tree_grid_key_events(void) {
       ui_tree_grid_base_set_expanded(tree_grid, (void *)((size_t)0x200 + j), 1);
     }
   }
-  tree_grid->active_node = (void *)0xdeadbeef;
+  tree_grid->active_node = (void *)(size_t)0xdeadbeef;
   ev.key_code = UI_KEY_RIGHT;
   EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev),
             UI_ERROR_OUT_OF_BOUNDS);

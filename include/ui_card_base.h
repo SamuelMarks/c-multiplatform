@@ -1,8 +1,15 @@
+/**
+ * @file ui_card_base.h
+ * @brief Base card component for grouping related content and actions.
+ */
+
 #ifndef UI_CARD_BASE_H
 #define UI_CARD_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 /* clang-format off */
@@ -32,6 +39,7 @@ ui_error_t ui_card_base_create(struct ui_card_base **out_card);
  * @brief Destroys a card instance and frees its resources.
  *
  * @param card The card instance to destroy. If null, does nothing.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_card_base_destroy(struct ui_card_base *card);
 
@@ -73,7 +81,8 @@ ui_error_t ui_card_base_set_actions(struct ui_card_base *card,
  * @brief Retrieves the underlying component of the card.
  *
  * @param card The card instance.
- * @return Pointer to the ui_component, or NULL if invalid.
+ * @param out_component Pointer to receive the underlying ui_component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_card_base_get_component(struct ui_card_base *card,
                                       struct ui_component **out_component);

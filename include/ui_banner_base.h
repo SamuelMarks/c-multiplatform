@@ -1,5 +1,20 @@
+/**
+ * @file ui_banner_base.h
+ * @brief Banner/Message bar base component definitions.
+ */
+
 #ifndef UI_BANNER_BASE_H
 #define UI_BANNER_BASE_H
+
+/** @brief Forward declaration of ui_computed. */
+struct ui_computed;
+
+/** @brief Forward declaration of ui_signal. */
+struct ui_signal;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* clang-format off */
 #include "ui_component.h"
@@ -7,10 +22,6 @@
 #include "ui_signal.h"
 #include "ui_computed.h"
 /* clang-format on */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * @brief Represents an unstyled banner or message bar component.
@@ -100,6 +111,7 @@ ui_error_t ui_banner_base_get_component(struct ui_banner_base *banner,
  * @brief Destroys a banner base component.
  *
  * @param banner The banner to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_banner_base_destroy(struct ui_banner_base *banner);
 

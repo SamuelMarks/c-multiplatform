@@ -267,7 +267,6 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
                                   float viewport_width, float viewport_height) {
 
   float x = 0.0f, y = 0.0f;
-  ui_error_t rc;
   struct ui_layout_node overlay_layout;
   char style_buf[256];
   struct ui_dom_node *root_node = NULL;

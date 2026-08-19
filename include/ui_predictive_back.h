@@ -1,3 +1,8 @@
+/**
+ * @file ui_predictive_back.h
+ * @brief Edge swipe gesture tracker for predictive back navigation routing.
+ */
+
 /* clang-format off */
 #ifndef UI_PREDICTIVE_BACK_H
 #define UI_PREDICTIVE_BACK_H

@@ -1,6 +1,13 @@
 #ifndef UI_SELECT_BASE_H
 #define UI_SELECT_BASE_H
 
+/**
+ * @file ui_select_base.h
+ * @brief Base select component functionality.
+ *
+ * Provides a primitive unstyled select/dropdown component with state tracking.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,6 +20,9 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing an unstyled select base component.
+ */
 struct ui_select_base;
 
 /**
@@ -21,6 +31,7 @@ struct ui_select_base;
  * @param select The select component.
  * @param selected_index The currently selected item index (-1 if none).
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_select_on_change_t)(struct ui_select_base *select,
                                             int selected_index,
@@ -32,6 +43,7 @@ typedef ui_error_t (*ui_select_on_change_t)(struct ui_select_base *select,
  * @param select The select component.
  * @param is_open 1 if opened, 0 if closed.
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_select_on_open_change_t)(struct ui_select_base *select,
                                                  int is_open, void *user_data);
@@ -60,6 +72,7 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select);
  * @brief Destroys a select base component.
  *
  * @param select The select component to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_select_base_destroy(struct ui_select_base *select);
 
@@ -110,7 +123,8 @@ ui_error_t ui_select_base_set_open(struct ui_select_base *select, int is_open);
  * @brief Checks if the select dropdown is open.
  *
  * @param select The select component.
- * @return 1 if open, 0 if closed.
+ * @param out_is_open Pointer to store 1 if open, 0 if closed.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_select_base_is_open(const struct ui_select_base *select,
                                   int *out_is_open);
@@ -130,7 +144,8 @@ ui_error_t ui_select_base_set_highlighted_index(struct ui_select_base *select,
  * @brief Gets the currently highlighted index.
  *
  * @param select The select component.
- * @return The highlighted index, or -1 if none.
+ * @param out_index Pointer to store the highlighted index, or -1 if none.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_select_base_get_highlighted_index(const struct ui_select_base *select,
@@ -150,7 +165,8 @@ ui_error_t ui_select_base_set_selected_index(struct ui_select_base *select,
  * @brief Gets the currently selected index.
  *
  * @param select The select component.
- * @return The selected index, or -1 if none.
+ * @param out_index Pointer to store the selected index, or -1 if none.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_select_base_get_selected_index(const struct ui_select_base *select,
@@ -194,14 +210,8 @@ ui_error_t ui_select_base_process_event(struct ui_select_base *select,
                                         double timestamp_ms);
 
 /**
- * @brief Gets the underlying component instance for style injection and DOM
- * mounting.
- *
- * @param select The select component.
- * @return The underlying component.
- */
-/**
  * @brief Gets the CVA vtable for this component.
+ *
  * @param select The select.
  * @param out_cva Pointer to store the vtable.
  * @return UI_ERROR_NONE on success.
@@ -209,6 +219,14 @@ ui_error_t ui_select_base_process_event(struct ui_select_base *select,
 ui_error_t ui_select_base_get_cva(struct ui_select_base *select,
                                   struct ui_control_value_accessor *out_cva);
 
+/**
+ * @brief Gets the underlying component instance for style injection and DOM
+ * mounting.
+ *
+ * @param select The select component.
+ * @param out_component Pointer to store the underlying component.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_select_base_get_component(struct ui_select_base *select,
                                         struct ui_component **out_component);
 

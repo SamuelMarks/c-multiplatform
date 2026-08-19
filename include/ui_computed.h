@@ -1,3 +1,8 @@
+/**
+ * @file ui_computed.h
+ * @brief Reactive computed signals that update based on dependencies.
+ */
+
 #ifndef UI_COMPUTED_H
 #define UI_COMPUTED_H
 

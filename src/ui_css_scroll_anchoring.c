@@ -5,6 +5,12 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief ui_css_scroll_anchoring_parse.
+ * @param style Parameter style.
+ * @param out_anchor Parameter out_anchor.
+ * @return Return value.
+ */
 ui_error_t
 ui_css_scroll_anchoring_parse(const struct ui_css_computed_style *style,
                               enum ui_css_overflow_anchor *out_anchor) {

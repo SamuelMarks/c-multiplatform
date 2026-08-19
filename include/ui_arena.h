@@ -1,3 +1,8 @@
+/**
+ * @file ui_arena.h
+ * @brief Arena allocator definitions.
+ */
+
 #ifndef UI_ARENA_H
 #define UI_ARENA_H
 
@@ -53,6 +58,11 @@ ui_error_t ui_arena_alloc(struct ui_arena *arena, size_t size, size_t alignment,
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_arena_reset(struct ui_arena *arena);
+
+/**
+ * @brief Opaque handle representing a memory arena block.
+ */
+struct ui_arena_block;
 
 /**
  * @brief Represents a savepoint in the arena for rollback.

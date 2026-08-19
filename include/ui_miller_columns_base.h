@@ -1,3 +1,8 @@
+/**
+ * @file ui_miller_columns_base.h
+ * @brief Miller Columns component for deep hierarchical navigation.
+ */
+
 #ifndef UI_MILLER_COLUMNS_BASE_H
 #define UI_MILLER_COLUMNS_BASE_H
 

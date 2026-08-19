@@ -1,8 +1,23 @@
+/**
+ * @file ui_split_pane_base.h
+ * @brief Split pane base declarations.
+ *
+ * @defgroup SplitPaneBase Split Pane Base
+ * @brief Base implementation for resizable split pane components.
+ * @{
+ */
+
 #ifndef UI_SPLIT_PANE_BASE_H
 #define UI_SPLIT_PANE_BASE_H
 
+/**
+ * @brief Opaque structure for a computed signal.
+ */
 struct ui_computed;
 
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -24,6 +39,9 @@ enum ui_split_pane_orientation {
                                            Resizer moves vertically. */
 };
 
+/**
+ * @brief Opaque structure representing the split pane base.
+ */
 struct ui_split_pane_base;
 
 /**
@@ -40,6 +58,7 @@ ui_split_pane_base_create(struct ui_split_pane_base **out_split_pane);
  * @brief Destroys a split pane base component.
  *
  * @param split_pane The split pane to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_split_pane_base_destroy(struct ui_split_pane_base *split_pane);
 
@@ -114,7 +133,7 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
 /**
  * @brief Binds the data property.
  *
- * @param widget The widget.
+ * @param widget The split pane widget.
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
@@ -126,3 +145,5 @@ ui_error_t ui_split_pane_base_bind_data(struct ui_split_pane_base *widget,
 #endif
 
 #endif /* UI_SPLIT_PANE_BASE_H */
+
+/** @} */

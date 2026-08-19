@@ -1,6 +1,15 @@
+/**
+ * @file ui_context_menu_base.h
+ * @brief Context menu base component definitions.
+ */
+
 #ifndef UI_CONTEXT_MENU_BASE_H
 #define UI_CONTEXT_MENU_BASE_H
+
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
+
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -14,6 +23,7 @@ extern "C" {
 #include "ui_overlay_director.h"
 /* clang-format on */
 
+/** @brief Opaque handle representing a context menu component. */
 struct ui_context_menu_base;
 
 /**
@@ -28,6 +38,7 @@ ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu);
  * @brief Destroys a context menu component.
  *
  * @param menu The context menu component to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu);
 
@@ -85,6 +96,6 @@ ui_context_menu_base_get_animating_signal(struct ui_context_menu_base *widget,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_CONTEXT_MENU_BASE_H */

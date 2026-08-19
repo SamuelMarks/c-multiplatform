@@ -22,6 +22,15 @@ struct web_backend_data {
     struct ui_window* active_window;
 };
 
+/**
+ * @brief web_create_window.
+ * @param backend Parameter backend.
+ * @param title Parameter title.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param out_window Parameter out_window.
+ * @return Return value.
+ */
 static ui_error_t web_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
     struct ui_window* win;
     struct web_backend_data* bdata;
@@ -78,6 +87,12 @@ static ui_error_t web_create_window(struct ui_window_backend* backend, const cha
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief web_destroy_window.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
 static ui_error_t web_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -89,6 +104,12 @@ static ui_error_t web_destroy_window(struct ui_window_backend* backend, struct u
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief web_show_window.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
 static ui_error_t web_show_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -96,6 +117,12 @@ static ui_error_t web_show_window(struct ui_window_backend* backend, struct ui_w
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief web_hide_window.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
 static ui_error_t web_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -103,6 +130,14 @@ static ui_error_t web_hide_window(struct ui_window_backend* backend, struct ui_w
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief web_poll_events.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_event Parameter out_event.
+ * @param out_has_event Parameter out_has_event.
+ * @return Return value.
+ */
 static ui_error_t web_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
     if (!backend || !window || !out_event || !out_has_event) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -112,6 +147,12 @@ static ui_error_t web_poll_events(struct ui_window_backend* backend, struct ui_w
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief web_swap_buffers.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
 static ui_error_t web_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -119,6 +160,13 @@ static ui_error_t web_swap_buffers(struct ui_window_backend* backend, struct ui_
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief web_resize_callback.
+ * @param eventType Parameter eventType.
+ * @param uiEvent Parameter uiEvent.
+ * @param userData Parameter userData.
+ * @return Return value.
+ */
 static EM_BOOL web_resize_callback(int eventType, const EmscriptenUiEvent *uiEvent, void *userData) {
     struct ui_window_backend* backend = (struct ui_window_backend*)userData;
     struct web_backend_data* bdata;
@@ -149,6 +197,11 @@ static ui_error_t web_set_on_resize_callback(struct ui_window_backend* backend, 
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_window_backend_web_create.
+ * @param out_backend Parameter out_backend.
+ * @return Return value.
+ */
 ui_error_t ui_window_backend_web_create(struct ui_window_backend** out_backend) {
     struct ui_window_backend* backend;
     struct web_backend_data* bdata;
@@ -188,6 +241,11 @@ ui_error_t ui_window_backend_web_create(struct ui_window_backend** out_backend) 
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_window_backend_web_destroy.
+ * @param backend Parameter backend.
+ * @return Return value.
+ */
 ui_error_t ui_window_backend_web_destroy(struct ui_window_backend* backend) {
     if (!backend) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -205,6 +263,11 @@ ui_error_t ui_window_backend_web_destroy(struct ui_window_backend* backend) {
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief ui_window_backend_web_create.
+ * @param out_backend Parameter out_backend.
+ * @return Return value.
+ */
 ui_error_t
 ui_window_backend_web_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
@@ -214,6 +277,11 @@ ui_window_backend_web_create(struct ui_window_backend **out_backend) {
   return UI_ERROR_UNKNOWN;
 }
 
+/**
+ * @brief ui_window_backend_web_destroy.
+ * @param backend Parameter backend.
+ * @return Return value.
+ */
 ui_error_t ui_window_backend_web_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;

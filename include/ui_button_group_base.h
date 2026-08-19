@@ -1,6 +1,12 @@
+/**
+ * @file ui_button_group_base.h
+ * @brief Button group base container for grouping related buttons.
+ */
+
 #ifndef UI_BUTTON_GROUP_BASE_H
 #define UI_BUTTON_GROUP_BASE_H
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 /* clang-format off */

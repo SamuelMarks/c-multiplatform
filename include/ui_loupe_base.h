@@ -1,3 +1,9 @@
+/**
+ * @file ui_loupe_base.h
+ * @brief Touch loupe overlay component for precision text editing and
+ * selection.
+ */
+
 #ifndef UI_LOUPE_BASE_H
 #define UI_LOUPE_BASE_H
 

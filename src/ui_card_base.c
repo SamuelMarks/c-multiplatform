@@ -1,3 +1,8 @@
+/**
+ * @file ui_card_base.c
+ * @brief Implementation of the card base component.
+ */
+
 /* clang-format off */
 #include "ui_card_base.h"
 #include "ui_internal_mem.h"
@@ -78,7 +83,10 @@ static const char ui_card_base_css[] = {
     97,  114, 100, 45,  97,  99,  116, 105, 111, 110, 115, 45,  112, 116, 44,
     32,  56,  112, 120, 41,  59,  32,  125, 0};
 
-/** \brief ui_card_base */
+/**
+ * @struct ui_card_base
+ * @brief Internal representation of a card base component.
+ */
 struct ui_card_base {
   struct ui_component *component;
   struct ui_dom_node *root_node;

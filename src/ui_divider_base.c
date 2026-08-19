@@ -46,6 +46,11 @@ struct ui_divider_base {
   struct ui_signal *data_signal;
 };
 
+/**
+ * @brief update_dom_state.
+ * @param divider Parameter divider.
+ * @return Return value.
+ */
 static ui_error_t update_dom_state(struct ui_divider_base *divider) {
   if (divider->orientation == UI_DIVIDER_ORIENTATION_VERTICAL) {
     (void)ui_dom_node_set_attribute(divider->root_node, "data-orientation",
@@ -64,6 +69,11 @@ static ui_error_t update_dom_state(struct ui_divider_base *divider) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_divider_base_create.
+ * @param out_divider Parameter out_divider.
+ * @return Return value.
+ */
 ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider) {
   struct ui_divider_base *divider;
   struct ui_css_stylesheet *default_style = NULL;
@@ -124,6 +134,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_divider_base_destroy.
+ * @param divider Parameter divider.
+ * @return Return value.
+ */
 ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   if (!divider) {
     return UI_ERROR_NONE;
@@ -133,6 +148,12 @@ ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_divider_base_set_orientation.
+ * @param divider Parameter divider.
+ * @param orientation Parameter orientation.
+ * @return Return value.
+ */
 ui_error_t
 ui_divider_base_set_orientation(struct ui_divider_base *divider,
                                 enum ui_divider_orientation orientation) {
@@ -143,6 +164,12 @@ ui_divider_base_set_orientation(struct ui_divider_base *divider,
   return update_dom_state(divider);
 }
 
+/**
+ * @brief ui_divider_base_set_inset.
+ * @param divider Parameter divider.
+ * @param inset Parameter inset.
+ * @return Return value.
+ */
 ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
                                      int inset) {
   if (!divider) {
@@ -152,6 +179,12 @@ ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
   return update_dom_state(divider);
 }
 
+/**
+ * @brief ui_divider_base_get_component.
+ * @param divider Parameter divider.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
                                          struct ui_component **out_component) {
   if (!divider || !out_component) {
@@ -161,6 +194,12 @@ ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_divider_base_bind_data.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_divider_base_bind_data(struct ui_divider_base *widget,
                                      struct ui_signal *signal) {
   if (!widget) {

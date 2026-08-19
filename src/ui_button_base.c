@@ -30,6 +30,13 @@ static const char *ui_button_base_default_css =
 #ifdef UI_TEST_MOCK_ALLOC
 int g_button_mock_fail = 0;
 
+/**
+ * @brief mock_ui_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param k Parameter k.
+ * @param v Parameter v.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_dom_node_set_attribute(struct ui_dom_node *node,
                                                  const char *k, const char *v) {
   if (g_button_mock_fail == 168 || g_button_mock_fail == 240 ||
@@ -41,6 +48,11 @@ static ui_error_t mock_ui_dom_node_set_attribute(struct ui_dom_node *node,
 }
 #define ui_dom_node_set_attribute mock_ui_dom_node_set_attribute
 
+/**
+ * @brief mock_ui_ripple_config_init.
+ * @param config Parameter config.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_ripple_config_init(struct ui_ripple_config *config) {
   if (g_button_mock_fail == 81) {
     return UI_ERROR_UNKNOWN;
@@ -49,6 +61,12 @@ static ui_error_t mock_ui_ripple_config_init(struct ui_ripple_config *config) {
 }
 #define ui_ripple_config_init mock_ui_ripple_config_init
 
+/**
+ * @brief mock_ui_component_set_default_style.
+ * @param comp Parameter comp.
+ * @param style Parameter style.
+ * @return Return value.
+ */
 static ui_error_t
 mock_ui_component_set_default_style(struct ui_component *comp,
                                     struct ui_css_stylesheet *style) {
@@ -59,6 +77,12 @@ mock_ui_component_set_default_style(struct ui_component *comp,
 }
 #define ui_component_set_default_style mock_ui_component_set_default_style
 
+/**
+ * @brief mock_ui_dom_node_remove_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_dom_node_remove_attribute(struct ui_dom_node *node,
                                                     const char *name) {
   if (g_button_mock_fail == 195) {
@@ -68,6 +92,14 @@ static ui_error_t mock_ui_dom_node_remove_attribute(struct ui_dom_node *node,
 }
 #define ui_dom_node_remove_attribute mock_ui_dom_node_remove_attribute
 
+/**
+ * @brief mock_ui_gesture_recognizer_process_event.
+ * @param recognizer Parameter recognizer.
+ * @param event Parameter event.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @param out_event Parameter out_event.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_gesture_recognizer_process_event(
     struct ui_gesture_recognizer *recognizer, const struct ui_event *event,
     double timestamp_ms, struct ui_gesture_event *out_event) {
@@ -84,6 +116,14 @@ static ui_error_t mock_ui_gesture_recognizer_process_event(
 #define ui_gesture_recognizer_process_event                                    \
   mock_ui_gesture_recognizer_process_event
 
+/**
+ * @brief mock_ui_ripple_start.
+ * @param config Parameter config.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param state Parameter state.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_ripple_start(struct ui_ripple_config *config, float x,
                                        float y, struct ui_ripple_state *state) {
   if (g_button_mock_fail == 245) {
@@ -111,6 +151,11 @@ struct ui_button_base {
   struct ui_ripple_state ripple_state;
 };
 
+/**
+ * @brief ui_button_base_create.
+ * @param out_button Parameter out_button.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_create(struct ui_button_base **out_button) {
   struct ui_button_base *btn;
   ui_error_t rc;
@@ -200,6 +245,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_button_base_destroy.
+ * @param button Parameter button.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_destroy(struct ui_button_base *button) {
   if (!button) {
     return UI_ERROR_NONE;
@@ -212,6 +262,12 @@ ui_error_t ui_button_base_destroy(struct ui_button_base *button) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_button_base_set_disabled.
+ * @param button Parameter button.
+ * @param disabled Parameter disabled.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_set_disabled(struct ui_button_base *button,
                                        int disabled) {
   ui_error_t rc;
@@ -263,6 +319,13 @@ ui_error_t ui_button_base_set_disabled(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_button_base_set_on_click.
+ * @param button Parameter button.
+ * @param on_click Parameter on_click.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_set_on_click(struct ui_button_base *button,
                                        ui_button_on_click_t on_click,
                                        void *user_data) {
@@ -276,6 +339,13 @@ ui_error_t ui_button_base_set_on_click(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_button_base_process_event.
+ * @param button Parameter button.
+ * @param event Parameter event.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_process_event(struct ui_button_base *button,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
@@ -319,6 +389,12 @@ ui_error_t ui_button_base_process_event(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_button_base_get_component.
+ * @param button Parameter button.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_get_component(struct ui_button_base *button,
                                         struct ui_component **out_component) {
   if (!button || !out_component) {
@@ -328,6 +404,12 @@ ui_error_t ui_button_base_get_component(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_button_base_bind_disabled.
+ * @param widget Parameter widget.
+ * @param disabled_signal Parameter disabled_signal.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_bind_disabled(struct ui_button_base *widget,
                                         struct ui_signal *disabled_signal) {
   if (!widget) {
@@ -337,6 +419,12 @@ ui_error_t ui_button_base_bind_disabled(struct ui_button_base *widget,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_button_base_bind_text.
+ * @param widget Parameter widget.
+ * @param text_signal Parameter text_signal.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_bind_text(struct ui_button_base *widget,
                                     struct ui_signal *text_signal) {
   if (!widget) {
@@ -346,6 +434,12 @@ ui_error_t ui_button_base_bind_text(struct ui_button_base *widget,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_button_base_get_ripple_state.
+ * @param button Parameter button.
+ * @param out_state Parameter out_state.
+ * @return Return value.
+ */
 ui_error_t ui_button_base_get_ripple_state(struct ui_button_base *button,
                                            struct ui_ripple_state *out_state) {
   if (!button || !out_state) {

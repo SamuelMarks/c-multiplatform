@@ -1,3 +1,8 @@
+/**
+ * @file ui_aria.c
+ * @brief Implementation of ARIA state parsing.
+ */
+
 /* clang-format off */
 #include "ui_aria.h"
 #include "ui_internal_mem.h"

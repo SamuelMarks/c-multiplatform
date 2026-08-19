@@ -292,8 +292,6 @@ static ui_error_t apply_step_state_attributes(struct ui_stepper_base *stepper,
   struct ui_stepper_step_entry *entry = &stepper->steps[index];
   enum ui_stepper_step_state effective_state = entry->explicit_state;
 
-  ui_error_t rc;
-
   if (index == stepper->active_index) {
     effective_state = UI_STEPPER_STEP_STATE_ACTIVE;
   }

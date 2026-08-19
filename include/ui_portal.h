@@ -1,3 +1,9 @@
+/**
+ * @file ui_portal.h
+ * @brief Portal utility to render components outside their standard DOM
+ * hierarchy.
+ */
+
 #ifndef UI_PORTAL_H
 #define UI_PORTAL_H
 

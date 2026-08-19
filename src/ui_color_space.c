@@ -21,6 +21,16 @@ static ui_error_t srgb_to_xyz(float r, float g, float b, float *x, float *y,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief xyz_to_srgb.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param z Parameter z.
+ * @param r Parameter r.
+ * @param g Parameter g.
+ * @param b Parameter b.
+ * @return Return value.
+ */
 static ui_error_t xyz_to_srgb(float x, float y, float z, float *r, float *g,
                               float *b) {
   float r_lin = x * 3.2406f + y * -1.5372f + z * -0.4986f;
@@ -36,6 +46,11 @@ static ui_error_t xyz_to_srgb(float x, float y, float z, float *r, float *g,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief calc_lab_f.
+ * @param t Parameter t.
+ * @return Return value.
+ */
 static float calc_lab_f(float t) {
   if (t > (216.0f / 24389.0f)) {
     return (float)pow(t, 1.0 / 3.0);
@@ -43,6 +58,11 @@ static float calc_lab_f(float t) {
   return (841.0f / 108.0f) * t + (4.0f / 29.0f);
 }
 
+/**
+ * @brief calc_lab_f_inv.
+ * @param t Parameter t.
+ * @return Return value.
+ */
 static float calc_lab_f_inv(float t) {
   float t3 = t * t * t;
   if (t3 > (216.0f / 24389.0f)) {
@@ -51,6 +71,16 @@ static float calc_lab_f_inv(float t) {
   return (108.0f / 841.0f) * (t - (4.0f / 29.0f));
 }
 
+/**
+ * @brief xyz_to_lab.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param z Parameter z.
+ * @param l Parameter l.
+ * @param a Parameter a.
+ * @param b_out Parameter b_out.
+ * @return Return value.
+ */
 static ui_error_t xyz_to_lab(float x, float y, float z, float *l, float *a,
                              float *b_out) {
   /* D65 standard illuminant */
@@ -68,6 +98,16 @@ static ui_error_t xyz_to_lab(float x, float y, float z, float *l, float *a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief lab_to_xyz.
+ * @param l Parameter l.
+ * @param a Parameter a.
+ * @param b_in Parameter b_in.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param z Parameter z.
+ * @return Return value.
+ */
 static ui_error_t lab_to_xyz(float l, float a, float b_in, float *x, float *y,
                              float *z) {
   float xn = 0.95047f;
@@ -84,6 +124,16 @@ static ui_error_t lab_to_xyz(float l, float a, float b_in, float *x, float *y,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief lab_to_lch.
+ * @param l Parameter l.
+ * @param a Parameter a.
+ * @param b_in Parameter b_in.
+ * @param l_out Parameter l_out.
+ * @param c Parameter c.
+ * @param h Parameter h.
+ * @return Return value.
+ */
 static ui_error_t lab_to_lch(float l, float a, float b_in, float *l_out,
                              float *c, float *h) {
   *l_out = l;
@@ -95,6 +145,16 @@ static ui_error_t lab_to_lch(float l, float a, float b_in, float *l_out,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief lch_to_lab.
+ * @param l Parameter l.
+ * @param c Parameter c.
+ * @param h Parameter h.
+ * @param l_out Parameter l_out.
+ * @param a Parameter a.
+ * @param b_out Parameter b_out.
+ * @return Return value.
+ */
 static ui_error_t lch_to_lab(float l, float c, float h, float *l_out, float *a,
                              float *b_out) {
   float h_rad = h * (float)M_PI / 180.0f;
@@ -104,6 +164,13 @@ static ui_error_t lch_to_lab(float l, float c, float h, float *l_out, float *a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief math_clamp.
+ * @param v Parameter v.
+ * @param min Parameter min.
+ * @param max Parameter max.
+ * @return Return value.
+ */
 static float math_clamp(float v, float min, float max) {
   if (v < min)
     return min;
@@ -112,6 +179,12 @@ static float math_clamp(float v, float min, float max) {
   return v;
 }
 
+/**
+ * @brief ui_color_argb_to_cam16.
+ * @param argb Parameter argb.
+ * @param out_cam16 Parameter out_cam16.
+ * @return Return value.
+ */
 ui_error_t ui_color_argb_to_cam16(ui_color_t argb,
                                   struct ui_color_cam16 *out_cam16) {
   float r, g, b, x, y, z, l, a_val, b_val, l_ch, c, h;
@@ -126,9 +199,15 @@ ui_error_t ui_color_argb_to_cam16(ui_color_t argb,
 
   {
     ui_error_t rc;
-    (void)srgb_to_xyz(r, g, b, &x, &y, &z);
-    (void)xyz_to_lab(x, y, z, &l, &a_val, &b_val);
-    (void)lab_to_lch(l, a_val, b_val, &l_ch, &c, &h);
+    rc = srgb_to_xyz(r, g, b, &x, &y, &z);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = xyz_to_lab(x, y, z, &l, &a_val, &b_val);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = lab_to_lch(l, a_val, b_val, &l_ch, &c, &h);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   out_cam16->hue = h;
@@ -141,6 +220,12 @@ ui_error_t ui_color_argb_to_cam16(ui_color_t argb,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_color_cam16_to_argb.
+ * @param cam16 Parameter cam16.
+ * @param out_argb Parameter out_argb.
+ * @return Return value.
+ */
 ui_error_t ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
                                   ui_color_t *out_argb) {
   float l_ch, a_val, b_val, x, y, z, r, g, b;
@@ -152,10 +237,15 @@ ui_error_t ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
 
   {
     ui_error_t rc;
-    (void)lch_to_lab(cam16->j, cam16->chroma, cam16->hue, &l_ch, &a_val,
-                     &b_val);
-    (void)lab_to_xyz(l_ch, a_val, b_val, &x, &y, &z);
-    (void)xyz_to_srgb(x, y, z, &r, &g, &b);
+    rc = lch_to_lab(cam16->j, cam16->chroma, cam16->hue, &l_ch, &a_val, &b_val);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = lab_to_xyz(l_ch, a_val, b_val, &x, &y, &z);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = xyz_to_srgb(x, y, z, &r, &g, &b);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   r8 = (ui_uint8)(math_clamp(r, 0.0f, 1.0f) * 255.0f + 0.5f);
@@ -166,6 +256,12 @@ ui_error_t ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_color_argb_to_hct.
+ * @param argb Parameter argb.
+ * @param out_hct Parameter out_hct.
+ * @return Return value.
+ */
 ui_error_t ui_color_argb_to_hct(ui_color_t argb, struct ui_color_hct *out_hct) {
   float r, g, b, x, y, z, l, a_val, b_val, l_ch, c, h;
 
@@ -180,9 +276,15 @@ ui_error_t ui_color_argb_to_hct(ui_color_t argb, struct ui_color_hct *out_hct) {
   /* Use LCh as a close surrogate for HCT */
   {
     ui_error_t rc;
-    (void)srgb_to_xyz(r, g, b, &x, &y, &z);
-    (void)xyz_to_lab(x, y, z, &l, &a_val, &b_val);
-    (void)lab_to_lch(l, a_val, b_val, &l_ch, &c, &h);
+    rc = srgb_to_xyz(r, g, b, &x, &y, &z);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = xyz_to_lab(x, y, z, &l, &a_val, &b_val);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = lab_to_lch(l, a_val, b_val, &l_ch, &c, &h);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   out_hct->hue = h;
@@ -192,6 +294,12 @@ ui_error_t ui_color_argb_to_hct(ui_color_t argb, struct ui_color_hct *out_hct) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_color_hct_to_argb.
+ * @param hct Parameter hct.
+ * @param out_argb Parameter out_argb.
+ * @return Return value.
+ */
 ui_error_t ui_color_hct_to_argb(const struct ui_color_hct *hct,
                                 ui_color_t *out_argb) {
   float l_ch, a_val, b_val, x, y, z, r, g, b;
@@ -203,9 +311,15 @@ ui_error_t ui_color_hct_to_argb(const struct ui_color_hct *hct,
 
   {
     ui_error_t rc;
-    (void)lch_to_lab(hct->tone, hct->chroma, hct->hue, &l_ch, &a_val, &b_val);
-    (void)lab_to_xyz(l_ch, a_val, b_val, &x, &y, &z);
-    (void)xyz_to_srgb(x, y, z, &r, &g, &b);
+    rc = lch_to_lab(hct->tone, hct->chroma, hct->hue, &l_ch, &a_val, &b_val);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = lab_to_xyz(l_ch, a_val, b_val, &x, &y, &z);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = xyz_to_srgb(x, y, z, &r, &g, &b);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   r8 = (ui_uint8)(math_clamp(r, 0.0f, 1.0f) * 255.0f + 0.5f);

@@ -1,3 +1,8 @@
+/**
+ * @file ui_audio_coreaudio.c
+ * @brief CoreAudio implementation stub for audio sink.
+ */
+
 /* clang-format off */
 #include "ui_audio_sink.h"
 #include "ui_error.h"

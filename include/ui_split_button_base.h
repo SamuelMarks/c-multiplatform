@@ -1,6 +1,18 @@
+/**
+ * @file ui_split_button_base.h
+ * @brief Split button base declarations.
+ *
+ * @defgroup SplitButtonBase Split Button Base
+ * @brief Base implementation for split button components.
+ * @{
+ */
+
 #ifndef UI_SPLIT_BUTTON_BASE_H
 #define UI_SPLIT_BUTTON_BASE_H
 
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -13,6 +25,9 @@ extern "C" {
 #include "ui_button_base.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing the split button base.
+ */
 struct ui_split_button_base;
 
 /**
@@ -35,6 +50,7 @@ ui_split_button_base_create(struct ui_split_button_base **out_split_button);
  * @brief Destroys a split button base component.
  *
  * @param split_button The split button to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_split_button_base_destroy(struct ui_split_button_base *split_button);
@@ -77,7 +93,8 @@ ui_error_t ui_split_button_base_get_trigger_button(
  * and DOM mounting.
  *
  * @param split_button The split button.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_split_button_base_get_component(struct ui_split_button_base *split_button,
@@ -86,7 +103,7 @@ ui_split_button_base_get_component(struct ui_split_button_base *split_button,
 /**
  * @brief Binds the disabled state to a boolean signal.
  *
- * @param widget The widget.
+ * @param widget The split button widget.
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
@@ -98,7 +115,7 @@ ui_split_button_base_bind_disabled(struct ui_split_button_base *widget,
  * @brief Binds the text content to a string signal for dynamic
  * internationalization.
  *
- * @param widget The widget.
+ * @param widget The split button widget.
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
@@ -110,3 +127,5 @@ ui_error_t ui_split_button_base_bind_text(struct ui_split_button_base *widget,
 #endif /* __cplusplus */
 
 #endif /* UI_SPLIT_BUTTON_BASE_H */
+
+/** @} */

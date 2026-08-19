@@ -1,3 +1,7 @@
+/**
+ * @file ui_button_base.h
+ * @brief Button base component definitions.
+ */
 #ifndef UI_BUTTON_BASE_H
 #define UI_BUTTON_BASE_H
 
@@ -43,6 +47,7 @@ ui_error_t ui_button_base_create(struct ui_button_base **out_button);
  * @brief Destroys a button base component.
  *
  * @param button The button to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_button_base_destroy(struct ui_button_base *button);
 
@@ -86,7 +91,8 @@ ui_error_t ui_button_base_process_event(struct ui_button_base *button,
  * mounting.
  *
  * @param button The button.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_button_base_get_component(struct ui_button_base *button,
                                         struct ui_component **out_component);
@@ -113,6 +119,13 @@ ui_error_t ui_button_base_bind_text(struct ui_button_base *widget,
                                     struct ui_signal *text_signal);
 
 struct ui_ripple_state;
+/**
+ * @brief Gets the ripple state of the button.
+ *
+ * @param button The button.
+ * @param out_state Pointer to receive the ripple state.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_button_base_get_ripple_state(struct ui_button_base *button,
                                            struct ui_ripple_state *out_state);
 #ifdef __cplusplus

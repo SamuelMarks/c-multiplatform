@@ -7,6 +7,12 @@ extern struct ui_image_decoder_backend ui_image_decoder_png;
 extern struct ui_image_decoder_backend ui_image_decoder_jpeg;
 extern struct ui_image_decoder_backend ui_image_decoder_webp;
 
+/**
+ * @brief get_backend_for_format.
+ * @param format Parameter format.
+ * @param out_backend Parameter out_backend.
+ * @return Return value.
+ */
 static ui_error_t
 get_backend_for_format(enum ui_image_format format,
                        struct ui_image_decoder_backend **out_backend) {
@@ -42,6 +48,14 @@ get_backend_for_format(enum ui_image_format format,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_image_decode_memory.
+ * @param format Parameter format.
+ * @param data Parameter data.
+ * @param size Parameter size.
+ * @param out_image Parameter out_image.
+ * @return Return value.
+ */
 ui_error_t ui_image_decode_memory(enum ui_image_format format, const void *data,
                                   size_t size, struct ui_image *out_image) {
   struct ui_image_decoder_backend *backend;
@@ -62,6 +76,11 @@ ui_error_t ui_image_decode_memory(enum ui_image_format format, const void *data,
   return backend->decode_memory(data, size, out_image);
 }
 
+/**
+ * @brief ui_image_free.
+ * @param image Parameter image.
+ * @return Return value.
+ */
 ui_error_t ui_image_free(struct ui_image *image) {
   /* For a real implementation, we might need to store which backend allocated
      the image, but for now we'll just dispatch to a generic free or let the

@@ -2,6 +2,12 @@
 #include "ui_focus_ring.h"
 /* clang-format on */
 
+/**
+ * @brief ui_focus_ring_get_standard.
+ * @param theme_primary_color Parameter theme_primary_color.
+ * @param out_ring Parameter out_ring.
+ * @return Return value.
+ */
 ui_error_t ui_focus_ring_get_standard(ui_color_t theme_primary_color,
                                       struct ui_focus_ring *out_ring) {
   if (!out_ring) {

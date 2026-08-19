@@ -1,3 +1,8 @@
+/**
+ * @file ui_share.h
+ * @brief Native OS share sheet integration.
+ */
+
 #ifndef UI_SHARE_H
 #define UI_SHARE_H
 

@@ -1,20 +1,28 @@
+/**
+ * @file ui_video_player_base.h
+ * @brief Base definitions for the video player UI component.
+ */
+
 #ifndef UI_VIDEO_PLAYER_BASE_H
 #define UI_VIDEO_PLAYER_BASE_H
-
-struct ui_computed;
-
-struct ui_signal;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* clang-format off */
 #include "ui_error.h"
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @addtogroup ui_video_player Video Player Base
+ * @brief Core structure and methods for the video player component.
+ * @{
+ */
+
 struct ui_component;
+struct ui_signal;
 
 /**
  * @struct ui_av_sync
@@ -27,22 +35,15 @@ struct ui_av_sync;
  * @brief Base state for a Video/Media Player UI component.
  */
 struct ui_video_player_base {
-  /** @brief Pointer to the associated UI component. */
-  struct ui_component *component;
-  /** @brief Pointer to the AV sync engine. */
-  struct ui_av_sync *av_sync;
-  /** @brief Non-zero if the player is currently playing. */
-  int is_playing;
-  /** @brief The current playback time in seconds. */
-  float current_time;
-  /** @brief The total duration of the media in seconds. */
-  float duration;
-  /** @brief The current volume level (0.0 to 1.0). */
-  float volume;
-  /** @brief Non-zero if the player is in fullscreen mode. */
-  int is_fullscreen;
-  /** @brief The signal containing the source URI. */
-  struct ui_signal *src_signal;
+  struct ui_component
+      *component;             /**< Pointer to the associated UI component. */
+  struct ui_av_sync *av_sync; /**< Pointer to the AV sync engine. */
+  int is_playing;     /**< Non-zero if the player is currently playing. */
+  float current_time; /**< The current playback time in seconds. */
+  float duration;     /**< The total duration of the media in seconds. */
+  float volume;       /**< The current volume level (0.0 to 1.0). */
+  int is_fullscreen;  /**< Non-zero if the player is in fullscreen mode. */
+  struct ui_signal *src_signal; /**< The signal containing the source URI. */
 };
 
 /**
@@ -104,6 +105,8 @@ ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player);
  */
 ui_error_t ui_video_player_base_bind_src(struct ui_video_player_base *widget,
                                          struct ui_signal *signal);
+
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -1,8 +1,15 @@
+/**
+ * @file ui_divider_base.h
+ * @brief Base component for rendering horizontal or vertical dividers.
+ */
+
 #ifndef UI_DIVIDER_BASE_H
 #define UI_DIVIDER_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 /* clang-format off */
@@ -18,8 +25,8 @@ extern "C" {
  * @brief Divider orientation options.
  */
 enum ui_divider_orientation {
-  UI_DIVIDER_ORIENTATION_HORIZONTAL = 0,
-  UI_DIVIDER_ORIENTATION_VERTICAL = 1
+  UI_DIVIDER_ORIENTATION_HORIZONTAL = 0, /**< Horizontal divider */
+  UI_DIVIDER_ORIENTATION_VERTICAL = 1    /**< Vertical divider */
 };
 
 /**
@@ -40,6 +47,7 @@ ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider);
  * @brief Destroys a divider instance and frees its resources.
  *
  * @param divider The divider instance to destroy. If null, does nothing.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider);
 
@@ -68,7 +76,8 @@ ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
  * @brief Retrieves the underlying component of the divider.
  *
  * @param divider The divider instance.
- * @return Pointer to the ui_component, or NULL if invalid.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
                                          struct ui_component **out_component);

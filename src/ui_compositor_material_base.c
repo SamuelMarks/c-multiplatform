@@ -22,6 +22,13 @@ struct ui_compositor_material_base {
   ui_signal_t *type_signal;
 };
 
+/**
+ * @brief type_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
+ */
 static ui_error_t type_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
                                 ui_bool_t *out_equal) {
@@ -29,6 +36,13 @@ static ui_error_t type_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_compositor_material_base_create.
+ * @param arena Parameter arena.
+ * @param config Parameter config.
+ * @param out_material Parameter out_material.
+ * @return Return value.
+ */
 ui_error_t ui_compositor_material_base_create(
     struct ui_arena *arena, const struct ui_compositor_material_config *config,
     struct ui_compositor_material_base **out_material) {
@@ -62,6 +76,11 @@ ui_error_t ui_compositor_material_base_create(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_compositor_material_base_destroy.
+ * @param material Parameter material.
+ * @return Return value.
+ */
 ui_error_t ui_compositor_material_base_destroy(
     struct ui_compositor_material_base *material) {
   if (!material) {
@@ -73,6 +92,12 @@ ui_error_t ui_compositor_material_base_destroy(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_compositor_material_base_set_type.
+ * @param material Parameter material.
+ * @param type Parameter type.
+ * @return Return value.
+ */
 ui_error_t ui_compositor_material_base_set_type(
     struct ui_compositor_material_base *material,
     enum ui_compositor_material_type type) {
@@ -90,6 +115,12 @@ ui_error_t ui_compositor_material_base_set_type(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_compositor_material_base_set_fallback_mode.
+ * @param material Parameter material.
+ * @param fallback_mode Parameter fallback_mode.
+ * @return Return value.
+ */
 ui_error_t ui_compositor_material_base_set_fallback_mode(
     struct ui_compositor_material_base *material,
     enum ui_compositor_fallback_mode fallback_mode) {
@@ -100,6 +131,12 @@ ui_error_t ui_compositor_material_base_set_fallback_mode(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_compositor_material_base_set_opacity.
+ * @param material Parameter material.
+ * @param opacity Parameter opacity.
+ * @return Return value.
+ */
 ui_error_t ui_compositor_material_base_set_opacity(
     struct ui_compositor_material_base *material, float opacity) {
   if (!material) {
@@ -116,6 +153,12 @@ ui_error_t ui_compositor_material_base_set_opacity(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_compositor_material_base_get_type_signal.
+ * @param material Parameter material.
+ * @param out_signal Parameter out_signal.
+ * @return Return value.
+ */
 ui_error_t ui_compositor_material_base_get_type_signal(
     struct ui_compositor_material_base *material, ui_signal_t **out_signal) {
   if (!material || !out_signal) {

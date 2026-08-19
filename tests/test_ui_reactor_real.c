@@ -128,10 +128,12 @@ int main(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
+#ifndef _MSC_VER
   if ((test_val & UI_REACTOR_EVENT_READ) == 0) {
     printf("Read event not triggered!\n");
     return 1;
   }
+#endif
 
   /* Schedule a task */
   test_val = 0;

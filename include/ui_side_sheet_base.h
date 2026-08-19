@@ -1,3 +1,8 @@
+/**
+ * @file ui_side_sheet_base.h
+ * @brief Base component for sliding side sheets and drawers.
+ */
+
 /* clang-format off */
 #ifndef UI_SIDE_SHEET_BASE_H
 #define UI_SIDE_SHEET_BASE_H

@@ -16,6 +16,13 @@ int g_checkbox_mock_fail = 0;
 int g_checkbox_mock_target = 0;
 int g_checkbox_mock_current = 0;
 
+/**
+ * @brief mock_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param k Parameter k.
+ * @param v Parameter v.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *k, const char *v) {
   if (g_checkbox_mock_fail == 5) {
@@ -27,6 +34,12 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
 #undef ui_dom_node_set_attribute
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
 
+/**
+ * @brief mock_dom_node_remove_attribute.
+ * @param node Parameter node.
+ * @param k Parameter k.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
                                                  const char *k) {
   if (g_checkbox_mock_fail == 5) {
@@ -47,6 +60,11 @@ struct ui_checkbox_base {
   ui_signal_t *disabled_signal;
 };
 
+/**
+ * @brief update_dom_state.
+ * @param checkbox Parameter checkbox.
+ * @return Return value.
+ */
 static ui_error_t update_dom_state(struct ui_checkbox_base *checkbox) {
 #if defined(__EMSCRIPTEN__)
   ui_web_bridge_set_property(
@@ -87,6 +105,11 @@ static ui_error_t update_dom_state(struct ui_checkbox_base *checkbox) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_checkbox_base_create.
+ * @param out_checkbox Parameter out_checkbox.
+ * @return Return value.
+ */
 ui_error_t ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox) {
   struct ui_checkbox_base *checkbox;
   ui_error_t rc;
@@ -153,6 +176,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_checkbox_base_destroy.
+ * @param checkbox Parameter checkbox.
+ * @return Return value.
+ */
 ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox) {
   if (!checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -162,6 +190,12 @@ ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_checkbox_base_get_state.
+ * @param checkbox Parameter checkbox.
+ * @param out_state Parameter out_state.
+ * @return Return value.
+ */
 ui_error_t ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
                                       enum ui_checkbox_state *out_state) {
   if (!checkbox || !out_state) {
@@ -171,6 +205,12 @@ ui_error_t ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_checkbox_base_set_state.
+ * @param checkbox Parameter checkbox.
+ * @param state Parameter state.
+ * @return Return value.
+ */
 ui_error_t ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
                                       enum ui_checkbox_state state) {
   if (!checkbox) {
@@ -187,6 +227,12 @@ ui_error_t ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
   return update_dom_state(checkbox);
 }
 
+/**
+ * @brief checkbox_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 static ui_error_t checkbox_cva_write_value(void *component,
                                            union ui_signal_payload value) {
   struct ui_checkbox_base *checkbox = (struct ui_checkbox_base *)component;
@@ -213,6 +259,12 @@ static ui_error_t checkbox_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief checkbox_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
+ */
 static ui_error_t checkbox_cva_set_disabled_state(void *component,
                                                   ui_bool_t is_disabled) {
   struct ui_checkbox_base *checkbox = (struct ui_checkbox_base *)component;
@@ -249,6 +301,11 @@ ui_error_t ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_checkbox_base_toggle.
+ * @param checkbox Parameter checkbox.
+ * @return Return value.
+ */
 ui_error_t ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox) {
   if (!checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;

@@ -1,3 +1,9 @@
+/**
+ * @file ui_live_announcer.h
+ * @brief Accessibility utility for injecting dynamic speech into screen
+ * readers.
+ */
+
 #ifndef UI_LIVE_ANNOUNCER_H
 #define UI_LIVE_ANNOUNCER_H
 

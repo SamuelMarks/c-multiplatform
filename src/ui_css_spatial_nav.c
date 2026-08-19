@@ -5,6 +5,12 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief ui_css_spatial_nav_parse.
+ * @param style Parameter style.
+ * @param out_props Parameter out_props.
+ * @return Return value.
+ */
 ui_error_t
 ui_css_spatial_nav_parse(const struct ui_css_computed_style *style,
                          struct ui_css_spatial_nav_properties *out_props) {

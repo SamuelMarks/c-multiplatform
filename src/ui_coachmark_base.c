@@ -47,6 +47,11 @@ struct ui_coachmark_tour {
   struct ui_computed *animating_signal;
 };
 
+/**
+ * @brief update_aria_and_focus.
+ * @param tour Parameter tour.
+ * @return Return value.
+ */
 static ui_error_t update_aria_and_focus(struct ui_coachmark_tour *tour) {
   ui_error_t rc = UI_ERROR_NONE;
   /* This updates the aria roles for the current coachmark container. */
@@ -71,6 +76,12 @@ static ui_error_t update_aria_and_focus(struct ui_coachmark_tour *tour) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_create.
+ * @param director Parameter director.
+ * @param out_tour Parameter out_tour.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
                                     struct ui_coachmark_tour **out_tour) {
   struct ui_coachmark_tour *tour;
@@ -152,6 +163,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_coachmark_tour_destroy.
+ * @param tour Parameter tour.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour) {
   if (!tour) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -170,6 +186,13 @@ ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_set_steps.
+ * @param tour Parameter tour.
+ * @param steps Parameter steps.
+ * @param step_count Parameter step_count.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
                                        const struct ui_coachmark_step *steps,
                                        int step_count) {
@@ -196,6 +219,13 @@ ui_error_t ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_set_on_step_change.
+ * @param tour Parameter tour.
+ * @param on_change Parameter on_change.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 ui_error_t
 ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
                                      ui_coachmark_on_step_change_t on_change,
@@ -213,6 +243,11 @@ int g_coachmark_signal_mock_fail = 0;
 int g_coachmark_dom_mock_fail = 0;
 #endif
 
+/**
+ * @brief render_current_step.
+ * @param tour Parameter tour.
+ * @return Return value.
+ */
 static ui_error_t render_current_step(struct ui_coachmark_tour *tour) {
   struct ui_dom_node *container_node;
   ui_error_t rc = UI_ERROR_NONE;
@@ -252,6 +287,11 @@ static ui_error_t render_current_step(struct ui_coachmark_tour *tour) {
   return rc;
 }
 
+/**
+ * @brief ui_coachmark_tour_start.
+ * @param tour Parameter tour.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!tour || tour->step_count == 0) {
@@ -308,6 +348,11 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_next.
+ * @param tour Parameter tour.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!tour) {
@@ -332,6 +377,11 @@ ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_prev.
+ * @param tour Parameter tour.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_prev(struct ui_coachmark_tour *tour) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!tour) {
@@ -351,6 +401,11 @@ ui_error_t ui_coachmark_tour_prev(struct ui_coachmark_tour *tour) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_skip.
+ * @param tour Parameter tour.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
   if (!tour) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -394,6 +449,13 @@ ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_update_layout.
+ * @param tour Parameter tour.
+ * @param viewport_width Parameter viewport_width.
+ * @param viewport_height Parameter viewport_height.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
                                            float viewport_width,
                                            float viewport_height) {
@@ -438,6 +500,12 @@ ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_process_event.
+ * @param tour Parameter tour.
+ * @param event Parameter event.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
                                            const struct ui_event *event) {
   if (!tour || !event) {
@@ -462,6 +530,12 @@ ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_bind_open.
+ * @param tour Parameter tour.
+ * @param open_signal Parameter open_signal.
+ * @return Return value.
+ */
 ui_error_t ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
                                        struct ui_signal *open_signal) {
   if (!tour) {
@@ -471,6 +545,12 @@ ui_error_t ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_coachmark_tour_get_animating_signal.
+ * @param tour Parameter tour.
+ * @param out_animating Parameter out_animating.
+ * @return Return value.
+ */
 ui_error_t
 ui_coachmark_tour_get_animating_signal(struct ui_coachmark_tour *tour,
                                        struct ui_computed **out_animating) {

@@ -1,3 +1,8 @@
+/**
+ * @file ui_auth.c
+ * @brief Implementation of cross-platform biometric/credential authentication.
+ */
+
 /* clang-format off */
 #include "../include/ui_auth.h"
 #include "ui_internal_mem.h"
@@ -18,7 +23,16 @@
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
+/** @brief Global flag to inject failure into auth mock functions. */
 int g_auth_mock_fail = 0;
+
+/**
+ * @brief Mock implementation of ui_promise_resolve for testing.
+ *
+ * @param promise The promise to resolve.
+ * @param value The value to resolve with.
+ * @return ui_error_t UI_ERROR_NONE on success or injected UI_ERROR_UNKNOWN.
+ */
 static ui_error_t mock_promise_resolve(struct ui_promise *promise,
                                        void *value) {
   if (g_auth_mock_fail == 1) {
@@ -29,6 +43,13 @@ static ui_error_t mock_promise_resolve(struct ui_promise *promise,
 #undef ui_promise_resolve
 #define ui_promise_resolve mock_promise_resolve
 
+/**
+ * @brief Mock implementation of ui_promise_reject for testing.
+ *
+ * @param promise The promise to reject.
+ * @param error The error to reject with.
+ * @return ui_error_t UI_ERROR_NONE on success or injected UI_ERROR_UNKNOWN.
+ */
 static ui_error_t mock_promise_reject(struct ui_promise *promise,
                                       ui_error_t error) {
   if (g_auth_mock_fail == 2) {
@@ -45,16 +66,22 @@ static ui_error_t mock_promise_reject(struct ui_promise *promise,
  * @brief Internal representation of an asynchronous authentication request.
  */
 struct ui_auth_task {
-  /** @brief The promise to resolve or reject when complete. */
-  struct ui_promise *promise;
-  /** @brief The result of the authentication attempt. */
-  enum ui_auth_result result;
+  struct ui_promise
+      *promise; /**< The promise to resolve or reject when complete. */
+  enum ui_auth_result result; /**< The result of the authentication attempt. */
 };
 
 /* We might need the thread pool to avoid blocking the main loop if we don't
    have true async APIs. But for now, we will just mock the OS behavior
    directly. */
 
+/**
+ * @brief Checks if authentication is supported on the current platform.
+ *
+ * @param out_is_available Pointer to an integer, populated with 1 if supported,
+ * 0 otherwise.
+ * @return ui_error_t `UI_ERROR_NONE` on success, or an appropriate error code.
+ */
 ui_error_t ui_auth_is_supported(int *out_is_available) {
   if (!out_is_available) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -65,6 +92,13 @@ ui_error_t ui_auth_is_supported(int *out_is_available) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Requests authentication asynchronously.
+ *
+ * @param config Pointer to the authentication request configuration.
+ * @param promise Pointer to the promise to be resolved or rejected.
+ * @return ui_error_t `UI_ERROR_NONE` on success, or an appropriate error code.
+ */
 ui_error_t ui_auth_request_async(const struct ui_auth_request_config *config,
                                  struct ui_promise *promise) {
   struct ui_auth_task *task;
@@ -117,6 +151,11 @@ ui_error_t ui_auth_request_async(const struct ui_auth_request_config *config,
 
 #ifdef UI_TEST_MOCK_ALLOC
 
+/**
+ * @brief Runs test coverage for authentication functionality.
+ *
+ * @return ui_error_t `UI_ERROR_NONE` on success.
+ */
 ui_error_t run_auth_coverage(void);
 ui_error_t run_auth_coverage(void) {
   struct ui_promise *promise = NULL;

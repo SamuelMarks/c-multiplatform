@@ -410,7 +410,11 @@ return 1;
   emscripten_set_main_loop(main_loop_step, 0, 1);
 #else
   int frame_count = 0;
+#if defined(CI_TEST_RUN)
+  const char *ci_test = "1";
+#else
   const char *ci_test = getenv("CI_TEST_RUN");
+#endif
   while (running) {
     if (ci_test && frame_count++ > 2)
       break;

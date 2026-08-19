@@ -1,3 +1,9 @@
+/**
+ * @file ui_node_graph_base.h
+ * @brief Node graph base component handling 2D canvas zooming, panning, and
+ * port connections.
+ */
+
 #ifndef UI_NODE_GRAPH_BASE_H
 #define UI_NODE_GRAPH_BASE_H
 

@@ -85,6 +85,11 @@ ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_stylesheet_destroy.
+ * @param stylesheet Parameter stylesheet.
+ * @return Return value.
+ */
 ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet) {
   struct ui_css_rule *rule;
   struct ui_css_rule *next_rule;
@@ -212,6 +217,12 @@ ui_css_stylesheet_register_layer(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_rule_create.
+ * @param type Parameter type.
+ * @param out_rule Parameter out_rule.
+ * @return Return value.
+ */
 ui_error_t ui_css_rule_create(enum ui_css_rule_type type,
                               struct ui_css_rule **out_rule) {
   struct ui_css_rule *rule;
@@ -246,6 +257,11 @@ ui_error_t ui_css_rule_create(enum ui_css_rule_type type,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_selector_destroy.
+ * @param sel Parameter sel.
+ * @return Return value.
+ */
 ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel) {
   struct ui_css_selector *next_sel;
   while (sel) {
@@ -268,6 +284,11 @@ ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_rule_destroy.
+ * @param rule Parameter rule.
+ * @return Return value.
+ */
 ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
   struct ui_css_declaration *decl;
   struct ui_css_declaration *next_decl;
@@ -373,6 +394,13 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_rule_append_selector.
+ * @param rule Parameter rule.
+ * @param type Parameter type.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 ui_error_t ui_css_rule_append_selector(struct ui_css_rule *rule,
                                        enum ui_css_selector_type type,
                                        const char *value) {
@@ -486,6 +514,14 @@ ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_rule_append_declaration.
+ * @param rule Parameter rule.
+ * @param property_name Parameter property_name.
+ * @param property_value Parameter property_value.
+ * @param is_important Parameter is_important.
+ * @return Return value.
+ */
 ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
                                           const char *property_name,
                                           const char *property_value,
@@ -543,6 +579,13 @@ ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief class_list_contains.
+ * @param class_list Parameter class_list.
+ * @param class_name Parameter class_name.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t class_list_contains(const char *class_list,
                                       const char *class_name,
                                       int *out_matched) {
@@ -570,6 +613,13 @@ static ui_error_t class_list_contains(const char *class_list,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief string_starts_with.
+ * @param str Parameter str.
+ * @param prefix Parameter prefix.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t string_starts_with(const char *str, const char *prefix,
                                      int *out_matched) {
   size_t prefix_len = strlen(prefix);
@@ -581,6 +631,13 @@ static ui_error_t string_starts_with(const char *str, const char *prefix,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief string_ends_with.
+ * @param str Parameter str.
+ * @param suffix Parameter suffix.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t string_ends_with(const char *str, const char *suffix,
                                    int *out_matched) {
   size_t str_len = strlen(str);
@@ -593,12 +650,26 @@ static ui_error_t string_ends_with(const char *str, const char *suffix,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief string_contains.
+ * @param str Parameter str.
+ * @param substr Parameter substr.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t string_contains(const char *str, const char *substr,
                                   int *out_matched) {
   *out_matched = (strstr(str, substr) != NULL);
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief string_dash_match.
+ * @param str Parameter str.
+ * @param val Parameter val.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t string_dash_match(const char *str, const char *val,
                                     int *out_matched) {
   size_t val_len = strlen(val);
@@ -612,6 +683,13 @@ static ui_error_t string_dash_match(const char *str, const char *val,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief attribute_matches.
+ * @param selector Parameter selector.
+ * @param attr_val Parameter attr_val.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t attribute_matches(const struct ui_css_selector *selector,
                                     const char *attr_val, int *out_matched) {
   if (selector->attr_op == UI_CSS_ATTR_OP_NONE) {
@@ -653,6 +731,13 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
                                    const struct ui_dom_node *node,
                                    int *out_matched);
 
+/**
+ * @brief any_selector_matches.
+ * @param selectors_list Parameter selectors_list.
+ * @param node Parameter node.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t
 any_selector_matches(const struct ui_css_selector *selectors_list,
                      const struct ui_dom_node *node, int *out_matched) {
@@ -670,6 +755,13 @@ any_selector_matches(const struct ui_css_selector *selectors_list,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief has_matching_descendant.
+ * @param selectors_list Parameter selectors_list.
+ * @param node Parameter node.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t
 has_matching_descendant(const struct ui_css_selector *selectors_list,
                         const struct ui_dom_node *node, int *out_matched) {
@@ -705,6 +797,14 @@ static const char *cssom_get_attr(const struct ui_dom_node *node,
   return NULL;
 }
 
+/**
+ * @brief is_in_scope.
+ * @param scope_start Parameter scope_start.
+ * @param scope_end Parameter scope_end.
+ * @param node Parameter node.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
                               const struct ui_css_selector *scope_end,
                               const struct ui_dom_node *node,
@@ -750,6 +850,13 @@ static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief has_matching_ancestor.
+ * @param selectors_list Parameter selectors_list.
+ * @param node Parameter node.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t
 has_matching_ancestor(const struct ui_css_selector *selectors_list,
                       const struct ui_dom_node *node, int *out_matched) {
@@ -769,6 +876,13 @@ has_matching_ancestor(const struct ui_css_selector *selectors_list,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief pseudo_class_matches.
+ * @param selector Parameter selector.
+ * @param node Parameter node.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
                                        const struct ui_dom_node *node,
                                        int *out_matched) {
@@ -794,12 +908,16 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
   } else if (strcmp(selector->value, "not") == 0) {
     {
       int m = 0;
-      ui_error_t rc;
       if (!selector->nested_selector) {
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
-      (void)any_selector_matches(selector->nested_selector, node, &m);
+      {
+        ui_error_t rc =
+            any_selector_matches(selector->nested_selector, node, &m);
+        if (rc != UI_ERROR_NONE)
+          return rc;
+      }
       *out_matched = !m;
       return UI_ERROR_NONE;
     }
@@ -1067,6 +1185,13 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
   }
 }
 
+/**
+ * @brief selector_matches.
+ * @param selector Parameter selector.
+ * @param node Parameter node.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t selector_matches(const struct ui_css_selector *selector,
                                    const struct ui_dom_node *node,
                                    int *out_matched) {
@@ -1231,6 +1356,14 @@ static ui_error_t append_computed_declaration(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief get_selector_specificity.
+ * @param sel Parameter sel.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
                                            int *a, int *b, int *c) {
   *a = 0;
@@ -1278,6 +1411,11 @@ static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cond_skip_ws.
+ * @param p Parameter p.
+ * @return Return value.
+ */
 static ui_error_t cond_skip_ws(const char **p) {
   while (**p == ' ' || **p == '\t' || **p == '\r' || **p == '\n') {
     (*p)++;
@@ -1285,6 +1423,13 @@ static ui_error_t cond_skip_ws(const char **p) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cond_is_word.
+ * @param p Parameter p.
+ * @param word Parameter word.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t cond_is_word(const char *p, const char *word,
                                int *out_matched) {
   size_t len = strlen(word);
@@ -1302,6 +1447,12 @@ static ui_error_t cond_is_word(const char *p, const char *word,
 
 static ui_error_t eval_cond_or(const char **p, int *out_matched);
 
+/**
+ * @brief eval_cond_term.
+ * @param p Parameter p.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t eval_cond_term(const char **p, int *out_matched) {
   int res = 0;
   int m1 = 0, m2 = 0, m3 = 0;
@@ -1394,6 +1545,12 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
   *out_matched = 0;
   return UI_ERROR_NONE;
 }
+/**
+ * @brief eval_cond_and.
+ * @param p Parameter p.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t eval_cond_and(const char **p, int *out_matched) {
   int res = 0;
   ui_error_t rc = eval_cond_term(p, &res);
@@ -1420,6 +1577,12 @@ static ui_error_t eval_cond_and(const char **p, int *out_matched) {
   *out_matched = res;
   return UI_ERROR_NONE;
 }
+/**
+ * @brief eval_cond_or.
+ * @param p Parameter p.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t eval_cond_or(const char **p, int *out_matched) {
   int res = 0;
   ui_error_t rc = eval_cond_and(p, &res);
@@ -1446,6 +1609,12 @@ static ui_error_t eval_cond_or(const char **p, int *out_matched) {
   *out_matched = res;
   return UI_ERROR_NONE;
 }
+/**
+ * @brief eval_supports_condition.
+ * @param condition Parameter condition.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static ui_error_t eval_supports_condition(const char *condition,
                                           int *out_matched) {
   const char *p = condition;
@@ -1528,10 +1697,14 @@ static ui_error_t resolve_rules_recursive(
       sel = rule->selectors;
       while (sel) {
         int _sm = 0;
-        (void)selector_matches(sel, node, &_sm);
+        ui_error_t rc = selector_matches(sel, node, &_sm);
+        if (rc != UI_ERROR_NONE)
+          return rc;
         if (_sm) {
           int a, b, c;
-          { ui_error_t sp_rc = get_selector_specificity(sel, &a, &b, &c); }
+          ui_error_t sp_rc = get_selector_specificity(sel, &a, &b, &c);
+          if (sp_rc != UI_ERROR_NONE)
+            return sp_rc;
           if (!matched || a > best_a || (a == best_a && b > best_b) ||
               (a == best_a && b == best_b && c > best_c)) {
             best_a = a;
@@ -1577,6 +1750,13 @@ static ui_error_t resolve_rules_recursive(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_resolve_style.
+ * @param stylesheet Parameter stylesheet.
+ * @param node Parameter node.
+ * @param out_style Parameter out_style.
+ * @return Return value.
+ */
 ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
                                 const struct ui_dom_node *node,
                                 struct ui_css_computed_style **out_style) {
@@ -1696,6 +1876,13 @@ ui_error_t ui_css_variable_store_destroy(struct ui_css_variable_store *store) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_variable_store_set.
+ * @param store Parameter store.
+ * @param name Parameter name.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 ui_error_t ui_css_variable_store_set(struct ui_css_variable_store *store,
                                      const char *name, const char *value) {
   struct ui_css_variable *var;

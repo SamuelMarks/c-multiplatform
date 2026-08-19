@@ -43,6 +43,13 @@ struct ui_datepicker_base {
 static ui_error_t trigger_cva_change(struct ui_datepicker_base *dp,
                                      const struct ui_date *date);
 
+/**
+ * @brief on_calendar_select.
+ * @param calendar Parameter calendar.
+ * @param date Parameter date.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t on_calendar_select(struct ui_calendar_base *calendar,
                                      const struct ui_date *date,
                                      void *user_data) {
@@ -73,6 +80,13 @@ static ui_error_t on_calendar_select(struct ui_calendar_base *calendar,
   return rc;
 }
 
+/**
+ * @brief on_input_change.
+ * @param input Parameter input.
+ * @param text Parameter text.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
                                   void *user_data) {
   struct ui_datepicker_base *datepicker =
@@ -115,6 +129,12 @@ static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
   return rc;
 }
 
+/**
+ * @brief trigger_cva_change.
+ * @param dp Parameter dp.
+ * @param date Parameter date.
+ * @return Return value.
+ */
 static ui_error_t trigger_cva_change(struct ui_datepicker_base *dp,
                                      const struct ui_date *date) {
   union ui_signal_payload payload;
@@ -134,6 +154,12 @@ static ui_error_t trigger_cva_change(struct ui_datepicker_base *dp,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief datepicker_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 static ui_error_t datepicker_cva_write_value(void *component,
                                              union ui_signal_payload value) {
   struct ui_datepicker_base *dp = (struct ui_datepicker_base *)component;
@@ -210,6 +236,12 @@ static ui_error_t datepicker_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief datepicker_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
+ */
 static ui_error_t datepicker_cva_set_disabled_state(void *component,
                                                     int is_disabled) {
   struct ui_datepicker_base *dp = (struct ui_datepicker_base *)component;
@@ -227,6 +259,15 @@ static ui_error_t datepicker_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datepicker_base_create.
+ * @param out_datepicker Parameter out_datepicker.
+ * @param input Parameter input.
+ * @param popover Parameter popover.
+ * @param calendar Parameter calendar.
+ * @param out_cva Parameter out_cva.
+ * @return Return value.
+ */
 ui_error_t ui_datepicker_base_create(
     struct ui_datepicker_base **out_datepicker, struct ui_input_base *input,
     struct ui_popover_base *popover, struct ui_calendar_base *calendar,
@@ -267,6 +308,11 @@ ui_error_t ui_datepicker_base_create(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datepicker_base_destroy.
+ * @param datepicker Parameter datepicker.
+ * @return Return value.
+ */
 ui_error_t ui_datepicker_base_destroy(struct ui_datepicker_base *datepicker) {
   if (!datepicker) {
     return UI_ERROR_NONE;
@@ -280,6 +326,12 @@ ui_error_t ui_datepicker_base_destroy(struct ui_datepicker_base *datepicker) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datepicker_parse_date.
+ * @param text Parameter text.
+ * @param out_date Parameter out_date.
+ * @return Return value.
+ */
 ui_error_t ui_datepicker_parse_date(const char *text,
                                     struct ui_date *out_date) {
   int y, m, d;
@@ -316,6 +368,13 @@ ui_error_t ui_datepicker_parse_date(const char *text,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datepicker_format_date.
+ * @param date Parameter date.
+ * @param out_text Parameter out_text.
+ * @param max_len Parameter max_len.
+ * @return Return value.
+ */
 ui_error_t ui_datepicker_format_date(const struct ui_date *date, char *out_text,
                                      int max_len) {
   if (!date || !out_text || max_len < 11) {
@@ -332,6 +391,11 @@ ui_error_t ui_datepicker_format_date(const struct ui_date *date, char *out_text,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datepicker_base_sync.
+ * @param datepicker Parameter datepicker.
+ * @return Return value.
+ */
 ui_error_t ui_datepicker_base_sync(struct ui_datepicker_base *datepicker) {
   const char *text = NULL;
   ui_error_t rc;

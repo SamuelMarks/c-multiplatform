@@ -1,6 +1,12 @@
+/**
+ * @file ui_bottom_app_bar_base.h
+ * @brief Bottom App Bar base component.
+ */
+
 #ifndef UI_BOTTOM_APP_BAR_BASE_H
 #define UI_BOTTOM_APP_BAR_BASE_H
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -13,6 +19,7 @@ extern "C" {
 #include "ui_fab_base.h"
 /* clang-format on */
 
+/** @brief Opaque handle to a bottom app bar component. */
 struct ui_bottom_app_bar_base;
 
 /**
@@ -20,8 +27,8 @@ struct ui_bottom_app_bar_base;
  * Bottom App Bar.
  */
 enum ui_bottom_app_bar_fab_alignment {
-  UI_BOTTOM_APP_BAR_FAB_CENTER,
-  UI_BOTTOM_APP_BAR_FAB_END
+  UI_BOTTOM_APP_BAR_FAB_CENTER, /**< FAB aligned in the center. */
+  UI_BOTTOM_APP_BAR_FAB_END     /**< FAB aligned to the end (trailing side). */
 };
 
 /**
@@ -41,6 +48,7 @@ ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar);
  * @brief Destroys a bottom app bar component.
  *
  * @param bar The bottom app bar to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar);
 
@@ -48,7 +56,8 @@ ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar);
  * @brief Gets the underlying component.
  *
  * @param bar The bottom app bar.
- * @return The underlying component.
+ * @param out_component Pointer to receive the component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,

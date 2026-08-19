@@ -1,3 +1,8 @@
+/**
+ * @file ui_alert_base.h
+ * @brief Alert base component definitions.
+ */
+
 #ifndef UI_ALERT_BASE_H
 #define UI_ALERT_BASE_H
 
@@ -12,6 +17,7 @@ extern "C" {
 #include "ui_computed.h"
 /* clang-format on */
 
+/** @brief Opaque handle to an alert base component. */
 struct ui_alert_base;
 
 /**
@@ -19,6 +25,7 @@ struct ui_alert_base;
  *
  * @param alert The alert component being dismissed.
  * @param user_data Opaque user data provided during setup.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_alert_on_dismiss_t)(struct ui_alert_base *alert,
                                             void *user_data);
@@ -43,6 +50,7 @@ ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert);
  * @brief Destroys an alert base component.
  *
  * @param alert The alert to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_alert_base_destroy(struct ui_alert_base *alert);
 

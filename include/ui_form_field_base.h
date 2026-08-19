@@ -1,3 +1,9 @@
+/**
+ * @file ui_form_field_base.h
+ * @brief Base component for form fields, providing floating labels and
+ * validation states.
+ */
+
 #ifndef UI_FORM_FIELD_BASE_H
 #define UI_FORM_FIELD_BASE_H
 

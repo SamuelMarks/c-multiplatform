@@ -1,4 +1,8 @@
-/* clang-format off */
+/**
+ * @file no_discard.h
+ * @brief Macro for [[nodiscard]] or equivalent.
+ */
+
 #ifndef C_CI_NO_DISCARD_H
 #define C_CI_NO_DISCARD_H
 
@@ -6,6 +10,11 @@
 extern "C" {
 #endif
 
+/**
+ * @def NO_DISCARD
+ * @brief Macro to indicate that the return value of a function must not be
+ * discarded.
+ */
 #if defined(__cplusplus) && __cplusplus >= 201703L
 #define NO_DISCARD [[nodiscard]]
 #elif defined(__GNUC__) || defined(__clang__)
@@ -18,7 +27,6 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* C_CI_NO_DISCARD_H */
-/* clang-format on */

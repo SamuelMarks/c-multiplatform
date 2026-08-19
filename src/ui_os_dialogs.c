@@ -81,6 +81,8 @@ static ui_error_t ui_os_file_worker(void *user_data) {
   {
     ui_error_t sched_rc =
         ui_reactor_schedule(task->reactor, ui_os_file_completion, task);
+    if (sched_rc != UI_ERROR_NONE)
+      return sched_rc;
   }
   return ui_reactor_wake(task->reactor);
 }
@@ -95,7 +97,7 @@ static ui_error_t ui_os_color_completion(void *user_data) {
   ui_error_t rc =
       ui_color_picker_base_set_rgb(task->picker, &task->result_color);
   C_MULTIPLATFORM_FREE(task);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -115,6 +117,8 @@ static ui_error_t ui_os_color_worker(void *user_data) {
   {
     ui_error_t sched_rc =
         ui_reactor_schedule(task->reactor, ui_os_color_completion, task);
+    if (sched_rc != UI_ERROR_NONE)
+      return sched_rc;
   }
   return ui_reactor_wake(task->reactor);
 }

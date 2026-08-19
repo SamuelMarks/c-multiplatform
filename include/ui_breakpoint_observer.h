@@ -1,3 +1,8 @@
+/**
+ * @file ui_breakpoint_observer.h
+ * @brief Window breakpoint observer for responsive design.
+ */
+
 #ifndef UI_BREAKPOINT_OBSERVER_H
 #define UI_BREAKPOINT_OBSERVER_H
 
@@ -10,19 +15,22 @@ extern "C" {
 #include "ui_signal.h"
 /* clang-format on */
 
+/** @brief Opaque handle to a breakpoint observer. */
 struct ui_breakpoint_observer;
+
+/** @brief Forward declaration of the window manager base component. */
 struct ui_window_manager_base;
 
 /**
  * @brief Represents standard breakpoints.
  */
 enum ui_breakpoint {
-  UI_BREAKPOINT_XSMALL, /* < 600px */
-  UI_BREAKPOINT_SMALL,  /* >= 600px */
-  UI_BREAKPOINT_MEDIUM, /* >= 900px */
-  UI_BREAKPOINT_LARGE,  /* >= 1200px */
-  UI_BREAKPOINT_XLARGE, /* >= 1536px */
-  UI_BREAKPOINT_COUNT
+  UI_BREAKPOINT_XSMALL, /**< Extra small (e.g. < 600px) */
+  UI_BREAKPOINT_SMALL,  /**< Small (e.g. >= 600px) */
+  UI_BREAKPOINT_MEDIUM, /**< Medium (e.g. >= 900px) */
+  UI_BREAKPOINT_LARGE,  /**< Large (e.g. >= 1200px) */
+  UI_BREAKPOINT_XLARGE, /**< Extra large (e.g. >= 1536px) */
+  UI_BREAKPOINT_COUNT   /**< Number of standard breakpoints */
 };
 
 /**
@@ -40,6 +48,7 @@ ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
  * @brief Destroys a breakpoint observer.
  *
  * @param observer The observer to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer);

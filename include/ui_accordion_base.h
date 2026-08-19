@@ -1,8 +1,15 @@
+/**
+ * @file ui_accordion_base.h
+ * @brief Accordion base component definitions.
+ */
+
 #ifndef UI_ACCORDION_BASE_H
 #define UI_ACCORDION_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -14,6 +21,7 @@ extern "C" {
 #include "ui_disclosure_base.h"
 /* clang-format on */
 
+/** @brief Opaque handle to an accordion base component. */
 struct ui_accordion_base;
 
 /**
@@ -23,6 +31,7 @@ struct ui_accordion_base;
  * @param active_disclosure The newly activated disclosure, or NULL if all are
  * collapsed.
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_accordion_on_change_t)(
     struct ui_accordion_base *accordion,
@@ -41,6 +50,7 @@ ui_error_t ui_accordion_base_create(struct ui_accordion_base **out_accordion);
  * Note: This does not destroy the individual ui_disclosure_base components.
  *
  * @param accordion The accordion to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_accordion_base_destroy(struct ui_accordion_base *accordion);
 
@@ -81,7 +91,9 @@ ui_error_t ui_accordion_base_set_active(struct ui_accordion_base *accordion,
  * @brief Retrieves the currently active (expanded) disclosure in the group.
  *
  * @param accordion The accordion manager.
- * @return The active disclosure, or NULL if none are expanded.
+ * @param out_active Pointer to receive the active disclosure, or NULL if none
+ * are expanded.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_accordion_base_get_active(const struct ui_accordion_base *accordion,
@@ -111,6 +123,6 @@ ui_error_t ui_accordion_base_bind_data(struct ui_accordion_base *widget,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_ACCORDION_BASE_H */

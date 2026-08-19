@@ -49,6 +49,11 @@ struct ui_dialog_base {
   struct ui_computed *animating_signal;
 };
 
+/**
+ * @brief ui_dialog_base_create.
+ * @param out_dialog Parameter out_dialog.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_create(struct ui_dialog_base **out_dialog) {
   struct ui_dialog_base *dialog;
   ui_error_t rc;
@@ -139,6 +144,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_dialog_base_destroy.
+ * @param dialog Parameter dialog.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_destroy(struct ui_dialog_base *dialog) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!dialog) {
@@ -163,6 +173,12 @@ ui_error_t ui_dialog_base_destroy(struct ui_dialog_base *dialog) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_set_content.
+ * @param dialog Parameter dialog.
+ * @param content Parameter content.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_set_content(struct ui_dialog_base *dialog,
                                       struct ui_component *content) {
   if (!dialog) {
@@ -178,6 +194,12 @@ ui_error_t ui_dialog_base_set_content(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_set_overlay_director.
+ * @param dialog Parameter dialog.
+ * @param director Parameter director.
+ * @return Return value.
+ */
 ui_error_t
 ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
                                     struct ui_overlay_director *director) {
@@ -188,6 +210,12 @@ ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_set_focus_manager.
+ * @param dialog Parameter dialog.
+ * @param focus_manager Parameter focus_manager.
+ * @return Return value.
+ */
 ui_error_t
 ui_dialog_base_set_focus_manager(struct ui_dialog_base *dialog,
                                  struct ui_focus_manager *focus_manager) {
@@ -198,6 +226,12 @@ ui_dialog_base_set_focus_manager(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_set_open.
+ * @param dialog Parameter dialog.
+ * @param is_open Parameter is_open.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_set_open(struct ui_dialog_base *dialog, int is_open) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -249,6 +283,12 @@ ui_error_t ui_dialog_base_set_open(struct ui_dialog_base *dialog, int is_open) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_is_open.
+ * @param dialog Parameter dialog.
+ * @param out_is_open Parameter out_is_open.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
                                   int *out_is_open) {
   if (!dialog || !out_is_open) {
@@ -258,6 +298,13 @@ ui_error_t ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_set_on_close.
+ * @param dialog Parameter dialog.
+ * @param on_close Parameter on_close.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
                                        ui_dialog_on_close_t on_close,
                                        void *user_data) {
@@ -269,6 +316,13 @@ ui_error_t ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_process_event.
+ * @param dialog Parameter dialog.
+ * @param event Parameter event.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
@@ -306,6 +360,12 @@ ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_get_component.
+ * @param dialog Parameter dialog.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_get_component(struct ui_dialog_base *dialog,
                                         struct ui_component **out_component) {
   if (!dialog || !out_component) {
@@ -315,6 +375,12 @@ ui_error_t ui_dialog_base_get_component(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_bind_open.
+ * @param widget Parameter widget.
+ * @param open_signal Parameter open_signal.
+ * @return Return value.
+ */
 ui_error_t ui_dialog_base_bind_open(struct ui_dialog_base *widget,
                                     struct ui_signal *open_signal) {
   if (!widget) {
@@ -324,6 +390,12 @@ ui_error_t ui_dialog_base_bind_open(struct ui_dialog_base *widget,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dialog_base_get_animating_signal.
+ * @param widget Parameter widget.
+ * @param out_animating Parameter out_animating.
+ * @return Return value.
+ */
 ui_error_t
 ui_dialog_base_get_animating_signal(struct ui_dialog_base *widget,
                                     struct ui_computed **out_animating) {

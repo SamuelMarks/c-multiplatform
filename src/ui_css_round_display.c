@@ -5,12 +5,23 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
 }
 
+/**
+ * @brief parse_geometry_box.
+ * @param str Parameter str.
+ * @param out_box Parameter out_box.
+ * @return Return value.
+ */
 static void parse_geometry_box(const char *str,
                                enum ui_css_geometry_box *out_box) {
   if (strstr(str, "margin-box"))
@@ -31,9 +42,14 @@ static void parse_geometry_box(const char *str,
     *out_box = UI_CSS_GEOMETRY_BOX_NONE;
 }
 
+/**
+ * @brief ui_css_parse_shape_inside.
+ * @param str Parameter str.
+ * @param out_shape Parameter out_shape.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_shape_inside(const char *str,
                                      struct ui_css_shape_inside *out_shape) {
-  ui_error_t rc;
   if (!str || !out_shape)
     return UI_ERROR_INVALID_ARGUMENT;
 

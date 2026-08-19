@@ -31,6 +31,13 @@ struct cg_context {
   int current_height;
 };
 
+/**
+ * @brief cg_begin_frame.
+ * @param ctx Parameter ctx.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @return Return value.
+ */
 static ui_error_t cg_begin_frame(void *ctx, int width, int height) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGColorSpaceRef colorSpace;
@@ -69,6 +76,11 @@ static ui_error_t cg_begin_frame(void *ctx, int width, int height) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_end_frame.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 static ui_error_t cg_end_frame(void *ctx) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (cgc && cgc->context) {
@@ -77,6 +89,13 @@ static ui_error_t cg_end_frame(void *ctx) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_draw_rect.
+ * @param ctx Parameter ctx.
+ * @param r Parameter r.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static ui_error_t cg_draw_rect(void *ctx, const struct ui_rect *r,
                                const struct ui_color *c) {
   struct cg_context *cgc = (struct cg_context *)ctx;
@@ -90,6 +109,14 @@ static ui_error_t cg_draw_rect(void *ctx, const struct ui_rect *r,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_draw_text.
+ * @param ctx Parameter ctx.
+ * @param text Parameter text.
+ * @param f Parameter f.
+ * @param r Parameter r.
+ * @return Return value.
+ */
 static ui_error_t cg_draw_text(void *ctx, const char *text,
                                const struct ui_font *f,
                                const struct ui_rect *r) {
@@ -188,6 +215,13 @@ static ui_error_t cg_draw_text(void *ctx, const char *text,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_draw_image.
+ * @param ctx Parameter ctx.
+ * @param img Parameter img.
+ * @param r Parameter r.
+ * @return Return value.
+ */
 static ui_error_t cg_draw_image(void *ctx, const struct ui_image *img,
                                 const struct ui_rect *r) {
   (void)ctx;
@@ -197,6 +231,13 @@ static ui_error_t cg_draw_image(void *ctx, const struct ui_image *img,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_draw_gradient.
+ * @param ctx Parameter ctx.
+ * @param r Parameter r.
+ * @param gradient Parameter gradient.
+ * @return Return value.
+ */
 static ui_error_t cg_draw_gradient(void *ctx, const struct ui_rect *r,
                                    const struct ui_css_image *gradient) {
   (void)ctx;
@@ -206,6 +247,13 @@ static ui_error_t cg_draw_gradient(void *ctx, const struct ui_rect *r,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_draw_path.
+ * @param ctx Parameter ctx.
+ * @param p Parameter p.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static ui_error_t cg_draw_path(void *ctx, const struct ui_path *p,
                                const struct ui_color *c) {
   struct cg_context *cgc = (struct cg_context *)ctx;
@@ -245,6 +293,12 @@ static ui_error_t cg_draw_path(void *ctx, const struct ui_path *p,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_push_clip.
+ * @param ctx Parameter ctx.
+ * @param r Parameter r.
+ * @return Return value.
+ */
 static ui_error_t cg_push_clip(void *ctx, const struct ui_rect *r) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (!cgc || !cgc->context || !r)
@@ -257,6 +311,11 @@ static ui_error_t cg_push_clip(void *ctx, const struct ui_rect *r) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_pop_clip.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 static ui_error_t cg_pop_clip(void *ctx) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (!cgc || !cgc->context)
@@ -267,6 +326,12 @@ static ui_error_t cg_pop_clip(void *ctx) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_set_blend_mode.
+ * @param ctx Parameter ctx.
+ * @param mode Parameter mode.
+ * @return Return value.
+ */
 static ui_error_t cg_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGBlendMode cg_mode = kCGBlendModeNormal;
@@ -331,6 +396,12 @@ static ui_error_t cg_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_set_shadow.
+ * @param ctx Parameter ctx.
+ * @param shadow Parameter shadow.
+ * @return Return value.
+ */
 static ui_error_t cg_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGColorSpaceRef colorSpace;
@@ -370,6 +441,12 @@ static ui_error_t cg_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_read_pixels.
+ * @param ctx Parameter ctx.
+ * @param out_rgba_buffer Parameter out_rgba_buffer.
+ * @return Return value.
+ */
 static ui_error_t cg_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   void *data;
@@ -400,6 +477,11 @@ static ui_error_t cg_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cg_destroy.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 static ui_error_t cg_destroy(void *ctx) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   if (cgc) {
@@ -418,6 +500,11 @@ static const struct ui_renderer_vtable cg_vtable = {
     cg_pop_clip,    cg_set_blend_mode, cg_set_shadow, cg_read_pixels,
     cg_destroy};
 
+/**
+ * @brief ui_renderer_native_init.
+ * @param renderer Parameter renderer.
+ * @return Return value.
+ */
 ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
   struct cg_context *cgc;
 
@@ -440,3 +527,6 @@ ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
 }
 #endif
 #endif
+
+/* Prevent empty translation unit warning on MSVC */
+typedef int ui_renderer_coregraphics_dummy_t;

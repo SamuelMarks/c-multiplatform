@@ -1,3 +1,8 @@
+/**
+ * @file ui_menu_base.h
+ * @brief Base menu component handling popup contextual and dropdown menus.
+ */
+
 #ifndef UI_MENU_BASE_H
 #define UI_MENU_BASE_H
 

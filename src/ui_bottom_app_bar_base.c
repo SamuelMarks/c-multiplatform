@@ -1,3 +1,8 @@
+/**
+ * @file ui_bottom_app_bar_base.c
+ * @brief Implementation of the bottom app bar base component.
+ */
+
 /* clang-format off */
 #include "ui_bottom_app_bar_base.h"
 #include "ui_internal_mem.h"
@@ -81,10 +86,10 @@ static const char *ui_bottom_app_bar_default_css =
  * @brief Internal implementation of the bottom app bar base component.
  */
 struct ui_bottom_app_bar_base {
-  struct ui_component *component;
-  struct ui_fab_base *fab;
-  enum ui_bottom_app_bar_fab_alignment alignment;
-  struct ui_signal *active_index_signal;
+  struct ui_component *component;                 /**< Core UI component */
+  struct ui_fab_base *fab;                        /**< Integrated FAB */
+  enum ui_bottom_app_bar_fab_alignment alignment; /**< FAB alignment */
+  struct ui_signal *active_index_signal; /**< Optional active index signal */
 };
 
 ui_error_t

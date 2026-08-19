@@ -49,6 +49,11 @@ ui_error_t ui_dom_node_create(enum ui_dom_node_type type,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_destroy(struct ui_dom_node *node) {
   struct ui_dom_node *child;
   struct ui_dom_node *next_child;
@@ -98,6 +103,12 @@ ui_error_t ui_dom_node_destroy(struct ui_dom_node *node) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dom_node_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_append_child(struct ui_dom_node *parent,
                                     struct ui_dom_node *child) {
   if (!parent || !child) {
@@ -148,6 +159,12 @@ ui_error_t ui_dom_node_append_child(struct ui_dom_node *parent,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dom_node_remove_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_remove_child(struct ui_dom_node *parent,
                                     struct ui_dom_node *child) {
   if (!parent || !child || child->parent != parent) {
@@ -175,6 +192,13 @@ ui_error_t ui_dom_node_remove_child(struct ui_dom_node *parent,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_set_attribute(struct ui_dom_node *node, const char *name,
                                      const char *value) {
   struct ui_dom_attribute *attr;
@@ -287,6 +311,13 @@ cleanup:
   return err;
 }
 
+/**
+ * @brief ui_dom_node_get_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @param out_value Parameter out_value.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_get_attribute(const struct ui_dom_node *node,
                                      const char *name, const char **out_value) {
   struct ui_dom_attribute *attr;
@@ -311,6 +342,12 @@ ui_error_t ui_dom_node_get_attribute(const struct ui_dom_node *node,
   return UI_ERROR_NOT_FOUND;
 }
 
+/**
+ * @brief ui_dom_node_remove_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_remove_attribute(struct ui_dom_node *node,
                                         const char *name) {
   struct ui_dom_attribute *attr;
@@ -368,6 +405,12 @@ ui_error_t ui_dom_node_remove_attribute(struct ui_dom_node *node,
   return UI_ERROR_NONE; /* Not found, but not an error to remove it */
 }
 
+/**
+ * @brief ui_dom_node_set_tag_name.
+ * @param node Parameter node.
+ * @param tag_name Parameter tag_name.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_set_tag_name(struct ui_dom_node *node,
                                     const char *tag_name) {
   char *tag_copy;
@@ -394,6 +437,12 @@ ui_error_t ui_dom_node_set_tag_name(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dom_node_set_text_content.
+ * @param node Parameter node.
+ * @param text Parameter text.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_set_text_content(struct ui_dom_node *node,
                                         const char *text) {
   char *text_copy;
@@ -439,6 +488,14 @@ ui_error_t ui_dom_node_set_text_content(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dom_node_add_event_listener.
+ * @param node Parameter node.
+ * @param type Parameter type.
+ * @param handler Parameter handler.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_add_event_listener(struct ui_dom_node *node,
                                           enum ui_event_type type,
                                           ui_event_handler_t handler,
@@ -457,6 +514,13 @@ ui_error_t ui_dom_node_add_event_listener(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dom_node_remove_event_listener.
+ * @param node Parameter node.
+ * @param type Parameter type.
+ * @param handler Parameter handler.
+ * @return Return value.
+ */
 ui_error_t ui_dom_node_remove_event_listener(struct ui_dom_node *node,
                                              enum ui_event_type type,
                                              ui_event_handler_t handler) {

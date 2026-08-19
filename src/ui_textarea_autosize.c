@@ -2,6 +2,11 @@
 #include "ui_textarea_autosize.h"
 /* clang-format on */
 
+/**
+ * @brief ui_textarea_autosize_config_init.
+ * @param out_config Parameter out_config.
+ * @return Return value.
+ */
 ui_error_t ui_textarea_autosize_config_init(
     struct ui_textarea_autosize_config *out_config) {
   ui_error_t rc = UI_ERROR_NONE;

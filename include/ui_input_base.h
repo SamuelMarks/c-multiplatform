@@ -1,6 +1,14 @@
 #ifndef UI_INPUT_BASE_H
 #define UI_INPUT_BASE_H
 
+/**
+ * @file ui_input_base.h
+ * @brief Base text input component.
+ *
+ * Provides a primitive text input component with change tracking and styling
+ * hooks.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,10 +21,18 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing an input base component.
+ */
 struct ui_input_base;
 
 /**
  * @brief Callback invoked when the input's text state changes.
+ *
+ * @param input The input component triggering the change.
+ * @param text The new text content.
+ * @param user_data Opaque user data provided during callback registration.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_input_on_change_t)(struct ui_input_base *input,
                                            const char *text, void *user_data);
@@ -44,6 +60,7 @@ ui_error_t ui_input_base_create(struct ui_input_base **out_input);
  * @brief Destroys an input base component.
  *
  * @param input The input to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_input_base_destroy(struct ui_input_base *input);
 
@@ -61,7 +78,8 @@ ui_error_t ui_input_base_set_text(struct ui_input_base *input,
  * @brief Gets the current text of the input.
  *
  * @param input The input.
- * @return The current text.
+ * @param out_text Pointer to receive the current text string pointer.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_input_base_get_text(const struct ui_input_base *input,
                                   const char **out_text);
@@ -124,14 +142,8 @@ ui_error_t ui_input_base_process_event(struct ui_input_base *input,
                                        double timestamp_ms);
 
 /**
- * @brief Gets the underlying component instance for style injection and DOM
- * mounting.
- *
- * @param input The input.
- * @return The underlying component.
- */
-/**
  * @brief Gets the CVA vtable for this component.
+ *
  * @param input The input.
  * @param out_cva Pointer to store the vtable.
  * @return UI_ERROR_NONE on success.
@@ -139,6 +151,14 @@ ui_error_t ui_input_base_process_event(struct ui_input_base *input,
 ui_error_t ui_input_base_get_cva(struct ui_input_base *input,
                                  struct ui_control_value_accessor *out_cva);
 
+/**
+ * @brief Gets the underlying component instance for style injection and DOM
+ * mounting.
+ *
+ * @param input The input.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_input_base_get_component(struct ui_input_base *input,
                                        struct ui_component **out_component);
 

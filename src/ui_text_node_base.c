@@ -266,7 +266,7 @@ ui_error_t ui_text_node_base_set_overflow(struct ui_text_node_base *node,
 
 ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   struct ui_font *font = NULL;
-  ui_error_t rc;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!node) {
     return UI_ERROR_INVALID_ARGUMENT;

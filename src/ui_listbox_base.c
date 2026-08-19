@@ -114,6 +114,8 @@ static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
     const char *attr = NULL;
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
 
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
@@ -195,6 +197,8 @@ static ui_error_t listbox_cva_write_value(void *component,
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -536,6 +540,8 @@ static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -595,6 +601,8 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
+    if (attr_rc != UI_ERROR_NONE)
+      return attr_rc;
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }

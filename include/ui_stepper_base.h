@@ -1,6 +1,18 @@
+/**
+ * @file ui_stepper_base.h
+ * @brief Stepper base component declarations.
+ *
+ * @defgroup StepperBase Stepper Base
+ * @brief Base implementation for multi-step workflow components.
+ * @{
+ */
+
 #ifndef UI_STEPPER_BASE_H
 #define UI_STEPPER_BASE_H
 
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -12,6 +24,9 @@ extern "C" {
 #include "ui_component.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing the stepper base.
+ */
 struct ui_stepper_base;
 
 /**
@@ -26,10 +41,10 @@ enum ui_stepper_mode {
  * @brief Individual state of a step.
  */
 enum ui_stepper_step_state {
-  UI_STEPPER_STEP_STATE_DEFAULT,
-  UI_STEPPER_STEP_STATE_ACTIVE,
-  UI_STEPPER_STEP_STATE_COMPLETED,
-  UI_STEPPER_STEP_STATE_ERROR
+  UI_STEPPER_STEP_STATE_DEFAULT,   /**< Default step state. */
+  UI_STEPPER_STEP_STATE_ACTIVE,    /**< Currently active step. */
+  UI_STEPPER_STEP_STATE_COMPLETED, /**< Successfully completed step. */
+  UI_STEPPER_STEP_STATE_ERROR      /**< Step containing an error. */
 };
 
 /**
@@ -56,6 +71,7 @@ ui_error_t ui_stepper_base_create(struct ui_stepper_base **out_stepper);
  * @brief Destroys a stepper base component.
  *
  * @param stepper The stepper component to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_stepper_base_destroy(struct ui_stepper_base *stepper);
 
@@ -166,7 +182,8 @@ ui_error_t ui_stepper_base_prev_step(struct ui_stepper_base *stepper);
  * @brief Gets the underlying UI component.
  *
  * @param stepper The stepper component.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_stepper_base_get_component(struct ui_stepper_base *stepper,
                                          struct ui_component **out_component);
@@ -174,7 +191,7 @@ ui_error_t ui_stepper_base_get_component(struct ui_stepper_base *stepper,
 /**
  * @brief Binds the active state/index to a signal.
  *
- * @param widget The widget.
+ * @param widget The stepper widget.
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
@@ -186,3 +203,5 @@ ui_error_t ui_stepper_base_bind_active_index(struct ui_stepper_base *widget,
 #endif /* __cplusplus */
 
 #endif /* UI_STEPPER_BASE_H */
+
+/** @} */

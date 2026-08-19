@@ -1,6 +1,13 @@
 #ifndef UI_EXECUTION_CONTEXT_H
 #define UI_EXECUTION_CONTEXT_H
 
+/**
+ * @file ui_execution_context.h
+ * @brief Execution context component.
+ *
+ * Provides an isolated execution context for scheduling and running tasks.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -54,7 +61,7 @@ ui_error_t ui_execution_context_tick(struct ui_execution_context *ctx);
  * @brief Sets the current execution context for the calling thread.
  *
  * @param ctx The execution context to set.
- * @return ui_error_t UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_execution_context_set_current(struct ui_execution_context *ctx);
 
@@ -62,12 +69,19 @@ ui_error_t ui_execution_context_set_current(struct ui_execution_context *ctx);
  * @brief Retrieves the current execution context for the calling thread.
  *
  * @param out_ctx Pointer to receive the current execution context.
- * @return ui_error_t UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_execution_context_get_current(struct ui_execution_context **out_ctx);
 
+/**
+ * @brief Cancels execution or tasks for the context.
+ *
+ * @param ctx The context to cancel.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_execution_context_cancel(struct ui_execution_context *ctx);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

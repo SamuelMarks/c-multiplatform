@@ -1,8 +1,23 @@
+/**
+ * @file ui_sort_header_base.h
+ * @brief Sort header base declarations.
+ *
+ * @defgroup SortHeaderBase Sort Header Base
+ * @brief Base implementation for sorting table columns.
+ * @{
+ */
+
 #ifndef UI_SORT_HEADER_BASE_H
 #define UI_SORT_HEADER_BASE_H
 
+/**
+ * @brief Opaque structure for a computed signal.
+ */
 struct ui_computed;
 
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -171,7 +186,7 @@ ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header);
 /**
  * @brief Binds the direction property.
  *
- * @param widget The widget.
+ * @param widget The sort header widget manager.
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
@@ -184,3 +199,5 @@ ui_sort_header_base_bind_direction(struct ui_sort_header_base *widget,
 #endif /* __cplusplus */
 
 #endif /* UI_SORT_HEADER_BASE_H */
+
+/** @} */

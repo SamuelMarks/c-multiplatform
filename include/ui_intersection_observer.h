@@ -1,3 +1,9 @@
+/**
+ * @file ui_intersection_observer.h
+ * @brief Intersection observer for tracking elements entering or leaving
+ * viewport bounds.
+ */
+
 #ifndef UI_INTERSECTION_OBSERVER_H
 #define UI_INTERSECTION_OBSERVER_H
 

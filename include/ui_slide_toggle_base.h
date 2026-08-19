@@ -1,3 +1,12 @@
+/**
+ * @file ui_slide_toggle_base.h
+ * @brief Slide toggle (switch) base implementation.
+ *
+ * @defgroup SlideToggleBase Slide Toggle Base
+ * @brief Base implementation for slide toggle components.
+ * @{
+ */
+
 #ifndef UI_SLIDE_TOGGLE_BASE_H
 #define UI_SLIDE_TOGGLE_BASE_H
 
@@ -34,6 +43,7 @@ ui_slide_toggle_base_create(struct ui_slide_toggle_base **out_toggle,
  * @brief Destroys a slide toggle base component.
  *
  * @param toggle The slide toggle to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle);
 
@@ -136,3 +146,5 @@ ui_slide_toggle_base_is_dragging(const struct ui_slide_toggle_base *toggle,
 #endif
 
 #endif /* UI_SLIDE_TOGGLE_BASE_H */
+
+/** @} */

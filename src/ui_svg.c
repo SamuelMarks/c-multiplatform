@@ -8,12 +8,23 @@
 /* clang-format on */
 #define UI_SVG_ABS(x) ((x) < 0.0f ? -(x) : (x))
 
+/**
+ * @brief skip_whitespace_and_commas.
+ * @param ptr Parameter ptr.
+ * @return Return value.
+ */
 static void skip_whitespace_and_commas(const char **ptr) {
   while (**ptr && (isspace((unsigned char)**ptr) || **ptr == ',')) {
     (*ptr)++;
   }
 }
 
+/**
+ * @brief parse_float.
+ * @param ptr Parameter ptr.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_float(const char **ptr, float *out_val) {
   char *end;
   skip_whitespace_and_commas(ptr);
@@ -28,6 +39,11 @@ static ui_error_t parse_float(const char **ptr, float *out_val) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ensure_capacity.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 static ui_error_t ensure_capacity(struct ui_svg_path *path) {
   if (path->count >= path->capacity) {
     ui_uint32 new_cap = path->capacity == 0 ? 16 : path->capacity * 2;
@@ -43,6 +59,13 @@ static ui_error_t ensure_capacity(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief reflect_point.
+ * @param out_p Parameter out_p.
+ * @param p Parameter p.
+ * @param ref Parameter ref.
+ * @return Return value.
+ */
 static void reflect_point(struct ui_svg_point *out_p,
                           const struct ui_svg_point *p,
                           const struct ui_svg_point *ref) {
@@ -50,6 +73,11 @@ static void reflect_point(struct ui_svg_point *out_p,
   out_p->y = ref->y * 2.0f - p->y;
 }
 
+/**
+ * @brief ui_svg_path_init.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 ui_error_t ui_svg_path_init(struct ui_svg_path *path) {
   if (!path) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -60,6 +88,11 @@ ui_error_t ui_svg_path_init(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_svg_path_destroy.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 ui_error_t ui_svg_path_destroy(struct ui_svg_path *path) {
   if (path) {
     if (path->commands) {
@@ -72,6 +105,12 @@ ui_error_t ui_svg_path_destroy(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_svg_path_parse.
+ * @param path Parameter path.
+ * @param d_attr Parameter d_attr.
+ * @return Return value.
+ */
 ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
   const char *ptr;
   char cmd;
@@ -314,6 +353,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_svg_flattened_path_init.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 ui_error_t ui_svg_flattened_path_init(struct ui_svg_flattened_path *path) {
   if (!path)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -323,6 +367,11 @@ ui_error_t ui_svg_flattened_path_init(struct ui_svg_flattened_path *path) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_svg_flattened_path_destroy.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 ui_error_t ui_svg_flattened_path_destroy(struct ui_svg_flattened_path *path) {
   ui_uint32 i;
   if (!path)
@@ -341,6 +390,11 @@ ui_error_t ui_svg_flattened_path_destroy(struct ui_svg_flattened_path *path) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_svg_geometry_init.
+ * @param geom Parameter geom.
+ * @return Return value.
+ */
 ui_error_t ui_svg_geometry_init(struct ui_svg_geometry *geom) {
   if (!geom)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -353,6 +407,11 @@ ui_error_t ui_svg_geometry_init(struct ui_svg_geometry *geom) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_svg_geometry_destroy.
+ * @param geom Parameter geom.
+ * @return Return value.
+ */
 ui_error_t ui_svg_geometry_destroy(struct ui_svg_geometry *geom) {
   if (!geom)
     return UI_ERROR_NONE;
@@ -369,6 +428,12 @@ ui_error_t ui_svg_geometry_destroy(struct ui_svg_geometry *geom) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief append_subpath.
+ * @param path Parameter path.
+ * @param out_subpath Parameter out_subpath.
+ * @return Return value.
+ */
 static ui_error_t append_subpath(struct ui_svg_flattened_path *path,
                                  struct ui_svg_subpath **out_subpath) {
   if (path->count >= path->capacity) {
@@ -391,6 +456,13 @@ static ui_error_t append_subpath(struct ui_svg_flattened_path *path,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief append_point.
+ * @param subpath Parameter subpath.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @return Return value.
+ */
 static ui_error_t append_point(struct ui_svg_subpath *subpath, float x,
                                float y) {
   if (subpath->count >= subpath->capacity) {
@@ -415,6 +487,17 @@ static ui_error_t append_point(struct ui_svg_subpath *subpath, float x,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief flatten_cubic_recursive.
+ * @param subpath Parameter subpath.
+ * @param p0 Parameter p0.
+ * @param p1 Parameter p1.
+ * @param p2 Parameter p2.
+ * @param p3 Parameter p3.
+ * @param tolerance_sq Parameter tolerance_sq.
+ * @param depth Parameter depth.
+ * @return Return value.
+ */
 static ui_error_t
 flatten_cubic_recursive(struct ui_svg_subpath *subpath, struct ui_svg_point p0,
                         struct ui_svg_point p1, struct ui_svg_point p2,
@@ -456,6 +539,16 @@ flatten_cubic_recursive(struct ui_svg_subpath *subpath, struct ui_svg_point p0,
   }
 }
 
+/**
+ * @brief flatten_quadratic_recursive.
+ * @param subpath Parameter subpath.
+ * @param p0 Parameter p0.
+ * @param p1 Parameter p1.
+ * @param p2 Parameter p2.
+ * @param tolerance_sq Parameter tolerance_sq.
+ * @param depth Parameter depth.
+ * @return Return value.
+ */
 static ui_error_t flatten_quadratic_recursive(struct ui_svg_subpath *subpath,
                                               struct ui_svg_point p0,
                                               struct ui_svg_point p1,
@@ -491,6 +584,19 @@ static ui_error_t flatten_quadratic_recursive(struct ui_svg_subpath *subpath,
   }
 }
 
+/**
+ * @brief arc_to_lines.
+ * @param subpath Parameter subpath.
+ * @param p0 Parameter p0.
+ * @param rx Parameter rx.
+ * @param ry Parameter ry.
+ * @param x_axis_rotation Parameter x_axis_rotation.
+ * @param large_arc_flag Parameter large_arc_flag.
+ * @param sweep_flag Parameter sweep_flag.
+ * @param p Parameter p.
+ * @param tolerance Parameter tolerance.
+ * @return Return value.
+ */
 static ui_error_t arc_to_lines(struct ui_svg_subpath *subpath,
                                struct ui_svg_point p0, float rx, float ry,
                                float x_axis_rotation, int large_arc_flag,
@@ -589,6 +695,13 @@ static ui_error_t arc_to_lines(struct ui_svg_subpath *subpath,
   return append_point(subpath, p.x, p.y);
 }
 
+/**
+ * @brief ui_svg_path_flatten.
+ * @param flattened Parameter flattened.
+ * @param path Parameter path.
+ * @param tolerance Parameter tolerance.
+ * @return Return value.
+ */
 ui_error_t ui_svg_path_flatten(struct ui_svg_flattened_path *flattened,
                                const struct ui_svg_path *path,
                                float tolerance) {
@@ -678,6 +791,13 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief append_vertex.
+ * @param geom Parameter geom.
+ * @param p Parameter p.
+ * @param out_index Parameter out_index.
+ * @return Return value.
+ */
 static ui_error_t append_vertex(struct ui_svg_geometry *geom,
                                 struct ui_svg_point p, ui_uint32 *out_index) {
   if (geom->vertex_count >= geom->vertex_capacity) {
@@ -697,6 +817,12 @@ static ui_error_t append_vertex(struct ui_svg_geometry *geom,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief append_index.
+ * @param geom Parameter geom.
+ * @param index Parameter index.
+ * @return Return value.
+ */
 static ui_error_t append_index(struct ui_svg_geometry *geom, ui_uint32 index) {
   if (geom->index_count >= geom->index_capacity) {
     ui_uint32 new_cap =
@@ -713,11 +839,28 @@ static ui_error_t append_index(struct ui_svg_geometry *geom, ui_uint32 index) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief triangle_area.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param c Parameter c.
+ * @param out_area Parameter out_area.
+ * @return Return value.
+ */
 static void triangle_area(struct ui_svg_point a, struct ui_svg_point b,
                           struct ui_svg_point c, float *out_area) {
   *out_area = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
+/**
+ * @brief is_point_in_triangle.
+ * @param p Parameter p.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param c Parameter c.
+ * @param out_match Parameter out_match.
+ * @return Return value.
+ */
 static ui_error_t is_point_in_triangle(struct ui_svg_point p,
                                        struct ui_svg_point a,
                                        struct ui_svg_point b,

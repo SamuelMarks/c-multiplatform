@@ -31,6 +31,11 @@ struct ui_chips_base {
   int is_disabled;
 };
 
+/**
+ * @brief trigger_cva_change.
+ * @param chips Parameter chips.
+ * @return Return value.
+ */
 static ui_error_t trigger_cva_change(struct ui_chips_base *chips) {
   union ui_signal_payload payload;
   if (chips->cva_on_change) {
@@ -43,6 +48,12 @@ static ui_error_t trigger_cva_change(struct ui_chips_base *chips) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief chips_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 static ui_error_t chips_cva_write_value(void *component,
                                         union ui_signal_payload value) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
@@ -78,6 +89,12 @@ static ui_error_t chips_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief chips_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
+ */
 static ui_error_t chips_cva_set_disabled_state(void *component,
                                                ui_bool_t is_disabled) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
@@ -88,6 +105,12 @@ static ui_error_t chips_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chips_base_create.
+ * @param out_chips Parameter out_chips.
+ * @param out_cva Parameter out_cva.
+ * @return Return value.
+ */
 ui_error_t ui_chips_base_create(struct ui_chips_base **out_chips,
                                 struct ui_control_value_accessor *out_cva) {
   struct ui_chips_base *chips;
@@ -119,6 +142,11 @@ ui_error_t ui_chips_base_create(struct ui_chips_base **out_chips,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chips_base_destroy.
+ * @param chips Parameter chips.
+ * @return Return value.
+ */
 ui_error_t ui_chips_base_destroy(struct ui_chips_base *chips) {
   size_t i;
   if (!chips) {
@@ -134,6 +162,12 @@ ui_error_t ui_chips_base_destroy(struct ui_chips_base *chips) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chips_base_add.
+ * @param chips Parameter chips.
+ * @param token Parameter token.
+ * @return Return value.
+ */
 ui_error_t ui_chips_base_add(struct ui_chips_base *chips, const char *token) {
   char **new_tokens;
   char *new_token;
@@ -167,6 +201,12 @@ ui_error_t ui_chips_base_add(struct ui_chips_base *chips, const char *token) {
   return trigger_cva_change(chips);
 }
 
+/**
+ * @brief ui_chips_base_remove.
+ * @param chips Parameter chips.
+ * @param index Parameter index.
+ * @return Return value.
+ */
 ui_error_t ui_chips_base_remove(struct ui_chips_base *chips, size_t index) {
   size_t i;
   if (!chips) {
@@ -183,6 +223,11 @@ ui_error_t ui_chips_base_remove(struct ui_chips_base *chips, size_t index) {
   return trigger_cva_change(chips);
 }
 
+/**
+ * @brief ui_chips_base_remove_last.
+ * @param chips Parameter chips.
+ * @return Return value.
+ */
 ui_error_t ui_chips_base_remove_last(struct ui_chips_base *chips) {
   if (!chips) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -193,6 +238,12 @@ ui_error_t ui_chips_base_remove_last(struct ui_chips_base *chips) {
   return ui_chips_base_remove(chips, chips->count - 1);
 }
 
+/**
+ * @brief ui_chips_base_get_count.
+ * @param chips Parameter chips.
+ * @param out_count Parameter out_count.
+ * @return Return value.
+ */
 ui_error_t ui_chips_base_get_count(const struct ui_chips_base *chips,
                                    size_t *out_count) {
   if (!chips || !out_count) {
@@ -202,6 +253,13 @@ ui_error_t ui_chips_base_get_count(const struct ui_chips_base *chips,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chips_base_get_token.
+ * @param chips Parameter chips.
+ * @param index Parameter index.
+ * @param out_token Parameter out_token.
+ * @return Return value.
+ */
 ui_error_t ui_chips_base_get_token(const struct ui_chips_base *chips,
                                    size_t index, const char **out_token) {
   if (!chips || !out_token) {
@@ -214,6 +272,13 @@ ui_error_t ui_chips_base_get_token(const struct ui_chips_base *chips,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chips_base_handle_backspace.
+ * @param chips Parameter chips.
+ * @param current_input Parameter current_input.
+ * @param out_focus_moved_to_last Parameter out_focus_moved_to_last.
+ * @return Return value.
+ */
 ui_error_t ui_chips_base_handle_backspace(struct ui_chips_base *chips,
                                           const char *current_input,
                                           int *out_focus_moved_to_last) {

@@ -60,7 +60,8 @@ struct app_context {
 };
 
 static ui_error_t create_dom(struct app_context *ctx) {
-  struct ui_dom_node *app, *sidebar, *content, *box1, *box2;
+  struct ui_dom_node *app = NULL, *sidebar = NULL, *content = NULL,
+                     *box1 = NULL, *box2 = NULL;
   ui_error_t err;
 
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &app);
@@ -378,7 +379,11 @@ return 1;
   emscripten_set_main_loop(main_loop_step, 0, 1);
 #else
   int frame_count = 0;
+#if defined(CI_TEST_RUN)
+  const char *ci_test = "1";
+#else
   const char *ci_test = getenv("CI_TEST_RUN");
+#endif
   while (running) {
     if (ci_test && frame_count++ > 2)
       break;

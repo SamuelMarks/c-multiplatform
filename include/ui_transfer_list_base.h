@@ -1,3 +1,12 @@
+/**
+ * @file ui_transfer_list_base.h
+ * @brief Transfer list component base declarations.
+ *
+ * @defgroup TransferListBase Transfer List Base
+ * @brief Base implementation for dual-list transfer selection widgets.
+ * @{
+ */
+
 #ifndef UI_TRANSFER_LIST_BASE_H
 #define UI_TRANSFER_LIST_BASE_H
 
@@ -11,6 +20,9 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a UI component.
+ */
 struct ui_component;
 
 /**
@@ -140,3 +152,5 @@ ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list);
 #endif /* __cplusplus */
 
 #endif /* UI_TRANSFER_LIST_BASE_H */
+
+/** @} */

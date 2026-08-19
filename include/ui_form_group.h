@@ -1,3 +1,8 @@
+/**
+ * @file ui_form_group.h
+ * @brief Form group control for reactive forms, managing multiple fields.
+ */
+
 #ifndef UI_FORM_GROUP_H
 #define UI_FORM_GROUP_H
 

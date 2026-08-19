@@ -27,6 +27,11 @@ struct ui_computed {
   size_t subscribers_capacity;
 };
 
+/**
+ * @brief ui_computed_lock.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
 static ui_error_t ui_computed_lock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     ui_int32 is_swapped = 0;
@@ -37,6 +42,11 @@ static ui_error_t ui_computed_lock(ui_computed_t *comp) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_computed_unlock.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
 static ui_error_t ui_computed_unlock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     (void)ui_atomic_store(&comp->lock, 0);
@@ -44,6 +54,12 @@ static ui_error_t ui_computed_unlock(ui_computed_t *comp) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_computed_add_subscriber.
+ * @param comp Parameter comp.
+ * @param node Parameter node.
+ * @return Return value.
+ */
 static ui_error_t ui_computed_add_subscriber(ui_computed_t *comp,
                                              struct ui_reactive_node *node) {
   size_t i;
@@ -72,6 +88,11 @@ static ui_error_t ui_computed_add_subscriber(ui_computed_t *comp,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_computed_on_notify.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t ui_computed_on_notify(void *user_data) {
   ui_computed_t *comp = (ui_computed_t *)user_data;
   size_t i;
@@ -116,6 +137,16 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_computed_create.
+ * @param arena Parameter arena.
+ * @param compute_fn Parameter compute_fn.
+ * @param user_data Parameter user_data.
+ * @param type Parameter type.
+ * @param mode Parameter mode.
+ * @param out_computed Parameter out_computed.
+ * @return Return value.
+ */
 ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
                               void *user_data, enum ui_signal_type type,
                               enum ui_signal_mode mode,
@@ -158,6 +189,12 @@ ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_computed_get.
+ * @param computed Parameter computed.
+ * @param out_value Parameter out_value.
+ * @return Return value.
+ */
 ui_error_t ui_computed_get(ui_computed_t *computed,
                            union ui_signal_payload *out_value) {
   struct ui_reactive_node *current_node = NULL;
@@ -201,6 +238,11 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
   return ui_computed_unlock(computed);
 }
 
+/**
+ * @brief ui_computed_destroy.
+ * @param computed Parameter computed.
+ * @return Return value.
+ */
 ui_error_t ui_computed_destroy(ui_computed_t *computed) {
   if (!computed) {
     return UI_ERROR_INVALID_ARGUMENT;

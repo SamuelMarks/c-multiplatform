@@ -1,3 +1,12 @@
+/**
+ * @file ui_svg.h
+ * @brief SVG parsing and tessellation functionalities.
+ *
+ * @defgroup Svg SVG Processing
+ * @brief Parser and tessellator for SVG path data.
+ * @{
+ */
+
 #ifndef UI_SVG_H
 #define UI_SVG_H
 
@@ -250,3 +259,5 @@ ui_svg_tessellate_stroke(struct ui_svg_geometry *geom,
 #endif /* __cplusplus */
 
 #endif /* UI_SVG_H */
+
+/** @} */

@@ -2,6 +2,13 @@
 #include "ui_css_logical.h"
 /* clang-format on */
 
+/**
+ * @brief ui_css_logical_to_physical_edge.
+ * @param logical_edge Parameter logical_edge.
+ * @param writing_mode Parameter writing_mode.
+ * @param direction Parameter direction.
+ * @return Return value.
+ */
 enum ui_css_physical_edge
 ui_css_logical_to_physical_edge(enum ui_css_logical_edge logical_edge,
                                 enum ui_css_writing_mode writing_mode,

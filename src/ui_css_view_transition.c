@@ -13,6 +13,11 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static ui_error_t skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;

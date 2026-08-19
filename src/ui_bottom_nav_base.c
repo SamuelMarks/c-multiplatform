@@ -1,3 +1,8 @@
+/**
+ * @file ui_bottom_nav_base.c
+ * @brief Implementation of the bottom navigation base component.
+ */
+
 #include "ui_bottom_nav_base.h"
 
 /* clang-format off */
@@ -12,8 +17,9 @@
  * @brief Internal representation of a bottom navigation bar base.
  */
 struct ui_bottom_nav_base {
-  struct ui_component *component;
-  struct ui_signal *active_index_signal;
+  struct ui_component *component; /**< Core UI component */
+  struct ui_signal
+      *active_index_signal; /**< Optional signal to bind active index */
 };
 
 /**
@@ -21,8 +27,8 @@ struct ui_bottom_nav_base {
  * @brief Internal representation of a bottom navigation item.
  */
 struct ui_bottom_nav_item_base {
-  struct ui_component *component;
-  int active;
+  struct ui_component *component; /**< Core UI component for the item */
+  int active;                     /**< Active state flag */
 };
 
 ui_error_t ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav) {

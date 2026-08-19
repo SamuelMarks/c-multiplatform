@@ -1,3 +1,9 @@
+/**
+ * @file ui_e2e_headful.h
+ * @brief End-to-end headful testing context (injects hardware events into real
+ * OS windows).
+ */
+
 #ifndef UI_E2E_HEADFUL_H
 #define UI_E2E_HEADFUL_H
 

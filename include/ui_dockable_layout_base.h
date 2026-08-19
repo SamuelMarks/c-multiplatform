@@ -1,3 +1,8 @@
+/**
+ * @file ui_dockable_layout_base.h
+ * @brief Complex dockable panel layout manager with drag-and-drop integration.
+ */
+
 /* clang-format off */
 #ifndef UI_DOCKABLE_LAYOUT_BASE_H
 #define UI_DOCKABLE_LAYOUT_BASE_H
@@ -13,17 +18,18 @@ extern "C" {
 
 /* clang-format on */
 
+/** @brief Opaque handle representing a dockable layout. */
 struct ui_dockable_layout_base;
 
 /**
  * @brief Represents the edges where a panel can be docked.
  */
 enum ui_dock_edge {
-  UI_DOCK_EDGE_LEFT = 0,
-  UI_DOCK_EDGE_RIGHT,
-  UI_DOCK_EDGE_TOP,
-  UI_DOCK_EDGE_BOTTOM,
-  UI_DOCK_EDGE_CENTER /**< Used for tabbed docking */
+  UI_DOCK_EDGE_LEFT = 0, /**< Dock to the left */
+  UI_DOCK_EDGE_RIGHT,    /**< Dock to the right */
+  UI_DOCK_EDGE_TOP,      /**< Dock to the top */
+  UI_DOCK_EDGE_BOTTOM,   /**< Dock to the bottom */
+  UI_DOCK_EDGE_CENTER    /**< Used for tabbed docking */
 };
 
 /**
@@ -39,6 +45,7 @@ ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout);
  * @brief Destroys a dockable layout base component.
  *
  * @param layout The layout to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout);
@@ -47,7 +54,8 @@ ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout);
  * @brief Gets the underlying component for DOM mounting.
  *
  * @param layout The dockable layout.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,

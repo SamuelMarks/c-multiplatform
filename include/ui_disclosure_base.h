@@ -1,8 +1,15 @@
+/**
+ * @file ui_disclosure_base.h
+ * @brief Disclosure (accordion) base component for collapsible content.
+ */
+
 #ifndef UI_DISCLOSURE_BASE_H
 #define UI_DISCLOSURE_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -16,6 +23,7 @@ extern "C" {
 #include "ui_event.h"
 /* clang-format on */
 
+/** @brief Opaque handle representing a disclosure base component. */
 struct ui_disclosure_base;
 
 /**
@@ -24,6 +32,7 @@ struct ui_disclosure_base;
  * @param disclosure The disclosure component.
  * @param is_expanded The new expanded state (1 if expanded, 0 if collapsed).
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_disclosure_on_toggle_t)(
     struct ui_disclosure_base *disclosure, int is_expanded, void *user_data);
@@ -50,6 +59,7 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure);
  * @brief Destroys a disclosure base component.
  *
  * @param disclosure The disclosure to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure);
 
@@ -80,7 +90,8 @@ ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
  * @brief Checks if the disclosure is currently expanded.
  *
  * @param disclosure The disclosure component.
- * @return 1 if expanded, 0 if collapsed.
+ * @param out_is_expanded Pointer to receive 1 if expanded, 0 if collapsed.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,

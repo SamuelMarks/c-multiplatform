@@ -1,8 +1,15 @@
+/**
+ * @file ui_aspect_ratio_base.h
+ * @brief Aspect ratio bounding box base component.
+ */
+
 #ifndef UI_ASPECT_RATIO_BASE_H
 #define UI_ASPECT_RATIO_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -14,6 +21,7 @@ extern "C" {
 #include "ui_component.h"
 /* clang-format on */
 
+/** @brief Opaque handle representing an aspect ratio component. */
 struct ui_aspect_ratio_base;
 
 /**
@@ -29,6 +37,7 @@ ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio);
  * @brief Destroys an aspect ratio base component.
  *
  * @param aspect_ratio The component to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio);
@@ -49,7 +58,8 @@ ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
  * mounting.
  *
  * @param aspect_ratio The aspect ratio component.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,

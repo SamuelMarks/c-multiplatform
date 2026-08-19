@@ -1,3 +1,8 @@
+/**
+ * @file ui_label_base.h
+ * @brief Label component linking descriptions to form controls.
+ */
+
 #ifndef UI_LABEL_BASE_H
 #define UI_LABEL_BASE_H
 

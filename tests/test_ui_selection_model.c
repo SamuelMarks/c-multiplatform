@@ -33,49 +33,49 @@ static int test_single_select(void) {
     return 1;
 
   /* Select item 5 */
-  if (ui_selection_model_select(model, (void *)5) != UI_ERROR_NONE)
+  if (ui_selection_model_select(model, (void *)(size_t)5) != UI_ERROR_NONE)
     return 1;
   ui_selection_model_get_selected_count(model, &count);
   if (count != 1)
     return 1;
 
-  ui_selection_model_is_selected(model, (void *)5, &is_selected);
+  ui_selection_model_is_selected(model, (void *)(size_t)5, &is_selected);
   if (!is_selected)
     return 1;
 
   /* Select item 10, should replace 5 */
-  ui_selection_model_select(model, (void *)10);
+  ui_selection_model_select(model, (void *)(size_t)10);
   ui_selection_model_get_selected_count(model, &count);
   if (count != 1)
     return 1;
 
-  ui_selection_model_is_selected(model, (void *)5, &is_selected);
+  ui_selection_model_is_selected(model, (void *)(size_t)5, &is_selected);
   if (is_selected)
     return 1;
 
-  ui_selection_model_is_selected(model, (void *)10, &is_selected);
+  ui_selection_model_is_selected(model, (void *)(size_t)10, &is_selected);
   if (!is_selected)
     return 1;
 
   ui_selection_model_get_selected(model, ids, 4);
-  if (ids[0] != (void *)10)
+  if (ids[0] != (void *)(size_t)10)
     return 1;
 
   /* Toggle on item 10 */
-  ui_selection_model_toggle(model, (void *)10);
+  ui_selection_model_toggle(model, (void *)(size_t)10);
   ui_selection_model_get_selected_count(model, &count);
   if (count != 0)
     return 1;
 
   /* Toggle off item 10 (which is now selected) */
-  ui_selection_model_toggle(model, (void *)10);
+  ui_selection_model_toggle(model, (void *)(size_t)10);
   ui_selection_model_get_selected_count(model, &count);
   if (count != 1)
     return 1;
 
   /* Deselect */
-  ui_selection_model_deselect(model, (void *)10);
-  ui_selection_model_deselect(model, (void *)99); /* Not selected */
+  ui_selection_model_deselect(model, (void *)(size_t)10);
+  ui_selection_model_deselect(model, (void *)(size_t)99); /* Not selected */
   ui_selection_model_get_selected_count(model, &count);
   if (count != 0)
     return 1;
@@ -89,7 +89,8 @@ static int test_multi_select(void) {
   int is_selected = 0;
   int count = 0;
   void *ids[4];
-  void *all_ids[] = {(void *)1, (void *)2, (void *)3, (void *)4, (void *)5};
+  void *all_ids[] = {(void *)(size_t)1, (void *)(size_t)2, (void *)(size_t)3,
+                     (void *)(size_t)4, (void *)(size_t)5};
   int on_change_count = 0;
 
   if (ui_selection_model_create(&model) != UI_ERROR_NONE)
@@ -100,37 +101,37 @@ static int test_multi_select(void) {
                                        &on_change_count) != UI_ERROR_NONE)
     return 1;
 
-  ui_selection_model_select(model, (void *)10);
-  ui_selection_model_select(model, (void *)20);
-  ui_selection_model_select(model, (void *)30);
-  ui_selection_model_select(model,
-                            (void *)20); /* Duplicate should be ignored */
+  ui_selection_model_select(model, (void *)(size_t)10);
+  ui_selection_model_select(model, (void *)(size_t)20);
+  ui_selection_model_select(model, (void *)(size_t)30);
+  ui_selection_model_select(
+      model, (void *)(size_t)20); /* Duplicate should be ignored */
 
   ui_selection_model_get_selected_count(model, &count);
   if (count != 3)
     return 1;
 
-  ui_selection_model_is_selected(model, (void *)10, &is_selected);
+  ui_selection_model_is_selected(model, (void *)(size_t)10, &is_selected);
   if (!is_selected)
     return 1;
-  ui_selection_model_is_selected(model, (void *)20, &is_selected);
+  ui_selection_model_is_selected(model, (void *)(size_t)20, &is_selected);
   if (!is_selected)
     return 1;
-  ui_selection_model_is_selected(model, (void *)30, &is_selected);
+  ui_selection_model_is_selected(model, (void *)(size_t)30, &is_selected);
   if (!is_selected)
     return 1;
 
   /* Deselect middle item */
-  ui_selection_model_deselect(model, (void *)20);
+  ui_selection_model_deselect(model, (void *)(size_t)20);
   ui_selection_model_get_selected_count(model, &count);
   if (count != 2)
     return 1;
 
-  ui_selection_model_toggle(model, (void *)30);
+  ui_selection_model_toggle(model, (void *)(size_t)30);
   ui_selection_model_get_selected_count(model, &count);
   if (count != 1)
     return 1;
-  ui_selection_model_is_selected(model, (void *)30, &is_selected);
+  ui_selection_model_is_selected(model, (void *)(size_t)30, &is_selected);
   if (is_selected)
     return 1;
 
@@ -145,7 +146,8 @@ static int test_multi_select(void) {
     return 1;
 
   ui_selection_model_get_selected(model, ids, 4);
-  if (ids[0] != (void *)1 || ids[1] != (void *)2 || ids[2] != (void *)3)
+  if (ids[0] != (void *)(size_t)1 || ids[1] != (void *)(size_t)2 ||
+      ids[2] != (void *)(size_t)3)
     return 1;
 
   /* Transition back to single select */
@@ -171,7 +173,7 @@ static int test_null_args(void) {
   int is_sel;
   int cnt;
   void *ids[4];
-  void *all_ids[] = {(void *)1};
+  void *all_ids[] = {(void *)(size_t)1};
 
   if (ui_selection_model_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -181,11 +183,14 @@ static int test_null_args(void) {
   ui_selection_model_destroy(NULL);
   if (ui_selection_model_set_multi_select(NULL, 1) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  if (ui_selection_model_select(NULL, (void *)1) != UI_ERROR_INVALID_ARGUMENT)
+  if (ui_selection_model_select(NULL, (void *)(size_t)1) !=
+      UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  if (ui_selection_model_deselect(NULL, (void *)1) != UI_ERROR_INVALID_ARGUMENT)
+  if (ui_selection_model_deselect(NULL, (void *)(size_t)1) !=
+      UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  if (ui_selection_model_toggle(NULL, (void *)1) != UI_ERROR_INVALID_ARGUMENT)
+  if (ui_selection_model_toggle(NULL, (void *)(size_t)1) !=
+      UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_selection_model_clear(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -209,13 +214,13 @@ static int test_null_args(void) {
     ui_selection_model_destroy(m);
   }
 
-  if (ui_selection_model_is_selected(NULL, (void *)1, &is_sel) !=
+  if (ui_selection_model_is_selected(NULL, (void *)(size_t)1, &is_sel) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
   {
     struct ui_selection_model *m = NULL;
     ui_selection_model_create(&m);
-    if (ui_selection_model_is_selected(m, (void *)1, NULL) !=
+    if (ui_selection_model_is_selected(m, (void *)(size_t)1, NULL) !=
         UI_ERROR_INVALID_ARGUMENT)
       return 1;
     if (ui_selection_model_get_selected_count(NULL, &cnt) !=
@@ -238,7 +243,8 @@ static int test_null_args(void) {
 static int test_oom(void) {
   struct ui_selection_model *m = NULL;
   int i;
-  void *all_ids[] = {(void *)1, (void *)2, (void *)3, (void *)4, (void *)5};
+  void *all_ids[] = {(void *)(size_t)1, (void *)(size_t)2, (void *)(size_t)3,
+                     (void *)(size_t)4, (void *)(size_t)5};
 
   g_malloc_fail_countdown = 0;
   if (ui_selection_model_create(&m) == UI_ERROR_NONE)
@@ -247,7 +253,7 @@ static int test_oom(void) {
 
   ui_selection_model_create(&m);
   g_malloc_fail_countdown = 0;
-  if (ui_selection_model_select(m, (void *)1) == UI_ERROR_NONE)
+  if (ui_selection_model_select(m, (void *)(size_t)1) == UI_ERROR_NONE)
     return 1;
   g_malloc_fail_countdown = -1;
   ui_selection_model_destroy(m);
@@ -285,9 +291,9 @@ static int test_fallback_and_select_all(void) {
 
   /* Test fallback branch 103-106 */
   ui_selection_model_set_multi_select(model, 1);
-  ui_selection_model_select(model, (void *)1);
-  ui_selection_model_select(model, (void *)2);
-  ui_selection_model_select(model, (void *)3);
+  ui_selection_model_select(model, (void *)(size_t)1);
+  ui_selection_model_select(model, (void *)(size_t)2);
+  ui_selection_model_select(model, (void *)(size_t)3);
 
   /* forcefully put into invalid state */
   internal = (struct ui_selection_model_internal *)model;
@@ -295,12 +301,12 @@ static int test_fallback_and_select_all(void) {
 
   /* select item 2, which is already selected, but count is 3 and single-select
    */
-  ui_selection_model_select(model, (void *)2);
+  ui_selection_model_select(model, (void *)(size_t)2);
 
   /* It should have cleaned up state */
   if (internal->count != 1)
     return 1;
-  if (internal->selected_ids[0] != (void *)2)
+  if (internal->selected_ids[0] != (void *)(size_t)2)
     return 1;
 
   ui_selection_model_destroy(model);
@@ -323,14 +329,14 @@ static int test_coverage_branches(void) {
 
   /* Hit 159: toggle item that is NOT in model */
   (void)ui_selection_model_clear(model);
-  ui_selection_model_toggle(model, (void *)10);
-  ui_selection_model_toggle(model, (void *)20);
+  ui_selection_model_toggle(model, (void *)(size_t)10);
+  ui_selection_model_toggle(model, (void *)(size_t)20);
 
   /* Hit 81: set multi, add multiple, then set single */
   (void)ui_selection_model_set_multi_select(model, 1);
-  ui_selection_model_select(model, (void *)10);
-  ui_selection_model_select(model, (void *)20);
-  ui_selection_model_select(model, (void *)30);
+  ui_selection_model_select(model, (void *)(size_t)10);
+  ui_selection_model_select(model, (void *)(size_t)20);
+  ui_selection_model_select(model, (void *)(size_t)30);
   (void)ui_selection_model_set_multi_select(model, 0); /* should trim to 1 */
 
   /* Hit 210: set_selected with count < 0 */
@@ -338,7 +344,7 @@ static int test_coverage_branches(void) {
 
   /* Hit 16: notify_change with NULL on_change */
   ui_selection_model_set_on_change(model, NULL, NULL);
-  ui_selection_model_select(model, (void *)arr[0]);
+  ui_selection_model_select(model, (void *)(size_t)arr[0]);
 
   ui_selection_model_destroy(model);
   return 0;

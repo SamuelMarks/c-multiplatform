@@ -4,6 +4,12 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @brief ui_speed_dial_base_init.
+ * @param speed_dial Parameter speed_dial.
+ * @param component Parameter component.
+ * @return Return value.
+ */
 ui_error_t ui_speed_dial_base_init(struct ui_speed_dial_base *speed_dial,
                                    struct ui_component *component) {
   if (!speed_dial || !component) {
@@ -40,6 +46,11 @@ ui_error_t ui_speed_dial_base_add_action(struct ui_speed_dial_base *speed_dial,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_speed_dial_base_toggle.
+ * @param speed_dial Parameter speed_dial.
+ * @return Return value.
+ */
 ui_error_t ui_speed_dial_base_toggle(struct ui_speed_dial_base *speed_dial) {
   if (!speed_dial)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -79,6 +90,12 @@ ui_error_t ui_speed_dial_base_bind_disabled(struct ui_speed_dial_base *widget,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_speed_dial_base_bind_text.
+ * @param widget Parameter widget.
+ * @param text_signal Parameter text_signal.
+ * @return Return value.
+ */
 ui_error_t ui_speed_dial_base_bind_text(struct ui_speed_dial_base *widget,
                                         struct ui_signal *text_signal) {
   if (!widget) {

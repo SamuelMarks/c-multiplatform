@@ -1,3 +1,8 @@
+/**
+ * @file ui_focus_trap.h
+ * @brief Focus trap mechanisms for modals and dialogs.
+ */
+
 #ifndef UI_FOCUS_TRAP_H
 #define UI_FOCUS_TRAP_H
 

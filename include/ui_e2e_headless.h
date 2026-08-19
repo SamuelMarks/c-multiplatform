@@ -1,3 +1,9 @@
+/**
+ * @file ui_e2e_headless.h
+ * @brief End-to-end headless testing context (injects software events into a
+ * dummy OS window backend).
+ */
+
 #ifndef UI_E2E_HEADLESS_H
 #define UI_E2E_HEADLESS_H
 
@@ -85,7 +91,7 @@ ui_error_t ui_e2e_headless_type_key(struct ui_e2e_headless_ctx *ctx,
                                     int key_code, unsigned int modifiers);
 
 /**
- * \brief Advances the virtual time in the headless context to trigger
+ * @brief Advances the virtual time in the headless context to trigger
  * animations and timers.
  *
  * @param ctx The headless context.
@@ -100,14 +106,3 @@ ui_error_t ui_e2e_advance_time(struct ui_e2e_headless_ctx *ctx,
 #endif /* __cplusplus */
 
 #endif /* UI_E2E_HEADLESS_H */
-
-/**
- * @brief Advances the virtual time in the headless context to trigger
- * animations and timers.
- *
- * @param ctx The headless context.
- * @param delta_ms The time in milliseconds to advance.
- * @return UI_ERROR_NONE on success.
- */
-ui_error_t ui_e2e_advance_time(struct ui_e2e_headless_ctx *ctx,
-                               double delta_ms);

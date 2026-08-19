@@ -1,3 +1,8 @@
+/**
+ * @file ui_listbox_base.h
+ * @brief Base listbox component handling selection models and navigation.
+ */
+
 #ifndef UI_LISTBOX_BASE_H
 #define UI_LISTBOX_BASE_H
 

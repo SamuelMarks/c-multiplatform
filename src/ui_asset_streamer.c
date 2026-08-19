@@ -1,3 +1,8 @@
+/**
+ * @file ui_asset_streamer.c
+ * @brief Implementation of asynchronous asset streaming and loading.
+ */
+
 /* clang-format off */
 #include "../include/ui_asset_streamer.h"
 #include "ui_internal_mem.h"
@@ -168,8 +173,6 @@ static ui_error_t asset_task_execute(void *user_data) {
     task->error = UI_ERROR_IO_FAILED;
     goto cleanup;
   }
-#endif
-#ifdef UI_TEST_MOCK_ALLOC
   if (g_mock_io_fail == 4) {
     task->error = UI_ERROR_IO_FAILED;
     goto cleanup;
@@ -190,7 +193,6 @@ static ui_error_t asset_task_execute(void *user_data) {
 
   task->asset =
       (struct ui_asset *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset));
-
   if (!task->asset) {
     task->error = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -216,8 +218,7 @@ static ui_error_t asset_task_execute(void *user_data) {
   ((char *)task->asset->data)[size] = '\0';
 
   {
-    size_t url_len;
-    url_len = strlen(task->url);
+    size_t url_len = strlen(task->url);
     task->asset->url = (char *)C_MULTIPLATFORM_MALLOC(url_len + 1);
     if (!task->asset->url) {
       task->error = UI_ERROR_OUT_OF_MEMORY;

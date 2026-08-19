@@ -1,6 +1,18 @@
+/**
+ * @file ui_sidenav_base.h
+ * @brief Sidenav component base declarations.
+ *
+ * @defgroup SidenavBase Sidenav Base
+ * @brief Base implementation for side navigation drawers.
+ * @{
+ */
+
 #ifndef UI_SIDENAV_BASE_H
 #define UI_SIDENAV_BASE_H
 
+/**
+ * @brief Opaque handle to a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -32,10 +44,17 @@ enum ui_sidenav_position {
   UI_SIDENAV_POSITION_END        /**< Right side in LTR. */
 };
 
+/**
+ * @brief Opaque structure representing the sidenav base.
+ */
 struct ui_sidenav_base;
 
 /**
  * @brief Callback invoked when the drawer is closed via backdrop or gesture.
+ *
+ * @param sidenav The sidenav.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_sidenav_on_close_t)(struct ui_sidenav_base *sidenav,
                                             void *user_data);
@@ -52,6 +71,7 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav);
  * @brief Destroys a sidenav instance.
  *
  * @param sidenav The sidenav.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav);
 
@@ -109,7 +129,9 @@ ui_error_t ui_sidenav_base_set_open(struct ui_sidenav_base *sidenav,
  * @brief Checks if the drawer is currently open.
  *
  * @param sidenav The sidenav.
- * @return 1 if open, 0 if closed.
+ * @param out_is_open Pointer to receive the open state (1 if open, 0 if
+ * closed).
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_sidenav_base_is_open(const struct ui_sidenav_base *sidenav,
                                    int *out_is_open);
@@ -143,7 +165,7 @@ ui_error_t ui_sidenav_base_set_on_close(struct ui_sidenav_base *sidenav,
  *
  * @param sidenav The sidenav.
  * @param event The input event.
- * @param timestamp_ms The timestamp.
+ * @param timestamp_ms The timestamp in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
@@ -154,7 +176,8 @@ ui_error_t ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
  * @brief Retrieves the underlying component wrapper.
  *
  * @param sidenav The sidenav.
- * @return The component.
+ * @param out_component Pointer to receive the component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_sidenav_base_get_component(struct ui_sidenav_base *sidenav,
                                          struct ui_component **out_component);
@@ -162,7 +185,7 @@ ui_error_t ui_sidenav_base_get_component(struct ui_sidenav_base *sidenav,
 /**
  * @brief Binds the active state/index to a signal.
  *
- * @param widget The widget.
+ * @param widget The sidenav widget.
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
@@ -174,3 +197,5 @@ ui_error_t ui_sidenav_base_bind_active_index(struct ui_sidenav_base *widget,
 #endif /* __cplusplus */
 
 #endif /* UI_SIDENAV_BASE_H */
+
+/** @} */

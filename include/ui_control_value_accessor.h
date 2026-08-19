@@ -1,3 +1,8 @@
+/**
+ * @file ui_control_value_accessor.h
+ * @brief Interfaces for bridging UI components to form controls.
+ */
+
 #ifndef UI_CONTROL_VALUE_ACCESSOR_H
 #define UI_CONTROL_VALUE_ACCESSOR_H
 

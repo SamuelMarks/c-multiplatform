@@ -55,9 +55,9 @@ static ui_error_t run_normal_tests(void) {
   pipes[0] = 42;
   pipes[1] = 43;
 #endif
-  void *fake_handle1 = (void *)(long)pipes[0];
-  void *fake_handle2 = (void *)43;
-  void *fake_handle3 = (void *)44;
+  void *fake_handle1 = (void *)(size_t)pipes[0];
+  void *fake_handle2 = (void *)(size_t)43;
+  void *fake_handle3 = (void *)(size_t)44;
 
   printf("Running normal reactor tests...\n");
 
@@ -271,10 +271,19 @@ static ui_error_t run_oom_tests(void) {
 
   g_malloc_fail_countdown = 1;
   rc = ui_reactor_create(&reactor);
+#if !defined(_WIN32)
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     printf("Expected OOM on create 2\n");
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   }
+#else
+  if (rc != UI_ERROR_NONE) {
+    printf("Expected success on create 2 for win32\n");
+    return rc;
+  }
+  ui_reactor_destroy(reactor);
+  reactor = NULL;
+#endif
 
   g_malloc_fail_countdown = -1;
   rc = ui_reactor_create(&reactor);

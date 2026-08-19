@@ -1,3 +1,9 @@
+/**
+ * @file ui_overlay_director.h
+ * @brief Manages the global overlay container for modals, popovers, and
+ * tooltips.
+ */
+
 #ifndef UI_OVERLAY_DIRECTOR_H
 #define UI_OVERLAY_DIRECTOR_H
 

@@ -1,3 +1,8 @@
+/**
+ * @file ui_color_space.h
+ * @brief Color space definitions and conversion utilities (e.g. CAM16, HCT).
+ */
+
 #ifndef UI_COLOR_SPACE_H
 #define UI_COLOR_SPACE_H
 

@@ -7,6 +7,12 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief trigger_event.
+ * @param node Parameter node.
+ * @param event Parameter event.
+ * @return Return value.
+ */
 static ui_error_t trigger_event(const struct ui_dom_node *node,
                                 const struct ui_event *event) {
   struct ui_dom_event_listener *listener;
@@ -28,6 +34,14 @@ static ui_error_t trigger_event(const struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief hit_test.
+ * @param node Parameter node.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param out_node Parameter out_node.
+ * @return Return value.
+ */
 static void hit_test(const struct ui_layout_node *node, float x, float y,
                      const struct ui_layout_node **out_node) {
   *out_node = NULL;
@@ -41,6 +55,14 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
                              const struct ui_event *event,
                              struct ui_mouse_state *state, void *user_data);
 
+/**
+ * @brief ui_event_dispatch.
+ * @param layout_root Parameter layout_root.
+ * @param event Parameter event.
+ * @param state Parameter state.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
                              const struct ui_event *event,
                              struct ui_mouse_state *state, void *user_data) {
@@ -62,7 +84,6 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
       if (hit != state->hovered_node) {
         if (state->hovered_node && state->hovered_node->dom_node) {
           struct ui_event ev_leave = *event;
-          ui_error_t rc;
           ev_leave.type = UI_EVENT_MOUSE_LEAVE;
           {
             ui_error_t trig_rc1 =
@@ -75,7 +96,6 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
         state->hovered_node = (struct ui_layout_node *)hit;
         if (state->hovered_node && state->hovered_node->dom_node) {
           struct ui_event ev_enter = *event;
-          ui_error_t rc;
           ev_enter.type = UI_EVENT_MOUSE_ENTER;
           {
             ui_error_t trig_rc2 =
@@ -106,7 +126,6 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
       state->active_node = (struct ui_layout_node *)hit;
       if (hit && event->event_data.mouse.button == 1) {
         struct ui_event ev_ctx = *event;
-        ui_error_t rc;
         ev_ctx.type = UI_EVENT_CONTEXT_MENU;
         {
           ui_error_t trig_rc5 = trigger_event(hit->dom_node, &ev_ctx);
@@ -127,7 +146,6 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
       if (hit && hit == state->active_node &&
           event->event_data.mouse.button == 0) {
         struct ui_event ev_click;
-        ui_error_t rc;
         state->click_count++;
         ev_click = *event;
         ev_click.type = UI_EVENT_CLICK;

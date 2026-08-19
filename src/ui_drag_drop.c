@@ -66,6 +66,11 @@ struct ui_drag_drop_context {
   int pointer_is_down;
 };
 
+/**
+ * @brief ui_drag_drop_create.
+ * @param out_ctx Parameter out_ctx.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_create(struct ui_drag_drop_context **out_ctx) {
   struct ui_drag_drop_context *ctx;
 
@@ -95,6 +100,11 @@ ui_error_t ui_drag_drop_create(struct ui_drag_drop_context **out_ctx) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_drag_drop_destroy.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_destroy(struct ui_drag_drop_context *ctx) {
   int i;
 
@@ -114,6 +124,12 @@ ui_error_t ui_drag_drop_destroy(struct ui_drag_drop_context *ctx) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_drag_drop_set_drag_threshold.
+ * @param ctx Parameter ctx.
+ * @param distance Parameter distance.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_set_drag_threshold(struct ui_drag_drop_context *ctx,
                                            int distance) {
   if (!ctx) {
@@ -123,6 +139,11 @@ ui_error_t ui_drag_drop_set_drag_threshold(struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_drag_drop_clear_lists.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx) {
   int i;
 
@@ -141,6 +162,12 @@ ui_error_t ui_drag_drop_clear_lists(struct ui_drag_drop_context *ctx) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_drag_drop_add_list.
+ * @param ctx Parameter ctx.
+ * @param list Parameter list.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
                                  const struct ui_drag_list *list) {
   struct ui_drag_list *new_list;
@@ -183,6 +210,11 @@ ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief update_placeholder.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 static void update_placeholder(struct ui_drag_drop_context *ctx) {
   int drag_center_x =
       ctx->current_x - ctx->drag_item_offset_x + ctx->drag_item_width / 2;
@@ -252,6 +284,14 @@ static void update_placeholder(struct ui_drag_drop_context *ctx) {
   return;
 }
 
+/**
+ * @brief handle_pointer_down.
+ * @param ctx Parameter ctx.
+ * @param pointer_id Parameter pointer_id.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @return Return value.
+ */
 static void handle_pointer_down(struct ui_drag_drop_context *ctx,
                                 int pointer_id, int x, int y) {
   int i, j;
@@ -288,6 +328,14 @@ static void handle_pointer_down(struct ui_drag_drop_context *ctx,
   return;
 }
 
+/**
+ * @brief handle_pointer_move.
+ * @param ctx Parameter ctx.
+ * @param pointer_id Parameter pointer_id.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @return Return value.
+ */
 static void handle_pointer_move(struct ui_drag_drop_context *ctx,
                                 int pointer_id, int x, int y) {
   if (ctx->active_pointer_id != pointer_id) {
@@ -311,6 +359,12 @@ static void handle_pointer_move(struct ui_drag_drop_context *ctx,
   return;
 }
 
+/**
+ * @brief handle_pointer_up.
+ * @param ctx Parameter ctx.
+ * @param pointer_id Parameter pointer_id.
+ * @return Return value.
+ */
 static void handle_pointer_up(struct ui_drag_drop_context *ctx,
                               int pointer_id) {
   if (ctx->active_pointer_id != pointer_id) {
@@ -332,6 +386,12 @@ static void handle_pointer_up(struct ui_drag_drop_context *ctx,
   return;
 }
 
+/**
+ * @brief handle_pointer_cancel.
+ * @param ctx Parameter ctx.
+ * @param pointer_id Parameter pointer_id.
+ * @return Return value.
+ */
 static void handle_pointer_cancel(struct ui_drag_drop_context *ctx,
                                   int pointer_id) {
   if (ctx->active_pointer_id != pointer_id) {
@@ -344,6 +404,12 @@ static void handle_pointer_cancel(struct ui_drag_drop_context *ctx,
   return;
 }
 
+/**
+ * @brief ui_drag_drop_process_event.
+ * @param ctx Parameter ctx.
+ * @param event Parameter event.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
                                       const struct ui_event *event) {
   if (!ctx || !event) {
@@ -397,6 +463,12 @@ ui_error_t ui_drag_drop_process_event(struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_drag_drop_get_state.
+ * @param ctx Parameter ctx.
+ * @param out_state Parameter out_state.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
                                   enum ui_drag_state *out_state) {
   if (!ctx || !out_state) {
@@ -406,6 +478,15 @@ ui_error_t ui_drag_drop_get_state(const struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_drag_drop_get_dragged_item.
+ * @param ctx Parameter ctx.
+ * @param out_item_id Parameter out_item_id.
+ * @param out_source_list_id Parameter out_source_list_id.
+ * @param out_current_x Parameter out_current_x.
+ * @param out_current_y Parameter out_current_y.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
                                          int *out_item_id,
                                          int *out_source_list_id,
@@ -429,6 +510,12 @@ ui_error_t ui_drag_drop_get_dragged_item(const struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_drag_drop_get_placeholder.
+ * @param ctx Parameter ctx.
+ * @param out_placeholder Parameter out_placeholder.
+ * @return Return value.
+ */
 ui_error_t
 ui_drag_drop_get_placeholder(const struct ui_drag_drop_context *ctx,
                              struct ui_drag_placeholder *out_placeholder) {
@@ -439,6 +526,16 @@ ui_drag_drop_get_placeholder(const struct ui_drag_drop_context *ctx,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_drag_drop_get_drop_event.
+ * @param ctx Parameter ctx.
+ * @param out_dropped Parameter out_dropped.
+ * @param out_item_id Parameter out_item_id.
+ * @param out_from_list Parameter out_from_list.
+ * @param out_to_list Parameter out_to_list.
+ * @param out_to_index Parameter out_to_index.
+ * @return Return value.
+ */
 ui_error_t ui_drag_drop_get_drop_event(struct ui_drag_drop_context *ctx,
                                        int *out_dropped, int *out_item_id,
                                        int *out_from_list, int *out_to_list,

@@ -1,3 +1,8 @@
+/**
+ * @file ui_menubar_base.h
+ * @brief Base menubar component providing desktop-style top menu strips.
+ */
+
 #ifndef UI_MENUBAR_BASE_H
 #define UI_MENUBAR_BASE_H
 

@@ -2,6 +2,12 @@
 #include "ui_vibrancy.h"
 /* clang-format on */
 
+/**
+ * @brief ui_vibrancy_params_init.
+ * @param params Parameter params.
+ * @param material Parameter material.
+ * @return Return value.
+ */
 ui_error_t ui_vibrancy_params_init(struct ui_vibrancy_params *params,
                                    enum ui_vibrancy_material material) {
   if (!params) {

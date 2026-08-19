@@ -24,6 +24,13 @@ struct ui_e2e_headful_ctx {
   struct ui_window *window;
 };
 
+/**
+ * @brief ui_e2e_headful_create.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_ctx Parameter out_ctx.
+ * @return Return value.
+ */
 ui_error_t ui_e2e_headful_create(struct ui_window_backend *backend,
                                  struct ui_window *window,
                                  struct ui_e2e_headful_ctx **out_ctx) {
@@ -45,6 +52,11 @@ ui_error_t ui_e2e_headful_create(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_e2e_headful_destroy.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 ui_error_t ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx) {
   if (!ctx) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -55,6 +67,11 @@ ui_error_t ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx) {
 
 #if defined(_WIN32) || defined(WIN32)
 
+/**
+ * @brief map_ui_key_to_vk.
+ * @param key_code Parameter key_code.
+ * @return Return value.
+ */
 static WORD map_ui_key_to_vk(int key_code) {
   switch (key_code) {
   case UI_KEY_SPACE:
@@ -84,13 +101,27 @@ static WORD map_ui_key_to_vk(int key_code) {
   }
 }
 
+/**
+ * @brief ui_e2e_headful_click.
+ * @param ctx Parameter ctx.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @return Return value.
+ */
 ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
   HWND hwnd;
   POINT pt;
   INPUT inputs[2];
   int screen_w, screen_h;
 
+  ui_error_t handle_rc;
+  void *os_handle = NULL;
+
   if (!ctx) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  if (!ctx->backend || !ctx->window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
@@ -98,7 +129,12 @@ ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
     return UI_ERROR_UNSUPPORTED;
   }
 
-  hwnd = (HWND)ctx->backend->get_os_handle(ctx->backend, ctx->window);
+  handle_rc =
+      ctx->backend->get_os_handle(ctx->backend, ctx->window, &os_handle);
+  if (handle_rc != UI_ERROR_NONE) {
+    return handle_rc;
+  }
+  hwnd = (HWND)os_handle;
   if (!hwnd) {
     return UI_ERROR_UNSUPPORTED;
   }
@@ -134,6 +170,13 @@ ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_e2e_headful_type_key.
+ * @param ctx Parameter ctx.
+ * @param key_code Parameter key_code.
+ * @param modifiers Parameter modifiers.
+ * @return Return value.
+ */
 ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
                                    unsigned int modifiers) {
   HWND hwnd;
@@ -141,7 +184,14 @@ ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
   INPUT inputs[4];
   int num_inputs = 0;
 
+  ui_error_t handle_rc;
+  void *os_handle = NULL;
+
   if (!ctx) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  if (!ctx->backend || !ctx->window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
@@ -149,7 +199,12 @@ ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
     return UI_ERROR_UNSUPPORTED;
   }
 
-  hwnd = (HWND)ctx->backend->get_os_handle(ctx->backend, ctx->window);
+  handle_rc =
+      ctx->backend->get_os_handle(ctx->backend, ctx->window, &os_handle);
+  if (handle_rc != UI_ERROR_NONE) {
+    return handle_rc;
+  }
+  hwnd = (HWND)os_handle;
   if (!hwnd) {
     return UI_ERROR_UNSUPPORTED;
   }
@@ -210,6 +265,13 @@ ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
 
 #else
 
+/**
+ * @brief ui_e2e_headful_click.
+ * @param ctx Parameter ctx.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @return Return value.
+ */
 ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
   (void)ctx;
   (void)x;
@@ -217,6 +279,13 @@ ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
   return UI_ERROR_UNSUPPORTED;
 }
 
+/**
+ * @brief ui_e2e_headful_type_key.
+ * @param ctx Parameter ctx.
+ * @param key_code Parameter key_code.
+ * @param modifiers Parameter modifiers.
+ * @return Return value.
+ */
 ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
                                    unsigned int modifiers) {
   (void)ctx;

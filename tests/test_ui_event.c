@@ -91,6 +91,9 @@ static void trigger_null_branches(void) {
 static ui_error_t failing_handler(struct ui_dom_node *node,
                                   const struct ui_event *event,
                                   void *user_data) {
+  (void)node;
+  (void)event;
+  (void)user_data;
   return UI_ERROR_UNKNOWN;
 }
 

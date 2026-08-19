@@ -22,6 +22,11 @@ struct ui_datagrid_base {
   struct ui_computed *data_signal;
 };
 
+/**
+ * @brief ui_datagrid_base_create.
+ * @param out_datagrid Parameter out_datagrid.
+ * @return Return value.
+ */
 ui_error_t ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid) {
   struct ui_datagrid_base *datagrid;
   ui_error_t rc;
@@ -89,6 +94,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_datagrid_base_destroy.
+ * @param datagrid Parameter datagrid.
+ * @return Return value.
+ */
 ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
   if (!datagrid) {
     return UI_ERROR_NONE;
@@ -98,6 +108,12 @@ ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datagrid_base_get_component.
+ * @param datagrid Parameter datagrid.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
                                           struct ui_component **out_component) {
   if (!datagrid || !out_component) {
@@ -107,6 +123,13 @@ ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datagrid_base_resize_column.
+ * @param datagrid Parameter datagrid.
+ * @param col_index Parameter col_index.
+ * @param new_width Parameter new_width.
+ * @return Return value.
+ */
 ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
                                           int col_index, float new_width) {
   (void)col_index;
@@ -117,6 +140,13 @@ ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datagrid_base_move_focus.
+ * @param datagrid Parameter datagrid.
+ * @param row_delta Parameter row_delta.
+ * @param col_delta Parameter col_delta.
+ * @return Return value.
+ */
 ui_error_t ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
                                        int row_delta, int col_delta) {
   (void)row_delta;
@@ -127,6 +157,12 @@ ui_error_t ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_datagrid_base_bind_data.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_datagrid_base_bind_data(struct ui_datagrid_base *widget,
                                       struct ui_computed *signal) {
   if (!widget) {

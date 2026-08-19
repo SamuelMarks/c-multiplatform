@@ -217,7 +217,7 @@ int example_basic_main(void) {
   struct ui_window *window = NULL;
   struct app_context app_ctx;
   struct render_context rctx;
-  struct ui_dom_node *box1, *box2, *box3;
+  struct ui_dom_node *box1 = NULL, *box2 = NULL, *box3 = NULL;
   ui_error_t err;
   int running = 1;
 
@@ -300,7 +300,11 @@ err = ui_window_backend_linux_create(&backend);
   emscripten_set_main_loop(main_loop_step, 0, 1);
 #else
   int frame_count = 0;
+#if defined(CI_TEST_RUN)
+  const char *ci_test = "1";
+#else
   const char *ci_test = getenv("CI_TEST_RUN");
+#endif
   while (running) {
     if (ci_test && frame_count++ > 2)
       break;

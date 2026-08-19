@@ -1,3 +1,8 @@
+/**
+ * @file ui_color_quantization.h
+ * @brief Utilities for extracting dominant colors from image data.
+ */
+
 #ifndef UI_COLOR_QUANTIZATION_H
 #define UI_COLOR_QUANTIZATION_H
 

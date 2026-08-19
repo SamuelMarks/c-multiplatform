@@ -1,3 +1,9 @@
+/**
+ * @file ui_modifier.h
+ * @brief UI Modifiers for injecting ad-hoc CSS classes or inline styles
+ * dynamically.
+ */
+
 #ifndef UI_MODIFIER_H
 #define UI_MODIFIER_H
 

@@ -167,6 +167,7 @@ ui_error_t ui_i18n_format_number(struct ui_i18n *i18n, double value,
 #if defined(_MSC_VER)
   sprintf_s(format_str, sizeof(format_str), "%%.%df", decimals);
   sprintf_s(out_str, out_len, format_str, value);
+  return UI_ERROR_NONE;
 #else
   sprintf(format_str, "%%.%df", decimals);
 #if defined(__GNUC__) || defined(__clang__)

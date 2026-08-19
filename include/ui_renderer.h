@@ -1,3 +1,8 @@
+/**
+ * @file ui_renderer.h
+ * @brief Core 2D renderer interface and drawing primitives.
+ */
+
 #ifndef UI_RENDERER_H
 #define UI_RENDERER_H
 

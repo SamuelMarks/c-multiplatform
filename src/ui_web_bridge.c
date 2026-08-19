@@ -21,8 +21,12 @@ static ui_uint32 *g_cmd_buffer = NULL;
 static size_t g_cmd_pos = 0;
 static size_t g_cmd_capacity = WEB_CMD_BUFFER_SIZE / sizeof(ui_uint32);
 
+/**
+ * @brief ensure_buffer.
+ * @param words_needed Parameter words_needed.
+ * @return Return value.
+ */
 static ui_error_t ensure_buffer(size_t words_needed) {
-  ui_error_t rc;
   if (!g_cmd_buffer) {
     g_cmd_buffer =
         (ui_uint32 *)C_MULTIPLATFORM_MALLOC(g_cmd_capacity * sizeof(ui_uint32));
@@ -204,6 +208,10 @@ EM_JS(void, flush_to_js, (ui_uint32 * buf, ui_uint32 len), {
 })
 #endif
 
+/**
+ * @brief ui_web_bridge_shutdown.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_shutdown(void) {
   if (g_cmd_buffer) {
     C_MULTIPLATFORM_FREE(g_cmd_buffer);
@@ -213,6 +221,10 @@ ui_error_t ui_web_bridge_shutdown(void) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_flush.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_flush(void) {
 #if defined(__EMSCRIPTEN__)
   if (g_cmd_pos > 0 && g_cmd_buffer) {
@@ -223,6 +235,12 @@ ui_error_t ui_web_bridge_flush(void) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_create_node.
+ * @param id Parameter id.
+ * @param tag_name Parameter tag_name.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_create_node(ui_uint32 id, const char *tag_name) {
   ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
@@ -234,6 +252,11 @@ ui_error_t ui_web_bridge_create_node(ui_uint32 id, const char *tag_name) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_destroy_node.
+ * @param id Parameter id.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_destroy_node(ui_uint32 id) {
   ui_error_t rc = ensure_buffer(2);
   if (rc != UI_ERROR_NONE)
@@ -244,6 +267,12 @@ ui_error_t ui_web_bridge_destroy_node(ui_uint32 id) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_set_text.
+ * @param id Parameter id.
+ * @param text Parameter text.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_set_text(ui_uint32 id, const char *text) {
   ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
@@ -255,6 +284,12 @@ ui_error_t ui_web_bridge_set_text(ui_uint32 id, const char *text) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_append_child.
+ * @param parent_id Parameter parent_id.
+ * @param child_id Parameter child_id.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_append_child(ui_uint32 parent_id, ui_uint32 child_id) {
   ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
@@ -266,6 +301,12 @@ ui_error_t ui_web_bridge_append_child(ui_uint32 parent_id, ui_uint32 child_id) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_remove_child.
+ * @param parent_id Parameter parent_id.
+ * @param child_id Parameter child_id.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_remove_child(ui_uint32 parent_id, ui_uint32 child_id) {
   ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
@@ -277,6 +318,15 @@ ui_error_t ui_web_bridge_remove_child(ui_uint32 parent_id, ui_uint32 child_id) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_set_bounds.
+ * @param id Parameter id.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_set_bounds(ui_uint32 id, float x, float y, float w,
                                     float h) {
   ui_error_t rc = ensure_buffer(6);
@@ -298,6 +348,13 @@ ui_error_t ui_web_bridge_set_bounds(ui_uint32 id, float x, float y, float w,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_insert_before.
+ * @param parent_id Parameter parent_id.
+ * @param child_id Parameter child_id.
+ * @param reference_id Parameter reference_id.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_insert_before(ui_uint32 parent_id, ui_uint32 child_id,
                                        ui_uint32 reference_id) {
   ui_error_t rc = ensure_buffer(4);
@@ -311,6 +368,13 @@ ui_error_t ui_web_bridge_insert_before(ui_uint32 parent_id, ui_uint32 child_id,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_set_style.
+ * @param id Parameter id.
+ * @param property Parameter property.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_set_style(ui_uint32 id, const char *property,
                                    const char *value) {
   ui_error_t rc = ensure_buffer(4);
@@ -330,6 +394,14 @@ ui_error_t ui_web_bridge_set_style(ui_uint32 id, const char *property,
 extern "C" {
 #endif
 
+/**
+ * @brief ui_web_bridge_dispatch_event.
+ * @param type Parameter type.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param buttons Parameter buttons.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
                                         int buttons) {
   struct ui_event event;
@@ -367,6 +439,13 @@ ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_dispatch_resize.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param dpr Parameter dpr.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_dispatch_resize(float w, float h, float dpr) {
   struct ui_event event;
   memset(&event, 0, sizeof(event));
@@ -377,6 +456,13 @@ ui_error_t ui_web_bridge_dispatch_resize(float w, float h, float dpr) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_dispatch_key.
+ * @param type Parameter type.
+ * @param key Parameter key.
+ * @param modifiers Parameter modifiers.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_dispatch_key(int type, const char *key,
                                       int modifiers) {
   struct ui_event event;
@@ -398,6 +484,17 @@ ui_error_t ui_web_bridge_dispatch_key(int type, const char *key,
 }
 #endif
 
+/**
+ * @brief ui_web_bridge_set_aria.
+ * @param id Parameter id.
+ * @param role Parameter role.
+ * @param label Parameter label.
+ * @param hidden Parameter hidden.
+ * @param disabled Parameter disabled.
+ * @param expanded Parameter expanded.
+ * @param checked Parameter checked.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_set_aria(ui_uint32 id, const char *role,
                                   const char *label, int hidden, int disabled,
                                   int expanded, int checked) {
@@ -417,6 +514,11 @@ ui_error_t ui_web_bridge_set_aria(ui_uint32 id, const char *role,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_push_state.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_push_state(const char *path) {
   ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
@@ -428,6 +530,11 @@ ui_error_t ui_web_bridge_push_state(const char *path) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_web_bridge_replace_state.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_replace_state(const char *path) {
   ui_error_t rc = ensure_buffer(3);
   if (rc != UI_ERROR_NONE)
@@ -438,6 +545,13 @@ ui_error_t ui_web_bridge_replace_state(const char *path) {
   g_cmd_buffer[g_cmd_pos++] = (ui_uint32)(ui_uintptr)path;
   return UI_ERROR_NONE;
 }
+/**
+ * @brief ui_web_bridge_set_attribute.
+ * @param id Parameter id.
+ * @param name Parameter name.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_set_attribute(ui_uint32 id, const char *name,
                                        const char *value) {
   ui_error_t rc = ensure_buffer(4);
@@ -450,6 +564,13 @@ ui_error_t ui_web_bridge_set_attribute(ui_uint32 id, const char *name,
   g_cmd_buffer[g_cmd_pos++] = (ui_uint32)(ui_uintptr)value;
   return UI_ERROR_NONE;
 }
+/**
+ * @brief ui_web_bridge_set_property.
+ * @param id Parameter id.
+ * @param name Parameter name.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 ui_error_t ui_web_bridge_set_property(ui_uint32 id, const char *name,
                                       const char *value) {
   ui_error_t rc = ensure_buffer(4);

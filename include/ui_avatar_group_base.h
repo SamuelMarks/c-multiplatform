@@ -1,8 +1,15 @@
+/**
+ * @file ui_avatar_group_base.h
+ * @brief Avatar group base component.
+ */
+
 #ifndef UI_AVATAR_GROUP_BASE_H
 #define UI_AVATAR_GROUP_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -15,6 +22,7 @@ extern "C" {
 #include "ui_avatar_base.h"
 /* clang-format on */
 
+/** @brief Opaque handle to an avatar group component. */
 struct ui_avatar_group_base;
 
 /**
@@ -29,6 +37,7 @@ ui_error_t ui_avatar_group_base_create(struct ui_avatar_group_base **out_group);
  * @brief Destroys an avatar group base component.
  *
  * @param group The group to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_avatar_group_base_destroy(struct ui_avatar_group_base *group);
 

@@ -1,3 +1,8 @@
+/**
+ * @file ui_shape_family.h
+ * @brief Predefined shape and corner radius scales.
+ */
+
 #ifndef UI_SHAPE_FAMILY_H
 #define UI_SHAPE_FAMILY_H
 

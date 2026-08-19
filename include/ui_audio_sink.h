@@ -1,3 +1,8 @@
+/**
+ * @file ui_audio_sink.h
+ * @brief Audio sink backend abstractions.
+ */
+
 #ifndef UI_AUDIO_SINK_H
 #define UI_AUDIO_SINK_H
 

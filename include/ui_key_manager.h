@@ -1,3 +1,8 @@
+/**
+ * @file ui_key_manager.h
+ * @brief Manage hotkeys and global keyboard shortcuts.
+ */
+
 #ifndef UI_KEY_MANAGER_H
 #define UI_KEY_MANAGER_H
 

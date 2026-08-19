@@ -1,3 +1,9 @@
+/**
+ * @file ui_avatar_group_base.c
+ * @brief Implementation of the avatar group component.
+ * @ingroup ui_avatar_group_base
+ */
+
 #include "ui_avatar_group_base.h"
 
 /* clang-format off */
@@ -7,14 +13,22 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @struct ui_avatar_group_base
+ * @brief Internal representation of an avatar group component.
+ */
 struct ui_avatar_group_base {
-  struct ui_component *component;
-  unsigned int total_avatars;
-  unsigned int max_avatars;
-  struct ui_computed *data_signal;
+  struct ui_component *component;  /**< Core UI component */
+  unsigned int total_avatars;      /**< Total number of avatars added */
+  unsigned int max_avatars;        /**< Maximum number of avatars to display */
+  struct ui_computed *data_signal; /**< Optional data signal */
 };
 
-/** \brief ui_error */
+/**
+ * @brief ui_avatar_group_base_create.
+ * @param out_group Parameter out_group.
+ * @return Return value.
+ */
 ui_error_t
 ui_avatar_group_base_create(struct ui_avatar_group_base **out_group) {
   struct ui_avatar_group_base *group;
@@ -45,6 +59,11 @@ ui_avatar_group_base_create(struct ui_avatar_group_base **out_group) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_avatar_group_base_destroy.
+ * @param group Parameter group.
+ * @return Return value.
+ */
 ui_error_t ui_avatar_group_base_destroy(struct ui_avatar_group_base *group) {
   if (!group) {
     return UI_ERROR_NONE;
@@ -54,7 +73,12 @@ ui_error_t ui_avatar_group_base_destroy(struct ui_avatar_group_base *group) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * @brief ui_avatar_group_base_get_component.
+ * @param group Parameter group.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t
 ui_avatar_group_base_get_component(struct ui_avatar_group_base *group,
                                    struct ui_component **out_component) {
@@ -65,7 +89,12 @@ ui_avatar_group_base_get_component(struct ui_avatar_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * @brief ui_avatar_group_base_append_avatar.
+ * @param group Parameter group.
+ * @param avatar Parameter avatar.
+ * @return Return value.
+ */
 ui_error_t
 ui_avatar_group_base_append_avatar(struct ui_avatar_group_base *group,
                                    struct ui_avatar_base *avatar) {
@@ -80,7 +109,12 @@ ui_avatar_group_base_append_avatar(struct ui_avatar_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * @brief ui_avatar_group_base_set_max_avatars.
+ * @param group Parameter group.
+ * @param max_avatars Parameter max_avatars.
+ * @return Return value.
+ */
 ui_error_t
 ui_avatar_group_base_set_max_avatars(struct ui_avatar_group_base *group,
                                      unsigned int max_avatars) {
@@ -91,7 +125,12 @@ ui_avatar_group_base_set_max_avatars(struct ui_avatar_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * @brief ui_avatar_group_base_get_max_avatars.
+ * @param group Parameter group.
+ * @param out_max_avatars Parameter out_max_avatars.
+ * @return Return value.
+ */
 ui_error_t
 ui_avatar_group_base_get_max_avatars(struct ui_avatar_group_base *group,
                                      unsigned int *out_max_avatars) {
@@ -102,7 +141,12 @@ ui_avatar_group_base_get_max_avatars(struct ui_avatar_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_avatar_group_base_get_truncation_remainder */
+/**
+ * @brief ui_avatar_group_base_get_truncation_remainder.
+ * @param group Parameter group.
+ * @param out_remainder Parameter out_remainder.
+ * @return Return value.
+ */
 ui_error_t ui_avatar_group_base_get_truncation_remainder(
     struct ui_avatar_group_base *group, unsigned int *out_remainder) {
   if (!group || !out_remainder) {
@@ -117,7 +161,12 @@ ui_error_t ui_avatar_group_base_get_truncation_remainder(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/**
+ * @brief ui_avatar_group_base_bind_data.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_avatar_group_base_bind_data(struct ui_avatar_group_base *widget,
                                           struct ui_computed *signal) {
   if (!widget) {

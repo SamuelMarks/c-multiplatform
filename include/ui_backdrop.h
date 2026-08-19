@@ -1,3 +1,8 @@
+/**
+ * @file ui_backdrop.h
+ * @brief Overlay backdrop manager for dismissals and click-away detection.
+ */
+
 #ifndef UI_BACKDROP_H
 #define UI_BACKDROP_H
 

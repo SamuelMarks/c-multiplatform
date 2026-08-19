@@ -1,3 +1,8 @@
+/**
+ * @file ui_pin_input_base.h
+ * @brief Base component for one-time passcode (OTP) and PIN input fields.
+ */
+
 #ifndef UI_PIN_INPUT_BASE_H
 #define UI_PIN_INPUT_BASE_H
 

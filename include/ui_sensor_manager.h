@@ -1,3 +1,9 @@
+/**
+ * @file ui_sensor_manager.h
+ * @brief Hardware sensor integration for accelerometer, gyroscope, and
+ * orientation.
+ */
+
 #ifndef UI_SENSOR_MANAGER_H
 #define UI_SENSOR_MANAGER_H
 

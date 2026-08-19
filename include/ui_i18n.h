@@ -1,3 +1,8 @@
+/**
+ * @file ui_i18n.h
+ * @brief Internationalization and localization features.
+ */
+
 /* clang-format off */
 #ifndef UI_I18N_H
 #define UI_I18N_H

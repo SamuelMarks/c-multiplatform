@@ -145,7 +145,6 @@ static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
                                          size_t *out_capacity) {
   struct ui_dom_node *child;
   ui_bool_t focusable = UI_FALSE;
-  ui_error_t rc;
 
   { (void)is_focusable(root, &focusable); }
 
@@ -194,7 +193,6 @@ ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
   size_t capacity = 0;
   size_t i;
   int current_index = -1;
-  ui_error_t rc;
 
   if (!manager || !root) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -252,8 +250,6 @@ gather_focusable_layout_nodes(struct ui_layout_node *node,
                               size_t *out_count, size_t *out_capacity) {
   struct ui_layout_node *child;
   ui_bool_t focusable = UI_FALSE;
-  ui_error_t rc = UI_ERROR_NONE;
-
   if (node->dom_node) {
     {
       (void)is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
@@ -362,8 +358,6 @@ ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
   struct ui_layout_node *current_layout_node = NULL;
   struct ui_layout_node *best_node = NULL;
   float best_distance = -1.0f;
-  ui_error_t rc;
-
   if (!manager || !layout_root) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

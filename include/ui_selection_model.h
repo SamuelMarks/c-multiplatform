@@ -1,3 +1,8 @@
+/**
+ * @file ui_selection_model.h
+ * @brief Manage selection state (single/multi) for lists, grids, and trees.
+ */
+
 #ifndef UI_SELECTION_MODEL_H
 #define UI_SELECTION_MODEL_H
 

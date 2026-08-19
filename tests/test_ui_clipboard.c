@@ -17,9 +17,17 @@ static void check_cond(int cond, int *failed) {
 extern int g_malloc_fail_countdown;
 extern int g_ui_clipboard_force_fallback;
 
+#if defined(_MSC_VER)
+#define POPEN_CMD _popen
+#define PCLOSE_CMD _pclose
+#else
+#define POPEN_CMD popen
+#define PCLOSE_CMD pclose
+#endif
+
 int (*g_mock_system_fn)(const char *) = system;
-FILE *(*g_mock_popen_fn)(const char *, const char *) = popen;
-int (*g_mock_pclose_fn)(FILE *) = pclose;
+FILE *(*g_mock_popen_fn)(const char *, const char *) = POPEN_CMD;
+int (*g_mock_pclose_fn)(FILE *) = PCLOSE_CMD;
 
 static int mock_system_wl(const char *cmd) {
   if (strstr(cmd, "wl-copy") || strstr(cmd, "wl-paste"))
@@ -182,8 +190,8 @@ static int run_normal_tests(void) {
     check_cond(rc != UI_ERROR_OUT_OF_MEMORY && rc != UI_ERROR_NONE, &failed);
 
     g_mock_system_fn = mock_system_always_fail;
-    g_mock_popen_fn = popen;
-    g_mock_pclose_fn = pclose;
+    g_mock_popen_fn = POPEN_CMD;
+    g_mock_pclose_fn = PCLOSE_CMD;
   }
 
   /* Test real clipboard first malloc failure */
@@ -194,8 +202,8 @@ static int run_normal_tests(void) {
   rc = ui_clipboard_get_text(&text);
   g_malloc_fail_countdown = -1;
   g_mock_system_fn = mock_system_always_fail;
-  g_mock_popen_fn = popen;
-  g_mock_pclose_fn = pclose;
+  g_mock_popen_fn = POPEN_CMD;
+  g_mock_pclose_fn = PCLOSE_CMD;
 
   printf("Testing popen failure for pbpaste...\n");
   g_mock_popen_fn = mock_popen_dummy;
@@ -203,13 +211,13 @@ static int run_normal_tests(void) {
   check_cond(rc != UI_ERROR_NONE, &failed);
   if (text)
     ui_clipboard_free_text(text);
-  g_mock_popen_fn = popen;
+  g_mock_popen_fn = POPEN_CMD;
 
   printf("Testing popen failure for pbcopy...\n");
   g_mock_popen_fn = mock_popen_dummy;
   rc = ui_clipboard_set_text("mock popen fail");
   check_cond(rc != UI_ERROR_NONE, &failed);
-  g_mock_popen_fn = popen;
+  g_mock_popen_fn = POPEN_CMD;
 
   printf("Testing empty real clipboard...\n");
   g_mock_system_fn = mock_system_wl;
@@ -221,8 +229,8 @@ static int run_normal_tests(void) {
       ui_clipboard_free_text(text);
   }
   g_mock_system_fn = mock_system_always_fail;
-  g_mock_popen_fn = popen;
-  g_mock_pclose_fn = pclose;
+  g_mock_popen_fn = POPEN_CMD;
+  g_mock_pclose_fn = PCLOSE_CMD;
 
   printf("Testing mock wl-copy...\n");
   g_mock_system_fn = mock_system_wl;
@@ -257,8 +265,8 @@ static int run_normal_tests(void) {
     ui_clipboard_free_text(text);
 
   g_mock_system_fn = system;
-  g_mock_popen_fn = popen;
-  g_mock_pclose_fn = pclose;
+  g_mock_popen_fn = POPEN_CMD;
+  g_mock_pclose_fn = PCLOSE_CMD;
 
   printf("Testing cleanup...\n");
   ui_clipboard_cleanup();

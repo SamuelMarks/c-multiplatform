@@ -1,3 +1,12 @@
+/**
+ * @file ui_theme_provider.h
+ * @brief Theme provider component declarations.
+ *
+ * @defgroup ThemeProvider Theme Provider
+ * @brief Component for injecting design tokens into the UI hierarchy.
+ * @{
+ */
+
 #ifndef UI_THEME_PROVIDER_H
 #define UI_THEME_PROVIDER_H
 
@@ -62,3 +71,5 @@ ui_error_t ui_theme_provider_get(struct ui_dom_node *node,
 #endif /* __cplusplus */
 
 #endif /* UI_THEME_PROVIDER_H */
+
+/** @} */

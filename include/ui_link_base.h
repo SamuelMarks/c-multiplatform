@@ -1,3 +1,8 @@
+/**
+ * @file ui_link_base.h
+ * @brief Base hyperlink component definitions.
+ */
+
 #ifndef UI_LINK_BASE_H
 #define UI_LINK_BASE_H
 

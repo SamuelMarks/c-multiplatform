@@ -1,3 +1,12 @@
+/**
+ * @file ui_spin_button_base.h
+ * @brief Spin button base declarations.
+ *
+ * @defgroup SpinButtonBase Spin Button Base
+ * @brief Base implementation for spin button components.
+ * @{
+ */
+
 #ifndef UI_SPIN_BUTTON_BASE_H
 #define UI_SPIN_BUTTON_BASE_H
 
@@ -12,10 +21,18 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing the spin button base.
+ */
 struct ui_spin_button_base;
 
 /**
  * @brief Callback invoked when the spin button value changes.
+ *
+ * @param spin_button The spin button.
+ * @param value The new value of the spin button.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_spin_button_on_change_t)(
     struct ui_spin_button_base *spin_button, double value, void *user_data);
@@ -42,6 +59,7 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
  * @brief Destroys a spin button base component.
  *
  * @param spin_button The spin button to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button);
 
@@ -80,7 +98,8 @@ ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
  * @brief Gets the current value.
  *
  * @param spin_button The spin button.
- * @return The current value.
+ * @param out_val Pointer to receive the current value.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_spin_button_base_get_value(const struct ui_spin_button_base *spin_button,
@@ -190,7 +209,8 @@ ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
  * @brief Gets the underlying component instance.
  *
  * @param spin_button The spin button.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_spin_button_base_get_component(struct ui_spin_button_base *spin_button,
@@ -201,3 +221,5 @@ ui_spin_button_base_get_component(struct ui_spin_button_base *spin_button,
 #endif /* __cplusplus */
 
 #endif /* UI_SPIN_BUTTON_BASE_H */
+
+/** @} */

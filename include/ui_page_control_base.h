@@ -1,3 +1,8 @@
+/**
+ * @file ui_page_control_base.h
+ * @brief Page control (dot indicator) component base definitions.
+ */
+
 #ifndef UI_PAGE_CONTROL_BASE_H
 #define UI_PAGE_CONTROL_BASE_H
 

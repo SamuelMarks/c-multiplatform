@@ -1,3 +1,12 @@
+/**
+ * @file ui_text_layout.h
+ * @brief Text layout definitions.
+ *
+ * @defgroup TextLayout Text Layout
+ * @brief Definitions for laying out and shaping text.
+ * @{
+ */
+
 #ifndef UI_TEXT_LAYOUT_H
 #define UI_TEXT_LAYOUT_H
 
@@ -106,3 +115,5 @@ ui_error_t ui_text_layout_get_bounds(struct ui_text_layout *layout,
 #endif /* __cplusplus */
 
 #endif /* UI_TEXT_LAYOUT_H */
+
+/** @} */

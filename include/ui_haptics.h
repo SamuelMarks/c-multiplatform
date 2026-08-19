@@ -1,3 +1,8 @@
+/**
+ * @file ui_haptics.h
+ * @brief Haptic feedback integrations.
+ */
+
 #ifndef UI_HAPTICS_H
 #define UI_HAPTICS_H
 

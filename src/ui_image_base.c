@@ -7,6 +7,12 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief ui_image_base_init.
+ * @param image Parameter image.
+ * @param component Parameter component.
+ * @return Return value.
+ */
 ui_error_t ui_image_base_init(struct ui_image_base *image,
                               struct ui_component *component) {
   if (!image || !component) {
@@ -22,6 +28,13 @@ ui_error_t ui_image_base_init(struct ui_image_base *image,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_image_base_set_src.
+ * @param image Parameter image.
+ * @param src_url Parameter src_url.
+ * @param lazy_load Parameter lazy_load.
+ * @return Return value.
+ */
 ui_error_t ui_image_base_set_src(struct ui_image_base *image,
                                  const char *src_url, int lazy_load) {
   size_t len;
@@ -52,6 +65,11 @@ ui_error_t ui_image_base_set_src(struct ui_image_base *image,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_image_base_cleanup.
+ * @param image Parameter image.
+ * @return Return value.
+ */
 ui_error_t ui_image_base_cleanup(struct ui_image_base *image) {
   if (!image) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -71,6 +89,12 @@ ui_error_t ui_image_base_cleanup(struct ui_image_base *image) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_image_base_bind_src.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_image_base_bind_src(struct ui_image_base *widget,
                                   struct ui_signal *signal) {
   if (!widget) {

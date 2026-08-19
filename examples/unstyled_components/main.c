@@ -24,6 +24,7 @@
 #include "ui_window_backend_web.h"
 #elif defined(_WIN32) || defined(__CYGWIN__)
 #include "ui_window_backend_win32.h"
+__declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #elif defined(__APPLE__)
 #include "ui_window_backend_macos.h"
 #elif defined(__linux__) || defined(__unix__)
@@ -433,7 +434,11 @@ return 1;
   backend->show_window(backend, window);
 
   int frame_count = 0;
+#if defined(CI_TEST_RUN)
+  const char *ci_test = "1";
+#else
   const char *ci_test = getenv("CI_TEST_RUN");
+#endif
   while (running) {
     if (ci_test && frame_count++ > 2)
       break;
@@ -498,7 +503,9 @@ return 1;
 
     /* Slight delay to make simulation visible */
 #if defined(_WIN32) || defined(__CYGWIN__)
-    Sleep(16);
+    if (!ci_test) {
+      Sleep(16);
+    }
 #endif
   }
 

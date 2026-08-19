@@ -18,7 +18,7 @@
   "type": "commonjs",
   "devDependencies": {
     "pixelmatch": "^7.2.0",
-    "playwright": "^1.61.1",
+    "playwright": "^1.62.1",
     "pngjs": "^7.0.0"
   }
 }

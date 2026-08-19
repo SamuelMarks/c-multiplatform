@@ -4,6 +4,11 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief ui_page_control_base_create.
+ * @param out_control Parameter out_control.
+ * @return Return value.
+ */
 ui_error_t
 ui_page_control_base_create(struct ui_page_control_base **out_control) {
   struct ui_page_control_base *control;
@@ -50,6 +55,11 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief update_page_control_dom.
+ * @param control Parameter control.
+ * @return Return value.
+ */
 static ui_error_t
 update_page_control_dom(struct ui_page_control_base *control) {
   char buf[32];

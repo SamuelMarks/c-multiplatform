@@ -1,3 +1,8 @@
+/**
+ * @file ui_camera_base.h
+ * @brief Camera stream capture and permission management.
+ */
+
 #ifndef UI_CAMERA_BASE_H
 #define UI_CAMERA_BASE_H
 
@@ -10,22 +15,31 @@
 extern "C" {
 #endif
 
+/** @brief Opaque handle representing a camera stream component. */
 struct ui_camera_base;
 
 /**
  * @brief Represents the current state of the camera.
  */
 enum ui_camera_state {
-  UI_CAMERA_STATE_UNINITIALIZED,
-  UI_CAMERA_STATE_REQUESTING_PERMISSION,
-  UI_CAMERA_STATE_PERMISSION_DENIED,
-  UI_CAMERA_STATE_READY,
-  UI_CAMERA_STATE_STREAMING,
-  UI_CAMERA_STATE_ERROR
+  UI_CAMERA_STATE_UNINITIALIZED,         /**< Camera is not yet initialized */
+  UI_CAMERA_STATE_REQUESTING_PERMISSION, /**< Pending user permission */
+  UI_CAMERA_STATE_PERMISSION_DENIED,     /**< User denied camera access */
+  UI_CAMERA_STATE_READY,     /**< Camera is ready to start streaming */
+  UI_CAMERA_STATE_STREAMING, /**< Camera is actively streaming frames */
+  UI_CAMERA_STATE_ERROR      /**< An error occurred */
 };
 
 /**
  * @brief Frame callback for zero-copy texture streaming or CPU processing.
+ *
+ * @param camera The camera component.
+ * @param frame_data Pointer to the frame pixel data.
+ * @param size The size of the frame data in bytes.
+ * @param width The pixel width of the frame.
+ * @param height The pixel height of the frame.
+ * @param user_data Opaque user data provided during callback registration.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_camera_frame_callback)(struct ui_camera_base *camera,
                                                const void *frame_data,
@@ -52,7 +66,8 @@ ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera);
  * @brief Retrieves the base component.
  *
  * @param camera The camera component.
- * @return The base component.
+ * @param out_component Pointer to receive the underlying base component.
+ * @return UI_ERROR_NONE on success, or an error code.
  */
 ui_error_t ui_camera_base_get_component(struct ui_camera_base *camera,
                                         struct ui_component **out_component);

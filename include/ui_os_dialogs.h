@@ -1,3 +1,8 @@
+/**
+ * @file ui_os_dialogs.h
+ * @brief Native OS dialogs (file picker, color picker, alerts) integration.
+ */
+
 #ifndef UI_OS_DIALOGS_H
 #define UI_OS_DIALOGS_H
 

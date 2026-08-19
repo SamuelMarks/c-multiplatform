@@ -1,3 +1,8 @@
+/**
+ * @file ui_audio_webaudio.c
+ * @brief WebAudio implementation stub for audio sink.
+ */
+
 /* clang-format off */
 #include "ui_audio_sink.h"
 #include "ui_error.h"
@@ -6,6 +11,12 @@
 #if defined(__EMSCRIPTEN__)
 /* WebAudio implementation stub */
 
+/**
+ * @brief Retrieves the default WebAudio audio sink backend.
+ *
+ * @param out_backend Pointer to the backend structure to populate.
+ * @return ui_error_t `UI_ERROR_NONE` on success, or an appropriate error code.
+ */
 ui_error_t
 ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend) {
   if (!out_backend) {

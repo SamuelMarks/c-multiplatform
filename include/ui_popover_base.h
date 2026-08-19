@@ -1,3 +1,8 @@
+/**
+ * @file ui_popover_base.h
+ * @brief Popover component providing anchored, floating contextual content.
+ */
+
 #ifndef UI_POPOVER_BASE_H
 #define UI_POPOVER_BASE_H
 struct ui_computed;

@@ -1,3 +1,8 @@
+/**
+ * @file ui_masonry_layout_base.h
+ * @brief Masonry layout component for cascading grid structures.
+ */
+
 #ifndef UI_MASONRY_LAYOUT_BASE_H
 #define UI_MASONRY_LAYOUT_BASE_H
 

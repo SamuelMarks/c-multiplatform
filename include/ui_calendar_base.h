@@ -1,3 +1,8 @@
+/**
+ * @file ui_calendar_base.h
+ * @brief Calendar base component definitions.
+ */
+
 #ifndef UI_CALENDAR_BASE_H
 #define UI_CALENDAR_BASE_H
 
@@ -10,6 +15,7 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/** @brief Opaque handle to a calendar base component. */
 struct ui_calendar_base;
 
 /**
@@ -25,13 +31,13 @@ struct ui_date {
  * @brief Day of week.
  */
 enum ui_day_of_week {
-  UI_SUNDAY = 0,
-  UI_MONDAY = 1,
-  UI_TUESDAY = 2,
-  UI_WEDNESDAY = 3,
-  UI_THURSDAY = 4,
-  UI_FRIDAY = 5,
-  UI_SATURDAY = 6
+  UI_SUNDAY = 0,    /**< Sunday */
+  UI_MONDAY = 1,    /**< Monday */
+  UI_TUESDAY = 2,   /**< Tuesday */
+  UI_WEDNESDAY = 3, /**< Wednesday */
+  UI_THURSDAY = 4,  /**< Thursday */
+  UI_FRIDAY = 5,    /**< Friday */
+  UI_SATURDAY = 6   /**< Saturday */
 };
 
 /**

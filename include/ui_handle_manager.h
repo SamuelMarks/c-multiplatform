@@ -1,3 +1,8 @@
+/**
+ * @file ui_handle_manager.h
+ * @brief Thread-safe handle manager for opaque resource tracking.
+ */
+
 #ifndef UI_HANDLE_MANAGER_H
 #define UI_HANDLE_MANAGER_H
 

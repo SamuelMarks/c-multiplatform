@@ -2,6 +2,11 @@
 #include "ui_color_quantization.h"
 #include "ui_internal_mem.h"
 #include <stddef.h>
+#if defined(_MSC_VER) && _MSC_VER < 1600
+typedef __int64 int64_t;
+#else
+#include <stdint.h>
+#endif
 /* clang-format on */
 
 /**
@@ -25,6 +30,16 @@ struct ui_cluster {
   int count;
 };
 
+/**
+ * @brief calc_color_distance.
+ * @param r1 Parameter r1.
+ * @param g1 Parameter g1.
+ * @param b1 Parameter b1.
+ * @param r2 Parameter r2.
+ * @param g2 Parameter g2.
+ * @param b2 Parameter b2.
+ * @return Return value.
+ */
 static int calc_color_distance(int r1, int g1, int b1, int r2, int g2, int b2) {
   int dr = r1 - r2;
   int dg = g1 - g2;
@@ -32,6 +47,17 @@ static int calc_color_distance(int r1, int g1, int b1, int r2, int g2, int b2) {
   return dr * dr + dg * dg + db * db;
 }
 
+/**
+ * @brief ui_color_quantize_kmeans.
+ * @param pixels Parameter pixels.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param channels Parameter channels.
+ * @param options Parameter options.
+ * @param out_colors Parameter out_colors.
+ * @param out_color_count Parameter out_color_count.
+ * @return Return value.
+ */
 ui_error_t
 ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
                          size_t height, int channels,

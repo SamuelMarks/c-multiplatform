@@ -303,7 +303,7 @@ static int run_extra_control3_all(void) {
 static int run_oom_tests_control(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   struct ui_arena *small_arena;
-  ui_form_control_t *control;
+  ui_form_control_t *control = NULL;
   union ui_signal_payload dummy = {0};
 
   ui_arena_create(1, &small_arena);
@@ -372,7 +372,7 @@ static int run_oom_tests_control(void) {
     ui_thread_pool_create(2, &pool);
     ui_reactor_create(&reactor);
 
-    ui_form_control_t *control4;
+    ui_form_control_t *control4 = NULL;
     ui_form_control_create(small_arena, dummy, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                            UI_SIGNAL_MODE_SINGLE_THREADED, &control4);
 
@@ -487,10 +487,6 @@ int main(void) {
 
   ui_thread_pool_destroy(pool);
   ui_reactor_poll(reactor, 10);
-  rc = ui_form_control_destroy(control);
-  ui_reactor_destroy(reactor);
-  (void)ui_arena_destroy(arena);
-
   printf("Running extra controls\n");
   run_extra_control();
   run_extra_control2_all();
@@ -506,6 +502,11 @@ int main(void) {
     ui_form_control_enable(control);
     *val_sig_ptr = old_sig;
   }
+
+  rc = ui_form_control_destroy(control);
+  ui_reactor_destroy(reactor);
+  (void)ui_arena_destroy(arena);
+
   run_oom_tests_control();
 
   {

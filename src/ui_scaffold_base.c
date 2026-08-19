@@ -4,6 +4,13 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief create_slot.
+ * @param parent Parameter parent.
+ * @param slot_name Parameter slot_name.
+ * @param out_slot Parameter out_slot.
+ * @return Return value.
+ */
 static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
                               struct ui_dom_node **out_slot) {
   ui_error_t err;
@@ -35,6 +42,11 @@ static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_scaffold_base_create.
+ * @param out_scaffold Parameter out_scaffold.
+ * @return Return value.
+ */
 ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
   struct ui_scaffold_base *scaffold;
   struct ui_component *base_comp;
@@ -103,6 +115,12 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_scaffold_base_set_top_bar.
+ * @param scaffold Parameter scaffold.
+ * @param top_bar Parameter top_bar.
+ * @return Return value.
+ */
 ui_error_t ui_scaffold_base_set_top_bar(struct ui_scaffold_base *scaffold,
                                         struct ui_component *top_bar) {
   if (!scaffold || !top_bar) {
@@ -121,6 +139,12 @@ ui_error_t ui_scaffold_base_set_main_content(struct ui_scaffold_base *scaffold,
                                   content->shadow_root);
 }
 
+/**
+ * @brief ui_scaffold_base_bind_data.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_scaffold_base_bind_data(struct ui_scaffold_base *widget,
                                       struct ui_signal *signal) {
   if (!widget) {

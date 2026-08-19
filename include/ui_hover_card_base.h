@@ -1,3 +1,8 @@
+/**
+ * @file ui_hover_card_base.h
+ * @brief Base hover card component for tooltip-like informational overlays.
+ */
+
 #ifndef UI_HOVER_CARD_BASE_H
 #define UI_HOVER_CARD_BASE_H
 struct ui_computed;

@@ -1,3 +1,8 @@
+/**
+ * @file ui_form_array.h
+ * @brief Form array controls for reactive forms.
+ */
+
 #ifndef UI_FORM_ARRAY_H
 #define UI_FORM_ARRAY_H
 

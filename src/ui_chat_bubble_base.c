@@ -16,6 +16,13 @@ struct ui_chat_bubble_base {
       *config_signal; /**< Signal dispatched when configuration changes */
 };
 
+/**
+ * @brief int_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
+ */
 static ui_error_t int_equality(union ui_signal_payload a,
                                union ui_signal_payload b,
                                ui_bool_t *out_equal) {
@@ -23,6 +30,12 @@ static ui_error_t int_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief pack_config.
+ * @param config Parameter config.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t pack_config(const struct ui_chat_bubble_config *config,
                               ui_int32 *out_val) {
   if ((int)config->tail_placement > (int)UI_CHAT_BUBBLE_TAIL_TOP_RIGHT ||
@@ -96,6 +109,11 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chat_bubble_base_destroy.
+ * @param bubble Parameter bubble.
+ * @return Return value.
+ */
 ui_error_t ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble) {
   if (!bubble)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -184,6 +202,12 @@ ui_error_t ui_chat_bubble_base_calculate_text_bounds(
 #ifdef UI_TEST_MOCK_ALLOC
 void ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
                                      int tail_placement);
+/**
+ * @brief ui_chat_bubble_base_mock_config.
+ * @param bubble Parameter bubble.
+ * @param tail_placement Parameter tail_placement.
+ * @return Return value.
+ */
 void ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
                                      int tail_placement) {
   if (bubble) {

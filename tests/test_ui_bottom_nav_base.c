@@ -12,7 +12,7 @@ static ui_error_t run_normal_tests(void) {
   struct ui_bottom_nav_item_base *item = NULL;
   struct ui_component *comp;
   int active;
-  ui_error_t rc;
+  ui_error_t rc = UI_ERROR_NONE;
 
   printf("Testing ui_bottom_nav_base_create...\n");
   rc = ui_bottom_nav_base_create(NULL);
@@ -116,7 +116,7 @@ static ui_error_t run_normal_tests(void) {
 static ui_error_t run_oom_tests(void) {
   struct ui_bottom_nav_base *nav = NULL;
   struct ui_bottom_nav_item_base *item = NULL;
-  ui_error_t rc;
+  ui_error_t rc = UI_ERROR_NONE;
   int i;
 
   printf("Testing OOM conditions for nav...\n");
@@ -158,15 +158,17 @@ static ui_error_t run_oom_tests(void) {
 }
 
 int main(void) {
-  ui_error_t rc;
+  ui_error_t rc = UI_ERROR_NONE;
   printf("--- ui_bottom_nav_base Tests ---\n");
 
-  if (run_normal_tests() != UI_ERROR_NONE) {
+  rc = run_normal_tests();
+  if (rc != UI_ERROR_NONE) {
     printf("Normal tests failed.\n");
     return 1;
   }
 
-  if (run_oom_tests() != UI_ERROR_NONE) {
+  rc = run_oom_tests();
+  if (rc != UI_ERROR_NONE) {
     printf("OOM tests failed.\n");
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   }

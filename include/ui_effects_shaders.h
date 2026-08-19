@@ -1,3 +1,9 @@
+/**
+ * @file ui_effects_shaders.h
+ * @brief Pre-compiled shader programs for visual effects (blur, blending,
+ * shadows).
+ */
+
 #ifndef UI_EFFECTS_SHADERS_H
 #define UI_EFFECTS_SHADERS_H
 
@@ -10,6 +16,7 @@ extern "C" {
 #include "ui_css_values.h"
 /* clang-format on */
 
+/** @brief Forward declaration of ui_shader_manager. */
 struct ui_shader_manager;
 
 /**
@@ -49,10 +56,26 @@ ui_effects_shaders_get_blend_program(struct ui_shader_manager *manager,
                                      enum ui_css_blend_mode mode,
                                      unsigned int *out_program_id);
 
+/**
+ * @brief Compiles and retrieves a color filter shader program.
+ *
+ * @param manager The shader manager.
+ * @param type The CSS filter type.
+ * @param out_program Pointer to receive the compiled program ID.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_effects_shaders_get_color_filter_program(struct ui_shader_manager *manager,
                                             enum ui_css_filter_type type,
                                             unsigned int *out_program);
+
+/**
+ * @brief Compiles and retrieves a drop shadow shader program.
+ *
+ * @param manager The shader manager.
+ * @param out_program Pointer to receive the compiled program ID.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_effects_shaders_get_drop_shadow_program(struct ui_shader_manager *manager,
                                            unsigned int *out_program);

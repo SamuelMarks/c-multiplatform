@@ -1,13 +1,24 @@
+/**
+ * @file ui_window_backend.h
+ * @brief Platform-agnostic window backend vtable and types.
+ */
+
 #ifndef UI_WINDOW_BACKEND_H
 #define UI_WINDOW_BACKEND_H
+
+/* clang-format off */
+#include "ui_error.h"
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* clang-format off */
-#include "ui_error.h"
-/* clang-format on */
+/**
+ * @addtogroup ui_window_backend Window Backend
+ * @brief Abstract interface for platform-specific window and event management.
+ * @{
+ */
 
 /**
  * @brief Forward declaration for unified input event struct.
@@ -32,7 +43,7 @@ struct ui_window_backend {
    * @param width The initial window width in virtual pixels.
    * @param height The initial window height in virtual pixels.
    * @param out_window Pointer to receive the native window handle.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*create_window)(struct ui_window_backend *backend,
                               const char *title, int width, int height,
@@ -43,7 +54,7 @@ struct ui_window_backend {
    *
    * @param backend The backend instance.
    * @param window The window to destroy.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*destroy_window)(struct ui_window_backend *backend,
                                struct ui_window *window);
@@ -53,7 +64,7 @@ struct ui_window_backend {
    *
    * @param backend The backend instance.
    * @param window The window to show.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*show_window)(struct ui_window_backend *backend,
                             struct ui_window *window);
@@ -63,7 +74,7 @@ struct ui_window_backend {
    *
    * @param backend The backend instance.
    * @param window The window to hide.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*hide_window)(struct ui_window_backend *backend,
                             struct ui_window *window);
@@ -76,43 +87,43 @@ struct ui_window_backend {
    * @param out_event Pointer to receive the event data.
    * @param out_has_event Set to 1 if an event was dequeued, 0 if queue is
    * empty.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*poll_events)(struct ui_window_backend *backend,
                             struct ui_window *window,
                             struct ui_event *out_event, int *out_has_event);
 
   /**
-   * @brief Swaps the rendering buffers (e.g., EGLSwapBuffers, SwapBuffers,
-   * etc).
+   * @brief Swaps the rendering buffers (e.g., EGLSwapBuffers, SwapBuffers).
    *
    * @param backend The backend instance.
    * @param window The window whose buffers should be swapped.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*swap_buffers)(struct ui_window_backend *backend,
                              struct ui_window *window);
 
   /**
-   * @brief Injects an OS-level deep link URI into the event queue (e.g. from
-   * App Links or Universal Links).
+   * @brief Injects an OS-level deep link URI into the event queue (e.g., App
+   * Links).
    *
    * @param backend The backend instance.
    * @param uri The deep link URI string.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*push_deep_link)(struct ui_window_backend *backend,
                                const char *uri);
 
   /**
-   * @brief Retrieves the native OS window handle (e.g., HWND, NSWindow*, etc.).
+   * @brief Retrieves the native OS window handle (e.g., HWND, NSWindow*).
    *
    * @param backend The backend instance.
    * @param window The window instance.
-   * @return The native handle, or NULL if unavailable.
+   * @param out_handle Pointer to receive the native handle.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
-  void *(*get_os_handle)(struct ui_window_backend *backend,
-                         struct ui_window *window);
+  ui_error_t (*get_os_handle)(struct ui_window_backend *backend,
+                              struct ui_window *window, void **out_handle);
 
   /**
    * @brief Sets a callback to be invoked immediately when the window is
@@ -122,18 +133,18 @@ struct ui_window_backend {
    * @param window The window instance.
    * @param callback The callback function.
    * @param user_data User data for the callback.
-   * @return UI_ERROR_NONE on success.
+   * @return UI_ERROR_NONE on success, or an appropriate error code.
    */
   ui_error_t (*set_on_resize_callback)(
       struct ui_window_backend *backend, struct ui_window *window,
       ui_error_t (*callback)(void *user_data, int width, int height),
       void *user_data);
 
-  /**
-   * @brief Opaque user data for the specific backend implementation.
-   */
-  void *user_data;
+  void *user_data; /**< Opaque user data for the specific backend
+                      implementation. */
 };
+
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -1,8 +1,23 @@
+/**
+ * @file ui_surface_base.h
+ * @brief Surface component base declarations.
+ *
+ * @defgroup SurfaceBase Surface Base
+ * @brief Base implementation for generic surface/paper containers.
+ * @{
+ */
+
 #ifndef UI_SURFACE_BASE_H
 #define UI_SURFACE_BASE_H
 
+/**
+ * @brief Opaque structure for a computed signal.
+ */
 struct ui_computed;
 
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 /* clang-format off */
@@ -49,7 +64,7 @@ ui_error_t ui_surface_base_set_elevation(struct ui_surface_base *surface,
 /**
  * @brief Binds the data property.
  *
- * @param widget The widget.
+ * @param widget The surface widget.
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
@@ -61,3 +76,5 @@ ui_error_t ui_surface_base_bind_data(struct ui_surface_base *widget,
 #endif /* __cplusplus */
 
 #endif /* UI_SURFACE_BASE_H */
+
+/** @} */

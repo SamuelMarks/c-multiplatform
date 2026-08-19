@@ -1,3 +1,8 @@
+/**
+ * @file ui_chart_base.c
+ * @brief Implementation of the chart base component.
+ */
+
 /* clang-format off */
 #include "ui_chart_base.h"
 #include "ui_internal_mem.h"
@@ -12,6 +17,7 @@ int g_chart_mock_fail = -1;
 #endif
 
 /**
+ * @struct ui_chart_base
  * @brief Internal representation of a chart base component.
  */
 struct ui_chart_base {
@@ -111,7 +117,6 @@ ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_chart_base_set_x_scale(struct ui_chart_base *chart,
                           const struct ui_chart_scale_config *config) {
@@ -125,7 +130,6 @@ ui_chart_base_set_x_scale(struct ui_chart_base *chart,
   return ui_signal_set(chart->topology_signal, payload);
 }
 
-/** \brief ui_error */
 ui_error_t
 ui_chart_base_set_y_scale(struct ui_chart_base *chart,
                           const struct ui_chart_scale_config *config) {
@@ -221,7 +225,6 @@ static ui_error_t unscale_value(double pixel,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
 ui_error_t ui_chart_base_data_to_pixel(const struct ui_chart_base *chart,
                                        double data_x, double data_y,
                                        struct ui_dom_point *out_pixel_point) {

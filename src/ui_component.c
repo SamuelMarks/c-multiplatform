@@ -14,6 +14,12 @@
 
 static int g_scope_counter = 0;
 
+/**
+ * @brief rewrite_classes_for_node.
+ * @param node Parameter node.
+ * @param scope_id Parameter scope_id.
+ * @return Return value.
+ */
 static ui_error_t rewrite_classes_for_node(struct ui_dom_node *node,
                                            const char *scope_id) {
   const char *attr_val;
@@ -82,6 +88,12 @@ static ui_error_t rewrite_classes_for_node(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief rewrite_stylesheet_selectors.
+ * @param stylesheet Parameter stylesheet.
+ * @param scope_id Parameter scope_id.
+ * @return Return value.
+ */
 static ui_error_t
 rewrite_stylesheet_selectors(struct ui_css_stylesheet *stylesheet,
                              const char *scope_id) {
@@ -113,6 +125,11 @@ rewrite_stylesheet_selectors(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_component_create.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t ui_component_create(struct ui_component **out_component) {
   struct ui_component *comp;
 
@@ -137,23 +154,35 @@ ui_error_t ui_component_create(struct ui_component **out_component) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_component_destroy.
+ * @param component Parameter component.
+ * @return Return value.
+ */
 ui_error_t ui_component_destroy(struct ui_component *component) {
-  ui_error_t rc = UI_ERROR_NONE;
   if (!component) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (component->shadow_root) {
-    (void)ui_dom_node_destroy(component->shadow_root);
+    ui_error_t rc = ui_dom_node_destroy(component->shadow_root);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   if (component->internal_style) {
-    (void)ui_css_stylesheet_destroy(component->internal_style);
+    ui_error_t rc = ui_css_stylesheet_destroy(component->internal_style);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   if (component->override_style) {
-    (void)ui_css_stylesheet_destroy(component->override_style);
+    ui_error_t rc = ui_css_stylesheet_destroy(component->override_style);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   if (component->bound_properties) {
-    (void)ui_css_stylesheet_destroy(component->bound_properties);
+    ui_error_t rc = ui_css_stylesheet_destroy(component->bound_properties);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   if (component->scope_id) {
     C_MULTIPLATFORM_FREE(component->scope_id);
@@ -179,6 +208,12 @@ ui_component_set_default_style(struct ui_component *component,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_component_inject_style_override.
+ * @param component Parameter component.
+ * @param css_string Parameter css_string.
+ * @return Return value.
+ */
 ui_error_t ui_component_inject_style_override(struct ui_component *component,
                                               const char *css_string) {
   struct ui_css_stylesheet *new_override = NULL;
@@ -201,6 +236,13 @@ ui_error_t ui_component_inject_style_override(struct ui_component *component,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_component_set_property.
+ * @param component Parameter component.
+ * @param property_name Parameter property_name.
+ * @param property_value Parameter property_value.
+ * @return Return value.
+ */
 ui_error_t ui_component_set_property(struct ui_component *component,
                                      const char *property_name,
                                      const char *property_value) {
@@ -241,6 +283,12 @@ ui_error_t ui_component_set_property(struct ui_component *component,
   return ui_css_rule_append_declaration(rule, property_name, property_value, 0);
 }
 
+/**
+ * @brief ui_component_mount.
+ * @param component Parameter component.
+ * @param host_node Parameter host_node.
+ * @return Return value.
+ */
 ui_error_t ui_component_mount(struct ui_component *component,
                               struct ui_dom_node *host_node) {
   if (!component || !host_node) {
@@ -254,6 +302,11 @@ ui_error_t ui_component_mount(struct ui_component *component,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_component_scope_styles.
+ * @param component Parameter component.
+ * @return Return value.
+ */
 ui_error_t ui_component_scope_styles(struct ui_component *component) {
   char scope_buf[64];
   ui_error_t rc;

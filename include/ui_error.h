@@ -1,3 +1,8 @@
+/**
+ * @file ui_error.h
+ * @brief Standard error return values for the UI engine.
+ */
+
 /* clang-format off */
 #ifndef UI_ERROR_H
 #define UI_ERROR_H
@@ -12,7 +17,7 @@ extern "C" {
 /**
  * @brief Represents standard return discriminants for all engine APIs.
  */
-enum NO_DISCARD ui_error {
+enum ui_error {
   UI_ERROR_NONE = 0,             /**< Success */
   UI_ERROR_OUT_OF_MEMORY = 1,    /**< Allocation failed */
   UI_ERROR_INVALID_ARGUMENT = 2, /**< Null pointer or invalid parameter */
@@ -32,7 +37,7 @@ enum NO_DISCARD ui_error {
  * @brief Typedef for ui_error with NO_DISCARD automatically applied to
  * variables and returns.
  */
-typedef NO_DISCARD enum ui_error ui_error_t;
+typedef enum ui_error ui_error_t;
 
 #ifdef __cplusplus
 }

@@ -1,3 +1,8 @@
+/**
+ * @file ui_mutation_observer.h
+ * @brief Observer API for tracking DOM tree mutations.
+ */
+
 #ifndef UI_MUTATION_OBSERVER_H
 #define UI_MUTATION_OBSERVER_H
 

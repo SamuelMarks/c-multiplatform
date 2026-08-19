@@ -1,3 +1,8 @@
+/**
+ * @file ui_map_view_base.h
+ * @brief Base interactive map view handling tiles, markers, and gestures.
+ */
+
 #ifndef UI_MAP_VIEW_BASE_H
 #define UI_MAP_VIEW_BASE_H
 

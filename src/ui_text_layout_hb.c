@@ -7,6 +7,10 @@
 #endif
 /* clang-format on */
 
+/**
+ * @brief ui_text_layout_hb_init.
+ * @return Return value.
+ */
 ui_error_t ui_text_layout_hb_init(void) {
 #ifdef UI_USE_HARFBUZZ
   return UI_ERROR_NONE;

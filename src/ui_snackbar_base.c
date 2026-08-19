@@ -378,7 +378,6 @@ ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar) {
  */
 ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
   double now;
-  ui_error_t rc;
 
   if (!snackbar)
     return UI_ERROR_INVALID_ARGUMENT;

@@ -34,6 +34,11 @@ ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_context_menu_base_destroy.
+ * @param menu Parameter menu.
+ * @return Return value.
+ */
 ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu) {
   if (menu) {
     (void)ui_menu_base_destroy(menu->menu);
@@ -42,6 +47,12 @@ ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_context_menu_base_get_menu.
+ * @param menu Parameter menu.
+ * @param out_menu Parameter out_menu.
+ * @return Return value.
+ */
 ui_error_t ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
                                          struct ui_menu_base **out_menu) {
   if (!menu || !out_menu) {
@@ -51,6 +62,18 @@ ui_error_t ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_context_menu_base_open_at.
+ * @param menu Parameter menu.
+ * @param director Parameter director.
+ * @param target_x Parameter target_x.
+ * @param target_y Parameter target_y.
+ * @param menu_width Parameter menu_width.
+ * @param menu_height Parameter menu_height.
+ * @param viewport_width Parameter viewport_width.
+ * @param viewport_height Parameter viewport_height.
+ * @return Return value.
+ */
 ui_error_t ui_context_menu_base_open_at(struct ui_context_menu_base *menu,
                                         struct ui_overlay_director *director,
                                         int target_x, int target_y,

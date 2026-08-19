@@ -1,3 +1,8 @@
+/**
+ * @file ui_aria.h
+ * @brief ARIA accessibility state and parsing.
+ */
+
 #ifndef UI_ARIA_H
 #define UI_ARIA_H
 

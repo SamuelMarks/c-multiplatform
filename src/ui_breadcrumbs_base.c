@@ -64,6 +64,12 @@ struct ui_breadcrumb_segment {
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_breadcrumbs_mock_fail;
 
+/**
+ * @brief mock_dom_node_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
   static int append_count = 0;
@@ -97,6 +103,12 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
 }
 #define ui_dom_node_append_child mock_dom_node_append_child
 
+/**
+ * @brief mock_ui_component_set_default_style.
+ * @param comp Parameter comp.
+ * @param style Parameter style.
+ * @return Return value.
+ */
 static ui_error_t
 mock_ui_component_set_default_style(struct ui_component *comp,
                                     struct ui_css_stylesheet *style) {
@@ -107,6 +119,12 @@ mock_ui_component_set_default_style(struct ui_component *comp,
 }
 #define ui_component_set_default_style mock_ui_component_set_default_style
 
+/**
+ * @brief mock_dom_node_remove_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
   if (g_breadcrumbs_mock_fail == 3) {
@@ -116,6 +134,11 @@ static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
 }
 #define ui_dom_node_remove_child mock_dom_node_remove_child
 
+/**
+ * @brief mock_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_destroy(struct ui_dom_node *node) {
   if (g_breadcrumbs_mock_fail == 4) {
     return UI_ERROR_UNKNOWN;
@@ -124,6 +147,11 @@ static ui_error_t mock_dom_node_destroy(struct ui_dom_node *node) {
 }
 #define ui_dom_node_destroy mock_dom_node_destroy
 
+/**
+ * @brief mock_ui_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_component_destroy(struct ui_component *comp) {
   if (g_breadcrumbs_mock_fail == 5) {
     return UI_ERROR_UNKNOWN;
@@ -132,6 +160,12 @@ static ui_error_t mock_ui_component_destroy(struct ui_component *comp) {
 }
 #define ui_component_destroy mock_ui_component_destroy
 
+/**
+ * @brief mock_ui_dom_node_set_text_content.
+ * @param node Parameter node.
+ * @param text Parameter text.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_dom_node_set_text_content(struct ui_dom_node *node,
                                                     const char *text) {
   if (g_breadcrumbs_mock_fail == 6) {
@@ -141,6 +175,12 @@ static ui_error_t mock_ui_dom_node_set_text_content(struct ui_dom_node *node,
 }
 #define ui_dom_node_set_text_content mock_ui_dom_node_set_text_content
 
+/**
+ * @brief mock_ui_router_navigate.
+ * @param router Parameter router.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_router_navigate(struct ui_router *router,
                                           const char *path) {
   if (g_breadcrumbs_mock_fail == 7) {
@@ -150,6 +190,13 @@ static ui_error_t mock_ui_router_navigate(struct ui_router *router,
 }
 #define ui_router_navigate mock_ui_router_navigate
 
+/**
+ * @brief mock_ui_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param k Parameter k.
+ * @param v Parameter v.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_dom_node_set_attribute(struct ui_dom_node *node,
                                                  const char *k, const char *v) {
   if (g_breadcrumbs_mock_fail == 8) {
@@ -159,6 +206,12 @@ static ui_error_t mock_ui_dom_node_set_attribute(struct ui_dom_node *node,
 }
 #define ui_dom_node_set_attribute mock_ui_dom_node_set_attribute
 
+/**
+ * @brief mock_ui_css_parse_stylesheet.
+ * @param css Parameter css.
+ * @param out Parameter out.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_css_parse_stylesheet(const char *css,
                                                struct ui_css_stylesheet **out) {
   if (g_breadcrumbs_mock_fail == 9) {
@@ -180,6 +233,13 @@ struct ui_breadcrumbs_base {
   struct ui_signal *active_index_signal;
 };
 
+/**
+ * @brief internal_strndup.
+ * @param src Parameter src.
+ * @param n Parameter n.
+ * @param out_str Parameter out_str.
+ * @return Return value.
+ */
 static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
   char *copy;
 
@@ -201,6 +261,12 @@ static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_breadcrumbs_base_create.
+ * @param router Parameter router.
+ * @param out_breadcrumbs Parameter out_breadcrumbs.
+ * @return Return value.
+ */
 ui_error_t
 ui_breadcrumbs_base_create(struct ui_router *router,
                            struct ui_breadcrumbs_base **out_breadcrumbs) {
@@ -278,6 +344,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief free_segments.
+ * @param bc Parameter bc.
+ * @return Return value.
+ */
 static ui_error_t free_segments(struct ui_breadcrumbs_base *bc) {
   size_t i;
   ui_error_t rc = UI_ERROR_NONE;
@@ -323,6 +394,11 @@ static ui_error_t free_segments(struct ui_breadcrumbs_base *bc) {
   return rc;
 }
 
+/**
+ * @brief ui_breadcrumbs_base_destroy.
+ * @param breadcrumbs Parameter breadcrumbs.
+ * @return Return value.
+ */
 ui_error_t
 ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -340,6 +416,12 @@ ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_breadcrumbs_base_get_component.
+ * @param breadcrumbs Parameter breadcrumbs.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t
 ui_breadcrumbs_base_get_component(struct ui_breadcrumbs_base *breadcrumbs,
                                   struct ui_component **out_component) {
@@ -350,6 +432,12 @@ ui_breadcrumbs_base_get_component(struct ui_breadcrumbs_base *breadcrumbs,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_breadcrumbs_base_set_path.
+ * @param bc Parameter bc.
+ * @param path Parameter path.
+ * @return Return value.
+ */
 ui_error_t ui_breadcrumbs_base_set_path(struct ui_breadcrumbs_base *bc,
                                         const char *path) {
   size_t segment_capacity = 4;
@@ -528,6 +616,12 @@ fail:
   return rc;
 }
 
+/**
+ * @brief ui_breadcrumbs_base_simulate_click.
+ * @param bc Parameter bc.
+ * @param index Parameter index.
+ * @return Return value.
+ */
 ui_error_t ui_breadcrumbs_base_simulate_click(struct ui_breadcrumbs_base *bc,
                                               size_t index) {
   if (!bc) {
@@ -544,6 +638,12 @@ ui_error_t ui_breadcrumbs_base_simulate_click(struct ui_breadcrumbs_base *bc,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_breadcrumbs_base_bind_active_index.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t
 ui_breadcrumbs_base_bind_active_index(struct ui_breadcrumbs_base *widget,
                                       struct ui_signal *signal) {
@@ -556,6 +656,10 @@ ui_breadcrumbs_base_bind_active_index(struct ui_breadcrumbs_base *widget,
 
 #ifdef UI_TEST_MOCK_ALLOC
 ui_error_t run_bc_coverage(void);
+/**
+ * @brief run_bc_coverage.
+ * @return Return value.
+ */
 ui_error_t run_bc_coverage(void) {
   struct ui_dom_node *dn1 = NULL;
   struct ui_dom_node *dn2 = NULL;

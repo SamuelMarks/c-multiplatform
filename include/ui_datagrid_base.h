@@ -1,8 +1,15 @@
+/**
+ * @file ui_datagrid_base.h
+ * @brief Datagrid component for tabular data display.
+ */
+
 #ifndef UI_DATAGRID_BASE_H
 #define UI_DATAGRID_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -14,6 +21,7 @@ extern "C" {
 #include "ui_component.h"
 /* clang-format on */
 
+/** @brief Opaque handle representing a datagrid base component. */
 struct ui_datagrid_base;
 
 /**
@@ -28,6 +36,7 @@ ui_error_t ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid);
  * @brief Destroys a datagrid base component.
  *
  * @param datagrid The component to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid);
 
@@ -36,7 +45,8 @@ ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid);
  * mounting.
  *
  * @param datagrid The datagrid component.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
                                           struct ui_component **out_component);

@@ -1,3 +1,8 @@
+/**
+ * @file ui_ripple_base.h
+ * @brief Touch ripple effect generation and state tracking.
+ */
+
 #ifndef UI_RIPPLE_BASE_H
 #define UI_RIPPLE_BASE_H
 

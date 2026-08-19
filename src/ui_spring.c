@@ -2,6 +2,15 @@
 #include "../include/ui_spring.h"
 /* clang-format on */
 
+/**
+ * @brief ui_spring_update.
+ * @param config Parameter config.
+ * @param current Parameter current.
+ * @param target Parameter target.
+ * @param delta_time_s Parameter delta_time_s.
+ * @param out_state Parameter out_state.
+ * @return Return value.
+ */
 ui_error_t ui_spring_update(const struct ui_spring_config *config,
                             const struct ui_spring_state *current, float target,
                             float delta_time_s,

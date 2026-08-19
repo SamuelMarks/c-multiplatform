@@ -1,3 +1,8 @@
+/**
+ * @file ui_preferences.h
+ * @brief Preferences and persistent key-value storage.
+ */
+
 #ifndef UI_PREFERENCES_H
 #define UI_PREFERENCES_H
 

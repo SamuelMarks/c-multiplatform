@@ -1,3 +1,8 @@
+/**
+ * @file ui_list_base.h
+ * @brief Base list and list item component definitions.
+ */
+
 #ifndef UI_LIST_BASE_H
 #define UI_LIST_BASE_H
 

@@ -1,3 +1,8 @@
+/**
+ * @file ui_form_control.h
+ * @brief Core form control definitions for reactive forms.
+ */
+
 #ifndef UI_FORM_CONTROL_H
 #define UI_FORM_CONTROL_H
 

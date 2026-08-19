@@ -1,3 +1,13 @@
+/**
+ * @file ui_textarea_autosize.h
+ * @brief Autosizing textarea logic.
+ *
+ * @defgroup TextareaAutosize Textarea Autosize
+ * @brief Logic for automatically calculating the bounds of textareas based on
+ * content.
+ * @{
+ */
+
 #ifndef UI_TEXTAREA_AUTOSIZE_H
 #define UI_TEXTAREA_AUTOSIZE_H
 
@@ -61,3 +71,5 @@ ui_textarea_autosize_calculate(const struct ui_textarea_autosize_config *config,
 #endif /* __cplusplus */
 
 #endif /* UI_TEXTAREA_AUTOSIZE_H */
+
+/** @} */

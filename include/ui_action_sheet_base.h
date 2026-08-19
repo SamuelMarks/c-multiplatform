@@ -1,3 +1,7 @@
+/**
+ * @file ui_action_sheet_base.h
+ * @brief Action sheet base component.
+ */
 #ifndef UI_ACTION_SHEET_BASE_H
 #define UI_ACTION_SHEET_BASE_H
 
@@ -18,55 +22,139 @@ extern "C" {
 
 struct ui_action_sheet_base;
 
+/**
+ * @brief Callback invoked when the action sheet is closed.
+ *
+ * @param sheet The action sheet.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 typedef ui_error_t (*ui_action_sheet_on_close_t)(
     struct ui_action_sheet_base *sheet, void *user_data);
 
-/** \brief ui_error */
+/**
+ * @brief Creates a new unstyled action sheet base component.
+ *
+ * @param out_sheet Pointer to receive the allocated component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet);
+/**
+ * @brief Destroys an action sheet base component.
+ *
+ * @param sheet The action sheet to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_action_sheet_base_destroy(struct ui_action_sheet_base *sheet);
 
-/** \brief ui_error */
+/**
+ * @brief Adds an action component to the action sheet.
+ *
+ * @param sheet The action sheet.
+ * @param action_comp The action component to add.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_action_sheet_base_add_action(struct ui_action_sheet_base *sheet,
                                            struct ui_component *action_comp);
 
-/** \brief ui_error */
+/**
+ * @brief Sets the cancel action component for the action sheet.
+ *
+ * @param sheet The action sheet.
+ * @param cancel_comp The cancel component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_action_sheet_base_set_cancel_action(struct ui_action_sheet_base *sheet,
                                        struct ui_component *cancel_comp);
 
+/**
+ * @brief Sets the open state of the action sheet.
+ *
+ * @param sheet The action sheet.
+ * @param is_open 1 to open, 0 to close.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_action_sheet_base_set_open(struct ui_action_sheet_base *sheet,
                                          int is_open);
-/** \brief ui_error */
+/**
+ * @brief Checks if the action sheet is open.
+ *
+ * @param sheet The action sheet.
+ * @param out_is_open Pointer to receive the open state (1 if open, 0
+ * otherwise).
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_action_sheet_base_is_open(const struct ui_action_sheet_base *sheet,
                              int *out_is_open);
 
-/** \brief ui_error */
+/**
+ * @brief Sets the overlay director for the action sheet.
+ *
+ * @param sheet The action sheet.
+ * @param director The overlay director.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_action_sheet_base_set_overlay_director(struct ui_action_sheet_base *sheet,
                                           struct ui_overlay_director *director);
 
-/** \brief ui_error */
+/**
+ * @brief Sets the on close callback for the action sheet.
+ *
+ * @param sheet The action sheet.
+ * @param on_close The callback function.
+ * @param user_data Opaque user data to pass to the callback.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_action_sheet_base_set_on_close(struct ui_action_sheet_base *sheet,
                                   ui_action_sheet_on_close_t on_close,
                                   void *user_data);
 
-/** \brief ui_action_sheet_base_attach_focus_and_keyboard */
+/**
+ * @brief Attaches focus and keyboard responders to the action sheet.
+ *
+ * @param sheet The action sheet.
+ * @param focus_manager The focus manager.
+ * @param keyboard_responder The keyboard responder.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_action_sheet_base_attach_focus_and_keyboard(
     struct ui_action_sheet_base *sheet, struct ui_focus_manager *focus_manager,
     struct ui_keyboard_responder *keyboard_responder);
 
-/** \brief ui_error */
+/**
+ * @brief Processes an event for the action sheet.
+ *
+ * @param sheet The action sheet.
+ * @param event The event to process.
+ * @param timestamp_ms The timestamp in milliseconds.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_action_sheet_base_process_event(struct ui_action_sheet_base *sheet,
                                    const struct ui_event *event,
                                    double timestamp_ms);
 
+/**
+ * @brief Updates the action sheet animation state.
+ *
+ * @param sheet The action sheet.
+ * @param timestamp_ms The timestamp in milliseconds.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_action_sheet_base_update(struct ui_action_sheet_base *sheet,
                                        double timestamp_ms);
 
-/** \brief ui_error */
+/**
+ * @brief Retrieves the underlying component of the action sheet.
+ *
+ * @param sheet The action sheet.
+ * @param out_component Pointer to receive the component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t
 ui_action_sheet_base_get_component(struct ui_action_sheet_base *sheet,
                                    struct ui_component **out_component);

@@ -1,3 +1,12 @@
+/**
+ * @file ui_text_layout_hb.h
+ * @brief HarfBuzz-backed text layout definitions.
+ *
+ * @defgroup TextLayoutHb HarfBuzz Text Layout
+ * @brief Text layout and shaping using HarfBuzz.
+ * @{
+ */
+
 #ifndef UI_TEXT_LAYOUT_HB_H
 #define UI_TEXT_LAYOUT_HB_H
 
@@ -46,3 +55,5 @@ ui_error_t ui_text_layout_shape_with_harfbuzz(struct ui_text_layout *layout,
 #endif /* __cplusplus */
 
 #endif /* UI_TEXT_LAYOUT_HB_H */
+
+/** @} */

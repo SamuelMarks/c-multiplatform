@@ -9,6 +9,12 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_breakpoint_mock_fail = 0;
+/**
+ * @brief mock_ui_signal_set.
+ * @param signal Parameter signal.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 static ui_error_t mock_ui_signal_set(struct ui_signal *signal,
                                      union ui_signal_payload value) {
   if (g_breakpoint_mock_fail > 0) {
@@ -46,6 +52,12 @@ struct ui_breakpoint_observer {
   int is_debouncing;
 };
 
+/**
+ * @brief evaluate_breakpoints.
+ * @param observer Parameter observer.
+ * @param width Parameter width.
+ * @return Return value.
+ */
 static ui_error_t evaluate_breakpoints(struct ui_breakpoint_observer *observer,
                                        float width) {
   union ui_signal_payload is_xsmall = {0};
@@ -85,6 +97,12 @@ static ui_error_t evaluate_breakpoints(struct ui_breakpoint_observer *observer,
   return rc;
 }
 
+/**
+ * @brief ui_breakpoint_observer_create.
+ * @param window_manager Parameter window_manager.
+ * @param out_observer Parameter out_observer.
+ * @return Return value.
+ */
 ui_error_t
 ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
                               struct ui_breakpoint_observer **out_observer) {
@@ -129,6 +147,11 @@ ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_breakpoint_observer_destroy.
+ * @param observer Parameter observer.
+ * @return Return value.
+ */
 ui_error_t
 ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer) {
   int i;
@@ -146,6 +169,13 @@ ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_breakpoint_observer_get_signal.
+ * @param observer Parameter observer.
+ * @param breakpoint Parameter breakpoint.
+ * @param out_signal Parameter out_signal.
+ * @return Return value.
+ */
 ui_error_t
 ui_breakpoint_observer_get_signal(struct ui_breakpoint_observer *observer,
                                   enum ui_breakpoint breakpoint,
@@ -158,6 +188,13 @@ ui_breakpoint_observer_get_signal(struct ui_breakpoint_observer *observer,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_breakpoint_observer_tick.
+ * @param observer Parameter observer.
+ * @param current_width Parameter current_width.
+ * @param current_time_ms Parameter current_time_ms.
+ * @return Return value.
+ */
 ui_error_t ui_breakpoint_observer_tick(struct ui_breakpoint_observer *observer,
                                        float current_width,
                                        double current_time_ms) {

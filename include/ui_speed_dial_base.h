@@ -1,6 +1,19 @@
+/**
+ * @file ui_speed_dial_base.h
+ * @brief Speed dial component base declarations.
+ *
+ * @defgroup SpeedDialBase Speed Dial Base
+ * @brief Base implementation for speed dial components (floating action buttons
+ * with child menus).
+ * @{
+ */
+
 #ifndef UI_SPEED_DIAL_BASE_H
 #define UI_SPEED_DIAL_BASE_H
 
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -12,7 +25,13 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a UI component.
+ */
 struct ui_component;
+/**
+ * @brief Opaque structure representing a floating action button base.
+ */
 struct ui_fab_base;
 
 /**
@@ -85,7 +104,7 @@ ui_error_t ui_speed_dial_base_cleanup(struct ui_speed_dial_base *speed_dial);
 /**
  * @brief Binds the disabled state to a boolean signal.
  *
- * @param widget The widget.
+ * @param widget The speed dial widget.
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
@@ -96,7 +115,7 @@ ui_error_t ui_speed_dial_base_bind_disabled(struct ui_speed_dial_base *widget,
  * @brief Binds the text content to a string signal for dynamic
  * internationalization.
  *
- * @param widget The widget.
+ * @param widget The speed dial widget.
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
@@ -108,3 +127,5 @@ ui_error_t ui_speed_dial_base_bind_text(struct ui_speed_dial_base *widget,
 #endif /* __cplusplus */
 
 #endif /* UI_SPEED_DIAL_BASE_H */
+
+/** @} */

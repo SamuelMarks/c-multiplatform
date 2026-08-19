@@ -1,3 +1,13 @@
+/**
+ * @file ui_state_layer.h
+ * @brief Interactive state layer calculations.
+ *
+ * @defgroup StateLayer State Layer
+ * @brief Utilities for calculating interaction state layer overlays (hover,
+ * focus, pressed).
+ * @{
+ */
+
 #ifndef UI_STATE_LAYER_H
 #define UI_STATE_LAYER_H
 
@@ -14,10 +24,10 @@ extern "C" {
  * @brief Standard interaction state layers.
  */
 enum ui_state_layer_type {
-  UI_STATE_LAYER_HOVER,
-  UI_STATE_LAYER_FOCUS,
-  UI_STATE_LAYER_PRESSED,
-  UI_STATE_LAYER_DRAGGED
+  UI_STATE_LAYER_HOVER,   /**< Hover state layer. */
+  UI_STATE_LAYER_FOCUS,   /**< Focus state layer. */
+  UI_STATE_LAYER_PRESSED, /**< Pressed state layer. */
+  UI_STATE_LAYER_DRAGGED  /**< Dragged state layer. */
 };
 
 /**
@@ -39,3 +49,5 @@ ui_error_t ui_state_layer_get_color(ui_color_t base_color, ui_color_t on_color,
 #endif /* __cplusplus */
 
 #endif /* UI_STATE_LAYER_H */
+
+/** @} */

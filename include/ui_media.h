@@ -1,3 +1,8 @@
+/**
+ * @file ui_media.h
+ * @brief Core media structs and abstract demuxer interfaces.
+ */
+
 #ifndef UI_MEDIA_H
 #define UI_MEDIA_H
 

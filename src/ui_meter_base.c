@@ -4,6 +4,11 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief ui_meter_base_create.
+ * @param out_meter Parameter out_meter.
+ * @return Return value.
+ */
 ui_error_t ui_meter_base_create(struct ui_meter_base **out_meter) {
   struct ui_meter_base *meter;
   struct ui_component *base_comp;
@@ -64,6 +69,11 @@ ui_error_t ui_meter_base_create(struct ui_meter_base **out_meter) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief update_meter_attributes.
+ * @param meter Parameter meter.
+ * @return Return value.
+ */
 static ui_error_t update_meter_attributes(struct ui_meter_base *meter) {
   char buf[32];
   ui_error_t err;
@@ -127,6 +137,12 @@ static ui_error_t update_meter_attributes(struct ui_meter_base *meter) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_meter_base_set_value.
+ * @param meter Parameter meter.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 ui_error_t ui_meter_base_set_value(struct ui_meter_base *meter, float value) {
   ui_error_t err;
   if (!meter) {
@@ -138,6 +154,13 @@ ui_error_t ui_meter_base_set_value(struct ui_meter_base *meter, float value) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_meter_base_set_bounds.
+ * @param meter Parameter meter.
+ * @param min_val Parameter min_val.
+ * @param max_val Parameter max_val.
+ * @return Return value.
+ */
 ui_error_t ui_meter_base_set_bounds(struct ui_meter_base *meter, float min_val,
                                     float max_val) {
   ui_error_t err;
@@ -151,6 +174,14 @@ ui_error_t ui_meter_base_set_bounds(struct ui_meter_base *meter, float min_val,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_meter_base_set_thresholds.
+ * @param meter Parameter meter.
+ * @param low_val Parameter low_val.
+ * @param high_val Parameter high_val.
+ * @param optimum_val Parameter optimum_val.
+ * @return Return value.
+ */
 ui_error_t ui_meter_base_set_thresholds(struct ui_meter_base *meter,
                                         float low_val, float high_val,
                                         float optimum_val) {
@@ -166,6 +197,12 @@ ui_error_t ui_meter_base_set_thresholds(struct ui_meter_base *meter,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_meter_base_bind_value.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_meter_base_bind_value(struct ui_meter_base *widget,
                                     struct ui_signal *signal) {
   if (!widget) {

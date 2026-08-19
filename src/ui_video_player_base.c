@@ -2,6 +2,13 @@
 #include "ui_video_player_base.h"
 /* clang-format on */
 
+/**
+ * @brief ui_video_player_base_init.
+ * @param player Parameter player.
+ * @param component Parameter component.
+ * @param av_sync Parameter av_sync.
+ * @return Return value.
+ */
 ui_error_t ui_video_player_base_init(struct ui_video_player_base *player,
                                      struct ui_component *component,
                                      struct ui_av_sync *av_sync) {
@@ -29,6 +36,12 @@ ui_video_player_base_toggle_play(struct ui_video_player_base *player) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_video_player_base_seek.
+ * @param player Parameter player.
+ * @param time Parameter time.
+ * @return Return value.
+ */
 ui_error_t ui_video_player_base_seek(struct ui_video_player_base *player,
                                      float time) {
   if (player) {
@@ -65,6 +78,12 @@ ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_video_player_base_bind_src.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_video_player_base_bind_src(struct ui_video_player_base *widget,
                                          struct ui_signal *signal) {
   if (!widget) {

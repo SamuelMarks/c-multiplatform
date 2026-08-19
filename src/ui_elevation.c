@@ -5,6 +5,14 @@
 /* M3 surface tint opacities for elevation levels 1-5 */
 static const float TINT_OPACITIES[] = {0.0f, 0.05f, 0.08f, 0.11f, 0.12f, 0.14f};
 
+/**
+ * @brief ui_elevation_get_tinted_surface.
+ * @param surface_color Parameter surface_color.
+ * @param tint_color Parameter tint_color.
+ * @param level Parameter level.
+ * @param out_color Parameter out_color.
+ * @return Return value.
+ */
 ui_error_t ui_elevation_get_tinted_surface(ui_color_t surface_color,
                                            ui_color_t tint_color,
                                            enum ui_elevation_level level,
@@ -46,6 +54,14 @@ ui_error_t ui_elevation_get_tinted_surface(ui_color_t surface_color,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_elevation_get_shadows.
+ * @param level Parameter level.
+ * @param shadow_color Parameter shadow_color.
+ * @param out_shadow1 Parameter out_shadow1.
+ * @param out_shadow2 Parameter out_shadow2.
+ * @return Return value.
+ */
 ui_error_t ui_elevation_get_shadows(enum ui_elevation_level level,
                                     ui_color_t shadow_color,
                                     struct ui_drop_shadow *out_shadow1,

@@ -1,3 +1,8 @@
+/**
+ * @file ui_css_scroll_anchoring.h
+ * @brief CSS scroll anchoring properties and parsers.
+ */
+
 #ifndef UI_CSS_SCROLL_ANCHORING_H
 #define UI_CSS_SCROLL_ANCHORING_H
 

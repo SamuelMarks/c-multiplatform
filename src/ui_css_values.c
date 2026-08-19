@@ -22,6 +22,13 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
+/**
+ * @brief parse_css_unit.
+ * @param str Parameter str.
+ * @param out_len Parameter out_len.
+ * @param out_unit Parameter out_unit.
+ * @return Return value.
+ */
 static ui_error_t parse_css_unit(const char *str, size_t *out_len,
                                  enum ui_css_unit *out_unit) {
   size_t i, j;
@@ -67,6 +74,12 @@ static ui_error_t parse_css_unit(const char *str, size_t *out_len,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_value_internal.
+ * @param p_str Parameter p_str.
+ * @param out_value Parameter out_value.
+ * @return Return value.
+ */
 static ui_error_t ui_css_parse_value_internal(const char **p_str,
                                               struct ui_css_value *out_value) {
   const char *str = *p_str;
@@ -109,6 +122,12 @@ static ui_error_t ui_css_parse_value_internal(const char **p_str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_value.
+ * @param str Parameter str.
+ * @param out_value Parameter out_value.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_value(const char *str, struct ui_css_value *out_value) {
   ui_error_t rc;
 
@@ -137,12 +156,24 @@ ui_error_t ui_css_parse_value(const char *str, struct ui_css_value *out_value) {
 static ui_error_t parse_expression(const char **p_str,
                                    struct ui_css_value_ext **out_expr);
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
 }
 
+/**
+ * @brief match_keyword.
+ * @param p_str Parameter p_str.
+ * @param kw Parameter kw.
+ * @param out_matched Parameter out_matched.
+ * @return Return value.
+ */
 static void match_keyword(const char **p_str, const char *kw,
                           int *out_matched) {
   size_t len = strlen(kw);
@@ -155,6 +186,12 @@ static void match_keyword(const char **p_str, const char *kw,
   return;
 }
 
+/**
+ * @brief create_math_node.
+ * @param op Parameter op.
+ * @param out_node Parameter out_node.
+ * @return Return value.
+ */
 static ui_error_t create_math_node(enum ui_css_math_op op,
                                    struct ui_css_math_expr **out_node) {
   struct ui_css_math_expr *node =
@@ -172,6 +209,12 @@ static ui_error_t create_math_node(enum ui_css_math_op op,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
+/**
+ * @brief create_value_ext_math.
+ * @param math Parameter math.
+ * @param out_ext Parameter out_ext.
+ * @return Return value.
+ */
 static ui_error_t create_value_ext_math(struct ui_css_math_expr *math,
                                         struct ui_css_value_ext **out_ext) {
   struct ui_css_value_ext *ext =
@@ -186,6 +229,12 @@ static ui_error_t create_value_ext_math(struct ui_css_math_expr *math,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
+/**
+ * @brief create_value_ext_scalar.
+ * @param scalar Parameter scalar.
+ * @param out_ext Parameter out_ext.
+ * @return Return value.
+ */
 static ui_error_t create_value_ext_scalar(const struct ui_css_value *scalar,
                                           struct ui_css_value_ext **out_ext) {
   struct ui_css_value_ext *ext =
@@ -200,6 +249,13 @@ static ui_error_t create_value_ext_scalar(const struct ui_css_value *scalar,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
+/**
+ * @brief create_value_ext_env.
+ * @param name Parameter name.
+ * @param fallback Parameter fallback.
+ * @param out_ext Parameter out_ext.
+ * @return Return value.
+ */
 static ui_error_t create_value_ext_env(const char *name,
                                        struct ui_css_value_ext *fallback,
                                        struct ui_css_value_ext **out_ext) {
@@ -236,6 +292,11 @@ static ui_error_t create_value_ext_env(const char *name,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief destroy_math_node.
+ * @param math Parameter math.
+ * @return Return value.
+ */
 static void destroy_math_node(struct ui_css_math_expr *math) {
   if (!math)
     return;
@@ -253,6 +314,11 @@ static void destroy_math_node(struct ui_css_math_expr *math) {
   C_MULTIPLATFORM_FREE(math);
 }
 
+/**
+ * @brief ui_css_value_ext_destroy.
+ * @param val Parameter val.
+ * @return Return value.
+ */
 void ui_css_value_ext_destroy(struct ui_css_value_ext *val) {
   if (!val)
     return;
@@ -621,6 +687,12 @@ static ui_error_t parse_function(const char **p_str,
     }
   }
 }
+/**
+ * @brief parse_term.
+ * @param p_str Parameter p_str.
+ * @param out_expr Parameter out_expr.
+ * @return Return value.
+ */
 static ui_error_t parse_term(const char **p_str,
                              struct ui_css_value_ext **out_expr) {
   struct ui_css_value_ext *left = NULL;
@@ -672,6 +744,12 @@ static ui_error_t parse_term(const char **p_str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_expression.
+ * @param p_str Parameter p_str.
+ * @param out_expr Parameter out_expr.
+ * @return Return value.
+ */
 static ui_error_t parse_expression(const char **p_str,
                                    struct ui_css_value_ext **out_expr) {
   struct ui_css_value_ext *left = NULL;
@@ -737,6 +815,12 @@ static ui_error_t parse_expression(const char **p_str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_value_ext.
+ * @param str Parameter str.
+ * @param out_value Parameter out_value.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_value_ext(const char *str,
                                   struct ui_css_value_ext **out_value) {
   ui_error_t rc;
@@ -764,6 +848,12 @@ ui_error_t ui_css_parse_value_ext(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_hex_color.
+ * @param str Parameter str.
+ * @param out_color Parameter out_color.
+ * @return Return value.
+ */
 static ui_error_t parse_hex_color(const char *str,
                                   struct ui_css_color *out_color) {
   size_t len = strlen(str);
@@ -804,6 +894,12 @@ static ui_error_t parse_hex_color(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_color.
+ * @param str Parameter str.
+ * @param out_color Parameter out_color.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   if (!str || !out_color)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -993,6 +1089,12 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_parse_image.
+ * @param str Parameter str.
+ * @param out_image Parameter out_image.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image) {
   if (!str || !out_image)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1086,6 +1188,12 @@ ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image) {
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief parse_geometry_box.
+ * @param str Parameter str.
+ * @param out_box Parameter out_box.
+ * @return Return value.
+ */
 static void parse_geometry_box(const char *str,
                                enum ui_css_geometry_box *out_box) {
 
@@ -1107,6 +1215,12 @@ static void parse_geometry_box(const char *str,
     *out_box = UI_CSS_GEOMETRY_BOX_NONE;
 }
 
+/**
+ * @brief ui_css_parse_clip_path.
+ * @param str Parameter str.
+ * @param out_clip_path Parameter out_clip_path.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_clip_path(const char *str,
                                   struct ui_css_clip_path *out_clip_path) {
   if (!str || !out_clip_path)
@@ -1180,6 +1294,12 @@ ui_error_t ui_css_parse_clip_path(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_mask.
+ * @param str Parameter str.
+ * @param out_mask Parameter out_mask.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_mask(const char *str,
                              struct ui_css_mask_layer *out_mask) {
   if (!str || !out_mask)
@@ -1248,6 +1368,11 @@ ui_error_t ui_css_parse_mask(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_transform_destroy.
+ * @param transform Parameter transform.
+ * @return Return value.
+ */
 ui_error_t ui_css_transform_destroy(struct ui_css_transform *transform) {
   if (!transform)
     return UI_ERROR_NONE;
@@ -1264,6 +1389,12 @@ ui_error_t ui_css_transform_destroy(struct ui_css_transform *transform) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_transform.
+ * @param str Parameter str.
+ * @param out_transform Parameter out_transform.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_transform(const char *str,
                                   struct ui_css_transform **out_transform) {
   struct ui_css_transform *transform;
@@ -1494,6 +1625,11 @@ ui_error_t ui_css_parse_shape_outside(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_filter_destroy.
+ * @param filter Parameter filter.
+ * @return Return value.
+ */
 ui_error_t ui_css_filter_destroy(struct ui_css_filter *filter) {
   if (!filter)
     return UI_ERROR_NONE;
@@ -1510,6 +1646,12 @@ ui_error_t ui_css_filter_destroy(struct ui_css_filter *filter) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_filter.
+ * @param str Parameter str.
+ * @param out_filter Parameter out_filter.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_filter(const char *str,
                                struct ui_css_filter **out_filter) {
   struct ui_css_filter *filter;
@@ -1709,6 +1851,12 @@ cleanup_fail: { ui_css_filter_destroy(filter); }
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_parse_blend_mode.
+ * @param str Parameter str.
+ * @param out_blend_mode Parameter out_blend_mode.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_blend_mode(const char *str,
                                    enum ui_css_blend_mode *out_blend_mode) {
   if (!str || !out_blend_mode)
@@ -1754,6 +1902,11 @@ ui_error_t ui_css_parse_blend_mode(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_shadow_list_destroy.
+ * @param list Parameter list.
+ * @return Return value.
+ */
 ui_error_t ui_css_shadow_list_destroy(struct ui_css_shadow_list *list) {
   if (!list)
     return UI_ERROR_NONE;
@@ -1770,6 +1923,12 @@ ui_error_t ui_css_shadow_list_destroy(struct ui_css_shadow_list *list) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_shadow.
+ * @param str Parameter str.
+ * @param out_shadows Parameter out_shadows.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_shadow(const char *str,
                                struct ui_css_shadow_list **out_shadows) {
   struct ui_css_shadow_list *list;
@@ -1898,6 +2057,12 @@ ui_error_t ui_css_parse_shadow(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_fill_rule.
+ * @param str Parameter str.
+ * @param out_rule Parameter out_rule.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_fill_rule(const char *str,
                                   enum ui_css_fill_rule *out_rule) {
   if (!str || !out_rule)
@@ -1959,6 +2124,12 @@ ui_css_parse_stroke_linejoin(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_parse_paint.
+ * @param str Parameter str.
+ * @param out_paint Parameter out_paint.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_paint(const char *str, struct ui_css_paint *out_paint) {
   if (!str || !out_paint)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -2010,6 +2181,12 @@ ui_error_t ui_css_parse_paint(const char *str, struct ui_css_paint *out_paint) {
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_parse_dasharray.
+ * @param str Parameter str.
+ * @param out_dasharray Parameter out_dasharray.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_dasharray(const char *str,
                                   struct ui_css_dasharray *out_dasharray) {
   char token_buf[512];
@@ -2124,6 +2301,11 @@ ui_css_parse_easing_function(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_transition_destroy.
+ * @param transitions Parameter transitions.
+ * @return Return value.
+ */
 ui_error_t ui_css_transition_destroy(struct ui_css_transition *transitions) {
   while (transitions) {
     struct ui_css_transition *next = transitions->next;
@@ -2298,6 +2480,11 @@ ui_error_t ui_css_parse_transition(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_animation_destroy.
+ * @param animations Parameter animations.
+ * @return Return value.
+ */
 ui_error_t ui_css_animation_destroy(struct ui_css_animation *animations) {
   while (animations) {
     struct ui_css_animation *next = animations->next;
@@ -2307,6 +2494,12 @@ ui_error_t ui_css_animation_destroy(struct ui_css_animation *animations) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_animation.
+ * @param str Parameter str.
+ * @param out_animations Parameter out_animations.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_animation(const char *str,
                                   struct ui_css_animation **out_animations) {
   struct ui_css_animation *head = NULL;

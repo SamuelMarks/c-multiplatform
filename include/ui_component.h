@@ -1,3 +1,8 @@
+/**
+ * @file ui_component.h
+ * @brief Isolated UI component interface with scoped CSS/DOM.
+ */
+
 #ifndef UI_COMPONENT_H
 #define UI_COMPONENT_H
 

@@ -12,6 +12,12 @@
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
 #else
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
+/**
+ * @brief dup_string.
+ * @param s Parameter s.
+ * @param out_str Parameter out_str.
+ * @return Return value.
+ */
 static ui_error_t dup_string(const char *s, char **out_str) {
   size_t len;
   char *p;
@@ -27,6 +33,11 @@ static ui_error_t dup_string(const char *s, char **out_str) {
 }
 #endif
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static ui_error_t skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
@@ -34,6 +45,12 @@ static ui_error_t skip_whitespace(const char **p_str) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_speech_strength.
+ * @param str Parameter str.
+ * @param out_strength Parameter out_strength.
+ * @return Return value.
+ */
 static void parse_speech_strength(const char *str,
                                   enum ui_css_speech_strength *out_strength) {
   if (strcmp(str, "none") == 0) {
@@ -54,6 +71,12 @@ static void parse_speech_strength(const char *str,
   }
 }
 
+/**
+ * @brief parse_pause_or_rest.
+ * @param str Parameter str.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_pause_or_rest(const char *str,
                                       struct ui_css_speech_pause *out_val) {
   ui_error_t parse_rc;
@@ -77,6 +100,12 @@ static ui_error_t parse_pause_or_rest(const char *str,
   }
 }
 
+/**
+ * @brief parse_cue.
+ * @param str Parameter str.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_cue(const char *str,
                             struct ui_css_speech_cue *out_val) {
   out_val->uri = NULL;
@@ -119,6 +148,12 @@ static ui_error_t parse_cue(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_voice_volume.
+ * @param str Parameter str.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_voice_volume(const char *str,
                                      struct ui_css_voice_volume *out_val) {
   out_val->has_keyword = 0;
@@ -155,6 +190,12 @@ static ui_error_t parse_voice_volume(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_voice_rate.
+ * @param str Parameter str.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_voice_rate(const char *str,
                                    struct ui_css_voice_rate *out_val) {
   out_val->has_keyword = 0;
@@ -188,6 +229,12 @@ static ui_error_t parse_voice_rate(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_voice_pitch.
+ * @param str Parameter str.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_voice_pitch(const char *str,
                                     struct ui_css_voice_pitch *out_val) {
   char token_buf[128];
@@ -246,6 +293,12 @@ static ui_error_t parse_voice_pitch(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_speech_parse.
+ * @param style Parameter style.
+ * @param out_props Parameter out_props.
+ * @return Return value.
+ */
 ui_error_t ui_css_speech_parse(const struct ui_css_computed_style *style,
                                struct ui_css_speech_properties *out_props) {
   const char *val_str;
@@ -401,6 +454,11 @@ ui_error_t ui_css_speech_parse(const struct ui_css_computed_style *style,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_speech_cleanup.
+ * @param props Parameter props.
+ * @return Return value.
+ */
 ui_error_t ui_css_speech_cleanup(struct ui_css_speech_properties *props) {
   if (!props)
     return UI_ERROR_INVALID_ARGUMENT;

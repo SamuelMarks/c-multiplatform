@@ -30,6 +30,7 @@
 #include "ui_window_backend_web.h"
 #elif defined(_WIN32) || defined(__CYGWIN__)
 #include "ui_window_backend_win32.h"
+__declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #elif defined(__APPLE__)
 #include "ui_window_backend_macos.h"
 #elif defined(__linux__) || defined(__unix__)
@@ -779,7 +780,11 @@ err = ui_window_backend_linux_create(&backend);
   emscripten_set_main_loop(main_loop_step, 0, 1);
 #else
   int frame_count = 0;
+#if defined(CI_TEST_RUN)
+  const char *ci_test = "1";
+#else
   const char *ci_test = getenv("CI_TEST_RUN");
+#endif
   while (running) {
     if (ci_test && frame_count++ > 2)
       break;
@@ -855,7 +860,9 @@ err = ui_window_backend_linux_create(&backend);
       goto cleanup;
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-    Sleep(16);
+    if (!ci_test) {
+      Sleep(16);
+    }
 #endif
   }
 #endif

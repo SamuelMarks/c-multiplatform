@@ -1,8 +1,23 @@
+/**
+ * @file ui_skeleton_base.h
+ * @brief Skeleton loader base implementation.
+ *
+ * @defgroup SkeletonBase Skeleton Base
+ * @brief Base implementation for skeleton loader components.
+ * @{
+ */
+
 #ifndef UI_SKELETON_BASE_H
 #define UI_SKELETON_BASE_H
 
+/**
+ * @brief Opaque structure for a computed signal.
+ */
 struct ui_computed;
 
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -18,22 +33,25 @@ extern "C" {
  * @brief Represents the shape of the skeleton loader.
  */
 enum ui_skeleton_shape {
-  UI_SKELETON_SHAPE_RECTANGLE,
-  UI_SKELETON_SHAPE_CIRCLE,
-  UI_SKELETON_SHAPE_ROUNDED_RECTANGLE
+  UI_SKELETON_SHAPE_RECTANGLE,        /**< Rectangular skeleton shape. */
+  UI_SKELETON_SHAPE_CIRCLE,           /**< Circular skeleton shape. */
+  UI_SKELETON_SHAPE_ROUNDED_RECTANGLE /**< Rounded rectangle skeleton shape. */
 };
 
 /**
  * @brief Configuration for the skeleton animation effect.
  */
 struct ui_skeleton_animation_config {
-  float duration_ms;       /**< Duration of one pulse/shimmer cycle in ms */
-  float base_opacity;      /**< Minimum opacity of the background */
-  float highlight_opacity; /**< Maximum opacity of the highlight wave */
+  float duration_ms;       /**< Duration of one pulse/shimmer cycle in ms. */
+  float base_opacity;      /**< Minimum opacity of the background. */
+  float highlight_opacity; /**< Maximum opacity of the highlight wave. */
   float highlight_width;   /**< Width of the highlight wave relative to the
-                              element (0.0 to 1.0) */
+                              element (0.0 to 1.0). */
 };
 
+/**
+ * @brief Opaque structure for the skeleton base component.
+ */
 struct ui_skeleton_base;
 
 /**
@@ -49,6 +67,7 @@ ui_error_t ui_skeleton_base_create(struct ui_skeleton_base **out_skeleton);
  * @brief Destroys a skeleton loader component.
  *
  * @param skeleton The skeleton to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_skeleton_base_destroy(struct ui_skeleton_base *skeleton);
 
@@ -132,7 +151,7 @@ ui_error_t ui_skeleton_base_get_animation_config(
 /**
  * @brief Binds the active property.
  *
- * @param widget The widget.
+ * @param widget The skeleton widget.
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
@@ -144,3 +163,5 @@ ui_error_t ui_skeleton_base_bind_active(struct ui_skeleton_base *widget,
 #endif
 
 #endif /* UI_SKELETON_BASE_H */
+
+/** @} */

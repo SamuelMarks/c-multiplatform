@@ -404,6 +404,7 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
           {
             ui_error_t set_rc =
                 ui_signal_set(control->status_signal, status_payload);
+            (void)set_rc;
             C_MULTIPLATFORM_FREE(task);
             return UI_ERROR_NONE;
           }
@@ -417,6 +418,7 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
         {
           ui_error_t set_rc =
               ui_signal_set(control->status_signal, status_payload);
+          (void)set_rc;
         }
         control->pending_async_count = 0;
         return UI_ERROR_NONE;
@@ -441,9 +443,7 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
  */
 ui_error_t ui_form_control_set_value(ui_form_control_t *control,
                                      union ui_signal_payload new_value) {
-
   union ui_signal_payload dirty_payload = {0};
-  ui_error_t rc;
 
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -485,7 +485,6 @@ ui_error_t ui_form_control_disable(ui_form_control_t *control) {
 }
 
 ui_error_t ui_form_control_enable(ui_form_control_t *control) {
-  ui_error_t rc;
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

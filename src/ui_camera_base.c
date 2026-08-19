@@ -1,3 +1,8 @@
+/**
+ * @file ui_camera_base.c
+ * @brief Implementation of the camera base component.
+ */
+
 /* clang-format off */
 #include "ui_camera_base.h"
 #include "ui_internal_mem.h"

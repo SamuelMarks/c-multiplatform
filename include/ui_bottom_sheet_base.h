@@ -1,3 +1,8 @@
+/**
+ * @file ui_bottom_sheet_base.h
+ * @brief Bottom sheet base component for modal interactions.
+ */
+
 #ifndef UI_BOTTOM_SHEET_BASE_H
 #define UI_BOTTOM_SHEET_BASE_H
 
@@ -23,6 +28,10 @@ struct ui_bottom_sheet_base;
 /**
  * @brief Callback invoked when the bottom sheet is closed via swipe down or
  * backdrop click.
+ *
+ * @param sheet The bottom sheet.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_bottom_sheet_on_close_t)(
     struct ui_bottom_sheet_base *sheet, void *user_data);
@@ -39,6 +48,7 @@ ui_error_t ui_bottom_sheet_base_create(struct ui_bottom_sheet_base **out_sheet);
  * @brief Destroys a bottom sheet instance.
  *
  * @param sheet The bottom sheet.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_bottom_sheet_base_destroy(struct ui_bottom_sheet_base *sheet);
 
@@ -66,7 +76,9 @@ ui_error_t ui_bottom_sheet_base_set_open(struct ui_bottom_sheet_base *sheet,
  * @brief Checks if the bottom sheet is currently open.
  *
  * @param sheet The bottom sheet.
- * @return 1 if open, 0 if closed.
+ * @param out_is_open Pointer to receive the open state (1 if open, 0 if
+ * closed).
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_bottom_sheet_base_is_open(const struct ui_bottom_sheet_base *sheet,
@@ -137,7 +149,8 @@ ui_bottom_sheet_base_set_spring_config(struct ui_bottom_sheet_base *sheet,
  * @brief Retrieves the underlying component wrapper.
  *
  * @param sheet The bottom sheet.
- * @return The component.
+ * @param out_component Pointer to receive the underlying component wrapper.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_bottom_sheet_base_get_component(struct ui_bottom_sheet_base *sheet,

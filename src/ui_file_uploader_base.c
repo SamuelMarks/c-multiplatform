@@ -19,6 +19,12 @@ extern int g_mock_io_fail;
 #define UI_FSEEK_SET_FAIL(f, o, w) fseek(f, o, w)
 #endif
 
+/**
+ * @brief ui_file_uploader_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 static ui_error_t
 ui_file_uploader_cva_write_value(void *component,
                                  union ui_signal_payload value) {
@@ -67,6 +73,12 @@ static ui_error_t ui_file_uploader_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_file_uploader_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
+ */
 static ui_error_t
 ui_file_uploader_cva_set_disabled_state(void *component,
                                         ui_bool_t is_disabled) {
@@ -76,6 +88,17 @@ ui_file_uploader_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_file_uploader_init.
+ * @param uploader Parameter uploader.
+ * @param max_files Parameter max_files.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param out_cva Parameter out_cva.
+ * @return Return value.
+ */
 ui_error_t ui_file_uploader_init(struct ui_file_uploader_base *uploader,
                                  int max_files, int x, int y, int width,
                                  int height,
@@ -126,6 +149,11 @@ ui_error_t ui_file_uploader_init(struct ui_file_uploader_base *uploader,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_file_uploader_destroy.
+ * @param uploader Parameter uploader.
+ * @return Return value.
+ */
 ui_error_t ui_file_uploader_destroy(struct ui_file_uploader_base *uploader) {
   int i;
   if (uploader == NULL) {
@@ -180,6 +208,12 @@ ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_file_uploader_drop_file.
+ * @param uploader Parameter uploader.
+ * @param file_path Parameter file_path.
+ * @return Return value.
+ */
 ui_error_t ui_file_uploader_drop_file(struct ui_file_uploader_base *uploader,
                                       const char *file_path) {
   const char *last_slash;

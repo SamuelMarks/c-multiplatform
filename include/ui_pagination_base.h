@@ -1,3 +1,8 @@
+/**
+ * @file ui_pagination_base.h
+ * @brief Pagination logic and control component base definitions.
+ */
+
 #ifndef UI_PAGINATION_BASE_H
 #define UI_PAGINATION_BASE_H
 

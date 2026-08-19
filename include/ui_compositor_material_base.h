@@ -1,3 +1,8 @@
+/**
+ * @file ui_compositor_material_base.h
+ * @brief OS-level compositor material abstractions (Mica, Acrylic).
+ */
+
 #ifndef UI_COMPOSITOR_MATERIAL_BASE_H
 #define UI_COMPOSITOR_MATERIAL_BASE_H
 

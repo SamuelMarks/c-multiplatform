@@ -14,6 +14,11 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static ui_error_t skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
@@ -21,6 +26,12 @@ static ui_error_t skip_whitespace(const char **p_str) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_outline_width.
+ * @param str Parameter str.
+ * @param out_width Parameter out_width.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_outline_width(const char *str,
                                       struct ui_css_value *out_width) {
   if (!str || !out_width)
@@ -48,6 +59,12 @@ ui_error_t ui_css_parse_outline_width(const char *str,
   return ui_css_parse_value(str, out_width);
 }
 
+/**
+ * @brief ui_css_parse_outline_style.
+ * @param str Parameter str.
+ * @param out_style Parameter out_style.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_outline_style(const char *str,
                                       enum ui_css_outline_style *out_style) {
   if (!str || !out_style)
@@ -86,6 +103,12 @@ ui_error_t ui_css_parse_outline_style(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_outline.
+ * @param str Parameter str.
+ * @param out_outline Parameter out_outline.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_outline(const char *str,
                                 struct ui_css_outline *out_outline) {
   char token_buf[256];
@@ -168,6 +191,11 @@ ui_error_t ui_css_parse_outline(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_cursor_destroy.
+ * @param cursor Parameter cursor.
+ * @return Return value.
+ */
 ui_error_t ui_css_cursor_destroy(struct ui_css_cursor *cursor) {
   if (!cursor)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -183,6 +211,12 @@ ui_error_t ui_css_cursor_destroy(struct ui_css_cursor *cursor) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_cursor.
+ * @param str Parameter str.
+ * @param out_cursor Parameter out_cursor.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_cursor(const char *str,
                                struct ui_css_cursor *out_cursor) {
   char token_buf[1024];
@@ -222,7 +256,6 @@ ui_error_t ui_css_parse_cursor(const char *str,
           (struct ui_css_cursor_image *)C_MULTIPLATFORM_MALLOC(
               sizeof(struct ui_css_cursor_image));
       if (!img) {
-        ui_error_t destroy_rc;
         out_cursor->images = head;
         ui_css_cursor_destroy(out_cursor);
         return UI_ERROR_OUT_OF_MEMORY;
@@ -349,7 +382,6 @@ ui_error_t ui_css_parse_cursor(const char *str,
       else if (strcmp(p, "zoom-out") == 0)
         out_cursor->keyword = UI_CSS_CURSOR_ZOOM_OUT;
       else {
-        ui_error_t destroy_rc;
         out_cursor->images = head;
         ui_css_cursor_destroy(out_cursor);
         return UI_ERROR_PARSE_FAILED;
@@ -363,6 +395,12 @@ ui_error_t ui_css_parse_cursor(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_user_select.
+ * @param str Parameter str.
+ * @param out_select Parameter out_select.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_user_select(const char *str,
                                     enum ui_css_user_select *out_select) {
   if (!str || !out_select)
@@ -389,6 +427,12 @@ ui_error_t ui_css_parse_user_select(const char *str,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_css_parse_appearance.
+ * @param str Parameter str.
+ * @param out_appearance Parameter out_appearance.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_appearance(const char *str,
                                    enum ui_css_appearance *out_appearance) {
   if (!str || !out_appearance)

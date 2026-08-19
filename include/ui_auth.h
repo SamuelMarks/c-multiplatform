@@ -1,3 +1,8 @@
+/**
+ * @file ui_auth.h
+ * @brief Biometric and Secure Enclave authentication API.
+ */
+
 #ifndef UI_AUTH_H
 #define UI_AUTH_H
 
@@ -14,10 +19,12 @@ extern "C" {
  * @brief Represents the result of an authentication request.
  */
 enum ui_auth_result {
-  UI_AUTH_RESULT_SUCCESS = 0,
-  UI_AUTH_RESULT_FAILED = 1,
-  UI_AUTH_RESULT_CANCELLED = 2,
-  UI_AUTH_RESULT_NOT_AVAILABLE = 3
+  UI_AUTH_RESULT_SUCCESS = 0, /**< Authentication was successful. */
+  UI_AUTH_RESULT_FAILED = 1,  /**< Authentication failed. */
+  UI_AUTH_RESULT_CANCELLED =
+      2, /**< Authentication was cancelled by the user. */
+  UI_AUTH_RESULT_NOT_AVAILABLE =
+      3 /**< Authentication hardware is unavailable. */
 };
 
 /**

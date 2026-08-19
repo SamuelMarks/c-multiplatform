@@ -1,3 +1,8 @@
+/**
+ * @file ui_cssom_api.h
+ * @brief Level 1 CSS Object Model API for runtime stylesheet mutation.
+ */
+
 #ifndef UI_CSSOM_API_H
 #define UI_CSSOM_API_H
 

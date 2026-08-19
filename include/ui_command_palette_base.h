@@ -1,6 +1,15 @@
+/**
+ * @file ui_command_palette_base.h
+ * @brief Base command palette component for global command execution.
+ */
+
 #ifndef UI_COMMAND_PALETTE_BASE_H
 #define UI_COMMAND_PALETTE_BASE_H
+
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
+
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -12,9 +21,16 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief Forward declaration of ui_component. */
 struct ui_component;
+
+/** @brief Forward declaration of ui_autocomplete_base. */
 struct ui_autocomplete_base;
+
+/** @brief Forward declaration of ui_dialog_base. */
 struct ui_dialog_base;
+
+/** @brief Forward declaration of ui_virtual_scroll_base. */
 struct ui_virtual_scroll_base;
 
 /**
@@ -49,6 +65,7 @@ ui_error_t ui_command_palette_base_init(
  * @brief Opens the command palette.
  *
  * @param palette Pointer to the command palette base struct.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_command_palette_base_open(struct ui_command_palette_base *palette);
@@ -57,6 +74,7 @@ ui_command_palette_base_open(struct ui_command_palette_base *palette);
  * @brief Closes the command palette.
  *
  * @param palette Pointer to the command palette base struct.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_command_palette_base_close(struct ui_command_palette_base *palette);

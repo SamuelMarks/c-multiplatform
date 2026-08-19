@@ -13,6 +13,11 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
@@ -23,7 +28,6 @@ static void skip_whitespace(const char **p_str) {
 ui_error_t
 ui_css_parse_list_style_type(const char *str,
                              struct ui_css_list_style_type_ext *out_type) {
-  ui_error_t rc;
   if (!str || !out_type)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -86,7 +90,6 @@ ui_css_parse_list_style_type(const char *str,
 /** \brief ui_css_parse_list_style_position */
 ui_error_t ui_css_parse_list_style_position(
     const char *str, enum ui_css_list_style_position *out_position) {
-  ui_error_t rc;
   if (!str || !out_position)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -103,10 +106,16 @@ ui_error_t ui_css_parse_list_style_position(
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_parse_list_style_image.
+ * @param str Parameter str.
+ * @param out_image Parameter out_image.
+ * @param out_is_none Parameter out_is_none.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_list_style_image(const char *str,
                                          struct ui_css_image *out_image,
                                          int *out_is_none) {
-  ui_error_t rc;
   if (!str || !out_image || !out_is_none)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -121,6 +130,12 @@ ui_error_t ui_css_parse_list_style_image(const char *str,
   return ui_css_parse_image(str, out_image);
 }
 
+/**
+ * @brief ui_css_parse_list_style.
+ * @param str Parameter str.
+ * @param out_style Parameter out_style.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_list_style(const char *str,
                                    struct ui_css_list_style *out_style) {
   char token_buf[512];
@@ -129,7 +144,6 @@ ui_error_t ui_css_parse_list_style(const char *str,
   int parsed_type = 0;
   int parsed_position = 0;
   int parsed_image = 0;
-  ui_error_t rc;
 
   if (!str || !out_style)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -202,7 +216,6 @@ ui_error_t ui_css_parse_list_style(const char *str,
 ui_error_t
 ui_css_parse_counter_action(const char *str,
                             struct ui_css_counter_action **out_actions) {
-  ui_error_t rc;
   char token_buf[512];
   char *token;
   char *next_token = NULL;

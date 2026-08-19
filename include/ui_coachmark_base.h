@@ -1,3 +1,8 @@
+/**
+ * @file ui_coachmark_base.h
+ * @brief Coachmark base component for creating guided product tours.
+ */
+
 #ifndef UI_COACHMARK_BASE_H
 #define UI_COACHMARK_BASE_H
 
@@ -14,12 +19,19 @@ extern "C" {
 #include "ui_computed.h"
 /* clang-format on */
 
+/** @brief Opaque handle representing a single coachmark step. */
 struct ui_coachmark_base;
-struct ui_coachmark_step;
+
+/** @brief Opaque handle representing a guided tour of coachmarks. */
 struct ui_coachmark_tour;
 
 /**
  * @brief Callback invoked when a tour step changes or ends.
+ *
+ * @param tour The tour instance.
+ * @param current_step The current step index, or -1 if ended.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_coachmark_on_step_change_t)(
     struct ui_coachmark_tour *tour, int current_step, void *user_data);
@@ -37,17 +49,29 @@ struct ui_coachmark_step {
 
 /**
  * @brief Creates a coachmark tour component.
+ *
+ * @param director The overlay director to orchestrate the popover rendering.
+ * @param out_tour Pointer to receive the allocated tour instance.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
                                     struct ui_coachmark_tour **out_tour);
 
 /**
  * @brief Destroys a coachmark tour component.
+ *
+ * @param tour The tour instance.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Sets the steps for the tour.
+ *
+ * @param tour The tour instance.
+ * @param steps Array of step structures.
+ * @param step_count Total number of steps.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
                                        const struct ui_coachmark_step *steps,
@@ -55,6 +79,11 @@ ui_error_t ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
 
 /**
  * @brief Sets a callback for when the step changes.
+ *
+ * @param tour The tour instance.
+ * @param on_change The callback.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
@@ -63,21 +92,33 @@ ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
 
 /**
  * @brief Starts the tour at step 0.
+ *
+ * @param tour The tour instance.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Advances to the next step.
+ *
+ * @param tour The tour instance.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Goes back to the previous step.
+ *
+ * @param tour The tour instance.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_prev(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Skips/ends the tour.
+ *
+ * @param tour The tour instance.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour);
 
@@ -105,6 +146,11 @@ ui_coachmark_tour_get_animating_signal(struct ui_coachmark_tour *tour,
 /**
  * @brief Updates layout/positioning for the current step (useful on window
  * resize).
+ *
+ * @param tour The tour instance.
+ * @param viewport_width Width of the viewport.
+ * @param viewport_height Height of the viewport.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
                                            float viewport_width,
@@ -113,6 +159,10 @@ ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
 /**
  * @brief Processes input events for the coachmark (keyboard navigation like
  * ESC, Tab).
+ *
+ * @param tour The tour instance.
+ * @param event The input event.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
                                            const struct ui_event *event);

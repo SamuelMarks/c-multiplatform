@@ -1,3 +1,12 @@
+/**
+ * @file ui_spring.h
+ * @brief Physics-based spring animation calculations.
+ *
+ * @defgroup Spring Spring Animation
+ * @brief Physics-based spring animation calculations.
+ * @{
+ */
+
 #ifndef UI_SPRING_H
 #define UI_SPRING_H
 
@@ -54,3 +63,5 @@ ui_error_t ui_spring_update(const struct ui_spring_config *config,
 #endif /* __cplusplus */
 
 #endif /* UI_SPRING_H */
+
+/** @} */

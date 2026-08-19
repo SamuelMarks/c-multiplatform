@@ -2,6 +2,12 @@
 #include "ui_tonal_palette.h"
 /* clang-format on */
 
+/**
+ * @brief ui_tonal_palette_from_color.
+ * @param argb Parameter argb.
+ * @param out_palette Parameter out_palette.
+ * @return Return value.
+ */
 ui_error_t ui_tonal_palette_from_color(ui_color_t argb,
                                        struct ui_tonal_palette *out_palette) {
   struct ui_color_hct hct;
@@ -11,7 +17,10 @@ ui_error_t ui_tonal_palette_from_color(ui_color_t argb,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_color_argb_to_hct(argb, &hct);
+  err = ui_color_argb_to_hct(argb, &hct);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
 
   out_palette->hue = hct.hue;
   out_palette->chroma = hct.chroma;
@@ -19,6 +28,13 @@ ui_error_t ui_tonal_palette_from_color(ui_color_t argb,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_tonal_palette_get_tone.
+ * @param palette Parameter palette.
+ * @param tone Parameter tone.
+ * @param out_color Parameter out_color.
+ * @return Return value.
+ */
 ui_error_t ui_tonal_palette_get_tone(const struct ui_tonal_palette *palette,
                                      float tone, ui_color_t *out_color) {
   struct ui_color_hct hct;

@@ -1,3 +1,8 @@
+/**
+ * @file ui_property_grid_base.h
+ * @brief Base property grid component for editing object fields and settings.
+ */
+
 #ifndef UI_PROPERTY_GRID_BASE_H
 #define UI_PROPERTY_GRID_BASE_H
 

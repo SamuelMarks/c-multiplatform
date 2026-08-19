@@ -2,6 +2,14 @@
 #include "ui_state_layer.h"
 /* clang-format on */
 
+/**
+ * @brief ui_state_layer_get_color.
+ * @param base_color Parameter base_color.
+ * @param on_color Parameter on_color.
+ * @param state Parameter state.
+ * @param out_color Parameter out_color.
+ * @return Return value.
+ */
 ui_error_t ui_state_layer_get_color(ui_color_t base_color, ui_color_t on_color,
                                     enum ui_state_layer_type state,
                                     ui_color_t *out_color) {

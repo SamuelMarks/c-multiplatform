@@ -1,3 +1,8 @@
+/**
+ * @file ui_icon_base.h
+ * @brief Base icon component for rendering vector glyphs or shapes.
+ */
+
 #ifndef UI_ICON_BASE_H
 #define UI_ICON_BASE_H
 

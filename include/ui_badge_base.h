@@ -1,8 +1,15 @@
+/**
+ * @file ui_badge_base.h
+ * @brief Badge base component definitions.
+ */
+
 #ifndef UI_BADGE_BASE_H
 #define UI_BADGE_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -14,6 +21,7 @@ extern "C" {
 #include "ui_component.h"
 /* clang-format on */
 
+/** @brief Opaque handle to a badge component. */
 struct ui_badge_base;
 
 /**
@@ -28,6 +36,7 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge);
  * @brief Destroys a badge base component.
  *
  * @param badge The badge component to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_badge_base_destroy(struct ui_badge_base *badge);
 
@@ -67,7 +76,8 @@ ui_error_t ui_badge_base_set_hidden(struct ui_badge_base *badge, int is_hidden);
  * @brief Gets the underlying component for rendering.
  *
  * @param badge The badge component.
- * @return The underlying ui_component pointer.
+ * @param out_component Pointer to receive the component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_badge_base_get_component(struct ui_badge_base *badge,
                                        struct ui_component **out_component);
@@ -84,6 +94,6 @@ ui_error_t ui_badge_base_bind_text(struct ui_badge_base *widget,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_BADGE_BASE_H */

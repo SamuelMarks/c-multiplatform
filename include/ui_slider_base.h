@@ -1,3 +1,12 @@
+/**
+ * @file ui_slider_base.h
+ * @brief Slider component base implementations.
+ *
+ * @defgroup SliderBase Slider Base
+ * @brief Base implementation for slider components.
+ * @{
+ */
+
 #ifndef UI_SLIDER_BASE_H
 #define UI_SLIDER_BASE_H
 
@@ -13,10 +22,18 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing the slider base component.
+ */
 struct ui_slider_base;
 
 /**
  * @brief Callback invoked when the slider value changes.
+ *
+ * @param slider The slider.
+ * @param value The new value of the slider.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_slider_on_change_t)(struct ui_slider_base *slider,
                                             float value, void *user_data);
@@ -44,6 +61,7 @@ ui_error_t ui_slider_base_create(struct ui_slider_base **out_slider,
  * @brief Destroys a slider base component.
  *
  * @param slider The slider to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_slider_base_destroy(struct ui_slider_base *slider);
 
@@ -78,7 +96,8 @@ ui_error_t ui_slider_base_set_value(struct ui_slider_base *slider, float value);
  * @brief Gets the current value of the slider.
  *
  * @param slider The slider.
- * @return The current value.
+ * @param out_value Pointer to receive the current value.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_slider_base_get_value(const struct ui_slider_base *slider,
                                     float *out_value);
@@ -148,7 +167,8 @@ ui_error_t ui_slider_base_process_event(struct ui_slider_base *slider,
  * mounting.
  *
  * @param slider The slider.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_slider_base_get_component(struct ui_slider_base *slider,
                                         struct ui_component **out_component);
@@ -158,3 +178,5 @@ ui_error_t ui_slider_base_get_component(struct ui_slider_base *slider,
 #endif /* __cplusplus */
 
 #endif /* UI_SLIDER_BASE_H */
+
+/** @} */

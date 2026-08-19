@@ -1,3 +1,8 @@
+/**
+ * @file ui_chart_base.h
+ * @brief Base chart component definitions and geometric utilities.
+ */
+
 #ifndef UI_CHART_BASE_H
 #define UI_CHART_BASE_H
 
@@ -13,21 +18,24 @@
 extern "C" {
 #endif
 
+/** @brief Forward declaration of ui_arena. */
+struct ui_arena;
+
 /**
  * @brief Types of coordinate systems.
  */
 enum ui_chart_coordinate_system {
-  UI_CHART_COORDINATE_CARTESIAN = 0, /* X/Y plane */
-  UI_CHART_COORDINATE_POLAR = 1      /* Angle/Radius plane */
+  UI_CHART_COORDINATE_CARTESIAN = 0, /**< X/Y plane */
+  UI_CHART_COORDINATE_POLAR = 1      /**< Angle/Radius plane */
 };
 
 /**
  * @brief Types of scales used to map abstract values to physical pixels.
  */
 enum ui_chart_scale_type {
-  UI_CHART_SCALE_LINEAR = 0,
-  UI_CHART_SCALE_LOGARITHMIC = 1,
-  UI_CHART_SCALE_TIME = 2
+  UI_CHART_SCALE_LINEAR = 0,      /**< Linear numeric scale */
+  UI_CHART_SCALE_LOGARITHMIC = 1, /**< Logarithmic scale */
+  UI_CHART_SCALE_TIME = 2         /**< Time/Date scale */
 };
 
 /**

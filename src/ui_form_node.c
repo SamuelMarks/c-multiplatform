@@ -4,6 +4,13 @@
 #include "ui_form_array.h"
 /* clang-format on */
 
+/**
+ * @brief _ui_form_node_get_status_internal.
+ * @param node Parameter node.
+ * @param out_status Parameter out_status.
+ * @param depth Parameter depth.
+ * @return Return value.
+ */
 ui_error_t _ui_form_node_get_status_internal(ui_form_node_t node,
                                              enum ui_form_status *out_status,
                                              size_t depth) {

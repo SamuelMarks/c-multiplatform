@@ -1,3 +1,8 @@
+/**
+ * @file ui_autocomplete_base.h
+ * @brief Autocomplete base component definitions.
+ */
+
 #ifndef UI_AUTOCOMPLETE_BASE_H
 #define UI_AUTOCOMPLETE_BASE_H
 
@@ -15,8 +20,13 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/** @brief Opaque handle representing an autocomplete component. */
 struct ui_autocomplete_base;
+
+/** @brief Forward declaration of ui_overlay_director. */
 struct ui_overlay_director;
+
+/** @brief Forward declaration of ui_focus_manager. */
 struct ui_focus_manager;
 
 /**
@@ -26,6 +36,7 @@ struct ui_focus_manager;
  * @param autocomplete The autocomplete component.
  * @param index The selected item index.
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_autocomplete_on_selection_t)(
     struct ui_autocomplete_base *autocomplete, int index, void *user_data);
@@ -37,6 +48,7 @@ typedef ui_error_t (*ui_autocomplete_on_selection_t)(
  * @param autocomplete The autocomplete component.
  * @param text The new text string.
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_autocomplete_on_text_change_t)(
     struct ui_autocomplete_base *autocomplete, const char *text,
@@ -57,6 +69,7 @@ ui_autocomplete_base_create(struct ui_autocomplete_base **out_autocomplete,
  * @brief Destroys an autocomplete component.
  *
  * @param autocomplete The autocomplete to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete);
@@ -65,7 +78,8 @@ ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete);
  * @brief Retrieves the root UI component (which wraps the input).
  *
  * @param autocomplete The autocomplete.
- * @return The component, or NULL.
+ * @param out_component Pointer to receive the component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_autocomplete_base_get_component(struct ui_autocomplete_base *autocomplete,
@@ -75,7 +89,8 @@ ui_autocomplete_base_get_component(struct ui_autocomplete_base *autocomplete,
  * @brief Retrieves the internal input base component.
  *
  * @param autocomplete The autocomplete.
- * @return The input base, or NULL.
+ * @param out_input Pointer to receive the input base.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_autocomplete_base_get_input(struct ui_autocomplete_base *autocomplete,
@@ -85,7 +100,8 @@ ui_autocomplete_base_get_input(struct ui_autocomplete_base *autocomplete,
  * @brief Retrieves the internal listbox base component.
  *
  * @param autocomplete The autocomplete.
- * @return The listbox base, or NULL.
+ * @param out_listbox Pointer to receive the listbox base.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_autocomplete_base_get_listbox(struct ui_autocomplete_base *autocomplete,

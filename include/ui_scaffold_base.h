@@ -1,3 +1,9 @@
+/**
+ * @file ui_scaffold_base.h
+ * @brief Scaffold component providing high-level app layouts (app bars,
+ * drawers).
+ */
+
 #ifndef UI_SCAFFOLD_BASE_H
 #define UI_SCAFFOLD_BASE_H
 

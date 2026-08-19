@@ -1,3 +1,8 @@
+/**
+ * @file ui_input_mask.h
+ * @brief Input masking utilities for form fields.
+ */
+
 /* clang-format off */
 #ifndef UI_INPUT_MASK_H
 #define UI_INPUT_MASK_H

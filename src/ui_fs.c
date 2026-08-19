@@ -13,6 +13,13 @@ int g_ui_fs_ftell_fail = 0;
 int g_ui_fs_fread_fail = 0;
 int g_ui_fs_fwrite_fail = 0;
 
+/**
+ * @brief mock_fseek.
+ * @param stream Parameter stream.
+ * @param offset Parameter offset.
+ * @param whence Parameter whence.
+ * @return Return value.
+ */
 static int mock_fseek(FILE *stream, long offset, int whence) {
   if (g_ui_fs_fseek_fail > 0) {
     g_ui_fs_fseek_fail--;
@@ -21,6 +28,11 @@ static int mock_fseek(FILE *stream, long offset, int whence) {
   }
   return fseek(stream, offset, whence);
 }
+/**
+ * @brief mock_ftell.
+ * @param stream Parameter stream.
+ * @return Return value.
+ */
 static long mock_ftell(FILE *stream) {
   if (g_ui_fs_ftell_fail == 1)
     return -1;
@@ -28,11 +40,27 @@ static long mock_ftell(FILE *stream) {
     return 0x40000000; /* Trigger huge file size check */
   return ftell(stream);
 }
+/**
+ * @brief mock_fread.
+ * @param ptr Parameter ptr.
+ * @param size Parameter size.
+ * @param nmemb Parameter nmemb.
+ * @param stream Parameter stream.
+ * @return Return value.
+ */
 static size_t mock_fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
   if (g_ui_fs_fread_fail)
     return 0;
   return fread(ptr, size, nmemb, stream);
 }
+/**
+ * @brief mock_fwrite.
+ * @param ptr Parameter ptr.
+ * @param size Parameter size.
+ * @param nmemb Parameter nmemb.
+ * @param stream Parameter stream.
+ * @return Return value.
+ */
 static size_t mock_fwrite(const void *ptr, size_t size, size_t nmemb,
                           FILE *stream) {
   if (g_ui_fs_fwrite_fail)
@@ -84,6 +112,13 @@ EM_JS(int, fs_write_file_js,
       })
 #endif
 
+/**
+ * @brief ui_fs_read_file.
+ * @param path Parameter path.
+ * @param out_data Parameter out_data.
+ * @param out_size Parameter out_size.
+ * @return Return value.
+ */
 ui_error_t ui_fs_read_file(const char *path, void **out_data,
                            size_t *out_size) {
   if (!path || !out_data || !out_size)
@@ -157,6 +192,13 @@ ui_error_t ui_fs_read_file(const char *path, void **out_data,
 #endif
 }
 
+/**
+ * @brief ui_fs_write_file.
+ * @param path Parameter path.
+ * @param data Parameter data.
+ * @param size Parameter size.
+ * @return Return value.
+ */
 ui_error_t ui_fs_write_file(const char *path, const void *data, size_t size) {
   if (!path || !data)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -213,6 +255,13 @@ EM_JS(int, fs_opfs_write_sync_js,
       })
 #endif
 
+/**
+ * @brief ui_fs_write_file_opfs_sync.
+ * @param path Parameter path.
+ * @param data Parameter data.
+ * @param size Parameter size.
+ * @return Return value.
+ */
 ui_error_t ui_fs_write_file_opfs_sync(const char *path, const void *data,
                                       size_t size) {
   if (!path || !data)

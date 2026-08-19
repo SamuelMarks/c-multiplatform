@@ -1,3 +1,8 @@
+/**
+ * @file ui_av_sync.h
+ * @brief Audio/Video synchronization clock manager.
+ */
+
 #ifndef UI_AV_SYNC_H
 #define UI_AV_SYNC_H
 

@@ -1,3 +1,8 @@
+/**
+ * @file ui_search_bar_base.h
+ * @brief Base search bar component definitions.
+ */
+
 #ifndef UI_SEARCH_BAR_BASE_H
 #define UI_SEARCH_BAR_BASE_H
 

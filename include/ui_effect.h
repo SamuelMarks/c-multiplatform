@@ -1,3 +1,8 @@
+/**
+ * @file ui_effect.h
+ * @brief Side effect management (used by the reactive graph).
+ */
+
 #ifndef UI_EFFECT_H
 #define UI_EFFECT_H
 

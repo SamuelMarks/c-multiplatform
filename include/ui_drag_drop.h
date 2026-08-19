@@ -1,3 +1,8 @@
+/**
+ * @file ui_drag_drop.h
+ * @brief Drag and drop context and configuration state for UI components.
+ */
+
 #ifndef UI_DRAG_DROP_H
 #define UI_DRAG_DROP_H
 

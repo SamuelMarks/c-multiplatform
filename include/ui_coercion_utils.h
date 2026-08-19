@@ -1,3 +1,8 @@
+/**
+ * @file ui_coercion_utils.h
+ * @brief Utilities for safe type coercion and string formatting.
+ */
+
 #ifndef UI_COERCION_UTILS_H
 #define UI_COERCION_UTILS_H
 

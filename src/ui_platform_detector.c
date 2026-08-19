@@ -8,7 +8,6 @@
 
 #if defined(_WIN32)
 #include <winsock2.h> /* Prevents windows.h bloat issues occasionally */
-/* clang-format on */
 /* For actual capability detection, GetSystemMetrics etc could be used,
    but we avoid direct windows.h include unless necessary or forward declare. */
 #elif defined(__APPLE__)
@@ -16,6 +15,7 @@
 #elif defined(__linux__) || defined(__gnu_linux__) || defined(__CYGWIN__)
 /* Linux capability macros */
 #endif
+/* clang-format on */
 
 /**
  * \struct ui_platform_detector

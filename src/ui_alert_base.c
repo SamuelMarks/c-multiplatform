@@ -1,3 +1,8 @@
+/**
+ * @file ui_alert_base.c
+ * @brief Implementation of alert base component.
+ */
+
 #include "ui_alert_base.h"
 
 /* clang-format off */

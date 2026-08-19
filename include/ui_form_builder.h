@@ -1,3 +1,8 @@
+/**
+ * @file ui_form_builder.h
+ * @brief Form builder utility for creating reactive forms dynamically.
+ */
+
 #ifndef UI_FORM_BUILDER_H
 #define UI_FORM_BUILDER_H
 

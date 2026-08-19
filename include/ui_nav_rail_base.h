@@ -1,3 +1,8 @@
+/**
+ * @file ui_nav_rail_base.h
+ * @brief Navigation rail component for side-anchored app navigation.
+ */
+
 #ifndef UI_NAV_RAIL_BASE_H
 #define UI_NAV_RAIL_BASE_H
 

@@ -1,3 +1,8 @@
+/**
+ * @file ui_platform_detector.h
+ * @brief OS and hardware capability detector (touch vs mouse vs keyboard).
+ */
+
 #ifndef UI_PLATFORM_DETECTOR_H
 #define UI_PLATFORM_DETECTOR_H
 

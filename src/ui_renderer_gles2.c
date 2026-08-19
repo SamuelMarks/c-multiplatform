@@ -4,10 +4,16 @@
  */
 
 #define GL_SILENCE_DEPRECATION
+/* clang-format off */
+#include "../include/ui_renderer.h"
+#include "../include/ui_error.h"
+/* clang-format on */
+
 #if defined(_WIN32) || defined(__CYGWIN__)
 /* clang-format off */
 #include <winsock2.h>
 #include <GL/gl.h>
+#include <stddef.h>
 #include "ui_internal_mem.h"
 
 #ifndef GL_FRAGMENT_SHADER
@@ -17,6 +23,10 @@
 #define GL_ELEMENT_ARRAY_BUFFER 0x8893
 #define GL_STATIC_DRAW 0x88E4
 #define GL_DYNAMIC_DRAW 0x88E8
+#endif
+
+#ifndef GLsizeiptr
+typedef ptrdiff_t GLsizeiptr;
 #endif
 
 typedef void (__stdcall *PFNGLUSEPROGRAMPROC) (unsigned int program);

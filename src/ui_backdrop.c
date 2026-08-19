@@ -1,3 +1,9 @@
+/**
+ * @file ui_backdrop.c
+ * @brief Implementation of the backdrop component.
+ * @ingroup ui_backdrop
+ */
+
 /* clang-format off */
 #include "ui_backdrop.h"
 #include "ui_internal_mem.h"
@@ -8,6 +14,10 @@
 int g_backdrop_mock_fail = 0;
 
 ui_error_t run_backdrop_coverage(void);
+/**
+ * @brief run_backdrop_coverage.
+ * @return Return value.
+ */
 ui_error_t run_backdrop_coverage(void) {
   struct ui_backdrop *backdrop = NULL;
   struct ui_event ev;
@@ -29,11 +39,20 @@ ui_error_t run_backdrop_coverage(void) {
 }
 #endif
 
+/**
+ * @struct ui_backdrop
+ * @brief Internal representation of a backdrop component.
+ */
 struct ui_backdrop {
-  int is_active;
-  int pointer_down_was_outside;
+  int is_active;                /**< Whether the backdrop is active */
+  int pointer_down_was_outside; /**< State tracking for pointer events */
 };
 
+/**
+ * @brief ui_backdrop_create.
+ * @param out_backdrop Parameter out_backdrop.
+ * @return Return value.
+ */
 ui_error_t ui_backdrop_create(struct ui_backdrop **out_backdrop) {
   struct ui_backdrop *bd;
 
@@ -53,6 +72,11 @@ ui_error_t ui_backdrop_create(struct ui_backdrop **out_backdrop) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_backdrop_destroy.
+ * @param backdrop Parameter backdrop.
+ * @return Return value.
+ */
 ui_error_t ui_backdrop_destroy(struct ui_backdrop *backdrop) {
   if (!backdrop) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -62,6 +86,17 @@ ui_error_t ui_backdrop_destroy(struct ui_backdrop *backdrop) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief is_point_outside.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param cx Parameter cx.
+ * @param cy Parameter cy.
+ * @param cw Parameter cw.
+ * @param ch Parameter ch.
+ * @param out_is Parameter out_is.
+ * @return Return value.
+ */
 static ui_error_t is_point_outside(float x, float y, float cx, float cy,
                                    float cw, float ch, int *out_is) {
   if (x < cx) {
@@ -79,6 +114,17 @@ static ui_error_t is_point_outside(float x, float y, float cx, float cy,
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief mock_is_point_outside.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param cx Parameter cx.
+ * @param cy Parameter cy.
+ * @param cw Parameter cw.
+ * @param ch Parameter ch.
+ * @param out_is Parameter out_is.
+ * @return Return value.
+ */
 static ui_error_t mock_is_point_outside(float x, float y, float cx, float cy,
                                         float cw, float ch, int *out_is) {
   if (g_backdrop_mock_fail == 1)
@@ -89,6 +135,12 @@ static ui_error_t mock_is_point_outside(float x, float y, float cx, float cy,
 #define is_point_outside mock_is_point_outside
 #endif
 
+/**
+ * @brief ui_backdrop_set_active.
+ * @param backdrop Parameter backdrop.
+ * @param is_active Parameter is_active.
+ * @return Return value.
+ */
 ui_error_t ui_backdrop_set_active(struct ui_backdrop *backdrop, int is_active) {
   if (!backdrop) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -97,6 +149,17 @@ ui_error_t ui_backdrop_set_active(struct ui_backdrop *backdrop, int is_active) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_backdrop_process_event.
+ * @param backdrop Parameter backdrop.
+ * @param event Parameter event.
+ * @param content_x Parameter content_x.
+ * @param content_y Parameter content_y.
+ * @param content_width Parameter content_width.
+ * @param content_height Parameter content_height.
+ * @param out_should_dismiss Parameter out_should_dismiss.
+ * @return Return value.
+ */
 ui_error_t ui_backdrop_process_event(struct ui_backdrop *backdrop,
                                      const struct ui_event *event,
                                      float content_x, float content_y,

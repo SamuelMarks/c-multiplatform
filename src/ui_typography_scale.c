@@ -2,6 +2,12 @@
 #include "ui_typography_scale.h"
 /* clang-format on */
 
+/**
+ * @brief ui_typography_scale_get_metrics.
+ * @param scale Parameter scale.
+ * @param out_metrics Parameter out_metrics.
+ * @return Return value.
+ */
 ui_error_t
 ui_typography_scale_get_metrics(enum ui_typography_scale scale,
                                 struct ui_typography_metrics *out_metrics) {

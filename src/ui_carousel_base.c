@@ -1,3 +1,8 @@
+/**
+ * @file ui_carousel_base.c
+ * @brief Implementation of the carousel base component.
+ */
+
 /* clang-format off */
 #include "ui_carousel_base.h"
 #include "ui_internal_mem.h"
@@ -80,8 +85,8 @@ static const char ui_carousel_base_css[] =
     "top: 0; left: 0; right: 0; bottom: 0; "
     "}";
 
-/** \brief ui_carousel_base */
 /**
+ * @struct ui_carousel_base
  * @brief Internal representation of a carousel base component.
  */
 struct ui_carousel_base {
@@ -259,7 +264,6 @@ ui_error_t ui_carousel_base_set_item_count(struct ui_carousel_base *carousel,
   return ui_virtual_scroll_base_set_item_count(carousel->virtual_scroll, count);
 }
 
-/** \brief ui_error */
 ui_error_t ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
                                               float width, float height) {
   if (!carousel)
@@ -268,7 +272,6 @@ ui_error_t ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
                                                   width, height);
 }
 
-/** \brief ui_error */
 ui_error_t ui_carousel_base_get_component(struct ui_carousel_base *carousel,
                                           struct ui_component **out_component) {
   if (!carousel || !out_component) {
@@ -368,7 +371,6 @@ ui_error_t ui_carousel_base_tick(struct ui_carousel_base *carousel,
                                        carousel->current_scroll);
 }
 
-/** \brief ui_error */
 ui_error_t ui_carousel_base_scroll_to_index(struct ui_carousel_base *carousel,
                                             size_t index, int smooth) {
   if (!carousel)

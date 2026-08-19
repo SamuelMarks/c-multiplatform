@@ -46,23 +46,50 @@ struct ui_css_tokenizer {
   size_t len;
 };
 
+/**
+ * @brief advance.
+ * @param tz Parameter tz.
+ * @return Return value.
+ */
 static void advance(struct ui_css_tokenizer *tz) { tz->pos++; }
 
+/**
+ * @brief peek.
+ * @param tz Parameter tz.
+ * @param out_char Parameter out_char.
+ * @return Return value.
+ */
 static void peek(struct ui_css_tokenizer *tz, char *out_char) {
   *out_char = tz->text[tz->pos];
 }
 
+/**
+ * @brief is_ident_start.
+ * @param c Parameter c.
+ * @param out_is_start Parameter out_is_start.
+ * @return Return value.
+ */
 static void is_ident_start(char c, int *out_is_start) {
   *out_is_start = isalpha((unsigned char)c) || c == '_' || c == '-';
 }
 
+/**
+ * @brief is_ident_char.
+ * @param c Parameter c.
+ * @param out_is_char Parameter out_is_char.
+ * @return Return value.
+ */
 static void is_ident_char(char c, int *out_is_char) {
   *out_is_char = isalnum((unsigned char)c) || c == '_' || c == '-';
 }
 
+/**
+ * @brief skip_whitespace_and_comments.
+ * @param tz Parameter tz.
+ * @return Return value.
+ */
 static void skip_whitespace_and_comments(struct ui_css_tokenizer *tz) {
   char c;
-  ui_error_t rc;
   while (tz->pos < tz->len) {
     peek(tz, &c);
     if (isspace((unsigned char)c)) {
@@ -86,11 +113,16 @@ static void skip_whitespace_and_comments(struct ui_css_tokenizer *tz) {
   }
 }
 
+/**
+ * @brief next_token.
+ * @param tz Parameter tz.
+ * @param out_token Parameter out_token.
+ * @return Return value.
+ */
 static void next_token(struct ui_css_tokenizer *tz,
                        struct ui_css_token *out_token) {
   struct ui_css_token t;
   char c;
-  ui_error_t rc;
 
   skip_whitespace_and_comments(tz);
 
@@ -329,6 +361,12 @@ static void next_token(struct ui_css_tokenizer *tz,
   }
 }
 
+/**
+ * @brief dup_token_str.
+ * @param t Parameter t.
+ * @param out_str Parameter out_str.
+ * @return Return value.
+ */
 static ui_error_t dup_token_str(const struct ui_css_token *t, char **out_str) {
   char *s = (char *)C_MULTIPLATFORM_MALLOC(t->length + 1);
   if (!s) {
@@ -341,6 +379,13 @@ static ui_error_t dup_token_str(const struct ui_css_token *t, char **out_str) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief dup_range_trim.
+ * @param start Parameter start.
+ * @param end Parameter end.
+ * @param out_str Parameter out_str.
+ * @return Return value.
+ */
 static ui_error_t dup_range_trim(const char *start, const char *end,
                                  char **out_str) {
   const char *s = start;
@@ -366,6 +411,13 @@ static ui_error_t dup_range_trim(const char *start, const char *end,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_selectors.
+ * @param tz Parameter tz.
+ * @param inout_token Parameter inout_token.
+ * @param out_selectors Parameter out_selectors.
+ * @return Return value.
+ */
 static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
                                   struct ui_css_token *inout_token,
                                   struct ui_css_selector **out_selectors) {
@@ -617,6 +669,13 @@ cleanup: {
   return rc;
 }
 
+/**
+ * @brief is_nested_rule.
+ * @param tz Parameter tz.
+ * @param first_token Parameter first_token.
+ * @param out_is_nested Parameter out_is_nested.
+ * @return Return value.
+ */
 static void is_nested_rule(struct ui_css_tokenizer *tz,
                            struct ui_css_token first_token,
                            int *out_is_nested) {
@@ -651,6 +710,14 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                                   struct ui_css_stylesheet *sheet,
                                   struct ui_css_rule **out_rules);
 
+/**
+ * @brief parse_rule_list.
+ * @param tz Parameter tz.
+ * @param inout_token Parameter inout_token.
+ * @param sheet Parameter sheet.
+ * @param out_rules Parameter out_rules.
+ * @return Return value.
+ */
 static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                                   struct ui_css_token *inout_token,
                                   struct ui_css_stylesheet *sheet,

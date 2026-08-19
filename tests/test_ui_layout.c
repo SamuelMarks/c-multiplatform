@@ -1502,10 +1502,10 @@ void test_more_layout(void) {
   ui_css_stylesheet_destroy(sheet);
 }
 void test_coverage_layout(void) {
-  struct ui_dom_node *root;
-  struct ui_css_stylesheet *sheet;
-  struct ui_layout_node *lroot;
-  struct ui_css_rule *rule;
+  struct ui_dom_node *root = NULL;
+  struct ui_css_stylesheet *sheet = NULL;
+  struct ui_layout_node *lroot = NULL;
+  struct ui_css_rule *rule = NULL;
 
   ui_layout_tree_generate(NULL, NULL, NULL); /* covers early exit */
   ui_layout_tree_generate(root, NULL, NULL);

@@ -1,3 +1,12 @@
+/**
+ * @file ui_tonal_palette.h
+ * @brief Material 3 Tonal Palette generation.
+ *
+ * @defgroup TonalPalette Tonal Palette
+ * @brief Utilities to generate a tonal color palette from a key color.
+ * @{
+ */
+
 #ifndef UI_TONAL_PALETTE_H
 #define UI_TONAL_PALETTE_H
 
@@ -50,3 +59,5 @@ ui_error_t ui_tonal_palette_get_tone(const struct ui_tonal_palette *palette,
 #endif /* __cplusplus */
 
 #endif /* UI_TONAL_PALETTE_H */
+
+/** @} */

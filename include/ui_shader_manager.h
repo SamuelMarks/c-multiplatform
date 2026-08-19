@@ -1,3 +1,8 @@
+/**
+ * @file ui_shader_manager.h
+ * @brief Shader compilation, caching, and uniform management.
+ */
+
 #ifndef UI_SHADER_MANAGER_H
 #define UI_SHADER_MANAGER_H
 

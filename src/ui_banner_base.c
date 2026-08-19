@@ -1,3 +1,8 @@
+/**
+ * @file ui_banner_base.c
+ * @brief Implementation of the banner base component.
+ */
+
 /* clang-format off */
 #include "ui_banner_base.h"
 #include "ui_internal_mem.h"
@@ -87,10 +92,10 @@ ui_error_t run_banner_coverage(void) {
  * @brief Internal state for a banner component.
  */
 struct ui_banner_base {
-  struct ui_component *base;
-  int is_open;
-  struct ui_signal *open_signal;
-  struct ui_computed *animating_signal;
+  struct ui_component *base;            /**< Core UI component */
+  int is_open;                          /**< Open state flag */
+  struct ui_signal *open_signal;        /**< Bound open state signal */
+  struct ui_computed *animating_signal; /**< Animating state signal */
 };
 
 ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {

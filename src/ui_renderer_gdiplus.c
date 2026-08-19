@@ -186,6 +186,11 @@ struct gdiplus_context {
   int current_height;
 };
 
+/**
+ * @brief ui_color_to_argb.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static ARGB ui_color_to_argb(const struct ui_color *c) {
   BYTE a = (BYTE)(c->a * 255.0f);
   BYTE r = (BYTE)(c->r * 255.0f);
@@ -194,6 +199,11 @@ static ARGB ui_color_to_argb(const struct ui_color *c) {
   return ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
 }
 
+/**
+ * @brief ui_css_color_to_argb.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static ARGB ui_css_color_to_argb(const struct ui_css_color *c) {
   /* Assuming SRGB for now */
   BYTE a = (BYTE)(c->components[3] * 255.0f);
@@ -203,6 +213,13 @@ static ARGB ui_css_color_to_argb(const struct ui_css_color *c) {
   return ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
 }
 
+/**
+ * @brief gdiplus_begin_frame.
+ * @param ctx Parameter ctx.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @return Return value.
+ */
 static int gdiplus_begin_frame(void *ctx, int width, int height) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
 
@@ -238,6 +255,11 @@ static int gdiplus_begin_frame(void *ctx, int width, int height) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_end_frame.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 static int gdiplus_end_frame(void *ctx) {
   /* For offscreen, nothing to do here.
      When blitting to screen, we would extract the bitmap or draw it to the
@@ -246,6 +268,13 @@ static int gdiplus_end_frame(void *ctx) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_draw_rect.
+ * @param ctx Parameter ctx.
+ * @param r Parameter r.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static int gdiplus_draw_rect(void *ctx, const struct ui_rect *r,
                              const struct ui_color *c) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
@@ -263,6 +292,14 @@ static int gdiplus_draw_rect(void *ctx, const struct ui_rect *r,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
+/**
+ * @brief gdiplus_draw_text.
+ * @param ctx Parameter ctx.
+ * @param text Parameter text.
+ * @param f Parameter f.
+ * @param r Parameter r.
+ * @return Return value.
+ */
 static int gdiplus_draw_text(void *ctx, const char *text,
                              const struct ui_font *f, const struct ui_rect *r) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
@@ -351,6 +388,13 @@ static int gdiplus_draw_text(void *ctx, const char *text,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_draw_image.
+ * @param ctx Parameter ctx.
+ * @param img Parameter img.
+ * @param r Parameter r.
+ * @return Return value.
+ */
 static int gdiplus_draw_image(void *ctx, const struct ui_image *img,
                               const struct ui_rect *r) {
   (void)ctx;
@@ -360,6 +404,13 @@ static int gdiplus_draw_image(void *ctx, const struct ui_image *img,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_draw_gradient.
+ * @param ctx Parameter ctx.
+ * @param r Parameter r.
+ * @param gradient Parameter gradient.
+ * @return Return value.
+ */
 static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
                                  const struct ui_css_image *gradient) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
@@ -468,6 +519,13 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
+/**
+ * @brief gdiplus_draw_path.
+ * @param ctx Parameter ctx.
+ * @param p Parameter p.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static int gdiplus_draw_path(void *ctx, const struct ui_path *p,
                              const struct ui_color *c) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
@@ -516,6 +574,12 @@ static int gdiplus_draw_path(void *ctx, const struct ui_path *p,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_push_clip.
+ * @param ctx Parameter ctx.
+ * @param r Parameter r.
+ * @return Return value.
+ */
 static int gdiplus_push_clip(void *ctx, const struct ui_rect *r) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   if (!gctx || !gctx->graphics || !r)
@@ -525,6 +589,11 @@ static int gdiplus_push_clip(void *ctx, const struct ui_rect *r) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_pop_clip.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 static int gdiplus_pop_clip(void *ctx) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   if (!gctx || !gctx->graphics)
@@ -533,6 +602,12 @@ static int gdiplus_pop_clip(void *ctx) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_set_blend_mode.
+ * @param ctx Parameter ctx.
+ * @param mode Parameter mode.
+ * @return Return value.
+ */
 static int gdiplus_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   (void)ctx;
   (void)mode;
@@ -540,6 +615,12 @@ static int gdiplus_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_set_shadow.
+ * @param ctx Parameter ctx.
+ * @param shadow Parameter shadow.
+ * @return Return value.
+ */
 static int gdiplus_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   (void)ctx;
   (void)shadow;
@@ -547,6 +628,12 @@ static int gdiplus_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_read_pixels.
+ * @param ctx Parameter ctx.
+ * @param out_rgba_buffer Parameter out_rgba_buffer.
+ * @return Return value.
+ */
 static int gdiplus_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   BitmapData bitmapData;
@@ -592,6 +679,11 @@ static int gdiplus_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief gdiplus_destroy.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 static int gdiplus_destroy(void *ctx) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   if (gctx) {
@@ -612,6 +704,11 @@ static const struct ui_renderer_vtable gdiplus_vtable = {
     gdiplus_set_blend_mode, gdiplus_set_shadow, gdiplus_read_pixels,
     gdiplus_destroy};
 
+/**
+ * @brief ui_renderer_native_init.
+ * @param renderer Parameter renderer.
+ * @return Return value.
+ */
 ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
   struct gdiplus_context *gctx;
   struct GdiplusStartupInput input;

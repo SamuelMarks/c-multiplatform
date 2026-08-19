@@ -155,7 +155,7 @@ static int test_search_bar_cva(void) {
   struct ui_search_bar_base sb;
   struct ui_component comp;
   struct ui_control_value_accessor cva;
-  union ui_signal_payload val;
+  union ui_signal_payload val = {0};
   ui_error_t err;
   void *ud1 = (void *)0x111;
   void *ud2 = (void *)0x222;

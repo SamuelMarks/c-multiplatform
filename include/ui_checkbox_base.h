@@ -1,6 +1,14 @@
 #ifndef UI_CHECKBOX_BASE_H
 #define UI_CHECKBOX_BASE_H
 
+/**
+ * @file ui_checkbox_base.h
+ * @brief Base checkbox component functionality.
+ *
+ * Provides a tri-state checkbox primitive, supporting unchecked,
+ * checked, and indeterminate states.
+ */
+
 /* clang-format off */
 #include "ui_error.h"
 #include "ui_control_value_accessor.h"
@@ -14,8 +22,11 @@ extern "C" {
  * @brief Represents the three possible states of a tri-state checkbox.
  */
 enum ui_checkbox_state {
+  /** @brief The checkbox is not checked. */
   UI_CHECKBOX_STATE_UNCHECKED = 0,
+  /** @brief The checkbox is checked. */
   UI_CHECKBOX_STATE_CHECKED = 1,
+  /** @brief The checkbox is in an indeterminate state. */
   UI_CHECKBOX_STATE_INDETERMINATE = 2
 };
 
@@ -38,6 +49,8 @@ ui_error_t ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox);
  *
  * @param checkbox The checkbox instance to destroy. If null, this function does
  * nothing.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if checkbox is
+ * null.
  */
 ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox);
 
@@ -72,6 +85,8 @@ ui_error_t ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if checkbox is
  * null.
  */
+ui_error_t ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox);
+
 /**
  * @brief Gets the CVA vtable for this component.
  * @param checkbox The checkbox.
@@ -80,8 +95,6 @@ ui_error_t ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
  */
 ui_error_t ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
                                     struct ui_control_value_accessor *out_cva);
-
-ui_error_t ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox);
 
 #ifdef __cplusplus
 }

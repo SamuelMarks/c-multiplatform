@@ -1,3 +1,12 @@
+/**
+ * @file ui_signal.h
+ * @brief Signal implementation for reactive state.
+ *
+ * @defgroup Signal Signal
+ * @brief Reactive state management through signals.
+ * @{
+ */
+
 #ifndef UI_SIGNAL_H
 #define UI_SIGNAL_H
 
@@ -53,6 +62,11 @@ union ui_signal_payload {
   /** @brief Boolean value representation. */
   ui_bool_t bool_val;
 };
+
+/**
+ * @brief Opaque structure for a signal.
+ */
+struct ui_signal;
 
 /**
  * @brief Opaque handle to a signal.
@@ -151,3 +165,5 @@ ui_error_t ui_signal_destroy(ui_signal_t *signal);
 #endif /* __cplusplus */
 
 #endif /* UI_SIGNAL_H */
+
+/** @} */

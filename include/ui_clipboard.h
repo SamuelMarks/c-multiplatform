@@ -1,3 +1,8 @@
+/**
+ * @file ui_clipboard.h
+ * @brief System clipboard abstraction.
+ */
+
 #ifndef UI_CLIPBOARD_H
 #define UI_CLIPBOARD_H
 
@@ -31,11 +36,13 @@ ui_error_t ui_clipboard_get_text(char **out_text);
  * @brief Frees text allocated by ui_clipboard_get_text.
  *
  * @param text The text to free.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_clipboard_free_text(char *text);
 
 /**
  * @brief Clears the fallback memory clipboard, if any was allocated.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_clipboard_cleanup(void);
 

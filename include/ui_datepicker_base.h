@@ -1,3 +1,8 @@
+/**
+ * @file ui_datepicker_base.h
+ * @brief Datepicker base component.
+ */
+
 #ifndef UI_DATEPICKER_BASE_H
 #define UI_DATEPICKER_BASE_H
 
@@ -11,8 +16,13 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/** @brief Opaque handle representing a datepicker base component. */
 struct ui_datepicker_base;
+
+/** @brief Forward declaration of ui_input_base. */
 struct ui_input_base;
+
+/** @brief Forward declaration of ui_popover_base. */
 struct ui_popover_base;
 
 /**
@@ -37,6 +47,7 @@ ui_error_t ui_datepicker_base_create(struct ui_datepicker_base **out_datepicker,
  * input/popover/calendar.
  *
  * @param datepicker The datepicker to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_datepicker_base_destroy(struct ui_datepicker_base *datepicker);
 

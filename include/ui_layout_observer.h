@@ -1,3 +1,8 @@
+/**
+ * @file ui_layout_observer.h
+ * @brief Layout breakpoint and resize observer.
+ */
+
 #ifndef UI_LAYOUT_OBSERVER_H
 #define UI_LAYOUT_OBSERVER_H
 

@@ -2,6 +2,15 @@
 #include "ui_geometry.h"
 /* clang-format on */
 
+/**
+ * @brief ui_dom_point_init.
+ * @param point Parameter point.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param z Parameter z.
+ * @param w Parameter w.
+ * @return Return value.
+ */
 ui_error_t ui_dom_point_init(struct ui_dom_point *point, double x, double y,
                              double z, double w) {
   if (!point) {
@@ -14,6 +23,15 @@ ui_error_t ui_dom_point_init(struct ui_dom_point *point, double x, double y,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_dom_rect_init.
+ * @param rect Parameter rect.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @return Return value.
+ */
 ui_error_t ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
                             double width, double height) {
   if (!rect) {
@@ -43,6 +61,14 @@ ui_error_t ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief get_min.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param c Parameter c.
+ * @param d Parameter d.
+ * @return Return value.
+ */
 static double get_min(double a, double b, double c, double d) {
   double min;
   min = a;
@@ -55,6 +81,14 @@ static double get_min(double a, double b, double c, double d) {
   return min;
 }
 
+/**
+ * @brief get_max.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param c Parameter c.
+ * @param d Parameter d.
+ * @return Return value.
+ */
 static double get_max(double a, double b, double c, double d) {
   double max;
   max = a;
@@ -67,6 +101,15 @@ static double get_max(double a, double b, double c, double d) {
   return max;
 }
 
+/**
+ * @brief ui_dom_quad_init.
+ * @param quad Parameter quad.
+ * @param p1 Parameter p1.
+ * @param p2 Parameter p2.
+ * @param p3 Parameter p3.
+ * @param p4 Parameter p4.
+ * @return Return value.
+ */
 ui_error_t ui_dom_quad_init(struct ui_dom_quad *quad,
                             const struct ui_dom_point *p1,
                             const struct ui_dom_point *p2,
@@ -92,6 +135,11 @@ ui_error_t ui_dom_quad_init(struct ui_dom_quad *quad,
                           max_y - min_y);
 }
 
+/**
+ * @brief ui_dom_matrix_init_identity.
+ * @param matrix Parameter matrix.
+ * @return Return value.
+ */
 ui_error_t ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix) {
   if (!matrix) {
     return UI_ERROR_INVALID_ARGUMENT;

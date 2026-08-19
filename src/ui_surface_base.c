@@ -4,6 +4,11 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief ui_surface_base_create.
+ * @param out_surface Parameter out_surface.
+ * @return Return value.
+ */
 ui_error_t ui_surface_base_create(struct ui_surface_base **out_surface) {
   struct ui_surface_base *surface;
   struct ui_component *base_comp;
@@ -48,6 +53,12 @@ ui_error_t ui_surface_base_create(struct ui_surface_base **out_surface) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_surface_base_set_elevation.
+ * @param surface Parameter surface.
+ * @param level Parameter level.
+ * @return Return value.
+ */
 ui_error_t ui_surface_base_set_elevation(struct ui_surface_base *surface,
                                          enum ui_elevation_level level) {
   char level_str[16];
@@ -68,6 +79,12 @@ ui_error_t ui_surface_base_set_elevation(struct ui_surface_base *surface,
                                    level_str);
 }
 
+/**
+ * @brief ui_surface_base_bind_data.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_surface_base_bind_data(struct ui_surface_base *widget,
                                      struct ui_signal *signal) {
   if (!widget) {

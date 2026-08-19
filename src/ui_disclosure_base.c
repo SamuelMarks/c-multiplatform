@@ -53,6 +53,11 @@ struct ui_disclosure_base {
   struct ui_signal *data_signal;
 };
 
+/**
+ * @brief update_dom_state.
+ * @param disclosure Parameter disclosure.
+ * @return Return value.
+ */
 static ui_error_t update_dom_state(struct ui_disclosure_base *disclosure) {
   if (disclosure->is_expanded) {
     ui_error_t rc = ui_dom_node_set_attribute(
@@ -66,6 +71,11 @@ static ui_error_t update_dom_state(struct ui_disclosure_base *disclosure) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_disclosure_base_create.
+ * @param out_disclosure Parameter out_disclosure.
+ * @return Return value.
+ */
 ui_error_t
 ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
   struct ui_disclosure_base *disclosure;
@@ -146,6 +156,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_disclosure_base_destroy.
+ * @param disclosure Parameter disclosure.
+ * @return Return value.
+ */
 ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
   if (!disclosure) {
     return UI_ERROR_NONE;
@@ -158,6 +173,12 @@ ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_disclosure_base_set_disabled.
+ * @param disclosure Parameter disclosure.
+ * @param disabled Parameter disabled.
+ * @return Return value.
+ */
 ui_error_t
 ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
                                 int disabled) {
@@ -181,6 +202,12 @@ ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_disclosure_base_set_expanded.
+ * @param disclosure Parameter disclosure.
+ * @param is_expanded Parameter is_expanded.
+ * @return Return value.
+ */
 ui_error_t
 ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
                                 int is_expanded) {
@@ -207,6 +234,12 @@ ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_disclosure_base_is_expanded.
+ * @param disclosure Parameter disclosure.
+ * @param out_is_expanded Parameter out_is_expanded.
+ * @return Return value.
+ */
 ui_error_t
 ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
                                int *out_is_expanded) {
@@ -220,6 +253,13 @@ ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_disclosure_base_set_on_toggle.
+ * @param disclosure Parameter disclosure.
+ * @param on_toggle Parameter on_toggle.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 ui_error_t
 ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
                                  ui_disclosure_on_toggle_t on_toggle,
@@ -234,6 +274,13 @@ ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_disclosure_base_process_event.
+ * @param disclosure Parameter disclosure.
+ * @param event Parameter event.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @return Return value.
+ */
 ui_error_t
 ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
                                  const struct ui_event *event,
@@ -272,6 +319,12 @@ ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_disclosure_base_get_component.
+ * @param disclosure Parameter disclosure.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t
 ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
                                  struct ui_component **out_component) {
@@ -286,6 +339,12 @@ ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_disclosure_base_bind_data.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_disclosure_base_bind_data(struct ui_disclosure_base *widget,
                                         struct ui_signal *signal) {
   if (!widget) {

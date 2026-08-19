@@ -1,3 +1,8 @@
+/**
+ * @file ui_css_env.h
+ * @brief CSS Environment Variables (`env()`) manager.
+ */
+
 #ifndef UI_CSS_ENV_H
 #define UI_CSS_ENV_H
 
@@ -11,7 +16,7 @@ extern "C" {
 /* clang-format on */
 
 /**
- * @brief Represents a dictionary of CSS environment variables.
+ * @brief Opaque handle representing a dictionary of CSS environment variables.
  */
 struct ui_css_env_manager;
 
@@ -27,6 +32,7 @@ ui_error_t ui_css_env_manager_create(struct ui_css_env_manager **out_manager);
  * @brief Destroys an environment variable manager.
  *
  * @param manager The manager to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_css_env_manager_destroy(struct ui_css_env_manager *manager);
 

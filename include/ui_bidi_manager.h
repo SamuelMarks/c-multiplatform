@@ -1,3 +1,8 @@
+/**
+ * @file ui_bidi_manager.h
+ * @brief Bidirectional text and layout manager.
+ */
+
 #ifndef UI_BIDI_MANAGER_H
 #define UI_BIDI_MANAGER_H
 
@@ -29,7 +34,8 @@ ui_error_t ui_bidi_set_direction(enum ui_bidi_direction direction);
 /**
  * @brief Gets the current global bidirectional text direction.
  *
- * @return The current global direction.
+ * @param out_dir Pointer to receive the current global direction.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_bidi_get_direction(enum ui_bidi_direction *out_dir);
 
@@ -38,13 +44,14 @@ ui_error_t ui_bidi_get_direction(enum ui_bidi_direction *out_dir);
  * direction. In RTL mode, UI_KEY_LEFT becomes UI_KEY_RIGHT, and vice versa.
  *
  * @param key The input key code.
- * @return The normalized key code.
+ * @param out_key Pointer to receive the normalized key code.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_bidi_normalize_horizontal_key(enum ui_key_code key,
                                             enum ui_key_code *out_key);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_BIDI_MANAGER_H */

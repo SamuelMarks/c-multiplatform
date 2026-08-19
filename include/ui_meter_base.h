@@ -1,3 +1,8 @@
+/**
+ * @file ui_meter_base.h
+ * @brief Base meter component for displaying bounded scalar values.
+ */
+
 #ifndef UI_METER_BASE_H
 #define UI_METER_BASE_H
 

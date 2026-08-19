@@ -3067,8 +3067,6 @@ static ui_error_t layout_block(struct ui_layout_node *node,
 
   /* Check for X overflow (simplistic) */
   if (node->width > 0.0f) {
-    float actual_children_width =
-        current_x - (node->padding[3] + node->border[3]);
   }
 
   return UI_ERROR_NONE;
@@ -3496,7 +3494,6 @@ ui_error_t ui_layout_sanity_check(const struct ui_layout_node *node) {
  */
 ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
                              float available_height) {
-  ui_error_t rc;
 
   if (!node) {
     return UI_ERROR_INVALID_ARGUMENT;

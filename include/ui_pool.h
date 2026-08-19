@@ -1,3 +1,8 @@
+/**
+ * @file ui_pool.h
+ * @brief High-performance object memory pool for allocations.
+ */
+
 #ifndef UI_POOL_H
 #define UI_POOL_H
 

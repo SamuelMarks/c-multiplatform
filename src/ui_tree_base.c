@@ -52,6 +52,7 @@ ui_error_t ui_tree_base_create(struct ui_tree_base **out_tree,
   tree->num_expanded = 0;
   tree->expanded_cap = 0;
   tree->active_node = NULL;
+  tree->data_signal = NULL;
 
   rc = ui_selection_model_create(&tree->selection_model);
   if (rc != UI_ERROR_NONE) {

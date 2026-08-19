@@ -1,6 +1,22 @@
+/**
+ * @file ui_snackbar_base.h
+ * @brief Snackbar base component declarations.
+ *
+ * @defgroup SnackbarBase Snackbar Base
+ * @brief Base implementation for snackbar notifications.
+ * @{
+ */
+
 #ifndef UI_SNACKBAR_BASE_H
 #define UI_SNACKBAR_BASE_H
+
+/**
+ * @brief Opaque structure for a computed signal.
+ */
 struct ui_computed;
+/**
+ * @brief Opaque structure for a signal.
+ */
 struct ui_signal;
 
 /* clang-format off */
@@ -117,7 +133,7 @@ ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
 /**
  * @brief Binds the open state to a signal.
  *
- * @param widget The widget.
+ * @param widget The snackbar widget manager.
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
@@ -127,7 +143,7 @@ ui_error_t ui_snackbar_base_bind_open(struct ui_snackbar_base *widget,
 /**
  * @brief Retrieves the computed signal indicating if the widget is animating.
  *
- * @param widget The widget.
+ * @param widget The snackbar widget manager.
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
@@ -140,3 +156,5 @@ ui_snackbar_base_get_animating_signal(struct ui_snackbar_base *widget,
 #endif /* __cplusplus */
 
 #endif /* UI_SNACKBAR_BASE_H */
+
+/** @} */

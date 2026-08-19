@@ -2,6 +2,11 @@
 #include "ui_ripple_base.h"
 /* clang-format on */
 
+/**
+ * @brief ui_ripple_config_init.
+ * @param out_config Parameter out_config.
+ * @return Return value.
+ */
 ui_error_t ui_ripple_config_init(struct ui_ripple_config *out_config) {
   ui_error_t rc = UI_ERROR_NONE;
 
@@ -22,6 +27,14 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_ripple_start.
+ * @param config Parameter config.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param out_state Parameter out_state.
+ * @return Return value.
+ */
 ui_error_t ui_ripple_start(const struct ui_ripple_config *config, float x,
                            float y, struct ui_ripple_state *out_state) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -42,6 +55,13 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_ripple_update.
+ * @param config Parameter config.
+ * @param delta_ms Parameter delta_ms.
+ * @param state Parameter state.
+ * @return Return value.
+ */
 ui_error_t ui_ripple_update(const struct ui_ripple_config *config,
                             float delta_ms, struct ui_ripple_state *state) {
   ui_error_t rc = UI_ERROR_NONE;

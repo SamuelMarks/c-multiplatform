@@ -4,6 +4,11 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @brief ui_menubar_base_create.
+ * @param out_menubar Parameter out_menubar.
+ * @return Return value.
+ */
 ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar) {
   struct ui_menubar_base *menubar;
   struct ui_component *base_comp;
@@ -45,6 +50,12 @@ ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_menubar_base_append_item.
+ * @param menubar Parameter menubar.
+ * @param item Parameter item.
+ * @return Return value.
+ */
 ui_error_t ui_menubar_base_append_item(struct ui_menubar_base *menubar,
                                        struct ui_component *item) {
   if (!menubar || !item) {
@@ -54,6 +65,12 @@ ui_error_t ui_menubar_base_append_item(struct ui_menubar_base *menubar,
   return ui_dom_node_append_child(menubar->base.shadow_root, item->shadow_root);
 }
 
+/**
+ * @brief ui_menubar_base_bind_active_index.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
 ui_error_t ui_menubar_base_bind_active_index(struct ui_menubar_base *widget,
                                              struct ui_signal *signal) {
   if (!widget) {

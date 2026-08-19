@@ -1,3 +1,8 @@
+/**
+ * @file ui_color_picker_base.h
+ * @brief Headless color picker utility and component state manager.
+ */
+
 #ifndef UI_COLOR_PICKER_BASE_H
 #define UI_COLOR_PICKER_BASE_H
 

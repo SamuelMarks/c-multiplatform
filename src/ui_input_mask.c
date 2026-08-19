@@ -42,7 +42,7 @@ struct ui_input_mask {
  */
 static ui_error_t safe_strcpy(char *dst, size_t sz, const char *src) {
 #if defined(_MSC_VER)
-  strcpy_s(dst, sz, src);
+  strncpy_s(dst, sz, src, _TRUNCATE);
 #else
   strncpy(dst, src, sz - 1);
   dst[sz - 1] = '\0';

@@ -2,6 +2,12 @@
 #include "ui_shape_family.h"
 /* clang-format on */
 
+/**
+ * @brief ui_shape_family_get_radius.
+ * @param family Parameter family.
+ * @param out_radius Parameter out_radius.
+ * @return Return value.
+ */
 ui_error_t ui_shape_family_get_radius(enum ui_shape_family family,
                                       float *out_radius) {
   if (!out_radius) {

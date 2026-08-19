@@ -1,3 +1,13 @@
+/**
+ * @file ui_syntax_surface_base.h
+ * @brief Syntax surface base component declarations.
+ *
+ * @defgroup SyntaxSurfaceBase Syntax Surface Base
+ * @brief Base implementation for syntax highlighting surfaces extending rich
+ * text components.
+ * @{
+ */
+
 #ifndef UI_SYNTAX_SURFACE_BASE_H
 #define UI_SYNTAX_SURFACE_BASE_H
 
@@ -163,3 +173,5 @@ ui_error_t ui_syntax_surface_base_set_bracket_match(
 #endif /* __cplusplus */
 
 #endif /* UI_SYNTAX_SURFACE_BASE_H */
+
+/** @} */

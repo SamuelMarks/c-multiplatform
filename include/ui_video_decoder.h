@@ -1,16 +1,26 @@
+/**
+ * @file ui_video_decoder.h
+ * @brief Abstraction layer for hardware video decoding.
+ */
+
 #ifndef UI_VIDEO_DECODER_H
 #define UI_VIDEO_DECODER_H
+
+/* clang-format off */
+#include "ui_error.h"
+#include "ui_types.h"
+#include <stddef.h>
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* clang-format off */
-#include "ui_error.h"
-#include <stddef.h>
-
-#include "ui_types.h"
-/* clang-format on */
+/**
+ * @addtogroup ui_video_decoder Video Decoder
+ * @brief Abstraction layer for hardware video decoding.
+ * @{
+ */
 
 /**
  * @struct ui_video_decoder
@@ -23,12 +33,9 @@ struct ui_video_decoder;
  * @brief Configuration for creating a video decoder.
  */
 struct ui_video_decoder_config {
-  /** @brief The width of the video. */
-  int width;
-  /** @brief The height of the video. */
-  int height;
-  /** @brief Generic codec ID, e.g., H264, HEVC, VP9. */
-  int codec_id;
+  int width;    /**< The width of the video. */
+  int height;   /**< The height of the video. */
+  int codec_id; /**< Generic codec ID, e.g., H264, HEVC, VP9. */
 };
 
 /**
@@ -36,18 +43,12 @@ struct ui_video_decoder_config {
  * @brief Represents a decoded video frame.
  */
 struct ui_video_frame {
-  /** @brief Planar data pointers (e.g., Y, U, V or RGBA). */
-  void *data[3];
-  /** @brief Stride for each plane. */
-  int linesize[3];
-  /** @brief Width of the frame. */
-  int width;
-  /** @brief Height of the frame. */
-  int height;
-  /** @brief Pixel format enum. */
-  int format;
-  /** @brief Presentation timestamp in microseconds. */
-  ui_int64 pts;
+  void *data[3];   /**< Planar data pointers (e.g., Y, U, V or RGBA). */
+  int linesize[3]; /**< Stride for each plane. */
+  int width;       /**< Width of the frame. */
+  int height;      /**< Height of the frame. */
+  int format;      /**< Pixel format enum. */
+  ui_int64 pts;    /**< Presentation timestamp in microseconds. */
 };
 
 /**
@@ -117,10 +118,8 @@ struct ui_video_decoder_backend {
                               struct ui_video_decoder *decoder,
                               struct ui_video_frame *frame);
 
-  /**
-   * @brief Opaque user data for the specific backend implementation.
-   */
-  void *user_data;
+  void *user_data; /**< Opaque user data for the specific backend
+                      implementation. */
 };
 
 /**
@@ -131,6 +130,8 @@ struct ui_video_decoder_backend {
  */
 ui_error_t ui_video_decoder_get_default_backend(
     struct ui_video_decoder_backend *out_backend);
+
+/** @} */
 
 #ifdef __cplusplus
 }

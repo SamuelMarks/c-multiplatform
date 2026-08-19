@@ -1,6 +1,15 @@
+/**
+ * @file ui_dialog_base.h
+ * @brief Dialog base component definitions.
+ */
+
 #ifndef UI_DIALOG_BASE_H
 #define UI_DIALOG_BASE_H
+
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
+
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -16,6 +25,7 @@ extern "C" {
 #include "ui_event.h"
 /* clang-format on */
 
+/** @brief Opaque handle representing a dialog base component. */
 struct ui_dialog_base;
 
 /**
@@ -24,6 +34,7 @@ struct ui_dialog_base;
  *
  * @param dialog The dialog component.
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success.
  */
 typedef ui_error_t (*ui_dialog_on_close_t)(struct ui_dialog_base *dialog,
                                            void *user_data);
@@ -47,6 +58,7 @@ ui_error_t ui_dialog_base_create(struct ui_dialog_base **out_dialog);
  * @brief Destroys a dialog base component.
  *
  * @param dialog The dialog to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_dialog_base_destroy(struct ui_dialog_base *dialog);
 
@@ -97,7 +109,8 @@ ui_error_t ui_dialog_base_set_open(struct ui_dialog_base *dialog, int is_open);
  * @brief Checks if the dialog is currently open.
  *
  * @param dialog The dialog component.
- * @return 1 if open, 0 if closed.
+ * @param out_is_open Pointer to receive 1 if open, 0 if closed.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
                                   int *out_is_open);
@@ -131,7 +144,8 @@ ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
  * @brief Gets the underlying wrapper component of the dialog.
  *
  * @param dialog The dialog component.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_dialog_base_get_component(struct ui_dialog_base *dialog,
                                         struct ui_component **out_component);

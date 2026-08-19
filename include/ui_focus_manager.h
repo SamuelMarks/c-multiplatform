@@ -1,3 +1,8 @@
+/**
+ * @file ui_focus_manager.h
+ * @brief Manage UI focus states and spatial navigation.
+ */
+
 #ifndef UI_FOCUS_MANAGER_H
 #define UI_FOCUS_MANAGER_H
 

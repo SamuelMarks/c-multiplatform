@@ -1,3 +1,8 @@
+/**
+ * @file ui_accordion_base.c
+ * @brief Implementation of accordion base component.
+ */
+
 /* clang-format off */
 #include "ui_accordion_base.h"
 #include "ui_internal_mem.h"

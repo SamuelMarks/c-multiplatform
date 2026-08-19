@@ -37,7 +37,13 @@ extern char *ui_mock_strdup(const char *src);
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_mock_strcpy_fail;
+#if defined(__GNUC__) || defined(__clang__)
 static int mock_strcpy_fail_check(void) __attribute__((unused));
+#endif
+/**
+ * @brief mock_strcpy_fail_check.
+ * @return Return value.
+ */
 static int mock_strcpy_fail_check(void) {
   if (g_mock_strcpy_fail == 1) {
     g_mock_strcpy_fail = 0;

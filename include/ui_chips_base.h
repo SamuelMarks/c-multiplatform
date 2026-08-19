@@ -1,3 +1,9 @@
+/**
+ * @file ui_chips_base.h
+ * @brief Base component for managing a collection of interactive chips
+ * (tokens).
+ */
+
 #ifndef UI_CHIPS_BASE_H
 #define UI_CHIPS_BASE_H
 
@@ -11,6 +17,7 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief Opaque handle representing a chips collection manager. */
 struct ui_chips_base;
 
 /**
@@ -27,6 +34,7 @@ ui_error_t ui_chips_base_create(struct ui_chips_base **out_chips,
  * @brief Destroys a chips collection manager and frees its tokens.
  *
  * @param chips The chips base to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_chips_base_destroy(struct ui_chips_base *chips);
 
@@ -93,6 +101,6 @@ ui_error_t ui_chips_base_handle_backspace(struct ui_chips_base *chips,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_CHIPS_BASE_H */

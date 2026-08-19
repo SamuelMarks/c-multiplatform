@@ -1,3 +1,8 @@
+/**
+ * @file ui_chat_bubble_base.h
+ * @brief Base component for rendering chat bubbles with dynamic tails.
+ */
+
 #ifndef UI_CHAT_BUBBLE_BASE_H
 #define UI_CHAT_BUBBLE_BASE_H
 
@@ -12,6 +17,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/** @brief Forward declaration of ui_arena. */
+struct ui_arena;
 
 /**
  * @brief Opaque handle for the chat bubble base component.

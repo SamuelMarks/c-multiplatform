@@ -1,3 +1,8 @@
+/**
+ * @file ui_bottom_sheet_base.c
+ * @brief Implementation of the bottom sheet base component.
+ */
+
 /* clang-format off */
 #include "ui_bottom_sheet_base.h"
 #include "ui_internal_mem.h"
@@ -305,36 +310,36 @@ static const char ui_bottom_sheet_base_default_css[] = {
  * @brief Internal representation of a bottom sheet component.
  */
 struct ui_bottom_sheet_base {
-  struct ui_component *component;
+  struct ui_component *component; /**< Core UI component */
 
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *sheet_node;
-  struct ui_dom_node *drag_handle_node;
-  struct ui_dom_node *content_node;
+  struct ui_dom_node *root_node;        /**< Shadow root node */
+  struct ui_dom_node *sheet_node;       /**< Container for the sheet */
+  struct ui_dom_node *drag_handle_node; /**< Drag handle element */
+  struct ui_dom_node *content_node;     /**< Container for projected content */
 
-  struct ui_component *content_component;
+  struct ui_component *content_component; /**< User projected component */
 
-  int is_open;
+  int is_open; /**< Visibility state */
 
-  struct ui_overlay_director *director;
-  struct ui_backdrop *backdrop_logic;
-  struct ui_overlay *overlay;
+  struct ui_overlay_director *director; /**< Overlay manager dependency */
+  struct ui_backdrop *backdrop_logic;   /**< Backdrop click/touch handler */
+  struct ui_overlay *overlay;           /**< Active overlay reference */
 
-  struct ui_gesture_recognizer *gesture_recognizer;
+  struct ui_gesture_recognizer
+      *gesture_recognizer; /**< Handles swipe down to dismiss */
 
-  struct ui_spring_config spring_config;
-  struct ui_spring_state spring_state;
+  struct ui_spring_config spring_config; /**< Animation configuration */
+  struct ui_spring_state spring_state;   /**< Current animation state */
 
-  ui_bottom_sheet_on_close_t on_close;
-  void *user_data;
+  ui_bottom_sheet_on_close_t on_close; /**< User callback when closing */
+  void *user_data;                     /**< User data for callback */
 
-  /* Reactive integration */
-  struct ui_signal *open_signal;
-  struct ui_computed *animating_signal;
+  struct ui_signal *open_signal; /**< Signal for reacting to state changes */
+  struct ui_computed
+      *animating_signal; /**< Signal indicating animation activity */
 };
 
 static ui_error_t update_dom_state(struct ui_bottom_sheet_base *sheet) {
-
   if (sheet->is_open) {
     ui_error_t rc =
         ui_dom_node_set_attribute(sheet->sheet_node, "data-open", "true");
@@ -356,7 +361,6 @@ ui_bottom_sheet_base_create(struct ui_bottom_sheet_base **out_sheet) {
   struct ui_bottom_sheet_base *sheet;
   ui_error_t rc;
   struct ui_css_stylesheet *default_style = NULL;
-  (void)rc;
 
   if (!out_sheet) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -620,7 +624,6 @@ ui_bottom_sheet_base_process_event(struct ui_bottom_sheet_base *sheet,
   int should_dismiss = 0;
   ui_error_t rc;
   struct ui_gesture_event gesture_ev;
-  (void)rc;
 
   if (!sheet || !event) {
     return UI_ERROR_INVALID_ARGUMENT;

@@ -1,6 +1,12 @@
+/**
+ * @file ui_breadcrumbs_base.h
+ * @brief Breadcrumbs navigation base component.
+ */
+
 #ifndef UI_BREADCRUMBS_BASE_H
 #define UI_BREADCRUMBS_BASE_H
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 /* clang-format off */
@@ -14,6 +20,7 @@ struct ui_signal;
 extern "C" {
 #endif
 
+/** @brief Opaque handle to a breadcrumbs base component. */
 struct ui_breadcrumbs_base;
 
 /**
@@ -31,6 +38,7 @@ ui_breadcrumbs_base_create(struct ui_router *router,
  * @brief Destroys the breadcrumbs instance.
  *
  * @param breadcrumbs The breadcrumbs instance.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs);
 
@@ -38,7 +46,8 @@ ui_error_t ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs);
  * @brief Gets the underlying UI component for rendering.
  *
  * @param breadcrumbs The breadcrumbs instance.
- * @return Pointer to the underlying ui_component, or NULL if invalid.
+ * @param out_component Pointer to receive the underlying ui_component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_breadcrumbs_base_get_component(struct ui_breadcrumbs_base *breadcrumbs,

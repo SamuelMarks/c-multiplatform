@@ -1,3 +1,8 @@
+/**
+ * @file ui_canonical_layout_base.h
+ * @brief Canonical layout base component for responsive app scaffolds.
+ */
+
 #ifndef UI_CANONICAL_LAYOUT_BASE_H
 #define UI_CANONICAL_LAYOUT_BASE_H
 
@@ -16,9 +21,9 @@ extern "C" {
  * @brief Window size classes for macro-adaptive layouts.
  */
 enum ui_window_size_class {
-  UI_WINDOW_SIZE_CLASS_COMPACT = 0,
-  UI_WINDOW_SIZE_CLASS_MEDIUM = 1,
-  UI_WINDOW_SIZE_CLASS_EXPANDED = 2
+  UI_WINDOW_SIZE_CLASS_COMPACT = 0, /**< Compact width (e.g. phones) */
+  UI_WINDOW_SIZE_CLASS_MEDIUM = 1,  /**< Medium width (e.g. tablets) */
+  UI_WINDOW_SIZE_CLASS_EXPANDED = 2 /**< Expanded width (e.g. desktops) */
 };
 
 /**

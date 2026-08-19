@@ -19,6 +19,14 @@ struct ui_window {
     void* on_resize_user_data;
 };
 
+/**
+ * @brief window_proc.
+ * @param hwnd Parameter hwnd.
+ * @param uMsg Parameter uMsg.
+ * @param wParam Parameter wParam.
+ * @param lParam Parameter lParam.
+ * @return Return value.
+ */
 static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     struct ui_window* win;
     if (uMsg == WM_CREATE) {
@@ -58,6 +66,15 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
     return DefWindowProcA(hwnd, uMsg, wParam, lParam);
 }
 
+/**
+ * @brief win32_create_window.
+ * @param backend Parameter backend.
+ * @param title Parameter title.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param out_window Parameter out_window.
+ * @return Return value.
+ */
 static ui_error_t win32_create_window(struct ui_window_backend* backend, const char* title, int width, int height, struct ui_window** out_window) {
     struct ui_window* win;
     WNDCLASSA wc;
@@ -177,6 +194,12 @@ cleanup:
     return rc;
 }
 
+/**
+ * @brief win32_destroy_window.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
 static ui_error_t win32_destroy_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -196,6 +219,12 @@ static ui_error_t win32_destroy_window(struct ui_window_backend* backend, struct
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief win32_show_window.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
 static ui_error_t win32_show_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -204,6 +233,12 @@ static ui_error_t win32_show_window(struct ui_window_backend* backend, struct ui
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief win32_hide_window.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
 static ui_error_t win32_hide_window(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -212,6 +247,14 @@ static ui_error_t win32_hide_window(struct ui_window_backend* backend, struct ui
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief win32_poll_events.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @param out_event Parameter out_event.
+ * @param out_has_event Parameter out_has_event.
+ * @return Return value.
+ */
 static ui_error_t win32_poll_events(struct ui_window_backend* backend, struct ui_window* window, struct ui_event* out_event, int* out_has_event) {
     MSG msg;
 
@@ -242,11 +285,24 @@ static ui_error_t win32_poll_events(struct ui_window_backend* backend, struct ui
     return UI_ERROR_NONE;
 }
 
-static void* win32_get_os_handle(struct ui_window_backend* backend, struct ui_window* window) {
-    if (!backend || !window) return NULL;
-    return (void*)window->hwnd;
+/**
+ * @brief win32_get_os_handle.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
+static ui_error_t win32_get_os_handle(struct ui_window_backend* backend, struct ui_window* window, void** out_handle) {
+    if (!backend || !window || !out_handle) return UI_ERROR_INVALID_ARGUMENT;
+    *out_handle = (void*)window->hwnd;
+    return UI_ERROR_NONE;
 }
 
+/**
+ * @brief win32_swap_buffers.
+ * @param backend Parameter backend.
+ * @param window Parameter window.
+ * @return Return value.
+ */
 static ui_error_t win32_swap_buffers(struct ui_window_backend* backend, struct ui_window* window) {
     if (!backend || !window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -264,6 +320,11 @@ static ui_error_t win32_set_on_resize_callback(struct ui_window_backend* backend
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_window_backend_win32_create.
+ * @param out_backend Parameter out_backend.
+ * @return Return value.
+ */
 ui_error_t ui_window_backend_win32_create(struct ui_window_backend** out_backend) {
     struct ui_window_backend* backend;
 
@@ -291,6 +352,11 @@ ui_error_t ui_window_backend_win32_create(struct ui_window_backend** out_backend
     return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_window_backend_win32_destroy.
+ * @param backend Parameter backend.
+ * @return Return value.
+ */
 ui_error_t ui_window_backend_win32_destroy(struct ui_window_backend* backend) {
     if (!backend) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -305,6 +371,11 @@ ui_error_t ui_window_backend_win32_destroy(struct ui_window_backend* backend) {
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief ui_window_backend_win32_create.
+ * @param out_backend Parameter out_backend.
+ * @return Return value.
+ */
 ui_error_t
 ui_window_backend_win32_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {

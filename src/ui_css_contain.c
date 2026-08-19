@@ -12,12 +12,23 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 #endif
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
 }
 
+/**
+ * @brief ui_css_parse_contain.
+ * @param str Parameter str.
+ * @param out_flags Parameter out_flags.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags) {
   char token_buf[256];
   char *token;
@@ -124,6 +135,12 @@ ui_error_t ui_css_parse_content_visibility(
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief parse_intrinsic_dim.
+ * @param p_str Parameter p_str.
+ * @param dim Parameter dim.
+ * @return Return value.
+ */
 static ui_error_t
 parse_intrinsic_dim(const char **p_str,
                     struct ui_css_contain_intrinsic_dim *dim) {

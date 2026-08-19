@@ -1,3 +1,8 @@
+/**
+ * @file ui_atomic.c
+ * @brief Implementation of cross-platform atomic operations.
+ */
+
 /* clang-format off */
 #include "../include/ui_atomic.h"
 /* clang-format on */
@@ -71,9 +76,7 @@ ui_error_t ui_atomic_store(ui_atomic_t *target, long value) {
 #elif defined(__GNUC__) || defined(__clang__)
 
 ui_error_t ui_atomic_add(ui_atomic_t *target, long value, long *out_old_value) {
-  if (!target)
-    return UI_ERROR_INVALID_ARGUMENT;
-  if (!out_old_value)
+  if (!target || !out_old_value)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_old_value = __sync_fetch_and_add(target, value);
   return UI_ERROR_NONE;
@@ -81,9 +84,7 @@ ui_error_t ui_atomic_add(ui_atomic_t *target, long value, long *out_old_value) {
 
 ui_error_t ui_atomic_cas(ui_atomic_t *target, long expected, long new_value,
                          int *out_swapped) {
-  if (!target)
-    return UI_ERROR_INVALID_ARGUMENT;
-  if (!out_swapped)
+  if (!target || !out_swapped)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_swapped =
       __sync_bool_compare_and_swap(target, expected, new_value) ? 1 : 0;
@@ -92,9 +93,7 @@ ui_error_t ui_atomic_cas(ui_atomic_t *target, long expected, long new_value,
 
 ui_error_t ui_atomic_ptr_cas(void *volatile *target, void *expected,
                              void *new_value, int *out_swapped) {
-  if (!target)
-    return UI_ERROR_INVALID_ARGUMENT;
-  if (!out_swapped)
+  if (!target || !out_swapped)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_swapped =
       __sync_bool_compare_and_swap(target, expected, new_value) ? 1 : 0;
@@ -102,9 +101,7 @@ ui_error_t ui_atomic_ptr_cas(void *volatile *target, void *expected,
 }
 
 ui_error_t ui_atomic_load(ui_atomic_t *target, long *out_value) {
-  if (!target)
-    return UI_ERROR_INVALID_ARGUMENT;
-  if (!out_value)
+  if (!target || !out_value)
     return UI_ERROR_INVALID_ARGUMENT;
   *out_value = __sync_val_compare_and_swap(target, 0, 0);
   return UI_ERROR_NONE;

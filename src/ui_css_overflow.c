@@ -6,12 +6,23 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @brief skip_whitespace.
+ * @param p_str Parameter p_str.
+ * @return Return value.
+ */
 static void skip_whitespace(const char **p_str) {
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
 }
 
+/**
+ * @brief ui_css_parse_overflow.
+ * @param str Parameter str.
+ * @param out_overflow Parameter out_overflow.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_overflow(const char *str,
                                  enum ui_css_overflow *out_overflow) {
   if (!str || !out_overflow)
@@ -109,6 +120,12 @@ ui_css_parse_block_ellipsis(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_parse_line_clamp.
+ * @param str Parameter str.
+ * @param out_clamp Parameter out_clamp.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_line_clamp(const char *str,
                                    struct ui_css_line_clamp *out_clamp) {
   if (!str || !out_clamp)
@@ -136,6 +153,12 @@ ui_error_t ui_css_parse_line_clamp(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
+/**
+ * @brief ui_css_parse_max_lines.
+ * @param str Parameter str.
+ * @param out_max_lines Parameter out_max_lines.
+ * @return Return value.
+ */
 ui_error_t ui_css_parse_max_lines(const char *str,
                                   struct ui_css_max_lines *out_max_lines) {
   if (!str || !out_max_lines)

@@ -1,3 +1,8 @@
+/**
+ * @file ui_keyboard_responder.h
+ * @brief Keyboard responder mapping keystrokes to actions within components.
+ */
+
 #ifndef UI_KEYBOARD_RESPONDER_H
 #define UI_KEYBOARD_RESPONDER_H
 

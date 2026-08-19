@@ -5,6 +5,13 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief ui_cssom_insert_rule.
+ * @param stylesheet Parameter stylesheet.
+ * @param css_text Parameter css_text.
+ * @param index Parameter index.
+ * @return Return value.
+ */
 ui_error_t ui_cssom_insert_rule(struct ui_css_stylesheet *stylesheet,
                                 const char *css_text, size_t index) {
   struct ui_css_stylesheet *temp_sheet = NULL;
@@ -57,6 +64,12 @@ ui_error_t ui_cssom_insert_rule(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_cssom_delete_rule.
+ * @param stylesheet Parameter stylesheet.
+ * @param index Parameter index.
+ * @return Return value.
+ */
 ui_error_t ui_cssom_delete_rule(struct ui_css_stylesheet *stylesheet,
                                 size_t index) {
   struct ui_css_rule *prev = NULL;
@@ -87,6 +100,14 @@ ui_error_t ui_cssom_delete_rule(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_cssom_set_property.
+ * @param rule Parameter rule.
+ * @param property_name Parameter property_name.
+ * @param property_value Parameter property_value.
+ * @param is_important Parameter is_important.
+ * @return Return value.
+ */
 ui_error_t ui_cssom_set_property(struct ui_css_rule *rule,
                                  const char *property_name,
                                  const char *property_value, int is_important) {
@@ -120,6 +141,12 @@ ui_error_t ui_cssom_set_property(struct ui_css_rule *rule,
                                         is_important);
 }
 
+/**
+ * @brief ui_cssom_remove_property.
+ * @param rule Parameter rule.
+ * @param property_name Parameter property_name.
+ * @return Return value.
+ */
 ui_error_t ui_cssom_remove_property(struct ui_css_rule *rule,
                                     const char *property_name) {
   struct ui_css_declaration *prev = NULL;
@@ -148,6 +175,13 @@ ui_error_t ui_cssom_remove_property(struct ui_css_rule *rule,
   return UI_ERROR_NOT_FOUND;
 }
 
+/**
+ * @brief ui_cssom_get_property_value.
+ * @param rule Parameter rule.
+ * @param property_name Parameter property_name.
+ * @param out_value Parameter out_value.
+ * @return Return value.
+ */
 ui_error_t ui_cssom_get_property_value(const struct ui_css_rule *rule,
                                        const char *property_name,
                                        const char **out_value) {
@@ -168,6 +202,13 @@ ui_error_t ui_cssom_get_property_value(const struct ui_css_rule *rule,
   return UI_ERROR_NOT_FOUND;
 }
 
+/**
+ * @brief ui_cssom_get_property_priority.
+ * @param rule Parameter rule.
+ * @param property_name Parameter property_name.
+ * @param out_is_important Parameter out_is_important.
+ * @return Return value.
+ */
 ui_error_t ui_cssom_get_property_priority(const struct ui_css_rule *rule,
                                           const char *property_name,
                                           int *out_is_important) {

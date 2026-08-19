@@ -1,8 +1,15 @@
+/**
+ * @file ui_avatar_base.h
+ * @brief Avatar base component.
+ */
+
 #ifndef UI_AVATAR_BASE_H
 #define UI_AVATAR_BASE_H
 
+/** @brief Forward declaration of ui_computed. */
 struct ui_computed;
 
+/** @brief Forward declaration of ui_signal. */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -23,6 +30,7 @@ enum ui_avatar_type {
   UI_AVATAR_TYPE_FALLBACK_ICON /**< Displaying a fallback icon */
 };
 
+/** @brief Opaque handle to an avatar component. */
 struct ui_avatar_base;
 
 /**
@@ -38,6 +46,7 @@ ui_error_t ui_avatar_base_create(struct ui_avatar_base **out_avatar);
  * @brief Destroys an avatar base component.
  *
  * @param avatar The avatar to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_avatar_base_destroy(struct ui_avatar_base *avatar);
 
@@ -146,6 +155,6 @@ ui_error_t ui_avatar_base_bind_src(struct ui_avatar_base *widget,
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_AVATAR_BASE_H */

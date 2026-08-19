@@ -124,7 +124,6 @@ static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
   const char *mode_str = "over";
   const char *pos_str = "start";
 
-  ui_error_t rc;
   if (sidenav->mode == UI_SIDENAV_MODE_PUSH)
     mode_str = "push";
   else if (sidenav->mode == UI_SIDENAV_MODE_SIDE)

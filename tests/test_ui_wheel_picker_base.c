@@ -143,7 +143,7 @@ static int test_items() {
 static int test_cva_and_events() {
   struct ui_wheel_picker_base *picker = NULL;
   struct ui_control_value_accessor cva = {0};
-  union ui_signal_payload payload;
+  union ui_signal_payload payload = {0};
   int failed = 0;
   struct ui_event ev = {0};
   const char *items[] = {"A", "B", "C"};
@@ -577,10 +577,20 @@ static int test_getters_and_misc() {
 
 int main(void) {
   int failed = 0;
+  printf("test_creation\n");
+  fflush(stdout);
   failed |= test_creation();
+  printf("test_items\n");
+  fflush(stdout);
   failed |= test_items();
+  printf("test_cva_and_events\n");
+  fflush(stdout);
   failed |= test_cva_and_events();
+  printf("test_physics\n");
+  fflush(stdout);
   failed |= test_physics();
+  printf("test_getters_and_misc\n");
+  fflush(stdout);
   failed |= test_getters_and_misc();
 
   if (!failed) {

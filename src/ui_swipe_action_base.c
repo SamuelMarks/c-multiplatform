@@ -3,6 +3,12 @@
 #include <math.h>
 /* clang-format on */
 
+/**
+ * @brief ui_swipe_action_base_init.
+ * @param swipe_action Parameter swipe_action.
+ * @param component Parameter component.
+ * @return Return value.
+ */
 ui_error_t ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
                                      struct ui_component *component) {
   if (!swipe_action || !component) {

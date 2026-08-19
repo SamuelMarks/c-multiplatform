@@ -1,3 +1,8 @@
+/**
+ * @file ui_bidi_manager.c
+ * @brief Implementation of global bidirectional text layout management.
+ */
+
 /* clang-format off */
 #include "ui_web_bridge.h"
 #include "ui_bidi_manager.h"
@@ -26,6 +31,7 @@ ui_error_t ui_bidi_get_direction(enum ui_bidi_direction *out_dir) {
   *out_dir = g_ui_bidi_dir;
   return UI_ERROR_NONE;
 }
+
 ui_error_t ui_bidi_normalize_horizontal_key(enum ui_key_code key,
                                             enum ui_key_code *out_key) {
   if (!out_key) {
