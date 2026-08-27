@@ -24,7 +24,9 @@ static ui_error_t mock_ui_font_manager_find_font(struct ui_font_manager *m,
   *out = (struct ui_font *)1; /* Fake font */
   return UI_ERROR_NONE;
 }
+/** @cond */
 #define ui_font_manager_find_font mock_ui_font_manager_find_font
+/** @endcond */
 
 static ui_error_t mock_ui_text_layout_shape(struct ui_text_layout *layout,
                                             struct ui_font *font, float size,
@@ -41,7 +43,9 @@ static ui_error_t mock_ui_text_layout_shape(struct ui_text_layout *layout,
     return UI_ERROR_UNKNOWN; /* Fail specifically during ellipsis truncation */
   return UI_ERROR_NONE;
 }
+/** @cond */
 #define ui_text_layout_shape mock_ui_text_layout_shape
+/** @endcond */
 
 static ui_error_t mock_ui_text_layout_get_bounds(struct ui_text_layout *layout,
                                                  float *w, float *h) {
@@ -62,7 +66,9 @@ static ui_error_t mock_ui_text_layout_get_bounds(struct ui_text_layout *layout,
                  max lines 2 -> 20) */
   return UI_ERROR_NONE;
 }
+/** @cond */
 #define ui_text_layout_get_bounds mock_ui_text_layout_get_bounds
+/** @endcond */
 
 static ui_error_t mock_ui_font_get_vmetrics(struct ui_font *font, float size,
                                             float *ascent, float *descent,
@@ -76,41 +82,44 @@ static ui_error_t mock_ui_font_get_vmetrics(struct ui_font *font, float size,
   *line_gap = 0.0f;
   return UI_ERROR_NONE;
 }
+/** @cond */
 #define ui_font_get_vmetrics mock_ui_font_get_vmetrics
+/** @endcond */
 
 #endif
 
 /**
  * @struct ui_text_node_base
+ * @struct ui_text_node_base
  * @brief Internal implementation of the text node component.
  */
 struct ui_text_node_base {
-  /** @brief Underlying UI component. */
-  struct ui_component *component;
-  /** @brief Text layout object. */
-  struct ui_text_layout *layout;
-  /** @brief Font manager. */
-  struct ui_font_manager *font_manager;
+  /* @brief Underlying UI component. */
+  struct ui_component *component; /**< component */
+  /* @brief Text layout object. */
+  struct ui_text_layout *layout; /**< layout */
+  /* @brief Font manager. */
+  struct ui_font_manager *font_manager; /**< font_manager */
 
-  /** @brief Text string. */
-  char *text;
-  /** @brief Font family string. */
-  char *font_family;
-  /** @brief Font size. */
-  float font_size;
-  /** @brief Maximum width. */
-  float max_width;
-  /** @brief Maximum lines. */
-  int max_lines;
-  /** @brief Overflow behavior. */
-  enum ui_text_node_overflow overflow;
+  /* @brief Text string. */
+  char *text; /**< text */
+  /* @brief Font family string. */
+  char *font_family; /**< font_family */
+  /* @brief Font size. */
+  float font_size; /**< font_size */
+  /* @brief Maximum width. */
+  float max_width; /**< max_width */
+  /* @brief Maximum lines. */
+  int max_lines; /**< max_lines */
+  /* @brief Overflow behavior. */
+  enum ui_text_node_overflow overflow; /**< overflow */
 
-  /** @brief Computed layout width. */
-  float computed_width;
-  /** @brief Computed layout height. */
-  float computed_height;
-  /** @brief Signal for text binding. */
-  struct ui_signal *text_signal;
+  /* @brief Computed layout width. */
+  float computed_width; /**< computed_width */
+  /* @brief Computed layout height. */
+  float computed_height; /**< computed_height */
+  /* @brief Signal for text binding. */
+  struct ui_signal *text_signal; /**< text_signal */
 };
 
 ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
@@ -276,14 +285,18 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   if (node->font_manager) {
     const char *primary_font =
         node->font_family ? node->font_family : "sans-serif";
+/** @cond */
 #define UI_FONT_FIND_IGNORE_PRIM(mgr, fam, w, it, outf)                        \
   ui_font_manager_find_font((mgr), (fam), (w), (it), (outf))
+    /** @endcond */
     rc = UI_FONT_FIND_IGNORE_PRIM(node->font_manager, primary_font, 400, 0,
                                   &font);
     if (rc != UI_ERROR_NONE) {
       /* Fallback to system-ui */
+/** @cond */
 #define UI_FONT_FIND_IGNORE(mgr, fam, w, it, outf)                             \
   ui_font_manager_find_font((mgr), (fam), (w), (it), (outf))
+      /** @endcond */
       (void)UI_FONT_FIND_IGNORE(node->font_manager, "system-ui", 400, 0, &font);
       /* If no font can be found, we just proceed with NULL and
        * ui_text_layout_shape will fail or mock it */

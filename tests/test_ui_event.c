@@ -1,3 +1,4 @@
+extern int g_malloc_fail_countdown;
 /* clang-format off */
 #include "../include/ui_dom_node.h"
 #include "../include/ui_error.h"
@@ -195,7 +196,6 @@ static void test_failing_events(void) {
   ui_dom_node_remove_event_listener(root_dom, UI_EVENT_KEY_DOWN,
                                     failing_handler);
 
-  extern int g_malloc_fail_countdown;
   ev.event_data.keyboard.key_code = 9;
   g_malloc_fail_countdown = 0;
   ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);

@@ -41,7 +41,8 @@ ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager);
  * @brief Gets the underlying component instance.
  *
  * @param window_manager The window manager component.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_window_manager_base_get_component(
     struct ui_window_manager_base *window_manager,

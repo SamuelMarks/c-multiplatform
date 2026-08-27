@@ -5,7 +5,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -16,7 +16,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/**
+/*
  * @brief parse_geometry_box.
  * @param str Parameter str.
  * @param out_box Parameter out_box.
@@ -42,7 +42,7 @@ static void parse_geometry_box(const char *str,
     *out_box = UI_CSS_GEOMETRY_BOX_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_shape_inside.
  * @param str Parameter str.
  * @param out_shape Parameter out_shape.
@@ -93,7 +93,7 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
     const char *paren_start = strchr(str, '(');
     const char *paren_end = strrchr(str, ')');
     if (paren_end) {
-      size_t len = paren_end - paren_start - 1;
+      size_t len = (size_t)(paren_end - paren_start) - 1;
       if (len >= sizeof(out_shape->shape.arguments))
         len = sizeof(out_shape->shape.arguments) - 1;
       memcpy(out_shape->shape.arguments, paren_start + 1, len);
@@ -114,7 +114,8 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_parse_border_boundary(const char *str,
                              enum ui_css_border_boundary *out_boundary) {

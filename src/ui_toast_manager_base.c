@@ -18,56 +18,59 @@
 
 /**
  * @struct ui_toast_entry
+ * @struct ui_toast_entry
  * @brief Internal representation of an active toast notification.
  */
 struct ui_toast_entry {
-  /** @brief Unique identifier for the toast. */
-  ui_toast_id id;
-  /** @brief Configuration for the toast. */
-  struct ui_toast_config config;
-  /** @brief Current animation state. */
-  enum ui_toast_anim_state anim_state;
-  /** @brief Time when the toast was shown. */
-  double show_time;
-  /** @brief Total time the toast has been paused. */
-  double total_paused_time;
-  /** @brief Time when the current pause started. */
-  double pause_start_time;
-  /** @brief Flag indicating if the toast is currently paused. */
-  int is_paused;
-  /** @brief The message string to display. */
-  char *message;
+  /* @brief Unique identifier for the toast. */
+  ui_toast_id id; /**< id */
+  /* @brief Configuration for the toast. */
+  struct ui_toast_config config; /**< config */
+  /* @brief Current animation state. */
+  enum ui_toast_anim_state anim_state; /**< anim_state */
+  /* @brief Time when the toast was shown. */
+  double show_time; /**< show_time */
+  /* @brief Total time the toast has been paused. */
+  double total_paused_time; /**< total_paused_time */
+  /* @brief Time when the current pause started. */
+  double pause_start_time; /**< pause_start_time */
+  /* @brief Flag indicating if the toast is currently paused. */
+  int is_paused; /**< is_paused */
+  /* @brief The message string to display. */
+  char *message; /**< message */
 
-  /** @brief The overlay component for rendering. */
-  struct ui_component *overlay_component;
-  /** @brief The active overlay instance. */
-  struct ui_overlay *active_overlay;
+  /* @brief The overlay component for rendering. */
+  struct ui_component *overlay_component; /**< overlay_component */
+  /* @brief The active overlay instance. */
+  struct ui_overlay *active_overlay; /**< active_overlay */
 };
 
 /**
  * @struct ui_toast_region_stack
+ * @struct ui_toast_region_stack
  * @brief Represents a stack of toasts in a specific region.
  */
 struct ui_toast_region_stack {
-  /** @brief Array of toast entries. */
-  struct ui_toast_entry **toasts;
-  /** @brief Number of toasts in the stack. */
-  size_t count;
-  /** @brief Allocated capacity of the toasts array. */
-  size_t capacity;
+  /* @brief Array of toast entries. */
+  struct ui_toast_entry **toasts; /**< toasts */
+  /* @brief Number of toasts in the stack. */
+  size_t count; /**< count */
+  /* @brief Allocated capacity of the toasts array. */
+  size_t capacity; /**< capacity */
 };
 
 /**
  * @struct ui_toast_manager_base
+ * @struct ui_toast_manager_base
  * @brief Internal implementation of the global toast manager.
  */
 struct ui_toast_manager_base {
-  /** @brief Array of toast region stacks. */
-  struct ui_toast_region_stack regions[UI_TOAST_REGION_COUNT];
-  /** @brief Next available toast ID. */
-  ui_toast_id next_id;
-  /** @brief Simple global hover state for primitive pause logic. */
-  int is_hovered;
+  /* @brief Array of toast region stacks. */
+  struct ui_toast_region_stack regions[UI_TOAST_REGION_COUNT]; /**< regions */
+  /* @brief Next available toast ID. */
+  ui_toast_id next_id; /**< next_id */
+  /* @brief Simple global hover state for primitive pause logic. */
+  int is_hovered; /**< is_hovered */
 };
 
 ui_error_t
@@ -96,7 +99,7 @@ ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Helper function to free a single toast entry.
  * @param entry The entry to free.
  * @return UI_ERROR_NONE on success.
@@ -187,7 +190,7 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
     size_t new_cap = stack->capacity == 0 ? 4 : stack->capacity * 2;
     struct ui_toast_entry **new_arr =
         (struct ui_toast_entry **)C_MULTIPLATFORM_REALLOC(
-            stack->toasts, new_cap * sizeof(struct ui_toast_entry *));
+            stack->toasts, (size_t)new_cap * sizeof(struct ui_toast_entry *));
     if (!new_arr) {
       (void)free_toast_entry(entry);
       return UI_ERROR_OUT_OF_MEMORY;

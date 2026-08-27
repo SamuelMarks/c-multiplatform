@@ -12,8 +12,10 @@
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
+/** @brief internal */
 #define WEB_CMD_BUFFER_SIZE 32
 #else
+/** @brief internal */
 #define WEB_CMD_BUFFER_SIZE (1024 * 1024 * 4) /* 4MB */
 #endif
 
@@ -21,15 +23,15 @@ static ui_uint32 *g_cmd_buffer = NULL;
 static size_t g_cmd_pos = 0;
 static size_t g_cmd_capacity = WEB_CMD_BUFFER_SIZE / sizeof(ui_uint32);
 
-/**
+/*
  * @brief ensure_buffer.
  * @param words_needed Parameter words_needed.
  * @return Return value.
  */
 static ui_error_t ensure_buffer(size_t words_needed) {
   if (!g_cmd_buffer) {
-    g_cmd_buffer =
-        (ui_uint32 *)C_MULTIPLATFORM_MALLOC(g_cmd_capacity * sizeof(ui_uint32));
+    g_cmd_buffer = (ui_uint32 *)C_MULTIPLATFORM_MALLOC((size_t)g_cmd_capacity *
+                                                       sizeof(ui_uint32));
     if (!g_cmd_buffer) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -208,7 +210,7 @@ EM_JS(void, flush_to_js, (ui_uint32 * buf, ui_uint32 len), {
 })
 #endif
 
-/**
+/*
  * @brief ui_web_bridge_shutdown.
  * @return Return value.
  */
@@ -221,7 +223,7 @@ ui_error_t ui_web_bridge_shutdown(void) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_flush.
  * @return Return value.
  */
@@ -235,7 +237,7 @@ ui_error_t ui_web_bridge_flush(void) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_create_node.
  * @param id Parameter id.
  * @param tag_name Parameter tag_name.
@@ -252,7 +254,7 @@ ui_error_t ui_web_bridge_create_node(ui_uint32 id, const char *tag_name) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_destroy_node.
  * @param id Parameter id.
  * @return Return value.
@@ -267,7 +269,7 @@ ui_error_t ui_web_bridge_destroy_node(ui_uint32 id) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_set_text.
  * @param id Parameter id.
  * @param text Parameter text.
@@ -284,7 +286,7 @@ ui_error_t ui_web_bridge_set_text(ui_uint32 id, const char *text) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_append_child.
  * @param parent_id Parameter parent_id.
  * @param child_id Parameter child_id.
@@ -301,7 +303,7 @@ ui_error_t ui_web_bridge_append_child(ui_uint32 parent_id, ui_uint32 child_id) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_remove_child.
  * @param parent_id Parameter parent_id.
  * @param child_id Parameter child_id.
@@ -318,7 +320,7 @@ ui_error_t ui_web_bridge_remove_child(ui_uint32 parent_id, ui_uint32 child_id) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_set_bounds.
  * @param id Parameter id.
  * @param x Parameter x.
@@ -348,7 +350,7 @@ ui_error_t ui_web_bridge_set_bounds(ui_uint32 id, float x, float y, float w,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_insert_before.
  * @param parent_id Parameter parent_id.
  * @param child_id Parameter child_id.
@@ -368,7 +370,7 @@ ui_error_t ui_web_bridge_insert_before(ui_uint32 parent_id, ui_uint32 child_id,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_set_style.
  * @param id Parameter id.
  * @param property Parameter property.
@@ -394,7 +396,7 @@ ui_error_t ui_web_bridge_set_style(ui_uint32 id, const char *property,
 extern "C" {
 #endif
 
-/**
+/*
  * @brief ui_web_bridge_dispatch_event.
  * @param type Parameter type.
  * @param x Parameter x.
@@ -419,8 +421,8 @@ ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
     event.type = UI_EVENT_OS_DEEP_LINK;
 
   if (type >= 1 && type <= 4) {
-    event.event_data.mouse.x = x;
-    event.event_data.mouse.y = y;
+    event.event_data.mouse.x = (int)x;
+    event.event_data.mouse.y = (int)y;
     event.event_data.mouse.button = buttons;
   } else if (type == 5) {
     event.event_data.mouse.wheel_x = x;
@@ -439,7 +441,7 @@ ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_dispatch_resize.
  * @param w Parameter w.
  * @param h Parameter h.
@@ -456,7 +458,7 @@ ui_error_t ui_web_bridge_dispatch_resize(float w, float h, float dpr) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_dispatch_key.
  * @param type Parameter type.
  * @param key Parameter key.
@@ -475,7 +477,7 @@ ui_error_t ui_web_bridge_dispatch_key(int type, const char *key,
 
   /* Naive mapping for demo */
   event.event_data.keyboard.key_code = key[0];
-  event.event_data.keyboard.modifiers = modifiers;
+  event.event_data.keyboard.modifiers = (unsigned int)modifiers;
 
   return UI_ERROR_NONE;
 }
@@ -484,7 +486,7 @@ ui_error_t ui_web_bridge_dispatch_key(int type, const char *key,
 }
 #endif
 
-/**
+/*
  * @brief ui_web_bridge_set_aria.
  * @param id Parameter id.
  * @param role Parameter role.
@@ -514,7 +516,7 @@ ui_error_t ui_web_bridge_set_aria(ui_uint32 id, const char *role,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_push_state.
  * @param path Parameter path.
  * @return Return value.
@@ -530,7 +532,7 @@ ui_error_t ui_web_bridge_push_state(const char *path) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_web_bridge_replace_state.
  * @param path Parameter path.
  * @return Return value.
@@ -545,7 +547,7 @@ ui_error_t ui_web_bridge_replace_state(const char *path) {
   g_cmd_buffer[g_cmd_pos++] = (ui_uint32)(ui_uintptr)path;
   return UI_ERROR_NONE;
 }
-/**
+/*
  * @brief ui_web_bridge_set_attribute.
  * @param id Parameter id.
  * @param name Parameter name.
@@ -564,7 +566,7 @@ ui_error_t ui_web_bridge_set_attribute(ui_uint32 id, const char *name,
   g_cmd_buffer[g_cmd_pos++] = (ui_uint32)(ui_uintptr)value;
   return UI_ERROR_NONE;
 }
-/**
+/*
  * @brief ui_web_bridge_set_property.
  * @param id Parameter id.
  * @param name Parameter name.

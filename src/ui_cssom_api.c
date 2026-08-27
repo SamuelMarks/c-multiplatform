@@ -5,7 +5,7 @@
 #include <string.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_cssom_insert_rule.
  * @param stylesheet Parameter stylesheet.
  * @param css_text Parameter css_text.
@@ -64,7 +64,7 @@ ui_error_t ui_cssom_insert_rule(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_cssom_delete_rule.
  * @param stylesheet Parameter stylesheet.
  * @param index Parameter index.
@@ -100,7 +100,7 @@ ui_error_t ui_cssom_delete_rule(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_cssom_set_property.
  * @param rule Parameter rule.
  * @param property_name Parameter property_name.
@@ -141,7 +141,7 @@ ui_error_t ui_cssom_set_property(struct ui_css_rule *rule,
                                         is_important);
 }
 
-/**
+/*
  * @brief ui_cssom_remove_property.
  * @param rule Parameter rule.
  * @param property_name Parameter property_name.
@@ -175,7 +175,7 @@ ui_error_t ui_cssom_remove_property(struct ui_css_rule *rule,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * @brief ui_cssom_get_property_value.
  * @param rule Parameter rule.
  * @param property_name Parameter property_name.
@@ -202,7 +202,7 @@ ui_error_t ui_cssom_get_property_value(const struct ui_css_rule *rule,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * @brief ui_cssom_get_property_priority.
  * @param rule Parameter rule.
  * @param property_name Parameter property_name.

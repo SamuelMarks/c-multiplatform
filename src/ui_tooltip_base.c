@@ -36,26 +36,27 @@ enum ui_tooltip_state {
 
 /**
  * @struct ui_tooltip_base
+ * @struct ui_tooltip_base
  * @brief Internal implementation of the tooltip component.
  */
 struct ui_tooltip_base {
   /** @brief The tooltip configuration. */
-  struct ui_tooltip_config config;
+  struct ui_tooltip_config config; /**< config */
   /** @brief The current state. */
-  enum ui_tooltip_state state;
+  enum ui_tooltip_state state; /**< state */
   /** @brief Time when the current state was entered. */
-  double state_enter_time;
+  double state_enter_time; /**< state_enter_time */
   /** @brief The tooltip text. */
-  char *text;
+  char *text; /**< text */
 
   /** @brief The overlay component for rendering. */
-  struct ui_component *overlay_component;
+  struct ui_component *overlay_component; /**< overlay_component */
   /** @brief The active overlay instance. */
-  struct ui_overlay *active_overlay;
+  struct ui_overlay *active_overlay; /**< active_overlay */
   /** @brief Signal for the open state. */
-  struct ui_signal *open_signal;
+  struct ui_signal *open_signal; /**< open_signal */
   /** @brief Signal for the animating state. */
-  struct ui_computed *animating_signal;
+  struct ui_computed *animating_signal; /**< animating_signal */
 };
 
 ui_error_t ui_tooltip_base_create(struct ui_tooltip_base **out_tooltip,

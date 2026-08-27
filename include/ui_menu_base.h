@@ -99,7 +99,8 @@ ui_error_t ui_menu_base_close(struct ui_menu_base *menu);
  * @brief Checks if the menu is open.
  *
  * @param menu The menu component.
- * @return 1 if open, 0 if closed.
+ * @param out_is_open Pointer to receive 1 if open, 0 if closed.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_menu_base_is_open(const struct ui_menu_base *menu,
                                 int *out_is_open);
@@ -133,7 +134,8 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
  * @brief Gets the underlying UI component.
  *
  * @param menu The menu component.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_menu_base_get_component(struct ui_menu_base *menu,
                                       struct ui_component **out_component);

@@ -13,25 +13,37 @@
 /* Use MSVC Safe CRT internally, string.h is already included. */
 #endif
 
+/**
+ * @struct ui_web_animation_effect
+ * \brief ui_web_animation_effect
+ */
 struct ui_web_animation_effect {
-  struct ui_dom_node *target;
-  struct ui_web_animation_keyframe *keyframes;
-  struct ui_web_animation_timing timing;
+  struct ui_dom_node *target;                  /**< target */
+  struct ui_web_animation_keyframe *keyframes; /**< keyframes */
+  struct ui_web_animation_timing timing;       /**< timing */
 };
 
+/**
+ * @struct ui_web_animation_timeline
+ * \brief ui_web_animation_timeline
+ */
 struct ui_web_animation_timeline {
-  enum ui_web_animation_timeline_type type;
-  struct ui_dom_node *target;
-  int axis;
-  double current_time;
+  enum ui_web_animation_timeline_type type; /**< type */
+  struct ui_dom_node *target;               /**< target */
+  int axis;                                 /**< axis */
+  double current_time;                      /**< current_time */
 };
 
+/**
+ * @struct ui_web_animation
+ * \brief ui_web_animation
+ */
 struct ui_web_animation {
-  struct ui_web_animation_effect *effect;
-  struct ui_web_animation_timeline *timeline;
-  enum ui_web_animation_play_state play_state;
-  double current_time;
-  double playback_rate;
+  struct ui_web_animation_effect *effect;      /**< effect */
+  struct ui_web_animation_timeline *timeline;  /**< timeline */
+  enum ui_web_animation_play_state play_state; /**< play_state */
+  double current_time;                         /**< current_time */
+  double playback_rate;                        /**< playback_rate */
 };
 
 ui_error_t ui_web_animation_effect_create_keyframe_effect(

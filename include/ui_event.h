@@ -170,7 +170,7 @@ struct ui_event {
     struct ui_gamepad_event gamepad;        /**< Data for gamepad events. */
     struct ui_window_event window;          /**< Data for window events. */
     struct ui_os_deep_link_event deep_link; /**< Data for deep link events. */
-  } event_data;
+  } event_data;                             /**< The event data union */
 };
 
 /**

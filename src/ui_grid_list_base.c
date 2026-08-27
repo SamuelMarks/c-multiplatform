@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_grid_list_base.c
  * \brief Implementation of the grid list base widget.
  */
@@ -9,18 +9,19 @@
 /* clang-format on */
 
 /**
+ * @struct ui_grid_list_base
  * \struct ui_grid_list_base
  * \brief Represents the internal state and properties of a grid list widget.
  */
 struct ui_grid_list_base {
-  int columns;
-  struct ui_grid_list_item *items;
-  size_t item_count;
-  size_t item_capacity;
-  struct ui_computed *data_signal;
+  int columns;                     /**< columns */
+  struct ui_grid_list_item *items; /**< items */
+  size_t item_count;               /**< item_count */
+  size_t item_capacity;            /**< item_capacity */
+  struct ui_computed *data_signal; /**< data_signal */
 };
 
-/**
+/*
  * \brief Creates a new grid list base widget.
  * \param[out] out_grid_list Pointer to store the created grid list.
  * \param[in] columns The number of columns in the grid.
@@ -54,7 +55,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a grid list base widget.
  * \param[in,out] grid_list The grid list to destroy.
  * \return UI_ERROR_NONE on success.
@@ -70,7 +71,7 @@ ui_error_t ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the number of columns in the grid list.
  * \param[in,out] grid_list The grid list widget.
  * \param[in] columns The new number of columns.
@@ -85,7 +86,7 @@ ui_error_t ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the number of columns in the grid list.
  * \param[in] grid_list The grid list widget.
  * \param[out] out_columns Pointer to store the column count.
@@ -101,7 +102,7 @@ ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds an item to the grid list with specified span.
  * \param[in,out] grid_list The grid list widget.
  * \param[in] rowspan The row span of the item.
@@ -122,7 +123,7 @@ ui_error_t ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
   if (grid_list->item_count == grid_list->item_capacity) {
     new_cap = grid_list->item_capacity == 0 ? 4 : grid_list->item_capacity * 2;
     new_items = (struct ui_grid_list_item *)C_MULTIPLATFORM_MALLOC(
-        new_cap * sizeof(struct ui_grid_list_item));
+        (size_t)new_cap * sizeof(struct ui_grid_list_item));
     if (!new_items) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -148,13 +149,13 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Gets the number of items in the grid list.
  * \param[in] grid_list The grid list widget.
  * \param[out] out_count Pointer to store the item count.
  * \return UI_ERROR_NONE on success.
  */
-/**
+/*
  * \brief Gets a specific item from the grid list by index.
  * \param[in] grid_list The grid list widget.
  * \param[in] index The index of the item.
@@ -171,7 +172,7 @@ ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets a specific item from the grid list by index.
  * \param[in] grid_list The grid list widget.
  * \param[in] index The index of the item.
@@ -192,7 +193,7 @@ ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Calculates the total number of rows required by the grid list.
  * \param[in] grid_list The grid list widget.
  * \param[out] out_rows Pointer to store the calculated row count.
@@ -213,7 +214,7 @@ ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
   }
 
   col_occupancy =
-      (int *)C_MULTIPLATFORM_MALLOC(grid_list->columns * sizeof(int));
+      (int *)C_MULTIPLATFORM_MALLOC((size_t)grid_list->columns * sizeof(int));
   if (!col_occupancy) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -275,7 +276,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Binds arbitrary computed data to the grid list.
  * \param[in,out] widget The grid list widget.
  * \param[in,out] signal The computed data signal.

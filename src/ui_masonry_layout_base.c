@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_masonry_layout_base.c
  * \brief Implementation of the UI masonry layout base component.
  */
@@ -16,17 +16,20 @@ static const char *ui_masonry_layout_base_default_css =
     "flex-wrap: wrap; "
     "}";
 
-/** \brief ui_masonry_layout_base */
+/* \brief ui_masonry_layout_base
+ */
 /**
+ * @struct ui_masonry_layout_base
  * \struct ui_masonry_layout_base
  * \brief Represents a masonry (waterfall) style layout container.
  */
 struct ui_masonry_layout_base {
-  struct ui_component *component;
-  struct ui_computed *data_signal;
+  struct ui_component *component;  /**< component */
+  struct ui_computed *data_signal; /**< data_signal */
 };
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
   struct ui_masonry_layout_base *masonry;
@@ -95,7 +98,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a masonry layout base component.
  * \param[in,out] masonry The masonry layout to destroy.
  * \return UI_ERROR_NONE on success.
@@ -110,7 +113,8 @@ ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_masonry_layout_base_reflow(struct ui_masonry_layout_base *masonry) {
   if (!masonry) {
@@ -122,7 +126,8 @@ ui_masonry_layout_base_reflow(struct ui_masonry_layout_base *masonry) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_masonry_layout_base_get_component(struct ui_masonry_layout_base *masonry,
                                      struct ui_component **out_component) {
@@ -133,7 +138,8 @@ ui_masonry_layout_base_get_component(struct ui_masonry_layout_base *masonry,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_masonry_layout_base_bind_data(struct ui_masonry_layout_base *widget,
                                  struct ui_computed *signal) {

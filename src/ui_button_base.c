@@ -30,7 +30,7 @@ static const char *ui_button_base_default_css =
 #ifdef UI_TEST_MOCK_ALLOC
 int g_button_mock_fail = 0;
 
-/**
+/*
  * @brief mock_ui_dom_node_set_attribute.
  * @param node Parameter node.
  * @param k Parameter k.
@@ -46,9 +46,11 @@ static ui_error_t mock_ui_dom_node_set_attribute(struct ui_dom_node *node,
   }
   return ui_dom_node_set_attribute(node, k, v);
 }
+/** @cond */
 #define ui_dom_node_set_attribute mock_ui_dom_node_set_attribute
+/** @endcond */
 
-/**
+/*
  * @brief mock_ui_ripple_config_init.
  * @param config Parameter config.
  * @return Return value.
@@ -59,9 +61,11 @@ static ui_error_t mock_ui_ripple_config_init(struct ui_ripple_config *config) {
   }
   return ui_ripple_config_init(config);
 }
+/** @cond */
 #define ui_ripple_config_init mock_ui_ripple_config_init
+/** @endcond */
 
-/**
+/*
  * @brief mock_ui_component_set_default_style.
  * @param comp Parameter comp.
  * @param style Parameter style.
@@ -75,9 +79,11 @@ mock_ui_component_set_default_style(struct ui_component *comp,
   }
   return ui_component_set_default_style(comp, style);
 }
+/** @cond */
 #define ui_component_set_default_style mock_ui_component_set_default_style
+/** @endcond */
 
-/**
+/*
  * @brief mock_ui_dom_node_remove_attribute.
  * @param node Parameter node.
  * @param name Parameter name.
@@ -90,9 +96,11 @@ static ui_error_t mock_ui_dom_node_remove_attribute(struct ui_dom_node *node,
   }
   return ui_dom_node_remove_attribute(node, name);
 }
+/** @cond */
 #define ui_dom_node_remove_attribute mock_ui_dom_node_remove_attribute
+/** @endcond */
 
-/**
+/*
  * @brief mock_ui_gesture_recognizer_process_event.
  * @param recognizer Parameter recognizer.
  * @param event Parameter event.
@@ -115,8 +123,7 @@ static ui_error_t mock_ui_gesture_recognizer_process_event(
 }
 #define ui_gesture_recognizer_process_event                                    \
   mock_ui_gesture_recognizer_process_event
-
-/**
+/*
  * @brief mock_ui_ripple_start.
  * @param config Parameter config.
  * @param x Parameter x.
@@ -131,27 +138,30 @@ static ui_error_t mock_ui_ripple_start(struct ui_ripple_config *config, float x,
   }
   return ui_ripple_start(config, x, y, state);
 }
+/** @cond */
 #define ui_ripple_start mock_ui_ripple_start
+/** @endcond */
 #endif
 
 /**
  * @struct ui_button_base
+ * @struct ui_button_base
  * @brief Internal representation of a base button component.
  */
 struct ui_button_base {
-  struct ui_component *component;
-  struct ui_gesture_recognizer *gesture_recognizer;
-  int disabled;
-  ui_button_on_click_t on_click;
-  void *user_data;
-  struct ui_signal *disabled_signal;
-  struct ui_signal *text_signal;
+  struct ui_component *component;                   /**< component */
+  struct ui_gesture_recognizer *gesture_recognizer; /**< gesture_recognizer */
+  int disabled;                                     /**< disabled */
+  ui_button_on_click_t on_click;                    /**< on_click */
+  void *user_data;                                  /**< user_data */
+  struct ui_signal *disabled_signal;                /**< disabled_signal */
+  struct ui_signal *text_signal;                    /**< text_signal */
   /* Ripple State */
-  struct ui_ripple_config ripple_config;
-  struct ui_ripple_state ripple_state;
+  struct ui_ripple_config ripple_config; /**< ripple_config */
+  struct ui_ripple_state ripple_state;   /**< ripple_state */
 };
 
-/**
+/*
  * @brief ui_button_base_create.
  * @param out_button Parameter out_button.
  * @return Return value.
@@ -245,7 +255,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_button_base_destroy.
  * @param button Parameter button.
  * @return Return value.
@@ -262,7 +272,7 @@ ui_error_t ui_button_base_destroy(struct ui_button_base *button) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_button_base_set_disabled.
  * @param button Parameter button.
  * @param disabled Parameter disabled.
@@ -319,7 +329,7 @@ ui_error_t ui_button_base_set_disabled(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_button_base_set_on_click.
  * @param button Parameter button.
  * @param on_click Parameter on_click.
@@ -339,7 +349,7 @@ ui_error_t ui_button_base_set_on_click(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_button_base_process_event.
  * @param button Parameter button.
  * @param event Parameter event.
@@ -369,8 +379,9 @@ ui_error_t ui_button_base_process_event(struct ui_button_base *button,
   /* Handle Mouse Down directly for Ripple Trigger */
   if (event->type == UI_EVENT_MOUSE_DOWN) {
     if (event->event_data.mouse.button == 0) {
-      rc = ui_ripple_start(&button->ripple_config, event->event_data.mouse.x,
-                           event->event_data.mouse.y, &button->ripple_state);
+      rc = ui_ripple_start(
+          &button->ripple_config, (float)event->event_data.mouse.x,
+          (float)event->event_data.mouse.y, &button->ripple_state);
       if (rc != UI_ERROR_NONE) {
         return rc;
       }
@@ -389,7 +400,7 @@ ui_error_t ui_button_base_process_event(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_button_base_get_component.
  * @param button Parameter button.
  * @param out_component Parameter out_component.
@@ -404,7 +415,7 @@ ui_error_t ui_button_base_get_component(struct ui_button_base *button,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_button_base_bind_disabled.
  * @param widget Parameter widget.
  * @param disabled_signal Parameter disabled_signal.
@@ -419,7 +430,7 @@ ui_error_t ui_button_base_bind_disabled(struct ui_button_base *widget,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_button_base_bind_text.
  * @param widget Parameter widget.
  * @param text_signal Parameter text_signal.
@@ -434,7 +445,7 @@ ui_error_t ui_button_base_bind_text(struct ui_button_base *widget,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_button_base_get_ripple_state.
  * @param button Parameter button.
  * @param out_state Parameter out_state.

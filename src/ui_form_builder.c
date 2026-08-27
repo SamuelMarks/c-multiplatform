@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_form_builder.c
  * \brief Implementation of the UI form builder utility.
  */
@@ -13,27 +13,28 @@
 /* MSVC Safe CRT */
 #endif
 
-/**
+/*
  * \def MAX_BUILDER_DEPTH
  * \brief Maximum depth for the form builder stack.
  */
 #define MAX_BUILDER_DEPTH 32
 
 /**
+ * @struct ui_form_builder
  * \struct ui_form_builder
  * \brief Context for fluently building complex form structures.
  */
 struct ui_form_builder {
-  struct ui_arena *arena;
+  struct ui_arena *arena; /**< arena */
 
-  void *stack[MAX_BUILDER_DEPTH];
-  int is_array[MAX_BUILDER_DEPTH];
-  int depth;
+  void *stack[MAX_BUILDER_DEPTH];  /**< stack */
+  int is_array[MAX_BUILDER_DEPTH]; /**< is_array */
+  int depth;                       /**< depth */
 
-  ui_form_group_t *root_group;
+  ui_form_group_t *root_group; /**< root_group */
 };
 
-/**
+/*
  * \brief Creates a new form builder.
  * \param[in,out] arena The memory arena.
  * \param[out] out_builder Pointer to store the created builder.
@@ -57,7 +58,7 @@ ui_error_t ui_form_builder_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Starts a new form group in the builder.
  * \param[in,out] builder The form builder.
  * \param[in] name The name of the group.
@@ -110,7 +111,7 @@ ui_error_t ui_form_builder_group_start(ui_form_builder_t *builder,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Ends the current form group in the builder.
  * \param[in,out] builder The form builder.
  * \return UI_ERROR_NONE on success.
@@ -127,7 +128,7 @@ ui_error_t ui_form_builder_group_end(ui_form_builder_t *builder) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Starts a new form array in the builder.
  * \param[in,out] builder The form builder.
  * \param[in] name The name of the array.
@@ -169,7 +170,7 @@ ui_error_t ui_form_builder_array_start(ui_form_builder_t *builder,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Ends the current form array in the builder.
  * \param[in,out] builder The form builder.
  * \return UI_ERROR_NONE on success.
@@ -186,7 +187,7 @@ ui_error_t ui_form_builder_array_end(ui_form_builder_t *builder) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief A dummy equality function for builder-created controls.
  * \param[in] a The first payload.
  * \param[in] b The second payload.
@@ -199,7 +200,7 @@ static ui_error_t dummy_equality(union ui_signal_payload a,
   *out_equal = (a.ptr_val == b.ptr_val);
   return UI_ERROR_NONE;
 }
-/**
+/*
  * \brief A dummy destructor function for builder-created controls.
  * \param[in] p The payload to destruct.
  * \return UI_ERROR_NONE on success.
@@ -209,7 +210,7 @@ static ui_error_t dummy_destructor(union ui_signal_payload p) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds a form control to the current group or array.
  * \param[in,out] builder The form builder.
  * \param[in] name The name of the control.
@@ -258,7 +259,7 @@ ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Finalizes the build process and returns the root form group.
  * \param[in] builder The form builder.
  * \param[out] out_root Pointer to store the root form group.
@@ -277,7 +278,7 @@ ui_error_t ui_form_builder_build(ui_form_builder_t *builder,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a form builder.
  * \param[in,out] builder The form builder to destroy.
  * \return UI_ERROR_NONE on success.

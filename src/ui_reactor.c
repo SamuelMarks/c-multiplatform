@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_reactor.c
  * \brief Implementation of the UI Reactor component.
  */
@@ -9,20 +9,28 @@
 #include <stddef.h>
 
 #if defined(__linux__)
+/** @cond */
 #define UI_USE_EPOLL
+/** @endcond */
 #include <sys/epoll.h>
 #include <unistd.h>
 #elif defined(__APPLE__) || defined(__FreeBSD__)
+/** @cond */
 #define UI_USE_KQUEUE
+/** @endcond */
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
 #include <unistd.h>
 #elif defined(_WIN32)
+/** @cond */
 #define UI_USE_SELECT_WIN
+/** @endcond */
 #include <winsock2.h>
 #else
+/** @cond */
 #define UI_USE_SELECT_POSIX
+/** @endcond */
 #include <sys/select.h>
 #include <sys/time.h>
 #endif
@@ -35,6 +43,7 @@ extern int g_malloc_fail_countdown;
 #endif
 
 /**
+ * @struct ui_reactor_node
  * \brief Internal structure representing a registered OS handle.
  */
 struct ui_reactor_node {
@@ -46,6 +55,7 @@ struct ui_reactor_node {
 };
 
 /**
+ * @struct ui_reactor_task
  * \brief Internal structure representing a scheduled task.
  */
 struct ui_reactor_task {
@@ -55,6 +65,7 @@ struct ui_reactor_task {
 };
 
 /**
+ * @struct ui_reactor
  * \brief Internal structure representing the reactor itself.
  */
 struct ui_reactor {
@@ -70,7 +81,7 @@ struct ui_reactor {
 #endif
 };
 
-/**
+/*
  * \brief Creates a new reactor instance.
  *
  * \param out_reactor Pointer to receive the new reactor handle.
@@ -131,7 +142,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a reactor instance.
  *
  * \param reactor The reactor to destroy.
@@ -175,7 +186,7 @@ ui_error_t ui_reactor_destroy(struct ui_reactor *reactor) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Registers an OS handle (fd or SOCKET) with the reactor.
  *
  * \param reactor The reactor to register with.
@@ -260,7 +271,7 @@ ui_error_t ui_reactor_register(struct ui_reactor *reactor, void *os_handle,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Schedules a callback to be executed on the reactor's thread.
  *
  * \param reactor The reactor.
@@ -317,7 +328,7 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Wakes up a reactor blocked in polling.
  *
  * \param reactor The reactor to wake.
@@ -331,7 +342,7 @@ ui_error_t ui_reactor_wake(struct ui_reactor *reactor) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Unregisters an OS handle from the reactor.
  *
  * \param reactor The reactor.
@@ -381,7 +392,7 @@ ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle) {
   return UI_ERROR_NONE; /* Not found is not a hard error */
 }
 
-/**
+/*
  * \brief Polls the reactor for events and dispatches callbacks.
  *
  * \param reactor The reactor to poll.

@@ -2,7 +2,7 @@
 #include "ui_typography_scale.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_typography_scale_get_metrics.
  * @param scale Parameter scale.
  * @param out_metrics Parameter out_metrics.

@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_execution_context.c
  * \brief Implementation of UI execution context.
  */
@@ -8,21 +8,22 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * \brief Thread-local pointer to the current execution context.
  */
 static UI_THREAD_LOCAL struct ui_execution_context *g_current_context = NULL;
 
 /**
+ * @struct ui_execution_context
  * \struct ui_execution_context
  * \brief Manages the execution context of UI tasks.
  */
 struct ui_execution_context {
-  ui_error_t (*task_callback)(void *);
-  void *task_user_data;
+  ui_error_t (*task_callback)(void *); /**< ) */
+  void *task_user_data;                /**< task_user_data */
 };
 
-/**
+/*
  * \brief Creates a new execution context.
  * \param[out] out_ctx Pointer to store the created context.
  * \return UI_ERROR_NONE on success.
@@ -52,7 +53,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys an execution context.
  * \param[in,out] ctx The context to destroy.
  * \return UI_ERROR_NONE on success.
@@ -66,7 +67,7 @@ ui_error_t ui_execution_context_destroy(struct ui_execution_context *ctx) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Schedules a callback in the execution context.
  * \param[in,out] ctx The execution context.
  * \param[in] callback The callback function to schedule.
@@ -85,7 +86,7 @@ ui_error_t ui_execution_context_schedule(struct ui_execution_context *ctx,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Ticks the execution context, running scheduled tasks.
  * \param[in,out] ctx The execution context.
  * \return UI_ERROR_NONE on success.
@@ -108,7 +109,7 @@ ui_error_t ui_execution_context_tick(struct ui_execution_context *ctx) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Cancels pending tasks in the execution context.
  * \param[in,out] ctx The execution context.
  * \return UI_ERROR_NONE on success.
@@ -124,7 +125,7 @@ ui_error_t ui_execution_context_cancel(struct ui_execution_context *ctx) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the current execution context for the thread.
  * \param[in,out] ctx The context to set as current.
  * \return UI_ERROR_NONE on success.
@@ -134,7 +135,8 @@ ui_error_t ui_execution_context_set_current(struct ui_execution_context *ctx) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_execution_context_get_current(struct ui_execution_context **out_ctx) {
   if (!out_ctx) {

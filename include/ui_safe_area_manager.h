@@ -1,3 +1,6 @@
+/**
+ * @file ui_safe_area_manager.h
+ */
 #ifndef UI_SAFE_AREA_MANAGER_H
 #define UI_SAFE_AREA_MANAGER_H
 

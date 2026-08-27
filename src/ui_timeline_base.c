@@ -11,30 +11,32 @@
 
 /**
  * @struct ui_timeline_node
+ * @struct ui_timeline_node
  * @brief Internal representation of a single node in the timeline.
  */
 struct ui_timeline_node {
-  /** @brief The title of the node. */
-  char *title;
-  /** @brief The description of the node. */
-  char *description;
+  /* @brief The title of the node. */
+  char *title; /**< title */
+  /* @brief The description of the node. */
+  char *description; /**< description */
 };
 
 /**
  * @struct ui_timeline_base
+ * @struct ui_timeline_base
  * @brief Internal implementation of the timeline base component.
  */
 struct ui_timeline_base {
-  /** @brief Alignment mode of the timeline. */
-  enum ui_timeline_alignment alignment;
-  /** @brief Array of timeline nodes. */
-  struct ui_timeline_node *nodes;
-  /** @brief Number of nodes currently in the timeline. */
-  size_t node_count;
-  /** @brief Allocated capacity for timeline nodes. */
-  size_t node_capacity;
-  /** @brief Bound data signal. */
-  struct ui_computed *data_signal;
+  /* @brief Alignment mode of the timeline. */
+  enum ui_timeline_alignment alignment; /**< alignment */
+  /* @brief Array of timeline nodes. */
+  struct ui_timeline_node *nodes; /**< nodes */
+  /* @brief Number of nodes currently in the timeline. */
+  size_t node_count; /**< node_count */
+  /* @brief Allocated capacity for timeline nodes. */
+  size_t node_capacity; /**< node_capacity */
+  /* @brief Bound data signal. */
+  struct ui_computed *data_signal; /**< data_signal */
 };
 
 ui_error_t ui_timeline_base_create(struct ui_timeline_base **out_timeline) {
@@ -145,7 +147,7 @@ ui_error_t ui_timeline_base_add_node(struct ui_timeline_base *timeline,
   if (timeline->node_count == timeline->node_capacity) {
     new_cap = timeline->node_capacity == 0 ? 4 : timeline->node_capacity * 2;
     new_nodes = (struct ui_timeline_node *)C_MULTIPLATFORM_MALLOC(
-        new_cap * sizeof(struct ui_timeline_node));
+        (size_t)new_cap * sizeof(struct ui_timeline_node));
     if (!new_nodes) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;

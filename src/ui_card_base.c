@@ -28,7 +28,9 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
   return (ui_dom_node_append_child)(parent, child);
 }
 #undef ui_dom_node_append_child
+/** @cond */
 #define ui_dom_node_append_child mock_dom_node_append_child
+/** @endcond */
 
 static ui_error_t
 mock_component_set_default_style(struct ui_component *component,
@@ -42,7 +44,9 @@ mock_component_set_default_style(struct ui_component *component,
   return (ui_component_set_default_style)(component, stylesheet);
 }
 #undef ui_component_set_default_style
+/** @cond */
 #define ui_component_set_default_style mock_component_set_default_style
+/** @endcond */
 #endif
 
 static const char ui_card_base_css[] = {
@@ -85,19 +89,20 @@ static const char ui_card_base_css[] = {
 
 /**
  * @struct ui_card_base
+ * @struct ui_card_base
  * @brief Internal representation of a card base component.
  */
 struct ui_card_base {
-  struct ui_component *component;
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *header_node;
-  struct ui_dom_node *content_node;
-  struct ui_dom_node *actions_node;
+  struct ui_component *component;   /**< component */
+  struct ui_dom_node *root_node;    /**< root_node */
+  struct ui_dom_node *header_node;  /**< header_node */
+  struct ui_dom_node *content_node; /**< content_node */
+  struct ui_dom_node *actions_node; /**< actions_node */
 
-  struct ui_component *header_content;
-  struct ui_component *main_content;
-  struct ui_component *actions_content;
-  struct ui_signal *data_signal;
+  struct ui_component *header_content;  /**< header_content */
+  struct ui_component *main_content;    /**< main_content */
+  struct ui_component *actions_content; /**< actions_content */
+  struct ui_signal *data_signal;        /**< data_signal */
 };
 
 ui_error_t ui_card_base_create(struct ui_card_base **out_card) {

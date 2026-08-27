@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_section_index_base.c
  * \brief Implementation of the UI Section Index Base component.
  */
@@ -10,7 +10,7 @@
 #include <stddef.h>
 /* clang-format on */
 
-/** \brief Default CSS stylesheet for the section index base */
+/* \brief Default CSS stylesheet for the section index base */
 static const char *ui_section_index_default_css =
     "div.section-index { "
     "display: flex; "
@@ -26,6 +26,7 @@ static const char *ui_section_index_default_css =
     "}";
 
 /**
+ * @struct ui_section_index_base
  * \brief Internal structure representing a section index component.
  */
 struct ui_section_index_base {
@@ -36,7 +37,7 @@ struct ui_section_index_base {
   struct ui_computed *data_signal; /**< Bound data signal */
 };
 
-/**
+/*
  * \brief Creates a new unstyled section index base component.
  *
  * \param out_index Pointer to receive the allocated section index base.
@@ -114,7 +115,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a section index component.
  *
  * \param index The section index to destroy.
@@ -134,7 +135,7 @@ ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the underlying component instance for style injection and DOM
  * mounting.
  *
@@ -152,7 +153,7 @@ ui_section_index_base_get_component(struct ui_section_index_base *index,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the sections (labels) for the index.
  *
  * This will create child nodes for each label.
@@ -189,7 +190,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
   }
 
   index->item_nodes = (struct ui_dom_node **)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_dom_node *) * count);
+      sizeof(struct ui_dom_node *) * (size_t)count);
   if (!index->item_nodes) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -242,7 +243,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Highlights the active section index visually.
  *
  * \param index The section index.
@@ -285,7 +286,7 @@ ui_section_index_base_set_active_section(struct ui_section_index_base *index,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the data property.
  *
  * \param widget The widget component.

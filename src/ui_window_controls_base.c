@@ -10,27 +10,34 @@
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @struct ui_region_rect
+ * \brief ui_region_rect
+ */
 struct ui_region_rect {
-  int x;
-  int y;
-  int width;
-  int height;
-  enum ui_window_control_hit_region region;
+  int x;                                    /**< x */
+  int y;                                    /**< y */
+  int width;                                /**< width */
+  int height;                               /**< height */
+  enum ui_window_control_hit_region region; /**< region */
 };
 
+/** @cond */
 #define UI_MAX_WINDOW_REGIONS 16
+/** @endcond */
 
 /**
+ * @struct ui_window_controls_base
  * @struct ui_window_controls_base
  * @brief Internal state for the window controls component.
  */
 struct ui_window_controls_base {
-  struct ui_arena *arena;
-  enum ui_window_state state;
-  ui_signal_t *state_signal;
+  struct ui_arena *arena;     /**< arena */
+  enum ui_window_state state; /**< state */
+  ui_signal_t *state_signal;  /**< state_signal */
 
-  struct ui_region_rect regions[UI_MAX_WINDOW_REGIONS];
-  int num_regions;
+  struct ui_region_rect regions[UI_MAX_WINDOW_REGIONS]; /**< regions */
+  int num_regions;                                      /**< num_regions */
 };
 
 static ui_error_t state_equality(union ui_signal_payload a,

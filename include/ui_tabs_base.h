@@ -103,7 +103,8 @@ ui_error_t ui_tabs_base_process_event(struct ui_tabs_base *tabs,
  * @brief Gets the underlying UI component.
  *
  * @param tabs The tabs component.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_tabs_base_get_component(struct ui_tabs_base *tabs,
                                       struct ui_component **out_component);

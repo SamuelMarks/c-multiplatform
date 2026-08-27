@@ -8,12 +8,16 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
+/** @endcond */
 #else
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
+/** @endcond */
 #endif
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -25,7 +29,8 @@ static ui_error_t skip_whitespace(const char **p_str) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_css_parse_view_transition_name */
+/* \brief ui_css_parse_view_transition_name
+ */
 ui_error_t ui_css_parse_view_transition_name(
     const char *str, struct ui_css_view_transition_name *out_name) {
   if (!str || !out_name)
@@ -49,7 +54,8 @@ ui_error_t ui_css_parse_view_transition_name(
 
   return UI_ERROR_NONE;
 }
-/** \brief ui_css_view_transition_class_destroy */
+/* \brief ui_css_view_transition_class_destroy
+ */
 ui_error_t ui_css_view_transition_class_destroy(
     struct ui_css_view_transition_class *vt_class) {
   struct ui_css_view_transition_class_name *current;
@@ -69,7 +75,8 @@ ui_error_t ui_css_view_transition_class_destroy(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_css_parse_view_transition_class */
+/* \brief ui_css_parse_view_transition_class
+ */
 ui_error_t ui_css_parse_view_transition_class(
     const char *str, struct ui_css_view_transition_class *out_class) {
   char token_buf[1024];

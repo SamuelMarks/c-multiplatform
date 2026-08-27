@@ -11,6 +11,7 @@
 /* clang-format on */
 
 /**
+ * @struct ui_arena_block
  * @brief Represents a single block of memory in the arena.
  */
 struct ui_arena_block {
@@ -21,6 +22,7 @@ struct ui_arena_block {
 };
 
 /**
+ * @struct ui_arena
  * @brief Main arena structure that manages a linked list of memory blocks.
  */
 struct ui_arena {
@@ -31,7 +33,7 @@ struct ui_arena {
       default_block_size; /**< Default size to use when allocating new blocks */
 };
 
-/**
+/*
  * @brief Allocates a new block of memory for the arena.
  *
  * @param size The size of the data segment for the new block.
@@ -56,12 +58,12 @@ static ui_error_t allocate_block(size_t size,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Opaque handle representing a memory arena.
  */
 struct ui_arena;
 
-/**
+/*
  * @brief Creates a new memory arena.
  *
  * @param block_size The size of each contiguous memory block the arena
@@ -89,7 +91,7 @@ ui_error_t ui_arena_create(size_t block_size, struct ui_arena **out_arena) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Destroys an arena and frees all its associated memory blocks.
  *
  * @param arena The arena to destroy.
@@ -114,7 +116,7 @@ ui_error_t ui_arena_destroy(struct ui_arena *arena) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Allocates memory from the arena.
  *
  * @param arena The arena to allocate from.
@@ -195,7 +197,7 @@ ui_error_t ui_arena_alloc(struct ui_arena *arena, size_t size, size_t alignment,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Resets the arena, invalidating all allocations but retaining the
  * blocks for reuse.
  *
@@ -222,7 +224,7 @@ ui_error_t ui_arena_reset(struct ui_arena *arena) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Saves the current allocation state of the arena.
  *
  * @param arena The arena to save.
@@ -244,7 +246,7 @@ ui_error_t ui_arena_save(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Restores the arena to a previously saved state.
  *
  * @param arena The arena to restore.
@@ -279,7 +281,7 @@ ui_error_t ui_arena_restore(struct ui_arena *arena,
 
 #ifndef NDEBUG
   {
-    size_t zero_size = arena->current->size - arena->current->used;
+    size_t zero_size = (size_t)(arena->current->size - arena->current->used);
     if (zero_size > 0) {
       memset((char *)arena->current + sizeof(struct ui_arena_block) +
                  arena->current->used,

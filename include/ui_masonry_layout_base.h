@@ -55,7 +55,8 @@ ui_masonry_layout_base_reflow(struct ui_masonry_layout_base *masonry);
  * mounting.
  *
  * @param masonry The masonry layout component.
- * @return The underlying component.
+ * @param out_component The pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t
 ui_masonry_layout_base_get_component(struct ui_masonry_layout_base *masonry,

@@ -4,7 +4,7 @@
 #include <stdio.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_link_base_create.
  * @param out_link Parameter out_link.
  * @return Return value.
@@ -62,7 +62,7 @@ ui_error_t ui_link_base_create(struct ui_link_base **out_link) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_link_base_set_href.
  * @param link Parameter link.
  * @param url Parameter url.
@@ -76,7 +76,7 @@ ui_error_t ui_link_base_set_href(struct ui_link_base *link, const char *url) {
   return ui_dom_node_set_attribute(link->base.shadow_root, "href", url);
 }
 
-/**
+/*
  * @brief ui_link_base_set_text.
  * @param link Parameter link.
  * @param text Parameter text.
@@ -109,7 +109,7 @@ ui_error_t ui_link_base_set_text(struct ui_link_base *link, const char *text) {
   return ui_dom_node_set_text_content(text_node, text);
 }
 
-/**
+/*
  * @brief ui_link_base_bind_disabled.
  * @param widget Parameter widget.
  * @param disabled_signal Parameter disabled_signal.
@@ -124,7 +124,7 @@ ui_error_t ui_link_base_bind_disabled(struct ui_link_base *widget,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_link_base_bind_text.
  * @param widget Parameter widget.
  * @param text_signal Parameter text_signal.

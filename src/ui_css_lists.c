@@ -8,12 +8,16 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
+/** @endcond */
 #else
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
+/** @endcond */
 #endif
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -24,7 +28,8 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_parse_list_style_type(const char *str,
                              struct ui_css_list_style_type_ext *out_type) {
@@ -70,7 +75,7 @@ ui_css_parse_list_style_type(const char *str,
     char quote = str[0];
     const char *end = strchr(str + 1, quote);
     if (end) {
-      size_t len = end - str - 1;
+      size_t len = (size_t)(end - str) - 1;
       if (len >= sizeof(out_type->string_value)) {
         len = sizeof(out_type->string_value) - 1;
       }
@@ -87,7 +92,8 @@ ui_css_parse_list_style_type(const char *str,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_css_parse_list_style_position */
+/* \brief ui_css_parse_list_style_position
+ */
 ui_error_t ui_css_parse_list_style_position(
     const char *str, enum ui_css_list_style_position *out_position) {
   if (!str || !out_position)
@@ -106,7 +112,7 @@ ui_error_t ui_css_parse_list_style_position(
   return UI_ERROR_PARSE_FAILED;
 }
 
-/**
+/*
  * @brief ui_css_parse_list_style_image.
  * @param str Parameter str.
  * @param out_image Parameter out_image.
@@ -130,7 +136,7 @@ ui_error_t ui_css_parse_list_style_image(const char *str,
   return ui_css_parse_image(str, out_image);
 }
 
-/**
+/*
  * @brief ui_css_parse_list_style.
  * @param str Parameter str.
  * @param out_style Parameter out_style.
@@ -212,7 +218,8 @@ ui_error_t ui_css_parse_list_style(const char *str,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_parse_counter_action(const char *str,
                             struct ui_css_counter_action **out_actions) {
@@ -304,7 +311,8 @@ ui_css_parse_counter_action(const char *str,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_counter_action_destroy(struct ui_css_counter_action *actions) {
   while (actions) {

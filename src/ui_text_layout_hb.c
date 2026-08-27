@@ -7,7 +7,7 @@
 #endif
 /* clang-format on */
 
-/**
+/*
  * @brief ui_text_layout_hb_init.
  * @return Return value.
  */
@@ -19,7 +19,8 @@ ui_error_t ui_text_layout_hb_init(void) {
 #endif
 }
 
-/** \brief ui_text_layout_shape_with_harfbuzz */
+/* \brief ui_text_layout_shape_with_harfbuzz
+ */
 ui_error_t ui_text_layout_shape_with_harfbuzz(
     struct ui_text_layout *layout, struct ui_font *font, float font_size,
     const char *text, float max_width, enum ui_text_direction direction) {

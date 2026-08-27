@@ -2,7 +2,7 @@
 #include "ui_css_logical.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_css_logical_to_physical_edge.
  * @param logical_edge Parameter logical_edge.
  * @param writing_mode Parameter writing_mode.
@@ -58,7 +58,8 @@ ui_css_logical_to_physical_edge(enum ui_css_logical_edge logical_edge,
   return UI_CSS_PHYSICAL_EDGE_TOP;
 }
 
-/** \brief ui_css_logical_to_physical_size */
+/* \brief ui_css_logical_to_physical_size
+ */
 ui_error_t ui_css_logical_to_physical_size(
     int is_inline, enum ui_css_writing_mode writing_mode, int *out_is_width) {
   if (!out_is_width)

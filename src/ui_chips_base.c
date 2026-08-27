@@ -6,32 +6,33 @@
 
 /**
  * @struct ui_chips_base
+ * @struct ui_chips_base
  * @brief Internal representation of a chips/tags base component.
  */
 struct ui_chips_base {
-  /** @brief Array of string tokens/chips. */
-  char **tokens;
-  /** @brief Current number of tokens. */
-  size_t count;
-  /** @brief Capacity of the tokens array. */
-  size_t capacity;
+  /* @brief Array of string tokens/chips. */
+  char **tokens; /**< tokens */
+  /* @brief Current number of tokens. */
+  size_t count; /**< count */
+  /* @brief Capacity of the tokens array. */
+  size_t capacity; /**< capacity */
 
-  /** @brief CVA: Callback fired when value changes. */
+  /* @brief CVA: Callback fired when value changes. */
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
-                              void *user_data);
-  /** @brief CVA: User data for on_change callback. */
-  void *cva_on_change_user_data;
+                              void *user_data); /**< user_data) */
+  /* @brief CVA: User data for on_change callback. */
+  void *cva_on_change_user_data; /**< cva_on_change_user_data */
 
-  /** @brief CVA: Callback fired when input is touched. */
-  ui_error_t (*cva_on_touched)(void *user_data);
-  /** @brief CVA: User data for on_touched callback. */
-  void *cva_on_touched_user_data;
+  /* @brief CVA: Callback fired when input is touched. */
+  ui_error_t (*cva_on_touched)(void *user_data); /**< user_data) */
+  /* @brief CVA: User data for on_touched callback. */
+  void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
 
-  /** @brief 1 if disabled, 0 otherwise. */
-  int is_disabled;
+  /* @brief 1 if disabled, 0 otherwise. */
+  int is_disabled; /**< is_disabled */
 };
 
-/**
+/*
  * @brief trigger_cva_change.
  * @param chips Parameter chips.
  * @return Return value.
@@ -48,7 +49,7 @@ static ui_error_t trigger_cva_change(struct ui_chips_base *chips) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief chips_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -89,7 +90,7 @@ static ui_error_t chips_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief chips_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -105,7 +106,7 @@ static ui_error_t chips_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_chips_base_create.
  * @param out_chips Parameter out_chips.
  * @param out_cva Parameter out_cva.
@@ -142,7 +143,7 @@ ui_error_t ui_chips_base_create(struct ui_chips_base **out_chips,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_chips_base_destroy.
  * @param chips Parameter chips.
  * @return Return value.
@@ -162,7 +163,7 @@ ui_error_t ui_chips_base_destroy(struct ui_chips_base *chips) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_chips_base_add.
  * @param chips Parameter chips.
  * @param token Parameter token.
@@ -178,8 +179,8 @@ ui_error_t ui_chips_base_add(struct ui_chips_base *chips, const char *token) {
   }
   if (chips->count == chips->capacity) {
     size_t new_cap = chips->capacity == 0 ? 4 : chips->capacity * 2;
-    new_tokens = (char **)C_MULTIPLATFORM_REALLOC(chips->tokens,
-                                                  new_cap * sizeof(char *));
+    new_tokens = (char **)C_MULTIPLATFORM_REALLOC(
+        chips->tokens, (size_t)new_cap * sizeof(char *));
     if (!new_tokens) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -201,7 +202,7 @@ ui_error_t ui_chips_base_add(struct ui_chips_base *chips, const char *token) {
   return trigger_cva_change(chips);
 }
 
-/**
+/*
  * @brief ui_chips_base_remove.
  * @param chips Parameter chips.
  * @param index Parameter index.
@@ -223,7 +224,7 @@ ui_error_t ui_chips_base_remove(struct ui_chips_base *chips, size_t index) {
   return trigger_cva_change(chips);
 }
 
-/**
+/*
  * @brief ui_chips_base_remove_last.
  * @param chips Parameter chips.
  * @return Return value.
@@ -238,7 +239,7 @@ ui_error_t ui_chips_base_remove_last(struct ui_chips_base *chips) {
   return ui_chips_base_remove(chips, chips->count - 1);
 }
 
-/**
+/*
  * @brief ui_chips_base_get_count.
  * @param chips Parameter chips.
  * @param out_count Parameter out_count.
@@ -253,7 +254,7 @@ ui_error_t ui_chips_base_get_count(const struct ui_chips_base *chips,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_chips_base_get_token.
  * @param chips Parameter chips.
  * @param index Parameter index.
@@ -272,7 +273,7 @@ ui_error_t ui_chips_base_get_token(const struct ui_chips_base *chips,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_chips_base_handle_backspace.
  * @param chips Parameter chips.
  * @param current_input Parameter current_input.

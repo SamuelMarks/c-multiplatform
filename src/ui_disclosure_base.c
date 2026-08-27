@@ -34,26 +34,27 @@ static const char *ui_disclosure_base_default_css =
 
 /**
  * @struct ui_disclosure_base
+ * @struct ui_disclosure_base
  * @brief Internal representation of a disclosure base component.
  */
 struct ui_disclosure_base {
-  /** @brief The base component. */
-  struct ui_component *component;
-  /** @brief Recognizer for tap gestures. */
-  struct ui_gesture_recognizer *gesture_recognizer;
-  /** @brief 1 if the disclosure is expanded, 0 otherwise. */
-  int is_expanded;
-  /** @brief 1 if the disclosure is disabled. */
-  int disabled;
-  /** @brief Callback for toggle events. */
-  ui_disclosure_on_toggle_t on_toggle;
-  /** @brief User data for the toggle callback. */
-  void *user_data;
-  /** @brief Signal to bind data. */
-  struct ui_signal *data_signal;
+  /* @brief The base component. */
+  struct ui_component *component; /**< component */
+  /* @brief Recognizer for tap gestures. */
+  struct ui_gesture_recognizer *gesture_recognizer; /**< gesture_recognizer */
+  /* @brief 1 if the disclosure is expanded, 0 otherwise. */
+  int is_expanded; /**< is_expanded */
+  /* @brief 1 if the disclosure is disabled. */
+  int disabled; /**< disabled */
+  /* @brief Callback for toggle events. */
+  ui_disclosure_on_toggle_t on_toggle; /**< on_toggle */
+  /* @brief User data for the toggle callback. */
+  void *user_data; /**< user_data */
+  /* @brief Signal to bind data. */
+  struct ui_signal *data_signal; /**< data_signal */
 };
 
-/**
+/*
  * @brief update_dom_state.
  * @param disclosure Parameter disclosure.
  * @return Return value.
@@ -71,7 +72,7 @@ static ui_error_t update_dom_state(struct ui_disclosure_base *disclosure) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_create.
  * @param out_disclosure Parameter out_disclosure.
  * @return Return value.
@@ -156,7 +157,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_destroy.
  * @param disclosure Parameter disclosure.
  * @return Return value.
@@ -173,7 +174,7 @@ ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_set_disabled.
  * @param disclosure Parameter disclosure.
  * @param disabled Parameter disabled.
@@ -202,7 +203,7 @@ ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_set_expanded.
  * @param disclosure Parameter disclosure.
  * @param is_expanded Parameter is_expanded.
@@ -234,7 +235,7 @@ ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_is_expanded.
  * @param disclosure Parameter disclosure.
  * @param out_is_expanded Parameter out_is_expanded.
@@ -253,7 +254,7 @@ ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_set_on_toggle.
  * @param disclosure Parameter disclosure.
  * @param on_toggle Parameter on_toggle.
@@ -274,7 +275,7 @@ ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_process_event.
  * @param disclosure Parameter disclosure.
  * @param event Parameter event.
@@ -319,7 +320,7 @@ ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_get_component.
  * @param disclosure Parameter disclosure.
  * @param out_component Parameter out_component.
@@ -339,7 +340,7 @@ ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_disclosure_base_bind_data.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

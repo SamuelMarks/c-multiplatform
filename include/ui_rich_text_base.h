@@ -1,3 +1,6 @@
+/**
+ * @file ui_rich_text_base.h
+ */
 #ifndef UI_RICH_TEXT_BASE_H
 #define UI_RICH_TEXT_BASE_H
 

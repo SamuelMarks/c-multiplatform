@@ -9,12 +9,16 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
+/** @endcond */
 #else
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
+/** @endcond */
 #endif
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -26,7 +30,7 @@ static ui_error_t skip_whitespace(const char **p_str) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_outline_width.
  * @param str Parameter str.
  * @param out_width Parameter out_width.
@@ -59,7 +63,7 @@ ui_error_t ui_css_parse_outline_width(const char *str,
   return ui_css_parse_value(str, out_width);
 }
 
-/**
+/*
  * @brief ui_css_parse_outline_style.
  * @param str Parameter str.
  * @param out_style Parameter out_style.
@@ -103,7 +107,7 @@ ui_error_t ui_css_parse_outline_style(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_outline.
  * @param str Parameter str.
  * @param out_outline Parameter out_outline.
@@ -191,7 +195,7 @@ ui_error_t ui_css_parse_outline(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_cursor_destroy.
  * @param cursor Parameter cursor.
  * @return Return value.
@@ -211,7 +215,7 @@ ui_error_t ui_css_cursor_destroy(struct ui_css_cursor *cursor) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_cursor.
  * @param str Parameter str.
  * @param out_cursor Parameter out_cursor.
@@ -270,7 +274,7 @@ ui_error_t ui_css_parse_cursor(const char *str,
         char *close_paren = strrchr(p, ')');
         if (close_paren) {
           char url_str[512];
-          size_t ulen = close_paren - p + 1;
+          size_t ulen = (size_t)(close_paren - p) + 1;
           ui_error_t img_rc;
           if (ulen >= sizeof(url_str)) {
             ulen = sizeof(url_str) - 1;
@@ -395,7 +399,7 @@ ui_error_t ui_css_parse_cursor(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_user_select.
  * @param str Parameter str.
  * @param out_select Parameter out_select.
@@ -427,7 +431,7 @@ ui_error_t ui_css_parse_user_select(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_appearance.
  * @param str Parameter str.
  * @param out_appearance Parameter out_appearance.
@@ -481,7 +485,8 @@ ui_error_t ui_css_parse_appearance(const char *str,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_parse_pointer_events(const char *str,
                                        enum ui_css_pointer_events *out_events) {
   if (!str || !out_events)
@@ -518,7 +523,8 @@ ui_error_t ui_css_parse_pointer_events(const char *str,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_css_parse_overscroll_behavior_axis */
+/* \brief ui_css_parse_overscroll_behavior_axis
+ */
 ui_error_t ui_css_parse_overscroll_behavior_axis(
     const char *str, enum ui_css_overscroll_behavior *out_behavior) {
   if (!str || !out_behavior)
@@ -542,11 +548,12 @@ ui_error_t ui_css_parse_overscroll_behavior_axis(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_css_parse_overscroll_behavior */
+/* \brief ui_css_parse_overscroll_behavior
+ */
 ui_error_t ui_css_parse_overscroll_behavior(
     const char *str,
     struct ui_css_overscroll_behavior_shorthand *out_shorthand) {
-  char buffer[256];
+  char buffer[256]; /**< buffer */
   char *token;
   char *next_token = NULL;
   enum ui_css_overscroll_behavior parsed_x = UI_CSS_OVERSCROLL_BEHAVIOR_AUTO;

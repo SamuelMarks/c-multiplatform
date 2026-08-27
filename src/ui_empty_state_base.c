@@ -4,7 +4,7 @@
 #include <stdio.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_empty_state_base_create.
  * @param out_state Parameter out_state.
  * @return Return value.
@@ -50,7 +50,7 @@ ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_empty_state_base_set_title.
  * @param state Parameter state.
  * @param text Parameter text.
@@ -64,7 +64,8 @@ ui_error_t ui_empty_state_base_set_title(struct ui_empty_state_base *state,
   return ui_dom_node_set_attribute(state->base.shadow_root, "data-title", text);
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_empty_state_base_set_description(struct ui_empty_state_base *state,
                                     const char *text) {
@@ -75,7 +76,7 @@ ui_empty_state_base_set_description(struct ui_empty_state_base *state,
                                    text);
 }
 
-/**
+/*
  * @brief ui_empty_state_base_bind_data.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

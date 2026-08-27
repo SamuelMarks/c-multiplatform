@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_icon_base.c
  * \brief Implementation of the generic icon base component.
  */
@@ -10,17 +10,18 @@
 /* clang-format on */
 
 /**
+ * @struct ui_icon_base
  * \struct ui_icon_base
  * \brief Internal state for a generic icon (SVG or Font-based).
  */
 struct ui_icon_base {
-  enum ui_icon_type type;
-  char *data;
-  struct ui_font *font;
-  struct ui_signal *name_signal;
+  enum ui_icon_type type;        /**< type */
+  char *data;                    /**< data */
+  struct ui_font *font;          /**< font */
+  struct ui_signal *name_signal; /**< name_signal */
 };
 
-/**
+/*
  * \brief Creates a new icon base component.
  * \param[out] out_icon Pointer to store the created icon.
  * \return UI_ERROR_NONE on success.
@@ -51,7 +52,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys an icon base component.
  * \param[in,out] icon The icon to destroy.
  * \return UI_ERROR_NONE on success.
@@ -67,7 +68,7 @@ ui_error_t ui_icon_base_destroy(struct ui_icon_base *icon) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the icon to use a font glyph.
  * \param[in,out] icon The icon widget.
  * \param[in] font The font containing the glyph.
@@ -115,7 +116,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Sets the icon to use an SVG path.
  * \param[in,out] icon The icon widget.
  * \param[in] svg_path_data The raw SVG path data.
@@ -161,7 +162,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Retrieves the underlying type of the icon.
  * \param[in] icon The icon widget.
  * \param[out] out_type Pointer to store the icon type.
@@ -176,7 +177,7 @@ ui_error_t ui_icon_base_get_type(const struct ui_icon_base *icon,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the raw data (glyph code or SVG path) for the icon.
  * \param[in] icon The icon widget.
  * \param[out] out_data Pointer to store the data string.
@@ -191,7 +192,7 @@ ui_error_t ui_icon_base_get_data(const struct ui_icon_base *icon,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the name of the icon to a reactive signal.
  * \param[in,out] widget The icon widget.
  * \param[in,out] signal The signal providing the icon name.

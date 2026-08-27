@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_live_announcer.c
  * \brief Implementation of the ARIA live announcer.
  */
@@ -16,27 +16,31 @@
 #endif
 
 /**
+ * @struct ui_live_message
  * \struct ui_live_message
  * \brief Represents an individual message in the live announcer queue.
  */
 struct ui_live_message {
-  char *text;
-  enum ui_live_politeness politeness;
-  struct ui_live_message *next;
-};
-
-/** \brief ui_live_announcer */
-struct ui_live_announcer {
-  struct ui_live_message *queue_head;
-  struct ui_live_message *queue_tail;
+  char *text;                         /**< text */
+  enum ui_live_politeness politeness; /**< politeness */
+  struct ui_live_message *next;       /**< next */
 };
 
 /**
+ * @struct ui_live_announcer
+ * \brief ui_live_announcer
+ */
+struct ui_live_announcer {
+  struct ui_live_message *queue_head; /**< queue_head */
+  struct ui_live_message *queue_tail; /**< queue_tail */
+};
+
+/*
  * \brief Creates a new live announcer context.
  * \param[out] out_announcer Pointer to store the created context.
  * \return UI_ERROR_NONE on success.
  */
-/**
+/*
  * \brief Queues a message for live announcement by the screen reader.
  * \param[in,out] announcer The live announcer context.
  * \param[in] message The text message to announce.
@@ -63,12 +67,12 @@ ui_error_t ui_live_announcer_create(struct ui_live_announcer **out_announcer) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a live announcer context and clears its queue.
  * \param[in,out] announcer The context to destroy.
  * \return UI_ERROR_NONE on success.
  */
-/**
+/*
  * \brief Queues a message for live announcement by the screen reader.
  * \param[in,out] announcer The live announcer context.
  * \param[in] message The text message to announce.
@@ -85,7 +89,7 @@ ui_error_t ui_live_announcer_destroy(struct ui_live_announcer *announcer) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Queues a message for live announcement by the screen reader.
  * \param[in,out] announcer The live announcer context.
  * \param[in] message The text message to announce.
@@ -132,14 +136,14 @@ ui_error_t ui_live_announce(struct ui_live_announcer *announcer,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Queues a message for live announcement by the screen reader.
  * \param[in,out] announcer The live announcer context.
  * \param[in] message The text message to announce.
  * \param[in] politeness The politeness level (e.g., polite or assertive).
  * \return UI_ERROR_NONE on success.
  */
-/**
+/*
  * \brief Clears the current announcement queue.
  * \param[in,out] announcer The live announcer context.
  * \return UI_ERROR_NONE on success.

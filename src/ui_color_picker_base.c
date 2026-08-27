@@ -9,7 +9,7 @@
 /* clang-format on */
 
 #if defined(_MSC_VER) && _MSC_VER < 1800
-/**
+/*
  * @brief ui_round.
  * @param number Parameter number.
  * @return Return value.
@@ -17,12 +17,14 @@
 static double ui_round(double number) {
   return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
 }
+/** @brief internal */
 #define ROUND ui_round
 #else
 /* Provide a fallback for strict C90 compilers where round() isn't available */
 static double ui_math_round_fallback(double number) {
   return number < 0.0 ? ceil(number - 0.5) : floor(number + 0.5);
 }
+/** @brief internal */
 #define ROUND ui_math_round_fallback
 #endif
 
@@ -36,29 +38,30 @@ int g_color_picker_mock_current = 0;
 
 /**
  * @struct ui_color_picker_base
+ * @struct ui_color_picker_base
  * @brief Internal representation of a color picker.
  */
 struct ui_color_picker_base {
   struct ui_color_rgb rgb; /**< Current RGB state */
   struct ui_color_hsv hsv; /**< Current HSV state */
 
-  /**
+  /*
    * @brief CVA: Callback fired when value changes
    */
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
-                              void *user_data);
+                              void *user_data); /**< user_data) */
   void *cva_on_change_user_data; /**< CVA: User data for on_change callback */
 
-  /**
+  /*
    * @brief CVA: Callback fired when input is touched
    */
-  ui_error_t (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data); /**< user_data) */
   void *cva_on_touched_user_data; /**< CVA: User data for on_touched callback */
 
   int is_disabled; /**< 1 if disabled, 0 otherwise */
 };
 
-/**
+/*
  * @brief trigger_cva_change.
  * @param picker Parameter picker.
  * @return Return value.
@@ -76,7 +79,7 @@ static ui_error_t trigger_cva_change(struct ui_color_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief color_picker_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -127,7 +130,7 @@ static ui_error_t color_picker_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief color_picker_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -144,7 +147,7 @@ static ui_error_t color_picker_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_base_create.
  * @param out_picker Parameter out_picker.
  * @param out_cva Parameter out_cva.
@@ -190,7 +193,7 @@ ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_base_destroy.
  * @param picker Parameter picker.
  * @return Return value.
@@ -202,7 +205,7 @@ ui_error_t ui_color_picker_base_destroy(struct ui_color_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_hsv_to_rgb.
  * @param hsv Parameter hsv.
  * @param out_rgb Parameter out_rgb.
@@ -256,7 +259,7 @@ ui_error_t ui_color_picker_hsv_to_rgb(const struct ui_color_hsv *hsv,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_rgb_to_hsv.
  * @param rgb Parameter rgb.
  * @param out_hsv Parameter out_hsv.
@@ -306,7 +309,7 @@ ui_error_t ui_color_picker_rgb_to_hsv(const struct ui_color_rgb *rgb,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_rgb_to_hex.
  * @param rgb Parameter rgb.
  * @param out_hex Parameter out_hex.
@@ -328,7 +331,7 @@ ui_error_t ui_color_picker_rgb_to_hex(const struct ui_color_rgb *rgb,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_hex_to_rgb.
  * @param hex Parameter hex.
  * @param out_rgb Parameter out_rgb.
@@ -366,7 +369,7 @@ ui_error_t ui_color_picker_hex_to_rgb(const char *hex,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_calc_hsv_from_2d.
  * @param hue Parameter hue.
  * @param x Parameter x.
@@ -408,7 +411,7 @@ ui_error_t ui_color_picker_calc_hsv_from_2d(double hue, double x, double y,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_base_get_rgb.
  * @param picker Parameter picker.
  * @param out_rgb Parameter out_rgb.
@@ -425,7 +428,7 @@ ui_color_picker_base_get_rgb(const struct ui_color_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_color_picker_base_set_rgb.
  * @param picker Parameter picker.
  * @param rgb Parameter rgb.
@@ -442,7 +445,7 @@ ui_error_t ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
   return trigger_cva_change(picker);
 }
 
-/**
+/*
  * @brief ui_color_picker_base_set_hsv.
  * @param picker Parameter picker.
  * @param hsv Parameter hsv.

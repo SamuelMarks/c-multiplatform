@@ -21,7 +21,9 @@ mock_component_set_default_style(struct ui_component *comp,
   return (ui_component_set_default_style)(comp, style);
 }
 #undef ui_component_set_default_style
+/** @cond */
 #define ui_component_set_default_style mock_component_set_default_style
+/** @endcond */
 
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *k, const char *v) {
@@ -31,7 +33,9 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
   return (ui_dom_node_set_attribute)(node, k, v);
 }
 #undef ui_dom_node_set_attribute
+/** @cond */
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
+/** @endcond */
 
 ui_error_t run_bottom_app_bar_coverage(void);
 ui_error_t run_bottom_app_bar_coverage(void) {
@@ -82,6 +86,7 @@ static const char *ui_bottom_app_bar_default_css =
     "}";
 
 /**
+ * @struct ui_bottom_app_bar_base
  * @struct ui_bottom_app_bar_base
  * @brief Internal implementation of the bottom app bar base component.
  */

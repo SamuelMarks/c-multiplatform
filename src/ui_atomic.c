@@ -11,11 +11,17 @@
 
 #ifndef UI_WINAPI
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_WINAPI __stdcall
+/** @endcond */
 #elif defined(__GNUC__)
+/** @cond */
 #define UI_WINAPI __attribute__((stdcall))
+/** @endcond */
 #else
+/** @cond */
 #define UI_WINAPI
+/** @endcond */
 #endif
 #endif
 

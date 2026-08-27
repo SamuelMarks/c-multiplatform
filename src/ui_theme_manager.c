@@ -11,18 +11,19 @@
 
 /**
  * @struct ui_theme_manager
+ * @struct ui_theme_manager
  * @brief Internal implementation of the theme manager.
  */
 struct ui_theme_manager {
-  /** @brief The arena used for allocations. */
-  struct ui_arena *arena;
-  /** @brief The current theme mode. */
-  enum ui_theme_mode current_mode;
-  /** @brief Signal emitted when the theme mode changes. */
-  ui_signal_t *change_signal;
+  /* @brief The arena used for allocations. */
+  struct ui_arena *arena; /**< arena */
+  /* @brief The current theme mode. */
+  enum ui_theme_mode current_mode; /**< current_mode */
+  /* @brief Signal emitted when the theme mode changes. */
+  ui_signal_t *change_signal; /**< change_signal */
 };
 
-/**
+/*
  * @brief Equality function for theme mode signals.
  * @param a The first payload.
  * @param b The second payload.
@@ -55,7 +56,7 @@ ui_error_t ui_theme_manager_create(struct ui_arena *arena,
   (*out_manager)->arena = arena;
   (*out_manager)->current_mode = UI_THEME_MODE_SYSTEM;
 
-  initial_payload.int_val = UI_THEME_MODE_SYSTEM;
+  initial_payload.int_val = (ui_int32)UI_THEME_MODE_SYSTEM;
   err = ui_signal_create(
       arena, initial_payload, UI_SIGNAL_TYPE_INT32, theme_mode_equality, NULL,
       UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_manager)->change_signal);

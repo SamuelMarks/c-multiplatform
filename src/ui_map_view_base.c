@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_map_view_base.c
  * \brief Implementation of the UI map view base component.
  */
@@ -16,39 +16,46 @@
 /* clang-format on */
 
 #ifndef M_PI
+/** @brief internal */
 #define M_PI 3.14159265358979323846
 #endif
 
-/** \brief ui_map_marker_entry */
+/**
+ * @struct ui_map_marker_entry
+ * \brief ui_map_marker_entry
+ */
 struct ui_map_marker_entry {
-  size_t id;
-  struct ui_map_marker data;
-};
-
-/** \brief ui_map_view_base */
-struct ui_map_view_base {
-  struct ui_component *component;
-  struct ui_signal *center_signal;
-  struct ui_signal *zoom_signal;
-  struct ui_signal *rotation_signal;
-
-  /* State */
-  struct ui_map_coordinate center;
-  double zoom;
-  double rotation;
-
-  /* Tile provider */
-  ui_map_tile_request_cb tile_cb;
-  void *tile_user_data;
-
-  /* Markers */
-  struct ui_map_marker_entry *markers;
-  size_t marker_capacity;
-  size_t marker_count;
-  size_t next_marker_id;
+  size_t id;                 /**< id */
+  struct ui_map_marker data; /**< data */
 };
 
 /**
+ * @struct ui_map_view_base
+ * \brief ui_map_view_base
+ */
+struct ui_map_view_base {
+  struct ui_component *component;    /**< component */
+  struct ui_signal *center_signal;   /**< center_signal */
+  struct ui_signal *zoom_signal;     /**< zoom_signal */
+  struct ui_signal *rotation_signal; /**< rotation_signal */
+
+  /* State */
+  struct ui_map_coordinate center; /**< center */
+  double zoom;                     /**< zoom */
+  double rotation;                 /**< rotation */
+
+  /* Tile provider */
+  ui_map_tile_request_cb tile_cb; /**< tile_cb */
+  void *tile_user_data;           /**< tile_user_data */
+
+  /* Markers */
+  struct ui_map_marker_entry *markers; /**< markers */
+  size_t marker_capacity;              /**< marker_capacity */
+  size_t marker_count;                 /**< marker_count */
+  size_t next_marker_id;               /**< next_marker_id */
+};
+
+/*
  * \brief Creates a new map view base widget.
  * \param[out] out_map Pointer to store the created map view.
  * \return UI_ERROR_NONE on success.
@@ -105,7 +112,7 @@ ui_error_t ui_map_view_base_create(struct ui_map_view_base **out_map) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a map view base widget.
  * \param[in,out] map The map view to destroy.
  * \return UI_ERROR_NONE on success.
@@ -122,7 +129,7 @@ ui_error_t ui_map_view_base_destroy(struct ui_map_view_base *map) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the center coordinate to a reactive signal.
  * \param[in,out] map The map view widget.
  * \param[in,out] signal The signal representing the center coordinate.
@@ -137,7 +144,7 @@ ui_error_t ui_map_view_base_bind_center(struct ui_map_view_base *map,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the zoom level to a reactive signal.
  * \param[in,out] map The map view widget.
  * \param[in,out] signal The signal representing the zoom level.
@@ -152,7 +159,7 @@ ui_error_t ui_map_view_base_bind_zoom(struct ui_map_view_base *map,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the rotation angle to a reactive signal.
  * \param[in,out] map The map view widget.
  * \param[in,out] signal The signal representing the rotation angle.
@@ -168,7 +175,7 @@ ui_error_t ui_map_view_base_bind_rotation(struct ui_map_view_base *map,
 }
 
 /* Helper functions for signal emission */
-/**
+/*
  * \brief Emits the current center coordinate to the bound signal.
  * \param[in,out] map The map view widget.
  * \return UI_ERROR_NONE on success.
@@ -186,7 +193,7 @@ static ui_error_t emit_center(struct ui_map_view_base *map) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Emits the current zoom level to the bound signal.
  * \param[in,out] map The map view widget.
  * \return UI_ERROR_NONE on success.
@@ -204,7 +211,7 @@ static ui_error_t emit_zoom(struct ui_map_view_base *map) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Emits the current rotation angle to the bound signal.
  * \param[in,out] map The map view widget.
  * \return UI_ERROR_NONE on success.
@@ -223,14 +230,14 @@ static ui_error_t emit_rotation(struct ui_map_view_base *map) {
 }
 
 /* Note: Simple Web Mercator implementation */
-/**
+/*
  * \brief Converts longitude to Web Mercator X coordinate.
  * \param[in] lon Longitude in degrees.
  * \return The X coordinate (0.0 to 1.0).
  */
 static double mercator_lon_to_x(double lon) { return (lon + 180.0) / 360.0; }
 
-/**
+/*
  * \brief Converts latitude to Web Mercator Y coordinate.
  * \param[in] lat Latitude in degrees.
  * \return The Y coordinate (0.0 to 1.0).
@@ -241,14 +248,14 @@ static double mercator_lat_to_y(double lat) {
   return 0.5 - (y / (2.0 * M_PI));
 }
 
-/**
+/*
  * \brief Converts Web Mercator X coordinate back to longitude.
  * \param[in] x The X coordinate (0.0 to 1.0).
  * \return Longitude in degrees.
  */
 static double mercator_x_to_lon(double x) { return x * 360.0 - 180.0; }
 
-/**
+/*
  * \brief Converts Web Mercator Y coordinate back to latitude.
  * \param[in] y The Y coordinate (0.0 to 1.0).
  * \return Latitude in degrees.
@@ -258,7 +265,7 @@ static double mercator_y_to_lat(double y) {
   return (180.0 / M_PI) * atan(0.5 * (exp(n) - exp(-n)));
 }
 
-/**
+/*
  * \brief Handles a panning interaction, updating the map center.
  * \param[in,out] map The map view widget.
  * \param[in] delta_x Pan delta on the X axis in pixels.
@@ -296,7 +303,7 @@ ui_error_t ui_map_view_base_handle_pan(struct ui_map_view_base *map,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Handles a pinch interaction, updating the zoom level.
  * \param[in,out] map The map view widget.
  * \param[in] scale The pinch scale multiplier.
@@ -324,7 +331,7 @@ ui_error_t ui_map_view_base_handle_pinch(struct ui_map_view_base *map,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Handles a rotation interaction.
  * \param[in,out] map The map view widget.
  * \param[in] angle The rotation angle in radians.
@@ -349,7 +356,7 @@ ui_error_t ui_map_view_base_handle_rotate(struct ui_map_view_base *map,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Projects a geographic coordinate to pixel coordinates relative to the
  * map center.
  * \param[in] map The map view widget.
@@ -386,7 +393,7 @@ ui_error_t ui_map_view_base_project(struct ui_map_view_base *map,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Unprojects pixel coordinates back to a geographic coordinate.
  * \param[in] map The map view widget.
  * \param[in] x The X pixel coordinate relative to the map center.
@@ -423,7 +430,7 @@ ui_error_t ui_map_view_base_unproject(struct ui_map_view_base *map, double x,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the callback for requesting map tiles.
  * \param[in,out] map The map view widget.
  * \param[in] cb The tile request callback.
@@ -441,7 +448,7 @@ ui_error_t ui_map_view_base_set_tile_provider(struct ui_map_view_base *map,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds a geographic marker to the map.
  * \param[in,out] map The map view widget.
  * \param[in] marker The marker data.
@@ -460,7 +467,7 @@ ui_error_t ui_map_view_base_add_marker(struct ui_map_view_base *map,
   if (map->marker_count >= map->marker_capacity) {
     new_cap = map->marker_capacity == 0 ? 8 : map->marker_capacity * 2;
     new_arr = (struct ui_map_marker_entry *)C_MULTIPLATFORM_REALLOC(
-        map->markers, new_cap * sizeof(struct ui_map_marker_entry));
+        map->markers, (size_t)new_cap * sizeof(struct ui_map_marker_entry));
     if (!new_arr) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -478,7 +485,7 @@ ui_error_t ui_map_view_base_add_marker(struct ui_map_view_base *map,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Removes a geographic marker from the map by its ID.
  * \param[in,out] map The map view widget.
  * \param[in] id The internal ID of the marker to remove.
@@ -504,7 +511,7 @@ ui_error_t ui_map_view_base_remove_marker(struct ui_map_view_base *map,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * \brief Gets the current projected pixel position of a marker.
  * \param[in] map The map view widget.
  * \param[in] id The internal ID of the marker.

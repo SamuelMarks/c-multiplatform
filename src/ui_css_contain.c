@@ -7,12 +7,16 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
+/** @endcond */
 #else
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
+/** @endcond */
 #endif
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -23,7 +27,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/**
+/*
  * @brief ui_css_parse_contain.
  * @param str Parameter str.
  * @param out_flags Parameter out_flags.
@@ -113,7 +117,8 @@ ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_css_parse_content_visibility */
+/* \brief ui_css_parse_content_visibility
+ */
 ui_error_t ui_css_parse_content_visibility(
     const char *str, enum ui_css_content_visibility *out_visibility) {
   if (!str || !out_visibility)
@@ -135,7 +140,7 @@ ui_error_t ui_css_parse_content_visibility(
   return UI_ERROR_PARSE_FAILED;
 }
 
-/**
+/*
  * @brief parse_intrinsic_dim.
  * @param p_str Parameter p_str.
  * @param dim Parameter dim.
@@ -177,7 +182,7 @@ parse_intrinsic_dim(const char **p_str,
     space++;
   }
 
-  len = space - str;
+  len = (size_t)(space - str);
   if (len >= sizeof(token_buf))
     len = sizeof(token_buf) - 1;
   memcpy(token_buf, str, len);
@@ -200,7 +205,8 @@ parse_intrinsic_dim(const char **p_str,
   }
 }
 
-/** \brief ui_css_parse_contain_intrinsic_size */
+/* \brief ui_css_parse_contain_intrinsic_size
+ */
 ui_error_t ui_css_parse_contain_intrinsic_size(
     const char *str, struct ui_css_contain_intrinsic_size *out_size) {
   ui_error_t rc;

@@ -19,7 +19,9 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
   return (ui_dom_node_append_child)(parent, child);
 }
 #undef ui_dom_node_append_child
+/** @cond */
 #define ui_dom_node_append_child mock_dom_node_append_child
+/** @endcond */
 
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *k, const char *v) {
@@ -29,7 +31,9 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
   return (ui_dom_node_set_attribute)(node, k, v);
 }
 #undef ui_dom_node_set_attribute
+/** @cond */
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
+/** @endcond */
 
 static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
                                                  const char *k) {
@@ -39,7 +43,9 @@ static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
   return (ui_dom_node_remove_attribute)(node, k);
 }
 #undef ui_dom_node_remove_attribute
+/** @cond */
 #define ui_dom_node_remove_attribute mock_dom_node_remove_attribute
+/** @endcond */
 
 static ui_error_t mock_signal_set(struct ui_signal *signal,
                                   union ui_signal_payload p) {
@@ -49,7 +55,9 @@ static ui_error_t mock_signal_set(struct ui_signal *signal,
   return (ui_signal_set)(signal, p);
 }
 #undef ui_signal_set
+/** @cond */
 #define ui_signal_set mock_signal_set
+/** @endcond */
 
 ui_error_t run_banner_coverage(void);
 ui_error_t run_banner_coverage(void) {
@@ -88,6 +96,7 @@ ui_error_t run_banner_coverage(void) {
 #endif
 
 /**
+ * @struct ui_banner_base
  * @struct ui_banner_base
  * @brief Internal state for a banner component.
  */

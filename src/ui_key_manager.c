@@ -3,9 +3,10 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/** @brief internal */
 #define INITIAL_CAPACITY 8
 
-/**
+/*
  * @brief ui_key_manager_init.
  * @param manager Parameter manager.
  * @return Return value.
@@ -19,7 +20,7 @@ ui_error_t ui_key_manager_init(struct ui_key_manager *manager) {
   }
 
   manager->hotkeys = (struct ui_hotkey *)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_hotkey) * INITIAL_CAPACITY);
+      sizeof(struct ui_hotkey) * (size_t)INITIAL_CAPACITY);
   if (!manager->hotkeys) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -32,7 +33,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_key_manager_cleanup.
  * @param manager Parameter manager.
  * @return Return value.
@@ -56,7 +57,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_key_manager_register.
  * @param manager Parameter manager.
  * @param hotkey Parameter hotkey.
@@ -82,7 +83,7 @@ ui_error_t ui_key_manager_register(struct ui_key_manager *manager,
       new_capacity = manager->count + 1;
     }
     new_array = (struct ui_hotkey *)C_MULTIPLATFORM_REALLOC(
-        manager->hotkeys, sizeof(struct ui_hotkey) * new_capacity);
+        manager->hotkeys, sizeof(struct ui_hotkey) * (size_t)new_capacity);
     if (!new_array) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -98,7 +99,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_key_manager_unregister.
  * @param manager Parameter manager.
  * @param id Parameter id.
@@ -129,7 +130,8 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_key_manager_process_event(const struct ui_key_manager *manager,
                                         const struct ui_keyboard_event *event,
                                         int *out_handled) {
@@ -159,7 +161,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_key_manager_format_hotkey.
  * @param hotkey Parameter hotkey.
  * @param out_buffer Parameter out_buffer.

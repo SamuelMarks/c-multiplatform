@@ -18,6 +18,7 @@ int g_chart_mock_fail = -1;
 
 /**
  * @struct ui_chart_base
+ * @struct ui_chart_base
  * @brief Internal representation of a chart base component.
  */
 struct ui_chart_base {

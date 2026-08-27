@@ -155,7 +155,8 @@ ui_error_t ui_side_sheet_base_process_event(struct ui_side_sheet_base *sheet,
  * @brief Retrieves the underlying component wrapper.
  *
  * @param sheet The side sheet.
- * @return The component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t
 ui_side_sheet_base_get_component(struct ui_side_sheet_base *sheet,

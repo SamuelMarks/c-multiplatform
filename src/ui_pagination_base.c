@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_pagination_base.c
  * \brief Implementation of pagination logic state management.
  */
@@ -8,17 +8,18 @@
 /* clang-format on */
 
 /**
+ * @struct ui_pagination_base
  * \struct ui_pagination_base
  * \brief Core state for pagination, including current page and total items.
  */
 struct ui_pagination_base {
-  size_t total_items;
-  size_t page_size;
-  size_t current_page;
-  struct ui_signal *current_page_signal;
+  size_t total_items;                    /**< total_items */
+  size_t page_size;                      /**< page_size */
+  size_t current_page;                   /**< current_page */
+  struct ui_signal *current_page_signal; /**< current_page_signal */
 };
 
-/**
+/*
  * \brief Creates a new pagination base context.
  * \param[out] out_pagination Pointer to store the created context.
  * \return UI_ERROR_NONE on success.
@@ -45,7 +46,7 @@ ui_pagination_base_create(struct ui_pagination_base **out_pagination) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a pagination base context.
  * \param[in,out] pagination The context to destroy.
  * \return UI_ERROR_NONE on success.
@@ -58,7 +59,7 @@ ui_error_t ui_pagination_base_destroy(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Configures the total items and page size for pagination.
  * \param[in,out] pagination The pagination context.
  * \param[in] total_items Total number of items.
@@ -86,7 +87,7 @@ ui_error_t ui_pagination_base_set_config(struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Computes the total number of pages based on config.
  * \param[in] pagination The pagination context.
  * \param[out] out_total_pages Pointer to store the calculated total pages.
@@ -109,7 +110,7 @@ ui_pagination_base_get_total_pages(const struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the current active page index (0-based).
  * \param[in,out] pagination The pagination context.
  * \param[in] page_index The requested page index.
@@ -141,7 +142,7 @@ ui_pagination_base_set_current_page(struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the current active page index.
  * \param[in] pagination The pagination context.
  * \param[out] out_current_page Pointer to store the current page index.
@@ -158,7 +159,7 @@ ui_pagination_base_get_current_page(const struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Advances to the next page if possible.
  * \param[in,out] pagination The pagination context.
  * \return UI_ERROR_NONE on success.
@@ -184,7 +185,7 @@ ui_error_t ui_pagination_base_next(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retreats to the previous page if possible.
  * \param[in,out] pagination The pagination context.
  * \return UI_ERROR_NONE on success.
@@ -201,7 +202,7 @@ ui_error_t ui_pagination_base_previous(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Jumps to the first page.
  * \param[in,out] pagination The pagination context.
  * \return UI_ERROR_NONE on success.
@@ -215,7 +216,7 @@ ui_error_t ui_pagination_base_first(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Jumps to the last page.
  * \param[in,out] pagination The pagination context.
  * \return UI_ERROR_NONE on success.
@@ -239,7 +240,7 @@ ui_error_t ui_pagination_base_last(struct ui_pagination_base *pagination) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Calculates the item index bounds for the current page.
  * \param[in] pagination The pagination context.
  * \param[out] out_start_index Pointer to store the start item index.
@@ -274,7 +275,7 @@ ui_pagination_base_get_bounds(const struct ui_pagination_base *pagination,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the current page index to a reactive signal.
  * \param[in,out] widget The pagination context.
  * \param[in,out] signal The signal to bind.

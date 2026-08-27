@@ -16,13 +16,14 @@ void EMSCRIPTEN_KEEPALIVE ui_camera_base_mock_permission_response_js(struct ui_c
 
 /**
  * @struct ui_camera_base
+ * @struct ui_camera_base
  * @brief Internal representation of a camera base component.
  */
 struct ui_camera_base {
-  struct ui_component *component;
-  enum ui_camera_state state;
-  ui_camera_frame_callback frame_callback;
-  void *frame_user_data;
+  struct ui_component *component;          /**< component */
+  enum ui_camera_state state;              /**< state */
+  ui_camera_frame_callback frame_callback; /**< frame_callback */
+  void *frame_user_data;                   /**< frame_user_data */
 };
 
 ui_error_t ui_camera_base_create(struct ui_camera_base **out_camera) {

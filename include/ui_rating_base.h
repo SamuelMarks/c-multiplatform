@@ -1,3 +1,6 @@
+/**
+ * @file ui_rating_base.h
+ */
 #ifndef UI_RATING_BASE_H
 #define UI_RATING_BASE_H
 

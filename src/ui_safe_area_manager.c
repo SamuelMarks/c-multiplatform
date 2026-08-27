@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_safe_area_manager.c
  * \brief Implementation of the UI Safe Area Manager component.
  */
@@ -12,6 +12,7 @@
 /* clang-format on */
 
 /**
+ * @struct ui_safe_area_manager
  * \brief Internal structure representing a safe area manager.
  */
 struct ui_safe_area_manager {
@@ -20,7 +21,7 @@ struct ui_safe_area_manager {
   ui_signal_t *change_signal;                /**< Signal for inset changes */
 };
 
-/**
+/*
  * \brief Evaluates equality of two safe area inset signal payloads.
  *
  * \param a First payload.
@@ -43,7 +44,7 @@ static ui_error_t insets_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a safe area manager.
  *
  * \param arena The memory arena to use for allocation.
@@ -104,7 +105,7 @@ ui_safe_area_manager_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a safe area manager.
  *
  * \param manager The safe area manager to destroy.
@@ -135,7 +136,7 @@ ui_error_t ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the current safe area insets (usually called by window backends).
  *
  * \param manager The safe area manager.
@@ -173,7 +174,7 @@ ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the current safe area insets.
  *
  * \param manager The safe area manager.
@@ -191,7 +192,7 @@ ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the signal emitted when insets change.
  * Payload is a pointer to a struct ui_safe_area_insets.
  *

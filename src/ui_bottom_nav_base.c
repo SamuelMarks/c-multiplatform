@@ -14,6 +14,7 @@
 
 /**
  * @struct ui_bottom_nav_base
+ * @struct ui_bottom_nav_base
  * @brief Internal representation of a bottom navigation bar base.
  */
 struct ui_bottom_nav_base {
@@ -23,6 +24,7 @@ struct ui_bottom_nav_base {
 };
 
 /**
+ * @struct ui_bottom_nav_item_base
  * @struct ui_bottom_nav_item_base
  * @brief Internal representation of a bottom navigation item.
  */

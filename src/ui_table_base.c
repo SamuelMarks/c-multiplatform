@@ -23,7 +23,9 @@ static ui_error_t mock_ui_dom_node_append_child(struct ui_dom_node *parent,
   }
   return ui_dom_node_append_child(parent, child);
 }
+/** @cond */
 #define ui_dom_node_append_child mock_ui_dom_node_append_child
+/** @endcond */
 #endif
 
 #if defined(_MSC_VER)
@@ -32,23 +34,24 @@ static ui_error_t mock_ui_dom_node_append_child(struct ui_dom_node *parent,
 
 /**
  * @struct ui_table_base
+ * @struct ui_table_base
  * @brief Internal implementation of the table base component.
  */
 struct ui_table_base {
-  /** @brief Data model containing rows, columns, and rendering logic. */
-  struct ui_table_model model;
-  /** @brief Array of column configurations. */
-  struct ui_table_column_config *col_configs;
-  /** @brief Number of columns. */
-  size_t num_cols;
-  /** @brief Active sort configuration. */
-  struct ui_table_sort_config sort_config;
-  /** @brief Active pagination configuration. */
-  struct ui_table_pagination_config pagination_config;
-  /** @brief Associated selection model. */
-  struct ui_selection_model *selection_model;
-  /** @brief Bound data signal. */
-  struct ui_computed *data_signal;
+  /* @brief Data model containing rows, columns, and rendering logic. */
+  struct ui_table_model model; /**< model */
+  /* @brief Array of column configurations. */
+  struct ui_table_column_config *col_configs; /**< col_configs */
+  /* @brief Number of columns. */
+  size_t num_cols; /**< num_cols */
+  /* @brief Active sort configuration. */
+  struct ui_table_sort_config sort_config; /**< sort_config */
+  /* @brief Active pagination configuration. */
+  struct ui_table_pagination_config pagination_config; /**< pagination_config */
+  /* @brief Associated selection model. */
+  struct ui_selection_model *selection_model; /**< selection_model */
+  /* @brief Bound data signal. */
+  struct ui_computed *data_signal; /**< data_signal */
 };
 
 ui_error_t ui_table_base_create(struct ui_table_base **out_table,
@@ -88,7 +91,7 @@ ui_error_t ui_table_base_create(struct ui_table_base **out_table,
   if (num_cols > 0) {
     table->col_configs =
         (struct ui_table_column_config *)C_MULTIPLATFORM_MALLOC(
-            num_cols * sizeof(struct ui_table_column_config));
+            (size_t)num_cols * sizeof(struct ui_table_column_config));
     if (!table->col_configs) {
       ui_selection_model_destroy(table->selection_model);
       C_MULTIPLATFORM_FREE(table);
@@ -162,7 +165,7 @@ ui_error_t ui_table_base_set_pagination_config(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Helper function to get ARIA string for sort direction.
  * @param dir The sort direction.
  * @return The corresponding ARIA string.
@@ -200,7 +203,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
   if (rc != UI_ERROR_NONE)
     return rc;
 
+/** @cond */
 #define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+  /** @endcond */
 
   (void)UI_DOM_SET_ATTR_IGNORE(table_root, "role", "grid");
 

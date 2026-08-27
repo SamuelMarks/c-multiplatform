@@ -23,7 +23,7 @@ ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
 /* GLES fallback initialization. */
 ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *renderer);
 
-/**
+/*
  * @brief ui_renderer_create.
  * @param out_renderer Parameter out_renderer.
  * @return Return value.
@@ -68,7 +68,7 @@ ui_error_t ui_renderer_create(struct ui_renderer **out_renderer) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_renderer_destroy.
  * @param renderer Parameter renderer.
  * @return Return value.

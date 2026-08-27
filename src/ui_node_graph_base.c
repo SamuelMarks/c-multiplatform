@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_node_graph_base.c
  * \brief Implementation of the UI node graph component for visual programming
  * or flow charts.
@@ -10,36 +10,38 @@
 #include <stddef.h>
 /* clang-format on */
 
-/**
+/*
  * \def UI_NODE_GRAPH_MAX_CONNECTIONS
  * \brief Maximum allowed number of connections in the graph.
  */
 #define UI_NODE_GRAPH_MAX_CONNECTIONS 256
 
 /**
+ * @struct ui_node_graph_base
  * \struct ui_node_graph_base
  * \brief Core state and camera context for a node graph widget.
  */
 struct ui_node_graph_base {
-  struct ui_arena *arena;
-  struct ui_node_graph_camera_config camera_config;
+  struct ui_arena *arena;                           /**< arena */
+  struct ui_node_graph_camera_config camera_config; /**< camera_config */
 
-  float zoom;
-  float pan_x;
-  float pan_y;
-  struct ui_dom_matrix camera_matrix;
+  float zoom;                         /**< zoom */
+  float pan_x;                        /**< pan_x */
+  float pan_y;                        /**< pan_y */
+  struct ui_dom_matrix camera_matrix; /**< camera_matrix */
 
-  struct ui_node_graph_connection connections[UI_NODE_GRAPH_MAX_CONNECTIONS];
-  int num_connections;
+  struct ui_node_graph_connection
+      connections[UI_NODE_GRAPH_MAX_CONNECTIONS]; /**< connections */
+  int num_connections;                            /**< num_connections */
 
-  struct ui_dom_rect current_marquee;
-  ui_bool_t has_marquee;
+  struct ui_dom_rect current_marquee; /**< current_marquee */
+  ui_bool_t has_marquee;              /**< has_marquee */
 
-  ui_signal_t *camera_signal;
-  ui_signal_t *topology_signal;
+  ui_signal_t *camera_signal;   /**< camera_signal */
+  ui_signal_t *topology_signal; /**< topology_signal */
 };
 
-/**
+/*
  * \brief Equality check for pointer payloads.
  * \param[in] a First payload.
  * \param[in] b Second payload.
@@ -53,7 +55,7 @@ static ui_error_t pointer_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Equality check that always returns false (for triggering signals
  * unconditionally).
  * \param[in] a First payload.
@@ -70,7 +72,7 @@ static ui_error_t void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Updates the internal camera matrix based on pan and zoom and triggers
  * its signal.
  * \param[in,out] graph The node graph widget.
@@ -94,7 +96,8 @@ static ui_error_t update_camera_matrix(struct ui_node_graph_base *graph) {
   return rc;
 }
 
-/** \brief ui_node_graph_base_create */
+/* \brief ui_node_graph_base_create
+ */
 ui_error_t ui_node_graph_base_create(
     struct ui_arena *arena,
     const struct ui_node_graph_camera_config *camera_config,
@@ -146,7 +149,7 @@ ui_error_t ui_node_graph_base_create(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a node graph widget.
  * \param[in,out] graph The node graph widget to destroy.
  * \return UI_ERROR_NONE on success.
@@ -161,7 +164,7 @@ ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Pans the camera view.
  * \param[in,out] graph The node graph widget.
  * \param[in] delta_x X pan delta.
@@ -180,14 +183,14 @@ ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
   /* Apply bounding box constraints if specified */
   if (graph->camera_config.bounds.width > 0 &&
       graph->camera_config.bounds.height > 0) {
-    if (graph->pan_x < graph->camera_config.bounds.left)
-      graph->pan_x = graph->camera_config.bounds.left;
-    if (graph->pan_y < graph->camera_config.bounds.top)
-      graph->pan_y = graph->camera_config.bounds.top;
-    if (graph->pan_x > graph->camera_config.bounds.right)
-      graph->pan_x = graph->camera_config.bounds.right;
-    if (graph->pan_y > graph->camera_config.bounds.bottom)
-      graph->pan_y = graph->camera_config.bounds.bottom;
+    if (graph->pan_x < (float)graph->camera_config.bounds.left)
+      graph->pan_x = (float)graph->camera_config.bounds.left;
+    if (graph->pan_y < (float)graph->camera_config.bounds.top)
+      graph->pan_y = (float)graph->camera_config.bounds.top;
+    if (graph->pan_x > (float)graph->camera_config.bounds.right)
+      graph->pan_x = (float)graph->camera_config.bounds.right;
+    if (graph->pan_y > (float)graph->camera_config.bounds.bottom)
+      graph->pan_y = (float)graph->camera_config.bounds.bottom;
   }
 
   rc = update_camera_matrix(graph);
@@ -195,7 +198,7 @@ ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Zooms the camera view, optionally towards a specific focal point.
  * \param[in,out] graph The node graph widget.
  * \param[in] zoom The new zoom level.
@@ -224,10 +227,10 @@ ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
   if (focal_point && old_zoom != 0.0f) {
     /* Offset pan to zoom towards focal point */
     scale_factor = zoom / old_zoom;
-    graph->pan_x =
-        focal_point->x - (focal_point->x - graph->pan_x) * scale_factor;
-    graph->pan_y =
-        focal_point->y - (focal_point->y - graph->pan_y) * scale_factor;
+    graph->pan_x = (float)(focal_point->x -
+                           (focal_point->x - graph->pan_x) * scale_factor);
+    graph->pan_y = (float)(focal_point->y -
+                           (focal_point->y - graph->pan_y) * scale_factor);
   }
 
   rc = update_camera_matrix(graph);
@@ -235,7 +238,8 @@ ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_node_graph_base_get_camera_signal(struct ui_node_graph_base *graph,
                                      ui_signal_t **out_signal) {
@@ -245,7 +249,8 @@ ui_node_graph_base_get_camera_signal(struct ui_node_graph_base *graph,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_node_graph_base_screen_to_graph(const struct ui_node_graph_base *graph,
                                    const struct ui_dom_point *screen_point,
@@ -265,7 +270,8 @@ ui_node_graph_base_screen_to_graph(const struct ui_node_graph_base *graph,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_node_graph_base_add_connection */
+/* \brief ui_node_graph_base_add_connection
+ */
 ui_error_t ui_node_graph_base_add_connection(
     struct ui_node_graph_base *graph,
     const struct ui_node_graph_connection *connection) {
@@ -284,7 +290,8 @@ ui_error_t ui_node_graph_base_add_connection(
   return ui_signal_set(graph->topology_signal, payload);
 }
 
-/** \brief ui_node_graph_base_set_marquee_selection */
+/* \brief ui_node_graph_base_set_marquee_selection
+ */
 ui_error_t ui_node_graph_base_set_marquee_selection(
     struct ui_node_graph_base *graph,
     const struct ui_dom_rect *selection_rect) {
@@ -304,7 +311,8 @@ ui_error_t ui_node_graph_base_set_marquee_selection(
   return ui_signal_set(graph->topology_signal, payload);
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_node_graph_base_get_topology_signal(struct ui_node_graph_base *graph,
                                        ui_signal_t **out_signal) {

@@ -1,3 +1,6 @@
+/**
+ * @file ui_section_index_base.h
+ */
 #ifndef UI_SECTION_INDEX_BASE_H
 #define UI_SECTION_INDEX_BASE_H
 

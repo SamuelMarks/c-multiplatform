@@ -8,18 +8,34 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_mock_io_fail;
+/** @cond */
 #define UI_FSEEK(f, o, w) (g_mock_io_fail == 1 ? -1 : fseek(f, o, w))
+/** @endcond */
+/** @cond */
 #define UI_FTELL(f) (g_mock_io_fail == 2 ? -1 : ftell(f))
+/** @endcond */
+/** @cond */
 #define UI_FREAD(p, s, n, f) (g_mock_io_fail == 3 ? 0 : fread(p, s, n, f))
+/** @endcond */
+/** @cond */
 #define UI_FSEEK_SET_FAIL(f, o, w) (g_mock_io_fail == 4 ? -1 : fseek(f, o, w))
+/** @endcond */
 #else
+/** @cond */
 #define UI_FSEEK(f, o, w) fseek(f, o, w)
+/** @endcond */
+/** @cond */
 #define UI_FTELL(f) ftell(f)
+/** @endcond */
+/** @cond */
 #define UI_FREAD(p, s, n, f) fread(p, s, n, f)
+/** @endcond */
+/** @cond */
 #define UI_FSEEK_SET_FAIL(f, o, w) fseek(f, o, w)
+/** @endcond */
 #endif
 
-/**
+/*
  * @brief ui_file_uploader_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -51,7 +67,8 @@ ui_file_uploader_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_file_uploader_cva_register_on_change */
+/* \brief ui_file_uploader_cva_register_on_change
+ */
 static ui_error_t ui_file_uploader_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -63,7 +80,8 @@ static ui_error_t ui_file_uploader_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_file_uploader_cva_register_on_touched */
+/* \brief ui_file_uploader_cva_register_on_touched
+ */
 static ui_error_t ui_file_uploader_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_file_uploader_base *uploader =
@@ -73,7 +91,7 @@ static ui_error_t ui_file_uploader_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_file_uploader_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -88,7 +106,7 @@ ui_file_uploader_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_file_uploader_init.
  * @param uploader Parameter uploader.
  * @param max_files Parameter max_files.
@@ -122,12 +140,13 @@ ui_error_t ui_file_uploader_init(struct ui_file_uploader_base *uploader,
   uploader->is_disabled = UI_FALSE;
 
   uploader->files = (struct ui_file_uploader_file *)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_file_uploader_file) * max_files);
+      sizeof(struct ui_file_uploader_file) * (size_t)max_files);
   if (uploader->files == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
-  memset(uploader->files, 0, sizeof(struct ui_file_uploader_file) * max_files);
+  memset(uploader->files, 0,
+         sizeof(struct ui_file_uploader_file) * (size_t)max_files);
 
   /* Initialize internal drag list */
   uploader->dropzone_list.list_id = -1; /* Arbitrary ID for external systems */
@@ -149,7 +168,7 @@ ui_error_t ui_file_uploader_init(struct ui_file_uploader_base *uploader,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_file_uploader_destroy.
  * @param uploader Parameter uploader.
  * @return Return value.
@@ -173,7 +192,8 @@ ui_error_t ui_file_uploader_destroy(struct ui_file_uploader_base *uploader) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_file_uploader_on_drag_enter(struct ui_file_uploader_base *uploader) {
   if (uploader == NULL) {
@@ -195,7 +215,8 @@ ui_file_uploader_on_drag_enter(struct ui_file_uploader_base *uploader) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader) {
   if (uploader == NULL) {
@@ -208,7 +229,7 @@ ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_file_uploader_drop_file.
  * @param uploader Parameter uploader.
  * @param file_path Parameter file_path.
@@ -286,7 +307,8 @@ ui_error_t ui_file_uploader_drop_file(struct ui_file_uploader_base *uploader,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_file_uploader_read_files(struct ui_file_uploader_base *uploader) {
   int i;
   FILE *fp = NULL;
@@ -387,7 +409,8 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_file_uploader_register_dropzone(struct ui_file_uploader_base *uploader,
                                    struct ui_drag_drop_context *drag_ctx) {

@@ -21,25 +21,32 @@ static ui_error_t mock_set_expanded(struct ui_disclosure_base *d, int val) {
   if (g_accordion_mock_fail == 3) return UI_ERROR_UNKNOWN;
   return (ui_disclosure_base_set_expanded)(d, val);
 }
+/** @cond */
 #define ui_disclosure_base_set_on_toggle mock_set_on_toggle
+/** @endcond */
+/** @cond */
 #define ui_disclosure_base_is_expanded mock_is_expanded
+/** @endcond */
+/** @cond */
 #define ui_disclosure_base_set_expanded mock_set_expanded
+/** @endcond */
 #endif
 /* clang-format on */
 
 /**
  * @struct ui_accordion_base
+ * @struct ui_accordion_base
  * @brief Represents an accordion manager that synchronizes a group of
  * disclosures.
  */
 struct ui_accordion_base {
-  struct ui_disclosure_base **disclosures;
-  size_t count;
-  size_t capacity;
-  struct ui_disclosure_base *active_disclosure;
-  ui_accordion_on_change_t on_change;
-  void *user_data;
-  struct ui_computed *data_signal;
+  struct ui_disclosure_base **disclosures;      /**< disclosures */
+  size_t count;                                 /**< count */
+  size_t capacity;                              /**< capacity */
+  struct ui_disclosure_base *active_disclosure; /**< active_disclosure */
+  ui_accordion_on_change_t on_change;           /**< on_change */
+  void *user_data;                              /**< user_data */
+  struct ui_computed *data_signal;              /**< data_signal */
 };
 
 static ui_error_t
@@ -160,7 +167,7 @@ ui_accordion_base_add_disclosure(struct ui_accordion_base *accordion,
     struct ui_disclosure_base **new_arr =
         (struct ui_disclosure_base **)C_MULTIPLATFORM_REALLOC(
             accordion->disclosures,
-            new_cap * sizeof(struct ui_disclosure_base *));
+            (size_t)new_cap * sizeof(struct ui_disclosure_base *));
     if (!new_arr) {
       return UI_ERROR_OUT_OF_MEMORY;
     }

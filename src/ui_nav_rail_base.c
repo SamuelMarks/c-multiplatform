@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_nav_rail_base.c
  * \brief Implementation of the UI navigation rail base component.
  */
@@ -12,21 +12,25 @@
 /* clang-format on */
 
 /**
+ * @struct ui_nav_rail_base
  * \struct ui_nav_rail_base
  * \brief Container state for a navigation rail widget.
  */
 struct ui_nav_rail_base {
-  struct ui_component *component;
-  struct ui_signal *active_index_signal;
-};
-
-/** \brief ui_nav_rail_item_base */
-struct ui_nav_rail_item_base {
-  struct ui_component *component;
-  int active;
+  struct ui_component *component;        /**< component */
+  struct ui_signal *active_index_signal; /**< active_index_signal */
 };
 
 /**
+ * @struct ui_nav_rail_item_base
+ * \brief ui_nav_rail_item_base
+ */
+struct ui_nav_rail_item_base {
+  struct ui_component *component; /**< component */
+  int active;                     /**< active */
+};
+
+/*
  * \brief Creates a new navigation rail base widget.
  * \param[out] out_rail Pointer to store the created rail.
  * \return UI_ERROR_NONE on success.
@@ -57,7 +61,7 @@ ui_error_t ui_nav_rail_base_create(struct ui_nav_rail_base **out_rail) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a navigation rail base widget.
  * \param[in,out] rail The rail widget to destroy.
  * \return UI_ERROR_NONE on success.
@@ -73,7 +77,7 @@ ui_error_t ui_nav_rail_base_destroy(struct ui_nav_rail_base *rail) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the underlying DOM component of the navigation rail.
  * \param[in,out] rail The rail widget.
  * \param[out] out_component Pointer to store the DOM component.
@@ -88,7 +92,7 @@ ui_error_t ui_nav_rail_base_get_component(struct ui_nav_rail_base *rail,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Appends an item to the navigation rail.
  * \param[in,out] rail The rail widget.
  * \param[in,out] item The rail item to append.
@@ -103,7 +107,7 @@ ui_error_t ui_nav_rail_base_append_item(struct ui_nav_rail_base *rail,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new navigation rail item.
  * \param[out] out_item Pointer to store the created item.
  * \return UI_ERROR_NONE on success.
@@ -134,7 +138,7 @@ ui_nav_rail_item_base_create(struct ui_nav_rail_item_base **out_item) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a navigation rail item.
  * \param[in,out] item The rail item to destroy.
  * \return UI_ERROR_NONE on success.
@@ -150,7 +154,7 @@ ui_error_t ui_nav_rail_item_base_destroy(struct ui_nav_rail_item_base *item) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the underlying DOM component of the navigation rail item.
  * \param[in,out] item The rail item.
  * \param[out] out_component Pointer to store the DOM component.
@@ -166,7 +170,7 @@ ui_nav_rail_item_base_get_component(struct ui_nav_rail_item_base *item,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the active (selected) state of a navigation rail item.
  * \param[in,out] item The rail item.
  * \param[in] active Non-zero to activate, 0 to deactivate.
@@ -182,7 +186,7 @@ ui_error_t ui_nav_rail_item_base_set_active(struct ui_nav_rail_item_base *item,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the active state of a navigation rail item.
  * \param[in] item The rail item.
  * \param[out] out_active Pointer to store the active state.
@@ -197,7 +201,7 @@ ui_error_t ui_nav_rail_item_base_get_active(struct ui_nav_rail_item_base *item,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the active index of the navigation rail to a reactive signal.
  * \param[in,out] widget The rail widget.
  * \param[in,out] signal The active index signal.

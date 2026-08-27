@@ -6,7 +6,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -17,7 +17,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/**
+/*
  * @brief match_keyword.
  * @param p_str Parameter p_str.
  * @param keyword Parameter keyword.
@@ -42,7 +42,7 @@ static void match_keyword(const char **p_str, const char *keyword,
   *out_match = 0;
 }
 
-/**
+/*
  * @brief parse_string.
  * @param p_str Parameter p_str.
  * @param out_buf Parameter out_buf.
@@ -82,7 +82,7 @@ static ui_error_t parse_string(const char **p_str, char *out_buf,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_ident.
  * @param p_str Parameter p_str.
  * @param out_buf Parameter out_buf.
@@ -109,7 +109,7 @@ static ui_error_t parse_ident(const char **p_str, char *out_buf,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_content.
  * @param str Parameter str.
  * @param out_content Parameter out_content.
@@ -165,7 +165,7 @@ ui_error_t ui_css_parse_content(const char *str,
         const char *end = strchr(start, ')');
         if (end) {
           char url_buf[512];
-          size_t len = end - start + 1;
+          size_t len = (size_t)(end - start) + 1;
           if (len >= sizeof(url_buf))
             len = sizeof(url_buf) - 1;
           memcpy(url_buf, start, len);
@@ -307,7 +307,7 @@ parse_failed:
   return rc != UI_ERROR_NONE ? rc : UI_ERROR_PARSE_FAILED;
 }
 
-/**
+/*
  * @brief ui_css_content_destroy.
  * @param content Parameter content.
  * @return Return value.

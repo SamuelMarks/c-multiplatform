@@ -7,7 +7,7 @@ extern struct ui_image_decoder_backend ui_image_decoder_png;
 extern struct ui_image_decoder_backend ui_image_decoder_jpeg;
 extern struct ui_image_decoder_backend ui_image_decoder_webp;
 
-/**
+/*
  * @brief get_backend_for_format.
  * @param format Parameter format.
  * @param out_backend Parameter out_backend.
@@ -48,7 +48,7 @@ get_backend_for_format(enum ui_image_format format,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_image_decode_memory.
  * @param format Parameter format.
  * @param data Parameter data.
@@ -76,7 +76,7 @@ ui_error_t ui_image_decode_memory(enum ui_image_format format, const void *data,
   return backend->decode_memory(data, size, out_image);
 }
 
-/**
+/*
  * @brief ui_image_free.
  * @param image Parameter image.
  * @return Return value.

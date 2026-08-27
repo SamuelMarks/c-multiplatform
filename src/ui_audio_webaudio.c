@@ -11,7 +11,7 @@
 #if defined(__EMSCRIPTEN__)
 /* WebAudio implementation stub */
 
-/**
+/*
  * @brief Retrieves the default WebAudio audio sink backend.
  *
  * @param out_backend Pointer to the backend structure to populate.

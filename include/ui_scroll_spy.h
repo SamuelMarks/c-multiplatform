@@ -1,3 +1,6 @@
+/**
+ * @file ui_scroll_spy.h
+ */
 #ifndef UI_SCROLL_SPY_H
 #define UI_SCROLL_SPY_H
 

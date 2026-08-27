@@ -5,6 +5,7 @@
 
 /**
  * @struct ui_calendar_base
+ * @struct ui_calendar_base
  * @brief Internal representation of a calendar component.
  */
 struct ui_calendar_base {
@@ -21,23 +22,23 @@ struct ui_calendar_base {
   ui_calendar_on_select_t on_select; /**< Callback fired upon selection */
   void *on_select_user_data; /**< User data for the selection callback */
 
-  /**
+  /*
    * @brief CVA: Callback fired when value changes
    */
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
-                              void *user_data);
+                              void *user_data); /**< user_data) */
   void *cva_on_change_user_data; /**< CVA: User data for on_change callback */
 
-  /**
+  /*
    * @brief CVA: Callback fired when input is touched
    */
-  ui_error_t (*cva_on_touched)(void *user_data);
+  ui_error_t (*cva_on_touched)(void *user_data); /**< user_data) */
   void *cva_on_touched_user_data; /**< CVA: User data for on_touched callback */
 
   int is_disabled; /**< 1 if the calendar is disabled */
 };
 
-/**
+/*
  * @brief calendar_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -84,7 +85,7 @@ static ui_error_t calendar_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief calendar_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -100,7 +101,7 @@ static ui_error_t calendar_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_is_leap_year.
  * @param year Parameter year.
  * @param out_is_leap Parameter out_is_leap.
@@ -122,7 +123,7 @@ ui_error_t ui_calendar_is_leap_year(int year, int *out_is_leap) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_days_in_month.
  * @param year Parameter year.
  * @param month Parameter month.
@@ -151,7 +152,7 @@ ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_get_day_of_week.
  * @param year Parameter year.
  * @param month Parameter month.
@@ -177,7 +178,7 @@ ui_error_t ui_calendar_get_day_of_week(int year, int month, int day,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_create.
  * @param out_calendar Parameter out_calendar.
  * @param out_cva Parameter out_cva.
@@ -222,7 +223,7 @@ ui_error_t ui_calendar_base_create(struct ui_calendar_base **out_calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_destroy.
  * @param calendar Parameter calendar.
  * @return Return value.
@@ -235,7 +236,7 @@ ui_error_t ui_calendar_base_destroy(struct ui_calendar_base *calendar) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_set_start_of_week.
  * @param calendar Parameter calendar.
  * @param start_day Parameter start_day.
@@ -253,7 +254,7 @@ ui_error_t ui_calendar_base_set_start_of_week(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_set_min_date.
  * @param calendar Parameter calendar.
  * @param min_date Parameter min_date.
@@ -273,7 +274,7 @@ ui_error_t ui_calendar_base_set_min_date(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_set_max_date.
  * @param calendar Parameter calendar.
  * @param max_date Parameter max_date.
@@ -293,7 +294,7 @@ ui_error_t ui_calendar_base_set_max_date(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_set_view_month.
  * @param calendar Parameter calendar.
  * @param year Parameter year.
@@ -322,7 +323,7 @@ ui_error_t ui_calendar_base_set_view_month(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_get_view_month.
  * @param calendar Parameter calendar.
  * @param out_year Parameter out_year.
@@ -340,7 +341,7 @@ ui_calendar_base_get_view_month(const struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief compare_dates.
  * @param d1 Parameter d1.
  * @param d2 Parameter d2.
@@ -359,7 +360,7 @@ static ui_error_t compare_dates(const struct ui_date *d1,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_select_date.
  * @param calendar Parameter calendar.
  * @param date Parameter date.
@@ -425,7 +426,7 @@ ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_get_selected_date.
  * @param calendar Parameter calendar.
  * @param out_date Parameter out_date.
@@ -444,7 +445,7 @@ ui_calendar_base_get_selected_date(const struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_clear_selection.
  * @param calendar Parameter calendar.
  * @return Return value.
@@ -468,7 +469,7 @@ ui_error_t ui_calendar_base_clear_selection(struct ui_calendar_base *calendar) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_set_on_select.
  * @param calendar Parameter calendar.
  * @param on_select Parameter on_select.
@@ -486,7 +487,7 @@ ui_error_t ui_calendar_base_set_on_select(struct ui_calendar_base *calendar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_calendar_base_get_month_grid.
  * @param calendar Parameter calendar.
  * @param out_grid Parameter out_grid.
@@ -514,7 +515,7 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     enum ui_day_of_week tmp_dow = UI_SUNDAY;
     (void)ui_calendar_get_day_of_week(calendar->view_year, calendar->view_month,
                                       1, &tmp_dow);
-    first_dow = tmp_dow;
+    first_dow = (int)tmp_dow;
   }
   {
     days_in_month = 0;

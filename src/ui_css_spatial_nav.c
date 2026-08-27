@@ -5,7 +5,7 @@
 #include <stddef.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_css_spatial_nav_parse.
  * @param style Parameter style.
  * @param out_props Parameter out_props.

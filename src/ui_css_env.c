@@ -5,18 +5,26 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @struct ui_css_env_entry
+ * \brief ui_css_env_entry
+ */
 struct ui_css_env_entry {
-  char name[64];
-  struct ui_css_value_ext *value;
-  struct ui_css_env_entry *next;
+  char name[64];                  /**< name */
+  struct ui_css_value_ext *value; /**< value */
+  struct ui_css_env_entry *next;  /**< next */
 };
 
-/** \brief ui_css_env_manager */
+/**
+ * @struct ui_css_env_manager
+ * \brief ui_css_env_manager
+ */
 struct ui_css_env_manager {
-  struct ui_css_env_entry *head;
+  struct ui_css_env_entry *head; /**< head */
 };
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_env_manager_create(struct ui_css_env_manager **out_manager) {
   struct ui_css_env_manager *manager;
 
@@ -36,7 +44,7 @@ ui_error_t ui_css_env_manager_create(struct ui_css_env_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_env_manager_destroy.
  * @param manager Parameter manager.
  * @return Return value.
@@ -61,7 +69,7 @@ ui_error_t ui_css_env_manager_destroy(struct ui_css_env_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_env_manager_set.
  * @param manager Parameter manager.
  * @param name Parameter name.
@@ -107,7 +115,8 @@ ui_error_t ui_css_env_manager_set(struct ui_css_env_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_env_manager_get(const struct ui_css_env_manager *manager,
                                   const char *name,
                                   const struct ui_css_value_ext **out_value) {
@@ -129,7 +138,7 @@ ui_error_t ui_css_env_manager_get(const struct ui_css_env_manager *manager,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * @brief ui_css_env_manager_remove.
  * @param manager Parameter manager.
  * @param name Parameter name.

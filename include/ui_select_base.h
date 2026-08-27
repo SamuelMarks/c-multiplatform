@@ -89,7 +89,7 @@ ui_error_t ui_select_base_set_disabled(struct ui_select_base *select,
 
 /**
  * @brief Adds an option to the select dropdown.
- * This appends a child <option> node to the select's DOM representation.
+ * This appends a child \<option\> node to the select's DOM representation.
  *
  * @param select The select component.
  * @param label The display text of the option.

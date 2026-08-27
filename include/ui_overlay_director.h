@@ -30,7 +30,7 @@ struct ui_overlay;
 /**
  * @brief Creates a new overlay director.
  * @param root_node The global root node where overlays will be physically
- * appended (e.g., a special <body> wrapper).
+ * appended (e.g., a special \<body\> wrapper).
  * @param out_director Pointer to receive the allocated director.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */

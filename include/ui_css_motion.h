@@ -1,4 +1,7 @@
 /**
+ * @file ui_css_motion.h
+ */
+/**
  * \file ui_css_motion.h
  * \brief CSS Motion Path properties definitions and parsing.
  * \author UI Framework Team

@@ -9,7 +9,8 @@
 /* MSVC Safe CRT */
 #endif
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_stylesheet_create(struct ui_css_stylesheet **out_stylesheet) {
   struct ui_css_stylesheet *sheet;
 
@@ -31,7 +32,8 @@ ui_error_t ui_css_stylesheet_create(struct ui_css_stylesheet **out_stylesheet) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
                                      const char *prefix, const char *uri) {
@@ -85,7 +87,7 @@ ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_stylesheet_destroy.
  * @param stylesheet Parameter stylesheet.
  * @return Return value.
@@ -134,7 +136,8 @@ ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_stylesheet_append_rule(struct ui_css_stylesheet *stylesheet,
                                          struct ui_css_rule *rule) {
   struct ui_css_rule *curr;
@@ -155,7 +158,8 @@ ui_error_t ui_css_stylesheet_append_rule(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_stylesheet_register_layer(struct ui_css_stylesheet *stylesheet,
                                  const char *name, int *out_order) {
@@ -217,7 +221,7 @@ ui_css_stylesheet_register_layer(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_rule_create.
  * @param type Parameter type.
  * @param out_rule Parameter out_rule.
@@ -257,7 +261,7 @@ ui_error_t ui_css_rule_create(enum ui_css_rule_type type,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_selector_destroy.
  * @param sel Parameter sel.
  * @return Return value.
@@ -284,7 +288,7 @@ ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_rule_destroy.
  * @param rule Parameter rule.
  * @return Return value.
@@ -394,7 +398,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_rule_append_selector.
  * @param rule Parameter rule.
  * @param type Parameter type.
@@ -451,7 +455,8 @@ ui_error_t ui_css_rule_append_selector(struct ui_css_rule *rule,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_css_rule_append_selector_attr */
+/* \brief ui_css_rule_append_selector_attr
+ */
 ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
                                             const char *attr_name,
                                             enum ui_css_attr_operator attr_op,
@@ -514,7 +519,7 @@ ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_rule_append_declaration.
  * @param rule Parameter rule.
  * @param property_name Parameter property_name.
@@ -579,7 +584,7 @@ ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief class_list_contains.
  * @param class_list Parameter class_list.
  * @param class_name Parameter class_name.
@@ -613,7 +618,7 @@ static ui_error_t class_list_contains(const char *class_list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief string_starts_with.
  * @param str Parameter str.
  * @param prefix Parameter prefix.
@@ -631,7 +636,7 @@ static ui_error_t string_starts_with(const char *str, const char *prefix,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief string_ends_with.
  * @param str Parameter str.
  * @param suffix Parameter suffix.
@@ -650,7 +655,7 @@ static ui_error_t string_ends_with(const char *str, const char *suffix,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief string_contains.
  * @param str Parameter str.
  * @param substr Parameter substr.
@@ -663,7 +668,7 @@ static ui_error_t string_contains(const char *str, const char *substr,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief string_dash_match.
  * @param str Parameter str.
  * @param val Parameter val.
@@ -683,7 +688,7 @@ static ui_error_t string_dash_match(const char *str, const char *val,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief attribute_matches.
  * @param selector Parameter selector.
  * @param attr_val Parameter attr_val.
@@ -731,7 +736,7 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
                                    const struct ui_dom_node *node,
                                    int *out_matched);
 
-/**
+/*
  * @brief any_selector_matches.
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
@@ -755,7 +760,7 @@ any_selector_matches(const struct ui_css_selector *selectors_list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief has_matching_descendant.
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
@@ -797,7 +802,7 @@ static const char *cssom_get_attr(const struct ui_dom_node *node,
   return NULL;
 }
 
-/**
+/*
  * @brief is_in_scope.
  * @param scope_start Parameter scope_start.
  * @param scope_end Parameter scope_end.
@@ -850,7 +855,7 @@ static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief has_matching_ancestor.
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
@@ -876,7 +881,7 @@ has_matching_ancestor(const struct ui_css_selector *selectors_list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief pseudo_class_matches.
  * @param selector Parameter selector.
  * @param node Parameter node.
@@ -1185,7 +1190,7 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
   }
 }
 
-/**
+/*
  * @brief selector_matches.
  * @param selector Parameter selector.
  * @param node Parameter node.
@@ -1264,7 +1269,8 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
   }
 }
 
-/** \brief append_computed_declaration */
+/* \brief append_computed_declaration
+ */
 static ui_error_t append_computed_declaration(
     struct ui_css_computed_style *style, const char *property_name,
     const char *property_value, int is_important, int layer_order, int spec_a,
@@ -1356,7 +1362,7 @@ static ui_error_t append_computed_declaration(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief get_selector_specificity.
  * @param sel Parameter sel.
  * @param a Parameter a.
@@ -1411,7 +1417,7 @@ static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief cond_skip_ws.
  * @param p Parameter p.
  * @return Return value.
@@ -1423,7 +1429,7 @@ static ui_error_t cond_skip_ws(const char **p) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief cond_is_word.
  * @param p Parameter p.
  * @param word Parameter word.
@@ -1447,7 +1453,7 @@ static ui_error_t cond_is_word(const char *p, const char *word,
 
 static ui_error_t eval_cond_or(const char **p, int *out_matched);
 
-/**
+/*
  * @brief eval_cond_term.
  * @param p Parameter p.
  * @param out_matched Parameter out_matched.
@@ -1545,7 +1551,7 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
   *out_matched = 0;
   return UI_ERROR_NONE;
 }
-/**
+/*
  * @brief eval_cond_and.
  * @param p Parameter p.
  * @param out_matched Parameter out_matched.
@@ -1577,7 +1583,7 @@ static ui_error_t eval_cond_and(const char **p, int *out_matched) {
   *out_matched = res;
   return UI_ERROR_NONE;
 }
-/**
+/*
  * @brief eval_cond_or.
  * @param p Parameter p.
  * @param out_matched Parameter out_matched.
@@ -1609,7 +1615,7 @@ static ui_error_t eval_cond_or(const char **p, int *out_matched) {
   *out_matched = res;
   return UI_ERROR_NONE;
 }
-/**
+/*
  * @brief eval_supports_condition.
  * @param condition Parameter condition.
  * @param out_matched Parameter out_matched.
@@ -1627,7 +1633,8 @@ static ui_error_t eval_supports_condition(const char *condition,
   }
 }
 
-/** \brief resolve_rules_recursive */
+/* \brief resolve_rules_recursive
+ */
 static ui_error_t resolve_rules_recursive(
     const struct ui_css_stylesheet *stylesheet, struct ui_css_rule *rules,
     const struct ui_dom_node *node, struct ui_css_computed_style *style,
@@ -1750,7 +1757,7 @@ static ui_error_t resolve_rules_recursive(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_resolve_style.
  * @param stylesheet Parameter stylesheet.
  * @param node Parameter node.
@@ -1791,7 +1798,8 @@ ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_computed_style_get_property(const struct ui_css_computed_style *style,
                                    const char *property_name,
@@ -1817,7 +1825,8 @@ ui_css_computed_style_get_property(const struct ui_css_computed_style *style,
   return UI_ERROR_NOT_FOUND;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_computed_style_destroy(struct ui_css_computed_style *style) {
   struct ui_css_computed_property *prop;
   struct ui_css_computed_property *next_prop;
@@ -1839,7 +1848,8 @@ ui_error_t ui_css_computed_style_destroy(struct ui_css_computed_style *style) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_variable_store_create(struct ui_css_variable_store **out_store) {
   struct ui_css_variable_store *store;
@@ -1857,7 +1867,8 @@ ui_css_variable_store_create(struct ui_css_variable_store **out_store) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_variable_store_destroy(struct ui_css_variable_store *store) {
   struct ui_css_variable *curr, *next;
 
@@ -1876,7 +1887,7 @@ ui_error_t ui_css_variable_store_destroy(struct ui_css_variable_store *store) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_variable_store_set.
  * @param store Parameter store.
  * @param name Parameter name.
@@ -1932,7 +1943,8 @@ ui_error_t ui_css_variable_store_set(struct ui_css_variable_store *store,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_resolve_variables(const struct ui_css_variable_store *store,
                                     const char *property_value,
                                     char **out_resolved) {
@@ -1952,7 +1964,7 @@ ui_error_t ui_css_resolve_variables(const struct ui_css_variable_store *store,
     end = strchr(start, ')');
     if (end) {
       char var_name[64];
-      size_t len = end - start - 4;
+      size_t len = (size_t)(end - start) - 4;
       struct ui_css_variable *var;
 
       /* len fits */

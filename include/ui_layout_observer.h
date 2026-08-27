@@ -92,7 +92,9 @@ ui_error_t ui_layout_observer_notify_resize(struct ui_layout_observer *observer,
  *
  * @param observer The observer.
  * @param breakpoint_id The breakpoint ID to query.
- * @return 1 if active, 0 if inactive or invalid ID.
+ * @param out_is_active Pointer to receive 1 if active, 0 if inactive or invalid
+ * ID.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t
 ui_layout_observer_is_active(const struct ui_layout_observer *observer,

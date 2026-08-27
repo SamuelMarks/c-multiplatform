@@ -1,8 +1,9 @@
-/**
+/*
  * \file ui_renderer_gles2.c
  * \brief Implementation of the UI Renderer GLES2 backend.
  */
 
+/** @brief internal */
 #define GL_SILENCE_DEPRECATION
 /* clang-format off */
 #include "../include/ui_renderer.h"
@@ -17,11 +18,17 @@
 #include "ui_internal_mem.h"
 
 #ifndef GL_FRAGMENT_SHADER
+/** @brief internal */
 #define GL_FRAGMENT_SHADER 0x8B30
+/** @brief internal */
 #define GL_VERTEX_SHADER 0x8B31
+/** @brief internal */
 #define GL_ARRAY_BUFFER 0x8892
+/** @brief internal */
 #define GL_ELEMENT_ARRAY_BUFFER 0x8893
+/** @brief internal */
 #define GL_STATIC_DRAW 0x88E4
+/** @brief internal */
 #define GL_DYNAMIC_DRAW 0x88E8
 #endif
 
@@ -32,7 +39,7 @@ typedef ptrdiff_t GLsizeiptr;
 typedef void (__stdcall *PFNGLUSEPROGRAMPROC) (unsigned int program);
 typedef void (__stdcall *PFNGLUNIFORM2FPROC) (int location, float v0, float v1);
 typedef void (__stdcall *PFNGLBINDBUFFERPROC) (unsigned int target, unsigned int buffer);
-typedef void (__stdcall *PFNGLBUFFERDATAPROC) (unsigned int target, int size, const void *data, unsigned int usage);
+typedef void (__stdcall *PFNGLBUFFERDATAPROC) (unsigned int target, GLsizeiptr size, const void *data, unsigned int usage);
 typedef void (__stdcall *PFNGLENABLEVERTEXATTRIBARRAYPROC) (unsigned int index);
 typedef void (__stdcall *PFNGLVERTEXATTRIBPOINTERPROC) (unsigned int index, int size, unsigned int type, unsigned char normalized, int stride, const void *pointer);
 typedef void (__stdcall *PFNGLDISABLEVERTEXATTRIBARRAYPROC) (unsigned int index);
@@ -99,65 +106,93 @@ static ui_error_t load_gl_extensions(void) {
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
+/** @brief internal */
 #define load_gl_extensions()
 #elif defined(__EMSCRIPTEN__)
 #include <GLES2/gl2.h>
+/** @brief internal */
 #define load_gl_extensions()
 #elif defined(__linux__) || defined(__unix__)
+/** @brief internal */
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/gl.h>
 #include <GL/glext.h>
+/** @brief internal */
 #define load_gl_extensions()
 #endif
 
 #ifdef UI_TEST_MOCK_ALLOC
 #undef glCreateProgram
+/** @brief internal */
 #define glCreateProgram() 1
 #undef glCreateShader
+/** @brief internal */
 #define glCreateShader(t) ((void)(t), 1)
 #undef glAttachShader
+/** @brief internal */
 #define glAttachShader(p, s) do { (void)(p); (void)(s); } while(0)
 #undef glLinkProgram
+/** @brief internal */
 #define glLinkProgram(p) do { (void)(p); } while(0)
 #undef glDeleteShader
+/** @brief internal */
 #define glDeleteShader(s) do { (void)(s); } while(0)
 #undef glGetAttribLocation
+/** @brief internal */
 #define glGetAttribLocation(p, n) ((void)(p), (void)(n), 1)
 #undef glGetUniformLocation
+/** @brief internal */
 #define glGetUniformLocation(p, n) ((void)(p), (void)(n), 1)
 #undef glGenBuffers
+/** @brief internal */
 #define glGenBuffers(n, b) do { (void)(n); *(b) = 1; } while(0)
 #undef glDeleteProgram
+/** @brief internal */
 #define glDeleteProgram(p) do { (void)(p); } while(0)
 #undef glDeleteBuffers
+/** @brief internal */
 #define glDeleteBuffers(n, b) do { (void)(n); (void)(b); } while(0)
 #undef glUseProgram
+/** @brief internal */
 #define glUseProgram(p) do { (void)(p); } while(0)
 #undef glUniform2f
+/** @brief internal */
 #define glUniform2f(l, v0, v1) do { (void)(l); (void)(v0); (void)(v1); } while(0)
 #undef glBindBuffer
+/** @brief internal */
 #define glBindBuffer(t, b) do { (void)(t); (void)(b); } while(0)
 #undef glBufferData
+/** @brief internal */
 #define glBufferData(t, s, d, u) do { (void)(t); (void)(s); (void)(d); (void)(u); } while(0)
 #undef glEnableVertexAttribArray
+/** @brief internal */
 #define glEnableVertexAttribArray(i) do { (void)(i); } while(0)
 #undef glVertexAttribPointer
+/** @brief internal */
 #define glVertexAttribPointer(i, s, t, n, st, p) do { (void)(i); (void)(s); (void)(t); (void)(n); (void)(st); (void)(p); } while(0)
 #undef glDrawElements
+/** @brief internal */
 #define glDrawElements(m, c, t, p) do { (void)(m); (void)(c); (void)(t); (void)(p); } while(0)
 #undef glDisableVertexAttribArray
+/** @brief internal */
 #define glDisableVertexAttribArray(i) do { (void)(i); } while(0)
 #undef glShaderSource
+/** @brief internal */
 #define glShaderSource(s, c, str, l) do { (void)(s); (void)(c); (void)(str); (void)(l); } while(0)
 #undef glCompileShader
+/** @brief internal */
 #define glCompileShader(s) do { (void)(s); } while(0)
 #undef glViewport
+/** @brief internal */
 #define glViewport(x, y, w, h) do { (void)(x); (void)(y); (void)(w); (void)(h); } while(0)
 #undef glClearColor
+/** @brief internal */
 #define glClearColor(r, g, b, a) do { (void)(r); (void)(g); (void)(b); (void)(a); } while(0)
 #undef glClear
+/** @brief internal */
 #define glClear(m) do { (void)(m); } while(0)
 #undef glReadPixels
+/** @brief internal */
 #define glReadPixels(x, y, w, h, f, t, d) do { (void)(x); (void)(y); (void)(w); (void)(h); (void)(f); (void)(t); (void)(d); } while(0)
 #endif
 
@@ -169,29 +204,30 @@ static ui_error_t load_gl_extensions(void) {
 #endif
 
 #ifndef GL_COLOR_BUFFER_BIT
-/** \brief Fallback GL_COLOR_BUFFER_BIT */
+/* \brief Fallback GL_COLOR_BUFFER_BIT */
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #endif
 
 #ifndef GL_FLOAT
-/** \brief Fallback GL_FLOAT */
+/* \brief Fallback GL_FLOAT */
 #define GL_FLOAT 0x1406
-/** \brief Fallback GL_UNSIGNED_SHORT */
+/* \brief Fallback GL_UNSIGNED_SHORT */
 #define GL_UNSIGNED_SHORT 0x1403
-/** \brief Fallback GL_TRIANGLES */
+/* \brief Fallback GL_TRIANGLES */
 #define GL_TRIANGLES 0x0004
-/** \brief Fallback GL_RGBA */
+/* \brief Fallback GL_RGBA */
 #define GL_RGBA 0x1908
-/** \brief Fallback GL_UNSIGNED_BYTE */
+/* \brief Fallback GL_UNSIGNED_BYTE */
 #define GL_UNSIGNED_BYTE 0x1401
 #endif
 
-/** \brief Maximum vertices per batch */
+/* \brief Maximum vertices per batch */
 #define GLES2_MAX_VERTICES 8192
-/** \brief Maximum indices per batch */
+/* \brief Maximum indices per batch */
 #define GLES2_MAX_INDICES 24576
 
 /**
+ * @struct gles2_renderer_data
  * \brief Internal state for the GLES2 renderer.
  */
 struct gles2_renderer_data {
@@ -211,7 +247,7 @@ struct gles2_renderer_data {
   float viewport_height; /**< Viewport height */
 };
 
-/** \brief Simple passthrough vertex shader */
+/* \brief Simple passthrough vertex shader */
 static const char *vertex_shader_source =
     "attribute vec2 a_position;\n"
     "attribute vec4 a_color;\n"
@@ -225,14 +261,14 @@ static const char *vertex_shader_source =
     "  v_color = a_color;\n"
     "}\n";
 
-/** \brief Simple passthrough fragment shader */
+/* \brief Simple passthrough fragment shader */
 static const char *fragment_shader_source = "precision mediump float;\n"
                                             "varying vec4 v_color;\n"
                                             "void main() {\n"
                                             "  gl_FragColor = v_color;\n"
                                             "}\n";
 
-/**
+/*
  * \brief Compiles a shader.
  *
  * \param type Shader type.
@@ -255,7 +291,7 @@ static ui_error_t compile_shader(unsigned int type, const char *source,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Flushes the batched geometry to the GPU.
  *
  * \param backend The renderer backend.
@@ -292,29 +328,31 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
 
     glBindBuffer(GL_ARRAY_BUFFER, data->vbo);
     {
-      GLsizeiptr vsz = data->vertex_count * sizeof(struct ui_vertex);
+      GLsizeiptr vsz =
+          (GLsizeiptr)((size_t)data->vertex_count * sizeof(struct ui_vertex));
       glBufferData(GL_ARRAY_BUFFER, vsz, data->vertices, GL_DYNAMIC_DRAW);
     }
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data->ibo);
     {
-      GLsizeiptr isz = data->index_count * sizeof(unsigned short);
+      GLsizeiptr isz =
+          (GLsizeiptr)((size_t)data->index_count * sizeof(unsigned short));
       glBufferData(GL_ELEMENT_ARRAY_BUFFER, isz, data->indices,
                    GL_DYNAMIC_DRAW);
     }
-
-    glEnableVertexAttribArray(data->a_position);
-    glVertexAttribPointer(data->a_position, 2, GL_FLOAT, 0,
+    glEnableVertexAttribArray((GLuint)data->a_position);
+    glVertexAttribPointer((GLuint)data->a_position, 2, GL_FLOAT, 0,
                           sizeof(struct ui_vertex), (void *)0);
 
-    glEnableVertexAttribArray(data->a_color);
-    glVertexAttribPointer(data->a_color, 4, GL_FLOAT, 0,
-                          sizeof(struct ui_vertex), (void *)16);
+    glEnableVertexAttribArray((GLuint)data->a_color);
+    glVertexAttribPointer((GLuint)data->a_color, 4, GL_FLOAT, 0,
+                          sizeof(struct ui_vertex),
+                          (void *)(sizeof(float) * 2));
 
     glDrawElements(GL_TRIANGLES, data->index_count, GL_UNSIGNED_SHORT, 0);
 
-    glDisableVertexAttribArray(data->a_position);
-    glDisableVertexAttribArray(data->a_color);
+    glDisableVertexAttribArray((GLuint)data->a_position);
+    glDisableVertexAttribArray((GLuint)data->a_color);
   }
 
   data->vertex_count = 0;
@@ -322,7 +360,7 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Submits arbitrary triangulated geometry (e.g. SVG paths) to the batch.
  *
  * \param backend The renderer backend.
@@ -375,7 +413,7 @@ static ui_error_t gles2_draw_triangles(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Submits a UI rectangle to the geometry batch.
  *
  * \param backend The renderer backend.
@@ -423,7 +461,7 @@ static ui_error_t gles2_draw_rect(struct ui_renderer_backend *backend, float x,
   return gles2_draw_triangles(backend, vertices, 4, indices, 6);
 }
 
-/**
+/*
  * \brief Submits a UI border (hollow rectangle) to the geometry batch.
  *
  * \param backend The renderer backend.
@@ -463,7 +501,7 @@ static ui_error_t gles2_draw_border(struct ui_renderer_backend *backend,
   return rc;
 }
 
-/**
+/*
  * \brief Initializes the renderer for the given window.
  *
  * \param backend The renderer backend.
@@ -526,7 +564,7 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys the renderer backend internal state.
  *
  * \param backend The renderer backend.
@@ -560,7 +598,7 @@ static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the rendering viewport.
  *
  * \param backend The renderer backend.
@@ -585,7 +623,7 @@ static ui_error_t gles2_set_viewport(struct ui_renderer_backend *backend, int x,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Clears the screen with the specified color.
  *
  * \param backend The renderer backend.
@@ -601,6 +639,7 @@ static ui_error_t gles2_clear(struct ui_renderer_backend *backend,
 }
 
 /**
+ * @struct gles2_texture
  * \brief Internal structure representing a GLES2 texture.
  */
 struct gles2_texture {
@@ -610,7 +649,7 @@ struct gles2_texture {
   int height;          /**< Texture height */
 };
 
-/**
+/*
  * \brief Pushes a clipping rect.
  *
  * \param backend The renderer backend.
@@ -638,7 +677,7 @@ static ui_error_t gles2_push_clip(struct ui_renderer_backend *backend, float x,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Pops a clipping rect.
  *
  * \param backend The renderer backend.
@@ -656,7 +695,7 @@ static ui_error_t gles2_pop_clip(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Pushes a stencil clip from triangulated geometry.
  *
  * \param backend The renderer backend.
@@ -687,7 +726,7 @@ static ui_error_t gles2_push_stencil_clip(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Pops a stencil clip.
  *
  * \param backend The renderer backend.
@@ -705,7 +744,7 @@ static ui_error_t gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates an offscreen texture (FBO) for rendering.
  *
  * \param backend The renderer backend.
@@ -737,7 +776,7 @@ static ui_error_t gles2_create_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys an offscreen texture (FBO).
  *
  * \param backend The renderer backend.
@@ -753,7 +792,7 @@ static ui_error_t gles2_destroy_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the render target to a specific texture (FBO).
  *
  * \param backend The renderer backend.
@@ -769,7 +808,7 @@ static ui_error_t gles2_set_render_target(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Draws a previously rendered offscreen texture.
  *
  * \param backend The renderer backend.
@@ -801,7 +840,7 @@ static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
   return gles2_draw_rect(backend, x, y, width, height, color);
 }
 
-/**
+/*
  * \brief Reads pixels from the current render target.
  *
  * \param backend The renderer backend.
@@ -821,7 +860,7 @@ static ui_error_t gles2_read_pixels(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a GLES 2.0 / WebGL 1.0 renderer backend.
  *
  * \param out_backend Pointer to receive the allocated backend.
@@ -863,7 +902,7 @@ ui_error_t ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a GLES 2.0 renderer backend.
  *
  * \param backend The backend to destroy.

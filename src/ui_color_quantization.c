@@ -11,26 +11,27 @@ typedef __int64 int64_t;
 
 /**
  * @struct ui_cluster
+ * @struct ui_cluster
  * @brief Internal representation of a color cluster for K-Means quantization.
  */
 struct ui_cluster {
-  /** @brief Current cluster center Red component. */
-  int r;
-  /** @brief Current cluster center Green component. */
-  int g;
-  /** @brief Current cluster center Blue component. */
-  int b;
-  /** @brief Accumulated Red for centroid recalculation. */
-  int64_t sum_r;
-  /** @brief Accumulated Green for centroid recalculation. */
-  int64_t sum_g;
-  /** @brief Accumulated Blue for centroid recalculation. */
-  int64_t sum_b;
-  /** @brief Number of pixels assigned to this cluster. */
-  int count;
+  /* @brief Current cluster center Red component. */
+  int r; /**< r */
+  /* @brief Current cluster center Green component. */
+  int g; /**< g */
+  /* @brief Current cluster center Blue component. */
+  int b; /**< b */
+  /* @brief Accumulated Red for centroid recalculation. */
+  int64_t sum_r; /**< sum_r */
+  /* @brief Accumulated Green for centroid recalculation. */
+  int64_t sum_g; /**< sum_g */
+  /* @brief Accumulated Blue for centroid recalculation. */
+  int64_t sum_b; /**< sum_b */
+  /* @brief Number of pixels assigned to this cluster. */
+  int count; /**< count */
 };
 
-/**
+/*
  * @brief calc_color_distance.
  * @param r1 Parameter r1.
  * @param g1 Parameter g1.
@@ -47,7 +48,7 @@ static int calc_color_distance(int r1, int g1, int b1, int r2, int g2, int b2) {
   return dr * dr + dg * dg + db * db;
 }
 
-/**
+/*
  * @brief ui_color_quantize_kmeans.
  * @param pixels Parameter pixels.
  * @param width Parameter width.

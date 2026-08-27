@@ -6,7 +6,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_css_gcpm_parse.
  * @param style Parameter style.
  * @param out_props Parameter out_props.
@@ -96,7 +96,8 @@ ui_error_t ui_css_gcpm_parse(const struct ui_css_computed_style *style,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_gcpm_properties_cleanup(struct ui_css_gcpm_properties *props) {
   if (!props)

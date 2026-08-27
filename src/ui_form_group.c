@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_form_group.c
  * \brief Implementation of form group nodes.
  */
@@ -10,28 +10,30 @@
 /* clang-format on */
 
 /**
+ * @struct ui_form_group_entry
  * \struct ui_form_group_entry
  * \brief An entry mapping a name to a form node within a group.
  */
 struct ui_form_group_entry {
-  char *name;
-  ui_form_node_t node;
+  char *name;          /**< name */
+  ui_form_node_t node; /**< node */
 };
 
 /**
+ * @struct ui_form_group
  * \struct ui_form_group
  * \brief Represents a group of named form nodes.
  */
 struct ui_form_group {
-  struct ui_arena *arena;
-  enum ui_signal_mode mode;
+  struct ui_arena *arena;   /**< arena */
+  enum ui_signal_mode mode; /**< mode */
 
-  struct ui_form_group_entry *entries;
-  size_t count;
-  size_t capacity;
+  struct ui_form_group_entry *entries; /**< entries */
+  size_t count;                        /**< count */
+  size_t capacity;                     /**< capacity */
 };
 
-/**
+/*
  * \brief Creates a new form group.
  * \param[in,out] arena The memory arena.
  * \param[in] mode The signaling mode.
@@ -62,7 +64,7 @@ ui_error_t ui_form_group_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Duplicates a string using an arena allocator.
  * \param[in,out] arena The arena to allocate from.
  * \param[in] str The string to copy.
@@ -81,7 +83,7 @@ static ui_error_t strdup_arena(struct ui_arena *arena, const char *str,
   return rc;
 }
 
-/**
+/*
  * \brief Adds a form node to the group with a specified name.
  * \param[in,out] group The form group.
  * \param[in] name The name for the node.
@@ -100,14 +102,15 @@ ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
 
   if (group->count >= group->capacity) {
     new_cap = group->capacity == 0 ? 4 : group->capacity * 2;
-    ui_arena_alloc(group->arena, new_cap * sizeof(struct ui_form_group_entry),
-                   8, (void **)&new_entries);
+    ui_arena_alloc(group->arena,
+                   (size_t)new_cap * sizeof(struct ui_form_group_entry), 8,
+                   (void **)&new_entries);
     if (!new_entries)
       return UI_ERROR_OUT_OF_MEMORY;
 
     if (group->count > 0) {
       memcpy(new_entries, group->entries,
-             group->count * sizeof(struct ui_form_group_entry));
+             (size_t)group->count * sizeof(struct ui_form_group_entry));
     }
     group->entries = new_entries;
     group->capacity = new_cap;
@@ -123,7 +126,7 @@ ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds a form control directly to the group.
  * \param[in,out] group The form group.
  * \param[in] name The name for the control.
@@ -138,7 +141,7 @@ ui_error_t ui_form_group_add_control(ui_form_group_t *group, const char *name,
   return ui_form_group_add_node(group, name, node);
 }
 
-/**
+/*
  * \brief Gets a form node by name from the group.
  * \param[in] group The form group.
  * \param[in] name The name of the node.
@@ -161,7 +164,7 @@ ui_error_t ui_form_group_get_node(ui_form_group_t *group, const char *name,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * \brief Gets a form control by name from the group.
  * \param[in] group The form group.
  * \param[in] name The name of the control.
@@ -182,7 +185,7 @@ ui_error_t ui_form_group_get_control(ui_form_group_t *group, const char *name,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Internal function to recursively get the status of a form group.
  * \param[in] group The form group.
  * \param[out] out_status Pointer to store the aggregated status.
@@ -218,7 +221,7 @@ ui_error_t _ui_form_group_get_status_internal(struct ui_form_group *group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the overall validation status of the form group.
  * \param[in] group The form group.
  * \param[out] out_status Pointer to store the status.
@@ -229,7 +232,7 @@ ui_error_t ui_form_group_get_status(ui_form_group_t *group,
   return _ui_form_group_get_status_internal(group, out_status, 0);
 }
 
-/**
+/*
  * \brief Checks if the entire form group is valid.
  * \param[in] group The form group.
  * \param[out] out_valid Set to UI_TRUE if valid, UI_FALSE otherwise.
@@ -245,7 +248,7 @@ ui_error_t ui_form_group_is_valid(ui_form_group_t *group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a form group.
  * \param[in,out] group The form group to destroy.
  * \return UI_ERROR_NONE on success.

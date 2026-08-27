@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_hover_card_base.c
  * \brief Implementation of hover card base component.
  */
@@ -18,14 +18,17 @@ static const char *ui_hover_card_base_default_css =
     "display: block; "
     "}";
 
-/** \brief ui_hover_card_base */
+/**
+ * @struct ui_hover_card_base
+ * \brief ui_hover_card_base
+ */
 struct ui_hover_card_base {
-  struct ui_component *component;
-  struct ui_signal *open_signal;
-  struct ui_computed *animating_signal;
+  struct ui_component *component;       /**< component */
+  struct ui_signal *open_signal;        /**< open_signal */
+  struct ui_computed *animating_signal; /**< animating_signal */
 };
 
-/**
+/*
  * \brief Creates a new hover card base component.
  * \param[out] out_hover_card Pointer to store the created hover card.
  * \return UI_ERROR_NONE on success.
@@ -98,7 +101,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a hover card base component.
  * \param[in,out] hover_card The hover card to destroy.
  * \return UI_ERROR_NONE on success.
@@ -114,7 +117,7 @@ ui_error_t ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the underlying DOM component of the hover card.
  * \param[in,out] hover_card The hover card component.
  * \param[out] out_component Pointer to store the DOM component.
@@ -130,7 +133,7 @@ ui_hover_card_base_get_component(struct ui_hover_card_base *hover_card,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Handles mouse enter events to potentially open the hover card.
  * \param[in,out] hover_card The hover card component.
  * \return UI_ERROR_NONE on success.
@@ -148,7 +151,7 @@ ui_hover_card_base_on_mouse_enter(struct ui_hover_card_base *hover_card) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Handles mouse leave events to potentially close the hover card.
  * \param[in,out] hover_card The hover card component.
  * \param[in] cursor_x The X coordinate of the cursor.
@@ -173,7 +176,7 @@ ui_hover_card_base_on_mouse_leave(struct ui_hover_card_base *hover_card,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the open state of the hover card to a signal.
  * \param[in,out] widget The hover card component.
  * \param[in,out] open_signal The signal representing the open state.
@@ -188,7 +191,7 @@ ui_error_t ui_hover_card_base_bind_open(struct ui_hover_card_base *widget,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the computed signal indicating if the hover card is currently
  * animating.
  * \param[in,out] widget The hover card component.

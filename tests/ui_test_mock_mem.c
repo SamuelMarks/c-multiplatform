@@ -1,6 +1,7 @@
 /* clang-format off */
 #include <stdlib.h>
 #include <string.h>
+#include "ui_test_mock_mem.h"
 /* clang-format on */
 
 int g_malloc_fail_countdown = -1;

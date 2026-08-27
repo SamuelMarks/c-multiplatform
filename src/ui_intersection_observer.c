@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_intersection_observer.c
  * \brief Implementation of intersection observer for viewport visibility
  * tracking.
@@ -10,31 +10,36 @@
 /* clang-format on */
 
 /**
+ * @struct ui_intersection_observer_target
  * \struct ui_intersection_observer_target
  * \brief Represents a target node being observed for intersection changes.
  */
 struct ui_intersection_observer_target {
-  struct ui_dom_node *node;
-  int is_intersecting;
-  float last_ratio;
+  struct ui_dom_node *node; /**< node */
+  int is_intersecting;      /**< is_intersecting */
+  float last_ratio;         /**< last_ratio */
 };
 
-/** \brief ui_intersection_observer */
+/**
+ * @struct ui_intersection_observer
+ * \brief ui_intersection_observer
+ */
 struct ui_intersection_observer {
-  struct ui_dom_node *root;
-  int root_margin_px;
-  float *thresholds;
-  int threshold_count;
+  struct ui_dom_node *root; /**< root */
+  int root_margin_px;       /**< root_margin_px */
+  float *thresholds;        /**< thresholds */
+  int threshold_count;      /**< threshold_count */
 
-  struct ui_intersection_observer_target *targets;
-  int target_count;
-  int target_capacity;
+  struct ui_intersection_observer_target *targets; /**< targets */
+  int target_count;                                /**< target_count */
+  int target_capacity;                             /**< target_capacity */
 
-  ui_intersection_observer_cb_t callback;
-  void *user_data;
+  ui_intersection_observer_cb_t callback; /**< callback */
+  void *user_data;                        /**< user_data */
 };
 
-/** \brief ui_intersection_observer_create */
+/* \brief ui_intersection_observer_create
+ */
 ui_error_t ui_intersection_observer_create(
     struct ui_dom_node *root, int root_margin_px, const float *thresholds,
     int threshold_count, struct ui_intersection_observer **out_observer) {
@@ -56,8 +61,8 @@ ui_error_t ui_intersection_observer_create(
   obs->root_margin_px = root_margin_px;
 
   if (threshold_count > 0) {
-    obs->thresholds =
-        (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * threshold_count);
+    obs->thresholds = (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) *
+                                                      (size_t)threshold_count);
     if (obs->thresholds == NULL) {
       C_MULTIPLATFORM_FREE(obs);
       return UI_ERROR_OUT_OF_MEMORY;
@@ -76,7 +81,7 @@ ui_error_t ui_intersection_observer_create(
   obs->targets =
       (struct ui_intersection_observer_target *)C_MULTIPLATFORM_MALLOC(
           sizeof(struct ui_intersection_observer_target) *
-          obs->target_capacity);
+          (size_t)obs->target_capacity);
   if (obs->targets == NULL) {
     if (obs->thresholds)
       C_MULTIPLATFORM_FREE(obs->thresholds);
@@ -91,7 +96,8 @@ ui_error_t ui_intersection_observer_create(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_intersection_observer_destroy */
+/* \brief ui_intersection_observer_destroy
+ */
 ui_error_t
 ui_intersection_observer_destroy(struct ui_intersection_observer *observer) {
   if (observer == NULL) {
@@ -108,7 +114,8 @@ ui_intersection_observer_destroy(struct ui_intersection_observer *observer) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_intersection_observer_observe(struct ui_intersection_observer *observer,
                                  struct ui_dom_node *target) {
@@ -130,13 +137,14 @@ ui_intersection_observer_observe(struct ui_intersection_observer *observer,
     int new_capacity = observer->target_capacity * 2;
     new_targets =
         (struct ui_intersection_observer_target *)C_MULTIPLATFORM_MALLOC(
-            sizeof(struct ui_intersection_observer_target) * new_capacity);
+            sizeof(struct ui_intersection_observer_target) *
+            (size_t)new_capacity);
     if (new_targets == NULL) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_targets, observer->targets,
            sizeof(struct ui_intersection_observer_target) *
-               observer->target_count);
+               (size_t)observer->target_count);
     C_MULTIPLATFORM_FREE(observer->targets);
     observer->targets = new_targets;
     observer->target_capacity = new_capacity;
@@ -150,7 +158,7 @@ ui_intersection_observer_observe(struct ui_intersection_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Stops observing a target node for intersection changes.
  * \param[in,out] observer The intersection observer.
  * \param[in,out] target The DOM node to stop observing.
@@ -178,7 +186,7 @@ ui_intersection_observer_unobserve(struct ui_intersection_observer *observer,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * \brief Stops observing all target nodes.
  * \param[in,out] observer The intersection observer.
  * \return UI_ERROR_NONE on success.
@@ -192,7 +200,7 @@ ui_intersection_observer_disconnect(struct ui_intersection_observer *observer) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Subscribes a callback to receive intersection events.
  * \param[in,out] observer The intersection observer.
  * \param[in] callback The callback function to invoke on intersection changes.
@@ -214,7 +222,7 @@ ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Evaluates intersections for all observed targets against thresholds.
  * \param[in,out] observer The intersection observer.
  * \return UI_ERROR_NONE on success.
@@ -242,7 +250,8 @@ ui_intersection_observer_evaluate(struct ui_intersection_observer *observer) {
   }
 
   entries = (struct ui_intersection_observer_entry *)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_intersection_observer_entry) * observer->target_count);
+      sizeof(struct ui_intersection_observer_entry) *
+      (size_t)observer->target_count);
   if (entries == NULL) {
     return UI_ERROR_OUT_OF_MEMORY;
   }

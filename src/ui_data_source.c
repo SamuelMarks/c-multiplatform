@@ -7,29 +7,30 @@
 
 /**
  * @struct ui_data_source
+ * @struct ui_data_source
  * @brief Internal representation of a data source.
  */
 struct ui_data_source {
-  /** @brief Function to fetch a page of data. */
-  ui_data_source_fetch_page_fn fetch_page;
-  /** @brief User data for fetch_page callback. */
-  void *fetch_page_user_data;
-  /** @brief Function to apply a sort operation. */
-  ui_data_source_apply_sort_fn apply_sort;
-  /** @brief User data for apply_sort callback. */
-  void *apply_sort_user_data;
-  /** @brief Function to apply a filter operation. */
-  ui_data_source_apply_filter_fn apply_filter;
-  /** @brief User data for apply_filter callback. */
-  void *apply_filter_user_data;
+  /* @brief Function to fetch a page of data. */
+  ui_data_source_fetch_page_fn fetch_page; /**< fetch_page */
+  /* @brief User data for fetch_page callback. */
+  void *fetch_page_user_data; /**< fetch_page_user_data */
+  /* @brief Function to apply a sort operation. */
+  ui_data_source_apply_sort_fn apply_sort; /**< apply_sort */
+  /* @brief User data for apply_sort callback. */
+  void *apply_sort_user_data; /**< apply_sort_user_data */
+  /* @brief Function to apply a filter operation. */
+  ui_data_source_apply_filter_fn apply_filter; /**< apply_filter */
+  /* @brief User data for apply_filter callback. */
+  void *apply_filter_user_data; /**< apply_filter_user_data */
 
-  /** @brief Signal for data source state changes. */
-  struct ui_signal *state_signal;
-  /** @brief Signal for data source data updates. */
-  struct ui_signal *data_signal;
+  /* @brief Signal for data source state changes. */
+  struct ui_signal *state_signal; /**< state_signal */
+  /* @brief Signal for data source data updates. */
+  struct ui_signal *data_signal; /**< data_signal */
 };
 
-/**
+/*
  * @brief ui_data_source_create.
  * @param out_ds Parameter out_ds.
  * @return Return value.
@@ -60,7 +61,7 @@ ui_error_t ui_data_source_create(struct ui_data_source **out_ds) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_destroy.
  * @param ds Parameter ds.
  * @return Return value.
@@ -73,7 +74,7 @@ ui_error_t ui_data_source_destroy(struct ui_data_source *ds) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_set_fetch_page_callback.
  * @param ds Parameter ds.
  * @param fetch_page Parameter fetch_page.
@@ -92,7 +93,7 @@ ui_data_source_set_fetch_page_callback(struct ui_data_source *ds,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_set_apply_sort_callback.
  * @param ds Parameter ds.
  * @param apply_sort Parameter apply_sort.
@@ -111,7 +112,7 @@ ui_data_source_set_apply_sort_callback(struct ui_data_source *ds,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_set_apply_filter_callback.
  * @param ds Parameter ds.
  * @param apply_filter Parameter apply_filter.
@@ -129,7 +130,7 @@ ui_error_t ui_data_source_set_apply_filter_callback(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_fetch_page.
  * @param ds Parameter ds.
  * @param offset Parameter offset.
@@ -152,7 +153,7 @@ ui_error_t ui_data_source_fetch_page(struct ui_data_source *ds,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_apply_sort.
  * @param ds Parameter ds.
  * @param sorts Parameter sorts.
@@ -176,7 +177,7 @@ ui_error_t ui_data_source_apply_sort(struct ui_data_source *ds,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_apply_filter.
  * @param ds Parameter ds.
  * @param filters Parameter filters.
@@ -201,7 +202,7 @@ ui_data_source_apply_filter(struct ui_data_source *ds,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_bind_state.
  * @param ds Parameter ds.
  * @param state_signal Parameter state_signal.
@@ -216,7 +217,7 @@ ui_error_t ui_data_source_bind_state(struct ui_data_source *ds,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_data_source_bind_data.
  * @param ds Parameter ds.
  * @param data_signal Parameter data_signal.

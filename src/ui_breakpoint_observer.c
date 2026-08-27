@@ -9,7 +9,7 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_breakpoint_mock_fail = 0;
-/**
+/*
  * @brief mock_ui_signal_set.
  * @param signal Parameter signal.
  * @param value Parameter value.
@@ -25,34 +25,38 @@ static ui_error_t mock_ui_signal_set(struct ui_signal *signal,
   }
   return ui_signal_set(signal, value);
 }
+/** @cond */
 #define ui_signal_set mock_ui_signal_set
+/** @endcond */
 #endif
 
+/** @brief internal */
 #define DEBOUNCE_DELAY_MS 50.0
 
 /**
  * @struct ui_breakpoint_observer
+ * @struct ui_breakpoint_observer
  * @brief Internal representation of a breakpoint observer.
  */
 struct ui_breakpoint_observer {
-  /** @brief Reference to the window manager (if needed for context). */
-  struct ui_window_manager_base *window_manager;
-  /** @brief Pointer to the memory arena used for allocations. */
-  struct ui_arena *arena;
-  /** @brief Array of boolean signals for each breakpoint. */
-  struct ui_signal *signals[UI_BREAKPOINT_COUNT];
+  /* @brief Reference to the window manager (if needed for context). */
+  struct ui_window_manager_base *window_manager; /**< window_manager */
+  /* @brief Pointer to the memory arena used for allocations. */
+  struct ui_arena *arena; /**< arena */
+  /* @brief Array of boolean signals for each breakpoint. */
+  struct ui_signal *signals[UI_BREAKPOINT_COUNT]; /**< signals */
 
-  /** @brief The width evaluated during the last successful tick. */
-  float last_width;
-  /** @brief The current pending width being debounced. */
-  float target_width;
-  /** @brief Timestamp of the last width change detection. */
-  double last_resize_time;
-  /** @brief Flag indicating if a resize is currently being debounced. */
-  int is_debouncing;
+  /* @brief The width evaluated during the last successful tick. */
+  float last_width; /**< last_width */
+  /* @brief The current pending width being debounced. */
+  float target_width; /**< target_width */
+  /* @brief Timestamp of the last width change detection. */
+  double last_resize_time; /**< last_resize_time */
+  /* @brief Flag indicating if a resize is currently being debounced. */
+  int is_debouncing; /**< is_debouncing */
 };
 
-/**
+/*
  * @brief evaluate_breakpoints.
  * @param observer Parameter observer.
  * @param width Parameter width.
@@ -97,7 +101,7 @@ static ui_error_t evaluate_breakpoints(struct ui_breakpoint_observer *observer,
   return rc;
 }
 
-/**
+/*
  * @brief ui_breakpoint_observer_create.
  * @param window_manager Parameter window_manager.
  * @param out_observer Parameter out_observer.
@@ -147,7 +151,7 @@ ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_breakpoint_observer_destroy.
  * @param observer Parameter observer.
  * @return Return value.
@@ -169,7 +173,7 @@ ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_breakpoint_observer_get_signal.
  * @param observer Parameter observer.
  * @param breakpoint Parameter breakpoint.
@@ -188,7 +192,7 @@ ui_breakpoint_observer_get_signal(struct ui_breakpoint_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_breakpoint_observer_tick.
  * @param observer Parameter observer.
  * @param current_width Parameter current_width.

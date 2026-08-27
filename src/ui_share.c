@@ -6,32 +6,39 @@
 #if defined(_WIN32)
 #ifndef UI_WINAPI
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_WINAPI __stdcall
+/** @endcond */
 #elif defined(__GNUC__)
+/** @cond */
 #define UI_WINAPI __attribute__((stdcall))
+/** @endcond */
 #else
+/** @cond */
 #define UI_WINAPI
+/** @endcond */
 #endif
 #endif
 /* Forward declarations for Windows DataTransferManager if needed */
 #endif
 /* clang-format on */
 
-/**
+/*
  * \file ui_share.c
  * \brief Share sheet implementation.
  */
 
 /**
+ * @struct ui_share_task
  * \brief ui_share_task structure.
  * \details Internal state for a share task.
  */
 struct ui_share_task {
-  struct ui_promise *promise;
-  struct ui_share_payload payload_copy;
+  struct ui_promise *promise;           /**< promise */
+  struct ui_share_payload payload_copy; /**< payload_copy */
 };
 
-/**
+/*
  * \brief Checks if sharing is supported.
  * \param out_is_available Pointer to store the result.
  * \return UI_ERROR_NONE on success.
@@ -46,7 +53,7 @@ ui_error_t ui_share_is_supported(int *out_is_available) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Requests a share operation asynchronously.
  * \param payload The payload to share.
  * \param promise The promise to resolve when done.

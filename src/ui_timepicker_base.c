@@ -10,38 +10,41 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
+/** @brief internal */
 #define NUM_FORMAT "%02d:%02d"
 #else
+/** @brief internal */
 #define NUM_FORMAT "%02d:%02d"
 #endif
 
 /**
  * @struct ui_timepicker_base
+ * @struct ui_timepicker_base
  * @brief Internal implementation of the timepicker base component.
  */
 struct ui_timepicker_base {
-  /** @brief The current hour. */
-  int hour;
-  /** @brief The current minute. */
-  int minute;
-  /** @brief The current time format. */
-  enum ui_timepicker_format format;
-  /** @brief Disabled state flag. */
-  int disabled;
+  /* @brief The current hour. */
+  int hour; /**< hour */
+  /* @brief The current minute. */
+  int minute; /**< minute */
+  /* @brief The current time format. */
+  enum ui_timepicker_format format; /**< format */
+  /* @brief Disabled state flag. */
+  int disabled; /**< disabled */
 
-  /** @brief CVA on-change callback. */
+  /* @brief CVA on-change callback. */
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
-                              void *user_data);
-  /** @brief User data for CVA on-change callback. */
-  void *cva_on_change_user_data;
+                              void *user_data); /**< user_data) */
+  /* @brief User data for CVA on-change callback. */
+  void *cva_on_change_user_data; /**< cva_on_change_user_data */
 
-  /** @brief CVA on-touched callback. */
-  ui_error_t (*cva_on_touched)(void *user_data);
-  /** @brief User data for CVA on-touched callback. */
-  void *cva_on_touched_user_data;
+  /* @brief CVA on-touched callback. */
+  ui_error_t (*cva_on_touched)(void *user_data); /**< user_data) */
+  /* @brief User data for CVA on-touched callback. */
+  void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
 };
 
-/**
+/*
  * @brief Triggers the CVA change callback.
  * @param tp The timepicker component.
  * @return UI_ERROR_NONE on success.
@@ -56,7 +59,7 @@ static ui_error_t trigger_cva_change(struct ui_timepicker_base *tp) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Triggers the CVA touched callback.
  * @param tp The timepicker component.
  * @return UI_ERROR_NONE on success.
@@ -68,7 +71,7 @@ static ui_error_t trigger_cva_touched(struct ui_timepicker_base *tp) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Handles writing a value to the CVA.
  * @param component The timepicker component.
  * @param value The value to write.
@@ -93,7 +96,7 @@ static ui_error_t timepicker_cva_write_value(void *component,
   return ui_timepicker_base_set_time(tp, h, m);
 }
 
-/**
+/*
  * @brief Registers the CVA on-change callback.
  * @param component The timepicker component.
  * @param callback The callback function.
@@ -112,7 +115,7 @@ static ui_error_t timepicker_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Registers the CVA on-touched callback.
  * @param component The timepicker component.
  * @param callback The callback function.
@@ -129,7 +132,7 @@ static ui_error_t timepicker_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Sets the CVA disabled state.
  * @param component The timepicker component.
  * @param is_disabled The disabled state flag.

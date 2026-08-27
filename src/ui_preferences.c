@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_preferences.c
  * \brief Implementation of persistent UI preferences (local storage, IDB, etc).
  */
@@ -14,15 +14,16 @@
 /* clang-format on */
 
 /**
+ * @struct ui_preferences
  * \struct ui_preferences
  * \brief Context for asynchronous storage interactions.
  */
 struct ui_preferences {
-  struct ui_thread_pool *pool;
-  struct ui_execution_context *ctx;
+  struct ui_thread_pool *pool;      /**< pool */
+  struct ui_execution_context *ctx; /**< ctx */
 };
 
-/**
+/*
  * \brief Creates a new preferences context.
  * \param[in,out] pool The thread pool for native background IO.
  * \param[in,out] ctx The execution context for callbacks.
@@ -51,7 +52,7 @@ ui_error_t ui_preferences_create(struct ui_thread_pool *pool,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a preferences context.
  * \param[in,out] prefs The context to destroy.
  * \return UI_ERROR_NONE on success.
@@ -91,7 +92,7 @@ EM_JS(char *, get_local_storage_js, (const char *key), {
 })
 #endif
 
-/**
+/*
  * \brief Synchronously sets a string preference (where supported, e.g. web
  * localStorage). \param[in,out] prefs The preferences context. \param[in] key
  * The preference key. \param[in] value The preference string value. \return
@@ -114,7 +115,7 @@ ui_error_t ui_preferences_set_string(struct ui_preferences *prefs,
 #endif
 }
 
-/**
+/*
  * \brief Synchronously gets a string preference (where supported).
  * \param[in,out] prefs The preferences context.
  * \param[in] key The preference key.
@@ -185,7 +186,7 @@ EM_JS(int, idb_save_js,
       })
 #endif
 
-/**
+/*
  * \brief Asynchronously saves a binary blob (e.g. via IndexedDB or background
  * file write).
  * \param[in,out] prefs The preferences context.

@@ -3,7 +3,7 @@
 #include <string.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_css_parse_field_sizing.
  * @param str Parameter str.
  * @param out_sizing Parameter out_sizing.
@@ -26,7 +26,7 @@ ui_error_t ui_css_parse_field_sizing(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_accent_color.
  * @param str Parameter str.
  * @param out_color Parameter out_color.
@@ -54,7 +54,7 @@ ui_error_t ui_css_parse_accent_color(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_parse_caret_color.
  * @param str Parameter str.
  * @param out_color Parameter out_color.

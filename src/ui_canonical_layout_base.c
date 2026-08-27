@@ -12,24 +12,25 @@
 
 /**
  * @struct ui_canonical_layout_base
+ * @struct ui_canonical_layout_base
  * @brief Internal implementation of the canonical layout.
  */
 struct ui_canonical_layout_base {
-  /** @brief Pointer to the arena used for allocation. */
-  struct ui_arena *arena;
-  /** @brief Current layout size class. */
-  enum ui_window_size_class size_class;
-  /** @brief Signal dispatched on size class change. */
-  ui_signal_t *layout_changed_signal;
+  /* @brief Pointer to the arena used for allocation. */
+  struct ui_arena *arena; /**< arena */
+  /* @brief Current layout size class. */
+  enum ui_window_size_class size_class; /**< size_class */
+  /* @brief Signal dispatched on size class change. */
+  ui_signal_t *layout_changed_signal; /**< layout_changed_signal */
 
-  /** @brief Central body component. */
-  struct ui_component *body;
-  /** @brief Left/start side pane. */
-  struct ui_component *leading_pane;
-  /** @brief Right/end side pane. */
-  struct ui_component *trailing_pane;
-  /** @brief Bottom bar component. */
-  struct ui_component *bottom_bar;
+  /* @brief Central body component. */
+  struct ui_component *body; /**< body */
+  /* @brief Left/start side pane. */
+  struct ui_component *leading_pane; /**< leading_pane */
+  /* @brief Right/end side pane. */
+  struct ui_component *trailing_pane; /**< trailing_pane */
+  /* @brief Bottom bar component. */
+  struct ui_component *bottom_bar; /**< bottom_bar */
 };
 
 static ui_error_t size_class_equality(union ui_signal_payload a,

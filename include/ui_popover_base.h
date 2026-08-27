@@ -86,7 +86,8 @@ ui_error_t ui_popover_base_close(struct ui_popover_base *popover);
  * @brief Checks if the popover is currently open.
  *
  * @param popover The popover.
- * @return 1 if open, 0 if closed.
+ * @param out_is_open Pointer to receive 1 if open, 0 if closed.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_popover_base_is_open(const struct ui_popover_base *popover,
                                    int *out_is_open);

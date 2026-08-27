@@ -1,3 +1,6 @@
+/**
+ * @file ui_progress_base.h
+ */
 #ifndef UI_PROGRESS_BASE_H
 #define UI_PROGRESS_BASE_H
 

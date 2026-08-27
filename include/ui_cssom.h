@@ -27,7 +27,7 @@ enum ui_css_selector_type {
   UI_CSS_SELECTOR_TYPE_UNIVERSAL,     /**< Universal selector (*). */
   UI_CSS_SELECTOR_TYPE_TAG,           /**< Tag name selector (div). */
   UI_CSS_SELECTOR_TYPE_CLASS,         /**< Class selector (.class). */
-  UI_CSS_SELECTOR_TYPE_ID,            /**< ID selector (#id). */
+  UI_CSS_SELECTOR_TYPE_ID,            /**< ID selector (\#id). */
   UI_CSS_SELECTOR_TYPE_ATTRIBUTE,     /**< Attribute selector ([attr=val]). */
   UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,  /**< Pseudo-class selector (:hover). */
   UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT /**< Pseudo-element selector (::before).
@@ -49,7 +49,7 @@ enum ui_css_attr_operator {
 };
 
 /**
- * @brief Represents a simple CSS selector (e.g., * or div or .btn or #main or
+ * @brief Represents a simple CSS selector (e.g., * or div or .btn or \#main or
  * [attr="val"]).
  */
 struct ui_css_selector {

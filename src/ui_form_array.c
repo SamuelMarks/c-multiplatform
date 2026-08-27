@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_form_array.c
  * \brief Implementation of form array nodes.
  */
@@ -10,19 +10,20 @@
 /* clang-format on */
 
 /**
+ * @struct ui_form_array
  * \struct ui_form_array
  * \brief Represents an array of form nodes.
  */
 struct ui_form_array {
-  struct ui_arena *arena;
-  enum ui_signal_mode mode;
+  struct ui_arena *arena;   /**< arena */
+  enum ui_signal_mode mode; /**< mode */
 
-  ui_form_node_t *nodes;
-  size_t count;
-  size_t capacity;
+  ui_form_node_t *nodes; /**< nodes */
+  size_t count;          /**< count */
+  size_t capacity;       /**< capacity */
 };
 
-/**
+/*
  * \brief Creates a new form array.
  * \param[in,out] arena The memory arena.
  * \param[in] mode The signaling mode.
@@ -53,7 +54,7 @@ ui_error_t ui_form_array_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Pushes a form node to the end of the array.
  * \param[in,out] array The form array.
  * \param[in] node The form node to push.
@@ -69,13 +70,14 @@ ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
 
   if (array->count >= array->capacity) {
     new_cap = array->capacity == 0 ? 4 : array->capacity * 2;
-    ui_arena_alloc(array->arena, new_cap * sizeof(ui_form_node_t), 8,
+    ui_arena_alloc(array->arena, (size_t)new_cap * sizeof(ui_form_node_t), 8,
                    (void **)&new_nodes);
     if (!new_nodes)
       return UI_ERROR_OUT_OF_MEMORY;
 
     if (array->count > 0) {
-      memcpy(new_nodes, array->nodes, array->count * sizeof(ui_form_node_t));
+      memcpy(new_nodes, array->nodes,
+             (size_t)array->count * sizeof(ui_form_node_t));
     }
     array->nodes = new_nodes;
     array->capacity = new_cap;
@@ -87,7 +89,7 @@ ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Inserts a form node at a specific index.
  * \param[in,out] array The form array.
  * \param[in] index The index to insert at.
@@ -106,13 +108,14 @@ ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
 
   if (array->count >= array->capacity) {
     new_cap = array->capacity == 0 ? 4 : array->capacity * 2;
-    ui_arena_alloc(array->arena, new_cap * sizeof(ui_form_node_t), 8,
+    ui_arena_alloc(array->arena, (size_t)new_cap * sizeof(ui_form_node_t), 8,
                    (void **)&new_nodes);
     if (!new_nodes)
       return UI_ERROR_OUT_OF_MEMORY;
 
     if (array->count > 0) {
-      memcpy(new_nodes, array->nodes, array->count * sizeof(ui_form_node_t));
+      memcpy(new_nodes, array->nodes,
+             (size_t)array->count * sizeof(ui_form_node_t));
     }
     array->nodes = new_nodes;
     array->capacity = new_cap;
@@ -128,7 +131,7 @@ ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Removes a form node at a specific index.
  * \param[in,out] array The form array.
  * \param[in] index The index to remove from.
@@ -149,7 +152,7 @@ ui_error_t ui_form_array_remove_at(ui_form_array_t *array, size_t index) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Clears all form nodes from the array.
  * \param[in,out] array The form array.
  * \return UI_ERROR_NONE on success.
@@ -161,7 +164,7 @@ ui_error_t ui_form_array_clear(ui_form_array_t *array) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets a form node at a specific index.
  * \param[in] array The form array.
  * \param[in] index The index of the node.
@@ -179,7 +182,7 @@ ui_error_t ui_form_array_get_node(ui_form_array_t *array, size_t index,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Internal function to get the validation status of a form array
  * recursively.
  * \param[in] array The form array.
@@ -216,7 +219,7 @@ ui_error_t _ui_form_array_get_status_internal(struct ui_form_array *array,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the aggregated validation status of a form array.
  * \param[in] array The form array.
  * \param[out] out_status Pointer to store the status.
@@ -227,7 +230,7 @@ ui_error_t ui_form_array_get_status(ui_form_array_t *array,
   return _ui_form_array_get_status_internal(array, out_status, 0);
 }
 
-/**
+/*
  * \brief Destroys a form array.
  * \param[in,out] array The form array to destroy.
  * \return UI_ERROR_NONE on success.

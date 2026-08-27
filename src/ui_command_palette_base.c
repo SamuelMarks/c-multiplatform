@@ -2,7 +2,7 @@
 #include "ui_command_palette_base.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_command_palette_base_init.
  * @param palette Parameter palette.
  * @param component Parameter component.
@@ -28,7 +28,8 @@ ui_error_t ui_command_palette_base_init(
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_command_palette_base_open(struct ui_command_palette_base *palette) {
   if (palette) {
@@ -37,7 +38,8 @@ ui_command_palette_base_open(struct ui_command_palette_base *palette) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_command_palette_base_close(struct ui_command_palette_base *palette) {
   if (palette) {
@@ -46,7 +48,8 @@ ui_command_palette_base_close(struct ui_command_palette_base *palette) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_command_palette_base_bind_open(struct ui_command_palette_base *widget,
                                   struct ui_signal *open_signal) {
@@ -57,7 +60,8 @@ ui_command_palette_base_bind_open(struct ui_command_palette_base *widget,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_command_palette_base_get_animating_signal */
+/* \brief ui_command_palette_base_get_animating_signal
+ */
 ui_error_t ui_command_palette_base_get_animating_signal(
     struct ui_command_palette_base *widget,
     struct ui_computed **out_animating) {

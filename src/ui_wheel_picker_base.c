@@ -13,9 +13,15 @@
 #include <math.h>
 /* clang-format on */
 
+/** @cond */
 #define UI_WHEEL_PICKER_ITEM_HEIGHT 40.0f
+/** @endcond */
+/** @cond */
 #define UI_WHEEL_PICKER_DECELERATION_RATE 0.95f
+/** @endcond */
+/** @cond */
 #define UI_WHEEL_PICKER_VELOCITY_THRESHOLD 0.1f
+/** @endcond */
 
 /* Provide a fallback for strict C90 compilers where roundf() isn't available */
 static ui_error_t ui_roundf_fallback(float number, float *out_val) {
@@ -26,32 +32,33 @@ static ui_error_t ui_roundf_fallback(float number, float *out_val) {
 
 /**
  * @struct ui_wheel_picker_base
+ * @struct ui_wheel_picker_base
  * @brief Internal state for the wheel picker component.
  */
 struct ui_wheel_picker_base {
-  struct ui_component *component;
-  struct ui_gesture_recognizer *gesture_recognizer;
+  struct ui_component *component;                   /**< component */
+  struct ui_gesture_recognizer *gesture_recognizer; /**< gesture_recognizer */
 
-  char **items;
-  int item_count;
-  int is_looping;
+  char **items;   /**< items */
+  int item_count; /**< item_count */
+  int is_looping; /**< is_looping */
 
-  int selected_index;
-  float scroll_offset; /* continuous offset */
-  float velocity;
-  int is_dragging;
+  int selected_index;                        /**< selected_index */
+  float scroll_offset; /**< scroll_offset */ /* continuous offset */
+  float velocity;                            /**< velocity */
+  int is_dragging;                           /**< is_dragging */
 
-  ui_wheel_picker_on_change_t on_change;
-  void *on_change_user_data;
+  ui_wheel_picker_on_change_t on_change; /**< on_change */
+  void *on_change_user_data;             /**< on_change_user_data */
 
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
-                              void *user_data);
-  void *cva_on_change_user_data;
+                              void *user_data); /**< user_data) */
+  void *cva_on_change_user_data;                /**< cva_on_change_user_data */
 
-  ui_error_t (*cva_on_touched)(void *user_data);
-  void *cva_on_touched_user_data;
+  ui_error_t (*cva_on_touched)(void *user_data); /**< user_data) */
+  void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
 
-  int is_disabled;
+  int is_disabled; /**< is_disabled */
 };
 
 static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
@@ -166,9 +173,9 @@ ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
     return rc;
   }
 
+/** @cond */
 #define UI_DOM_SET_TAG_IGNORE(n, t) ui_dom_node_set_tag_name((n), (t))
-#define ui_dom_node_set_attribute(n, a, v)                                     \
-  ui_dom_node_set_attribute((n), (a), (v))
+  /** @endcond */
 
   (void)UI_DOM_SET_TAG_IGNORE(root_node, "div");
   (void)ui_dom_node_set_attribute(root_node, "role", "listbox");
@@ -193,7 +200,9 @@ ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
     out_cva->set_disabled_state = wheel_picker_cva_set_disabled_state;
   }
 
+/** @cond */
 #define UI_UPDATE_DOM_IGNORE(p) update_dom_state((p))
+  /** @endcond */
   (void)UI_UPDATE_DOM_IGNORE(picker);
 
   *out_picker = picker;
@@ -245,7 +254,8 @@ ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
   picker->item_count = 0;
 
   if (count > 0) {
-    picker->items = (char **)C_MULTIPLATFORM_MALLOC(sizeof(char *) * count);
+    picker->items =
+        (char **)C_MULTIPLATFORM_MALLOC(sizeof(char *) * (size_t)count);
     if (!picker->items) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -271,7 +281,9 @@ ui_error_t ui_wheel_picker_base_set_items(struct ui_wheel_picker_base *picker,
         (float)picker->selected_index * UI_WHEEL_PICKER_ITEM_HEIGHT;
   }
 
+/** @cond */
 #define UI_UPDATE_DOM_IGNORE(p) update_dom_state((p))
+  /** @endcond */
   (void)UI_UPDATE_DOM_IGNORE(picker);
 
   return UI_ERROR_NONE;
@@ -308,7 +320,9 @@ ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
     picker->selected_index = index;
     picker->scroll_offset = (float)index * UI_WHEEL_PICKER_ITEM_HEIGHT;
     picker->velocity = 0.0f;
+/** @cond */
 #define UI_UPDATE_DOM_IGNORE(p) update_dom_state((p))
+    /** @endcond */
     (void)UI_UPDATE_DOM_IGNORE(picker);
     if (picker->on_change) {
       ui_error_t change_rc = picker->on_change(picker, picker->selected_index,
@@ -320,7 +334,8 @@ ui_wheel_picker_base_set_selected_index(struct ui_wheel_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_wheel_picker_base_get_selected_index */
+/* \brief ui_wheel_picker_base_get_selected_index
+ */
 ui_error_t ui_wheel_picker_base_get_selected_index(
     const struct ui_wheel_picker_base *picker, int *out_index) {
   if (!picker || !out_index) {
@@ -355,7 +370,9 @@ ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
     return UI_ERROR_NONE;
   }
 
+/** @cond */
 #define UI_TRIG_CVA_TOUCH_IGNORE(s) trigger_cva_touched((s))
+  /** @endcond */
   (void)UI_TRIG_CVA_TOUCH_IGNORE(picker);
 
   /* Keyboard Support */
@@ -419,7 +436,9 @@ ui_error_t ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
       /* Snap to nearest index */
       {
         float rounded_index = 0.0f;
+/** @cond */
 #define UI_ROUNDF_IGNORE(v, o) ui_roundf_fallback((v), (o))
+        /** @endcond */
         (void)UI_ROUNDF_IGNORE(picker->scroll_offset /
                                    UI_WHEEL_PICKER_ITEM_HEIGHT,
                                &rounded_index);
@@ -451,7 +470,9 @@ ui_error_t ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
 
         if (picker->selected_index != target_index) {
           picker->selected_index = target_index;
+/** @cond */
 #define UI_UPDATE_DOM_IGNORE(p) update_dom_state((p))
+          /** @endcond */
           (void)UI_UPDATE_DOM_IGNORE(picker);
           if (picker->on_change) {
             ui_error_t change_rc = picker->on_change(
@@ -459,7 +480,9 @@ ui_error_t ui_wheel_picker_base_on_tick(struct ui_wheel_picker_base *picker,
             if (change_rc != UI_ERROR_NONE)
               return change_rc;
           }
+/** @cond */
 #define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+          /** @endcond */
           (void)UI_TRIG_CVA_CHG_IGNORE(picker);
         }
       }

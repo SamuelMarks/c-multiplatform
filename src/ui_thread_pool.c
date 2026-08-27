@@ -9,11 +9,17 @@
 #if defined(_WIN32) && !defined(UI_SINGLE_THREADED)
 #ifndef UI_WINAPI
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_WINAPI __stdcall
+/** @endcond */
 #elif defined(__GNUC__)
+/** @cond */
 #define UI_WINAPI __attribute__((stdcall))
+/** @endcond */
 #else
+/** @cond */
 #define UI_WINAPI
+/** @endcond */
 #endif
 #endif
 
@@ -27,7 +33,9 @@ extern int UI_WINAPI ReleaseMutex(ui_win_handle);
 extern unsigned long UI_WINAPI WaitForSingleObject(ui_win_handle, unsigned long);
 extern int UI_WINAPI CloseHandle(ui_win_handle);
 
+/** @cond */
 #define UI_INFINITE 0xFFFFFFFF
+/** @endcond */
 
 #elif !defined(UI_SINGLE_THREADED)
 #include <pthread.h>
@@ -36,53 +44,55 @@ extern int UI_WINAPI CloseHandle(ui_win_handle);
 
 /**
  * @struct ui_task_node
+ * @struct ui_task_node
  * @brief Internal representation of a queued task.
  */
 struct ui_task_node {
-  /** @brief The callback function to execute. */
-  ui_error_t (*callback)(void *);
-  /** @brief Opaque user data for the callback. */
-  void *user_data;
-  /** @brief Pointer to the next task in the queue. */
-  struct ui_task_node *next;
+  /* @brief The callback function to execute. */
+  ui_error_t (*callback)(void *); /**< ) */
+  /* @brief Opaque user data for the callback. */
+  void *user_data; /**< user_data */
+  /* @brief Pointer to the next task in the queue. */
+  struct ui_task_node *next; /**< next */
 };
 
 /**
  * @struct ui_thread_pool
+ * @struct ui_thread_pool
  * @brief Internal implementation of the thread pool.
  */
 struct ui_thread_pool {
-  /** @brief Head of the task queue. */
-  struct ui_task_node *head;
-  /** @brief Tail of the task queue. */
-  struct ui_task_node *tail;
-  /** @brief Shutdown flag. */
-  int shutdown;
-  /** @brief Number of threads. */
-  int num_threads;
+  /* @brief Head of the task queue. */
+  struct ui_task_node *head; /**< head */
+  /* @brief Tail of the task queue. */
+  struct ui_task_node *tail; /**< tail */
+  /* @brief Shutdown flag. */
+  int shutdown; /**< shutdown */
+  /* @brief Number of threads. */
+  int num_threads; /**< num_threads */
 
 #ifndef UI_SINGLE_THREADED
 #ifdef _WIN32
-  /** @brief Windows mutex. */
-  ui_win_handle mutex;
-  /** @brief Windows semaphore. */
-  ui_win_handle semaphore;
-  /** @brief Array of Windows thread handles. */
-  ui_win_handle *threads;
+  /* @brief Windows mutex. */
+  ui_win_handle mutex; /**< mutex */
+  /* @brief Windows semaphore. */
+  ui_win_handle semaphore; /**< semaphore */
+  /* @brief Array of Windows thread handles. */
+  ui_win_handle *threads; /**< threads */
 #else
-  /** @brief POSIX mutex. */
-  pthread_mutex_t mutex;
-  /** @brief POSIX condition variable. */
-  pthread_cond_t cond;
-  /** @brief Array of POSIX threads. */
-  pthread_t *threads;
+  /* @brief POSIX mutex. */
+  pthread_mutex_t mutex; /**< mutex */
+  /* @brief POSIX condition variable. */
+  pthread_cond_t cond; /**< cond */
+  /* @brief Array of POSIX threads. */
+  pthread_t *threads; /**< threads */
 #endif
 #endif
 };
 
 #ifndef UI_SINGLE_THREADED
 #ifdef _WIN32
-/**
+/*
  * @brief Thread worker function for Windows.
  * @param arg Pointer to the thread pool.
  * @return Thread exit code.
@@ -111,7 +121,9 @@ static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
     ReleaseMutex(pool->mutex);
 
     if (task) {
+/** @cond */
 #define UI_EXECUTE_TASK_CB(t) (t)->callback((t)->user_data)
+      /** @endcond */
       (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
       C_MULTIPLATFORM_FREE(task);
       task = NULL;
@@ -124,7 +136,7 @@ static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
   return 0;
 }
 #else
-/**
+/*
  * @brief Thread worker function for POSIX.
  * @param arg Pointer to the thread pool.
  * @return NULL.
@@ -152,7 +164,9 @@ static void *ui_worker_thread(void *arg) {
     }
     pthread_mutex_unlock(&pool->mutex);
 
+/** @cond */
 #define UI_EXECUTE_TASK_CB(t) (t)->callback((t)->user_data)
+    /** @endcond */
     (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
     C_MULTIPLATFORM_FREE(task);
     task = NULL;
@@ -207,7 +221,7 @@ ui_error_t ui_thread_pool_create(int num_threads,
   }
 
   pool->threads = (ui_win_handle *)C_MULTIPLATFORM_MALLOC(
-      sizeof(ui_win_handle) * num_threads);
+      sizeof(ui_win_handle) * (size_t)num_threads);
   if (!pool->threads) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -240,8 +254,8 @@ ui_error_t ui_thread_pool_create(int num_threads,
   (void)pthread_mutex_init(&pool->mutex, NULL);
   (void)pthread_cond_init(&pool->cond, NULL);
 
-  pool->threads =
-      (pthread_t *)C_MULTIPLATFORM_MALLOC(sizeof(pthread_t) * num_threads);
+  pool->threads = (pthread_t *)C_MULTIPLATFORM_MALLOC(sizeof(pthread_t) *
+                                                      (size_t)num_threads);
   if (!pool->threads) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;

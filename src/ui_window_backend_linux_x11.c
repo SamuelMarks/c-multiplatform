@@ -11,16 +11,20 @@
 #include <GL/gl.h>
 /* clang-format on */
 
+/**
+ * @struct ui_window
+ * \brief ui_window
+ */
 struct ui_window {
-  Display *display;
-  Window window;
-  GLXContext glc;
-  void *context;
-  int is_closing;
-  Atom wm_delete_window;
+  Display *display;      /**< display */
+  Window window;         /**< window */
+  GLXContext glc;        /**< glc */
+  void *context;         /**< context */
+  int is_closing;        /**< is_closing */
+  Atom wm_delete_window; /**< wm_delete_window */
 };
 
-/**
+/*
  * @brief linux_create_window.
  * @param backend Parameter backend.
  * @param title Parameter title.
@@ -100,7 +104,7 @@ static ui_error_t linux_create_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief linux_destroy_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -125,7 +129,7 @@ static ui_error_t linux_destroy_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief linux_show_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -141,7 +145,7 @@ static ui_error_t linux_show_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief linux_hide_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -157,7 +161,7 @@ static ui_error_t linux_hide_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief linux_poll_events.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -200,7 +204,7 @@ static ui_error_t linux_poll_events(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief linux_swap_buffers.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -215,7 +219,8 @@ static ui_error_t linux_swap_buffers(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   struct ui_window_backend *backend;
@@ -245,7 +250,8 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -268,7 +274,8 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   return UI_ERROR_UNKNOWN;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;

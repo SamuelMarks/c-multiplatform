@@ -5,7 +5,7 @@
 #include <stdlib.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_css_page_floats_parse.
  * @param style Parameter style.
  * @param out_props Parameter out_props.

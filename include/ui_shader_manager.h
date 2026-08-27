@@ -49,14 +49,41 @@ ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
                                          const char *fragment_source,
                                          unsigned int *out_program_id);
 
+/**
+ * @brief Sets a matrix uniform for the current shader.
+ * @param manager The shader manager.
+ * @param location The uniform location.
+ * @param name The uniform name (for debugging or fallback).
+ * @param matrix The 4x4 matrix data.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
+ */
 ui_error_t
 ui_shader_manager_set_uniform_matrix(struct ui_shader_manager *manager,
                                      unsigned int location, const char *name,
                                      const float *matrix);
+/**
+ * @brief Sets a color uniform for the current shader.
+ * @param manager The shader manager.
+ * @param location The uniform location.
+ * @param name The uniform name (for debugging or fallback).
+ * @param r The red channel (0-1).
+ * @param g The green channel (0-1).
+ * @param b The blue channel (0-1).
+ * @param a The alpha channel (0-1).
+ * @return ui_error_t `UI_ERROR_NONE` on success.
+ */
 ui_error_t
 ui_shader_manager_set_uniform_color(struct ui_shader_manager *manager,
                                     unsigned int location, const char *name,
                                     float r, float g, float b, float a);
+/**
+ * @brief Sets a float uniform for the current shader.
+ * @param manager The shader manager.
+ * @param location The uniform location.
+ * @param name The uniform name (for debugging or fallback).
+ * @param value The float value.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
+ */
 ui_error_t
 ui_shader_manager_set_uniform_float(struct ui_shader_manager *manager,
                                     unsigned int location, const char *name,

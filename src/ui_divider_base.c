@@ -31,22 +31,23 @@ static const char *ui_divider_base_css =
 
 /**
  * @struct ui_divider_base
+ * @struct ui_divider_base
  * @brief Internal representation of a divider base component.
  */
 struct ui_divider_base {
-  /** @brief The base component. */
-  struct ui_component *component;
-  /** @brief The DOM node. */
-  struct ui_dom_node *root_node;
-  /** @brief The orientation of the divider. */
-  enum ui_divider_orientation orientation;
-  /** @brief 1 if the divider has an inset, 0 otherwise. */
-  int inset;
-  /** @brief Signal bound for data. */
-  struct ui_signal *data_signal;
+  /* @brief The base component. */
+  struct ui_component *component; /**< component */
+  /* @brief The DOM node. */
+  struct ui_dom_node *root_node; /**< root_node */
+  /* @brief The orientation of the divider. */
+  enum ui_divider_orientation orientation; /**< orientation */
+  /* @brief 1 if the divider has an inset, 0 otherwise. */
+  int inset; /**< inset */
+  /* @brief Signal bound for data. */
+  struct ui_signal *data_signal; /**< data_signal */
 };
 
-/**
+/*
  * @brief update_dom_state.
  * @param divider Parameter divider.
  * @return Return value.
@@ -69,7 +70,7 @@ static ui_error_t update_dom_state(struct ui_divider_base *divider) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_divider_base_create.
  * @param out_divider Parameter out_divider.
  * @return Return value.
@@ -134,7 +135,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_divider_base_destroy.
  * @param divider Parameter divider.
  * @return Return value.
@@ -148,7 +149,7 @@ ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_divider_base_set_orientation.
  * @param divider Parameter divider.
  * @param orientation Parameter orientation.
@@ -164,7 +165,7 @@ ui_divider_base_set_orientation(struct ui_divider_base *divider,
   return update_dom_state(divider);
 }
 
-/**
+/*
  * @brief ui_divider_base_set_inset.
  * @param divider Parameter divider.
  * @param inset Parameter inset.
@@ -179,7 +180,7 @@ ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
   return update_dom_state(divider);
 }
 
-/**
+/*
  * @brief ui_divider_base_get_component.
  * @param divider Parameter divider.
  * @param out_component Parameter out_component.
@@ -194,7 +195,7 @@ ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_divider_base_bind_data.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

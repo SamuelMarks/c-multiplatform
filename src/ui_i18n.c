@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_i18n.c
  * \brief Implementation of Internationalization (i18n) routines.
  */
@@ -17,22 +17,23 @@
 #include <stdio.h>
 /* clang-format on */
 
-/**
+/*
  * \def MAX_LOCALE_LEN
  * \brief Maximum length for a locale string (e.g. "en-US").
  */
 #define MAX_LOCALE_LEN 32
 
 /**
+ * @struct ui_i18n
  * \struct ui_i18n
  * \brief State and configuration for internationalization.
  */
 struct ui_i18n {
-  char locale[MAX_LOCALE_LEN];
-  struct ui_signal *locale_signal;
+  char locale[MAX_LOCALE_LEN];     /**< locale */
+  struct ui_signal *locale_signal; /**< locale_signal */
 };
 
-/**
+/*
  * \brief Safely copies a string, guaranteeing null termination.
  * \param[out] dst The destination buffer.
  * \param[in] sz The size of the destination buffer.
@@ -49,7 +50,7 @@ static ui_error_t safe_strcpy(char *dst, size_t sz, const char *src) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new i18n context.
  * \param[out] out_i18n Pointer to store the created context.
  * \return UI_ERROR_NONE on success.
@@ -73,7 +74,7 @@ ui_error_t ui_i18n_create(struct ui_i18n **out_i18n) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys an i18n context.
  * \param[in,out] i18n The context to destroy.
  * \return UI_ERROR_NONE on success.
@@ -86,7 +87,7 @@ ui_error_t ui_i18n_destroy(struct ui_i18n *i18n) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the current locale and updates bidi direction if necessary.
  * \param[in,out] i18n The i18n context.
  * \param[in] locale The locale string (e.g. "ar-EG").
@@ -119,7 +120,7 @@ ui_error_t ui_i18n_set_locale(struct ui_i18n *i18n, const char *locale) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the current locale string.
  * \param[in] i18n The i18n context.
  * \param[out] out_locale Pointer to store the locale string.
@@ -133,7 +134,7 @@ ui_error_t ui_i18n_get_locale(struct ui_i18n *i18n, const char **out_locale) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the current locale to a reactive signal.
  * \param[in,out] i18n The i18n context.
  * \param[in,out] locale_signal The signal to bind.
@@ -148,7 +149,7 @@ ui_error_t ui_i18n_bind_locale_signal(struct ui_i18n *i18n,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Formats a floating point number to a string.
  * \param[in] i18n The i18n context.
  * \param[in] value The numeric value to format.
@@ -182,7 +183,7 @@ ui_error_t ui_i18n_format_number(struct ui_i18n *i18n, double value,
 #endif
 }
 
-/**
+/*
  * \brief Formats an amount as currency.
  * \param[in] i18n The i18n context.
  * \param[in] amount The amount to format.
@@ -216,7 +217,7 @@ ui_error_t ui_i18n_format_currency(struct ui_i18n *i18n, double amount,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Formats a timestamp as a date string.
  * \param[in] i18n The i18n context.
  * \param[in] timestamp_ms The timestamp in milliseconds.
@@ -240,7 +241,7 @@ ui_error_t ui_i18n_format_date(struct ui_i18n *i18n, double timestamp_ms,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Selects the correct pluralized string based on a count.
  * \param[in] i18n The i18n context.
  * \param[in] count The count.
@@ -271,7 +272,7 @@ ui_error_t ui_i18n_pluralize(struct ui_i18n *i18n, int count, const char *zero,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Interpolates variables into a template string (e.g. "Hello {{name}}").
  * \param[in] i18n The i18n context.
  * \param[in] template_str The template string containing placeholders.
@@ -302,7 +303,7 @@ ui_error_t ui_i18n_interpolate(struct ui_i18n *i18n, const char *template_str,
       }
 
       if (template_str[end_idx] == '}') {
-        size_t key_len = end_idx - (t_idx + 2);
+        size_t key_len = (size_t)(end_idx - (t_idx + 2));
         size_t k;
         int found = 0;
 

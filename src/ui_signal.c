@@ -8,31 +8,32 @@
 #include "ui_reactive_graph.h"
 /* clang-format on */
 
-/**
+/*
  * \file ui_signal.c
  * \brief Signal implementation.
  */
 
 /**
+ * @struct ui_signal
  * \brief ui_signal structure.
  * \details Internal state for a signal.
  */
 struct ui_signal {
-  union ui_signal_payload value;
-  enum ui_signal_type type;
-  ui_equality_fn equality_fn;
-  ui_destructor_fn destructor_fn;
-  enum ui_signal_mode mode;
-  struct ui_arena *arena;
-  ui_int32 ref_count;
-  ui_atomic_t lock;
+  union ui_signal_payload value;  /**< value */
+  enum ui_signal_type type;       /**< type */
+  ui_equality_fn equality_fn;     /**< equality_fn */
+  ui_destructor_fn destructor_fn; /**< destructor_fn */
+  enum ui_signal_mode mode;       /**< mode */
+  struct ui_arena *arena;         /**< arena */
+  ui_int32 ref_count;             /**< ref_count */
+  ui_atomic_t lock;               /**< lock */
 
-  struct ui_reactive_node **subscribers;
-  size_t subscribers_count;
-  size_t subscribers_capacity;
+  struct ui_reactive_node **subscribers; /**< subscribers */
+  size_t subscribers_count;              /**< subscribers_count */
+  size_t subscribers_capacity;           /**< subscribers_capacity */
 };
 
-/**
+/*
  * \brief Locks a signal.
  * \param sig The signal to lock.
  * \return UI_ERROR_NONE on success.
@@ -50,7 +51,7 @@ static ui_error_t ui_signal_lock(ui_signal_t *sig) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Unlocks a signal.
  * \param sig The signal to unlock.
  * \return UI_ERROR_NONE on success.
@@ -65,7 +66,7 @@ static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds a subscriber to a signal.
  * \param sig The signal.
  * \param node The subscriber node.
@@ -87,7 +88,7 @@ static ui_error_t ui_signal_add_subscriber(ui_signal_t *sig,
     new_cap =
         sig->subscribers_capacity == 0 ? 4 : sig->subscribers_capacity * 2;
     new_array = (struct ui_reactive_node **)C_MULTIPLATFORM_REALLOC(
-        sig->subscribers, new_cap * sizeof(struct ui_reactive_node *));
+        sig->subscribers, (size_t)new_cap * sizeof(struct ui_reactive_node *));
     if (!new_array) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -99,7 +100,7 @@ static ui_error_t ui_signal_add_subscriber(ui_signal_t *sig,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new signal.
  * \param arena The arena to allocate from.
  * \param initial_value The initial value.
@@ -155,7 +156,7 @@ ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the value of a signal.
  * \param signal The signal.
  * \param out_value Pointer to store the value.
@@ -202,7 +203,7 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
   return rc;
 }
 
-/**
+/*
  * \brief Sets the value of a signal.
  * \param signal The signal.
  * \param new_value The new value.
@@ -269,7 +270,8 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
      * deadlocks */
     if (signal->subscribers_count > 0) {
       subs_copy = (struct ui_reactive_node **)C_MULTIPLATFORM_MALLOC(
-          signal->subscribers_count * sizeof(struct ui_reactive_node *));
+          (size_t)signal->subscribers_count *
+          sizeof(struct ui_reactive_node *));
       if (subs_copy) {
         subs_count = signal->subscribers_count;
         for (i = 0; i < subs_count; i++) {
@@ -299,7 +301,7 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
   return rc;
 }
 
-/**
+/*
  * \brief Updates the value of a signal using a callback.
  * \param signal The signal.
  * \param update_fn The update function.
@@ -327,7 +329,7 @@ ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a signal.
  * \param signal The signal to destroy.
  * \return UI_ERROR_NONE on success.

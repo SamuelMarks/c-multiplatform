@@ -880,6 +880,8 @@ cleanup:
     ui_theme_manager_destroy(app_ctx.state.theme_manager);
   if (app_ctx.state.i18n)
     ui_i18n_destroy(app_ctx.state.i18n);
+  if (app_ctx.state.router)
+    ui_router_destroy(app_ctx.state.router);
   if (app_ctx.state.arena)
     ui_arena_destroy(app_ctx.state.arena);
 

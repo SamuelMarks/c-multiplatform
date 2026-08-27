@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_loupe_base.c
  * \brief Implementation of the UI loupe (magnifying glass) component.
  */
@@ -11,24 +11,25 @@
 /* clang-format on */
 
 /**
+ * @struct ui_loupe_base
  * \struct ui_loupe_base
  * \brief Context for a loupe widget, including focal and overlay coordinates.
  */
 struct ui_loupe_base {
-  struct ui_arena *arena;
-  float magnification_level;
-  float loupe_width;
-  float loupe_height;
-  float y_offset;
-  ui_bool_t is_visible;
+  struct ui_arena *arena;    /**< arena */
+  float magnification_level; /**< magnification_level */
+  float loupe_width;         /**< loupe_width */
+  float loupe_height;        /**< loupe_height */
+  float y_offset;            /**< y_offset */
+  ui_bool_t is_visible;      /**< is_visible */
 
-  struct ui_dom_point focal_point;
-  struct ui_dom_point overlay_origin;
+  struct ui_dom_point focal_point;    /**< focal_point */
+  struct ui_dom_point overlay_origin; /**< overlay_origin */
 
-  ui_signal_t *overlay_origin_signal;
+  ui_signal_t *overlay_origin_signal; /**< overlay_origin_signal */
 };
 
-/**
+/*
  * \brief Signal equality callback for comparing two UI points.
  * \param[in] a The first point payload.
  * \param[in] b The second point payload.
@@ -47,7 +48,7 @@ static ui_error_t point_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new loupe base widget.
  * \param[in,out] arena The memory arena.
  * \param[in] config The initial configuration (size, magnification).
@@ -100,7 +101,7 @@ ui_error_t ui_loupe_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a loupe base widget.
  * \param[in,out] loupe The loupe to destroy.
  * \return UI_ERROR_NONE on success.
@@ -117,7 +118,7 @@ ui_error_t ui_loupe_base_destroy(struct ui_loupe_base *loupe) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the focal point of the loupe, updating the overlay origin signal.
  * \param[in,out] loupe The loupe widget.
  * \param[in] focal_point The new focal coordinates.
@@ -146,7 +147,7 @@ ui_loupe_base_set_focal_point(struct ui_loupe_base *loupe,
   return ui_signal_set(loupe->overlay_origin_signal, payload);
 }
 
-/**
+/*
  * \brief Gets the signal representing the computed top-left origin for the
  * loupe overlay.
  * \param[in] loupe The loupe widget.
@@ -162,7 +163,7 @@ ui_error_t ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the current focal point of the loupe.
  * \param[in] loupe The loupe widget.
  * \param[out] out_focal_point Pointer to store the focal point.
@@ -177,7 +178,7 @@ ui_error_t ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the visibility state of the loupe.
  * \param[in,out] loupe The loupe widget.
  * \param[in] visible The boolean visibility state.
@@ -192,7 +193,7 @@ ui_error_t ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the magnification scale level of the loupe.
  * \param[in,out] loupe The loupe widget.
  * \param[in] magnification_level The new magnification level.

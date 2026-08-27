@@ -9,26 +9,28 @@
 
 /**
  * @struct ui_task_node
+ * @struct ui_task_node
  * @brief Internal representation of a queued task for the tick engine.
  */
 struct ui_task_node {
-  /** @brief The callback function to execute. */
-  ui_error_t (*callback)(void *);
-  /** @brief Opaque user data for the callback. */
-  void *user_data;
-  /** @brief Pointer to the next task in the queue. */
-  struct ui_task_node *next;
+  /* @brief The callback function to execute. */
+  ui_error_t (*callback)(void *); /**< ) */
+  /* @brief Opaque user data for the callback. */
+  void *user_data; /**< user_data */
+  /* @brief Pointer to the next task in the queue. */
+  struct ui_task_node *next; /**< next */
 };
 
 /**
  * @struct ui_tick_engine
+ * @struct ui_tick_engine
  * @brief Internal implementation of the single-threaded tick engine.
  */
 struct ui_tick_engine {
-  /** @brief Head of the task queue. */
-  struct ui_task_node *head;
-  /** @brief Tail of the task queue. */
-  struct ui_task_node *tail;
+  /* @brief Head of the task queue. */
+  struct ui_task_node *head; /**< head */
+  /* @brief Tail of the task queue. */
+  struct ui_task_node *tail; /**< tail */
 };
 
 ui_error_t ui_tick_engine_create(struct ui_tick_engine **out_engine) {
@@ -124,7 +126,9 @@ ui_error_t ui_tick_engine_tick(struct ui_tick_engine *engine) {
   while (current) {
     next = current->next;
     {
+/** @cond */
 #define UI_TICK_EXECUTE_CB(c) (c)->callback((c)->user_data)
+      /** @endcond */
       ui_error_t cb_rc = UI_TICK_EXECUTE_CB(current);
       if (cb_rc != UI_ERROR_NONE) {
         if (tick_rc == UI_ERROR_NONE) {

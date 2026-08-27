@@ -4,33 +4,34 @@
 #include <stdlib.h>
 /* clang-format on */
 
-/**
+/*
  * \file ui_slide_toggle_base.c
  * \brief Slide toggle base component implementation.
  */
 
 /**
+ * @struct ui_slide_toggle_base
  * \brief ui_slide_toggle_base structure.
  * \details Internal state for the slide toggle base component.
  */
 struct ui_slide_toggle_base {
-  int checked;
-  int disabled;
+  int checked;  /**< checked */
+  int disabled; /**< disabled */
 
-  struct ui_gesture_recognizer *recognizer;
-  int is_dragging;
-  float drag_offset_x;
-  float drag_start_offset_x;
+  struct ui_gesture_recognizer *recognizer; /**< recognizer */
+  int is_dragging;                          /**< is_dragging */
+  float drag_offset_x;                      /**< drag_offset_x */
+  float drag_start_offset_x;                /**< drag_start_offset_x */
 
   ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
-                              void *user_data);
-  void *cva_on_change_user_data;
+                              void *user_data); /**< user_data) */
+  void *cva_on_change_user_data;                /**< cva_on_change_user_data */
 
-  ui_error_t (*cva_on_touched)(void *user_data);
-  void *cva_on_touched_user_data;
+  ui_error_t (*cva_on_touched)(void *user_data); /**< user_data) */
+  void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
 };
 
-/**
+/*
  * \brief Triggers a CVA change event.
  * \param toggle The slide toggle component.
  * \return UI_ERROR_NONE on success.
@@ -44,7 +45,7 @@ static ui_error_t trigger_cva_change(struct ui_slide_toggle_base *toggle) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Triggers a CVA touched event.
  * \param toggle The slide toggle component.
  * \return UI_ERROR_NONE on success.
@@ -56,7 +57,7 @@ static ui_error_t trigger_cva_touched(struct ui_slide_toggle_base *toggle) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Writes a value from CVA.
  * \param component The slide toggle component.
  * \param value The value to write.
@@ -75,7 +76,7 @@ static ui_error_t slide_toggle_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Registers an on-change callback for CVA.
  * \param component The slide toggle component.
  * \param callback The callback to register.
@@ -95,7 +96,7 @@ static ui_error_t slide_toggle_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Registers an on-touched callback for CVA.
  * \param component The slide toggle component.
  * \param callback The callback to register.
@@ -113,7 +114,7 @@ static ui_error_t slide_toggle_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the disabled state from CVA.
  * \param component The slide toggle component.
  * \param is_disabled The disabled state.
@@ -129,7 +130,7 @@ static ui_error_t slide_toggle_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new slide toggle base component.
  * \param out_toggle Pointer to store the component.
  * \param out_cva Optional pointer to store the CVA.
@@ -183,7 +184,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a slide toggle base component.
  * \param toggle The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -197,7 +198,7 @@ ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the checked state.
  * \param toggle The slide toggle component.
  * \param checked The checked state.
@@ -212,7 +213,7 @@ ui_error_t ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the checked state.
  * \param toggle The slide toggle component.
  * \param out_checked Pointer to store the result.
@@ -228,7 +229,7 @@ ui_slide_toggle_base_get_checked(const struct ui_slide_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the disabled state.
  * \param toggle The slide toggle component.
  * \param disabled The disabled state.
@@ -248,7 +249,7 @@ ui_slide_toggle_base_set_disabled(struct ui_slide_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the disabled state.
  * \param toggle The slide toggle component.
  * \param out_disabled Pointer to store the result.
@@ -264,7 +265,7 @@ ui_slide_toggle_base_get_disabled(const struct ui_slide_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Toggles the slide toggle state.
  * \param toggle The slide toggle component.
  * \return UI_ERROR_NONE on success.
@@ -289,7 +290,7 @@ ui_error_t ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an event.
  * \param toggle The slide toggle component.
  * \param event The event.
@@ -388,7 +389,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Gets the current drag offset.
  * \param toggle The slide toggle component.
  * \param out_offset_x Pointer to store the offset.
@@ -404,7 +405,7 @@ ui_slide_toggle_base_get_drag_offset(const struct ui_slide_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Checks if the toggle is currently being dragged.
  * \param toggle The slide toggle component.
  * \param out_is_dragging Pointer to store the result.

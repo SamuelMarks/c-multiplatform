@@ -4,7 +4,7 @@
 #include <stdio.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_page_control_base_create.
  * @param out_control Parameter out_control.
  * @return Return value.
@@ -55,7 +55,7 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief update_page_control_dom.
  * @param control Parameter control.
  * @return Return value.
@@ -92,7 +92,8 @@ update_page_control_dom(struct ui_page_control_base *control) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_page_control_base_set_number_of_pages(struct ui_page_control_base *control,
                                          int count) {
@@ -109,7 +110,8 @@ ui_page_control_base_set_number_of_pages(struct ui_page_control_base *control,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_page_control_base_set_current_page(struct ui_page_control_base *control,
                                       int page) {
@@ -126,7 +128,8 @@ ui_page_control_base_set_current_page(struct ui_page_control_base *control,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_page_control_base_bind_current_page(struct ui_page_control_base *widget,
                                        struct ui_signal *signal) {

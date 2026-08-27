@@ -14,21 +14,24 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @cond */
 #define UI_TREE_IS_EXPAND_IGNORE(t, n, o)                                      \
   ui_tree_base_is_expanded((t), (n), (o))
+/** @endcond */
 
 /**
+ * @struct ui_tree_base
  * @struct ui_tree_base
  * @brief Internal state for the tree base component.
  */
 struct ui_tree_base {
-  struct ui_tree_model model;
-  void **expanded_nodes;
-  size_t num_expanded;
-  size_t expanded_cap;
-  void *active_node;
-  struct ui_selection_model *selection_model;
-  struct ui_computed *data_signal;
+  struct ui_tree_model model;                 /**< model */
+  void **expanded_nodes;                      /**< expanded_nodes */
+  size_t num_expanded;                        /**< num_expanded */
+  size_t expanded_cap;                        /**< expanded_cap */
+  void *active_node;                          /**< active_node */
+  struct ui_selection_model *selection_model; /**< selection_model */
+  struct ui_computed *data_signal;            /**< data_signal */
 };
 
 ui_error_t ui_tree_base_create(struct ui_tree_base **out_tree,
@@ -117,7 +120,7 @@ ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
       if (tree->num_expanded >= tree->expanded_cap) {
         size_t new_cap = tree->expanded_cap == 0 ? 8 : tree->expanded_cap * 2;
         void **new_arr = (void **)C_MULTIPLATFORM_REALLOC(
-            tree->expanded_nodes, new_cap * sizeof(void *));
+            tree->expanded_nodes, (size_t)new_cap * sizeof(void *));
         if (!new_arr)
           return UI_ERROR_OUT_OF_MEMORY;
         tree->expanded_nodes = new_arr;
@@ -168,7 +171,7 @@ ui_error_t ui_tree_base_get_active_node(const struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Helper to find a node's index among its siblings.
  * @param tree The tree instance.
  * @param parent The parent node identifier.
@@ -190,7 +193,7 @@ static size_t get_node_index(struct ui_tree_base *tree, void *parent,
   return 0;
 }
 
-/**
+/*
  * @brief Gets the next visible node in a pre-order traversal.
  * @param tree The tree instance.
  * @param node The current node identifier.
@@ -225,7 +228,7 @@ static void *get_next_visible_node(struct ui_tree_base *tree, void *node) {
   return NULL;
 }
 
-/**
+/*
  * @brief Gets the previous visible node in a pre-order traversal.
  * @param tree The tree instance.
  * @param node The current node identifier.
@@ -337,7 +340,7 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Recursively renders tree nodes to the DOM.
  * @param tree The tree instance.
  * @param node The current node identifier.
@@ -368,7 +371,9 @@ static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
     (void)_ign_rc;
   }
 
+/** @cond */
 #define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+  /** @endcond */
 
   /* Accessibility */
   (void)UI_DOM_SET_ATTR_IGNORE(item, "role", "treeitem");
@@ -393,9 +398,8 @@ static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
 #endif
   (void)UI_DOM_SET_ATTR_IGNORE(item, "aria-setsize", buf);
 
-#define UI_SEL_IS_SEL_IGNORE(m, n, o)                                          \
-  ui_selection_model_is_selected((m), (n), (o))
-  (void)UI_SEL_IS_SEL_IGNORE(tree->selection_model, node, &is_selected);
+  (void)ui_selection_model_is_selected(tree->selection_model, node,
+                                       &is_selected);
   if (is_selected) {
     (void)UI_DOM_SET_ATTR_IGNORE(item, "aria-selected", "true");
   }

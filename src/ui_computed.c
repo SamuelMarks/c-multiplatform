@@ -10,24 +10,28 @@
 #include <stdio.h>
 /* clang-format on */
 
+/**
+ * @struct ui_computed
+ * \brief ui_computed
+ */
 struct ui_computed {
-  ui_compute_fn compute_fn;
-  void *user_data;
-  enum ui_signal_type type;
-  enum ui_signal_mode mode;
-  struct ui_arena *arena;
-  union ui_signal_payload cached_value;
-  ui_bool_t is_dirty;
-  ui_atomic_t lock;
+  ui_compute_fn compute_fn;             /**< compute_fn */
+  void *user_data;                      /**< user_data */
+  enum ui_signal_type type;             /**< type */
+  enum ui_signal_mode mode;             /**< mode */
+  struct ui_arena *arena;               /**< arena */
+  union ui_signal_payload cached_value; /**< cached_value */
+  ui_bool_t is_dirty;                   /**< is_dirty */
+  ui_atomic_t lock;                     /**< lock */
 
-  struct ui_reactive_node self_node;
+  struct ui_reactive_node self_node; /**< self_node */
 
-  struct ui_reactive_node **subscribers;
-  size_t subscribers_count;
-  size_t subscribers_capacity;
+  struct ui_reactive_node **subscribers; /**< subscribers */
+  size_t subscribers_count;              /**< subscribers_count */
+  size_t subscribers_capacity;           /**< subscribers_capacity */
 };
 
-/**
+/*
  * @brief ui_computed_lock.
  * @param comp Parameter comp.
  * @return Return value.
@@ -42,7 +46,7 @@ static ui_error_t ui_computed_lock(ui_computed_t *comp) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_computed_unlock.
  * @param comp Parameter comp.
  * @return Return value.
@@ -54,7 +58,7 @@ static ui_error_t ui_computed_unlock(ui_computed_t *comp) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_computed_add_subscriber.
  * @param comp Parameter comp.
  * @param node Parameter node.
@@ -76,7 +80,7 @@ static ui_error_t ui_computed_add_subscriber(ui_computed_t *comp,
     new_cap =
         comp->subscribers_capacity == 0 ? 4 : comp->subscribers_capacity * 2;
     new_array = (struct ui_reactive_node **)C_MULTIPLATFORM_REALLOC(
-        comp->subscribers, new_cap * sizeof(struct ui_reactive_node *));
+        comp->subscribers, (size_t)new_cap * sizeof(struct ui_reactive_node *));
     if (!new_array) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -88,7 +92,7 @@ static ui_error_t ui_computed_add_subscriber(ui_computed_t *comp,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_computed_on_notify.
  * @param user_data Parameter user_data.
  * @return Return value.
@@ -112,7 +116,7 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   /* Make a copy of subscribers to notify outside the lock */
   if (comp->subscribers_count > 0) {
     subs_copy = (struct ui_reactive_node **)C_MULTIPLATFORM_MALLOC(
-        comp->subscribers_count * sizeof(struct ui_reactive_node *));
+        (size_t)comp->subscribers_count * sizeof(struct ui_reactive_node *));
     if (subs_copy) {
       subs_count = comp->subscribers_count;
       for (i = 0; i < subs_count; i++) {
@@ -137,7 +141,7 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_computed_create.
  * @param arena Parameter arena.
  * @param compute_fn Parameter compute_fn.
@@ -189,7 +193,7 @@ ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_computed_get.
  * @param computed Parameter computed.
  * @param out_value Parameter out_value.
@@ -238,7 +242,7 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
   return ui_computed_unlock(computed);
 }
 
-/**
+/*
  * @brief ui_computed_destroy.
  * @param computed Parameter computed.
  * @return Return value.

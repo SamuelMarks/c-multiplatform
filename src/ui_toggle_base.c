@@ -17,44 +17,45 @@
 
 /**
  * @struct ui_toggle_base
+ * @struct ui_toggle_base
  * @brief Internal implementation of the toggle component.
  */
 struct ui_toggle_base {
-  /** @brief The base component instance. */
-  struct ui_component *component;
-  /** @brief The gesture recognizer. */
-  struct ui_gesture_recognizer *gesture_recognizer;
-  /** @brief Type of toggle (checkbox or radio). */
-  enum ui_toggle_type type;
-  /** @brief Current checked state. */
-  int checked;
-  /** @brief Current disabled state. */
-  int disabled;
-  /** @brief Optional group name for radio exclusion. */
-  char *group_name;
-  /** @brief Callback for change events. */
-  ui_toggle_on_change_t on_change;
-  /** @brief User data for change callback. */
-  void *user_data;
+  /* @brief The base component instance. */
+  struct ui_component *component; /**< component */
+  /* @brief The gesture recognizer. */
+  struct ui_gesture_recognizer *gesture_recognizer; /**< gesture_recognizer */
+  /* @brief Type of toggle (checkbox or radio). */
+  enum ui_toggle_type type; /**< type */
+  /* @brief Current checked state. */
+  int checked; /**< checked */
+  /* @brief Current disabled state. */
+  int disabled; /**< disabled */
+  /* @brief Optional group name for radio exclusion. */
+  char *group_name; /**< group_name */
+  /* @brief Callback for change events. */
+  ui_toggle_on_change_t on_change; /**< on_change */
+  /* @brief User data for change callback. */
+  void *user_data; /**< user_data */
 
-  /** @brief CVA on-change callback. */
-  ui_error_t (*cva_on_change)(union ui_signal_payload, void *);
-  /** @brief User data for CVA on-change callback. */
-  void *cva_on_change_user_data;
-  /** @brief CVA on-touched callback. */
-  ui_error_t (*cva_on_touched)(void *);
-  /** @brief User data for CVA on-touched callback. */
-  void *cva_on_touched_user_data;
+  /* @brief CVA on-change callback. */
+  ui_error_t (*cva_on_change)(union ui_signal_payload, void *); /**< ) */
+  /* @brief User data for CVA on-change callback. */
+  void *cva_on_change_user_data; /**< cva_on_change_user_data */
+  /* @brief CVA on-touched callback. */
+  ui_error_t (*cva_on_touched)(void *); /**< ) */
+  /* @brief User data for CVA on-touched callback. */
+  void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
 
-  /** @brief Next toggle in the global registry (for radio exclusion). */
-  struct ui_toggle_base *next;
-  /** @brief Previous toggle in the global registry. */
-  struct ui_toggle_base *prev;
+  /* @brief Next toggle in the global registry (for radio exclusion). */
+  struct ui_toggle_base *next; /**< next */
+  /* @brief Previous toggle in the global registry. */
+  struct ui_toggle_base *prev; /**< prev */
 };
 
 static struct ui_toggle_base *g_radio_registry = NULL;
 
-/**
+/*
  * @brief Updates the DOM state attributes based on the current toggle state.
  * @param toggle The toggle instance.
  * @return UI_ERROR_NONE on success.
@@ -93,7 +94,7 @@ static ui_error_t update_dom_state(struct ui_toggle_base *toggle) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Enforces radio button exclusion logic (only one checked per group).
  * @param checked_radio The radio button that was just checked.
  * @return UI_ERROR_NONE on success.
@@ -515,7 +516,7 @@ ui_error_t ui_toggle_base_get_component(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Handles writing a value to the CVA.
  * @param component The toggle component.
  * @param value The value to write.
@@ -527,7 +528,7 @@ static ui_error_t toggle_cva_write_value(void *component,
   return ui_toggle_base_set_checked(toggle, value.int_val);
 }
 
-/**
+/*
  * @brief Registers the CVA on-change callback.
  * @param component The toggle component.
  * @param callback The callback function.
@@ -546,7 +547,7 @@ static ui_error_t toggle_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Registers the CVA on-touched callback.
  * @param component The toggle component.
  * @param callback The callback function.
@@ -565,7 +566,7 @@ static ui_error_t toggle_cva_register_on_touched(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Sets the CVA disabled state.
  * @param component The toggle component.
  * @param is_disabled The disabled state flag.

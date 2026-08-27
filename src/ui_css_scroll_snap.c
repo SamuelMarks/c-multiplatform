@@ -8,12 +8,16 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
+/** @endcond */
 #else
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
+/** @endcond */
 #endif
 
-/**
+/*
  * @brief parse_snap_type.
  * @param str Parameter str.
  * @param out_type Parameter out_type.
@@ -68,7 +72,7 @@ static ui_error_t parse_snap_type(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_align_keyword.
  * @param str Parameter str.
  * @param out_keyword Parameter out_keyword.
@@ -87,7 +91,7 @@ parse_align_keyword(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_snap_align.
  * @param str Parameter str.
  * @param out_align Parameter out_align.
@@ -134,7 +138,7 @@ static ui_error_t parse_snap_align(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief set_quad_default.
  * @param top Parameter top.
  * @param right Parameter right.
@@ -158,7 +162,7 @@ static ui_error_t set_quad_default(struct ui_css_value *top,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_quad_shorthand.
  * @param str Parameter str.
  * @param top Parameter top.
@@ -220,7 +224,8 @@ static ui_error_t parse_quad_shorthand(const char *str,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
                          struct ui_css_scroll_snap_properties *out_props) {

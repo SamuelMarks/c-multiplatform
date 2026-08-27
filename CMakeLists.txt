@@ -1,5 +1,26 @@
 cmake_minimum_required(VERSION 3.15)
 project(c-multiplatform-engine C)
+if (MSVC AND CMAKE_HOST_UNIX)
+    # Workaround for MSVC hanging under Wine on macOS/Linux due to mspdbsrv.exe and incremental linking
+    # Replace flags in default debug variables
+    string(REPLACE "/debug" "/DEBUG:NONE" CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+    string(REPLACE "/debug" "/DEBUG:NONE" CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
+    string(REPLACE "/INCREMENTAL" "/INCREMENTAL:NO" CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+    string(REPLACE "/INCREMENTAL" "/INCREMENTAL:NO" CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
+    string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
+    string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+
+    # Propagate to TryCompile
+    list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
+         CMAKE_EXE_LINKER_FLAGS_DEBUG
+         CMAKE_SHARED_LINKER_FLAGS_DEBUG
+         CMAKE_C_FLAGS_DEBUG
+         CMAKE_CXX_FLAGS_DEBUG)
+
+    # Forcefully apply to all downstream targets, overriding any individual target settings
+    add_compile_options("/Z7")
+    add_link_options("/DEBUG:NONE" "/INCREMENTAL:NO")
+endif()
 
 # Set C89 standard strictly
 set(CMAKE_C_STANDARD 90)
@@ -122,9 +143,9 @@ endif()
 
 if(MSVC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Gy /wd4701")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMTD")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB:LIBCMTD")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMTD")
+
+
+
     # Target-specific warnings will be added later
 
 else()
@@ -176,7 +197,7 @@ endif()
 if(MSVC)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
     target_compile_options(ui_engine PRIVATE /W4 /WX /Gy /wd4702 /wd4716 /wd4033 /wd4133 /wd4024 /wd4047 /wd4715 /wd4113)
-    target_link_options(ui_engine PRIVATE /NODEFAULTLIB:LIBCMTD)
+
 else()
     target_compile_options(ui_engine PRIVATE -pedantic -Wall -Werror  )
     if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "")
@@ -187,7 +208,6 @@ else()
 endif()
 
 
-set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
 include(FetchContent)
 
 macro(UI_FetchDependencyLocalOrArchive NAME LOCAL_DIR GITHUB_REPO)
@@ -213,6 +233,11 @@ macro(UI_FetchDependencyLocalOrArchive NAME LOCAL_DIR GITHUB_REPO)
     set(BUILD_TESTING ON CACHE BOOL "Enable testing for main project" FORCE)
 endmacro()
 
+if(NOT MSVC)
+    set(OLD_CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error -Wno-error=format-nonliteral -Wno-error=sign-conversion -Wno-long-long -Wno-error=overlength-strings -Wno-error=shorten-64-to-32 -Wno-error=float-conversion -Wno-error=implicit-int-float-conversion")
+endif()
+
 if(NOT TARGET cfs)
     UI_FetchDependencyLocalOrArchive(cfs "c-fs" "SamuelMarks/c-fs")
 endif()
@@ -221,6 +246,25 @@ UI_FetchDependencyLocalOrArchive(parson "parson" "SamuelMarks/parson")
 UI_FetchDependencyLocalOrArchive(c_cdd "cdd-c" "SamuelMarks/cdd-c")
 UI_FetchDependencyLocalOrArchive(c-abstract-http "c-abstract-http" "SamuelMarks/c-abstract-http")
 UI_FetchDependencyLocalOrArchive(c_orm "c-orm" "SamuelMarks/c-orm")
+
+foreach(dep c_cdd c_str_span c-abstract-http c-orm c89stringutils parson cfs)
+    if(TARGET ${dep})
+        if(NOT MSVC)
+            set_property(TARGET ${dep} PROPERTY COMPILE_OPTIONS "")
+            set_property(TARGET ${dep} PROPERTY INTERFACE_COMPILE_OPTIONS "")
+        endif()
+        set_property(TARGET ${dep} PROPERTY LINK_OPTIONS "")
+        set_property(TARGET ${dep} PROPERTY INTERFACE_LINK_OPTIONS "")
+    endif()
+endforeach()
+if(TARGET c_cdd_compiler_flags)
+    set_property(TARGET c_cdd_compiler_flags PROPERTY LINK_OPTIONS "")
+    set_property(TARGET c_cdd_compiler_flags PROPERTY INTERFACE_LINK_OPTIONS "")
+endif()
+
+if(NOT MSVC)
+    set(CMAKE_C_FLAGS "${OLD_CMAKE_C_FLAGS}")
+endif()
 if(TARGET c-orm AND TARGET c_str_span)
     target_include_directories(c-orm PUBLIC build/_deps/c_cdd-src/src)
     target_link_libraries(c-orm PUBLIC c_str_span c_cdd)
@@ -279,7 +323,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     if(MSVC)
         add_compile_definitions(_CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
         target_compile_options(ui_engine_test PRIVATE /W4 /WX /Gy /wd4702 /wd4716 /wd4033 /wd4133 /wd4024 /wd4047 /wd4715 /wd4113)
-        target_link_options(ui_engine_test PRIVATE /NODEFAULTLIB:LIBCMTD)
+
     else()
         target_compile_options(ui_engine_test PRIVATE -pedantic -Wall -Werror  )
         if(ENABLE_COVERAGE)
@@ -438,7 +482,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     target_link_libraries(test_ui_dom_node ui_engine_test)
     add_test(NAME test_ui_dom_node COMMAND test_ui_dom_node)
 
-    add_executable(test_ui_cssom tests/test_ui_cssom.c tests/ui_test_mock_mem.c)
+    add_executable(test_ui_cssom tests/test_ui_cssom.c tests/test_ui_cssom_selectors.c tests/test_ui_cssom_rules.c tests/test_ui_cssom_declarations.c tests/test_ui_cssom_stylesheets.c tests/test_ui_cssom_serialization.c tests/test_ui_cssom_memory.c tests/test_ui_cssom_vars.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_cssom ui_engine_test)
     add_test(NAME test_ui_cssom COMMAND test_ui_cssom)
 

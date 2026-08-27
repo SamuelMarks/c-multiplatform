@@ -1,3 +1,6 @@
+/**
+ * @file ui_rich_text_editor_base.h
+ */
 #ifndef UI_RICH_TEXT_EDITOR_BASE_H
 #define UI_RICH_TEXT_EDITOR_BASE_H
 

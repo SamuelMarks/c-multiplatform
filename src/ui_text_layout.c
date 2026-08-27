@@ -9,19 +9,20 @@
 
 /**
  * @struct ui_text_layout
+ * @struct ui_text_layout
  * @brief Internal representation of a text layout.
  */
 struct ui_text_layout {
-  /** @brief Array of positioned glyphs. */
-  struct ui_positioned_glyph *glyphs;
-  /** @brief Allocated capacity for glyphs. */
-  size_t capacity;
-  /** @brief Number of active glyphs. */
-  size_t count;
-  /** @brief Width of the bounds. */
-  float bounds_width;
-  /** @brief Height of the bounds. */
-  float bounds_height;
+  /* @brief Array of positioned glyphs. */
+  struct ui_positioned_glyph *glyphs; /**< glyphs */
+  /* @brief Allocated capacity for glyphs. */
+  size_t capacity; /**< capacity */
+  /* @brief Number of active glyphs. */
+  size_t count; /**< count */
+  /* @brief Width of the bounds. */
+  float bounds_width; /**< bounds_width */
+  /* @brief Height of the bounds. */
+  float bounds_height; /**< bounds_height */
 };
 
 ui_error_t ui_text_layout_create(struct ui_text_layout **out_layout) {
@@ -59,7 +60,7 @@ ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Helper function to decode a UTF-8 character.
  * @param text Pointer to the text string, updated to the next character.
  * @param out_codepoint Pointer to receive the decoded codepoint.
@@ -103,7 +104,7 @@ static ui_error_t decode_utf8(const char **text, int *out_codepoint) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Helper function to add a glyph to the layout.
  * @param layout The layout instance.
  * @param codepoint The codepoint to add.
@@ -118,7 +119,7 @@ static ui_error_t add_glyph(struct ui_text_layout *layout, int codepoint,
     size_t new_cap = layout->capacity == 0 ? 32 : layout->capacity * 2;
     struct ui_positioned_glyph *new_glyphs =
         (struct ui_positioned_glyph *)C_MULTIPLATFORM_MALLOC(
-            new_cap * sizeof(struct ui_positioned_glyph));
+            (size_t)new_cap * sizeof(struct ui_positioned_glyph));
     if (!new_glyphs) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -184,18 +185,14 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
       continue;
     }
 
-#define UI_FONT_GET_GLYPH_METRICS_IGNORE(f, c, s, m)                           \
-  ui_font_get_glyph_metrics((f), (c), (s), (m))
-    rc = UI_FONT_GET_GLYPH_METRICS_IGNORE(font, codepoint, font_size, &metrics);
+    rc = ui_font_get_glyph_metrics(font, codepoint, font_size, &metrics);
     if (rc != UI_ERROR_NONE) {
       continue;
     }
 
     if (prev_codepoint != 0) {
-#define UI_GET_KERNING_IGNORE(font, p, c, sz, k)                               \
-  ui_font_get_kerning((font), (p), (c), (sz), (k))
-      (void)UI_GET_KERNING_IGNORE(font, prev_codepoint, codepoint, font_size,
-                                  &kerning);
+      (void)ui_font_get_kerning(font, prev_codepoint, codepoint, font_size,
+                                &kerning);
     }
 
     x += kerning;

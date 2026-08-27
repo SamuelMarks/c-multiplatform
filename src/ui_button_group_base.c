@@ -8,7 +8,7 @@
 int g_button_group_mock_fail = 0;
 #endif
 
-/**
+/*
  * @brief ui_button_group_base_create.
  * @param out_group Parameter out_group.
  * @return Return value.
@@ -75,7 +75,8 @@ ui_button_group_base_create(struct ui_button_group_base **out_group) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_button_group_base_set_orientation(struct ui_button_group_base *group,
                                      int is_vertical) {
@@ -94,7 +95,8 @@ ui_button_group_base_set_orientation(struct ui_button_group_base *group,
   }
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_button_group_base_append_button(struct ui_button_group_base *group,
                                    struct ui_component *child) {
@@ -112,7 +114,8 @@ ui_button_group_base_append_button(struct ui_button_group_base *group,
   return ui_dom_node_append_child(group->base.shadow_root, child->shadow_root);
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_button_group_base_bind_disabled(struct ui_button_group_base *widget,
                                    struct ui_signal *disabled_signal) {
@@ -123,7 +126,8 @@ ui_button_group_base_bind_disabled(struct ui_button_group_base *widget,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_button_group_base_bind_text(struct ui_button_group_base *widget,
                                           struct ui_signal *text_signal) {
   if (!widget) {

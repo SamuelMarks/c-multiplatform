@@ -38,11 +38,17 @@ static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
 }
 
 #undef ui_signal_set
+/** @cond */
 #define ui_signal_set mock_signal_set
+/** @endcond */
 #undef ui_dom_node_set_attribute
+/** @cond */
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
+/** @endcond */
 #undef ui_dom_node_remove_attribute
+/** @cond */
 #define ui_dom_node_remove_attribute mock_dom_node_remove_attribute
+/** @endcond */
 
 static ui_error_t mock_on_dismiss_fail(struct ui_alert_base *alert, void *u) {
   (void)alert;
@@ -94,18 +100,19 @@ ui_error_t run_alert_coverage(void) {
 
 /**
  * @struct ui_alert_base
+ * @struct ui_alert_base
  * @brief Internal representation of an alert component.
  */
 struct ui_alert_base {
-  struct ui_component *component;
-  enum ui_alert_role role;
-  int dismissible;
-  ui_alert_on_dismiss_t on_dismiss;
-  void *on_dismiss_data;
-  struct ui_component *focus_return;
-  int is_dismissed;
-  struct ui_signal *open_signal;
-  struct ui_computed *animating_signal;
+  struct ui_component *component;       /**< component */
+  enum ui_alert_role role;              /**< role */
+  int dismissible;                      /**< dismissible */
+  ui_alert_on_dismiss_t on_dismiss;     /**< on_dismiss */
+  void *on_dismiss_data;                /**< on_dismiss_data */
+  struct ui_component *focus_return;    /**< focus_return */
+  int is_dismissed;                     /**< is_dismissed */
+  struct ui_signal *open_signal;        /**< open_signal */
+  struct ui_computed *animating_signal; /**< animating_signal */
 };
 
 ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert) {

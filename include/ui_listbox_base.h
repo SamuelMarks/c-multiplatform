@@ -53,7 +53,8 @@ ui_error_t ui_listbox_base_destroy(struct ui_listbox_base *listbox);
  * @brief Retrieves the underlying UI component.
  *
  * @param listbox The listbox.
- * @return The component, or NULL.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_listbox_base_get_component(struct ui_listbox_base *listbox,
                                          struct ui_component **out_component);
@@ -62,7 +63,8 @@ ui_error_t ui_listbox_base_get_component(struct ui_listbox_base *listbox,
  * @brief Gets the selection model attached to this listbox.
  *
  * @param listbox The listbox.
- * @return The selection model, or NULL.
+ * @param out_model Pointer to receive the selection model used by the listbox.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t
 ui_listbox_base_get_selection_model(struct ui_listbox_base *listbox,
@@ -116,7 +118,9 @@ ui_error_t ui_listbox_base_set_active_index(struct ui_listbox_base *listbox,
  * @brief Gets the active (focused) item index.
  *
  * @param listbox The listbox.
- * @return The index, or -1 if none.
+ * @param out_index Pointer to receive the index of the active option, or -1 if
+ * none is active.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t
 ui_listbox_base_get_active_index(const struct ui_listbox_base *listbox,

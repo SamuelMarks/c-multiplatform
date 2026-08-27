@@ -71,7 +71,8 @@ ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
  * @brief Gets the current checked state of the toggle.
  *
  * @param toggle The toggle.
- * @return 1 if checked, 0 if unchecked.
+ * @param out_is_checked Pointer to receive 1 if checked, 0 if unchecked.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
                                      int *out_is_checked);
@@ -128,7 +129,8 @@ ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
  * mounting.
  *
  * @param toggle The toggle.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_toggle_base_get_component(struct ui_toggle_base *toggle,
                                         struct ui_component **out_component);

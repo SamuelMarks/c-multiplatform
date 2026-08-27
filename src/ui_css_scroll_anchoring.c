@@ -5,7 +5,7 @@
 #include <stddef.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_css_scroll_anchoring_parse.
  * @param style Parameter style.
  * @param out_anchor Parameter out_anchor.

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 /* clang-format on */
 
-/**
+/*
  * @brief trigger_cva_change.
  * @param list Parameter list.
  * @return Return value.
@@ -25,7 +25,7 @@ static ui_error_t trigger_cva_change(struct ui_transfer_list_base *list) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief trigger_cva_touched.
  * @param list Parameter list.
  * @return Return value.
@@ -37,7 +37,7 @@ static ui_error_t trigger_cva_touched(struct ui_transfer_list_base *list) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief transfer_list_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -62,7 +62,8 @@ static ui_error_t transfer_list_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/** \brief transfer_list_cva_register_on_change */
+/* \brief transfer_list_cva_register_on_change
+ */
 static ui_error_t transfer_list_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -76,7 +77,8 @@ static ui_error_t transfer_list_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/** \brief transfer_list_cva_register_on_touched */
+/* \brief transfer_list_cva_register_on_touched
+ */
 static ui_error_t transfer_list_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_transfer_list_base *list =
@@ -88,7 +90,7 @@ static ui_error_t transfer_list_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief transfer_list_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -104,7 +106,8 @@ static ui_error_t transfer_list_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_transfer_list_base_init(struct ui_transfer_list_base *list,
                            struct ui_component *component,
@@ -132,7 +135,7 @@ ui_transfer_list_base_init(struct ui_transfer_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_transfer_list_base_add_item.
  * @param list Parameter list.
  * @param to_right Parameter to_right.
@@ -165,13 +168,15 @@ ui_error_t ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
     list->left_list = item;
   }
 
+/** @cond */
 #define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+  /** @endcond */
   (void)UI_TRIG_CVA_CHG_IGNORE(list);
 
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief find_item.
  * @param head Parameter head.
  * @param id Parameter id.
@@ -189,7 +194,8 @@ find_item(struct ui_transfer_list_item *head, int id) {
   return NULL;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
                                    int selected) {
@@ -213,15 +219,19 @@ ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
 
   if (item->selected != selected) {
     item->selected = selected;
+/** @cond */
 #define UI_TRIG_CVA_TOUCH_IGNORE(s) trigger_cva_touched((s))
+    /** @endcond */
     (void)UI_TRIG_CVA_TOUCH_IGNORE(list);
+/** @cond */
 #define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+    /** @endcond */
     (void)UI_TRIG_CVA_CHG_IGNORE(list);
   }
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief move_items.
  * @param src_head Parameter src_head.
  * @param dst_head Parameter dst_head.
@@ -264,7 +274,8 @@ static ui_error_t move_items(struct ui_transfer_list_item **src_head,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
                                     int to_right) {
@@ -278,7 +289,9 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
 
   (void)UI_TRIG_CVA_TOUCH_IGNORE(list);
 
+/** @cond */
 #define UI_MOVE_ITEMS_IGNORE(sh, dh, o, m) move_items((sh), (dh), (o), (m))
+  /** @endcond */
   if (to_right) {
     (void)UI_MOVE_ITEMS_IGNORE(&list->left_list, &list->right_list, 1, &moved);
   } else {
@@ -286,14 +299,16 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
   }
 
   if (moved > 0) {
+/** @cond */
 #define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+    /** @endcond */
     (void)UI_TRIG_CVA_CHG_IGNORE(list);
   }
 
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_transfer_list_base_move_all.
  * @param list Parameter list.
  * @param to_right Parameter to_right.
@@ -318,14 +333,16 @@ ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
   }
 
   if (moved > 0) {
+/** @cond */
 #define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
+    /** @endcond */
     (void)UI_TRIG_CVA_CHG_IGNORE(list);
   }
 
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief free_list.
  * @param head Parameter head.
  * @return Return value.
@@ -341,7 +358,8 @@ static ui_error_t free_list(struct ui_transfer_list_item *head) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list) {
   if (!list) {
     return UI_ERROR_NONE;

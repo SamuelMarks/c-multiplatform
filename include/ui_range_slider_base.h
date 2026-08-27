@@ -1,3 +1,6 @@
+/**
+ * @file ui_range_slider_base.h
+ */
 #ifndef UI_RANGE_SLIDER_BASE_H
 #define UI_RANGE_SLIDER_BASE_H
 

@@ -1,4 +1,7 @@
 /**
+ * @file ui_css_page_floats.h
+ */
+/**
  * \file ui_css_page_floats.h
  * \brief CSS Page Floats definitions and parsing.
  * \author UI Framework Team

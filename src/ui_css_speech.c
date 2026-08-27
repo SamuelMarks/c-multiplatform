@@ -9,10 +9,14 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
+/** @endcond */
 #else
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
-/**
+/** @endcond */
+/*
  * @brief dup_string.
  * @param s Parameter s.
  * @param out_str Parameter out_str.
@@ -33,7 +37,7 @@ static ui_error_t dup_string(const char *s, char **out_str) {
 }
 #endif
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -45,7 +49,7 @@ static ui_error_t skip_whitespace(const char **p_str) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_speech_strength.
  * @param str Parameter str.
  * @param out_strength Parameter out_strength.
@@ -71,7 +75,7 @@ static void parse_speech_strength(const char *str,
   }
 }
 
-/**
+/*
  * @brief parse_pause_or_rest.
  * @param str Parameter str.
  * @param out_val Parameter out_val.
@@ -100,7 +104,7 @@ static ui_error_t parse_pause_or_rest(const char *str,
   }
 }
 
-/**
+/*
  * @brief parse_cue.
  * @param str Parameter str.
  * @param out_val Parameter out_val.
@@ -117,7 +121,7 @@ static ui_error_t parse_cue(const char *str,
     const char *start = str + 4;
     const char *end = strchr(start, ')');
     if (end) {
-      size_t len = end - start;
+      size_t len = (size_t)(end - start);
       if (start[0] == '"' || start[0] == '\'') {
         start++;
         len -= 2;
@@ -148,7 +152,7 @@ static ui_error_t parse_cue(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_voice_volume.
  * @param str Parameter str.
  * @param out_val Parameter out_val.
@@ -190,7 +194,7 @@ static ui_error_t parse_voice_volume(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_voice_rate.
  * @param str Parameter str.
  * @param out_val Parameter out_val.
@@ -229,7 +233,7 @@ static ui_error_t parse_voice_rate(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_voice_pitch.
  * @param str Parameter str.
  * @param out_val Parameter out_val.
@@ -293,7 +297,7 @@ static ui_error_t parse_voice_pitch(const char *str,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_speech_parse.
  * @param style Parameter style.
  * @param out_props Parameter out_props.
@@ -454,7 +458,7 @@ ui_error_t ui_css_speech_parse(const struct ui_css_computed_style *style,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_css_speech_cleanup.
  * @param props Parameter props.
  * @return Return value.

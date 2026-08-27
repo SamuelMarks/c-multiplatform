@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_engine_core.c
  * \brief Core UI engine implementation.
  */
@@ -17,17 +17,18 @@
 /* clang-format on */
 
 /**
+ * @struct ui_engine
  * \struct ui_engine
  * \brief The main UI engine structure.
  */
 struct ui_engine {
-  struct ui_tick_engine *tick_engine;
-  struct ui_thread_pool *thread_pool;
-  struct ui_reactor *reactor;
-  struct ui_timer *timer;
+  struct ui_tick_engine *tick_engine; /**< tick_engine */
+  struct ui_thread_pool *thread_pool; /**< thread_pool */
+  struct ui_reactor *reactor;         /**< reactor */
+  struct ui_timer *timer;             /**< timer */
 };
 
-/**
+/*
  * \brief Creates the UI engine.
  * \param[in] config Configuration for the engine.
  * \param[out] out_engine Pointer to store the created engine.
@@ -94,7 +95,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys the UI engine.
  * \param[in,out] engine The engine to destroy.
  * \return UI_ERROR_NONE on success.
@@ -123,7 +124,7 @@ ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Ticks the UI engine, advancing its state.
  * \param[in,out] engine The engine to tick.
  * \return UI_ERROR_NONE on success.

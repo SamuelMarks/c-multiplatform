@@ -11,20 +11,21 @@
 
 /**
  * @struct ui_top_app_bar_base
+ * @struct ui_top_app_bar_base
  * @brief Internal implementation of the top app bar base component.
  */
 struct ui_top_app_bar_base {
-  /** @brief Memory arena for allocations. */
-  struct ui_arena *arena;
-  /** @brief The top app bar configuration. */
-  struct ui_top_app_bar_config config;
-  /** @brief Signal for the current state. */
-  ui_signal_t *state_signal;
-  /** @brief Signal for the current height. */
-  ui_signal_t *height_signal;
+  /* @brief Memory arena for allocations. */
+  struct ui_arena *arena; /**< arena */
+  /* @brief The top app bar configuration. */
+  struct ui_top_app_bar_config config; /**< config */
+  /* @brief Signal for the current state. */
+  ui_signal_t *state_signal; /**< state_signal */
+  /* @brief Signal for the current height. */
+  ui_signal_t *height_signal; /**< height_signal */
 };
 
-/**
+/*
  * @brief Equality function for state signals.
  * @param a The first payload.
  * @param b The second payload.
@@ -38,7 +39,7 @@ static ui_error_t state_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief Equality function for height signals.
  * @param a The first payload.
  * @param b The second payload.
@@ -73,7 +74,7 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
   (*out_bar)->arena = arena;
   (*out_bar)->config = *config;
 
-  initial_state.int_val = config->initial_state;
+  initial_state.int_val = (ui_int32)config->initial_state;
   {
     ui_error_t _ign_rc = ui_signal_create(
         arena, initial_state, UI_SIGNAL_TYPE_INT32, state_equality, NULL,
@@ -168,7 +169,7 @@ ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
   }
 
   if ((ui_int32)new_state != state_payload.int_val) {
-    state_payload.int_val = new_state;
+    state_payload.int_val = (ui_int32)new_state;
     {
       ui_error_t _ign_rc = ui_signal_set(bar->state_signal, state_payload);
       (void)_ign_rc;

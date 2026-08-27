@@ -8,12 +8,16 @@
 /* clang-format on */
 
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
+/** @endcond */
 #else
+/** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
+/** @endcond */
 #endif
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -24,7 +28,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/**
+/*
  * @brief ui_css_parse_offset_path.
  * @param str Parameter str.
  * @param out_path Parameter out_path.
@@ -51,7 +55,7 @@ ui_error_t ui_css_parse_offset_path(const char *str,
     const char *start = str + 4;
     const char *end = strrchr(start, ')');
     if (end) {
-      size_t len = end - start;
+      size_t len = (size_t)(end - start);
       if (len >= sizeof(out_path->url))
         len = sizeof(out_path->url) - 1;
       memcpy(out_path->url, start, len);
@@ -63,7 +67,7 @@ ui_error_t ui_css_parse_offset_path(const char *str,
     const char *start = str + 5;
     const char *end = strrchr(start, ')');
     if (end) {
-      size_t len = end - start;
+      size_t len = (size_t)(end - start);
       out_path->shape.type = UI_CSS_BASIC_SHAPE_PATH;
       if (len >= sizeof(out_path->shape.arguments))
         len = sizeof(out_path->shape.arguments) - 1;
@@ -78,7 +82,7 @@ ui_error_t ui_css_parse_offset_path(const char *str,
     const char *end = strchr(start, ')');
     if (end) {
       char arg_buf[128];
-      size_t len = end - start;
+      size_t len = (size_t)(end - start);
       if (len >= sizeof(arg_buf))
         len = sizeof(arg_buf) - 1;
       memcpy(arg_buf, start, len);
@@ -106,7 +110,7 @@ ui_error_t ui_css_parse_offset_path(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/**
+/*
  * @brief ui_css_parse_offset_distance.
  * @param str Parameter str.
  * @param out_distance Parameter out_distance.
@@ -120,7 +124,8 @@ ui_error_t ui_css_parse_offset_distance(const char *str,
   return ui_css_parse_value(str, out_distance);
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_parse_offset_position(const char *str,
                              struct ui_css_offset_position *out_position) {
@@ -151,7 +156,8 @@ ui_css_parse_offset_position(const char *str,
   return rc;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_parse_offset_anchor(const char *str,
                                       struct ui_css_offset_anchor *out_anchor) {
   ui_error_t rc;
@@ -179,7 +185,8 @@ ui_error_t ui_css_parse_offset_anchor(const char *str,
   return rc;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_parse_offset_rotate(const char *str,
                                       struct ui_css_offset_rotate *out_rotate) {
   ui_error_t rc;

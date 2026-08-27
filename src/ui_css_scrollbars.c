@@ -5,7 +5,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -16,7 +16,8 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_parse_scrollbar_width(const char *str,
                              enum ui_css_scrollbar_width *out_width) {
@@ -39,7 +40,8 @@ ui_css_parse_scrollbar_width(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_parse_scrollbar_color(const char *str,
                              struct ui_css_scrollbar_color *out_color) {
@@ -66,7 +68,7 @@ ui_css_parse_scrollbar_color(const char *str,
     space++;
   }
 
-  len = space - str;
+  len = (size_t)(space - str);
   if (len >= sizeof(token_buf))
     len = sizeof(token_buf) - 1;
   memcpy(token_buf, str, len);

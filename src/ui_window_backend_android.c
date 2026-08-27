@@ -8,16 +8,19 @@
 #include <android/native_activity.h>
 #include <EGL/egl.h>
 
-/** \brief ui_window */
+/**
+ * @struct ui_window
+ * \brief ui_window
+ */
 struct ui_window {
-    ANativeWindow* window;
-    EGLDisplay display;
-    EGLSurface surface;
-    EGLContext context;
-    int is_closing;
+    ANativeWindow* window; /**< window */
+    EGLDisplay display; /**< display */
+    EGLSurface surface; /**< surface */
+    EGLContext context; /**< context */
+    int is_closing; /**< is_closing */
 };
 
-/**
+/*
  * @brief android_create_window.
  * @param backend Parameter backend.
  * @param title Parameter title.
@@ -34,7 +37,7 @@ static ui_error_t android_create_window(struct ui_window_backend* backend, const
     return UI_ERROR_UNKNOWN; /* Stubbed native setup until hooked to Android lifecycle */
 }
 
-/**
+/*
  * @brief android_destroy_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -47,7 +50,7 @@ static ui_error_t android_destroy_window(struct ui_window_backend* backend, stru
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief android_show_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -60,7 +63,7 @@ static ui_error_t android_show_window(struct ui_window_backend* backend, struct 
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief android_hide_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -73,7 +76,7 @@ static ui_error_t android_hide_window(struct ui_window_backend* backend, struct 
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief android_poll_events.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -90,7 +93,7 @@ static ui_error_t android_poll_events(struct ui_window_backend* backend, struct 
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief android_swap_buffers.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -103,7 +106,7 @@ static ui_error_t android_swap_buffers(struct ui_window_backend* backend, struct
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_window_backend_android_create.
  * @param out_backend Parameter out_backend.
  * @return Return value.
@@ -135,7 +138,7 @@ ui_error_t ui_window_backend_android_create(struct ui_window_backend** out_backe
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_window_backend_android_destroy.
  * @param backend Parameter backend.
  * @return Return value.
@@ -154,7 +157,7 @@ ui_error_t ui_window_backend_android_destroy(struct ui_window_backend* backend) 
 #include <stddef.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_window_backend_android_create.
  * @param out_backend Parameter out_backend.
  * @return Return value.
@@ -168,7 +171,8 @@ ui_window_backend_android_create(struct ui_window_backend **out_backend) {
   return UI_ERROR_UNKNOWN;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_window_backend_android_destroy(struct ui_window_backend *backend) {
   if (!backend) {

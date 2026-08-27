@@ -43,7 +43,7 @@ struct ui_design_token {
     float number_val;       /**< Value for a numeric token. */
     const char *string_val; /**< Value for a string token. */
     const char *alias_val;  /**< Value for an alias token (the target name). */
-  } value;
+  } value;                  /**< The union value */
 };
 
 /**

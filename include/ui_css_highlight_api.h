@@ -1,4 +1,7 @@
 /**
+ * @file ui_css_highlight_api.h
+ */
+/**
  * \file ui_css_highlight_api.h
  * \brief CSS Custom Highlight API definitions.
  * \author UI Framework Team

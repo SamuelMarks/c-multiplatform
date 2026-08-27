@@ -3,24 +3,25 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * \file ui_sort_header_base.c
  * \brief Sort header base component implementation.
  */
 
 /**
+ * @struct ui_sort_header_base
  * \brief ui_sort_header_base structure.
  * \details Internal state for the sort header base component.
  */
 struct ui_sort_header_base {
-  int is_multi;
-  struct ui_sort_state *states;
-  size_t capacity;
-  size_t count;
-  struct ui_signal *direction_signal;
+  int is_multi;                       /**< is_multi */
+  struct ui_sort_state *states;       /**< states */
+  size_t capacity;                    /**< capacity */
+  size_t count;                       /**< count */
+  struct ui_signal *direction_signal; /**< direction_signal */
 };
 
-/**
+/*
  * \brief Creates a new sort header base component.
  * \param out_sort_header Pointer to store the component.
  * \return UI_ERROR_NONE on success.
@@ -48,7 +49,7 @@ ui_sort_header_base_create(struct ui_sort_header_base **out_sort_header) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a sort header component.
  * \param sort_header The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -66,7 +67,7 @@ ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets whether multiple columns can be sorted at once.
  * \param sort_header The sort header.
  * \param is_multi 1 to allow multiple, 0 to allow only one.
@@ -89,7 +90,7 @@ ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Finds the index of a state by ID.
  * \param sort_header The sort header.
  * \param id The ID to look for.
@@ -107,7 +108,7 @@ static void find_state_index(struct ui_sort_header_base *sort_header, void *id,
   }
 }
 
-/**
+/*
  * \brief Removes a state at a given index.
  * \param sort_header The sort header.
  * \param index The index to remove.
@@ -125,7 +126,7 @@ static ui_error_t remove_state_at(struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Inserts or updates a sort state.
  * \param sort_header The sort header.
  * \param id The ID of the item.
@@ -159,7 +160,8 @@ insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
     size_t new_cap = sort_header->capacity == 0 ? 4 : sort_header->capacity * 2;
     struct ui_sort_state *new_states =
         (struct ui_sort_state *)C_MULTIPLATFORM_REALLOC(
-            sort_header->states, new_cap * sizeof(struct ui_sort_state));
+            sort_header->states,
+            (size_t)new_cap * sizeof(struct ui_sort_state));
     if (!new_states) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -174,7 +176,7 @@ insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Toggles the sort direction for a given column ID.
  * \param sort_header The sort header.
  * \param id The column ID.
@@ -211,7 +213,7 @@ ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
   return insert_or_update_state(sort_header, id, next_dir);
 }
 
-/**
+/*
  * \brief Sets the sort direction for a given column ID.
  * \param sort_header The sort header.
  * \param id The column ID.
@@ -228,7 +230,7 @@ ui_sort_header_base_set_direction(struct ui_sort_header_base *sort_header,
   return insert_or_update_state(sort_header, id, direction);
 }
 
-/**
+/*
  * \brief Gets the current sort direction for a given column ID.
  * \param sort_header The sort header.
  * \param id The column ID.
@@ -256,7 +258,7 @@ ui_sort_header_base_get_direction(const struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets all active sorts.
  * \param sort_header The sort header.
  * \param out_states Array to store the states.
@@ -284,7 +286,7 @@ ui_error_t ui_sort_header_base_get_active_sorts(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Clears all active sorts.
  * \param sort_header The sort header.
  * \return UI_ERROR_NONE on success.
@@ -298,7 +300,7 @@ ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the direction state to a signal.
  * \param widget The sort header component.
  * \param signal The signal to bind.

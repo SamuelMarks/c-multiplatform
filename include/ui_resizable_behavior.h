@@ -1,3 +1,6 @@
+/**
+ * @file ui_resizable_behavior.h
+ */
 #ifndef UI_RESIZABLE_BEHAVIOR_H
 #define UI_RESIZABLE_BEHAVIOR_H
 

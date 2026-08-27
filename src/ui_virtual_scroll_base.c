@@ -18,23 +18,24 @@
 
 /**
  * @struct ui_virtual_scroll_base
+ * @struct ui_virtual_scroll_base
  * @brief Internal state for the virtual scroll base component.
  */
 struct ui_virtual_scroll_base {
-  struct ui_virtual_scroll_config config;
-  size_t item_count;
-  float viewport_width;
-  float viewport_height;
+  struct ui_virtual_scroll_config config; /**< config */
+  size_t item_count;                      /**< item_count */
+  float viewport_width;                   /**< viewport_width */
+  float viewport_height;                  /**< viewport_height */
 
-  struct ui_dom_node *container;
+  struct ui_dom_node *container; /**< container */
 
-  struct ui_dom_node **active_nodes;
-  size_t *active_node_indices;
-  size_t num_active_nodes;
-  size_t max_active_nodes;
-  float *cached_prefix_heights;
-  size_t cached_prefix_heights_count;
-  struct ui_computed *data_signal;
+  struct ui_dom_node **active_nodes;  /**< active_nodes */
+  size_t *active_node_indices;        /**< active_node_indices */
+  size_t num_active_nodes;            /**< num_active_nodes */
+  size_t max_active_nodes;            /**< max_active_nodes */
+  float *cached_prefix_heights;       /**< cached_prefix_heights */
+  size_t cached_prefix_heights_count; /**< cached_prefix_heights_count */
+  struct ui_computed *data_signal;    /**< data_signal */
 };
 
 ui_error_t ui_virtual_scroll_base_create(
@@ -102,7 +103,7 @@ ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
 
   if (vs->config.strategy == UI_VIRTUAL_SCROLL_VARIABLE_SIZE) {
     float *new_cache = (float *)C_MULTIPLATFORM_REALLOC(
-        vs->cached_prefix_heights, (count + 1) * sizeof(float));
+        vs->cached_prefix_heights, (size_t)(count + 1) * sizeof(float));
     if (!new_cache && count > 0)
       return UI_ERROR_OUT_OF_MEMORY;
     vs->cached_prefix_heights = new_cache;
@@ -261,13 +262,13 @@ ui_error_t ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
 
   if (visible_count > vs->max_active_nodes) {
     new_nodes = (struct ui_dom_node **)C_MULTIPLATFORM_REALLOC(
-        vs->active_nodes, visible_count * sizeof(struct ui_dom_node *));
+        vs->active_nodes, (size_t)visible_count * sizeof(struct ui_dom_node *));
     if (!new_nodes)
       return UI_ERROR_OUT_OF_MEMORY;
     vs->active_nodes = new_nodes;
 
     new_indices = (size_t *)C_MULTIPLATFORM_REALLOC(
-        vs->active_node_indices, visible_count * sizeof(size_t));
+        vs->active_node_indices, (size_t)visible_count * sizeof(size_t));
     if (!new_indices)
       return UI_ERROR_OUT_OF_MEMORY;
     vs->active_node_indices = new_indices;

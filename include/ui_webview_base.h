@@ -44,7 +44,8 @@ ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview);
  * @brief Retrieves the base component.
  *
  * @param webview The webview component.
- * @return The base component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
                                          struct ui_component **out_component);

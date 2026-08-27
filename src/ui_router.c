@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_router.c
  * \brief Implementation of the UI Router component.
  */
@@ -25,10 +25,11 @@
 #endif
 /* clang-format on */
 
-/** \brief Initial capacity for router stacks and route arrays */
+/* \brief Initial capacity for router stacks and route arrays */
 #define UI_ROUTER_INITIAL_CAPACITY 8
 
 /**
+ * @struct ui_route_param
  * \brief Key-value pair for route parameters and queries.
  */
 struct ui_route_param {
@@ -37,6 +38,7 @@ struct ui_route_param {
 };
 
 /**
+ * @struct ui_route_request
  * \brief Internal structure representing a route request.
  */
 struct ui_route_request {
@@ -49,6 +51,7 @@ struct ui_route_request {
 };
 
 /**
+ * @struct ui_route
  * \brief Internal structure mapping a route pattern to a factory.
  */
 struct ui_route {
@@ -58,6 +61,7 @@ struct ui_route {
 };
 
 /**
+ * @struct ui_router
  * \brief Internal structure representing a router manager.
  */
 struct ui_router {
@@ -70,7 +74,7 @@ struct ui_router {
   size_t routes_size;      /**< Current number of routes */
 };
 
-/**
+/*
  * \brief Frees a route request and its parameters.
  *
  * \param req The request to free.
@@ -104,7 +108,7 @@ static ui_error_t request_free(struct ui_route_request *req) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Copies a string up to n characters safely.
  *
  * \param src Source string.
@@ -133,7 +137,7 @@ static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Appends a key-value pair to a parameter array.
  *
  * \param params Pointer to the array of parameters.
@@ -173,7 +177,7 @@ static int add_param(struct ui_route_param **params, size_t *size,
   }
 
   new_params = (struct ui_route_param *)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_route_param) * (*size + 1));
+      sizeof(struct ui_route_param) * (size_t)(*size + 1));
   if (!new_params) {
     C_MULTIPLATFORM_FREE(k);
     C_MULTIPLATFORM_FREE(v);
@@ -181,7 +185,8 @@ static int add_param(struct ui_route_param **params, size_t *size,
   }
 
   if (*size > 0) {
-    memcpy(new_params, *params, sizeof(struct ui_route_param) * (*size));
+    memcpy(new_params, *params,
+           sizeof(struct ui_route_param) * (size_t)(*size));
     C_MULTIPLATFORM_FREE(*params);
   }
 
@@ -192,7 +197,7 @@ static int add_param(struct ui_route_param **params, size_t *size,
   return 1;
 }
 
-/**
+/*
  * \brief Matches a URL against a route pattern, extracting parameters.
  *
  * \param pattern The route pattern.
@@ -315,7 +320,7 @@ static ui_error_t match_route(const char *pattern, const char *url,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets a path parameter (e.g. from "/settings/:id") by name.
  *
  * \param req The route request.
@@ -340,7 +345,7 @@ ui_error_t ui_route_request_get_param(const struct ui_route_request *req,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets a query string parameter (e.g. from "?tab=2") by name.
  *
  * \param req The route request.
@@ -365,7 +370,7 @@ ui_error_t ui_route_request_get_query(const struct ui_route_request *req,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * \brief Gets the exact path string that was requested (excluding query
  * string).
  *
@@ -381,7 +386,7 @@ ui_error_t ui_route_request_get_path(const struct ui_route_request *req,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the custom state pointer passed during navigation.
  *
  * \param req The route request.
@@ -396,7 +401,7 @@ ui_error_t ui_route_request_get_state(const struct ui_route_request *req,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new screen manager (router) navigation stack.
  *
  * \param out_router Pointer to receive the allocated router.
@@ -417,7 +422,7 @@ ui_error_t ui_router_create(struct ui_router **out_router) {
   router->stack_capacity = UI_ROUTER_INITIAL_CAPACITY;
   router->stack_size = 0;
   router->stack = (struct ui_component **)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_component *) * router->stack_capacity);
+      sizeof(struct ui_component *) * (size_t)router->stack_capacity);
 
   if (!router->stack) {
     C_MULTIPLATFORM_FREE(router);
@@ -427,7 +432,7 @@ ui_error_t ui_router_create(struct ui_router **out_router) {
   router->routes_capacity = UI_ROUTER_INITIAL_CAPACITY;
   router->routes_size = 0;
   router->routes = (struct ui_route *)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_route) * router->routes_capacity);
+      sizeof(struct ui_route) * (size_t)router->routes_capacity);
 
   if (!router->routes) {
     C_MULTIPLATFORM_FREE(router->stack);
@@ -439,7 +444,7 @@ ui_error_t ui_router_create(struct ui_router **out_router) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a router and all screens in its stack.
  *
  * \param router The router to destroy.
@@ -467,7 +472,7 @@ ui_error_t ui_router_destroy(struct ui_router *router) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Registers a route pattern mapping to a screen factory.
  *
  * \param router The router instance.
@@ -490,12 +495,12 @@ ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
   if (router->routes_size >= router->routes_capacity) {
     new_capacity = router->routes_capacity * 2;
     new_routes = (struct ui_route *)C_MULTIPLATFORM_MALLOC(
-        sizeof(struct ui_route) * new_capacity);
+        sizeof(struct ui_route) * (size_t)new_capacity);
     if (!new_routes) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_routes, router->routes,
-           sizeof(struct ui_route) * router->routes_size);
+           sizeof(struct ui_route) * (size_t)router->routes_size);
     C_MULTIPLATFORM_FREE(router->routes);
     router->routes = new_routes;
     router->routes_capacity = new_capacity;
@@ -521,7 +526,7 @@ ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Navigates to a specific URL with an optional state payload.
  *
  * \param router The router instance.
@@ -577,7 +582,7 @@ ui_error_t ui_router_navigate_with_state(struct ui_router *router,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * \brief Navigates to a specific URL by matching it against registered routes
  * and pushing the resulting screen.
  *
@@ -590,7 +595,7 @@ ui_error_t ui_router_navigate(struct ui_router *router, const char *path) {
   return ui_router_navigate_with_state(router, path, NULL);
 }
 
-/**
+/*
  * \brief Pushes a new screen component onto the navigation stack.
  *
  * \param router The router.
@@ -609,12 +614,12 @@ ui_error_t ui_router_push(struct ui_router *router,
   if (router->stack_size >= router->stack_capacity) {
     new_capacity = router->stack_capacity * 2;
     new_stack = (struct ui_component **)C_MULTIPLATFORM_MALLOC(
-        sizeof(struct ui_component *) * new_capacity);
+        sizeof(struct ui_component *) * (size_t)new_capacity);
     if (!new_stack) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_stack, router->stack,
-           sizeof(struct ui_component *) * router->stack_size);
+           sizeof(struct ui_component *) * (size_t)router->stack_size);
     C_MULTIPLATFORM_FREE(router->stack);
     router->stack = new_stack;
     router->stack_capacity = new_capacity;
@@ -625,7 +630,7 @@ ui_error_t ui_router_push(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Pops the top screen from the navigation stack and destroys it.
  *
  * \param router The router.
@@ -647,7 +652,7 @@ ui_error_t ui_router_pop(struct ui_router *router) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Replaces the current top screen with a new screen component.
  *
  * \param router The router.
@@ -670,7 +675,7 @@ ui_error_t ui_router_replace(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the current top screen from the navigation stack.
  *
  * \param router The router.
@@ -692,7 +697,7 @@ ui_error_t ui_router_get_current(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an OS event, looking for deep link events to automatically
  * navigate.
  *
@@ -714,7 +719,7 @@ ui_error_t ui_router_process_event(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Installs OS-level integration for the router (e.g., HTML5 History API
  * for Emscripten).
  *

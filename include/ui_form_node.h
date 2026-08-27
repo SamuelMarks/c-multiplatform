@@ -54,7 +54,7 @@ typedef struct ui_form_node {
     struct ui_form_control *control; /**< Control handle. */
     struct ui_form_group *group;     /**< Group handle. */
     struct ui_form_array *array;     /**< Array handle. */
-  } node;
+  } node;                            /**< The union data. */
 } ui_form_node_t;
 
 #ifdef __cplusplus

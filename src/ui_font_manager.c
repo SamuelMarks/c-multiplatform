@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_font_manager.c
  * \brief Implementation of the UI font manager.
  */
@@ -29,6 +29,7 @@
 
 /* #define STB_TRUETYPE_IMPLEMENTATION */
 #define STBTT_malloc(x,u)  ((void)(u),C_MULTIPLATFORM_MALLOC(x))
+/** @brief internal */
 #define STBTT_free(x,u)    ((void)(u),C_MULTIPLATFORM_FREE(x))
 #include "../include/stb_truetype.h"
 
@@ -42,31 +43,33 @@
 /* clang-format on */
 
 /**
+ * @struct ui_font
  * \struct ui_font
  * \brief Represents a loaded font instance.
  */
 struct ui_font {
-  stbtt_fontinfo info;
-  unsigned char *data;
-  size_t size;
-  char family[128];
-  int weight;
-  int is_italic;
-  enum ui_font_status status;
-  struct ui_font_axis *axes;
-  int axis_count;
-  struct ui_font *next;
+  stbtt_fontinfo info;        /**< info */
+  unsigned char *data;        /**< data */
+  size_t size;                /**< size */
+  char family[128];           /**< family */
+  int weight;                 /**< weight */
+  int is_italic;              /**< is_italic */
+  enum ui_font_status status; /**< status */
+  struct ui_font_axis *axes;  /**< axes */
+  int axis_count;             /**< axis_count */
+  struct ui_font *next;       /**< next */
 };
 
 /**
+ * @struct ui_font_manager
  * \struct ui_font_manager
  * \brief Manages a collection of loaded fonts.
  */
 struct ui_font_manager {
-  struct ui_font *head;
+  struct ui_font *head; /**< head */
 };
 
-/**
+/*
  * \brief Creates a new font manager.
  * \param[out] out_manager Pointer to store the created font manager.
  * \return UI_ERROR_NONE on success.
@@ -90,7 +93,7 @@ ui_error_t ui_font_manager_create(struct ui_font_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a font manager and frees its fonts.
  * \param[in,out] manager The font manager to destroy.
  * \return UI_ERROR_NONE on success.
@@ -118,7 +121,7 @@ ui_error_t ui_font_manager_destroy(struct ui_font_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Loads a font from a memory buffer.
  * \param[in,out] manager The font manager.
  * \param[in] font_data The memory buffer containing the font data.
@@ -171,7 +174,7 @@ ui_error_t ui_font_manager_load_font_memory(struct ui_font_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves glyph metrics for a codepoint.
  * \param[in] font The font to query.
  * \param[in] codepoint The unicode codepoint.
@@ -197,14 +200,14 @@ ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
 
   out_metrics->width = x1 - x0;
   out_metrics->height = y1 - y0;
-  out_metrics->bearing_x = (int)(lsb * scale);
+  out_metrics->bearing_x = (int)((float)lsb * scale);
   out_metrics->bearing_y = -y0; /* usually y0 is negative for bearing */
-  out_metrics->advance = (int)(advance * scale);
+  out_metrics->advance = (int)((float)advance * scale);
 
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves vertical metrics for a font.
  * \param[in] font The font to query.
  * \param[in] font_size The size of the font in pixels.
@@ -233,7 +236,7 @@ ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves kerning advance between two codepoints.
  * \param[in] font The font to query.
  * \param[in] codepoint1 The first unicode codepoint.
@@ -255,11 +258,11 @@ ui_error_t ui_font_get_kerning(struct ui_font *font, int codepoint1,
   scale = stbtt_ScaleForPixelHeight(&font->info, font_size);
   kern = stbtt_GetCodepointKernAdvance(&font->info, codepoint1, codepoint2);
 
-  *out_kerning = kern * scale;
+  *out_kerning = (float)kern * scale;
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the raw font data buffer.
  * \param[in] font The font to query.
  * \param[out] out_data Pointer to store the font data buffer.
@@ -276,7 +279,7 @@ ui_error_t ui_font_get_data(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Generates a texture atlas for a set of codepoints.
  * \param[in] font The font to use.
  * \param[in] font_size The font size in pixels.
@@ -378,7 +381,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Frees a generated texture atlas.
  * \param[in,out] atlas_rgba The atlas buffer to free.
  * \return UI_ERROR_NONE on success.
@@ -390,7 +393,7 @@ ui_error_t ui_font_free_atlas(unsigned char *atlas_rgba) {
   C_MULTIPLATFORM_FREE(atlas_rgba);
   return UI_ERROR_NONE;
 }
-/**
+/*
  * \brief Sets metadata for a font (family, weight, italic).
  * \param[in,out] font The font to update.
  * \param[in] family The font family string.
@@ -410,7 +413,7 @@ ui_error_t ui_font_set_metadata(struct ui_font *font, const char *family,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the current loading status of a font.
  * \param[in] font The font to query.
  * \param[out] out_status Pointer to store the status.
@@ -424,7 +427,7 @@ ui_error_t ui_font_get_status(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the loading status of a font.
  * \param[in,out] font The font to update.
  * \param[in] status The status to set.
@@ -438,7 +441,7 @@ ui_error_t ui_font_set_status(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Finds a loaded font matching the provided metadata.
  * \param[in] manager The font manager.
  * \param[in] family The font family.
@@ -468,7 +471,7 @@ ui_error_t ui_font_manager_find_font(struct ui_font_manager *manager,
   return UI_ERROR_NOT_FOUND;
 }
 
-/**
+/*
  * \brief Sets axis variations for a font.
  * \param[in,out] font The font to update.
  * \param[in] axes The array of font axes.
@@ -508,7 +511,7 @@ ui_error_t ui_font_set_variations(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the current axis variations for a font.
  * \param[in] font The font to query.
  * \param[out] out_axes Pointer to store the array of axes.

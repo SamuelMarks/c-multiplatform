@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_scroll_base.c
  * \brief Implementation of the UI Scroll Base component.
  */
@@ -14,7 +14,7 @@
 /* MSVC Safe CRT */
 #endif
 
-/** \brief Default CSS stylesheet for the scroll base */
+/* \brief Default CSS stylesheet for the scroll base */
 static const char *ui_scroll_base_default_css =
     "div { "
     "overflow: auto; "
@@ -33,6 +33,7 @@ static const char *ui_scroll_base_default_css =
     "}";
 
 /**
+ * @struct ui_scroll_base
  * \brief Internal structure representing a scroll base component.
  */
 struct ui_scroll_base {
@@ -49,7 +50,7 @@ struct ui_scroll_base {
   struct ui_signal *data_signal;   /**< Bound data signal */
 };
 
-/**
+/*
  * \brief Updates DOM state to reflect the scroll position.
  *
  * \param scroll The scroll area component.
@@ -59,7 +60,7 @@ static void update_dom_state(struct ui_scroll_base *scroll) {
   /* You might map scroll positions to CSS variables or inline styles */
 }
 
-/**
+/*
  * \brief Creates a new unstyled scroll area base component.
  *
  * \param out_scroll Pointer to receive the allocated scroll base.
@@ -154,7 +155,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a scroll area component.
  *
  * \param scroll The scroll area to destroy.
@@ -169,7 +170,7 @@ ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the scroll position.
  *
  * \param scroll The scroll area.
@@ -221,7 +222,7 @@ ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the horizontal scroll position.
  *
  * \param scroll The scroll area.
@@ -236,7 +237,7 @@ ui_error_t ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the vertical scroll position.
  *
  * \param scroll The scroll area.
@@ -251,7 +252,7 @@ ui_error_t ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the content dimensions for overflow calculations.
  *
  * \param scroll The scroll area.
@@ -271,7 +272,7 @@ ui_error_t ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
                                        scroll->scroll_y);
 }
 
-/**
+/*
  * \brief Sets the viewport dimensions for overflow calculations.
  *
  * \param scroll The scroll area.
@@ -291,7 +292,7 @@ ui_error_t ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
                                        scroll->scroll_y);
 }
 
-/**
+/*
  * \brief Sets the change handler for the scroll area.
  *
  * \param scroll The scroll area.
@@ -311,7 +312,7 @@ ui_error_t ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an incoming input event to trigger scrolling (e.g., mouse
  * wheel, touch drag).
  *
@@ -336,7 +337,7 @@ ui_error_t ui_scroll_base_process_event(struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the underlying component instance for style injection and DOM
  * mounting.
  *
@@ -353,7 +354,7 @@ ui_error_t ui_scroll_base_get_component(struct ui_scroll_base *scroll,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the data property.
  *
  * \param widget The scroll area component.

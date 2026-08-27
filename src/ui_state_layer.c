@@ -2,7 +2,7 @@
 #include "ui_state_layer.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_state_layer_get_color.
  * @param base_color Parameter base_color.
  * @param on_color Parameter on_color.

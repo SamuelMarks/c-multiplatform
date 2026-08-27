@@ -11,14 +11,17 @@
 #include <objc/runtime.h>
 #include <objc/message.h>
 
-/** \brief ui_window */
+/**
+ * @struct ui_window
+ * \brief ui_window
+ */
 struct ui_window {
-    id window;
-    id context;
-    int is_closing;
+    id window; /**< window */
+    id context; /**< context */
+    int is_closing; /**< is_closing */
 };
 
-/**
+/*
  * @brief ios_create_window.
  * @param backend Parameter backend.
  * @param title Parameter title.
@@ -40,7 +43,7 @@ static ui_error_t ios_create_window(struct ui_window_backend* backend, const cha
     return UI_ERROR_UNKNOWN;
 }
 
-/**
+/*
  * @brief ios_destroy_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -53,7 +56,7 @@ static ui_error_t ios_destroy_window(struct ui_window_backend* backend, struct u
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ios_show_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -66,7 +69,7 @@ static ui_error_t ios_show_window(struct ui_window_backend* backend, struct ui_w
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ios_hide_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -79,7 +82,7 @@ static ui_error_t ios_hide_window(struct ui_window_backend* backend, struct ui_w
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ios_poll_events.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -96,7 +99,7 @@ static ui_error_t ios_poll_events(struct ui_window_backend* backend, struct ui_w
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ios_swap_buffers.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -109,7 +112,7 @@ static ui_error_t ios_swap_buffers(struct ui_window_backend* backend, struct ui_
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_window_backend_ios_create.
  * @param out_backend Parameter out_backend.
  * @return Return value.
@@ -141,7 +144,7 @@ ui_error_t ui_window_backend_ios_create(struct ui_window_backend** out_backend) 
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_window_backend_ios_destroy.
  * @param backend Parameter backend.
  * @return Return value.
@@ -167,7 +170,7 @@ ui_error_t ui_window_backend_ios_create(struct ui_window_backend** out_backend) 
     return UI_ERROR_UNKNOWN;
 }
 
-/**
+/*
  * @brief ui_window_backend_ios_destroy.
  * @param backend Parameter backend.
  * @return Return value.
@@ -185,7 +188,7 @@ ui_error_t ui_window_backend_ios_destroy(struct ui_window_backend* backend) {
 #include <stddef.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_window_backend_ios_create.
  * @param out_backend Parameter out_backend.
  * @return Return value.
@@ -199,7 +202,7 @@ ui_window_backend_ios_create(struct ui_window_backend **out_backend) {
   return UI_ERROR_UNKNOWN;
 }
 
-/**
+/*
  * @brief ui_window_backend_ios_destroy.
  * @param backend Parameter backend.
  * @return Return value.

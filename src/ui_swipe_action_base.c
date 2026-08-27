@@ -3,7 +3,7 @@
 #include <math.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_swipe_action_base_init.
  * @param swipe_action Parameter swipe_action.
  * @param component Parameter component.
@@ -23,7 +23,8 @@ ui_error_t ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
                             float delta_x) {
@@ -41,7 +42,8 @@ ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action) {
   if (!swipe_action) {
@@ -60,7 +62,8 @@ ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action) {
   if (!swipe_action)
@@ -71,7 +74,8 @@ ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
                                    struct ui_signal *disabled_signal) {
@@ -82,7 +86,8 @@ ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_swipe_action_base_bind_text(struct ui_swipe_action_base *widget,
                                           struct ui_signal *text_signal) {
   if (!widget) {

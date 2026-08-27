@@ -11,24 +11,28 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/** @brief internal */
 #define MAX_EXPANDED_NODES 256
 
+/** @cond */
 #define UI_TREE_GRID_IS_EXPAND_IGNORE(t, n, o)                                 \
   ui_tree_grid_base_is_expanded((t), (n), (o))
+/** @endcond */
 
 /**
+ * @struct ui_tree_grid_base
  * @struct ui_tree_grid_base
  * @brief Internal state for the tree grid base component.
  */
 struct ui_tree_grid_base {
-  struct ui_component *component;
-  struct ui_tree_grid_model model;
+  struct ui_component *component;  /**< component */
+  struct ui_tree_grid_model model; /**< model */
 
-  void *expanded_nodes[MAX_EXPANDED_NODES];
-  size_t expanded_count;
+  void *expanded_nodes[MAX_EXPANDED_NODES]; /**< expanded_nodes */
+  size_t expanded_count;                    /**< expanded_count */
 
-  void *active_node;
-  size_t active_col;
+  void *active_node; /**< active_node */
+  size_t active_col; /**< active_col */
 };
 
 ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
@@ -189,7 +193,9 @@ ui_error_t ui_tree_grid_base_render(struct ui_tree_grid_base *tree_grid,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
+/** @cond */
 #define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+  /** @endcond */
   (void)UI_DOM_SET_ATTR_IGNORE(container, "role", "treegrid");
 
   /* Rendering recursion would go here. */

@@ -6,7 +6,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -17,7 +17,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/**
+/*
  * @brief ui_css_parse_overflow.
  * @param str Parameter str.
  * @param out_overflow Parameter out_overflow.
@@ -50,7 +50,8 @@ ui_error_t ui_css_parse_overflow(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_parse_text_overflow(const char *str,
                            struct ui_css_text_overflow *out_overflow) {
@@ -71,7 +72,7 @@ ui_css_parse_text_overflow(const char *str,
     char quote = str[0];
     const char *end = strchr(str + 1, quote);
     if (end) {
-      size_t len = end - str - 1;
+      size_t len = (size_t)(end - str) - 1;
       if (len >= sizeof(out_overflow->string)) {
         len = sizeof(out_overflow->string) - 1;
       }
@@ -85,7 +86,8 @@ ui_css_parse_text_overflow(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_css_parse_block_ellipsis(const char *str,
                             struct ui_css_block_ellipsis *out_ellipsis) {
@@ -106,7 +108,7 @@ ui_css_parse_block_ellipsis(const char *str,
     char quote = str[0];
     const char *end = strchr(str + 1, quote);
     if (end) {
-      size_t len = end - str - 1;
+      size_t len = (size_t)(end - str) - 1;
       if (len >= sizeof(out_ellipsis->string)) {
         len = sizeof(out_ellipsis->string) - 1;
       }
@@ -120,7 +122,7 @@ ui_css_parse_block_ellipsis(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/**
+/*
  * @brief ui_css_parse_line_clamp.
  * @param str Parameter str.
  * @param out_clamp Parameter out_clamp.
@@ -153,7 +155,7 @@ ui_error_t ui_css_parse_line_clamp(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/**
+/*
  * @brief ui_css_parse_max_lines.
  * @param str Parameter str.
  * @param out_max_lines Parameter out_max_lines.
@@ -186,7 +188,8 @@ ui_error_t ui_css_parse_max_lines(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_parse_overflow_clip_margin(const char *str,
                                              struct ui_css_value *out_margin) {
   if (!str || !out_margin)

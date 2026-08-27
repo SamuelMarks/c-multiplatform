@@ -28,7 +28,8 @@ static const char *yuv_fragment_source =
     "    gl_FragColor = vec4(r, g, b, 1.0);\n"
     "}\n";
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_video_shaders_get_yuv_program(struct ui_shader_manager *manager,
                                             unsigned int *out_program_id) {
   if (!manager || !out_program_id) {

@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_os_dialogs.c
  * \brief Implementation of OS-native dialogs (file pickers, color pickers,
  * message boxes).
@@ -13,11 +13,17 @@
 #if defined(_WIN32)
 #ifndef UI_WINAPI
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_WINAPI __stdcall
+/** @endcond */
 #elif defined(__GNUC__)
+/** @cond */
 #define UI_WINAPI __attribute__((stdcall))
+/** @endcond */
 #else
+/** @cond */
 #define UI_WINAPI
+/** @endcond */
 #endif
 #endif
 extern int UI_WINAPI MessageBoxA(void *hWnd, const char *lpText, const char *lpCaption, unsigned int uType);
@@ -25,24 +31,28 @@ extern int UI_WINAPI MessageBoxA(void *hWnd, const char *lpText, const char *lpC
 /* clang-format on */
 
 /**
+ * @struct ui_os_file_task
  * \struct ui_os_file_task
  * \brief Asynchronous task context for an OS file picker dialog.
  */
 struct ui_os_file_task {
-  struct ui_file_uploader_base *uploader;
-  struct ui_os_file_picker_config config;
-  struct ui_reactor *reactor;
-  char result_path[1024];
-};
-
-/** \brief ui_os_color_task */
-struct ui_os_color_task {
-  struct ui_color_picker_base *picker;
-  struct ui_reactor *reactor;
-  struct ui_color_rgb result_color;
+  struct ui_file_uploader_base *uploader; /**< uploader */
+  struct ui_os_file_picker_config config; /**< config */
+  struct ui_reactor *reactor;             /**< reactor */
+  char result_path[1024];                 /**< result_path */
 };
 
 /**
+ * @struct ui_os_color_task
+ * \brief ui_os_color_task
+ */
+struct ui_os_color_task {
+  struct ui_color_picker_base *picker; /**< picker */
+  struct ui_reactor *reactor;          /**< reactor */
+  struct ui_color_rgb result_color;    /**< result_color */
+};
+
+/*
  * \brief Reactor callback triggered when the file picker completes.
  * \param[in,out] user_data Pointer to the file task context.
  * \return UI_ERROR_NONE on success.
@@ -56,7 +66,7 @@ ui_error_t ui_os_file_completion(void *user_data) {
   return rc;
 }
 
-/**
+/*
  * \brief Background thread worker that actually invokes the OS file picker.
  * \param[in,out] user_data Pointer to the file task context.
  * \return UI_ERROR_NONE on success.
@@ -87,7 +97,7 @@ static ui_error_t ui_os_file_worker(void *user_data) {
   return ui_reactor_wake(task->reactor);
 }
 
-/**
+/*
  * \brief Reactor callback triggered when the color picker completes.
  * \param[in,out] user_data Pointer to the color task context.
  * \return UI_ERROR_NONE on success.
@@ -100,7 +110,7 @@ static ui_error_t ui_os_color_completion(void *user_data) {
   return rc;
 }
 
-/**
+/*
  * \brief Background thread worker that actually invokes the OS color picker.
  * \param[in,out] user_data Pointer to the color task context.
  * \return UI_ERROR_NONE on success.
@@ -123,7 +133,7 @@ static ui_error_t ui_os_color_worker(void *user_data) {
   return ui_reactor_wake(task->reactor);
 }
 
-/**
+/*
  * \brief Shows a native OS message box (blocking).
  * \param[in] title The dialog title.
  * \param[in] message The dialog message.
@@ -163,8 +173,9 @@ ui_error_t ui_os_dialog_show_message_box(const char *title, const char *message,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_os_dialog_open_file_picker_async */
-/**
+/* \brief ui_os_dialog_open_file_picker_async
+ */
+/*
  * \brief Asynchronously opens a native OS file picker.
  * \param[in,out] uploader The file uploader base widget to receive the result.
  * \param[in] config Optional configuration (filters, multi-select).
@@ -202,7 +213,7 @@ ui_error_t ui_os_dialog_open_file_picker_async(
   return ui_thread_pool_schedule(pool, ui_os_file_worker, task);
 }
 
-/**
+/*
  * \brief Asynchronously opens a native OS color picker.
  * \param[in,out] picker The color picker base widget to receive the result.
  * \param[in,out] reactor The reactor to handle the result callback.

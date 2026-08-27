@@ -2,7 +2,7 @@
 #include "ui_video_player_base.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_video_player_base_init.
  * @param player Parameter player.
  * @param component Parameter component.
@@ -27,7 +27,8 @@ ui_error_t ui_video_player_base_init(struct ui_video_player_base *player,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_video_player_base_toggle_play(struct ui_video_player_base *player) {
   if (player) {
@@ -36,7 +37,7 @@ ui_video_player_base_toggle_play(struct ui_video_player_base *player) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_video_player_base_seek.
  * @param player Parameter player.
  * @param time Parameter time.
@@ -55,7 +56,8 @@ ui_error_t ui_video_player_base_seek(struct ui_video_player_base *player,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_video_player_base_set_volume(struct ui_video_player_base *player,
                                            float volume) {
   if (player) {
@@ -69,7 +71,8 @@ ui_error_t ui_video_player_base_set_volume(struct ui_video_player_base *player,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player) {
   if (player) {
@@ -78,7 +81,7 @@ ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_video_player_base_bind_src.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

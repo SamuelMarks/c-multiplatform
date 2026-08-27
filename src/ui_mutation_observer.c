@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_mutation_observer.c
  * \brief Implementation of DOM mutation observation.
  */
@@ -9,7 +9,7 @@
 #include <stdlib.h>
 /* clang-format on */
 
-/**
+/*
  * \def MAX_GLOBAL_OBSERVERS
  * \brief Maximum number of global mutation observers.
  */
@@ -17,22 +17,28 @@
 
 static struct ui_mutation_observer *g_observers[MAX_GLOBAL_OBSERVERS] = {NULL};
 
-/** \brief ui_mutation_target_info */
+/**
+ * @struct ui_mutation_target_info
+ * \brief ui_mutation_target_info
+ */
 struct ui_mutation_target_info {
-  struct ui_dom_node *target;
-  struct ui_mutation_observer_init options;
-};
-
-/** \brief ui_mutation_observer */
-struct ui_mutation_observer {
-  ui_mutation_observer_cb_t callback;
-  void *user_data;
-  struct ui_mutation_target_info *targets;
-  int target_count;
-  int target_capacity;
+  struct ui_dom_node *target;               /**< target */
+  struct ui_mutation_observer_init options; /**< options */
 };
 
 /**
+ * @struct ui_mutation_observer
+ * \brief ui_mutation_observer
+ */
+struct ui_mutation_observer {
+  ui_mutation_observer_cb_t callback;      /**< callback */
+  void *user_data;                         /**< user_data */
+  struct ui_mutation_target_info *targets; /**< targets */
+  int target_count;                        /**< target_count */
+  int target_capacity;                     /**< target_capacity */
+};
+
+/*
  * \brief Creates a new mutation observer.
  * \param[in] callback The callback function triggered on mutations.
  * \param[in] user_data User data for the callback.
@@ -61,7 +67,7 @@ ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
   obs->target_count = 0;
 
   obs->targets = (struct ui_mutation_target_info *)C_MULTIPLATFORM_MALLOC(
-      sizeof(struct ui_mutation_target_info) * obs->target_capacity);
+      sizeof(struct ui_mutation_target_info) * (size_t)obs->target_capacity);
   if (obs->targets == NULL) {
     C_MULTIPLATFORM_FREE(obs);
     return UI_ERROR_OUT_OF_MEMORY;
@@ -81,7 +87,7 @@ ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
   return UI_ERROR_OUT_OF_BOUNDS;
 }
 
-/**
+/*
  * \brief Destroys a mutation observer.
  * \param[in,out] observer The observer to destroy.
  * \return UI_ERROR_NONE on success.
@@ -107,7 +113,7 @@ ui_error_t ui_mutation_observer_destroy(struct ui_mutation_observer *observer) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Observes a target DOM node for mutations.
  * \param[in,out] observer The mutation observer.
  * \param[in,out] target The DOM node to observe.
@@ -135,12 +141,14 @@ ui_mutation_observer_observe(struct ui_mutation_observer *observer,
   if (observer->target_count >= observer->target_capacity) {
     observer->target_capacity *= 2;
     new_targets = (struct ui_mutation_target_info *)C_MULTIPLATFORM_MALLOC(
-        sizeof(struct ui_mutation_target_info) * observer->target_capacity);
+        sizeof(struct ui_mutation_target_info) *
+        (size_t)observer->target_capacity);
     if (new_targets == NULL) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memcpy(new_targets, observer->targets,
-           sizeof(struct ui_mutation_target_info) * observer->target_count);
+           sizeof(struct ui_mutation_target_info) *
+               (size_t)observer->target_count);
     C_MULTIPLATFORM_FREE(observer->targets);
     observer->targets = new_targets;
   }
@@ -152,7 +160,7 @@ ui_mutation_observer_observe(struct ui_mutation_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Disconnects a mutation observer, stopping all observation.
  * \param[in,out] observer The mutation observer.
  * \return UI_ERROR_NONE on success.
@@ -166,7 +174,7 @@ ui_mutation_observer_disconnect(struct ui_mutation_observer *observer) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Checks if a node is an ancestor of another node.
  * \param[in] ancestor The potential ancestor node.
  * \param[in] node The child node.
@@ -183,7 +191,7 @@ static int is_ancestor(struct ui_dom_node *ancestor, struct ui_dom_node *node) {
   return 0;
 }
 
-/**
+/*
  * \brief Dispatches a single mutation record to the observer's callback.
  * \param[in,out] observer The observer.
  * \param[in,out] record The mutation record.
@@ -197,7 +205,7 @@ static ui_error_t dispatch_record(struct ui_mutation_observer *observer,
   return cb_rc;
 }
 
-/**
+/*
  * \brief System entry point: Notifies observers of a child list mutation.
  * \param[in,out] target The parent node affected.
  * \param[in,out] added The node that was added (or NULL).
@@ -261,7 +269,7 @@ ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief System entry point: Notifies observers of an attribute mutation.
  * \param[in,out] target The node affected.
  * \param[in] name The name of the attribute.
@@ -358,7 +366,7 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief System entry point: Notifies observers of a text content mutation.
  * \param[in,out] target The text node affected.
  * \param[in] old_value The previous text content.

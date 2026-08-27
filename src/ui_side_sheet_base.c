@@ -5,30 +5,31 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * \file ui_side_sheet_base.c
  * \brief Side sheet base component implementation.
  */
 
 /**
+ * @struct ui_side_sheet_base
  * \brief ui_side_sheet_base structure.
  * \details Internal state for the side sheet base component.
  */
 struct ui_side_sheet_base {
-  struct ui_component *component;
-  struct ui_component *content_component;
-  struct ui_overlay_director *director;
-  struct ui_signal *open_signal;
+  struct ui_component *component;         /**< component */
+  struct ui_component *content_component; /**< content_component */
+  struct ui_overlay_director *director;   /**< director */
+  struct ui_signal *open_signal;          /**< open_signal */
 
-  enum ui_side_sheet_edge edge;
-  enum ui_side_sheet_mode mode;
-  int is_open;
+  enum ui_side_sheet_edge edge; /**< edge */
+  enum ui_side_sheet_mode mode; /**< mode */
+  int is_open;                  /**< is_open */
 
-  ui_side_sheet_on_close_t on_close;
-  void *on_close_user_data;
+  ui_side_sheet_on_close_t on_close; /**< on_close */
+  void *on_close_user_data;          /**< on_close_user_data */
 };
 
-/**
+/*
  * \brief Creates a side sheet base component.
  * \param out_sheet Pointer to store the component.
  * \return UI_ERROR_NONE on success.
@@ -66,7 +67,7 @@ ui_error_t ui_side_sheet_base_create(struct ui_side_sheet_base **out_sheet) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a side sheet base component.
  * \param sheet The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -80,7 +81,7 @@ ui_error_t ui_side_sheet_base_destroy(struct ui_side_sheet_base *sheet) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the content component of the side sheet.
  * \param sheet The side sheet component.
  * \param content The content component.
@@ -96,7 +97,7 @@ ui_error_t ui_side_sheet_base_set_content(struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the edge of the side sheet.
  * \param sheet The side sheet component.
  * \param edge The edge.
@@ -111,7 +112,7 @@ ui_error_t ui_side_sheet_base_set_edge(struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the mode of the side sheet.
  * \param sheet The side sheet component.
  * \param mode The mode.
@@ -126,7 +127,7 @@ ui_error_t ui_side_sheet_base_set_mode(struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets whether the side sheet is open.
  * \param sheet The side sheet component.
  * \param is_open 1 to open, 0 to close.
@@ -152,7 +153,7 @@ ui_error_t ui_side_sheet_base_set_open(struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Checks if the side sheet is open.
  * \param sheet The side sheet component.
  * \param out_is_open Pointer to store the result.
@@ -167,7 +168,7 @@ ui_error_t ui_side_sheet_base_is_open(const struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the overlay director.
  * \param sheet The side sheet component.
  * \param director The overlay director.
@@ -183,7 +184,7 @@ ui_side_sheet_base_set_overlay_director(struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the on close callback.
  * \param sheet The side sheet component.
  * \param on_close The callback function.
@@ -201,7 +202,7 @@ ui_error_t ui_side_sheet_base_set_on_close(struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an event for the side sheet.
  * \param sheet The side sheet component.
  * \param event The event to process.
@@ -231,7 +232,7 @@ ui_error_t ui_side_sheet_base_process_event(struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the base component for the side sheet.
  * \param sheet The side sheet component.
  * \param out_component Pointer to store the component.
@@ -247,7 +248,7 @@ ui_side_sheet_base_get_component(struct ui_side_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the open state to a signal.
  * \param sheet The side sheet component.
  * \param open_signal The signal to bind.

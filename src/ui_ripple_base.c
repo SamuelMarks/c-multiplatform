@@ -2,7 +2,7 @@
 #include "ui_ripple_base.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_ripple_config_init.
  * @param out_config Parameter out_config.
  * @return Return value.
@@ -27,7 +27,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_ripple_start.
  * @param config Parameter config.
  * @param x Parameter x.
@@ -55,7 +55,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_ripple_update.
  * @param config Parameter config.
  * @param delta_ms Parameter delta_ms.

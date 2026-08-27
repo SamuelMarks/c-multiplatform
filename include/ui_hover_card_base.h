@@ -40,7 +40,8 @@ ui_error_t ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card);
  * mounting.
  *
  * @param hover_card The hover card component.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t
 ui_hover_card_base_get_component(struct ui_hover_card_base *hover_card,

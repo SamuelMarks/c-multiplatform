@@ -2,7 +2,7 @@
 #include "../include/ui_spring.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_spring_update.
  * @param config Parameter config.
  * @param current Parameter current.

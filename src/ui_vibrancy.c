@@ -2,7 +2,7 @@
 #include "ui_vibrancy.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_vibrancy_params_init.
  * @param params Parameter params.
  * @param material Parameter material.

@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_menu_base.c
  * \brief Implementation of the UI menu base component (for dropdowns, context
  * menus, etc).
@@ -24,41 +24,46 @@ static const char *ui_menu_base_default_css =
     "justify-content: space-between; } "
     ".ui-menu-item[data-active=\"true\"] { background-color: #eee; }";
 
-/** \brief ui_menu_item_entry */
+/**
+ * @struct ui_menu_item_entry
+ * \brief ui_menu_item_entry
+ */
 struct ui_menu_item_entry {
-  char *id;
-  struct ui_dom_node *node;
-  struct ui_menu_base *submenu;
+  char *id;                     /**< id */
+  struct ui_dom_node *node;     /**< node */
+  struct ui_menu_base *submenu; /**< submenu */
 };
 
-/** \brief ui_menu_base */
+/* \brief ui_menu_base
+ */
 /**
+ * @struct ui_menu_base
  * \struct ui_menu_base
  * \brief State and DOM mapping for a menu, supporting nested submenus.
  */
 struct ui_menu_base {
-  struct ui_component *component;
-  struct ui_dom_node *container_node;
-  struct ui_overlay *overlay_handle;
-  struct ui_overlay_director *director;
+  struct ui_component *component;       /**< component */
+  struct ui_dom_node *container_node;   /**< container_node */
+  struct ui_overlay *overlay_handle;    /**< overlay_handle */
+  struct ui_overlay_director *director; /**< director */
 
-  struct ui_menu_item_entry *items;
-  int item_count;
-  int item_capacity;
+  struct ui_menu_item_entry *items; /**< items */
+  int item_count;                   /**< item_count */
+  int item_capacity;                /**< item_capacity */
 
-  int active_index;
-  int is_open;
-  int last_x;
-  int last_y;
+  int active_index; /**< active_index */
+  int is_open;      /**< is_open */
+  int last_x;       /**< last_x */
+  int last_y;       /**< last_y */
 
-  struct ui_menu_base *parent_menu;
+  struct ui_menu_base *parent_menu; /**< parent_menu */
 
-  ui_menu_on_action_t on_action;
-  void *user_data;
-  struct ui_signal *active_index_signal;
+  ui_menu_on_action_t on_action;         /**< on_action */
+  void *user_data;                       /**< user_data */
+  struct ui_signal *active_index_signal; /**< active_index_signal */
 };
 
-/**
+/*
  * \brief Creates a new menu base component.
  * \param[out] out_menu Pointer to store the created menu.
  * \return UI_ERROR_NONE on success.
@@ -130,7 +135,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a menu base component.
  * \param[in,out] menu The menu to destroy.
  * \return UI_ERROR_NONE on success.
@@ -158,7 +163,7 @@ ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Helper to dynamically duplicate a string.
  * \param[in] src The string to duplicate.
  * \param[out] out_str Pointer to store the newly allocated copy.
@@ -181,7 +186,7 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds an item to the menu, optionally marking it as a submenu trigger.
  * \param[in,out] menu The menu to modify.
  * \param[in] item_id The logical ID of the item.
@@ -202,7 +207,7 @@ ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
   if (menu->item_count >= menu->item_capacity) {
     int new_cap = menu->item_capacity == 0 ? 4 : menu->item_capacity * 2;
     new_items = (struct ui_menu_item_entry *)C_MULTIPLATFORM_REALLOC(
-        menu->items, new_cap * sizeof(struct ui_menu_item_entry));
+        menu->items, (size_t)new_cap * sizeof(struct ui_menu_item_entry));
     if (!new_items)
       return UI_ERROR_OUT_OF_MEMORY;
     menu->items = new_items;
@@ -245,7 +250,7 @@ ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the callback invoked when a menu item is triggered.
  * \param[in,out] menu The menu.
  * \param[in] on_action The callback function.
@@ -262,7 +267,7 @@ ui_error_t ui_menu_base_set_on_action(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Opens the menu at a specific screen coordinate via an overlay
  * director.
  * \param[in,out] menu The menu to open.
@@ -303,7 +308,7 @@ ui_error_t ui_menu_base_open_at(struct ui_menu_base *menu,
                                              &menu->overlay_handle);
 }
 
-/**
+/*
  * \brief Closes the menu and all its submenus.
  * \param[in,out] menu The menu to close.
  * \return UI_ERROR_NONE on success.
@@ -332,7 +337,7 @@ ui_error_t ui_menu_base_close(struct ui_menu_base *menu) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Checks if the menu is currently open.
  * \param[in] menu The menu.
  * \param[out] out_is_open Set to 1 if open, 0 otherwise.
@@ -347,7 +352,8 @@ ui_error_t ui_menu_base_is_open(const struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_menu_base_intercept_context_menu(struct ui_menu_base *menu,
                                     struct ui_overlay_director *director,
@@ -358,7 +364,7 @@ ui_menu_base_intercept_context_menu(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Internal helper to update the visually active item index.
  * \param[in,out] menu The menu.
  * \param[in] new_index The new active index.
@@ -385,7 +391,7 @@ static ui_error_t update_active_index(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an incoming UI event (keyboard navigation) for the menu.
  * \param[in,out] menu The menu.
  * \param[in] event The event to process.
@@ -499,7 +505,7 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
   (void)handled;
   return UI_ERROR_NONE;
 }
-/**
+/*
  * \brief Retrieves the underlying generic DOM component.
  * \param[in,out] menu The menu.
  * \param[out] out_component Pointer to store the DOM component.
@@ -514,7 +520,7 @@ ui_error_t ui_menu_base_get_component(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the active index of the menu to a reactive signal.
  * \param[in,out] widget The menu.
  * \param[in,out] signal The signal representing the active index.

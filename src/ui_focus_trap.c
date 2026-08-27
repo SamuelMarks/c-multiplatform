@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_focus_trap.c
  * \brief Implementation of focus trap mechanisms.
  */
@@ -8,17 +8,18 @@
 /* clang-format on */
 
 /**
+ * @struct ui_focus_trap
  * \struct ui_focus_trap
  * \brief Context for an active focus trap.
  */
 struct ui_focus_trap {
-  struct ui_dom_node *root;
-  struct ui_focus_manager *manager;
-  struct ui_keyboard_responder *responder;
-  int is_active;
+  struct ui_dom_node *root;                /**< root */
+  struct ui_focus_manager *manager;        /**< manager */
+  struct ui_keyboard_responder *responder; /**< responder */
+  int is_active;                           /**< is_active */
 };
 
-/**
+/*
  * \brief Keyboard event handler for a focus trap.
  * \param[in] node The node receiving the event.
  * \param[in,out] user_data Pointer to the focus trap context.
@@ -39,7 +40,7 @@ static ui_error_t trap_keyboard_handler(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new focus trap.
  * \param[out] out_trap Pointer to store the created trap.
  * \return UI_ERROR_NONE on success.
@@ -66,7 +67,7 @@ ui_error_t ui_focus_trap_create(struct ui_focus_trap **out_trap) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a focus trap and deactivates it if active.
  * \param[in,out] trap The trap to destroy.
  * \return UI_ERROR_NONE on success.
@@ -84,7 +85,7 @@ ui_error_t ui_focus_trap_destroy(struct ui_focus_trap *trap) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Activates a focus trap.
  * \param[in,out] trap The trap to activate.
  * \param[in,out] manager The focus manager.
@@ -115,7 +116,7 @@ ui_error_t ui_focus_trap_activate(struct ui_focus_trap *trap,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Deactivates a focus trap.
  * \param[in,out] trap The trap to deactivate.
  * \param[in,out] manager The focus manager.
@@ -144,7 +145,7 @@ ui_error_t ui_focus_trap_deactivate(struct ui_focus_trap *trap,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Attaches keyboard responders to the focus trap for Tab cycling.
  * \param[in,out] trap The trap to attach to.
  * \param[in,out] responder The keyboard responder context.

@@ -2,7 +2,7 @@
 #include "ui_geometry.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_dom_point_init.
  * @param point Parameter point.
  * @param x Parameter x.
@@ -23,7 +23,7 @@ ui_error_t ui_dom_point_init(struct ui_dom_point *point, double x, double y,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_dom_rect_init.
  * @param rect Parameter rect.
  * @param x Parameter x.
@@ -61,7 +61,7 @@ ui_error_t ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief get_min.
  * @param a Parameter a.
  * @param b Parameter b.
@@ -81,7 +81,7 @@ static double get_min(double a, double b, double c, double d) {
   return min;
 }
 
-/**
+/*
  * @brief get_max.
  * @param a Parameter a.
  * @param b Parameter b.
@@ -101,7 +101,7 @@ static double get_max(double a, double b, double c, double d) {
   return max;
 }
 
-/**
+/*
  * @brief ui_dom_quad_init.
  * @param quad Parameter quad.
  * @param p1 Parameter p1.
@@ -135,7 +135,7 @@ ui_error_t ui_dom_quad_init(struct ui_dom_quad *quad,
                           max_y - min_y);
 }
 
-/**
+/*
  * @brief ui_dom_matrix_init_identity.
  * @param matrix Parameter matrix.
  * @return Return value.

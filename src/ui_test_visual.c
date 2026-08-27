@@ -216,7 +216,7 @@ ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
 
 static void log_stbi_write_c_file(void *context, void *data, int size) {
   FILE *f = (FILE *)context;
-  fwrite(data, 1, size, f);
+  fwrite(data, 1, (size_t)size, f);
 }
 
 ui_error_t ui_visual_write_heatmap_to_disk(const char *filepath,

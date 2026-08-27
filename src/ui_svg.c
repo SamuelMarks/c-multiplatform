@@ -6,9 +6,11 @@
 #include <string.h>
 #include <math.h>
 /* clang-format on */
+/** @cond */
 #define UI_SVG_ABS(x) ((x) < 0.0f ? -(x) : (x))
+/** @endcond */
 
-/**
+/*
  * @brief skip_whitespace_and_commas.
  * @param ptr Parameter ptr.
  * @return Return value.
@@ -19,7 +21,7 @@ static void skip_whitespace_and_commas(const char **ptr) {
   }
 }
 
-/**
+/*
  * @brief parse_float.
  * @param ptr Parameter ptr.
  * @param out_val Parameter out_val.
@@ -39,7 +41,7 @@ static ui_error_t parse_float(const char **ptr, float *out_val) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ensure_capacity.
  * @param path Parameter path.
  * @return Return value.
@@ -49,7 +51,7 @@ static ui_error_t ensure_capacity(struct ui_svg_path *path) {
     ui_uint32 new_cap = path->capacity == 0 ? 16 : path->capacity * 2;
     struct ui_svg_command *new_cmds =
         (struct ui_svg_command *)C_MULTIPLATFORM_REALLOC(
-            path->commands, new_cap * sizeof(struct ui_svg_command));
+            path->commands, (size_t)new_cap * sizeof(struct ui_svg_command));
     if (!new_cmds) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
@@ -59,7 +61,7 @@ static ui_error_t ensure_capacity(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief reflect_point.
  * @param out_p Parameter out_p.
  * @param p Parameter p.
@@ -73,7 +75,7 @@ static void reflect_point(struct ui_svg_point *out_p,
   out_p->y = ref->y * 2.0f - p->y;
 }
 
-/**
+/*
  * @brief ui_svg_path_init.
  * @param path Parameter path.
  * @return Return value.
@@ -88,7 +90,7 @@ ui_error_t ui_svg_path_init(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_svg_path_destroy.
  * @param path Parameter path.
  * @return Return value.
@@ -105,7 +107,7 @@ ui_error_t ui_svg_path_destroy(struct ui_svg_path *path) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_svg_path_parse.
  * @param path Parameter path.
  * @param d_attr Parameter d_attr.
@@ -353,7 +355,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_svg_flattened_path_init.
  * @param path Parameter path.
  * @return Return value.
@@ -367,7 +369,7 @@ ui_error_t ui_svg_flattened_path_init(struct ui_svg_flattened_path *path) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_svg_flattened_path_destroy.
  * @param path Parameter path.
  * @return Return value.
@@ -390,7 +392,7 @@ ui_error_t ui_svg_flattened_path_destroy(struct ui_svg_flattened_path *path) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_svg_geometry_init.
  * @param geom Parameter geom.
  * @return Return value.
@@ -407,7 +409,7 @@ ui_error_t ui_svg_geometry_init(struct ui_svg_geometry *geom) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_svg_geometry_destroy.
  * @param geom Parameter geom.
  * @return Return value.
@@ -428,7 +430,7 @@ ui_error_t ui_svg_geometry_destroy(struct ui_svg_geometry *geom) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief append_subpath.
  * @param path Parameter path.
  * @param out_subpath Parameter out_subpath.
@@ -441,7 +443,7 @@ static ui_error_t append_subpath(struct ui_svg_flattened_path *path,
     struct ui_svg_subpath *new_arr;
 
     new_arr = (struct ui_svg_subpath *)C_MULTIPLATFORM_REALLOC(
-        path->subpaths, new_cap * sizeof(struct ui_svg_subpath));
+        path->subpaths, (size_t)new_cap * sizeof(struct ui_svg_subpath));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     path->subpaths = new_arr;
@@ -456,7 +458,7 @@ static ui_error_t append_subpath(struct ui_svg_flattened_path *path,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief append_point.
  * @param subpath Parameter subpath.
  * @param x Parameter x.
@@ -469,7 +471,7 @@ static ui_error_t append_point(struct ui_svg_subpath *subpath, float x,
     ui_uint32 new_cap = subpath->capacity == 0 ? 16 : subpath->capacity * 2;
     struct ui_svg_point *new_arr =
         (struct ui_svg_point *)C_MULTIPLATFORM_REALLOC(
-            subpath->points, new_cap * sizeof(struct ui_svg_point));
+            subpath->points, (size_t)new_cap * sizeof(struct ui_svg_point));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     subpath->points = new_arr;
@@ -487,7 +489,7 @@ static ui_error_t append_point(struct ui_svg_subpath *subpath, float x,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief flatten_cubic_recursive.
  * @param subpath Parameter subpath.
  * @param p0 Parameter p0.
@@ -539,7 +541,7 @@ flatten_cubic_recursive(struct ui_svg_subpath *subpath, struct ui_svg_point p0,
   }
 }
 
-/**
+/*
  * @brief flatten_quadratic_recursive.
  * @param subpath Parameter subpath.
  * @param p0 Parameter p0.
@@ -584,7 +586,7 @@ static ui_error_t flatten_quadratic_recursive(struct ui_svg_subpath *subpath,
   }
 }
 
-/**
+/*
  * @brief arc_to_lines.
  * @param subpath Parameter subpath.
  * @param p0 Parameter p0.
@@ -695,7 +697,7 @@ static ui_error_t arc_to_lines(struct ui_svg_subpath *subpath,
   return append_point(subpath, p.x, p.y);
 }
 
-/**
+/*
  * @brief ui_svg_path_flatten.
  * @param flattened Parameter flattened.
  * @param path Parameter path.
@@ -791,7 +793,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief append_vertex.
  * @param geom Parameter geom.
  * @param p Parameter p.
@@ -805,7 +807,7 @@ static ui_error_t append_vertex(struct ui_svg_geometry *geom,
         geom->vertex_capacity == 0 ? 64 : geom->vertex_capacity * 2;
     struct ui_svg_point *new_arr =
         (struct ui_svg_point *)C_MULTIPLATFORM_REALLOC(
-            geom->vertices, new_cap * sizeof(struct ui_svg_point));
+            geom->vertices, (size_t)new_cap * sizeof(struct ui_svg_point));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     geom->vertices = new_arr;
@@ -817,7 +819,7 @@ static ui_error_t append_vertex(struct ui_svg_geometry *geom,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief append_index.
  * @param geom Parameter geom.
  * @param index Parameter index.
@@ -828,7 +830,7 @@ static ui_error_t append_index(struct ui_svg_geometry *geom, ui_uint32 index) {
     ui_uint32 new_cap =
         geom->index_capacity == 0 ? 128 : geom->index_capacity * 2;
     ui_uint32 *new_arr = (ui_uint32 *)C_MULTIPLATFORM_REALLOC(
-        geom->indices, new_cap * sizeof(ui_uint32));
+        geom->indices, (size_t)new_cap * sizeof(ui_uint32));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     geom->indices = new_arr;
@@ -839,7 +841,7 @@ static ui_error_t append_index(struct ui_svg_geometry *geom, ui_uint32 index) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief triangle_area.
  * @param a Parameter a.
  * @param b Parameter b.
@@ -852,7 +854,7 @@ static void triangle_area(struct ui_svg_point a, struct ui_svg_point b,
   *out_area = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
-/**
+/*
  * @brief is_point_in_triangle.
  * @param p Parameter p.
  * @param a Parameter a.
@@ -879,7 +881,8 @@ static ui_error_t is_point_in_triangle(struct ui_svg_point p,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
                        const struct ui_svg_flattened_path *flattened) {
@@ -908,7 +911,7 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
     if (n < 3)
       continue;
 
-    linked = (ui_uint32 *)C_MULTIPLATFORM_MALLOC(n * sizeof(ui_uint32));
+    linked = (ui_uint32 *)C_MULTIPLATFORM_MALLOC((size_t)n * sizeof(ui_uint32));
     if (!linked) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -1026,7 +1029,8 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_svg_tessellate_stroke(struct ui_svg_geometry *geom,
                          const struct ui_svg_flattened_path *flattened,

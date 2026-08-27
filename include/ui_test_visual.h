@@ -1,3 +1,6 @@
+/**
+ * @file ui_test_visual.h
+ */
 #ifndef UI_TEST_VISUAL_H
 #define UI_TEST_VISUAL_H
 
@@ -9,10 +12,14 @@ extern "C" {
 #include "ui_error.h"
 /* clang-format on */
 
+/**
+ * @struct ui_visual_test_config
+ * @brief Configuration for visual tests.
+ */
 struct ui_visual_test_config {
-  double rms_threshold;
-  double delta_e_threshold;
-  double max_drift_percentage;
+  double rms_threshold;        /**< RMS error threshold. */
+  double delta_e_threshold;    /**< Delta E threshold. */
+  double max_drift_percentage; /**< Max drift. */
 };
 
 /**

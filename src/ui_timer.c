@@ -4,6 +4,7 @@
  */
 #if !defined(_WIN32)
 #if !defined(_POSIX_C_SOURCE)
+/** @brief internal */
 #define _POSIX_C_SOURCE 199309L
 #endif
 #endif
@@ -16,21 +17,33 @@
 
 #ifndef UI_WINAPI
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_WINAPI __stdcall
+/** @endcond */
 #elif defined(__GNUC__)
+/** @cond */
 #define UI_WINAPI __attribute__((stdcall))
+/** @endcond */
 #else
+/** @cond */
 #define UI_WINAPI
+/** @endcond */
 #endif
 #endif
 
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_TIMER_INT64 __int64
+/** @endcond */
 #elif defined(__GNUC__) || defined(__clang__)
 __extension__ typedef long long ui_timer_int64;
+/** @cond */
 #define UI_TIMER_INT64 ui_timer_int64
+/** @endcond */
 #else
+/** @cond */
 #define UI_TIMER_INT64 long long
+/** @endcond */
 #endif
 
 extern int UI_WINAPI QueryPerformanceCounter(UI_TIMER_INT64* lpPerformanceCount);
@@ -50,23 +63,25 @@ extern int g_ui_timer_clock_gettime_fail;
 #include <emscripten.h>
 #endif
 
+/** @brief internal */
 enum ui_timer_type { UI_TIMER_CUSTOM, UI_TIMER_MONOTONIC };
 
 /**
  * @struct ui_timer
+ * @struct ui_timer
  * @brief Internal implementation of the timer object.
  */
 struct ui_timer {
-  /** @brief Type of the timer. */
-  enum ui_timer_type type;
-  /** @brief Custom time source callback. */
-  ui_error_t (*custom_time_source)(void *, double *);
-  /** @brief User data for the custom time source. */
-  void *custom_user_data;
+  /* @brief Type of the timer. */
+  enum ui_timer_type type; /**< type */
+  /* @brief Custom time source callback. */
+  ui_error_t (*custom_time_source)(void *, double *); /**< ) */
+  /* @brief User data for the custom time source. */
+  void *custom_user_data; /**< custom_user_data */
 
 #if defined(_WIN32)
-  /** @brief Windows QueryPerformanceFrequency value. */
-  UI_TIMER_INT64 qpf;
+  /* @brief Windows QueryPerformanceFrequency value. */
+  UI_TIMER_INT64 qpf; /**< qpf */
 #endif
 };
 

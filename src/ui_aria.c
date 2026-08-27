@@ -27,7 +27,9 @@ static ui_error_t mock_dom_node_get_attribute(const struct ui_dom_node *node,
   return (ui_dom_node_get_attribute)(node, name, out_value);
 }
 #undef ui_dom_node_get_attribute
+/** @cond */
 #define ui_dom_node_get_attribute mock_dom_node_get_attribute
+/** @endcond */
 #endif
 
 ui_error_t ui_aria_role_from_string(const char *role_str,
@@ -89,8 +91,12 @@ static ui_error_t mock_aria_state_cleanup(struct ui_aria_state *state) {
 }
 #endif
 #ifdef UI_TEST_MOCK_ALLOC
+/** @cond */
 #define ui_aria_role_from_string mock_aria_role_from_string
+/** @endcond */
+/** @cond */
 #define ui_aria_state_cleanup mock_aria_state_cleanup
+/** @endcond */
 #endif
 ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
                                struct ui_aria_state *out_state) {

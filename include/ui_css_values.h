@@ -137,7 +137,7 @@ struct ui_css_value_ext {
     struct ui_css_value scalar;    /**< A scalar CSS value. */
     struct ui_css_math_expr *math; /**< A CSS math expression. */
     struct ui_css_env_ref *env;    /**< A CSS environment variable. */
-  } value;
+  } value;                         /**< The union value */
 };
 
 /**
@@ -255,25 +255,25 @@ struct ui_css_image {
       float angle;                          /**< The linear gradient angle. */
       struct ui_css_gradient_stop stops[8]; /**< The color stops. */
       int stop_count;                       /**< The number of color stops. */
-    } linear_gradient;
+    } linear_gradient; /**< Linear gradient configuration */
     /** \brief Radial gradient configuration. */
     struct {
       struct ui_css_gradient_stop stops[8]; /**< The color stops. */
       int stop_count;                       /**< The number of color stops. */
-    } radial_gradient;
+    } radial_gradient; /**< Radial gradient configuration */
     /** \brief Conic gradient configuration. */
     struct {
       float angle;                          /**< The conic gradient angle. */
       struct ui_css_gradient_stop stops[8]; /**< The color stops. */
       int stop_count;                       /**< The number of color stops. */
-    } conic_gradient;
+    } conic_gradient;                       /**< Conic gradient configuration */
     /** \brief Image set configuration. */
     struct {
       char urls[4][256];  /**< Array of image URLs. */
       int resolutions[4]; /**< Array of resolutions (1x, 2x, etc). */
       int image_count;    /**< The total number of images in the set. */
-    } image_set;
-  } data;
+    } image_set;          /**< Image set configuration */
+  } data;                 /**< The union data */
 };
 
 /**
@@ -495,8 +495,8 @@ struct ui_css_filter_function {
       struct ui_css_value blur_radius; /**< Blur radius. */
       struct ui_css_color color;       /**< Shadow color. */
       int has_color; /**< 1 if color is specified, 0 otherwise. */
-    } drop_shadow;
-  } data;
+    } drop_shadow;   /**< Drop shadow details */
+  } data;            /**< The filter function data */
   struct ui_css_filter_function
       *next; /**< Pointer to the next filter function. */
 };
@@ -735,14 +735,17 @@ struct ui_css_easing_function {
   union {
     /** \brief Parameters for cubic-bezier. */
     struct {
-      float x1, y1, x2, y2;
-    } cubic_bezier;
+      float x1;     /**< First control point X */
+      float y1;     /**< First control point Y */
+      float x2;     /**< Second control point X */
+      float y2;     /**< Second control point Y */
+    } cubic_bezier; /**< Cubic bezier parameters */
     /** \brief Parameters for steps. */
     struct {
-      int count;
-      enum ui_css_steps_position position;
-    } steps;
-  } data;
+      int count;                           /**< Number of steps */
+      enum ui_css_steps_position position; /**< Step position */
+    } steps;                               /**< Step parameters */
+  } data;                                  /**< The union data */
 };
 
 /**

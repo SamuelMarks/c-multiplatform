@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_scroll_dispatcher.c
  * \brief Implementation of the UI Scroll Dispatcher component.
  */
@@ -9,10 +9,11 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/** \brief Initial capacity for the subscriber array */
+/* \brief Initial capacity for the subscriber array */
 #define INITIAL_SUBSCRIBER_CAPACITY 8
 
 /**
+ * @struct ui_scroll_subscriber
  * \brief Internal structure representing a scroll event subscriber.
  */
 struct ui_scroll_subscriber {
@@ -22,6 +23,7 @@ struct ui_scroll_subscriber {
 };
 
 /**
+ * @struct ui_scroll_dispatcher
  * \brief Internal structure representing a scroll dispatcher.
  */
 struct ui_scroll_dispatcher {
@@ -31,7 +33,7 @@ struct ui_scroll_dispatcher {
   int next_id;     /**< ID generator for the next subscriber */
 };
 
-/**
+/*
  * \brief Layout observer callback to handle layout changes by triggering a mock
  * scroll event.
  *
@@ -67,7 +69,7 @@ static ui_error_t layout_observer_callback(struct ui_layout_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new scroll dispatcher instance.
  *
  * \param out_dispatcher Pointer to receive the created dispatcher.
@@ -92,7 +94,8 @@ ui_scroll_dispatcher_create(struct ui_scroll_dispatcher **out_dispatcher) {
 
   dispatcher->subscribers =
       (struct ui_scroll_subscriber *)C_MULTIPLATFORM_MALLOC(
-          sizeof(struct ui_scroll_subscriber) * INITIAL_SUBSCRIBER_CAPACITY);
+          sizeof(struct ui_scroll_subscriber) *
+          (size_t)INITIAL_SUBSCRIBER_CAPACITY);
   if (!dispatcher->subscribers) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -112,7 +115,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a scroll dispatcher and frees its resources.
  *
  * \param dispatcher The dispatcher to destroy.
@@ -136,7 +139,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Registers a callback to be notified of scroll events.
  *
  * \param dispatcher The scroll dispatcher.
@@ -162,7 +165,7 @@ ui_scroll_dispatcher_register(struct ui_scroll_dispatcher *dispatcher,
     new_capacity = dispatcher->capacity * 2;
     new_array = (struct ui_scroll_subscriber *)C_MULTIPLATFORM_REALLOC(
         dispatcher->subscribers,
-        sizeof(struct ui_scroll_subscriber) * new_capacity);
+        sizeof(struct ui_scroll_subscriber) * (size_t)new_capacity);
     if (!new_array) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
@@ -183,7 +186,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Unregisters a previously registered scroll callback.
  *
  * \param dispatcher The scroll dispatcher.
@@ -218,7 +221,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Dispatches a scroll event to all registered callbacks.
  *
  * \param dispatcher The scroll dispatcher.
@@ -248,7 +251,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Integrates the scroll dispatcher with a layout observer.
  *
  * \param dispatcher The scroll dispatcher.

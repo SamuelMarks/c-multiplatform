@@ -27,7 +27,9 @@ static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
   return (ui_dom_node_remove_child)(parent, child);
 }
 #undef ui_dom_node_remove_child
+/** @cond */
 #define ui_dom_node_remove_child mock_dom_node_remove_child
+/** @endcond */
 
 static ui_error_t mock_focus_trap_create(struct ui_focus_trap **ft) {
   if (g_action_sheet_mock_fail == 6 || g_action_sheet_mock_fail == 7) {
@@ -36,7 +38,9 @@ static ui_error_t mock_focus_trap_create(struct ui_focus_trap **ft) {
   return (ui_focus_trap_create)(ft);
 }
 #undef ui_focus_trap_create
+/** @cond */
 #define ui_focus_trap_create mock_focus_trap_create
+/** @endcond */
 
 static ui_error_t mock_dom_node_append_child2(struct ui_dom_node *parent,
                                               struct ui_dom_node *child) {
@@ -52,7 +56,9 @@ static ui_error_t mock_dom_node_append_child2(struct ui_dom_node *parent,
   return (ui_dom_node_append_child)(parent, child);
 }
 #undef ui_dom_node_append_child
+/** @cond */
 #define ui_dom_node_append_child mock_dom_node_append_child2
+/** @endcond */
 
 static ui_error_t
 mock_bottom_sheet_set_content(struct ui_bottom_sheet_base *sheet,
@@ -63,7 +69,9 @@ mock_bottom_sheet_set_content(struct ui_bottom_sheet_base *sheet,
   return (ui_bottom_sheet_base_set_content)(sheet, content);
 }
 #undef ui_bottom_sheet_base_set_content
+/** @cond */
 #define ui_bottom_sheet_base_set_content mock_bottom_sheet_set_content
+/** @endcond */
 
 static ui_error_t
 mock_bottom_sheet_is_open(const struct ui_bottom_sheet_base *sheet, int *out) {
@@ -78,7 +86,9 @@ mock_bottom_sheet_is_open(const struct ui_bottom_sheet_base *sheet, int *out) {
   return (ui_bottom_sheet_base_is_open)(sheet, out);
 }
 #undef ui_bottom_sheet_base_is_open
+/** @cond */
 #define ui_bottom_sheet_base_is_open mock_bottom_sheet_is_open
+/** @endcond */
 
 static ui_error_t mock_bottom_sheet_set_open(struct ui_bottom_sheet_base *sheet,
                                              int is_open) {
@@ -91,7 +101,9 @@ static ui_error_t mock_bottom_sheet_set_open(struct ui_bottom_sheet_base *sheet,
   return (ui_bottom_sheet_base_set_open)(sheet, is_open);
 }
 #undef ui_bottom_sheet_base_set_open
+/** @cond */
 #define ui_bottom_sheet_base_set_open mock_bottom_sheet_set_open
+/** @endcond */
 
 static ui_bottom_sheet_on_close_t captured_close_cb = NULL;
 static ui_error_t
@@ -105,7 +117,9 @@ mock_bottom_sheet_set_on_close2(struct ui_bottom_sheet_base *sheet,
 }
 
 #undef ui_bottom_sheet_base_set_on_close
+/** @cond */
 #define ui_bottom_sheet_base_set_on_close mock_bottom_sheet_set_on_close2
+/** @endcond */
 
 static ui_error_t mock_focus_trap_deactivate(struct ui_focus_trap *ft,
                                              struct ui_focus_manager *fm) {
@@ -118,7 +132,9 @@ static ui_error_t mock_focus_trap_deactivate(struct ui_focus_trap *ft,
   return (ui_focus_trap_deactivate)(ft, fm);
 }
 #undef ui_focus_trap_deactivate
+/** @cond */
 #define ui_focus_trap_deactivate mock_focus_trap_deactivate
+/** @endcond */
 
 static ui_error_t mock_on_close_fail(struct ui_action_sheet_base *sheet,
                                      void *user_data) {
@@ -136,29 +152,30 @@ static ui_error_t mock_on_close_success(struct ui_action_sheet_base *sheet,
 
 /**
  * @struct ui_action_sheet_base
+ * @struct ui_action_sheet_base
  * @brief Internal implementation of the action sheet base.
  */
 struct ui_action_sheet_base {
-  /** @brief Underlying bottom sheet component. */
-  struct ui_bottom_sheet_base *bottom_sheet;
-  /** @brief Container for the entire sheet. */
-  struct ui_component *container;
-  /** @brief Container for the main actions. */
-  struct ui_component *actions_container;
-  /** @brief Container for the cancel action. */
-  struct ui_component *cancel_container;
+  /* @brief Underlying bottom sheet component. */
+  struct ui_bottom_sheet_base *bottom_sheet; /**< bottom_sheet */
+  /* @brief Container for the entire sheet. */
+  struct ui_component *container; /**< container */
+  /* @brief Container for the main actions. */
+  struct ui_component *actions_container; /**< actions_container */
+  /* @brief Container for the cancel action. */
+  struct ui_component *cancel_container; /**< cancel_container */
 
-  /** @brief Trap to keep focus within the sheet when open. */
-  struct ui_focus_trap *focus_trap;
-  /** @brief Focus manager reference. */
-  struct ui_focus_manager *focus_manager;
-  /** @brief Keyboard responder reference. */
-  struct ui_keyboard_responder *keyboard_responder;
+  /* @brief Trap to keep focus within the sheet when open. */
+  struct ui_focus_trap *focus_trap; /**< focus_trap */
+  /* @brief Focus manager reference. */
+  struct ui_focus_manager *focus_manager; /**< focus_manager */
+  /* @brief Keyboard responder reference. */
+  struct ui_keyboard_responder *keyboard_responder; /**< keyboard_responder */
 
-  /** @brief Callback invoked when the sheet closes. */
-  ui_action_sheet_on_close_t on_close;
-  /** @brief User data for the close callback. */
-  void *on_close_user_data;
+  /* @brief Callback invoked when the sheet closes. */
+  ui_action_sheet_on_close_t on_close; /**< on_close */
+  /* @brief User data for the close callback. */
+  void *on_close_user_data; /**< on_close_user_data */
 };
 
 static ui_error_t on_bottom_sheet_close(struct ui_bottom_sheet_base *bs,

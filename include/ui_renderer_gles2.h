@@ -1,3 +1,6 @@
+/**
+ * @file ui_renderer_gles2.h
+ */
 #ifndef UI_RENDERER_GLES2_H
 #define UI_RENDERER_GLES2_H
 

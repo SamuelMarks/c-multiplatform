@@ -7,9 +7,11 @@
 #include <string.h>
 /* clang-format on */
 
+/** @brief internal */
 #define MAX_PANELS 128
 
 /**
+ * @struct layout_node
  * @struct layout_node
  * @brief Internal node representation for a docked panel.
  */
@@ -22,6 +24,7 @@ struct layout_node {
 
 /**
  * @struct ui_dockable_layout_base
+ * @struct ui_dockable_layout_base
  * @brief Internal representation of a dockable layout.
  */
 struct ui_dockable_layout_base {
@@ -31,7 +34,7 @@ struct ui_dockable_layout_base {
   struct layout_node nodes[MAX_PANELS]; /**< Array of layout nodes */
 };
 
-/**
+/*
  * @brief ui_dockable_layout_base_create.
  * @param out_layout Parameter out_layout.
  * @return Return value.
@@ -68,7 +71,7 @@ ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_dockable_layout_base_destroy.
  * @param layout Parameter layout.
  * @return Return value.
@@ -83,7 +86,7 @@ ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_dockable_layout_base_get_component.
  * @param layout Parameter layout.
  * @param out_component Parameter out_component.
@@ -99,7 +102,7 @@ ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_dockable_layout_base_dock_panel.
  * @param layout Parameter layout.
  * @param panel_id Parameter panel_id.
@@ -141,7 +144,7 @@ ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_dockable_layout_base_remove_panel.
  * @param layout Parameter layout.
  * @param panel_id Parameter panel_id.
@@ -165,7 +168,7 @@ ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_dockable_layout_base_serialize.
  * @param layout Parameter layout.
  * @param out_buffer Parameter out_buffer.
@@ -196,7 +199,7 @@ ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
               layout->nodes[i].target_panel_id, (int)layout->nodes[i].edge);
 #endif
       len = strlen(tmp);
-      if (offset + len < buffer_size) {
+      if ((size_t)offset + len < buffer_size) {
         memcpy(&out_buffer[offset], tmp, len);
         offset += (int)len;
         out_buffer[offset] = '\0';
@@ -206,7 +209,7 @@ ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_dockable_layout_base_deserialize.
  * @param layout Parameter layout.
  * @param buffer Parameter buffer.
@@ -254,7 +257,7 @@ ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_dockable_layout_base_integrate_drag_drop.
  * @param layout Parameter layout.
  * @param drag_ctx Parameter drag_ctx.

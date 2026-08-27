@@ -5,6 +5,7 @@
 #include "../include/ui_font_manager.h"
 
 #if defined(_WIN32)
+/** @brief internal */
 #define WIN32_LEAN_AND_MEAN
 #include <winsock2.h>
 #include <winuser.h>
@@ -26,14 +27,18 @@ typedef enum { FillModeAlternate = 0, FillModeWinding = 1 } GpFillMode;
 
 typedef DWORD ARGB;
 
-/** \brief GdiplusStartupInput */
+/**
+ * @struct GdiplusStartupInput
+ * \brief GdiplusStartupInput
+ */
 struct GdiplusStartupInput {
-  UINT32 GdiplusVersion;
-  void *DebugEventCallback;
-  BOOL SuppressBackgroundThread;
-  BOOL SuppressExternalCodecs;
+  UINT32 GdiplusVersion;         /**< GdiplusVersion */
+  void *DebugEventCallback;      /**< DebugEventCallback */
+  BOOL SuppressBackgroundThread; /**< SuppressBackgroundThread */
+  BOOL SuppressExternalCodecs;   /**< SuppressExternalCodecs */
 };
 
+/** @brief internal */
 #define WINGDIPAPI __stdcall
 
 GpStatus WINGDIPAPI GdiplusStartup(ULONG_PTR *token,
@@ -71,7 +76,8 @@ GpStatus WINGDIPAPI GdipFillPath(GpGraphics *graphics, GpBrush *brush,
 
 typedef void GpLineGradient;
 typedef void GpPathGradient;
-/** \brief enum */
+/* \brief enum
+ */
 typedef enum {
   WrapModeTile = 0,
   WrapModeTileFlipX = 1,
@@ -80,7 +86,8 @@ typedef enum {
   WrapModeClamp = 4
 } GpWrapMode;
 
-/** \brief struct */
+/* \brief struct
+ */
 typedef struct {
   float X;
   float Y;
@@ -88,7 +95,8 @@ typedef struct {
   float Height;
 } GpRectF;
 
-/** \brief struct */
+/* \brief struct
+ */
 typedef struct {
   INT X;
   INT Y;
@@ -96,14 +104,16 @@ typedef struct {
   INT Height;
 } GpRect;
 
-/** \brief enum */
+/* \brief enum
+ */
 typedef enum {
   ImageLockModeRead = 1,
   ImageLockModeWrite = 2,
   ImageLockModeUserInputBuf = 4
 } ImageLockMode;
 
-/** \brief struct */
+/* \brief struct
+ */
 typedef struct {
   UINT Width;
   UINT Height;
@@ -113,7 +123,8 @@ typedef struct {
   UINT_PTR Reserved;
 } BitmapData;
 
-/** \brief struct */
+/* \brief struct
+ */
 typedef struct {
   float X;
   float Y;
@@ -175,18 +186,23 @@ GpStatus WINGDIPAPI GdipDrawString(GpGraphics *graphics, const WCHAR *string,
                                    const GpStringFormat *stringFormat,
                                    const GpBrush *brush);
 
+/** @brief internal */
 #define PixelFormat32bppARGB 0x26200A
 
 /* GDI+ Renderer Context */
+/**
+ * @struct gdiplus_context
+ * \brief gdiplus_context
+ */
 struct gdiplus_context {
-  ULONG_PTR token;
-  GpBitmap *offscreen_bitmap;
-  GpGraphics *graphics;
-  int current_width;
-  int current_height;
+  ULONG_PTR token;            /**< token */
+  GpBitmap *offscreen_bitmap; /**< offscreen_bitmap */
+  GpGraphics *graphics;       /**< graphics */
+  int current_width;          /**< current_width */
+  int current_height;         /**< current_height */
 };
 
-/**
+/*
  * @brief ui_color_to_argb.
  * @param c Parameter c.
  * @return Return value.
@@ -199,7 +215,7 @@ static ARGB ui_color_to_argb(const struct ui_color *c) {
   return ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
 }
 
-/**
+/*
  * @brief ui_css_color_to_argb.
  * @param c Parameter c.
  * @return Return value.
@@ -213,7 +229,7 @@ static ARGB ui_css_color_to_argb(const struct ui_css_color *c) {
   return ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
 }
 
-/**
+/*
  * @brief gdiplus_begin_frame.
  * @param ctx Parameter ctx.
  * @param width Parameter width.
@@ -255,7 +271,7 @@ static int gdiplus_begin_frame(void *ctx, int width, int height) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_end_frame.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -268,7 +284,7 @@ static int gdiplus_end_frame(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_draw_rect.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -292,7 +308,7 @@ static int gdiplus_draw_rect(void *ctx, const struct ui_rect *r,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-/**
+/*
  * @brief gdiplus_draw_text.
  * @param ctx Parameter ctx.
  * @param text Parameter text.
@@ -329,7 +345,7 @@ static int gdiplus_draw_text(void *ctx, const char *text,
   text_len = MultiByteToWideChar(CP_UTF8, 0, text, -1, NULL, 0);
   if (text_len <= 0)
     return UI_ERROR_INVALID_ARGUMENT;
-  wtext = (WCHAR *)C_MULTIPLATFORM_MALLOC(text_len * sizeof(WCHAR));
+  wtext = (WCHAR *)C_MULTIPLATFORM_MALLOC((size_t)text_len * sizeof(WCHAR));
   if (!wtext)
     return UI_ERROR_INVALID_ARGUMENT;
   MultiByteToWideChar(CP_UTF8, 0, text, -1, wtext, text_len);
@@ -388,7 +404,7 @@ static int gdiplus_draw_text(void *ctx, const char *text,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_draw_image.
  * @param ctx Parameter ctx.
  * @param img Parameter img.
@@ -404,7 +420,7 @@ static int gdiplus_draw_image(void *ctx, const struct ui_image *img,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_draw_gradient.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -440,8 +456,9 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
     if (GdipCreateLineBrushFromRectWithAngle(
             &rect, 0, 0, gradient->data.linear_gradient.angle, TRUE,
             WrapModeClamp, &brush) == Ok) {
-      colors = (ARGB *)C_MULTIPLATFORM_MALLOC(sizeof(ARGB) * count);
-      positions = (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * count);
+      colors = (ARGB *)C_MULTIPLATFORM_MALLOC(sizeof(ARGB) * (size_t)count);
+      positions =
+          (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * (size_t)count);
       if (colors && positions) {
         for (i = 0; i < count; ++i) {
           colors[i] = ui_css_color_to_argb(
@@ -483,8 +500,9 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
       GdipAddPathEllipse(path, r->x, r->y, r->width, r->height);
 
       if (GdipCreatePathGradientFromPath(path, &brush) == Ok) {
-        colors = (ARGB *)C_MULTIPLATFORM_MALLOC(sizeof(ARGB) * count);
-        positions = (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * count);
+        colors = (ARGB *)C_MULTIPLATFORM_MALLOC(sizeof(ARGB) * (size_t)count);
+        positions =
+            (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * (size_t)count);
         if (colors && positions) {
           GpPointF center;
 
@@ -519,7 +537,7 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-/**
+/*
  * @brief gdiplus_draw_path.
  * @param ctx Parameter ctx.
  * @param p Parameter p.
@@ -574,7 +592,7 @@ static int gdiplus_draw_path(void *ctx, const struct ui_path *p,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_push_clip.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -589,7 +607,7 @@ static int gdiplus_push_clip(void *ctx, const struct ui_rect *r) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_pop_clip.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -602,7 +620,7 @@ static int gdiplus_pop_clip(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_set_blend_mode.
  * @param ctx Parameter ctx.
  * @param mode Parameter mode.
@@ -615,7 +633,7 @@ static int gdiplus_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_set_shadow.
  * @param ctx Parameter ctx.
  * @param shadow Parameter shadow.
@@ -628,7 +646,7 @@ static int gdiplus_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_read_pixels.
  * @param ctx Parameter ctx.
  * @param out_rgba_buffer Parameter out_rgba_buffer.
@@ -679,7 +697,7 @@ static int gdiplus_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief gdiplus_destroy.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -704,7 +722,7 @@ static const struct ui_renderer_vtable gdiplus_vtable = {
     gdiplus_set_blend_mode, gdiplus_set_shadow, gdiplus_read_pixels,
     gdiplus_destroy};
 
-/**
+/*
  * @brief ui_renderer_native_init.
  * @param renderer Parameter renderer.
  * @return Return value.

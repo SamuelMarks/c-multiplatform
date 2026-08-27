@@ -7,22 +7,23 @@
 
 /**
  * @struct ui_compositor_material_base
+ * @struct ui_compositor_material_base
  * @brief Internal representation of a compositor material.
  */
 struct ui_compositor_material_base {
-  /** @brief Arena for internal allocations. */
-  struct ui_arena *arena;
-  /** @brief Material type. */
-  enum ui_compositor_material_type type;
-  /** @brief Fallback mode. */
-  enum ui_compositor_fallback_mode fallback_mode;
-  /** @brief Opacity level. */
-  float opacity;
-  /** @brief Signal emitted on type change. */
-  ui_signal_t *type_signal;
+  /* @brief Arena for internal allocations. */
+  struct ui_arena *arena; /**< arena */
+  /* @brief Material type. */
+  enum ui_compositor_material_type type; /**< type */
+  /* @brief Fallback mode. */
+  enum ui_compositor_fallback_mode fallback_mode; /**< fallback_mode */
+  /* @brief Opacity level. */
+  float opacity; /**< opacity */
+  /* @brief Signal emitted on type change. */
+  ui_signal_t *type_signal; /**< type_signal */
 };
 
-/**
+/*
  * @brief type_equality.
  * @param a Parameter a.
  * @param b Parameter b.
@@ -36,7 +37,7 @@ static ui_error_t type_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_compositor_material_base_create.
  * @param arena Parameter arena.
  * @param config Parameter config.
@@ -76,7 +77,7 @@ ui_error_t ui_compositor_material_base_create(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_compositor_material_base_destroy.
  * @param material Parameter material.
  * @return Return value.
@@ -92,7 +93,7 @@ ui_error_t ui_compositor_material_base_destroy(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_compositor_material_base_set_type.
  * @param material Parameter material.
  * @param type Parameter type.
@@ -115,7 +116,7 @@ ui_error_t ui_compositor_material_base_set_type(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_compositor_material_base_set_fallback_mode.
  * @param material Parameter material.
  * @param fallback_mode Parameter fallback_mode.
@@ -131,7 +132,7 @@ ui_error_t ui_compositor_material_base_set_fallback_mode(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_compositor_material_base_set_opacity.
  * @param material Parameter material.
  * @param opacity Parameter opacity.
@@ -153,7 +154,7 @@ ui_error_t ui_compositor_material_base_set_opacity(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_compositor_material_base_get_type_signal.
  * @param material Parameter material.
  * @param out_signal Parameter out_signal.

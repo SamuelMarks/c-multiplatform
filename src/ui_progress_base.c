@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_progress_base.c
  * \brief Implementation of the UI Progress Base component.
  */
@@ -11,6 +11,7 @@
 /* clang-format on */
 
 /**
+ * @struct ui_progress_base
  * \brief Internal structure representing a progress component.
  */
 struct ui_progress_base {
@@ -22,7 +23,7 @@ struct ui_progress_base {
   struct ui_signal *value_signal; /**< Signal bound to the value */
 };
 
-/**
+/*
  * \brief Updates the DOM node attributes according to the progress state.
  *
  * \param progress The progress component to update.
@@ -91,7 +92,7 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new progress base component.
  *
  * \param out_progress Pointer to receive the allocated progress component.
@@ -158,7 +159,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a progress component.
  *
  * \param progress The progress component to destroy.
@@ -172,7 +173,7 @@ ui_error_t ui_progress_base_destroy(struct ui_progress_base *progress) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the component to determinate mode and updates the value.
  *
  * \param progress The progress component.
@@ -208,7 +209,7 @@ ui_error_t ui_progress_base_set_determinate(struct ui_progress_base *progress,
   return update_dom_state(progress);
 }
 
-/**
+/*
  * \brief Sets the component to indeterminate mode.
  *
  * \param progress The progress component.
@@ -224,7 +225,7 @@ ui_progress_base_set_indeterminate(struct ui_progress_base *progress) {
   return update_dom_state(progress);
 }
 
-/**
+/*
  * \brief Retrieves the underlying UI component.
  *
  * \param progress The progress component.
@@ -240,7 +241,7 @@ ui_error_t ui_progress_base_get_component(struct ui_progress_base *progress,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the current normalized percentage [0.0, 1.0].
  * If the progress is indeterminate, this returns 0.0.
  *
@@ -265,7 +266,7 @@ ui_error_t ui_progress_base_get_normalized_percentage(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Checks if the progress is currently indeterminate.
  *
  * \param progress The progress component.
@@ -282,7 +283,7 @@ ui_progress_base_is_indeterminate(const struct ui_progress_base *progress,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the value property.
  *
  * \param widget The progress component.

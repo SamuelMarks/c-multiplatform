@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_handle_manager.c
  * \brief Implementation of the UI handle manager.
  */
@@ -9,39 +9,45 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * \def HANDLE_INDEX
  * \brief Extracts the index portion of a handle.
  */
 #define HANDLE_INDEX(h) ((ui_uint32)((h) & 0xFFFFFFFF))
-/**
+/*
  * \def HANDLE_GEN
  * \brief Extracts the generation portion of a handle.
  */
 #define HANDLE_GEN(h) ((ui_uint32)((h) >> 32))
-/**
+/*
  * \def MAKE_HANDLE
  * \brief Combines an index and generation into a handle.
  */
 #define MAKE_HANDLE(i, g) ((((ui_uint64)(g)) << 32) | (ui_uint32)(i))
 
-/** \brief ui_handle_entry */
+/**
+ * @struct ui_handle_entry
+ * \brief ui_handle_entry
+ */
 struct ui_handle_entry {
-  void *data;
-  ui_uint32 next_free;
-  ui_uint32 generation;
-};
-
-/** \brief ui_handle_manager */
-struct ui_handle_manager {
-  struct ui_handle_entry *entries;
-  ui_uint32 capacity;
-  ui_uint32 first_free;
-  ui_uint32 active_count;
-  ui_atomic_t lock;
+  void *data;           /**< data */
+  ui_uint32 next_free;  /**< next_free */
+  ui_uint32 generation; /**< generation */
 };
 
 /**
+ * @struct ui_handle_manager
+ * \brief ui_handle_manager
+ */
+struct ui_handle_manager {
+  struct ui_handle_entry *entries; /**< entries */
+  ui_uint32 capacity;              /**< capacity */
+  ui_uint32 first_free;            /**< first_free */
+  ui_uint32 active_count;          /**< active_count */
+  ui_atomic_t lock;                /**< lock */
+};
+
+/*
  * \brief Acquires a spin lock.
  * \param[in,out] lock The lock to acquire.
  * \return UI_ERROR_NONE on success.
@@ -61,7 +67,7 @@ static ui_error_t spin_lock(ui_atomic_t *lock) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Releases a spin lock.
  * \param[in,out] lock The lock to release.
  * \return UI_ERROR_NONE on success.
@@ -78,7 +84,7 @@ static ui_error_t spin_unlock(ui_atomic_t *lock) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a handle manager with a specified capacity.
  * \param[in] capacity The maximum number of handles.
  * \param[out] out_manager Pointer to store the created manager.
@@ -103,7 +109,7 @@ ui_error_t ui_handle_manager_create(ui_uint32 capacity,
   }
 
   manager->entries = (struct ui_handle_entry *)C_MULTIPLATFORM_MALLOC(
-      capacity * sizeof(struct ui_handle_entry));
+      (size_t)capacity * sizeof(struct ui_handle_entry));
   if (!manager->entries) {
     rc = UI_ERROR_OUT_OF_MEMORY;
     goto cleanup;
@@ -134,7 +140,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a handle manager.
  * \param[in,out] manager The manager to destroy.
  * \return UI_ERROR_NONE on success.
@@ -150,7 +156,7 @@ ui_error_t ui_handle_manager_destroy(struct ui_handle_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Allocates a new handle and associates it with data.
  * \param[in,out] manager The handle manager.
  * \param[in] data The data pointer to associate with the handle.
@@ -195,7 +201,7 @@ ui_error_t ui_handle_manager_alloc(struct ui_handle_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the data associated with a valid handle.
  * \param[in,out] manager The handle manager.
  * \param[in] handle The handle to look up.
@@ -242,7 +248,7 @@ ui_error_t ui_handle_manager_get(struct ui_handle_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Frees a handle, making its slot available for reuse and incrementing
  * its generation.
  * \param[in,out] manager The handle manager.

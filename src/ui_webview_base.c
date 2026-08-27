@@ -11,15 +11,16 @@
 
 /**
  * @struct ui_webview_base
+ * @struct ui_webview_base
  * @brief Internal state for the webview base component.
  */
 struct ui_webview_base {
-  struct ui_component *component;
-  struct ui_signal *url_signal;
-  ui_webview_ipc_callback ipc_callback;
-  void *ipc_user_data;
-  char *current_url;
-  char *current_html;
+  struct ui_component *component;       /**< component */
+  struct ui_signal *url_signal;         /**< url_signal */
+  ui_webview_ipc_callback ipc_callback; /**< ipc_callback */
+  void *ipc_user_data;                  /**< ipc_user_data */
+  char *current_url;                    /**< current_url */
+  char *current_html;                   /**< current_html */
 };
 
 ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview) {
@@ -51,9 +52,13 @@ ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview) {
     return rc;
   }
 
+/** @cond */
 #define UI_DOM_SET_TAG_IGNORE(n, t) ui_dom_node_set_tag_name((n), (t))
+  /** @endcond */
   (void)UI_DOM_SET_TAG_IGNORE(root_node, "iframe");
+/** @cond */
 #define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+  /** @endcond */
   (void)UI_DOM_SET_ATTR_IGNORE(root_node, "role", "application");
   webview->component->shadow_root = root_node;
 

@@ -11,13 +11,14 @@
 
 /**
  * @struct ui_virtual_keyboard
+ * @struct ui_virtual_keyboard
  * @brief Internal state for the virtual keyboard manager.
  */
 struct ui_virtual_keyboard {
-  float height;
-  struct ui_signal *height_signal;
-  struct ui_safe_area_manager *safe_area_manager;
-  float base_bottom_inset;
+  float height;                                   /**< height */
+  struct ui_signal *height_signal;                /**< height_signal */
+  struct ui_safe_area_manager *safe_area_manager; /**< safe_area_manager */
+  float base_bottom_inset;                        /**< base_bottom_inset */
 };
 
 /* In a real implementation we would subscribe to the safe area manager's signal

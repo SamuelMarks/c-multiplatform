@@ -10,34 +10,36 @@
 
 /**
  * @struct ui_titlebar_btn_rect
+ * @struct ui_titlebar_btn_rect
  * @brief Internal representation of a button hit area in the titlebar.
  */
 struct ui_titlebar_btn_rect {
-  /** @brief The type of button for this rect. */
-  enum ui_titlebar_hit_test_result btn_type;
-  /** @brief X coordinate of the rect. */
-  float x;
-  /** @brief Y coordinate of the rect. */
-  float y;
-  /** @brief Width of the rect. */
-  float w;
-  /** @brief Height of the rect. */
-  float h;
-  /** @brief Pointer to the next button rect in the linked list. */
-  struct ui_titlebar_btn_rect *next;
+  /* @brief The type of button for this rect. */
+  enum ui_titlebar_hit_test_result btn_type; /**< btn_type */
+  /* @brief X coordinate of the rect. */
+  float x; /**< x */
+  /* @brief Y coordinate of the rect. */
+  float y; /**< y */
+  /* @brief Width of the rect. */
+  float w; /**< w */
+  /* @brief Height of the rect. */
+  float h; /**< h */
+  /* @brief Pointer to the next button rect in the linked list. */
+  struct ui_titlebar_btn_rect *next; /**< next */
 };
 
 /**
  * @struct ui_titlebar_base
+ * @struct ui_titlebar_base
  * @brief Internal implementation of the titlebar base component.
  */
 struct ui_titlebar_base {
-  /** @brief Memory arena for allocations. */
-  struct ui_arena *arena;
-  /** @brief The titlebar configuration. */
-  struct ui_titlebar_config config;
-  /** @brief Linked list of button hit areas. */
-  struct ui_titlebar_btn_rect *buttons;
+  /* @brief Memory arena for allocations. */
+  struct ui_arena *arena; /**< arena */
+  /* @brief The titlebar configuration. */
+  struct ui_titlebar_config config; /**< config */
+  /* @brief Linked list of button hit areas. */
+  struct ui_titlebar_btn_rect *buttons; /**< buttons */
 };
 
 ui_error_t ui_titlebar_base_create(struct ui_arena *arena,

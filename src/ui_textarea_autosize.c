@@ -2,7 +2,7 @@
 #include "ui_textarea_autosize.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_textarea_autosize_config_init.
  * @param out_config Parameter out_config.
  * @return Return value.
@@ -26,7 +26,8 @@ cleanup:
   return rc;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_textarea_autosize_calculate(const struct ui_textarea_autosize_config *config,
                                size_t num_lines,

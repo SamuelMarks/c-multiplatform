@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_form_field_base.c
  * \brief Implementation of the base form field widget.
  */
@@ -60,42 +60,44 @@ static const char ui_form_field_base_default_css[] = {
     45,  101, 114, 114, 111, 114, 45,  99,  111, 108, 111, 114, 44,  32,  35,
     102, 48,  48,  41,  59,  32,  125, 0};
 
-/** \brief ui_form_field_base */
+/* \brief ui_form_field_base
+ */
 /**
+ * @struct ui_form_field_base
  * \struct ui_form_field_base
  * \brief State and DOM structure for a form field base component.
  */
 struct ui_form_field_base {
-  struct ui_component *component;
+  struct ui_component *component; /**< component */
 
-  char *label_text;
-  char *hint_text;
-  char *error_text;
+  char *label_text; /**< label_text */
+  char *hint_text;  /**< hint_text */
+  char *error_text; /**< error_text */
 
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *wrapper_node;
-  struct ui_dom_node *label_node;
-  struct ui_dom_node *control_container;
-  struct ui_dom_node *prefix_container;
-  struct ui_dom_node *suffix_container;
-  struct ui_dom_node *subscript_node;
-  struct ui_dom_node *hint_node;
-  struct ui_dom_node *error_node;
+  struct ui_dom_node *root_node;         /**< root_node */
+  struct ui_dom_node *wrapper_node;      /**< wrapper_node */
+  struct ui_dom_node *label_node;        /**< label_node */
+  struct ui_dom_node *control_container; /**< control_container */
+  struct ui_dom_node *prefix_container;  /**< prefix_container */
+  struct ui_dom_node *suffix_container;  /**< suffix_container */
+  struct ui_dom_node *subscript_node;    /**< subscript_node */
+  struct ui_dom_node *hint_node;         /**< hint_node */
+  struct ui_dom_node *error_node;        /**< error_node */
 
-  struct ui_component *control;
-  struct ui_component *prefix;
-  struct ui_component *suffix;
+  struct ui_component *control; /**< control */
+  struct ui_component *prefix;  /**< prefix */
+  struct ui_component *suffix;  /**< suffix */
 
-  int is_focused;
-  int has_value;
+  int is_focused; /**< is_focused */
+  int has_value;  /**< has_value */
 
-  struct ui_arena *binding_arena;
-  ui_effect_t *binding_effect;
-  struct field_effect_data *binding_data;
-  struct ui_signal *data_signal;
+  struct ui_arena *binding_arena;         /**< binding_arena */
+  ui_effect_t *binding_effect;            /**< binding_effect */
+  struct field_effect_data *binding_data; /**< binding_data */
+  struct ui_signal *data_signal;          /**< data_signal */
 };
 
-/**
+/*
  * \brief Updates the DOM nodes based on the current field state.
  * \param[in,out] field The form field.
  * \return UI_ERROR_NONE on success.
@@ -142,7 +144,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Creates a new form field base component.
  * \param[out] out_field Pointer to store the created component.
  * \return UI_ERROR_NONE on success.
@@ -286,7 +288,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a form field base component.
  * \param[in,out] field The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -311,7 +313,7 @@ ui_error_t ui_form_field_base_destroy(struct ui_form_field_base *field) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the label text for the form field.
  * \param[in,out] field The form field.
  * \param[in] label The label text.
@@ -342,7 +344,7 @@ ui_error_t ui_form_field_base_set_label(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the hint text for the form field.
  * \param[in,out] field The form field.
  * \param[in] hint The hint text.
@@ -373,7 +375,7 @@ ui_error_t ui_form_field_base_set_hint(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the error message for the form field.
  * \param[in,out] field The form field.
  * \param[in] error_msg The error message.
@@ -405,7 +407,7 @@ ui_error_t ui_form_field_base_set_error(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Mounts a prefix component within the form field.
  * \param[in,out] field The form field.
  * \param[in,out] prefix The prefix component.
@@ -422,7 +424,7 @@ ui_error_t ui_form_field_base_set_prefix(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Mounts a suffix component within the form field.
  * \param[in,out] field The form field.
  * \param[in,out] suffix The suffix component.
@@ -439,7 +441,7 @@ ui_error_t ui_form_field_base_set_suffix(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Mounts a control component within the form field.
  * \param[in,out] field The form field.
  * \param[in,out] control The control component.
@@ -456,7 +458,7 @@ ui_error_t ui_form_field_base_set_control(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the focused visual state of the form field.
  * \param[in,out] field The form field.
  * \param[in] is_focused Non-zero if focused.
@@ -474,7 +476,7 @@ ui_error_t ui_form_field_base_set_focused(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets whether the form field has a value (for styling labels).
  * \param[in,out] field The form field.
  * \param[in] has_value Non-zero if a value is present.
@@ -492,7 +494,7 @@ ui_error_t ui_form_field_base_set_has_value(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the underlying generic component for the form field.
  * \param[in,out] field The form field.
  * \param[out] out_component Pointer to store the component.
@@ -512,17 +514,19 @@ ui_form_field_base_get_component(struct ui_form_field_base *field,
 #include "ui_form_control.h"
 #include "ui_signal.h"
 
-/** \brief field_effect_data */
+/* \brief field_effect_data
+ */
 /**
+ * @struct field_effect_data
  * \struct field_effect_data
  * \brief Data context for field reactive effects.
  */
 struct field_effect_data {
-  struct ui_form_field_base *field;
-  ui_signal_t *errors_signal;
+  struct ui_form_field_base *field; /**< field */
+  ui_signal_t *errors_signal;       /**< errors_signal */
 };
 
-/**
+/*
  * \brief Effect runner for syncing errors to the field.
  * \param[in,out] user_data Pointer to field effect data.
  * \return UI_ERROR_NONE on success.
@@ -536,7 +540,7 @@ static ui_error_t error_effect_runner(void *user_data) {
   return ui_form_field_base_set_error(data->field, (const char *)val.ptr_val);
 }
 
-/**
+/*
  * \brief Binds a logical form control to this visual field base.
  * \param[in,out] field The visual form field.
  * \param[in,out] form_control The logical form control.
@@ -597,7 +601,7 @@ ui_form_field_base_bind_form_control(struct ui_form_field_base *field,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds arbitrary data to the form field.
  * \param[in,out] widget The form field.
  * \param[in,out] signal The data signal.

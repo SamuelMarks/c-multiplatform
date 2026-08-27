@@ -1,3 +1,6 @@
+/**
+ * @file ui_segmented_control_base.h
+ */
 #ifndef UI_SEGMENTED_CONTROL_BASE_H
 #define UI_SEGMENTED_CONTROL_BASE_H
 

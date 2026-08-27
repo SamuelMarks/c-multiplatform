@@ -1,3 +1,6 @@
+/**
+ * @file ui_scroll_base.h
+ */
 #ifndef UI_SCROLL_BASE_H
 #define UI_SCROLL_BASE_H
 

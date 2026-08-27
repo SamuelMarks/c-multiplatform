@@ -8,7 +8,7 @@
 #include "c89stringutils_string_extras.h"
 /* clang-format on */
 
-/**
+/*
  * @brief ui_coerce_string_to_bool.
  * @param str Parameter str.
  * @param out_val Parameter out_val.
@@ -34,7 +34,7 @@ ui_error_t ui_coerce_string_to_bool(const char *str, int *out_val) {
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-/**
+/*
  * @brief ui_coerce_string_to_int.
  * @param str Parameter str.
  * @param out_val Parameter out_val.
@@ -57,7 +57,7 @@ ui_error_t ui_coerce_string_to_int(const char *str, int *out_val) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_coerce_string_to_float.
  * @param str Parameter str.
  * @param out_val Parameter out_val.
@@ -80,7 +80,7 @@ ui_error_t ui_coerce_string_to_float(const char *str, float *out_val) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_safe_string_copy.
  * @param dest Parameter dest.
  * @param dest_size Parameter dest_size.
@@ -108,7 +108,7 @@ ui_error_t ui_safe_string_copy(char *dest, size_t dest_size, const char *src) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_safe_string_format.
  * @param dest Parameter dest.
  * @param dest_size Parameter dest_size.

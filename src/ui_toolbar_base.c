@@ -11,17 +11,18 @@
 
 /**
  * @struct ui_toolbar_base
+ * @struct ui_toolbar_base
  * @brief Internal implementation of the toolbar component.
  */
 struct ui_toolbar_base {
-  /** @brief The toolbar title string. */
-  char *title;
-  /** @brief The toolbar layout mode. */
-  enum ui_toolbar_mode mode;
-  /** @brief The alignment mode. */
-  enum ui_toolbar_alignment alignment;
-  /** @brief Data signal bound to the toolbar. */
-  struct ui_signal *data_signal;
+  /* @brief The toolbar title string. */
+  char *title; /**< title */
+  /* @brief The toolbar layout mode. */
+  enum ui_toolbar_mode mode; /**< mode */
+  /* @brief The alignment mode. */
+  enum ui_toolbar_alignment alignment; /**< alignment */
+  /* @brief Data signal bound to the toolbar. */
+  struct ui_signal *data_signal; /**< data_signal */
 };
 
 ui_error_t ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar) {

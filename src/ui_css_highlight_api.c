@@ -5,15 +5,19 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @struct ui_css_highlight
+ * \brief ui_css_highlight
+ */
 struct ui_css_highlight {
-  enum ui_css_highlight_type type;
-  char *custom_name;
-  struct ui_css_highlight_range *ranges;
-  size_t range_count;
-  size_t range_capacity;
+  enum ui_css_highlight_type type;       /**< type */
+  char *custom_name;                     /**< custom_name */
+  struct ui_css_highlight_range *ranges; /**< ranges */
+  size_t range_count;                    /**< range_count */
+  size_t range_capacity;                 /**< range_capacity */
 };
 
-/**
+/*
  * @brief ui_css_highlight_create.
  * @param type Parameter type.
  * @param custom_name Parameter custom_name.
@@ -74,7 +78,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_css_highlight_add_range.
  * @param highlight Parameter highlight.
  * @param start_offset Parameter start_offset.
@@ -96,14 +100,15 @@ ui_error_t ui_css_highlight_add_range(struct ui_css_highlight *highlight,
     new_cap =
         highlight->range_capacity == 0 ? 4 : highlight->range_capacity * 2;
     new_ranges = (struct ui_css_highlight_range *)C_MULTIPLATFORM_MALLOC(
-        new_cap * sizeof(struct ui_css_highlight_range));
+        (size_t)new_cap * sizeof(struct ui_css_highlight_range));
     if (!new_ranges) {
       rc = UI_ERROR_OUT_OF_MEMORY;
       goto cleanup;
     }
     if (highlight->ranges) {
       memcpy(new_ranges, highlight->ranges,
-             highlight->range_count * sizeof(struct ui_css_highlight_range));
+             (size_t)highlight->range_count *
+                 sizeof(struct ui_css_highlight_range));
       C_MULTIPLATFORM_FREE(highlight->ranges);
     }
     highlight->ranges = new_ranges;
@@ -120,7 +125,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_css_highlight_destroy.
  * @param highlight Parameter highlight.
  * @return Return value.

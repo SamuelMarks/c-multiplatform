@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_radio_group_base.c
  * \brief Implementation of the UI Radio Group Base component.
  */
@@ -11,6 +11,7 @@
 /* clang-format on */
 
 /**
+ * @struct ui_radio_group_base
  * \brief Internal structure representing a radio group.
  */
 struct ui_radio_group_base {
@@ -30,7 +31,7 @@ struct ui_radio_group_base {
   int is_disabled;                               /**< Non-zero if disabled */
 };
 
-/**
+/*
  * \brief Triggers the CVA change callback.
  *
  * \param group The group.
@@ -47,7 +48,7 @@ static ui_error_t trigger_cva_change(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Triggers the CVA touched callback.
  *
  * \param group The group.
@@ -60,7 +61,7 @@ static ui_error_t trigger_cva_touched(struct ui_radio_group_base *group) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief CVA method to write a value.
  *
  * \param component The radio group component.
@@ -86,7 +87,7 @@ static ui_error_t radio_group_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief CVA method to register an on-change callback.
  *
  * \param component The radio group component.
@@ -106,7 +107,7 @@ static ui_error_t radio_group_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief CVA method to register an on-touched callback.
  *
  * \param component The radio group component.
@@ -124,7 +125,7 @@ static ui_error_t radio_group_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief CVA method to set the disabled state.
  *
  * \param component The radio group component.
@@ -148,7 +149,7 @@ static ui_error_t radio_group_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Callback invoked when a child toggle changes.
  *
  * \param toggle The toggle that changed.
@@ -197,7 +198,7 @@ static ui_error_t on_child_toggle_change(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new radio group manager.
  *
  * \param out_group Pointer to receive the allocated radio group.
@@ -242,7 +243,7 @@ ui_radio_group_base_create(struct ui_radio_group_base **out_group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a radio group manager.
  * Note: This does not destroy the individual ui_toggle_base components.
  *
@@ -266,7 +267,7 @@ ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds a toggle (radio button) to the group.
  *
  * \param group The radio group manager.
@@ -292,7 +293,7 @@ ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
       new_cap = 4;
     }
     new_arr = (struct ui_toggle_base **)C_MULTIPLATFORM_REALLOC(
-        group->toggles, new_cap * sizeof(struct ui_toggle_base *));
+        group->toggles, (size_t)new_cap * sizeof(struct ui_toggle_base *));
     if (!new_arr)
       return UI_ERROR_OUT_OF_MEMORY;
     group->toggles = new_arr;
@@ -313,7 +314,7 @@ ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Removes a toggle from the group.
  *
  * \param group The radio group manager.
@@ -352,7 +353,7 @@ ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Manually sets the active (checked) toggle in the group.
  * Unchecks all other toggles in this group.
  *
@@ -395,7 +396,7 @@ ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the currently active (checked) toggle in the group.
  *
  * \param group The radio group manager.
@@ -411,7 +412,7 @@ ui_radio_group_base_get_active(const struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the change handler for the radio group.
  *
  * \param group The radio group manager.
@@ -430,7 +431,7 @@ ui_radio_group_base_set_on_change(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an input event for keyboard routing (Arrow keys) to cycle
  * selection. Typically, this is called when the group container or an active
  * radio receives key events.

@@ -1,3 +1,6 @@
+/**
+ * @file ui_ring_buffer.h
+ */
 #ifndef UI_RING_BUFFER_H
 #define UI_RING_BUFFER_H
 

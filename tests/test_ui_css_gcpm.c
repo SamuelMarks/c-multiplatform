@@ -2,14 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "ui_css_gcpm.h"
-extern void *ui_mock_malloc(size_t size);
-extern void ui_mock_free(void *ptr);
+#include "ui_test_mock_mem.h"
 #include <stdlib.h>
 #include "ui_cssom.h"
-#include <stdlib.h>
 /* clang-format on */
-
-extern int g_malloc_fail_countdown;
 
 /* Since ui_cssom provides ui_css_computed_style_get_property, we just need to
  * populate the struct ourselves since there is no

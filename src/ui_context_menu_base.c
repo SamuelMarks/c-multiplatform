@@ -3,13 +3,18 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+/**
+ * @struct ui_context_menu_base
+ * \brief ui_context_menu_base
+ */
 struct ui_context_menu_base {
-  struct ui_menu_base *menu;
-  struct ui_signal *open_signal;
-  struct ui_computed *animating_signal;
+  struct ui_menu_base *menu;            /**< menu */
+  struct ui_signal *open_signal;        /**< open_signal */
+  struct ui_computed *animating_signal; /**< animating_signal */
 };
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
   struct ui_context_menu_base *ctx_menu;
   ui_error_t rc;
@@ -34,7 +39,7 @@ ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_context_menu_base_destroy.
  * @param menu Parameter menu.
  * @return Return value.
@@ -47,7 +52,7 @@ ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_context_menu_base_get_menu.
  * @param menu Parameter menu.
  * @param out_menu Parameter out_menu.
@@ -62,7 +67,7 @@ ui_error_t ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_context_menu_base_open_at.
  * @param menu Parameter menu.
  * @param director Parameter director.
@@ -106,7 +111,8 @@ ui_error_t ui_context_menu_base_open_at(struct ui_context_menu_base *menu,
   return ui_menu_base_open_at(menu->menu, director, clamped_x, clamped_y);
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
                                           struct ui_signal *open_signal) {
   if (!widget) {
@@ -116,7 +122,8 @@ ui_error_t ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_context_menu_base_get_animating_signal(struct ui_context_menu_base *widget,
                                           struct ui_computed **out_animating) {

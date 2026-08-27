@@ -8,7 +8,7 @@
 #include <stdio.h>
 /* clang-format on */
 
-/**
+/*
  * \file ui_snackbar_base.c
  * \brief Snackbar base component implementation.
  */
@@ -18,6 +18,7 @@
 #endif
 
 #if defined(_MSC_VER)
+/** @brief internal */
 #define SAFE_STRDUP(dest, src)                                                 \
   do {                                                                         \
     size_t len = strlen(src);                                                  \
@@ -27,6 +28,7 @@
     }                                                                          \
   } while (0)
 #else
+/** @brief internal */
 #define SAFE_STRDUP(dest, src)                                                 \
   do {                                                                         \
     size_t len = strlen(src);                                                  \
@@ -37,6 +39,7 @@
   } while (0)
 #endif
 
+/** @brief internal */
 #define MAX_SNACKBARS_IN_QUEUE 10
 
 static const char ui_snackbar_base_css[] = {
@@ -96,45 +99,47 @@ static const char ui_snackbar_base_css[] = {
     0};
 
 /**
+ * @struct internal_snackbar
  * \brief internal_snackbar structure.
  * \details Internal representation of a queued snackbar.
  */
 struct internal_snackbar {
-  char *message;
-  char *action_label;
-  ui_snackbar_action_cb action_callback;
-  void *action_user_data;
-  double duration_secs;
+  char *message;                         /**< message */
+  char *action_label;                    /**< action_label */
+  ui_snackbar_action_cb action_callback; /**< action_callback */
+  void *action_user_data;                /**< action_user_data */
+  double duration_secs;                  /**< duration_secs */
 };
 
 /**
+ * @struct ui_snackbar_base
  * \brief ui_snackbar_base structure.
  * \details Internal state for the snackbar base component.
  */
 struct ui_snackbar_base {
-  struct ui_timer *timer;
-  struct ui_overlay_director *director;
-  struct ui_ring_buffer *queue;
+  struct ui_timer *timer;               /**< timer */
+  struct ui_overlay_director *director; /**< director */
+  struct ui_ring_buffer *queue;         /**< queue */
 
   /* Component state */
-  struct ui_component *component;
-  struct ui_dom_node *root_node;
-  struct ui_dom_node *wrapper_node;
-  struct ui_dom_node *message_node;
-  struct ui_dom_node *message_text_node;
-  struct ui_dom_node *action_node;
-  struct ui_dom_node *action_text_node;
-  struct ui_overlay *overlay_handle;
+  struct ui_component *component;        /**< component */
+  struct ui_dom_node *root_node;         /**< root_node */
+  struct ui_dom_node *wrapper_node;      /**< wrapper_node */
+  struct ui_dom_node *message_node;      /**< message_node */
+  struct ui_dom_node *message_text_node; /**< message_text_node */
+  struct ui_dom_node *action_node;       /**< action_node */
+  struct ui_dom_node *action_text_node;  /**< action_text_node */
+  struct ui_overlay *overlay_handle;     /**< overlay_handle */
 
   /* Active snackbar state */
-  int is_active;
-  struct internal_snackbar current;
-  double show_time;
-  struct ui_signal *open_signal;
-  struct ui_computed *animating_signal;
+  int is_active;                        /**< is_active */
+  struct internal_snackbar current;     /**< current */
+  double show_time;                     /**< show_time */
+  struct ui_signal *open_signal;        /**< open_signal */
+  struct ui_computed *animating_signal; /**< animating_signal */
 };
 
-/**
+/*
  * \brief Creates a new snackbar base component.
  * \param timer The timer instance.
  * \param director The overlay director.
@@ -173,11 +178,19 @@ ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
+/** @cond */
 #define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
+/** @endcond */
+/** @cond */
 #define UI_DOM_APP_CHILD_IGNORE(p, c) ui_dom_node_append_child((p), (c))
+/** @endcond */
+/** @cond */
 #define UI_DOM_SET_TXT_IGNORE(n, t) ui_dom_node_set_text_content((n), (t))
+/** @endcond */
 
+/** @cond */
 #define UI_DOM_SET_TAG_IGNORE(n, t) ui_dom_node_set_tag_name((n), (t))
+  /** @endcond */
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sb->root_node);
   if (rc != UI_ERROR_NONE)
@@ -247,7 +260,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a snackbar base component.
  * \param snackbar The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -274,7 +287,9 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
   }
 
   while (1) {
+/** @cond */
 #define UI_RING_BUF_POP_IGNORE(q, i) ui_ring_buffer_pop((q), (i))
+    /** @endcond */
     ui_error_t pop_rc = UI_RING_BUF_POP_IGNORE(snackbar->queue, &pop_item);
     if (pop_rc != UI_ERROR_NONE) {
       break;
@@ -293,7 +308,7 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Enqueues a new snackbar message.
  * \param snackbar The snackbar component.
  * \param config The configuration for the message.
@@ -340,7 +355,7 @@ ui_error_t ui_snackbar_base_enqueue(struct ui_snackbar_base *snackbar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Dismisses the currently active snackbar message.
  * \param snackbar The snackbar component.
  * \return UI_ERROR_NONE on success.
@@ -352,7 +367,9 @@ ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar) {
   if (snackbar->is_active) {
     if (snackbar->overlay_handle) {
       ui_error_t unmount_rc;
+/** @cond */
 #define ui_overlay_director_unmount(d, o) ui_overlay_director_unmount((d), (o))
+      /** @endcond */
       unmount_rc = ui_overlay_director_unmount(snackbar->director,
                                                snackbar->overlay_handle);
       snackbar->overlay_handle = NULL;
@@ -371,7 +388,7 @@ ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Ticks the snackbar base component.
  * \param snackbar The component to tick.
  * \return UI_ERROR_NONE on success.
@@ -427,10 +444,9 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
 
       /* Mount to overlay director */
       if (!snackbar->overlay_handle) {
-#define UI_OVR_DIR_MNT_IGNORE(d, c, z, o)                                      \
-  ui_overlay_director_mount_component((d), (c), (z), (o))
-        (void)UI_OVR_DIR_MNT_IGNORE(snackbar->director, snackbar->component,
-                                    1000, &snackbar->overlay_handle);
+        (void)ui_overlay_director_mount_component(snackbar->director,
+                                                  snackbar->component, 1000,
+                                                  &snackbar->overlay_handle);
       }
     }
   }
@@ -438,7 +454,7 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an event.
  * \param snackbar The component.
  * \param event The event.
@@ -491,7 +507,7 @@ ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the open state to a signal.
  * \param widget The snackbar component.
  * \param open_signal The signal to bind.
@@ -506,7 +522,7 @@ ui_error_t ui_snackbar_base_bind_open(struct ui_snackbar_base *widget,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the animating signal.
  * \param widget The snackbar component.
  * \param out_animating Pointer to store the computed signal.

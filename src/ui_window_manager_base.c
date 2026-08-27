@@ -20,11 +20,12 @@ static const char *ui_window_manager_base_default_css =
 
 /**
  * @struct ui_window_manager_base
+ * @struct ui_window_manager_base
  * @brief Internal state for the window manager base component.
  */
 struct ui_window_manager_base {
-  struct ui_component *component;
-  struct ui_computed *data_signal;
+  struct ui_component *component;  /**< component */
+  struct ui_computed *data_signal; /**< data_signal */
 };
 
 ui_error_t ui_window_manager_base_create(

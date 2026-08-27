@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_range_slider_base.c
  * \brief Implementation of the UI Range Slider Base component.
  */
@@ -17,7 +17,7 @@
 /* MSVC Safe CRT */
 #endif
 
-/** \brief Default CSS stylesheet for the range slider */
+/* \brief Default CSS stylesheet for the range slider */
 static const char ui_range_slider_base_default_css[] = {
     46,  117, 105, 45,  114, 97,  110, 103, 101, 45,  115, 108, 105, 100, 101,
     114, 32,  123, 32,  112, 111, 115, 105, 116, 105, 111, 110, 58,  32,  114,
@@ -59,6 +59,7 @@ static const char ui_range_slider_base_default_css[] = {
     125, 0};
 
 /**
+ * @struct ui_range_slider_base
  * \brief Internal structure representing a range slider.
  */
 struct ui_range_slider_base {
@@ -76,7 +77,7 @@ struct ui_range_slider_base {
   void *user_data;                       /**< Callback user data */
 };
 
-/**
+/*
  * \brief Updates DOM attributes and styles for the slider.
  *
  * \param slider The component.
@@ -150,7 +151,7 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new unstyled range slider base component.
  *
  * \param out_slider Pointer to receive the allocated range slider base.
@@ -261,7 +262,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * \brief Destroys a range slider base component.
  *
  * \param slider The range slider to destroy.
@@ -276,7 +277,7 @@ ui_error_t ui_range_slider_base_destroy(struct ui_range_slider_base *slider) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the minimum value of the range slider.
  *
  * \param slider The range slider component.
@@ -298,7 +299,7 @@ ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the maximum value of the range slider.
  *
  * \param slider The range slider component.
@@ -320,7 +321,7 @@ ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the current values of the range slider.
  *
  * \param slider The range slider component.
@@ -375,7 +376,7 @@ ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the current values of the range slider.
  *
  * \param slider The range slider component.
@@ -393,7 +394,7 @@ ui_range_slider_base_get_values(const struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the step increment. If 0.0, the slider is continuous.
  *
  * \param slider The range slider component.
@@ -411,7 +412,7 @@ ui_error_t ui_range_slider_base_set_step(struct ui_range_slider_base *slider,
                                          slider->high_value);
 }
 
-/**
+/*
  * \brief Sets the disabled state of the range slider.
  *
  * \param slider The range slider component.
@@ -428,7 +429,7 @@ ui_range_slider_base_set_disabled(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the change handler for the range slider.
  *
  * \param slider The range slider component.
@@ -447,7 +448,7 @@ ui_range_slider_base_set_on_change(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an incoming input event to trigger slider interactions based
  * on normalized pointer position.
  *
@@ -495,7 +496,7 @@ ui_range_slider_base_set_normalized_value(struct ui_range_slider_base *slider,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an incoming input event (e.g., keyboard interactions like
  * Arrow Keys).
  *
@@ -518,7 +519,8 @@ ui_error_t ui_range_slider_base_process_event(
     float increment = slider->step > 0.0f
                           ? slider->step
                           : (slider->max_val - slider->min_val) * 0.1f;
-    enum ui_key_code key = event->event_data.keyboard.key_code;
+    enum ui_key_code key =
+        (enum ui_key_code)event->event_data.keyboard.key_code;
 
     if (increment == 0.0f)
       increment = 1.0f;
@@ -558,7 +560,7 @@ ui_error_t ui_range_slider_base_process_event(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the underlying component instance for style injection and DOM
  * mounting.
  *

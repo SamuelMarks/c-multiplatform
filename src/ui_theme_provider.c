@@ -5,7 +5,7 @@
 #include <string.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_theme_provider_create.
  * @param arena Parameter arena.
  * @param tokens Parameter tokens.
@@ -42,7 +42,7 @@ ui_error_t ui_theme_provider_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_theme_provider_mount.
  * @param provider Parameter provider.
  * @param node Parameter node.
@@ -65,7 +65,7 @@ ui_error_t ui_theme_provider_mount(struct ui_theme_provider *provider,
   return ui_dom_node_set_attribute(node, "__ui_theme_ptr", ptr_str);
 }
 
-/**
+/*
  * @brief ui_theme_provider_get.
  * @param node Parameter node.
  * @param out_tokens Parameter out_tokens.

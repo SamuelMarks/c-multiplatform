@@ -13,21 +13,25 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * \file ui_shader_manager.c
  * \brief Shader manager implementation.
  */
 
 #ifndef GL_VERTEX_SHADER
+/** @brief internal */
 #define GL_VERTEX_SHADER 0x8B31
 #endif
 #ifndef GL_FRAGMENT_SHADER
+/** @brief internal */
 #define GL_FRAGMENT_SHADER 0x8B30
 #endif
 #ifndef GL_COMPILE_STATUS
+/** @brief internal */
 #define GL_COMPILE_STATUS 0x8B81
 #endif
 #ifndef GL_LINK_STATUS
+/** @brief internal */
 #define GL_LINK_STATUS 0x8B82
 #endif
 
@@ -119,57 +123,113 @@ static ui_error_t mock_glUniform1f(int location, float v0) {
   return UI_ERROR_NONE;
 }
 
+/** @cond */
 #define UI_GL_CREATE_SHADER mock_glCreateShader
+/** @endcond */
+/** @cond */
 #define UI_GL_SHADER_SOURCE mock_glShaderSource
+/** @endcond */
+/** @cond */
 #define UI_GL_COMPILE_SHADER mock_glCompileShader
+/** @endcond */
+/** @cond */
 #define UI_GL_GET_SHADERIV mock_glGetShaderiv
+/** @endcond */
+/** @cond */
 #define UI_GL_CREATE_PROGRAM mock_glCreateProgram
+/** @endcond */
+/** @cond */
 #define UI_GL_ATTACH_SHADER mock_glAttachShader
+/** @endcond */
+/** @cond */
 #define UI_GL_LINK_PROGRAM mock_glLinkProgram
+/** @endcond */
+/** @cond */
 #define UI_GL_GET_PROGRAMIV mock_glGetProgramiv
+/** @endcond */
+/** @cond */
 #define UI_GL_DELETE_SHADER mock_glDeleteShader
+/** @endcond */
+/** @cond */
 #define UI_GL_DELETE_PROGRAM mock_glDeleteProgram
+/** @endcond */
+/** @cond */
 #define UI_GL_GET_UNIFORM_LOCATION mock_glGetUniformLocation
+/** @endcond */
+/** @cond */
 #define UI_GL_UNIFORM_MATRIX4FV mock_glUniformMatrix4fv
+/** @endcond */
+/** @cond */
 #define UI_GL_UNIFORM4F mock_glUniform4f
+/** @endcond */
+/** @cond */
 #define UI_GL_UNIFORM1F mock_glUniform1f
+/** @endcond */
 #else
 /* Assume standard GLES2 headers are available (e.g. Linux, Emscripten) */
 #define UI_GL_CREATE_SHADER glCreateShader
+/** @cond */
 #define UI_GL_SHADER_SOURCE glShaderSource
+/** @endcond */
+/** @cond */
 #define UI_GL_COMPILE_SHADER glCompileShader
+/** @endcond */
+/** @cond */
 #define UI_GL_GET_SHADERIV glGetShaderiv
+/** @endcond */
+/** @cond */
 #define UI_GL_CREATE_PROGRAM glCreateProgram
+/** @endcond */
+/** @cond */
 #define UI_GL_ATTACH_SHADER glAttachShader
+/** @endcond */
+/** @cond */
 #define UI_GL_LINK_PROGRAM glLinkProgram
+/** @endcond */
+/** @cond */
 #define UI_GL_GET_PROGRAMIV glGetProgramiv
+/** @endcond */
+/** @cond */
 #define UI_GL_DELETE_SHADER glDeleteShader
+/** @endcond */
+/** @cond */
 #define UI_GL_DELETE_PROGRAM glDeleteProgram
+/** @endcond */
+/** @cond */
 #define UI_GL_GET_UNIFORM_LOCATION glGetUniformLocation
+/** @endcond */
+/** @cond */
 #define UI_GL_UNIFORM_MATRIX4FV glUniformMatrix4fv
+/** @endcond */
+/** @cond */
 #define UI_GL_UNIFORM4F glUniform4f
+/** @endcond */
+/** @cond */
 #define UI_GL_UNIFORM1F glUniform1f
+/** @endcond */
 #endif
 
 /**
+ * @struct ui_shader_entry
  * \brief ui_shader_entry structure.
  * \details Internal state for a cached shader.
  */
 struct ui_shader_entry {
-  char name[64];
-  unsigned int program_id;
-  struct ui_shader_entry *next;
+  char name[64];                /**< name */
+  unsigned int program_id;      /**< program_id */
+  struct ui_shader_entry *next; /**< next */
 };
 
 /**
+ * @struct ui_shader_manager
  * \brief ui_shader_manager structure.
  * \details Internal state for the shader manager.
  */
 struct ui_shader_manager {
-  struct ui_shader_entry *head;
+  struct ui_shader_entry *head; /**< head */
 };
 
-/**
+/*
  * \brief Creates a new shader manager.
  * \param out_manager Pointer to store the manager.
  * \return UI_ERROR_NONE on success.
@@ -193,7 +253,7 @@ ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a shader manager.
  * \param manager The manager to destroy.
  * \return UI_ERROR_NONE on success.
@@ -218,7 +278,7 @@ ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets or compiles a shader program.
  * \param manager The shader manager.
  * \param name The name of the shader.
@@ -310,7 +370,7 @@ ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets a uniform matrix for a shader.
  * \param manager The shader manager.
  * \param program_id The program ID.
@@ -331,7 +391,7 @@ ui_error_t ui_shader_manager_set_uniform_matrix(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets a uniform color for a shader.
  * \param manager The shader manager.
  * \param program_id The program ID.
@@ -355,7 +415,7 @@ ui_error_t ui_shader_manager_set_uniform_color(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets a uniform float for a shader.
  * \param manager The shader manager.
  * \param program_id The program ID.

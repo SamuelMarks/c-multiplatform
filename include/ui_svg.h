@@ -62,12 +62,12 @@ struct ui_svg_command {
     struct {
       /** @brief Destination point. */
       struct ui_svg_point p;
-    } move_to;
+    } move_to; /**< Data for move_to. */
     /** @brief Data for line_to. */
     struct {
       /** @brief Destination point. */
       struct ui_svg_point p;
-    } line_to;
+    } line_to; /**< Data for line_to. */
     /** @brief Data for cubic_bezier. */
     struct {
       /** @brief Control point 1. */
@@ -76,14 +76,14 @@ struct ui_svg_command {
       struct ui_svg_point cp2;
       /** @brief Destination point. */
       struct ui_svg_point p;
-    } cubic_bezier;
+    } cubic_bezier; /**< Data for cubic bezier. */
     /** @brief Data for quadratic_bezier. */
     struct {
       /** @brief Control point. */
       struct ui_svg_point cp;
       /** @brief Destination point. */
       struct ui_svg_point p;
-    } quadratic_bezier;
+    } quadratic_bezier; /**< Data for quadratic bezier. */
     /** @brief Data for arc. */
     struct {
       /** @brief X radius. */
@@ -98,8 +98,8 @@ struct ui_svg_command {
       ui_uint8 sweep_flag;
       /** @brief Destination point. */
       struct ui_svg_point p;
-    } arc;
-  } data;
+    } arc; /**< Data for arc. */
+  } data;  /**< The union data. */
 };
 
 /**

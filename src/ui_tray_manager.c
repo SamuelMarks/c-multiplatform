@@ -11,11 +11,17 @@
 #if defined(_WIN32)
 #ifndef UI_WINAPI
 #if defined(_MSC_VER)
+/** @cond */
 #define UI_WINAPI __stdcall
+/** @endcond */
 #elif defined(__GNUC__)
+/** @cond */
 #define UI_WINAPI __attribute__((stdcall))
+/** @endcond */
 #else
+/** @cond */
 #define UI_WINAPI
+/** @endcond */
 #endif
 #endif
 #endif
@@ -23,17 +29,18 @@
 
 /**
  * @struct ui_tray_manager
+ * @struct ui_tray_manager
  * @brief Internal state for the system tray / app indicator instance.
  */
 struct ui_tray_manager {
-  struct ui_image_base *icon;
-  char tooltip[256];
-  struct ui_menu_base *menu;
-  int is_visible;
+  struct ui_image_base *icon; /**< icon */
+  char tooltip[256];          /**< tooltip */
+  struct ui_menu_base *menu;  /**< menu */
+  int is_visible;             /**< is_visible */
 
   /* Platform specific handles would go here */
 #if defined(_WIN32)
-  void *notify_icon_data;
+  void *notify_icon_data; /**< notify_icon_data */
 #endif
 };
 

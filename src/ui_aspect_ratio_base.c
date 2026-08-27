@@ -22,7 +22,9 @@ mock_component_set_default_style(struct ui_component *component,
   return (ui_component_set_default_style)(component, style);
 }
 #undef ui_component_set_default_style
+/** @cond */
 #define ui_component_set_default_style mock_component_set_default_style
+/** @endcond */
 
 ui_error_t run_aspect_ratio_coverage(void);
 ui_error_t run_aspect_ratio_coverage(void) {
@@ -53,6 +55,7 @@ static const char *ui_aspect_ratio_base_default_css =
     "}";
 
 /**
+ * @struct ui_aspect_ratio_base
  * @struct ui_aspect_ratio_base
  * @brief Internal representation of an aspect ratio container.
  */
@@ -144,7 +147,7 @@ ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio) {
 ui_error_t
 ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
                                float ratio) {
-  char buffer[64];
+  char buffer[64]; /**< buffer */
   float padding_bottom;
   ui_error_t rc;
 

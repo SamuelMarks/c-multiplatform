@@ -1,3 +1,6 @@
+/**
+ * @file ui_scroll_dispatcher.h
+ */
 #ifndef UI_SCROLL_DISPATCHER_H
 #define UI_SCROLL_DISPATCHER_H
 

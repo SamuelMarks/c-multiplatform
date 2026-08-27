@@ -29,7 +29,9 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
   return (ui_dom_node_append_child)(parent, child);
 }
 #undef ui_dom_node_append_child
+/** @cond */
 #define ui_dom_node_append_child mock_dom_node_append_child
+/** @endcond */
 
 static ui_error_t mock_css_parse_stylesheet(const char *css,
                                             struct ui_css_stylesheet **out) {
@@ -42,7 +44,9 @@ static ui_error_t mock_css_parse_stylesheet(const char *css,
   return (ui_css_parse_stylesheet)(css, out);
 }
 #undef ui_css_parse_stylesheet
+/** @cond */
 #define ui_css_parse_stylesheet mock_css_parse_stylesheet
+/** @endcond */
 
 static ui_error_t
 mock_component_set_default_style(struct ui_component *component,
@@ -56,7 +60,9 @@ mock_component_set_default_style(struct ui_component *component,
   return (ui_component_set_default_style)(component, stylesheet);
 }
 #undef ui_component_set_default_style
+/** @cond */
 #define ui_component_set_default_style mock_component_set_default_style
+/** @endcond */
 
 static ui_error_t
 mock_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
@@ -70,7 +76,9 @@ mock_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
   return (ui_virtual_scroll_base_render)(vs, scroll_offset);
 }
 #undef ui_virtual_scroll_base_render
+/** @cond */
 #define ui_virtual_scroll_base_render mock_virtual_scroll_base_render
+/** @endcond */
 
 #endif
 
@@ -86,6 +94,7 @@ static const char ui_carousel_base_css[] =
     "}";
 
 /**
+ * @struct ui_carousel_base
  * @struct ui_carousel_base
  * @brief Internal representation of a carousel base component.
  */

@@ -6,6 +6,7 @@
 #include <ctype.h>
 /* clang-format on */
 
+/** @brief internal */
 enum ui_css_token_type {
   TOKEN_EOF,
   TOKEN_IDENT,
@@ -32,28 +33,34 @@ enum ui_css_token_type {
   TOKEN_ERROR
 };
 
-/** \brief ui_css_token */
+/**
+ * @struct ui_css_token
+ * \brief ui_css_token
+ */
 struct ui_css_token {
-  enum ui_css_token_type type;
-  const char *start;
-  size_t length;
-};
-
-/** \brief ui_css_tokenizer */
-struct ui_css_tokenizer {
-  const char *text;
-  size_t pos;
-  size_t len;
+  enum ui_css_token_type type; /**< type */
+  const char *start;           /**< start */
+  size_t length;               /**< length */
 };
 
 /**
+ * @struct ui_css_tokenizer
+ * \brief ui_css_tokenizer
+ */
+struct ui_css_tokenizer {
+  const char *text; /**< text */
+  size_t pos;       /**< pos */
+  size_t len;       /**< len */
+};
+
+/*
  * @brief advance.
  * @param tz Parameter tz.
  * @return Return value.
  */
 static void advance(struct ui_css_tokenizer *tz) { tz->pos++; }
 
-/**
+/*
  * @brief peek.
  * @param tz Parameter tz.
  * @param out_char Parameter out_char.
@@ -63,7 +70,7 @@ static void peek(struct ui_css_tokenizer *tz, char *out_char) {
   *out_char = tz->text[tz->pos];
 }
 
-/**
+/*
  * @brief is_ident_start.
  * @param c Parameter c.
  * @param out_is_start Parameter out_is_start.
@@ -73,7 +80,7 @@ static void is_ident_start(char c, int *out_is_start) {
   *out_is_start = isalpha((unsigned char)c) || c == '_' || c == '-';
 }
 
-/**
+/*
  * @brief is_ident_char.
  * @param c Parameter c.
  * @param out_is_char Parameter out_is_char.
@@ -83,7 +90,7 @@ static void is_ident_char(char c, int *out_is_char) {
   *out_is_char = isalnum((unsigned char)c) || c == '_' || c == '-';
 }
 
-/**
+/*
  * @brief skip_whitespace_and_comments.
  * @param tz Parameter tz.
  * @return Return value.
@@ -113,7 +120,7 @@ static void skip_whitespace_and_comments(struct ui_css_tokenizer *tz) {
   }
 }
 
-/**
+/*
  * @brief next_token.
  * @param tz Parameter tz.
  * @param out_token Parameter out_token.
@@ -361,7 +368,7 @@ static void next_token(struct ui_css_tokenizer *tz,
   }
 }
 
-/**
+/*
  * @brief dup_token_str.
  * @param t Parameter t.
  * @param out_str Parameter out_str.
@@ -379,7 +386,7 @@ static ui_error_t dup_token_str(const struct ui_css_token *t, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief dup_range_trim.
  * @param start Parameter start.
  * @param end Parameter end.
@@ -411,7 +418,7 @@ static ui_error_t dup_range_trim(const char *start, const char *end,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief parse_selectors.
  * @param tz Parameter tz.
  * @param inout_token Parameter inout_token.
@@ -669,7 +676,7 @@ cleanup: {
   return rc;
 }
 
-/**
+/*
  * @brief is_nested_rule.
  * @param tz Parameter tz.
  * @param first_token Parameter first_token.
@@ -710,7 +717,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                                   struct ui_css_stylesheet *sheet,
                                   struct ui_css_rule **out_rules);
 
-/**
+/*
  * @brief parse_rule_list.
  * @param tz Parameter tz.
  * @param inout_token Parameter inout_token.
@@ -1386,7 +1393,8 @@ cleanup: {
   return rc;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_css_parse_stylesheet(const char *css_text,
                                    struct ui_css_stylesheet **out_stylesheet) {
   struct ui_css_tokenizer tz;

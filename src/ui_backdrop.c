@@ -1,7 +1,6 @@
 /**
  * @file ui_backdrop.c
  * @brief Implementation of the backdrop component.
- * @ingroup ui_backdrop
  */
 
 /* clang-format off */
@@ -14,7 +13,7 @@
 int g_backdrop_mock_fail = 0;
 
 ui_error_t run_backdrop_coverage(void);
-/**
+/*
  * @brief run_backdrop_coverage.
  * @return Return value.
  */
@@ -41,6 +40,7 @@ ui_error_t run_backdrop_coverage(void) {
 
 /**
  * @struct ui_backdrop
+ * @struct ui_backdrop
  * @brief Internal representation of a backdrop component.
  */
 struct ui_backdrop {
@@ -48,7 +48,7 @@ struct ui_backdrop {
   int pointer_down_was_outside; /**< State tracking for pointer events */
 };
 
-/**
+/*
  * @brief ui_backdrop_create.
  * @param out_backdrop Parameter out_backdrop.
  * @return Return value.
@@ -72,7 +72,7 @@ ui_error_t ui_backdrop_create(struct ui_backdrop **out_backdrop) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_backdrop_destroy.
  * @param backdrop Parameter backdrop.
  * @return Return value.
@@ -86,7 +86,7 @@ ui_error_t ui_backdrop_destroy(struct ui_backdrop *backdrop) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief is_point_outside.
  * @param x Parameter x.
  * @param y Parameter y.
@@ -114,7 +114,7 @@ static ui_error_t is_point_outside(float x, float y, float cx, float cy,
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
-/**
+/*
  * @brief mock_is_point_outside.
  * @param x Parameter x.
  * @param y Parameter y.
@@ -132,10 +132,11 @@ static ui_error_t mock_is_point_outside(float x, float y, float cx, float cy,
   return (is_point_outside)(x, y, cx, cy, cw, ch, out_is);
 }
 #undef is_point_outside
+/** @brief internal */
 #define is_point_outside mock_is_point_outside
 #endif
 
-/**
+/*
  * @brief ui_backdrop_set_active.
  * @param backdrop Parameter backdrop.
  * @param is_active Parameter is_active.
@@ -149,7 +150,7 @@ ui_error_t ui_backdrop_set_active(struct ui_backdrop *backdrop, int is_active) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_backdrop_process_event.
  * @param backdrop Parameter backdrop.
  * @param event Parameter event.

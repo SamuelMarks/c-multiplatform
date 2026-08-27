@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_pool.c
  * \brief Implementation of fixed-size block memory pooling.
  */
@@ -10,6 +10,7 @@
 /* clang-format on */
 
 /**
+ * @struct ui_pool_chunk
  * @brief Represents a single chunk of memory in the pool.
  */
 struct ui_pool_chunk {
@@ -18,13 +19,15 @@ struct ui_pool_chunk {
 };
 
 /**
+ * @struct ui_pool_free_node
  * @brief Represents a node in the free list.
  */
 struct ui_pool_free_node {
-  struct ui_pool_free_node *next;
+  struct ui_pool_free_node *next; /**< next */
 };
 
 /**
+ * @struct ui_pool
  * @brief Main pool structure.
  */
 struct ui_pool {
@@ -36,7 +39,7 @@ struct ui_pool {
   size_t free_count;                   /**< Number of free elements */
 };
 
-/**
+/*
  * @brief Allocates a new chunk of memory for the pool and populates the free
  * list.
  *
@@ -75,7 +78,7 @@ static ui_error_t allocate_chunk(struct ui_pool *pool) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new memory pool.
  * \param[in] element_size The size in bytes of each element.
  * \param[in] chunk_capacity The number of elements allocated per chunk.
@@ -117,7 +120,7 @@ ui_error_t ui_pool_create(size_t element_size, size_t chunk_capacity,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a memory pool and frees all its chunks.
  * \param[in,out] pool The pool to destroy.
  * \return UI_ERROR_NONE on success.
@@ -141,7 +144,7 @@ ui_error_t ui_pool_destroy(struct ui_pool *pool) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Allocates an element from the pool.
  * \param[in,out] pool The pool.
  * \param[out] out_ptr Pointer to store the allocated element address.
@@ -168,7 +171,7 @@ ui_error_t ui_pool_alloc(struct ui_pool *pool, void **out_ptr) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Frees an element back to the pool.
  * \param[in,out] pool The pool.
  * \param[in] ptr The pointer to free.
@@ -189,7 +192,7 @@ ui_error_t ui_pool_free(struct ui_pool *pool, void *ptr) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves current metrics for the memory pool.
  * \param[in] pool The pool.
  * \param[out] out_free_count Pointer to store the number of currently free

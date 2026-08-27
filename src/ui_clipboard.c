@@ -26,8 +26,12 @@ __declspec(dllimport) void *__stdcall GlobalLock(void *);
 __declspec(dllimport) int __stdcall GlobalUnlock(void *);
 __declspec(dllimport) void *__stdcall GlobalFree(void *);
 
+/** @cond */
 #define UI_CF_TEXT 1
+/** @endcond */
+/** @cond */
 #define UI_GMEM_MOVEABLE 0x0002
+/** @endcond */
 
 #else
 #endif
@@ -42,17 +46,23 @@ extern int (*g_mock_system_fn)(const char *);
 extern FILE *(*g_mock_popen_fn)(const char *, const char *);
 extern int (*g_mock_pclose_fn)(FILE *);
 
+/** @brief internal */
 #define SYSTEM_CMD(cmd) (g_mock_system_fn(cmd))
+/** @brief internal */
 #define POPEN_CMD(cmd, mode) (g_mock_popen_fn(cmd, mode))
+/** @brief internal */
 #define PCLOSE_CMD(stream) (g_mock_pclose_fn(stream))
 
 #else
+/** @brief internal */
 #define SYSTEM_CMD(cmd) system(cmd)
+/** @brief internal */
 #define POPEN_CMD(cmd, mode) popen(cmd, mode)
+/** @brief internal */
 #define PCLOSE_CMD(stream) pclose(stream)
 #endif
 
-/**
+/*
  * @brief ui_clipboard_set_text.
  * @param text Parameter text.
  * @return Return value.
@@ -144,7 +154,7 @@ fallback:
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_clipboard_get_text.
  * @param out_text Parameter out_text.
  * @return Return value.
@@ -189,7 +199,7 @@ ui_error_t ui_clipboard_get_text(char **out_text) {
   {
     FILE *p = POPEN_CMD("pbpaste", "r");
     if (p) {
-      char buffer[1024];
+      char buffer[1024]; /**< buffer */
       size_t total = 0;
       size_t cap = 1024;
       char *text = (char *)C_MULTIPLATFORM_MALLOC(cap);
@@ -234,7 +244,7 @@ ui_error_t ui_clipboard_get_text(char **out_text) {
       p = POPEN_CMD("xsel --clipboard --output", "r");
     }
     if (p) {
-      char buffer[1024];
+      char buffer[1024]; /**< buffer */
       size_t total = 0;
       size_t cap = 1024;
       char *text = (char *)C_MULTIPLATFORM_MALLOC(cap);
@@ -289,7 +299,7 @@ fallback:
   return UI_ERROR_UNSUPPORTED;
 }
 
-/**
+/*
  * @brief ui_clipboard_free_text.
  * @param text Parameter text.
  * @return Return value.
@@ -301,7 +311,7 @@ ui_error_t ui_clipboard_free_text(char *text) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_clipboard_cleanup.
  * @return Return value.
  */

@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_e2e_headless.c
  * \brief Headless E2E backend implementation.
  */
@@ -20,29 +20,30 @@ EM_JS(void, ui_e2e_screenshot_js, (ui_uint32 node_id), {
 #endif
 #include "ui_internal_mem.h"
 
-/** \def UI_HEADLESS_MAX_EVENTS
+/* \def UI_HEADLESS_MAX_EVENTS
  *  \brief Maximum number of headless events.
  */
 #define UI_HEADLESS_MAX_EVENTS 256
 
 /**
+ * @struct ui_e2e_headless_ctx
  * \struct ui_e2e_headless_ctx
  * \brief Context for the headless E2E testing backend.
  */
 struct ui_e2e_headless_ctx {
-  struct ui_window_backend backend;
-  struct ui_window *dummy_window;
+  struct ui_window_backend backend; /**< backend */
+  struct ui_window *dummy_window;   /**< dummy_window */
 
-  int width;
-  int height;
-  int is_visible;
+  int width;      /**< width */
+  int height;     /**< height */
+  int is_visible; /**< is_visible */
 
-  struct ui_event event_queue[UI_HEADLESS_MAX_EVENTS];
-  int event_head;
-  int event_tail;
+  struct ui_event event_queue[UI_HEADLESS_MAX_EVENTS]; /**< event_queue */
+  int event_head;                                      /**< event_head */
+  int event_tail;                                      /**< event_tail */
 };
 
-/**
+/*
  * \brief Creates a dummy headless window.
  * \param[in,out] backend The window backend context.
  * \param[in] title The window title.
@@ -68,7 +69,7 @@ static ui_error_t headless_create_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a dummy headless window.
  * \param[in,out] backend The window backend context.
  * \param[in,out] window The dummy window to destroy.
@@ -81,7 +82,7 @@ static ui_error_t headless_destroy_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Shows a dummy headless window.
  * \param[in,out] backend The window backend context.
  * \param[in,out] window The dummy window to show.
@@ -99,7 +100,7 @@ static ui_error_t headless_show_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Hides a dummy headless window.
  * \param[in,out] backend The window backend context.
  * \param[in,out] window The dummy window to hide.
@@ -117,7 +118,7 @@ static ui_error_t headless_hide_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Polls events from the headless queue.
  * \param[in,out] backend The window backend context.
  * \param[in,out] window The dummy window context.
@@ -148,7 +149,7 @@ static ui_error_t headless_poll_events(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Swaps buffers for a dummy headless window (no-op).
  * \param[in,out] backend The window backend context.
  * \param[in,out] window The dummy window context.
@@ -162,7 +163,7 @@ static ui_error_t headless_swap_buffers(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Pushes a deep link event to the headless queue.
  * \param[in,out] backend The window backend context.
  * \param[in] uri The URI to push.
@@ -197,7 +198,7 @@ static ui_error_t headless_push_deep_link(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new headless E2E context.
  * \param[in] width The initial width.
  * \param[in] height The initial height.
@@ -233,7 +234,7 @@ ui_error_t ui_e2e_headless_create(int width, int height,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a headless E2E context.
  * \param[in,out] ctx The context to destroy.
  * \return UI_ERROR_NONE on success.
@@ -246,7 +247,7 @@ ui_error_t ui_e2e_headless_destroy(struct ui_e2e_headless_ctx *ctx) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the window backend from a headless context.
  * \param[in,out] ctx The headless context.
  * \param[out] out_backend Pointer to store the window backend.
@@ -264,7 +265,7 @@ ui_error_t ui_e2e_headless_get_backend(struct ui_e2e_headless_ctx *ctx,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Pushes an event into the headless event queue.
  * \param[in,out] ctx The headless context.
  * \param[in] event The event to push.
@@ -289,7 +290,7 @@ ui_error_t ui_e2e_headless_push_event(struct ui_e2e_headless_ctx *ctx,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Simulates a mouse click in the headless context.
  * \param[in,out] ctx The headless context.
  * \param[in] x The X coordinate.
@@ -323,7 +324,7 @@ ui_error_t ui_e2e_headless_click(struct ui_e2e_headless_ctx *ctx, int x,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Simulates key typing in the headless context.
  * \param[in,out] ctx The headless context.
  * \param[in] key_code The key code to type.
@@ -356,7 +357,7 @@ ui_error_t ui_e2e_headless_type_key(struct ui_e2e_headless_ctx *ctx,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Advances the mock time for the headless context.
  * \param[in,out] ctx The headless context.
  * \param[in] delta_ms The time delta in milliseconds.

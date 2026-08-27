@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_form_control.c
  * \brief Implementation of individual form controls.
  */
@@ -11,56 +11,58 @@
 /* clang-format on */
 
 /**
+ * @struct ui_form_control_async_task
  * \struct ui_form_control_async_task
  * \brief Context for an asynchronous validation task.
  */
 struct ui_form_control_async_task {
-  ui_form_control_t *control;
-  ui_async_validator_fn validator;
-  void *user_data;
-  ui_int32 generation;
-  struct ui_reactor *reactor;
-  union ui_signal_payload value;
-  ui_bool_t is_valid;
+  ui_form_control_t *control;      /**< control */
+  ui_async_validator_fn validator; /**< validator */
+  void *user_data;                 /**< user_data */
+  ui_int32 generation;             /**< generation */
+  struct ui_reactor *reactor;      /**< reactor */
+  union ui_signal_payload value;   /**< value */
+  ui_bool_t is_valid;              /**< is_valid */
 };
 
 /**
+ * @struct ui_form_control
  * \struct ui_form_control
  * \brief Represents an individual UI form control and its state.
  */
 struct ui_form_control {
-  struct ui_arena *arena;
-  ui_signal_t *value_signal;
-  ui_signal_t *status_signal;
-  ui_signal_t *touched_signal;
-  ui_signal_t *dirty_signal;
-  ui_signal_t *errors_signal;
-  char *error_str;
+  struct ui_arena *arena;      /**< arena */
+  ui_signal_t *value_signal;   /**< value_signal */
+  ui_signal_t *status_signal;  /**< status_signal */
+  ui_signal_t *touched_signal; /**< touched_signal */
+  ui_signal_t *dirty_signal;   /**< dirty_signal */
+  ui_signal_t *errors_signal;  /**< errors_signal */
+  char *error_str;             /**< error_str */
 
-  ui_validator_t *sync_validators;
-  size_t sync_validators_count;
-  size_t sync_validators_capacity;
+  ui_validator_t *sync_validators; /**< sync_validators */
+  size_t sync_validators_count;    /**< sync_validators_count */
+  size_t sync_validators_capacity; /**< sync_validators_capacity */
 
-  ui_async_validator_t *async_validators;
-  size_t async_validators_count;
-  size_t async_validators_capacity;
+  ui_async_validator_t *async_validators; /**< async_validators */
+  size_t async_validators_count;          /**< async_validators_count */
+  size_t async_validators_capacity;       /**< async_validators_capacity */
 
-  struct ui_thread_pool *thread_pool;
-  struct ui_reactor *reactor;
+  struct ui_thread_pool *thread_pool; /**< thread_pool */
+  struct ui_reactor *reactor;         /**< reactor */
 
-  ui_int32 validation_generation;
-  size_t pending_async_count;
+  ui_int32 validation_generation; /**< validation_generation */
+  size_t pending_async_count;     /**< pending_async_count */
 };
 
 /* Forward declarations */
-/**
+/*
  * \brief Runs all validators (sync and async) for a form control.
  * \param[in,out] control The form control.
  * \return UI_ERROR_NONE on success.
  */
 static ui_error_t ui_form_control_run_validation(ui_form_control_t *control);
 
-/**
+/*
  * \brief Creates a new form control.
  * \param[in,out] arena The memory arena.
  * \param[in] initial_value The initial value payload.
@@ -154,7 +156,7 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds a synchronous validator to a form control.
  * \param[in,out] control The form control.
  * \param[in] validator The validator function.
@@ -177,8 +179,9 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
                   : control->sync_validators_capacity * 2;
     /* Use arena or malloc? Arena is bounded per-form but no realloc.
        For long-lived, we can just alloc from arena. */
-    alloc_rc = ui_arena_alloc(control->arena, new_cap * sizeof(ui_validator_t),
-                              8, (void **)&new_validators);
+    alloc_rc =
+        ui_arena_alloc(control->arena, (size_t)new_cap * sizeof(ui_validator_t),
+                       8, (void **)&new_validators);
     if (alloc_rc != UI_ERROR_NONE)
       return UI_ERROR_OUT_OF_MEMORY;
 
@@ -202,7 +205,7 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Adds an asynchronous validator to a form control.
  * \param[in,out] control The form control.
  * \param[in] validator The async validator function.
@@ -230,9 +233,9 @@ ui_error_t ui_form_control_add_async_validator(
     new_cap = control->async_validators_capacity == 0
                   ? 4
                   : control->async_validators_capacity * 2;
-    alloc_rc =
-        ui_arena_alloc(control->arena, new_cap * sizeof(ui_async_validator_t),
-                       8, (void **)&new_validators);
+    alloc_rc = ui_arena_alloc(control->arena,
+                              (size_t)new_cap * sizeof(ui_async_validator_t), 8,
+                              (void **)&new_validators);
     if (alloc_rc != UI_ERROR_NONE)
       return UI_ERROR_OUT_OF_MEMORY;
 
@@ -256,7 +259,7 @@ ui_error_t ui_form_control_add_async_validator(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Callback triggered when an async validation task completes.
  * \param[in,out] user_data Pointer to the task context.
  * \return UI_ERROR_NONE on success.
@@ -321,7 +324,7 @@ static ui_error_t ui_form_control_async_worker(void *user_data) {
   }
 }
 
-/**
+/*
  * \brief Runs all validators (sync and async) for a form control.
  * \param[in,out] control The form control.
  * \return UI_ERROR_NONE on success.
@@ -435,7 +438,7 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the value of a form control, marking it dirty and re-validating.
  * \param[in,out] control The form control.
  * \param[in] value The new value payload.
@@ -495,13 +498,13 @@ ui_error_t ui_form_control_enable(ui_form_control_t *control) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the current value of a form control.
  * \param[in] control The form control.
  * \param[out] out_value Pointer to store the value payload.
  * \return UI_ERROR_NONE on success.
  */
-/**
+/*
  * \brief Gets the signal representing the control's value.
  * \param[in] control The form control.
  * \param[out] out_signal Pointer to store the signal.
@@ -516,13 +519,13 @@ ui_error_t ui_form_control_get_value_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the validation status of a form control.
  * \param[in] control The form control.
  * \param[out] out_status Pointer to store the status.
  * \return UI_ERROR_NONE on success.
  */
-/**
+/*
  * \brief Gets the signal representing the control's validation status.
  * \param[in] control The form control.
  * \param[out] out_signal Pointer to store the signal.
@@ -537,7 +540,7 @@ ui_error_t ui_form_control_get_status_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the signal representing whether the control is touched.
  * \param[in] control The form control.
  * \param[out] out_signal Pointer to store the signal.
@@ -552,7 +555,7 @@ ui_error_t ui_form_control_get_touched_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the signal representing whether the control is dirty.
  * \param[in] control The form control.
  * \param[out] out_signal Pointer to store the signal.
@@ -567,7 +570,7 @@ ui_error_t ui_form_control_get_dirty_signal(ui_form_control_t *control,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a form control.
  * \param[in,out] control The form control to destroy.
  * \return UI_ERROR_NONE on success.
@@ -589,14 +592,14 @@ ui_error_t ui_form_control_destroy(ui_form_control_t *control) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the current error string for a form control.
  * \param[in] control The form control.
  * \param[out] out_error_str Pointer to store the error string, or NULL if
  * valid.
  * \return UI_ERROR_NONE on success.
  */
-/**
+/*
  * \brief Gets the signal representing the control's current error string.
  * \param[in] control The form control.
  * \param[out] out_signal Pointer to store the signal.

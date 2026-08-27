@@ -22,7 +22,9 @@ static ui_error_t mock_promise_resolve(struct ui_promise *promise,
   return (ui_promise_resolve)(promise, value);
 }
 #undef ui_promise_resolve
+/** @cond */
 #define ui_promise_resolve mock_promise_resolve
+/** @endcond */
 
 static ui_error_t mock_promise_reject(struct ui_promise *promise,
                                       ui_error_t error) {
@@ -32,7 +34,9 @@ static ui_error_t mock_promise_reject(struct ui_promise *promise,
   return (ui_promise_reject)(promise, error);
 }
 #undef ui_promise_reject
+/** @cond */
 #define ui_promise_reject mock_promise_reject
+/** @endcond */
 
 #include "ui_thread_pool.h"
 static ui_error_t mock_thread_pool_schedule(struct ui_thread_pool *pool,
@@ -44,21 +48,33 @@ static ui_error_t mock_thread_pool_schedule(struct ui_thread_pool *pool,
   return (ui_thread_pool_schedule)(pool, task, user_data);
 }
 #undef ui_thread_pool_schedule
+/** @cond */
 #define ui_thread_pool_schedule mock_thread_pool_schedule
+/** @endcond */
 #endif
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_mock_io_fail;
+/** @cond */
 #define UI_FSEEK(f, o, w) (g_mock_io_fail == 1 ? -1 : fseek(f, o, w))
+/** @endcond */
 #define UI_FTELL(f)                                                            \
   (g_mock_io_fail == 2                                                         \
        ? -1                                                                    \
        : (g_mock_io_fail == 5 ? (long)(256 * 1024 * 1024) + 1L : ftell(f)))
+/** @cond */
 #define UI_FREAD(p, s, n, f) (g_mock_io_fail == 3 ? 0 : fread(p, s, n, f))
+/** @endcond */
 #else
+/** @cond */
 #define UI_FSEEK(f, o, w) fseek(f, o, w)
+/** @endcond */
+/** @cond */
 #define UI_FTELL(f) ftell(f)
+/** @endcond */
+/** @cond */
 #define UI_FREAD(p, s, n, f) fread(p, s, n, f)
+/** @endcond */
 #endif
 
 #if defined(__EMSCRIPTEN__)
@@ -68,6 +84,7 @@ extern int fetch_asset_js(const char *url_cstr, int task_ptr);
 
 /**
  * @struct ui_asset_streamer
+ * @struct ui_asset_streamer
  * @brief Internal representation of an asset streamer.
  */
 struct ui_asset_streamer {
@@ -76,6 +93,7 @@ struct ui_asset_streamer {
 };
 
 /**
+ * @struct ui_asset_task
  * @struct ui_asset_task
  * @brief Internal task for loading an asset asynchronously.
  */

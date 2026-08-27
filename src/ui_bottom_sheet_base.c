@@ -29,9 +29,9 @@ static ui_error_t mock_ui_gesture_recognizer_process_event(
                                                out_event);
 }
 #undef ui_gesture_recognizer_process_event
+/** @cond */
 #define ui_gesture_recognizer_process_event                                    \
   mock_ui_gesture_recognizer_process_event
-
 static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
   if (g_bottom_sheet_mock_fail == 1) {
@@ -48,7 +48,9 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
   return (ui_dom_node_append_child)(parent, child);
 }
 #undef ui_dom_node_append_child
+/** @cond */
 #define ui_dom_node_append_child mock_dom_node_append_child
+/** @endcond */
 
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *name,
@@ -59,7 +61,9 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
   return (ui_dom_node_set_attribute)(node, name, value);
 }
 #undef ui_dom_node_set_attribute
+/** @cond */
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
+/** @endcond */
 
 static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
                                                  const char *name) {
@@ -69,7 +73,9 @@ static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
   return (ui_dom_node_remove_attribute)(node, name);
 }
 #undef ui_dom_node_remove_attribute
+/** @cond */
 #define ui_dom_node_remove_attribute mock_dom_node_remove_attribute
+/** @endcond */
 
 static ui_error_t
 mock_ui_component_set_default_style(struct ui_component *component,
@@ -80,7 +86,9 @@ mock_ui_component_set_default_style(struct ui_component *component,
   return (ui_component_set_default_style)(component, style);
 }
 #undef ui_component_set_default_style
+/** @cond */
 #define ui_component_set_default_style mock_ui_component_set_default_style
+/** @endcond */
 
 static ui_error_t
 mock_ui_overlay_director_unmount(struct ui_overlay_director *director,
@@ -91,7 +99,9 @@ mock_ui_overlay_director_unmount(struct ui_overlay_director *director,
   return (ui_overlay_director_unmount)(director, overlay);
 }
 #undef ui_overlay_director_unmount
+/** @cond */
 #define ui_overlay_director_unmount mock_ui_overlay_director_unmount
+/** @endcond */
 
 static ui_error_t
 mock_ui_gesture_recognizer_destroy(struct ui_gesture_recognizer *recognizer) {
@@ -101,7 +111,9 @@ mock_ui_gesture_recognizer_destroy(struct ui_gesture_recognizer *recognizer) {
   return (ui_gesture_recognizer_destroy)(recognizer);
 }
 #undef ui_gesture_recognizer_destroy
+/** @cond */
 #define ui_gesture_recognizer_destroy mock_ui_gesture_recognizer_destroy
+/** @endcond */
 
 static ui_error_t mock_ui_backdrop_destroy(struct ui_backdrop *backdrop) {
   if (g_bottom_sheet_mock_fail == 9) {
@@ -110,7 +122,9 @@ static ui_error_t mock_ui_backdrop_destroy(struct ui_backdrop *backdrop) {
   return (ui_backdrop_destroy)(backdrop);
 }
 #undef ui_backdrop_destroy
+/** @cond */
 #define ui_backdrop_destroy mock_ui_backdrop_destroy
+/** @endcond */
 
 static ui_error_t mock_ui_component_destroy(struct ui_component *component) {
   if (g_bottom_sheet_mock_fail == 10) {
@@ -119,7 +133,9 @@ static ui_error_t mock_ui_component_destroy(struct ui_component *component) {
   return (ui_component_destroy)(component);
 }
 #undef ui_component_destroy
+/** @cond */
 #define ui_component_destroy mock_ui_component_destroy
+/** @endcond */
 
 static ui_error_t mock_ui_signal_set(struct ui_signal *signal,
                                      union ui_signal_payload value) {
@@ -129,7 +145,9 @@ static ui_error_t mock_ui_signal_set(struct ui_signal *signal,
   return (ui_signal_set)(signal, value);
 }
 #undef ui_signal_set
+/** @cond */
 #define ui_signal_set mock_ui_signal_set
+/** @endcond */
 
 static ui_error_t mock_ui_spring_update(struct ui_spring_config *config,
                                         struct ui_spring_state *state,
@@ -141,7 +159,9 @@ static ui_error_t mock_ui_spring_update(struct ui_spring_config *config,
   return (ui_spring_update)(config, state, target, dt, out);
 }
 #undef ui_spring_update
+/** @cond */
 #define ui_spring_update mock_ui_spring_update
+/** @endcond */
 
 static ui_error_t mock_ui_css_parse_stylesheet(const char *css,
                                                struct ui_css_stylesheet **out) {
@@ -151,7 +171,9 @@ static ui_error_t mock_ui_css_parse_stylesheet(const char *css,
   return (ui_css_parse_stylesheet)(css, out);
 }
 #undef ui_css_parse_stylesheet
+/** @cond */
 #define ui_css_parse_stylesheet mock_ui_css_parse_stylesheet
+/** @endcond */
 
 static ui_error_t mock_ui_dom_node_create(enum ui_dom_node_type type,
                                           struct ui_dom_node **out) {
@@ -161,7 +183,9 @@ static ui_error_t mock_ui_dom_node_create(enum ui_dom_node_type type,
   return (ui_dom_node_create)(type, out);
 }
 #undef ui_dom_node_create
+/** @cond */
 #define ui_dom_node_create mock_ui_dom_node_create
+/** @endcond */
 
 static ui_error_t mock_ui_dom_node_set_tag_name(struct ui_dom_node *node,
                                                 const char *tag_name) {
@@ -171,7 +195,9 @@ static ui_error_t mock_ui_dom_node_set_tag_name(struct ui_dom_node *node,
   return (ui_dom_node_set_tag_name)(node, tag_name);
 }
 #undef ui_dom_node_set_tag_name
+/** @cond */
 #define ui_dom_node_set_tag_name mock_ui_dom_node_set_tag_name
+/** @endcond */
 
 static ui_error_t mock_ui_backdrop_process_event(struct ui_backdrop *backdrop,
                                                  const struct ui_event *event,
@@ -190,7 +216,9 @@ static ui_error_t mock_ui_backdrop_process_event(struct ui_backdrop *backdrop,
                                      out_should_dismiss);
 }
 #undef ui_backdrop_process_event
+/** @cond */
 #define ui_backdrop_process_event mock_ui_backdrop_process_event
+/** @endcond */
 
 ui_error_t run_bottom_sheet_coverage(void);
 ui_error_t run_bottom_sheet_coverage(void) {
@@ -306,6 +334,7 @@ static const char ui_bottom_sheet_base_default_css[] = {
     112, 120, 32,  97,  117, 116, 111, 59,  32,  125, 0};
 
 /**
+ * @struct ui_bottom_sheet_base
  * @struct ui_bottom_sheet_base
  * @brief Internal representation of a bottom sheet component.
  */

@@ -3,7 +3,7 @@
 #include <stddef.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_geometry_anchor_compute.
  * @param target Parameter target.
  * @param overlay Parameter overlay.

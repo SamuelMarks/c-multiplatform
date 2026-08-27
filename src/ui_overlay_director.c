@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_overlay_director.c
  * \brief Implementation of the UI overlay director for managing modals,
  * popovers, and floating menus.
@@ -11,23 +11,27 @@
 /* clang-format on */
 
 /**
+ * @struct ui_overlay
  * \struct ui_overlay
  * \brief Internal record of an active overlay mount.
  */
 struct ui_overlay {
-  struct ui_component *component;
-  struct ui_dom_node *wrapper_node;
-  int z_index;
-  struct ui_overlay *next;
-};
-
-/** \brief ui_overlay_director */
-struct ui_overlay_director {
-  struct ui_dom_node *root_node;
-  struct ui_overlay *first_overlay;
+  struct ui_component *component;   /**< component */
+  struct ui_dom_node *wrapper_node; /**< wrapper_node */
+  int z_index;                      /**< z_index */
+  struct ui_overlay *next;          /**< next */
 };
 
 /**
+ * @struct ui_overlay_director
+ * \brief ui_overlay_director
+ */
+struct ui_overlay_director {
+  struct ui_dom_node *root_node;    /**< root_node */
+  struct ui_overlay *first_overlay; /**< first_overlay */
+};
+
+/*
  * \brief Creates a new overlay director bound to a specific root DOM node.
  * \param[in,out] root_node The DOM node where overlays will be mounted.
  * \param[out] out_director Pointer to store the created director.
@@ -55,7 +59,7 @@ ui_overlay_director_create(struct ui_dom_node *root_node,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys an overlay director and unmounts all active overlays.
  * \param[in,out] director The director to destroy.
  * \return UI_ERROR_NONE on success.
@@ -83,7 +87,7 @@ ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Mounts a UI component as an overlay on top of the current view.
  * \param[in,out] director The overlay director.
  * \param[in,out] component The component to mount.
@@ -158,7 +162,7 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Unmounts a specific overlay.
  * \param[in,out] director The overlay director.
  * \param[in,out] overlay The overlay handle to unmount.

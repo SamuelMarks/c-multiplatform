@@ -1,3 +1,6 @@
+/**
+ * @file ui_ribbon_base.h
+ */
 #ifndef UI_RIBBON_BASE_H
 #define UI_RIBBON_BASE_H
 

@@ -76,7 +76,8 @@ ui_error_t ui_label_base_process_event(struct ui_label_base *label,
  * mounting.
  *
  * @param label The label.
- * @return The underlying component.
+ * @param out_component Pointer to receive the underlying component.
+ * @return ui_error_t `UI_ERROR_NONE` on success.
  */
 ui_error_t ui_label_base_get_component(struct ui_label_base *label,
                                        struct ui_component **out_component);

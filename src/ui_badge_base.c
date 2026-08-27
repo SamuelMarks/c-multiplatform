@@ -1,7 +1,6 @@
 /**
  * @file ui_badge_base.c
  * @brief Implementation of the badge base component.
- * @ingroup ui_badge_base
  */
 
 /* clang-format off */
@@ -13,7 +12,7 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_badge_mock_fail = 0;
-/**
+/*
  * @brief mock_dom_node_set_tag_name.
  * @param node Parameter node.
  * @param tag Parameter tag.
@@ -26,9 +25,11 @@ static ui_error_t mock_dom_node_set_tag_name(struct ui_dom_node *node,
   return (ui_dom_node_set_tag_name)(node, tag);
 }
 #undef ui_dom_node_set_tag_name
+/** @cond */
 #define ui_dom_node_set_tag_name mock_dom_node_set_tag_name
+/** @endcond */
 
-/**
+/*
  * @brief mock_dom_node_create.
  * @param type Parameter type.
  * @param out Parameter out.
@@ -46,9 +47,11 @@ static ui_error_t mock_dom_node_create(enum ui_dom_node_type type,
   return (ui_dom_node_create)(type, out);
 }
 #undef ui_dom_node_create
+/** @cond */
 #define ui_dom_node_create mock_dom_node_create
+/** @endcond */
 
-/**
+/*
  * @brief mock_dom_node_append_child.
  * @param parent Parameter parent.
  * @param child Parameter child.
@@ -61,10 +64,12 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
   return (ui_dom_node_append_child)(parent, child);
 }
 #undef ui_dom_node_append_child
+/** @cond */
 #define ui_dom_node_append_child mock_dom_node_append_child
+/** @endcond */
 
 ui_error_t run_badge_coverage(void);
-/**
+/*
  * @brief run_badge_coverage.
  * @return Return value.
  */
@@ -97,6 +102,7 @@ ui_error_t run_badge_coverage(void) {
 
 /**
  * @struct ui_badge_base
+ * @struct ui_badge_base
  * @brief Internal representation of a badge component.
  */
 struct ui_badge_base {
@@ -104,7 +110,7 @@ struct ui_badge_base {
   struct ui_signal *text_signal;  /**< Optional signal to bind the text to */
 };
 
-/**
+/*
  * @brief ui_badge_base_create.
  * @param out_badge Parameter out_badge.
  * @return Return value.
@@ -178,7 +184,7 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_badge_base_destroy.
  * @param badge Parameter badge.
  * @return Return value.
@@ -193,7 +199,7 @@ ui_error_t ui_badge_base_destroy(struct ui_badge_base *badge) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_badge_base_set_value.
  * @param badge Parameter badge.
  * @param value Parameter value.
@@ -229,7 +235,7 @@ ui_error_t ui_badge_base_set_value(struct ui_badge_base *badge, int value,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-/**
+/*
  * @brief ui_badge_base_set_text.
  * @param badge Parameter badge.
  * @param text Parameter text.
@@ -248,7 +254,7 @@ ui_error_t ui_badge_base_set_text(struct ui_badge_base *badge,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-/**
+/*
  * @brief ui_badge_base_set_hidden.
  * @param badge Parameter badge.
  * @param is_hidden Parameter is_hidden.
@@ -269,7 +275,7 @@ ui_error_t ui_badge_base_set_hidden(struct ui_badge_base *badge,
   }
 }
 
-/**
+/*
  * @brief ui_badge_base_get_component.
  * @param badge Parameter badge.
  * @param out_component Parameter out_component.
@@ -284,7 +290,7 @@ ui_error_t ui_badge_base_get_component(struct ui_badge_base *badge,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_badge_base_bind_text.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

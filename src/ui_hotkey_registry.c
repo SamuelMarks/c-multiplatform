@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_hotkey_registry.c
  * \brief Implementation of the hotkey registry.
  */
@@ -8,31 +8,35 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/**
+/*
  * \def MAX_HOTKEYS
  * \brief Maximum number of registered hotkeys.
  */
 #define MAX_HOTKEYS 128
 
 /**
+ * @struct hotkey_entry
  * \struct hotkey_entry
  * \brief Internal record of a registered hotkey.
  */
 struct hotkey_entry {
-  int id;
-  struct ui_hotkey_chord chord;
-  ui_hotkey_callback_t callback;
-  void *user_data;
-  int in_use;
-};
-
-/** \brief ui_hotkey_registry */
-struct ui_hotkey_registry {
-  struct hotkey_entry entries[MAX_HOTKEYS];
-  int next_id;
+  int id;                        /**< id */
+  struct ui_hotkey_chord chord;  /**< chord */
+  ui_hotkey_callback_t callback; /**< callback */
+  void *user_data;               /**< user_data */
+  int in_use;                    /**< in_use */
 };
 
 /**
+ * @struct ui_hotkey_registry
+ * \brief ui_hotkey_registry
+ */
+struct ui_hotkey_registry {
+  struct hotkey_entry entries[MAX_HOTKEYS]; /**< entries */
+  int next_id;                              /**< next_id */
+};
+
+/*
  * \brief Creates a new hotkey registry.
  * \param[out] out_registry Pointer to store the created registry.
  * \return UI_ERROR_NONE on success.
@@ -60,7 +64,7 @@ ui_error_t ui_hotkey_registry_create(struct ui_hotkey_registry **out_registry) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a hotkey registry.
  * \param[in,out] registry The registry to destroy.
  * \return UI_ERROR_NONE on success.
@@ -73,7 +77,7 @@ ui_error_t ui_hotkey_registry_destroy(struct ui_hotkey_registry *registry) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Registers a new hotkey callback for a specific key chord.
  * \param[in,out] registry The hotkey registry.
  * \param[in] chord The key chord to trigger the callback.
@@ -108,7 +112,7 @@ ui_error_t ui_hotkey_registry_register(struct ui_hotkey_registry *registry,
   return UI_ERROR_OUT_OF_BOUNDS;
 }
 
-/**
+/*
  * \brief Unregisters a hotkey by its ID.
  * \param[in,out] registry The hotkey registry.
  * \param[in] id The ID of the hotkey to unregister.
@@ -133,7 +137,7 @@ ui_error_t ui_hotkey_registry_unregister(struct ui_hotkey_registry *registry,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an incoming UI event and triggers matching hotkeys.
  * \param[in,out] registry The hotkey registry.
  * \param[in] event The UI event to evaluate.

@@ -13,16 +13,17 @@ static const char *ui_datagrid_base_default_css = ".datagrid-container { "
 
 /**
  * @struct ui_datagrid_base
+ * @struct ui_datagrid_base
  * @brief Internal representation of a datagrid component.
  */
 struct ui_datagrid_base {
-  /** @brief The base component. */
-  struct ui_component *component;
-  /** @brief Signal bound for data. */
-  struct ui_computed *data_signal;
+  /* @brief The base component. */
+  struct ui_component *component; /**< component */
+  /* @brief Signal bound for data. */
+  struct ui_computed *data_signal; /**< data_signal */
 };
 
-/**
+/*
  * @brief ui_datagrid_base_create.
  * @param out_datagrid Parameter out_datagrid.
  * @return Return value.
@@ -94,7 +95,7 @@ cleanup:
   return rc;
 }
 
-/**
+/*
  * @brief ui_datagrid_base_destroy.
  * @param datagrid Parameter datagrid.
  * @return Return value.
@@ -108,7 +109,7 @@ ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_datagrid_base_get_component.
  * @param datagrid Parameter datagrid.
  * @param out_component Parameter out_component.
@@ -123,7 +124,7 @@ ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_datagrid_base_resize_column.
  * @param datagrid Parameter datagrid.
  * @param col_index Parameter col_index.
@@ -140,7 +141,7 @@ ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_datagrid_base_move_focus.
  * @param datagrid Parameter datagrid.
  * @param row_delta Parameter row_delta.
@@ -157,7 +158,7 @@ ui_error_t ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_datagrid_base_bind_data.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

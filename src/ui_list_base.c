@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_list_base.c
  * \brief Implementation of the generic list base component.
  */
@@ -12,21 +12,25 @@
 /* clang-format on */
 
 /**
+ * @struct ui_list_base
  * \struct ui_list_base
  * \brief Internal state for a generic list container widget.
  */
 struct ui_list_base {
-  struct ui_component *component;
-  enum ui_list_orientation orientation;
-  struct ui_computed *data_signal;
-};
-
-/** \brief ui_list_item_base */
-struct ui_list_item_base {
-  struct ui_component *component;
+  struct ui_component *component;       /**< component */
+  enum ui_list_orientation orientation; /**< orientation */
+  struct ui_computed *data_signal;      /**< data_signal */
 };
 
 /**
+ * @struct ui_list_item_base
+ * \brief ui_list_item_base
+ */
+struct ui_list_item_base {
+  struct ui_component *component; /**< component */
+};
+
+/*
  * \brief Creates a new list base widget.
  * \param[out] out_list Pointer to store the created list.
  * \return UI_ERROR_NONE on success.
@@ -60,7 +64,7 @@ ui_error_t ui_list_base_create(struct ui_list_base **out_list) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a list base widget.
  * \param[in,out] list The list widget to destroy.
  * \return UI_ERROR_NONE on success.
@@ -76,7 +80,7 @@ ui_error_t ui_list_base_destroy(struct ui_list_base *list) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the underlying DOM component of the list widget.
  * \param[in] list The list widget.
  * \param[out] out_component Pointer to store the DOM component.
@@ -91,7 +95,8 @@ ui_error_t ui_list_base_get_component(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_list_base_set_orientation(struct ui_list_base *list,
                                         enum ui_list_orientation orientation) {
   if (!list) {
@@ -101,7 +106,8 @@ ui_error_t ui_list_base_set_orientation(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_list_base_get_orientation(struct ui_list_base *list,
                              enum ui_list_orientation *out_orientation) {
@@ -112,7 +118,7 @@ ui_list_base_get_orientation(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Appends an item to the end of the list.
  * \param[in,out] list The list widget.
  * \param[in,out] item The list item to append.
@@ -130,7 +136,7 @@ ui_error_t ui_list_base_append_item(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a new list item widget.
  * \param[out] out_item Pointer to store the created item.
  * \return UI_ERROR_NONE on success.
@@ -162,7 +168,7 @@ ui_error_t ui_list_item_base_create(struct ui_list_item_base **out_item) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a list item widget.
  * \param[in,out] item The list item to destroy.
  * \return UI_ERROR_NONE on success.
@@ -178,7 +184,8 @@ ui_error_t ui_list_item_base_destroy(struct ui_list_item_base *item) {
   return UI_ERROR_NONE;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_list_item_base_get_component(struct ui_list_item_base *item,
                                 struct ui_component **out_component) {
@@ -189,7 +196,7 @@ ui_list_item_base_get_component(struct ui_list_item_base *item,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds arbitrary data to the list widget.
  * \param[in,out] widget The list widget.
  * \param[in,out] signal The data signal to bind.

@@ -6,20 +6,23 @@
 #include "../include/ui_event.h"
 #include "ui_internal_mem.h"
 
-/** \brief ui_window */
+/**
+ * @struct ui_window
+ * \brief ui_window
+ */
 struct ui_window {
-    HWND hwnd;
-    HDC hdc;
-    HGLRC hglrc;
-    int is_closing;
-    int has_resize;
-    int new_width;
-    int new_height;
-    void (*on_resize_callback)(void*, int, int);
-    void* on_resize_user_data;
+    HWND hwnd; /**< hwnd */
+    HDC hdc; /**< hdc */
+    HGLRC hglrc; /**< hglrc */
+    int is_closing; /**< is_closing */
+    int has_resize; /**< has_resize */
+    int new_width; /**< new_width */
+    int new_height; /**< new_height */
+    void (*on_resize_callback)(void*, int, int); /**< int) */
+    void* on_resize_user_data; /**< on_resize_user_data */
 };
 
-/**
+/*
  * @brief window_proc.
  * @param hwnd Parameter hwnd.
  * @param uMsg Parameter uMsg.
@@ -66,7 +69,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
     return DefWindowProcA(hwnd, uMsg, wParam, lParam);
 }
 
-/**
+/*
  * @brief win32_create_window.
  * @param backend Parameter backend.
  * @param title Parameter title.
@@ -194,7 +197,7 @@ cleanup:
     return rc;
 }
 
-/**
+/*
  * @brief win32_destroy_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -219,7 +222,7 @@ static ui_error_t win32_destroy_window(struct ui_window_backend* backend, struct
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief win32_show_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -233,7 +236,7 @@ static ui_error_t win32_show_window(struct ui_window_backend* backend, struct ui
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief win32_hide_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -247,7 +250,7 @@ static ui_error_t win32_hide_window(struct ui_window_backend* backend, struct ui
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief win32_poll_events.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -285,7 +288,7 @@ static ui_error_t win32_poll_events(struct ui_window_backend* backend, struct ui
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief win32_get_os_handle.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -297,7 +300,7 @@ static ui_error_t win32_get_os_handle(struct ui_window_backend* backend, struct 
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief win32_swap_buffers.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -320,7 +323,7 @@ static ui_error_t win32_set_on_resize_callback(struct ui_window_backend* backend
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_window_backend_win32_create.
  * @param out_backend Parameter out_backend.
  * @return Return value.
@@ -352,7 +355,7 @@ ui_error_t ui_window_backend_win32_create(struct ui_window_backend** out_backend
     return UI_ERROR_NONE;
 }
 
-/**
+/*
  * @brief ui_window_backend_win32_destroy.
  * @param backend Parameter backend.
  * @return Return value.
@@ -371,7 +374,7 @@ ui_error_t ui_window_backend_win32_destroy(struct ui_window_backend* backend) {
 #include <stddef.h>
 /* clang-format on */
 
-/**
+/*
  * @brief ui_window_backend_win32_create.
  * @param out_backend Parameter out_backend.
  * @return Return value.
@@ -385,7 +388,8 @@ ui_window_backend_win32_create(struct ui_window_backend **out_backend) {
   return UI_ERROR_UNKNOWN;
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t ui_window_backend_win32_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;

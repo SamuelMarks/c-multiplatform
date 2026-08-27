@@ -166,7 +166,8 @@ static const char blur_v_fragment_source[] = {
     10,  32,  32,  32,  32,  103, 108, 95,  70,  114, 97,  103, 67,  111, 108,
     111, 114, 32,  61,  32,  115, 117, 109, 59,  10,  125, 10,  0};
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_effects_shaders_get_blur_h_program(struct ui_shader_manager *manager,
                                       unsigned int *out_program) {
@@ -178,7 +179,8 @@ ui_effects_shaders_get_blur_h_program(struct ui_shader_manager *manager,
                                        blur_h_fragment_source, out_program);
 }
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_effects_shaders_get_blur_v_program(struct ui_shader_manager *manager,
                                       unsigned int *out_program) {
@@ -483,7 +485,8 @@ static const char *blend_fragment_source_normal =
     "    gl_FragColor = vec4(result, src.a + dst.a * (1.0 - src.a));\n"
     "}\n";
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_effects_shaders_get_blend_program(struct ui_shader_manager *manager,
                                      enum ui_css_blend_mode mode,
@@ -586,7 +589,8 @@ static const char *filter_fragment_source_sepia =
     "    gl_FragColor = vec4(r, g, b, src.a);\n"
     "}\n";
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_effects_shaders_get_color_filter_program(struct ui_shader_manager *manager,
                                             enum ui_css_filter_type type,
@@ -624,7 +628,8 @@ static const char *drop_shadow_fragment_source =
     "    gl_FragColor = u_color * alpha;\n"
     "}\n";
 
-/** \brief ui_error */
+/* \brief ui_error
+ */
 ui_error_t
 ui_effects_shaders_get_drop_shadow_program(struct ui_shader_manager *manager,
                                            unsigned int *out_program) {

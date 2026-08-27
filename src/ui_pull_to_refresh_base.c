@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_pull_to_refresh_base.c
  * \brief Implementation of the UI Pull-to-Refresh Base component.
  */
@@ -13,14 +13,15 @@
 #include <math.h>
 /* clang-format on */
 
-/** \brief Distance threshold to trigger a refresh */
+/* \brief Distance threshold to trigger a refresh */
 #define UI_PTR_THRESHOLD 100.0f
-/** \brief Spring rate for returning to idle */
+/* \brief Spring rate for returning to idle */
 #define UI_PTR_SPRING_RATE 0.85f
-/** \brief Delay before completing the refresh visual state */
+/* \brief Delay before completing the refresh visual state */
 #define UI_PTR_COMPLETION_DELAY_MS 300.0f
 
 /**
+ * @struct ui_pull_to_refresh_base
  * \brief Internal structure representing a pull-to-refresh component.
  */
 struct ui_pull_to_refresh_base {
@@ -39,7 +40,7 @@ struct ui_pull_to_refresh_base {
       *computed_refreshing_signal; /**< Computed refreshing state */
 };
 
-/**
+/*
  * \brief Updates DOM attributes based on internal pull state.
  *
  * \param ptr The component.
@@ -73,7 +74,7 @@ static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Creates a pull-to-refresh base component.
  *
  * \param out_ptr Pointer to receive the allocated component.
@@ -129,7 +130,7 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a pull-to-refresh base component.
  *
  * \param ptr The component to destroy.
@@ -153,7 +154,7 @@ ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the callback for when the refresh action is fully triggered.
  *
  * \param ptr The component.
@@ -172,7 +173,7 @@ ui_error_t ui_pull_to_refresh_base_set_on_refresh(
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Marks the refresh as complete.
  *
  * \param ptr The component.
@@ -193,7 +194,7 @@ ui_pull_to_refresh_base_complete(struct ui_pull_to_refresh_base *ptr) {
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Gets the current state of the pull-to-refresh mechanism.
  *
  * \param ptr The component.
@@ -207,7 +208,7 @@ ui_pull_to_refresh_base_get_state(const struct ui_pull_to_refresh_base *ptr) {
   return ptr->state;
 }
 
-/**
+/*
  * \brief Gets the current pull progress (0.0 to 1.0+).
  *
  * \param ptr The component.
@@ -224,7 +225,7 @@ ui_pull_to_refresh_base_get_progress(const struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Processes an incoming input event (gesture/pan tracking).
  *
  * \param ptr The component.
@@ -298,7 +299,7 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Integrates physics and timers (springing back, state transitions).
  *
  * \param ptr The component.
@@ -352,7 +353,7 @@ ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the underlying container component.
  *
  * \param ptr The component.
@@ -369,7 +370,7 @@ ui_pull_to_refresh_base_get_component(struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Sets the spinner component that visually represents the progress.
  *
  * \param ptr The component.
@@ -390,7 +391,7 @@ ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Binds the refreshing state to a signal.
  *
  * \param widget The widget.
@@ -407,7 +408,7 @@ ui_pull_to_refresh_base_bind_refreshing(struct ui_pull_to_refresh_base *widget,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Retrieves the computed signal indicating if the widget is refreshing.
  *
  * \param widget The widget.

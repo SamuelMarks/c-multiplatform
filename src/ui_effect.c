@@ -1,4 +1,4 @@
-/**
+/*
  * \file ui_effect.c
  * \brief Implementation of reactive effects.
  */
@@ -13,18 +13,19 @@
 /* clang-format on */
 
 /**
+ * @struct ui_effect
  * \struct ui_effect
  * \brief Represents a reactive effect.
  */
 struct ui_effect {
-  ui_effect_fn effect_fn;
-  void *user_data;
-  struct ui_reactor *target_reactor;
-  struct ui_arena *arena;
-  struct ui_reactive_node self_node;
+  ui_effect_fn effect_fn;            /**< effect_fn */
+  void *user_data;                   /**< user_data */
+  struct ui_reactor *target_reactor; /**< target_reactor */
+  struct ui_arena *arena;            /**< arena */
+  struct ui_reactive_node self_node; /**< self_node */
 };
 
-/**
+/*
  * \brief Evaluates the reactive effect.
  * \param[in,out] user_data Pointer to the ui_effect instance.
  * \return UI_ERROR_NONE on success.
@@ -50,7 +51,7 @@ static ui_error_t ui_effect_evaluate(void *user_data) {
   return rc;
 }
 
-/**
+/*
  * \brief Callback triggered when the effect is notified of a change.
  * \param[in,out] user_data Pointer to the ui_effect instance.
  * \return UI_ERROR_NONE on success.
@@ -71,7 +72,7 @@ static ui_error_t ui_effect_on_notify(void *user_data) {
   return ui_effect_evaluate(eff);
 }
 
-/**
+/*
  * \brief Creates a new reactive effect.
  * \param[in,out] arena Optional arena for memory allocation.
  * \param[in] effect_fn The function to execute for the effect.
@@ -121,7 +122,7 @@ ui_error_t ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
   return UI_ERROR_NONE;
 }
 
-/**
+/*
  * \brief Destroys a reactive effect.
  * \param[in,out] effect The effect to destroy.
  * \return UI_ERROR_NONE on success.
