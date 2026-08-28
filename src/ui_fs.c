@@ -1,3 +1,7 @@
+/**
+ * @file ui_fs.c
+ * @brief ui_fs.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_fs.h"
 #include "ui_internal_mem.h"
@@ -13,7 +17,7 @@ int g_ui_fs_ftell_fail = 0;
 int g_ui_fs_fread_fail = 0;
 int g_ui_fs_fwrite_fail = 0;
 
-/*
+/**
  * @brief mock_fseek.
  * @param stream Parameter stream.
  * @param offset Parameter offset.
@@ -28,7 +32,7 @@ static int mock_fseek(FILE *stream, long offset, int whence) {
   }
   return fseek(stream, offset, whence);
 }
-/*
+/**
  * @brief mock_ftell.
  * @param stream Parameter stream.
  * @return Return value.
@@ -40,7 +44,7 @@ static long mock_ftell(FILE *stream) {
     return 0x40000000; /* Trigger huge file size check */
   return ftell(stream);
 }
-/*
+/**
  * @brief mock_fread.
  * @param ptr Parameter ptr.
  * @param size Parameter size.
@@ -53,7 +57,7 @@ static size_t mock_fread(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     return 0;
   return fread(ptr, size, nmemb, stream);
 }
-/*
+/**
  * @brief mock_fwrite.
  * @param ptr Parameter ptr.
  * @param size Parameter size.
@@ -128,7 +132,7 @@ EM_JS(int, fs_write_file_js,
       })
 #endif
 
-/*
+/**
  * @brief ui_fs_read_file.
  * @param path Parameter path.
  * @param out_data Parameter out_data.
@@ -208,7 +212,7 @@ ui_error_t ui_fs_read_file(const char *path, void **out_data,
 #endif
 }
 
-/*
+/**
  * @brief ui_fs_write_file.
  * @param path Parameter path.
  * @param data Parameter data.
@@ -271,7 +275,7 @@ EM_JS(int, fs_opfs_write_sync_js,
       })
 #endif
 
-/*
+/**
  * @brief ui_fs_write_file_opfs_sync.
  * @param path Parameter path.
  * @param data Parameter data.

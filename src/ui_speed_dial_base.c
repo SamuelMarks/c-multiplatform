@@ -1,10 +1,14 @@
+/**
+ * @file ui_speed_dial_base.c
+ * @brief ui_speed_dial_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_speed_dial_base.h"
 #include <stdlib.h>
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_speed_dial_base_init.
  * @param speed_dial Parameter speed_dial.
  * @param component Parameter component.
@@ -47,7 +51,7 @@ ui_error_t ui_speed_dial_base_add_action(struct ui_speed_dial_base *speed_dial,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_speed_dial_base_toggle.
  * @param speed_dial Parameter speed_dial.
  * @return Return value.
@@ -93,7 +97,7 @@ ui_error_t ui_speed_dial_base_bind_disabled(struct ui_speed_dial_base *widget,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_speed_dial_base_bind_text.
  * @param widget Parameter widget.
  * @param text_signal Parameter text_signal.

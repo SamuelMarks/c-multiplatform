@@ -72,6 +72,7 @@ ui_error_t run_bottom_app_bar_coverage(void) {
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet for bottom app bar base component */
 static const char *ui_bottom_app_bar_default_css =
     "div.bottom-app-bar { "
     "display: flex; "

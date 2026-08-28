@@ -5,19 +5,28 @@
 #ifndef UI_WINDOW_MANAGER_BASE_H
 #define UI_WINDOW_MANAGER_BASE_H
 
-struct ui_computed;
-
-struct ui_signal;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* clang-format off */
 #include "ui_error.h"
 #include "ui_component.h"
 /* clang-format on */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief Forward declaration for ui_computed.
+ */
+struct ui_computed;
+
+/**
+ * @brief Forward declaration for ui_signal.
+ */
+struct ui_signal;
+
+/**
+ * @brief Opaque structure representing the window manager base component.
+ */
 struct ui_window_manager_base;
 
 /**
@@ -33,6 +42,7 @@ ui_error_t ui_window_manager_base_create(
  * @brief Destroys a window manager base component.
  *
  * @param window_manager The component to destroy.
+ * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
 ui_error_t
 ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager);
@@ -42,7 +52,7 @@ ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager);
  *
  * @param window_manager The window manager component.
  * @param out_component Pointer to receive the underlying component.
- * @return ui_error_t `UI_ERROR_NONE` on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_window_manager_base_get_component(
     struct ui_window_manager_base *window_manager,
@@ -53,7 +63,7 @@ ui_error_t ui_window_manager_base_get_component(
  *
  * @param window_manager The window manager component.
  * @param window_id Identifier for the internal window.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_window_manager_base_bring_to_front(
     struct ui_window_manager_base *window_manager, int window_id);
@@ -65,7 +75,7 @@ ui_error_t ui_window_manager_base_bring_to_front(
  * @param window_id Identifier for the internal window.
  * @param delta_x X-axis drag delta.
  * @param delta_y Y-axis drag delta.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
@@ -74,9 +84,9 @@ ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
 /**
  * @brief Binds the data property.
  *
- * @param widget The widget.
+ * @param widget The window manager widget.
  * @param signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_window_manager_base_bind_data(struct ui_window_manager_base *widget,

@@ -1,3 +1,7 @@
+/**
+ * @file ui_property_grid_base.c
+ * @brief ui_property_grid_base.c implementation.
+ */
 /*
  * \file ui_property_grid_base.c
  * \brief Implementation of the UI Property Grid Base component.
@@ -10,9 +14,13 @@
 #include <string.h>
 /* clang-format on */
 
-/* \brief Maximum number of rows in the property grid */
+/** @def UI_PROPERTY_GRID_MAX_ROWS
+ * @brief Maximum number of rows in the property grid
+ */
 #define UI_PROPERTY_GRID_MAX_ROWS 128
-/* \brief Maximum number of groups in the property grid */
+/** @def UI_PROPERTY_GRID_MAX_GROUPS
+ * @brief Maximum number of groups in the property grid
+ */
 #define UI_PROPERTY_GRID_MAX_GROUPS 32
 
 /**
@@ -47,13 +55,20 @@ struct ui_property_grid_base {
   ui_signal_t *value_changed_signal; /**< Signal emitted on value change */
 };
 
-/*
+/**
  * \brief Evaluates equality of two pointer signal payloads.
  *
  * \param a First payload.
  * \param b Second payload.
  * \param out_equal Pointer to receive the equality result.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief pointer_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
  */
 static ui_error_t pointer_equality(union ui_signal_payload a,
                                    union ui_signal_payload b,
@@ -62,7 +77,7 @@ static ui_error_t pointer_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a Property Grid base component.
  *
  * \param arena The memory arena to use for allocation.
@@ -97,7 +112,7 @@ ui_property_grid_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a Property Grid base component.
  *
  * \param grid The component to destroy.
@@ -113,7 +128,7 @@ ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets an existing group state or creates a new one.
  *
  * \param grid The component.
@@ -122,6 +137,13 @@ ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid) {
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t
+/**
+ * @brief get_or_create_group.
+ * @param grid Parameter grid.
+ * @param group_id Parameter group_id.
+ * @param out_group Parameter out_group.
+ * @return Return value.
+ */
 get_or_create_group(struct ui_property_grid_base *grid, const char *group_id,
                     struct ui_property_group_state **out_group) {
   int i;
@@ -144,7 +166,7 @@ get_or_create_group(struct ui_property_grid_base *grid, const char *group_id,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Registers a property row in the grid data model.
  *
  * \param grid The component.
@@ -176,7 +198,7 @@ ui_property_grid_base_add_property(struct ui_property_grid_base *grid,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets a custom factory function for instantiating inline editors.
  *
  * \param grid The component.
@@ -197,7 +219,7 @@ ui_error_t ui_property_grid_base_set_editor_factory(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Filters the visible properties based on a search string.
  *
  * \param grid The component.
@@ -213,7 +235,7 @@ ui_error_t ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Toggles the collapsed/expanded state of a specific property group.
  *
  * \param grid The component.
@@ -242,7 +264,7 @@ ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Retrieves the signal emitted when a property's value is modified.
  *
  * \param grid The component.
@@ -258,7 +280,7 @@ ui_error_t ui_property_grid_base_get_value_changed_signal(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Internal simulation helper.
  *
  * \param grid The component.

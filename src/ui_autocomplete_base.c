@@ -14,7 +14,7 @@
 int g_ac_mock_fail = 0;
 int g_ac_mock_is_open = 0;
 
-/*
+/**
  * @brief mock_listbox_get_active_index.
  * @param lb Parameter lb.
  * @param out Parameter out.
@@ -31,7 +31,7 @@ static ui_error_t mock_listbox_get_active_index(struct ui_listbox_base *lb,
 #define ui_listbox_base_get_active_index mock_listbox_get_active_index
 /** @endcond */
 
-/*
+/**
  * @brief mock_listbox_get_comp.
  * @param lb Parameter lb.
  * @param c Parameter c.
@@ -48,7 +48,7 @@ static ui_error_t mock_listbox_get_comp(struct ui_listbox_base *lb,
 #define ui_listbox_base_get_component mock_listbox_get_comp
 /** @endcond */
 
-/*
+/**
  * @brief mock_popover_process_event.
  * @param p Parameter p.
  * @param e Parameter e.
@@ -68,7 +68,7 @@ static ui_error_t mock_popover_process_event(struct ui_popover_base *p,
 #define ui_popover_base_process_event mock_popover_process_event
 /** @endcond */
 
-/*
+/**
  * @brief mock_input_process_event.
  * @param i Parameter i.
  * @param e Parameter e.
@@ -86,7 +86,7 @@ static ui_error_t mock_input_process_event(struct ui_input_base *i,
 #define ui_input_base_process_event mock_input_process_event
 /** @endcond */
 
-/*
+/**
  * @brief mock_listbox_create.
  * @param out Parameter out.
  * @param cva Parameter cva.
@@ -103,7 +103,7 @@ static ui_error_t mock_listbox_create(struct ui_listbox_base **out,
 #define ui_listbox_base_create mock_listbox_create
 /** @endcond */
 
-/*
+/**
  * @brief mock_popover_create.
  * @param out Parameter out.
  * @return Return value.
@@ -118,7 +118,7 @@ static ui_error_t mock_popover_create(struct ui_popover_base **out) {
 #define ui_popover_base_create mock_popover_create
 /** @endcond */
 
-/*
+/**
  * @brief mock_dom_node_append_child.
  * @param parent Parameter parent.
  * @param child Parameter child.
@@ -135,7 +135,7 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
 #define ui_dom_node_append_child mock_dom_node_append_child
 /** @endcond */
 
-/*
+/**
  * @brief mock_input_base_set_on_change.
  * @param input Parameter input.
  * @param cb Parameter cb.
@@ -154,7 +154,7 @@ static ui_error_t mock_input_base_set_on_change(struct ui_input_base *input,
 #define ui_input_base_set_on_change mock_input_base_set_on_change
 /** @endcond */
 
-/*
+/**
  * @brief mock_dom_node_remove_child.
  * @param parent Parameter parent.
  * @param child Parameter child.
@@ -170,7 +170,7 @@ static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
 #define ui_dom_node_remove_child mock_dom_node_remove_child
 /** @endcond */
 
-/*
+/**
  * @brief mock_component_destroy.
  * @param comp Parameter comp.
  * @return Return value.
@@ -183,7 +183,7 @@ static ui_error_t mock_component_destroy(struct ui_component *comp) {
 #define ui_component_destroy mock_component_destroy
 /** @endcond */
 
-/*
+/**
  * @brief mock_input_base_get_component.
  * @param i Parameter i.
  * @param c Parameter c.
@@ -210,7 +210,7 @@ static ui_error_t mock_input_base_get_component(struct ui_input_base *i,
 #define ui_input_base_get_component mock_input_base_get_component
 /** @endcond */
 
-/*
+/**
  * @brief mock_popover_open.
  * @param popover Parameter popover.
  * @param content Parameter content.
@@ -247,7 +247,7 @@ mock_popover_open(struct ui_popover_base *popover, struct ui_dom_node *content,
 #define ui_popover_base_open mock_popover_open
 /** @endcond */
 
-/*
+/**
  * @brief mock_popover_close.
  * @param p Parameter p.
  * @return Return value.
@@ -265,7 +265,7 @@ static ui_error_t mock_popover_close(struct ui_popover_base *p) {
 /** @endcond */
 
 static int g_popover_is_open_calls = 0;
-/*
+/**
  * @brief mock_popover_is_open.
  * @param p Parameter p.
  * @param o Parameter o.
@@ -286,7 +286,7 @@ static ui_error_t mock_popover_is_open(struct ui_popover_base *p, int *o) {
 #define ui_popover_base_is_open mock_popover_is_open
 /** @endcond */
 
-/*
+/**
  * @brief mock_dom_node_set_attribute.
  * @param n Parameter n.
  * @param k Parameter k.
@@ -304,7 +304,7 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *n,
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
 /** @endcond */
 
-/*
+/**
  * @brief mock_listbox_get_selection_model.
  * @param lb Parameter lb.
  * @param m Parameter m.
@@ -322,7 +322,7 @@ mock_listbox_get_selection_model(struct ui_listbox_base *lb,
 #define ui_listbox_base_get_selection_model mock_listbox_get_selection_model
 /** @endcond */
 
-/*
+/**
  * @brief mock_selection_model_select.
  * @param m Parameter m.
  * @param item Parameter item.
@@ -369,7 +369,7 @@ struct ui_autocomplete_base {
   void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
 };
 
-/*
+/**
  * @brief on_input_text_change.
  * @param input Parameter input.
  * @param text Parameter text.
@@ -398,7 +398,7 @@ static ui_error_t on_input_text_change(struct ui_input_base *input,
   return rc;
 }
 
-/*
+/**
  * @brief autocomplete_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -416,6 +416,13 @@ static ui_error_t autocomplete_cva_write_value(void *component,
   }
 }
 
+/**
+ * @brief autocomplete_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t autocomplete_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -428,6 +435,13 @@ static ui_error_t autocomplete_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief autocomplete_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t autocomplete_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_autocomplete_base *ac = (struct ui_autocomplete_base *)component;
@@ -438,7 +452,7 @@ static ui_error_t autocomplete_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief autocomplete_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -452,7 +466,7 @@ static ui_error_t autocomplete_cva_set_disabled_state(void *component,
   return ui_input_base_set_disabled(ac->input, is_disabled);
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_create.
  * @param out_autocomplete Parameter out_autocomplete.
  * @param out_cva Parameter out_cva.
@@ -577,7 +591,7 @@ cleanup: {
   return rc;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_destroy.
  * @param autocomplete Parameter autocomplete.
  * @return Return value.
@@ -603,7 +617,7 @@ ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_get_component.
  * @param autocomplete Parameter autocomplete.
  * @param out_component Parameter out_component.
@@ -619,7 +633,7 @@ ui_autocomplete_base_get_component(struct ui_autocomplete_base *autocomplete,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_get_input.
  * @param autocomplete Parameter autocomplete.
  * @param out_input Parameter out_input.
@@ -635,7 +649,7 @@ ui_autocomplete_base_get_input(struct ui_autocomplete_base *autocomplete,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_get_listbox.
  * @param autocomplete Parameter autocomplete.
  * @param out_listbox Parameter out_listbox.
@@ -651,7 +665,7 @@ ui_autocomplete_base_get_listbox(struct ui_autocomplete_base *autocomplete,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_set_overlay_dependencies.
  * @param autocomplete Parameter autocomplete.
  * @param director Parameter director.
@@ -669,7 +683,7 @@ ui_error_t ui_autocomplete_base_set_overlay_dependencies(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_set_on_text_change.
  * @param autocomplete Parameter autocomplete.
  * @param on_text_change Parameter on_text_change.
@@ -687,7 +701,7 @@ ui_error_t ui_autocomplete_base_set_on_text_change(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_set_on_selection.
  * @param autocomplete Parameter autocomplete.
  * @param on_selection Parameter on_selection.
@@ -705,7 +719,7 @@ ui_error_t ui_autocomplete_base_set_on_selection(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_open.
  * @param autocomplete Parameter autocomplete.
  * @param trigger_layout Parameter trigger_layout.
@@ -759,7 +773,7 @@ ui_autocomplete_base_open(struct ui_autocomplete_base *autocomplete,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_close.
  * @param autocomplete Parameter autocomplete.
  * @return Return value.
@@ -788,7 +802,7 @@ ui_autocomplete_base_close(struct ui_autocomplete_base *autocomplete) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_autocomplete_base_process_event.
  * @param autocomplete Parameter autocomplete.
  * @param event Parameter event.
@@ -856,7 +870,7 @@ ui_autocomplete_base_process_event(struct ui_autocomplete_base *autocomplete,
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
-/*
+/**
  * @brief mock_cva_on_change.
  * @param payload Parameter payload.
  * @param u Parameter u.
@@ -867,7 +881,7 @@ static ui_error_t mock_cva_on_change(union ui_signal_payload payload, void *u) {
   (void)u;
   return UI_ERROR_UNKNOWN;
 }
-/*
+/**
  * @brief mock_text_change.
  * @param ac Parameter ac.
  * @param t Parameter t.
@@ -883,7 +897,7 @@ static ui_error_t mock_text_change(struct ui_autocomplete_base *ac,
 }
 
 ui_error_t run_ac_coverage(void);
-/*
+/**
  * @brief run_ac_coverage.
  * @return Return value.
  */

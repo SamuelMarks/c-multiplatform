@@ -1,3 +1,7 @@
+/**
+ * @file ui_syntax_surface_base.c
+ * @brief ui_syntax_surface_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_syntax_surface_base.h"
 #include "ui_arena.h"
@@ -34,12 +38,19 @@ struct ui_syntax_surface_base {
   ui_signal_t *active_line_signal;  /**< active_line_signal */
 };
 
-/*
+/**
  * \brief Equality function for void pointers.
  * \param a First payload.
  * \param b Second payload.
  * \param out_equal Pointer to store the result.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief void_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
  */
 static ui_error_t void_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
@@ -50,12 +61,19 @@ static ui_error_t void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Equality function for integers.
  * \param a First payload.
  * \param b Second payload.
  * \param out_equal Pointer to store the result.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief int_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
  */
 static ui_error_t int_equality(union ui_signal_payload a,
                                union ui_signal_payload b,
@@ -64,7 +82,7 @@ static ui_error_t int_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new syntax surface base component.
  * \param arena The arena to allocate from.
  * \param base_rich_text The base rich text component.
@@ -113,7 +131,7 @@ ui_syntax_surface_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a syntax surface base component.
  * \param surface The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -130,7 +148,7 @@ ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Calculates the width of the line number gutter.
  * \param surface The syntax surface component.
  * \param total_lines The total number of lines.
@@ -159,7 +177,7 @@ ui_error_t ui_syntax_surface_base_calculate_gutter_width(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets a fold region.
  * \param surface The syntax surface component.
  * \param start_line The start line of the fold.
@@ -202,7 +220,7 @@ ui_syntax_surface_base_set_fold_region(struct ui_syntax_surface_base *surface,
   return ui_signal_set(surface->fold_changed_signal, payload);
 }
 
-/*
+/**
  * \brief Gets the fold changed signal.
  * \param surface The syntax surface component.
  * \param out_signal Pointer to store the signal.
@@ -216,7 +234,7 @@ ui_error_t ui_syntax_surface_base_get_fold_changed_signal(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the visual line index for a given absolute line.
  * \param surface The syntax surface component.
  * \param absolute_line The absolute line number.
@@ -258,7 +276,7 @@ ui_error_t ui_syntax_surface_base_get_visual_line_index(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the active line.
  * \param surface The syntax surface component.
  * \param absolute_line The absolute line number.
@@ -278,7 +296,7 @@ ui_syntax_surface_base_set_active_line(struct ui_syntax_surface_base *surface,
   return ui_signal_set(surface->active_line_signal, payload);
 }
 
-/*
+/**
  * \brief Gets the active line signal.
  * \param surface The syntax surface component.
  * \param out_signal Pointer to store the signal.
@@ -292,7 +310,7 @@ ui_error_t ui_syntax_surface_base_get_active_line_signal(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the bracket match region.
  * \param surface The syntax surface component.
  * \param match The bracket match info.

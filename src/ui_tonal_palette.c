@@ -1,8 +1,12 @@
+/**
+ * @file ui_tonal_palette.c
+ * @brief ui_tonal_palette.c implementation.
+ */
 /* clang-format off */
 #include "ui_tonal_palette.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_tonal_palette_from_color.
  * @param argb Parameter argb.
  * @param out_palette Parameter out_palette.
@@ -28,7 +32,7 @@ ui_error_t ui_tonal_palette_from_color(ui_color_t argb,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_tonal_palette_get_tone.
  * @param palette Parameter palette.
  * @param tone Parameter tone.

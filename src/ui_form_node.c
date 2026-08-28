@@ -1,11 +1,22 @@
+/**
+ * @file ui_form_node.c
+ * @brief Implementation of generic form node utilities.
+ */
+
+#include "ui_form_array.h"
+#include "ui_form_group.h"
+#include "ui_form_node_internal.h"
 /* clang-format off */
 #include "ui_form_node_internal.h"
 #include "ui_form_group.h"
 #include "ui_form_array.h"
 /* clang-format on */
 
-/*
- * @brief _ui_form_node_get_status_internal.
+/**
+ * @brief Get status of form node (internal).
+ * @param node Node
+ * @param depth Recursion depth
+ * @param out_status Out status
  * @param node Parameter node.
  * @param out_status Parameter out_status.
  * @param depth Parameter depth.

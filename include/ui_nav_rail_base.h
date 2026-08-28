@@ -6,6 +6,9 @@
 #ifndef UI_NAV_RAIL_BASE_H
 #define UI_NAV_RAIL_BASE_H
 
+/**
+ * @brief Opaque structure representing a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -17,7 +20,14 @@ extern "C" {
 #include "ui_component.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a navigation rail base component.
+ */
 struct ui_nav_rail_base;
+
+/**
+ * @brief Opaque structure representing a navigation rail item base component.
+ */
 struct ui_nav_rail_item_base;
 
 /**
@@ -32,6 +42,7 @@ ui_error_t ui_nav_rail_base_create(struct ui_nav_rail_base **out_rail);
  * @brief Destroys a navigation rail component.
  *
  * @param rail The rail to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_nav_rail_base_destroy(struct ui_nav_rail_base *rail);
 
@@ -68,6 +79,7 @@ ui_nav_rail_item_base_create(struct ui_nav_rail_item_base **out_item);
  * @brief Destroys a navigation rail item component.
  *
  * @param item The item to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_nav_rail_item_base_destroy(struct ui_nav_rail_item_base *item);
 

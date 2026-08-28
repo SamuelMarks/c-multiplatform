@@ -49,6 +49,7 @@ mock_component_set_default_style(struct ui_component *component,
 /** @endcond */
 #endif
 
+/** @brief Default CSS stylesheet for card base component */
 static const char ui_card_base_css[] = {
     58,  104, 111, 115, 116, 32,  123, 32,  100, 105, 115, 112, 108, 97,  121,
     58,  32,  98,  108, 111, 99,  107, 59,  32,  112, 111, 115, 105, 116, 105,

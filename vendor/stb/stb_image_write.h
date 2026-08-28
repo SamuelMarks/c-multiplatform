@@ -166,6 +166,9 @@ LICENSE
 /* clang-format off */
 #include <stdlib.h>
 
+/** @def STBIWDEF
+ * @brief STB Image Write definition macro
+ */
 #ifndef STBIWDEF
 #ifdef STB_IMAGE_WRITE_STATIC
 #define STBIWDEF static
@@ -179,20 +182,70 @@ LICENSE
 #endif
 
 #ifndef STB_IMAGE_WRITE_STATIC
+/** @brief Global TGA RLE flag */
 STBIWDEF int stbi_write_tga_with_rle;
+/** @brief Global PNG compression level */
 STBIWDEF int stbi_write_png_compression_level;
+/** @brief Global PNG force filter flag */
 STBIWDEF int stbi_write_force_png_filter;
 #endif
 
 #ifndef STBI_WRITE_NO_STDIO
+/**
+ * @brief stbi_write_png.
+ * @param filename Parameter filename.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @param stride_in_bytes Parameter stride_in_bytes.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_png(char const *filename, int w, int h, int comp,
                             const void *data, int stride_in_bytes);
+/**
+ * @brief stbi_write_bmp.
+ * @param filename Parameter filename.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_bmp(char const *filename, int w, int h, int comp,
                             const void *data);
+/**
+ * @brief stbi_write_tga.
+ * @param filename Parameter filename.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_tga(char const *filename, int w, int h, int comp,
                             const void *data);
+/**
+ * @brief stbi_write_hdr.
+ * @param filename Parameter filename.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_hdr(char const *filename, int w, int h, int comp,
                             const float *data);
+/**
+ * @brief stbi_write_jpg.
+ * @param filename Parameter filename.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @param quality Parameter quality.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_jpg(char const *filename, int x, int y, int comp,
                             const void *data, int quality);
 
@@ -202,21 +255,81 @@ STBIWDEF int stbiw_convert_wchar_to_utf8(char *buffer, size_t bufferlen,
 #endif
 #endif
 
+/**
+ * @brief stbi_write_func.
+ */
 typedef void stbi_write_func(void *context, void *data, int size);
 
+/**
+ * @brief stbi_write_png_to_func.
+ * @param func Parameter func.
+ * @param context Parameter context.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @param stride_in_bytes Parameter stride_in_bytes.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_png_to_func(stbi_write_func *func, void *context, int w,
                                     int h, int comp, const void *data,
                                     int stride_in_bytes);
+/**
+ * @brief stbi_write_bmp_to_func.
+ * @param func Parameter func.
+ * @param context Parameter context.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_bmp_to_func(stbi_write_func *func, void *context, int w,
                                     int h, int comp, const void *data);
+/**
+ * @brief stbi_write_tga_to_func.
+ * @param func Parameter func.
+ * @param context Parameter context.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_tga_to_func(stbi_write_func *func, void *context, int w,
                                     int h, int comp, const void *data);
+/**
+ * @brief stbi_write_hdr_to_func.
+ * @param func Parameter func.
+ * @param context Parameter context.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_hdr_to_func(stbi_write_func *func, void *context, int w,
                                     int h, int comp, const float *data);
+/**
+ * @brief stbi_write_jpg_to_func.
+ * @param func Parameter func.
+ * @param context Parameter context.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @param quality Parameter quality.
+ * @return Return value.
+ */
 STBIWDEF int stbi_write_jpg_to_func(stbi_write_func *func, void *context, int x,
                                     int y, int comp, const void *data,
                                     int quality);
 
+/**
+ * @brief stbi_flip_vertically_on_write.
+ * @param flip_boolean Parameter flip_boolean.
+ * @return Return value.
+ */
 STBIWDEF void stbi_flip_vertically_on_write(int flip_boolean);
 
 #endif
@@ -306,6 +419,13 @@ static void stbi__start_write_callbacks(stbi__write_context *s,
 
 #ifndef STBI_WRITE_NO_STDIO
 
+/**
+ * @brief stbi__stdio_write.
+ * @param context Parameter context.
+ * @param data Parameter data.
+ * @param size Parameter size.
+ * @return Return value.
+ */
 static void stbi__stdio_write(void *context, void *data, int size) {
   fwrite(data, 1, size, (FILE *)context);
 }
@@ -359,6 +479,12 @@ static FILE *stbiw__fopen(char const *filename, char const *mode) {
   return f;
 }
 
+/**
+ * @brief stbi__start_write_file.
+ * @param s Parameter s.
+ * @param filename Parameter filename.
+ * @return Return value.
+ */
 static int stbi__start_write_file(stbi__write_context *s,
                                   const char *filename) {
   FILE *f = stbiw__fopen(filename, "wb");
@@ -366,6 +492,11 @@ static int stbi__start_write_file(stbi__write_context *s,
   return f != NULL;
 }
 
+/**
+ * @brief stbi__end_write_file.
+ * @param s Parameter s.
+ * @return Return value.
+ */
 static void stbi__end_write_file(stbi__write_context *s) {
   fclose((FILE *)s->context);
 }
@@ -375,6 +506,13 @@ static void stbi__end_write_file(stbi__write_context *s) {
 typedef unsigned int stbiw_uint32;
 typedef int stb_image_write_test[sizeof(stbiw_uint32) == 4 ? 1 : -1];
 
+/**
+ * @brief stbiw__writefv.
+ * @param s Parameter s.
+ * @param fmt Parameter fmt.
+ * @param v Parameter v.
+ * @return Return value.
+ */
 static void stbiw__writefv(stbi__write_context *s, const char *fmt, va_list v) {
   while (*fmt) {
     switch (*fmt++) {
@@ -410,6 +548,13 @@ static void stbiw__writefv(stbi__write_context *s, const char *fmt, va_list v) {
   }
 }
 
+/**
+ * @brief stbiw__writef.
+ * @param s Parameter s.
+ * @param fmt Parameter fmt.
+ * @param ... Parameter ....
+ * @return Return value.
+ */
 static void stbiw__writef(stbi__write_context *s, const char *fmt, ...) {
   va_list v;
   va_start(v, fmt);
@@ -417,6 +562,11 @@ static void stbiw__writef(stbi__write_context *s, const char *fmt, ...) {
   va_end(v);
 }
 
+/**
+ * @brief stbiw__write_flush.
+ * @param s Parameter s.
+ * @return Return value.
+ */
 static void stbiw__write_flush(stbi__write_context *s) {
   if (s->buf_used) {
     s->func(s->context, &s->buffer, s->buf_used);
@@ -424,16 +574,36 @@ static void stbiw__write_flush(stbi__write_context *s) {
   }
 }
 
+/**
+ * @brief stbiw__putc.
+ * @param s Parameter s.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static void stbiw__putc(stbi__write_context *s, unsigned char c) {
   s->func(s->context, &c, 1);
 }
 
+/**
+ * @brief stbiw__write1.
+ * @param s Parameter s.
+ * @param a Parameter a.
+ * @return Return value.
+ */
 static void stbiw__write1(stbi__write_context *s, unsigned char a) {
   if ((size_t)s->buf_used + 1 > sizeof(s->buffer))
     stbiw__write_flush(s);
   s->buffer[s->buf_used++] = a;
 }
 
+/**
+ * @brief stbiw__write3.
+ * @param s Parameter s.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param c Parameter c.
+ * @return Return value.
+ */
 static void stbiw__write3(stbi__write_context *s, unsigned char a,
                           unsigned char b, unsigned char c) {
   int n;
@@ -446,6 +616,16 @@ static void stbiw__write3(stbi__write_context *s, unsigned char a,
   s->buffer[n + 2] = c;
 }
 
+/**
+ * @brief stbiw__write_pixel.
+ * @param s Parameter s.
+ * @param rgb_dir Parameter rgb_dir.
+ * @param comp Parameter comp.
+ * @param write_alpha Parameter write_alpha.
+ * @param expand_mono Parameter expand_mono.
+ * @param d Parameter d.
+ * @return Return value.
+ */
 static void stbiw__write_pixel(stbi__write_context *s, int rgb_dir, int comp,
                                int write_alpha, int expand_mono,
                                unsigned char *d) {
@@ -481,6 +661,20 @@ static void stbiw__write_pixel(stbi__write_context *s, int rgb_dir, int comp,
     stbiw__write1(s, d[comp - 1]);
 }
 
+/**
+ * @brief stbiw__write_pixels.
+ * @param s Parameter s.
+ * @param rgb_dir Parameter rgb_dir.
+ * @param vdir Parameter vdir.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @param write_alpha Parameter write_alpha.
+ * @param scanline_pad Parameter scanline_pad.
+ * @param expand_mono Parameter expand_mono.
+ * @return Return value.
+ */
 static void stbiw__write_pixels(stbi__write_context *s, int rgb_dir, int vdir,
                                 int x, int y, int comp, void *data,
                                 int write_alpha, int scanline_pad,
@@ -512,6 +706,22 @@ static void stbiw__write_pixels(stbi__write_context *s, int rgb_dir, int vdir,
   }
 }
 
+/**
+ * @brief stbiw__outfile.
+ * @param s Parameter s.
+ * @param rgb_dir Parameter rgb_dir.
+ * @param vdir Parameter vdir.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param comp Parameter comp.
+ * @param expand_mono Parameter expand_mono.
+ * @param data Parameter data.
+ * @param alpha Parameter alpha.
+ * @param pad Parameter pad.
+ * @param fmt Parameter fmt.
+ * @param ... Parameter ....
+ * @return Return value.
+ */
 static int stbiw__outfile(stbi__write_context *s, int rgb_dir, int vdir, int x,
                           int y, int comp, int expand_mono, void *data,
                           int alpha, int pad, const char *fmt, ...) {
@@ -528,6 +738,15 @@ static int stbiw__outfile(stbi__write_context *s, int rgb_dir, int vdir, int x,
   }
 }
 
+/**
+ * @brief stbi_write_bmp_core.
+ * @param s Parameter s.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 static int stbi_write_bmp_core(stbi__write_context *s, int x, int y, int comp,
                                const void *data) {
   if (comp != 4) {
@@ -569,6 +788,15 @@ STBIWDEF int stbi_write_bmp(char const *filename, int x, int y, int comp,
 }
 #endif
 
+/**
+ * @brief stbi_write_tga_core.
+ * @param s Parameter s.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 static int stbi_write_tga_core(stbi__write_context *s, int x, int y, int comp,
                                void *data) {
   int has_alpha = (comp == 2 || comp == 4);
@@ -674,6 +902,12 @@ STBIWDEF int stbi_write_tga(char const *filename, int x, int y, int comp,
 
 #ifndef STBI_WRITE_NO_STDIO
 
+/**
+ * @brief stbiw__linear_to_rgbe.
+ * @param rgbe Parameter rgbe.
+ * @param linear Parameter linear.
+ * @return Return value.
+ */
 static void stbiw__linear_to_rgbe(unsigned char *rgbe, float *linear) {
   int exponent;
   float maxcomp = stbiw__max(linear[0], stbiw__max(linear[1], linear[2]));
@@ -698,6 +932,13 @@ static void stbiw__write_run_data(stbi__write_context *s, int length,
   s->func(s->context, &databyte, 1);
 }
 
+/**
+ * @brief stbiw__write_dump_data.
+ * @param s Parameter s.
+ * @param length Parameter length.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 static void stbiw__write_dump_data(stbi__write_context *s, int length,
                                    unsigned char *data) {
   unsigned char lengthbyte = STBIW_UCHAR(length);
@@ -706,6 +947,15 @@ static void stbiw__write_dump_data(stbi__write_context *s, int length,
   s->func(s->context, data, length);
 }
 
+/**
+ * @brief stbiw__write_hdr_scanline.
+ * @param s Parameter s.
+ * @param width Parameter width.
+ * @param ncomp Parameter ncomp.
+ * @param scratch Parameter scratch.
+ * @param scanline Parameter scanline.
+ * @return Return value.
+ */
 static void stbiw__write_hdr_scanline(stbi__write_context *s, int width,
                                       int ncomp, unsigned char *scratch,
                                       float *scanline) {
@@ -800,6 +1050,15 @@ static void stbiw__write_hdr_scanline(stbi__write_context *s, int width,
   }
 }
 
+/**
+ * @brief stbi_write_hdr_core.
+ * @param s Parameter s.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 static int stbi_write_hdr_core(stbi__write_context *s, int x, int y, int comp,
                                float *data) {
   if (y <= 0 || x <= 0 || data == NULL)
@@ -894,6 +1153,12 @@ static unsigned char *stbiw__zlib_flushf(unsigned char *data,
   return data;
 }
 
+/**
+ * @brief stbiw__zlib_bitrev.
+ * @param code Parameter code.
+ * @param codebits Parameter codebits.
+ * @return Return value.
+ */
 static int stbiw__zlib_bitrev(int code, int codebits) {
   int res = 0;
   while (codebits--) {
@@ -1160,6 +1425,12 @@ static unsigned int stbiw__crc32(unsigned char *buffer, int len) {
   stbiw__wpng4(data, (v) >> 24, (v) >> 16, (v) >> 8, (v));
 #define stbiw__wptag(data, s) stbiw__wpng4(data, s[0], s[1], s[2], s[3])
 
+/**
+ * @brief stbiw__wpcrc.
+ * @param data Parameter data.
+ * @param len Parameter len.
+ * @return Return value.
+ */
 static void stbiw__wpcrc(unsigned char **data, int len) {
   unsigned int crc = stbiw__crc32(*data - len - 4, len + 4);
   stbiw__wp32(*data, crc);
@@ -1174,6 +1445,18 @@ static unsigned char stbiw__paeth(int a, int b, int c) {
   return STBIW_UCHAR(c);
 }
 
+/**
+ * @brief stbiw__encode_png_line.
+ * @param pixels Parameter pixels.
+ * @param stride_bytes Parameter stride_bytes.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param y Parameter y.
+ * @param n Parameter n.
+ * @param filter_type Parameter filter_type.
+ * @param line_buffer Parameter line_buffer.
+ * @return Return value.
+ */
 static void stbiw__encode_png_line(unsigned char *pixels, int stride_bytes,
                                    int width, int height, int y, int n,
                                    int filter_type, signed char *line_buffer) {
@@ -1394,6 +1677,14 @@ static const unsigned char stbiw__jpg_ZigZag[] = {
     10, 19, 23, 32, 39, 45, 52, 54, 20, 22, 33, 38, 46, 51, 55, 60,
     21, 34, 37, 47, 50, 56, 59, 61, 35, 36, 48, 49, 57, 58, 62, 63};
 
+/**
+ * @brief stbiw__jpg_writeBits.
+ * @param s Parameter s.
+ * @param bitBufP Parameter bitBufP.
+ * @param bitCntP Parameter bitCntP.
+ * @param bs Parameter bs.
+ * @return Return value.
+ */
 static void stbiw__jpg_writeBits(stbi__write_context *s, int *bitBufP,
                                  int *bitCntP, const unsigned short *bs) {
   int bitBuf = *bitBufP, bitCnt = *bitCntP;
@@ -1412,6 +1703,18 @@ static void stbiw__jpg_writeBits(stbi__write_context *s, int *bitBufP,
   *bitCntP = bitCnt;
 }
 
+/**
+ * @brief stbiw__jpg_DCT.
+ * @param d0p Parameter d0p.
+ * @param d1p Parameter d1p.
+ * @param d2p Parameter d2p.
+ * @param d3p Parameter d3p.
+ * @param d4p Parameter d4p.
+ * @param d5p Parameter d5p.
+ * @param d6p Parameter d6p.
+ * @param d7p Parameter d7p.
+ * @return Return value.
+ */
 static void stbiw__jpg_DCT(float *d0p, float *d1p, float *d2p, float *d3p,
                            float *d4p, float *d5p, float *d6p, float *d7p) {
   float d0 = *d0p, d1 = *d1p, d2 = *d2p, d3 = *d3p, d4 = *d4p, d5 = *d5p,
@@ -1462,6 +1765,12 @@ static void stbiw__jpg_DCT(float *d0p, float *d1p, float *d2p, float *d3p,
   *d6p = d6;
 }
 
+/**
+ * @brief stbiw__jpg_calcBits.
+ * @param val Parameter val.
+ * @param bits[2] Parameter bits[2].
+ * @return Return value.
+ */
 static void stbiw__jpg_calcBits(int val, unsigned short bits[2]) {
   int tmp1 = val < 0 ? -val : val;
   val = val < 0 ? val - 1 : val;
@@ -1472,6 +1781,19 @@ static void stbiw__jpg_calcBits(int val, unsigned short bits[2]) {
   bits[0] = val & ((1 << bits[1]) - 1);
 }
 
+/**
+ * @brief stbiw__jpg_processDU.
+ * @param s Parameter s.
+ * @param bitBuf Parameter bitBuf.
+ * @param bitCnt Parameter bitCnt.
+ * @param CDU Parameter CDU.
+ * @param du_stride Parameter du_stride.
+ * @param fdtbl Parameter fdtbl.
+ * @param DC Parameter DC.
+ * @param HTDC[256][2] Parameter HTDC[256][2].
+ * @param HTAC[256][2] Parameter HTAC[256][2].
+ * @return Return value.
+ */
 static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf,
                                 int *bitCnt, float *CDU, int du_stride,
                                 float *fdtbl, int DC,
@@ -1548,6 +1870,16 @@ static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf,
   return DU[0];
 }
 
+/**
+ * @brief stbi_write_jpg_core.
+ * @param s Parameter s.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param comp Parameter comp.
+ * @param data Parameter data.
+ * @param quality Parameter quality.
+ * @return Return value.
+ */
 static int stbi_write_jpg_core(stbi__write_context *s, int width, int height,
                                int comp, const void *data, int quality) {
 

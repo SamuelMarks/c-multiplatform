@@ -1,3 +1,7 @@
+/**
+ * @file ui_color_quantization.c
+ * @brief ui_color_quantization.c implementation.
+ */
 /* clang-format off */
 #include "ui_color_quantization.h"
 #include "ui_internal_mem.h"
@@ -31,7 +35,7 @@ struct ui_cluster {
   int count; /**< count */
 };
 
-/*
+/**
  * @brief calc_color_distance.
  * @param r1 Parameter r1.
  * @param g1 Parameter g1.
@@ -48,7 +52,7 @@ static int calc_color_distance(int r1, int g1, int b1, int r2, int g2, int b2) {
   return dr * dr + dg * dg + db * db;
 }
 
-/*
+/**
  * @brief ui_color_quantize_kmeans.
  * @param pixels Parameter pixels.
  * @param width Parameter width.

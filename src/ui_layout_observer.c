@@ -1,6 +1,10 @@
+/**
+ * @file ui_layout_observer.c
+ * @brief ui_layout_observer.c implementation.
+ */
 /*
- * \file ui_layout_observer.c
- * \brief Implementation of responsive layout observations and breakpoints.
+ * @file ui_layout_observer.c
+ * @brief Implementation of responsive layout observations and breakpoints.
  */
 /* clang-format off */
 #include "ui_layout_observer.h"
@@ -10,8 +14,8 @@
 
 /**
  * @struct ui_layout_breakpoint
- * \struct ui_layout_breakpoint
- * \brief Defines a dimensional range for triggering layout changes.
+ * @struct ui_layout_breakpoint
+ * @brief Defines a dimensional range for triggering layout changes.
  */
 struct ui_layout_breakpoint {
   int id;         /**< id */
@@ -24,7 +28,7 @@ struct ui_layout_breakpoint {
 
 /**
  * @struct ui_layout_subscriber
- * \brief ui_layout_subscriber
+ * @brief ui_layout_subscriber
  */
 struct ui_layout_subscriber {
   ui_layout_observer_cb_t callback; /**< callback */
@@ -33,7 +37,7 @@ struct ui_layout_subscriber {
 
 /**
  * @struct ui_layout_observer
- * \brief ui_layout_observer
+ * @brief ui_layout_observer
  */
 struct ui_layout_observer {
   struct ui_layout_breakpoint *breakpoints; /**< breakpoints */
@@ -49,7 +53,10 @@ struct ui_layout_observer {
   int last_height; /**< last_height */
 };
 
-/* \brief ui_error
+/**
+ * @brief Creates a new layout observer.
+ * @param[out] out_observer Pointer to store the created layout observer.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_layout_observer_create(struct ui_layout_observer **out_observer) {
   struct ui_layout_observer *obs;
@@ -73,10 +80,10 @@ ui_error_t ui_layout_observer_create(struct ui_layout_observer **out_observer) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a layout observer.
- * \param[in,out] observer The observer to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a layout observer.
+ * @param[in,out] observer The observer to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_layout_observer_destroy(struct ui_layout_observer *observer) {
   if (!observer) {
@@ -94,7 +101,15 @@ ui_error_t ui_layout_observer_destroy(struct ui_layout_observer *observer) {
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Adds a breakpoint to the layout observer.
+ * @param[in,out] observer The layout observer.
+ * @param[in] min_width Minimum width for the breakpoint.
+ * @param[in] max_width Maximum width for the breakpoint.
+ * @param[in] min_height Minimum height for the breakpoint.
+ * @param[in] max_height Maximum height for the breakpoint.
+ * @param[out] out_breakpoint_id Pointer to store the ID of the new breakpoint.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
@@ -148,12 +163,12 @@ ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Subscribes a callback to layout breakpoint changes.
- * \param[in,out] observer The layout observer.
- * \param[in] callback The function to call when a breakpoint triggers.
- * \param[in] user_data Optional user data to pass to the callback.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Subscribes a callback to layout breakpoint changes.
+ * @param[in,out] observer The layout observer.
+ * @param[in] callback The function to call when a breakpoint triggers.
+ * @param[in] user_data Optional user data to pass to the callback.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_layout_observer_subscribe(struct ui_layout_observer *observer,
                                         ui_layout_observer_cb_t callback,
@@ -187,7 +202,12 @@ ui_error_t ui_layout_observer_subscribe(struct ui_layout_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Notifies the layout observer of a resize event.
+ * @param[in,out] observer The layout observer.
+ * @param[in] width The new width.
+ * @param[in] height The new height.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_layout_observer_notify_resize(struct ui_layout_observer *observer,
                                             int width, int height) {
@@ -232,7 +252,12 @@ ui_error_t ui_layout_observer_notify_resize(struct ui_layout_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Checks if a layout breakpoint is currently active.
+ * @param[in] observer The layout observer.
+ * @param[in] breakpoint_id The ID of the breakpoint to check.
+ * @param[out] out_is_active Pointer to store whether the breakpoint is active.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_layout_observer_is_active(const struct ui_layout_observer *observer,

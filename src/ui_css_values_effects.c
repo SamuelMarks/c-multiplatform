@@ -1,3 +1,21 @@
+/**
+ * @file ui_css_values_effects.c
+ * @brief CSS effects values parsing and memory management implementation.
+ */
+
+/* clang-format off */
+#include "ui_types.h"
+#include "ui_internal_mem.h"
+#include <string.h>
+#include <stdio.h>
+/* clang-format on */
+
+/**
+ * @brief Parses a CSS transform string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_transform Pointer to the output transform structure pointer.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_css_parse_transform(const char *str,
                                   struct ui_css_transform **out_transform) {
   struct ui_css_transform *transform;
@@ -146,7 +164,11 @@ cleanup_fail: { ui_css_transform_destroy(transform); }
   return UI_ERROR_PARSE_FAILED;
 }
 
-/* \brief ui_error
+/**
+ * @brief Parses a CSS shape-outside string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_shape Pointer to the output shape-outside structure.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_shape_outside(const char *str,
                                       struct ui_css_shape_outside *out_shape) {
@@ -229,10 +251,10 @@ ui_error_t ui_css_parse_shape_outside(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
- * @brief ui_css_filter_destroy.
- * @param filter Parameter filter.
- * @return Return value.
+/**
+ * @brief Destroys a CSS filter list and frees memory.
+ * @param[in,out] filter Pointer to the CSS filter to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_css_filter_destroy(struct ui_css_filter *filter) {
   if (!filter)
@@ -250,11 +272,11 @@ ui_error_t ui_css_filter_destroy(struct ui_css_filter *filter) {
   return UI_ERROR_NONE;
 }
 
-/*
- * @brief ui_css_parse_filter.
- * @param str Parameter str.
- * @param out_filter Parameter out_filter.
- * @return Return value.
+/**
+ * @brief Parses a CSS filter string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_filter Pointer to the output filter pointer.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_filter(const char *str,
                                struct ui_css_filter **out_filter) {
@@ -455,11 +477,11 @@ cleanup_fail: { ui_css_filter_destroy(filter); }
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
- * @brief ui_css_parse_blend_mode.
- * @param str Parameter str.
- * @param out_blend_mode Parameter out_blend_mode.
- * @return Return value.
+/**
+ * @brief Parses a CSS blend mode.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_blend_mode Pointer to the output blend mode.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_blend_mode(const char *str,
                                    enum ui_css_blend_mode *out_blend_mode) {
@@ -506,10 +528,10 @@ ui_error_t ui_css_parse_blend_mode(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
- * @brief ui_css_shadow_list_destroy.
- * @param list Parameter list.
- * @return Return value.
+/**
+ * @brief Destroys a CSS shadow list and frees memory.
+ * @param[in,out] list Pointer to the shadow list to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_css_shadow_list_destroy(struct ui_css_shadow_list *list) {
   if (!list)
@@ -527,11 +549,11 @@ ui_error_t ui_css_shadow_list_destroy(struct ui_css_shadow_list *list) {
   return UI_ERROR_NONE;
 }
 
-/*
- * @brief ui_css_parse_shadow.
- * @param str Parameter str.
- * @param out_shadows Parameter out_shadows.
- * @return Return value.
+/**
+ * @brief Parses a CSS shadow string into a list.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_shadows Pointer to the output shadow list pointer.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_shadow(const char *str,
                                struct ui_css_shadow_list **out_shadows) {
@@ -661,11 +683,11 @@ ui_error_t ui_css_parse_shadow(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
- * @brief ui_css_parse_fill_rule.
- * @param str Parameter str.
- * @param out_rule Parameter out_rule.
- * @return Return value.
+/**
+ * @brief Parses a CSS fill rule string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_rule Pointer to the output fill rule enum.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_fill_rule(const char *str,
                                   enum ui_css_fill_rule *out_rule) {
@@ -684,7 +706,11 @@ ui_error_t ui_css_parse_fill_rule(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/* \brief ui_error
+/**
+ * @brief Parses a CSS stroke linecap string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_linecap Pointer to the output stroke linecap enum.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_css_parse_stroke_linecap(const char *str,
@@ -707,7 +733,11 @@ ui_css_parse_stroke_linecap(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/* \brief ui_error
+/**
+ * @brief Parses a CSS stroke linejoin string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_linejoin Pointer to the output stroke linejoin enum.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_css_parse_stroke_linejoin(const char *str,
@@ -730,11 +760,11 @@ ui_css_parse_stroke_linejoin(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
- * @brief ui_css_parse_paint.
- * @param str Parameter str.
- * @param out_paint Parameter out_paint.
- * @return Return value.
+/**
+ * @brief Parses a CSS paint string (color or url).
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_paint Pointer to the output paint structure.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_paint(const char *str, struct ui_css_paint *out_paint) {
   if (!str || !out_paint)
@@ -787,11 +817,11 @@ ui_error_t ui_css_parse_paint(const char *str, struct ui_css_paint *out_paint) {
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
- * @brief ui_css_parse_dasharray.
- * @param str Parameter str.
- * @param out_dasharray Parameter out_dasharray.
- * @return Return value.
+/**
+ * @brief Parses a CSS dasharray string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_dasharray Pointer to the output dasharray structure.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_dasharray(const char *str,
                                   struct ui_css_dasharray *out_dasharray) {
@@ -842,7 +872,11 @@ ui_error_t ui_css_parse_dasharray(const char *str,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Parses a CSS easing function string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_easing Pointer to the output easing function structure.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_css_parse_easing_function(const char *str,
@@ -908,10 +942,10 @@ ui_css_parse_easing_function(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
- * @brief ui_css_transition_destroy.
- * @param transitions Parameter transitions.
- * @return Return value.
+/**
+ * @brief Destroys a CSS transition list.
+ * @param[in,out] transitions Pointer to the CSS transitions to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_css_transition_destroy(struct ui_css_transition *transitions) {
   while (transitions) {

@@ -1,3 +1,7 @@
+/**
+ * @file ui_breadcrumbs_base.c
+ * @brief Implementation of ui_breadcrumbs_base.c.
+ */
 /* clang-format off */
 #include "ui_breadcrumbs_base.h"
 #include "ui_internal_mem.h"
@@ -11,6 +15,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet for breadcrumbs base component */
 static const char *ui_breadcrumbs_base_css = ":host { "
                                              "display: block; "
                                              "font-family: sans-serif; "
@@ -65,7 +70,7 @@ struct ui_breadcrumb_segment {
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_breadcrumbs_mock_fail;
 
-/*
+/**
  * @brief mock_dom_node_append_child.
  * @param parent Parameter parent.
  * @param child Parameter child.
@@ -106,7 +111,7 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
 #define ui_dom_node_append_child mock_dom_node_append_child
 /** @endcond */
 
-/*
+/**
  * @brief mock_ui_component_set_default_style.
  * @param comp Parameter comp.
  * @param style Parameter style.
@@ -124,7 +129,7 @@ mock_ui_component_set_default_style(struct ui_component *comp,
 #define ui_component_set_default_style mock_ui_component_set_default_style
 /** @endcond */
 
-/*
+/**
  * @brief mock_dom_node_remove_child.
  * @param parent Parameter parent.
  * @param child Parameter child.
@@ -141,7 +146,7 @@ static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
 #define ui_dom_node_remove_child mock_dom_node_remove_child
 /** @endcond */
 
-/*
+/**
  * @brief mock_dom_node_destroy.
  * @param node Parameter node.
  * @return Return value.
@@ -156,7 +161,7 @@ static ui_error_t mock_dom_node_destroy(struct ui_dom_node *node) {
 #define ui_dom_node_destroy mock_dom_node_destroy
 /** @endcond */
 
-/*
+/**
  * @brief mock_ui_component_destroy.
  * @param comp Parameter comp.
  * @return Return value.
@@ -171,7 +176,7 @@ static ui_error_t mock_ui_component_destroy(struct ui_component *comp) {
 #define ui_component_destroy mock_ui_component_destroy
 /** @endcond */
 
-/*
+/**
  * @brief mock_ui_dom_node_set_text_content.
  * @param node Parameter node.
  * @param text Parameter text.
@@ -188,7 +193,7 @@ static ui_error_t mock_ui_dom_node_set_text_content(struct ui_dom_node *node,
 #define ui_dom_node_set_text_content mock_ui_dom_node_set_text_content
 /** @endcond */
 
-/*
+/**
  * @brief mock_ui_router_navigate.
  * @param router Parameter router.
  * @param path Parameter path.
@@ -205,7 +210,7 @@ static ui_error_t mock_ui_router_navigate(struct ui_router *router,
 #define ui_router_navigate mock_ui_router_navigate
 /** @endcond */
 
-/*
+/**
  * @brief mock_ui_dom_node_set_attribute.
  * @param node Parameter node.
  * @param k Parameter k.
@@ -223,7 +228,7 @@ static ui_error_t mock_ui_dom_node_set_attribute(struct ui_dom_node *node,
 #define ui_dom_node_set_attribute mock_ui_dom_node_set_attribute
 /** @endcond */
 
-/*
+/**
  * @brief mock_ui_css_parse_stylesheet.
  * @param css Parameter css.
  * @param out Parameter out.
@@ -256,7 +261,7 @@ struct ui_breadcrumbs_base {
   struct ui_signal *active_index_signal;  /**< active_index_signal */
 };
 
-/*
+/**
  * @brief internal_strndup.
  * @param src Parameter src.
  * @param n Parameter n.
@@ -284,7 +289,7 @@ static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_breadcrumbs_base_create.
  * @param router Parameter router.
  * @param out_breadcrumbs Parameter out_breadcrumbs.
@@ -367,7 +372,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief free_segments.
  * @param bc Parameter bc.
  * @return Return value.
@@ -417,7 +422,7 @@ static ui_error_t free_segments(struct ui_breadcrumbs_base *bc) {
   return rc;
 }
 
-/*
+/**
  * @brief ui_breadcrumbs_base_destroy.
  * @param breadcrumbs Parameter breadcrumbs.
  * @return Return value.
@@ -439,7 +444,7 @@ ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_breadcrumbs_base_get_component.
  * @param breadcrumbs Parameter breadcrumbs.
  * @param out_component Parameter out_component.
@@ -455,7 +460,7 @@ ui_breadcrumbs_base_get_component(struct ui_breadcrumbs_base *breadcrumbs,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_breadcrumbs_base_set_path.
  * @param bc Parameter bc.
  * @param path Parameter path.
@@ -640,7 +645,7 @@ fail:
   return rc;
 }
 
-/*
+/**
  * @brief ui_breadcrumbs_base_simulate_click.
  * @param bc Parameter bc.
  * @param index Parameter index.
@@ -662,7 +667,7 @@ ui_error_t ui_breadcrumbs_base_simulate_click(struct ui_breadcrumbs_base *bc,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_breadcrumbs_base_bind_active_index.
  * @param widget Parameter widget.
  * @param signal Parameter signal.
@@ -680,7 +685,7 @@ ui_breadcrumbs_base_bind_active_index(struct ui_breadcrumbs_base *widget,
 
 #ifdef UI_TEST_MOCK_ALLOC
 ui_error_t run_bc_coverage(void);
-/*
+/**
  * @brief run_bc_coverage.
  * @return Return value.
  */

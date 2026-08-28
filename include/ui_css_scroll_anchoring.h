@@ -18,8 +18,8 @@ extern "C" {
  * @brief CSS overflow-anchor property.
  */
 enum ui_css_overflow_anchor {
-  UI_CSS_OVERFLOW_ANCHOR_AUTO,
-  UI_CSS_OVERFLOW_ANCHOR_NONE
+  UI_CSS_OVERFLOW_ANCHOR_AUTO, /**< Auto scroll anchoring */
+  UI_CSS_OVERFLOW_ANCHOR_NONE  /**< No scroll anchoring */
 };
 
 struct ui_css_computed_style; /* Forward declare */

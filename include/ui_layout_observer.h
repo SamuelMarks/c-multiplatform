@@ -14,6 +14,9 @@ extern "C" {
 #include "ui_error.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a layout breakpoint observer.
+ */
 struct ui_layout_observer;
 
 /**
@@ -24,6 +27,7 @@ struct ui_layout_observer;
  * @param is_active 1 if the breakpoint just became active, 0 if it became
  * inactive.
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_layout_observer_cb_t)(
     struct ui_layout_observer *observer, int breakpoint_id, int is_active,
@@ -41,6 +45,7 @@ ui_error_t ui_layout_observer_create(struct ui_layout_observer **out_observer);
  * @brief Destroys a layout breakpoint observer.
  *
  * @param observer The observer to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_layout_observer_destroy(struct ui_layout_observer *observer);
 

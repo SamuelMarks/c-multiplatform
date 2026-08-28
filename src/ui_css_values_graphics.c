@@ -1,3 +1,19 @@
+/**
+ * @file ui_css_values_graphics.c
+ * @brief CSS graphics values parsing implementation.
+ */
+
+/* clang-format off */
+#include "ui_types.h"
+#include <string.h>
+/* clang-format on */
+
+/**
+ * @brief Parses a CSS image (url, gradients).
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_image Pointer to the output image structure.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
 ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image) {
   if (!str || !out_image)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -91,11 +107,10 @@ ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image) {
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
- * @brief parse_geometry_box.
- * @param str Parameter str.
- * @param out_box Parameter out_box.
- * @return Return value.
+/**
+ * @brief Parses a geometry box from a CSS string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_box Pointer to the output geometry box enum.
  */
 static void parse_geometry_box(const char *str,
                                enum ui_css_geometry_box *out_box) {
@@ -118,11 +133,11 @@ static void parse_geometry_box(const char *str,
     *out_box = UI_CSS_GEOMETRY_BOX_NONE;
 }
 
-/*
- * @brief ui_css_parse_clip_path.
- * @param str Parameter str.
- * @param out_clip_path Parameter out_clip_path.
- * @return Return value.
+/**
+ * @brief Parses a CSS clip-path string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_clip_path Pointer to the output clip-path structure.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_clip_path(const char *str,
                                   struct ui_css_clip_path *out_clip_path) {
@@ -197,11 +212,11 @@ ui_error_t ui_css_parse_clip_path(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
- * @brief ui_css_parse_mask.
- * @param str Parameter str.
- * @param out_mask Parameter out_mask.
- * @return Return value.
+/**
+ * @brief Parses a CSS mask string.
+ * @param[in] str The CSS string to parse.
+ * @param[out] out_mask Pointer to the output mask layer structure.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_css_parse_mask(const char *str,
                              struct ui_css_mask_layer *out_mask) {
@@ -271,10 +286,10 @@ ui_error_t ui_css_parse_mask(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
- * @brief ui_css_transform_destroy.
- * @param transform Parameter transform.
- * @return Return value.
+/**
+ * @brief Destroys a CSS transform structure and frees memory.
+ * @param[in,out] transform Pointer to the CSS transform to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_css_transform_destroy(struct ui_css_transform *transform) {
   if (!transform)
@@ -291,10 +306,3 @@ ui_error_t ui_css_transform_destroy(struct ui_css_transform *transform) {
   C_MULTIPLATFORM_FREE(transform);
   return UI_ERROR_NONE;
 }
-
-/*
- * @brief ui_css_parse_transform.
- * @param str Parameter str.
- * @param out_transform Parameter out_transform.
- * @return Return value.
- */

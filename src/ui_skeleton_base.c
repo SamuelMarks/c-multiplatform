@@ -1,3 +1,7 @@
+/**
+ * @file ui_skeleton_base.c
+ * @brief ui_skeleton_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_skeleton_base.h"
 #include "ui_internal_mem.h"
@@ -23,7 +27,7 @@ struct ui_skeleton_base {
   struct ui_signal *active_signal;            /**< active_signal */
 };
 
-/*
+/**
  * \brief Creates a new skeleton base component.
  * \param out_skeleton Pointer to store the component.
  * \return UI_ERROR_NONE on success.
@@ -60,7 +64,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Destroys a skeleton base component.
  * \param skeleton The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -73,7 +77,7 @@ ui_error_t ui_skeleton_base_destroy(struct ui_skeleton_base *skeleton) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the shape of the skeleton.
  * \param skeleton The skeleton component.
  * \param shape The shape to set.
@@ -88,7 +92,7 @@ ui_error_t ui_skeleton_base_set_shape(struct ui_skeleton_base *skeleton,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the shape of the skeleton.
  * \param skeleton The skeleton component.
  * \param out_shape Pointer to store the shape.
@@ -103,7 +107,7 @@ ui_error_t ui_skeleton_base_get_shape(const struct ui_skeleton_base *skeleton,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the dimensions of the skeleton.
  * \param skeleton The skeleton component.
  * \param width The width to set.
@@ -127,7 +131,7 @@ ui_error_t ui_skeleton_base_set_dimensions(struct ui_skeleton_base *skeleton,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the dimensions of the skeleton.
  * \param skeleton The skeleton component.
  * \param out_width Pointer to store the width.
@@ -147,7 +151,7 @@ ui_skeleton_base_get_dimensions(const struct ui_skeleton_base *skeleton,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Ticks the animation for the skeleton.
  * \param skeleton The skeleton component.
  * \param delta_time_ms The elapsed time in ms.
@@ -170,7 +174,7 @@ ui_error_t ui_skeleton_base_tick(struct ui_skeleton_base *skeleton,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the animation phase of the skeleton.
  * \param skeleton The skeleton component.
  * \param out_phase Pointer to store the phase.
@@ -192,7 +196,7 @@ ui_skeleton_base_get_animation_phase(const struct ui_skeleton_base *skeleton,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the animation config for the skeleton.
  * \param skeleton The skeleton component.
  * \param out_config Pointer to store the config.
@@ -209,7 +213,7 @@ ui_error_t ui_skeleton_base_get_animation_config(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Binds the active state to a signal.
  * \param widget The skeleton component.
  * \param signal The signal to bind.

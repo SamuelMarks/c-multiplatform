@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_content.c
+ * @brief ui_css_content.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_content.h"
 #include <string.h>
@@ -6,7 +10,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -17,7 +21,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/*
+/**
  * @brief match_keyword.
  * @param p_str Parameter p_str.
  * @param keyword Parameter keyword.
@@ -42,7 +46,7 @@ static void match_keyword(const char **p_str, const char *keyword,
   *out_match = 0;
 }
 
-/*
+/**
  * @brief parse_string.
  * @param p_str Parameter p_str.
  * @param out_buf Parameter out_buf.
@@ -82,7 +86,7 @@ static ui_error_t parse_string(const char **p_str, char *out_buf,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief parse_ident.
  * @param p_str Parameter p_str.
  * @param out_buf Parameter out_buf.
@@ -109,7 +113,7 @@ static ui_error_t parse_ident(const char **p_str, char *out_buf,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_content.
  * @param str Parameter str.
  * @param out_content Parameter out_content.
@@ -307,18 +311,19 @@ parse_failed:
   return rc != UI_ERROR_NONE ? rc : UI_ERROR_PARSE_FAILED;
 }
 
-/*
+/**
  * @brief ui_css_content_destroy.
  * @param content Parameter content.
  * @return Return value.
  */
-void ui_css_content_destroy(struct ui_css_content *content) {
+ui_error_t ui_css_content_destroy(struct ui_css_content *content) {
   if (!content)
-    return;
+    return UI_ERROR_INVALID_ARGUMENT;
 
   while (content->items) {
     struct ui_css_content_item *next = content->items->next;
     C_MULTIPLATFORM_FREE(content->items);
     content->items = next;
   }
+  return UI_ERROR_NONE;
 }

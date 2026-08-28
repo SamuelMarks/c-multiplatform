@@ -1,3 +1,7 @@
+/**
+ * @file ui_button_group_base.c
+ * @brief Implementation of ui_button_group_base.c.
+ */
 /* clang-format off */
 #include "ui_button_group_base.h"
 #include "ui_internal_mem.h"
@@ -8,7 +12,7 @@
 int g_button_group_mock_fail = 0;
 #endif
 
-/*
+/**
  * @brief ui_button_group_base_create.
  * @param out_group Parameter out_group.
  * @return Return value.
@@ -77,6 +81,12 @@ ui_button_group_base_create(struct ui_button_group_base **out_group) {
 
 /* \brief ui_error
  */
+/**
+ * @brief ui_button_group_base_set_orientation.
+ * @param group Parameter group.
+ * @param is_vertical Parameter is_vertical.
+ * @return Return value.
+ */
 ui_error_t
 ui_button_group_base_set_orientation(struct ui_button_group_base *group,
                                      int is_vertical) {
@@ -97,6 +107,12 @@ ui_button_group_base_set_orientation(struct ui_button_group_base *group,
 
 /* \brief ui_error
  */
+/**
+ * @brief ui_button_group_base_append_button.
+ * @param group Parameter group.
+ * @param child Parameter child.
+ * @return Return value.
+ */
 ui_error_t
 ui_button_group_base_append_button(struct ui_button_group_base *group,
                                    struct ui_component *child) {
@@ -116,6 +132,12 @@ ui_button_group_base_append_button(struct ui_button_group_base *group,
 
 /* \brief ui_error
  */
+/**
+ * @brief ui_button_group_base_bind_disabled.
+ * @param widget Parameter widget.
+ * @param disabled_signal Parameter disabled_signal.
+ * @return Return value.
+ */
 ui_error_t
 ui_button_group_base_bind_disabled(struct ui_button_group_base *widget,
                                    struct ui_signal *disabled_signal) {
@@ -127,6 +149,12 @@ ui_button_group_base_bind_disabled(struct ui_button_group_base *widget,
 }
 
 /* \brief ui_error
+ */
+/**
+ * @brief ui_button_group_base_bind_text.
+ * @param widget Parameter widget.
+ * @param text_signal Parameter text_signal.
+ * @return Return value.
  */
 ui_error_t ui_button_group_base_bind_text(struct ui_button_group_base *widget,
                                           struct ui_signal *text_signal) {

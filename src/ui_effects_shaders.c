@@ -1,9 +1,14 @@
+/**
+ * @file ui_effects_shaders.c
+ * @brief ui_effects_shaders.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_effects_shaders.h"
 #include "../include/ui_shader_manager.h"
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief Blur vertex shader source */
 static const char *blur_vertex_source = "attribute vec4 a_position;\n"
                                         "attribute vec2 a_texcoord;\n"
                                         "varying vec2 v_texcoord;\n"
@@ -12,6 +17,7 @@ static const char *blur_vertex_source = "attribute vec4 a_position;\n"
                                         "    v_texcoord = a_texcoord;\n"
                                         "}\n";
 
+/** @brief Horizontal blur fragment shader source */
 static const char blur_h_fragment_source[] = {
     112, 114, 101, 99,  105, 115, 105, 111, 110, 32,  109, 101, 100, 105, 117,
     109, 112, 32,  102, 108, 111, 97,  116, 59,  10,  118, 97,  114, 121, 105,
@@ -89,6 +95,7 @@ static const char blur_h_fragment_source[] = {
     10,  32,  32,  32,  32,  103, 108, 95,  70,  114, 97,  103, 67,  111, 108,
     111, 114, 32,  61,  32,  115, 117, 109, 59,  10,  125, 10,  0};
 
+/** @brief Vertical blur fragment shader source */
 static const char blur_v_fragment_source[] = {
     112, 114, 101, 99,  105, 115, 105, 111, 110, 32,  109, 101, 100, 105, 117,
     109, 112, 32,  102, 108, 111, 97,  116, 59,  10,  118, 97,  114, 121, 105,
@@ -191,6 +198,7 @@ ui_effects_shaders_get_blur_v_program(struct ui_shader_manager *manager,
   return ui_shader_manager_get_program(manager, "blur_v", blur_vertex_source,
                                        blur_v_fragment_source, out_program);
 }
+/** @brief Blend vertex shader source */
 static const char *blend_vertex_source = "attribute vec4 a_position;\n"
                                          "attribute vec2 a_texcoord;\n"
                                          "varying vec2 v_texcoord;\n"
@@ -199,6 +207,7 @@ static const char *blend_vertex_source = "attribute vec4 a_position;\n"
                                          "    v_texcoord = a_texcoord;\n"
                                          "}\n";
 
+/** @brief Multiply blend fragment shader source */
 static const char *blend_fragment_source_multiply =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -211,6 +220,7 @@ static const char *blend_fragment_source_multiply =
     "    gl_FragColor = vec4(result, src.a + dst.a - src.a * dst.a);\n"
     "}\n";
 
+/** @brief Screen blend fragment shader source */
 static const char *blend_fragment_source_screen =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -223,6 +233,7 @@ static const char *blend_fragment_source_screen =
     "    gl_FragColor = vec4(result, src.a + dst.a - src.a * dst.a);\n"
     "}\n";
 
+/** @brief Overlay blend fragment shader source */
 static const char blend_fragment_source_overlay[] = {
     112, 114, 101, 99,  105, 115, 105, 111, 110, 32,  109, 101, 100, 105, 117,
     109, 112, 32,  102, 108, 111, 97,  116, 59,  10,  118, 97,  114, 121, 105,
@@ -260,6 +271,7 @@ static const char blend_fragment_source_overlay[] = {
     46,  97,  32,  45,  32,  115, 114, 99,  46,  97,  32,  42,  32,  100, 115,
     116, 46,  97,  41,  59,  10,  125, 10,  0};
 
+/** @brief Darken blend fragment shader source */
 static const char *blend_fragment_source_darken =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -272,6 +284,7 @@ static const char *blend_fragment_source_darken =
     "    gl_FragColor = vec4(result, src.a + dst.a - src.a * dst.a);\n"
     "}\n";
 
+/** @brief Lighten blend fragment shader source */
 static const char *blend_fragment_source_lighten =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -284,6 +297,7 @@ static const char *blend_fragment_source_lighten =
     "    gl_FragColor = vec4(result, src.a + dst.a - src.a * dst.a);\n"
     "}\n";
 
+/** @brief Color dodge blend fragment shader source */
 static const char blend_fragment_source_color_dodge[] = {
     112, 114, 101, 99,  105, 115, 105, 111, 110, 32,  109, 101, 100, 105, 117,
     109, 112, 32,  102, 108, 111, 97,  116, 59,  10,  118, 97,  114, 121, 105,
@@ -323,6 +337,7 @@ static const char blend_fragment_source_color_dodge[] = {
     115, 114, 99,  46,  97,  32,  42,  32,  100, 115, 116, 46,  97,  41,  59,
     10,  125, 10,  0};
 
+/** @brief Color burn blend fragment shader source */
 static const char blend_fragment_source_color_burn[] = {
     112, 114, 101, 99,  105, 115, 105, 111, 110, 32,  109, 101, 100, 105, 117,
     109, 112, 32,  102, 108, 111, 97,  116, 59,  10,  118, 97,  114, 121, 105,
@@ -362,6 +377,7 @@ static const char blend_fragment_source_color_burn[] = {
     45,  32,  115, 114, 99,  46,  97,  32,  42,  32,  100, 115, 116, 46,  97,
     41,  59,  10,  125, 10,  0};
 
+/** @brief Hard light blend fragment shader source */
 static const char blend_fragment_source_hard_light[] = {
     112, 114, 101, 99,  105, 115, 105, 111, 110, 32,  109, 101, 100, 105, 117,
     109, 112, 32,  102, 108, 111, 97,  116, 59,  10,  118, 97,  114, 121, 105,
@@ -400,6 +416,7 @@ static const char blend_fragment_source_hard_light[] = {
     45,  32,  115, 114, 99,  46,  97,  32,  42,  32,  100, 115, 116, 46,  97,
     41,  59,  10,  125, 10,  0};
 
+/** @brief Soft light blend fragment shader source */
 static const char blend_fragment_source_soft_light[] = {
     112, 114, 101, 99,  105, 115, 105, 111, 110, 32,  109, 101, 100, 105, 117,
     109, 112, 32,  102, 108, 111, 97,  116, 59,  10,  118, 97,  114, 121, 105,
@@ -445,6 +462,7 @@ static const char blend_fragment_source_soft_light[] = {
     114, 99,  46,  97,  32,  42,  32,  100, 115, 116, 46,  97,  41,  59,  10,
     125, 10,  0};
 
+/** @brief Difference blend fragment shader source */
 static const char *blend_fragment_source_difference =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -457,6 +475,7 @@ static const char *blend_fragment_source_difference =
     "    gl_FragColor = vec4(result, src.a + dst.a - src.a * dst.a);\n"
     "}\n";
 
+/** @brief Exclusion blend fragment shader source */
 static const char *blend_fragment_source_exclusion =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -473,6 +492,7 @@ static const char *blend_fragment_source_exclusion =
  * conversions (RGB <-> HSL) */
 /* We will map them to a simple fallback for now (normal blend) since full
  * RGB<->HSL in shader is complex. */
+/** @brief Normal blend fragment shader source */
 static const char *blend_fragment_source_normal =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -558,6 +578,7 @@ ui_effects_shaders_get_blend_program(struct ui_shader_manager *manager,
       manager, program_name, blend_vertex_source, frag_source, out_program);
 }
 
+/** @brief Invert filter fragment shader source */
 static const char *filter_fragment_source_invert =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -567,6 +588,7 @@ static const char *filter_fragment_source_invert =
     "    gl_FragColor = vec4(1.0 - src.rgb, src.a);\n"
     "}\n";
 
+/** @brief Grayscale filter fragment shader source */
 static const char *filter_fragment_source_grayscale =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -577,6 +599,7 @@ static const char *filter_fragment_source_grayscale =
     "    gl_FragColor = vec4(vec3(gray), src.a);\n"
     "}\n";
 
+/** @brief Sepia filter fragment shader source */
 static const char *filter_fragment_source_sepia =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"
@@ -618,6 +641,7 @@ ui_effects_shaders_get_color_filter_program(struct ui_shader_manager *manager,
                                        frag_source, out_program);
 }
 
+/** @brief Drop shadow fragment shader source */
 static const char *drop_shadow_fragment_source =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"

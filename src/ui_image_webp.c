@@ -1,9 +1,13 @@
+/**
+ * @file ui_image_webp.c
+ * @brief ui_image_webp.c implementation.
+ */
 /* clang-format off */
 #include "ui_image_decoder.h"
 #include "ui_error.h"
 /* clang-format on */
 
-/*
+/**
  * @brief webp_supports_format.
  * @param format Parameter format.
  * @param out_supported Parameter out_supported.
@@ -15,7 +19,7 @@ static ui_error_t webp_supports_format(enum ui_image_format format,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief webp_decode_memory.
  * @param data Parameter data.
  * @param size Parameter size.
@@ -37,7 +41,7 @@ static ui_error_t webp_decode_memory(const void *data, size_t size,
   return UI_ERROR_UNKNOWN; /* TODO: Implement actual C89 WebP decoding */
 }
 
-/*
+/**
  * @brief webp_free_image.
  * @param image Parameter image.
  * @return Return value.
@@ -50,5 +54,6 @@ static ui_error_t webp_free_image(struct ui_image *image) {
   return UI_ERROR_NONE;
 }
 
+/** @brief WebP decoder backend */
 struct ui_image_decoder_backend ui_image_decoder_webp = {
     webp_supports_format, webp_decode_memory, webp_free_image};

@@ -1,5 +1,10 @@
-#if defined(_WIN32) || defined(__CYGWIN__)
+/**
+ * @file ui_shader_manager.c
+ * @brief Implementation of the shader manager.
+ */
+
 /* clang-format off */
+#if defined(_WIN32) || defined(__CYGWIN__)
 #include <winsock2.h>
 #include <GL/gl.h>
 #elif defined(__APPLE__)
@@ -13,25 +18,20 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
- * \file ui_shader_manager.c
- * \brief Shader manager implementation.
- */
-
 #ifndef GL_VERTEX_SHADER
-/** @brief internal */
+/** @brief Internal definition for GL_VERTEX_SHADER if not provided. */
 #define GL_VERTEX_SHADER 0x8B31
 #endif
 #ifndef GL_FRAGMENT_SHADER
-/** @brief internal */
+/** @brief Internal definition for GL_FRAGMENT_SHADER if not provided. */
 #define GL_FRAGMENT_SHADER 0x8B30
 #endif
 #ifndef GL_COMPILE_STATUS
-/** @brief internal */
+/** @brief Internal definition for GL_COMPILE_STATUS if not provided. */
 #define GL_COMPILE_STATUS 0x8B81
 #endif
 #ifndef GL_LINK_STATUS
-/** @brief internal */
+/** @brief Internal definition for GL_LINK_STATUS if not provided. */
 #define GL_LINK_STATUS 0x8B82
 #endif
 
@@ -41,13 +41,31 @@
    linking against an extension wrapper. */
 #if defined(UI_TEST_MOCK_ALLOC) || defined(_WIN32) || defined(__CYGWIN__) ||   \
     defined(__APPLE__)
+/** @brief Internal mock fail flag for shader. */
 int g_mock_shader_fail = 0;
+/** @brief Internal mock fail flag for program. */
 int g_mock_program_fail = 0;
+/** @brief Internal mock ID counter. */
 static unsigned int mock_id_counter = 1;
+
+/**
+ * @brief Mocks glCreateShader.
+ * @param type The shader type.
+ * @return The mocked shader ID.
+ */
 static unsigned int mock_glCreateShader(int type) {
   (void)type;
   return mock_id_counter++;
 }
+
+/**
+ * @brief Mocks glShaderSource.
+ * @param shader The shader ID.
+ * @param count The number of strings.
+ * @param string The array of strings.
+ * @param length The array of string lengths.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glShaderSource(unsigned int shader, int count,
                                       const char **string, const int *length) {
   (void)shader;
@@ -56,10 +74,24 @@ static ui_error_t mock_glShaderSource(unsigned int shader, int count,
   (void)length;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glCompileShader.
+ * @param shader The shader ID.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glCompileShader(unsigned int shader) {
   (void)shader;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glGetShaderiv.
+ * @param shader The shader ID.
+ * @param pname The parameter name.
+ * @param params The parameter result.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glGetShaderiv(unsigned int shader, int pname,
                                      int *params) {
   (void)shader;
@@ -67,17 +99,43 @@ static ui_error_t mock_glGetShaderiv(unsigned int shader, int pname,
   *params = (g_mock_shader_fail == (int)shader) ? 0 : 1;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glCreateProgram.
+ * @return The mocked program ID.
+ */
 static unsigned int mock_glCreateProgram(void) { return mock_id_counter++; }
+
+/**
+ * @brief Mocks glAttachShader.
+ * @param program The program ID.
+ * @param shader The shader ID.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glAttachShader(unsigned int program,
                                       unsigned int shader) {
   (void)program;
   (void)shader;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glLinkProgram.
+ * @param program The program ID.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glLinkProgram(unsigned int program) {
   (void)program;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glGetProgramiv.
+ * @param program The program ID.
+ * @param pname The parameter name.
+ * @param params The parameter result.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glGetProgramiv(unsigned int program, int pname,
                                       int *params) {
   (void)program;
@@ -85,20 +143,48 @@ static ui_error_t mock_glGetProgramiv(unsigned int program, int pname,
   *params = g_mock_program_fail ? 0 : 1;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glDeleteShader.
+ * @param shader The shader ID.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glDeleteShader(unsigned int shader) {
   (void)shader;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glDeleteProgram.
+ * @param program The program ID.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glDeleteProgram(unsigned int program) {
   (void)program;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glGetUniformLocation.
+ * @param program The program ID.
+ * @param name The uniform name.
+ * @return The mocked location index.
+ */
 static int mock_glGetUniformLocation(unsigned int program, const char *name) {
   (void)program;
   if (name[0] == 'i')
     return -1;
   return 1;
 }
+
+/**
+ * @brief Mocks glUniformMatrix4fv.
+ * @param location The uniform location.
+ * @param count The number of matrices.
+ * @param transpose The transpose flag.
+ * @param value The matrix values.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glUniformMatrix4fv(int location, int count,
                                           unsigned char transpose,
                                           const float *value) {
@@ -108,6 +194,16 @@ static ui_error_t mock_glUniformMatrix4fv(int location, int count,
   (void)value;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glUniform4f.
+ * @param location The uniform location.
+ * @param v0 Value 0.
+ * @param v1 Value 1.
+ * @param v2 Value 2.
+ * @param v3 Value 3.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glUniform4f(int location, float v0, float v1, float v2,
                                    float v3) {
   (void)location;
@@ -117,6 +213,13 @@ static ui_error_t mock_glUniform4f(int location, float v0, float v1, float v2,
   (void)v3;
   return UI_ERROR_NONE;
 }
+
+/**
+ * @brief Mocks glUniform1f.
+ * @param location The uniform location.
+ * @param v0 Value 0.
+ * @return UI_ERROR_NONE.
+ */
 static ui_error_t mock_glUniform1f(int location, float v0) {
   (void)location;
   (void)v0;
@@ -125,114 +228,64 @@ static ui_error_t mock_glUniform1f(int location, float v0) {
 
 /** @cond */
 #define UI_GL_CREATE_SHADER mock_glCreateShader
-/** @endcond */
-/** @cond */
 #define UI_GL_SHADER_SOURCE mock_glShaderSource
-/** @endcond */
-/** @cond */
 #define UI_GL_COMPILE_SHADER mock_glCompileShader
-/** @endcond */
-/** @cond */
 #define UI_GL_GET_SHADERIV mock_glGetShaderiv
-/** @endcond */
-/** @cond */
 #define UI_GL_CREATE_PROGRAM mock_glCreateProgram
-/** @endcond */
-/** @cond */
 #define UI_GL_ATTACH_SHADER mock_glAttachShader
-/** @endcond */
-/** @cond */
 #define UI_GL_LINK_PROGRAM mock_glLinkProgram
-/** @endcond */
-/** @cond */
 #define UI_GL_GET_PROGRAMIV mock_glGetProgramiv
-/** @endcond */
-/** @cond */
 #define UI_GL_DELETE_SHADER mock_glDeleteShader
-/** @endcond */
-/** @cond */
 #define UI_GL_DELETE_PROGRAM mock_glDeleteProgram
-/** @endcond */
-/** @cond */
 #define UI_GL_GET_UNIFORM_LOCATION mock_glGetUniformLocation
-/** @endcond */
-/** @cond */
 #define UI_GL_UNIFORM_MATRIX4FV mock_glUniformMatrix4fv
-/** @endcond */
-/** @cond */
 #define UI_GL_UNIFORM4F mock_glUniform4f
-/** @endcond */
-/** @cond */
 #define UI_GL_UNIFORM1F mock_glUniform1f
 /** @endcond */
 #else
 /* Assume standard GLES2 headers are available (e.g. Linux, Emscripten) */
+/** @cond */
 #define UI_GL_CREATE_SHADER glCreateShader
-/** @cond */
 #define UI_GL_SHADER_SOURCE glShaderSource
-/** @endcond */
-/** @cond */
 #define UI_GL_COMPILE_SHADER glCompileShader
-/** @endcond */
-/** @cond */
 #define UI_GL_GET_SHADERIV glGetShaderiv
-/** @endcond */
-/** @cond */
 #define UI_GL_CREATE_PROGRAM glCreateProgram
-/** @endcond */
-/** @cond */
 #define UI_GL_ATTACH_SHADER glAttachShader
-/** @endcond */
-/** @cond */
 #define UI_GL_LINK_PROGRAM glLinkProgram
-/** @endcond */
-/** @cond */
 #define UI_GL_GET_PROGRAMIV glGetProgramiv
-/** @endcond */
-/** @cond */
 #define UI_GL_DELETE_SHADER glDeleteShader
-/** @endcond */
-/** @cond */
 #define UI_GL_DELETE_PROGRAM glDeleteProgram
-/** @endcond */
-/** @cond */
 #define UI_GL_GET_UNIFORM_LOCATION glGetUniformLocation
-/** @endcond */
-/** @cond */
 #define UI_GL_UNIFORM_MATRIX4FV glUniformMatrix4fv
-/** @endcond */
-/** @cond */
 #define UI_GL_UNIFORM4F glUniform4f
-/** @endcond */
-/** @cond */
 #define UI_GL_UNIFORM1F glUniform1f
 /** @endcond */
 #endif
 
 /**
  * @struct ui_shader_entry
- * \brief ui_shader_entry structure.
- * \details Internal state for a cached shader.
+ * @brief Internal state for a cached shader.
  */
 struct ui_shader_entry {
-  char name[64];                /**< name */
-  unsigned int program_id;      /**< program_id */
-  struct ui_shader_entry *next; /**< next */
+  char name[64];           /**< The name of the cached shader. */
+  unsigned int program_id; /**< The OpenGL program ID. */
+  struct ui_shader_entry
+      *next; /**< Pointer to the next shader entry in the cache. */
 };
 
 /**
  * @struct ui_shader_manager
- * \brief ui_shader_manager structure.
- * \details Internal state for the shader manager.
+ * @brief Internal state for the shader manager.
  */
 struct ui_shader_manager {
-  struct ui_shader_entry *head; /**< head */
+  struct ui_shader_entry
+      *head; /**< Head of the linked list caching shader entries. */
 };
 
-/*
- * \brief Creates a new shader manager.
- * \param out_manager Pointer to store the manager.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new shader manager.
+ * @param[out] out_manager Pointer to store the manager.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager) {
   struct ui_shader_manager *manager;
@@ -253,10 +306,10 @@ ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a shader manager.
- * \param manager The manager to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a shader manager.
+ * @param[in,out] manager The manager to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager) {
   struct ui_shader_entry *current;
@@ -278,14 +331,14 @@ ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets or compiles a shader program.
- * \param manager The shader manager.
- * \param name The name of the shader.
- * \param vertex_source The vertex shader source.
- * \param fragment_source The fragment shader source.
- * \param out_program_id Pointer to store the program ID.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets or compiles a shader program.
+ * @param[in,out] manager The shader manager.
+ * @param[in] name The name of the shader.
+ * @param[in] vertex_source The vertex shader source.
+ * @param[in] fragment_source The fragment shader source.
+ * @param[out] out_program_id Pointer to store the program ID.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
                                          const char *name,
@@ -370,13 +423,13 @@ ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets a uniform matrix for a shader.
- * \param manager The shader manager.
- * \param program_id The program ID.
- * \param uniform_name The uniform name.
- * \param matrix4x4 The matrix data.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets a uniform matrix for a shader.
+ * @param[in,out] manager The shader manager.
+ * @param[in] program_id The program ID.
+ * @param[in] uniform_name The uniform name.
+ * @param[in] matrix4x4 The matrix data.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_shader_manager_set_uniform_matrix(
     struct ui_shader_manager *manager, unsigned int program_id,
@@ -391,16 +444,16 @@ ui_error_t ui_shader_manager_set_uniform_matrix(
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets a uniform color for a shader.
- * \param manager The shader manager.
- * \param program_id The program ID.
- * \param uniform_name The uniform name.
- * \param r Red value.
- * \param g Green value.
- * \param b Blue value.
- * \param a Alpha value.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets a uniform color for a shader.
+ * @param[in,out] manager The shader manager.
+ * @param[in] program_id The program ID.
+ * @param[in] uniform_name The uniform name.
+ * @param[in] r Red value.
+ * @param[in] g Green value.
+ * @param[in] b Blue value.
+ * @param[in] a Alpha value.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_shader_manager_set_uniform_color(
     struct ui_shader_manager *manager, unsigned int program_id,
@@ -415,13 +468,13 @@ ui_error_t ui_shader_manager_set_uniform_color(
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets a uniform float for a shader.
- * \param manager The shader manager.
- * \param program_id The program ID.
- * \param uniform_name The uniform name.
- * \param value The float value.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets a uniform float for a shader.
+ * @param[in,out] manager The shader manager.
+ * @param[in] program_id The program ID.
+ * @param[in] uniform_name The uniform name.
+ * @param[in] value The float value.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_shader_manager_set_uniform_float(struct ui_shader_manager *manager,

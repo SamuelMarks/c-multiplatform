@@ -5,15 +5,15 @@
 #ifndef UI_TIMEPICKER_BASE_H
 #define UI_TIMEPICKER_BASE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* clang-format off */
 #include "ui_error.h"
 #include "ui_control_value_accessor.h"
 #include <stddef.h>
 /* clang-format on */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Time formats for the timepicker.
@@ -26,8 +26,14 @@ enum ui_timepicker_format {
 /**
  * @brief Represents the AM/PM period.
  */
-enum ui_timepicker_period { UI_TIMEPICKER_PERIOD_AM, UI_TIMEPICKER_PERIOD_PM };
+enum ui_timepicker_period {
+  UI_TIMEPICKER_PERIOD_AM, /**< AM period */
+  UI_TIMEPICKER_PERIOD_PM  /**< PM period */
+};
 
+/**
+ * @brief Opaque structure representing the timepicker base component.
+ */
 struct ui_timepicker_base;
 
 /**
@@ -45,6 +51,7 @@ ui_error_t ui_timepicker_base_create(struct ui_timepicker_base **out_timepicker,
  * @brief Destroys a timepicker base component.
  *
  * @param timepicker The timepicker to destroy.
+ * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
 ui_error_t ui_timepicker_base_destroy(struct ui_timepicker_base *timepicker);
 

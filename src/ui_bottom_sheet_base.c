@@ -15,6 +15,14 @@
 #ifdef UI_TEST_MOCK_ALLOC
 int g_bottom_sheet_mock_fail = 0;
 
+/**
+ * @brief mock_ui_gesture_recognizer_process_event.
+ * @param recognizer Parameter recognizer.
+ * @param event Parameter event.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @param out_event Parameter out_event.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_ui_gesture_recognizer_process_event(
     struct ui_gesture_recognizer *recognizer, const struct ui_event *event,
     double timestamp_ms, struct ui_gesture_event *out_event) {
@@ -32,6 +40,12 @@ static ui_error_t mock_ui_gesture_recognizer_process_event(
 /** @cond */
 #define ui_gesture_recognizer_process_event                                    \
   mock_ui_gesture_recognizer_process_event
+/**
+ * @brief mock_dom_node_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
   if (g_bottom_sheet_mock_fail == 1) {
@@ -221,6 +235,10 @@ static ui_error_t mock_ui_backdrop_process_event(struct ui_backdrop *backdrop,
 /** @endcond */
 
 ui_error_t run_bottom_sheet_coverage(void);
+/**
+ * @brief run_bottom_sheet_coverage.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t run_bottom_sheet_coverage(void) {
   union ui_signal_payload dummy_payload;
   struct ui_dom_node *dn1 = NULL;
@@ -284,6 +302,7 @@ ui_error_t run_bottom_sheet_coverage(void) {
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet for bottom sheet base component */
 static const char ui_bottom_sheet_base_default_css[] = {
     58,  104, 111, 115, 116, 32,  123, 32,  100, 105, 115, 112, 108, 97,  121,
     58,  32,  102, 108, 101, 120, 59,  32,  102, 108, 101, 120, 45,  100, 105,
@@ -368,6 +387,11 @@ struct ui_bottom_sheet_base {
       *animating_signal; /**< Signal indicating animation activity */
 };
 
+/**
+ * @brief update_dom_state.
+ * @param sheet Parameter sheet.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t update_dom_state(struct ui_bottom_sheet_base *sheet) {
   if (sheet->is_open) {
     ui_error_t rc =
@@ -385,6 +409,11 @@ static ui_error_t update_dom_state(struct ui_bottom_sheet_base *sheet) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_create.
+ * @param out_sheet Parameter out_sheet.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_bottom_sheet_base_create(struct ui_bottom_sheet_base **out_sheet) {
   struct ui_bottom_sheet_base *sheet;
@@ -525,6 +554,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_destroy.
+ * @param sheet Parameter sheet.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_bottom_sheet_base_destroy(struct ui_bottom_sheet_base *sheet) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!sheet) {
@@ -555,6 +589,12 @@ ui_error_t ui_bottom_sheet_base_destroy(struct ui_bottom_sheet_base *sheet) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_set_content.
+ * @param sheet Parameter sheet.
+ * @param content Parameter content.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_bottom_sheet_base_set_content(struct ui_bottom_sheet_base *sheet,
                                             struct ui_component *content) {
   if (!sheet) {
@@ -567,6 +607,12 @@ ui_error_t ui_bottom_sheet_base_set_content(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_set_open.
+ * @param sheet Parameter sheet.
+ * @param is_open Parameter is_open.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_bottom_sheet_base_set_open(struct ui_bottom_sheet_base *sheet,
                                          int is_open) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -615,6 +661,12 @@ ui_error_t ui_bottom_sheet_base_set_open(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_is_open.
+ * @param sheet Parameter sheet.
+ * @param out_is_open Parameter out_is_open.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_bottom_sheet_base_is_open(const struct ui_bottom_sheet_base *sheet,
                              int *out_is_open) {
@@ -625,6 +677,12 @@ ui_bottom_sheet_base_is_open(const struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_set_overlay_director.
+ * @param sheet Parameter sheet.
+ * @param director Parameter director.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_bottom_sheet_base_set_overlay_director(
     struct ui_bottom_sheet_base *sheet, struct ui_overlay_director *director) {
   if (!sheet) {
@@ -634,6 +692,13 @@ ui_error_t ui_bottom_sheet_base_set_overlay_director(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_set_on_close.
+ * @param sheet Parameter sheet.
+ * @param on_close Parameter on_close.
+ * @param user_data Parameter user_data.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_bottom_sheet_base_set_on_close(struct ui_bottom_sheet_base *sheet,
                                   ui_bottom_sheet_on_close_t on_close,
@@ -646,6 +711,13 @@ ui_bottom_sheet_base_set_on_close(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_process_event.
+ * @param sheet Parameter sheet.
+ * @param event Parameter event.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_bottom_sheet_base_process_event(struct ui_bottom_sheet_base *sheet,
                                    const struct ui_event *event,
@@ -710,6 +782,12 @@ ui_bottom_sheet_base_process_event(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_update.
+ * @param sheet Parameter sheet.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_bottom_sheet_base_update(struct ui_bottom_sheet_base *sheet,
                                        double timestamp_ms) {
   struct ui_gesture_event gesture_ev;
@@ -745,6 +823,12 @@ ui_error_t ui_bottom_sheet_base_update(struct ui_bottom_sheet_base *sheet,
                                       &gesture_ev);
 }
 
+/**
+ * @brief ui_bottom_sheet_base_get_component.
+ * @param sheet Parameter sheet.
+ * @param out_component Parameter out_component.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_bottom_sheet_base_get_component(struct ui_bottom_sheet_base *sheet,
                                    struct ui_component **out_component) {
@@ -755,6 +839,12 @@ ui_bottom_sheet_base_get_component(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_set_spring_config.
+ * @param sheet Parameter sheet.
+ * @param config Parameter config.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_bottom_sheet_base_set_spring_config(struct ui_bottom_sheet_base *sheet,
                                        const struct ui_spring_config *config) {
@@ -765,6 +855,12 @@ ui_bottom_sheet_base_set_spring_config(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_bind_open.
+ * @param sheet Parameter sheet.
+ * @param open_signal Parameter open_signal.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_bottom_sheet_base_bind_open(struct ui_bottom_sheet_base *sheet,
                                           struct ui_signal *open_signal) {
   if (!sheet) {
@@ -774,6 +870,12 @@ ui_error_t ui_bottom_sheet_base_bind_open(struct ui_bottom_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_bottom_sheet_base_get_animating_signal.
+ * @param sheet Parameter sheet.
+ * @param out_animating Parameter out_animating.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_bottom_sheet_base_get_animating_signal(struct ui_bottom_sheet_base *sheet,
                                           struct ui_computed **out_animating) {

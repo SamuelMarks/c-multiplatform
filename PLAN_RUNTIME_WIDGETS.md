@@ -1,3 +1,11 @@
+/**
+ * @file PLAN_RUNTIME_WIDGETS.md
+ * @brief PLAN_RUNTIME_WIDGETS.md implementation.
+ */
+/**
+ * @file PLAN_RUNTIME_WIDGETS.md
+ * @brief PLAN_RUNTIME_WIDGETS.md implementation.
+ */
 # Architecture Plan: Runtime Defined Widgets & AoT Ejection
 
 This plan details the implementation strategy for supporting runtime-defined widgets (e.g., for a form builder or remote UI delivery) that can be instantly rendered in the engine and subsequently "ejected" to raw C code for Ahead-of-Time (AoT) compilation.

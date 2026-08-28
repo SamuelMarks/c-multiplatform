@@ -1,3 +1,7 @@
+/**
+ * @file ui_design_tokens.c
+ * @brief ui_design_tokens.c implementation.
+ */
 /* clang-format off */
 #include "ui_design_tokens.h"
 #include <string.h>
@@ -10,7 +14,7 @@
 #define UI_TOKEN_INITIAL_CAPACITY 64
 /** @endcond */
 
-/*
+/**
  * @brief ui_design_token_dict_init.
  * @param arena Parameter arena.
  * @param out_dict Parameter out_dict.
@@ -40,7 +44,7 @@ ui_error_t ui_design_token_dict_init(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief find_token.
  * @param dict Parameter dict.
  * @param name Parameter name.
@@ -57,7 +61,7 @@ find_token(const struct ui_design_token_dict *dict, const char *name) {
   return NULL;
 }
 
-/*
+/**
  * @brief duplicate_string.
  * @param arena Parameter arena.
  * @param str Parameter str.
@@ -87,7 +91,7 @@ static ui_error_t duplicate_string(struct ui_arena *arena, const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ensure_capacity.
  * @param dict Parameter dict.
  * @return Return value.
@@ -123,7 +127,7 @@ static ui_error_t ensure_capacity(struct ui_design_token_dict *dict) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief get_or_create_token.
  * @param dict Parameter dict.
  * @param name Parameter name.
@@ -160,7 +164,7 @@ static ui_error_t get_or_create_token(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_design_token_set_color.
  * @param dict Parameter dict.
  * @param name Parameter name.
@@ -187,7 +191,7 @@ ui_error_t ui_design_token_set_color(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_design_token_set_number.
  * @param dict Parameter dict.
  * @param name Parameter name.
@@ -214,7 +218,7 @@ ui_error_t ui_design_token_set_number(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_design_token_set_string.
  * @param dict Parameter dict.
  * @param name Parameter name.
@@ -247,7 +251,7 @@ ui_error_t ui_design_token_set_string(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_design_token_set_alias.
  * @param dict Parameter dict.
  * @param name Parameter name.
@@ -280,7 +284,7 @@ ui_error_t ui_design_token_set_alias(struct ui_design_token_dict *dict,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief resolve_token.
  * @param dict Parameter dict.
  * @param name Parameter name.
@@ -314,7 +318,7 @@ static ui_error_t resolve_token(const struct ui_design_token_dict *dict,
   return UI_ERROR_UNKNOWN; /* Cycle or max depth reached */
 }
 
-/*
+/**
  * @brief ui_design_token_get_color.
  * @param dict Parameter dict.
  * @param name Parameter name.

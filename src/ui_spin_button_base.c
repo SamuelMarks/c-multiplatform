@@ -1,3 +1,7 @@
+/**
+ * @file ui_spin_button_base.c
+ * @brief ui_spin_button_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_spin_button_base.h"
 #include "ui_aria.h"
@@ -21,14 +25,17 @@
 #define UI_SPIN_BUTTON_REPEAT_RATE_MS 50.0
 /** @endcond */
 
-/*
+/**
  * \brief ui_spin_button_dir enum.
  * \details Spin button continuous scroll directions.
  */
+/**
+ * @brief ui_spin_button_dir.
+ */
 enum ui_spin_button_dir {
-  UI_SPIN_BUTTON_DIR_NONE = 0,
-  UI_SPIN_BUTTON_DIR_INC = 1,
-  UI_SPIN_BUTTON_DIR_DEC = 2
+  UI_SPIN_BUTTON_DIR_NONE = 0, /**< No direction */
+  UI_SPIN_BUTTON_DIR_INC = 1,  /**< Increment direction */
+  UI_SPIN_BUTTON_DIR_DEC = 2   /**< Decrement direction */
 };
 
 /**
@@ -59,19 +66,19 @@ struct ui_spin_button_base {
   void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
 };
 
-/*
+/**
  * \brief Triggers a CVA change event.
  * \param spin_button The component.
  * \return UI_ERROR_NONE on success.
  */
 static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button);
-/*
+/**
  * \brief Triggers a CVA touched event.
  * \param spin_button The component.
  * \return UI_ERROR_NONE on success.
  */
 static ui_error_t trigger_cva_touched(struct ui_spin_button_base *spin_button);
-/*
+/**
  * \brief Sets the disabled state.
  * \param spin_button The spin button.
  * \param disabled The disabled state.
@@ -88,12 +95,17 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
 #define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
 /** @endcond */
 
-/*
+/**
  * \brief Updates ARIA attributes for the spin button.
  * \param spin_button The component.
  * \return UI_ERROR_NONE on success.
  */
 static ui_error_t
+/**
+ * @brief ui_spin_button_base_update_aria.
+ * @param spin_button Parameter spin_button.
+ * @return Return value.
+ */
 ui_spin_button_base_update_aria(struct ui_spin_button_base *spin_button) {
   char buf[64];
   if (!spin_button->component || !spin_button->component->shadow_root)
@@ -133,6 +145,11 @@ ui_spin_button_base_update_aria(struct ui_spin_button_base *spin_button) {
 #define UI_TRIG_CVA_TOUCH_IGNORE(s) trigger_cva_touched((s))
 /** @endcond */
 
+/**
+ * @brief trigger_cva_change.
+ * @param spin_button Parameter spin_button.
+ * @return Return value.
+ */
 static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button) {
   if (spin_button->cva_on_change) {
     union ui_signal_payload payload;
@@ -146,6 +163,11 @@ static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief trigger_cva_touched.
+ * @param spin_button Parameter spin_button.
+ * @return Return value.
+ */
 static ui_error_t trigger_cva_touched(struct ui_spin_button_base *spin_button) {
   if (spin_button->cva_on_touched) {
 /** @cond */
@@ -157,11 +179,17 @@ static ui_error_t trigger_cva_touched(struct ui_spin_button_base *spin_button) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Writes a value from CVA.
  * \param component The spin button.
  * \param value The value to write.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief spin_button_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
  */
 static ui_error_t spin_button_cva_write_value(void *component,
                                               union ui_signal_payload value) {
@@ -179,12 +207,19 @@ static ui_error_t spin_button_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Registers an on-change callback for CVA.
  * \param component The spin button.
  * \param callback The callback to register.
  * \param user_data User data for the callback.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief spin_button_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t spin_button_cva_register_on_change(
     void *component,
@@ -199,12 +234,19 @@ static ui_error_t spin_button_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Registers an on-touched callback for CVA.
  * \param component The spin button.
  * \param callback The callback to register.
  * \param user_data User data for the callback.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief spin_button_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t spin_button_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
@@ -217,11 +259,17 @@ static ui_error_t spin_button_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the disabled state from CVA.
  * \param component The spin button.
  * \param is_disabled The disabled state.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief spin_button_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
  */
 static ui_error_t spin_button_cva_set_disabled_state(void *component,
                                                      int is_disabled) {
@@ -236,7 +284,7 @@ static ui_error_t spin_button_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new spin button base component.
  * \param out_spin_button Pointer to store the component.
  * \param out_cva Optional pointer to store the CVA.
@@ -315,7 +363,7 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a spin button base component.
  * \param spin_button The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -330,7 +378,7 @@ ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the minimum value.
  * \param spin_button The spin button.
  * \param min_val The minimum value.
@@ -356,7 +404,7 @@ ui_error_t ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the maximum value.
  * \param spin_button The spin button.
  * \param max_val The maximum value.
@@ -382,7 +430,7 @@ ui_error_t ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the current value.
  * \param spin_button The spin button.
  * \param value The value to set.
@@ -421,7 +469,7 @@ ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the current value.
  * \param spin_button The spin button.
  * \param out_val Pointer to store the value.
@@ -436,7 +484,7 @@ ui_spin_button_base_get_value(const struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the step value.
  * \param spin_button The spin button.
  * \param step The step value.
@@ -451,7 +499,7 @@ ui_error_t ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the disabled state.
  * \param spin_button The spin button.
  * \param disabled The disabled state.
@@ -482,7 +530,7 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the on change callback.
  * \param spin_button The spin button.
  * \param on_change The callback function.
@@ -501,7 +549,7 @@ ui_spin_button_base_set_on_change(struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Increments the spin button value.
  * \param spin_button The spin button.
  * \return UI_ERROR_NONE on success.
@@ -515,7 +563,7 @@ ui_spin_button_base_increment(struct ui_spin_button_base *spin_button) {
                                        spin_button->value + spin_button->step);
 }
 
-/*
+/**
  * \brief Decrements the spin button value.
  * \param spin_button The spin button.
  * \return UI_ERROR_NONE on success.
@@ -529,7 +577,7 @@ ui_spin_button_base_decrement(struct ui_spin_button_base *spin_button) {
                                        spin_button->value - spin_button->step);
 }
 
-/*
+/**
  * \brief Starts continuous incrementation.
  * \param spin_button The spin button.
  * \return UI_ERROR_NONE on success.
@@ -545,7 +593,7 @@ ui_error_t ui_spin_button_base_start_continuous_increment(
   return ui_spin_button_base_increment(spin_button);
 }
 
-/*
+/**
  * \brief Starts continuous decrementation.
  * \param spin_button The spin button.
  * \return UI_ERROR_NONE on success.
@@ -561,7 +609,7 @@ ui_error_t ui_spin_button_base_start_continuous_decrement(
   return ui_spin_button_base_decrement(spin_button);
 }
 
-/*
+/**
  * \brief Stops continuous value change.
  * \param spin_button The spin button.
  * \return UI_ERROR_NONE on success.
@@ -577,7 +625,7 @@ ui_spin_button_base_stop_continuous(struct ui_spin_button_base *spin_button) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Triggers a tick update for continuous scrolling.
  * \param spin_button The spin button.
  * \param delta_ms The time since the last tick in ms.
@@ -618,7 +666,7 @@ ui_error_t ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Processes an event.
  * \param spin_button The spin button.
  * \param event The event.
@@ -665,7 +713,7 @@ ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the base component for the spin button.
  * \param spin_button The spin button.
  * \param out_component Pointer to store the component.

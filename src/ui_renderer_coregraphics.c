@@ -1,3 +1,7 @@
+/**
+ * @file ui_renderer_coregraphics.c
+ * @brief ui_renderer_coregraphics.c implementation.
+ */
 #if defined(__APPLE__)
 /** @brief internal */
 #define GL_SILENCE_DEPRECATION
@@ -45,7 +49,7 @@ struct cg_context {
   int current_height;   /**< current_height */
 };
 
-/*
+/**
  * @brief cg_begin_frame.
  * @param ctx Parameter ctx.
  * @param width Parameter width.
@@ -90,7 +94,7 @@ static ui_error_t cg_begin_frame(void *ctx, int width, int height) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_end_frame.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -103,7 +107,7 @@ static ui_error_t cg_end_frame(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_draw_rect.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -123,7 +127,7 @@ static ui_error_t cg_draw_rect(void *ctx, const struct ui_rect *r,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_draw_text.
  * @param ctx Parameter ctx.
  * @param text Parameter text.
@@ -229,7 +233,7 @@ static ui_error_t cg_draw_text(void *ctx, const char *text,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_draw_image.
  * @param ctx Parameter ctx.
  * @param img Parameter img.
@@ -245,7 +249,7 @@ static ui_error_t cg_draw_image(void *ctx, const struct ui_image *img,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_draw_gradient.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -261,7 +265,7 @@ static ui_error_t cg_draw_gradient(void *ctx, const struct ui_rect *r,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_draw_path.
  * @param ctx Parameter ctx.
  * @param p Parameter p.
@@ -307,7 +311,7 @@ static ui_error_t cg_draw_path(void *ctx, const struct ui_path *p,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_push_clip.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -325,7 +329,7 @@ static ui_error_t cg_push_clip(void *ctx, const struct ui_rect *r) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_pop_clip.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -340,7 +344,7 @@ static ui_error_t cg_pop_clip(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_set_blend_mode.
  * @param ctx Parameter ctx.
  * @param mode Parameter mode.
@@ -410,7 +414,7 @@ static ui_error_t cg_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_set_shadow.
  * @param ctx Parameter ctx.
  * @param shadow Parameter shadow.
@@ -455,7 +459,7 @@ static ui_error_t cg_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_read_pixels.
  * @param ctx Parameter ctx.
  * @param out_rgba_buffer Parameter out_rgba_buffer.
@@ -491,7 +495,7 @@ static ui_error_t cg_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cg_destroy.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -514,7 +518,7 @@ static const struct ui_renderer_vtable cg_vtable = {
     cg_pop_clip,    cg_set_blend_mode, cg_set_shadow, cg_read_pixels,
     cg_destroy};
 
-/*
+/**
  * @brief ui_renderer_native_init.
  * @param renderer Parameter renderer.
  * @return Return value.
@@ -543,4 +547,7 @@ ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
 #endif
 
 /* Prevent empty translation unit warning on MSVC */
+/**
+ * @brief ui_renderer_coregraphics_dummy_t.
+ */
 typedef int ui_renderer_coregraphics_dummy_t;

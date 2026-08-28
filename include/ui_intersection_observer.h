@@ -63,6 +63,7 @@ ui_intersection_observer_create(struct ui_dom_node *root, int root_margin_px,
 /**
  * @brief Destroys an intersection observer.
  * @param observer The observer to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_intersection_observer_destroy(struct ui_intersection_observer *observer);

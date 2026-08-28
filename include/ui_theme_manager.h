@@ -18,9 +18,9 @@ extern "C" {
  * @brief Built-in theme modes.
  */
 enum ui_theme_mode {
-  UI_THEME_MODE_SYSTEM,
-  UI_THEME_MODE_LIGHT,
-  UI_THEME_MODE_DARK
+  UI_THEME_MODE_SYSTEM, /**< System theme mode */
+  UI_THEME_MODE_LIGHT,  /**< Light theme mode */
+  UI_THEME_MODE_DARK    /**< Dark theme mode */
 };
 
 /**

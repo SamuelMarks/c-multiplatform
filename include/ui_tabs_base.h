@@ -5,6 +5,9 @@
 #ifndef UI_TABS_BASE_H
 #define UI_TABS_BASE_H
 
+/**
+ * @brief Opaque structure representing a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -17,10 +20,17 @@ extern "C" {
 #include "ui_event.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a tabs base component.
+ */
 struct ui_tabs_base;
 
 /**
  * @brief Callback invoked when the active tab changes.
+ * @param tabs The tabs component.
+ * @param new_index The new index.
+ * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_tabs_on_change_t)(struct ui_tabs_base *tabs,
                                           int new_index, void *user_data);
@@ -37,6 +47,7 @@ ui_error_t ui_tabs_base_create(struct ui_tabs_base **out_tabs);
  * @brief Destroys a tabs base component.
  *
  * @param tabs The tabs component to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs);
 

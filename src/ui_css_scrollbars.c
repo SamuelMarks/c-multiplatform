@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_scrollbars.c
+ * @brief ui_css_scrollbars.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_scrollbars.h"
 #include <string.h>
@@ -5,7 +9,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.

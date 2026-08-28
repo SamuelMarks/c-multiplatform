@@ -45,6 +45,7 @@ ui_error_t ui_fab_base_create(struct ui_fab_base **out_fab);
  * @brief Destroys a FAB base component and frees all internal actions.
  *
  * @param fab The FAB to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_destroy(struct ui_fab_base *fab);
 

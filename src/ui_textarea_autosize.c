@@ -1,11 +1,16 @@
+/**
+ * @file ui_textarea_autosize.c
+ * @brief ui_textarea_autosize.c implementation.
+ * @details Implements autosize calculations for textareas.
+ */
 /* clang-format off */
 #include "ui_textarea_autosize.h"
 /* clang-format on */
 
-/*
- * @brief ui_textarea_autosize_config_init.
- * @param out_config Parameter out_config.
- * @return Return value.
+/**
+ * @brief Initialize textarea autosize configuration with defaults.
+ * @param out_config Pointer to the configuration to initialize.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
  */
 ui_error_t ui_textarea_autosize_config_init(
     struct ui_textarea_autosize_config *out_config) {
@@ -26,7 +31,12 @@ cleanup:
   return rc;
 }
 
-/* \brief ui_error
+/**
+ * @brief Calculate the resulting height and state of the textarea.
+ * @param config Pointer to the configuration.
+ * @param num_lines The number of lines of text.
+ * @param out_state Pointer to the output state to populate.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
  */
 ui_error_t
 ui_textarea_autosize_calculate(const struct ui_textarea_autosize_config *config,

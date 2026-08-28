@@ -82,6 +82,7 @@ mock_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
 
 #endif
 
+/** @brief Default CSS stylesheet for carousel base component */
 static const char ui_carousel_base_css[] =
     ":host { "
     "display: block; "
@@ -265,6 +266,13 @@ ui_error_t ui_carousel_base_destroy(struct ui_carousel_base *carousel) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the number of items in the carousel.
+ *
+ * @param carousel The carousel instance.
+ * @param count The number of items.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
+ */
 ui_error_t ui_carousel_base_set_item_count(struct ui_carousel_base *carousel,
                                            size_t count) {
   if (!carousel)
@@ -380,6 +388,15 @@ ui_error_t ui_carousel_base_tick(struct ui_carousel_base *carousel,
                                        carousel->current_scroll);
 }
 
+/**
+ * @brief Scrolls to a specific index.
+ *
+ * @param carousel The carousel.
+ * @param index The item index.
+ * @param smooth If true, animates to the index, else jumps instantly.
+ * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if index is out of
+ * range, or UI_ERROR_INVALID_ARGUMENT if null.
+ */
 ui_error_t ui_carousel_base_scroll_to_index(struct ui_carousel_base *carousel,
                                             size_t index, int smooth) {
   if (!carousel)

@@ -6,8 +6,14 @@
 #ifndef UI_MASONRY_LAYOUT_BASE_H
 #define UI_MASONRY_LAYOUT_BASE_H
 
+/**
+ * @brief Opaque structure representing a computed value.
+ */
 struct ui_computed;
 
+/**
+ * @brief Opaque structure representing a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -19,6 +25,9 @@ extern "C" {
 #include "ui_component.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a masonry layout base component.
+ */
 struct ui_masonry_layout_base;
 
 /**
@@ -34,6 +43,7 @@ ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry);
  * @brief Destroys a masonry layout base component.
  *
  * @param masonry The component to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry);

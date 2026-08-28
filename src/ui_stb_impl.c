@@ -1,3 +1,7 @@
+/**
+ * @file ui_stb_impl.c
+ * @brief ui_stb_impl.c implementation.
+ */
 /* clang-format off */
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +36,7 @@
 #define STBTT_malloc(x,u)  ((void)(u),C_MULTIPLATFORM_MALLOC(x))
 /** @brief internal */
 #define STBTT_free(x,u)    ((void)(u),C_MULTIPLATFORM_FREE(x))
-#include "../include/stb_truetype.h"
+#include "stb_truetype.h"
 
 /** @brief internal */
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -42,7 +46,7 @@
 #define STBIW_REALLOC(p,x) C_MULTIPLATFORM_REALLOC(p,x)
 /** @brief internal */
 #define STBIW_FREE(x)      C_MULTIPLATFORM_FREE(x)
-#include "../include/stb_image_write.h"
+#include "stb_image_write.h"
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

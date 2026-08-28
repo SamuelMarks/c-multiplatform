@@ -1,3 +1,7 @@
+/**
+ * @file ui_sensor_manager.c
+ * @brief ui_sensor_manager.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_sensor_manager.h"
 #include "ui_internal_mem.h"
@@ -22,7 +26,7 @@ struct ui_sensor_manager {
   struct ui_sensor_quaternion current_quat; /**< current_quat */
 };
 
-/*
+/**
  * \brief Creates a new sensor manager.
  * \param out_manager Pointer to store the manager.
  * \return UI_ERROR_NONE on success.
@@ -52,7 +56,7 @@ ui_error_t ui_sensor_manager_create(struct ui_sensor_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a sensor manager.
  * \param manager The manager to destroy.
  * \return UI_ERROR_NONE on success.
@@ -72,7 +76,7 @@ ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Starts the sensor manager.
  * \param manager The manager to start.
  * \return UI_ERROR_NONE on success.
@@ -95,7 +99,7 @@ ui_error_t ui_sensor_manager_start(struct ui_sensor_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Stops the sensor manager.
  * \param manager The manager to stop.
  * \return UI_ERROR_NONE on success.
@@ -116,7 +120,7 @@ ui_error_t ui_sensor_manager_stop(struct ui_sensor_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Binds a signal for orientation updates.
  * \param manager The sensor manager.
  * \param signal The signal to bind.
@@ -132,7 +136,7 @@ ui_error_t ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the current accelerometer data.
  * \param manager The sensor manager.
  * \param out_accel Pointer to store the vector.
@@ -149,7 +153,7 @@ ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the current gyroscope data.
  * \param manager The sensor manager.
  * \param out_gyro Pointer to store the vector.
@@ -166,17 +170,22 @@ ui_error_t ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
 }
 
 /* Forward declarations */
-/*
+/**
  * \brief Mocks a tick for the sensor manager.
  * \param manager The manager.
  * \return UI_ERROR_NONE on success.
  */
 ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager);
 
-/*
+/**
  * \brief Mocks a tick for the sensor manager.
  * \param manager The manager.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief ui_sensor_manager_tick_mock.
+ * @param manager Parameter manager.
+ * @return Return value.
  */
 ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
   if (!manager || !manager->is_running) {

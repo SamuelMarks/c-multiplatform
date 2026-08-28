@@ -1,9 +1,13 @@
+/**
+ * @file ui_swipe_action_base.c
+ * @brief ui_swipe_action_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_swipe_action_base.h"
 #include <math.h>
 /* clang-format on */
 
-/*
+/**
  * @brief ui_swipe_action_base_init.
  * @param swipe_action Parameter swipe_action.
  * @param component Parameter component.

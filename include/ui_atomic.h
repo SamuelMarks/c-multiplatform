@@ -64,11 +64,11 @@ ui_error_t ui_atomic_store(ui_atomic_t *target, long value);
  * @param target Pointer to the volatile pointer to swap.
  * @param expected The expected current pointer.
  * @param new_value The new pointer to set.
- * @param out_actual Pointer to receive 1 if successful, 0 otherwise.
+ * @param out_swapped Pointer to receive 1 if successful, 0 otherwise.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_atomic_ptr_cas(void *volatile *target, void *expected,
-                             void *new_value, int *out_actual);
+                             void *new_value, int *out_swapped);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

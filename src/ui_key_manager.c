@@ -1,3 +1,7 @@
+/**
+ * @file ui_key_manager.c
+ * @brief ui_key_manager.c implementation.
+ */
 /* clang-format off */
 #include "ui_key_manager.h"
 #include "ui_internal_mem.h"
@@ -6,7 +10,7 @@
 /** @brief internal */
 #define INITIAL_CAPACITY 8
 
-/*
+/**
  * @brief ui_key_manager_init.
  * @param manager Parameter manager.
  * @return Return value.
@@ -33,7 +37,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_key_manager_cleanup.
  * @param manager Parameter manager.
  * @return Return value.
@@ -57,7 +61,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_key_manager_register.
  * @param manager Parameter manager.
  * @param hotkey Parameter hotkey.
@@ -99,7 +103,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_key_manager_unregister.
  * @param manager Parameter manager.
  * @param id Parameter id.
@@ -161,7 +165,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_key_manager_format_hotkey.
  * @param hotkey Parameter hotkey.
  * @param out_buffer Parameter out_buffer.

@@ -1,3 +1,7 @@
+/**
+ * @file ui_color_space.c
+ * @brief ui_color_space.c implementation.
+ */
 /* clang-format off */
 #include "ui_color_space.h"
 #include <math.h>
@@ -9,6 +13,16 @@
 #endif
 
 /* Standard sRGB to XYZ matrix */
+/**
+ * @brief srgb_to_xyz.
+ * @param r Parameter r.
+ * @param g Parameter g.
+ * @param b Parameter b.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param z Parameter z.
+ * @return Return value.
+ */
 static ui_error_t srgb_to_xyz(float r, float g, float b, float *x, float *y,
                               float *z) {
   /* Linearize */
@@ -22,7 +36,7 @@ static ui_error_t srgb_to_xyz(float r, float g, float b, float *x, float *y,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief xyz_to_srgb.
  * @param x Parameter x.
  * @param y Parameter y.
@@ -47,7 +61,7 @@ static ui_error_t xyz_to_srgb(float x, float y, float z, float *r, float *g,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief calc_lab_f.
  * @param t Parameter t.
  * @return Return value.
@@ -59,7 +73,7 @@ static float calc_lab_f(float t) {
   return (841.0f / 108.0f) * t + (4.0f / 29.0f);
 }
 
-/*
+/**
  * @brief calc_lab_f_inv.
  * @param t Parameter t.
  * @return Return value.
@@ -72,7 +86,7 @@ static float calc_lab_f_inv(float t) {
   return (108.0f / 841.0f) * (t - (4.0f / 29.0f));
 }
 
-/*
+/**
  * @brief xyz_to_lab.
  * @param x Parameter x.
  * @param y Parameter y.
@@ -99,7 +113,7 @@ static ui_error_t xyz_to_lab(float x, float y, float z, float *l, float *a,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief lab_to_xyz.
  * @param l Parameter l.
  * @param a Parameter a.
@@ -125,7 +139,7 @@ static ui_error_t lab_to_xyz(float l, float a, float b_in, float *x, float *y,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief lab_to_lch.
  * @param l Parameter l.
  * @param a Parameter a.
@@ -146,7 +160,7 @@ static ui_error_t lab_to_lch(float l, float a, float b_in, float *l_out,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief lch_to_lab.
  * @param l Parameter l.
  * @param c Parameter c.
@@ -165,7 +179,7 @@ static ui_error_t lch_to_lab(float l, float c, float h, float *l_out, float *a,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief math_clamp.
  * @param v Parameter v.
  * @param min Parameter min.
@@ -180,7 +194,7 @@ static float math_clamp(float v, float min, float max) {
   return v;
 }
 
-/*
+/**
  * @brief ui_color_argb_to_cam16.
  * @param argb Parameter argb.
  * @param out_cam16 Parameter out_cam16.
@@ -221,7 +235,7 @@ ui_error_t ui_color_argb_to_cam16(ui_color_t argb,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_color_cam16_to_argb.
  * @param cam16 Parameter cam16.
  * @param out_argb Parameter out_argb.
@@ -257,7 +271,7 @@ ui_error_t ui_color_cam16_to_argb(const struct ui_color_cam16 *cam16,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_color_argb_to_hct.
  * @param argb Parameter argb.
  * @param out_hct Parameter out_hct.
@@ -295,7 +309,7 @@ ui_error_t ui_color_argb_to_hct(ui_color_t argb, struct ui_color_hct *out_hct) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_color_hct_to_argb.
  * @param hct Parameter hct.
  * @param out_argb Parameter out_argb.

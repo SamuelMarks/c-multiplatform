@@ -1,3 +1,7 @@
+/**
+ * @file ui_sort_header_base.c
+ * @brief ui_sort_header_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_sort_header_base.h"
 #include "ui_internal_mem.h"
@@ -21,7 +25,7 @@ struct ui_sort_header_base {
   struct ui_signal *direction_signal; /**< direction_signal */
 };
 
-/*
+/**
  * \brief Creates a new sort header base component.
  * \param out_sort_header Pointer to store the component.
  * \return UI_ERROR_NONE on success.
@@ -49,7 +53,7 @@ ui_sort_header_base_create(struct ui_sort_header_base **out_sort_header) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a sort header component.
  * \param sort_header The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -67,7 +71,7 @@ ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets whether multiple columns can be sorted at once.
  * \param sort_header The sort header.
  * \param is_multi 1 to allow multiple, 0 to allow only one.
@@ -90,11 +94,18 @@ ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Finds the index of a state by ID.
  * \param sort_header The sort header.
  * \param id The ID to look for.
  * \param out_index Pointer to store the result.
+ */
+/**
+ * @brief find_state_index.
+ * @param sort_header Parameter sort_header.
+ * @param id Parameter id.
+ * @param out_index Parameter out_index.
+ * @return Return value.
  */
 static void find_state_index(struct ui_sort_header_base *sort_header, void *id,
                              int *out_index) {
@@ -108,11 +119,17 @@ static void find_state_index(struct ui_sort_header_base *sort_header, void *id,
   }
 }
 
-/*
+/**
  * \brief Removes a state at a given index.
  * \param sort_header The sort header.
  * \param index The index to remove.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief remove_state_at.
+ * @param sort_header Parameter sort_header.
+ * @param index Parameter index.
+ * @return Return value.
  */
 static ui_error_t remove_state_at(struct ui_sort_header_base *sort_header,
                                   int index) {
@@ -126,7 +143,7 @@ static ui_error_t remove_state_at(struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Inserts or updates a sort state.
  * \param sort_header The sort header.
  * \param id The ID of the item.
@@ -134,6 +151,13 @@ static ui_error_t remove_state_at(struct ui_sort_header_base *sort_header,
  * \return UI_ERROR_NONE on success.
  */
 static ui_error_t
+/**
+ * @brief insert_or_update_state.
+ * @param sort_header Parameter sort_header.
+ * @param id Parameter id.
+ * @param direction Parameter direction.
+ * @return Return value.
+ */
 insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
                        enum ui_sort_direction direction) {
   int existing_index;
@@ -176,7 +200,7 @@ insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Toggles the sort direction for a given column ID.
  * \param sort_header The sort header.
  * \param id The column ID.
@@ -213,7 +237,7 @@ ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
   return insert_or_update_state(sort_header, id, next_dir);
 }
 
-/*
+/**
  * \brief Sets the sort direction for a given column ID.
  * \param sort_header The sort header.
  * \param id The column ID.
@@ -230,7 +254,7 @@ ui_sort_header_base_set_direction(struct ui_sort_header_base *sort_header,
   return insert_or_update_state(sort_header, id, direction);
 }
 
-/*
+/**
  * \brief Gets the current sort direction for a given column ID.
  * \param sort_header The sort header.
  * \param id The column ID.
@@ -258,7 +282,7 @@ ui_sort_header_base_get_direction(const struct ui_sort_header_base *sort_header,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets all active sorts.
  * \param sort_header The sort header.
  * \param out_states Array to store the states.
@@ -286,7 +310,7 @@ ui_error_t ui_sort_header_base_get_active_sorts(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Clears all active sorts.
  * \param sort_header The sort header.
  * \return UI_ERROR_NONE on success.
@@ -300,7 +324,7 @@ ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Binds the direction state to a signal.
  * \param widget The sort header component.
  * \param signal The signal to bind.

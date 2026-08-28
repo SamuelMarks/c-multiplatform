@@ -1,3 +1,7 @@
+/**
+ * @file ui_ring_buffer.c
+ * @brief ui_ring_buffer.c implementation.
+ */
 /*
  * \file ui_ring_buffer.c
  * \brief Implementation of the UI Ring Buffer component.
@@ -23,7 +27,7 @@ struct ui_ring_buffer {
   void *buffer;     /**< Pointer to backing memory array */
 };
 
-/*
+/**
  * \brief Creates a new lock-free ring buffer.
  *
  * \param item_size Size of each element in bytes.
@@ -66,7 +70,7 @@ ui_error_t ui_ring_buffer_create(size_t item_size, size_t capacity,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a ring buffer and frees its memory.
  *
  * \param buffer The buffer to destroy.
@@ -82,7 +86,7 @@ ui_error_t ui_ring_buffer_destroy(struct ui_ring_buffer *buffer) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Pushes an item into the ring buffer.
  *        Safe to call from a single producer thread.
  *
@@ -125,7 +129,7 @@ ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Pops an item from the ring buffer.
  *        Safe to call from a single consumer thread.
  *
@@ -168,7 +172,7 @@ ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Pushes an item into the ring buffer safely from multiple threads.
  *        Uses a spinlock to ensure thread-safe multi-producer access.
  *

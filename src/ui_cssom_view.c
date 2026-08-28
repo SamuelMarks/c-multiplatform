@@ -1,8 +1,12 @@
+/**
+ * @file ui_cssom_view.c
+ * @brief ui_cssom_view.c implementation.
+ */
 /* clang-format off */
 #include "ui_cssom_view.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_cssom_view_get_bounding_client_rect.
  * @param node Parameter node.
  * @param out_rect Parameter out_rect.
@@ -38,7 +42,7 @@ ui_cssom_view_get_bounding_client_rect(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_cssom_view_get_client_width.
  * @param node Parameter node.
  * @param out_width Parameter out_width.
@@ -64,7 +68,7 @@ ui_error_t ui_cssom_view_get_client_width(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_cssom_view_get_client_height.
  * @param node Parameter node.
  * @param out_height Parameter out_height.
@@ -86,7 +90,7 @@ ui_error_t ui_cssom_view_get_client_height(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_cssom_view_get_client_top.
  * @param node Parameter node.
  * @param out_top Parameter out_top.
@@ -102,7 +106,7 @@ ui_error_t ui_cssom_view_get_client_top(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_cssom_view_get_client_left.
  * @param node Parameter node.
  * @param out_left Parameter out_left.
@@ -118,7 +122,7 @@ ui_error_t ui_cssom_view_get_client_left(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_cssom_view_get_scroll_width.
  * @param node Parameter node.
  * @param out_width Parameter out_width.
@@ -137,7 +141,7 @@ ui_error_t ui_cssom_view_get_scroll_width(const struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_cssom_view_get_scroll_height.
  * @param node Parameter node.
  * @param out_height Parameter out_height.

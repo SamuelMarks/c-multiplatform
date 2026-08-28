@@ -6,6 +6,9 @@
 #ifndef UI_PAGINATION_BASE_H
 #define UI_PAGINATION_BASE_H
 
+/**
+ * @brief Opaque structure representing a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -17,6 +20,9 @@ extern "C" {
 #include <stddef.h>
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a pagination base instance.
+ */
 struct ui_pagination_base;
 
 /**
@@ -32,6 +38,7 @@ ui_pagination_base_create(struct ui_pagination_base **out_pagination);
  * @brief Destroys a pagination base instance.
  *
  * @param pagination The pagination instance to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_pagination_base_destroy(struct ui_pagination_base *pagination);
 

@@ -2,6 +2,7 @@
  * @file ui_table_base.c
  * @brief Implementation of the table base component.
  */
+
 /* clang-format off */
 #include "ui_table_base.h"
 #include "ui_internal_mem.h"
@@ -11,7 +12,15 @@
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
+/** @brief Internal mock countdown for append child failures. */
 extern int g_mock_append_child_fail_countdown;
+
+/**
+ * @brief Mock implementation of ui_dom_node_append_child.
+ * @param parent Parent node.
+ * @param child Child node.
+ * @return Mocked error code.
+ */
 static ui_error_t mock_ui_dom_node_append_child(struct ui_dom_node *parent,
                                                 struct ui_dom_node *child) {
   if (g_mock_append_child_fail_countdown == 0) {
@@ -34,26 +43,28 @@ static ui_error_t mock_ui_dom_node_append_child(struct ui_dom_node *parent,
 
 /**
  * @struct ui_table_base
- * @struct ui_table_base
  * @brief Internal implementation of the table base component.
  */
 struct ui_table_base {
-  /* @brief Data model containing rows, columns, and rendering logic. */
-  struct ui_table_model model; /**< model */
-  /* @brief Array of column configurations. */
-  struct ui_table_column_config *col_configs; /**< col_configs */
-  /* @brief Number of columns. */
-  size_t num_cols; /**< num_cols */
-  /* @brief Active sort configuration. */
-  struct ui_table_sort_config sort_config; /**< sort_config */
-  /* @brief Active pagination configuration. */
-  struct ui_table_pagination_config pagination_config; /**< pagination_config */
-  /* @brief Associated selection model. */
-  struct ui_selection_model *selection_model; /**< selection_model */
-  /* @brief Bound data signal. */
-  struct ui_computed *data_signal; /**< data_signal */
+  struct ui_table_model
+      model; /**< Data model containing rows, columns, and rendering logic. */
+  struct ui_table_column_config
+      *col_configs; /**< Array of column configurations. */
+  size_t num_cols;  /**< Number of columns. */
+  struct ui_table_sort_config sort_config; /**< Active sort configuration. */
+  struct ui_table_pagination_config
+      pagination_config; /**< Active pagination configuration. */
+  struct ui_selection_model
+      *selection_model;            /**< Associated selection model. */
+  struct ui_computed *data_signal; /**< Bound data signal. */
 };
 
+/**
+ * @brief Creates a new table base component.
+ * @param[out] out_table Pointer to store the created table.
+ * @param[in] model The table data model.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_table_base_create(struct ui_table_base **out_table,
                                 const struct ui_table_model *model) {
   struct ui_table_base *table;
@@ -111,6 +122,11 @@ ui_error_t ui_table_base_create(struct ui_table_base **out_table,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Destroys a table base component.
+ * @param[in,out] table The table to destroy.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_table_base_destroy(struct ui_table_base *table) {
   if (!table)
     return UI_ERROR_NONE;
@@ -122,6 +138,12 @@ ui_error_t ui_table_base_destroy(struct ui_table_base *table) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Retrieves the selection model of the table.
+ * @param[in,out] table The table.
+ * @param[out] out_model Pointer to store the selection model.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_table_base_get_selection_model(struct ui_table_base *table,
                                   struct ui_selection_model **out_model) {
@@ -131,6 +153,13 @@ ui_table_base_get_selection_model(struct ui_table_base *table,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the configuration for a specific column.
+ * @param[in,out] table The table.
+ * @param[in] col_index The index of the column to configure.
+ * @param[in] config The column configuration.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
                                 const struct ui_table_column_config *config) {
@@ -143,6 +172,12 @@ ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the active sort configuration for the table.
+ * @param[in,out] table The table.
+ * @param[in] config The sort configuration.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_table_base_set_sort_config(struct ui_table_base *table,
                               const struct ui_table_sort_config *config) {
@@ -156,6 +191,12 @@ ui_table_base_set_sort_config(struct ui_table_base *table,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the pagination configuration for the table.
+ * @param[in,out] table The table.
+ * @param[in] config The pagination configuration.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_table_base_set_pagination_config(
     struct ui_table_base *table,
     const struct ui_table_pagination_config *config) {
@@ -165,7 +206,7 @@ ui_error_t ui_table_base_set_pagination_config(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Helper function to get ARIA string for sort direction.
  * @param dir The sort direction.
  * @return The corresponding ARIA string.
@@ -181,6 +222,12 @@ static const char *get_aria_sort_string(enum ui_table_sort_direction dir) {
   }
 }
 
+/**
+ * @brief Renders the table into a DOM container.
+ * @param[in,out] table The table widget.
+ * @param[in,out] container The DOM node to render into.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_table_base_render(struct ui_table_base *table,
                                 struct ui_dom_node *container) {
   struct ui_dom_node *table_root = NULL;
@@ -367,6 +414,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Binds a reactive data signal to the table.
+ * @param[in,out] widget The table widget.
+ * @param[in,out] signal The data signal.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_table_base_bind_data(struct ui_table_base *widget,
                                    struct ui_computed *signal) {
   if (!widget) {

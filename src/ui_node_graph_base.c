@@ -1,7 +1,7 @@
-/*
- * \file ui_node_graph_base.c
- * \brief Implementation of the UI node graph component for visual programming
- * or flow charts.
+/**
+ * @file ui_node_graph_base.c
+ * @brief Implementation of the UI node graph component.
+ * @details Supports visual programming layouts and flow charts.
  */
 /* clang-format off */
 #include "ui_node_graph_base.h"
@@ -10,43 +10,43 @@
 #include <stddef.h>
 /* clang-format on */
 
-/*
- * \def UI_NODE_GRAPH_MAX_CONNECTIONS
- * \brief Maximum allowed number of connections in the graph.
+/** @def UI_NODE_GRAPH_MAX_CONNECTIONS
+ * @brief Maximum allowed number of connections in the graph.
  */
 #define UI_NODE_GRAPH_MAX_CONNECTIONS 256
 
 /**
  * @struct ui_node_graph_base
- * \struct ui_node_graph_base
- * \brief Core state and camera context for a node graph widget.
+ * @brief Core state and camera context for a node graph widget.
  */
 struct ui_node_graph_base {
-  struct ui_arena *arena;                           /**< arena */
-  struct ui_node_graph_camera_config camera_config; /**< camera_config */
+  struct ui_arena *arena; /**< Memory arena for the graph */
+  struct ui_node_graph_camera_config
+      camera_config; /**< Camera config settings */
 
-  float zoom;                         /**< zoom */
-  float pan_x;                        /**< pan_x */
-  float pan_y;                        /**< pan_y */
-  struct ui_dom_matrix camera_matrix; /**< camera_matrix */
+  float zoom;                         /**< Current zoom level */
+  float pan_x;                        /**< Current pan X translation */
+  float pan_y;                        /**< Current pan Y translation */
+  struct ui_dom_matrix camera_matrix; /**< Resulting 2D transformation matrix */
 
   struct ui_node_graph_connection
-      connections[UI_NODE_GRAPH_MAX_CONNECTIONS]; /**< connections */
-  int num_connections;                            /**< num_connections */
+      connections[UI_NODE_GRAPH_MAX_CONNECTIONS]; /**< Active connections list
+                                                   */
+  int num_connections;                            /**< Total connection count */
 
-  struct ui_dom_rect current_marquee; /**< current_marquee */
-  ui_bool_t has_marquee;              /**< has_marquee */
+  struct ui_dom_rect current_marquee; /**< Current drag marquee rect */
+  ui_bool_t has_marquee;              /**< Indicates if marquee is active */
 
-  ui_signal_t *camera_signal;   /**< camera_signal */
-  ui_signal_t *topology_signal; /**< topology_signal */
+  ui_signal_t *camera_signal;   /**< Signal for camera updates */
+  ui_signal_t *topology_signal; /**< Signal for topology updates */
 };
 
-/*
- * \brief Equality check for pointer payloads.
- * \param[in] a First payload.
- * \param[in] b Second payload.
- * \param[out] out_equal True if equal.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Equality check for pointer payloads.
+ * @param[in] a First payload.
+ * @param[in] b Second payload.
+ * @param[out] out_equal True if equal.
+ * @return UI_ERROR_NONE on success.
  */
 static ui_error_t pointer_equality(union ui_signal_payload a,
                                    union ui_signal_payload b,
@@ -55,13 +55,13 @@ static ui_error_t pointer_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Equality check that always returns false (for triggering signals
+/**
+ * @brief Equality check that always returns false (for triggering signals
  * unconditionally).
- * \param[in] a First payload.
- * \param[in] b Second payload.
- * \param[out] out_equal Always set to UI_FALSE.
- * \return UI_ERROR_NONE on success.
+ * @param[in] a First payload.
+ * @param[in] b Second payload.
+ * @param[out] out_equal Always set to UI_FALSE.
+ * @return UI_ERROR_NONE on success.
  */
 static ui_error_t void_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
@@ -72,11 +72,11 @@ static ui_error_t void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Updates the internal camera matrix based on pan and zoom and triggers
+/**
+ * @brief Updates the internal camera matrix based on pan and zoom and triggers
  * its signal.
- * \param[in,out] graph The node graph widget.
- * \return UI_ERROR_NONE on success.
+ * @param[in,out] graph The node graph widget.
+ * @return UI_ERROR_NONE on success.
  */
 static ui_error_t update_camera_matrix(struct ui_node_graph_base *graph) {
   union ui_signal_payload payload;
@@ -96,7 +96,12 @@ static ui_error_t update_camera_matrix(struct ui_node_graph_base *graph) {
   return rc;
 }
 
-/* \brief ui_node_graph_base_create
+/**
+ * @brief Creates a new node graph widget.
+ * @param[in,out] arena Memory arena.
+ * @param[in] camera_config Initial configuration for the camera.
+ * @param[out] out_graph Pointer to store the created graph widget.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_node_graph_base_create(
     struct ui_arena *arena,
@@ -132,9 +137,6 @@ ui_error_t ui_node_graph_base_create(
                          pointer_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                          &(*out_graph)->camera_signal);
   if (err != UI_ERROR_NONE) {
-    /* If signal creation fails, we don't have a specific free for arena blocks,
-       but the caller will likely destroy the arena. We just return the error.
-     */
     return err;
   }
 
@@ -149,10 +151,10 @@ ui_error_t ui_node_graph_base_create(
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a node graph widget.
- * \param[in,out] graph The node graph widget to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a node graph widget.
+ * @param[in,out] graph The node graph widget to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
   if (!graph)
@@ -164,12 +166,12 @@ ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Pans the camera view.
- * \param[in,out] graph The node graph widget.
- * \param[in] delta_x X pan delta.
- * \param[in] delta_y Y pan delta.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Pans the camera view.
+ * @param[in,out] graph The node graph widget.
+ * @param[in] delta_x X pan delta.
+ * @param[in] delta_y Y pan delta.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
                                   float delta_x, float delta_y) {
@@ -198,12 +200,12 @@ ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Zooms the camera view, optionally towards a specific focal point.
- * \param[in,out] graph The node graph widget.
- * \param[in] zoom The new zoom level.
- * \param[in] focal_point Optional focal point for the zoom operation.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Zooms the camera view, optionally towards a specific focal point.
+ * @param[in,out] graph The node graph widget.
+ * @param[in] zoom The new zoom level.
+ * @param[in] focal_point Optional focal point for the zoom operation.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
                                    const struct ui_dom_point *focal_point) {
@@ -238,7 +240,11 @@ ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Gets the signal for camera transformation updates.
+ * @param[in,out] graph The node graph widget.
+ * @param[out] out_signal Pointer to store the camera signal.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_node_graph_base_get_camera_signal(struct ui_node_graph_base *graph,
@@ -249,7 +255,12 @@ ui_node_graph_base_get_camera_signal(struct ui_node_graph_base *graph,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Converts screen coordinates to graph coordinates.
+ * @param[in] graph The node graph widget.
+ * @param[in] screen_point The point in screen space.
+ * @param[out] out_graph_point The corresponding point in graph space.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_node_graph_base_screen_to_graph(const struct ui_node_graph_base *graph,
@@ -270,7 +281,11 @@ ui_node_graph_base_screen_to_graph(const struct ui_node_graph_base *graph,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_node_graph_base_add_connection
+/**
+ * @brief Adds a new connection to the node graph.
+ * @param[in,out] graph The node graph widget.
+ * @param[in] connection The connection structure to add.
+ * @return UI_ERROR_NONE on success, or an error if connection limit reached.
  */
 ui_error_t ui_node_graph_base_add_connection(
     struct ui_node_graph_base *graph,
@@ -290,7 +305,11 @@ ui_error_t ui_node_graph_base_add_connection(
   return ui_signal_set(graph->topology_signal, payload);
 }
 
-/* \brief ui_node_graph_base_set_marquee_selection
+/**
+ * @brief Sets or updates the active marquee selection rectangle.
+ * @param[in,out] graph The node graph widget.
+ * @param[in] selection_rect The bounding box for the selection marquee.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_node_graph_base_set_marquee_selection(
     struct ui_node_graph_base *graph,
@@ -311,7 +330,11 @@ ui_error_t ui_node_graph_base_set_marquee_selection(
   return ui_signal_set(graph->topology_signal, payload);
 }
 
-/* \brief ui_error
+/**
+ * @brief Gets the signal emitted when node connections or selections change.
+ * @param[in,out] graph The node graph widget.
+ * @param[out] out_signal Pointer to store the topology signal.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_node_graph_base_get_topology_signal(struct ui_node_graph_base *graph,

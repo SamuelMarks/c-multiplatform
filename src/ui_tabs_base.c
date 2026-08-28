@@ -16,6 +16,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet */
 static const char *ui_tabs_base_default_css =
     ".ui-tabs { display: flex; flex-direction: column; } "
     ".ui-tablist { display: flex; flex-direction: row; } "
@@ -215,7 +216,7 @@ ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Duplicates a string using multiplatform malloc.
  * @param src The source string.
  * @param out_str Pointer to receive the duplicated string.
@@ -238,7 +239,7 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Formats an identifier by combining a prefix and a suffix.
  * @param buf The output buffer.
  * @param buf_size The size of the output buffer.

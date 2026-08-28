@@ -5,18 +5,24 @@
 #ifndef UI_TOOLBAR_BASE_H
 #define UI_TOOLBAR_BASE_H
 
-struct ui_computed;
-
-struct ui_signal;
+/* clang-format off */
+#include "ui_error.h"
+#include <stddef.h>
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* clang-format off */
-#include "ui_error.h"
-#include <stddef.h>
-/* clang-format on */
+/**
+ * @brief Forward declaration of ui_computed.
+ */
+struct ui_computed;
+
+/**
+ * @brief Forward declaration of ui_signal.
+ */
+struct ui_signal;
 
 /**
  * @brief Toolbar modes for layout behavior.
@@ -36,7 +42,7 @@ enum ui_toolbar_alignment {
 };
 
 /**
- * @brief Represents a toolbar base component.
+ * @brief Opaque structure representing a toolbar base component.
  */
 struct ui_toolbar_base;
 
@@ -53,6 +59,7 @@ ui_error_t ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar);
  * @brief Destroys a toolbar base component and frees its title if allocated.
  *
  * @param toolbar The toolbar to destroy.
+ * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
 ui_error_t ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar);
 
@@ -124,11 +131,11 @@ ui_toolbar_base_get_alignment(const struct ui_toolbar_base *toolbar,
 /**
  * @brief Binds the data property.
  *
- * @param widget The widget.
+ * @param toolbar The toolbar.
  * @param signal The signal to bind to.
- * @return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toolbar_base_bind_data(struct ui_toolbar_base *widget,
+ui_error_t ui_toolbar_base_bind_data(struct ui_toolbar_base *toolbar,
                                      struct ui_signal *signal);
 
 #ifdef __cplusplus

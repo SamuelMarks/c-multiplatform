@@ -1,3 +1,11 @@
+/**
+ * @file TEST_PLAN.md
+ * @brief TEST_PLAN.md implementation.
+ */
+/**
+ * @file TEST_PLAN.md
+ * @brief TEST_PLAN.md implementation.
+ */
 # C-Multiplatform UI Testing Framework Plan (Maximum Exhaustion Edition)
 
 ## 1. Memory, Allocators, and Core Lifecycle

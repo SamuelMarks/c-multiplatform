@@ -1,3 +1,7 @@
+/**
+ * @file ui_context_menu_base.c
+ * @brief ui_context_menu_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_context_menu_base.h"
 #include "ui_internal_mem.h"
@@ -39,7 +43,7 @@ ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_context_menu_base_destroy.
  * @param menu Parameter menu.
  * @return Return value.
@@ -52,7 +56,7 @@ ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_context_menu_base_get_menu.
  * @param menu Parameter menu.
  * @param out_menu Parameter out_menu.
@@ -67,7 +71,7 @@ ui_error_t ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_context_menu_base_open_at.
  * @param menu Parameter menu.
  * @param director Parameter director.

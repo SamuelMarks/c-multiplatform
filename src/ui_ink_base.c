@@ -1,6 +1,10 @@
+/**
+ * @file ui_ink_base.c
+ * @brief ui_ink_base.c implementation.
+ */
 /*
- * \file ui_ink_base.c
- * \brief Implementation of the generic ink drawing component.
+ * @file ui_ink_base.c
+ * @brief Implementation of the generic ink drawing component.
  */
 /* clang-format off */
 #include "ui_ink_base.h"
@@ -11,8 +15,8 @@
 
 /**
  * @struct ui_ink_base
- * \struct ui_ink_base
- * \brief Internal state for a generic ink component tracking raw and smoothed
+ * @struct ui_ink_base
+ * @brief Internal state for a generic ink component tracking raw and smoothed
  * points.
  */
 struct ui_ink_base {
@@ -26,10 +30,10 @@ struct ui_ink_base {
   size_t smoothed_count;                /**< smoothed_count */
 };
 
-/*
- * \brief Creates a new ink base component.
- * \param[out] out_ink Pointer to store the created ink component.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new ink base component.
+ * @param[out] out_ink Pointer to store the created ink component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
   struct ui_ink_base *ink;
@@ -84,10 +88,10 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys an ink base component.
- * \param[in,out] ink The ink component to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys an ink base component.
+ * @param[in,out] ink The ink component to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink) {
   if (!ink) {
@@ -106,11 +110,11 @@ ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves the underlying DOM component of the ink widget.
- * \param[in,out] ink The ink component.
- * \param[out] out_component Pointer to store the DOM component.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves the underlying DOM component of the ink widget.
+ * @param[in,out] ink The ink component.
+ * @param[out] out_component Pointer to store the DOM component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_ink_base_get_component(struct ui_ink_base *ink,
                                      struct ui_component **out_component) {
@@ -121,15 +125,25 @@ ui_error_t ui_ink_base_get_component(struct ui_ink_base *ink,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Interpolates a point using Catmull-Rom splines.
- * \param[in] p0 First control point.
- * \param[in] p1 Second control point (start of segment).
- * \param[in] p2 Third control point (end of segment).
- * \param[in] p3 Fourth control point.
- * \param[in] t Interpolation parameter (0.0 to 1.0).
- * \param[out] out The interpolated point.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Interpolates a point using Catmull-Rom splines.
+ * @param[in] p0 First control point.
+ * @param[in] p1 Second control point (start of segment).
+ * @param[in] p2 Third control point (end of segment).
+ * @param[in] p3 Fourth control point.
+ * @param[in] t Interpolation parameter (0.0 to 1.0).
+ * @param[out] out The interpolated point.
+ * @return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief interpolate_catmull_rom.
+ * @param p0 Parameter p0.
+ * @param p1 Parameter p1.
+ * @param p2 Parameter p2.
+ * @param p3 Parameter p3.
+ * @param t Parameter t.
+ * @param out Parameter out.
+ * @return Return value.
  */
 static ui_error_t interpolate_catmull_rom(const struct ui_ink_event *p0,
                                           const struct ui_ink_event *p1,
@@ -155,14 +169,23 @@ static ui_error_t interpolate_catmull_rom(const struct ui_ink_event *p0,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Appends a smoothed curve segment between points to the ink context.
- * \param[in,out] ink The ink context.
- * \param[in] p0 First control point.
- * \param[in] p1 Second control point.
- * \param[in] p2 Third control point.
- * \param[in] p3 Fourth control point.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Appends a smoothed curve segment between points to the ink context.
+ * @param[in,out] ink The ink context.
+ * @param[in] p0 First control point.
+ * @param[in] p1 Second control point.
+ * @param[in] p2 Third control point.
+ * @param[in] p3 Fourth control point.
+ * @return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief append_smoothed_segment.
+ * @param ink Parameter ink.
+ * @param p0 Parameter p0.
+ * @param p1 Parameter p1.
+ * @param p2 Parameter p2.
+ * @param p3 Parameter p3.
+ * @return Return value.
  */
 static ui_error_t append_smoothed_segment(struct ui_ink_base *ink,
                                           const struct ui_ink_event *p0,
@@ -191,11 +214,11 @@ static ui_error_t append_smoothed_segment(struct ui_ink_base *ink,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Adds a raw pointer event to the ink stroke and smooths it.
- * \param[in,out] ink The ink context.
- * \param[in] event The raw ink event to add.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Adds a raw pointer event to the ink stroke and smooths it.
+ * @param[in,out] ink The ink context.
+ * @param[in] event The raw ink event to add.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_ink_base_add_event(struct ui_ink_base *ink,
                                  const struct ui_ink_event *event) {
@@ -237,10 +260,10 @@ ui_error_t ui_ink_base_add_event(struct ui_ink_base *ink,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Completes the current ink stroke, finalizing the smoothing.
- * \param[in,out] ink The ink context.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Completes the current ink stroke, finalizing the smoothing.
+ * @param[in,out] ink The ink context.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_ink_base_finish_stroke(struct ui_ink_base *ink) {
   if (!ink) {
@@ -260,18 +283,18 @@ ui_error_t ui_ink_base_finish_stroke(struct ui_ink_base *ink) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves the count of smoothed points in the ink stroke.
- * \param[in] ink The ink context.
- * \param[out] out_count Pointer to store the point count.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves the count of smoothed points in the ink stroke.
+ * @param[in] ink The ink context.
+ * @param[out] out_count Pointer to store the point count.
+ * @return UI_ERROR_NONE on success.
  */
-/*
- * \brief Retrieves a specific smoothed point from the ink stroke.
- * \param[in] ink The ink context.
- * \param[in] index The index of the point.
- * \param[out] out_point Pointer to store the retrieved point.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves a specific smoothed point from the ink stroke.
+ * @param[in] ink The ink context.
+ * @param[in] index The index of the point.
+ * @param[out] out_point Pointer to store the retrieved point.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
                                                  size_t *out_count) {
@@ -282,12 +305,12 @@ ui_error_t ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves a specific smoothed point from the ink stroke.
- * \param[in] ink The ink context.
- * \param[in] index The index of the point.
- * \param[out] out_point Pointer to store the retrieved point.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves a specific smoothed point from the ink stroke.
+ * @param[in] ink The ink context.
+ * @param[in] index The index of the point.
+ * @param[out] out_point Pointer to store the retrieved point.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_ink_base_get_smoothed_point(struct ui_ink_base *ink, size_t index,
                                           struct ui_ink_event *out_point) {

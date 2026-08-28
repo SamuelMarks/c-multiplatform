@@ -1,3 +1,15 @@
+/**
+ * @file ui_layout_tree.c
+ * @brief ui_layout_tree.c implementation.
+ */
+/**
+ * @brief create_layout_node.
+ * @param dom_node Parameter dom_node.
+ * @param style Parameter style.
+ * @param is_anonymous Parameter is_anonymous.
+ * @param out_node Parameter out_node.
+ * @return Return value.
+ */
 static ui_error_t create_layout_node(const struct ui_dom_node *dom_node,
                                      struct ui_css_computed_style *style,
                                      int is_anonymous,
@@ -79,6 +91,12 @@ static ui_error_t create_layout_node(const struct ui_dom_node *dom_node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief append_layout_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
 static ui_error_t append_layout_child(struct ui_layout_node *parent,
                                       struct ui_layout_node *child) {
   child->parent = parent;
@@ -94,6 +112,13 @@ static ui_error_t append_layout_child(struct ui_layout_node *parent,
 }
 
 static ui_error_t
+/**
+ * @brief build_tree_recursive.
+ * @param dom_node Parameter dom_node.
+ * @param stylesheet Parameter stylesheet.
+ * @param out_layout_node Parameter out_layout_node.
+ * @return Return value.
+ */
 build_tree_recursive(const struct ui_dom_node *dom_node,
                      const struct ui_css_stylesheet *stylesheet,
                      struct ui_layout_node **out_layout_node) {
@@ -227,7 +252,12 @@ cleanup:
   return err;
 }
 
-/* \brief ui_error
+/**
+ * @brief Generates a layout tree from a DOM root and stylesheet.
+ * @param[in] dom_root The root DOM node.
+ * @param[in] stylesheet The computed stylesheet.
+ * @param[out] out_layout_root Pointer to store the created layout root.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_layout_tree_generate(const struct ui_dom_node *dom_root,
                                    const struct ui_css_stylesheet *stylesheet,
@@ -262,9 +292,9 @@ ui_error_t ui_layout_tree_destroy(struct ui_layout_node *node) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Computes basic block layout for a node and its children.
- * \param[in,out] node The layout node to compute.
- * \param[in] available_width The width available for this node.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Computes basic block layout for a node and its children.
+ * @param[in,out] node The layout node to compute.
+ * @param[in] available_width The width available for this node.
+ * @return UI_ERROR_NONE on success.
  */

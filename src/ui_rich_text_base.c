@@ -1,3 +1,7 @@
+/**
+ * @file ui_rich_text_base.c
+ * @brief ui_rich_text_base.c implementation.
+ */
 /*
  * \file ui_rich_text_base.c
  * \brief Implementation of the UI Rich Text Base component.
@@ -50,7 +54,7 @@ struct ui_rich_text_base {
   struct ui_signal *text_signal; /**< Text property signal */
 };
 
-/*
+/**
  * \brief Creates a rich text editor base component.
  *
  * \param out_editor Pointer to receive the allocated component.
@@ -128,10 +132,15 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Frees a linked list of text runs.
  *
  * \param head The head of the run list.
+ */
+/**
+ * @brief free_runs.
+ * @param head Parameter head.
+ * @return Return value.
  */
 static void free_runs(struct ui_rich_text_run *head) {
   struct ui_rich_text_run *current = head;
@@ -145,10 +154,15 @@ static void free_runs(struct ui_rich_text_run *head) {
   }
 }
 
-/*
+/**
  * \brief Frees a linked list of history entries.
  *
  * \param head The head of the history list.
+ */
+/**
+ * @brief free_history.
+ * @param head Parameter head.
+ * @return Return value.
  */
 static void free_history(struct ui_rich_text_history_entry *head) {
   struct ui_rich_text_history_entry *current = head;
@@ -162,7 +176,7 @@ static void free_history(struct ui_rich_text_history_entry *head) {
   }
 }
 
-/*
+/**
  * \brief Destroys a rich text editor base component.
  *
  * \param editor The rich text editor.
@@ -191,7 +205,7 @@ ui_error_t ui_rich_text_base_destroy(struct ui_rich_text_base *editor) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the underlying component.
  *
  * \param editor The rich text editor.
@@ -211,7 +225,7 @@ ui_rich_text_base_get_component(struct ui_rich_text_base *editor,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the content of the editor.
  *
  * \param editor The rich text editor.
@@ -264,7 +278,7 @@ ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the content of the editor.
  *
  * Returned string must be freed by the caller using C_MULTIPLATFORM_FREE.
@@ -310,7 +324,7 @@ ui_error_t ui_rich_text_base_get_text(struct ui_rich_text_base *editor,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Toggles a specific format on the current selection.
  *
  * \param editor The rich text editor.
@@ -328,7 +342,7 @@ ui_error_t ui_rich_text_base_toggle_format(struct ui_rich_text_base *editor,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Performs undo.
  *
  * \param editor The rich text editor.
@@ -344,7 +358,7 @@ ui_error_t ui_rich_text_base_undo(struct ui_rich_text_base *editor) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Performs redo.
  *
  * \param editor The rich text editor.
@@ -360,7 +374,7 @@ ui_error_t ui_rich_text_base_redo(struct ui_rich_text_base *editor) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Processes an input event (keyboard, mouse).
  *
  * \param editor The rich text editor.
@@ -397,7 +411,7 @@ ui_error_t ui_rich_text_base_process_event(struct ui_rich_text_base *editor,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the IME composition text (called from window backends during IME
  * input).
  *
@@ -419,7 +433,7 @@ ui_rich_text_base_set_ime_composition(struct ui_rich_text_base *editor,
               : UI_ERROR_OUT_OF_MEMORY);
 }
 
-/*
+/**
  * \brief Binds the text property.
  *
  * \param widget The widget.

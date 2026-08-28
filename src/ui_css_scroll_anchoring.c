@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_scroll_anchoring.c
+ * @brief ui_css_scroll_anchoring.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_css_scroll_anchoring.h"
 #include "../include/ui_cssom.h"
@@ -5,7 +9,7 @@
 #include <stddef.h>
 /* clang-format on */
 
-/*
+/**
  * @brief ui_css_scroll_anchoring_parse.
  * @param style Parameter style.
  * @param out_anchor Parameter out_anchor.

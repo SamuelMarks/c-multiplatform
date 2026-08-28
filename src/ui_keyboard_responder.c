@@ -1,6 +1,10 @@
+/**
+ * @file ui_keyboard_responder.c
+ * @brief ui_keyboard_responder.c implementation.
+ */
 /*
- * \file ui_keyboard_responder.c
- * \brief Implementation of keyboard event delegation and binding.
+ * @file ui_keyboard_responder.c
+ * @brief Implementation of keyboard event delegation and binding.
  */
 /* clang-format off */
 #include "ui_keyboard_responder.h"
@@ -12,8 +16,8 @@
 
 /**
  * @struct ui_keyboard_binding
- * \struct ui_keyboard_binding
- * \brief Internal record of a keyboard binding for a specific role or tag.
+ * @struct ui_keyboard_binding
+ * @brief Internal record of a keyboard binding for a specific role or tag.
  */
 struct ui_keyboard_binding {
   char *role_or_tag;         /**< role_or_tag */
@@ -25,7 +29,7 @@ struct ui_keyboard_binding {
 
 /**
  * @struct ui_keyboard_responder
- * \brief ui_keyboard_responder
+ * @brief ui_keyboard_responder
  */
 struct ui_keyboard_responder {
   struct ui_keyboard_binding *bindings; /**< bindings */
@@ -33,7 +37,10 @@ struct ui_keyboard_responder {
   size_t bindings_capacity;             /**< bindings_capacity */
 };
 
-/* \brief ui_error
+/**
+ * @brief Creates a keyboard responder.
+ * @param[out] out_responder Pointer to store the created responder.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder) {
@@ -57,10 +64,10 @@ ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a keyboard responder.
- * \param[in,out] responder The keyboard responder to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a keyboard responder.
+ * @param[in,out] responder The keyboard responder to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder) {
@@ -79,7 +86,14 @@ ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder) {
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_keyboard_responder_bind_key
+/**
+ * @brief Binds a key event to a callback.
+ * @param[in,out] responder The keyboard responder.
+ * @param[in] role_or_tag The role or tag to match.
+ * @param[in] key_code The key code.
+ * @param[in] callback The callback function.
+ * @param[in] user_data User data for the callback.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_keyboard_responder_bind_key(
     struct ui_keyboard_responder *responder, const char *role_or_tag,
@@ -131,7 +145,13 @@ ui_error_t ui_keyboard_responder_bind_key(
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_keyboard_responder_handle_event
+/**
+ * @brief Handles a UI event in the keyboard responder.
+ * @param[in,out] responder The keyboard responder.
+ * @param[in,out] focused_node The currently focused DOM node.
+ * @param[in] event The UI event.
+ * @param[out] out_handled Pointer to store whether the event was handled.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_keyboard_responder_handle_event(
     struct ui_keyboard_responder *responder, struct ui_dom_node *focused_node,

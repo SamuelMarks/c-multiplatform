@@ -1,9 +1,14 @@
+/**
+ * @file ui_video_shaders.c
+ * @brief ui_video_shaders.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_video_shaders.h"
 #include "../include/ui_shader_manager.h"
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief YUV vertex shader source */
 static const char *yuv_vertex_source = "attribute vec4 a_position;\n"
                                        "attribute vec2 a_texcoord;\n"
                                        "varying vec2 v_texcoord;\n"
@@ -12,6 +17,7 @@ static const char *yuv_vertex_source = "attribute vec4 a_position;\n"
                                        "    v_texcoord = a_texcoord;\n"
                                        "}\n";
 
+/** @brief YUV fragment shader source */
 static const char *yuv_fragment_source =
     "precision mediump float;\n"
     "varying vec2 v_texcoord;\n"

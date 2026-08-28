@@ -1,3 +1,7 @@
+/**
+ * @file ui_chat_bubble_base.c
+ * @brief Implementation of ui_chat_bubble_base.c.
+ */
 /* clang-format off */
 #include "ui_chat_bubble_base.h"
 #include "ui_internal_mem.h"
@@ -17,7 +21,7 @@ struct ui_chat_bubble_base {
       *config_signal; /**< Signal dispatched when configuration changes */
 };
 
-/*
+/**
  * @brief int_equality.
  * @param a Parameter a.
  * @param b Parameter b.
@@ -31,7 +35,7 @@ static ui_error_t int_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief pack_config.
  * @param config Parameter config.
  * @param out_val Parameter out_val.
@@ -54,6 +58,13 @@ static ui_error_t pack_config(const struct ui_chat_bubble_config *config,
 }
 
 /* \brief ui_error
+ */
+/**
+ * @brief ui_chat_bubble_base_create.
+ * @param arena Parameter arena.
+ * @param config Parameter config.
+ * @param out_bubble Parameter out_bubble.
+ * @return Return value.
  */
 ui_error_t
 ui_chat_bubble_base_create(struct ui_arena *arena,
@@ -111,7 +122,7 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_chat_bubble_base_destroy.
  * @param bubble Parameter bubble.
  * @return Return value.
@@ -124,6 +135,12 @@ ui_error_t ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble) {
 }
 
 /* \brief ui_error
+ */
+/**
+ * @brief ui_chat_bubble_base_set_config.
+ * @param bubble Parameter bubble.
+ * @param config Parameter config.
+ * @return Return value.
  */
 ui_error_t
 ui_chat_bubble_base_set_config(struct ui_chat_bubble_base *bubble,
@@ -147,6 +164,12 @@ ui_chat_bubble_base_set_config(struct ui_chat_bubble_base *bubble,
 
 /* \brief ui_error
  */
+/**
+ * @brief ui_chat_bubble_base_get_config_signal.
+ * @param bubble Parameter bubble.
+ * @param out_signal Parameter out_signal.
+ * @return Return value.
+ */
 ui_error_t
 ui_chat_bubble_base_get_config_signal(struct ui_chat_bubble_base *bubble,
                                       ui_signal_t **out_signal) {
@@ -157,6 +180,13 @@ ui_chat_bubble_base_get_config_signal(struct ui_chat_bubble_base *bubble,
 }
 
 /* \brief ui_chat_bubble_base_calculate_text_bounds
+ */
+/**
+ * @brief ui_chat_bubble_base_calculate_text_bounds.
+ * @param bubble Parameter bubble.
+ * @param raw_bounds Parameter raw_bounds.
+ * @param out_text_bounds Parameter out_text_bounds.
+ * @return Return value.
  */
 ui_error_t ui_chat_bubble_base_calculate_text_bounds(
     const struct ui_chat_bubble_base *bubble,
@@ -207,7 +237,7 @@ ui_error_t ui_chat_bubble_base_calculate_text_bounds(
 #ifdef UI_TEST_MOCK_ALLOC
 void ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
                                      int tail_placement);
-/*
+/**
  * @brief ui_chat_bubble_base_mock_config.
  * @param bubble Parameter bubble.
  * @param tail_placement Parameter tail_placement.

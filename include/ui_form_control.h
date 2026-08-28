@@ -22,10 +22,10 @@ extern "C" {
  * @brief Represents the validation status of a form control, group, or array.
  */
 enum ui_form_status {
-  UI_FORM_STATUS_VALID = 0,
-  UI_FORM_STATUS_INVALID = 1,
-  UI_FORM_STATUS_PENDING = 2,
-  UI_FORM_STATUS_DISABLED = 3
+  UI_FORM_STATUS_VALID = 0,   /**< Form control is valid */
+  UI_FORM_STATUS_INVALID = 1, /**< Form control is invalid */
+  UI_FORM_STATUS_PENDING = 2, /**< Form control validation is pending */
+  UI_FORM_STATUS_DISABLED = 3 /**< Form control is disabled */
 };
 
 /**
@@ -170,10 +170,6 @@ ui_error_t ui_form_control_set_error(ui_form_control_t *control,
  */
 ui_error_t ui_form_control_destroy(ui_form_control_t *control);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
 /**
  * @brief Adds a synchronous validator to the form control.
  *
@@ -200,4 +196,8 @@ ui_error_t ui_form_control_add_async_validator(
     ui_form_control_t *control, ui_async_validator_fn validator,
     void *user_data, struct ui_thread_pool *thread_pool,
     struct ui_reactor *reactor);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 #endif /* UI_FORM_CONTROL_H */

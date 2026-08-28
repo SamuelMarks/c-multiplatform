@@ -1,3 +1,7 @@
+/**
+ * @file ui_renderer_gdiplus.c
+ * @brief ui_renderer_gdiplus.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_renderer.h"
 #include "../include/ui_error.h"
@@ -202,7 +206,7 @@ struct gdiplus_context {
   int current_height;         /**< current_height */
 };
 
-/*
+/**
  * @brief ui_color_to_argb.
  * @param c Parameter c.
  * @return Return value.
@@ -215,7 +219,7 @@ static ARGB ui_color_to_argb(const struct ui_color *c) {
   return ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
 }
 
-/*
+/**
  * @brief ui_css_color_to_argb.
  * @param c Parameter c.
  * @return Return value.
@@ -229,7 +233,7 @@ static ARGB ui_css_color_to_argb(const struct ui_css_color *c) {
   return ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
 }
 
-/*
+/**
  * @brief gdiplus_begin_frame.
  * @param ctx Parameter ctx.
  * @param width Parameter width.
@@ -271,7 +275,7 @@ static int gdiplus_begin_frame(void *ctx, int width, int height) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_end_frame.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -284,7 +288,7 @@ static int gdiplus_end_frame(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_draw_rect.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -308,7 +312,7 @@ static int gdiplus_draw_rect(void *ctx, const struct ui_rect *r,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-/*
+/**
  * @brief gdiplus_draw_text.
  * @param ctx Parameter ctx.
  * @param text Parameter text.
@@ -404,7 +408,7 @@ static int gdiplus_draw_text(void *ctx, const char *text,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_draw_image.
  * @param ctx Parameter ctx.
  * @param img Parameter img.
@@ -420,7 +424,7 @@ static int gdiplus_draw_image(void *ctx, const struct ui_image *img,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_draw_gradient.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -537,7 +541,7 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
-/*
+/**
  * @brief gdiplus_draw_path.
  * @param ctx Parameter ctx.
  * @param p Parameter p.
@@ -592,7 +596,7 @@ static int gdiplus_draw_path(void *ctx, const struct ui_path *p,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_push_clip.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -607,7 +611,7 @@ static int gdiplus_push_clip(void *ctx, const struct ui_rect *r) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_pop_clip.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -620,7 +624,7 @@ static int gdiplus_pop_clip(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_set_blend_mode.
  * @param ctx Parameter ctx.
  * @param mode Parameter mode.
@@ -633,7 +637,7 @@ static int gdiplus_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_set_shadow.
  * @param ctx Parameter ctx.
  * @param shadow Parameter shadow.
@@ -646,7 +650,7 @@ static int gdiplus_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_read_pixels.
  * @param ctx Parameter ctx.
  * @param out_rgba_buffer Parameter out_rgba_buffer.
@@ -697,7 +701,7 @@ static int gdiplus_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gdiplus_destroy.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -722,7 +726,7 @@ static const struct ui_renderer_vtable gdiplus_vtable = {
     gdiplus_set_blend_mode, gdiplus_set_shadow, gdiplus_read_pixels,
     gdiplus_destroy};
 
-/*
+/**
  * @brief ui_renderer_native_init.
  * @param renderer Parameter renderer.
  * @return Return value.

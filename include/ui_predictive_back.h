@@ -17,6 +17,9 @@ extern "C" {
 
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a predictive back tracker.
+ */
 struct ui_predictive_back;
 
 /**
@@ -31,6 +34,7 @@ ui_error_t ui_predictive_back_create(struct ui_predictive_back **out_tracker);
  * @brief Destroys a predictive back gesture tracker.
  *
  * @param tracker The tracker to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_predictive_back_destroy(struct ui_predictive_back *tracker);
 

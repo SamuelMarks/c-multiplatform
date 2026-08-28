@@ -1,3 +1,7 @@
+/**
+ * @file ui_segmented_control_base.c
+ * @brief ui_segmented_control_base.c implementation.
+ */
 /*
  * \file ui_segmented_control_base.c
  * \brief Implementation of the UI Segmented Control Base component.
@@ -44,7 +48,7 @@ struct ui_segmented_button_base {
   int index;                                /**< Index in parent */
 };
 
-/*
+/**
  * \brief Triggers the CVA change callback.
  *
  * \param control The segmented control.
@@ -52,6 +56,12 @@ struct ui_segmented_button_base {
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t
+/**
+ * @brief trigger_cva_change.
+ * @param control Parameter control.
+ * @param active_button Parameter active_button.
+ * @return Return value.
+ */
 trigger_cva_change(struct ui_segmented_control_base *control,
                    struct ui_segmented_button_base *active_button) {
   (void)active_button;
@@ -72,13 +82,18 @@ trigger_cva_change(struct ui_segmented_control_base *control,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Triggers the CVA touched callback.
  *
  * \param control The segmented control.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t
+/**
+ * @brief trigger_cva_touched.
+ * @param control Parameter control.
+ * @return Return value.
+ */
 trigger_cva_touched(struct ui_segmented_control_base *control) {
   if (control->cva_on_touched) {
     return control->cva_on_touched(control->cva_on_touched_user_data);
@@ -86,12 +101,18 @@ trigger_cva_touched(struct ui_segmented_control_base *control) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to write a value.
  *
  * \param component The segmented control component.
  * \param value The new value (int index).
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief segmented_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
  */
 static ui_error_t segmented_cva_write_value(void *component,
                                             union ui_signal_payload value) {
@@ -112,13 +133,20 @@ static ui_error_t segmented_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to register an on-change callback.
  *
  * \param component The segmented control component.
  * \param callback The callback.
  * \param user_data Opaque user data.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief segmented_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t segmented_cva_register_on_change(
     void *component,
@@ -133,13 +161,20 @@ static ui_error_t segmented_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to register an on-touched callback.
  *
  * \param component The segmented control component.
  * \param callback The callback.
  * \param user_data Opaque user data.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief segmented_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t segmented_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
@@ -152,12 +187,18 @@ static ui_error_t segmented_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to set the disabled state.
  *
  * \param component The segmented control component.
  * \param is_disabled The disabled state.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief segmented_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
  */
 static ui_error_t segmented_cva_set_disabled_state(void *component,
                                                    int is_disabled) {
@@ -169,7 +210,7 @@ static ui_error_t segmented_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new unstyled segmented control component.
  *
  * \param out_control Pointer to receive the allocated control base.
@@ -223,7 +264,7 @@ ui_segmented_control_base_create(struct ui_segmented_control_base **out_control,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a segmented control component.
  *
  * \param control The control to destroy.
@@ -244,7 +285,7 @@ ui_segmented_control_base_destroy(struct ui_segmented_control_base *control) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the underlying component for the segmented control.
  *
  * \param control The control.
@@ -261,7 +302,7 @@ ui_error_t ui_segmented_control_base_get_component(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the selection mode (single vs multi).
  *
  * \param control The control.
@@ -278,7 +319,7 @@ ui_segmented_control_base_set_mode(struct ui_segmented_control_base *control,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the current selection mode.
  *
  * \param control The control.
@@ -295,7 +336,7 @@ ui_segmented_control_base_get_mode(struct ui_segmented_control_base *control,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Appends a segment button to the control.
  *
  * \param control The control.
@@ -332,7 +373,7 @@ ui_error_t ui_segmented_control_base_append_segment(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new unstyled segmented button component.
  *
  * \param out_button Pointer to receive the allocated button base.
@@ -369,7 +410,7 @@ ui_segmented_button_base_create(struct ui_segmented_button_base **out_button) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a segmented button component.
  *
  * \param button The button to destroy.
@@ -387,7 +428,7 @@ ui_segmented_button_base_destroy(struct ui_segmented_button_base *button) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the underlying component for the segmented button.
  *
  * \param button The button.
@@ -404,7 +445,7 @@ ui_segmented_button_base_get_component(struct ui_segmented_button_base *button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the selected state of the button.
  *
  * \param button The button.
@@ -447,7 +488,7 @@ ui_segmented_button_base_set_selected(struct ui_segmented_button_base *button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the selected state of the button.
  *
  * \param button The button.

@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_highlight_api.c
+ * @brief ui_css_highlight_api.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_css_highlight_api.h"
 #include <stdlib.h>
@@ -17,7 +21,7 @@ struct ui_css_highlight {
   size_t range_capacity;                 /**< range_capacity */
 };
 
-/*
+/**
  * @brief ui_css_highlight_create.
  * @param type Parameter type.
  * @param custom_name Parameter custom_name.
@@ -78,7 +82,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_css_highlight_add_range.
  * @param highlight Parameter highlight.
  * @param start_offset Parameter start_offset.
@@ -125,7 +129,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_css_highlight_destroy.
  * @param highlight Parameter highlight.
  * @return Return value.

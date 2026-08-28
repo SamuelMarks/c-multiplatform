@@ -2,8 +2,10 @@
  * @file ui_thread_pool.h
  * @brief Defines the thread pool task executor.
  */
+/** @cond */
 #ifndef UI_THREAD_POOL_H
 #define UI_THREAD_POOL_H
+/** @endcond */
 
 #ifdef __cplusplus
 extern "C" {

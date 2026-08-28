@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_page_floats.c
+ * @brief ui_css_page_floats.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_css_page_floats.h"
 #include "../include/ui_cssom.h"
@@ -5,7 +9,7 @@
 #include <stdlib.h>
 /* clang-format on */
 
-/*
+/**
  * @brief ui_css_page_floats_parse.
  * @param style Parameter style.
  * @param out_props Parameter out_props.

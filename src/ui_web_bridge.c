@@ -1,3 +1,7 @@
+/**
+ * @file ui_web_bridge.c
+ * @brief ui_web_bridge.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_web_bridge.h"
 #include "ui_internal_mem.h"
@@ -19,11 +23,14 @@
 #define WEB_CMD_BUFFER_SIZE (1024 * 1024 * 4) /* 4MB */
 #endif
 
+/** @brief Global command buffer */
 static ui_uint32 *g_cmd_buffer = NULL;
+/** @brief Global command position */
 static size_t g_cmd_pos = 0;
+/** @brief Global command capacity */
 static size_t g_cmd_capacity = WEB_CMD_BUFFER_SIZE / sizeof(ui_uint32);
 
-/*
+/**
  * @brief ensure_buffer.
  * @param words_needed Parameter words_needed.
  * @return Return value.
@@ -210,7 +217,7 @@ EM_JS(void, flush_to_js, (ui_uint32 * buf, ui_uint32 len), {
 })
 #endif
 
-/*
+/**
  * @brief ui_web_bridge_shutdown.
  * @return Return value.
  */
@@ -223,7 +230,7 @@ ui_error_t ui_web_bridge_shutdown(void) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_flush.
  * @return Return value.
  */
@@ -237,7 +244,7 @@ ui_error_t ui_web_bridge_flush(void) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_create_node.
  * @param id Parameter id.
  * @param tag_name Parameter tag_name.
@@ -254,7 +261,7 @@ ui_error_t ui_web_bridge_create_node(ui_uint32 id, const char *tag_name) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_destroy_node.
  * @param id Parameter id.
  * @return Return value.
@@ -269,7 +276,7 @@ ui_error_t ui_web_bridge_destroy_node(ui_uint32 id) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_set_text.
  * @param id Parameter id.
  * @param text Parameter text.
@@ -286,7 +293,7 @@ ui_error_t ui_web_bridge_set_text(ui_uint32 id, const char *text) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_append_child.
  * @param parent_id Parameter parent_id.
  * @param child_id Parameter child_id.
@@ -303,7 +310,7 @@ ui_error_t ui_web_bridge_append_child(ui_uint32 parent_id, ui_uint32 child_id) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_remove_child.
  * @param parent_id Parameter parent_id.
  * @param child_id Parameter child_id.
@@ -320,7 +327,7 @@ ui_error_t ui_web_bridge_remove_child(ui_uint32 parent_id, ui_uint32 child_id) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_set_bounds.
  * @param id Parameter id.
  * @param x Parameter x.
@@ -350,7 +357,7 @@ ui_error_t ui_web_bridge_set_bounds(ui_uint32 id, float x, float y, float w,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_insert_before.
  * @param parent_id Parameter parent_id.
  * @param child_id Parameter child_id.
@@ -370,7 +377,7 @@ ui_error_t ui_web_bridge_insert_before(ui_uint32 parent_id, ui_uint32 child_id,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_set_style.
  * @param id Parameter id.
  * @param property Parameter property.
@@ -396,7 +403,7 @@ ui_error_t ui_web_bridge_set_style(ui_uint32 id, const char *property,
 extern "C" {
 #endif
 
-/*
+/**
  * @brief ui_web_bridge_dispatch_event.
  * @param type Parameter type.
  * @param x Parameter x.
@@ -441,7 +448,7 @@ ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_dispatch_resize.
  * @param w Parameter w.
  * @param h Parameter h.
@@ -458,7 +465,7 @@ ui_error_t ui_web_bridge_dispatch_resize(float w, float h, float dpr) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_dispatch_key.
  * @param type Parameter type.
  * @param key Parameter key.
@@ -486,7 +493,7 @@ ui_error_t ui_web_bridge_dispatch_key(int type, const char *key,
 }
 #endif
 
-/*
+/**
  * @brief ui_web_bridge_set_aria.
  * @param id Parameter id.
  * @param role Parameter role.
@@ -516,7 +523,7 @@ ui_error_t ui_web_bridge_set_aria(ui_uint32 id, const char *role,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_push_state.
  * @param path Parameter path.
  * @return Return value.
@@ -532,7 +539,7 @@ ui_error_t ui_web_bridge_push_state(const char *path) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_web_bridge_replace_state.
  * @param path Parameter path.
  * @return Return value.
@@ -547,7 +554,7 @@ ui_error_t ui_web_bridge_replace_state(const char *path) {
   g_cmd_buffer[g_cmd_pos++] = (ui_uint32)(ui_uintptr)path;
   return UI_ERROR_NONE;
 }
-/*
+/**
  * @brief ui_web_bridge_set_attribute.
  * @param id Parameter id.
  * @param name Parameter name.
@@ -566,7 +573,7 @@ ui_error_t ui_web_bridge_set_attribute(ui_uint32 id, const char *name,
   g_cmd_buffer[g_cmd_pos++] = (ui_uint32)(ui_uintptr)value;
   return UI_ERROR_NONE;
 }
-/*
+/**
  * @brief ui_web_bridge_set_property.
  * @param id Parameter id.
  * @param name Parameter name.

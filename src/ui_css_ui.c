@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_ui.c
+ * @brief ui_css_ui.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_ui.h"
 #include "ui_internal_mem.h"
@@ -18,7 +22,7 @@
 /** @endcond */
 #endif
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -30,7 +34,7 @@ static ui_error_t skip_whitespace(const char **p_str) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_outline_width.
  * @param str Parameter str.
  * @param out_width Parameter out_width.
@@ -63,7 +67,7 @@ ui_error_t ui_css_parse_outline_width(const char *str,
   return ui_css_parse_value(str, out_width);
 }
 
-/*
+/**
  * @brief ui_css_parse_outline_style.
  * @param str Parameter str.
  * @param out_style Parameter out_style.
@@ -107,7 +111,7 @@ ui_error_t ui_css_parse_outline_style(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_outline.
  * @param str Parameter str.
  * @param out_outline Parameter out_outline.
@@ -195,7 +199,7 @@ ui_error_t ui_css_parse_outline(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_cursor_destroy.
  * @param cursor Parameter cursor.
  * @return Return value.
@@ -215,7 +219,7 @@ ui_error_t ui_css_cursor_destroy(struct ui_css_cursor *cursor) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_cursor.
  * @param str Parameter str.
  * @param out_cursor Parameter out_cursor.
@@ -399,7 +403,7 @@ ui_error_t ui_css_parse_cursor(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_user_select.
  * @param str Parameter str.
  * @param out_select Parameter out_select.
@@ -431,7 +435,7 @@ ui_error_t ui_css_parse_user_select(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_appearance.
  * @param str Parameter str.
  * @param out_appearance Parameter out_appearance.

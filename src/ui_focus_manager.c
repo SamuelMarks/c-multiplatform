@@ -1,6 +1,6 @@
-/*
- * \file ui_focus_manager.c
- * \brief Implementation of the UI focus manager.
+/**
+ * @file ui_focus_manager.c
+ * @brief Implementation of the UI focus manager.
  */
 /* clang-format off */
 #include "ui_focus_manager.h"
@@ -11,30 +11,30 @@
 
 /**
  * @struct ui_focus_trap
- * \struct ui_focus_trap
- * \brief Represents a focus trap boundary.
+ * @brief Represents a focus trap boundary.
  */
 struct ui_focus_trap {
-  struct ui_dom_node *root;               /**< root */
-  struct ui_dom_node *previously_focused; /**< previously_focused */
+  struct ui_dom_node
+      *root; /**< The root node defining the boundaries of the trap. */
+  struct ui_dom_node *previously_focused; /**< The node that held focus before
+                                             the trap was activated. */
 };
 
 /**
  * @struct ui_focus_manager
- * \struct ui_focus_manager
- * \brief Manages focus state and navigation within the UI.
+ * @brief Manages focus state and navigation within the UI.
  */
 struct ui_focus_manager {
-  struct ui_dom_node *focused_node; /**< focused_node */
-  struct ui_focus_trap *traps;      /**< traps */
-  size_t traps_count;               /**< traps_count */
-  size_t traps_capacity;            /**< traps_capacity */
+  struct ui_dom_node *focused_node; /**< The currently focused DOM node. */
+  struct ui_focus_trap *traps;      /**< Stack of active focus traps. */
+  size_t traps_count;    /**< Number of active focus traps in the stack. */
+  size_t traps_capacity; /**< Allocated capacity of the traps stack. */
 };
 
-/*
- * \brief Creates a focus manager.
- * \param[out] out_manager Pointer to store the created focus manager.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a focus manager.
+ * @param[out] out_manager Pointer to store the created focus manager.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_focus_manager_create(struct ui_focus_manager **out_manager) {
   struct ui_focus_manager *mgr;
@@ -58,10 +58,10 @@ ui_error_t ui_focus_manager_create(struct ui_focus_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a focus manager.
- * \param[in,out] manager The focus manager to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a focus manager.
+ * @param[in,out] manager The focus manager to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_focus_manager_destroy(struct ui_focus_manager *manager) {
   if (!manager) {
@@ -74,11 +74,11 @@ ui_error_t ui_focus_manager_destroy(struct ui_focus_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Requests focus for a specific DOM node.
- * \param[in,out] manager The focus manager.
- * \param[in] node The node to focus.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Requests focus for a specific DOM node.
+ * @param[in,out] manager The focus manager.
+ * @param[in] node The node to focus.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_focus_manager_request_focus(struct ui_focus_manager *manager,
                                           struct ui_dom_node *node) {
@@ -89,11 +89,11 @@ ui_error_t ui_focus_manager_request_focus(struct ui_focus_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the currently focused DOM node.
- * \param[in] manager The focus manager.
- * \param[out] out_node Pointer to store the focused node.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets the currently focused DOM node.
+ * @param[in] manager The focus manager.
+ * @param[out] out_node Pointer to store the focused node.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_focus_manager_get_focused_node(const struct ui_focus_manager *manager,
@@ -105,11 +105,11 @@ ui_focus_manager_get_focused_node(const struct ui_focus_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Checks if a DOM node is focusable based on tabindex.
- * \param[in] node The DOM node to check.
- * \param[out] out_focusable Set to UI_TRUE if focusable, UI_FALSE otherwise.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Checks if a DOM node is focusable based on tabindex.
+ * @param[in] node The DOM node to check.
+ * @param[out] out_focusable Set to UI_TRUE if focusable, UI_FALSE otherwise.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t is_focusable(struct ui_dom_node *node,
                                ui_bool_t *out_focusable) {
@@ -132,14 +132,14 @@ static ui_error_t is_focusable(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Recursively gathers focusable DOM nodes from a root node.
- * \param[in] root The root DOM node.
- * \param[in,out] out_nodes Pointer to a dynamically allocated array of
+/**
+ * @brief Recursively gathers focusable DOM nodes from a root node.
+ * @param[in] root The root DOM node.
+ * @param[in,out] out_nodes Pointer to a dynamically allocated array of
  * focusable nodes.
- * \param[in,out] out_count Number of nodes found.
- * \param[in,out] out_capacity Capacity of the nodes array.
- * \return UI_ERROR_NONE on success.
+ * @param[in,out] out_count Number of nodes found.
+ * @param[in,out] out_capacity Capacity of the nodes array.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
                                          struct ui_dom_node ***out_nodes,
@@ -180,12 +180,12 @@ static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Advances focus sequentially (e.g., via Tab key).
- * \param[in,out] manager The focus manager.
- * \param[in] root The root DOM node to search within.
- * \param[in] forward 1 to advance forward, 0 to advance backward.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Advances focus sequentially (e.g., via Tab key).
+ * @param[in,out] manager The focus manager.
+ * @param[in] root The root DOM node to search within.
+ * @param[in] forward 1 to advance forward, 0 to advance backward.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
                                     struct ui_dom_node *root, int forward) {
@@ -205,7 +205,13 @@ ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
     target_root = manager->traps[manager->traps_count - 1].root;
   }
 
-  gather_focusable_nodes(target_root, &nodes, &count, &capacity);
+  {
+    ui_error_t g_rc =
+        gather_focusable_nodes(target_root, &nodes, &count, &capacity);
+    if (g_rc != UI_ERROR_NONE) {
+      return g_rc;
+    }
+  }
 
   if (count == 0) {
     return UI_ERROR_NONE;
@@ -237,14 +243,14 @@ ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Recursively gathers focusable layout nodes from a root node.
- * \param[in] node The root layout node.
- * \param[in,out] out_nodes Pointer to a dynamically allocated array of
+/**
+ * @brief Recursively gathers focusable layout nodes from a root node.
+ * @param[in] node The root layout node.
+ * @param[in,out] out_nodes Pointer to a dynamically allocated array of
  * focusable nodes.
- * \param[in,out] out_count Number of nodes found.
- * \param[in,out] out_capacity Capacity of the nodes array.
- * \return UI_ERROR_NONE on success.
+ * @param[in,out] out_count Number of nodes found.
+ * @param[in,out] out_capacity Capacity of the nodes array.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t
 gather_focusable_layout_nodes(struct ui_layout_node *node,
@@ -286,16 +292,15 @@ gather_focusable_layout_nodes(struct ui_layout_node *node,
     child = child->next_sibling;
   }
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
 }
 
-/*
- * \brief Calculates the spatial distance penalty for navigating between layout
+/**
+ * @brief Calculates the spatial distance penalty for navigating between layout
  * nodes.
- * \param[in] a The starting layout node.
- * \param[in] b The target layout node.
- * \param[in] dir The direction of navigation.
- * \param[out] out_distance Computed distance penalty. -1.0f if invalid.
+ * @param[in] a The starting layout node.
+ * @param[in] b The target layout node.
+ * @param[in] dir The direction of navigation.
+ * @param[out] out_distance Computed distance penalty. -1.0f if invalid.
  */
 static void get_distance(struct ui_layout_node *a, struct ui_layout_node *b,
                          enum ui_focus_direction dir, float *out_distance) {
@@ -311,26 +316,30 @@ static void get_distance(struct ui_layout_node *a, struct ui_layout_node *b,
 
   switch (dir) {
   case UI_FOCUS_DIRECTION_UP:
-    if (center_by >= center_ay)
+    if (center_by >= center_ay) {
       return; /* Must be strictly above */
+    }
     dx = center_ax - center_bx;
     dy = center_ay - center_by;
     break;
   case UI_FOCUS_DIRECTION_DOWN:
-    if (center_by <= center_ay)
+    if (center_by <= center_ay) {
       return; /* Must be strictly below */
+    }
     dx = center_ax - center_bx;
     dy = center_by - center_ay;
     break;
   case UI_FOCUS_DIRECTION_LEFT:
-    if (center_bx >= center_ax)
+    if (center_bx >= center_ax) {
       return; /* Must be strictly left */
+    }
     dx = center_ax - center_bx;
     dy = center_ay - center_by;
     break;
   case UI_FOCUS_DIRECTION_RIGHT:
-    if (center_bx <= center_ax)
+    if (center_bx <= center_ax) {
       return; /* Must be strictly right */
+    }
     dx = center_bx - center_ax;
     dy = center_ay - center_by;
     break;
@@ -343,12 +352,12 @@ static void get_distance(struct ui_layout_node *a, struct ui_layout_node *b,
   return;
 }
 
-/*
- * \brief Navigates focus spatially (e.g., via arrow keys).
- * \param[in,out] manager The focus manager.
- * \param[in] layout_root The root layout node to search within.
- * \param[in] direction The direction to navigate.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Navigates focus spatially (e.g., via arrow keys).
+ * @param[in,out] manager The focus manager.
+ * @param[in] layout_root The root layout node to search within.
+ * @param[in] direction The direction to navigate.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
                                      struct ui_layout_node *layout_root,
@@ -384,15 +393,17 @@ ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
   }
 
   if (!current_layout_node) {
-    if (nodes)
+    if (nodes) {
       C_MULTIPLATFORM_FREE(nodes);
+    }
     return UI_ERROR_NONE;
   }
 
   for (i = 0; i < count; ++i) {
     float dist;
-    if (nodes[i] == current_layout_node)
+    if (nodes[i] == current_layout_node) {
       continue;
+    }
 
     /* If there's a trap, only consider nodes inside the trap */
     if (manager->traps_count > 0) {
@@ -407,8 +418,9 @@ ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
         }
         ancestor = ancestor->parent;
       }
-      if (!in_trap)
+      if (!in_trap) {
         continue;
+      }
     }
 
     get_distance(current_layout_node, nodes[i], direction, &dist);
@@ -425,16 +437,18 @@ ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
     manager->focused_node = (struct ui_dom_node *)best_node->dom_node;
   }
 
-  C_MULTIPLATFORM_FREE(nodes);
+  if (nodes) {
+    C_MULTIPLATFORM_FREE(nodes);
+  }
 
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Pushes a new focus trap onto the focus manager.
- * \param[in,out] manager The focus manager.
- * \param[in] trap_root The root node of the trap.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Pushes a new focus trap onto the focus manager.
+ * @param[in,out] manager The focus manager.
+ * @param[in] trap_root The root node of the trap.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
                                       struct ui_dom_node *trap_root) {
@@ -466,10 +480,10 @@ ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Pops the current focus trap from the focus manager.
- * \param[in,out] manager The focus manager.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Pops the current focus trap from the focus manager.
+ * @param[in,out] manager The focus manager.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_focus_manager_pop_trap(struct ui_focus_manager *manager) {
   struct ui_focus_trap *popped;

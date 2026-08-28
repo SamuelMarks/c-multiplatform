@@ -1,8 +1,12 @@
+/**
+ * @file ui_shape_family.c
+ * @brief ui_shape_family.c implementation.
+ */
 /* clang-format off */
 #include "ui_shape_family.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_shape_family_get_radius.
  * @param family Parameter family.
  * @param out_radius Parameter out_radius.

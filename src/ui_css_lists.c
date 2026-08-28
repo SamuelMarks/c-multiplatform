@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_lists.c
+ * @brief ui_css_lists.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_lists.h"
 #include <string.h>
@@ -17,7 +21,7 @@
 /** @endcond */
 #endif
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -112,7 +116,7 @@ ui_error_t ui_css_parse_list_style_position(
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
+/**
  * @brief ui_css_parse_list_style_image.
  * @param str Parameter str.
  * @param out_image Parameter out_image.
@@ -136,7 +140,7 @@ ui_error_t ui_css_parse_list_style_image(const char *str,
   return ui_css_parse_image(str, out_image);
 }
 
-/*
+/**
  * @brief ui_css_parse_list_style.
  * @param str Parameter str.
  * @param out_style Parameter out_style.

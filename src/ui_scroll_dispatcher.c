@@ -1,3 +1,7 @@
+/**
+ * @file ui_scroll_dispatcher.c
+ * @brief ui_scroll_dispatcher.c implementation.
+ */
 /*
  * \file ui_scroll_dispatcher.c
  * \brief Implementation of the UI Scroll Dispatcher component.
@@ -10,6 +14,9 @@
 /* clang-format on */
 
 /* \brief Initial capacity for the subscriber array */
+/** @def INITIAL_SUBSCRIBER_CAPACITY
+ * @brief Initial subscriber capacity
+ */
 #define INITIAL_SUBSCRIBER_CAPACITY 8
 
 /**
@@ -33,7 +40,7 @@ struct ui_scroll_dispatcher {
   int next_id;     /**< ID generator for the next subscriber */
 };
 
-/*
+/**
  * \brief Layout observer callback to handle layout changes by triggering a mock
  * scroll event.
  *
@@ -42,6 +49,14 @@ struct ui_scroll_dispatcher {
  * \param is_active Whether the breakpoint is active.
  * \param user_data Opaque pointer to the scroll dispatcher.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief layout_observer_callback.
+ * @param observer Parameter observer.
+ * @param breakpoint_id Parameter breakpoint_id.
+ * @param is_active Parameter is_active.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t layout_observer_callback(struct ui_layout_observer *observer,
                                            int breakpoint_id, int is_active,
@@ -69,7 +84,7 @@ static ui_error_t layout_observer_callback(struct ui_layout_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new scroll dispatcher instance.
  *
  * \param out_dispatcher Pointer to receive the created dispatcher.
@@ -115,7 +130,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Destroys a scroll dispatcher and frees its resources.
  *
  * \param dispatcher The dispatcher to destroy.
@@ -139,7 +154,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Registers a callback to be notified of scroll events.
  *
  * \param dispatcher The scroll dispatcher.
@@ -186,7 +201,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Unregisters a previously registered scroll callback.
  *
  * \param dispatcher The scroll dispatcher.
@@ -221,7 +236,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Dispatches a scroll event to all registered callbacks.
  *
  * \param dispatcher The scroll dispatcher.
@@ -251,7 +266,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Integrates the scroll dispatcher with a layout observer.
  *
  * \param dispatcher The scroll dispatcher.

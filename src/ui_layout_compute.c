@@ -1,3 +1,12 @@
+/**
+ * @file ui_layout_compute.c
+ * @brief ui_layout_compute.c implementation.
+ */
+/**
+ * @brief compute_box_model.
+ * @param node Parameter node.
+ * @return Return value.
+ */
 static ui_error_t compute_box_model(struct ui_layout_node *node) {
   ui_error_t _prop_rc = UI_ERROR_NONE;
   const char *val;

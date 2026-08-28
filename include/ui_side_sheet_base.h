@@ -25,8 +25,8 @@ extern "C" {
  * @brief Represents the side sheet's anchored edge.
  */
 enum ui_side_sheet_edge {
-  UI_SIDE_SHEET_EDGE_LEFT = 0,
-  UI_SIDE_SHEET_EDGE_RIGHT = 1
+  UI_SIDE_SHEET_EDGE_LEFT = 0, /**< Anchored to the left edge */
+  UI_SIDE_SHEET_EDGE_RIGHT = 1 /**< Anchored to the right edge */
 };
 
 /**
@@ -61,6 +61,7 @@ ui_error_t ui_side_sheet_base_create(struct ui_side_sheet_base **out_sheet);
  * @brief Destroys a side sheet instance.
  *
  * @param sheet The side sheet.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_side_sheet_base_destroy(struct ui_side_sheet_base *sheet);
 

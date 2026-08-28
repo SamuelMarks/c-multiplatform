@@ -1,9 +1,13 @@
+/**
+ * @file ui_search_bar_base.c
+ * @brief ui_search_bar_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_search_bar_base.h"
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
+/**
  * @brief trigger_cva_change.
  * @param search_bar Parameter search_bar.
  * @return Return value.
@@ -18,7 +22,7 @@ static ui_error_t trigger_cva_change(struct ui_search_bar_base *search_bar) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief trigger_cva_touched.
  * @param search_bar Parameter search_bar.
  * @return Return value.
@@ -30,7 +34,7 @@ static ui_error_t trigger_cva_touched(struct ui_search_bar_base *search_bar) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief search_bar_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -54,6 +58,13 @@ static ui_error_t search_bar_cva_write_value(void *component,
   return ui_search_bar_base_set_query(search_bar, str);
 }
 
+/**
+ * @brief search_bar_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t search_bar_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -68,6 +79,13 @@ static ui_error_t search_bar_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief search_bar_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t search_bar_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_search_bar_base *search_bar =
@@ -80,7 +98,7 @@ static ui_error_t search_bar_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief search_bar_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -97,7 +115,7 @@ static ui_error_t search_bar_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_search_bar_base_init.
  * @param search_bar Parameter search_bar.
  * @param component Parameter component.
@@ -133,7 +151,7 @@ ui_error_t ui_search_bar_base_init(struct ui_search_bar_base *search_bar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_search_bar_base_set_query.
  * @param search_bar Parameter search_bar.
  * @param query Parameter query.
@@ -171,7 +189,7 @@ ui_error_t ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_search_bar_base_set_loading.
  * @param search_bar Parameter search_bar.
  * @param is_loading Parameter is_loading.
@@ -186,7 +204,7 @@ ui_error_t ui_search_bar_base_set_loading(struct ui_search_bar_base *search_bar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_search_bar_base_cleanup.
  * @param search_bar Parameter search_bar.
  * @return Return value.

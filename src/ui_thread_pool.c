@@ -92,7 +92,7 @@ struct ui_thread_pool {
 
 #ifndef UI_SINGLE_THREADED
 #ifdef _WIN32
-/*
+/**
  * @brief Thread worker function for Windows.
  * @param arg Pointer to the thread pool.
  * @return Thread exit code.
@@ -136,7 +136,7 @@ static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
   return 0;
 }
 #else
-/*
+/**
  * @brief Thread worker function for POSIX.
  * @param arg Pointer to the thread pool.
  * @return NULL.

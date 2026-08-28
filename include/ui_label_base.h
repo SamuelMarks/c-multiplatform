@@ -6,8 +6,14 @@
 #ifndef UI_LABEL_BASE_H
 #define UI_LABEL_BASE_H
 
+/**
+ * @brief Opaque structure representing a computed value.
+ */
 struct ui_computed;
 
+/**
+ * @brief Opaque structure representing a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -21,6 +27,9 @@ extern "C" {
 #include "ui_event.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a label base component.
+ */
 struct ui_label_base;
 
 /**
@@ -35,6 +44,7 @@ ui_error_t ui_label_base_create(struct ui_label_base **out_label);
  * @brief Destroys a label base component.
  *
  * @param label The label to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_label_base_destroy(struct ui_label_base *label);
 

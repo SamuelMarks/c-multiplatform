@@ -32,6 +32,7 @@ ui_hover_card_base_create(struct ui_hover_card_base **out_hover_card);
  * @brief Destroys a hover card base component.
  *
  * @param hover_card The component to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card);
 

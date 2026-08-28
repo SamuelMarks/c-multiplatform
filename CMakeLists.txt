@@ -115,6 +115,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb")
 if(EMSCRIPTEN)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
 
@@ -235,7 +236,7 @@ endmacro()
 
 if(NOT MSVC)
     set(OLD_CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error -Wno-error=format-nonliteral -Wno-error=sign-conversion -Wno-long-long -Wno-error=overlength-strings -Wno-error=shorten-64-to-32 -Wno-error=float-conversion -Wno-error=implicit-int-float-conversion")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error -Wno-error=format-nonliteral -Wno-error=sign-conversion -Wno-long-long -Wno-error=overlength-strings -Wno-error=shorten-64-to-32 -Wno-error=float-conversion -Wno-error=implicit-int-float-conversion -Wno-error=macro-redefined -Wno-macro-redefined")
 endif()
 
 if(NOT TARGET cfs)

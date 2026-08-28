@@ -1,3 +1,7 @@
+/**
+ * @file ui_rich_text_editor_base.c
+ * @brief ui_rich_text_editor_base.c implementation.
+ */
 /*
  * \file ui_rich_text_editor_base.c
  * \brief Implementation of the UI Rich Text Editor Base component.
@@ -12,6 +16,7 @@
 /* clang-format on */
 
 /* \brief Default CSS stylesheet for the rich text editor */
+/** @brief Default CSS stylesheet */
 static const char *ui_rich_text_editor_base_default_css =
     ".rte-container { "
     "display: flex; "
@@ -39,11 +44,16 @@ struct ui_rich_text_editor_base {
   int is_disabled; /**< Non-zero if disabled */
 };
 
-/*
+/**
  * \brief Triggers the CVA change callback.
  *
  * \param rte The rich text editor component.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief trigger_cva_change.
+ * @param rte Parameter rte.
+ * @return Return value.
  */
 static ui_error_t trigger_cva_change(struct ui_rich_text_editor_base *rte) {
   if (rte->cva_on_change) {
@@ -54,11 +64,16 @@ static ui_error_t trigger_cva_change(struct ui_rich_text_editor_base *rte) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Triggers the CVA touched callback.
  *
  * \param rte The rich text editor component.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief trigger_cva_touched.
+ * @param rte Parameter rte.
+ * @return Return value.
  */
 static ui_error_t trigger_cva_touched(struct ui_rich_text_editor_base *rte) {
   if (rte->cva_on_touched) {
@@ -67,12 +82,18 @@ static ui_error_t trigger_cva_touched(struct ui_rich_text_editor_base *rte) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to write a value into the editor.
  *
  * \param component The component.
  * \param value The new value (expected as a string pointer).
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief rte_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
  */
 static ui_error_t rte_cva_write_value(void *component,
                                       union ui_signal_payload value) {
@@ -109,13 +130,20 @@ static ui_error_t rte_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to register the on-change callback.
  *
  * \param component The component.
  * \param callback The callback to register.
  * \param user_data Opaque pointer for the callback.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief rte_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t rte_cva_register_on_change(
     void *component,
@@ -130,13 +158,20 @@ static ui_error_t rte_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to register the on-touched callback.
  *
  * \param component The component.
  * \param callback The callback to register.
  * \param user_data Opaque pointer for the callback.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief rte_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t rte_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
@@ -149,12 +184,18 @@ static ui_error_t rte_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to set the disabled state.
  *
  * \param component The component.
  * \param is_disabled Non-zero if disabled.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief rte_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
  */
 static ui_error_t rte_cva_set_disabled_state(void *component, int is_disabled) {
   struct ui_rich_text_editor_base *rte =
@@ -181,7 +222,7 @@ static ui_error_t rte_cva_set_disabled_state(void *component, int is_disabled) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new unstyled rich text editor base component.
  *
  * \param out_rte Pointer to receive the allocated component.
@@ -273,7 +314,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Destroys a rich text editor base component.
  *
  * \param rte The component to destroy.
@@ -294,7 +335,7 @@ ui_rich_text_editor_base_destroy(struct ui_rich_text_editor_base *rte) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the underlying component instance.
  *
  * \param rte The rich text editor component.
@@ -311,7 +352,7 @@ ui_rich_text_editor_base_get_component(struct ui_rich_text_editor_base *rte,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Handles text insertion, updating the AST and caret position.
  *
  * \param rte The rich text editor component.
@@ -368,7 +409,7 @@ ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Maps screen coordinates to an exact caret position.
  *
  * \param rte The rich text editor component.
@@ -385,7 +426,7 @@ ui_error_t ui_rich_text_editor_base_set_caret_from_point(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Performs an undo operation.
  *
  * \param rte The rich text editor component.
@@ -397,7 +438,7 @@ ui_error_t ui_rich_text_editor_base_undo(struct ui_rich_text_editor_base *rte) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Performs a redo operation.
  *
  * \param rte The rich text editor component.
@@ -409,7 +450,7 @@ ui_error_t ui_rich_text_editor_base_redo(struct ui_rich_text_editor_base *rte) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Starts IME composition.
  *
  * \param rte The rich text editor component.
@@ -422,7 +463,7 @@ ui_rich_text_editor_base_ime_start(struct ui_rich_text_editor_base *rte) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Updates IME composition.
  *
  * \param rte The rich text editor component.
@@ -438,7 +479,7 @@ ui_rich_text_editor_base_ime_update(struct ui_rich_text_editor_base *rte,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Ends IME composition, confirming the final text.
  *
  * \param rte The rich text editor component.

@@ -1,3 +1,7 @@
+/**
+ * @file ui_signal.c
+ * @brief ui_signal.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_signal.h"
 #include "../include/ui_types.h"
@@ -33,10 +37,15 @@ struct ui_signal {
   size_t subscribers_capacity;           /**< subscribers_capacity */
 };
 
-/*
+/**
  * \brief Locks a signal.
  * \param sig The signal to lock.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief ui_signal_lock.
+ * @param sig Parameter sig.
+ * @return Return value.
  */
 static ui_error_t ui_signal_lock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
@@ -51,10 +60,15 @@ static ui_error_t ui_signal_lock(ui_signal_t *sig) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Unlocks a signal.
  * \param sig The signal to unlock.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief ui_signal_unlock.
+ * @param sig Parameter sig.
+ * @return Return value.
  */
 static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
@@ -66,11 +80,17 @@ static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Adds a subscriber to a signal.
  * \param sig The signal.
  * \param node The subscriber node.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief ui_signal_add_subscriber.
+ * @param sig Parameter sig.
+ * @param node Parameter node.
+ * @return Return value.
  */
 static ui_error_t ui_signal_add_subscriber(ui_signal_t *sig,
                                            struct ui_reactive_node *node) {
@@ -100,7 +120,7 @@ static ui_error_t ui_signal_add_subscriber(ui_signal_t *sig,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new signal.
  * \param arena The arena to allocate from.
  * \param initial_value The initial value.
@@ -156,7 +176,7 @@ ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the value of a signal.
  * \param signal The signal.
  * \param out_value Pointer to store the value.
@@ -203,7 +223,7 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
   return rc;
 }
 
-/*
+/**
  * \brief Sets the value of a signal.
  * \param signal The signal.
  * \param new_value The new value.
@@ -301,7 +321,7 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
   return rc;
 }
 
-/*
+/**
  * \brief Updates the value of a signal using a callback.
  * \param signal The signal.
  * \param update_fn The update function.
@@ -329,7 +349,7 @@ ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a signal.
  * \param signal The signal to destroy.
  * \return UI_ERROR_NONE on success.

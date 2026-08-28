@@ -8,6 +8,7 @@
 #include "ui_bidi_manager.h"
 /* clang-format on */
 
+/** @brief Global direction state for BIDI manager */
 static enum ui_bidi_direction g_ui_bidi_dir = UI_BIDI_DIR_LTR;
 
 ui_error_t ui_bidi_set_direction(enum ui_bidi_direction direction) {

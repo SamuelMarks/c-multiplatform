@@ -1,6 +1,10 @@
+/**
+ * @file ui_list_base.c
+ * @brief ui_list_base.c implementation.
+ */
 /*
- * \file ui_list_base.c
- * \brief Implementation of the generic list base component.
+ * @file ui_list_base.c
+ * @brief Implementation of the generic list base component.
  */
 #include "ui_list_base.h"
 
@@ -13,8 +17,8 @@
 
 /**
  * @struct ui_list_base
- * \struct ui_list_base
- * \brief Internal state for a generic list container widget.
+ * @struct ui_list_base
+ * @brief Internal state for a generic list container widget.
  */
 struct ui_list_base {
   struct ui_component *component;       /**< component */
@@ -24,16 +28,16 @@ struct ui_list_base {
 
 /**
  * @struct ui_list_item_base
- * \brief ui_list_item_base
+ * @brief ui_list_item_base
  */
 struct ui_list_item_base {
   struct ui_component *component; /**< component */
 };
 
-/*
- * \brief Creates a new list base widget.
- * \param[out] out_list Pointer to store the created list.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new list base widget.
+ * @param[out] out_list Pointer to store the created list.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_base_create(struct ui_list_base **out_list) {
   struct ui_list_base *list;
@@ -64,10 +68,10 @@ ui_error_t ui_list_base_create(struct ui_list_base **out_list) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a list base widget.
- * \param[in,out] list The list widget to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a list base widget.
+ * @param[in,out] list The list widget to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_base_destroy(struct ui_list_base *list) {
   if (!list) {
@@ -80,11 +84,11 @@ ui_error_t ui_list_base_destroy(struct ui_list_base *list) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the underlying DOM component of the list widget.
- * \param[in] list The list widget.
- * \param[out] out_component Pointer to store the DOM component.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets the underlying DOM component of the list widget.
+ * @param[in] list The list widget.
+ * @param[out] out_component Pointer to store the DOM component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_base_get_component(struct ui_list_base *list,
                                       struct ui_component **out_component) {
@@ -95,7 +99,11 @@ ui_error_t ui_list_base_get_component(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Sets the orientation of the list widget.
+ * @param[in,out] list The list widget.
+ * @param[in] orientation The orientation.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_base_set_orientation(struct ui_list_base *list,
                                         enum ui_list_orientation orientation) {
@@ -106,7 +114,11 @@ ui_error_t ui_list_base_set_orientation(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Gets the orientation of the list widget.
+ * @param[in] list The list widget.
+ * @param[out] out_orientation Pointer to store the orientation.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_list_base_get_orientation(struct ui_list_base *list,
@@ -118,11 +130,11 @@ ui_list_base_get_orientation(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Appends an item to the end of the list.
- * \param[in,out] list The list widget.
- * \param[in,out] item The list item to append.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Appends an item to the end of the list.
+ * @param[in,out] list The list widget.
+ * @param[in,out] item The list item to append.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_base_append_item(struct ui_list_base *list,
                                     struct ui_list_item_base *item) {
@@ -136,10 +148,10 @@ ui_error_t ui_list_base_append_item(struct ui_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Creates a new list item widget.
- * \param[out] out_item Pointer to store the created item.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new list item widget.
+ * @param[out] out_item Pointer to store the created item.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_item_base_create(struct ui_list_item_base **out_item) {
   struct ui_list_item_base *item;
@@ -168,10 +180,10 @@ ui_error_t ui_list_item_base_create(struct ui_list_item_base **out_item) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a list item widget.
- * \param[in,out] item The list item to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a list item widget.
+ * @param[in,out] item The list item to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_item_base_destroy(struct ui_list_item_base *item) {
   if (!item) {
@@ -184,7 +196,11 @@ ui_error_t ui_list_item_base_destroy(struct ui_list_item_base *item) {
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Gets the component of the list item widget.
+ * @param[in] item The list item widget.
+ * @param[out] out_component Pointer to store the component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_list_item_base_get_component(struct ui_list_item_base *item,
@@ -196,11 +212,11 @@ ui_list_item_base_get_component(struct ui_list_item_base *item,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Binds arbitrary data to the list widget.
- * \param[in,out] widget The list widget.
- * \param[in,out] signal The data signal to bind.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Binds arbitrary data to the list widget.
+ * @param[in,out] widget The list widget.
+ * @param[in,out] signal The data signal to bind.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_base_bind_data(struct ui_list_base *widget,
                                   struct ui_computed *signal) {

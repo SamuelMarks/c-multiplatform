@@ -10,6 +10,7 @@
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief Default CSS stylesheet */
 static const char *ui_window_manager_base_default_css =
     ".window-manager-container { "
     "position: relative; "

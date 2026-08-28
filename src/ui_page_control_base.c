@@ -1,10 +1,14 @@
+/**
+ * @file ui_page_control_base.c
+ * @brief ui_page_control_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_page_control_base.h"
 #include "ui_internal_mem.h"
 #include <stdio.h>
 /* clang-format on */
 
-/*
+/**
  * @brief ui_page_control_base_create.
  * @param out_control Parameter out_control.
  * @return Return value.
@@ -55,7 +59,7 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief update_page_control_dom.
  * @param control Parameter control.
  * @return Return value.

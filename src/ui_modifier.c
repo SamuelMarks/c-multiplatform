@@ -1,6 +1,8 @@
-/*
- * \file ui_modifier.c
- * \brief Implementation of style and class modifiers for UI components.
+/**
+ * @file ui_modifier.c
+ * @brief Implementation of style and class modifiers for UI components.
+ * @details Provides the ability to compose and apply CSS classes and styles
+ * dynamically.
  */
 /* clang-format off */
 #include "ui_modifier.h"
@@ -15,39 +17,38 @@
 
 /**
  * @struct ui_modifier_class
- * \struct ui_modifier_class
- * \brief Linked list node representing an added CSS class.
+ * @brief Linked list node representing an added CSS class.
  */
 struct ui_modifier_class {
-  char *name;                     /**< name */
-  struct ui_modifier_class *next; /**< next */
+  char *name;                     /**< Name of the class */
+  struct ui_modifier_class *next; /**< Next class in list */
 };
 
 /**
  * @struct ui_modifier_style
- * \brief ui_modifier_style
+ * @brief Linked list node representing an inline CSS style.
  */
 struct ui_modifier_style {
-  char *property;                 /**< property */
-  char *value;                    /**< value */
-  struct ui_modifier_style *next; /**< next */
+  char *property;                 /**< Style property name */
+  char *value;                    /**< Style property value */
+  struct ui_modifier_style *next; /**< Next style in list */
 };
 
 /**
  * @struct ui_modifier
- * \brief ui_modifier
+ * @brief Modifer context storing classes and inline styles.
  */
 struct ui_modifier {
-  struct ui_modifier_class *first_class; /**< first_class */
-  struct ui_modifier_class *last_class;  /**< last_class */
-  struct ui_modifier_style *first_style; /**< first_style */
-  struct ui_modifier_style *last_style;  /**< last_style */
+  struct ui_modifier_class *first_class; /**< Head of class list */
+  struct ui_modifier_class *last_class;  /**< Tail of class list */
+  struct ui_modifier_style *first_style; /**< Head of style list */
+  struct ui_modifier_style *last_style;  /**< Tail of style list */
 };
 
-/*
- * \brief Creates a new modifier configuration.
- * \param[out] out_modifier Pointer to store the created modifier.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new modifier configuration.
+ * @param[out] out_modifier Pointer to store the created modifier.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_modifier_create(struct ui_modifier **out_modifier) {
   struct ui_modifier *modifier;
@@ -71,10 +72,10 @@ ui_error_t ui_modifier_create(struct ui_modifier **out_modifier) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a modifier configuration.
- * \param[in,out] modifier The modifier to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a modifier configuration.
+ * @param[in,out] modifier The modifier to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_modifier_destroy(struct ui_modifier *modifier) {
   struct ui_modifier_class *c_curr;
@@ -113,11 +114,11 @@ ui_error_t ui_modifier_destroy(struct ui_modifier *modifier) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Duplicates a string using standard allocation.
- * \param[in] src The string to copy.
- * \param[out] out_dest Pointer to store the copied string.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Duplicates a string using standard allocation.
+ * @param[in] src The string to copy.
+ * @param[out] out_dest Pointer to store the copied string.
+ * @return UI_ERROR_NONE on success.
  */
 static ui_error_t str_dup(const char *src, char **out_dest) {
   size_t len;
@@ -139,11 +140,11 @@ static ui_error_t str_dup(const char *src, char **out_dest) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Adds a CSS class to the modifier.
- * \param[in,out] modifier The modifier configuration.
- * \param[in] class_name The CSS class name to add.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Adds a CSS class to the modifier.
+ * @param[in,out] modifier The modifier configuration.
+ * @param[in] class_name The CSS class name to add.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_modifier_add_class(struct ui_modifier *modifier,
                                  const char *class_name) {
@@ -179,12 +180,12 @@ ui_error_t ui_modifier_add_class(struct ui_modifier *modifier,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Adds an inline CSS style to the modifier.
- * \param[in,out] modifier The modifier configuration.
- * \param[in] property_name The CSS property name.
- * \param[in] property_value The CSS property value.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Adds an inline CSS style to the modifier.
+ * @param[in,out] modifier The modifier configuration.
+ * @param[in] property_name The CSS property name.
+ * @param[in] property_value The CSS property value.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_modifier_add_style(struct ui_modifier *modifier,
                                  const char *property_name,
@@ -229,12 +230,12 @@ ui_error_t ui_modifier_add_style(struct ui_modifier *modifier,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Applies the modifier's classes and styles to a target component's
+/**
+ * @brief Applies the modifier's classes and styles to a target component's
  * shadow root.
- * \param[in] modifier The modifier configuration.
- * \param[in,out] component The target UI component.
- * \return UI_ERROR_NONE on success.
+ * @param[in] modifier The modifier configuration.
+ * @param[in,out] component The target UI component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
                              struct ui_component *component) {

@@ -1,6 +1,10 @@
+/**
+ * @file ui_hover_card_base.c
+ * @brief ui_hover_card_base.c implementation.
+ */
 /*
- * \file ui_hover_card_base.c
- * \brief Implementation of hover card base component.
+ * @file ui_hover_card_base.c
+ * @brief Implementation of hover card base component.
  */
 /* clang-format off */
 #include "ui_hover_card_base.h"
@@ -9,6 +13,7 @@
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief Default CSS stylesheet for hover card base component */
 static const char *ui_hover_card_base_default_css =
     ".hover-card-container { "
     "position: absolute; "
@@ -20,7 +25,7 @@ static const char *ui_hover_card_base_default_css =
 
 /**
  * @struct ui_hover_card_base
- * \brief ui_hover_card_base
+ * @brief ui_hover_card_base
  */
 struct ui_hover_card_base {
   struct ui_component *component;       /**< component */
@@ -28,10 +33,10 @@ struct ui_hover_card_base {
   struct ui_computed *animating_signal; /**< animating_signal */
 };
 
-/*
- * \brief Creates a new hover card base component.
- * \param[out] out_hover_card Pointer to store the created hover card.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new hover card base component.
+ * @param[out] out_hover_card Pointer to store the created hover card.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_hover_card_base_create(struct ui_hover_card_base **out_hover_card) {
@@ -101,10 +106,10 @@ cleanup:
   return rc;
 }
 
-/*
- * \brief Destroys a hover card base component.
- * \param[in,out] hover_card The hover card to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a hover card base component.
+ * @param[in,out] hover_card The hover card to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card) {
   if (!hover_card) {
@@ -117,11 +122,11 @@ ui_error_t ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves the underlying DOM component of the hover card.
- * \param[in,out] hover_card The hover card component.
- * \param[out] out_component Pointer to store the DOM component.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves the underlying DOM component of the hover card.
+ * @param[in,out] hover_card The hover card component.
+ * @param[out] out_component Pointer to store the DOM component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_hover_card_base_get_component(struct ui_hover_card_base *hover_card,
@@ -133,10 +138,10 @@ ui_hover_card_base_get_component(struct ui_hover_card_base *hover_card,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Handles mouse enter events to potentially open the hover card.
- * \param[in,out] hover_card The hover card component.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Handles mouse enter events to potentially open the hover card.
+ * @param[in,out] hover_card The hover card component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_hover_card_base_on_mouse_enter(struct ui_hover_card_base *hover_card) {
@@ -151,12 +156,12 @@ ui_hover_card_base_on_mouse_enter(struct ui_hover_card_base *hover_card) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Handles mouse leave events to potentially close the hover card.
- * \param[in,out] hover_card The hover card component.
- * \param[in] cursor_x The X coordinate of the cursor.
- * \param[in] cursor_y The Y coordinate of the cursor.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Handles mouse leave events to potentially close the hover card.
+ * @param[in,out] hover_card The hover card component.
+ * @param[in] cursor_x The X coordinate of the cursor.
+ * @param[in] cursor_y The Y coordinate of the cursor.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_hover_card_base_on_mouse_leave(struct ui_hover_card_base *hover_card,
@@ -176,11 +181,11 @@ ui_hover_card_base_on_mouse_leave(struct ui_hover_card_base *hover_card,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Binds the open state of the hover card to a signal.
- * \param[in,out] widget The hover card component.
- * \param[in,out] open_signal The signal representing the open state.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Binds the open state of the hover card to a signal.
+ * @param[in,out] widget The hover card component.
+ * @param[in,out] open_signal The signal representing the open state.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_hover_card_base_bind_open(struct ui_hover_card_base *widget,
                                         struct ui_signal *open_signal) {
@@ -191,12 +196,12 @@ ui_error_t ui_hover_card_base_bind_open(struct ui_hover_card_base *widget,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the computed signal indicating if the hover card is currently
+/**
+ * @brief Gets the computed signal indicating if the hover card is currently
  * animating.
- * \param[in,out] widget The hover card component.
- * \param[out] out_animating Pointer to store the computed signal.
- * \return UI_ERROR_NONE on success.
+ * @param[in,out] widget The hover card component.
+ * @param[out] out_animating Pointer to store the computed signal.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_hover_card_base_get_animating_signal(struct ui_hover_card_base *widget,

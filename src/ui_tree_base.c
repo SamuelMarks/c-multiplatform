@@ -171,7 +171,7 @@ ui_error_t ui_tree_base_get_active_node(const struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Helper to find a node's index among its siblings.
  * @param tree The tree instance.
  * @param parent The parent node identifier.
@@ -193,7 +193,7 @@ static size_t get_node_index(struct ui_tree_base *tree, void *parent,
   return 0;
 }
 
-/*
+/**
  * @brief Gets the next visible node in a pre-order traversal.
  * @param tree The tree instance.
  * @param node The current node identifier.
@@ -228,7 +228,7 @@ static void *get_next_visible_node(struct ui_tree_base *tree, void *node) {
   return NULL;
 }
 
-/*
+/**
  * @brief Gets the previous visible node in a pre-order traversal.
  * @param tree The tree instance.
  * @param node The current node identifier.
@@ -340,7 +340,7 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Recursively renders tree nodes to the DOM.
  * @param tree The tree instance.
  * @param node The current node identifier.

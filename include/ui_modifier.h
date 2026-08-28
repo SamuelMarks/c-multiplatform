@@ -16,6 +16,9 @@ extern "C" {
 #include "ui_component.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a modifier.
+ */
 struct ui_modifier;
 
 /**
@@ -30,6 +33,7 @@ ui_error_t ui_modifier_create(struct ui_modifier **out_modifier);
  * @brief Destroys a modifier payload.
  *
  * @param modifier The modifier to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_modifier_destroy(struct ui_modifier *modifier);
 

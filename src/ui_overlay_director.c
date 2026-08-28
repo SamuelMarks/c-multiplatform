@@ -1,7 +1,8 @@
-/*
- * \file ui_overlay_director.c
- * \brief Implementation of the UI overlay director for managing modals,
- * popovers, and floating menus.
+/**
+ * @file ui_overlay_director.c
+ * @brief Implementation of the UI overlay director.
+ * @details Manages modals, popovers, and floating menus mounted onto a root
+ * overlay layer.
  */
 /* clang-format off */
 #include "ui_overlay_director.h"
@@ -12,30 +13,29 @@
 
 /**
  * @struct ui_overlay
- * \struct ui_overlay
- * \brief Internal record of an active overlay mount.
+ * @brief Internal record of an active overlay mount.
  */
 struct ui_overlay {
-  struct ui_component *component;   /**< component */
-  struct ui_dom_node *wrapper_node; /**< wrapper_node */
-  int z_index;                      /**< z_index */
-  struct ui_overlay *next;          /**< next */
+  struct ui_component *component;   /**< The mounted UI component */
+  struct ui_dom_node *wrapper_node; /**< Intermediate wrapper node */
+  int z_index;                      /**< Stored Z-index level */
+  struct ui_overlay *next;          /**< Next overlay in linked list */
 };
 
 /**
  * @struct ui_overlay_director
- * \brief ui_overlay_director
+ * @brief Core engine managing multiple mounted overlays.
  */
 struct ui_overlay_director {
-  struct ui_dom_node *root_node;    /**< root_node */
-  struct ui_overlay *first_overlay; /**< first_overlay */
+  struct ui_dom_node *root_node;    /**< Target DOM node to mount over */
+  struct ui_overlay *first_overlay; /**< Head of active overlays list */
 };
 
-/*
- * \brief Creates a new overlay director bound to a specific root DOM node.
- * \param[in,out] root_node The DOM node where overlays will be mounted.
- * \param[out] out_director Pointer to store the created director.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new overlay director bound to a specific root DOM node.
+ * @param[in,out] root_node The DOM node where overlays will be mounted.
+ * @param[out] out_director Pointer to store the created director.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_overlay_director_create(struct ui_dom_node *root_node,
@@ -59,10 +59,10 @@ ui_overlay_director_create(struct ui_dom_node *root_node,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys an overlay director and unmounts all active overlays.
- * \param[in,out] director The director to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys an overlay director and unmounts all active overlays.
+ * @param[in,out] director The director to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director) {
   struct ui_overlay *current;
@@ -87,13 +87,13 @@ ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Mounts a UI component as an overlay on top of the current view.
- * \param[in,out] director The overlay director.
- * \param[in,out] component The component to mount.
- * \param[in] z_index The CSS z-index for the overlay.
- * \param[out] out_overlay Pointer to store the resulting overlay handle.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Mounts a UI component as an overlay on top of the current view.
+ * @param[in,out] director The overlay director.
+ * @param[in,out] component The component to mount.
+ * @param[in] z_index The CSS z-index for the overlay.
+ * @param[out] out_overlay Pointer to store the resulting overlay handle.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_overlay_director_mount_component(struct ui_overlay_director *director,
@@ -162,11 +162,11 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Unmounts a specific overlay.
- * \param[in,out] director The overlay director.
- * \param[in,out] overlay The overlay handle to unmount.
- * \return UI_ERROR_NONE on success, or UI_ERROR_NOT_FOUND if the overlay
+/**
+ * @brief Unmounts a specific overlay.
+ * @param[in,out] director The overlay director.
+ * @param[in,out] overlay The overlay handle to unmount.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_NOT_FOUND if the overlay
  * doesn't exist.
  */
 ui_error_t ui_overlay_director_unmount(struct ui_overlay_director *director,

@@ -1,6 +1,7 @@
 /**
  * @file ui_timeline_base.c
  * @brief Implementation of the timeline UI component base logic.
+ * @details Provides the core functions to manage a timeline widget.
  */
 /* clang-format off */
 #include "ui_timeline_base.h"
@@ -10,7 +11,6 @@
 /* clang-format on */
 
 /**
- * @struct ui_timeline_node
  * @struct ui_timeline_node
  * @brief Internal representation of a single node in the timeline.
  */
@@ -22,7 +22,6 @@ struct ui_timeline_node {
 };
 
 /**
- * @struct ui_timeline_base
  * @struct ui_timeline_base
  * @brief Internal implementation of the timeline base component.
  */
@@ -39,6 +38,11 @@ struct ui_timeline_base {
   struct ui_computed *data_signal; /**< data_signal */
 };
 
+/**
+ * @brief Creates a new timeline base instance.
+ * @param out_timeline Pointer to receive the newly created timeline base.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_timeline_base_create(struct ui_timeline_base **out_timeline) {
   struct ui_timeline_base *tb;
   ui_error_t rc = UI_ERROR_NONE;
@@ -66,6 +70,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Destroys a timeline base instance.
+ * @param timeline The timeline base to destroy.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline) {
   size_t i;
 
@@ -85,6 +94,12 @@ ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the alignment of the timeline.
+ * @param timeline The timeline base.
+ * @param alignment The alignment to set.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t
 ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
                                enum ui_timeline_alignment alignment) {
@@ -95,6 +110,12 @@ ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Gets the alignment of the timeline.
+ * @param timeline The timeline base.
+ * @param out_alignment Pointer to receive the alignment.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t
 ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
                                enum ui_timeline_alignment *out_alignment) {
@@ -105,6 +126,13 @@ ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Adds a node to the timeline.
+ * @param timeline The timeline base.
+ * @param title The title of the node.
+ * @param description The description of the node.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_timeline_base_add_node(struct ui_timeline_base *timeline,
                                      const char *title,
                                      const char *description) {
@@ -182,6 +210,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Gets the number of nodes in the timeline.
+ * @param timeline The timeline base.
+ * @param out_count Pointer to receive the node count.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t
 ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
                                 size_t *out_count) {
@@ -192,6 +226,14 @@ ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Gets a node from the timeline.
+ * @param timeline The timeline base.
+ * @param index The index of the node.
+ * @param out_title Pointer to receive the node title string.
+ * @param out_description Pointer to receive the node description string.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
                                      size_t index, const char **out_title,
                                      const char **out_description) {
@@ -209,6 +251,11 @@ ui_error_t ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Renders the timeline.
+ * @param timeline The timeline base to render.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_timeline_base_render(struct ui_timeline_base *timeline) {
   if (!timeline) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -219,6 +266,12 @@ ui_error_t ui_timeline_base_render(struct ui_timeline_base *timeline) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Binds a data signal to the timeline.
+ * @param widget The timeline base widget.
+ * @param signal The computed signal to bind.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_timeline_base_bind_data(struct ui_timeline_base *widget,
                                       struct ui_computed *signal) {
   if (!widget) {

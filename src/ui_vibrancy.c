@@ -1,8 +1,12 @@
+/**
+ * @file ui_vibrancy.c
+ * @brief ui_vibrancy.c implementation.
+ */
 /* clang-format off */
 #include "ui_vibrancy.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_vibrancy_params_init.
  * @param params Parameter params.
  * @param material Parameter material.

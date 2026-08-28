@@ -32,6 +32,7 @@ ui_error_t ui_focus_trap_create(struct ui_focus_trap **out_trap);
 /**
  * @brief Destroys a focus trap.
  * @param trap The trap to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_focus_trap_destroy(struct ui_focus_trap *trap);
 

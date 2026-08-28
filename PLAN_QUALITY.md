@@ -1,3 +1,11 @@
+/**
+ * @file PLAN_QUALITY.md
+ * @brief PLAN_QUALITY.md implementation.
+ */
+/**
+ * @file PLAN_QUALITY.md
+ * @brief PLAN_QUALITY.md implementation.
+ */
 # Architecture Plan: Quality Assurance, Testing & Bindings
 
 ## 1. Automated Testing & Tooling (100% Coverage Mandate)

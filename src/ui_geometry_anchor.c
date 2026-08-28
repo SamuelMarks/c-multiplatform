@@ -1,9 +1,13 @@
+/**
+ * @file ui_geometry_anchor.c
+ * @brief ui_geometry_anchor.c implementation.
+ */
 /* clang-format off */
 #include "ui_geometry_anchor.h"
 #include <stddef.h>
 /* clang-format on */
 
-/*
+/**
  * @brief ui_geometry_anchor_compute.
  * @param target Parameter target.
  * @param overlay Parameter overlay.

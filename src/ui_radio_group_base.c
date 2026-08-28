@@ -1,3 +1,7 @@
+/**
+ * @file ui_radio_group_base.c
+ * @brief ui_radio_group_base.c implementation.
+ */
 /*
  * \file ui_radio_group_base.c
  * \brief Implementation of the UI Radio Group Base component.
@@ -31,12 +35,18 @@ struct ui_radio_group_base {
   int is_disabled;                               /**< Non-zero if disabled */
 };
 
-/*
+/**
  * \brief Triggers the CVA change callback.
  *
  * \param group The group.
  * \param active_index The active index.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief trigger_cva_change.
+ * @param group Parameter group.
+ * @param active_index Parameter active_index.
+ * @return Return value.
  */
 static ui_error_t trigger_cva_change(struct ui_radio_group_base *group,
                                      int active_index) {
@@ -48,11 +58,16 @@ static ui_error_t trigger_cva_change(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Triggers the CVA touched callback.
  *
  * \param group The group.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief trigger_cva_touched.
+ * @param group Parameter group.
+ * @return Return value.
  */
 static ui_error_t trigger_cva_touched(struct ui_radio_group_base *group) {
   if (group->cva_on_touched) {
@@ -61,12 +76,18 @@ static ui_error_t trigger_cva_touched(struct ui_radio_group_base *group) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to write a value.
  *
  * \param component The radio group component.
  * \param value The payload containing the index.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief radio_group_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
  */
 static ui_error_t radio_group_cva_write_value(void *component,
                                               union ui_signal_payload value) {
@@ -87,13 +108,20 @@ static ui_error_t radio_group_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to register an on-change callback.
  *
  * \param component The radio group component.
  * \param callback The callback.
  * \param user_data Opaque user data.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief radio_group_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t radio_group_cva_register_on_change(
     void *component,
@@ -107,13 +135,20 @@ static ui_error_t radio_group_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to register an on-touched callback.
  *
  * \param component The radio group component.
  * \param callback The callback.
  * \param user_data Opaque user data.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief radio_group_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t radio_group_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
@@ -125,12 +160,18 @@ static ui_error_t radio_group_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to set the disabled state.
  *
  * \param component The radio group component.
  * \param is_disabled The disabled state.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief radio_group_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
  */
 static ui_error_t radio_group_cva_set_disabled_state(void *component,
                                                      ui_bool_t is_disabled) {
@@ -149,13 +190,20 @@ static ui_error_t radio_group_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Callback invoked when a child toggle changes.
  *
  * \param toggle The toggle that changed.
  * \param checked The new checked state.
  * \param user_data Pointer to the radio group.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief on_child_toggle_change.
+ * @param toggle Parameter toggle.
+ * @param checked Parameter checked.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t on_child_toggle_change(struct ui_toggle_base *toggle,
                                          int checked, void *user_data) {
@@ -198,7 +246,7 @@ static ui_error_t on_child_toggle_change(struct ui_toggle_base *toggle,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new radio group manager.
  *
  * \param out_group Pointer to receive the allocated radio group.
@@ -243,7 +291,7 @@ ui_radio_group_base_create(struct ui_radio_group_base **out_group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a radio group manager.
  * Note: This does not destroy the individual ui_toggle_base components.
  *
@@ -267,7 +315,7 @@ ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Adds a toggle (radio button) to the group.
  *
  * \param group The radio group manager.
@@ -314,7 +362,7 @@ ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Removes a toggle from the group.
  *
  * \param group The radio group manager.
@@ -353,7 +401,7 @@ ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Manually sets the active (checked) toggle in the group.
  * Unchecks all other toggles in this group.
  *
@@ -396,7 +444,7 @@ ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Retrieves the currently active (checked) toggle in the group.
  *
  * \param group The radio group manager.
@@ -412,7 +460,7 @@ ui_radio_group_base_get_active(const struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the change handler for the radio group.
  *
  * \param group The radio group manager.
@@ -431,7 +479,7 @@ ui_radio_group_base_set_on_change(struct ui_radio_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Processes an input event for keyboard routing (Arrow keys) to cycle
  * selection. Typically, this is called when the group container or an active
  * radio receives key events.

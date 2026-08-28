@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_round_display.c
+ * @brief ui_css_round_display.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_round_display.h"
 #include <string.h>
@@ -5,7 +9,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -16,7 +20,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/*
+/**
  * @brief parse_geometry_box.
  * @param str Parameter str.
  * @param out_box Parameter out_box.
@@ -42,7 +46,7 @@ static void parse_geometry_box(const char *str,
     *out_box = UI_CSS_GEOMETRY_BOX_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_shape_inside.
  * @param str Parameter str.
  * @param out_shape Parameter out_shape.

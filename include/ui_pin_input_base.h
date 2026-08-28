@@ -16,6 +16,9 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a pin input base component.
+ */
 struct ui_pin_input_base;
 
 /**
@@ -34,6 +37,7 @@ ui_error_t ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input,
  * @brief Destroys a pin input base component.
  *
  * @param pin_input The component to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_pin_input_base_destroy(struct ui_pin_input_base *pin_input);
 

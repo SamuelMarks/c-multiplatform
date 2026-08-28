@@ -1,3 +1,7 @@
+/**
+ * @file ui_renderer_gles_fallback.c
+ * @brief ui_renderer_gles_fallback.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_renderer.h"
 #include "../include/ui_error.h"
@@ -24,7 +28,7 @@ struct gles_fallback_context {
 extern int g_mock_gles2_create_fail;
 #endif
 
-/*
+/**
  * @brief gles_fallback_begin_frame.
  * @param ctx Parameter ctx.
  * @param width Parameter width.
@@ -58,7 +62,7 @@ static ui_error_t gles_fallback_begin_frame(void *ctx, int width, int height) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_end_frame.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -75,7 +79,7 @@ static ui_error_t gles_fallback_end_frame(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_draw_rect.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -91,7 +95,7 @@ static ui_error_t gles_fallback_draw_rect(void *ctx, const struct ui_rect *r,
                                               r->width, r->height, *c);
 }
 
-/*
+/**
  * @brief gles_fallback_draw_text.
  * @param ctx Parameter ctx.
  * @param text Parameter text.
@@ -110,7 +114,7 @@ static ui_error_t gles_fallback_draw_text(void *ctx, const char *text,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_draw_image.
  * @param ctx Parameter ctx.
  * @param img Parameter img.
@@ -127,7 +131,7 @@ static ui_error_t gles_fallback_draw_image(void *ctx,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_draw_gradient.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -144,7 +148,7 @@ gles_fallback_draw_gradient(void *ctx, const struct ui_rect *r,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_draw_path.
  * @param ctx Parameter ctx.
  * @param p Parameter p.
@@ -160,7 +164,7 @@ static ui_error_t gles_fallback_draw_path(void *ctx, const struct ui_path *p,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_push_clip.
  * @param ctx Parameter ctx.
  * @param r Parameter r.
@@ -173,7 +177,7 @@ static ui_error_t gles_fallback_push_clip(void *ctx, const struct ui_rect *r) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_pop_clip.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -184,7 +188,7 @@ static ui_error_t gles_fallback_pop_clip(void *ctx) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_set_blend_mode.
  * @param ctx Parameter ctx.
  * @param mode Parameter mode.
@@ -198,7 +202,7 @@ static ui_error_t gles_fallback_set_blend_mode(void *ctx,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_set_shadow.
  * @param ctx Parameter ctx.
  * @param shadow Parameter shadow.
@@ -212,7 +216,7 @@ static ui_error_t gles_fallback_set_shadow(void *ctx,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief gles_fallback_read_pixels.
  * @param ctx Parameter ctx.
  * @param out_rgba_buffer Parameter out_rgba_buffer.
@@ -230,7 +234,7 @@ static ui_error_t gles_fallback_read_pixels(void *ctx,
       out_rgba_buffer);
 }
 
-/*
+/**
  * @brief gles_fallback_destroy.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -253,6 +257,7 @@ static ui_error_t gles_fallback_destroy(void *ctx) {
   return UI_ERROR_NONE;
 }
 
+/** @brief Fallback renderer vtable */
 static const struct ui_renderer_vtable gles_fallback_vtable = {
     gles_fallback_begin_frame, gles_fallback_end_frame,
     gles_fallback_draw_rect,   gles_fallback_draw_text,
@@ -262,7 +267,7 @@ static const struct ui_renderer_vtable gles_fallback_vtable = {
     gles_fallback_set_shadow,  gles_fallback_read_pixels,
     gles_fallback_destroy};
 
-/*
+/**
  * @brief ui_renderer_gles_fallback_init.
  * @param renderer Parameter renderer.
  * @return Return value.

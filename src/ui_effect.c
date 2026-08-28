@@ -1,6 +1,6 @@
-/*
- * \file ui_effect.c
- * \brief Implementation of reactive effects.
+/**
+ * @file ui_effect.c
+ * @brief Implementation of reactive effects.
  */
 /* clang-format off */
 #include "../include/ui_effect.h"
@@ -14,21 +14,22 @@
 
 /**
  * @struct ui_effect
- * \struct ui_effect
- * \brief Represents a reactive effect.
+ * @brief Represents a reactive effect.
  */
 struct ui_effect {
-  ui_effect_fn effect_fn;            /**< effect_fn */
-  void *user_data;                   /**< user_data */
-  struct ui_reactor *target_reactor; /**< target_reactor */
-  struct ui_arena *arena;            /**< arena */
-  struct ui_reactive_node self_node; /**< self_node */
+  ui_effect_fn effect_fn; /**< The function to execute for the effect. */
+  void *user_data;        /**< User data passed to the effect function. */
+  struct ui_reactor
+      *target_reactor;    /**< The reactor on which this effect is scheduled. */
+  struct ui_arena *arena; /**< Optional memory arena for allocation. */
+  struct ui_reactive_node self_node; /**< The reactive node representing this
+                                        effect in the graph. */
 };
 
-/*
- * \brief Evaluates the reactive effect.
- * \param[in,out] user_data Pointer to the ui_effect instance.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Evaluates the reactive effect.
+ * @param[in,out] user_data Pointer to the ui_effect instance.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t ui_effect_evaluate(void *user_data) {
   ui_effect_t *eff = (ui_effect_t *)user_data;
@@ -37,24 +38,27 @@ static ui_error_t ui_effect_evaluate(void *user_data) {
 
   if (eff && eff->effect_fn) {
     rc = ui_reactive_graph_set_current_node(&eff->self_node, &prev_node);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
 
     rc = eff->effect_fn(eff->user_data);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
 
     rc = ui_reactive_graph_set_current_node(prev_node, NULL);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
   }
   return rc;
 }
 
-/*
- * \brief Callback triggered when the effect is notified of a change.
- * \param[in,out] user_data Pointer to the ui_effect instance.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Callback triggered when the effect is notified of a change.
+ * @param[in,out] user_data Pointer to the ui_effect instance.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t ui_effect_on_notify(void *user_data) {
   ui_effect_t *eff = (ui_effect_t *)user_data;
@@ -62,8 +66,9 @@ static ui_error_t ui_effect_on_notify(void *user_data) {
   if (eff->target_reactor) {
     ui_error_t sched_rc =
         ui_reactor_schedule(eff->target_reactor, ui_effect_evaluate, eff);
-    if (sched_rc != UI_ERROR_NONE)
+    if (sched_rc != UI_ERROR_NONE) {
       return sched_rc;
+    }
     return ui_reactor_wake(eff->target_reactor);
   }
 
@@ -72,14 +77,14 @@ static ui_error_t ui_effect_on_notify(void *user_data) {
   return ui_effect_evaluate(eff);
 }
 
-/*
- * \brief Creates a new reactive effect.
- * \param[in,out] arena Optional arena for memory allocation.
- * \param[in] effect_fn The function to execute for the effect.
- * \param[in] user_data User data for the effect function.
- * \param[in,out] target_reactor The reactor to schedule the effect on.
- * \param[out] out_effect Pointer to store the created effect.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new reactive effect.
+ * @param[in,out] arena Optional arena for memory allocation.
+ * @param[in] effect_fn The function to execute for the effect.
+ * @param[in] user_data User data for the effect function.
+ * @param[in,out] target_reactor The reactor to schedule the effect on.
+ * @param[out] out_effect Pointer to store the created effect.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
                             void *user_data, struct ui_reactor *target_reactor,
@@ -115,17 +120,18 @@ ui_error_t ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
 
   /* Run once to establish initial dependencies */
   rc = ui_effect_on_notify(eff);
-  if (rc != UI_ERROR_NONE)
+  if (rc != UI_ERROR_NONE) {
     return rc;
+  }
 
   *out_effect = eff;
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a reactive effect.
- * \param[in,out] effect The effect to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a reactive effect.
+ * @param[in,out] effect The effect to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_effect_destroy(ui_effect_t *effect) {
   if (!effect) {

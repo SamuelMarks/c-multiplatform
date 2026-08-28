@@ -1,6 +1,7 @@
 /**
  * @file ui_virtual_scroll_base.c
  * @brief Implementation of the virtual scroll base component.
+ * @details Core logic for a virtual scrolling view.
  */
 
 /* clang-format off */
@@ -12,12 +13,7 @@
 #include <stdio.h>
 /* clang-format on */
 
-#if defined(_MSC_VER)
-/* MSVC Safe CRT */
-#endif
-
 /**
- * @struct ui_virtual_scroll_base
  * @struct ui_virtual_scroll_base
  * @brief Internal state for the virtual scroll base component.
  */
@@ -38,6 +34,12 @@ struct ui_virtual_scroll_base {
   struct ui_computed *data_signal;    /**< data_signal */
 };
 
+/**
+ * @brief Creates a virtual scroll base instance.
+ * @param out_virtual_scroll Pointer to receive the virtual scroll base.
+ * @param config Pointer to the configuration for the virtual scroll.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_virtual_scroll_base_create(
     struct ui_virtual_scroll_base **out_virtual_scroll,
     const struct ui_virtual_scroll_config *config) {
@@ -78,6 +80,11 @@ ui_error_t ui_virtual_scroll_base_create(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Destroys a virtual scroll base instance.
+ * @param vs The virtual scroll instance to destroy.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_virtual_scroll_base_destroy(struct ui_virtual_scroll_base *vs) {
   if (!vs)
     return UI_ERROR_NONE;
@@ -93,6 +100,12 @@ ui_error_t ui_virtual_scroll_base_destroy(struct ui_virtual_scroll_base *vs) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the number of items in the virtual scroll view.
+ * @param vs The virtual scroll instance.
+ * @param count The number of items.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t
 ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
                                       size_t count) {
@@ -123,6 +136,13 @@ ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the viewport size for the virtual scroll view.
+ * @param vs The virtual scroll instance.
+ * @param width The width of the viewport.
+ * @param height The height of the viewport.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t
 ui_virtual_scroll_base_set_viewport_size(struct ui_virtual_scroll_base *vs,
                                          float width, float height) {
@@ -140,6 +160,12 @@ ui_virtual_scroll_base_set_viewport_size(struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Gets the total height of all items in the virtual scroll view.
+ * @param vs The virtual scroll instance.
+ * @param out_height Pointer to receive the total height.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t
 ui_virtual_scroll_base_get_total_height(const struct ui_virtual_scroll_base *vs,
                                         float *out_height) {
@@ -164,6 +190,15 @@ ui_virtual_scroll_base_get_total_height(const struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Gets the visible range of items based on scroll position.
+ * @param vs The virtual scroll instance.
+ * @param scroll_y The current vertical scroll position.
+ * @param out_start_index Pointer to receive the starting index.
+ * @param out_end_index Pointer to receive the ending index.
+ * @param out_offset_y Pointer to receive the Y offset of the starting index.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_virtual_scroll_base_get_visible_range(
     const struct ui_virtual_scroll_base *vs, float scroll_y,
     size_t *out_start_index, size_t *out_end_index, float *out_offset_y) {
@@ -235,6 +270,12 @@ ui_error_t ui_virtual_scroll_base_get_visible_range(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Renders the virtual scroll view for a given scroll position.
+ * @param vs The virtual scroll instance.
+ * @param scroll_y The current vertical scroll position.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
                                          float scroll_y) {
   size_t start, end, visible_count, i;
@@ -243,6 +284,8 @@ ui_error_t ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
   char style_buf[128];
   struct ui_dom_node **new_nodes = NULL;
   size_t *new_indices = NULL;
+  size_t item_index;
+  struct ui_dom_node *node;
 
   if (!vs || !vs->container)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -290,8 +333,8 @@ ui_error_t ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
   vs->num_active_nodes = visible_count;
 
   for (i = 0; i < visible_count; i++) {
-    size_t item_index = start + i;
-    struct ui_dom_node *node = vs->active_nodes[i];
+    item_index = start + i;
+    node = vs->active_nodes[i];
 
     if (vs->active_node_indices[i] != item_index) {
       rc = vs->config.update_node(item_index, node, vs->config.user_data);
@@ -341,6 +384,12 @@ ui_error_t ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Mounts the virtual scroll onto a container DOM node.
+ * @param vs The virtual scroll instance.
+ * @param container The container DOM node.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_virtual_scroll_base_mount(struct ui_virtual_scroll_base *vs,
                                         struct ui_dom_node *container) {
   if (!vs || !container)
@@ -350,6 +399,12 @@ ui_error_t ui_virtual_scroll_base_mount(struct ui_virtual_scroll_base *vs,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Binds a data signal to the virtual scroll instance.
+ * @param widget The virtual scroll base widget.
+ * @param signal The computed signal.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t
 ui_virtual_scroll_base_bind_data(struct ui_virtual_scroll_base *widget,
                                  struct ui_computed *signal) {

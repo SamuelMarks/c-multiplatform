@@ -23,7 +23,7 @@ struct ui_theme_manager {
   ui_signal_t *change_signal; /**< change_signal */
 };
 
-/*
+/**
  * @brief Equality function for theme mode signals.
  * @param a The first payload.
  * @param b The second payload.

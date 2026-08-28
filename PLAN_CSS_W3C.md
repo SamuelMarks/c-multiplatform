@@ -1,3 +1,11 @@
+/**
+ * @file PLAN_CSS_W3C.md
+ * @brief PLAN_CSS_W3C.md implementation.
+ */
+/**
+ * @file PLAN_CSS_W3C.md
+ * @brief PLAN_CSS_W3C.md implementation.
+ */
 # Architecture Plan: 100% W3C CSS Specification Implementation
 
 This document contains the exhaustive checklist of all CSS Modules currently tracked by the W3C. Our engine will fully implement the parsed AST, evaluation, and rendering models for all modules to achieve 100% spec compliance.

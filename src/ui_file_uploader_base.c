@@ -1,3 +1,7 @@
+/**
+ * @file ui_file_uploader_base.c
+ * @brief ui_file_uploader_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_file_uploader_base.h"
 #include "ui_internal_mem.h"
@@ -35,7 +39,7 @@ extern int g_mock_io_fail;
 /** @endcond */
 #endif
 
-/*
+/**
  * @brief ui_file_uploader_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -69,6 +73,13 @@ ui_file_uploader_cva_write_value(void *component,
 
 /* \brief ui_file_uploader_cva_register_on_change
  */
+/**
+ * @brief ui_file_uploader_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t ui_file_uploader_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -82,6 +93,13 @@ static ui_error_t ui_file_uploader_cva_register_on_change(
 
 /* \brief ui_file_uploader_cva_register_on_touched
  */
+/**
+ * @brief ui_file_uploader_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t ui_file_uploader_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_file_uploader_base *uploader =
@@ -91,7 +109,7 @@ static ui_error_t ui_file_uploader_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_file_uploader_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -106,7 +124,7 @@ ui_file_uploader_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_file_uploader_init.
  * @param uploader Parameter uploader.
  * @param max_files Parameter max_files.
@@ -168,7 +186,7 @@ ui_error_t ui_file_uploader_init(struct ui_file_uploader_base *uploader,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_file_uploader_destroy.
  * @param uploader Parameter uploader.
  * @return Return value.
@@ -229,7 +247,7 @@ ui_file_uploader_on_drag_leave(struct ui_file_uploader_base *uploader) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_file_uploader_drop_file.
  * @param uploader Parameter uploader.
  * @param file_path Parameter file_path.

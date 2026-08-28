@@ -1,10 +1,14 @@
+/**
+ * @file ui_transfer_list_base.c
+ * @brief ui_transfer_list_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_transfer_list_base.h"
 #include "ui_internal_mem.h"
 #include <stdlib.h>
 /* clang-format on */
 
-/*
+/**
  * @brief trigger_cva_change.
  * @param list Parameter list.
  * @return Return value.
@@ -25,7 +29,7 @@ static ui_error_t trigger_cva_change(struct ui_transfer_list_base *list) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief trigger_cva_touched.
  * @param list Parameter list.
  * @return Return value.
@@ -37,7 +41,7 @@ static ui_error_t trigger_cva_touched(struct ui_transfer_list_base *list) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief transfer_list_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -64,6 +68,13 @@ static ui_error_t transfer_list_cva_write_value(void *component,
 
 /* \brief transfer_list_cva_register_on_change
  */
+/**
+ * @brief transfer_list_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t transfer_list_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -79,6 +90,13 @@ static ui_error_t transfer_list_cva_register_on_change(
 
 /* \brief transfer_list_cva_register_on_touched
  */
+/**
+ * @brief transfer_list_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t transfer_list_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_transfer_list_base *list =
@@ -90,7 +108,7 @@ static ui_error_t transfer_list_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief transfer_list_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -135,7 +153,7 @@ ui_transfer_list_base_init(struct ui_transfer_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_transfer_list_base_add_item.
  * @param list Parameter list.
  * @param to_right Parameter to_right.
@@ -176,7 +194,7 @@ ui_error_t ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief find_item.
  * @param head Parameter head.
  * @param id Parameter id.
@@ -231,7 +249,7 @@ ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief move_items.
  * @param src_head Parameter src_head.
  * @param dst_head Parameter dst_head.
@@ -308,7 +326,7 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_transfer_list_base_move_all.
  * @param list Parameter list.
  * @param to_right Parameter to_right.
@@ -342,7 +360,7 @@ ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief free_list.
  * @param head Parameter head.
  * @return Return value.

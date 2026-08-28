@@ -64,7 +64,10 @@ extern int g_ui_timer_clock_gettime_fail;
 #endif
 
 /** @brief internal */
-enum ui_timer_type { UI_TIMER_CUSTOM, UI_TIMER_MONOTONIC };
+enum ui_timer_type {
+  UI_TIMER_CUSTOM,   /**< Custom timer type */
+  UI_TIMER_MONOTONIC /**< Monotonic timer type */
+};
 
 /**
  * @struct ui_timer

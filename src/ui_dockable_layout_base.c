@@ -1,3 +1,7 @@
+/**
+ * @file ui_dockable_layout_base.c
+ * @brief ui_dockable_layout_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_dockable_layout_base.h"
 #include "ui_component.h"
@@ -34,7 +38,7 @@ struct ui_dockable_layout_base {
   struct layout_node nodes[MAX_PANELS]; /**< Array of layout nodes */
 };
 
-/*
+/**
  * @brief ui_dockable_layout_base_create.
  * @param out_layout Parameter out_layout.
  * @return Return value.
@@ -71,7 +75,7 @@ ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dockable_layout_base_destroy.
  * @param layout Parameter layout.
  * @return Return value.
@@ -86,7 +90,7 @@ ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dockable_layout_base_get_component.
  * @param layout Parameter layout.
  * @param out_component Parameter out_component.
@@ -102,7 +106,7 @@ ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dockable_layout_base_dock_panel.
  * @param layout Parameter layout.
  * @param panel_id Parameter panel_id.
@@ -144,7 +148,7 @@ ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dockable_layout_base_remove_panel.
  * @param layout Parameter layout.
  * @param panel_id Parameter panel_id.
@@ -168,7 +172,7 @@ ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dockable_layout_base_serialize.
  * @param layout Parameter layout.
  * @param out_buffer Parameter out_buffer.
@@ -209,7 +213,7 @@ ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dockable_layout_base_deserialize.
  * @param layout Parameter layout.
  * @param buffer Parameter buffer.
@@ -257,7 +261,7 @@ ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dockable_layout_base_integrate_drag_drop.
  * @param layout Parameter layout.
  * @param drag_ctx Parameter drag_ctx.

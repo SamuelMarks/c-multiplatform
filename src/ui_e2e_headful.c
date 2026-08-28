@@ -1,3 +1,7 @@
+/**
+ * @file ui_e2e_headful.c
+ * @brief ui_e2e_headful.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_e2e_headful.h"
 #include <stdlib.h>
@@ -27,7 +31,7 @@ struct ui_e2e_headful_ctx {
   struct ui_window *window; /**< window */
 };
 
-/*
+/**
  * @brief ui_e2e_headful_create.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -55,7 +59,7 @@ ui_error_t ui_e2e_headful_create(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_e2e_headful_destroy.
  * @param ctx Parameter ctx.
  * @return Return value.
@@ -70,7 +74,7 @@ ui_error_t ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx) {
 
 #if defined(_WIN32) || defined(WIN32)
 
-/*
+/**
  * @brief map_ui_key_to_vk.
  * @param key_code Parameter key_code.
  * @return Return value.
@@ -104,7 +108,7 @@ static WORD map_ui_key_to_vk(int key_code) {
   }
 }
 
-/*
+/**
  * @brief ui_e2e_headful_click.
  * @param ctx Parameter ctx.
  * @param x Parameter x.
@@ -173,7 +177,7 @@ ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_e2e_headful_type_key.
  * @param ctx Parameter ctx.
  * @param key_code Parameter key_code.
@@ -268,7 +272,7 @@ ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
 
 #else
 
-/*
+/**
  * @brief ui_e2e_headful_click.
  * @param ctx Parameter ctx.
  * @param x Parameter x.
@@ -282,7 +286,7 @@ ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
   return UI_ERROR_UNSUPPORTED;
 }
 
-/*
+/**
  * @brief ui_e2e_headful_type_key.
  * @param ctx Parameter ctx.
  * @param key_code Parameter key_code.

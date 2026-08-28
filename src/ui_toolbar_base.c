@@ -1,6 +1,7 @@
 /**
  * @file ui_toolbar_base.c
  * @brief Implementation of the toolbar base component.
+ * @details Provides the core logic and memory management for toolbars.
  */
 /* clang-format off */
 #include "ui_toolbar_base.h"
@@ -10,7 +11,6 @@
 /* clang-format on */
 
 /**
- * @struct ui_toolbar_base
  * @struct ui_toolbar_base
  * @brief Internal implementation of the toolbar component.
  */
@@ -25,6 +25,11 @@ struct ui_toolbar_base {
   struct ui_signal *data_signal; /**< data_signal */
 };
 
+/**
+ * @brief Creates a new toolbar base instance.
+ * @param out_toolbar Pointer to receive the newly created toolbar base.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar) {
   struct ui_toolbar_base *tb;
   ui_error_t rc = UI_ERROR_NONE;
@@ -51,6 +56,11 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Destroys a toolbar base instance.
+ * @param toolbar The toolbar base to destroy.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar) {
   if (!toolbar) {
     return UI_ERROR_NONE;
@@ -62,6 +72,12 @@ ui_error_t ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the title of the toolbar.
+ * @param toolbar The toolbar base.
+ * @param title The string title to set.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
                                      const char *title) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -91,6 +107,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Gets the title of the toolbar.
+ * @param toolbar The toolbar base.
+ * @param out_title Pointer to receive the string title.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_toolbar_base_get_title(const struct ui_toolbar_base *toolbar,
                                      const char **out_title) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -106,6 +128,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Sets the layout mode of the toolbar.
+ * @param toolbar The toolbar base.
+ * @param mode The mode to set.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_toolbar_base_set_mode(struct ui_toolbar_base *toolbar,
                                     enum ui_toolbar_mode mode) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -121,6 +149,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Gets the layout mode of the toolbar.
+ * @param toolbar The toolbar base.
+ * @param out_mode Pointer to receive the mode.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_toolbar_base_get_mode(const struct ui_toolbar_base *toolbar,
                                     enum ui_toolbar_mode *out_mode) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -136,6 +170,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Sets the alignment of the toolbar.
+ * @param toolbar The toolbar base.
+ * @param alignment The alignment to set.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
                                          enum ui_toolbar_alignment alignment) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -151,6 +191,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Gets the alignment of the toolbar.
+ * @param toolbar The toolbar base.
+ * @param out_alignment Pointer to receive the alignment.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t
 ui_toolbar_base_get_alignment(const struct ui_toolbar_base *toolbar,
                               enum ui_toolbar_alignment *out_alignment) {
@@ -167,6 +213,12 @@ cleanup:
   return rc;
 }
 
+/**
+ * @brief Binds a data signal to the toolbar widget.
+ * @param widget The toolbar base.
+ * @param signal The signal to bind.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t ui_toolbar_base_bind_data(struct ui_toolbar_base *widget,
                                      struct ui_signal *signal) {
   if (!widget) {

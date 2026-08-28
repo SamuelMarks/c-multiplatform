@@ -1,3 +1,7 @@
+/**
+ * @file ui_action_sheet_base.c
+ * @brief Implementation of ui_action_sheet_base.c.
+ */
 /* clang-format off */
 #include "ui_action_sheet_base.h"
 #include "ui_focus_trap.h"
@@ -11,6 +15,12 @@
 int g_action_sheet_mock_fail = 0;
 int g_append_fail_countdown = -1;
 
+/**
+ * @brief mock_dom_node_remove_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
   if (g_action_sheet_mock_fail == 6) {
@@ -106,6 +116,13 @@ static ui_error_t mock_bottom_sheet_set_open(struct ui_bottom_sheet_base *sheet,
 /** @endcond */
 
 static ui_bottom_sheet_on_close_t captured_close_cb = NULL;
+/**
+ * @brief mock_bottom_sheet_set_on_close2.
+ * @param sheet Parameter sheet.
+ * @param cb Parameter cb.
+ * @param u Parameter u.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t
 mock_bottom_sheet_set_on_close2(struct ui_bottom_sheet_base *sheet,
                                 ui_bottom_sheet_on_close_t cb, void *u) {
@@ -142,6 +159,12 @@ static ui_error_t mock_on_close_fail(struct ui_action_sheet_base *sheet,
   (void)user_data;
   return UI_ERROR_UNKNOWN;
 }
+/**
+ * @brief mock_on_close_success.
+ * @param sheet Parameter sheet.
+ * @param user_data Parameter user_data.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_on_close_success(struct ui_action_sheet_base *sheet,
                                         void *user_data) {
   (void)sheet;
@@ -178,6 +201,12 @@ struct ui_action_sheet_base {
   void *on_close_user_data; /**< on_close_user_data */
 };
 
+/**
+ * @brief on_bottom_sheet_close.
+ * @param bs Parameter bs.
+ * @param user_data Parameter user_data.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t on_bottom_sheet_close(struct ui_bottom_sheet_base *bs,
                                         void *user_data) {
   struct ui_action_sheet_base *sheet = (struct ui_action_sheet_base *)user_data;
@@ -198,6 +227,11 @@ static ui_error_t on_bottom_sheet_close(struct ui_bottom_sheet_base *bs,
   return rc;
 }
 
+/**
+ * @brief ui_action_sheet_base_create.
+ * @param out_sheet Parameter out_sheet.
+ * @return Return value.
+ */
 ui_error_t
 ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -381,6 +415,11 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_action_sheet_base_destroy.
+ * @param sheet Parameter sheet.
+ * @return Return value.
+ */
 ui_error_t ui_action_sheet_base_destroy(struct ui_action_sheet_base *sheet) {
   ui_error_t rc = UI_ERROR_NONE;
   if (!sheet) {
@@ -409,6 +448,12 @@ ui_error_t ui_action_sheet_base_destroy(struct ui_action_sheet_base *sheet) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_action_sheet_base_add_action.
+ * @param sheet Parameter sheet.
+ * @param action_comp Parameter action_comp.
+ * @return Return value.
+ */
 ui_error_t ui_action_sheet_base_add_action(struct ui_action_sheet_base *sheet,
                                            struct ui_component *action_comp) {
   if (!sheet || !action_comp) {
@@ -418,6 +463,12 @@ ui_error_t ui_action_sheet_base_add_action(struct ui_action_sheet_base *sheet,
                                   action_comp->shadow_root);
 }
 
+/**
+ * @brief ui_action_sheet_base_set_cancel_action.
+ * @param sheet Parameter sheet.
+ * @param cancel_comp Parameter cancel_comp.
+ * @return Return value.
+ */
 ui_error_t
 ui_action_sheet_base_set_cancel_action(struct ui_action_sheet_base *sheet,
                                        struct ui_component *cancel_comp) {
@@ -439,6 +490,12 @@ ui_action_sheet_base_set_cancel_action(struct ui_action_sheet_base *sheet,
                                   cancel_comp->shadow_root);
 }
 
+/**
+ * @brief ui_action_sheet_base_set_open.
+ * @param sheet Parameter sheet.
+ * @param is_open Parameter is_open.
+ * @return Return value.
+ */
 ui_error_t ui_action_sheet_base_set_open(struct ui_action_sheet_base *sheet,
                                          int is_open) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -462,6 +519,12 @@ ui_error_t ui_action_sheet_base_set_open(struct ui_action_sheet_base *sheet,
   return ui_bottom_sheet_base_set_open(sheet->bottom_sheet, is_open);
 }
 
+/**
+ * @brief ui_action_sheet_base_is_open.
+ * @param sheet Parameter sheet.
+ * @param out_is_open Parameter out_is_open.
+ * @return Return value.
+ */
 ui_error_t
 ui_action_sheet_base_is_open(const struct ui_action_sheet_base *sheet,
                              int *out_is_open) {
@@ -471,6 +534,12 @@ ui_action_sheet_base_is_open(const struct ui_action_sheet_base *sheet,
   return ui_bottom_sheet_base_is_open(sheet->bottom_sheet, out_is_open);
 }
 
+/**
+ * @brief ui_action_sheet_base_set_overlay_director.
+ * @param sheet Parameter sheet.
+ * @param director Parameter director.
+ * @return Return value.
+ */
 ui_error_t ui_action_sheet_base_set_overlay_director(
     struct ui_action_sheet_base *sheet, struct ui_overlay_director *director) {
   if (!sheet) {
@@ -480,6 +549,13 @@ ui_error_t ui_action_sheet_base_set_overlay_director(
                                                    director);
 }
 
+/**
+ * @brief ui_action_sheet_base_set_on_close.
+ * @param sheet Parameter sheet.
+ * @param on_close Parameter on_close.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 ui_error_t
 ui_action_sheet_base_set_on_close(struct ui_action_sheet_base *sheet,
                                   ui_action_sheet_on_close_t on_close,
@@ -492,6 +568,13 @@ ui_action_sheet_base_set_on_close(struct ui_action_sheet_base *sheet,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_action_sheet_base_attach_focus_and_keyboard.
+ * @param sheet Parameter sheet.
+ * @param focus_manager Parameter focus_manager.
+ * @param keyboard_responder Parameter keyboard_responder.
+ * @return Return value.
+ */
 ui_error_t ui_action_sheet_base_attach_focus_and_keyboard(
     struct ui_action_sheet_base *sheet, struct ui_focus_manager *focus_manager,
     struct ui_keyboard_responder *keyboard_responder) {
@@ -508,6 +591,13 @@ ui_error_t ui_action_sheet_base_attach_focus_and_keyboard(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_action_sheet_base_process_event.
+ * @param sheet Parameter sheet.
+ * @param event Parameter event.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @return Return value.
+ */
 ui_error_t
 ui_action_sheet_base_process_event(struct ui_action_sheet_base *sheet,
                                    const struct ui_event *event,
@@ -543,6 +633,12 @@ ui_action_sheet_base_process_event(struct ui_action_sheet_base *sheet,
                                             timestamp_ms);
 }
 
+/**
+ * @brief ui_action_sheet_base_update.
+ * @param sheet Parameter sheet.
+ * @param timestamp_ms Parameter timestamp_ms.
+ * @return Return value.
+ */
 ui_error_t ui_action_sheet_base_update(struct ui_action_sheet_base *sheet,
                                        double timestamp_ms) {
   if (!sheet) {
@@ -551,6 +647,12 @@ ui_error_t ui_action_sheet_base_update(struct ui_action_sheet_base *sheet,
   return ui_bottom_sheet_base_update(sheet->bottom_sheet, timestamp_ms);
 }
 
+/**
+ * @brief ui_action_sheet_base_get_component.
+ * @param sheet Parameter sheet.
+ * @param out_component Parameter out_component.
+ * @return Return value.
+ */
 ui_error_t
 ui_action_sheet_base_get_component(struct ui_action_sheet_base *sheet,
                                    struct ui_component **out_component) {
@@ -560,6 +662,12 @@ ui_action_sheet_base_get_component(struct ui_action_sheet_base *sheet,
   return ui_bottom_sheet_base_get_component(sheet->bottom_sheet, out_component);
 }
 
+/**
+ * @brief ui_action_sheet_base_bind_open.
+ * @param sheet Parameter sheet.
+ * @param open_signal Parameter open_signal.
+ * @return Return value.
+ */
 ui_error_t ui_action_sheet_base_bind_open(struct ui_action_sheet_base *sheet,
                                           struct ui_signal *open_signal) {
   if (!sheet) {
@@ -568,6 +676,12 @@ ui_error_t ui_action_sheet_base_bind_open(struct ui_action_sheet_base *sheet,
   return ui_bottom_sheet_base_bind_open(sheet->bottom_sheet, open_signal);
 }
 
+/**
+ * @brief ui_action_sheet_base_get_animating_signal.
+ * @param sheet Parameter sheet.
+ * @param out_animating Parameter out_animating.
+ * @return Return value.
+ */
 ui_error_t
 ui_action_sheet_base_get_animating_signal(struct ui_action_sheet_base *sheet,
                                           struct ui_computed **out_animating) {
@@ -580,6 +694,10 @@ ui_action_sheet_base_get_animating_signal(struct ui_action_sheet_base *sheet,
 
 #ifdef UI_TEST_MOCK_ALLOC
 ui_error_t run_action_sheet_coverage(void);
+/**
+ * @brief run_action_sheet_coverage.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t run_action_sheet_coverage(void) {
   struct ui_action_sheet_base *sheet = NULL;
   struct ui_event ev;

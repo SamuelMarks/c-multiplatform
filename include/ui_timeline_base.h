@@ -5,8 +5,14 @@
 #ifndef UI_TIMELINE_BASE_H
 #define UI_TIMELINE_BASE_H
 
+/**
+ * @brief Opaque structure representing a computed value.
+ */
 struct ui_computed;
 
+/**
+ * @brief Opaque structure representing a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -27,7 +33,14 @@ enum ui_timeline_alignment {
   UI_TIMELINE_ALIGN_ALTERNATE /**< Nodes alternate left and right */
 };
 
+/**
+ * @brief Opaque structure representing a timeline base component.
+ */
 struct ui_timeline_base;
+
+/**
+ * @brief Opaque structure representing a single timeline node.
+ */
 struct ui_timeline_node;
 
 /**
@@ -43,6 +56,7 @@ ui_error_t ui_timeline_base_create(struct ui_timeline_base **out_timeline);
  * @brief Destroys a timeline base component and frees all nodes.
  *
  * @param timeline The timeline to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline);
 

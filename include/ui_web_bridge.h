@@ -20,19 +20,19 @@ extern "C" {
 
 /** \brief Opcodes for the Wasm to JS Command Buffer */
 enum ui_web_cmd {
-  CMD_CREATE_NODE = 1,
-  CMD_DESTROY_NODE,
-  CMD_SET_TEXT,
-  CMD_APPEND_CHILD,
-  CMD_INSERT_BEFORE,
-  CMD_REMOVE_CHILD,
-  CMD_SET_BOUNDS,
-  CMD_SET_STYLE,
-  CMD_SET_ARIA,
-  CMD_PUSH_STATE,
-  CMD_REPLACE_STATE,
-  CMD_SET_ATTRIBUTE,
-  CMD_SET_PROPERTY
+  CMD_CREATE_NODE = 1, /**< Create a DOM node */
+  CMD_DESTROY_NODE,    /**< Destroy a DOM node */
+  CMD_SET_TEXT,        /**< Set text content of a DOM node */
+  CMD_APPEND_CHILD,    /**< Append a child to a DOM node */
+  CMD_INSERT_BEFORE,   /**< Insert a child before another DOM node */
+  CMD_REMOVE_CHILD,    /**< Remove a child from a DOM node */
+  CMD_SET_BOUNDS,      /**< Set bounding box of a DOM node */
+  CMD_SET_STYLE,       /**< Set style of a DOM node */
+  CMD_SET_ARIA,        /**< Set ARIA attributes of a DOM node */
+  CMD_PUSH_STATE,      /**< Push history state */
+  CMD_REPLACE_STATE,   /**< Replace history state */
+  CMD_SET_ATTRIBUTE,   /**< Set attribute of a DOM node */
+  CMD_SET_PROPERTY     /**< Set property of a DOM node */
 };
 
 /**

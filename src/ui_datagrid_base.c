@@ -1,3 +1,7 @@
+/**
+ * @file ui_datagrid_base.c
+ * @brief ui_datagrid_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_datagrid_base.h"
 #include "ui_internal_mem.h"
@@ -5,6 +9,7 @@
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief Default CSS stylesheet for datagrid base component */
 static const char *ui_datagrid_base_default_css = ".datagrid-container { "
                                                   "display: grid; "
                                                   "overflow: auto; "
@@ -23,7 +28,7 @@ struct ui_datagrid_base {
   struct ui_computed *data_signal; /**< data_signal */
 };
 
-/*
+/**
  * @brief ui_datagrid_base_create.
  * @param out_datagrid Parameter out_datagrid.
  * @return Return value.
@@ -95,7 +100,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_datagrid_base_destroy.
  * @param datagrid Parameter datagrid.
  * @return Return value.
@@ -109,7 +114,7 @@ ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_datagrid_base_get_component.
  * @param datagrid Parameter datagrid.
  * @param out_component Parameter out_component.
@@ -124,7 +129,7 @@ ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_datagrid_base_resize_column.
  * @param datagrid Parameter datagrid.
  * @param col_index Parameter col_index.
@@ -141,7 +146,7 @@ ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_datagrid_base_move_focus.
  * @param datagrid Parameter datagrid.
  * @param row_delta Parameter row_delta.
@@ -158,7 +163,7 @@ ui_error_t ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_datagrid_base_bind_data.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

@@ -1,8 +1,12 @@
+/**
+ * @file ui_video_player_base.c
+ * @brief ui_video_player_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_video_player_base.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_video_player_base_init.
  * @param player Parameter player.
  * @param component Parameter component.
@@ -37,7 +41,7 @@ ui_video_player_base_toggle_play(struct ui_video_player_base *player) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_video_player_base_seek.
  * @param player Parameter player.
  * @param time Parameter time.
@@ -81,7 +85,7 @@ ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_video_player_base_bind_src.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

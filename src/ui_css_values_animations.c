@@ -1,3 +1,13 @@
+/**
+ * @file ui_css_values_animations.c
+ * @brief ui_css_values_animations.c implementation.
+ */
+/**
+ * @brief Parses a CSS transition property value.
+ * @param str The string to parse.
+ * @param out_transitions Pointer to receive the parsed transition linked list.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_css_parse_transition(const char *str,
                                    struct ui_css_transition **out_transitions) {
   struct ui_css_transition *head = NULL;
@@ -162,7 +172,7 @@ ui_error_t ui_css_parse_transition(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_animation_destroy.
  * @param animations Parameter animations.
  * @return Return value.
@@ -176,7 +186,7 @@ ui_error_t ui_css_animation_destroy(struct ui_css_animation *animations) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_animation.
  * @param str Parameter str.
  * @param out_animations Parameter out_animations.

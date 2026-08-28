@@ -1,3 +1,7 @@
+/**
+ * @file ui_window_backend_linux_wayland.c
+ * @brief ui_window_backend_linux_wayland.c implementation.
+ */
 #if defined(__linux__) || defined(__FreeBSD__)
 
 /* clang-format off */
@@ -51,7 +55,7 @@ struct ui_window {
   int has_pending_event;         /**< has_pending_event */
 };
 
-/*
+/**
  * @brief log_xdg_toplevel_configure.
  * @param data Parameter data.
  * @param xdg_toplevel Parameter xdg_toplevel.
@@ -83,7 +87,7 @@ static ui_error_t log_xdg_toplevel_configure(void *data,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief log_xdg_toplevel_close.
  * @param data Parameter data.
  * @param xdg_toplevel Parameter xdg_toplevel.
@@ -99,7 +103,7 @@ static ui_error_t log_xdg_toplevel_close(void *data,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief log_xdg_toplevel_configure_bounds.
  * @param data Parameter data.
  * @param xdg_toplevel Parameter xdg_toplevel.
@@ -117,7 +121,7 @@ log_xdg_toplevel_configure_bounds(void *data, struct xdg_toplevel *xdg_toplevel,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief log_xdg_toplevel_wm_capabilities.
  * @param data Parameter data.
  * @param xdg_toplevel Parameter xdg_toplevel.
@@ -137,7 +141,7 @@ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
     log_xdg_toplevel_configure, log_xdg_toplevel_close,
     log_xdg_toplevel_configure_bounds, log_xdg_toplevel_wm_capabilities};
 
-/*
+/**
  * @brief log_xdg_surface_configure.
  * @param data Parameter data.
  * @param xdg_surface Parameter xdg_surface.
@@ -156,7 +160,7 @@ static ui_error_t log_xdg_surface_configure(void *data,
 static const struct xdg_surface_listener xdg_surface_listener = {
     log_xdg_surface_configure};
 
-/*
+/**
  * @brief log_xdg_wm_base_ping.
  * @param data Parameter data.
  * @param xdg_wm_base Parameter xdg_wm_base.
@@ -174,7 +178,7 @@ static ui_error_t log_xdg_wm_base_ping(void *data,
 static const struct xdg_wm_base_listener xdg_wm_base_listener = {
     log_xdg_wm_base_ping};
 
-/*
+/**
  * @brief log_registry_handler.
  * @param data Parameter data.
  * @param registry Parameter registry.
@@ -199,7 +203,7 @@ static ui_error_t log_registry_handler(void *data, struct wl_registry *registry,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief log_registry_remover.
  * @param data Parameter data.
  * @param registry Parameter registry.
@@ -217,7 +221,7 @@ static ui_error_t log_registry_remover(void *data, struct wl_registry *registry,
 static const struct wl_registry_listener registry_listener = {
     log_registry_handler, log_registry_remover};
 
-/*
+/**
  * @brief linux_create_window.
  * @param backend Parameter backend.
  * @param title Parameter title.
@@ -352,7 +356,7 @@ cleanup:
   return UI_ERROR_UNKNOWN;
 }
 
-/*
+/**
  * @brief linux_destroy_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -402,7 +406,7 @@ static ui_error_t linux_destroy_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_show_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -416,7 +420,7 @@ static ui_error_t linux_show_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_hide_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -430,7 +434,7 @@ static ui_error_t linux_hide_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_poll_events.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -460,7 +464,7 @@ static ui_error_t linux_poll_events(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_swap_buffers.
  * @param backend Parameter backend.
  * @param window Parameter window.

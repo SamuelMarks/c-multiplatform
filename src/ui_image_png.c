@@ -1,9 +1,13 @@
+/**
+ * @file ui_image_png.c
+ * @brief ui_image_png.c implementation.
+ */
 /* clang-format off */
 #include "ui_image_decoder.h"
 #include "ui_error.h"
 /* clang-format on */
 
-/*
+/**
  * @brief png_supports_format.
  * @param format Parameter format.
  * @param out_supported Parameter out_supported.
@@ -15,7 +19,7 @@ static ui_error_t png_supports_format(enum ui_image_format format,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief png_decode_memory.
  * @param data Parameter data.
  * @param size Parameter size.
@@ -37,7 +41,7 @@ static ui_error_t png_decode_memory(const void *data, size_t size,
   return UI_ERROR_UNKNOWN; /* TODO: Implement actual C89 PNG decoding */
 }
 
-/*
+/**
  * @brief png_free_image.
  * @param image Parameter image.
  * @return Return value.
@@ -50,5 +54,6 @@ static ui_error_t png_free_image(struct ui_image *image) {
   return UI_ERROR_NONE;
 }
 
+/** @brief PNG decoder backend */
 struct ui_image_decoder_backend ui_image_decoder_png = {
     png_supports_format, png_decode_memory, png_free_image};

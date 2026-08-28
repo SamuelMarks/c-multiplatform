@@ -1,3 +1,7 @@
+/**
+ * @file ui_router.c
+ * @brief ui_router.c implementation.
+ */
 /*
  * \file ui_router.c
  * \brief Implementation of the UI Router component.
@@ -26,6 +30,9 @@
 /* clang-format on */
 
 /* \brief Initial capacity for router stacks and route arrays */
+/** @def UI_ROUTER_INITIAL_CAPACITY
+ * @brief Initial capacity for router
+ */
 #define UI_ROUTER_INITIAL_CAPACITY 8
 
 /**
@@ -74,11 +81,16 @@ struct ui_router {
   size_t routes_size;      /**< Current number of routes */
 };
 
-/*
+/**
  * \brief Frees a route request and its parameters.
  *
  * \param req The request to free.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief request_free.
+ * @param req Parameter req.
+ * @return Return value.
  */
 static ui_error_t request_free(struct ui_route_request *req) {
   size_t i;
@@ -108,13 +120,20 @@ static ui_error_t request_free(struct ui_route_request *req) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Copies a string up to n characters safely.
  *
  * \param src Source string.
  * \param n Max characters to copy.
  * \param out_str Pointer to receive the allocated string.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief internal_strndup.
+ * @param src Parameter src.
+ * @param n Parameter n.
+ * @param out_str Parameter out_str.
+ * @return Return value.
  */
 static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
   char *copy;
@@ -137,7 +156,7 @@ static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Appends a key-value pair to a parameter array.
  *
  * \param params Pointer to the array of parameters.
@@ -147,6 +166,16 @@ static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
  * \param value Value string.
  * \param val_len Length of value string.
  * \return 1 on success, 0 on failure.
+ */
+/**
+ * @brief add_param.
+ * @param params Parameter params.
+ * @param size Parameter size.
+ * @param key Parameter key.
+ * @param key_len Parameter key_len.
+ * @param value Parameter value.
+ * @param val_len Parameter val_len.
+ * @return Return value.
  */
 static int add_param(struct ui_route_param **params, size_t *size,
                      const char *key, size_t key_len, const char *value,
@@ -197,7 +226,7 @@ static int add_param(struct ui_route_param **params, size_t *size,
   return 1;
 }
 
-/*
+/**
  * \brief Matches a URL against a route pattern, extracting parameters.
  *
  * \param pattern The route pattern.
@@ -205,6 +234,14 @@ static int add_param(struct ui_route_param **params, size_t *size,
  * \param out_req Pointer to receive the populated request if matched.
  * \param out_match Set to 1 if matched, 0 otherwise.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief match_route.
+ * @param pattern Parameter pattern.
+ * @param url Parameter url.
+ * @param out_req Parameter out_req.
+ * @param out_match Parameter out_match.
+ * @return Return value.
  */
 static ui_error_t match_route(const char *pattern, const char *url,
                               struct ui_route_request **out_req,
@@ -320,7 +357,7 @@ static ui_error_t match_route(const char *pattern, const char *url,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets a path parameter (e.g. from "/settings/:id") by name.
  *
  * \param req The route request.
@@ -345,7 +382,7 @@ ui_error_t ui_route_request_get_param(const struct ui_route_request *req,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets a query string parameter (e.g. from "?tab=2") by name.
  *
  * \param req The route request.
@@ -370,7 +407,7 @@ ui_error_t ui_route_request_get_query(const struct ui_route_request *req,
   return UI_ERROR_NOT_FOUND;
 }
 
-/*
+/**
  * \brief Gets the exact path string that was requested (excluding query
  * string).
  *
@@ -386,7 +423,7 @@ ui_error_t ui_route_request_get_path(const struct ui_route_request *req,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the custom state pointer passed during navigation.
  *
  * \param req The route request.
@@ -401,7 +438,7 @@ ui_error_t ui_route_request_get_state(const struct ui_route_request *req,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new screen manager (router) navigation stack.
  *
  * \param out_router Pointer to receive the allocated router.
@@ -444,7 +481,7 @@ ui_error_t ui_router_create(struct ui_router **out_router) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a router and all screens in its stack.
  *
  * \param router The router to destroy.
@@ -472,7 +509,7 @@ ui_error_t ui_router_destroy(struct ui_router *router) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Registers a route pattern mapping to a screen factory.
  *
  * \param router The router instance.
@@ -526,7 +563,7 @@ ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Navigates to a specific URL with an optional state payload.
  *
  * \param router The router instance.
@@ -582,7 +619,7 @@ ui_error_t ui_router_navigate_with_state(struct ui_router *router,
   return UI_ERROR_NOT_FOUND;
 }
 
-/*
+/**
  * \brief Navigates to a specific URL by matching it against registered routes
  * and pushing the resulting screen.
  *
@@ -595,7 +632,7 @@ ui_error_t ui_router_navigate(struct ui_router *router, const char *path) {
   return ui_router_navigate_with_state(router, path, NULL);
 }
 
-/*
+/**
  * \brief Pushes a new screen component onto the navigation stack.
  *
  * \param router The router.
@@ -630,7 +667,7 @@ ui_error_t ui_router_push(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Pops the top screen from the navigation stack and destroys it.
  *
  * \param router The router.
@@ -652,7 +689,7 @@ ui_error_t ui_router_pop(struct ui_router *router) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Replaces the current top screen with a new screen component.
  *
  * \param router The router.
@@ -675,7 +712,7 @@ ui_error_t ui_router_replace(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the current top screen from the navigation stack.
  *
  * \param router The router.
@@ -697,7 +734,7 @@ ui_error_t ui_router_get_current(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Processes an OS event, looking for deep link events to automatically
  * navigate.
  *
@@ -719,7 +756,7 @@ ui_error_t ui_router_process_event(struct ui_router *router,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Installs OS-level integration for the router (e.g., HTML5 History API
  * for Emscripten).
  *

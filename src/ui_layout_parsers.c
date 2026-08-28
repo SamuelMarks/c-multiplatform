@@ -1,8 +1,18 @@
+/**
+ * @file ui_layout_parsers.c
+ * @brief ui_layout_parsers.c implementation.
+ */
 
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
 
+/**
+ * @brief resolve_length.
+ * @param val_str Parameter val_str.
+ * @param out_length Parameter out_length.
+ * @return Return value.
+ */
 static ui_error_t resolve_length(const char *val_str, float *out_length) {
   struct ui_css_value val;
   *out_length = 0.0f;
@@ -33,6 +43,12 @@ static ui_error_t resolve_length(const char *val_str, float *out_length) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_break.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_break(const char *val, enum ui_layout_break *out_val) {
   if (strcmp(val, "avoid") == 0) {
     *out_val = UI_LAYOUT_BREAK_AVOID;
@@ -92,6 +108,13 @@ static ui_error_t parse_break(const char *val, enum ui_layout_break *out_val) {
   }
 }
 
+/**
+ * @brief resolve_size.
+ * @param val_str Parameter val_str.
+ * @param out_length Parameter out_length.
+ * @param out_type Parameter out_type.
+ * @return Return value.
+ */
 static ui_error_t resolve_size(const char *val_str, float *out_length,
                                enum ui_layout_size_type *out_type) {
   *out_length = 0.0f;
@@ -119,6 +142,12 @@ static ui_error_t resolve_size(const char *val_str, float *out_length,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_shorthand_4.
+ * @param shorthand Parameter shorthand.
+ * @param out_metrics Parameter out_metrics.
+ * @return Return value.
+ */
 static ui_error_t parse_shorthand_4(const char *shorthand,
                                     float out_metrics[4]) {
   const char *p = shorthand;
@@ -174,6 +203,12 @@ static ui_error_t parse_shorthand_4(const char *shorthand,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_overflow.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_overflow(const char *val,
                                  enum ui_layout_overflow *out_val) {
   if (strcmp(val, "hidden") == 0) {
@@ -194,6 +229,12 @@ static ui_error_t parse_overflow(const char *val,
   }
 }
 
+/**
+ * @brief parse_wrap_flow.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_wrap_flow(const char *val,
                                   enum ui_layout_wrap_flow *out_val) {
   if (local_strcmp(val, "auto") == 0) {
@@ -230,6 +271,12 @@ static ui_error_t parse_wrap_flow(const char *val,
   }
 }
 
+/**
+ * @brief parse_wrap_through.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_wrap_through(const char *val,
                                      enum ui_layout_wrap_through *out_val) {
   if (strcmp(val, "wrap") == 0) {
@@ -246,6 +293,12 @@ static ui_error_t parse_wrap_through(const char *val,
   }
 }
 
+/**
+ * @brief parse_white_space.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_white_space(const char *val,
                                     enum ui_layout_white_space *out_val) {
   if (local_strcmp(val, "normal") == 0) {
@@ -278,6 +331,12 @@ static ui_error_t parse_white_space(const char *val,
   }
 }
 
+/**
+ * @brief parse_text_align.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_text_align(const char *val,
                                    enum ui_layout_text_align *out_val) {
   if (strcmp(val, "start") == 0) {
@@ -318,6 +377,12 @@ static ui_error_t parse_text_align(const char *val,
   }
 }
 
+/**
+ * @brief parse_word_break.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_word_break(const char *val,
                                    enum ui_layout_word_break *out_val) {
   if (local_strcmp(val, "normal") == 0) {
@@ -342,6 +407,12 @@ static ui_error_t parse_word_break(const char *val,
   }
 }
 
+/**
+ * @brief parse_hyphens.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_hyphens(const char *val,
                                 enum ui_layout_hyphens *out_val) {
   if (local_strcmp(val, "none") == 0) {
@@ -362,6 +433,12 @@ static ui_error_t parse_hyphens(const char *val,
   }
 }
 
+/**
+ * @brief parse_writing_mode.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_writing_mode(const char *val,
                                      enum ui_layout_writing_mode *out_val) {
   if (strcmp(val, "horizontal-tb") == 0) {
@@ -382,6 +459,12 @@ static ui_error_t parse_writing_mode(const char *val,
   }
 }
 
+/**
+ * @brief parse_direction.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_direction(const char *val,
                                   enum ui_layout_direction *out_val) {
   if (strcmp(val, "ltr") == 0) {
@@ -398,6 +481,12 @@ static ui_error_t parse_direction(const char *val,
   }
 }
 
+/**
+ * @brief parse_unicode_bidi.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_unicode_bidi(const char *val,
                                      enum ui_layout_unicode_bidi *out_val) {
   if (local_strcmp(val, "normal") == 0) {
@@ -430,6 +519,12 @@ static ui_error_t parse_unicode_bidi(const char *val,
   }
 }
 
+/**
+ * @brief parse_line_grid.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_line_grid(const char *val,
                                   enum ui_layout_line_grid *out_val) {
   if (strcmp(val, "create") == 0) {
@@ -442,6 +537,12 @@ static ui_error_t parse_line_grid(const char *val,
   }
 }
 
+/**
+ * @brief parse_line_snap.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_line_snap(const char *val,
                                   enum ui_layout_line_snap *out_val) {
   if (strcmp(val, "baseline") == 0) {
@@ -458,6 +559,12 @@ static ui_error_t parse_line_snap(const char *val,
   }
 }
 
+/**
+ * @brief parse_box_snap.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_box_snap(const char *val,
                                  enum ui_layout_box_snap *out_val) {
   if (strcmp(val, "block-start") == 0) {
@@ -483,6 +590,12 @@ static ui_error_t parse_box_snap(const char *val,
 }
 
 static ui_error_t
+/**
+ * @brief parse_block_step_insert.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_block_step_insert(const char *val,
                         enum ui_layout_block_step_insert *out_val) {
   if (strcmp(val, "padding") == 0) {
@@ -496,6 +609,12 @@ parse_block_step_insert(const char *val,
 }
 
 static ui_error_t
+/**
+ * @brief parse_block_step_align.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_block_step_align(const char *val,
                        enum ui_layout_block_step_align *out_val) {
   if (strcmp(val, "center") == 0) {
@@ -517,6 +636,12 @@ parse_block_step_align(const char *val,
 }
 
 static ui_error_t
+/**
+ * @brief parse_block_step_round.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_block_step_round(const char *val,
                        enum ui_layout_block_step_round *out_val) {
   if (strcmp(val, "down") == 0) {
@@ -533,6 +658,12 @@ parse_block_step_round(const char *val,
   }
 }
 
+/**
+ * @brief parse_color_scheme.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_color_scheme(const char *val,
                                      enum ui_layout_color_scheme *out_val) {
   int mask = UI_LAYOUT_COLOR_SCHEME_NORMAL;
@@ -551,6 +682,12 @@ static ui_error_t parse_color_scheme(const char *val,
 }
 
 static ui_error_t
+/**
+ * @brief parse_print_color_adjust.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_print_color_adjust(const char *val,
                          enum ui_layout_print_color_adjust *out_val) {
   if (strcmp(val, "exact") == 0) {
@@ -564,6 +701,12 @@ parse_print_color_adjust(const char *val,
 }
 
 static ui_error_t
+/**
+ * @brief parse_forced_color_adjust.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_forced_color_adjust(const char *val,
                           enum ui_layout_forced_color_adjust *out_val) {
   if (local_strcmp(val, "none") == 0) {
@@ -581,6 +724,12 @@ parse_forced_color_adjust(const char *val,
 }
 
 static ui_error_t
+/**
+ * @brief parse_text_orientation.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_text_orientation(const char *val,
                        enum ui_layout_text_orientation *out_val) {
   if (strcmp(val, "mixed") == 0) {
@@ -601,6 +750,12 @@ parse_text_orientation(const char *val,
   }
 }
 
+/**
+ * @brief parse_text_decoration_line.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_text_decoration_line(const char *val, int *out_val) {
   int mask = UI_LAYOUT_TEXT_DECORATION_LINE_NONE;
   if (local_strcmp(val, "none") == 0) {
@@ -622,6 +777,12 @@ static ui_error_t parse_text_decoration_line(const char *val, int *out_val) {
 }
 
 static ui_error_t
+/**
+ * @brief parse_text_decoration_style.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_text_decoration_style(const char *val,
                             enum ui_layout_text_decoration_style *out_val) {
   if (strcmp(val, "double") == 0) {
@@ -646,6 +807,12 @@ parse_text_decoration_style(const char *val,
   }
 }
 
+/**
+ * @brief parse_font_style.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_font_style(const char *val,
                                    enum ui_layout_font_style *out_val) {
   if (strcmp(val, "italic") == 0) {
@@ -662,6 +829,12 @@ static ui_error_t parse_font_style(const char *val,
   }
 }
 
+/**
+ * @brief parse_font_stretch.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_font_stretch(const char *val,
                                      enum ui_layout_font_stretch *out_val) {
   if (strcmp(val, "ultra-condensed") == 0) {
@@ -702,6 +875,12 @@ static ui_error_t parse_font_stretch(const char *val,
   }
 }
 
+/**
+ * @brief parse_font_weight.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_font_weight(const char *val, int *out_val) {
   if (local_strcmp(val, "normal") == 0) {
     *out_val = 400;
@@ -726,6 +905,12 @@ static ui_error_t parse_font_weight(const char *val, int *out_val) {
 }
 
 static ui_error_t
+/**
+ * @brief parse_text_size_adjust.
+ * @param val Parameter val.
+ * @param out_adjust Parameter out_adjust.
+ * @return Return value.
+ */
 parse_text_size_adjust(const char *val,
                        struct ui_layout_text_size_adjust *out_adjust) {
   struct ui_css_value parsed_val;
@@ -751,6 +936,12 @@ parse_text_size_adjust(const char *val,
 }
 
 static ui_error_t
+/**
+ * @brief parse_background_repeat_single.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_background_repeat_single(const char *val,
                                enum ui_layout_background_repeat *out_val) {
   if (strcmp(val, "repeat") == 0) {
@@ -776,6 +967,12 @@ parse_background_repeat_single(const char *val,
 }
 
 static ui_error_t
+/**
+ * @brief parse_background_size.
+ * @param val Parameter val.
+ * @param out_size Parameter out_size.
+ * @return Return value.
+ */
 parse_background_size(const char *val,
                       struct ui_layout_background_size *out_size) {
   out_size->type_x = UI_LAYOUT_BACKGROUND_SIZE_AUTO;
@@ -806,6 +1003,12 @@ parse_background_size(const char *val,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_border_radius.
+ * @param val Parameter val.
+ * @param out_radius Parameter out_radius.
+ * @return Return value.
+ */
 static ui_error_t parse_border_radius(const char *val, float out_radius[4][2]) {
   int i;
   float r = 0.0f;
@@ -822,6 +1025,12 @@ static ui_error_t parse_border_radius(const char *val, float out_radius[4][2]) {
 }
 
 static ui_error_t
+/**
+ * @brief parse_box_decoration_break.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 parse_box_decoration_break(const char *val,
                            enum ui_layout_box_decoration_break *out_val) {
   if (strcmp(val, "clone") == 0) {
@@ -834,6 +1043,13 @@ parse_box_decoration_break(const char *val,
   }
 }
 
+/**
+ * @brief parse_box_shadow.
+ * @param val Parameter val.
+ * @param shadows Parameter shadows.
+ * @param count Parameter count.
+ * @return Return value.
+ */
 static ui_error_t parse_box_shadow(const char *val,
                                    struct ui_layout_box_shadow *shadows,
                                    int *count) {
@@ -859,6 +1075,13 @@ static ui_error_t parse_box_shadow(const char *val,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief parse_alignment.
+ * @param val Parameter val.
+ * @param default_val Parameter default_val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_alignment(const char *val,
                                   enum ui_layout_alignment default_val,
                                   enum ui_layout_alignment *out_val) {
@@ -904,6 +1127,12 @@ static ui_error_t parse_alignment(const char *val,
   }
 }
 
+/**
+ * @brief parse_flex_direction.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_flex_direction(const char *val,
                                        enum ui_layout_flex_direction *out_val) {
   if (strcmp(val, "row-reverse") == 0) {
@@ -924,6 +1153,12 @@ static ui_error_t parse_flex_direction(const char *val,
   }
 }
 
+/**
+ * @brief parse_flex_wrap.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_flex_wrap(const char *val,
                                   enum ui_layout_flex_wrap *out_val) {
   if (strcmp(val, "wrap") == 0) {
@@ -940,6 +1175,12 @@ static ui_error_t parse_flex_wrap(const char *val,
   }
 }
 
+/**
+ * @brief parse_margin_trim.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_margin_trim(const char *val,
                                     enum ui_layout_margin_trim *out_val) {
   if (strcmp(val, "block") == 0) {
@@ -976,6 +1217,12 @@ static ui_error_t parse_margin_trim(const char *val,
   }
 }
 
+/**
+ * @brief parse_aspect_ratio.
+ * @param val Parameter val.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t parse_aspect_ratio(const char *val, float *out_val) {
   float w = 1.0f, h = 1.0f;
   const char *slash;

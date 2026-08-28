@@ -18,13 +18,13 @@ extern "C" {
  * @brief Represents different types of haptic feedback for OS integration.
  */
 enum ui_haptic_feedback_type {
-  UI_HAPTIC_FEEDBACK_LIGHT,
-  UI_HAPTIC_FEEDBACK_MEDIUM,
-  UI_HAPTIC_FEEDBACK_HEAVY,
-  UI_HAPTIC_FEEDBACK_SUCCESS,
-  UI_HAPTIC_FEEDBACK_WARNING,
-  UI_HAPTIC_FEEDBACK_ERROR,
-  UI_HAPTIC_FEEDBACK_SELECTION
+  UI_HAPTIC_FEEDBACK_LIGHT,    /**< Light haptic feedback */
+  UI_HAPTIC_FEEDBACK_MEDIUM,   /**< Medium haptic feedback */
+  UI_HAPTIC_FEEDBACK_HEAVY,    /**< Heavy haptic feedback */
+  UI_HAPTIC_FEEDBACK_SUCCESS,  /**< Success haptic feedback */
+  UI_HAPTIC_FEEDBACK_WARNING,  /**< Warning haptic feedback */
+  UI_HAPTIC_FEEDBACK_ERROR,    /**< Error haptic feedback */
+  UI_HAPTIC_FEEDBACK_SELECTION /**< Selection haptic feedback */
 };
 
 /**

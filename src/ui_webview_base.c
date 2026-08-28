@@ -90,6 +90,12 @@ ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief duplicate_string.
+ * @param str Parameter str.
+ * @param out_copy Parameter out_copy.
+ * @return Return value.
+ */
 static ui_error_t duplicate_string(const char *str, char **out_copy) {
   size_t len;
   char *dup;

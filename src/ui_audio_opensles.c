@@ -11,7 +11,7 @@
 #if defined(__ANDROID__)
 /* OpenSL ES implementation stub */
 
-/*
+/**
  * @brief Retrieves the default OpenSL ES audio sink backend.
  *
  * @param out_backend Pointer to the backend structure to populate.

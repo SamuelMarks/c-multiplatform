@@ -45,6 +45,7 @@ ui_error_t ui_icon_base_create(struct ui_icon_base **out_icon);
  * @brief Destroys an icon base component and frees all resources.
  *
  * @param icon The icon to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_icon_base_destroy(struct ui_icon_base *icon);
 

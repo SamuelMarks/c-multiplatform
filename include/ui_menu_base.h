@@ -6,6 +6,9 @@
 #ifndef UI_MENU_BASE_H
 #define UI_MENU_BASE_H
 
+/**
+ * @brief Opaque structure representing a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -19,6 +22,9 @@ extern "C" {
 #include "ui_overlay_director.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a menu base component.
+ */
 struct ui_menu_base;
 
 /**
@@ -27,6 +33,7 @@ struct ui_menu_base;
  * @param menu The menu component.
  * @param item_id The unique identifier of the triggered item.
  * @param user_data Opaque user data.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_menu_on_action_t)(struct ui_menu_base *menu,
                                           const char *item_id, void *user_data);
@@ -43,6 +50,7 @@ ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu);
  * @brief Destroys a menu component.
  *
  * @param menu The menu component to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu);
 

@@ -14,6 +14,12 @@
 int g_asset_streamer_mock_fail = 0;
 extern int g_malloc_fail_countdown;
 
+/**
+ * @brief mock_promise_resolve.
+ * @param promise Parameter promise.
+ * @param value Parameter value.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_promise_resolve(struct ui_promise *promise,
                                        void *value) {
   if (g_asset_streamer_mock_fail == 1) {
@@ -106,6 +112,13 @@ struct ui_asset_task {
   ui_error_t error;           /**< The resulting error code, if any */
 };
 
+/**
+ * @brief ui_asset_streamer_create.
+ * @param pool Parameter pool.
+ * @param ctx Parameter ctx.
+ * @param out_streamer Parameter out_streamer.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_asset_streamer_create(struct ui_thread_pool *pool,
                                     struct ui_execution_context *ctx,
                                     struct ui_asset_streamer **out_streamer) {
@@ -128,6 +141,11 @@ ui_error_t ui_asset_streamer_create(struct ui_thread_pool *pool,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_asset_streamer_destroy.
+ * @param streamer Parameter streamer.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_asset_streamer_destroy(struct ui_asset_streamer *streamer) {
   if (!streamer) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -136,6 +154,11 @@ ui_error_t ui_asset_streamer_destroy(struct ui_asset_streamer *streamer) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_asset_destroy.
+ * @param asset Parameter asset.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_asset_destroy(struct ui_asset *asset) {
   if (asset) {
     C_MULTIPLATFORM_FREE(asset->url);
@@ -145,6 +168,11 @@ ui_error_t ui_asset_destroy(struct ui_asset *asset) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief asset_task_complete.
+ * @param user_data Parameter user_data.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t asset_task_complete(void *user_data) {
   struct ui_asset_task *task = (struct ui_asset_task *)user_data;
   ui_error_t rc = UI_ERROR_NONE;
@@ -166,6 +194,11 @@ static ui_error_t asset_task_complete(void *user_data) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief asset_task_execute.
+ * @param user_data Parameter user_data.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t asset_task_execute(void *user_data) {
   struct ui_asset_task *task = (struct ui_asset_task *)user_data;
   FILE *f = NULL;
@@ -277,6 +310,14 @@ cleanup:
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_asset_streamer_request.
+ * @param streamer Parameter streamer.
+ * @param url Parameter url.
+ * @param type Parameter type.
+ * @param out_promise Parameter out_promise.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_asset_streamer_request(struct ui_asset_streamer *streamer,
                                      const char *url, enum ui_asset_type type,
                                      struct ui_promise **out_promise) {
@@ -352,6 +393,10 @@ static ui_error_t asset_task_execute(void *user_data);
 static ui_error_t asset_task_complete(void *user_data);
 
 ui_error_t run_asset_streamer_coverage(void);
+/**
+ * @brief run_asset_streamer_coverage.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t run_asset_streamer_coverage(void) {
   struct ui_asset_streamer *streamer = NULL;
   struct ui_thread_pool *pool = NULL;

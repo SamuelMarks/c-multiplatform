@@ -1,3 +1,13 @@
+/**
+ * @file ui_layout_algorithms.c
+ * @brief ui_layout_algorithms.c implementation.
+ */
+/**
+ * @brief layout_block.
+ * @param node Parameter node.
+ * @param available_width Parameter available_width.
+ * @return Return value.
+ */
 static ui_error_t layout_block(struct ui_layout_node *node,
                                float available_width) {
   struct ui_layout_node *child;
@@ -228,11 +238,17 @@ struct ui_flex_line {
   int child_count;                    /**< child_count */
 };
 
-/*
+/**
  * \brief Computes flexbox layout for a node and its children.
  * \param[in,out] node The flex container node.
  * \param[in] available_width The width available for this flex container.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief layout_flex.
+ * @param node Parameter node.
+ * @param available_width Parameter available_width.
+ * @return Return value.
  */
 static ui_error_t layout_flex(struct ui_layout_node *node,
                               float available_width) {
@@ -493,7 +509,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Solves the layout for the entire viewport starting from the root.
  * \param[in,out] root The root layout node.
  * \param[in] window_width The width of the viewport window.

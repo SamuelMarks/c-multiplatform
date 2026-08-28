@@ -1,6 +1,10 @@
-/*
- * \file ui_form_builder.c
- * \brief Implementation of the UI form builder utility.
+/**
+ * @file ui_form_builder.c
+ * @brief ui_form_builder.c implementation.
+ */
+/**
+ * @file ui_form_builder.c
+ * @brief Implementation of the UI form builder utility.
  */
 /* clang-format off */
 #include "ui_form_builder.h"
@@ -13,16 +17,15 @@
 /* MSVC Safe CRT */
 #endif
 
-/*
- * \def MAX_BUILDER_DEPTH
- * \brief Maximum depth for the form builder stack.
+/** @def MAX_BUILDER_DEPTH
+ * @brief Maximum builder stack depth
  */
+
 #define MAX_BUILDER_DEPTH 32
 
 /**
  * @struct ui_form_builder
- * \struct ui_form_builder
- * \brief Context for fluently building complex form structures.
+ * @brief Context for fluently building complex form structures.
  */
 struct ui_form_builder {
   struct ui_arena *arena; /**< arena */
@@ -34,11 +37,11 @@ struct ui_form_builder {
   ui_form_group_t *root_group; /**< root_group */
 };
 
-/*
- * \brief Creates a new form builder.
- * \param[in,out] arena The memory arena.
- * \param[out] out_builder Pointer to store the created builder.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new form builder.
+ * @param[in,out] arena The memory arena.
+ * @param[out] out_builder Pointer to store the created builder.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_builder_create(struct ui_arena *arena,
                                   ui_form_builder_t **out_builder) {
@@ -58,11 +61,11 @@ ui_error_t ui_form_builder_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Starts a new form group in the builder.
- * \param[in,out] builder The form builder.
- * \param[in] name The name of the group.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Starts a new form group in the builder.
+ * @param[in,out] builder The form builder.
+ * @param[in] name The name of the group.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_builder_group_start(ui_form_builder_t *builder,
                                        const char *name) {
@@ -111,10 +114,10 @@ ui_error_t ui_form_builder_group_start(ui_form_builder_t *builder,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Ends the current form group in the builder.
- * \param[in,out] builder The form builder.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Ends the current form group in the builder.
+ * @param[in,out] builder The form builder.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_builder_group_end(ui_form_builder_t *builder) {
   if (!builder)
@@ -128,11 +131,11 @@ ui_error_t ui_form_builder_group_end(ui_form_builder_t *builder) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Starts a new form array in the builder.
- * \param[in,out] builder The form builder.
- * \param[in] name The name of the array.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Starts a new form array in the builder.
+ * @param[in,out] builder The form builder.
+ * @param[in] name The name of the array.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_builder_array_start(ui_form_builder_t *builder,
                                        const char *name) {
@@ -170,10 +173,10 @@ ui_error_t ui_form_builder_array_start(ui_form_builder_t *builder,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Ends the current form array in the builder.
- * \param[in,out] builder The form builder.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Ends the current form array in the builder.
+ * @param[in,out] builder The form builder.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_builder_array_end(ui_form_builder_t *builder) {
   if (!builder)
@@ -187,12 +190,19 @@ ui_error_t ui_form_builder_array_end(ui_form_builder_t *builder) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief A dummy equality function for builder-created controls.
- * \param[in] a The first payload.
- * \param[in] b The second payload.
- * \param[out] out_equal Pointer to store the equality result.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief A dummy equality function for builder-created controls.
+ * @param[in] a The first payload.
+ * @param[in] b The second payload.
+ * @param[out] out_equal Pointer to store the equality result.
+ * @return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief dummy_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
  */
 static ui_error_t dummy_equality(union ui_signal_payload a,
                                  union ui_signal_payload b,
@@ -200,25 +210,30 @@ static ui_error_t dummy_equality(union ui_signal_payload a,
   *out_equal = (a.ptr_val == b.ptr_val);
   return UI_ERROR_NONE;
 }
-/*
- * \brief A dummy destructor function for builder-created controls.
- * \param[in] p The payload to destruct.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief A dummy destructor function for builder-created controls.
+ * @param[in] p The payload to destruct.
+ * @return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief dummy_destructor.
+ * @param p Parameter p.
+ * @return Return value.
  */
 static ui_error_t dummy_destructor(union ui_signal_payload p) {
   (void)p;
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Adds a form control to the current group or array.
- * \param[in,out] builder The form builder.
- * \param[in] name The name of the control.
- * \param[in] initial_value The initial value payload.
- * \param[in] type The signal type for the control.
- * \param[in] validator An optional validator function.
- * \param[in] user_data User data for the validator.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Adds a form control to the current group or array.
+ * @param[in,out] builder The form builder.
+ * @param[in] name The name of the control.
+ * @param[in] initial_value The initial value payload.
+ * @param[in] type The signal type for the control.
+ * @param[in] validator An optional validator function.
+ * @param[in] user_data User data for the validator.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
                                    union ui_signal_payload initial_value,
@@ -259,11 +274,11 @@ ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Finalizes the build process and returns the root form group.
- * \param[in] builder The form builder.
- * \param[out] out_root Pointer to store the root form group.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Finalizes the build process and returns the root form group.
+ * @param[in] builder The form builder.
+ * @param[out] out_root Pointer to store the root form group.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_builder_build(ui_form_builder_t *builder,
                                  ui_form_group_t **out_root) {
@@ -278,10 +293,10 @@ ui_error_t ui_form_builder_build(ui_form_builder_t *builder,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a form builder.
- * \param[in,out] builder The form builder to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a form builder.
+ * @param[in,out] builder The form builder to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_builder_destroy(ui_form_builder_t *builder) {
   if (!builder)

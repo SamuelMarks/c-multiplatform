@@ -1,3 +1,7 @@
+/**
+ * @file ui_checkbox_base.c
+ * @brief Implementation of ui_checkbox_base.c.
+ */
 #ifdef _MSC_VER
 #pragma warning(disable : 4716)
 #endif
@@ -16,7 +20,7 @@ int g_checkbox_mock_fail = 0;
 int g_checkbox_mock_target = 0;
 int g_checkbox_mock_current = 0;
 
-/*
+/**
  * @brief mock_dom_node_set_attribute.
  * @param node Parameter node.
  * @param k Parameter k.
@@ -36,7 +40,7 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
 /** @endcond */
 
-/*
+/**
  * @brief mock_dom_node_remove_attribute.
  * @param node Parameter node.
  * @param k Parameter k.
@@ -68,7 +72,7 @@ struct ui_checkbox_base {
   ui_signal_t *disabled_signal;   /**< disabled_signal */
 };
 
-/*
+/**
  * @brief update_dom_state.
  * @param checkbox Parameter checkbox.
  * @return Return value.
@@ -113,7 +117,7 @@ static ui_error_t update_dom_state(struct ui_checkbox_base *checkbox) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_checkbox_base_create.
  * @param out_checkbox Parameter out_checkbox.
  * @return Return value.
@@ -184,7 +188,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_checkbox_base_destroy.
  * @param checkbox Parameter checkbox.
  * @return Return value.
@@ -198,7 +202,7 @@ ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_checkbox_base_get_state.
  * @param checkbox Parameter checkbox.
  * @param out_state Parameter out_state.
@@ -213,7 +217,7 @@ ui_error_t ui_checkbox_base_get_state(struct ui_checkbox_base *checkbox,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_checkbox_base_set_state.
  * @param checkbox Parameter checkbox.
  * @param state Parameter state.
@@ -235,7 +239,7 @@ ui_error_t ui_checkbox_base_set_state(struct ui_checkbox_base *checkbox,
   return update_dom_state(checkbox);
 }
 
-/*
+/**
  * @brief checkbox_cva_write_value.
  * @param component Parameter component.
  * @param value Parameter value.
@@ -249,6 +253,13 @@ static ui_error_t checkbox_cva_write_value(void *component,
 }
 
 /* No change callback exposed in ui_checkbox_base.h yet! We will mock it */
+/**
+ * @brief checkbox_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t checkbox_cva_register_on_change(
     void *component, ui_error_t (*callback)(union ui_signal_payload, void *),
     void *user_data) {
@@ -260,6 +271,14 @@ static ui_error_t checkbox_cva_register_on_change(
 
 /* \brief checkbox_cva_register_on_touched
  */
+/**
+ * @brief checkbox_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param ) Parameter ).
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ * @param callback Parameter callback.
+ */
 static ui_error_t checkbox_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *), void *user_data) {
   (void)component;
@@ -268,7 +287,7 @@ static ui_error_t checkbox_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief checkbox_cva_set_disabled_state.
  * @param component Parameter component.
  * @param is_disabled Parameter is_disabled.
@@ -300,6 +319,12 @@ static ui_error_t checkbox_cva_set_disabled_state(void *component,
 
 /* \brief ui_error
  */
+/**
+ * @brief ui_checkbox_base_get_cva.
+ * @param checkbox Parameter checkbox.
+ * @param out_cva Parameter out_cva.
+ * @return Return value.
+ */
 ui_error_t ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
                                     struct ui_control_value_accessor *out_cva) {
   if (!checkbox || !out_cva)
@@ -311,7 +336,7 @@ ui_error_t ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_checkbox_base_toggle.
  * @param checkbox Parameter checkbox.
  * @return Return value.

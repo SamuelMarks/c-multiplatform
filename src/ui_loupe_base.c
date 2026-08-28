@@ -1,6 +1,10 @@
+/**
+ * @file ui_loupe_base.c
+ * @brief ui_loupe_base.c implementation.
+ */
 /*
- * \file ui_loupe_base.c
- * \brief Implementation of the UI loupe (magnifying glass) component.
+ * @file ui_loupe_base.c
+ * @brief Implementation of the UI loupe (magnifying glass) component.
  */
 /* clang-format off */
 #include "ui_loupe_base.h"
@@ -12,8 +16,8 @@
 
 /**
  * @struct ui_loupe_base
- * \struct ui_loupe_base
- * \brief Context for a loupe widget, including focal and overlay coordinates.
+ * @struct ui_loupe_base
+ * @brief Context for a loupe widget, including focal and overlay coordinates.
  */
 struct ui_loupe_base {
   struct ui_arena *arena;    /**< arena */
@@ -29,12 +33,19 @@ struct ui_loupe_base {
   ui_signal_t *overlay_origin_signal; /**< overlay_origin_signal */
 };
 
-/*
- * \brief Signal equality callback for comparing two UI points.
- * \param[in] a The first point payload.
- * \param[in] b The second point payload.
- * \param[out] out_equal Pointer to store the boolean equality result.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Signal equality callback for comparing two UI points.
+ * @param[in] a The first point payload.
+ * @param[in] b The second point payload.
+ * @param[out] out_equal Pointer to store the boolean equality result.
+ * @return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief point_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
  */
 static ui_error_t point_equality(union ui_signal_payload a,
                                  union ui_signal_payload b,
@@ -48,12 +59,12 @@ static ui_error_t point_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Creates a new loupe base widget.
- * \param[in,out] arena The memory arena.
- * \param[in] config The initial configuration (size, magnification).
- * \param[out] out_loupe Pointer to store the created loupe widget.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new loupe base widget.
+ * @param[in,out] arena The memory arena.
+ * @param[in] config The initial configuration (size, magnification).
+ * @param[out] out_loupe Pointer to store the created loupe widget.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_loupe_base_create(struct ui_arena *arena,
                                 const struct ui_loupe_config *config,
@@ -101,10 +112,10 @@ ui_error_t ui_loupe_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a loupe base widget.
- * \param[in,out] loupe The loupe to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a loupe base widget.
+ * @param[in,out] loupe The loupe to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_loupe_base_destroy(struct ui_loupe_base *loupe) {
   if (!loupe) {
@@ -118,11 +129,11 @@ ui_error_t ui_loupe_base_destroy(struct ui_loupe_base *loupe) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets the focal point of the loupe, updating the overlay origin signal.
- * \param[in,out] loupe The loupe widget.
- * \param[in] focal_point The new focal coordinates.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets the focal point of the loupe, updating the overlay origin signal.
+ * @param[in,out] loupe The loupe widget.
+ * @param[in] focal_point The new focal coordinates.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_loupe_base_set_focal_point(struct ui_loupe_base *loupe,
@@ -147,12 +158,12 @@ ui_loupe_base_set_focal_point(struct ui_loupe_base *loupe,
   return ui_signal_set(loupe->overlay_origin_signal, payload);
 }
 
-/*
- * \brief Gets the signal representing the computed top-left origin for the
+/**
+ * @brief Gets the signal representing the computed top-left origin for the
  * loupe overlay.
- * \param[in] loupe The loupe widget.
- * \param[out] out_signal Pointer to store the signal.
- * \return UI_ERROR_NONE on success.
+ * @param[in] loupe The loupe widget.
+ * @param[out] out_signal Pointer to store the signal.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
                                                    ui_signal_t **out_signal) {
@@ -163,11 +174,11 @@ ui_error_t ui_loupe_base_get_overlay_origin_signal(struct ui_loupe_base *loupe,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves the current focal point of the loupe.
- * \param[in] loupe The loupe widget.
- * \param[out] out_focal_point Pointer to store the focal point.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves the current focal point of the loupe.
+ * @param[in] loupe The loupe widget.
+ * @param[out] out_focal_point Pointer to store the focal point.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
                                          struct ui_dom_point *out_focal_point) {
@@ -178,11 +189,11 @@ ui_error_t ui_loupe_base_get_focal_point(const struct ui_loupe_base *loupe,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets the visibility state of the loupe.
- * \param[in,out] loupe The loupe widget.
- * \param[in] visible The boolean visibility state.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets the visibility state of the loupe.
+ * @param[in,out] loupe The loupe widget.
+ * @param[in] visible The boolean visibility state.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
                                      ui_bool_t visible) {
@@ -193,11 +204,11 @@ ui_error_t ui_loupe_base_set_visible(struct ui_loupe_base *loupe,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets the magnification scale level of the loupe.
- * \param[in,out] loupe The loupe widget.
- * \param[in] magnification_level The new magnification level.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets the magnification scale level of the loupe.
+ * @param[in,out] loupe The loupe widget.
+ * @param[in] magnification_level The new magnification level.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_loupe_base_set_magnification_level(struct ui_loupe_base *loupe,
                                                  float magnification_level) {

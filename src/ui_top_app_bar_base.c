@@ -25,7 +25,7 @@ struct ui_top_app_bar_base {
   ui_signal_t *height_signal; /**< height_signal */
 };
 
-/*
+/**
  * @brief Equality function for state signals.
  * @param a The first payload.
  * @param b The second payload.
@@ -39,7 +39,7 @@ static ui_error_t state_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Equality function for height signals.
  * @param a The first payload.
  * @param b The second payload.

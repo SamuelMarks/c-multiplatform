@@ -11,7 +11,7 @@
 #if defined(_WIN32) || defined(__CYGWIN__)
 /* WASAPI implementation stub */
 
-/*
+/**
  * @brief Retrieves the default WASAPI audio sink backend.
  *
  * @param out_backend Pointer to the backend structure to populate.

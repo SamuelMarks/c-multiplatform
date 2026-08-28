@@ -2,6 +2,7 @@
  * @file ui_text_layout.c
  * @brief Implementation of text layout components.
  */
+
 /* clang-format off */
 #include "../include/ui_text_layout.h"
 #include "ui_internal_mem.h"
@@ -9,22 +10,21 @@
 
 /**
  * @struct ui_text_layout
- * @struct ui_text_layout
  * @brief Internal representation of a text layout.
  */
 struct ui_text_layout {
-  /* @brief Array of positioned glyphs. */
-  struct ui_positioned_glyph *glyphs; /**< glyphs */
-  /* @brief Allocated capacity for glyphs. */
-  size_t capacity; /**< capacity */
-  /* @brief Number of active glyphs. */
-  size_t count; /**< count */
-  /* @brief Width of the bounds. */
-  float bounds_width; /**< bounds_width */
-  /* @brief Height of the bounds. */
-  float bounds_height; /**< bounds_height */
+  struct ui_positioned_glyph *glyphs; /**< Array of positioned glyphs. */
+  size_t capacity;                    /**< Allocated capacity for glyphs. */
+  size_t count;                       /**< Number of active glyphs. */
+  float bounds_width;                 /**< Width of the bounds. */
+  float bounds_height;                /**< Height of the bounds. */
 };
 
+/**
+ * @brief Creates a new text layout instance.
+ * @param[out] out_layout Pointer to store the created layout.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_text_layout_create(struct ui_text_layout **out_layout) {
   struct ui_text_layout *layout;
 
@@ -48,6 +48,11 @@ ui_error_t ui_text_layout_create(struct ui_text_layout **out_layout) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Destroys a text layout instance.
+ * @param[in,out] layout The text layout to destroy.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout) {
   if (!layout) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -60,10 +65,11 @@ ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Helper function to decode a UTF-8 character.
- * @param text Pointer to the text string, updated to the next character.
- * @param out_codepoint Pointer to receive the decoded codepoint.
+ * @param[in,out] text Pointer to the text string, updated to the next
+ * character.
+ * @param[out] out_codepoint Pointer to receive the decoded codepoint.
  * @return UI_ERROR_NONE on success.
  */
 static ui_error_t decode_utf8(const char **text, int *out_codepoint) {
@@ -104,13 +110,13 @@ static ui_error_t decode_utf8(const char **text, int *out_codepoint) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Helper function to add a glyph to the layout.
- * @param layout The layout instance.
- * @param codepoint The codepoint to add.
- * @param x The X coordinate.
- * @param y The Y coordinate.
- * @param advance The glyph's advance width.
+ * @param[in,out] layout The layout instance.
+ * @param[in] codepoint The codepoint to add.
+ * @param[in] x The X coordinate.
+ * @param[in] y The Y coordinate.
+ * @param[in] advance The glyph's advance width.
  * @return UI_ERROR_NONE on success.
  */
 static ui_error_t add_glyph(struct ui_text_layout *layout, int codepoint,
@@ -143,6 +149,16 @@ static ui_error_t add_glyph(struct ui_text_layout *layout, int codepoint,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Shapes text into positioned glyphs.
+ * @param[in,out] layout The text layout.
+ * @param[in] font The font to use for shaping.
+ * @param[in] font_size The size of the font.
+ * @param[in] text The text string to shape.
+ * @param[in] max_width The maximum width for line wrapping.
+ * @param[in] direction The text direction (e.g., LTR, RTL).
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
                                 struct ui_font *font, float font_size,
                                 const char *text, float max_width,
@@ -222,6 +238,13 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Retrieves the array of positioned glyphs.
+ * @param[in] layout The text layout.
+ * @param[out] out_glyphs Pointer to store the glyphs array.
+ * @param[out] out_count Pointer to store the number of glyphs.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_text_layout_get_glyphs(struct ui_text_layout *layout,
                           const struct ui_positioned_glyph **out_glyphs,
@@ -236,6 +259,13 @@ ui_text_layout_get_glyphs(struct ui_text_layout *layout,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Retrieves the bounding box of the layout.
+ * @param[in] layout The text layout.
+ * @param[out] out_width Pointer to store the width of the bounds.
+ * @param[out] out_height Pointer to store the height of the bounds.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_text_layout_get_bounds(struct ui_text_layout *layout,
                                      float *out_width, float *out_height) {
   if (!layout || !out_width || !out_height) {

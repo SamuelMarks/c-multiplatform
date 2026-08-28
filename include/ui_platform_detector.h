@@ -39,6 +39,7 @@ ui_platform_detector_create(struct ui_platform_detector **out_detector);
 /**
  * @brief Destroys a platform detector instance.
  * @param detector The instance to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_platform_detector_destroy(struct ui_platform_detector *detector);
 

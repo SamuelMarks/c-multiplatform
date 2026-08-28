@@ -33,6 +33,13 @@ struct ui_chart_base {
   ui_signal_t *topology_signal; /**< Signal fired when scales/bounds change */
 };
 
+/**
+ * @brief void_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t void_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
                                 ui_bool_t *out_equal) {
@@ -43,6 +50,13 @@ static ui_error_t void_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chart_base_create.
+ * @param arena Parameter arena.
+ * @param coord_system Parameter coord_system.
+ * @param out_chart Parameter out_chart.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_chart_base_create(struct ui_arena *arena,
                                 enum ui_chart_coordinate_system coord_system,
                                 struct ui_chart_base **out_chart) {
@@ -111,6 +125,11 @@ ui_error_t ui_chart_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chart_base_destroy.
+ * @param chart Parameter chart.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart) {
   if (!chart)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -118,6 +137,12 @@ ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chart_base_set_x_scale.
+ * @param chart Parameter chart.
+ * @param config Parameter config.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_chart_base_set_x_scale(struct ui_chart_base *chart,
                           const struct ui_chart_scale_config *config) {
@@ -131,6 +156,12 @@ ui_chart_base_set_x_scale(struct ui_chart_base *chart,
   return ui_signal_set(chart->topology_signal, payload);
 }
 
+/**
+ * @brief ui_chart_base_set_y_scale.
+ * @param chart Parameter chart.
+ * @param config Parameter config.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_chart_base_set_y_scale(struct ui_chart_base *chart,
                           const struct ui_chart_scale_config *config) {
@@ -144,6 +175,12 @@ ui_chart_base_set_y_scale(struct ui_chart_base *chart,
   return ui_signal_set(chart->topology_signal, payload);
 }
 
+/**
+ * @brief ui_chart_base_set_draw_bounds.
+ * @param chart Parameter chart.
+ * @param bounds Parameter bounds.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_chart_base_set_draw_bounds(struct ui_chart_base *chart,
                                          const struct ui_dom_rect *bounds) {
   union ui_signal_payload payload;
@@ -156,6 +193,13 @@ ui_error_t ui_chart_base_set_draw_bounds(struct ui_chart_base *chart,
   return ui_signal_set(chart->topology_signal, payload);
 }
 
+/**
+ * @brief scale_value.
+ * @param val Parameter val.
+ * @param scale Parameter scale.
+ * @param out_val Parameter out_val.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t scale_value(double val,
                               const struct ui_chart_scale_config *scale,
                               double *out_val) {
@@ -192,6 +236,13 @@ static ui_error_t scale_value(double val,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief unscale_value.
+ * @param pixel Parameter pixel.
+ * @param scale Parameter scale.
+ * @param out_val Parameter out_val.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t unscale_value(double pixel,
                                 const struct ui_chart_scale_config *scale,
                                 double *out_val) {
@@ -226,6 +277,14 @@ static ui_error_t unscale_value(double pixel,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chart_base_data_to_pixel.
+ * @param chart Parameter chart.
+ * @param data_x Parameter data_x.
+ * @param data_y Parameter data_y.
+ * @param out_pixel_point Parameter out_pixel_point.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_chart_base_data_to_pixel(const struct ui_chart_base *chart,
                                        double data_x, double data_y,
                                        struct ui_dom_point *out_pixel_point) {
@@ -269,6 +328,15 @@ ui_error_t ui_chart_base_data_to_pixel(const struct ui_chart_base *chart,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chart_base_pixel_to_data.
+ * @param chart Parameter chart.
+ * @param pixel_x Parameter pixel_x.
+ * @param pixel_y Parameter pixel_y.
+ * @param out_data_x Parameter out_data_x.
+ * @param out_data_y Parameter out_data_y.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_chart_base_pixel_to_data(const struct ui_chart_base *chart,
                                        double pixel_x, double pixel_y,
                                        double *out_data_x, double *out_data_y) {
@@ -317,6 +385,12 @@ ui_error_t ui_chart_base_pixel_to_data(const struct ui_chart_base *chart,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_chart_base_get_topology_signal.
+ * @param chart Parameter chart.
+ * @param out_signal Parameter out_signal.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_chart_base_get_topology_signal(struct ui_chart_base *chart,
                                              ui_signal_t **out_signal) {
   if (!chart || !out_signal)

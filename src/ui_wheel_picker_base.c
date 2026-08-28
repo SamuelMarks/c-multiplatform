@@ -24,6 +24,12 @@
 /** @endcond */
 
 /* Provide a fallback for strict C90 compilers where roundf() isn't available */
+/**
+ * @brief ui_roundf_fallback.
+ * @param number Parameter number.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
 static ui_error_t ui_roundf_fallback(float number, float *out_val) {
   *out_val =
       (float)(number < 0.0f ? ceil(number - 0.5f) : floor(number + 0.5f));
@@ -61,6 +67,11 @@ struct ui_wheel_picker_base {
   int is_disabled; /**< is_disabled */
 };
 
+/**
+ * @brief update_dom_state.
+ * @param picker Parameter picker.
+ * @return Return value.
+ */
 static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
   if (picker->component && picker->component->shadow_root) {
     char buf[64];
@@ -75,6 +86,11 @@ static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief trigger_cva_change.
+ * @param picker Parameter picker.
+ * @return Return value.
+ */
 static ui_error_t trigger_cva_change(struct ui_wheel_picker_base *picker) {
   if (picker->cva_on_change) {
     union ui_signal_payload payload;
@@ -84,6 +100,11 @@ static ui_error_t trigger_cva_change(struct ui_wheel_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief trigger_cva_touched.
+ * @param picker Parameter picker.
+ * @return Return value.
+ */
 static ui_error_t trigger_cva_touched(struct ui_wheel_picker_base *picker) {
   if (picker->cva_on_touched) {
     return picker->cva_on_touched(picker->cva_on_touched_user_data);
@@ -91,6 +112,12 @@ static ui_error_t trigger_cva_touched(struct ui_wheel_picker_base *picker) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief wheel_picker_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 static ui_error_t wheel_picker_cva_write_value(void *component,
                                                union ui_signal_payload value) {
   struct ui_wheel_picker_base *picker =
@@ -102,6 +129,13 @@ static ui_error_t wheel_picker_cva_write_value(void *component,
   return ui_wheel_picker_base_set_selected_index(picker, value.int_val);
 }
 
+/**
+ * @brief wheel_picker_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t wheel_picker_cva_register_on_change(
     void *component,
     ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
@@ -115,6 +149,13 @@ static ui_error_t wheel_picker_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief wheel_picker_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 static ui_error_t wheel_picker_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
   struct ui_wheel_picker_base *picker =
@@ -126,6 +167,12 @@ static ui_error_t wheel_picker_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief wheel_picker_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
+ */
 static ui_error_t wheel_picker_cva_set_disabled_state(void *component,
                                                       int is_disabled) {
   ui_error_t rc;

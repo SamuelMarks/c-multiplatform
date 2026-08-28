@@ -58,6 +58,7 @@ ui_color_picker_base_create(struct ui_color_picker_base **out_picker,
  * @brief Destroys a color picker manager.
  *
  * @param picker The color picker manager to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_color_picker_base_destroy(struct ui_color_picker_base *picker);
 

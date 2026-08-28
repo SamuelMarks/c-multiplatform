@@ -1,3 +1,7 @@
+/**
+ * @file ui_split_pane_base.c
+ * @brief ui_split_pane_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_split_pane_base.h"
 #include "ui_internal_mem.h"
@@ -27,7 +31,7 @@ struct ui_split_pane_base {
   struct ui_signal *data_signal; /**< data_signal */
 };
 
-/*
+/**
  * \brief Creates a new split pane base component.
  * \param out_split_pane Pointer to store the component.
  * \return UI_ERROR_NONE on success.
@@ -64,7 +68,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Destroys a split pane base component.
  * \param split_pane The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -77,7 +81,7 @@ ui_error_t ui_split_pane_base_destroy(struct ui_split_pane_base *split_pane) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the orientation of the split pane.
  * \param split_pane The split pane component.
  * \param orientation The orientation to set.
@@ -93,7 +97,7 @@ ui_split_pane_base_set_orientation(struct ui_split_pane_base *split_pane,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the current orientation.
  * \param split_pane The split pane component.
  * \param out_orientation Pointer to store the orientation.
@@ -109,7 +113,7 @@ ui_error_t ui_split_pane_base_get_orientation(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the position of the divider.
  * \param split_pane The split pane component.
  * \param position The position to set.
@@ -133,7 +137,7 @@ ui_split_pane_base_set_position(struct ui_split_pane_base *split_pane,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the current position of the divider.
  * \param split_pane The split pane component.
  * \param out_position Pointer to store the position.
@@ -149,7 +153,7 @@ ui_split_pane_base_get_position(const struct ui_split_pane_base *split_pane,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the allowed bounds for the divider.
  * \param split_pane The split pane component.
  * \param min_position The minimum position.
@@ -175,7 +179,7 @@ ui_error_t ui_split_pane_base_set_bounds(struct ui_split_pane_base *split_pane,
   return ui_split_pane_base_set_position(split_pane, split_pane->position);
 }
 
-/*
+/**
  * \brief Processes an event.
  * \param split_pane The split pane component.
  * \param event The event.
@@ -253,7 +257,7 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Binds the data state to a signal.
  * \param widget The split pane component.
  * \param signal The signal to bind.

@@ -1,6 +1,10 @@
+/**
+ * @file ui_gesture.c
+ * @brief ui_gesture.c implementation.
+ */
 /*
- * \file ui_gesture.c
- * \brief Implementation of pointer gesture recognition.
+ * @file ui_gesture.c
+ * @brief Implementation of pointer gesture recognition.
  */
 /* clang-format off */
 #include "ui_gesture.h"
@@ -11,36 +15,31 @@
 #include <stdio.h>
 /* clang-format on */
 
-/*
- * \def UI_TAP_MAX_DURATION_MS
- * \brief Maximum duration for a tap gesture.
+/** @def UI_TAP_MAX_DURATION_MS
+ * @brief Maximum duration for a tap gesture
  */
 #define UI_TAP_MAX_DURATION_MS 300.0
-/*
- * \def UI_TAP_MAX_DISTANCE
- * \brief Maximum distance allowed for a tap gesture.
+/** @def UI_TAP_MAX_DISTANCE
+ * @brief Maximum distance for a tap gesture
  */
 #define UI_TAP_MAX_DISTANCE 10.0
-/*
- * \def UI_LONG_PRESS_MIN_DURATION_MS
- * \brief Minimum duration for a long press gesture.
+/** @def UI_LONG_PRESS_MIN_DURATION_MS
+ * @brief Minimum duration for a long press
  */
 #define UI_LONG_PRESS_MIN_DURATION_MS 500.0
-/*
- * \def UI_PAN_MIN_DISTANCE
- * \brief Minimum distance required to trigger a pan gesture.
+/** @def UI_PAN_MIN_DISTANCE
+ * @brief Minimum distance for a pan gesture
  */
 #define UI_PAN_MIN_DISTANCE 10.0
-/*
- * \def UI_SWIPE_MIN_VELOCITY
- * \brief Minimum velocity required to trigger a swipe gesture.
+/** @def UI_SWIPE_MIN_VELOCITY
+ * @brief Minimum velocity for a swipe gesture
  */
-#define UI_SWIPE_MIN_VELOCITY 500.0 /* pixels per second */
+#define UI_SWIPE_MIN_VELOCITY 500.0
 
 /**
  * @struct ui_gesture_recognizer
- * \struct ui_gesture_recognizer
- * \brief Tracks pointer state to recognize gestures.
+ * @struct ui_gesture_recognizer
+ * @brief Tracks pointer state to recognize gestures.
  */
 struct ui_gesture_recognizer {
   int is_tracking;      /**< is_tracking */
@@ -64,10 +63,10 @@ struct ui_gesture_recognizer {
   float last_rotation;    /**< last_rotation */
 };
 
-/*
- * \brief Creates a new gesture recognizer.
- * \param[out] out_recognizer Pointer to store the created recognizer.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new gesture recognizer.
+ * @param[out] out_recognizer Pointer to store the created recognizer.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_gesture_recognizer_create(struct ui_gesture_recognizer **out_recognizer) {
@@ -102,10 +101,10 @@ ui_gesture_recognizer_create(struct ui_gesture_recognizer **out_recognizer) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a gesture recognizer.
- * \param[in,out] recognizer The recognizer to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a gesture recognizer.
+ * @param[in,out] recognizer The recognizer to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_gesture_recognizer_destroy(struct ui_gesture_recognizer *recognizer) {
@@ -116,10 +115,15 @@ ui_gesture_recognizer_destroy(struct ui_gesture_recognizer *recognizer) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Resets the internal state of the gesture recognizer.
- * \param[in,out] r The recognizer to reset.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Resets the internal state of the gesture recognizer.
+ * @param[in,out] r The recognizer to reset.
+ * @return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief ui_gesture_reset.
+ * @param r Parameter r.
+ * @return Return value.
  */
 static ui_error_t ui_gesture_reset(struct ui_gesture_recognizer *r) {
   r->is_tracking = 0;
@@ -134,13 +138,13 @@ static ui_error_t ui_gesture_reset(struct ui_gesture_recognizer *r) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Processes a pointer event and updates gesture state.
- * \param[in,out] r The gesture recognizer.
- * \param[in] event The pointer event to process.
- * \param[in] timestamp_ms The timestamp of the event.
- * \param[out] out_gesture_event Pointer to store any recognized gesture event.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Processes a pointer event and updates gesture state.
+ * @param[in,out] r The gesture recognizer.
+ * @param[in] event The pointer event to process.
+ * @param[in] timestamp_ms The timestamp of the event.
+ * @param[out] out_gesture_event Pointer to store any recognized gesture event.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_gesture_recognizer_process_event(
     struct ui_gesture_recognizer *r, const struct ui_event *event,
@@ -388,13 +392,13 @@ ui_error_t ui_gesture_recognizer_process_event(
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Updates the gesture recognizer (e.g., checking timeouts for long
+/**
+ * @brief Updates the gesture recognizer (e.g., checking timeouts for long
  * press).
- * \param[in,out] r The gesture recognizer.
- * \param[in] timestamp_ms The current timestamp.
- * \param[out] out_gesture_event Pointer to store any recognized gesture event.
- * \return UI_ERROR_NONE on success.
+ * @param[in,out] r The gesture recognizer.
+ * @param[in] timestamp_ms The current timestamp.
+ * @param[out] out_gesture_event Pointer to store any recognized gesture event.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_gesture_recognizer_update(struct ui_gesture_recognizer *r,

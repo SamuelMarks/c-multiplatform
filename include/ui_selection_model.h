@@ -14,6 +14,9 @@ extern "C" {
 #include "ui_error.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a selection model.
+ */
 struct ui_selection_model;
 
 /**
@@ -28,6 +31,7 @@ ui_error_t ui_selection_model_create(struct ui_selection_model **out_model);
  * @brief Destroys a selection model.
  *
  * @param model The selection model.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_selection_model_destroy(struct ui_selection_model *model);
 

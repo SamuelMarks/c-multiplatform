@@ -74,6 +74,9 @@ ui_error_t ui_coerce_string_to_float(const char *str, float *out_val);
  */
 ui_error_t ui_safe_string_copy(char *dest, size_t dest_size, const char *src);
 
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((format(printf, 3, 4)))
+#endif
 /**
  * @brief Safely formats a string.
  * Uses vsprintf_s on MSVC, vsnprintf on standard environments.
@@ -81,12 +84,9 @@ ui_error_t ui_safe_string_copy(char *dest, size_t dest_size, const char *src);
  * @param dest Destination buffer.
  * @param dest_size Size of destination buffer in bytes.
  * @param format Format string.
+ * @param ... Variadic arguments for the format string.
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if truncated.
  */
-#if defined(__GNUC__) || defined(__clang__)
-__attribute__((format(printf, 3, 4)))
-#endif
-/** \brief ui_error */
 ui_error_t
 ui_safe_string_format(char *dest, size_t dest_size, const char *format, ...);
 

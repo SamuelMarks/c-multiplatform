@@ -1,6 +1,7 @@
-/*
- * \file ui_masonry_layout_base.c
- * \brief Implementation of the UI masonry layout base component.
+/**
+ * @file ui_masonry_layout_base.c
+ * @brief Implementation of the UI masonry layout base component.
+ * @details Provides the base DOM representation for masonry layout.
  */
 /* clang-format off */
 #include "ui_masonry_layout_base.h"
@@ -9,6 +10,7 @@
 #include <stddef.h>
 /* clang-format on */
 
+/** @brief Default CSS stylesheet for masonry layout */
 static const char *ui_masonry_layout_base_default_css =
     ".masonry-container { "
     "display: flex; "
@@ -16,19 +18,20 @@ static const char *ui_masonry_layout_base_default_css =
     "flex-wrap: wrap; "
     "}";
 
-/* \brief ui_masonry_layout_base
- */
 /**
  * @struct ui_masonry_layout_base
- * \struct ui_masonry_layout_base
- * \brief Represents a masonry (waterfall) style layout container.
+ * @brief Represents a masonry (waterfall) style layout container.
+ * @details State and internal data structure.
  */
 struct ui_masonry_layout_base {
-  struct ui_component *component;  /**< component */
-  struct ui_computed *data_signal; /**< data_signal */
+  struct ui_component *component;  /**< The underlying DOM component */
+  struct ui_computed *data_signal; /**< The data bound signal */
 };
 
-/* \brief ui_error
+/**
+ * @brief Creates a masonry layout base component.
+ * @param[out] out_masonry Pointer to store the newly created masonry layout.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
@@ -98,10 +101,10 @@ cleanup:
   return rc;
 }
 
-/*
- * \brief Destroys a masonry layout base component.
- * \param[in,out] masonry The masonry layout to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a masonry layout base component.
+ * @param[in,out] masonry The masonry layout to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
@@ -113,7 +116,10 @@ ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Reflows the masonry layout component.
+ * @param[in,out] masonry The masonry layout to reflow.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_masonry_layout_base_reflow(struct ui_masonry_layout_base *masonry) {
@@ -126,7 +132,11 @@ ui_masonry_layout_base_reflow(struct ui_masonry_layout_base *masonry) {
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Retrieves the generic DOM component for the masonry layout.
+ * @param[in] masonry The masonry layout.
+ * @param[out] out_component Pointer to store the underlying component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_masonry_layout_base_get_component(struct ui_masonry_layout_base *masonry,
@@ -138,7 +148,11 @@ ui_masonry_layout_base_get_component(struct ui_masonry_layout_base *masonry,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Binds a reactive data signal to the masonry layout.
+ * @param[in,out] widget The masonry layout widget.
+ * @param[in,out] signal The reactive computed data signal.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_masonry_layout_base_bind_data(struct ui_masonry_layout_base *widget,

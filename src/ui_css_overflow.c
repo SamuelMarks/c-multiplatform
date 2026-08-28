@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_overflow.c
+ * @brief ui_css_overflow.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_overflow.h"
 #include <string.h>
@@ -6,7 +10,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -17,7 +21,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/*
+/**
  * @brief ui_css_parse_overflow.
  * @param str Parameter str.
  * @param out_overflow Parameter out_overflow.
@@ -122,7 +126,7 @@ ui_css_parse_block_ellipsis(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
+/**
  * @brief ui_css_parse_line_clamp.
  * @param str Parameter str.
  * @param out_clamp Parameter out_clamp.
@@ -155,7 +159,7 @@ ui_error_t ui_css_parse_line_clamp(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
+/**
  * @brief ui_css_parse_max_lines.
  * @param str Parameter str.
  * @param out_max_lines Parameter out_max_lines.

@@ -1,3 +1,7 @@
+/**
+ * @file ui_haptics.c
+ * @brief ui_haptics.c implementation.
+ */
 /* clang-format off */
 #include "ui_haptics.h"
 #include <stddef.h>

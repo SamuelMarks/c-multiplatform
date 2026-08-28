@@ -1,3 +1,7 @@
+/**
+ * @file ui_scroll_spy.c
+ * @brief ui_scroll_spy.c implementation.
+ */
 /*
  * \file ui_scroll_spy.c
  * \brief Implementation of the UI Scroll Spy component.
@@ -11,6 +15,9 @@
 /* clang-format on */
 
 /* \brief Maximum number of targets a scroll spy can track */
+/** @def MAX_SPY_TARGETS
+ * @brief Maximum spy targets
+ */
 #define MAX_SPY_TARGETS 64
 
 /**
@@ -39,7 +46,7 @@ struct ui_scroll_spy {
   int root_margin_px;       /**< Root margin in pixels */
 };
 
-/*
+/**
  * \brief Intersection observer callback to handle visibility changes.
  *
  * \param observer The intersection observer.
@@ -49,6 +56,14 @@ struct ui_scroll_spy {
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t
+/**
+ * @brief on_intersection.
+ * @param observer Parameter observer.
+ * @param entries Parameter entries.
+ * @param entry_count Parameter entry_count.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
 on_intersection(struct ui_intersection_observer *observer,
                 const struct ui_intersection_observer_entry *entries,
                 int entry_count, void *user_data) {
@@ -94,7 +109,7 @@ on_intersection(struct ui_intersection_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new scroll spy behavior instance.
  *
  * \param out_spy Pointer to receive the allocated scroll spy.
@@ -123,7 +138,7 @@ ui_error_t ui_scroll_spy_create(struct ui_scroll_spy **out_spy) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a scroll spy instance.
  *
  * \param spy The scroll spy to destroy.
@@ -141,7 +156,7 @@ ui_error_t ui_scroll_spy_destroy(struct ui_scroll_spy *spy) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the root scrolling container and its observation margin.
  *
  * \param spy The scroll spy.
@@ -196,7 +211,7 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Adds a target section to be tracked by the scroll spy.
  *
  * \param spy The scroll spy.
@@ -232,7 +247,7 @@ ui_error_t ui_scroll_spy_add_target(struct ui_scroll_spy *spy,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Removes a target section from the scroll spy.
  *
  * \param spy The scroll spy.
@@ -266,7 +281,7 @@ ui_error_t ui_scroll_spy_remove_target(struct ui_scroll_spy *spy,
   return UI_ERROR_NOT_FOUND;
 }
 
-/*
+/**
  * \brief Binds a signal that will receive the active section ID.
  * The payload of the signal should be castable to (int).
  *
@@ -283,7 +298,7 @@ ui_error_t ui_scroll_spy_bind_active_section(struct ui_scroll_spy *spy,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Triggers an evaluation of the underlying intersection observer.
  * Typically called during a layout or scroll event.
  *

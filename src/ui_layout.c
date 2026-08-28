@@ -1,10 +1,20 @@
+/**
+ * @file ui_layout.c
+ * @brief ui_layout.c implementation.
+ */
 /*
- * \file ui_layout.c
- * \brief Implementation of the UI layout engine (Flexbox & Block).
+ * @file ui_layout.c
+ * @brief Implementation of the UI layout engine (Flexbox & Block).
  */
 /* clang-format off */
 #include "ui_layout.h"
 
+/**
+ * @brief local_strcmp.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @return Return value.
+ */
 static int local_strcmp(const char *a, const char *b) {
   while (*a && (*a == *b)) {
     a++;
@@ -77,10 +87,10 @@ ui_error_t ui_layout_solve_viewport(struct ui_layout_node *root,
   return ui_layout_compute(root, window_width, window_height);
 }
 
-/*
- * \brief Checks the computed layout tree for bounding box violations.
- * \param[in] node The layout node to check recursively.
- * \return UI_ERROR_NONE if valid, UI_ERROR_LAYOUT_VIOLATION if elements
+/**
+ * @brief Checks the computed layout tree for bounding box violations.
+ * @param[in] node The layout node to check recursively.
+ * @return UI_ERROR_NONE if valid, UI_ERROR_LAYOUT_VIOLATION if elements
  * improperly exceed bounds.
  */
 ui_error_t ui_layout_sanity_check(const struct ui_layout_node *node) {
@@ -154,12 +164,12 @@ ui_error_t ui_layout_sanity_check(const struct ui_layout_node *node) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Computes layout for a node based on its display properties.
- * \param[in,out] node The layout node.
- * \param[in] available_width The available width.
- * \param[in] available_height The available height.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Computes layout for a node based on its display properties.
+ * @param[in,out] node The layout node.
+ * @param[in] available_width The available width.
+ * @param[in] available_height The available height.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
                              float available_height) {

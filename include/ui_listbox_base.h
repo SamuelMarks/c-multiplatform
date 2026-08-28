@@ -18,6 +18,9 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a listbox base component.
+ */
 struct ui_listbox_base;
 
 /**
@@ -46,6 +49,7 @@ ui_error_t ui_listbox_base_create(struct ui_listbox_base **out_listbox,
  * @brief Destroys a listbox base component.
  *
  * @param listbox The listbox component to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_listbox_base_destroy(struct ui_listbox_base *listbox);
 

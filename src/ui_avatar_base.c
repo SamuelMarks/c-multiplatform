@@ -24,7 +24,7 @@ struct ui_avatar_base {
   struct ui_signal *src_signal; /**< Bound source signal */
 };
 
-/*
+/**
  * @brief get_utf8_len.
  * @param c Parameter c.
  * @param out_len Parameter out_len.
@@ -46,7 +46,7 @@ static ui_error_t get_utf8_len(unsigned char c, int *out_len) {
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_avatar_mock_fail = 0;
-/*
+/**
  * @brief mock_get_utf8_len.
  * @param c Parameter c.
  * @param out_len Parameter out_len.
@@ -66,7 +66,7 @@ static ui_error_t mock_get_utf8_len(unsigned char c, int *out_len) {
 #define get_utf8_len mock_get_utf8_len
 #endif
 
-/*
+/**
  * @brief extract_initials.
  * @param name Parameter name.
  * @param initials_out Parameter initials_out.
@@ -124,7 +124,7 @@ static ui_error_t extract_initials(const char *name, char *initials_out) {
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
-/*
+/**
  * @brief mock_extract_initials.
  * @param name Parameter name.
  * @param initials_out Parameter initials_out.
@@ -140,7 +140,7 @@ static ui_error_t mock_extract_initials(const char *name, char *initials_out) {
 #define extract_initials mock_extract_initials
 
 ui_error_t run_avatar_coverage(void);
-/*
+/**
  * @brief run_avatar_coverage.
  * @return Return value.
  */
@@ -165,7 +165,7 @@ ui_error_t run_avatar_coverage(void) {
 }
 #endif
 
-/*
+/**
  * @brief ui_avatar_base_create.
  * @param out_avatar Parameter out_avatar.
  * @return Return value.
@@ -197,7 +197,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_avatar_base_destroy.
  * @param avatar Parameter avatar.
  * @return Return value.
@@ -215,7 +215,7 @@ ui_error_t ui_avatar_base_destroy(struct ui_avatar_base *avatar) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_base_set_name.
  * @param avatar Parameter avatar.
  * @param name Parameter name.
@@ -248,7 +248,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_avatar_base_get_name.
  * @param avatar Parameter avatar.
  * @param out_name Parameter out_name.
@@ -263,7 +263,7 @@ ui_error_t ui_avatar_base_get_name(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_base_get_initials.
  * @param avatar Parameter avatar.
  * @param out_initials Parameter out_initials.
@@ -278,7 +278,7 @@ ui_error_t ui_avatar_base_get_initials(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_base_set_image_url.
  * @param avatar Parameter avatar.
  * @param image_url Parameter image_url.
@@ -308,7 +308,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_avatar_base_get_image_url.
  * @param avatar Parameter avatar.
  * @param out_image_url Parameter out_image_url.
@@ -323,7 +323,7 @@ ui_error_t ui_avatar_base_get_image_url(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_base_set_fallback_icon.
  * @param avatar Parameter avatar.
  * @param icon Parameter icon.
@@ -343,7 +343,7 @@ ui_error_t ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_base_get_fallback_icon.
  * @param avatar Parameter avatar.
  * @param out_icon Parameter out_icon.
@@ -358,7 +358,7 @@ ui_error_t ui_avatar_base_get_fallback_icon(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_base_get_type.
  * @param avatar Parameter avatar.
  * @param out_type Parameter out_type.
@@ -381,7 +381,7 @@ ui_error_t ui_avatar_base_get_type(const struct ui_avatar_base *avatar,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_base_bind_src.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

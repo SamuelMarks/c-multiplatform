@@ -1,3 +1,7 @@
+/**
+ * @file ui_divider_base.c
+ * @brief ui_divider_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_divider_base.h"
 #include "ui_internal_mem.h"
@@ -9,6 +13,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet for divider base component */
 static const char *ui_divider_base_css =
     ":host { "
     "display: block; "
@@ -47,7 +52,7 @@ struct ui_divider_base {
   struct ui_signal *data_signal; /**< data_signal */
 };
 
-/*
+/**
  * @brief update_dom_state.
  * @param divider Parameter divider.
  * @return Return value.
@@ -70,7 +75,7 @@ static ui_error_t update_dom_state(struct ui_divider_base *divider) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_divider_base_create.
  * @param out_divider Parameter out_divider.
  * @return Return value.
@@ -135,7 +140,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_divider_base_destroy.
  * @param divider Parameter divider.
  * @return Return value.
@@ -149,7 +154,7 @@ ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_divider_base_set_orientation.
  * @param divider Parameter divider.
  * @param orientation Parameter orientation.
@@ -165,7 +170,7 @@ ui_divider_base_set_orientation(struct ui_divider_base *divider,
   return update_dom_state(divider);
 }
 
-/*
+/**
  * @brief ui_divider_base_set_inset.
  * @param divider Parameter divider.
  * @param inset Parameter inset.
@@ -180,7 +185,7 @@ ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
   return update_dom_state(divider);
 }
 
-/*
+/**
  * @brief ui_divider_base_get_component.
  * @param divider Parameter divider.
  * @param out_component Parameter out_component.
@@ -195,7 +200,7 @@ ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_divider_base_bind_data.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

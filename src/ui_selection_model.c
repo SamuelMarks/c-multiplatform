@@ -1,3 +1,7 @@
+/**
+ * @file ui_selection_model.c
+ * @brief ui_selection_model.c implementation.
+ */
 /* clang-format off */
 #include "ui_selection_model.h"
 #include "ui_internal_mem.h"
@@ -22,10 +26,15 @@ struct ui_selection_model {
   void *on_change_user_data;                /**< on_change_user_data */
 };
 
-/*
+/**
  * \brief Triggers a change event on the model.
  * \param model The selection model.
  * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief trigger_change.
+ * @param model Parameter model.
+ * @return Return value.
  */
 static ui_error_t trigger_change(struct ui_selection_model *model) {
   if (model->on_change) {
@@ -34,7 +43,7 @@ static ui_error_t trigger_change(struct ui_selection_model *model) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new selection model.
  * \param out_model Pointer to store the model.
  * \return UI_ERROR_NONE on success.
@@ -63,7 +72,7 @@ ui_error_t ui_selection_model_create(struct ui_selection_model **out_model) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the on change callback.
  * \param model The selection model.
  * \param callback The callback function.
@@ -83,7 +92,7 @@ ui_selection_model_set_on_change(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a selection model.
  * \param model The model to destroy.
  * \return UI_ERROR_NONE on success.
@@ -100,7 +109,7 @@ ui_error_t ui_selection_model_destroy(struct ui_selection_model *model) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets whether the model allows multiple selections.
  * \param model The selection model.
  * \param is_multi 1 for multi-select, 0 for single-select.
@@ -123,7 +132,7 @@ ui_error_t ui_selection_model_set_multi_select(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Selects an item.
  * \param model The selection model.
  * \param id The item ID to select.
@@ -182,7 +191,7 @@ ui_error_t ui_selection_model_select(struct ui_selection_model *model,
   return trigger_change(model);
 }
 
-/*
+/**
  * \brief Deselects an item.
  * \param model The selection model.
  * \param id The item ID to deselect.
@@ -215,7 +224,7 @@ ui_error_t ui_selection_model_deselect(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Toggles the selection state of an item.
  * \param model The selection model.
  * \param id The item ID to toggle.
@@ -244,7 +253,7 @@ ui_error_t ui_selection_model_toggle(struct ui_selection_model *model,
   }
 }
 
-/*
+/**
  * \brief Clears all selections.
  * \param model The selection model.
  * \return UI_ERROR_NONE on success.
@@ -261,7 +270,7 @@ ui_error_t ui_selection_model_clear(struct ui_selection_model *model) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Selects multiple items.
  * \param model The selection model.
  * \param ids Array of item IDs to select.
@@ -306,7 +315,7 @@ ui_error_t ui_selection_model_select_all(struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Checks if an item is selected.
  * \param model The selection model.
  * \param id The item ID.
@@ -334,7 +343,7 @@ ui_selection_model_is_selected(const struct ui_selection_model *model, void *id,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the number of selected items.
  * \param model The selection model.
  * \param out_count Pointer to store the count.
@@ -351,7 +360,7 @@ ui_selection_model_get_selected_count(const struct ui_selection_model *model,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the selected items.
  * \param model The selection model.
  * \param out_ids Array to store the selected IDs.

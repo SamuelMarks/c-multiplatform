@@ -1,6 +1,10 @@
+/**
+ * @file ui_handle_manager.c
+ * @brief ui_handle_manager.c implementation.
+ */
 /*
- * \file ui_handle_manager.c
- * \brief Implementation of the UI handle manager.
+ * @file ui_handle_manager.c
+ * @brief Implementation of the UI handle manager.
  */
 /* clang-format off */
 #include <stddef.h>
@@ -9,25 +13,22 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
- * \def HANDLE_INDEX
- * \brief Extracts the index portion of a handle.
+/** @def HANDLE_INDEX
+ * @brief Handle index extraction
  */
 #define HANDLE_INDEX(h) ((ui_uint32)((h) & 0xFFFFFFFF))
-/*
- * \def HANDLE_GEN
- * \brief Extracts the generation portion of a handle.
+/** @def HANDLE_GEN
+ * @brief Handle generation extraction
  */
 #define HANDLE_GEN(h) ((ui_uint32)((h) >> 32))
-/*
- * \def MAKE_HANDLE
- * \brief Combines an index and generation into a handle.
+/** @def MAKE_HANDLE
+ * @brief Handle generation
  */
 #define MAKE_HANDLE(i, g) ((((ui_uint64)(g)) << 32) | (ui_uint32)(i))
 
 /**
  * @struct ui_handle_entry
- * \brief ui_handle_entry
+ * @brief ui_handle_entry
  */
 struct ui_handle_entry {
   void *data;           /**< data */
@@ -37,7 +38,7 @@ struct ui_handle_entry {
 
 /**
  * @struct ui_handle_manager
- * \brief ui_handle_manager
+ * @brief ui_handle_manager
  */
 struct ui_handle_manager {
   struct ui_handle_entry *entries; /**< entries */
@@ -47,10 +48,15 @@ struct ui_handle_manager {
   ui_atomic_t lock;                /**< lock */
 };
 
-/*
- * \brief Acquires a spin lock.
- * \param[in,out] lock The lock to acquire.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Acquires a spin lock.
+ * @param[in,out] lock The lock to acquire.
+ * @return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief spin_lock.
+ * @param lock Parameter lock.
+ * @return Return value.
  */
 static ui_error_t spin_lock(ui_atomic_t *lock) {
 #ifndef UI_SINGLE_THREADED
@@ -67,10 +73,15 @@ static ui_error_t spin_lock(ui_atomic_t *lock) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Releases a spin lock.
- * \param[in,out] lock The lock to release.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Releases a spin lock.
+ * @param[in,out] lock The lock to release.
+ * @return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief spin_unlock.
+ * @param lock Parameter lock.
+ * @return Return value.
  */
 static ui_error_t spin_unlock(ui_atomic_t *lock) {
 #ifndef UI_SINGLE_THREADED
@@ -84,11 +95,11 @@ static ui_error_t spin_unlock(ui_atomic_t *lock) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Creates a handle manager with a specified capacity.
- * \param[in] capacity The maximum number of handles.
- * \param[out] out_manager Pointer to store the created manager.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a handle manager with a specified capacity.
+ * @param[in] capacity The maximum number of handles.
+ * @param[out] out_manager Pointer to store the created manager.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_handle_manager_create(ui_uint32 capacity,
                                     struct ui_handle_manager **out_manager) {
@@ -140,10 +151,10 @@ cleanup:
   return rc;
 }
 
-/*
- * \brief Destroys a handle manager.
- * \param[in,out] manager The manager to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a handle manager.
+ * @param[in,out] manager The manager to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_handle_manager_destroy(struct ui_handle_manager *manager) {
   if (!manager) {
@@ -156,12 +167,12 @@ ui_error_t ui_handle_manager_destroy(struct ui_handle_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Allocates a new handle and associates it with data.
- * \param[in,out] manager The handle manager.
- * \param[in] data The data pointer to associate with the handle.
- * \param[out] out_handle Pointer to store the allocated handle.
- * \return UI_ERROR_NONE on success, or UI_ERROR_QUEUE_FULL if at capacity.
+/**
+ * @brief Allocates a new handle and associates it with data.
+ * @param[in,out] manager The handle manager.
+ * @param[in] data The data pointer to associate with the handle.
+ * @param[out] out_handle Pointer to store the allocated handle.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_QUEUE_FULL if at capacity.
  */
 ui_error_t ui_handle_manager_alloc(struct ui_handle_manager *manager,
                                    void *data, ui_uint64 *out_handle) {
@@ -201,12 +212,12 @@ ui_error_t ui_handle_manager_alloc(struct ui_handle_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves the data associated with a valid handle.
- * \param[in,out] manager The handle manager.
- * \param[in] handle The handle to look up.
- * \param[out] out_data Pointer to store the associated data.
- * \return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT for
+/**
+ * @brief Retrieves the data associated with a valid handle.
+ * @param[in,out] manager The handle manager.
+ * @param[in] handle The handle to look up.
+ * @param[out] out_data Pointer to store the associated data.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT for
  * invalid/stale handle.
  */
 ui_error_t ui_handle_manager_get(struct ui_handle_manager *manager,
@@ -248,12 +259,12 @@ ui_error_t ui_handle_manager_get(struct ui_handle_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Frees a handle, making its slot available for reuse and incrementing
+/**
+ * @brief Frees a handle, making its slot available for reuse and incrementing
  * its generation.
- * \param[in,out] manager The handle manager.
- * \param[in] handle The handle to free.
- * \return UI_ERROR_NONE on success.
+ * @param[in,out] manager The handle manager.
+ * @param[in] handle The handle to free.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_handle_manager_free(struct ui_handle_manager *manager,
                                   ui_uint64 handle) {

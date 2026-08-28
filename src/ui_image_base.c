@@ -1,3 +1,7 @@
+/**
+ * @file ui_image_base.c
+ * @brief ui_image_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_image_base.h"
 #include <stdlib.h>
@@ -7,7 +11,7 @@
 #include <string.h>
 /* clang-format on */
 
-/*
+/**
  * @brief ui_image_base_init.
  * @param image Parameter image.
  * @param component Parameter component.
@@ -28,7 +32,7 @@ ui_error_t ui_image_base_init(struct ui_image_base *image,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_image_base_set_src.
  * @param image Parameter image.
  * @param src_url Parameter src_url.
@@ -65,7 +69,7 @@ ui_error_t ui_image_base_set_src(struct ui_image_base *image,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_image_base_cleanup.
  * @param image Parameter image.
  * @return Return value.
@@ -89,7 +93,7 @@ ui_error_t ui_image_base_cleanup(struct ui_image_base *image) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_image_base_bind_src.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

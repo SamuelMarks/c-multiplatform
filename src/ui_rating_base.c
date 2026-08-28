@@ -1,3 +1,7 @@
+/**
+ * @file ui_rating_base.c
+ * @brief ui_rating_base.c implementation.
+ */
 /*
  * \file ui_rating_base.c
  * \brief Implementation of the UI Rating Base component.
@@ -30,11 +34,16 @@ struct ui_rating_base {
   int is_disabled; /**< Non-zero if disabled */
 };
 
-/*
+/**
  * \brief Triggers the CVA change callback.
  *
  * \param rating The rating component.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief trigger_cva_change.
+ * @param rating Parameter rating.
+ * @return Return value.
  */
 static ui_error_t trigger_cva_change(struct ui_rating_base *rating) {
   if (rating->cva_on_change) {
@@ -45,11 +54,16 @@ static ui_error_t trigger_cva_change(struct ui_rating_base *rating) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Triggers the CVA touched callback.
  *
  * \param rating The rating component.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief trigger_cva_touched.
+ * @param rating Parameter rating.
+ * @return Return value.
  */
 static ui_error_t trigger_cva_touched(struct ui_rating_base *rating) {
   if (rating->cva_on_touched) {
@@ -58,12 +72,18 @@ static ui_error_t trigger_cva_touched(struct ui_rating_base *rating) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to write a value.
  *
  * \param component The rating component.
  * \param value The payload containing the float value.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief rating_cva_write_value.
+ * @param component Parameter component.
+ * @param value Parameter value.
+ * @return Return value.
  */
 static ui_error_t rating_cva_write_value(void *component,
                                          union ui_signal_payload value) {
@@ -77,13 +97,20 @@ static ui_error_t rating_cva_write_value(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to register an on-change callback.
  *
  * \param component The rating component.
  * \param callback The callback.
  * \param user_data Opaque user data.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief rating_cva_register_on_change.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t rating_cva_register_on_change(
     void *component,
@@ -97,13 +124,20 @@ static ui_error_t rating_cva_register_on_change(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to register an on-touched callback.
  *
  * \param component The rating component.
  * \param callback The callback.
  * \param user_data Opaque user data.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief rating_cva_register_on_touched.
+ * @param component Parameter component.
+ * @param callback Parameter callback.
+ * @param user_data Parameter user_data.
+ * @return Return value.
  */
 static ui_error_t rating_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *user_data), void *user_data) {
@@ -115,12 +149,18 @@ static ui_error_t rating_cva_register_on_touched(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief CVA method to set the disabled state.
  *
  * \param component The rating component.
  * \param is_disabled The disabled state.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief rating_cva_set_disabled_state.
+ * @param component Parameter component.
+ * @param is_disabled Parameter is_disabled.
+ * @return Return value.
  */
 static ui_error_t rating_cva_set_disabled_state(void *component,
                                                 int is_disabled) {
@@ -131,7 +171,7 @@ static ui_error_t rating_cva_set_disabled_state(void *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a new unstyled rating component.
  *
  * \param out_rating Pointer to receive the allocated rating base.
@@ -195,7 +235,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Destroys a rating component and frees all resources.
  *
  * \param rating The rating component to destroy.
@@ -220,7 +260,7 @@ ui_error_t ui_rating_base_destroy(struct ui_rating_base *rating) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the maximum rating bound (number of items/stars).
  *
  * \param rating The rating component.
@@ -240,7 +280,7 @@ ui_error_t ui_rating_base_set_max(struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the maximum rating bound.
  *
  * \param rating The rating component.
@@ -257,7 +297,7 @@ ui_error_t ui_rating_base_get_max(const struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the current fractional rating value.
  *
  * The value will be clamped between 0.0 and max_rating.
@@ -290,7 +330,7 @@ ui_error_t ui_rating_base_set_value(struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the current fractional rating value.
  *
  * \param rating The rating component.
@@ -307,7 +347,7 @@ ui_error_t ui_rating_base_get_value(const struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the fraction to render for a given item index based on the
  * current rating.
  *
@@ -344,7 +384,7 @@ ui_error_t ui_rating_base_get_item_fraction(const struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Retrieves the icon component used to represent a fully filled rating
  * item.
  *
@@ -365,7 +405,7 @@ ui_error_t ui_rating_base_get_full_icon(struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Retrieves the icon component used to represent a partially filled
  * (half) rating item.
  *
@@ -386,7 +426,7 @@ ui_error_t ui_rating_base_get_half_icon(struct ui_rating_base *rating,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Retrieves the icon component used to represent an empty rating item.
  *
  * The returned icon is owned by the rating component and can be modified

@@ -1,3 +1,7 @@
+/**
+ * @file ui_resizable_behavior.c
+ * @brief ui_resizable_behavior.c implementation.
+ */
 /*
  * \file ui_resizable_behavior.c
  * \brief Implementation of the UI Resizable Behavior component.
@@ -31,7 +35,7 @@ struct ui_resizable_behavior {
   int start_h;               /**< Start height */
 };
 
-/*
+/**
  * \brief Creates a new resizable behavior.
  *
  * \param out_behavior Pointer to receive the allocated behavior.
@@ -70,7 +74,7 @@ ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a resizable behavior.
  *
  * \param behavior The behavior to destroy.
@@ -84,7 +88,7 @@ ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Configures the resizable constraints and allowed edges.
  *
  * \param behavior The resizable behavior.
@@ -109,7 +113,7 @@ ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the callback to be invoked when a resize is requested.
  *
  * \param behavior The resizable behavior.
@@ -128,7 +132,7 @@ ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Processes input events to handle drag-to-resize logic.
  *
  * \param behavior The resizable behavior.

@@ -19,9 +19,9 @@ extern "C" {
  * @brief Types of DOM mutations.
  */
 enum ui_mutation_type {
-  UI_MUTATION_TYPE_ATTRIBUTES = 1,
-  UI_MUTATION_TYPE_CHILD_LIST = 2,
-  UI_MUTATION_TYPE_CHARACTER_DATA = 3
+  UI_MUTATION_TYPE_ATTRIBUTES = 1,    /**< Mutation of attributes */
+  UI_MUTATION_TYPE_CHILD_LIST = 2,    /**< Mutation of child node list */
+  UI_MUTATION_TYPE_CHARACTER_DATA = 3 /**< Mutation of character data */
 };
 
 /**
@@ -62,6 +62,7 @@ struct ui_mutation_observer;
  * @param records Array of mutation records.
  * @param record_count Number of records in the array.
  * @param user_data Opaque pointer passed during creation.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_mutation_observer_cb_t)(
     struct ui_mutation_observer *observer,
@@ -82,6 +83,7 @@ ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
 /**
  * @brief Destroys a mutation observer.
  * @param observer The observer to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_mutation_observer_destroy(struct ui_mutation_observer *observer);
 
@@ -111,6 +113,7 @@ ui_mutation_observer_disconnect(struct ui_mutation_observer *observer);
  * @param target The parent node.
  * @param added The node added (or NULL).
  * @param removed The node removed (or NULL).
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
                                                   struct ui_dom_node *added,
@@ -121,6 +124,7 @@ ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
  * @param target The target node.
  * @param name The name of the attribute.
  * @param old_value The previous value (or NULL).
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
                                                  const char *name,
@@ -130,6 +134,7 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
  * @brief Internal notification hook when text content is modified.
  * @param target The target node.
  * @param old_value The previous text content (or NULL).
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_mutation_observer_notify_character_data(struct ui_dom_node *target,

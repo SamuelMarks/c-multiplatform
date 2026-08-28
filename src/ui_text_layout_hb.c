@@ -1,3 +1,7 @@
+/**
+ * @file ui_text_layout_hb.c
+ * @brief ui_text_layout_hb.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_text_layout_hb.h"
 #include "ui_internal_mem.h"
@@ -7,7 +11,7 @@
 #endif
 /* clang-format on */
 
-/*
+/**
  * @brief ui_text_layout_hb_init.
  * @return Return value.
  */

@@ -24,7 +24,7 @@ struct ui_avatar_group_base {
   struct ui_computed *data_signal; /**< Optional data signal */
 };
 
-/*
+/**
  * @brief ui_avatar_group_base_create.
  * @param out_group Parameter out_group.
  * @return Return value.
@@ -59,7 +59,7 @@ ui_avatar_group_base_create(struct ui_avatar_group_base **out_group) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_group_base_destroy.
  * @param group Parameter group.
  * @return Return value.
@@ -73,7 +73,7 @@ ui_error_t ui_avatar_group_base_destroy(struct ui_avatar_group_base *group) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_group_base_get_component.
  * @param group Parameter group.
  * @param out_component Parameter out_component.
@@ -89,7 +89,7 @@ ui_avatar_group_base_get_component(struct ui_avatar_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_group_base_append_avatar.
  * @param group Parameter group.
  * @param avatar Parameter avatar.
@@ -109,7 +109,7 @@ ui_avatar_group_base_append_avatar(struct ui_avatar_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_group_base_set_max_avatars.
  * @param group Parameter group.
  * @param max_avatars Parameter max_avatars.
@@ -125,7 +125,7 @@ ui_avatar_group_base_set_max_avatars(struct ui_avatar_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_group_base_get_max_avatars.
  * @param group Parameter group.
  * @param out_max_avatars Parameter out_max_avatars.
@@ -141,7 +141,7 @@ ui_avatar_group_base_get_max_avatars(struct ui_avatar_group_base *group,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_group_base_get_truncation_remainder.
  * @param group Parameter group.
  * @param out_remainder Parameter out_remainder.
@@ -161,7 +161,7 @@ ui_error_t ui_avatar_group_base_get_truncation_remainder(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_avatar_group_base_bind_data.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

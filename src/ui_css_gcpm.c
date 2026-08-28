@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_gcpm.c
+ * @brief ui_css_gcpm.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_css_gcpm.h"
 #include "../include/ui_cssom.h"
@@ -6,7 +10,7 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_css_gcpm_parse.
  * @param style Parameter style.
  * @param out_props Parameter out_props.

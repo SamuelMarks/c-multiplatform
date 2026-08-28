@@ -1,3 +1,11 @@
+/**
+ * @file WAYLAND_PLAN.md
+ * @brief WAYLAND_PLAN.md implementation.
+ */
+/**
+ * @file WAYLAND_PLAN.md
+ * @brief WAYLAND_PLAN.md implementation.
+ */
 # Wayland Integration Plan
 
 This document outlines the architecture and execution strategy for introducing native Wayland support to the C-Multiplatform UI engine on Linux, while preserving the existing X11 implementation as a fallback for non-Wayland environments.

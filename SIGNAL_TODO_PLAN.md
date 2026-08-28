@@ -1,3 +1,11 @@
+/**
+ * @file SIGNAL_TODO_PLAN.md
+ * @brief SIGNAL_TODO_PLAN.md implementation.
+ */
+/**
+ * @file SIGNAL_TODO_PLAN.md
+ * @brief SIGNAL_TODO_PLAN.md implementation.
+ */
 - [x] examples/auth_flow/i18n_dict.c
 - [x] examples/auth_flow/main.c
 - [x] examples/auth_flow/views.c

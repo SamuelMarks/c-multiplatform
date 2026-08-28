@@ -1,3 +1,7 @@
+/**
+ * @file ui_window_backend_linux_x11.c
+ * @brief ui_window_backend_linux_x11.c implementation.
+ */
 #if defined(__linux__) || defined(__FreeBSD__)
 
 /* clang-format off */
@@ -24,7 +28,7 @@ struct ui_window {
   Atom wm_delete_window; /**< wm_delete_window */
 };
 
-/*
+/**
  * @brief linux_create_window.
  * @param backend Parameter backend.
  * @param title Parameter title.
@@ -104,7 +108,7 @@ static ui_error_t linux_create_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_destroy_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -129,7 +133,7 @@ static ui_error_t linux_destroy_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_show_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -145,7 +149,7 @@ static ui_error_t linux_show_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_hide_window.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -161,7 +165,7 @@ static ui_error_t linux_hide_window(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_poll_events.
  * @param backend Parameter backend.
  * @param window Parameter window.
@@ -204,7 +208,7 @@ static ui_error_t linux_poll_events(struct ui_window_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief linux_swap_buffers.
  * @param backend Parameter backend.
  * @param window Parameter window.

@@ -1,6 +1,6 @@
-/*
- * \file ui_fab_base.c
- * \brief Implementation of the Floating Action Button (FAB) base widget.
+/**
+ * @file ui_fab_base.c
+ * @brief Implementation of the Floating Action Button (FAB) base widget.
  */
 /* clang-format off */
 #include "ui_fab_base.h"
@@ -8,36 +8,38 @@
 #include <stdlib.h>
 /* clang-format on */
 
-/*
- * \def EXPANSION_DURATION_MS
- * \brief Duration of FAB expansion in milliseconds.
- */
+/** @brief Duration of FAB expansion in milliseconds. */
 #define EXPANSION_DURATION_MS 200.0f
 
 /**
  * @struct ui_fab_base
- * \struct ui_fab_base
- * \brief Represents the internal state of a FAB widget.
+ * @brief Represents the internal state of a FAB widget.
  */
 struct ui_fab_base {
-  struct ui_button_base *main_button;     /**< main_button */
-  struct ui_button_base **action_buttons; /**< action_buttons */
-  size_t action_count;                    /**< action_count */
-  size_t action_capacity;                 /**< action_capacity */
+  struct ui_button_base *main_button; /**< The main action button of the FAB. */
+  struct ui_button_base *
+      *action_buttons; /**< Array of secondary action buttons. */
+  size_t action_count; /**< Current number of action buttons. */
+  size_t
+      action_capacity; /**< Allocated capacity of the action buttons array. */
 
-  enum ui_fab_state state;                             /**< state */
-  float expansion_progress; /**< expansion_progress */ /* 0.0 to 1.0 */
+  enum ui_fab_state state; /**< Current visual and semantic state of the FAB. */
+  float expansion_progress; /**< Expansion progress from 0.0 (collapsed) to 1.0
+                               (expanded). */
 
-  struct ui_ripple_config ripple_cfg;  /**< ripple_cfg */
-  struct ui_ripple_state ripple_state; /**< ripple_state */
-  struct ui_signal *disabled_signal;   /**< disabled_signal */
-  struct ui_signal *text_signal;       /**< text_signal */
+  struct ui_ripple_config
+      ripple_cfg; /**< Configuration for the ripple effect. */
+  struct ui_ripple_state
+      ripple_state; /**< Current runtime state of the ripple effect. */
+  struct ui_signal
+      *disabled_signal; /**< Signal indicating if the FAB is disabled. */
+  struct ui_signal *text_signal; /**< Signal providing text for the FAB. */
 };
 
-/*
- * \brief Creates a new FAB base widget.
- * \param[out] out_fab Pointer to store the created FAB.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new FAB base widget.
+ * @param[out] out_fab Pointer to store the created FAB.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_create(struct ui_fab_base **out_fab) {
   struct ui_fab_base *fab;
@@ -76,10 +78,10 @@ cleanup:
   return rc;
 }
 
-/*
- * \brief Destroys a FAB base widget.
- * \param[in,out] fab The FAB to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a FAB base widget.
+ * @param[in,out] fab The FAB to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_destroy(struct ui_fab_base *fab) {
   if (!fab) {
@@ -102,11 +104,11 @@ ui_error_t ui_fab_base_destroy(struct ui_fab_base *fab) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets the main button for the FAB.
- * \param[in,out] fab The FAB widget.
- * \param[in,out] button The main button.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets the main button for the FAB.
+ * @param[in,out] fab The FAB widget.
+ * @param[in,out] button The main button.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_set_main_button(struct ui_fab_base *fab,
                                        struct ui_button_base *button) {
@@ -122,11 +124,11 @@ ui_error_t ui_fab_base_set_main_button(struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the main button from the FAB.
- * \param[in] fab The FAB widget.
- * \param[out] out_button Pointer to store the main button.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets the main button from the FAB.
+ * @param[in] fab The FAB widget.
+ * @param[out] out_button Pointer to store the main button.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_get_main_button(const struct ui_fab_base *fab,
                                        struct ui_button_base **out_button) {
@@ -138,11 +140,11 @@ ui_error_t ui_fab_base_get_main_button(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Adds an action button to the FAB.
- * \param[in,out] fab The FAB widget.
- * \param[in,out] action_button The action button to add.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Adds an action button to the FAB.
+ * @param[in,out] fab The FAB widget.
+ * @param[in,out] action_button The action button to add.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_add_action(struct ui_fab_base *fab,
                                   struct ui_button_base *action_button) {
@@ -182,18 +184,11 @@ cleanup:
   return rc;
 }
 
-/*
- * \brief Gets the number of actions in the FAB.
- * \param[in] fab The FAB widget.
- * \param[out] out_count Pointer to store the action count.
- * \return UI_ERROR_NONE on success.
- */
-/*
- * \brief Gets an action button by index.
- * \param[in] fab The FAB widget.
- * \param[in] index The index of the action button.
- * \param[out] out_button Pointer to store the action button.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets the number of actions in the FAB.
+ * @param[in] fab The FAB widget.
+ * @param[out] out_count Pointer to store the action count.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_get_action_count(const struct ui_fab_base *fab,
                                         size_t *out_count) {
@@ -205,12 +200,12 @@ ui_error_t ui_fab_base_get_action_count(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets an action button by index.
- * \param[in] fab The FAB widget.
- * \param[in] index The index of the action button.
- * \param[out] out_button Pointer to store the action button.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets an action button by index.
+ * @param[in] fab The FAB widget.
+ * @param[in] index The index of the action button.
+ * @param[out] out_button Pointer to store the action button.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_get_action(const struct ui_fab_base *fab, size_t index,
                                   struct ui_button_base **out_button) {
@@ -226,10 +221,10 @@ ui_error_t ui_fab_base_get_action(const struct ui_fab_base *fab, size_t index,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Toggles the FAB's expanded state.
- * \param[in,out] fab The FAB widget.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Toggles the FAB's expanded state.
+ * @param[in,out] fab The FAB widget.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_toggle(struct ui_fab_base *fab) {
   if (!fab) {
@@ -246,11 +241,11 @@ ui_error_t ui_fab_base_toggle(struct ui_fab_base *fab) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the current state of the FAB.
- * \param[in] fab The FAB widget.
- * \param[out] out_state Pointer to store the state.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets the current state of the FAB.
+ * @param[in] fab The FAB widget.
+ * @param[out] out_state Pointer to store the state.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_get_state(const struct ui_fab_base *fab,
                                  enum ui_fab_state *out_state) {
@@ -262,11 +257,11 @@ ui_error_t ui_fab_base_get_state(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Ticks the FAB's animation.
- * \param[in,out] fab The FAB widget.
- * \param[in] dt_ms Delta time in milliseconds.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Ticks the FAB's animation.
+ * @param[in,out] fab The FAB widget.
+ * @param[in] dt_ms Delta time in milliseconds.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_tick(struct ui_fab_base *fab, float dt_ms) {
   if (!fab) {
@@ -308,12 +303,12 @@ ui_error_t ui_fab_base_tick(struct ui_fab_base *fab, float dt_ms) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the FAB's expansion progress.
- * \param[in] fab The FAB widget.
- * \param[out] out_progress Pointer to store the expansion progress (0.0
+/**
+ * @brief Gets the FAB's expansion progress.
+ * @param[in] fab The FAB widget.
+ * @param[out] out_progress Pointer to store the expansion progress (0.0
  * to 1.0).
- * \return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_get_expansion_progress(const struct ui_fab_base *fab,
                                               float *out_progress) {
@@ -325,11 +320,11 @@ ui_error_t ui_fab_base_get_expansion_progress(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the FAB's current ripple state.
- * \param[in] fab The FAB widget.
- * \param[out] out_ripple_state Pointer to store the ripple state.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets the FAB's current ripple state.
+ * @param[in] fab The FAB widget.
+ * @param[out] out_ripple_state Pointer to store the ripple state.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_fab_base_get_ripple_state(const struct ui_fab_base *fab,
@@ -344,12 +339,12 @@ ui_fab_base_get_ripple_state(const struct ui_fab_base *fab,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Starts a ripple effect on the FAB.
- * \param[in,out] fab The FAB widget.
- * \param[in] origin_x The X origin of the ripple.
- * \param[in] origin_y The Y origin of the ripple.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Starts a ripple effect on the FAB.
+ * @param[in,out] fab The FAB widget.
+ * @param[in] origin_x The X origin of the ripple.
+ * @param[in] origin_y The Y origin of the ripple.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_start_ripple(struct ui_fab_base *fab, float origin_x,
                                     float origin_y) {
@@ -375,11 +370,11 @@ ui_error_t ui_fab_base_start_ripple(struct ui_fab_base *fab, float origin_x,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Binds the FAB's disabled state to a signal.
- * \param[in,out] widget The FAB widget.
- * \param[in,out] disabled_signal The signal representing disabled state.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Binds the FAB's disabled state to a signal.
+ * @param[in,out] widget The FAB widget.
+ * @param[in,out] disabled_signal The signal representing disabled state.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_bind_disabled(struct ui_fab_base *widget,
                                      struct ui_signal *disabled_signal) {
@@ -390,11 +385,11 @@ ui_error_t ui_fab_base_bind_disabled(struct ui_fab_base *widget,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Binds the FAB's text to a signal.
- * \param[in,out] widget The FAB widget.
- * \param[in,out] text_signal The signal representing the text.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Binds the FAB's text to a signal.
+ * @param[in,out] widget The FAB widget.
+ * @param[in,out] text_signal The signal representing the text.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_fab_base_bind_text(struct ui_fab_base *widget,
                                  struct ui_signal *text_signal) {

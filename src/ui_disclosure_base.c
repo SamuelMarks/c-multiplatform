@@ -1,3 +1,7 @@
+/**
+ * @file ui_disclosure_base.c
+ * @brief ui_disclosure_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_disclosure_base.h"
 #include "ui_internal_mem.h"
@@ -9,6 +13,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet for disclosure base component */
 static const char *ui_disclosure_base_default_css =
     "details { "
     "background: var(--disclosure-bg, transparent); "
@@ -54,7 +59,7 @@ struct ui_disclosure_base {
   struct ui_signal *data_signal; /**< data_signal */
 };
 
-/*
+/**
  * @brief update_dom_state.
  * @param disclosure Parameter disclosure.
  * @return Return value.
@@ -72,7 +77,7 @@ static ui_error_t update_dom_state(struct ui_disclosure_base *disclosure) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_create.
  * @param out_disclosure Parameter out_disclosure.
  * @return Return value.
@@ -157,7 +162,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_destroy.
  * @param disclosure Parameter disclosure.
  * @return Return value.
@@ -174,7 +179,7 @@ ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_set_disabled.
  * @param disclosure Parameter disclosure.
  * @param disabled Parameter disabled.
@@ -203,7 +208,7 @@ ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_set_expanded.
  * @param disclosure Parameter disclosure.
  * @param is_expanded Parameter is_expanded.
@@ -235,7 +240,7 @@ ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_is_expanded.
  * @param disclosure Parameter disclosure.
  * @param out_is_expanded Parameter out_is_expanded.
@@ -254,7 +259,7 @@ ui_disclosure_base_is_expanded(const struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_set_on_toggle.
  * @param disclosure Parameter disclosure.
  * @param on_toggle Parameter on_toggle.
@@ -275,7 +280,7 @@ ui_disclosure_base_set_on_toggle(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_process_event.
  * @param disclosure Parameter disclosure.
  * @param event Parameter event.
@@ -320,7 +325,7 @@ ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_get_component.
  * @param disclosure Parameter disclosure.
  * @param out_component Parameter out_component.
@@ -340,7 +345,7 @@ ui_disclosure_base_get_component(struct ui_disclosure_base *disclosure,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_disclosure_base_bind_data.
  * @param widget Parameter widget.
  * @param signal Parameter signal.

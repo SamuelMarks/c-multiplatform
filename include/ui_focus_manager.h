@@ -21,10 +21,10 @@ extern "C" {
  * @brief Direction for spatial navigation (D-pad/arrow keys).
  */
 enum ui_focus_direction {
-  UI_FOCUS_DIRECTION_UP = 0,
-  UI_FOCUS_DIRECTION_DOWN,
-  UI_FOCUS_DIRECTION_LEFT,
-  UI_FOCUS_DIRECTION_RIGHT
+  UI_FOCUS_DIRECTION_UP = 0, /**< Navigate upwards */
+  UI_FOCUS_DIRECTION_DOWN,   /**< Navigate downwards */
+  UI_FOCUS_DIRECTION_LEFT,   /**< Navigate leftwards */
+  UI_FOCUS_DIRECTION_RIGHT   /**< Navigate rightwards */
 };
 
 struct ui_focus_manager;

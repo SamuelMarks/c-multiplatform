@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_env.c
+ * @brief ui_css_env.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_env.h"
 #include <stdlib.h>
@@ -44,7 +48,7 @@ ui_error_t ui_css_env_manager_create(struct ui_css_env_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_env_manager_destroy.
  * @param manager Parameter manager.
  * @return Return value.
@@ -69,7 +73,7 @@ ui_error_t ui_css_env_manager_destroy(struct ui_css_env_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_env_manager_set.
  * @param manager Parameter manager.
  * @param name Parameter name.
@@ -138,7 +142,7 @@ ui_error_t ui_css_env_manager_get(const struct ui_css_env_manager *manager,
   return UI_ERROR_NOT_FOUND;
 }
 
-/*
+/**
  * @brief ui_css_env_manager_remove.
  * @param manager Parameter manager.
  * @param name Parameter name.

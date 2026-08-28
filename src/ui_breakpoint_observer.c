@@ -1,3 +1,7 @@
+/**
+ * @file ui_breakpoint_observer.c
+ * @brief Implementation of ui_breakpoint_observer.c.
+ */
 /* clang-format off */
 #include "ui_breakpoint_observer.h"
 #include "ui_internal_mem.h"
@@ -9,7 +13,7 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_breakpoint_mock_fail = 0;
-/*
+/**
  * @brief mock_ui_signal_set.
  * @param signal Parameter signal.
  * @param value Parameter value.
@@ -56,7 +60,7 @@ struct ui_breakpoint_observer {
   int is_debouncing; /**< is_debouncing */
 };
 
-/*
+/**
  * @brief evaluate_breakpoints.
  * @param observer Parameter observer.
  * @param width Parameter width.
@@ -101,7 +105,7 @@ static ui_error_t evaluate_breakpoints(struct ui_breakpoint_observer *observer,
   return rc;
 }
 
-/*
+/**
  * @brief ui_breakpoint_observer_create.
  * @param window_manager Parameter window_manager.
  * @param out_observer Parameter out_observer.
@@ -151,7 +155,7 @@ ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_breakpoint_observer_destroy.
  * @param observer Parameter observer.
  * @return Return value.
@@ -173,7 +177,7 @@ ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_breakpoint_observer_get_signal.
  * @param observer Parameter observer.
  * @param breakpoint Parameter breakpoint.
@@ -192,7 +196,7 @@ ui_breakpoint_observer_get_signal(struct ui_breakpoint_observer *observer,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_breakpoint_observer_tick.
  * @param observer Parameter observer.
  * @param current_width Parameter current_width.

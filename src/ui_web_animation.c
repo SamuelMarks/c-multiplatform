@@ -252,6 +252,11 @@ ui_error_t ui_web_animation_destroy(struct ui_web_animation *animation) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief get_active_duration.
+ * @param anim Parameter anim.
+ * @return Return value.
+ */
 static double get_active_duration(const struct ui_web_animation *anim) {
   if (!anim->effect) {
     return 0.0;

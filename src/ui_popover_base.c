@@ -1,7 +1,8 @@
-/*
- * \file ui_popover_base.c
- * \brief Implementation of the UI popover base component.
+/**
+ * @file ui_popover_base.c
+ * @brief Implementation of the UI popover base component.
  */
+
 /* clang-format off */
 #include "ui_popover_base.h"
 #include "ui_internal_mem.h"
@@ -13,36 +14,35 @@
 #include <stdio.h>
 /* clang-format on */
 
-#if defined(_MSC_VER)
-/* MSVC Safe CRT */
-#endif
-
 /**
  * @struct ui_popover_base
- * \struct ui_popover_base
- * \brief State and DOM mapping for a popover widget (menus, tooltips, dialogs).
+ * @brief State and DOM mapping for a popover widget (menus, tooltips, dialogs).
  */
 struct ui_popover_base {
-  int is_open; /**< is_open */
+  int is_open; /**< Non-zero if the popover is currently open. */
 
-  struct ui_component *overlay_component;      /**< overlay_component */
-  struct ui_overlay *active_overlay;           /**< active_overlay */
-  struct ui_backdrop *backdrop;                /**< backdrop */
-  struct ui_focus_manager *active_focus_mgr;   /**< active_focus_mgr */
-  struct ui_overlay_director *active_director; /**< active_director */
+  struct ui_component *overlay_component; /**< Overlay component. */
+  struct ui_overlay *active_overlay;      /**< Active overlay instance. */
+  struct ui_backdrop *backdrop; /**< Backdrop for click-outside detection. */
+  struct ui_focus_manager
+      *active_focus_mgr; /**< The focus manager for trapping focus. */
+  struct ui_overlay_director
+      *active_director; /**< The overlay director managing the popover. */
 
-  float current_x;                      /**< current_x */
-  float current_y;                      /**< current_y */
-  float current_width;                  /**< current_width */
-  float current_height;                 /**< current_height */
-  struct ui_signal *open_signal;        /**< open_signal */
-  struct ui_computed *animating_signal; /**< animating_signal */
+  float current_x;      /**< X coordinate of the popover. */
+  float current_y;      /**< Y coordinate of the popover. */
+  float current_width;  /**< Width of the popover. */
+  float current_height; /**< Height of the popover. */
+  struct ui_signal
+      *open_signal; /**< Bound signal indicating if the popover is open. */
+  struct ui_computed
+      *animating_signal; /**< Computed signal tracking animation state. */
 };
 
-/*
- * \brief Creates a new popover base widget.
- * \param[out] out_popover Pointer to store the created widget.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new popover base widget.
+ * @param[out] out_popover Pointer to store the created widget.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_popover_base_create(struct ui_popover_base **out_popover) {
   struct ui_popover_base *popover;
@@ -82,10 +82,10 @@ ui_error_t ui_popover_base_create(struct ui_popover_base **out_popover) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a popover base widget.
- * \param[in,out] popover The widget to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a popover base widget.
+ * @param[in,out] popover The widget to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_popover_base_destroy(struct ui_popover_base *popover) {
   if (!popover)
@@ -103,18 +103,18 @@ ui_error_t ui_popover_base_destroy(struct ui_popover_base *popover) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Opens the popover, anchoring it to a specific layout node.
- * \param[in,out] popover The popover widget.
- * \param[in] content The DOM node containing the popover's visual content.
- * \param[in,out] director The overlay director to mount the popover into.
- * \param[in,out] focus_mgr Optional focus manager to trap focus within the
+/**
+ * @brief Opens the popover, anchoring it to a specific layout node.
+ * @param[in,out] popover The popover widget.
+ * @param[in] content The DOM node containing the popover's visual content.
+ * @param[in,out] director The overlay director to mount the popover into.
+ * @param[in,out] focus_mgr Optional focus manager to trap focus within the
  * popover.
- * \param[in] trigger_layout The layout node of the trigger element.
- * \param[in] anchor_config Configuration for anchoring the popover.
- * \param[in] viewport_width Width of the viewport.
- * \param[in] viewport_height Height of the viewport.
- * \return UI_ERROR_NONE on success.
+ * @param[in] trigger_layout The layout node of the trigger element.
+ * @param[in] anchor_config Configuration for anchoring the popover.
+ * @param[in] viewport_width Width of the viewport.
+ * @param[in] viewport_height Height of the viewport.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
                                 struct ui_dom_node *content,
@@ -136,6 +136,8 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
 
   if (popover->is_open) {
     rc = ui_popover_base_close(popover);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   /* Compute anchor position.
@@ -163,18 +165,24 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
   popover->current_height = overlay_layout.height;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Standard W3C mapping for popovers / dialogs */
   {
     ui_error_t attr_rc = ui_dom_node_set_attribute(root_node, "role", "dialog");
-    if (attr_rc != UI_ERROR_NONE)
+    if (attr_rc != UI_ERROR_NONE) {
+      (void)ui_dom_node_destroy(root_node);
       return attr_rc;
+    }
   }
   {
     ui_error_t attr_rc =
         ui_dom_node_set_attribute(root_node, "aria-modal", "true");
-    if (attr_rc != UI_ERROR_NONE)
+    if (attr_rc != UI_ERROR_NONE) {
+      (void)ui_dom_node_destroy(root_node);
       return attr_rc;
+    }
   }
 
 #if defined(_MSC_VER)
@@ -187,8 +195,10 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
   {
     ui_error_t attr_rc =
         ui_dom_node_set_attribute(root_node, "style", style_buf);
-    if (attr_rc != UI_ERROR_NONE)
+    if (attr_rc != UI_ERROR_NONE) {
+      (void)ui_dom_node_destroy(root_node);
       return attr_rc;
+    }
   }
 
   rc = ui_dom_node_append_child(root_node, content);
@@ -238,11 +248,11 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Processes an incoming UI event (like clicks outside) for the popover.
- * \param[in,out] popover The popover widget.
- * \param[in] event The UI event to process.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Processes an incoming UI event (like clicks outside) for the popover.
+ * @param[in,out] popover The popover widget.
+ * @param[in] event The UI event to process.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_popover_base_process_event(struct ui_popover_base *popover,
                                          const struct ui_event *event) {
@@ -270,10 +280,10 @@ ui_error_t ui_popover_base_process_event(struct ui_popover_base *popover,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Closes the popover and cleans up its overlay/focus state.
- * \param[in,out] popover The popover widget.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Closes the popover and cleans up its overlay/focus state.
+ * @param[in,out] popover The popover widget.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_popover_base_close(struct ui_popover_base *popover) {
   struct ui_dom_node *root;
@@ -316,11 +326,11 @@ ui_error_t ui_popover_base_close(struct ui_popover_base *popover) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Checks if the popover is currently open.
- * \param[in] popover The popover widget.
- * \param[out] out_is_open Set to 1 if open, 0 otherwise.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Checks if the popover is currently open.
+ * @param[in] popover The popover widget.
+ * @param[out] out_is_open Set to 1 if open, 0 otherwise.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_popover_base_is_open(const struct ui_popover_base *popover,
                                    int *out_is_open) {
@@ -330,11 +340,11 @@ ui_error_t ui_popover_base_is_open(const struct ui_popover_base *popover,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Binds the open state of the popover to a reactive signal.
- * \param[in,out] widget The popover widget.
- * \param[in,out] open_signal The signal representing the open state.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Binds the open state of the popover to a reactive signal.
+ * @param[in,out] widget The popover widget.
+ * @param[in,out] open_signal The signal representing the open state.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_popover_base_bind_open(struct ui_popover_base *widget,
                                      struct ui_signal *open_signal) {
@@ -345,12 +355,12 @@ ui_error_t ui_popover_base_bind_open(struct ui_popover_base *widget,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the computed signal indicating if the popover is currently
+/**
+ * @brief Gets the computed signal indicating if the popover is currently
  * animating.
- * \param[in,out] widget The popover widget.
- * \param[out] out_animating Pointer to store the computed signal.
- * \return UI_ERROR_NONE on success.
+ * @param[in,out] widget The popover widget.
+ * @param[out] out_animating Pointer to store the computed signal.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_popover_base_get_animating_signal(struct ui_popover_base *widget,

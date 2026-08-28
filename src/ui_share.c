@@ -1,3 +1,7 @@
+/**
+ * @file ui_share.c
+ * @brief ui_share.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_share.h"
 #include "ui_internal_mem.h"
@@ -38,7 +42,7 @@ struct ui_share_task {
   struct ui_share_payload payload_copy; /**< payload_copy */
 };
 
-/*
+/**
  * \brief Checks if sharing is supported.
  * \param out_is_available Pointer to store the result.
  * \return UI_ERROR_NONE on success.
@@ -53,7 +57,7 @@ ui_error_t ui_share_is_supported(int *out_is_available) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Requests a share operation asynchronously.
  * \param payload The payload to share.
  * \param promise The promise to resolve when done.

@@ -1,3 +1,7 @@
+/**
+ * @file ui_renderer_gles2.c
+ * @brief ui_renderer_gles2.c implementation.
+ */
 /*
  * \file ui_renderer_gles2.c
  * \brief Implementation of the UI Renderer GLES2 backend.
@@ -204,26 +208,42 @@ static ui_error_t load_gl_extensions(void) {
 #endif
 
 #ifndef GL_COLOR_BUFFER_BIT
-/* \brief Fallback GL_COLOR_BUFFER_BIT */
+/** @def GL_COLOR_BUFFER_BIT
+ * @brief Fallback GL_COLOR_BUFFER_BIT
+ */
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #endif
 
 #ifndef GL_FLOAT
-/* \brief Fallback GL_FLOAT */
+/** @def GL_FLOAT
+ * @brief Fallback GL_FLOAT
+ */
 #define GL_FLOAT 0x1406
-/* \brief Fallback GL_UNSIGNED_SHORT */
+/** @def GL_UNSIGNED_SHORT
+ * @brief Fallback GL_UNSIGNED_SHORT
+ */
 #define GL_UNSIGNED_SHORT 0x1403
-/* \brief Fallback GL_TRIANGLES */
+/** @def GL_TRIANGLES
+ * @brief Fallback GL_TRIANGLES
+ */
 #define GL_TRIANGLES 0x0004
-/* \brief Fallback GL_RGBA */
+/** @def GL_RGBA
+ * @brief Fallback GL_RGBA
+ */
 #define GL_RGBA 0x1908
-/* \brief Fallback GL_UNSIGNED_BYTE */
+/** @def GL_UNSIGNED_BYTE
+ * @brief Fallback GL_UNSIGNED_BYTE
+ */
 #define GL_UNSIGNED_BYTE 0x1401
 #endif
 
-/* \brief Maximum vertices per batch */
+/** @def GLES2_MAX_VERTICES
+ * @brief Maximum vertices per batch
+ */
 #define GLES2_MAX_VERTICES 8192
-/* \brief Maximum indices per batch */
+/** @def GLES2_MAX_INDICES
+ * @brief Maximum indices per batch
+ */
 #define GLES2_MAX_INDICES 24576
 
 /**
@@ -247,7 +267,7 @@ struct gles2_renderer_data {
   float viewport_height; /**< Viewport height */
 };
 
-/* \brief Simple passthrough vertex shader */
+/** @brief Simple passthrough vertex shader */
 static const char *vertex_shader_source =
     "attribute vec2 a_position;\n"
     "attribute vec4 a_color;\n"
@@ -261,20 +281,27 @@ static const char *vertex_shader_source =
     "  v_color = a_color;\n"
     "}\n";
 
-/* \brief Simple passthrough fragment shader */
+/** @brief Simple passthrough fragment shader */
 static const char *fragment_shader_source = "precision mediump float;\n"
                                             "varying vec4 v_color;\n"
                                             "void main() {\n"
                                             "  gl_FragColor = v_color;\n"
                                             "}\n";
 
-/*
+/**
  * \brief Compiles a shader.
  *
  * \param type Shader type.
  * \param source Source code.
  * \param out_shader Pointer to receive the shader ID.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief compile_shader.
+ * @param type Parameter type.
+ * @param source Parameter source.
+ * @param out_shader Parameter out_shader.
+ * @return Return value.
  */
 static ui_error_t compile_shader(unsigned int type, const char *source,
                                  unsigned int *out_shader) {
@@ -291,11 +318,16 @@ static ui_error_t compile_shader(unsigned int type, const char *source,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Flushes the batched geometry to the GPU.
  *
  * \param backend The renderer backend.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_flush.
+ * @param backend Parameter backend.
+ * @return Return value.
  */
 static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
@@ -360,7 +392,7 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Submits arbitrary triangulated geometry (e.g. SVG paths) to the batch.
  *
  * \param backend The renderer backend.
@@ -369,6 +401,15 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
  * \param indices Array of indices defining triangles.
  * \param index_count Number of indices.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_draw_triangles.
+ * @param backend Parameter backend.
+ * @param vertices Parameter vertices.
+ * @param vertex_count Parameter vertex_count.
+ * @param indices Parameter indices.
+ * @param index_count Parameter index_count.
+ * @return Return value.
  */
 static ui_error_t gles2_draw_triangles(struct ui_renderer_backend *backend,
                                        const struct ui_vertex *vertices,
@@ -413,7 +454,7 @@ static ui_error_t gles2_draw_triangles(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Submits a UI rectangle to the geometry batch.
  *
  * \param backend The renderer backend.
@@ -423,6 +464,16 @@ static ui_error_t gles2_draw_triangles(struct ui_renderer_backend *backend,
  * \param height Rectangle height.
  * \param color Fill color.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_draw_rect.
+ * @param backend Parameter backend.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param color Parameter color.
+ * @return Return value.
  */
 static ui_error_t gles2_draw_rect(struct ui_renderer_backend *backend, float x,
                                   float y, float width, float height,
@@ -461,7 +512,7 @@ static ui_error_t gles2_draw_rect(struct ui_renderer_backend *backend, float x,
   return gles2_draw_triangles(backend, vertices, 4, indices, 6);
 }
 
-/*
+/**
  * \brief Submits a UI border (hollow rectangle) to the geometry batch.
  *
  * \param backend The renderer backend.
@@ -472,6 +523,17 @@ static ui_error_t gles2_draw_rect(struct ui_renderer_backend *backend, float x,
  * \param thickness Border thickness.
  * \param color Border color.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_draw_border.
+ * @param backend Parameter backend.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param thickness Parameter thickness.
+ * @param color Parameter color.
+ * @return Return value.
  */
 static ui_error_t gles2_draw_border(struct ui_renderer_backend *backend,
                                     float x, float y, float width, float height,
@@ -501,13 +563,20 @@ static ui_error_t gles2_draw_border(struct ui_renderer_backend *backend,
   return rc;
 }
 
-/*
+/**
  * \brief Initializes the renderer for the given window.
  *
  * \param backend The renderer backend.
  * \param window_backend The window backend.
  * \param window The window instance.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_init.
+ * @param backend Parameter backend.
+ * @param window_backend Parameter window_backend.
+ * @param window Parameter window.
+ * @return Return value.
  */
 static ui_error_t gles2_init(struct ui_renderer_backend *backend,
                              struct ui_window_backend *window_backend,
@@ -564,11 +633,16 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys the renderer backend internal state.
  *
  * \param backend The renderer backend.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_destroy.
+ * @param backend Parameter backend.
+ * @return Return value.
  */
 static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   struct gles2_renderer_data *data;
@@ -598,7 +672,7 @@ static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the rendering viewport.
  *
  * \param backend The renderer backend.
@@ -607,6 +681,15 @@ static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
  * \param width Viewport width.
  * \param height Viewport height.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_set_viewport.
+ * @param backend Parameter backend.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @return Return value.
  */
 static ui_error_t gles2_set_viewport(struct ui_renderer_backend *backend, int x,
                                      int y, int width, int height) {
@@ -623,12 +706,18 @@ static ui_error_t gles2_set_viewport(struct ui_renderer_backend *backend, int x,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Clears the screen with the specified color.
  *
  * \param backend The renderer backend.
  * \param color The clear color.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_clear.
+ * @param backend Parameter backend.
+ * @param color Parameter color.
+ * @return Return value.
  */
 static ui_error_t gles2_clear(struct ui_renderer_backend *backend,
                               struct ui_color color) {
@@ -649,7 +738,7 @@ struct gles2_texture {
   int height;          /**< Texture height */
 };
 
-/*
+/**
  * \brief Pushes a clipping rect.
  *
  * \param backend The renderer backend.
@@ -658,6 +747,15 @@ struct gles2_texture {
  * \param width Width.
  * \param height Height.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_push_clip.
+ * @param backend Parameter backend.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @return Return value.
  */
 static ui_error_t gles2_push_clip(struct ui_renderer_backend *backend, float x,
                                   float y, float width, float height) {
@@ -677,11 +775,16 @@ static ui_error_t gles2_push_clip(struct ui_renderer_backend *backend, float x,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Pops a clipping rect.
  *
  * \param backend The renderer backend.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_pop_clip.
+ * @param backend Parameter backend.
+ * @return Return value.
  */
 static ui_error_t gles2_pop_clip(struct ui_renderer_backend *backend) {
   ui_error_t rc;
@@ -695,7 +798,7 @@ static ui_error_t gles2_pop_clip(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Pushes a stencil clip from triangulated geometry.
  *
  * \param backend The renderer backend.
@@ -704,6 +807,15 @@ static ui_error_t gles2_pop_clip(struct ui_renderer_backend *backend) {
  * \param indices Array of indices defining triangles.
  * \param index_count Number of indices.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_push_stencil_clip.
+ * @param backend Parameter backend.
+ * @param vertices Parameter vertices.
+ * @param vertex_count Parameter vertex_count.
+ * @param indices Parameter indices.
+ * @param index_count Parameter index_count.
+ * @return Return value.
  */
 static ui_error_t gles2_push_stencil_clip(struct ui_renderer_backend *backend,
                                           const struct ui_vertex *vertices,
@@ -726,11 +838,16 @@ static ui_error_t gles2_push_stencil_clip(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Pops a stencil clip.
  *
  * \param backend The renderer backend.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_pop_stencil_clip.
+ * @param backend Parameter backend.
+ * @return Return value.
  */
 static ui_error_t gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
   ui_error_t rc;
@@ -744,7 +861,7 @@ static ui_error_t gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates an offscreen texture (FBO) for rendering.
  *
  * \param backend The renderer backend.
@@ -752,6 +869,14 @@ static ui_error_t gles2_pop_stencil_clip(struct ui_renderer_backend *backend) {
  * \param height Texture height.
  * \param out_texture_handle Pointer to receive the texture handle.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_create_texture.
+ * @param backend Parameter backend.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param out_texture_handle Parameter out_texture_handle.
+ * @return Return value.
  */
 static ui_error_t gles2_create_texture(struct ui_renderer_backend *backend,
                                        int width, int height,
@@ -776,12 +901,18 @@ static ui_error_t gles2_create_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys an offscreen texture (FBO).
  *
  * \param backend The renderer backend.
  * \param texture_handle The texture handle to destroy.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_destroy_texture.
+ * @param backend Parameter backend.
+ * @param texture_handle Parameter texture_handle.
+ * @return Return value.
  */
 static ui_error_t gles2_destroy_texture(struct ui_renderer_backend *backend,
                                         void *texture_handle) {
@@ -792,12 +923,18 @@ static ui_error_t gles2_destroy_texture(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the render target to a specific texture (FBO).
  *
  * \param backend The renderer backend.
  * \param texture_handle The texture handle, or NULL for screen.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_set_render_target.
+ * @param backend Parameter backend.
+ * @param texture_handle Parameter texture_handle.
+ * @return Return value.
  */
 static ui_error_t gles2_set_render_target(struct ui_renderer_backend *backend,
                                           void *texture_handle) {
@@ -808,7 +945,7 @@ static ui_error_t gles2_set_render_target(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Draws a previously rendered offscreen texture.
  *
  * \param backend The renderer backend.
@@ -819,6 +956,17 @@ static ui_error_t gles2_set_render_target(struct ui_renderer_backend *backend,
  * \param height Dest height.
  * \param opacity Alpha opacity modifier.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_draw_texture.
+ * @param backend Parameter backend.
+ * @param texture_handle Parameter texture_handle.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param opacity Parameter opacity.
+ * @return Return value.
  */
 static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
                                      void *texture_handle, float x, float y,
@@ -840,7 +988,7 @@ static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
   return gles2_draw_rect(backend, x, y, width, height, color);
 }
 
-/*
+/**
  * \brief Reads pixels from the current render target.
  *
  * \param backend The renderer backend.
@@ -848,6 +996,14 @@ static ui_error_t gles2_draw_texture(struct ui_renderer_backend *backend,
  * \param height Height of region to read.
  * \param out_rgba_buffer Pre-allocated buffer to receive RGBA pixels.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+/**
+ * @brief gles2_read_pixels.
+ * @param backend Parameter backend.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param out_rgba_buffer Parameter out_rgba_buffer.
+ * @return Return value.
  */
 static ui_error_t gles2_read_pixels(struct ui_renderer_backend *backend,
                                     int width, int height,
@@ -860,7 +1016,7 @@ static ui_error_t gles2_read_pixels(struct ui_renderer_backend *backend,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Creates a GLES 2.0 / WebGL 1.0 renderer backend.
  *
  * \param out_backend Pointer to receive the allocated backend.
@@ -902,7 +1058,7 @@ ui_error_t ui_renderer_gles2_create(struct ui_renderer_backend **out_backend) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Destroys a GLES 2.0 renderer backend.
  *
  * \param backend The backend to destroy.

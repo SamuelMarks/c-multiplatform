@@ -1,8 +1,12 @@
+/**
+ * @file ui_focus_ring.c
+ * @brief ui_focus_ring.c implementation.
+ */
 /* clang-format off */
 #include "ui_focus_ring.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_focus_ring_get_standard.
  * @param theme_primary_color Parameter theme_primary_color.
  * @param out_ring Parameter out_ring.

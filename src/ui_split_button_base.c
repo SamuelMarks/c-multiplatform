@@ -1,3 +1,7 @@
+/**
+ * @file ui_split_button_base.c
+ * @brief ui_split_button_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_split_button_base.h"
 #include "ui_internal_mem.h"
@@ -14,6 +18,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet */
 static const char *ui_split_button_base_default_css =
     "div.split-button { "
     "display: flex; "
@@ -36,7 +41,7 @@ struct ui_split_button_base {
   struct ui_signal *text_signal;         /**< text_signal */
 };
 
-/*
+/**
  * \brief Creates a new split button base component.
  * \param out_split_button Pointer to store the component.
  * \return UI_ERROR_NONE on success.
@@ -171,7 +176,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * \brief Destroys a split button base component.
  * \param split_button The component to destroy.
  * \return UI_ERROR_NONE on success.
@@ -208,7 +213,7 @@ ui_split_button_base_destroy(struct ui_split_button_base *split_button) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the disabled state.
  * \param split_button The split button component.
  * \param disabled The disabled state.
@@ -237,7 +242,7 @@ ui_split_button_base_set_disabled(struct ui_split_button_base *split_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the main button.
  * \param split_button The split button component.
  * \param out_main_btn Pointer to store the main button.
@@ -253,7 +258,7 @@ ui_split_button_base_get_main_button(struct ui_split_button_base *split_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the trigger button.
  * \param split_button The split button component.
  * \param out_trigger_btn Pointer to store the trigger button.
@@ -269,7 +274,7 @@ ui_error_t ui_split_button_base_get_trigger_button(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Gets the base component for the split button.
  * \param split_button The split button component.
  * \param out_comp Pointer to store the component.
@@ -285,7 +290,7 @@ ui_split_button_base_get_component(struct ui_split_button_base *split_button,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Binds the disabled state to a signal.
  * \param widget The split button component.
  * \param disabled_signal The signal to bind.
@@ -301,7 +306,7 @@ ui_split_button_base_bind_disabled(struct ui_split_button_base *widget,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Binds the text state to a signal.
  * \param widget The split button component.
  * \param text_signal The signal to bind.

@@ -1,5 +1,11 @@
 /**
  * @file stb_truetype.h
+ * @brief stb_truetype header.
+ */
+/** @cond */
+
+/**
+ * @file stb_truetype.h
  * @brief Public domain library for TrueType font rendering.
  */
 /* stb_truetype.h - v1.26 - public domain*/
@@ -318,6 +324,10 @@ unsigned char temp_bitmap[512*512];
 stbtt_bakedchar cdata[96]; /* ASCII 32..126 is 95 glyphs*/
 GLuint ftex;
 
+/**
+ * @brief my_stbtt_initfont.
+ * @return Return value.
+ */
 void my_stbtt_initfont(void)
 {
    fread(ttf_buffer, 1, 1<<20, fopen("c:/windows/fonts/times.ttf", "rb"));
@@ -330,6 +340,13 @@ void my_stbtt_initfont(void)
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 }
 
+/**
+ * @brief my_stbtt_print.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param text Parameter text.
+ * @return Return value.
+ */
 void my_stbtt_print(float x, float y, char *text)
 {
    /* assume orthographic projection with units = screen pixels, origin at top left*/
@@ -563,6 +580,19 @@ typedef struct {
   float xoff, yoff, xadvance;
 } stbtt_bakedchar;
 
+/**
+ * @brief stbtt_BakeFontBitmap.
+ * @param data Parameter data.
+ * @param offset Parameter offset.
+ * @param pixel_height Parameter pixel_height.
+ * @param pixels Parameter pixels.
+ * @param pw Parameter pw.
+ * @param ph Parameter ph.
+ * @param first_char Parameter first_char.
+ * @param num_chars Parameter num_chars.
+ * @param chardata Parameter chardata.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_BakeFontBitmap(
     const unsigned char *data,
     int offset,         /* font location (use offset=0 for plain .ttf)*/
@@ -581,6 +611,18 @@ typedef struct {
   float x1, y1, s1, t1; /* bottom-right*/
 } stbtt_aligned_quad;
 
+/**
+ * @brief stbtt_GetBakedQuad.
+ * @param chardata Parameter chardata.
+ * @param pw Parameter pw.
+ * @param ph Parameter ph.
+ * @param char_index Parameter char_index.
+ * @param xpos Parameter xpos.
+ * @param ypos Parameter ypos.
+ * @param q Parameter q.
+ * @param opengl_fillrule Parameter opengl_fillrule.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetBakedQuad(
     const stbtt_bakedchar *chardata, int pw, int ph, /* same data as above*/
     int char_index,                                  /* character to display*/
@@ -598,6 +640,16 @@ STBTT_DEF void stbtt_GetBakedQuad(
 /**/
 /* It's inefficient; you might want to c&p it and optimize it.*/
 
+/**
+ * @brief stbtt_GetScaledFontVMetrics.
+ * @param fontdata Parameter fontdata.
+ * @param index Parameter index.
+ * @param size Parameter size.
+ * @param ascent Parameter ascent.
+ * @param descent Parameter descent.
+ * @param lineGap Parameter lineGap.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char *fontdata,
                                            int index, float size, float *ascent,
                                            float *descent, float *lineGap);
@@ -616,12 +668,32 @@ typedef struct {
   float xoff2, yoff2;
 } stbtt_packedchar;
 
+/**
+ * @brief stbtt_pack_context.
+ */
 typedef struct stbtt_pack_context stbtt_pack_context;
+/**
+ * @brief stbtt_fontinfo.
+ */
 typedef struct stbtt_fontinfo stbtt_fontinfo;
 #ifndef STB_RECT_PACK_VERSION
+/**
+ * @brief stbrp_rect.
+ */
 typedef struct stbrp_rect stbrp_rect;
 #endif
 
+/**
+ * @brief stbtt_PackBegin.
+ * @param spc Parameter spc.
+ * @param pixels Parameter pixels.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param stride_in_bytes Parameter stride_in_bytes.
+ * @param padding Parameter padding.
+ * @param alloc_context Parameter alloc_context.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels,
                               int width, int height, int stride_in_bytes,
                               int padding, void *alloc_context);
@@ -635,11 +707,27 @@ STBTT_DEF int stbtt_PackBegin(stbtt_pack_context *spc, unsigned char *pixels,
 /**/
 /* Returns 0 on failure, 1 on success.*/
 
+/**
+ * @brief stbtt_PackEnd.
+ * @param spc Parameter spc.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_PackEnd(stbtt_pack_context *spc);
 /* Cleans up the packing context and frees all memory.*/
 
 #define STBTT_POINT_SIZE(x) (-(x))
 
+/**
+ * @brief stbtt_PackFontRange.
+ * @param spc Parameter spc.
+ * @param fontdata Parameter fontdata.
+ * @param font_index Parameter font_index.
+ * @param font_size Parameter font_size.
+ * @param first_unicode_char_in_range Parameter first_unicode_char_in_range.
+ * @param num_chars_in_range Parameter num_chars_in_range.
+ * @param chardata_for_range Parameter chardata_for_range.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context *spc,
                                   const unsigned char *fontdata, int font_index,
                                   float font_size,
@@ -677,6 +765,15 @@ typedef struct {
       v_oversample; /* don't set these, they're used internally*/
 } stbtt_pack_range;
 
+/**
+ * @brief stbtt_PackFontRanges.
+ * @param spc Parameter spc.
+ * @param fontdata Parameter fontdata.
+ * @param font_index Parameter font_index.
+ * @param ranges Parameter ranges.
+ * @param num_ranges Parameter num_ranges.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context *spc,
                                    const unsigned char *fontdata,
                                    int font_index, stbtt_pack_range *ranges,
@@ -686,6 +783,13 @@ STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context *spc,
 /* calls to stbtt_PackFontRange. Note that you can call this multiple*/
 /* times within a single PackBegin/PackEnd.*/
 
+/**
+ * @brief stbtt_PackSetOversampling.
+ * @param spc Parameter spc.
+ * @param h_oversample Parameter h_oversample.
+ * @param v_oversample Parameter v_oversample.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_PackSetOversampling(stbtt_pack_context *spc,
                                          unsigned int h_oversample,
                                          unsigned int v_oversample);
@@ -705,6 +809,12 @@ STBTT_DEF void stbtt_PackSetOversampling(stbtt_pack_context *spc,
 /* To use with PackFontRangesGather etc., you must set it before calls*/
 /* call to PackFontRangesGatherRects.*/
 
+/**
+ * @brief stbtt_PackSetSkipMissingCodepoints.
+ * @param spc Parameter spc.
+ * @param skip Parameter skip.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc,
                                                   int skip);
 /* If skip != 0, this tells stb_truetype to skip any codepoints for which*/
@@ -712,6 +822,18 @@ STBTT_DEF void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc,
 /* codepoints without a glyph recived the font's "missing character" glyph,*/
 /* typically an empty box by convention.*/
 
+/**
+ * @brief stbtt_GetPackedQuad.
+ * @param chardata Parameter chardata.
+ * @param pw Parameter pw.
+ * @param ph Parameter ph.
+ * @param char_index Parameter char_index.
+ * @param xpos Parameter xpos.
+ * @param ypos Parameter ypos.
+ * @param q Parameter q.
+ * @param align_to_integer Parameter align_to_integer.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetPackedQuad(
     const stbtt_packedchar *chardata, int pw, int ph, /* same data as above*/
     int char_index,                                   /* character to display*/
@@ -720,13 +842,38 @@ STBTT_DEF void stbtt_GetPackedQuad(
     stbtt_aligned_quad *q, /* output: quad to draw*/
     int align_to_integer);
 
+/**
+ * @brief stbtt_PackFontRangesGatherRects.
+ * @param spc Parameter spc.
+ * @param info Parameter info.
+ * @param ranges Parameter ranges.
+ * @param num_ranges Parameter num_ranges.
+ * @param rects Parameter rects.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_PackFontRangesGatherRects(stbtt_pack_context *spc,
                                               const stbtt_fontinfo *info,
                                               stbtt_pack_range *ranges,
                                               int num_ranges,
                                               stbrp_rect *rects);
+/**
+ * @brief stbtt_PackFontRangesPackRects.
+ * @param spc Parameter spc.
+ * @param rects Parameter rects.
+ * @param num_rects Parameter num_rects.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_PackFontRangesPackRects(stbtt_pack_context *spc,
                                              stbrp_rect *rects, int num_rects);
+/**
+ * @brief stbtt_PackFontRangesRenderIntoRects.
+ * @param spc Parameter spc.
+ * @param info Parameter info.
+ * @param ranges Parameter ranges.
+ * @param num_ranges Parameter num_ranges.
+ * @param rects Parameter rects.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_PackFontRangesRenderIntoRects(stbtt_pack_context *spc,
                                                   const stbtt_fontinfo *info,
                                                   stbtt_pack_range *ranges,
@@ -763,6 +910,11 @@ struct stbtt_pack_context {
 /**/
 /**/
 
+/**
+ * @brief stbtt_GetNumberOfFonts.
+ * @param data Parameter data.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetNumberOfFonts(const unsigned char *data);
 /* This function will determine the number of fonts in a font file.  TrueType*/
 /* collection (.ttc) files may contain multiple fonts, while TrueType font*/
@@ -770,6 +922,12 @@ STBTT_DEF int stbtt_GetNumberOfFonts(const unsigned char *data);
 /* indexing with the previous function where the index is between zero and one*/
 /* less than the total fonts. If an error occurs, -1 is returned.*/
 
+/**
+ * @brief stbtt_GetFontOffsetForIndex.
+ * @param data Parameter data.
+ * @param index Parameter index.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetFontOffsetForIndex(const unsigned char *data, int index);
 /* Each .ttf/.ttc file may have more than one font. Each font has a sequential*/
 /* index number starting from 0. Call this function to get the font offset for*/
@@ -799,6 +957,13 @@ struct stbtt_fontinfo {
   stbtt__buf fdselect;    /* map from glyph to fontdict*/
 };
 
+/**
+ * @brief stbtt_InitFont.
+ * @param info Parameter info.
+ * @param data Parameter data.
+ * @param offset Parameter offset.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_InitFont(stbtt_fontinfo *info, const unsigned char *data,
                              int offset);
 /* Given an offset into the file that defines a font, this function builds*/
@@ -811,6 +976,12 @@ STBTT_DEF int stbtt_InitFont(stbtt_fontinfo *info, const unsigned char *data,
 /**/
 /* CHARACTER TO GLYPH-INDEX CONVERSIOn*/
 
+/**
+ * @brief stbtt_FindGlyphIndex.
+ * @param info Parameter info.
+ * @param unicode_codepoint Parameter unicode_codepoint.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info,
                                    int unicode_codepoint);
 /* If you're going to perform multiple operations on the same character*/
@@ -824,6 +995,12 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info,
 /* CHARACTER PROPERTIES*/
 /**/
 
+/**
+ * @brief stbtt_ScaleForPixelHeight.
+ * @param info Parameter info.
+ * @param pixels Parameter pixels.
+ * @return Return value.
+ */
 STBTT_DEF float stbtt_ScaleForPixelHeight(const stbtt_fontinfo *info,
                                           float pixels);
 /* computes a scale factor to produce a font whose "height" is 'pixels' tall.*/
@@ -834,12 +1011,26 @@ STBTT_DEF float stbtt_ScaleForPixelHeight(const stbtt_fontinfo *info,
 /* so if you prefer to measure height by the ascent only, use a similar
  * calculation.*/
 
+/**
+ * @brief stbtt_ScaleForMappingEmToPixels.
+ * @param info Parameter info.
+ * @param pixels Parameter pixels.
+ * @return Return value.
+ */
 STBTT_DEF float stbtt_ScaleForMappingEmToPixels(const stbtt_fontinfo *info,
                                                 float pixels);
 /* computes a scale factor to produce a font whose EM size is mapped to*/
 /* 'pixels' tall. This is probably what traditional APIs compute, but*/
 /* I'm not positive.*/
 
+/**
+ * @brief stbtt_GetFontVMetrics.
+ * @param info Parameter info.
+ * @param ascent Parameter ascent.
+ * @param descent Parameter descent.
+ * @param lineGap Parameter lineGap.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetFontVMetrics(const stbtt_fontinfo *info, int *ascent,
                                      int *descent, int *lineGap);
 /* ascent is the coordinate above the baseline the font extends; descent*/
@@ -852,6 +1043,14 @@ STBTT_DEF void stbtt_GetFontVMetrics(const stbtt_fontinfo *info, int *ascent,
 /*   these are expressed in unscaled coordinates, so you must multiply by*/
 /*   the scale factor for a given size*/
 
+/**
+ * @brief stbtt_GetFontVMetricsOS2.
+ * @param info Parameter info.
+ * @param typoAscent Parameter typoAscent.
+ * @param typoDescent Parameter typoDescent.
+ * @param typoLineGap Parameter typoLineGap.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetFontVMetricsOS2(const stbtt_fontinfo *info,
                                        int *typoAscent, int *typoDescent,
                                        int *typoLineGap);
@@ -861,10 +1060,27 @@ STBTT_DEF int stbtt_GetFontVMetricsOS2(const stbtt_fontinfo *info,
 /**/
 /* Returns 1 on success (table present), 0 on failure.*/
 
+/**
+ * @brief stbtt_GetFontBoundingBox.
+ * @param info Parameter info.
+ * @param x0 Parameter x0.
+ * @param y0 Parameter y0.
+ * @param x1 Parameter x1.
+ * @param y1 Parameter y1.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetFontBoundingBox(const stbtt_fontinfo *info, int *x0,
                                         int *y0, int *x1, int *y1);
 /* the bounding box around all possible characters*/
 
+/**
+ * @brief stbtt_GetCodepointHMetrics.
+ * @param info Parameter info.
+ * @param codepoint Parameter codepoint.
+ * @param advanceWidth Parameter advanceWidth.
+ * @param leftSideBearing Parameter leftSideBearing.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetCodepointHMetrics(const stbtt_fontinfo *info,
                                           int codepoint, int *advanceWidth,
                                           int *leftSideBearing);
@@ -874,20 +1090,62 @@ STBTT_DEF void stbtt_GetCodepointHMetrics(const stbtt_fontinfo *info,
  * horizontal position*/
 /*   these are expressed in unscaled coordinates*/
 
+/**
+ * @brief stbtt_GetCodepointKernAdvance.
+ * @param info Parameter info.
+ * @param ch1 Parameter ch1.
+ * @param ch2 Parameter ch2.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1,
                                             int ch2);
 /* an additional amount to add to the 'advance' value between ch1 and ch2*/
 
+/**
+ * @brief stbtt_GetCodepointBox.
+ * @param info Parameter info.
+ * @param codepoint Parameter codepoint.
+ * @param x0 Parameter x0.
+ * @param y0 Parameter y0.
+ * @param x1 Parameter x1.
+ * @param y1 Parameter y1.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetCodepointBox(const stbtt_fontinfo *info, int codepoint,
                                     int *x0, int *y0, int *x1, int *y1);
 /* Gets the bounding box of the visible part of the glyph, in unscaled
  * coordinates*/
 
+/**
+ * @brief stbtt_GetGlyphHMetrics.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @param advanceWidth Parameter advanceWidth.
+ * @param leftSideBearing Parameter leftSideBearing.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetGlyphHMetrics(const stbtt_fontinfo *info,
                                       int glyph_index, int *advanceWidth,
                                       int *leftSideBearing);
+/**
+ * @brief stbtt_GetGlyphKernAdvance.
+ * @param info Parameter info.
+ * @param glyph1 Parameter glyph1.
+ * @param glyph2 Parameter glyph2.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetGlyphKernAdvance(const stbtt_fontinfo *info, int glyph1,
                                         int glyph2);
+/**
+ * @brief stbtt_GetGlyphBox.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @param x0 Parameter x0.
+ * @param y0 Parameter y0.
+ * @param x1 Parameter x1.
+ * @param y1 Parameter y1.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetGlyphBox(const stbtt_fontinfo *info, int glyph_index,
                                 int *x0, int *y0, int *x1, int *y1);
 /* as above, but takes one or more glyph indices for greater efficiency*/
@@ -896,9 +1154,24 @@ typedef struct stbtt_kerningentry {
   int glyph1; /* use stbtt_FindGlyphIndex*/
   int glyph2;
   int advance;
+  /**
+   * @brief stbtt_kerningentry.
+   */
 } stbtt_kerningentry;
 
+/**
+ * @brief stbtt_GetKerningTableLength.
+ * @param info Parameter info.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetKerningTableLength(const stbtt_fontinfo *info);
+/**
+ * @brief stbtt_GetKerningTable.
+ * @param info Parameter info.
+ * @param table Parameter table.
+ * @param table_length Parameter table_length.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetKerningTable(const stbtt_fontinfo *info,
                                     stbtt_kerningentry *table,
                                     int table_length);
@@ -916,6 +1189,9 @@ STBTT_DEF int stbtt_GetKerningTable(const stbtt_fontinfo *info,
 
 #ifndef STBTT_vmove /* you can predefine these to use different values (but    \
                        why?)*/
+/**
+ * @brief @026307322236077014326251146216173004064116061245.
+ */
 enum { STBTT_vmove = 1, STBTT_vline, STBTT_vcurve, STBTT_vcubic };
 #endif
 
@@ -930,12 +1206,32 @@ typedef struct {
 } stbtt_vertex;
 #endif
 
+/**
+ * @brief stbtt_IsGlyphEmpty.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_IsGlyphEmpty(const stbtt_fontinfo *info, int glyph_index);
 /* returns non-zero if nothing is drawn for this glyph*/
 
+/**
+ * @brief stbtt_GetCodepointShape.
+ * @param info Parameter info.
+ * @param unicode_codepoint Parameter unicode_codepoint.
+ * @param vertices Parameter vertices.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetCodepointShape(const stbtt_fontinfo *info,
                                       int unicode_codepoint,
                                       stbtt_vertex **vertices);
+/**
+ * @brief stbtt_GetGlyphShape.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @param vertices Parameter vertices.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetGlyphShape(const stbtt_fontinfo *info, int glyph_index,
                                   stbtt_vertex **vertices);
 /* returns # of vertices and fills *vertices with the pointer to them*/
@@ -948,13 +1244,39 @@ STBTT_DEF int stbtt_GetGlyphShape(const stbtt_fontinfo *info, int glyph_index,
 /* draws a quadratic bezier from previous endpoint to*/
 /* its x,y, using cx,cy as the bezier control point.*/
 
+/**
+ * @brief stbtt_FreeShape.
+ * @param info Parameter info.
+ * @param vertices Parameter vertices.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_FreeShape(const stbtt_fontinfo *info,
                                stbtt_vertex *vertices);
 /* frees the data allocated above*/
 
+/**
+ * @brief stbtt_FindSVGDoc.
+ * @param info Parameter info.
+ * @param gl Parameter gl.
+ * @return Return value.
+ */
 STBTT_DEF unsigned char *stbtt_FindSVGDoc(const stbtt_fontinfo *info, int gl);
+/**
+ * @brief stbtt_GetCodepointSVG.
+ * @param info Parameter info.
+ * @param unicode_codepoint Parameter unicode_codepoint.
+ * @param svg Parameter svg.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetCodepointSVG(const stbtt_fontinfo *info,
                                     int unicode_codepoint, const char **svg);
+/**
+ * @brief stbtt_GetGlyphSVG.
+ * @param info Parameter info.
+ * @param gl Parameter gl.
+ * @param svg Parameter svg.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_GetGlyphSVG(const stbtt_fontinfo *info, int gl,
                                 const char **svg);
 /* fills svg with the character's SVG data.*/
@@ -965,9 +1287,27 @@ STBTT_DEF int stbtt_GetGlyphSVG(const stbtt_fontinfo *info, int gl,
 /* BITMAP RENDERING*/
 /**/
 
+/**
+ * @brief stbtt_FreeBitmap.
+ * @param bitmap Parameter bitmap.
+ * @param userdata Parameter userdata.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_FreeBitmap(unsigned char *bitmap, void *userdata);
 /* frees the bitmap allocated below*/
 
+/**
+ * @brief stbtt_GetCodepointBitmap.
+ * @param info Parameter info.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param codepoint Parameter codepoint.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param xoff Parameter xoff.
+ * @param yoff Parameter yoff.
+ * @return Return value.
+ */
 STBTT_DEF unsigned char *stbtt_GetCodepointBitmap(const stbtt_fontinfo *info,
                                                   float scale_x, float scale_y,
                                                   int codepoint, int *width,
@@ -983,14 +1323,41 @@ STBTT_DEF unsigned char *stbtt_GetCodepointBitmap(const stbtt_fontinfo *info,
 /* xoff/yoff are the offset it pixel space from the glyph origin to the top-left
  * of the bitmap*/
 
-STBTT_DEF unsigned char *
-stbtt_GetCodepointBitmapSubpixel(const stbtt_fontinfo *info, float scale_x,
-                                 float scale_y, float shift_x, float shift_y,
-                                 int codepoint, int *width, int *height,
-                                 int *xoff, int *yoff);
+STBTT_DEF unsigned char
+    *
+    /**
+     * @brief stbtt_GetCodepointBitmapSubpixel.
+     * @param info Parameter info.
+     * @param scale_x Parameter scale_x.
+     * @param scale_y Parameter scale_y.
+     * @param shift_x Parameter shift_x.
+     * @param shift_y Parameter shift_y.
+     * @param codepoint Parameter codepoint.
+     * @param width Parameter width.
+     * @param height Parameter height.
+     * @param xoff Parameter xoff.
+     * @param yoff Parameter yoff.
+     * @return Return value.
+     */
+    stbtt_GetCodepointBitmapSubpixel(const stbtt_fontinfo *info, float scale_x,
+                                     float scale_y, float shift_x,
+                                     float shift_y, int codepoint, int *width,
+                                     int *height, int *xoff, int *yoff);
 /* the same as stbtt_GetCodepoitnBitmap, but you can specify a subpixel*/
 /* shift for the character*/
 
+/**
+ * @brief stbtt_MakeCodepointBitmap.
+ * @param info Parameter info.
+ * @param output Parameter output.
+ * @param out_w Parameter out_w.
+ * @param out_h Parameter out_h.
+ * @param out_stride Parameter out_stride.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param codepoint Parameter codepoint.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_MakeCodepointBitmap(const stbtt_fontinfo *info,
                                          unsigned char *output, int out_w,
                                          int out_h, int out_stride,
@@ -1003,6 +1370,20 @@ STBTT_DEF void stbtt_MakeCodepointBitmap(const stbtt_fontinfo *info,
  * the*/
 /* width and height and positioning info for it first.*/
 
+/**
+ * @brief stbtt_MakeCodepointBitmapSubpixel.
+ * @param info Parameter info.
+ * @param output Parameter output.
+ * @param out_w Parameter out_w.
+ * @param out_h Parameter out_h.
+ * @param out_stride Parameter out_stride.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param shift_x Parameter shift_x.
+ * @param shift_y Parameter shift_y.
+ * @param codepoint Parameter codepoint.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_MakeCodepointBitmapSubpixel(const stbtt_fontinfo *info,
                                                  unsigned char *output,
                                                  int out_w, int out_h,
@@ -1012,6 +1393,24 @@ STBTT_DEF void stbtt_MakeCodepointBitmapSubpixel(const stbtt_fontinfo *info,
 /* same as stbtt_MakeCodepointBitmap, but you can specify a subpixel*/
 /* shift for the character*/
 
+/**
+ * @brief stbtt_MakeCodepointBitmapSubpixelPrefilter.
+ * @param info Parameter info.
+ * @param output Parameter output.
+ * @param out_w Parameter out_w.
+ * @param out_h Parameter out_h.
+ * @param out_stride Parameter out_stride.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param shift_x Parameter shift_x.
+ * @param shift_y Parameter shift_y.
+ * @param oversample_x Parameter oversample_x.
+ * @param oversample_y Parameter oversample_y.
+ * @param sub_x Parameter sub_x.
+ * @param sub_y Parameter sub_y.
+ * @param codepoint Parameter codepoint.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_MakeCodepointBitmapSubpixelPrefilter(
     const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h,
     int out_stride, float scale_x, float scale_y, float shift_x, float shift_y,
@@ -1020,6 +1419,18 @@ STBTT_DEF void stbtt_MakeCodepointBitmapSubpixelPrefilter(
 /* same as stbtt_MakeCodepointBitmapSubpixel, but prefiltering*/
 /* is performed (see stbtt_PackSetOversampling)*/
 
+/**
+ * @brief stbtt_GetCodepointBitmapBox.
+ * @param font Parameter font.
+ * @param codepoint Parameter codepoint.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param ix0 Parameter ix0.
+ * @param iy0 Parameter iy0.
+ * @param ix1 Parameter ix1.
+ * @param iy1 Parameter iy1.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetCodepointBitmapBox(const stbtt_fontinfo *font,
                                            int codepoint, float scale_x,
                                            float scale_y, int *ix0, int *iy0,
@@ -1030,6 +1441,20 @@ STBTT_DEF void stbtt_GetCodepointBitmapBox(const stbtt_fontinfo *font,
 /* (Note that the bitmap uses y-increases-down, but the shape uses*/
 /* y-increases-up, so CodepointBitmapBox and CodepointBox are inverted.)*/
 
+/**
+ * @brief stbtt_GetCodepointBitmapBoxSubpixel.
+ * @param font Parameter font.
+ * @param codepoint Parameter codepoint.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param shift_x Parameter shift_x.
+ * @param shift_y Parameter shift_y.
+ * @param ix0 Parameter ix0.
+ * @param iy0 Parameter iy0.
+ * @param ix1 Parameter ix1.
+ * @param iy1 Parameter iy1.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetCodepointBitmapBoxSubpixel(
     const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y,
     float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1);
@@ -1038,29 +1463,127 @@ STBTT_DEF void stbtt_GetCodepointBitmapBoxSubpixel(
 
 /* the following functions are equivalent to the above functions, but operate*/
 /* on glyph indices instead of Unicode codepoints (for efficiency)*/
-STBTT_DEF unsigned char *
-stbtt_GetGlyphBitmap(const stbtt_fontinfo *info, float scale_x, float scale_y,
-                     int glyph, int *width, int *height, int *xoff, int *yoff);
+STBTT_DEF unsigned char
+    *
+    /**
+     * @brief stbtt_GetGlyphBitmap.
+     * @param info Parameter info.
+     * @param scale_x Parameter scale_x.
+     * @param scale_y Parameter scale_y.
+     * @param glyph Parameter glyph.
+     * @param width Parameter width.
+     * @param height Parameter height.
+     * @param xoff Parameter xoff.
+     * @param yoff Parameter yoff.
+     * @return Return value.
+     */
+    stbtt_GetGlyphBitmap(const stbtt_fontinfo *info, float scale_x,
+                         float scale_y, int glyph, int *width, int *height,
+                         int *xoff, int *yoff);
+/**
+ * @brief stbtt_GetGlyphBitmapSubpixel.
+ * @param info Parameter info.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param shift_x Parameter shift_x.
+ * @param shift_y Parameter shift_y.
+ * @param glyph Parameter glyph.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param xoff Parameter xoff.
+ * @param yoff Parameter yoff.
+ * @return Return value.
+ */
 STBTT_DEF unsigned char *stbtt_GetGlyphBitmapSubpixel(
     const stbtt_fontinfo *info, float scale_x, float scale_y, float shift_x,
     float shift_y, int glyph, int *width, int *height, int *xoff, int *yoff);
+/**
+ * @brief stbtt_MakeGlyphBitmap.
+ * @param info Parameter info.
+ * @param output Parameter output.
+ * @param out_w Parameter out_w.
+ * @param out_h Parameter out_h.
+ * @param out_stride Parameter out_stride.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param glyph Parameter glyph.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_MakeGlyphBitmap(const stbtt_fontinfo *info,
                                      unsigned char *output, int out_w,
                                      int out_h, int out_stride, float scale_x,
                                      float scale_y, int glyph);
+/**
+ * @brief stbtt_MakeGlyphBitmapSubpixel.
+ * @param info Parameter info.
+ * @param output Parameter output.
+ * @param out_w Parameter out_w.
+ * @param out_h Parameter out_h.
+ * @param out_stride Parameter out_stride.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param shift_x Parameter shift_x.
+ * @param shift_y Parameter shift_y.
+ * @param glyph Parameter glyph.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_MakeGlyphBitmapSubpixel(const stbtt_fontinfo *info,
                                              unsigned char *output, int out_w,
                                              int out_h, int out_stride,
                                              float scale_x, float scale_y,
                                              float shift_x, float shift_y,
                                              int glyph);
+/**
+ * @brief stbtt_MakeGlyphBitmapSubpixelPrefilter.
+ * @param info Parameter info.
+ * @param output Parameter output.
+ * @param out_w Parameter out_w.
+ * @param out_h Parameter out_h.
+ * @param out_stride Parameter out_stride.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param shift_x Parameter shift_x.
+ * @param shift_y Parameter shift_y.
+ * @param oversample_x Parameter oversample_x.
+ * @param oversample_y Parameter oversample_y.
+ * @param sub_x Parameter sub_x.
+ * @param sub_y Parameter sub_y.
+ * @param glyph Parameter glyph.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_MakeGlyphBitmapSubpixelPrefilter(
     const stbtt_fontinfo *info, unsigned char *output, int out_w, int out_h,
     int out_stride, float scale_x, float scale_y, float shift_x, float shift_y,
     int oversample_x, int oversample_y, float *sub_x, float *sub_y, int glyph);
+/**
+ * @brief stbtt_GetGlyphBitmapBox.
+ * @param font Parameter font.
+ * @param glyph Parameter glyph.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param ix0 Parameter ix0.
+ * @param iy0 Parameter iy0.
+ * @param ix1 Parameter ix1.
+ * @param iy1 Parameter iy1.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetGlyphBitmapBox(const stbtt_fontinfo *font, int glyph,
                                        float scale_x, float scale_y, int *ix0,
                                        int *iy0, int *ix1, int *iy1);
+/**
+ * @brief stbtt_GetGlyphBitmapBoxSubpixel.
+ * @param font Parameter font.
+ * @param glyph Parameter glyph.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param shift_x Parameter shift_x.
+ * @param shift_y Parameter shift_y.
+ * @param ix0 Parameter ix0.
+ * @param iy0 Parameter iy0.
+ * @param ix1 Parameter ix1.
+ * @param iy1 Parameter iy1.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_GetGlyphBitmapBoxSubpixel(const stbtt_fontinfo *font,
                                                int glyph, float scale_x,
                                                float scale_y, float shift_x,
@@ -1074,6 +1597,22 @@ typedef struct {
 } stbtt__bitmap;
 
 /* rasterize a shape with quadratic beziers into a bitmap*/
+/**
+ * @brief stbtt_Rasterize.
+ * @param result Parameter result.
+ * @param flatness_in_pixels Parameter flatness_in_pixels.
+ * @param vertices Parameter vertices.
+ * @param num_verts Parameter num_verts.
+ * @param scale_x Parameter scale_x.
+ * @param scale_y Parameter scale_y.
+ * @param shift_x Parameter shift_x.
+ * @param shift_y Parameter shift_y.
+ * @param x_off Parameter x_off.
+ * @param y_off Parameter y_off.
+ * @param invert Parameter invert.
+ * @param userdata Parameter userdata.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_Rasterize(
     stbtt__bitmap *result,        /* 1-channel bitmap to draw into*/
     float flatness_in_pixels,     /* allowable error of curve in pixels*/
@@ -1089,19 +1628,54 @@ STBTT_DEF void stbtt_Rasterize(
 /**/
 /* Signed Distance Function (or Field) rendering*/
 
+/**
+ * @brief stbtt_FreeSDF.
+ * @param bitmap Parameter bitmap.
+ * @param userdata Parameter userdata.
+ * @return Return value.
+ */
 STBTT_DEF void stbtt_FreeSDF(unsigned char *bitmap, void *userdata);
 /* frees the SDF bitmap allocated below*/
 
+/**
+ * @brief stbtt_GetGlyphSDF.
+ * @param info Parameter info.
+ * @param scale Parameter scale.
+ * @param glyph Parameter glyph.
+ * @param padding Parameter padding.
+ * @param onedge_value Parameter onedge_value.
+ * @param pixel_dist_scale Parameter pixel_dist_scale.
+ * @param width Parameter width.
+ * @param height Parameter height.
+ * @param xoff Parameter xoff.
+ * @param yoff Parameter yoff.
+ * @return Return value.
+ */
 STBTT_DEF unsigned char *stbtt_GetGlyphSDF(const stbtt_fontinfo *info,
                                            float scale, int glyph, int padding,
                                            unsigned char onedge_value,
                                            float pixel_dist_scale, int *width,
                                            int *height, int *xoff, int *yoff);
-STBTT_DEF unsigned char *
-stbtt_GetCodepointSDF(const stbtt_fontinfo *info, float scale, int codepoint,
-                      int padding, unsigned char onedge_value,
-                      float pixel_dist_scale, int *width, int *height,
-                      int *xoff, int *yoff);
+STBTT_DEF unsigned char
+    *
+    /**
+     * @brief stbtt_GetCodepointSDF.
+     * @param info Parameter info.
+     * @param scale Parameter scale.
+     * @param codepoint Parameter codepoint.
+     * @param padding Parameter padding.
+     * @param onedge_value Parameter onedge_value.
+     * @param pixel_dist_scale Parameter pixel_dist_scale.
+     * @param width Parameter width.
+     * @param height Parameter height.
+     * @param xoff Parameter xoff.
+     * @param yoff Parameter yoff.
+     * @return Return value.
+     */
+    stbtt_GetCodepointSDF(const stbtt_fontinfo *info, float scale,
+                          int codepoint, int padding,
+                          unsigned char onedge_value, float pixel_dist_scale,
+                          int *width, int *height, int *xoff, int *yoff);
 /* These functions compute a discretized SDF field for a single character,
  * suitable for storing*/
 /* in a single-channel texture, sampling with bilinear filtering, and testing
@@ -1188,6 +1762,13 @@ stbtt_GetCodepointSDF(const stbtt_fontinfo *info, float scale, int codepoint,
 /*             from the file yourself and do your own comparisons on them.*/
 /*             You have to have called stbtt_InitFont() first.*/
 
+/**
+ * @brief stbtt_FindMatchingFont.
+ * @param fontdata Parameter fontdata.
+ * @param name Parameter name.
+ * @param flags Parameter flags.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_FindMatchingFont(const unsigned char *fontdata,
                                      const char *name, int flags);
 /* returns the offset (not index) of the font that matches, or -1 if none*/
@@ -1202,12 +1783,30 @@ STBTT_DEF int stbtt_FindMatchingFont(const unsigned char *fontdata,
 #define STBTT_MACSTYLE_NONE                                                    \
   8 /* <= not same as 0, this makes us check the bitfield is 0*/
 
+/**
+ * @brief stbtt_CompareUTF8toUTF16_bigendian.
+ * @param s1 Parameter s1.
+ * @param len1 Parameter len1.
+ * @param s2 Parameter s2.
+ * @param len2 Parameter len2.
+ * @return Return value.
+ */
 STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char *s1, int len1,
                                                  const char *s2, int len2);
 /* returns 1/0 whether the first string interpreted as utf8 is identical to*/
 /* the second string interpreted as big-endian utf16... useful for strings from
  * next func*/
 
+/**
+ * @brief stbtt_GetFontNameString.
+ * @param font Parameter font.
+ * @param length Parameter length.
+ * @param platformID Parameter platformID.
+ * @param encodingID Parameter encodingID.
+ * @param languageID Parameter languageID.
+ * @param nameID Parameter nameID.
+ * @return Return value.
+ */
 STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font,
                                               int *length, int platformID,
                                               int encodingID, int languageID,
@@ -1219,6 +1818,9 @@ STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font,
 /*     http://developer.apple.com/textfonts/TTRefMan/RM06/Chap6name.html*/
 /*     http://www.microsoft.com/typography/otspec/name.htm*/
 
+/**
+ * @brief @314340075035140235202071261213004372266100341122.
+ */
 enum { /* platformID*/
        STBTT_PLATFORM_ID_UNICODE = 0,
        STBTT_PLATFORM_ID_MAC = 1,
@@ -1226,6 +1828,9 @@ enum { /* platformID*/
        STBTT_PLATFORM_ID_MICROSOFT = 3
 };
 
+/**
+ * @brief @165053251053160334123207175256052010273060043123.
+ */
 enum { /* encodingID for STBTT_PLATFORM_ID_UNICODE*/
        STBTT_UNICODE_EID_UNICODE_1_0 = 0,
        STBTT_UNICODE_EID_UNICODE_1_1 = 1,
@@ -1234,6 +1839,9 @@ enum { /* encodingID for STBTT_PLATFORM_ID_UNICODE*/
        STBTT_UNICODE_EID_UNICODE_2_0_FULL = 4
 };
 
+/**
+ * @brief @152311224364215251273010207216127074330165245174.
+ */
 enum { /* encodingID for STBTT_PLATFORM_ID_MICROSOFT*/
        STBTT_MS_EID_SYMBOL = 0,
        STBTT_MS_EID_UNICODE_BMP = 1,
@@ -1241,6 +1849,9 @@ enum { /* encodingID for STBTT_PLATFORM_ID_MICROSOFT*/
        STBTT_MS_EID_UNICODE_FULL = 10
 };
 
+/**
+ * @brief @137350020013271061047315234014347175106312246052.
+ */
 enum { /* encodingID for STBTT_PLATFORM_ID_MAC; same as Script Manager codes*/
        STBTT_MAC_EID_ROMAN = 0,
        STBTT_MAC_EID_ARABIC = 4,
@@ -1252,6 +1863,9 @@ enum { /* encodingID for STBTT_PLATFORM_ID_MAC; same as Script Manager codes*/
        STBTT_MAC_EID_RUSSIAN = 7
 };
 
+/**
+ * @brief @011022374222003167224065203113122173152243255055.
+ */
 enum { /* languageID for STBTT_PLATFORM_ID_MICROSOFT; same as LCID...*/
        /* problematic because there are e.g. 16 english LCIDs and 16 arabic
           LCIDs*/
@@ -1269,6 +1883,9 @@ enum { /* languageID for STBTT_PLATFORM_ID_MICROSOFT; same as LCID...*/
        STBTT_MS_LANG_SWEDISH = 0x041D
 };
 
+/**
+ * @brief @122070333356333115130245013045132117130213074257.
+ */
 enum { /* languageID for STBTT_PLATFORM_ID_MAC*/
        STBTT_MAC_LANG_ENGLISH = 0,
        STBTT_MAC_LANG_JAPANESE = 11,
@@ -1339,11 +1956,23 @@ static stbtt_uint8 stbtt__buf_peek8(stbtt__buf *b) {
   return b->data[b->cursor];
 }
 
+/**
+ * @brief stbtt__buf_seek.
+ * @param b Parameter b.
+ * @param o Parameter o.
+ * @return Return value.
+ */
 static void stbtt__buf_seek(stbtt__buf *b, int o) {
   STBTT_assert(!(o > b->size || o < 0));
   b->cursor = (o > b->size || o < 0) ? b->size : o;
 }
 
+/**
+ * @brief stbtt__buf_skip.
+ * @param b Parameter b.
+ * @param o Parameter o.
+ * @return Return value.
+ */
 static void stbtt__buf_skip(stbtt__buf *b, int o) {
   stbtt__buf_seek(b, b->cursor + o);
 }
@@ -1407,6 +2036,11 @@ static stbtt_uint32 stbtt__cff_int(stbtt__buf *b) {
   return 0;
 }
 
+/**
+ * @brief stbtt__cff_skip_operand.
+ * @param b Parameter b.
+ * @return Return value.
+ */
 static void stbtt__cff_skip_operand(stbtt__buf *b) {
   int v, b0 = stbtt__buf_peek8(b);
   STBTT_assert(b0 >= 28);
@@ -1438,6 +2072,14 @@ static stbtt__buf stbtt__dict_get(stbtt__buf *b, int key) {
   return stbtt__buf_range(b, 0, 0);
 }
 
+/**
+ * @brief stbtt__dict_get_ints.
+ * @param b Parameter b.
+ * @param key Parameter key.
+ * @param outcount Parameter outcount.
+ * @param out Parameter out.
+ * @return Return value.
+ */
 static void stbtt__dict_get_ints(stbtt__buf *b, int key, int outcount,
                                  stbtt_uint32 *out) {
   int i;
@@ -1446,6 +2088,11 @@ static void stbtt__dict_get_ints(stbtt__buf *b, int key, int outcount,
     out[i] = stbtt__cff_int(&operands);
 }
 
+/**
+ * @brief stbtt__cff_index_count.
+ * @param b Parameter b.
+ * @return Return value.
+ */
 static int stbtt__cff_index_count(stbtt__buf *b) {
   stbtt__buf_seek(b, 0);
   return stbtt__buf_get16(b);
@@ -1490,6 +2137,11 @@ static stbtt_int32 ttLONG(stbtt_uint8 *p) {
   ((p)[0] == (c0) && (p)[1] == (c1) && (p)[2] == (c2) && (p)[3] == (c3))
 #define stbtt_tag(p, str) stbtt_tag4(p, str[0], str[1], str[2], str[3])
 
+/**
+ * @brief stbtt__isfont.
+ * @param font Parameter font.
+ * @return Return value.
+ */
 static int stbtt__isfont(stbtt_uint8 *font) {
   /* check the version number*/
   if (stbtt_tag4(font, '1', 0, 0, 0))
@@ -1519,6 +2171,12 @@ static stbtt_uint32 stbtt__find_table(stbtt_uint8 *data, stbtt_uint32 fontstart,
   return 0;
 }
 
+/**
+ * @brief stbtt_GetFontOffsetForIndex_internal.
+ * @param font_collection Parameter font_collection.
+ * @param index Parameter index.
+ * @return Return value.
+ */
 static int stbtt_GetFontOffsetForIndex_internal(unsigned char *font_collection,
                                                 int index) {
   /* if it's just a font, there's only one valid index*/
@@ -1539,6 +2197,11 @@ static int stbtt_GetFontOffsetForIndex_internal(unsigned char *font_collection,
   return -1;
 }
 
+/**
+ * @brief stbtt_GetNumberOfFonts_internal.
+ * @param font_collection Parameter font_collection.
+ * @return Return value.
+ */
 static int stbtt_GetNumberOfFonts_internal(unsigned char *font_collection) {
   /* if it's just a font, there's only one valid font*/
   if (stbtt__isfont(font_collection))
@@ -1571,6 +2234,11 @@ static stbtt__buf stbtt__get_subrs(stbtt__buf cff, stbtt__buf fontdict) {
 
 /* since most people won't use this, find this table the first time it's
  * needed*/
+/**
+ * @brief stbtt__get_svg.
+ * @param info Parameter info.
+ * @return Return value.
+ */
 static int stbtt__get_svg(stbtt_fontinfo *info) {
   stbtt_uint32 t;
   if (info->svg < 0) {
@@ -1585,6 +2253,13 @@ static int stbtt__get_svg(stbtt_fontinfo *info) {
   return info->svg;
 }
 
+/**
+ * @brief stbtt_InitFont_internal.
+ * @param info Parameter info.
+ * @param data Parameter data.
+ * @param fontstart Parameter fontstart.
+ * @return Return value.
+ */
 static int stbtt_InitFont_internal(stbtt_fontinfo *info, unsigned char *data,
                                    int fontstart) {
   stbtt_uint32 cmap, t;
@@ -1811,6 +2486,16 @@ STBTT_DEF int stbtt_GetCodepointShape(const stbtt_fontinfo *info,
       info, stbtt_FindGlyphIndex(info, unicode_codepoint), vertices);
 }
 
+/**
+ * @brief stbtt_setvertex.
+ * @param v Parameter v.
+ * @param type Parameter type.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param cx Parameter cx.
+ * @param cy Parameter cy.
+ * @return Return value.
+ */
 static void stbtt_setvertex(stbtt_vertex *v, stbtt_uint8 type, stbtt_int32 x,
                             stbtt_int32 y, stbtt_int32 cx, stbtt_int32 cy) {
   v->type = type;
@@ -1820,6 +2505,12 @@ static void stbtt_setvertex(stbtt_vertex *v, stbtt_uint8 type, stbtt_int32 x,
   v->cy = (stbtt_int16)cy;
 }
 
+/**
+ * @brief stbtt__GetGlyfOffset.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @return Return value.
+ */
 static int stbtt__GetGlyfOffset(const stbtt_fontinfo *info, int glyph_index) {
   int g1, g2;
 
@@ -1842,6 +2533,16 @@ static int stbtt__GetGlyfOffset(const stbtt_fontinfo *info, int glyph_index) {
   return g1 == g2 ? -1 : g1; /* if length is 0, return -1*/
 }
 
+/**
+ * @brief stbtt__GetGlyphInfoT2.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @param x0 Parameter x0.
+ * @param y0 Parameter y0.
+ * @param x1 Parameter x1.
+ * @param y1 Parameter y1.
+ * @return Return value.
+ */
 static int stbtt__GetGlyphInfoT2(const stbtt_fontinfo *info, int glyph_index,
                                  int *x0, int *y0, int *x1, int *y1);
 
@@ -1885,6 +2586,20 @@ STBTT_DEF int stbtt_IsGlyphEmpty(const stbtt_fontinfo *info, int glyph_index) {
   return numberOfContours == 0;
 }
 
+/**
+ * @brief stbtt__close_shape.
+ * @param vertices Parameter vertices.
+ * @param num_vertices Parameter num_vertices.
+ * @param was_off Parameter was_off.
+ * @param start_off Parameter start_off.
+ * @param sx Parameter sx.
+ * @param sy Parameter sy.
+ * @param scx Parameter scx.
+ * @param scy Parameter scy.
+ * @param cx Parameter cx.
+ * @param cy Parameter cy.
+ * @return Return value.
+ */
 static int stbtt__close_shape(stbtt_vertex *vertices, int num_vertices,
                               int was_off, int start_off, stbtt_int32 sx,
                               stbtt_int32 sy, stbtt_int32 scx, stbtt_int32 scy,
@@ -1903,6 +2618,13 @@ static int stbtt__close_shape(stbtt_vertex *vertices, int num_vertices,
   return num_vertices;
 }
 
+/**
+ * @brief stbtt__GetGlyphShapeTT.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @param pvertices Parameter pvertices.
+ * @return Return value.
+ */
 static int stbtt__GetGlyphShapeTT(const stbtt_fontinfo *info, int glyph_index,
                                   stbtt_vertex **pvertices) {
   stbtt_int16 numberOfContours;
@@ -2174,6 +2896,13 @@ typedef struct {
 
 #define STBTT__CSCTX_INIT(bounds) {bounds, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0}
 
+/**
+ * @brief stbtt__track_vertex.
+ * @param c Parameter c.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @return Return value.
+ */
 static void stbtt__track_vertex(stbtt__csctx *c, stbtt_int32 x, stbtt_int32 y) {
   if (x > c->max_x || !c->started)
     c->max_x = x;
@@ -2186,6 +2915,18 @@ static void stbtt__track_vertex(stbtt__csctx *c, stbtt_int32 x, stbtt_int32 y) {
   c->started = 1;
 }
 
+/**
+ * @brief stbtt__csctx_v.
+ * @param c Parameter c.
+ * @param type Parameter type.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param cx Parameter cx.
+ * @param cy Parameter cy.
+ * @param cx1 Parameter cx1.
+ * @param cy1 Parameter cy1.
+ * @return Return value.
+ */
 static void stbtt__csctx_v(stbtt__csctx *c, stbtt_uint8 type, stbtt_int32 x,
                            stbtt_int32 y, stbtt_int32 cx, stbtt_int32 cy,
                            stbtt_int32 cx1, stbtt_int32 cy1) {
@@ -2203,12 +2944,24 @@ static void stbtt__csctx_v(stbtt__csctx *c, stbtt_uint8 type, stbtt_int32 x,
   c->num_vertices++;
 }
 
+/**
+ * @brief stbtt__csctx_close_shape.
+ * @param ctx Parameter ctx.
+ * @return Return value.
+ */
 static void stbtt__csctx_close_shape(stbtt__csctx *ctx) {
   if (ctx->first_x != ctx->x || ctx->first_y != ctx->y)
     stbtt__csctx_v(ctx, STBTT_vline, (int)ctx->first_x, (int)ctx->first_y, 0, 0,
                    0, 0);
 }
 
+/**
+ * @brief stbtt__csctx_rmove_to.
+ * @param ctx Parameter ctx.
+ * @param dx Parameter dx.
+ * @param dy Parameter dy.
+ * @return Return value.
+ */
 static void stbtt__csctx_rmove_to(stbtt__csctx *ctx, float dx, float dy) {
   stbtt__csctx_close_shape(ctx);
   ctx->first_x = ctx->x = ctx->x + dx;
@@ -2216,12 +2969,30 @@ static void stbtt__csctx_rmove_to(stbtt__csctx *ctx, float dx, float dy) {
   stbtt__csctx_v(ctx, STBTT_vmove, (int)ctx->x, (int)ctx->y, 0, 0, 0, 0);
 }
 
+/**
+ * @brief stbtt__csctx_rline_to.
+ * @param ctx Parameter ctx.
+ * @param dx Parameter dx.
+ * @param dy Parameter dy.
+ * @return Return value.
+ */
 static void stbtt__csctx_rline_to(stbtt__csctx *ctx, float dx, float dy) {
   ctx->x += dx;
   ctx->y += dy;
   stbtt__csctx_v(ctx, STBTT_vline, (int)ctx->x, (int)ctx->y, 0, 0, 0, 0);
 }
 
+/**
+ * @brief stbtt__csctx_rccurve_to.
+ * @param ctx Parameter ctx.
+ * @param dx1 Parameter dx1.
+ * @param dy1 Parameter dy1.
+ * @param dx2 Parameter dx2.
+ * @param dy2 Parameter dy2.
+ * @param dx3 Parameter dx3.
+ * @param dy3 Parameter dy3.
+ * @return Return value.
+ */
 static void stbtt__csctx_rccurve_to(stbtt__csctx *ctx, float dx1, float dy1,
                                     float dx2, float dy2, float dx3,
                                     float dy3) {
@@ -2578,6 +3349,13 @@ static int stbtt__run_charstring(const stbtt_fontinfo *info, int glyph_index,
 #undef STBTT__CSERR
 }
 
+/**
+ * @brief stbtt__GetGlyphShapeT2.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @param pvertices Parameter pvertices.
+ * @return Return value.
+ */
 static int stbtt__GetGlyphShapeT2(const stbtt_fontinfo *info, int glyph_index,
                                   stbtt_vertex **pvertices) {
   /* runs the charstring twice, once to count and once to output (to avoid
@@ -2597,6 +3375,16 @@ static int stbtt__GetGlyphShapeT2(const stbtt_fontinfo *info, int glyph_index,
   return 0;
 }
 
+/**
+ * @brief stbtt__GetGlyphInfoT2.
+ * @param info Parameter info.
+ * @param glyph_index Parameter glyph_index.
+ * @param x0 Parameter x0.
+ * @param y0 Parameter y0.
+ * @param x1 Parameter x1.
+ * @param y1 Parameter y1.
+ * @return Return value.
+ */
 static int stbtt__GetGlyphInfoT2(const stbtt_fontinfo *info, int glyph_index,
                                  int *x0, int *y0, int *x1, int *y1) {
   stbtt__csctx c = STBTT__CSCTX_INIT(1);
@@ -2681,6 +3469,13 @@ STBTT_DEF int stbtt_GetKerningTable(const stbtt_fontinfo *info,
   return length;
 }
 
+/**
+ * @brief stbtt__GetGlyphKernInfoAdvance.
+ * @param info Parameter info.
+ * @param glyph1 Parameter glyph1.
+ * @param glyph2 Parameter glyph2.
+ * @return Return value.
+ */
 static int stbtt__GetGlyphKernInfoAdvance(const stbtt_fontinfo *info,
                                           int glyph1, int glyph2) {
   stbtt_uint8 *data = info->data + info->kern;
@@ -3154,11 +3949,23 @@ static void *stbtt__hheap_alloc(stbtt__hheap *hh, size_t size, void *userdata) {
   }
 }
 
+/**
+ * @brief stbtt__hheap_free.
+ * @param hh Parameter hh.
+ * @param p Parameter p.
+ * @return Return value.
+ */
 static void stbtt__hheap_free(stbtt__hheap *hh, void *p) {
   *(void **)p = hh->first_free;
   hh->first_free = p;
 }
 
+/**
+ * @brief stbtt__hheap_cleanup.
+ * @param hh Parameter hh.
+ * @param userdata Parameter userdata.
+ * @return Return value.
+ */
 static void stbtt__hheap_cleanup(stbtt__hheap *hh, void *userdata) {
   stbtt__hheap_chunk *c = hh->head;
   while (c) {
@@ -3252,6 +4059,14 @@ static stbtt__active_edge *stbtt__new_active(stbtt__hheap *hh, stbtt__edge *e,
 /* note: this routine clips fills that extend off the edges... ideally this*/
 /* wouldn't happen, but it could happen if the truetype glyph bounding boxes*/
 /* are wrong, or if the user supplies a too-small bitmap*/
+/**
+ * @brief stbtt__fill_active_edges.
+ * @param scanline Parameter scanline.
+ * @param len Parameter len.
+ * @param e Parameter e.
+ * @param max_weight Parameter max_weight.
+ * @return Return value.
+ */
 static void stbtt__fill_active_edges(unsigned char *scanline, int len,
                                      stbtt__active_edge *e, int max_weight) {
   /* non-zero winding fill*/
@@ -3302,6 +4117,17 @@ static void stbtt__fill_active_edges(unsigned char *scanline, int len,
   }
 }
 
+/**
+ * @brief stbtt__rasterize_sorted_edges.
+ * @param result Parameter result.
+ * @param e Parameter e.
+ * @param n Parameter n.
+ * @param vsubsample Parameter vsubsample.
+ * @param off_x Parameter off_x.
+ * @param off_y Parameter off_y.
+ * @param userdata Parameter userdata.
+ * @return Return value.
+ */
 static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
                                           int n, int vsubsample, int off_x,
                                           int off_y, void *userdata) {
@@ -3412,6 +4238,17 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
 /* the edge passed in here does not cross the vertical line at x or the vertical
  * line at x+1*/
 /* (i.e. it has already been clipped to those)*/
+/**
+ * @brief stbtt__handle_clipped_edge.
+ * @param scanline Parameter scanline.
+ * @param x Parameter x.
+ * @param e Parameter e.
+ * @param x0 Parameter x0.
+ * @param y0 Parameter y0.
+ * @param x1 Parameter x1.
+ * @param y1 Parameter y1.
+ * @return Return value.
+ */
 static void stbtt__handle_clipped_edge(float *scanline, int x,
                                        stbtt__active_edge *e, float x0,
                                        float y0, float x1, float y1) {
@@ -3471,6 +4308,15 @@ static float stbtt__sized_triangle_area(float height, float width) {
   return height * width / 2;
 }
 
+/**
+ * @brief stbtt__fill_active_edges_new.
+ * @param scanline Parameter scanline.
+ * @param scanline_fill Parameter scanline_fill.
+ * @param len Parameter len.
+ * @param e Parameter e.
+ * @param y_top Parameter y_top.
+ * @return Return value.
+ */
 static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill,
                                          int len, stbtt__active_edge *e,
                                          float y_top) {
@@ -3738,6 +4584,17 @@ static void stbtt__fill_active_edges_new(float *scanline, float *scanline_fill,
 }
 
 /* directly AA rasterize edges w/o supersampling*/
+/**
+ * @brief stbtt__rasterize_sorted_edges.
+ * @param result Parameter result.
+ * @param e Parameter e.
+ * @param n Parameter n.
+ * @param vsubsample Parameter vsubsample.
+ * @param off_x Parameter off_x.
+ * @param off_y Parameter off_y.
+ * @param userdata Parameter userdata.
+ * @return Return value.
+ */
 static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
                                           int n, int vsubsample, int off_x,
                                           int off_y, void *userdata) {
@@ -3848,6 +4705,12 @@ static void stbtt__rasterize_sorted_edges(stbtt__bitmap *result, stbtt__edge *e,
 
 #define STBTT__COMPARE(a, b) ((a)->y0 < (b)->y0)
 
+/**
+ * @brief stbtt__sort_edges_ins_sort.
+ * @param p Parameter p.
+ * @param n Parameter n.
+ * @return Return value.
+ */
 static void stbtt__sort_edges_ins_sort(stbtt__edge *p, int n) {
   int i, j;
   for (i = 1; i < n; ++i) {
@@ -3866,6 +4729,12 @@ static void stbtt__sort_edges_ins_sort(stbtt__edge *p, int n) {
   }
 }
 
+/**
+ * @brief stbtt__sort_edges_quicksort.
+ * @param p Parameter p.
+ * @param n Parameter n.
+ * @return Return value.
+ */
 static void stbtt__sort_edges_quicksort(stbtt__edge *p, int n) {
   /* threshold for transitioning to insertion sort */
   while (n > 12) {
@@ -3930,6 +4799,12 @@ static void stbtt__sort_edges_quicksort(stbtt__edge *p, int n) {
   }
 }
 
+/**
+ * @brief stbtt__sort_edges.
+ * @param p Parameter p.
+ * @param n Parameter n.
+ * @return Return value.
+ */
 static void stbtt__sort_edges(stbtt__edge *p, int n) {
   stbtt__sort_edges_quicksort(p, n);
   stbtt__sort_edges_ins_sort(p, n);
@@ -4005,6 +4880,14 @@ static void stbtt__rasterize(stbtt__bitmap *result, stbtt__point *pts,
   STBTT_free(e, userdata);
 }
 
+/**
+ * @brief stbtt__add_point.
+ * @param points Parameter points.
+ * @param n Parameter n.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @return Return value.
+ */
 static void stbtt__add_point(stbtt__point *points, int n, float x, float y) {
   if (!points)
     return; /* during first pass, it's unallocated*/
@@ -4014,6 +4897,20 @@ static void stbtt__add_point(stbtt__point *points, int n, float x, float y) {
 
 /* tessellate until threshold p is happy... @TODO warped to compensate for
  * non-linear stretching*/
+/**
+ * @brief stbtt__tesselate_curve.
+ * @param points Parameter points.
+ * @param num_points Parameter num_points.
+ * @param x0 Parameter x0.
+ * @param y0 Parameter y0.
+ * @param x1 Parameter x1.
+ * @param y1 Parameter y1.
+ * @param x2 Parameter x2.
+ * @param y2 Parameter y2.
+ * @param objspace_flatness_squared Parameter objspace_flatness_squared.
+ * @param n Parameter n.
+ * @return Return value.
+ */
 static int stbtt__tesselate_curve(stbtt__point *points, int *num_points,
                                   float x0, float y0, float x1, float y1,
                                   float x2, float y2,
@@ -4042,6 +4939,22 @@ static int stbtt__tesselate_curve(stbtt__point *points, int *num_points,
   return 1;
 }
 
+/**
+ * @brief stbtt__tesselate_cubic.
+ * @param points Parameter points.
+ * @param num_points Parameter num_points.
+ * @param x0 Parameter x0.
+ * @param y0 Parameter y0.
+ * @param x1 Parameter x1.
+ * @param y1 Parameter y1.
+ * @param x2 Parameter x2.
+ * @param y2 Parameter y2.
+ * @param x3 Parameter x3.
+ * @param y3 Parameter y3.
+ * @param objspace_flatness_squared Parameter objspace_flatness_squared.
+ * @param n Parameter n.
+ * @return Return value.
+ */
 static void stbtt__tesselate_cubic(stbtt__point *points, int *num_points,
                                    float x0, float y0, float x1, float y1,
                                    float x2, float y2, float x3, float y3,
@@ -4459,6 +5372,13 @@ static void stbrp_init_target(stbrp_context *con, int pw, int ph,
   STBTT__NOTUSED(num_nodes);
 }
 
+/**
+ * @brief stbrp_pack_rects.
+ * @param con Parameter con.
+ * @param rects Parameter rects.
+ * @param num_rects Parameter num_rects.
+ * @return Return value.
+ */
 static void stbrp_pack_rects(stbrp_context *con, stbrp_rect *rects,
                              int num_rects) {
   int i;
@@ -4548,6 +5468,15 @@ STBTT_DEF void stbtt_PackSetSkipMissingCodepoints(stbtt_pack_context *spc,
 
 #define STBTT__OVER_MASK (STBTT_MAX_OVERSAMPLE - 1)
 
+/**
+ * @brief stbtt__h_prefilter.
+ * @param pixels Parameter pixels.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param stride_in_bytes Parameter stride_in_bytes.
+ * @param kernel_width Parameter kernel_width.
+ * @return Return value.
+ */
 static void stbtt__h_prefilter(unsigned char *pixels, int w, int h,
                                int stride_in_bytes, unsigned int kernel_width) {
   unsigned char buffer[STBTT_MAX_OVERSAMPLE];
@@ -4613,6 +5542,15 @@ static void stbtt__h_prefilter(unsigned char *pixels, int w, int h,
   }
 }
 
+/**
+ * @brief stbtt__v_prefilter.
+ * @param pixels Parameter pixels.
+ * @param w Parameter w.
+ * @param h Parameter h.
+ * @param stride_in_bytes Parameter stride_in_bytes.
+ * @param kernel_width Parameter kernel_width.
+ * @return Return value.
+ */
 static void stbtt__v_prefilter(unsigned char *pixels, int w, int h,
                                int stride_in_bytes, unsigned int kernel_width) {
   unsigned char buffer[STBTT_MAX_OVERSAMPLE];
@@ -5026,8 +5964,22 @@ static int stbtt__ray_intersect_bezier(float orig[2], float ray[2], float q0[2],
   }
 }
 
+/**
+ * @brief equal.
+ * @param a Parameter a.
+ * @param b[1] Parameter b[1].
+ * @return Return value.
+ */
 static int equal(float *a, float *b) { return (a[0] == b[0] && a[1] == b[1]); }
 
+/**
+ * @brief stbtt__compute_crossings_x.
+ * @param x Parameter x.
+ * @param y Parameter y.
+ * @param nverts Parameter nverts.
+ * @param verts Parameter verts.
+ * @return Return value.
+ */
 static int stbtt__compute_crossings_x(float x, float y, int nverts,
                                       stbtt_vertex *verts) {
   int i;
@@ -5108,6 +6060,14 @@ static float stbtt__cuberoot(float x) {
 }
 
 /* x^3 + a*x^2 + b*x + c = 0*/
+/**
+ * @brief stbtt__solve_cubic.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param c Parameter c.
+ * @param r Parameter r.
+ * @return Return value.
+ */
 static int stbtt__solve_cubic(float a, float b, float c, float *r) {
   float s = -a / 3;
   float p = b - a * a / 3;
@@ -5430,6 +6390,14 @@ stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 *s1, stbtt_int32 len1,
   return i;
 }
 
+/**
+ * @brief stbtt_CompareUTF8toUTF16_bigendian_internal.
+ * @param s1 Parameter s1.
+ * @param len1 Parameter len1.
+ * @param s2 Parameter s2.
+ * @param len2 Parameter len2.
+ * @return Return value.
+ */
 static int stbtt_CompareUTF8toUTF16_bigendian_internal(char *s1, int len1,
                                                        char *s2, int len2) {
   return len1 == stbtt__CompareUTF8toUTF16_bigendian_prefix(
@@ -5465,6 +6433,16 @@ STBTT_DEF const char *stbtt_GetFontNameString(const stbtt_fontinfo *font,
   return NULL;
 }
 
+/**
+ * @brief stbtt__matchpair.
+ * @param fc Parameter fc.
+ * @param nm Parameter nm.
+ * @param name Parameter name.
+ * @param nlen Parameter nlen.
+ * @param target_id Parameter target_id.
+ * @param next_id Parameter next_id.
+ * @return Return value.
+ */
 static int stbtt__matchpair(stbtt_uint8 *fc, stbtt_uint32 nm, stbtt_uint8 *name,
                             stbtt_int32 nlen, stbtt_int32 target_id,
                             stbtt_int32 next_id) {
@@ -5523,6 +6501,14 @@ static int stbtt__matchpair(stbtt_uint8 *fc, stbtt_uint32 nm, stbtt_uint8 *name,
   return 0;
 }
 
+/**
+ * @brief stbtt__matches.
+ * @param fc Parameter fc.
+ * @param offset Parameter offset.
+ * @param name Parameter name.
+ * @param flags Parameter flags.
+ * @return Return value.
+ */
 static int stbtt__matches(stbtt_uint8 *fc, stbtt_uint32 offset,
                           stbtt_uint8 *name, stbtt_int32 flags) {
   stbtt_int32 nlen = (stbtt_int32)STBTT_strlen((char *)name);
@@ -5562,6 +6548,13 @@ static int stbtt__matches(stbtt_uint8 *fc, stbtt_uint32 offset,
   return 0;
 }
 
+/**
+ * @brief stbtt_FindMatchingFont_internal.
+ * @param font_collection Parameter font_collection.
+ * @param name_utf8 Parameter name_utf8.
+ * @param flags Parameter flags.
+ * @return Return value.
+ */
 static int stbtt_FindMatchingFont_internal(unsigned char *font_collection,
                                            char *name_utf8, stbtt_int32 flags) {
   stbtt_int32 i;
@@ -5740,3 +6733,4 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ------------------------------------------------------------------------------
 */
+/** @endcond */

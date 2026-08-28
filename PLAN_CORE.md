@@ -1,3 +1,11 @@
+/**
+ * @file PLAN_CORE.md
+ * @brief PLAN_CORE.md implementation.
+ */
+/**
+ * @file PLAN_CORE.md
+ * @brief PLAN_CORE.md implementation.
+ */
 # Architecture Plan: Core, Execution & Platform
 
 ## 1. Abstract Execution & Concurrency

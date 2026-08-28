@@ -5,10 +5,6 @@
 #ifndef UI_TOGGLE_BASE_H
 #define UI_TOGGLE_BASE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* clang-format off */
 #include "ui_error.h"
 #include "ui_component.h"
@@ -16,15 +12,30 @@ extern "C" {
 #include "ui_control_value_accessor.h"
 /* clang-format on */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief The type of the toggle component.
  */
-enum ui_toggle_type { UI_TOGGLE_TYPE_CHECKBOX = 0, UI_TOGGLE_TYPE_RADIO };
+enum ui_toggle_type {
+  UI_TOGGLE_TYPE_CHECKBOX = 0, /**< Checkbox type */
+  UI_TOGGLE_TYPE_RADIO         /**< Radio button type */
+};
 
+/**
+ * @brief Opaque structure representing the toggle base component.
+ */
 struct ui_toggle_base;
 
 /**
  * @brief Callback invoked when the toggle's checked state changes.
+ *
+ * @param toggle The toggle component that changed state.
+ * @param checked The new checked state (1 for checked, 0 for unchecked).
+ * @param user_data Opaque user data provided during registration.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 typedef ui_error_t (*ui_toggle_on_change_t)(struct ui_toggle_base *toggle,
                                             int checked, void *user_data);
@@ -53,6 +64,7 @@ ui_error_t ui_toggle_base_create(enum ui_toggle_type type,
  * @brief Destroys a toggle base component.
  *
  * @param toggle The toggle to destroy.
+ * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
 ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle);
 
@@ -72,7 +84,7 @@ ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
  *
  * @param toggle The toggle.
  * @param out_is_checked Pointer to receive 1 if checked, 0 if unchecked.
- * @return ui_error_t `UI_ERROR_NONE` on success.
+ * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
 ui_error_t ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
                                      int *out_is_checked);
@@ -130,7 +142,7 @@ ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
  *
  * @param toggle The toggle.
  * @param out_component Pointer to receive the underlying component.
- * @return ui_error_t `UI_ERROR_NONE` on success.
+ * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
 ui_error_t ui_toggle_base_get_component(struct ui_toggle_base *toggle,
                                         struct ui_component **out_component);
@@ -147,6 +159,6 @@ ui_error_t ui_toggle_base_get_cva(struct ui_toggle_base *toggle,
 
 #ifdef __cplusplus
 }
-#endif /* __cplusplus */
+#endif
 
 #endif /* UI_TOGGLE_BASE_H */

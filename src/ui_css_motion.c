@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_motion.c
+ * @brief ui_css_motion.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_motion.h"
 #include <string.h>
@@ -17,7 +21,7 @@
 /** @endcond */
 #endif
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -28,7 +32,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/*
+/**
  * @brief ui_css_parse_offset_path.
  * @param str Parameter str.
  * @param out_path Parameter out_path.
@@ -110,7 +114,7 @@ ui_error_t ui_css_parse_offset_path(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
+/**
  * @brief ui_css_parse_offset_distance.
  * @param str Parameter str.
  * @param out_distance Parameter out_distance.

@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_values.c
+ * @brief ui_css_values.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_css_values.h"
 
@@ -30,7 +34,7 @@
 /** @endcond */
 #endif
 
-/*
+/**
  * @brief parse_css_unit.
  * @param str Parameter str.
  * @param out_len Parameter out_len.
@@ -40,9 +44,10 @@
 static ui_error_t parse_css_unit(const char *str, size_t *out_len,
                                  enum ui_css_unit *out_unit) {
   size_t i, j;
+  /** @brief Represents a CSS unit mapping */
   static const struct {
-    const char *name;
-    enum ui_css_unit unit;
+    const char *name;      /**< Unit string name */
+    enum ui_css_unit unit; /**< Corresponding unit enum */
   } units[] = {{"px", UI_CSS_UNIT_PX},       {"%", UI_CSS_UNIT_PERCENT},
                {"cqmin", UI_CSS_UNIT_CQMIN}, {"cqmax", UI_CSS_UNIT_CQMAX},
                {"cqw", UI_CSS_UNIT_CQW},     {"cqh", UI_CSS_UNIT_CQH},
@@ -82,7 +87,7 @@ static ui_error_t parse_css_unit(const char *str, size_t *out_len,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_value_internal.
  * @param p_str Parameter p_str.
  * @param out_value Parameter out_value.
@@ -130,7 +135,7 @@ static ui_error_t ui_css_parse_value_internal(const char **p_str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_value.
  * @param str Parameter str.
  * @param out_value Parameter out_value.
@@ -164,7 +169,7 @@ ui_error_t ui_css_parse_value(const char *str, struct ui_css_value *out_value) {
 static ui_error_t parse_expression(const char **p_str,
                                    struct ui_css_value_ext **out_expr);
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -175,7 +180,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/*
+/**
  * @brief match_keyword.
  * @param p_str Parameter p_str.
  * @param kw Parameter kw.
@@ -194,7 +199,7 @@ static void match_keyword(const char **p_str, const char *kw,
   return;
 }
 
-/*
+/**
  * @brief create_math_node.
  * @param op Parameter op.
  * @param out_node Parameter out_node.
@@ -217,7 +222,7 @@ static ui_error_t create_math_node(enum ui_css_math_op op,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
-/*
+/**
  * @brief create_value_ext_math.
  * @param math Parameter math.
  * @param out_ext Parameter out_ext.
@@ -237,7 +242,7 @@ static ui_error_t create_value_ext_math(struct ui_css_math_expr *math,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
-/*
+/**
  * @brief create_value_ext_scalar.
  * @param scalar Parameter scalar.
  * @param out_ext Parameter out_ext.
@@ -257,7 +262,7 @@ static ui_error_t create_value_ext_scalar(const struct ui_css_value *scalar,
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
-/*
+/**
  * @brief create_value_ext_env.
  * @param name Parameter name.
  * @param fallback Parameter fallback.
@@ -300,7 +305,7 @@ static ui_error_t create_value_ext_env(const char *name,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief destroy_math_node.
  * @param math Parameter math.
  * @return Return value.
@@ -322,7 +327,7 @@ static void destroy_math_node(struct ui_css_math_expr *math) {
   C_MULTIPLATFORM_FREE(math);
 }
 
-/*
+/**
  * @brief ui_css_value_ext_destroy.
  * @param val Parameter val.
  * @return Return value.
@@ -344,6 +349,12 @@ void ui_css_value_ext_destroy(struct ui_css_value_ext *val) {
 }
 
 /* We need to properly handle min(), max(), clamp() */
+/**
+ * @brief parse_function.
+ * @param p_str Parameter p_str.
+ * @param out_expr Parameter out_expr.
+ * @return Return value.
+ */
 static ui_error_t parse_function(const char **p_str,
                                  struct ui_css_value_ext **out_expr) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -695,7 +706,7 @@ static ui_error_t parse_function(const char **p_str,
     }
   }
 }
-/*
+/**
  * @brief parse_term.
  * @param p_str Parameter p_str.
  * @param out_expr Parameter out_expr.
@@ -752,7 +763,7 @@ static ui_error_t parse_term(const char **p_str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief parse_expression.
  * @param p_str Parameter p_str.
  * @param out_expr Parameter out_expr.
@@ -823,7 +834,7 @@ static ui_error_t parse_expression(const char **p_str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_value_ext.
  * @param str Parameter str.
  * @param out_value Parameter out_value.
@@ -856,7 +867,7 @@ ui_error_t ui_css_parse_value_ext(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief parse_hex_color.
  * @param str Parameter str.
  * @param out_color Parameter out_color.
@@ -902,7 +913,7 @@ static ui_error_t parse_hex_color(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_parse_color.
  * @param str Parameter str.
  * @param out_color Parameter out_color.
@@ -1097,7 +1108,7 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
+/**
  * @brief ui_css_parse_image.
  * @param str Parameter str.
  * @param out_image Parameter out_image.

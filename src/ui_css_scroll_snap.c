@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_scroll_snap.c
+ * @brief ui_css_scroll_snap.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_css_scroll_snap.h"
 #include "../include/ui_cssom.h"
@@ -17,7 +21,7 @@
 /** @endcond */
 #endif
 
-/*
+/**
  * @brief parse_snap_type.
  * @param str Parameter str.
  * @param out_type Parameter out_type.
@@ -72,7 +76,7 @@ static ui_error_t parse_snap_type(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief parse_align_keyword.
  * @param str Parameter str.
  * @param out_keyword Parameter out_keyword.
@@ -91,7 +95,7 @@ parse_align_keyword(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief parse_snap_align.
  * @param str Parameter str.
  * @param out_align Parameter out_align.
@@ -138,7 +142,7 @@ static ui_error_t parse_snap_align(const char *str,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief set_quad_default.
  * @param top Parameter top.
  * @param right Parameter right.
@@ -162,7 +166,7 @@ static ui_error_t set_quad_default(struct ui_css_value *top,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief parse_quad_shorthand.
  * @param str Parameter str.
  * @param top Parameter top.

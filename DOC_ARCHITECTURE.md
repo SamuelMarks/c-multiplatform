@@ -1,3 +1,11 @@
+/**
+ * @file DOC_ARCHITECTURE.md
+ * @brief DOC_ARCHITECTURE.md implementation.
+ */
+/**
+ * @file DOC_ARCHITECTURE.md
+ * @brief DOC_ARCHITECTURE.md implementation.
+ */
 # Core Architecture: Memory & Threading
 
 ## 1. Memory Ownership Model

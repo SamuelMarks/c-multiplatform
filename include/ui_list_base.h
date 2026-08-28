@@ -6,8 +6,14 @@
 #ifndef UI_LIST_BASE_H
 #define UI_LIST_BASE_H
 
+/**
+ * @brief Opaque structure representing a computed value.
+ */
 struct ui_computed;
 
+/**
+ * @brief Opaque structure representing a signal.
+ */
 struct ui_signal;
 
 #ifdef __cplusplus
@@ -19,15 +25,22 @@ extern "C" {
 #include "ui_component.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a list base component.
+ */
 struct ui_list_base;
+
+/**
+ * @brief Opaque structure representing a list item base component.
+ */
 struct ui_list_item_base;
 
 /**
  * @brief List orientation types for rendering flow.
  */
 enum ui_list_orientation {
-  UI_LIST_ORIENTATION_VERTICAL,
-  UI_LIST_ORIENTATION_HORIZONTAL
+  UI_LIST_ORIENTATION_VERTICAL,  /**< Vertical orientation */
+  UI_LIST_ORIENTATION_HORIZONTAL /**< Horizontal orientation */
 };
 
 /**
@@ -42,6 +55,7 @@ ui_error_t ui_list_base_create(struct ui_list_base **out_list);
  * @brief Destroys a list component.
  *
  * @param list The list to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_list_base_destroy(struct ui_list_base *list);
 
@@ -98,6 +112,7 @@ ui_error_t ui_list_item_base_create(struct ui_list_item_base **out_item);
  * @brief Destroys a list item component.
  *
  * @param item The list item to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_list_item_base_destroy(struct ui_list_item_base *item);
 

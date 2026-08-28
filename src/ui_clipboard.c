@@ -1,3 +1,7 @@
+/**
+ * @file ui_clipboard.c
+ * @brief Implementation of ui_clipboard.c.
+ */
 /* clang-format off */
 #include "ui_clipboard.h"
 #include "ui_internal_mem.h"
@@ -36,6 +40,8 @@ __declspec(dllimport) void *__stdcall GlobalFree(void *);
 #else
 #endif
 
+/** @brief Global fallback clipboard buffer for environments lacking native
+ * support */
 static char *s_fallback_clipboard = NULL;
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -62,7 +68,7 @@ extern int (*g_mock_pclose_fn)(FILE *);
 #define PCLOSE_CMD(stream) pclose(stream)
 #endif
 
-/*
+/**
  * @brief ui_clipboard_set_text.
  * @param text Parameter text.
  * @return Return value.
@@ -154,7 +160,7 @@ fallback:
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_clipboard_get_text.
  * @param out_text Parameter out_text.
  * @return Return value.
@@ -299,7 +305,7 @@ fallback:
   return UI_ERROR_UNSUPPORTED;
 }
 
-/*
+/**
  * @brief ui_clipboard_free_text.
  * @param text Parameter text.
  * @return Return value.
@@ -311,7 +317,7 @@ ui_error_t ui_clipboard_free_text(char *text) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_clipboard_cleanup.
  * @return Return value.
  */

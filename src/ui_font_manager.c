@@ -1,6 +1,10 @@
-/*
- * \file ui_font_manager.c
- * \brief Implementation of the UI font manager.
+/**
+ * @file ui_font_manager.c
+ * @brief ui_font_manager.c implementation.
+ */
+/**
+ * @file ui_font_manager.c
+ * @brief Implementation of the UI font manager.
  */
 /* clang-format off */
 #include "../include/ui_font_manager.h"
@@ -28,10 +32,11 @@
 #endif
 
 /* #define STB_TRUETYPE_IMPLEMENTATION */
+/** @brief STB TrueType memory allocation */
 #define STBTT_malloc(x,u)  ((void)(u),C_MULTIPLATFORM_MALLOC(x))
 /** @brief internal */
 #define STBTT_free(x,u)    ((void)(u),C_MULTIPLATFORM_FREE(x))
-#include "../include/stb_truetype.h"
+#include "stb_truetype.h"
 
 #if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
@@ -44,8 +49,7 @@
 
 /**
  * @struct ui_font
- * \struct ui_font
- * \brief Represents a loaded font instance.
+ * @brief Represents a loaded font instance.
  */
 struct ui_font {
   stbtt_fontinfo info;        /**< info */
@@ -62,17 +66,16 @@ struct ui_font {
 
 /**
  * @struct ui_font_manager
- * \struct ui_font_manager
- * \brief Manages a collection of loaded fonts.
+ * @brief Manages a collection of loaded fonts.
  */
 struct ui_font_manager {
   struct ui_font *head; /**< head */
 };
 
-/*
- * \brief Creates a new font manager.
- * \param[out] out_manager Pointer to store the created font manager.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new font manager.
+ * @param[out] out_manager Pointer to store the created font manager.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_manager_create(struct ui_font_manager **out_manager) {
   struct ui_font_manager *manager;
@@ -93,10 +96,10 @@ ui_error_t ui_font_manager_create(struct ui_font_manager **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a font manager and frees its fonts.
- * \param[in,out] manager The font manager to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a font manager and frees its fonts.
+ * @param[in,out] manager The font manager to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_manager_destroy(struct ui_font_manager *manager) {
   struct ui_font *current;
@@ -121,13 +124,13 @@ ui_error_t ui_font_manager_destroy(struct ui_font_manager *manager) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Loads a font from a memory buffer.
- * \param[in,out] manager The font manager.
- * \param[in] font_data The memory buffer containing the font data.
- * \param[in] data_size The size of the memory buffer in bytes.
- * \param[out] out_font Pointer to store the loaded font.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Loads a font from a memory buffer.
+ * @param[in,out] manager The font manager.
+ * @param[in] font_data The memory buffer containing the font data.
+ * @param[in] data_size The size of the memory buffer in bytes.
+ * @param[out] out_font Pointer to store the loaded font.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_manager_load_font_memory(struct ui_font_manager *manager,
                                             const unsigned char *font_data,
@@ -174,13 +177,13 @@ ui_error_t ui_font_manager_load_font_memory(struct ui_font_manager *manager,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves glyph metrics for a codepoint.
- * \param[in] font The font to query.
- * \param[in] codepoint The unicode codepoint.
- * \param[in] font_size The size of the font in pixels.
- * \param[out] out_metrics Pointer to store the retrieved metrics.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves glyph metrics for a codepoint.
+ * @param[in] font The font to query.
+ * @param[in] codepoint The unicode codepoint.
+ * @param[in] font_size The size of the font in pixels.
+ * @param[out] out_metrics Pointer to store the retrieved metrics.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
                                      float font_size,
@@ -207,14 +210,14 @@ ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves vertical metrics for a font.
- * \param[in] font The font to query.
- * \param[in] font_size The size of the font in pixels.
- * \param[out] out_ascent Pointer to store the ascent.
- * \param[out] out_descent Pointer to store the descent.
- * \param[out] out_line_gap Pointer to store the line gap.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves vertical metrics for a font.
+ * @param[in] font The font to query.
+ * @param[in] font_size The size of the font in pixels.
+ * @param[out] out_ascent Pointer to store the ascent.
+ * @param[out] out_descent Pointer to store the descent.
+ * @param[out] out_line_gap Pointer to store the line gap.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
                                 float *out_ascent, float *out_descent,
@@ -236,14 +239,14 @@ ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves kerning advance between two codepoints.
- * \param[in] font The font to query.
- * \param[in] codepoint1 The first unicode codepoint.
- * \param[in] codepoint2 The second unicode codepoint.
- * \param[in] font_size The size of the font in pixels.
- * \param[out] out_kerning Pointer to store the kerning value.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves kerning advance between two codepoints.
+ * @param[in] font The font to query.
+ * @param[in] codepoint1 The first unicode codepoint.
+ * @param[in] codepoint2 The second unicode codepoint.
+ * @param[in] font_size The size of the font in pixels.
+ * @param[out] out_kerning Pointer to store the kerning value.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_get_kerning(struct ui_font *font, int codepoint1,
                                int codepoint2, float font_size,
@@ -262,12 +265,12 @@ ui_error_t ui_font_get_kerning(struct ui_font *font, int codepoint1,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves the raw font data buffer.
- * \param[in] font The font to query.
- * \param[out] out_data Pointer to store the font data buffer.
- * \param[out] out_size Pointer to store the size of the buffer.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves the raw font data buffer.
+ * @param[in] font The font to query.
+ * @param[out] out_data Pointer to store the font data buffer.
+ * @param[out] out_size Pointer to store the size of the buffer.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_get_data(struct ui_font *font,
                             const unsigned char **out_data, size_t *out_size) {
@@ -279,16 +282,16 @@ ui_error_t ui_font_get_data(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Generates a texture atlas for a set of codepoints.
- * \param[in] font The font to use.
- * \param[in] font_size The font size in pixels.
- * \param[in] codepoints Array of codepoints to pack.
- * \param[in] codepoint_count Number of codepoints.
- * \param[out] out_atlas_rgba Pointer to store the allocated RGBA atlas buffer.
- * \param[out] out_width Pointer to store the width of the generated atlas.
- * \param[out] out_height Pointer to store the height of the generated atlas.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Generates a texture atlas for a set of codepoints.
+ * @param[in] font The font to use.
+ * @param[in] font_size The font size in pixels.
+ * @param[in] codepoints Array of codepoints to pack.
+ * @param[in] codepoint_count Number of codepoints.
+ * @param[out] out_atlas_rgba Pointer to store the allocated RGBA atlas buffer.
+ * @param[out] out_width Pointer to store the width of the generated atlas.
+ * @param[out] out_height Pointer to store the height of the generated atlas.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_generate_atlas(struct ui_font *font, float font_size,
                                   const int *codepoints, int codepoint_count,
@@ -381,10 +384,10 @@ cleanup:
   return rc;
 }
 
-/*
- * \brief Frees a generated texture atlas.
- * \param[in,out] atlas_rgba The atlas buffer to free.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Frees a generated texture atlas.
+ * @param[in,out] atlas_rgba The atlas buffer to free.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_free_atlas(unsigned char *atlas_rgba) {
   if (!atlas_rgba) {
@@ -393,13 +396,13 @@ ui_error_t ui_font_free_atlas(unsigned char *atlas_rgba) {
   C_MULTIPLATFORM_FREE(atlas_rgba);
   return UI_ERROR_NONE;
 }
-/*
- * \brief Sets metadata for a font (family, weight, italic).
- * \param[in,out] font The font to update.
- * \param[in] family The font family string.
- * \param[in] weight The font weight.
- * \param[in] is_italic 1 if italic, 0 otherwise.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets metadata for a font (family, weight, italic).
+ * @param[in,out] font The font to update.
+ * @param[in] family The font family string.
+ * @param[in] weight The font weight.
+ * @param[in] is_italic 1 if italic, 0 otherwise.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_set_metadata(struct ui_font *font, const char *family,
                                 int weight, int is_italic) {
@@ -413,11 +416,11 @@ ui_error_t ui_font_set_metadata(struct ui_font *font, const char *family,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Gets the current loading status of a font.
- * \param[in] font The font to query.
- * \param[out] out_status Pointer to store the status.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Gets the current loading status of a font.
+ * @param[in] font The font to query.
+ * @param[out] out_status Pointer to store the status.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_get_status(struct ui_font *font,
                               enum ui_font_status *out_status) {
@@ -427,11 +430,11 @@ ui_error_t ui_font_get_status(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets the loading status of a font.
- * \param[in,out] font The font to update.
- * \param[in] status The status to set.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets the loading status of a font.
+ * @param[in,out] font The font to update.
+ * @param[in] status The status to set.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_set_status(struct ui_font *font,
                               enum ui_font_status status) {
@@ -441,14 +444,14 @@ ui_error_t ui_font_set_status(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Finds a loaded font matching the provided metadata.
- * \param[in] manager The font manager.
- * \param[in] family The font family.
- * \param[in] weight The font weight.
- * \param[in] is_italic The italic flag.
- * \param[out] out_font Pointer to store the found font.
- * \return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if not found.
+/**
+ * @brief Finds a loaded font matching the provided metadata.
+ * @param[in] manager The font manager.
+ * @param[in] family The font family.
+ * @param[in] weight The font weight.
+ * @param[in] is_italic The italic flag.
+ * @param[out] out_font Pointer to store the found font.
+ * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if not found.
  */
 ui_error_t ui_font_manager_find_font(struct ui_font_manager *manager,
                                      const char *family, int weight,
@@ -471,12 +474,12 @@ ui_error_t ui_font_manager_find_font(struct ui_font_manager *manager,
   return UI_ERROR_NOT_FOUND;
 }
 
-/*
- * \brief Sets axis variations for a font.
- * \param[in,out] font The font to update.
- * \param[in] axes The array of font axes.
- * \param[in] axis_count The number of axes.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets axis variations for a font.
+ * @param[in,out] font The font to update.
+ * @param[in] axes The array of font axes.
+ * @param[in] axis_count The number of axes.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_set_variations(struct ui_font *font,
                                   const struct ui_font_axis *axes,
@@ -511,12 +514,12 @@ ui_error_t ui_font_set_variations(struct ui_font *font,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Retrieves the current axis variations for a font.
- * \param[in] font The font to query.
- * \param[out] out_axes Pointer to store the array of axes.
- * \param[out] out_axis_count Pointer to store the number of axes.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Retrieves the current axis variations for a font.
+ * @param[in] font The font to query.
+ * @param[out] out_axes Pointer to store the array of axes.
+ * @param[out] out_axis_count Pointer to store the number of axes.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_font_get_variations(struct ui_font *font,
                                   struct ui_font_axis **out_axes,
@@ -533,6 +536,10 @@ ui_error_t ui_font_get_variations(struct ui_font *font,
 extern int g_malloc_fail_countdown;
 ui_error_t ui_test_font_manager_coverage_in_src(void);
 
+/**
+ * @brief Tests ui font manager coverage.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_test_font_manager_coverage_in_src(void) {
   struct ui_font_manager *manager = NULL;
   struct ui_font *font = NULL;

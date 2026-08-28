@@ -1,3 +1,7 @@
+/**
+ * @file ui_internal_mem.h
+ * @brief ui_internal_mem.h implementation.
+ */
 #ifndef UI_INTERNAL_MEM_H
 #define UI_INTERNAL_MEM_H
 
@@ -6,27 +10,63 @@
 #include <string.h>
 /* clang-format on */
 
+/**
+ * @brief ui_mock_malloc.
+ * @param size Parameter size.
+ * @return Return value.
+ */
 extern void *ui_mock_malloc(size_t size);
+/**
+ * @brief ui_mock_realloc.
+ * @param ptr Parameter ptr.
+ * @param size Parameter size.
+ * @return Return value.
+ */
 extern void *ui_mock_realloc(void *ptr, size_t size);
+/**
+ * @brief ui_mock_free.
+ * @param ptr Parameter ptr.
+ * @return Return value.
+ */
 extern void ui_mock_free(void *ptr);
+/**
+ * @brief ui_mock_strdup.
+ * @param src Parameter src.
+ * @return Return value.
+ */
 extern char *ui_mock_strdup(const char *src);
 
+/** @def C_MULTIPLATFORM_MALLOC
+ * @brief Platform malloc
+ */
 #ifndef C_MULTIPLATFORM_MALLOC
 #define C_MULTIPLATFORM_MALLOC malloc
 #endif
 
+/** @def C_MULTIPLATFORM_FREE
+ * @brief Platform free
+ */
 #ifndef C_MULTIPLATFORM_FREE
 #define C_MULTIPLATFORM_FREE free
 #endif
 
+/** @def C_MULTIPLATFORM_REALLOC
+ * @brief Platform realloc
+ */
 #ifndef C_MULTIPLATFORM_REALLOC
 #define C_MULTIPLATFORM_REALLOC realloc
 #endif
 
+/** @def C_MULTIPLATFORM_CALLOC
+ * @brief Platform calloc
+ */
 #ifndef C_MULTIPLATFORM_CALLOC
 #define C_MULTIPLATFORM_CALLOC calloc
 #endif
 
+/** @def C_MULTIPLATFORM_STRDUP
+ * @brief Platform strdup
+ */
 #ifndef C_MULTIPLATFORM_STRDUP
 #if defined(_MSC_VER)
 #define C_MULTIPLATFORM_STRDUP _strdup
@@ -62,22 +102,46 @@ static int mock_strcpy_fail_check(void) {
   return 0;
 }
 #if defined(_MSC_VER)
+/** @def UI_STRCPY
+ * @brief Safe strcpy wrapper
+ */
 #define UI_STRCPY(dest, destsz, src)                                           \
   (mock_strcpy_fail_check() ? -1 : strcpy_s((dest), (destsz), (src)))
+/** @def UI_STRNCPY
+ * @brief Safe strncpy wrapper
+ */
 #define UI_STRNCPY(dest, destsz, src, count)                                   \
   strncpy_s((dest), (destsz), (src), (count))
 #else
+/** @def UI_STRCPY
+ * @brief Safe strcpy wrapper
+ */
 #define UI_STRCPY(dest, destsz, src)                                           \
   (mock_strcpy_fail_check() ? -1 : (strcpy((dest), (src)), 0))
+/** @def UI_STRNCPY
+ * @brief Safe strncpy wrapper
+ */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
 #endif
 #else
 #if defined(_MSC_VER)
+/** @def UI_STRCPY
+ * @brief Safe strcpy wrapper
+ */
 #define UI_STRCPY(dest, destsz, src) strcpy_s((dest), (destsz), (src))
+/** @def UI_STRNCPY
+ * @brief Safe strncpy wrapper
+ */
 #define UI_STRNCPY(dest, destsz, src, count)                                   \
   strncpy_s((dest), (destsz), (src), (count))
 #else
+/** @def UI_STRCPY
+ * @brief Safe strcpy wrapper
+ */
 #define UI_STRCPY(dest, destsz, src) (strcpy((dest), (src)), 0)
+/** @def UI_STRNCPY
+ * @brief Safe strncpy wrapper
+ */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
 #endif
 #endif

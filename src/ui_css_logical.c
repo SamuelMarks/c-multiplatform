@@ -1,8 +1,12 @@
+/**
+ * @file ui_css_logical.c
+ * @brief ui_css_logical.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_logical.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_css_logical_to_physical_edge.
  * @param logical_edge Parameter logical_edge.
  * @param writing_mode Parameter writing_mode.

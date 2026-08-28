@@ -29,103 +29,139 @@ typedef int ui_bool_t;
  */
 #define UI_FALSE 0
 
+#if defined(_MSC_VER)
 /**
  * @brief Signed 8-bit integer.
  */
-#if defined(_MSC_VER)
 typedef signed __int8 ui_int8;
 #else
+/**
+ * @brief Signed 8-bit integer.
+ */
 typedef signed char ui_int8;
 #endif
 
+#if defined(_MSC_VER)
 /**
  * @brief Unsigned 8-bit integer.
  */
-#if defined(_MSC_VER)
 typedef unsigned __int8 ui_uint8;
 #else
+/**
+ * @brief Unsigned 8-bit integer.
+ */
 typedef unsigned char ui_uint8;
 #endif
 
+#if defined(_MSC_VER)
 /**
  * @brief Signed 16-bit integer.
  */
-#if defined(_MSC_VER)
 typedef signed __int16 ui_int16;
 #else
+/**
+ * @brief Signed 16-bit integer.
+ */
 typedef signed short ui_int16;
 #endif
 
+#if defined(_MSC_VER)
 /**
  * @brief Unsigned 16-bit integer.
  */
-#if defined(_MSC_VER)
 typedef unsigned __int16 ui_uint16;
 #else
+/**
+ * @brief Unsigned 16-bit integer.
+ */
 typedef unsigned short ui_uint16;
 #endif
 
+#if defined(_MSC_VER)
 /**
  * @brief Signed 32-bit integer.
  */
-#if defined(_MSC_VER)
 typedef signed __int32 ui_int32;
 #else
+/**
+ * @brief Signed 32-bit integer.
+ */
 typedef signed int ui_int32;
 #endif
 
+#if defined(_MSC_VER)
 /**
  * @brief Unsigned 32-bit integer.
  */
-#if defined(_MSC_VER)
 typedef unsigned __int32 ui_uint32;
 #else
+/**
+ * @brief Unsigned 32-bit integer.
+ */
 typedef unsigned int ui_uint32;
 #endif
 
+#if defined(_MSC_VER)
 /**
  * @brief Signed 64-bit integer.
  */
-#if defined(_MSC_VER)
 typedef signed __int64 ui_int64;
 #else
 #if defined(__GNUC__) || defined(__clang__)
+/**
+ * @brief Signed 64-bit integer.
+ */
 __extension__ typedef signed long long ui_int64;
 #else
+/**
+ * @brief Signed 64-bit integer.
+ */
 typedef signed long long ui_int64;
 #endif
 #endif
 
+#if defined(_MSC_VER)
 /**
  * @brief Unsigned 64-bit integer.
  */
-#if defined(_MSC_VER)
 typedef unsigned __int64 ui_uint64;
 #else
 #if defined(__GNUC__) || defined(__clang__)
+/**
+ * @brief Unsigned 64-bit integer.
+ */
 __extension__ typedef unsigned long long ui_uint64;
 #else
+/**
+ * @brief Unsigned 64-bit integer.
+ */
 typedef unsigned long long ui_uint64;
 #endif
 #endif
 
+#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) ||            \
+    defined(__aarch64__) || defined(_M_X64) || defined(_M_ARM64)
 /**
  * @brief Signed pointer-sized integer.
  */
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) ||            \
-    defined(__aarch64__) || defined(_M_X64) || defined(_M_ARM64)
 typedef ui_int64 ui_intptr;
 #else
+/**
+ * @brief Signed pointer-sized integer.
+ */
 typedef ui_int32 ui_intptr;
 #endif
 
+#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) ||            \
+    defined(__aarch64__) || defined(_M_X64) || defined(_M_ARM64)
 /**
  * @brief Unsigned pointer-sized integer.
  */
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__) ||            \
-    defined(__aarch64__) || defined(_M_X64) || defined(_M_ARM64)
 typedef ui_uint64 ui_uintptr;
 #else
+/**
+ * @brief Unsigned pointer-sized integer.
+ */
 typedef ui_uint32 ui_uintptr;
 #endif
 

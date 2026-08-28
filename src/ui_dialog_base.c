@@ -1,3 +1,7 @@
+/**
+ * @file ui_dialog_base.c
+ * @brief ui_dialog_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_dialog_base.h"
 #include "ui_internal_mem.h"
@@ -9,6 +13,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet for dialog base component */
 static const char *ui_dialog_base_default_css =
     "dialog[role=\"dialog\"] { "
     "background: var(--dialog-bg, #fff); "
@@ -50,7 +55,7 @@ struct ui_dialog_base {
   struct ui_computed *animating_signal; /**< animating_signal */
 };
 
-/*
+/**
  * @brief ui_dialog_base_create.
  * @param out_dialog Parameter out_dialog.
  * @return Return value.
@@ -145,7 +150,7 @@ cleanup:
   return rc;
 }
 
-/*
+/**
  * @brief ui_dialog_base_destroy.
  * @param dialog Parameter dialog.
  * @return Return value.
@@ -174,7 +179,7 @@ ui_error_t ui_dialog_base_destroy(struct ui_dialog_base *dialog) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_set_content.
  * @param dialog Parameter dialog.
  * @param content Parameter content.
@@ -195,7 +200,7 @@ ui_error_t ui_dialog_base_set_content(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_set_overlay_director.
  * @param dialog Parameter dialog.
  * @param director Parameter director.
@@ -211,7 +216,7 @@ ui_dialog_base_set_overlay_director(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_set_focus_manager.
  * @param dialog Parameter dialog.
  * @param focus_manager Parameter focus_manager.
@@ -227,7 +232,7 @@ ui_dialog_base_set_focus_manager(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_set_open.
  * @param dialog Parameter dialog.
  * @param is_open Parameter is_open.
@@ -284,7 +289,7 @@ ui_error_t ui_dialog_base_set_open(struct ui_dialog_base *dialog, int is_open) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_is_open.
  * @param dialog Parameter dialog.
  * @param out_is_open Parameter out_is_open.
@@ -299,7 +304,7 @@ ui_error_t ui_dialog_base_is_open(const struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_set_on_close.
  * @param dialog Parameter dialog.
  * @param on_close Parameter on_close.
@@ -317,7 +322,7 @@ ui_error_t ui_dialog_base_set_on_close(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_process_event.
  * @param dialog Parameter dialog.
  * @param event Parameter event.
@@ -361,7 +366,7 @@ ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_get_component.
  * @param dialog Parameter dialog.
  * @param out_component Parameter out_component.
@@ -376,7 +381,7 @@ ui_error_t ui_dialog_base_get_component(struct ui_dialog_base *dialog,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_bind_open.
  * @param widget Parameter widget.
  * @param open_signal Parameter open_signal.
@@ -391,7 +396,7 @@ ui_error_t ui_dialog_base_bind_open(struct ui_dialog_base *widget,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_dialog_base_get_animating_signal.
  * @param widget Parameter widget.
  * @param out_animating Parameter out_animating.

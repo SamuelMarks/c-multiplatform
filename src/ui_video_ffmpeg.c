@@ -1,3 +1,7 @@
+/**
+ * @file ui_video_ffmpeg.c
+ * @brief ui_video_ffmpeg.c implementation.
+ */
 /* clang-format off */
 #include "ui_video_decoder.h"
 #include "ui_error.h"

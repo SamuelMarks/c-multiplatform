@@ -1,9 +1,13 @@
+/**
+ * @file ui_image_jpeg.c
+ * @brief ui_image_jpeg.c implementation.
+ */
 /* clang-format off */
 #include "ui_image_decoder.h"
 #include "ui_error.h"
 /* clang-format on */
 
-/*
+/**
  * @brief jpeg_supports_format.
  * @param format Parameter format.
  * @param out_supported Parameter out_supported.
@@ -15,7 +19,7 @@ static ui_error_t jpeg_supports_format(enum ui_image_format format,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief jpeg_decode_memory.
  * @param data Parameter data.
  * @param size Parameter size.
@@ -37,7 +41,7 @@ static ui_error_t jpeg_decode_memory(const void *data, size_t size,
   return UI_ERROR_UNKNOWN; /* TODO: Implement actual C89 JPEG decoding */
 }
 
-/*
+/**
  * @brief jpeg_free_image.
  * @param image Parameter image.
  * @return Return value.
@@ -50,5 +54,6 @@ static ui_error_t jpeg_free_image(struct ui_image *image) {
   return UI_ERROR_NONE;
 }
 
+/** @brief JPEG decoder backend */
 struct ui_image_decoder_backend ui_image_decoder_jpeg = {
     jpeg_supports_format, jpeg_decode_memory, jpeg_free_image};

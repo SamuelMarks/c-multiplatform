@@ -1,3 +1,7 @@
+/**
+ * @file ui_event.c
+ * @brief ui_event.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_event.h"
 #include "../include/ui_error.h"
@@ -7,7 +11,7 @@
 #include <stddef.h>
 /* clang-format on */
 
-/*
+/**
  * @brief trigger_event.
  * @param node Parameter node.
  * @param event Parameter event.
@@ -34,7 +38,7 @@ static ui_error_t trigger_event(const struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief hit_test.
  * @param node Parameter node.
  * @param x Parameter x.
@@ -55,7 +59,7 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
                              const struct ui_event *event,
                              struct ui_mouse_state *state, void *user_data);
 
-/*
+/**
  * @brief ui_event_dispatch.
  * @param layout_root Parameter layout_root.
  * @param event Parameter event.

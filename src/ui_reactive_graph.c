@@ -1,3 +1,7 @@
+/**
+ * @file ui_reactive_graph.c
+ * @brief ui_reactive_graph.c implementation.
+ */
 /*
  * \file ui_reactive_graph.c
  * \brief Implementation of the UI Reactive Graph component.
@@ -11,9 +15,10 @@
 /* clang-format on */
 
 /* \brief Thread-local pointer to the currently evaluating reactive node */
-static UI_THREAD_LOCAL struct ui_reactive_node *g_current_node = NULL;
+static /** @brief Currently active reactive node */
+    UI_THREAD_LOCAL struct ui_reactive_node *g_current_node = NULL;
 
-/*
+/**
  * \brief Gets the currently evaluating reactive node for the current thread.
  *
  * \param out_node Pointer to store the result.
@@ -27,7 +32,7 @@ ui_reactive_graph_get_current_node(struct ui_reactive_node **out_node) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * \brief Sets the currently evaluating reactive node for the current thread.
  *
  * \param node The node to set as current.

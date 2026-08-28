@@ -1,3 +1,7 @@
+/**
+ * @file ui_cssom.c
+ * @brief ui_cssom.c implementation.
+ */
 /* clang-format off */
 #include "ui_cssom.h"
 #include "ui_internal_mem.h"
@@ -87,7 +91,7 @@ ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_stylesheet_destroy.
  * @param stylesheet Parameter stylesheet.
  * @return Return value.
@@ -221,7 +225,7 @@ ui_css_stylesheet_register_layer(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_rule_create.
  * @param type Parameter type.
  * @param out_rule Parameter out_rule.
@@ -261,7 +265,7 @@ ui_error_t ui_css_rule_create(enum ui_css_rule_type type,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_selector_destroy.
  * @param sel Parameter sel.
  * @return Return value.
@@ -288,7 +292,7 @@ ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_rule_destroy.
  * @param rule Parameter rule.
  * @return Return value.
@@ -398,7 +402,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_rule_append_selector.
  * @param rule Parameter rule.
  * @param type Parameter type.
@@ -519,7 +523,7 @@ ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_rule_append_declaration.
  * @param rule Parameter rule.
  * @param property_name Parameter property_name.
@@ -584,7 +588,7 @@ ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief class_list_contains.
  * @param class_list Parameter class_list.
  * @param class_name Parameter class_name.
@@ -618,7 +622,7 @@ static ui_error_t class_list_contains(const char *class_list,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief string_starts_with.
  * @param str Parameter str.
  * @param prefix Parameter prefix.
@@ -636,7 +640,7 @@ static ui_error_t string_starts_with(const char *str, const char *prefix,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief string_ends_with.
  * @param str Parameter str.
  * @param suffix Parameter suffix.
@@ -655,7 +659,7 @@ static ui_error_t string_ends_with(const char *str, const char *suffix,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief string_contains.
  * @param str Parameter str.
  * @param substr Parameter substr.
@@ -668,7 +672,7 @@ static ui_error_t string_contains(const char *str, const char *substr,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief string_dash_match.
  * @param str Parameter str.
  * @param val Parameter val.
@@ -688,7 +692,7 @@ static ui_error_t string_dash_match(const char *str, const char *val,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief attribute_matches.
  * @param selector Parameter selector.
  * @param attr_val Parameter attr_val.
@@ -736,7 +740,7 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
                                    const struct ui_dom_node *node,
                                    int *out_matched);
 
-/*
+/**
  * @brief any_selector_matches.
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
@@ -760,7 +764,7 @@ any_selector_matches(const struct ui_css_selector *selectors_list,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief has_matching_descendant.
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
@@ -791,6 +795,12 @@ has_matching_descendant(const struct ui_css_selector *selectors_list,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief cssom_get_attr.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @return Return value.
+ */
 static const char *cssom_get_attr(const struct ui_dom_node *node,
                                   const char *name) {
   struct ui_dom_attribute *attr = node->attributes;
@@ -802,7 +812,7 @@ static const char *cssom_get_attr(const struct ui_dom_node *node,
   return NULL;
 }
 
-/*
+/**
  * @brief is_in_scope.
  * @param scope_start Parameter scope_start.
  * @param scope_end Parameter scope_end.
@@ -855,7 +865,7 @@ static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief has_matching_ancestor.
  * @param selectors_list Parameter selectors_list.
  * @param node Parameter node.
@@ -881,7 +891,7 @@ has_matching_ancestor(const struct ui_css_selector *selectors_list,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief pseudo_class_matches.
  * @param selector Parameter selector.
  * @param node Parameter node.
@@ -1190,7 +1200,7 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
   }
 }
 
-/*
+/**
  * @brief selector_matches.
  * @param selector Parameter selector.
  * @param node Parameter node.
@@ -1270,6 +1280,19 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
 }
 
 /* \brief append_computed_declaration
+ */
+/**
+ * @brief append_computed_declaration.
+ * @param style Parameter style.
+ * @param property_name Parameter property_name.
+ * @param property_value Parameter property_value.
+ * @param is_important Parameter is_important.
+ * @param layer_order Parameter layer_order.
+ * @param spec_a Parameter spec_a.
+ * @param spec_b Parameter spec_b.
+ * @param spec_c Parameter spec_c.
+ * @param source_order Parameter source_order.
+ * @return Return value.
  */
 static ui_error_t append_computed_declaration(
     struct ui_css_computed_style *style, const char *property_name,
@@ -1362,7 +1385,7 @@ static ui_error_t append_computed_declaration(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief get_selector_specificity.
  * @param sel Parameter sel.
  * @param a Parameter a.
@@ -1417,7 +1440,7 @@ static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cond_skip_ws.
  * @param p Parameter p.
  * @return Return value.
@@ -1429,7 +1452,7 @@ static ui_error_t cond_skip_ws(const char **p) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief cond_is_word.
  * @param p Parameter p.
  * @param word Parameter word.
@@ -1453,7 +1476,7 @@ static ui_error_t cond_is_word(const char *p, const char *word,
 
 static ui_error_t eval_cond_or(const char **p, int *out_matched);
 
-/*
+/**
  * @brief eval_cond_term.
  * @param p Parameter p.
  * @param out_matched Parameter out_matched.
@@ -1551,7 +1574,7 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
   *out_matched = 0;
   return UI_ERROR_NONE;
 }
-/*
+/**
  * @brief eval_cond_and.
  * @param p Parameter p.
  * @param out_matched Parameter out_matched.
@@ -1583,7 +1606,7 @@ static ui_error_t eval_cond_and(const char **p, int *out_matched) {
   *out_matched = res;
   return UI_ERROR_NONE;
 }
-/*
+/**
  * @brief eval_cond_or.
  * @param p Parameter p.
  * @param out_matched Parameter out_matched.
@@ -1615,7 +1638,7 @@ static ui_error_t eval_cond_or(const char **p, int *out_matched) {
   *out_matched = res;
   return UI_ERROR_NONE;
 }
-/*
+/**
  * @brief eval_supports_condition.
  * @param condition Parameter condition.
  * @param out_matched Parameter out_matched.
@@ -1634,6 +1657,16 @@ static ui_error_t eval_supports_condition(const char *condition,
 }
 
 /* \brief resolve_rules_recursive
+ */
+/**
+ * @brief resolve_rules_recursive.
+ * @param stylesheet Parameter stylesheet.
+ * @param rules Parameter rules.
+ * @param node Parameter node.
+ * @param style Parameter style.
+ * @param source_order_counter Parameter source_order_counter.
+ * @param current_layer_order Parameter current_layer_order.
+ * @return Return value.
  */
 static ui_error_t resolve_rules_recursive(
     const struct ui_css_stylesheet *stylesheet, struct ui_css_rule *rules,
@@ -1757,7 +1790,7 @@ static ui_error_t resolve_rules_recursive(
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_resolve_style.
  * @param stylesheet Parameter stylesheet.
  * @param node Parameter node.
@@ -1887,7 +1920,7 @@ ui_error_t ui_css_variable_store_destroy(struct ui_css_variable_store *store) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_css_variable_store_set.
  * @param store Parameter store.
  * @param name Parameter name.

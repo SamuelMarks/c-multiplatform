@@ -46,6 +46,7 @@ ui_error_t ui_component_create(struct ui_component **out_component);
  * @brief Destroys a component and its isolated DOM/style subtrees.
  *
  * @param component The component to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_component_destroy(struct ui_component *component);
 

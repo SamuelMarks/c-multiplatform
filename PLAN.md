@@ -1,3 +1,11 @@
+/**
+ * @file PLAN.md
+ * @brief PLAN.md implementation.
+ */
+/**
+ * @file PLAN.md
+ * @brief PLAN.md implementation.
+ */
 # Multi-Paradigm C89 UI Engine & Media Framework (Master Plan)
 
 This project is a multi-threaded, strictly C89-compliant cross-platform engine driving a CSS layout system and robust UI design systems. It supports complex media (video, audio, SVG) and targets web, mobile, and desktop environments utilizing a fully opaque FFI boundary.

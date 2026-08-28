@@ -1,3 +1,11 @@
+/**
+ * @file PLAN_ENGINE.md
+ * @brief PLAN_ENGINE.md implementation.
+ */
+/**
+ * @file PLAN_ENGINE.md
+ * @brief PLAN_ENGINE.md implementation.
+ */
 # Architecture Plan: DOM, Media & Rendering Engine
 
 ## 1. DOM & Layout Integration

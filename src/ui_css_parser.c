@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_parser.c
+ * @brief ui_css_parser.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_css_parser.h"
 #include "../include/ui_error.h"
@@ -8,29 +12,29 @@
 
 /** @brief internal */
 enum ui_css_token_type {
-  TOKEN_EOF,
-  TOKEN_IDENT,
-  TOKEN_HASH,
-  TOKEN_DOT,
-  TOKEN_COLON,
-  TOKEN_SEMICOLON,
-  TOKEN_COMMA,
-  TOKEN_LBRACE,
-  TOKEN_RBRACE,
-  TOKEN_LBRACKET,
-  TOKEN_RBRACKET,
-  TOKEN_LPAREN,
-  TOKEN_RPAREN,
-  TOKEN_EQUALS,
-  TOKEN_PREFIX_MATCH,
-  TOKEN_SUFFIX_MATCH,
-  TOKEN_SUBSTRING_MATCH,
-  TOKEN_DASH_MATCH,
-  TOKEN_INCLUDE_MATCH,
-  TOKEN_ASTERISK,
-  TOKEN_STRING,
-  TOKEN_AT_KEYWORD,
-  TOKEN_ERROR
+  TOKEN_EOF,             /**< End of file */
+  TOKEN_IDENT,           /**< Identifier */
+  TOKEN_HASH,            /**< Hash (#) */
+  TOKEN_DOT,             /**< Dot (.) */
+  TOKEN_COLON,           /**< Colon (:) */
+  TOKEN_SEMICOLON,       /**< Semicolon (;) */
+  TOKEN_COMMA,           /**< Comma (,) */
+  TOKEN_LBRACE,          /**< Left brace ({) */
+  TOKEN_RBRACE,          /**< Right brace (}) */
+  TOKEN_LBRACKET,        /**< Left bracket ([) */
+  TOKEN_RBRACKET,        /**< Right bracket (]) */
+  TOKEN_LPAREN,          /**< Left parenthesis (() */
+  TOKEN_RPAREN,          /**< Right parenthesis ()) */
+  TOKEN_EQUALS,          /**< Equals (=) */
+  TOKEN_PREFIX_MATCH,    /**< Prefix match (^=) */
+  TOKEN_SUFFIX_MATCH,    /**< Suffix match ($=) */
+  TOKEN_SUBSTRING_MATCH, /**< Substring match (*=) */
+  TOKEN_DASH_MATCH,      /**< Dash match (|=) */
+  TOKEN_INCLUDE_MATCH,   /**< Include match (~=) */
+  TOKEN_ASTERISK,        /**< Asterisk (*) */
+  TOKEN_STRING,          /**< String */
+  TOKEN_AT_KEYWORD,      /**< At keyword (@) */
+  TOKEN_ERROR            /**< Error */
 };
 
 /**
@@ -53,14 +57,14 @@ struct ui_css_tokenizer {
   size_t len;       /**< len */
 };
 
-/*
+/**
  * @brief advance.
  * @param tz Parameter tz.
  * @return Return value.
  */
 static void advance(struct ui_css_tokenizer *tz) { tz->pos++; }
 
-/*
+/**
  * @brief peek.
  * @param tz Parameter tz.
  * @param out_char Parameter out_char.
@@ -70,7 +74,7 @@ static void peek(struct ui_css_tokenizer *tz, char *out_char) {
   *out_char = tz->text[tz->pos];
 }
 
-/*
+/**
  * @brief is_ident_start.
  * @param c Parameter c.
  * @param out_is_start Parameter out_is_start.
@@ -80,7 +84,7 @@ static void is_ident_start(char c, int *out_is_start) {
   *out_is_start = isalpha((unsigned char)c) || c == '_' || c == '-';
 }
 
-/*
+/**
  * @brief is_ident_char.
  * @param c Parameter c.
  * @param out_is_char Parameter out_is_char.
@@ -90,7 +94,7 @@ static void is_ident_char(char c, int *out_is_char) {
   *out_is_char = isalnum((unsigned char)c) || c == '_' || c == '-';
 }
 
-/*
+/**
  * @brief skip_whitespace_and_comments.
  * @param tz Parameter tz.
  * @return Return value.
@@ -120,7 +124,7 @@ static void skip_whitespace_and_comments(struct ui_css_tokenizer *tz) {
   }
 }
 
-/*
+/**
  * @brief next_token.
  * @param tz Parameter tz.
  * @param out_token Parameter out_token.
@@ -368,7 +372,7 @@ static void next_token(struct ui_css_tokenizer *tz,
   }
 }
 
-/*
+/**
  * @brief dup_token_str.
  * @param t Parameter t.
  * @param out_str Parameter out_str.
@@ -386,7 +390,7 @@ static ui_error_t dup_token_str(const struct ui_css_token *t, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief dup_range_trim.
  * @param start Parameter start.
  * @param end Parameter end.
@@ -418,7 +422,7 @@ static ui_error_t dup_range_trim(const char *start, const char *end,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief parse_selectors.
  * @param tz Parameter tz.
  * @param inout_token Parameter inout_token.
@@ -676,7 +680,7 @@ cleanup: {
   return rc;
 }
 
-/*
+/**
  * @brief is_nested_rule.
  * @param tz Parameter tz.
  * @param first_token Parameter first_token.
@@ -717,7 +721,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                                   struct ui_css_stylesheet *sheet,
                                   struct ui_css_rule **out_rules);
 
-/*
+/**
  * @brief parse_rule_list.
  * @param tz Parameter tz.
  * @param inout_token Parameter inout_token.

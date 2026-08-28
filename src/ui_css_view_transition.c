@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_view_transition.c
+ * @brief ui_css_view_transition.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_view_transition.h"
 #include "ui_internal_mem.h"
@@ -17,7 +21,7 @@
 /** @endcond */
 #endif
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.

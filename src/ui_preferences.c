@@ -1,7 +1,8 @@
-/*
- * \file ui_preferences.c
- * \brief Implementation of persistent UI preferences (local storage, IDB, etc).
+/**
+ * @file ui_preferences.c
+ * @brief Implementation of persistent UI preferences (local storage, IDB, etc).
  */
+
 /* clang-format off */
 #include "../include/ui_preferences.h"
 #include "../include/ui_web_bridge.h"
@@ -15,20 +16,19 @@
 
 /**
  * @struct ui_preferences
- * \struct ui_preferences
- * \brief Context for asynchronous storage interactions.
+ * @brief Context for asynchronous storage interactions.
  */
 struct ui_preferences {
-  struct ui_thread_pool *pool;      /**< pool */
-  struct ui_execution_context *ctx; /**< ctx */
+  struct ui_thread_pool *pool; /**< Thread pool for native background IO. */
+  struct ui_execution_context *ctx; /**< Execution context for callbacks. */
 };
 
-/*
- * \brief Creates a new preferences context.
- * \param[in,out] pool The thread pool for native background IO.
- * \param[in,out] ctx The execution context for callbacks.
- * \param[out] out_prefs Pointer to store the created preferences context.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new preferences context.
+ * @param[in,out] pool The thread pool for native background IO.
+ * @param[in,out] ctx The execution context for callbacks.
+ * @param[out] out_prefs Pointer to store the created preferences context.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_preferences_create(struct ui_thread_pool *pool,
                                  struct ui_execution_context *ctx,
@@ -52,10 +52,10 @@ ui_error_t ui_preferences_create(struct ui_thread_pool *pool,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Destroys a preferences context.
- * \param[in,out] prefs The context to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a preferences context.
+ * @param[in,out] prefs The context to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_preferences_destroy(struct ui_preferences *prefs) {
   if (!prefs) {
@@ -92,11 +92,13 @@ EM_JS(char *, get_local_storage_js, (const char *key), {
 })
 #endif
 
-/*
- * \brief Synchronously sets a string preference (where supported, e.g. web
- * localStorage). \param[in,out] prefs The preferences context. \param[in] key
- * The preference key. \param[in] value The preference string value. \return
- * UI_ERROR_NONE on success.
+/**
+ * @brief Synchronously sets a string preference (where supported, e.g. web
+ * localStorage).
+ * @param[in,out] prefs The preferences context.
+ * @param[in] key The preference key.
+ * @param[in] value The preference string value.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_preferences_set_string(struct ui_preferences *prefs,
                                      const char *key, const char *value) {
@@ -115,13 +117,13 @@ ui_error_t ui_preferences_set_string(struct ui_preferences *prefs,
 #endif
 }
 
-/*
- * \brief Synchronously gets a string preference (where supported).
- * \param[in,out] prefs The preferences context.
- * \param[in] key The preference key.
- * \param[out] out_value Pointer to store the retrieved string (caller must
+/**
+ * @brief Synchronously gets a string preference (where supported).
+ * @param[in,out] prefs The preferences context.
+ * @param[in] key The preference key.
+ * @param[out] out_value Pointer to store the retrieved string (caller must
  * free).
- * \return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_preferences_get_string(struct ui_preferences *prefs,
                                      const char *key, char **out_value) {
@@ -186,16 +188,16 @@ EM_JS(int, idb_save_js,
       })
 #endif
 
-/*
- * \brief Asynchronously saves a binary blob (e.g. via IndexedDB or background
+/**
+ * @brief Asynchronously saves a binary blob (e.g. via IndexedDB or background
  * file write).
- * \param[in,out] prefs The preferences context.
- * \param[in] key The preference key.
- * \param[in] data The binary data to save.
- * \param[in] length The length of the binary data in bytes.
- * \param[out] out_promise Pointer to store the promise tracking the save
+ * @param[in,out] prefs The preferences context.
+ * @param[in] key The preference key.
+ * @param[in] data The binary data to save.
+ * @param[in] length The length of the binary data in bytes.
+ * @param[out] out_promise Pointer to store the promise tracking the save
  * operation.
- * \return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
                                             const char *key, const void *data,

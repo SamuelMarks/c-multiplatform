@@ -1,8 +1,12 @@
+/**
+ * @file ui_command_palette_base.c
+ * @brief ui_command_palette_base.c implementation.
+ */
 /* clang-format off */
 #include "ui_command_palette_base.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_command_palette_base_init.
  * @param palette Parameter palette.
  * @param component Parameter component.

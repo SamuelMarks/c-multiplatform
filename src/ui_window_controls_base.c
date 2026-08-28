@@ -40,6 +40,13 @@ struct ui_window_controls_base {
   int num_regions;                                      /**< num_regions */
 };
 
+/**
+ * @brief state_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
+ */
 static ui_error_t state_equality(union ui_signal_payload a,
                                  union ui_signal_payload b,
                                  ui_bool_t *out_equal) {

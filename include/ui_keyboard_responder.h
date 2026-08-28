@@ -16,6 +16,9 @@ extern "C" {
 #include "ui_dom_node.h"
 /* clang-format on */
 
+/**
+ * @brief Opaque structure representing a keyboard responder.
+ */
 struct ui_keyboard_responder;
 
 /**
@@ -31,6 +34,7 @@ ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder);
  * @brief Destroys a keyboard responder instance.
  *
  * @param responder The responder.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder);

@@ -1,20 +1,17 @@
 /**
  * @file ui_css_content.h
- */
-/**
- * \file ui_css_content.h
- * \brief CSS Content definitions and parsing.
- * \author UI Framework Team
- * \date 2026
+ * @brief CSS Content definitions and parsing.
+ * @author UI Framework Team
+ * @date 2026
  */
 
 #ifndef UI_CSS_CONTENT_H
 #define UI_CSS_CONTENT_H
 
 /**
- * \defgroup ui_css_content CSS Content
- * \brief Types and functions for CSS content properties.
- * \{
+ * @defgroup ui_css_content CSS Content
+ * @brief Types and functions for CSS content properties.
+ * @{
  */
 
 #ifdef __cplusplus
@@ -51,12 +48,14 @@ struct ui_css_content_item {
     char string_val[128];      /**< String value */
     struct ui_css_image image; /**< Image value */
     char attr_name[64];        /**< Attribute name */
+    /** @brief Counter properties */
     struct {
       char name[64];  /**< Counter name */
       char style[32]; /**< Counter style (e.g. "upper-roman" or empty for
                          default) */
     } counter;        /**< Counter properties */
 
+    /** @brief Counters properties */
     struct {
       char name[64];                /**< Counter name */
       char separator[16];           /**< Separator string */
@@ -91,7 +90,7 @@ ui_error_t ui_css_parse_content(const char *str,
  *
  * \param content The content object to destroy.
  */
-void ui_css_content_destroy(struct ui_css_content *content);
+ui_error_t ui_css_content_destroy(struct ui_css_content *content);
 
 #ifdef __cplusplus
 }

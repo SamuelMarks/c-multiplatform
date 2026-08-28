@@ -19,17 +19,17 @@ extern "C" {
  * @brief States of a drag and drop operation.
  */
 enum ui_drag_state {
-  UI_DRAG_STATE_IDLE = 0,
-  UI_DRAG_STATE_PENDING, /**< Pointer down, but drag threshold not yet met */
-  UI_DRAG_STATE_DRAGGING
+  UI_DRAG_STATE_IDLE = 0, /**< No drag operation in progress */
+  UI_DRAG_STATE_PENDING,  /**< Pointer down, but drag threshold not yet met */
+  UI_DRAG_STATE_DRAGGING  /**< Drag operation currently in progress */
 };
 
 /**
  * @brief Layout orientation of a list.
  */
 enum ui_drag_list_orientation {
-  UI_DRAG_LIST_ORIENTATION_VERTICAL = 0,
-  UI_DRAG_LIST_ORIENTATION_HORIZONTAL
+  UI_DRAG_LIST_ORIENTATION_VERTICAL = 0, /**< Vertical list layout */
+  UI_DRAG_LIST_ORIENTATION_HORIZONTAL    /**< Horizontal list layout */
 };
 
 /**

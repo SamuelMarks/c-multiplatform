@@ -9,14 +9,33 @@
 #include <stddef.h>
 #ifdef UI_TEST_MOCK_ALLOC
 int g_accordion_mock_fail = 0;
+/**
+ * @brief mock_set_on_toggle.
+ * @param d Parameter d.
+ * @param f Parameter f.
+ * @param u Parameter u.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_set_on_toggle(struct ui_disclosure_base *d, ui_disclosure_on_toggle_t f, void *u) {
   if (g_accordion_mock_fail == 1) return UI_ERROR_UNKNOWN;
   return (ui_disclosure_base_set_on_toggle)(d, f, u);
 }
+/**
+ * @brief mock_is_expanded.
+ * @param d Parameter d.
+ * @param out Parameter out.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_is_expanded(struct ui_disclosure_base *d, int *out) {
   if (g_accordion_mock_fail == 2) return UI_ERROR_UNKNOWN;
   return (ui_disclosure_base_is_expanded)(d, out);
 }
+/**
+ * @brief mock_set_expanded.
+ * @param d Parameter d.
+ * @param val Parameter val.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_set_expanded(struct ui_disclosure_base *d, int val) {
   if (g_accordion_mock_fail == 3) return UI_ERROR_UNKNOWN;
   return (ui_disclosure_base_set_expanded)(d, val);
@@ -49,6 +68,13 @@ struct ui_accordion_base {
   struct ui_computed *data_signal;              /**< data_signal */
 };
 
+/**
+ * @brief on_child_disclosure_toggle.
+ * @param disclosure Parameter disclosure.
+ * @param is_expanded Parameter is_expanded.
+ * @param user_data Parameter user_data.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t
 on_child_disclosure_toggle(struct ui_disclosure_base *disclosure,
                            int is_expanded, void *user_data) {
@@ -100,6 +126,11 @@ on_child_disclosure_toggle(struct ui_disclosure_base *disclosure,
   return rc;
 }
 
+/**
+ * @brief ui_accordion_base_create.
+ * @param out_accordion Parameter out_accordion.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_accordion_base_create(struct ui_accordion_base **out_accordion) {
   struct ui_accordion_base *accordion;
 
@@ -125,6 +156,11 @@ ui_error_t ui_accordion_base_create(struct ui_accordion_base **out_accordion) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_accordion_base_destroy.
+ * @param accordion Parameter accordion.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_accordion_base_destroy(struct ui_accordion_base *accordion) {
   size_t i;
   ui_error_t rc;
@@ -146,6 +182,12 @@ ui_error_t ui_accordion_base_destroy(struct ui_accordion_base *accordion) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_accordion_base_add_disclosure.
+ * @param accordion Parameter accordion.
+ * @param disclosure Parameter disclosure.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_accordion_base_add_disclosure(struct ui_accordion_base *accordion,
                                  struct ui_disclosure_base *disclosure) {
@@ -199,6 +241,12 @@ ui_accordion_base_add_disclosure(struct ui_accordion_base *accordion,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_accordion_base_remove_disclosure.
+ * @param accordion Parameter accordion.
+ * @param disclosure Parameter disclosure.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_accordion_base_remove_disclosure(struct ui_accordion_base *accordion,
                                     struct ui_disclosure_base *disclosure) {
@@ -238,6 +286,12 @@ ui_accordion_base_remove_disclosure(struct ui_accordion_base *accordion,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_accordion_base_set_active.
+ * @param accordion Parameter accordion.
+ * @param disclosure Parameter disclosure.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_accordion_base_set_active(struct ui_accordion_base *accordion,
                                         struct ui_disclosure_base *disclosure) {
   size_t i;
@@ -275,6 +329,12 @@ ui_error_t ui_accordion_base_set_active(struct ui_accordion_base *accordion,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_accordion_base_get_active.
+ * @param accordion Parameter accordion.
+ * @param out_active Parameter out_active.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_accordion_base_get_active(const struct ui_accordion_base *accordion,
                              struct ui_disclosure_base **out_active) {
@@ -285,6 +345,13 @@ ui_accordion_base_get_active(const struct ui_accordion_base *accordion,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_accordion_base_set_on_change.
+ * @param accordion Parameter accordion.
+ * @param on_change Parameter on_change.
+ * @param user_data Parameter user_data.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_accordion_base_set_on_change(struct ui_accordion_base *accordion,
                                            ui_accordion_on_change_t on_change,
                                            void *user_data) {
@@ -296,6 +363,12 @@ ui_error_t ui_accordion_base_set_on_change(struct ui_accordion_base *accordion,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_accordion_base_bind_data.
+ * @param widget Parameter widget.
+ * @param signal Parameter signal.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_accordion_base_bind_data(struct ui_accordion_base *widget,
                                        struct ui_computed *signal) {
   if (!widget) {
@@ -306,6 +379,13 @@ ui_error_t ui_accordion_base_bind_data(struct ui_accordion_base *widget,
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief mock_accordion_fail_cb.
+ * @param a Parameter a.
+ * @param d Parameter d.
+ * @param u Parameter u.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t mock_accordion_fail_cb(struct ui_accordion_base *a,
                                          struct ui_disclosure_base *d,
                                          void *u) {
@@ -316,6 +396,10 @@ static ui_error_t mock_accordion_fail_cb(struct ui_accordion_base *a,
 }
 
 ui_error_t run_accordion_methods_coverage(void);
+/**
+ * @brief run_accordion_methods_coverage.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t run_accordion_methods_coverage(void) {
   struct ui_accordion_base *accordion = NULL;
   struct ui_disclosure_base *d1 = NULL;

@@ -1,8 +1,12 @@
+/**
+ * @file ui_spring.c
+ * @brief ui_spring.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_spring.h"
 /* clang-format on */
 
-/*
+/**
  * @brief ui_spring_update.
  * @param config Parameter config.
  * @param current Parameter current.

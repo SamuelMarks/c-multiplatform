@@ -1,3 +1,7 @@
+/**
+ * @file ui_css_contain.c
+ * @brief ui_css_contain.c implementation.
+ */
 /* clang-format off */
 #include "ui_css_contain.h"
 #include <string.h>
@@ -16,7 +20,7 @@
 /** @endcond */
 #endif
 
-/*
+/**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
@@ -27,7 +31,7 @@ static void skip_whitespace(const char **p_str) {
   }
 }
 
-/*
+/**
  * @brief ui_css_parse_contain.
  * @param str Parameter str.
  * @param out_flags Parameter out_flags.
@@ -140,7 +144,7 @@ ui_error_t ui_css_parse_content_visibility(
   return UI_ERROR_PARSE_FAILED;
 }
 
-/*
+/**
  * @brief parse_intrinsic_dim.
  * @param p_str Parameter p_str.
  * @param dim Parameter dim.

@@ -33,6 +33,13 @@ struct ui_canonical_layout_base {
   struct ui_component *bottom_bar; /**< bottom_bar */
 };
 
+/**
+ * @brief size_class_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return UI_ERROR_NONE on success.
+ */
 static ui_error_t size_class_equality(union ui_signal_payload a,
                                       union ui_signal_payload b,
                                       ui_bool_t *out_equal) {
@@ -41,6 +48,13 @@ static ui_error_t size_class_equality(union ui_signal_payload a,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_create.
+ * @param arena Parameter arena.
+ * @param config Parameter config.
+ * @param out_layout Parameter out_layout.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_canonical_layout_base_create(struct ui_arena *arena,
                                 const struct ui_canonical_layout_config *config,
@@ -77,6 +91,11 @@ ui_canonical_layout_base_create(struct ui_arena *arena,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_destroy.
+ * @param layout Parameter layout.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout) {
   if (!layout) {
@@ -88,6 +107,12 @@ ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_set_size_class.
+ * @param layout Parameter layout.
+ * @param size_class Parameter size_class.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_canonical_layout_base_set_size_class(struct ui_canonical_layout_base *layout,
                                         enum ui_window_size_class size_class) {
@@ -109,6 +134,12 @@ ui_canonical_layout_base_set_size_class(struct ui_canonical_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_get_size_class.
+ * @param layout Parameter layout.
+ * @param out_size_class Parameter out_size_class.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_canonical_layout_base_get_size_class(
     const struct ui_canonical_layout_base *layout,
     enum ui_window_size_class *out_size_class) {
@@ -119,6 +150,12 @@ ui_error_t ui_canonical_layout_base_get_size_class(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_set_body.
+ * @param layout Parameter layout.
+ * @param body Parameter body.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_canonical_layout_base_set_body(struct ui_canonical_layout_base *layout,
                                   struct ui_component *body) {
@@ -129,6 +166,12 @@ ui_canonical_layout_base_set_body(struct ui_canonical_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_set_leading_pane.
+ * @param layout Parameter layout.
+ * @param leading_pane Parameter leading_pane.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_canonical_layout_base_set_leading_pane(
     struct ui_canonical_layout_base *layout,
     struct ui_component *leading_pane) {
@@ -139,6 +182,12 @@ ui_error_t ui_canonical_layout_base_set_leading_pane(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_set_trailing_pane.
+ * @param layout Parameter layout.
+ * @param trailing_pane Parameter trailing_pane.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_canonical_layout_base_set_trailing_pane(
     struct ui_canonical_layout_base *layout,
     struct ui_component *trailing_pane) {
@@ -149,6 +198,12 @@ ui_error_t ui_canonical_layout_base_set_trailing_pane(
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_set_bottom_bar.
+ * @param layout Parameter layout.
+ * @param bottom_bar Parameter bottom_bar.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t
 ui_canonical_layout_base_set_bottom_bar(struct ui_canonical_layout_base *layout,
                                         struct ui_component *bottom_bar) {
@@ -159,6 +214,12 @@ ui_canonical_layout_base_set_bottom_bar(struct ui_canonical_layout_base *layout,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief ui_canonical_layout_base_get_layout_changed_signal.
+ * @param layout Parameter layout.
+ * @param out_signal Parameter out_signal.
+ * @return UI_ERROR_NONE on success.
+ */
 ui_error_t ui_canonical_layout_base_get_layout_changed_signal(
     struct ui_canonical_layout_base *layout, ui_signal_t **out_signal) {
   if (!layout || !out_signal) {

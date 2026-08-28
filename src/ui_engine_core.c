@@ -1,6 +1,6 @@
-/*
- * \file ui_engine_core.c
- * \brief Core UI engine implementation.
+/**
+ * @file ui_engine_core.c
+ * @brief Core UI engine implementation.
  */
 /* clang-format off */
 #include <stddef.h>
@@ -18,21 +18,22 @@
 
 /**
  * @struct ui_engine
- * \struct ui_engine
- * \brief The main UI engine structure.
+ * @brief The main UI engine structure.
  */
 struct ui_engine {
-  struct ui_tick_engine *tick_engine; /**< tick_engine */
-  struct ui_thread_pool *thread_pool; /**< thread_pool */
-  struct ui_reactor *reactor;         /**< reactor */
-  struct ui_timer *timer;             /**< timer */
+  struct ui_tick_engine
+      *tick_engine; /**< The tick engine for periodic updates. */
+  struct ui_thread_pool
+      *thread_pool; /**< Thread pool for concurrent tasks (if enabled). */
+  struct ui_reactor *reactor; /**< The asynchronous I/O and task reactor. */
+  struct ui_timer *timer;     /**< Monotonic timer for the engine. */
 };
 
-/*
- * \brief Creates the UI engine.
- * \param[in] config Configuration for the engine.
- * \param[out] out_engine Pointer to store the created engine.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates the UI engine.
+ * @param[in] config Configuration for the engine.
+ * @param[out] out_engine Pointer to store the created engine.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_engine_create(const struct ui_engine_config *config,
                             struct ui_engine **out_engine) {
@@ -84,21 +85,21 @@ cleanup:
   if (engine) {
     if (engine->thread_pool) {
 #ifndef UI_SINGLE_THREADED
-      (void)(void)ui_thread_pool_destroy(engine->thread_pool);
+      (void)ui_thread_pool_destroy(engine->thread_pool);
 #endif
     }
     if (engine->tick_engine) {
-      (void)(void)ui_tick_engine_destroy(engine->tick_engine);
+      (void)ui_tick_engine_destroy(engine->tick_engine);
     }
     C_MULTIPLATFORM_FREE(engine);
   }
   return rc;
 }
 
-/*
- * \brief Destroys the UI engine.
- * \param[in,out] engine The engine to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys the UI engine.
+ * @param[in,out] engine The engine to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   if (!engine) {
@@ -106,28 +107,28 @@ ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   }
 
   if (engine->timer) {
-    (void)(void)ui_timer_destroy(engine->timer);
+    (void)ui_timer_destroy(engine->timer);
   }
   if (engine->reactor) {
-    (void)(void)ui_reactor_destroy(engine->reactor);
+    (void)ui_reactor_destroy(engine->reactor);
   }
 #ifndef UI_SINGLE_THREADED
   if (engine->thread_pool) {
-    (void)(void)ui_thread_pool_destroy(engine->thread_pool);
+    (void)ui_thread_pool_destroy(engine->thread_pool);
   }
 #endif
   if (engine->tick_engine) {
-    (void)(void)ui_tick_engine_destroy(engine->tick_engine);
+    (void)ui_tick_engine_destroy(engine->tick_engine);
   }
 
   C_MULTIPLATFORM_FREE(engine);
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Ticks the UI engine, advancing its state.
- * \param[in,out] engine The engine to tick.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Ticks the UI engine, advancing its state.
+ * @param[in,out] engine The engine to tick.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_engine_tick(struct ui_engine *engine) {
   ui_error_t rc = UI_ERROR_NONE;

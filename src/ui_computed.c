@@ -1,3 +1,7 @@
+/**
+ * @file ui_computed.c
+ * @brief ui_computed.c implementation.
+ */
 /* clang-format off */
 #include "../include/ui_computed.h"
 #include "../include/ui_types.h"
@@ -31,7 +35,7 @@ struct ui_computed {
   size_t subscribers_capacity;           /**< subscribers_capacity */
 };
 
-/*
+/**
  * @brief ui_computed_lock.
  * @param comp Parameter comp.
  * @return Return value.
@@ -46,7 +50,7 @@ static ui_error_t ui_computed_lock(ui_computed_t *comp) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_computed_unlock.
  * @param comp Parameter comp.
  * @return Return value.
@@ -58,7 +62,7 @@ static ui_error_t ui_computed_unlock(ui_computed_t *comp) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_computed_add_subscriber.
  * @param comp Parameter comp.
  * @param node Parameter node.
@@ -92,7 +96,7 @@ static ui_error_t ui_computed_add_subscriber(ui_computed_t *comp,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_computed_on_notify.
  * @param user_data Parameter user_data.
  * @return Return value.
@@ -141,7 +145,7 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_computed_create.
  * @param arena Parameter arena.
  * @param compute_fn Parameter compute_fn.
@@ -193,7 +197,7 @@ ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_computed_get.
  * @param computed Parameter computed.
  * @param out_value Parameter out_value.
@@ -242,7 +246,7 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
   return ui_computed_unlock(computed);
 }
 
-/*
+/**
  * @brief ui_computed_destroy.
  * @param computed Parameter computed.
  * @return Return value.

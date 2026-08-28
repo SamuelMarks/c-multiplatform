@@ -1,3 +1,7 @@
+/**
+ * @file ui_component.c
+ * @brief ui_component.c implementation.
+ */
 /* clang-format off */
 #include "ui_component.h"
 #include "ui_internal_mem.h"
@@ -12,9 +16,10 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Global scope counter for generating unique IDs */
 static int g_scope_counter = 0;
 
-/*
+/**
  * @brief rewrite_classes_for_node.
  * @param node Parameter node.
  * @param scope_id Parameter scope_id.
@@ -88,7 +93,7 @@ static ui_error_t rewrite_classes_for_node(struct ui_dom_node *node,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief rewrite_stylesheet_selectors.
  * @param stylesheet Parameter stylesheet.
  * @param scope_id Parameter scope_id.
@@ -125,7 +130,7 @@ rewrite_stylesheet_selectors(struct ui_css_stylesheet *stylesheet,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_component_create.
  * @param out_component Parameter out_component.
  * @return Return value.
@@ -154,7 +159,7 @@ ui_error_t ui_component_create(struct ui_component **out_component) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_component_destroy.
  * @param component Parameter component.
  * @return Return value.
@@ -209,7 +214,7 @@ ui_component_set_default_style(struct ui_component *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_component_inject_style_override.
  * @param component Parameter component.
  * @param css_string Parameter css_string.
@@ -237,7 +242,7 @@ ui_error_t ui_component_inject_style_override(struct ui_component *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_component_set_property.
  * @param component Parameter component.
  * @param property_name Parameter property_name.
@@ -284,7 +289,7 @@ ui_error_t ui_component_set_property(struct ui_component *component,
   return ui_css_rule_append_declaration(rule, property_name, property_value, 0);
 }
 
-/*
+/**
  * @brief ui_component_mount.
  * @param component Parameter component.
  * @param host_node Parameter host_node.
@@ -303,7 +308,7 @@ ui_error_t ui_component_mount(struct ui_component *component,
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief ui_component_scope_styles.
  * @param component Parameter component.
  * @return Return value.

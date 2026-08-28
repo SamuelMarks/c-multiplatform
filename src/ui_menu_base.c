@@ -1,7 +1,7 @@
-/*
- * \file ui_menu_base.c
- * \brief Implementation of the UI menu base component (for dropdowns, context
- * menus, etc).
+/**
+ * @file ui_menu_base.c
+ * @brief Implementation of the UI menu base component.
+ * @details Manages menu states, submenus, and keyboard navigation.
  */
 /* clang-format off */
 #include "ui_menu_base.h"
@@ -17,6 +17,7 @@
 /* MSVC Safe CRT */
 #endif
 
+/** @brief Default CSS stylesheet for menus */
 static const char *ui_menu_base_default_css =
     ".ui-menu { display: flex; flex-direction: column; position: absolute; "
     "background-color: #fff; border: 1px solid #ccc; z-index: 1000; } "
@@ -26,47 +27,44 @@ static const char *ui_menu_base_default_css =
 
 /**
  * @struct ui_menu_item_entry
- * \brief ui_menu_item_entry
+ * @brief Structure tracking a single item in a menu.
  */
 struct ui_menu_item_entry {
-  char *id;                     /**< id */
-  struct ui_dom_node *node;     /**< node */
-  struct ui_menu_base *submenu; /**< submenu */
+  char *id;                     /**< Item ID */
+  struct ui_dom_node *node;     /**< DOM node associated with the item */
+  struct ui_menu_base *submenu; /**< Submenu linked to this item, if any */
 };
 
-/* \brief ui_menu_base
- */
 /**
  * @struct ui_menu_base
- * \struct ui_menu_base
- * \brief State and DOM mapping for a menu, supporting nested submenus.
+ * @brief State and DOM mapping for a menu, supporting nested submenus.
  */
 struct ui_menu_base {
-  struct ui_component *component;       /**< component */
-  struct ui_dom_node *container_node;   /**< container_node */
-  struct ui_overlay *overlay_handle;    /**< overlay_handle */
-  struct ui_overlay_director *director; /**< director */
+  struct ui_component *component;       /**< UI component */
+  struct ui_dom_node *container_node;   /**< Container DOM node */
+  struct ui_overlay *overlay_handle;    /**< Overlay handle when open */
+  struct ui_overlay_director *director; /**< Overlay director */
 
-  struct ui_menu_item_entry *items; /**< items */
-  int item_count;                   /**< item_count */
-  int item_capacity;                /**< item_capacity */
+  struct ui_menu_item_entry *items; /**< Menu items array */
+  int item_count;                   /**< Current number of items */
+  int item_capacity;                /**< Allocated capacity of items */
 
-  int active_index; /**< active_index */
-  int is_open;      /**< is_open */
-  int last_x;       /**< last_x */
-  int last_y;       /**< last_y */
+  int active_index; /**< Currently active index for keyboard nav */
+  int is_open;      /**< Indicates if the menu is open */
+  int last_x;       /**< Last known X coordinate */
+  int last_y;       /**< Last known Y coordinate */
 
-  struct ui_menu_base *parent_menu; /**< parent_menu */
+  struct ui_menu_base *parent_menu; /**< Parent menu reference */
 
-  ui_menu_on_action_t on_action;         /**< on_action */
-  void *user_data;                       /**< user_data */
-  struct ui_signal *active_index_signal; /**< active_index_signal */
+  ui_menu_on_action_t on_action;         /**< Action callback */
+  void *user_data;                       /**< User data for callback */
+  struct ui_signal *active_index_signal; /**< Signal for the active index */
 };
 
-/*
- * \brief Creates a new menu base component.
- * \param[out] out_menu Pointer to store the created menu.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new menu base component.
+ * @param[out] out_menu Pointer to store the created menu.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu) {
   struct ui_menu_base *menu;
@@ -135,10 +133,10 @@ cleanup:
   return rc;
 }
 
-/*
- * \brief Destroys a menu base component.
- * \param[in,out] menu The menu to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys a menu base component.
+ * @param[in,out] menu The menu to destroy.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
   int i;
@@ -163,11 +161,11 @@ ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Helper to dynamically duplicate a string.
- * \param[in] src The string to duplicate.
- * \param[out] out_str Pointer to store the newly allocated copy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Helper to dynamically duplicate a string.
+ * @param[in] src The string to duplicate.
+ * @param[out] out_str Pointer to store the newly allocated copy.
+ * @return UI_ERROR_NONE on success.
  */
 static ui_error_t duplicate_string(const char *src, char **out_str) {
   size_t len;
@@ -186,14 +184,14 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Adds an item to the menu, optionally marking it as a submenu trigger.
- * \param[in,out] menu The menu to modify.
- * \param[in] item_id The logical ID of the item.
- * \param[in,out] label_node The DOM node representing the visual item.
- * \param[in,out] submenu Optional submenu component to open when this item is
+/**
+ * @brief Adds an item to the menu, optionally marking it as a submenu trigger.
+ * @param[in,out] menu The menu to modify.
+ * @param[in] item_id The logical ID of the item.
+ * @param[in,out] label_node The DOM node representing the visual item.
+ * @param[in,out] submenu Optional submenu component to open when this item is
  * active.
- * \return UI_ERROR_NONE on success.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
                                  struct ui_dom_node *label_node,
@@ -250,12 +248,12 @@ ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets the callback invoked when a menu item is triggered.
- * \param[in,out] menu The menu.
- * \param[in] on_action The callback function.
- * \param[in] user_data User data for the callback.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets the callback invoked when a menu item is triggered.
+ * @param[in,out] menu The menu.
+ * @param[in] on_action The callback function.
+ * @param[in] user_data User data for the callback.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_set_on_action(struct ui_menu_base *menu,
                                       ui_menu_on_action_t on_action,
@@ -267,14 +265,14 @@ ui_error_t ui_menu_base_set_on_action(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Opens the menu at a specific screen coordinate via an overlay
+/**
+ * @brief Opens the menu at a specific screen coordinate via an overlay
  * director.
- * \param[in,out] menu The menu to open.
- * \param[in,out] director The overlay director managing the mount.
- * \param[in] x The X coordinate.
- * \param[in] y The Y coordinate.
- * \return UI_ERROR_NONE on success.
+ * @param[in,out] menu The menu to open.
+ * @param[in,out] director The overlay director managing the mount.
+ * @param[in] x The X coordinate.
+ * @param[in] y The Y coordinate.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_open_at(struct ui_menu_base *menu,
                                 struct ui_overlay_director *director, int x,
@@ -308,10 +306,10 @@ ui_error_t ui_menu_base_open_at(struct ui_menu_base *menu,
                                              &menu->overlay_handle);
 }
 
-/*
- * \brief Closes the menu and all its submenus.
- * \param[in,out] menu The menu to close.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Closes the menu and all its submenus.
+ * @param[in,out] menu The menu to close.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_close(struct ui_menu_base *menu) {
   int i;
@@ -337,11 +335,11 @@ ui_error_t ui_menu_base_close(struct ui_menu_base *menu) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Checks if the menu is currently open.
- * \param[in] menu The menu.
- * \param[out] out_is_open Set to 1 if open, 0 otherwise.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Checks if the menu is currently open.
+ * @param[in] menu The menu.
+ * @param[out] out_is_open Set to 1 if open, 0 otherwise.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_is_open(const struct ui_menu_base *menu,
                                 int *out_is_open) {
@@ -352,7 +350,12 @@ ui_error_t ui_menu_base_is_open(const struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Intercepts a context menu event to potentially show this menu.
+ * @param[in,out] menu The menu to show.
+ * @param[in,out] director The overlay director to attach to.
+ * @param[in] event The UI event representing the context menu request.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t
 ui_menu_base_intercept_context_menu(struct ui_menu_base *menu,
@@ -364,11 +367,11 @@ ui_menu_base_intercept_context_menu(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Internal helper to update the visually active item index.
- * \param[in,out] menu The menu.
- * \param[in] new_index The new active index.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Internal helper to update the visually active item index.
+ * @param[in,out] menu The menu.
+ * @param[in] new_index The new active index.
+ * @return UI_ERROR_NONE on success.
  */
 static ui_error_t update_active_index(struct ui_menu_base *menu,
                                       int new_index) {
@@ -391,11 +394,11 @@ static ui_error_t update_active_index(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Processes an incoming UI event (keyboard navigation) for the menu.
- * \param[in,out] menu The menu.
- * \param[in] event The event to process.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Processes an incoming UI event (keyboard navigation) for the menu.
+ * @param[in,out] menu The menu.
+ * @param[in] event The event to process.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
                                       const struct ui_event *event) {
@@ -505,11 +508,12 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
   (void)handled;
   return UI_ERROR_NONE;
 }
-/*
- * \brief Retrieves the underlying generic DOM component.
- * \param[in,out] menu The menu.
- * \param[out] out_component Pointer to store the DOM component.
- * \return UI_ERROR_NONE on success.
+
+/**
+ * @brief Retrieves the underlying generic DOM component.
+ * @param[in] menu The menu.
+ * @param[out] out_component Pointer to store the DOM component.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_get_component(struct ui_menu_base *menu,
                                       struct ui_component **out_component) {
@@ -520,11 +524,11 @@ ui_error_t ui_menu_base_get_component(struct ui_menu_base *menu,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Binds the active index of the menu to a reactive signal.
- * \param[in,out] widget The menu.
- * \param[in,out] signal The signal representing the active index.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Binds the active index of the menu to a reactive signal.
+ * @param[in,out] widget The menu.
+ * @param[in,out] signal The signal representing the active index.
+ * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_menu_base_bind_active_index(struct ui_menu_base *widget,
                                           struct ui_signal *signal) {

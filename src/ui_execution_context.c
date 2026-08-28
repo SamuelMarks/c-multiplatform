@@ -1,6 +1,6 @@
-/*
- * \file ui_execution_context.c
- * \brief Implementation of UI execution context.
+/**
+ * @file ui_execution_context.c
+ * @brief Implementation of UI execution context.
  */
 /* clang-format off */
 #include "../include/ui_execution_context.h"
@@ -8,25 +8,26 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
-/*
- * \brief Thread-local pointer to the current execution context.
+/**
+ * @brief Thread-local pointer to the current execution context.
  */
 static UI_THREAD_LOCAL struct ui_execution_context *g_current_context = NULL;
 
 /**
  * @struct ui_execution_context
- * \struct ui_execution_context
- * \brief Manages the execution context of UI tasks.
+ * @brief Manages the execution context of UI tasks.
  */
 struct ui_execution_context {
-  ui_error_t (*task_callback)(void *); /**< ) */
-  void *task_user_data;                /**< task_user_data */
+  ui_error_t (*task_callback)(
+      void *); /**< Pointer to the callback function for a scheduled task. */
+  void *task_user_data; /**< User data to be passed to the scheduled task
+                           callback. */
 };
 
-/*
- * \brief Creates a new execution context.
- * \param[out] out_ctx Pointer to store the created context.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Creates a new execution context.
+ * @param[out] out_ctx Pointer to store the created context.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_execution_context_create(struct ui_execution_context **out_ctx) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -53,10 +54,10 @@ cleanup:
   return rc;
 }
 
-/*
- * \brief Destroys an execution context.
- * \param[in,out] ctx The context to destroy.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Destroys an execution context.
+ * @param[in,out] ctx The context to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_execution_context_destroy(struct ui_execution_context *ctx) {
   if (!ctx) {
@@ -67,12 +68,12 @@ ui_error_t ui_execution_context_destroy(struct ui_execution_context *ctx) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Schedules a callback in the execution context.
- * \param[in,out] ctx The execution context.
- * \param[in] callback The callback function to schedule.
- * \param[in] user_data User data to pass to the callback.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Schedules a callback in the execution context.
+ * @param[in,out] ctx The execution context.
+ * @param[in] callback The callback function to schedule.
+ * @param[in] user_data User data to pass to the callback.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_execution_context_schedule(struct ui_execution_context *ctx,
                                          ui_error_t (*callback)(void *),
@@ -86,10 +87,10 @@ ui_error_t ui_execution_context_schedule(struct ui_execution_context *ctx,
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Ticks the execution context, running scheduled tasks.
- * \param[in,out] ctx The execution context.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Ticks the execution context, running scheduled tasks.
+ * @param[in,out] ctx The execution context.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_execution_context_tick(struct ui_execution_context *ctx) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -101,18 +102,19 @@ ui_error_t ui_execution_context_tick(struct ui_execution_context *ctx) {
     rc = ctx->task_callback(ctx->task_user_data);
     ctx->task_callback = NULL;
     ctx->task_user_data = NULL;
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
     return UI_ERROR_NONE;
   }
 
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Cancels pending tasks in the execution context.
- * \param[in,out] ctx The execution context.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Cancels pending tasks in the execution context.
+ * @param[in,out] ctx The execution context.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_execution_context_cancel(struct ui_execution_context *ctx) {
   if (!ctx) {
@@ -125,17 +127,20 @@ ui_error_t ui_execution_context_cancel(struct ui_execution_context *ctx) {
   return UI_ERROR_NONE;
 }
 
-/*
- * \brief Sets the current execution context for the thread.
- * \param[in,out] ctx The context to set as current.
- * \return UI_ERROR_NONE on success.
+/**
+ * @brief Sets the current execution context for the thread.
+ * @param[in,out] ctx The context to set as current.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_execution_context_set_current(struct ui_execution_context *ctx) {
   g_current_context = ctx;
   return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Gets the current execution context for the thread.
+ * @param[out] out_ctx Pointer to store the current execution context.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t
 ui_execution_context_get_current(struct ui_execution_context **out_ctx) {

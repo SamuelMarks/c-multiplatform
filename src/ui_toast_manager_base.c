@@ -99,7 +99,7 @@ ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
   return UI_ERROR_NONE;
 }
 
-/*
+/**
  * @brief Helper function to free a single toast entry.
  * @param entry The entry to free.
  * @return UI_ERROR_NONE on success.
@@ -351,6 +351,12 @@ ui_toast_manager_base_handle_event(struct ui_toast_manager_base *manager,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief get_region_style.
+ * @param region Parameter region.
+ * @param out_str Parameter out_str.
+ * @return Return value.
+ */
 static ui_error_t get_region_style(enum ui_toast_region region,
                                    const char **out_str) {
   switch (region) {

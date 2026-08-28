@@ -36,6 +36,7 @@ ui_error_t run_aspect_ratio_coverage(void) {
 }
 #endif
 
+/** @brief Default CSS stylesheet for aspect ratio base component */
 static const char *ui_aspect_ratio_base_default_css =
     ".aspect-ratio-container { "
     "position: relative; "

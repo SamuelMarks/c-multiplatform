@@ -21,7 +21,7 @@ extern "C" {
  * @brief Types of OS-level compositor materials.
  */
 enum ui_compositor_material_type {
-  UI_COMPOSITOR_MATERIAL_TYPE_NONE = 0,
+  UI_COMPOSITOR_MATERIAL_TYPE_NONE = 0, /**< No compositor material */
   UI_COMPOSITOR_MATERIAL_TYPE_MICA =
       1, /**< Windows 11 Mica (desktop wallpaper bleed) */
   UI_COMPOSITOR_MATERIAL_TYPE_MICA_ALT =
@@ -39,7 +39,7 @@ enum ui_compositor_material_type {
  * unavailable.
  */
 enum ui_compositor_fallback_mode {
-  UI_COMPOSITOR_FALLBACK_MODE_SOLID_COLOR = 0,
+  UI_COMPOSITOR_FALLBACK_MODE_SOLID_COLOR = 0, /**< Fallback to solid color */
   UI_COMPOSITOR_FALLBACK_MODE_VIBRANCY =
       1 /**< Fallback to engine-rendered vibrancy/blur */
 };

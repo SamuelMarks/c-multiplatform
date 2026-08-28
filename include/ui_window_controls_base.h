@@ -20,17 +20,17 @@ extern "C" {
  * @brief Window state definitions for OS integration.
  */
 enum ui_window_state {
-  UI_WINDOW_STATE_NORMAL = 0,
-  UI_WINDOW_STATE_MAXIMIZED = 1,
-  UI_WINDOW_STATE_MINIMIZED = 2,
-  UI_WINDOW_STATE_FULLSCREEN = 3
+  UI_WINDOW_STATE_NORMAL = 0,    /**< Normal window state */
+  UI_WINDOW_STATE_MAXIMIZED = 1, /**< Maximized window state */
+  UI_WINDOW_STATE_MINIMIZED = 2, /**< Minimized window state */
+  UI_WINDOW_STATE_FULLSCREEN = 3 /**< Fullscreen window state */
 };
 
 /**
  * @brief Hit-test regions to pass back to the OS window manager.
  */
 enum ui_window_control_hit_region {
-  UI_WINDOW_CONTROL_HIT_REGION_NONE = 0,
+  UI_WINDOW_CONTROL_HIT_REGION_NONE = 0,     /**< No region hit */
   UI_WINDOW_CONTROL_HIT_REGION_CLIENT = 1,   /**< Normal interactive app area */
   UI_WINDOW_CONTROL_HIT_REGION_DRAG = 2,     /**< Draggable titlebar area */
   UI_WINDOW_CONTROL_HIT_REGION_MINIMIZE = 3, /**< Minimize button */
