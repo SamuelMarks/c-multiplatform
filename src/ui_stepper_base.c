@@ -269,7 +269,7 @@ static ui_error_t duplicate_string(const char *src, char **out_copy) {
 #if defined(_MSC_VER)
   strcpy_s(dst, len + 1, src);
 #else
-  strcpy(dst, src);
+  UI_STRCPY(dst, 256, src);
 #endif
   *out_copy = dst;
   return UI_ERROR_NONE;

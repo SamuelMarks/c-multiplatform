@@ -291,7 +291,7 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
       C_MULTIPLATFORM_FREE(snackbar->current.action_label);
   }
 
-  while (1) {
+  for (;;) {
 /** @cond */
 #define UI_RING_BUF_POP_IGNORE(q, i) ui_ring_buffer_pop((q), (i))
     /** @endcond */

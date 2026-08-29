@@ -148,7 +148,9 @@ static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
   struct ui_dom_node *child;
   ui_bool_t focusable = UI_FALSE;
 
-  { (void)is_focusable(root, &focusable); }
+  {
+    (void)is_focusable(root, &focusable);
+  }
 
   if (focusable) {
     if (*out_count >= *out_capacity) {

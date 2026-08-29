@@ -11,24 +11,9 @@
 #include "ui_internal_mem.h"
 
 #if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wcast-qual"
-#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#pragma GCC diagnostic ignored "-Wunused-value"
-#pragma GCC diagnostic ignored "-Wtype-limits"
 #if !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 #elif defined(_MSC_VER)
-#pragma warning(push, 0)
 #endif
 
 /* #define STB_TRUETYPE_IMPLEMENTATION */
@@ -39,9 +24,7 @@
 #include "stb_truetype.h"
 
 #if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
 #elif defined(_MSC_VER)
-#pragma warning(pop)
 #endif
 
 #include <string.h>

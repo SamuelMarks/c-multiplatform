@@ -9,25 +9,11 @@
 #include "ui_internal_mem.h"
 
 #if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4204) /* nonstandard extension used: non-constant aggregate initializer */
-#pragma warning(disable : 4244) /* possible loss of data */
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-#pragma GCC diagnostic ignored "-Wc++-compat"
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#pragma GCC diagnostic ignored "-Wconversion"
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
-#pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
-#pragma GCC diagnostic ignored "-Wshorten-64-to-32"
-#pragma GCC diagnostic ignored "-Wcast-qual"
-#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-#pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#pragma GCC diagnostic ignored "-Wendif-labels"
-#pragma GCC diagnostic ignored "-Wcomment"
+#if defined(__clang__)
+#endif
 #endif
 
 /** @brief internal */
@@ -49,10 +35,8 @@
 #include "stb_image_write.h"
 
 #if defined(_MSC_VER)
-#pragma warning(pop)
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
 #endif
 /* clang-format on */

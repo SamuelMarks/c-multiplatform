@@ -578,7 +578,9 @@ static ui_error_t select_on_change_wrapper(struct ui_select_base *select,
   if (wrap->callback) {
     union ui_signal_payload p;
     p.int_val = index;
-    { (void)wrap->callback(p, wrap->user_data); }
+    {
+      (void)wrap->callback(p, wrap->user_data);
+    }
   }
   return UI_ERROR_NONE;
 }

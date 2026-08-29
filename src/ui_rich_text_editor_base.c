@@ -13,6 +13,7 @@
 #include "ui_css_parser.h"
 #include <stddef.h>
 #include <string.h>
+
 /* clang-format on */
 
 /* \brief Default CSS stylesheet for the rich text editor */
@@ -126,7 +127,7 @@ static ui_error_t rte_cva_write_value(void *component,
     rte->html_capacity = new_cap;
   }
 
-  strcpy(rte->html_buffer, str);
+  UI_STRCPY(rte->html_buffer, rte->html_capacity, str);
   return UI_ERROR_NONE;
 }
 
@@ -398,7 +399,7 @@ ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
   if (cur_len == 0) {
     rte->html_buffer[0] = '\0';
   }
-  strcat(rte->html_buffer, text);
+  UI_STRCAT(rte->html_buffer, rte->html_capacity, text);
 
   {
     ui_error_t c_rc = trigger_cva_change(rte);

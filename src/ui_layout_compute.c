@@ -352,7 +352,9 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           node->computed_style, "text-decoration", &val);
       if (attr_rc2 == UI_ERROR_NONE) {
         /* Basic shorthand fallback */
-        { (void)parse_text_decoration_line(val, &node->text_decoration_line); }
+        {
+          (void)parse_text_decoration_line(val, &node->text_decoration_line);
+        }
       }
     }
   }
@@ -442,7 +444,9 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     if (attr_rc == UI_ERROR_NONE) {
       /* For multiple backgrounds we'd ideally split by comma. For Level 3/4
        * mock, we'll parse the first one */
-      { (void)ui_css_parse_image(val, &node->background_image[0]); }
+      {
+        (void)ui_css_parse_image(val, &node->background_image[0]);
+      }
       node->background_image_count = 1;
     }
   }
@@ -862,7 +866,9 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
       {
         (void)parse_overflow(val, &node->overflow_x);
       }
-      { (void)parse_overflow(val, &node->overflow_y); }
+      {
+        (void)parse_overflow(val, &node->overflow_y);
+      }
     }
   }
   {

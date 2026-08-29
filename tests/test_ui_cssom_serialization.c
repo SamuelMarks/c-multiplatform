@@ -30,7 +30,7 @@ static char *my_strdup(const char *s) {
   size_t len = strlen(s);
   char *d = C_MULTIPLATFORM_MALLOC(len + 1);
   if (d)
-    strcpy(d, s);
+    UI_STRCPY(d, 256, s);
   return d;
 }
 

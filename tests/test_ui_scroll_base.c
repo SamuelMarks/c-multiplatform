@@ -187,7 +187,7 @@ static int run_normal_tests(void) {
 
   /* Test bind_data */
   {
-    struct ui_signal *dummy_signal = (struct ui_signal *)0xdeadbeef;
+    struct ui_signal *dummy_signal = (struct ui_signal *)(size_t)0xdeadbeef;
     if (ui_scroll_base_bind_data(NULL, dummy_signal) !=
         UI_ERROR_INVALID_ARGUMENT)
       return 1;

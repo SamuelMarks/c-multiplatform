@@ -132,7 +132,8 @@ ui_error_t ui_cssom_set_property(struct ui_css_rule *rule,
 #if defined(_MSC_VER)
       strcpy_s(decl->property_value, val_len + 1, property_value);
 #else
-      strcpy(decl->property_value, property_value);
+      UI_STRCPY(decl->property_value, sizeof(decl->property_value),
+                property_value);
 #endif
       decl->is_important = is_important;
       return UI_ERROR_NONE;

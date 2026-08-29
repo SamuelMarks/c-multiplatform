@@ -8,6 +8,10 @@
 #include "ui_internal_mem.h"
 #include <string.h>
 #include <stdio.h>
+
+#if defined(_MSC_VER)
+#define UI_SSCANF sscanf_s
+#endif
 /* clang-format on */
 
 /**
@@ -26,7 +30,9 @@ ui_error_t ui_css_parse_transform(const char *str,
 
   *out_transform = NULL;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;
   }
@@ -46,7 +52,9 @@ ui_error_t ui_css_parse_transform(const char *str,
     const char *paren_end;
     const char *arg_str;
 
-    { skip_whitespace(&str); }
+    {
+      skip_whitespace(&str);
+    }
     if (*str == '\0')
       break;
 
@@ -124,7 +132,9 @@ ui_error_t ui_css_parse_transform(const char *str,
     arg_str = paren_start + 1;
     while (arg_str < paren_end && func->value_count < 16) {
       ui_error_t rc;
-      { skip_whitespace(&arg_str); }
+      {
+        skip_whitespace(&arg_str);
+      }
       if (arg_str >= paren_end)
         break;
 
@@ -132,12 +142,16 @@ ui_error_t ui_css_parse_transform(const char *str,
                                        &func->values[func->value_count]);
       if (rc != UI_ERROR_NONE) {
         C_MULTIPLATFORM_FREE(func);
-        { ui_css_transform_destroy(transform); }
+        {
+          ui_css_transform_destroy(transform);
+        }
         return rc;
       }
       func->value_count++;
 
-      { skip_whitespace(&arg_str); }
+      {
+        skip_whitespace(&arg_str);
+      }
       if (*arg_str == ',') {
         arg_str++;
       }
@@ -176,7 +190,9 @@ ui_error_t ui_css_parse_shape_outside(const char *str,
   if (!str || !out_shape)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   out_shape->box = UI_CSS_GEOMETRY_BOX_NONE;
   out_shape->shape.type = UI_CSS_BASIC_SHAPE_NONE;
   out_shape->shape.arguments[0] = '\0';
@@ -211,7 +227,9 @@ ui_error_t ui_css_parse_shape_outside(const char *str,
   }
 
   /* Try parsing geometry box or basic shape */
-  { parse_geometry_box(p, &out_shape->box); }
+  {
+    parse_geometry_box(p, &out_shape->box);
+  }
 
   if (strstr(p, "inset(")) {
     out_shape->shape.type = UI_CSS_BASIC_SHAPE_INSET;
@@ -239,7 +257,9 @@ ui_error_t ui_css_parse_shape_outside(const char *str,
     /* Check if geometry box is appended after shape */
     if (out_shape->box == UI_CSS_GEOMETRY_BOX_NONE && paren_end) {
       const char *after_paren = paren_end + 1;
-      { parse_geometry_box(after_paren, &out_shape->box); }
+      {
+        parse_geometry_box(after_paren, &out_shape->box);
+      }
     }
   }
 
@@ -288,7 +308,9 @@ ui_error_t ui_css_parse_filter(const char *str,
 
   *out_filter = NULL;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;
   }
@@ -308,7 +330,9 @@ ui_error_t ui_css_parse_filter(const char *str,
     const char *paren_end;
     const char *arg_str;
 
-    { skip_whitespace(&str); }
+    {
+      skip_whitespace(&str);
+    }
     if (*str == '\0')
       break;
 
@@ -401,14 +425,18 @@ ui_error_t ui_css_parse_filter(const char *str,
           rc = ui_css_parse_value(token, &func->data.drop_shadow.offset_x);
           if (rc != UI_ERROR_NONE) {
             C_MULTIPLATFORM_FREE(func);
-            { ui_css_filter_destroy(filter); }
+            {
+              ui_css_filter_destroy(filter);
+            }
             return rc;
           }
         } else if (part_idx == 1) {
           rc = ui_css_parse_value(token, &func->data.drop_shadow.offset_y);
           if (rc != UI_ERROR_NONE) {
             C_MULTIPLATFORM_FREE(func);
-            { ui_css_filter_destroy(filter); }
+            {
+              ui_css_filter_destroy(filter);
+            }
             return rc;
           }
         } else if (part_idx == 2) {
@@ -432,7 +460,9 @@ ui_error_t ui_css_parse_filter(const char *str,
             if (0)
               return rc;
             C_MULTIPLATFORM_FREE(func);
-            { ui_css_filter_destroy(filter); }
+            {
+              ui_css_filter_destroy(filter);
+            }
             return rc;
           }
           func->data.drop_shadow.has_color = 1;
@@ -455,7 +485,9 @@ ui_error_t ui_css_parse_filter(const char *str,
       rc = ui_css_parse_value(val_str, &func->data.value);
       if (rc != UI_ERROR_NONE) {
         C_MULTIPLATFORM_FREE(func);
-        { ui_css_filter_destroy(filter); }
+        {
+          ui_css_filter_destroy(filter);
+        }
         return rc;
       }
     }
@@ -488,7 +520,9 @@ ui_error_t ui_css_parse_blend_mode(const char *str,
   if (!str || !out_blend_mode)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
 
   if (strcmp(str, "normal") == 0)
     *out_blend_mode = UI_CSS_BLEND_MODE_NORMAL;
@@ -565,7 +599,9 @@ ui_error_t ui_css_parse_shadow(const char *str,
 
   *out_shadows = NULL;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;
   }
@@ -587,7 +623,9 @@ ui_error_t ui_css_parse_shadow(const char *str,
     const char *comma_pos;
     size_t part_len;
 
-    { skip_whitespace(&str); }
+    {
+      skip_whitespace(&str);
+    }
     if (*str == '\0')
       break;
 
@@ -661,7 +699,9 @@ ui_error_t ui_css_parse_shadow(const char *str,
     /* Must have at least offset-x and offset-y */
     if (length_idx < 2) {
       C_MULTIPLATFORM_FREE(shadow);
-      { ui_css_shadow_list_destroy(list); }
+      {
+        ui_css_shadow_list_destroy(list);
+      }
       return UI_ERROR_PARSE_FAILED;
     }
 
@@ -694,7 +734,9 @@ ui_error_t ui_css_parse_fill_rule(const char *str,
   if (!str || !out_rule)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   if (strcmp(str, "nonzero") == 0) {
     *out_rule = UI_CSS_FILL_RULE_NONZERO;
     return UI_ERROR_NONE;
@@ -718,7 +760,9 @@ ui_css_parse_stroke_linecap(const char *str,
   if (!str || !out_linecap)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   if (strcmp(str, "butt") == 0) {
     *out_linecap = UI_CSS_STROKE_LINECAP_BUTT;
     return UI_ERROR_NONE;
@@ -745,7 +789,9 @@ ui_css_parse_stroke_linejoin(const char *str,
   if (!str || !out_linejoin)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   if (strcmp(str, "miter") == 0) {
     *out_linejoin = UI_CSS_STROKE_LINEJOIN_MITER;
     return UI_ERROR_NONE;
@@ -770,7 +816,9 @@ ui_error_t ui_css_parse_paint(const char *str, struct ui_css_paint *out_paint) {
   if (!str || !out_paint)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
 
   out_paint->type = UI_CSS_PAINT_NONE;
   out_paint->url[0] = '\0';
@@ -813,8 +861,6 @@ ui_error_t ui_css_parse_paint(const char *str, struct ui_css_paint *out_paint) {
     out_paint->type = UI_CSS_PAINT_COLOR;
     return UI_ERROR_NONE;
   }
-
-  return UI_ERROR_PARSE_FAILED;
 }
 
 /**
@@ -833,7 +879,9 @@ ui_error_t ui_css_parse_dasharray(const char *str,
   if (!str || !out_dasharray)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
 
   out_dasharray->count = 0;
 
@@ -884,7 +932,9 @@ ui_css_parse_easing_function(const char *str,
   if (!str || !out_easing)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
 
   if (strcmp(str, "linear") == 0) {
     out_easing->type = UI_CSS_EASING_LINEAR;
@@ -903,7 +953,7 @@ ui_css_parse_easing_function(const char *str,
     return UI_ERROR_NONE;
   } else if (strncmp(str, "cubic-bezier(", 13) == 0) {
     float x1, y1, x2, y2;
-    if (sscanf(str + 13, "%f , %f , %f , %f", &x1, &y1, &x2, &y2) == 4) {
+    if (UI_SSCANF(str + 13, "%f , %f , %f , %f", &x1, &y1, &x2, &y2) == 4) {
       out_easing->type = UI_CSS_EASING_CUBIC_BEZIER;
       out_easing->data.cubic_bezier.x1 = x1;
       out_easing->data.cubic_bezier.y1 = y1;
@@ -914,7 +964,13 @@ ui_css_parse_easing_function(const char *str,
   } else if (strncmp(str, "steps(", 6) == 0) {
     int count = 0;
     char pos_str[32] = {0};
-    int matched = sscanf(str + 6, "%d , %31[^)]", &count, pos_str);
+    int matched;
+#if defined(_MSC_VER)
+    matched = sscanf_s(str + 6, "%d , %31[^)]", &count, pos_str,
+                       (unsigned int)sizeof(pos_str));
+#else
+    matched = UI_SSCANF(str + 6, "%d , %31[^)]", &count, pos_str);
+#endif
     if (matched >= 1) {
       out_easing->type = UI_CSS_EASING_STEPS;
       out_easing->data.steps.count = count;

@@ -4,6 +4,7 @@
  */
 /* clang-format off */
 #include "ui_coercion_utils.h"
+#include "ui_internal_mem.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -106,7 +107,7 @@ ui_error_t ui_safe_string_copy(char *dest, size_t dest_size, const char *src) {
     dest[dest_size - 1] = '\0';
     return UI_ERROR_OUT_OF_BOUNDS;
   }
-  strcpy(dest, src);
+  UI_STRCPY(dest, 256, src);
 #endif
 
   return UI_ERROR_NONE;

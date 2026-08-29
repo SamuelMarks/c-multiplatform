@@ -66,7 +66,7 @@ static ui_error_t rewrite_classes_for_node(struct ui_dom_node *node,
 #if defined(_MSC_VER)
           strcpy_s(dst, new_len - (dst - new_classes), scope_id);
 #else
-          strcpy(dst, scope_id);
+          UI_STRCPY(dst, 256, scope_id);
 #endif
           dst += strlen(scope_id);
         }

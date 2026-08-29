@@ -51,7 +51,7 @@ repos:
   hooks:
   - id: build-compilation-db
     name: Build Compilation Database
-    entry: bash -c "unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE && cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+    entry: cmake -E env --unset=GIT_INDEX_FILE --unset=GIT_DIR --unset=GIT_WORK_TREE cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     language: system
     pass_filenames: false
   - id: check-api-returns
@@ -108,13 +108,8 @@ repos:
     pass_filenames: false
   - id: build-msvc-wine
     name: Build & Test (MSVC Wine)
-    entry: bash -c 'unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE; if command -v wine >/dev/null 2>&1 && [ -d "${MSVC_WINE_PATH:-$HOME/my_msvc/opt/msvc}"
-      ]; then bash ~/repos/c-ci/build_msvc_wine.sh -DCMAKE_DISABLE_FIND_PACKAGE_SQLite3=ON
-      -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON -DCMAKE_DISABLE_FIND_PACKAGE_Brotli=ON
-      -DCMAKE_DISABLE_FIND_PACKAGE_CURL=ON > wine_hook.log 2>&1; RET=$?; cat wine_hook.log;
-      rm -f wine_hook.log; wineserver -k9 || true; exit $RET; else echo "Skipping
-      MSVC Wine"; fi'
-    language: system
+    entry: python -c "import os, subprocess, shutil, sys; (print('Skipping MSVC Wine'), sys.exit(0)) if os.name == 'nt' or not shutil.which('wine') or not os.path.isdir(os.environ.get('MSVC_WINE_PATH', os.path.expanduser('~/my_msvc/opt/msvc'))) else None; [os.environ.pop(k, None) for k in ('GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE')]; r = subprocess.run(['bash', '-c', 'bash ~/repos/c-ci/build_msvc_wine.sh -DCMAKE_DISABLE_FIND_PACKAGE_SQLite3=ON -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON -DCMAKE_DISABLE_FIND_PACKAGE_Brotli=ON -DCMAKE_DISABLE_FIND_PACKAGE_CURL=ON > wine_hook.log 2>&1; R=$?; cat wine_hook.log; rm -f wine_hook.log; wineserver -k9 || true; exit $R']); sys.exit(r.returncode)"
+    language: python
     pass_filenames: false
   - id: build-msvc
     name: Build (MSVC)
@@ -142,8 +137,8 @@ repos:
     pass_filenames: false
   - id: wasm-layout-assertions
     name: Wasm Layout Assertions
-    entry: bash -c "unset GIT_INDEX_FILE GIT_DIR GIT_WORK_TREE && rm -rf build_wasm && mkdir build_wasm && cd build_wasm && cmake .. && make test_ui_layout_observer && ./bin/test_ui_layout_observer"
-    language: system
+    entry: python -c "import os, subprocess, shutil; [os.environ.pop(k, None) for k in ('GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE')]; shutil.rmtree('build_wasm', ignore_errors=True); os.makedirs('build_wasm', exist_ok=True); subprocess.run(['cmake', '..'], cwd='build_wasm', check=True); subprocess.run(['cmake', '--build', '.', '--target', 'test_ui_layout_observer'], cwd='build_wasm', check=True); subprocess.run(['ctest', '-C', 'Debug', '--output-on-failure', '-R', '^test_ui_layout_observer$'], cwd='build_wasm', check=True)"
+    language: python
     pass_filenames: false
   - id: valgrind
     name: Valgrind (GCC)

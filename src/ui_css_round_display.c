@@ -79,7 +79,9 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
     return UI_ERROR_NONE;
   }
 
-  { parse_geometry_box(str, &out_shape->box); }
+  {
+    parse_geometry_box(str, &out_shape->box);
+  }
 
   if (strstr(str, "inset(")) {
     out_shape->shape.type = UI_CSS_BASIC_SHAPE_INSET;
@@ -106,7 +108,9 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
 
     if (out_shape->box == UI_CSS_GEOMETRY_BOX_NONE) {
       const char *after_paren = paren_end ? (paren_end + 1) : str;
-      { parse_geometry_box(after_paren, &out_shape->box); }
+      {
+        parse_geometry_box(after_paren, &out_shape->box);
+      }
     }
   }
 

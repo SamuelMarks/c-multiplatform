@@ -71,6 +71,9 @@ extern char *ui_mock_strdup(const char *src);
 #if defined(_MSC_VER)
 #define C_MULTIPLATFORM_STRDUP _strdup
 #else
+#if defined(__CYGWIN__)
+char *strdup(const char *);
+#endif
 #define C_MULTIPLATFORM_STRDUP strdup
 #endif
 #endif
@@ -112,16 +115,18 @@ static int mock_strcpy_fail_check(void) {
  */
 #define UI_STRNCPY(dest, destsz, src, count)                                   \
   strncpy_s((dest), (destsz), (src), (count))
+#define UI_STRCAT(dest, destsz, src) strcat_s((dest), (destsz), (src))
 #else
 /** @def UI_STRCPY
  * @brief Safe strcpy wrapper
  */
 #define UI_STRCPY(dest, destsz, src)                                           \
-  (mock_strcpy_fail_check() ? -1 : (strcpy((dest), (src)), 0))
+  (mock_strcpy_fail_check() ? -1 : (strcpy((dest), (src)) == NULL ? -1 : 0))
 /** @def UI_STRNCPY
  * @brief Safe strncpy wrapper
  */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
+#define UI_STRCAT(dest, destsz, src) (strcat((dest), (src)) == NULL ? -1 : 0)
 #endif
 #else
 #if defined(_MSC_VER)
@@ -134,15 +139,17 @@ static int mock_strcpy_fail_check(void) {
  */
 #define UI_STRNCPY(dest, destsz, src, count)                                   \
   strncpy_s((dest), (destsz), (src), (count))
+#define UI_STRCAT(dest, destsz, src) strcat_s((dest), (destsz), (src))
 #else
 /** @def UI_STRCPY
  * @brief Safe strcpy wrapper
  */
-#define UI_STRCPY(dest, destsz, src) (strcpy((dest), (src)), 0)
+#define UI_STRCPY(dest, destsz, src) (strcpy((dest), (src)) == NULL ? -1 : 0)
 /** @def UI_STRNCPY
  * @brief Safe strncpy wrapper
  */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
+#define UI_STRCAT(dest, destsz, src) (strcat((dest), (src)) == NULL ? -1 : 0)
 #endif
 #endif
 

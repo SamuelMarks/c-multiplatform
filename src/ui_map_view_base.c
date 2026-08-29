@@ -4,8 +4,6 @@
  * @details Provides the core map view functionality.
  */
 #ifdef _MSC_VER
-#pragma warning(disable : 4716)
-#pragma warning(disable : 4702)
 #endif
 
 /* clang-format off */

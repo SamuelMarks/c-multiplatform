@@ -86,25 +86,25 @@ static PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 
 static ui_error_t load_gl_extensions(void) {
     if (glCreateProgram) return UI_ERROR_NONE;
-    glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
-    glUniform2f = (PFNGLUNIFORM2FPROC)wglGetProcAddress("glUniform2f");
-    glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
-    glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
-    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
-    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
-    glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glDisableVertexAttribArray");
-    glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
-    glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
-    glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
-    glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
-    glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
-    glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
-    glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
-    glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation");
-    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
-    glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
-    glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram");
-    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers");
+    glUseProgram = (PFNGLUSEPROGRAMPROC)(size_t)wglGetProcAddress("glUseProgram");
+    glUniform2f = (PFNGLUNIFORM2FPROC)(size_t)wglGetProcAddress("glUniform2f");
+    glBindBuffer = (PFNGLBINDBUFFERPROC)(size_t)wglGetProcAddress("glBindBuffer");
+    glBufferData = (PFNGLBUFFERDATAPROC)(size_t)wglGetProcAddress("glBufferData");
+    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)(size_t)wglGetProcAddress("glEnableVertexAttribArray");
+    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)(size_t)wglGetProcAddress("glVertexAttribPointer");
+    glDisableVertexAttribArray = (PFNGLDISABLEVERTEXATTRIBARRAYPROC)(size_t)wglGetProcAddress("glDisableVertexAttribArray");
+    glCreateShader = (PFNGLCREATESHADERPROC)(size_t)wglGetProcAddress("glCreateShader");
+    glShaderSource = (PFNGLSHADERSOURCEPROC)(size_t)wglGetProcAddress("glShaderSource");
+    glCompileShader = (PFNGLCOMPILESHADERPROC)(size_t)wglGetProcAddress("glCompileShader");
+    glCreateProgram = (PFNGLCREATEPROGRAMPROC)(size_t)wglGetProcAddress("glCreateProgram");
+    glAttachShader = (PFNGLATTACHSHADERPROC)(size_t)wglGetProcAddress("glAttachShader");
+    glLinkProgram = (PFNGLLINKPROGRAMPROC)(size_t)wglGetProcAddress("glLinkProgram");
+    glDeleteShader = (PFNGLDELETESHADERPROC)(size_t)wglGetProcAddress("glDeleteShader");
+    glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)(size_t)wglGetProcAddress("glGetAttribLocation");
+    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)(size_t)wglGetProcAddress("glGetUniformLocation");
+    glGenBuffers = (PFNGLGENBUFFERSPROC)(size_t)wglGetProcAddress("glGenBuffers");
+    glDeleteProgram = (PFNGLDELETEPROGRAMPROC)(size_t)wglGetProcAddress("glDeleteProgram");
+    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)(size_t)wglGetProcAddress("glDeleteBuffers");
   return UI_ERROR_NONE;
 }
 #elif defined(__APPLE__)

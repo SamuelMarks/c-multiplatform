@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "../include/ui_os_dialogs.h"
+#include "../src/ui_internal_mem.h"
 #include "../include/ui_error.h"
 #include "../include/ui_file_uploader_base.h"
 #include "../include/ui_color_picker_base.h"
@@ -100,7 +101,7 @@ static int test_os_file_completion(void) {
 
   task = malloc(sizeof(struct ui_os_file_task));
   task->uploader = &uploader;
-  strcpy(task->result_path, "mock_path.txt");
+  UI_STRCPY(task->result_path, sizeof(task->result_path), "mock_path.txt");
   ui_os_file_completion(task);
 
   ui_file_uploader_destroy(&uploader);

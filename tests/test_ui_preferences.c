@@ -114,9 +114,9 @@ static int test_preferences_save_binary(void) {
     return 1;
 
 #if defined(__EMSCRIPTEN__)
-    /* Resolves eventually via JS */
+  /* Resolves eventually via JS */
 #else
-    /* Rejected natively currently */
+  /* Rejected natively currently */
 #endif
 
   (void)ui_promise_destroy(promise);

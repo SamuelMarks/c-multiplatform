@@ -557,7 +557,9 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     next_y++;
   }
 
-  { (void)ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev); }
+  {
+    (void)ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev);
+  }
 
   offset = first_dow - (int)calendar->start_of_week;
   if (offset < 0) {

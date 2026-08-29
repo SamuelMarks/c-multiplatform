@@ -1,3 +1,4 @@
+#include "../src/ui_internal_mem.h"
 #include <stdlib.h>
 /* clang-format off */
 #include <stdio.h>
@@ -80,7 +81,7 @@ static int test_parse_scrollbar_color(void) {
     char long_str[300];
     memset(long_str, 'x', 260);
     long_str[260] = ' ';
-    strcpy(&long_str[261], "blue");
+    UI_STRCPY(&long_str[261], 1024 - 261, "blue");
     TEST_ASSERT(ui_css_parse_scrollbar_color(long_str, &color) ==
                 UI_ERROR_PARSE_FAILED);
   }

@@ -17,7 +17,9 @@ ui_error_t ui_css_parse_transition(const char *str,
     return UI_ERROR_INVALID_ARGUMENT;
 
   *out_transitions = NULL;
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
 
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE; /* NULL list represents none */
@@ -201,7 +203,9 @@ ui_error_t ui_css_parse_animation(const char *str,
     return UI_ERROR_INVALID_ARGUMENT;
 
   *out_animations = NULL;
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
 
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;

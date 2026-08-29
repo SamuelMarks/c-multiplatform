@@ -24,7 +24,9 @@
 #include "ui_window_backend_web.h"
 #elif defined(_WIN32) || defined(__CYGWIN__)
 #include "ui_window_backend_win32.h"
+#if defined(_MSC_VER)
 __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
+#endif
 #elif defined(__APPLE__)
 #include "ui_window_backend_macos.h"
 #elif defined(__linux__) || defined(__unix__)

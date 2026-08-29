@@ -240,7 +240,7 @@ static ARGB ui_css_color_to_argb(const struct ui_css_color *c) {
  * @param height Parameter height.
  * @return Return value.
  */
-static int gdiplus_begin_frame(void *ctx, int width, int height) {
+static ui_error_t gdiplus_begin_frame(void *ctx, int width, int height) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
 
   if (!gctx)
@@ -280,7 +280,7 @@ static int gdiplus_begin_frame(void *ctx, int width, int height) {
  * @param ctx Parameter ctx.
  * @return Return value.
  */
-static int gdiplus_end_frame(void *ctx) {
+static ui_error_t gdiplus_end_frame(void *ctx) {
   /* For offscreen, nothing to do here.
      When blitting to screen, we would extract the bitmap or draw it to the
      window HDC. */
@@ -295,8 +295,8 @@ static int gdiplus_end_frame(void *ctx) {
  * @param c Parameter c.
  * @return Return value.
  */
-static int gdiplus_draw_rect(void *ctx, const struct ui_rect *r,
-                             const struct ui_color *c) {
+static ui_error_t gdiplus_draw_rect(void *ctx, const struct ui_rect *r,
+                                    const struct ui_color *c) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   GpSolidFill *brush = NULL;
 
@@ -320,8 +320,9 @@ static int gdiplus_draw_rect(void *ctx, const struct ui_rect *r,
  * @param r Parameter r.
  * @return Return value.
  */
-static int gdiplus_draw_text(void *ctx, const char *text,
-                             const struct ui_font *f, const struct ui_rect *r) {
+static ui_error_t gdiplus_draw_text(void *ctx, const char *text,
+                                    const struct ui_font *f,
+                                    const struct ui_rect *r) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   GpFontCollection *collection = NULL;
   GpFontFamily *family = NULL;
@@ -415,8 +416,8 @@ static int gdiplus_draw_text(void *ctx, const char *text,
  * @param r Parameter r.
  * @return Return value.
  */
-static int gdiplus_draw_image(void *ctx, const struct ui_image *img,
-                              const struct ui_rect *r) {
+static ui_error_t gdiplus_draw_image(void *ctx, const struct ui_image *img,
+                                     const struct ui_rect *r) {
   (void)ctx;
   (void)img;
   (void)r;
@@ -431,8 +432,8 @@ static int gdiplus_draw_image(void *ctx, const struct ui_image *img,
  * @param gradient Parameter gradient.
  * @return Return value.
  */
-static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
-                                 const struct ui_css_image *gradient) {
+static ui_error_t gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
+                                        const struct ui_css_image *gradient) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   if (!gctx || !gctx->graphics || !r || !gradient)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -548,8 +549,8 @@ static int gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
  * @param c Parameter c.
  * @return Return value.
  */
-static int gdiplus_draw_path(void *ctx, const struct ui_path *p,
-                             const struct ui_color *c) {
+static ui_error_t gdiplus_draw_path(void *ctx, const struct ui_path *p,
+                                    const struct ui_color *c) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   GpPath *path = NULL;
   GpSolidFill *brush = NULL;
@@ -602,7 +603,7 @@ static int gdiplus_draw_path(void *ctx, const struct ui_path *p,
  * @param r Parameter r.
  * @return Return value.
  */
-static int gdiplus_push_clip(void *ctx, const struct ui_rect *r) {
+static ui_error_t gdiplus_push_clip(void *ctx, const struct ui_rect *r) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   if (!gctx || !gctx->graphics || !r)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -616,7 +617,7 @@ static int gdiplus_push_clip(void *ctx, const struct ui_rect *r) {
  * @param ctx Parameter ctx.
  * @return Return value.
  */
-static int gdiplus_pop_clip(void *ctx) {
+static ui_error_t gdiplus_pop_clip(void *ctx) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   if (!gctx || !gctx->graphics)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -630,7 +631,8 @@ static int gdiplus_pop_clip(void *ctx) {
  * @param mode Parameter mode.
  * @return Return value.
  */
-static int gdiplus_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
+static ui_error_t gdiplus_set_blend_mode(void *ctx,
+                                         enum ui_css_blend_mode mode) {
   (void)ctx;
   (void)mode;
   /* Stub for blend mode */
@@ -643,7 +645,8 @@ static int gdiplus_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
  * @param shadow Parameter shadow.
  * @return Return value.
  */
-static int gdiplus_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
+static ui_error_t gdiplus_set_shadow(void *ctx,
+                                     const struct ui_css_shadow *shadow) {
   (void)ctx;
   (void)shadow;
   /* Stub for drop shadow */
@@ -656,7 +659,8 @@ static int gdiplus_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
  * @param out_rgba_buffer Parameter out_rgba_buffer.
  * @return Return value.
  */
-static int gdiplus_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
+static ui_error_t gdiplus_read_pixels(void *ctx,
+                                      unsigned char *out_rgba_buffer) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   BitmapData bitmapData;
   GpRect rect;
@@ -706,7 +710,7 @@ static int gdiplus_read_pixels(void *ctx, unsigned char *out_rgba_buffer) {
  * @param ctx Parameter ctx.
  * @return Return value.
  */
-static int gdiplus_destroy(void *ctx) {
+static ui_error_t gdiplus_destroy(void *ctx) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   if (gctx) {
     if (gctx->graphics)

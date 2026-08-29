@@ -196,7 +196,9 @@ ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
   }
 
   rc = update_camera_matrix(graph);
-  { (void)rc; }
+  {
+    (void)rc;
+  }
   return UI_ERROR_NONE;
 }
 
@@ -236,7 +238,9 @@ ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
   }
 
   rc = update_camera_matrix(graph);
-  { (void)rc; }
+  {
+    (void)rc;
+  }
   return UI_ERROR_NONE;
 }
 

@@ -132,7 +132,7 @@ ui_error_t ui_label_base_set_for(struct ui_label_base *label,
 #if defined(_MSC_VER)
     strcpy_s(label->target_id, len + 1, target_id);
 #else
-    strcpy(label->target_id, target_id);
+    UI_STRCPY(label->target_id, sizeof(label->target_id), target_id);
 #endif
 
     if (label->component && label->component->shadow_root) {

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include <stdio.h>
+#include "../src/ui_internal_mem.h"
 #include <stdlib.h>
 #include <math.h>
 #include "../include/ui_css_values.h"
@@ -174,9 +175,9 @@ static void test_more_branches(void) {
 
   /* very long shadow */
   char long_shadow[256];
-  strcpy(long_shadow, "10px 10px ");
+  UI_STRCPY(long_shadow, 1024, "10px 10px ");
   memset(long_shadow + 10, 'A', 200);
-  strcpy(long_shadow + 210, "px #fff");
+  UI_STRCPY(long_shadow + 210, 1024 - 210, "px #fff");
   if (shadow) {
     ui_css_shadow_list_destroy(shadow);
     shadow = NULL;
@@ -193,7 +194,7 @@ static void test_more_branches(void) {
   /* long segment transition / animation */
   char long_trans[1024];
   memset(long_trans, 'a', 600);
-  strcpy(long_trans + 600, " 1s");
+  UI_STRCPY(long_trans + 600, 1024 - 600, " 1s");
   if (trans) {
     ui_css_transition_destroy(trans);
     trans = NULL;
@@ -208,9 +209,9 @@ static void test_more_branches(void) {
   /* removed check */
 
   char long_easing[256];
-  strcpy(long_easing, "cubic-bezier(0.1, ");
+  UI_STRCPY(long_easing, 1024, "cubic-bezier(0.1, ");
   memset(long_easing + 18, ' ', 100);
-  strcpy(long_easing + 118, "0.1, 0.1, 0.1)");
+  UI_STRCPY(long_easing + 118, 1024 - 118, "0.1, 0.1, 0.1)");
   if (trans) {
     ui_css_transition_destroy(trans);
     trans = NULL;
@@ -224,9 +225,9 @@ static void test_more_branches(void) {
 
   /* very long filter */
   char long_filter[256];
-  strcpy(long_filter, "blur(");
+  UI_STRCPY(long_filter, 1024, "blur(");
   memset(long_filter + 5, '1', 200);
-  strcpy(long_filter + 205, "px)");
+  UI_STRCPY(long_filter + 205, 1024 - 205, "px)");
   struct ui_css_filter *filter = NULL;
   if (filter) {
     ui_css_filter_destroy(filter);
@@ -674,9 +675,9 @@ static void test_more_branches_6(void) {
 
   /* long paint url */
   char long_paint[1024];
-  strcpy(long_paint, "url('");
+  UI_STRCPY(long_paint, 1024, "url(\'");
   memset(long_paint + 5, 'a', 300);
-  strcpy(long_paint + 305, "')");
+  UI_STRCPY(long_paint + 305, 1024 - 305, "\')");
   rc = ui_css_parse_paint(long_paint, &paint);
 
   /* dasharray too many items */
@@ -685,7 +686,7 @@ static void test_more_branches_6(void) {
 
   /* shadow token too long */
   char shadow_str[100];
-  strcpy(shadow_str, "10px 10px ");
+  UI_STRCPY(shadow_str, 256, "10px 10px ");
   memset(shadow_str + 10, 'a', 50);
   shadow_str[60] = '\0';
   if (shadow) {
@@ -708,9 +709,9 @@ static void test_more_branches_6(void) {
   rc = ui_css_parse_filter("drop-shadow(red 10px 10px 5px)", &filter);
   {
     char long_filter[400];
-    strcpy(long_filter, "drop-shadow(");
+    UI_STRCPY(long_filter, 1024, "drop-shadow(");
     memset(long_filter + 12, '1', 350);
-    strcpy(long_filter + 362, ")");
+    UI_STRCPY(long_filter + 362, 1024 - 362, ")");
     if (filter) {
       ui_css_filter_destroy(filter);
       filter = NULL;
@@ -720,18 +721,18 @@ static void test_more_branches_6(void) {
 
   /* transition / animation long easing */
   char long_easing[100];
-  strcpy(long_easing, "opacity 1s cubic-bezier(");
+  UI_STRCPY(long_easing, 1024, "opacity 1s cubic-bezier(");
   memset(long_easing + 24, '1', 40);
-  strcpy(long_easing + 64, ")");
+  UI_STRCPY(long_easing + 64, 1024 - 64, ")");
   if (trans) {
     ui_css_transition_destroy(trans);
     trans = NULL;
   }
   rc = ui_css_parse_transition(long_easing, &trans);
 
-  strcpy(long_easing, "fadein 1s cubic-bezier(");
+  UI_STRCPY(long_easing, 1024, "fadein 1s cubic-bezier(");
   memset(long_easing + 23, '1', 40);
-  strcpy(long_easing + 63, ")");
+  UI_STRCPY(long_easing + 63, 1024 - 63, ")");
   if (anim) {
     ui_css_animation_destroy(anim);
     anim = NULL;
@@ -888,9 +889,9 @@ static void test_missing_branches(void) {
   /* clip path long url */
   {
     char long_clip_url[512];
-    strcpy(long_clip_url, "url(");
+    UI_STRCPY(long_clip_url, 1024, "url(");
     memset(long_clip_url + 4, 'B', 300);
-    strcpy(long_clip_url + 304, ")");
+    UI_STRCPY(long_clip_url + 304, 1024 - 304, ")");
     rc = ui_css_parse_clip_path(long_clip_url, &clip);
   }
 
@@ -904,9 +905,9 @@ static void test_missing_branches(void) {
   /* paint long url */
   {
     char long_paint_url[512];
-    strcpy(long_paint_url, "url(");
+    UI_STRCPY(long_paint_url, 1024, "url(");
     memset(long_paint_url + 4, 'C', 300);
-    strcpy(long_paint_url + 304, ")");
+    UI_STRCPY(long_paint_url + 304, 1024 - 304, ")");
     struct ui_css_paint paint;
     rc = ui_css_parse_paint(long_paint_url, &paint);
   }
@@ -927,18 +928,18 @@ static void test_missing_branches(void) {
   /* clip path shape arguments long */
   {
     char long_clip_shape[512];
-    strcpy(long_clip_shape, "circle(");
+    UI_STRCPY(long_clip_shape, 1024, "circle(");
     memset(long_clip_shape + 7, 'a', 300);
-    strcpy(long_clip_shape + 307, ")");
+    UI_STRCPY(long_clip_shape + 307, 1024 - 307, ")");
     rc = ui_css_parse_clip_path(long_clip_shape, &clip);
   }
 
   /* shape outside arguments long */
   {
     char long_shape[512];
-    strcpy(long_shape, "circle(");
+    UI_STRCPY(long_shape, 1024, "circle(");
     memset(long_shape + 7, 'a', 300);
-    strcpy(long_shape + 307, ")");
+    UI_STRCPY(long_shape + 307, 1024 - 307, ")");
     rc = ui_css_parse_shape_outside(long_shape, &shape);
   }
 
@@ -1136,9 +1137,9 @@ static void test_missing_branches(void) {
   /* ui_css_parse_image too long url */
   {
     char long_img[512];
-    strcpy(long_img, "url(");
+    UI_STRCPY(long_img, 1024, "url(");
     memset(long_img + 4, 'B', 300);
-    strcpy(long_img + 304, ")");
+    UI_STRCPY(long_img + 304, 1024 - 304, ")");
     rc = ui_css_parse_image(long_img, &img);
   }
 
@@ -1196,9 +1197,9 @@ static void test_missing_branches(void) {
 
   {
     char long_clip_path[512];
-    strcpy(long_clip_path, "url(");
+    UI_STRCPY(long_clip_path, 1024, "url(");
     memset(long_clip_path + 4, 'a', 300);
-    strcpy(long_clip_path + 304, ")");
+    UI_STRCPY(long_clip_path + 304, 1024 - 304, ")");
     rc = ui_css_parse_clip_path(long_clip_path, &clip);
   }
 

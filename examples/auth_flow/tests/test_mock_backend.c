@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "../mock_backend.h"
+#include "../../../src/ui_internal_mem.h"
 #include <stdio.h>
 #include <string.h>
 /* clang-format on */
@@ -74,8 +75,9 @@ static int test_mock_logout(void) {
 
   memset(&state, 0, sizeof(state));
   state.is_authenticated = 1;
-  strcpy(state.current_user, "test");
-  strcpy(state.auth_error_message, "some error");
+  UI_STRCPY(state.current_user, sizeof(state.current_user), "test");
+  UI_STRCPY(state.auth_error_message, sizeof(state.auth_error_message),
+            "some error");
 
   err = mock_logout(&state);
   fails |=

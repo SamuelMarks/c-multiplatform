@@ -79,7 +79,9 @@ ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director) {
     /* Unmounting automatically cleans up the wrapper_node and detaches from
      * root */
     unmount_rc = ui_overlay_director_unmount(director, current);
-    { (void)unmount_rc; }
+    {
+      (void)unmount_rc;
+    }
     current = next;
   }
 

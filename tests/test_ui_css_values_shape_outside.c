@@ -71,9 +71,9 @@ int test_css_values_shape_outside(void) {
     EXPECT_EQ(UI_CSS_BASIC_SHAPE_INSET, shape.shape.type);
 
     char long_shape[512];
-    strcpy(long_shape, "circle(");
+    UI_STRCPY(long_shape, 1024, "circle(");
     memset(long_shape + 7, '0', 256);
-    strcpy(long_shape + 263, ")");
+    UI_STRCPY(long_shape + 263, 1024 - 263, ")");
     rc = ui_css_parse_shape_outside(long_shape, &shape);
     EXPECT_EQ(UI_ERROR_NONE, rc);
     EXPECT_EQ(UI_CSS_BASIC_SHAPE_CIRCLE, shape.shape.type);
@@ -82,9 +82,9 @@ int test_css_values_shape_outside(void) {
     EXPECT_EQ(UI_ERROR_NONE, rc);
 
     char long_shape2[512];
-    strcpy(long_shape2, "circle(");
+    UI_STRCPY(long_shape2, 1024, "circle(");
     memset(long_shape2 + 7, '0', 256);
-    strcpy(long_shape2 + 263, ")");
+    UI_STRCPY(long_shape2 + 263, 1024 - 263, ")");
     rc = ui_css_parse_shape_outside(long_shape2, &shape);
     EXPECT_EQ(UI_ERROR_NONE, rc);
 
@@ -215,9 +215,9 @@ int test_css_values_shape_outside(void) {
     /* removed check */
 
     char filter_url[1024];
-    strcpy(filter_url, "url(");
+    UI_STRCPY(filter_url, 1024, "url(");
     memset(filter_url + 4, 'C', 600);
-    strcpy(filter_url + 604, ")");
+    UI_STRCPY(filter_url + 604, 1024 - 604, ")");
     if (filter) {
       ui_css_filter_destroy(filter);
       filter = NULL;

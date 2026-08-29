@@ -118,7 +118,7 @@ ui_error_t ui_tooltip_base_set_text(struct ui_tooltip_base *tooltip,
 #if defined(_MSC_VER)
     strcpy_s(tooltip->text, len + 1, text);
 #else
-    strcpy(tooltip->text, text);
+    UI_STRCPY(tooltip->text, sizeof(tooltip->text), text);
 #endif
   }
   return UI_ERROR_NONE;
@@ -333,7 +333,8 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
 #if defined(_MSC_VER)
         strcpy_s(text_node->text_content, len + 1, tooltip->text);
 #else
-        strcpy(text_node->text_content, tooltip->text);
+        UI_STRCPY(text_node->text_content, sizeof(text_node->text_content),
+                  tooltip->text);
 #endif
       }
     }

@@ -218,7 +218,9 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
               new_last = anon;
             }
           }
-          { (void)append_layout_child(anon, curr); }
+          {
+            (void)append_layout_child(anon, curr);
+          }
         } else {
           anon = NULL; /* Break the sequence of inlines */
           /* Append block child directly */

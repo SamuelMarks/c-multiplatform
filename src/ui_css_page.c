@@ -96,7 +96,7 @@ ui_error_t ui_css_page_parse(const struct ui_css_computed_style *style,
 #if defined(_MSC_VER)
       strcpy_s(out_props->page_name, len + 1, val);
 #else
-      strcpy(out_props->page_name, val);
+      UI_STRCPY(out_props->page_name, sizeof(out_props->page_name), val);
 #endif
     }
   }

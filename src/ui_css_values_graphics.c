@@ -18,7 +18,9 @@ ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image) {
   if (!str || !out_image)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   out_image->type = UI_CSS_IMAGE_NONE;
 
   if (strcmp(str, "none") == 0) {
@@ -144,7 +146,9 @@ ui_error_t ui_css_parse_clip_path(const char *str,
   if (!str || !out_clip_path)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   out_clip_path->geometry_box = UI_CSS_GEOMETRY_BOX_NONE;
   out_clip_path->shape.type = UI_CSS_BASIC_SHAPE_NONE;
   out_clip_path->shape.arguments[0] = '\0';
@@ -177,7 +181,9 @@ ui_error_t ui_css_parse_clip_path(const char *str,
     return UI_ERROR_PARSE_FAILED;
   }
 
-  { parse_geometry_box(str, &out_clip_path->geometry_box); }
+  {
+    parse_geometry_box(str, &out_clip_path->geometry_box);
+  }
 
   if (strstr(str, "inset(")) {
     out_clip_path->shape.type = UI_CSS_BASIC_SHAPE_INSET;
@@ -223,7 +229,9 @@ ui_error_t ui_css_parse_mask(const char *str,
   if (!str || !out_mask)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
 
   /* Initialize with defaults */
   out_mask->image.type = UI_CSS_IMAGE_NONE;
@@ -253,7 +261,9 @@ ui_error_t ui_css_parse_mask(const char *str,
   else
     out_mask->composite = UI_CSS_MASK_COMPOSITE_ADD;
 
-  { parse_geometry_box(str, &out_mask->clip); }
+  {
+    parse_geometry_box(str, &out_mask->clip);
+  }
   out_mask->origin = out_mask->clip; /* In real parsing they are separate */
 
   /* Try parsing an image */

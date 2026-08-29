@@ -15,10 +15,12 @@
 #if defined(_MSC_VER)
 /** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_s((str), (delim), (ctx))
+#define UI_SSCANF sscanf_s
 /** @endcond */
 #else
 /** @cond */
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
+#define UI_SSCANF sscanf
 /** @endcond */
 #endif
 
@@ -299,8 +301,8 @@ ui_error_t ui_css_parse_cursor(const char *str,
             while (isspace((unsigned char)*coords))
               coords++;
             if (*coords) {
-              if (sscanf(coords, "%f %f", &img->hotspot_x, &img->hotspot_y) ==
-                  2) {
+              if (UI_SSCANF(coords, "%f %f", &img->hotspot_x,
+                            &img->hotspot_y) == 2) {
                 img->has_hotspot = 1;
               }
             }

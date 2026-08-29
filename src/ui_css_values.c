@@ -10,10 +10,12 @@
 #if defined(_MSC_VER)
 /** @cond */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy_s((dest), (destsz), (src), (count))
+#define UI_SSCANF sscanf_s
 /** @endcond */
 #else
 /** @cond */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
+#define UI_SSCANF sscanf
 /** @endcond */
 #endif
 
@@ -314,14 +316,22 @@ static void destroy_math_node(struct ui_css_math_expr *math) {
   if (!math)
     return;
 
-  { ui_css_value_ext_destroy(math->left); }
-  { ui_css_value_ext_destroy(math->right); }
-  { ui_css_value_ext_destroy(math->ext); }
+  {
+    ui_css_value_ext_destroy(math->left);
+  }
+  {
+    ui_css_value_ext_destroy(math->right);
+  }
+  {
+    ui_css_value_ext_destroy(math->ext);
+  }
 
   while (math->next) {
     struct ui_css_math_expr *next = math->next;
     math->next = next->next;
-    { ui_css_value_ext_destroy(next->left); }
+    {
+      ui_css_value_ext_destroy(next->left);
+    }
     C_MULTIPLATFORM_FREE(next);
   }
   C_MULTIPLATFORM_FREE(math);
@@ -367,7 +377,9 @@ static ui_error_t parse_function(const char **p_str,
     if (rc != UI_ERROR_NONE)
       return rc;
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str != ')') {
       {
         ui_css_value_ext_destroy(*out_expr);
@@ -385,7 +397,9 @@ static ui_error_t parse_function(const char **p_str,
     if (rc != UI_ERROR_NONE)
       return rc;
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str != ')') {
       {
         ui_css_value_ext_destroy(*out_expr);
@@ -412,7 +426,9 @@ static ui_error_t parse_function(const char **p_str,
       return rc;
     }
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     while (**p_str == ',') {
       struct ui_css_math_expr *next_arg = NULL;
       (*p_str)++;
@@ -429,7 +445,9 @@ static ui_error_t parse_function(const char **p_str,
 
       tail->next = next_arg;
       tail = next_arg;
-      { skip_whitespace(p_str); }
+      {
+        skip_whitespace(p_str);
+      }
     }
 
     if (**p_str != ')') {
@@ -444,7 +462,9 @@ static ui_error_t parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_min: {
-    { destroy_math_node(node); }
+    {
+      destroy_math_node(node);
+    }
     return rc;
   }
   }
@@ -464,7 +484,9 @@ static ui_error_t parse_function(const char **p_str,
       return rc;
     }
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     while (**p_str == ',') {
       struct ui_css_math_expr *next_arg = NULL;
       (*p_str)++;
@@ -481,7 +503,9 @@ static ui_error_t parse_function(const char **p_str,
 
       tail->next = next_arg;
       tail = next_arg;
-      { skip_whitespace(p_str); }
+      {
+        skip_whitespace(p_str);
+      }
     }
 
     if (**p_str != ')') {
@@ -496,7 +520,9 @@ static ui_error_t parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_max: {
-    { destroy_math_node(node); }
+    {
+      destroy_math_node(node);
+    }
     return rc;
   }
   }
@@ -514,7 +540,9 @@ static ui_error_t parse_function(const char **p_str,
       return rc;
     }
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -526,7 +554,9 @@ static ui_error_t parse_function(const char **p_str,
       goto cleanup_clamp;
     }
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -538,7 +568,9 @@ static ui_error_t parse_function(const char **p_str,
       goto cleanup_clamp;
     }
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str != ')') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -551,7 +583,9 @@ static ui_error_t parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_clamp: {
-    { destroy_math_node(node); }
+    {
+      destroy_math_node(node);
+    }
     return rc;
   }
   }
@@ -569,7 +603,9 @@ static ui_error_t parse_function(const char **p_str,
       return rc;
     }
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_atan2;
@@ -581,7 +617,9 @@ static ui_error_t parse_function(const char **p_str,
       goto cleanup_atan2;
     }
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str != ')') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_atan2;
@@ -594,7 +632,9 @@ static ui_error_t parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_atan2: {
-    { destroy_math_node(node); }
+    {
+      destroy_math_node(node);
+    }
     return rc;
   }
   }
@@ -604,7 +644,9 @@ static ui_error_t parse_function(const char **p_str,
     char name[64];
     struct ui_css_value_ext *fallback = NULL;
     size_t n = 0;
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
 
     while (**p_str && **p_str != ',' && **p_str != ')' &&
            !isspace((unsigned char)**p_str)) {
@@ -615,17 +657,23 @@ static ui_error_t parse_function(const char **p_str,
     }
     name[n] = '\0';
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str == ',') {
       (*p_str)++;
-      { skip_whitespace(p_str); }
+      {
+        skip_whitespace(p_str);
+      }
       rc = parse_expression(p_str, &fallback);
       if (rc != UI_ERROR_NONE) {
         return rc;
       }
     }
 
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str != ')') {
       {
         ui_css_value_ext_destroy(fallback);
@@ -670,7 +718,9 @@ static ui_error_t parse_function(const char **p_str,
         return rc;
       }
 
-      { skip_whitespace(p_str); }
+      {
+        skip_whitespace(p_str);
+      }
       if (**p_str != ')') {
         {
           destroy_math_node(node);
@@ -721,7 +771,9 @@ static ui_error_t parse_term(const char **p_str,
 
   for (;;) {
     const char *saved = *p_str;
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
     if (**p_str == '*' || **p_str == '/') {
       char op_char = **p_str;
       struct ui_css_value_ext *right = NULL;
@@ -779,7 +831,9 @@ static ui_error_t parse_expression(const char **p_str,
   for (;;) {
     const char *saved = *p_str;
     int has_leading_space = isspace((unsigned char)**p_str);
-    { skip_whitespace(p_str); }
+    {
+      skip_whitespace(p_str);
+    }
 
     if (**p_str == '+' || **p_str == '-') {
       char op_char = **p_str;
@@ -855,7 +909,9 @@ ui_error_t ui_css_parse_value_ext(const char *str,
     return rc;
   }
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
   if (*str != '\0') {
     {
       ui_css_value_ext_destroy(*out_value);
@@ -881,14 +937,14 @@ static ui_error_t parse_hex_color(const char *str,
 
   if (len == 4) { /* #RGB */
     unsigned int r, g, b;
-    if (sscanf(str, "#%1x%1x%1x", &r, &g, &b) == 3) {
+    if (UI_SSCANF(str, "#%1x%1x%1x", &r, &g, &b) == 3) {
       out_color->components[0] = (float)((r << 4) | r) / 255.0f;
       out_color->components[1] = (float)((g << 4) | g) / 255.0f;
       out_color->components[2] = (float)((b << 4) | b) / 255.0f;
     }
   } else if (len == 5) { /* #RGBA */
     unsigned int r, g, b, a;
-    if (sscanf(str, "#%1x%1x%1x%1x", &r, &g, &b, &a) == 4) {
+    if (UI_SSCANF(str, "#%1x%1x%1x%1x", &r, &g, &b, &a) == 4) {
       out_color->components[0] = (float)((r << 4) | r) / 255.0f;
       out_color->components[1] = (float)((g << 4) | g) / 255.0f;
       out_color->components[2] = (float)((b << 4) | b) / 255.0f;
@@ -896,14 +952,14 @@ static ui_error_t parse_hex_color(const char *str,
     }
   } else if (len == 7) { /* #RRGGBB */
     unsigned int r, g, b;
-    if (sscanf(str, "#%2x%2x%2x", &r, &g, &b) == 3) {
+    if (UI_SSCANF(str, "#%2x%2x%2x", &r, &g, &b) == 3) {
       out_color->components[0] = (float)r / 255.0f;
       out_color->components[1] = (float)g / 255.0f;
       out_color->components[2] = (float)b / 255.0f;
     }
   } else if (len == 9) { /* #RRGGBBAA */
     unsigned int r, g, b, a;
-    if (sscanf(str, "#%2x%2x%2x%2x", &r, &g, &b, &a) == 4) {
+    if (UI_SSCANF(str, "#%2x%2x%2x%2x", &r, &g, &b, &a) == 4) {
       out_color->components[0] = (float)r / 255.0f;
       out_color->components[1] = (float)g / 255.0f;
       out_color->components[2] = (float)b / 255.0f;
@@ -930,7 +986,9 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   out_color->components[2] = 0.0f;
   out_color->components[3] = 1.0f;
 
-  { skip_whitespace(&str); }
+  {
+    skip_whitespace(&str);
+  }
 
   if (str[0] == '#') {
     return parse_hex_color(str, out_color);
@@ -939,14 +997,14 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   if (strncmp(str, "rgb(", 4) == 0 || strncmp(str, "rgba(", 5) == 0) {
     float r, g, b, a = 1.0f;
     const char *p = str + (str[3] == 'a' ? 5 : 4);
-    if (sscanf(p, "%f, %f, %f, %f", &r, &g, &b, &a) >= 3) {
+    if (UI_SSCANF(p, "%f, %f, %f, %f", &r, &g, &b, &a) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_SRGB;
       out_color->components[0] = r > 1.0f ? r / 255.0f : r;
       out_color->components[1] = g > 1.0f ? g / 255.0f : g;
       out_color->components[2] = b > 1.0f ? b / 255.0f : b;
       out_color->components[3] = a;
       return UI_ERROR_NONE;
-    } else if (sscanf(p, "%f %f %f / %f", &r, &g, &b, &a) >= 3) {
+    } else if (UI_SSCANF(p, "%f %f %f / %f", &r, &g, &b, &a) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_SRGB;
       out_color->components[0] = r > 1.0f ? r / 255.0f : r;
       out_color->components[1] = g > 1.0f ? g / 255.0f : g;
@@ -957,14 +1015,14 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   } else if (strncmp(str, "hsl(", 4) == 0 || strncmp(str, "hsla(", 5) == 0) {
     float h, s, l, a = 1.0f;
     const char *p = str + (str[3] == 'a' ? 5 : 4);
-    if (sscanf(p, "%f, %f%%, %f%%, %f", &h, &s, &l, &a) >= 3) {
+    if (UI_SSCANF(p, "%f, %f%%, %f%%, %f", &h, &s, &l, &a) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_HSL;
       out_color->components[0] = h;
       out_color->components[1] = s / 100.0f;
       out_color->components[2] = l / 100.0f;
       out_color->components[3] = a;
       return UI_ERROR_NONE;
-    } else if (sscanf(p, "%f %f%% %f%% / %f", &h, &s, &l, &a) >= 3) {
+    } else if (UI_SSCANF(p, "%f %f%% %f%% / %f", &h, &s, &l, &a) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_HSL;
       out_color->components[0] = h;
       out_color->components[1] = s / 100.0f;
@@ -975,7 +1033,7 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   } else if (strncmp(str, "lab(", 4) == 0) {
     float l, a_comp, b_comp, alpha = 1.0f;
     const char *p = str + 4;
-    if (sscanf(p, "%f %f %f / %f", &l, &a_comp, &b_comp, &alpha) >= 3) {
+    if (UI_SSCANF(p, "%f %f %f / %f", &l, &a_comp, &b_comp, &alpha) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_LAB;
       out_color->components[0] = l;
       out_color->components[1] = a_comp;
@@ -986,7 +1044,7 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   } else if (strncmp(str, "lch(", 4) == 0) {
     float l, c, h, alpha = 1.0f;
     const char *p = str + 4;
-    if (sscanf(p, "%f %f %f / %f", &l, &c, &h, &alpha) >= 3) {
+    if (UI_SSCANF(p, "%f %f %f / %f", &l, &c, &h, &alpha) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_LCH;
       out_color->components[0] = l;
       out_color->components[1] = c;
@@ -997,7 +1055,7 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   } else if (strncmp(str, "oklab(", 6) == 0) {
     float l, a_comp, b_comp, alpha = 1.0f;
     const char *p = str + 6;
-    if (sscanf(p, "%f %f %f / %f", &l, &a_comp, &b_comp, &alpha) >= 3) {
+    if (UI_SSCANF(p, "%f %f %f / %f", &l, &a_comp, &b_comp, &alpha) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_OKLAB;
       out_color->components[0] = l;
       out_color->components[1] = a_comp;
@@ -1008,7 +1066,7 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   } else if (strncmp(str, "oklch(", 6) == 0) {
     float l, c, h, alpha = 1.0f;
     const char *p = str + 6;
-    if (sscanf(p, "%f %f %f / %f", &l, &c, &h, &alpha) >= 3) {
+    if (UI_SSCANF(p, "%f %f %f / %f", &l, &c, &h, &alpha) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_OKLCH;
       out_color->components[0] = l;
       out_color->components[1] = c;
@@ -1019,7 +1077,7 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   } else if (strncmp(str, "hwb(", 4) == 0) {
     float h, w, b, alpha = 1.0f;
     const char *p = str + 4;
-    if (sscanf(p, "%f %f%% %f%% / %f", &h, &w, &b, &alpha) >= 3) {
+    if (UI_SSCANF(p, "%f %f%% %f%% / %f", &h, &w, &b, &alpha) >= 3) {
       out_color->space = UI_CSS_COLOR_SPACE_HWB;
       out_color->components[0] = h;
       out_color->components[1] = w / 100.0f;
@@ -1031,8 +1089,15 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
     float c1, c2, c3, alpha = 1.0f;
     char space_name[32];
     const char *p = str + 6;
-    int num_parsed =
-        sscanf(p, "%31s %f %f %f / %f", space_name, &c1, &c2, &c3, &alpha);
+    int num_parsed;
+#if defined(_MSC_VER)
+    num_parsed =
+        sscanf_s(p, "%31s %f %f %f / %f", space_name,
+                 (unsigned int)sizeof(space_name), &c1, &c2, &c3, &alpha);
+#else
+    num_parsed =
+        UI_SSCANF(p, "%31s %f %f %f / %f", space_name, &c1, &c2, &c3, &alpha);
+#endif
     if (num_parsed >= 4) {
       if (num_parsed == 4) {
         alpha = 1.0f;

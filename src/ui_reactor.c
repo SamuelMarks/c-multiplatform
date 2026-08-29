@@ -302,7 +302,7 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
 
   {
     int is_swapped = 0;
-    while (1) {
+    for (;;) {
       (void)ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
 #ifdef UI_TEST_MOCK_ALLOC
       {
@@ -603,7 +603,7 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
   {
     struct ui_reactor_task *tasks_to_run = NULL;
     int is_swapped = 0;
-    while (1) {
+    for (;;) {
       (void)ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
 #ifdef UI_TEST_MOCK_ALLOC
       {

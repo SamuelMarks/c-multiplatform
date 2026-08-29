@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_css_ui.h"
+#include "../src/ui_internal_mem.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -158,7 +159,7 @@ static ui_error_t test_parse_cursor(void) {
   {
     char long_url[1024] = "url(";
     memset(long_url + 4, 'A', 600);
-    strcpy(long_url + 604, "), auto");
+    UI_STRCPY(long_url + 604, 1024 - 604, "), auto");
     err = ui_css_parse_cursor(long_url, &cursor);
     EXPECT_EQ(UI_ERROR_NONE, err);
     ui_css_cursor_destroy(&cursor);

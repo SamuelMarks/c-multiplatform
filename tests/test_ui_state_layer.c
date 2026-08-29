@@ -57,6 +57,7 @@ static ui_error_t test_state_layer(void) {
     fprintf(stderr, "Invalid state did not fail\n");
     exit(1);
   }
+  return UI_ERROR_NONE;
 }
 
 int main(void) {

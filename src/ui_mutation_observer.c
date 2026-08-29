@@ -203,7 +203,9 @@ static ui_error_t dispatch_record(struct ui_mutation_observer *observer,
                                   struct ui_mutation_record *record) {
   ui_error_t cb_rc =
       observer->callback(observer, record, 1, observer->user_data);
-  { (void)cb_rc; }
+  {
+    (void)cb_rc;
+  }
   return cb_rc;
 }
 
@@ -332,7 +334,8 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
           size_t name_len = strlen(name);
           record.attribute_name = (char *)C_MULTIPLATFORM_MALLOC(name_len + 1);
           if (record.attribute_name != NULL) {
-            strcpy(record.attribute_name, name);
+            UI_STRCPY(record.attribute_name, sizeof(record.attribute_name),
+                      name);
           }
         }
 #endif
@@ -344,7 +347,7 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
 #if defined(_MSC_VER)
             strcpy_s(old_val_copy, old_val_len + 1, old_value);
 #else
-            strcpy(old_val_copy, old_value);
+            UI_STRCPY(old_val_copy, 256, old_value);
 #endif
             record.old_value = old_val_copy;
           }
@@ -422,7 +425,7 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
 #if defined(_MSC_VER)
             strcpy_s(old_val_copy, old_val_len + 1, old_value);
 #else
-            strcpy(old_val_copy, old_value);
+            UI_STRCPY(old_val_copy, 256, old_value);
 #endif
             record.old_value = old_val_copy;
           }

@@ -545,7 +545,7 @@ static int test_tree_navigation(void) {
 #endif
 
   /* Trigger line 167: search for non-existent node */
-  ui_tree_base_set_active_node(tree, (void *)0xdeadbeef);
+  ui_tree_base_set_active_node(tree, (void *)(size_t)0xdeadbeef);
 
   /* Null checks */
   EXPECT_EQ(ui_tree_base_set_active_node(NULL, &child1_2),

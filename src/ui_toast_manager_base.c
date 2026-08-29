@@ -175,7 +175,7 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
 #if defined(_MSC_VER)
     strcpy_s(entry->message, len + 1, config->message);
 #else
-    strcpy(entry->message, config->message);
+    UI_STRCPY(entry->message, sizeof(entry->message), config->message);
 #endif
   }
 
@@ -470,7 +470,8 @@ ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
 #if defined(_MSC_VER)
         (void)strcpy_s(text_node->text_content, len + 1, entry->message);
 #else
-        strcpy(text_node->text_content, entry->message);
+        UI_STRCPY(text_node->text_content, sizeof(text_node->text_content),
+                  entry->message);
 #endif
         {
           ui_error_t _ign_rc = ui_dom_node_append_child(root_node, text_node);

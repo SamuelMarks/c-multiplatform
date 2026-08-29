@@ -67,7 +67,7 @@ ui_error_t ui_css_highlight_create(enum ui_css_highlight_type type,
 #if defined(_MSC_VER)
     strcpy_s(hl->custom_name, len + 1, custom_name);
 #else
-    strcpy(hl->custom_name, custom_name);
+    UI_STRCPY(hl->custom_name, sizeof(hl->custom_name), custom_name);
 #endif
   }
 

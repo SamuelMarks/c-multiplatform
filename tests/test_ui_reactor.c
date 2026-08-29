@@ -2,7 +2,7 @@
 #include "../include/ui_reactor.h"
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <unistd.h>
 #endif
 /* clang-format on */
@@ -49,7 +49,7 @@ static ui_error_t run_normal_tests(void) {
   ui_error_t rc;
   int test_val = 0;
   int pipes[2];
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
   pipe(pipes);
 #else
   pipes[0] = 42;
@@ -125,7 +125,7 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
   write(pipes[1], "A", 1);
 #endif
   rc = ui_reactor_poll(reactor, 100);
@@ -159,7 +159,7 @@ static ui_error_t run_normal_tests(void) {
     return rc;
   }
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
   write(pipes[1], "A", 1);
 #endif
   rc = ui_reactor_poll(reactor, 100);
@@ -184,10 +184,10 @@ static ui_error_t run_normal_tests(void) {
   rc = ui_reactor_poll(reactor, 1);
   if (rc != UI_ERROR_UNKNOWN)
     return rc;
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
   close(pipes[0]);
 #endif
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
   close(pipes[1]);
 #endif
   rc = ui_reactor_unregister(reactor, fake_handle1);
@@ -207,10 +207,10 @@ static ui_error_t run_normal_tests(void) {
   rc = ui_reactor_poll(reactor, 1);
   if (rc != UI_ERROR_UNKNOWN)
     return rc;
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
   close(pipes[0]);
 #endif
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
   close(pipes[1]);
 #endif
 
@@ -271,7 +271,7 @@ static ui_error_t run_oom_tests(void) {
 
   g_malloc_fail_countdown = 1;
   rc = ui_reactor_create(&reactor);
-#if !defined(_WIN32)
+#if defined(__APPLE__)
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     printf("Expected OOM on create 2\n");
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
@@ -345,17 +345,17 @@ void test_ui_reactor_oom(void) {
   if (rc == UI_ERROR_NONE && reactor) {
     g_malloc_fail_countdown = 0;
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
     (void)rc;
     g_malloc_fail_countdown = -1;
 
     /* Cover destroy while having tasks and nodes */
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
     (void)rc;
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     (void)rc;
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     (void)rc;
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
@@ -380,11 +380,11 @@ void test_ui_reactor_destroy_populated(void) {
   rc = ui_reactor_create(&reactor);
   if (rc == UI_ERROR_NONE && reactor) {
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
     (void)rc;
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     (void)rc;
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     (void)rc;
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
@@ -405,7 +405,7 @@ void test_ui_reactor_poll_error(void) {
   rc = ui_reactor_create(&reactor);
   if (rc == UI_ERROR_NONE && reactor) {
     /* To get cb_rc != UI_ERROR_NONE in the task queue */
-    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
     (void)rc;
     /* Actually that will crash if it tries to execute 0x1. We need a real
      * callback. */

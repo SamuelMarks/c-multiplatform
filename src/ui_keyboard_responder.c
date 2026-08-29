@@ -128,7 +128,7 @@ ui_error_t ui_keyboard_responder_bind_key(
 #if defined(_MSC_VER)
       strcpy_s(role_copy, len + 1, role_or_tag);
 #else
-      strcpy(role_copy, role_or_tag);
+      UI_STRCPY(role_copy, sizeof(role_copy), role_or_tag);
 #endif
     }
   }

@@ -7,7 +7,6 @@
  * @brief Implementation of Internationalization (i18n) routines.
  */
 #ifdef _MSC_VER
-#pragma warning(disable : 4702)
 #endif
 
 /* clang-format off */
@@ -171,27 +170,16 @@ ui_error_t ui_i18n_bind_locale_signal(struct ui_i18n *i18n,
  */
 ui_error_t ui_i18n_format_number(struct ui_i18n *i18n, double value,
                                  int decimals, char *out_str, size_t out_len) {
-  char format_str[16];
   if (!i18n || !out_str || out_len == 0) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
 #if defined(_MSC_VER)
-  sprintf_s(format_str, sizeof(format_str), "%%.%df", decimals);
-  sprintf_s(out_str, out_len, format_str, value);
-  return UI_ERROR_NONE;
+  sprintf_s(out_str, out_len, "%.*f", decimals, value);
 #else
-  sprintf(format_str, "%%.%df", decimals);
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-#endif
-  sprintf(out_str, format_str, value);
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
+  sprintf(out_str, "%.*f", decimals, value);
 #endif
   return UI_ERROR_NONE;
-#endif
 }
 
 /**

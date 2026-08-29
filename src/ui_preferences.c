@@ -69,9 +69,8 @@ ui_error_t ui_preferences_destroy(struct ui_preferences *prefs) {
 EM_JS(void, set_local_storage_js, (const char *key, const char *value), {
   try {
     localStorage.setItem(UTF8ToString(key), UTF8ToString(value));
-  } catch (e) {
-    console.error("localStorage setItem failed", e);
-  }
+}
+catch(e) { console.error("localStorage setItem failed", e); }
 })
 
 EM_JS(char *, get_local_storage_js, (const char *key), {
@@ -82,13 +81,14 @@ EM_JS(char *, get_local_storage_js, (const char *key), {
     const lengthBytes = lengthBytesUTF8(val) + 1;
     const stringOnWasmHeap = _malloc(lengthBytes);
     if (stringOnWasmHeap) {
-      stringToUTF8(val, stringOnWasmHeap, lengthBytes);
+  stringToUTF8(val, stringOnWasmHeap, lengthBytes);
     }
     return stringOnWasmHeap;
-  } catch (e) {
-    console.error("localStorage getItem failed", e);
-    return 0;
-  }
+}
+catch(e) {
+  console.error("localStorage getItem failed", e);
+  return 0;
+}
 })
 #endif
 
@@ -154,17 +154,17 @@ EM_JS(int, idb_save_js,
                        .slice(); /* copy to avoid heap mutation issues */
         if (!window._ui_idb) {
           const req = indexedDB.open("UIFrameworkDB", 1);
-          req.onupgradeneeded = (e) = > {
+          req.onupgradeneeded = (e) => {
             const db = e.target.result;
             if (!db.objectStoreNames.contains("assets")) {
               db.createObjectStore("assets");
             }
           };
-          req.onsuccess = (e) = > {
+          req.onsuccess = (e) => {
             window._ui_idb = e.target.result;
             _do_save();
           };
-          req.onerror = (e) = > {
+          req.onerror = (e) => {
             console.error("IDB Open Failed", e);
             _ui_web_bridge_promise_reject_js(promise_id, 2); /* io error */
           };
@@ -176,10 +176,10 @@ EM_JS(int, idb_save_js,
           const tx = window._ui_idb.transaction("assets", "readwrite");
           const store = tx.objectStore("assets");
           const req = store.put(u8, key);
-          req.onsuccess = () = > {
+          req.onsuccess = () => {
             _ui_web_bridge_promise_resolve_js(promise_id, 0);
           };
-          req.onerror = (e) = > {
+          req.onerror = (e) => {
             console.error("IDB Put Failed", e);
             _ui_web_bridge_promise_reject_js(promise_id, 2);
           };

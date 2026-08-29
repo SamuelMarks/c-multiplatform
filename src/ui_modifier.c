@@ -133,7 +133,7 @@ static ui_error_t str_dup(const char *src, char **out_dest) {
 #if defined(_MSC_VER)
   strcpy_s(dest, len + 1, src);
 #else
-  strcpy(dest, src);
+  UI_STRCPY(dest, 256, src);
 #endif
 
   *out_dest = dest;

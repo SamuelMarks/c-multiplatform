@@ -33,7 +33,9 @@ extern long UI_WINAPI _InterlockedExchange(long volatile *, long);
 
 #pragma intrinsic(_InterlockedExchangeAdd)
 #pragma intrinsic(_InterlockedCompareExchange)
+#if _MSC_VER >= 1600 || defined(_WIN64)
 #pragma intrinsic(_InterlockedCompareExchangePointer)
+#endif
 #pragma intrinsic(_InterlockedExchange)
 
 ui_error_t ui_atomic_add(ui_atomic_t *target, long value, long *out_old_value) {
@@ -58,10 +60,18 @@ ui_error_t ui_atomic_ptr_cas(void *volatile *target, void *expected,
                              void *new_value, int *out_swapped) {
   if (!target || !out_swapped)
     return UI_ERROR_INVALID_ARGUMENT;
+#if defined(_WIN64)
   *out_swapped = _InterlockedCompareExchangePointer(target, new_value,
                                                     expected) == expected
                      ? 1
                      : 0;
+#else
+  *out_swapped =
+      _InterlockedCompareExchange((long volatile *)target, (long)new_value,
+                                  (long)expected) == (long)expected
+          ? 1
+          : 0;
+#endif
   return UI_ERROR_NONE;
 }
 

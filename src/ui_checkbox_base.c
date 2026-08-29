@@ -3,7 +3,6 @@
  * @brief Implementation of ui_checkbox_base.c.
  */
 #ifdef _MSC_VER
-#pragma warning(disable : 4716)
 #endif
 
 /* clang-format off */

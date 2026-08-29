@@ -15,7 +15,7 @@ static struct ui_component *mock_screen = NULL;
 static ui_error_t mock_factory(const struct ui_route_request *req,
                                void *user_data,
                                struct ui_component **out_screen) {
-  ui_error_t rc;
+  ui_error_t rc = UI_ERROR_NONE;
   (void)req;
   (void)user_data;
   rc = ui_component_create(&mock_screen);
@@ -32,7 +32,7 @@ static ui_error_t mock_factory(const struct ui_route_request *req,
 static ui_error_t run_normal_tests(void) {
   struct ui_breadcrumbs_base *bc = NULL;
   struct ui_router *router = NULL;
-  ui_error_t rc;
+  ui_error_t rc = UI_ERROR_NONE;
 
   printf("Testing invalid arguments...\n");
   rc = ui_breadcrumbs_base_create(NULL, NULL);
@@ -230,7 +230,7 @@ static ui_error_t run_oom_tests(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   struct ui_breadcrumbs_base *bc = NULL;
   struct ui_router *router = NULL;
-  ui_error_t rc;
+  ui_error_t rc = UI_ERROR_NONE;
   int i;
 
   rc = ui_router_create(&router);
@@ -388,7 +388,7 @@ static ui_error_t run_oom_tests(void) {
 }
 
 int main(void) {
-  ui_error_t rc;
+  ui_error_t rc = UI_ERROR_NONE;
   if (run_normal_tests() != UI_ERROR_NONE) {
     printf("Normal tests failed.\n");
     return 1;
@@ -403,10 +403,14 @@ int main(void) {
 #endif
 
   /* Targeted test for breadcrumbs null bind */
-  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
+  {
+    ui_breadcrumbs_base_bind_active_index(NULL, NULL);
+  }
 
   /* Targeted test for breadcrumbs null bind */
-  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
+  {
+    ui_breadcrumbs_base_bind_active_index(NULL, NULL);
+  }
 
   printf("All ui_breadcrumbs_base tests passed.\n");
   return 0;

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include <stdio.h>
+#include "../src/ui_internal_mem.h"
 #include <string.h>
 #include "ui_css_gcpm.h"
 #include "ui_test_mock_mem.h"
@@ -16,9 +17,9 @@ static void add_prop(struct ui_css_computed_style *style, const char *name,
       (struct ui_css_computed_property *)C_MULTIPLATFORM_MALLOC(sizeof(*p));
   memset(p, 0, sizeof(*p));
   p->property_name = (char *)C_MULTIPLATFORM_MALLOC(strlen(name) + 1);
-  strcpy(p->property_name, name);
+  UI_STRCPY(p->property_name, sizeof(p->property_name), name);
   p->property_value = (char *)C_MULTIPLATFORM_MALLOC(strlen(val) + 1);
-  strcpy(p->property_value, val);
+  UI_STRCPY(p->property_value, sizeof(p->property_value), val);
   p->next = style->properties;
   style->properties = p;
 }

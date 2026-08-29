@@ -552,7 +552,7 @@ ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
 #if defined(_MSC_VER)
   strcpy_s(p, len + 1, pattern);
 #else
-  strcpy(p, pattern);
+  UI_STRCPY(p, 256, pattern);
 #endif
 
   router->routes[router->routes_size].pattern = p;

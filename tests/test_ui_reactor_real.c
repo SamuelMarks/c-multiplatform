@@ -2,8 +2,11 @@
 #include "../include/ui_reactor.h"
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef _MSC_VER
+#ifndef _WIN32
 #include <unistd.h>
+#else
+#include <io.h>
+#include <fcntl.h>
 #endif
 /* clang-format on */
 
@@ -71,14 +74,14 @@ int main(void) {
 
   printf("Running real reactor tests...\n");
 
-#ifndef _MSC_VER
+#ifndef _WIN32
   if (pipe(pipes) != 0) {
     return 1;
   }
 #else
-  /* TODO: use _pipe on windows */
-  pipes[0] = 0;
-  pipes[1] = 0;
+  if (_pipe(pipes, 256, 0) != 0) {
+    return 1;
+  }
 #endif
 
   rc = ui_reactor_create(&reactor);
@@ -91,7 +94,7 @@ int main(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-#ifndef _MSC_VER
+#if !defined(_WIN32) && !defined(__CYGWIN__)
   write(pipes[1], "A", 1);
 #endif
 
@@ -128,7 +131,7 @@ int main(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-#ifndef _MSC_VER
+#if !defined(_WIN32) && !defined(__CYGWIN__)
   if ((test_val & UI_REACTOR_EVENT_READ) == 0) {
     printf("Read event not triggered!\n");
     return 1;
@@ -211,7 +214,7 @@ int main(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-#ifndef _MSC_VER
+#if !defined(_WIN32) && !defined(__CYGWIN__)
   close(pipes[0]);
   close(pipes[1]);
 #endif

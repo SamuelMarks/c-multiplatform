@@ -115,7 +115,9 @@ ui_error_t ui_compositor_material_base_set_type(
   material->type = type;
   payload.int_val = (ui_int32)type;
 
-  { (void)ui_signal_set(material->type_signal, payload); }
+  {
+    (void)ui_signal_set(material->type_signal, payload);
+  }
 
   return UI_ERROR_NONE;
 }

@@ -87,8 +87,8 @@ __attribute__((format(printf, 3, 4)))
  * @param ... Variadic arguments for the format string.
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if truncated.
  */
-ui_error_t
-ui_safe_string_format(char *dest, size_t dest_size, const char *format, ...);
+ui_error_t ui_safe_string_format(char *dest, size_t dest_size,
+                                 const char *format, ...);
 
 #ifdef __cplusplus
 }

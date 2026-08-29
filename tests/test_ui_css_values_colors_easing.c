@@ -74,9 +74,9 @@ int test_css_values_colors_easing(void) {
 
   /* Test env() parsing failures and truncation */
   char long_env[128];
-  strcpy(long_env, "env(");
+  UI_STRCPY(long_env, 1024, "env(");
   memset(long_env + 4, 'B', 100);
-  strcpy(long_env + 104, ")");
+  UI_STRCPY(long_env + 104, 1024 - 104, ")");
   if (ext_val) {
     ui_css_value_ext_destroy(ext_val);
     ext_val = NULL;
@@ -523,9 +523,9 @@ int test_css_values_colors_easing(void) {
     /* removed check */
 
     char long_url[1024];
-    strcpy(long_url, "url(");
+    UI_STRCPY(long_url, 1024, "url(");
     memset(long_url + 4, 'A', 600);
-    strcpy(long_url + 604, ")");
+    UI_STRCPY(long_url + 604, 1024 - 604, ")");
     rc = ui_css_parse_image(long_url, &img);
     /* removed check */
   }

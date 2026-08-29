@@ -148,7 +148,9 @@ static ui_error_t layout_block(struct ui_layout_node *node,
       child->x = current_x + child->margin[3];
       child->y = current_y + child->margin[0];
 
-      { (void)ui_layout_compute(child, child_available_width, 0.0f); }
+      {
+        (void)ui_layout_compute(child, child_available_width, 0.0f);
+      }
 
       current_y = child->y + child->height + child->margin[2];
     } else if (child->display_outside == UI_LAYOUT_DISPLAY_OUTSIDE_INLINE) {
@@ -156,7 +158,9 @@ static ui_error_t layout_block(struct ui_layout_node *node,
       child->x = current_x + child->margin[3];
       child->y = current_y + child->margin[0];
 
-      { (void)ui_layout_compute(child, child_available_width, 0.0f); }
+      {
+        (void)ui_layout_compute(child, child_available_width, 0.0f);
+      }
 
       current_x = child->x + child->width + child->margin[1];
       /* If child exceeds width, should wrap, but simplistic for now */
@@ -361,7 +365,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
 
     if (free_space > 0.0f && line->total_flex_grow > 0.0f) {
       child = line->first_child;
-      while (1) {
+      for (;;) {
         float extra = (child->flex_grow / line->total_flex_grow) * free_space;
         if (is_row) {
           child->width += extra;
@@ -380,7 +384,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
                !is_wrap) {
       /* Only shrink if not wrapping (or if single line forced) */
       child = line->first_child;
-      while (1) {
+      for (;;) {
         float shrink =
             (child->flex_shrink / line->total_flex_shrink) * (-free_space);
         if (is_row) {
@@ -453,7 +457,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
     }
 
     child = line->first_child;
-    while (1) {
+    for (;;) {
       enum ui_layout_alignment align = child->align_self;
       if (align == UI_LAYOUT_ALIGN_AUTO)
         align = node->align_items;

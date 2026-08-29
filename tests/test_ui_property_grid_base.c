@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_property_grid_base.h"
+#include "../src/ui_internal_mem.h"
 #include "ui_arena.h"
 #include "ui_error.h"
 #include <stdio.h>
@@ -98,7 +99,7 @@ int main(void) {
             UI_ERROR_INVALID_ARGUMENT);
 
   char dynamic_group_id[32];
-  strcpy(dynamic_group_id, "Appearance");
+  UI_STRCPY(dynamic_group_id, sizeof(dynamic_group_id), "Appearance");
   ASSERT_SUCCESS(ui_property_grid_base_set_group_collapsed(
       grid, dynamic_group_id, UI_TRUE));
 

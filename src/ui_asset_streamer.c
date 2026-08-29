@@ -278,7 +278,7 @@ static ui_error_t asset_task_execute(void *user_data) {
 #if defined(_MSC_VER)
     strcpy_s(task->asset->url, url_len + 1, task->url);
 #else
-    strcpy(task->asset->url, task->url);
+    UI_STRCPY(task->asset->url, sizeof(task->asset->url), task->url);
 #endif
   }
 
@@ -360,7 +360,7 @@ ui_error_t ui_asset_streamer_request(struct ui_asset_streamer *streamer,
 #if defined(_MSC_VER)
   strcpy_s(task->url, url_len + 1, url);
 #else
-  strcpy(task->url, url);
+  UI_STRCPY(task->url, sizeof(task->url), url);
 #endif
 
   rc = ui_thread_pool_schedule(streamer->pool, asset_task_execute, task);
@@ -409,7 +409,11 @@ ui_error_t run_asset_streamer_coverage(void) {
   (void)ui_execution_context_create(&ctx);
   (void)ui_asset_streamer_create(pool, ctx, &streamer);
 
+#if defined(_MSC_VER)
+  fopen_s(&dummy, "dummy_asset.txt", "wb");
+#else
   dummy = fopen("dummy_asset.txt", "wb");
+#endif
   fwrite("test", 1, 4, dummy);
   fclose(dummy);
 
@@ -421,7 +425,7 @@ ui_error_t run_asset_streamer_coverage(void) {
   task->type = UI_ASSET_TYPE_BINARY;
   (void)ui_promise_create(&task->promise);
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
-  strcpy(task->url, "dummy_asset.txt");
+  UI_STRCPY(task->url, 100, "dummy_asset.txt");
   g_mock_io_fail = 4; /* mock fopen fail */
   (void)asset_task_execute(task);
   g_mock_io_fail = 0;
@@ -435,7 +439,7 @@ ui_error_t run_asset_streamer_coverage(void) {
   task->type = UI_ASSET_TYPE_BINARY;
   (void)ui_promise_create(&task->promise);
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
-  strcpy(task->url, "dummy_asset.txt");
+  UI_STRCPY(task->url, 100, "dummy_asset.txt");
   (void)asset_task_execute(task);
   g_asset_streamer_mock_fail = 1; /* resolve fails */
   (void)asset_task_complete(task);
@@ -454,7 +458,7 @@ ui_error_t run_asset_streamer_coverage(void) {
   task->type = UI_ASSET_TYPE_BINARY;
   (void)ui_promise_create(&task->promise);
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
-  strcpy(task->url, "non_existent.txt");
+  UI_STRCPY(task->url, 100, "non_existent.txt");
   (void)asset_task_execute(task); /* IO fail */
   g_asset_streamer_mock_fail = 2; /* reject fails */
   (void)asset_task_complete(task);
@@ -472,7 +476,7 @@ ui_error_t run_asset_streamer_coverage(void) {
   task->type = UI_ASSET_TYPE_BINARY;
   (void)ui_promise_create(&task->promise);
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
-  strcpy(task->url, "dummy_asset.txt");
+  UI_STRCPY(task->url, 100, "dummy_asset.txt");
   g_mock_io_fail = 3; /* builtin mock for UI_FREAD to return 0 */
   (void)asset_task_execute(task);
   g_mock_io_fail = 0;
@@ -490,7 +494,7 @@ ui_error_t run_asset_streamer_coverage(void) {
   task->type = UI_ASSET_TYPE_BINARY;
   (void)ui_promise_create(&task->promise);
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
-  strcpy(task->url, "dummy_asset.txt");
+  UI_STRCPY(task->url, 100, "dummy_asset.txt");
   g_malloc_fail_countdown = 0;
   (void)asset_task_execute(task);
   g_malloc_fail_countdown = -1;
@@ -513,7 +517,7 @@ ui_error_t run_asset_streamer_coverage(void) {
   task->type = UI_ASSET_TYPE_BINARY;
   (void)ui_promise_create(&task->promise);
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
-  strcpy(task->url, "dummy_asset.txt");
+  UI_STRCPY(task->url, 100, "dummy_asset.txt");
   g_malloc_fail_countdown = 2;
   (void)asset_task_execute(task);
   g_malloc_fail_countdown = -1;

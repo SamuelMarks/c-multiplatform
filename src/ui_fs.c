@@ -112,7 +112,8 @@ EM_JS(int, fs_read_file_js,
           setValue(out_ptr, ptr, "i32");
           setValue(out_size, length, "i32");
           return 0; /* Success */
-        } catch (e) {
+        }
+        catch(e) {
           console.error("FS.readFile failed", e);
           return 2; /* IO Error */
         }
@@ -125,7 +126,8 @@ EM_JS(int, fs_write_file_js,
           const u8 = new Uint8Array(HEAPU8.buffer, data, size);
           FS.writeFile(path, u8);
           return 0; /* Success */
-        } catch (e) {
+        }
+        catch(e) {
           console.error("FS.writeFile failed", e);
           return 2; /* IO Error */
         }
@@ -268,7 +270,8 @@ EM_JS(int, fs_opfs_write_sync_js,
           console.error("Synchronous OPFS writes must be performed in a "
                         "WebWorker context.");
           return 3;
-        } catch (e) {
+        }
+        catch(e) {
           console.error("OPFS sync write failed", e);
           return 2;
         }

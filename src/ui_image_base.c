@@ -60,7 +60,7 @@ ui_error_t ui_image_base_set_src(struct ui_image_base *image,
 #if defined(_MSC_VER)
   strcpy_s(image->src_url, len + 1, src_url);
 #else
-  strcpy(image->src_url, src_url);
+  UI_STRCPY(image->src_url, sizeof(image->src_url), src_url);
 #endif
 
   image->lazy_load = lazy_load;

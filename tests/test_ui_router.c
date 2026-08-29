@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_router.h"
+#include "../src/ui_internal_mem.h"
 #include "ui_event.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -288,7 +289,8 @@ static int run_normal_tests(void) {
   strcpy_s(ev.event_data.deep_link.uri, sizeof(ev.event_data.deep_link.uri),
            "/search?tab=2");
 #else
-  strcpy(ev.event_data.deep_link.uri, "/search?tab=2");
+  UI_STRCPY(ev.event_data.deep_link.uri, sizeof(ev.event_data.deep_link.uri),
+            "/search?tab=2");
 #endif
   rc = ui_router_process_event(router, &ev);
   if (rc != UI_ERROR_NONE)
@@ -484,7 +486,8 @@ void test_ui_router_oom_add(void) {
   struct ui_router *router = NULL;
   ui_router_create(&router);
   if (router) {
-    for (int i = 0; i < 5; i++) {
+    int i;
+    for (i = 0; i < 5; i++) {
       g_malloc_fail_countdown = i;
       ui_router_add_route(router, "/my/route/pattern", NULL, NULL);
     }
@@ -497,7 +500,8 @@ void test_ui_router_stack_realloc(void) {
   struct ui_router *router = NULL;
   ui_router_create(&router);
   if (router) {
-    for (int i = 0; i < 30; i++) {
+    int i;
+    for (i = 0; i < 30; i++) {
       struct ui_component *cmp;
       ui_component_create(&cmp);
       ui_router_push(router, cmp);
@@ -510,7 +514,8 @@ void test_ui_router_oom_add2(void) {
   struct ui_router *router = NULL;
   ui_router_create(&router);
   if (router) {
-    for (int i = 0; i < 5; i++) {
+    int i;
+    for (i = 0; i < 5; i++) {
       g_malloc_fail_countdown = i;
       ui_router_add_route(router, "/my/route/pattern", mock_factory_success,
                           NULL);

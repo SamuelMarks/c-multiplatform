@@ -256,7 +256,7 @@ ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
 #if defined(_MSC_VER)
     strcpy_s(out_state->label, len + 1, val);
 #else
-    strcpy(out_state->label, val);
+    UI_STRCPY(out_state->label, sizeof(out_state->label), val);
 #endif
   }
 
@@ -278,7 +278,7 @@ ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
 #if defined(_MSC_VER)
     strcpy_s(out_state->description, len + 1, val);
 #else
-    strcpy(out_state->description, val);
+    UI_STRCPY(out_state->description, sizeof(out_state->description), val);
 #endif
   }
 

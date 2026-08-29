@@ -105,7 +105,7 @@ ui_error_t ui_icon_base_set_font_glyph(struct ui_icon_base *icon,
     goto cleanup;
   }
 #else
-  strcpy(new_data, glyph_name_or_code);
+  UI_STRCPY(new_data, 256, glyph_name_or_code);
 #endif
 
   if (icon->data) {
@@ -151,7 +151,7 @@ ui_error_t ui_icon_base_set_svg_path(struct ui_icon_base *icon,
     goto cleanup;
   }
 #else
-  strcpy(new_data, svg_path_data);
+  UI_STRCPY(new_data, 2048, svg_path_data);
 #endif
 
   if (icon->data) {

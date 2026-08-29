@@ -14,19 +14,9 @@ extern int g_mock_stbi_write_png_fail;
 #include <stdio.h>
 
 #if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4204) /* nonstandard extension used: non-constant aggregate initializer */
-#pragma warning(disable : 4244) /* possible loss of data */
 #elif defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-#pragma GCC diagnostic ignored "-Wc++-compat"
-#pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #if !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wformat="
 #endif
-#pragma GCC diagnostic ignored "-Wendif-labels"
-#pragma GCC diagnostic ignored "-Wcomment"
 #endif
 
 /* #define STB_IMAGE_WRITE_IMPLEMENTATION */
@@ -34,9 +24,7 @@ extern int g_mock_stbi_write_png_fail;
 /* clang-format on */
 
 #if defined(_MSC_VER)
-#pragma warning(pop)
 #elif defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
 #endif
 
 /**

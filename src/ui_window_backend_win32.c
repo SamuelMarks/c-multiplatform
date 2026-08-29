@@ -22,7 +22,7 @@ struct ui_window {
     int has_resize; /**< has_resize */
     int new_width; /**< new_width */
     int new_height; /**< new_height */
-    void (*on_resize_callback)(void*, int, int); /**< int) */
+    ui_error_t (*on_resize_callback)(void*, int, int); /**< int) */
     void* on_resize_user_data; /**< on_resize_user_data */
 };
 

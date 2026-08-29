@@ -351,7 +351,7 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
             strcpy_s(trunc_str + target_len, 4, "...");
 #else
             strncpy(trunc_str, node->text, target_len);
-            strcpy(trunc_str + target_len, "...");
+            UI_STRCPY(trunc_str + target_len, 256 - target_len, "...");
 #endif
             rc = ui_text_layout_shape(node->layout, font, node->font_size,
                                       trunc_str, node->max_width,

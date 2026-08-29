@@ -7,7 +7,6 @@
  * @brief Implementation of input masking logic.
  */
 #ifdef _MSC_VER
-#pragma warning(disable : 4702)
 #endif
 
 /* clang-format off */
@@ -161,7 +160,6 @@ ui_error_t ui_input_mask_bind(struct ui_input_mask *mask,
     (void)get_rc;
     return ui_input_mask_process_text(mask, tmp_text);
   }
-  return UI_ERROR_NONE;
 }
 
 /**

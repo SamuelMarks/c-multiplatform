@@ -200,7 +200,7 @@ static ui_error_t check_range_validity(struct ui_date_range_picker_base *picker,
   }
 
   current = *start;
-  while (1) {
+  for (;;) {
     {
       ui_error_t rc = ui_date_compare(&current, end, &cmp);
       (void)rc;

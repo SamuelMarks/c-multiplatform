@@ -191,7 +191,7 @@ ui_error_t ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
   }
 
   /* Simple spinlock */
-  while (1) {
+  for (;;) {
     ui_error_t _ign_rc = ui_atomic_cas(&buffer->lock, 0, 1, &swapped);
     (void)_ign_rc;
     if (swapped != 0)

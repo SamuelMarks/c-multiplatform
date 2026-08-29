@@ -243,7 +243,7 @@ static void *get_prev_visible_node(struct ui_tree_base *tree, void *node) {
         parent ? tree->model.get_child(parent, idx - 1, tree->model.user_data)
                : tree->model.get_root_node(idx - 1, tree->model.user_data);
 
-    while (1) {
+    for (;;) {
       int is_expanded = 0;
       (void)UI_TREE_IS_EXPAND_IGNORE(tree, prev_sib, &is_expanded);
       if (is_expanded &&

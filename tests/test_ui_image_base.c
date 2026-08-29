@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_image_base.h"
+#include "../src/ui_internal_mem.h"
 #include "ui_component.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,7 +82,7 @@ static ui_error_t run_normal_tests(void) {
   /* Populate alt_text manually to cover that branch */
   image.alt_text = (char *)malloc(10);
   if (image.alt_text)
-    strcpy(image.alt_text, "alt");
+    UI_STRCPY(image.alt_text, sizeof(image.alt_text), "alt");
 
   rc = ui_image_base_cleanup(&image);
   if (rc != UI_ERROR_NONE)

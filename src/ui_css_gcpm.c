@@ -44,7 +44,7 @@ ui_error_t ui_css_gcpm_parse(const struct ui_css_computed_style *style,
 #if defined(_MSC_VER)
       strcpy_s(out_props->string_set, len + 1, val);
 #else
-      strcpy(out_props->string_set, val);
+      UI_STRCPY(out_props->string_set, sizeof(out_props->string_set), val);
 #endif
     } else {
       return UI_ERROR_OUT_OF_MEMORY;
@@ -63,7 +63,8 @@ ui_error_t ui_css_gcpm_parse(const struct ui_css_computed_style *style,
 #if defined(_MSC_VER)
       strcpy_s(out_props->bookmark_label, len + 1, val);
 #else
-      strcpy(out_props->bookmark_label, val);
+      UI_STRCPY(out_props->bookmark_label, sizeof(out_props->bookmark_label),
+                val);
 #endif
     } else {
       ui_css_gcpm_properties_cleanup(out_props);

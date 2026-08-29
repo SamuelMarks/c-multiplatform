@@ -203,7 +203,9 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
   control->sync_validators_count++;
 
   /* Re-run validation */
-  { (void)ui_form_control_run_validation(control); }
+  {
+    (void)ui_form_control_run_validation(control);
+  }
   return UI_ERROR_NONE;
 }
 
@@ -257,7 +259,9 @@ ui_error_t ui_form_control_add_async_validator(
   control->async_validators_count++;
 
   /* Re-run validation */
-  { (void)ui_form_control_run_validation(control); }
+  {
+    (void)ui_form_control_run_validation(control);
+  }
   return UI_ERROR_NONE;
 }
 
@@ -401,7 +405,9 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
   /* Dispatch async validators */
   if (control->async_validators_count > 0) {
     status_payload.int_val = (ui_int32)UI_FORM_STATUS_PENDING;
-    { (void)ui_signal_set(control->status_signal, status_payload); }
+    {
+      (void)ui_signal_set(control->status_signal, status_payload);
+    }
 
     for (i = 0; i < control->async_validators_count; i++) {
       struct ui_form_control_async_task *task =
@@ -425,8 +431,6 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
             ui_error_t set_rc =
                 ui_signal_set(control->status_signal, status_payload);
             (void)set_rc;
-            C_MULTIPLATFORM_FREE(task);
-            return UI_ERROR_NONE;
           }
           control->pending_async_count = 0;
           C_MULTIPLATFORM_FREE(task);
@@ -474,7 +478,9 @@ ui_error_t ui_form_control_set_value(ui_form_control_t *control,
   dirty_payload.bool_val = UI_TRUE;
   (void)ui_signal_set(control->dirty_signal, dirty_payload);
 
-  { (void)ui_form_control_run_validation(control); }
+  {
+    (void)ui_form_control_run_validation(control);
+  }
 
   return UI_ERROR_NONE;
 }
@@ -531,7 +537,9 @@ ui_error_t ui_form_control_enable(ui_form_control_t *control) {
   }
 
   /* Re-evaluates validators */
-  { (void)ui_form_control_run_validation(control); }
+  {
+    (void)ui_form_control_run_validation(control);
+  }
 
   return UI_ERROR_NONE;
 }
@@ -619,11 +627,21 @@ ui_error_t ui_form_control_destroy(ui_form_control_t *control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  { ui_signal_destroy(control->value_signal); }
-  { ui_signal_destroy(control->status_signal); }
-  { ui_signal_destroy(control->touched_signal); }
-  { ui_signal_destroy(control->dirty_signal); }
-  { ui_signal_destroy(control->errors_signal); }
+  {
+    ui_signal_destroy(control->value_signal);
+  }
+  {
+    ui_signal_destroy(control->status_signal);
+  }
+  {
+    ui_signal_destroy(control->touched_signal);
+  }
+  {
+    ui_signal_destroy(control->dirty_signal);
+  }
+  {
+    ui_signal_destroy(control->errors_signal);
+  }
   if (control->error_str)
     C_MULTIPLATFORM_FREE(control->error_str);
 
@@ -674,7 +692,7 @@ ui_error_t ui_form_control_set_error(ui_form_control_t *control,
 #if defined(_MSC_VER)
     strcpy_s(control->error_str, l + 1, error_msg);
 #else
-    strcpy(control->error_str, error_msg);
+    UI_STRCPY(control->error_str, sizeof(control->error_str), error_msg);
 #endif
   }
   payload.ptr_val = control->error_str;

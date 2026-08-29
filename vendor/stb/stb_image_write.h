@@ -334,6 +334,12 @@ STBIWDEF void stbi_flip_vertically_on_write(int flip_boolean);
 
 #endif
 
+
+#ifdef STB_IMAGE_WRITE_IMPLEMENTATION
+STBIWDEF unsigned char *stbi_zlib_compress(unsigned char *data, int data_len, int *out_len, int quality);
+STBIWDEF unsigned char *stbi_write_png_to_mem(const unsigned char *pixels, int stride_bytes, int x, int y, int n, int *out_len);
+#endif
+
 #ifdef STB_IMAGE_WRITE_IMPLEMENTATION
 
 #ifdef _WIN32
@@ -436,12 +442,13 @@ static void stbi__stdio_write(void *context, void *data, int size) {
 #else
 #define STBIW_EXTERN extern
 #endif
-STBIW_EXTERN __declspec(dllimport) int __stdcall MultiByteToWideChar(
-    unsigned int cp, unsigned long flags, const char *str, int cbmb,
-    wchar_t *widestr, int cchwide);
-STBIW_EXTERN __declspec(dllimport) int __stdcall WideCharToMultiByte(
-    unsigned int cp, unsigned long flags, const wchar_t *widestr, int cchwide,
-    char *str, int cbmb, const char *defchar, int *used_default);
+STBIW_EXTERN __declspec(dllimport) int __stdcall
+MultiByteToWideChar(unsigned int cp, unsigned long flags, const char *str,
+                    int cbmb, wchar_t *widestr, int cchwide);
+STBIW_EXTERN __declspec(dllimport) int __stdcall
+WideCharToMultiByte(unsigned int cp, unsigned long flags,
+                    const wchar_t *widestr, int cchwide, char *str, int cbmb,
+                    const char *defchar, int *used_default);
 
 STBIWDEF int stbiw_convert_wchar_to_utf8(char *buffer, size_t bufferlen,
                                          const wchar_t *input) {
@@ -1072,7 +1079,7 @@ static int stbi_write_hdr_core(stbi__write_context *s, int x, int y, int comp,
         "#?RADIANCE\n# Written by stb_image_write.h\nFORMAT=32-bit_rle_rgbe\n";
     s->func(s->context, header, sizeof(header) - 1);
 
-#ifdef __STDC_LIB_EXT1__
+#if defined(__STDC_LIB_EXT1__) || defined(_MSC_VER)
     len =
         sprintf_s(buffer, sizeof(buffer),
                   "EXPOSURE=          1.0000000000000\n\n-Y %d +X %d\n", y, x);
@@ -1799,10 +1806,10 @@ static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf,
                                 float *fdtbl, int DC,
                                 const unsigned short HTDC[256][2],
                                 const unsigned short HTAC[256][2]) {
-  const unsigned short EOB[2] = {HTAC[0x00][0], HTAC[0x00][1]};
-  const unsigned short M16zeroes[2] = {HTAC[0xF0][0], HTAC[0xF0][1]};
+  unsigned short EOB[2];
+  unsigned short M16zeroes[2];
   int dataOff, i, j, n, diff, end0pos, x, y;
-  int DU[64];
+  int DU[64]; EOB[0] = HTAC[0x00][0]; EOB[1] = HTAC[0x00][1]; M16zeroes[0] = HTAC[0xF0][0]; M16zeroes[1] = HTAC[0xF0][1];
 
   for (dataOff = 0, n = du_stride * 8; dataOff < n; dataOff += du_stride) {
     stbiw__jpg_DCT(&CDU[dataOff], &CDU[dataOff + 1], &CDU[dataOff + 2],
@@ -2091,30 +2098,13 @@ static int stbi_write_jpg_core(stbi__write_context *s, int width, int height,
         0,    0,    1,    0,    1, 0,    0,   0xFF, 0xDB, 0,   0x84, 0};
     static const unsigned char head2[] = {0xFF, 0xDA, 0, 0xC,  3, 1,    0,
                                           2,    0x11, 3, 0x11, 0, 0x3F, 0};
-    const unsigned char head1[] = {0xFF,
-                                   0xC0,
-                                   0,
-                                   0x11,
-                                   8,
-                                   (unsigned char)(height >> 8),
-                                   STBIW_UCHAR(height),
-                                   (unsigned char)(width >> 8),
-                                   STBIW_UCHAR(width),
-                                   3,
-                                   1,
-                                   (unsigned char)(subsample ? 0x22 : 0x11),
-                                   0,
-                                   2,
-                                   0x11,
-                                   1,
-                                   3,
-                                   0x11,
-                                   1,
-                                   0xFF,
-                                   0xC4,
-                                   0x01,
-                                   0xA2,
-                                   0};
+    unsigned char head1[24] = {0xFF, 0xC0, 0, 0x11, 8, 0, 0, 0, 0, 3, 1, 0, 0, 2, 0x11, 1, 3, 0x11, 1, 0xFF, 0xC4, 0x01, 0xA2, 0};
+    head1[5] = (unsigned char)(height >> 8);
+    head1[6] = STBIW_UCHAR(height);
+    head1[7] = (unsigned char)(width >> 8);
+    head1[8] = STBIW_UCHAR(width);
+    head1[11] = (unsigned char)(subsample ? 0x22 : 0x11);
+    
     s->func(s->context, (void *)head0, sizeof(head0));
     s->func(s->context, (void *)YTable, sizeof(YTable));
     stbiw__putc(s, 1);

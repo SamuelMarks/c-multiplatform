@@ -124,10 +124,10 @@ if(EMSCRIPTEN)
     set(UI_WASM_RUNTIME_METHODS "ccall,cwrap,UTF8ToString,stringToUTF8,setValue,getValue")
 
     if(CMAKE_BUILD_TYPE MATCHES "Debug")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -gsource-map -Wno-c99-extensions -Wno-missing-prototypes")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -gsource-map")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O0 -gsource-map --source-map-base http://localhost:8080/")
     else()
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -flto -Wno-c99-extensions -Wno-missing-prototypes")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -flto")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O3 -flto")
     endif()
 
@@ -168,8 +168,8 @@ if(UNIX AND NOT APPLE AND NOT CYGWIN AND NOT EMSCRIPTEN)
         include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
         set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_wayland.c ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c)
-        set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c PROPERTIES COMPILE_FLAGS "-Wno-pedantic -Wno-missing-prototypes -Wno-strict-prototypes -Wno-unused-parameter -Dinline=__inline__")
-        set_source_files_properties(src/ui_window_backend_linux_wayland.c PROPERTIES COMPILE_FLAGS "-Wno-pedantic -Wno-missing-prototypes -Wno-strict-prototypes -Wno-unused-parameter -Dinline=__inline__")
+        set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c PROPERTIES COMPILE_FLAGS " -Dinline=__inline__")
+        set_source_files_properties(src/ui_window_backend_linux_wayland.c PROPERTIES COMPILE_FLAGS " -Dinline=__inline__")
 
     else()
         set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_x11.c)
@@ -196,8 +196,8 @@ if(NOT UI_SINGLE_THREADED)
 endif()
 
 if(MSVC)
-    add_compile_definitions(_CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
-    target_compile_options(ui_engine PRIVATE /W4 /WX /Gy /wd4702 /wd4716 /wd4033 /wd4133 /wd4024 /wd4047 /wd4715 /wd4113)
+    
+    target_compile_options(ui_engine PRIVATE /W4 /WX /Gy /wd4715 /wd4706 /wd4127)
 
 else()
     target_compile_options(ui_engine PRIVATE -pedantic -Wall -Werror  )
@@ -236,7 +236,7 @@ endmacro()
 
 if(NOT MSVC)
     set(OLD_CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error -Wno-error=format-nonliteral -Wno-error=sign-conversion -Wno-long-long -Wno-error=overlength-strings -Wno-error=shorten-64-to-32 -Wno-error=float-conversion -Wno-error=implicit-int-float-conversion -Wno-error=macro-redefined -Wno-macro-redefined")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 endif()
 
 if(NOT TARGET cfs)
@@ -281,7 +281,7 @@ foreach(DEP_TARGET c_cdd c-abstract-http cfs c-orm c-orm-async c_str_span c89str
 endforeach()
 
 if(TARGET c_cdd AND MSVC)
-    target_compile_options(c_cdd PRIVATE "/wd4005")
+    target_compile_options(c_cdd PRIVATE "/wd4005" "/wd4996")
 endif()
 if(TARGET c_cdd)
     target_compile_definitions(c_cdd PUBLIC CDD_BUILD_TESTS=1)
@@ -322,8 +322,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     target_link_libraries(ui_engine_test PRIVATE c-abstract-http cfs c-orm)
 
     if(MSVC)
-        add_compile_definitions(_CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS)
-        target_compile_options(ui_engine_test PRIVATE /W4 /WX /Gy /wd4702 /wd4716 /wd4033 /wd4133 /wd4024 /wd4047 /wd4715 /wd4113)
+        
+        target_compile_options(ui_engine_test PRIVATE /W4 /WX /Gy /wd4715 /wd4133 /wd4312 /wd4706 /wd4127)
 
     else()
         target_compile_options(ui_engine_test PRIVATE -pedantic -Wall -Werror  )

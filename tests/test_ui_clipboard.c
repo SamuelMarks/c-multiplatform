@@ -4,9 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void check_cond(int cond, int *failed) {
-  if (cond) *failed = 1;
+static void check_cond_impl(int cond, int *failed, int line) {
+  if (cond) {
+    *failed = 1;
+    printf("Failed at line %d\n", line);
+  }
 }
+#define check_cond(cond, failed) check_cond_impl(cond, failed, __LINE__)
+
 
 
 #if !defined(_WIN32)
@@ -23,9 +28,12 @@ extern int g_ui_clipboard_force_fallback;
 #else
 #define POPEN_CMD popen
 #define PCLOSE_CMD pclose
+extern FILE *popen(const char *, const char *);
+extern int pclose(FILE *);
 #endif
 
 int (*g_mock_system_fn)(const char *) = system;
+
 FILE *(*g_mock_popen_fn)(const char *, const char *) = POPEN_CMD;
 int (*g_mock_pclose_fn)(FILE *) = PCLOSE_CMD;
 
@@ -166,6 +174,7 @@ static int run_normal_tests(void) {
 
   g_ui_clipboard_force_fallback = 0;
 
+#if !defined(_WIN32)
   printf("Testing large text for real clipboard realloc...\n");
   {
     char large_text[1500];
@@ -187,7 +196,10 @@ static int run_normal_tests(void) {
     g_malloc_fail_countdown = 1; /* 0 is first malloc, 1 is the first realloc */
     rc = ui_clipboard_get_text(&text);
     g_malloc_fail_countdown = -1;
-    check_cond(rc != UI_ERROR_OUT_OF_MEMORY && rc != UI_ERROR_NONE, &failed);
+    if (rc != UI_ERROR_OUT_OF_MEMORY && rc != UI_ERROR_NONE) {
+      failed = 1;
+      printf("Failed at line %d, rc=%d\n", __LINE__, rc);
+    }
 
     g_mock_system_fn = mock_system_always_fail;
     g_mock_popen_fn = POPEN_CMD;
@@ -267,6 +279,7 @@ static int run_normal_tests(void) {
   g_mock_system_fn = system;
   g_mock_popen_fn = POPEN_CMD;
   g_mock_pclose_fn = PCLOSE_CMD;
+#endif
 
   printf("Testing cleanup...\n");
   ui_clipboard_cleanup();
@@ -276,7 +289,10 @@ static int run_normal_tests(void) {
   /* Get text after cleanup on fallback */
   g_ui_clipboard_force_fallback = 1;
   rc = ui_clipboard_get_text(&text);
-  check_cond(rc != UI_ERROR_UNSUPPORTED, &failed);
+  if (rc != UI_ERROR_UNSUPPORTED) {
+    failed = 1;
+    printf("Failed at line %d, rc=%d\n", __LINE__, rc);
+  }
   g_ui_clipboard_force_fallback = 0;
 
   return failed;

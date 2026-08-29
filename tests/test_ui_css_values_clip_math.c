@@ -12,9 +12,9 @@ int test_css_values_clip_math(void) {
     /* removed check */
 
     char long_url_clip[1024];
-    strcpy(long_url_clip, "url(");
+    UI_STRCPY(long_url_clip, 1024, "url(");
     memset(long_url_clip + 4, 'A', 600);
-    strcpy(long_url_clip + 604, ")");
+    UI_STRCPY(long_url_clip + 604, 1024 - 604, ")");
     rc = ui_css_parse_clip_path(long_url_clip, &clip);
     /* removed check */
 
@@ -61,9 +61,9 @@ int test_css_values_clip_math(void) {
     EXPECT_EQ(UI_CSS_BASIC_SHAPE_INSET, clip.shape.type);
 
     char long_shape[512];
-    strcpy(long_shape, "circle(");
+    UI_STRCPY(long_shape, 1024, "circle(");
     memset(long_shape + 7, '0', 256);
-    strcpy(long_shape + 263, ")");
+    UI_STRCPY(long_shape + 263, 1024 - 263, ")");
     rc = ui_css_parse_clip_path(long_shape, &clip);
     EXPECT_EQ(UI_ERROR_NONE, rc);
     EXPECT_EQ(UI_CSS_BASIC_SHAPE_CIRCLE, clip.shape.type);

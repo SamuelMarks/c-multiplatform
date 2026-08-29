@@ -43,7 +43,11 @@ char *ui_mock_strdup(const char *src) {
   len = strlen(src);
   copy = (char *)ui_mock_malloc(len + 1);
   if (copy) {
+#if defined(_MSC_VER)
+    strcpy_s(copy, len + 1, src);
+#else
     strcpy(copy, src);
+#endif
   }
   return copy;
 }
