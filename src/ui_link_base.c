@@ -30,7 +30,12 @@ ui_error_t ui_link_base_create(struct ui_link_base **out_link) {
   link = (struct ui_link_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_link_base));
   if (!link) {
-    (void)ui_component_destroy(base_comp);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -45,7 +50,12 @@ ui_error_t ui_link_base_create(struct ui_link_base **out_link) {
 
   err = ui_dom_node_set_tag_name(link->base.shadow_root, "ui-link");
   if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(link->base.shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(link->base.shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(link);
     return err;
   }

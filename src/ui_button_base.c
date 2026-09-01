@@ -248,13 +248,29 @@ ui_error_t ui_button_base_create(struct ui_button_base **out_button) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (btn->gesture_recognizer) {
-    (void)ui_gesture_recognizer_destroy(btn->gesture_recognizer);
+    {
+      ui_error_t rc_cleanup =
+          ui_gesture_recognizer_destroy(btn->gesture_recognizer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (btn->component) {
-    (void)ui_component_destroy(btn->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(btn->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(btn);
   return rc;
@@ -270,8 +286,19 @@ ui_error_t ui_button_base_destroy(struct ui_button_base *button) {
     return UI_ERROR_NONE;
   }
 
-  (void)ui_gesture_recognizer_destroy(button->gesture_recognizer);
-  (void)ui_component_destroy(button->component);
+  {
+    ui_error_t rc_cleanup =
+        ui_gesture_recognizer_destroy(button->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(button->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(button);
   return UI_ERROR_NONE;

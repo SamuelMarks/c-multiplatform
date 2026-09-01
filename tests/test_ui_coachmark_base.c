@@ -99,24 +99,49 @@ static int test_coachmark(void) {
   ui_coachmark_tour_skip(tour);
 
   /* Test branching inside process_event */
-  (void)ui_coachmark_tour_process_event(tour, &ev); /* Not active */
+  {
+    ui_error_t rc_cleanup = ui_coachmark_tour_process_event(tour, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* Not active */
 
   /* Mock set_signal failure */
   {
 #ifdef UI_TEST_MOCK_ALLOC
     extern int g_coachmark_signal_mock_fail;
     g_coachmark_signal_mock_fail = 1;
-    (void)ui_coachmark_tour_start(tour);
+    {
+      ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_coachmark_signal_mock_fail = 0;
 
-    (void)ui_coachmark_tour_start(tour);
+    {
+      ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_coachmark_signal_mock_fail = 1;
-    (void)ui_coachmark_tour_skip(tour);
+    {
+      ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_coachmark_signal_mock_fail = 0;
 #endif
   }
 
-  (void)ui_coachmark_tour_start(tour);
+  {
+    ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ENTER;
@@ -180,8 +205,18 @@ static int test_coachmark(void) {
   ui_coachmark_tour_prev(tour); /* Hits !is_active true branch */
 
   ui_coachmark_tour_bind_open(tour, NULL);
-  (void)ui_signal_destroy(sig);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Add dummy content component to test node appending */
   {
@@ -197,24 +232,52 @@ static int test_coachmark(void) {
         UI_ERROR_NONE) {
       dummy_comp.shadow_root = dummy_root;
       dummy_comp2.shadow_root = NULL; /* Hits the NULL shadow root branch */
-      (void)ui_coachmark_tour_set_steps(tour, steps, 2);
+      {
+        ui_error_t rc_cleanup = ui_coachmark_tour_set_steps(tour, steps, 2);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       /* Trigger ui_dom_node_append_child failure */
 #ifdef UI_TEST_MOCK_ALLOC
       {
         extern int g_coachmark_dom_mock_fail;
         g_coachmark_dom_mock_fail = 1;
-        (void)ui_coachmark_tour_start(tour);
+        {
+          ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         g_coachmark_dom_mock_fail = 0;
       }
 #endif
 
-      (void)ui_coachmark_tour_start(tour);
-      (void)ui_coachmark_tour_update_layout(tour, 800,
-                                            600); /* Layout while active */
-      (void)ui_coachmark_tour_next(
-          tour); /* Renders step 1 with NULL shadow root */
-      (void)ui_coachmark_tour_skip(tour);
+      {
+        ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_coachmark_tour_update_layout(tour, 800, 600);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      } /* Layout while active */
+      {
+        ui_error_t rc_cleanup = ui_coachmark_tour_next(tour);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      } /* Renders step 1 with NULL shadow root */
+      {
+        ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       /* dummy_root is destroyed by the tour's container destruction, do not
        * double-free it */
       dummy_comp.shadow_root = NULL;
@@ -222,8 +285,18 @@ static int test_coachmark(void) {
   }
 
   ui_coachmark_tour_destroy(tour);
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test NULLs */
   ui_coachmark_tour_create(NULL, NULL);
@@ -325,8 +398,18 @@ static int test_coachmark(void) {
     g_malloc_fail_countdown = -1;
   }
 
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }

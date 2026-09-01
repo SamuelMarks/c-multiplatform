@@ -31,7 +31,12 @@ static int test_window_manager_creation(void) {
   CHECK_FAIL(ui_window_manager_base_get_component(wm, &comp) != UI_ERROR_NONE);
   CHECK_FAIL(comp == NULL);
 
-  (void)ui_window_manager_base_destroy(wm);
+  {
+    ui_error_t rc_cleanup = ui_window_manager_base_destroy(wm);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -49,7 +54,12 @@ static int test_window_manager_operations(void) {
   rc = ui_window_manager_base_drag(wm, 1, 10.0f, 20.0f);
   CHECK_FAIL(rc != UI_ERROR_NONE);
 
-  (void)ui_window_manager_base_destroy(wm);
+  {
+    ui_error_t rc_cleanup = ui_window_manager_base_destroy(wm);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -60,7 +70,12 @@ static int test_invalid_args(void) {
 
   CHECK_FAIL(ui_window_manager_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT);
 
-  (void)ui_window_manager_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_window_manager_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   CHECK_FAIL(ui_window_manager_base_get_component(NULL, &comp) !=
              UI_ERROR_INVALID_ARGUMENT);
@@ -81,7 +96,12 @@ static int test_invalid_args(void) {
              UI_ERROR_INVALID_ARGUMENT);
   CHECK_FAIL(ui_window_manager_base_bind_data(wm, NULL) != UI_ERROR_NONE);
 
-  (void)ui_window_manager_base_destroy(wm);
+  {
+    ui_error_t rc_cleanup = ui_window_manager_base_destroy(wm);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -92,7 +112,12 @@ static int test_oom(void) {
   int i;
   for (i = 0; i < 15; i++) {
     g_malloc_fail_countdown = i;
-    (void)ui_window_manager_base_create(&wm);
+    {
+      ui_error_t rc_cleanup = ui_window_manager_base_create(&wm);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   g_malloc_fail_countdown = -1;
 #endif
@@ -106,9 +131,19 @@ static int test_missing_coverage(void) {
   if (rc == UI_ERROR_NONE) {
     /* Manually destroy component and set to NULL for coverage */
     extern ui_error_t ui_component_destroy(struct ui_component *);
-    (void)ui_component_destroy(wm->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(wm->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     wm->component = NULL;
-    (void)ui_window_manager_base_destroy(wm);
+    {
+      ui_error_t rc_cleanup = ui_window_manager_base_destroy(wm);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   } else {
     failed = 1;
   }

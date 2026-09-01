@@ -22,7 +22,12 @@ static int test_ui_section_index_base_init(void) {
     g_malloc_fail_countdown = i;
     rc = ui_section_index_base_create(&index);
     if (rc == UI_ERROR_NONE) {
-      (void)ui_section_index_base_destroy(index);
+      {
+        ui_error_t rc_cleanup = ui_section_index_base_destroy(index);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     } else {
       if (index != NULL)
         return 1; /* index should be null on fail */
@@ -59,8 +64,18 @@ static int test_ui_section_index_base_init(void) {
     return 1;
 
   /* Destroy */
-  (void)ui_section_index_base_destroy(NULL);
-  (void)ui_section_index_base_destroy(index);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_destroy(index);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -160,7 +175,12 @@ static int test_ui_section_index_base_sections(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_section_index_base_destroy(index);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_destroy(index);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -202,16 +222,42 @@ void test_ui_section_index_errs(void) {
   int i;
 
   rc = ui_section_index_base_create(&index);
-  (void)ui_section_index_base_set_sections(index, sections, 3);
-  (void)ui_section_index_base_set_active_section(index, 1);
+  {
+    ui_error_t rc_cleanup =
+        ui_section_index_base_set_sections(index, sections, 3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_set_active_section(index, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = 0;
-  (void)ui_section_index_base_set_active_section(index, 2);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_set_active_section(index, 2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
 
   g_malloc_fail_countdown = 0;
-  (void)ui_section_index_base_set_active_section(index, 1);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_set_active_section(index, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
-  (void)ui_section_index_base_destroy(index);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_destroy(index);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 void test_ui_section_index_remove_attr_err(void) {
   struct ui_section_index_base *index2 = NULL;
@@ -245,12 +291,38 @@ void test_ui_section_index_remove_attr_err(void) {
 
   struct ui_section_index_base *index = NULL;
   const char *sections[] = {"A", "B", "C"};
-  (void)ui_section_index_base_create(&index);
-  (void)ui_section_index_base_set_sections(index, sections, 3);
-  (void)ui_section_index_base_set_active_section(index, 1);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_create(&index);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_section_index_base_set_sections(index, sections, 3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_set_active_section(index, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* corrupt node to fail remove_attribute */
   index->item_nodes[1]->type = UI_DOM_NODE_TYPE_TEXT;
-  (void)ui_section_index_base_set_active_section(index, 2);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_set_active_section(index, 2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   index->item_nodes[1]->type = UI_DOM_NODE_TYPE_ELEMENT;
-  (void)ui_section_index_base_destroy(index);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_destroy(index);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

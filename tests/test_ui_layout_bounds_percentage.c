@@ -56,7 +56,12 @@ void test_more_layout(void) {
   ui_layout_compute(lroot, 100.0f, 100.0f);
   ui_layout_tree_destroy(lroot);
 
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_css_stylesheet_destroy(sheet);
 }
 void test_coverage_layout(void) {
@@ -124,7 +129,12 @@ void test_coverage_layout(void) {
     ui_layout_tree_destroy(lroot);
   }
 
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_css_stylesheet_destroy(sheet);
 }
 /* clang-format off */
@@ -219,7 +229,12 @@ void test_bounds(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 void test_sequences_and_overflow(void) {
@@ -319,8 +334,18 @@ void test_sequences_and_overflow(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  (void)ui_dom_node_destroy(root);
-  (void)ui_dom_node_destroy(oroot);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(oroot);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 void test_null_api_calls(void) {
@@ -371,7 +396,12 @@ void test_percentage_negative(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 void test_percentage_negative_block(void) {
@@ -412,5 +442,10 @@ void test_percentage_negative_block(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

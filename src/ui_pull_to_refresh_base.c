@@ -64,27 +64,58 @@ struct ui_pull_to_refresh_base {
 static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
   char buf[64];
   float progress = 0.0f;
-  (void)ui_pull_to_refresh_base_get_progress(ptr, &progress);
+  {
+    ui_error_t rc_cleanup =
+        ui_pull_to_refresh_base_get_progress(ptr, &progress);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%.2f", progress);
 #else
   sprintf(buf, "%.2f", progress);
 #endif
-  (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-progress",
-                                  buf);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+        ptr->component->shadow_root, "data-progress", buf);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ptr->state == UI_PULL_TO_REFRESH_RESTING) {
-    (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
-                                    "resting");
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+          ptr->component->shadow_root, "data-state", "resting");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   } else if (ptr->state == UI_PULL_TO_REFRESH_PULLING) {
-    (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
-                                    "pulling");
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+          ptr->component->shadow_root, "data-state", "pulling");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   } else if (ptr->state == UI_PULL_TO_REFRESH_REFRESHING) {
-    (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
-                                    "refreshing");
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+          ptr->component->shadow_root, "data-state", "refreshing");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   } else {
-    (void)ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
-                                    "completing");
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+          ptr->component->shadow_root, "data-state", "completing");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -122,19 +153,39 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(ptr->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(ptr);
     return rc;
   }
 
-  (void)ui_dom_node_set_tag_name(root_node, "div");
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(root_node, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ptr->component->shadow_root = root_node;
 
   rc = ui_gesture_recognizer_create(&ptr->gesture_recognizer);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ptr->component->shadow_root = NULL;
-    (void)ui_component_destroy(ptr->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(ptr);
     return rc;
   }
@@ -157,13 +208,29 @@ ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr) {
     return UI_ERROR_NONE;
   }
 
-  (void)ui_gesture_recognizer_destroy(ptr->gesture_recognizer);
+  {
+    ui_error_t rc_cleanup =
+        ui_gesture_recognizer_destroy(ptr->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ptr->component->shadow_root) {
-    (void)ui_dom_node_destroy(ptr->component->shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(ptr->component->shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ptr->component->shadow_root = NULL;
   }
-  (void)ui_component_destroy(ptr->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(ptr);
   return UI_ERROR_NONE;
@@ -400,8 +467,13 @@ ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
   }
   ptr->spinner_comp = spinner_comp;
   if (spinner_comp) {
-    (void)ui_dom_node_append_child(ptr->component->shadow_root,
-                                   spinner_comp->shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_append_child(
+          ptr->component->shadow_root, spinner_comp->shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return UI_ERROR_NONE;
 }

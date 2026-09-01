@@ -59,17 +59,39 @@ struct ui_divider_base {
  */
 static ui_error_t update_dom_state(struct ui_divider_base *divider) {
   if (divider->orientation == UI_DIVIDER_ORIENTATION_VERTICAL) {
-    (void)ui_dom_node_set_attribute(divider->root_node, "data-orientation",
-                                    "vertical");
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+          divider->root_node, "data-orientation", "vertical");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   } else {
-    (void)ui_dom_node_set_attribute(divider->root_node, "data-orientation",
-                                    "horizontal");
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+          divider->root_node, "data-orientation", "horizontal");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   if (divider->inset) {
-    (void)ui_dom_node_set_attribute(divider->root_node, "data-inset", "true");
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(divider->root_node, "data-inset", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   } else {
-    (void)ui_dom_node_remove_attribute(divider->root_node, "data-inset");
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_remove_attribute(divider->root_node, "data-inset");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;
@@ -118,7 +140,13 @@ ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider) {
     goto cleanup;
   }
 
-  (void)ui_component_set_default_style(divider->component, default_style);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_set_default_style(divider->component, default_style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   divider->component->shadow_root = divider->root_node;
   divider->orientation = UI_DIVIDER_ORIENTATION_HORIZONTAL;
@@ -131,10 +159,20 @@ ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider) {
 
 cleanup:
   if (divider->root_node) {
-    (void)ui_dom_node_destroy(divider->root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(divider->root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (divider->component) {
-    (void)ui_component_destroy(divider->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(divider->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(divider);
   return rc;
@@ -149,7 +187,12 @@ ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   if (!divider) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(divider->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(divider->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(divider);
   return UI_ERROR_NONE;
 }

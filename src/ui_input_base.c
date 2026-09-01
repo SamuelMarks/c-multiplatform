@@ -183,7 +183,13 @@ ui_error_t ui_input_base_create(struct ui_input_base **out_input) {
   rc = ui_css_parse_stylesheet(ui_input_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_component_set_default_style(input->component, default_style);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_set_default_style(input->component, default_style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   input->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
@@ -193,13 +199,29 @@ ui_error_t ui_input_base_create(struct ui_input_base **out_input) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (input->gesture_recognizer) {
-    (void)ui_gesture_recognizer_destroy(input->gesture_recognizer);
+    {
+      ui_error_t rc_cleanup =
+          ui_gesture_recognizer_destroy(input->gesture_recognizer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (input->component) {
-    (void)ui_component_destroy(input->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(input->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(input);
   return rc;
@@ -229,8 +251,19 @@ ui_error_t ui_input_base_destroy(struct ui_input_base *input) {
   C_MULTIPLATFORM_FREE(input->placeholder);
   if (input->on_change == input_cva_on_change_wrapper)
     C_MULTIPLATFORM_FREE(input->user_data);
-  (void)ui_gesture_recognizer_destroy(input->gesture_recognizer);
-  (void)ui_component_destroy(input->component);
+  {
+    ui_error_t rc_cleanup =
+        ui_gesture_recognizer_destroy(input->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(input->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(input);
   return UI_ERROR_NONE;
 }

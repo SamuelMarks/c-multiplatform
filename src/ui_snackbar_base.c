@@ -255,10 +255,19 @@ ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
 
 cleanup:
   if (sb->root_node) {
-    (void)ui_dom_node_destroy(sb->root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(sb->root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  if (sb->component)
-    (void)ui_component_destroy(sb->component);
+  if (sb->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(sb->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (sb->queue)
     ui_ring_buffer_destroy(sb->queue);
   C_MULTIPLATFORM_FREE(sb);
@@ -307,8 +316,12 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
 
   if (snackbar->queue)
     ui_ring_buffer_destroy(snackbar->queue);
-  if (snackbar->component)
-    (void)ui_component_destroy(snackbar->component);
+  if (snackbar->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(snackbar->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(snackbar);
   return UI_ERROR_NONE;
 }
@@ -449,9 +462,14 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
 
       /* Mount to overlay director */
       if (!snackbar->overlay_handle) {
-        (void)ui_overlay_director_mount_component(snackbar->director,
-                                                  snackbar->component, 1000,
-                                                  &snackbar->overlay_handle);
+        {
+          ui_error_t rc_cleanup = ui_overlay_director_mount_component(
+              snackbar->director, snackbar->component, 1000,
+              &snackbar->overlay_handle);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }

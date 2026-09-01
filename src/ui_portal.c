@@ -59,10 +59,20 @@ ui_error_t ui_portal_destroy(struct ui_portal *portal) {
   if (portal->content_node) {
     /* Unmount from physical target if attached */
     if (portal->content_node->parent == portal->physical_target) {
-      (void)ui_dom_node_remove_child(portal->physical_target,
-                                     portal->content_node);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_remove_child(
+            portal->physical_target, portal->content_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
-    (void)ui_dom_node_destroy(portal->content_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(portal->content_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   C_MULTIPLATFORM_FREE(portal);
@@ -85,10 +95,20 @@ ui_error_t ui_portal_set_content(struct ui_portal *portal,
 
   if (portal->content_node) {
     if (portal->content_node->parent == portal->physical_target) {
-      (void)ui_dom_node_remove_child(portal->physical_target,
-                                     portal->content_node);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_remove_child(
+            portal->physical_target, portal->content_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
-    (void)ui_dom_node_destroy(portal->content_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(portal->content_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   portal->content_node = content_node;

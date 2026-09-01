@@ -48,11 +48,27 @@ static ui_error_t test_scaffold_base(void) {
     fprintf(stderr, "main content not mounted to slot\n");
     exit(1);
   }
-  (void)ui_component_destroy((struct ui_component *)scaffold);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_destroy((struct ui_component *)scaffold);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   top_bar->shadow_root = NULL;
-  (void)ui_component_destroy(top_bar);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(top_bar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   main_content->shadow_root = NULL;
-  (void)ui_component_destroy(main_content);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(main_content);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -78,7 +94,13 @@ int test_scaffold_base_extra(void) {
     ui_scaffold_base_set_main_content(scaffold, NULL);
     ui_scaffold_base_bind_data(NULL, NULL);
     ui_scaffold_base_bind_data(scaffold, NULL);
-    (void)ui_component_destroy((struct ui_component *)scaffold);
+    {
+      ui_error_t rc_cleanup =
+          ui_component_destroy((struct ui_component *)scaffold);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;

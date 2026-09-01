@@ -523,9 +523,24 @@ static int run_normal_tests(void) {
   }
 
   /* Destroy while active and queued */
-  (void)ui_snackbar_base_destroy(snackbar);
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
+  {
+    ui_error_t rc_cleanup = ui_snackbar_base_destroy(snackbar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_timer_destroy(timer);
   return 0;
 }
@@ -574,7 +589,12 @@ static int run_oom_tests(void) {
       }
       if (j == 10)
         return 1;
-      (void)ui_snackbar_base_destroy(snackbar);
+      {
+        ui_error_t rc_cleanup = ui_snackbar_base_destroy(snackbar);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break; /* We hit enough allocations to succeed */
     } else {
       printf("Unexpected error code %d\n", rc);
@@ -586,8 +606,18 @@ static int run_oom_tests(void) {
   if (i == 100)
     return 1;
 
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_timer_destroy(timer);
 #endif
   return 0;

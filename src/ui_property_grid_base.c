@@ -94,7 +94,13 @@ ui_property_grid_base_create(struct ui_arena *arena,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_arena_alloc(arena, sizeof(struct ui_property_grid_base), 8, &ptr);
+  {
+    ui_error_t rc_cleanup =
+        ui_arena_alloc(arena, sizeof(struct ui_property_grid_base), 8, &ptr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   *out_grid = (struct ui_property_grid_base *)ptr;
   (*out_grid)->arena = arena;
@@ -105,9 +111,14 @@ ui_property_grid_base_create(struct ui_arena *arena,
   (*out_grid)->current_filter = NULL;
 
   initial_payload.ptr_val = NULL;
-  (void)ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
-                         pointer_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
-                         &(*out_grid)->value_changed_signal);
+  {
+    ui_error_t rc_cleanup = ui_signal_create(
+        arena, initial_payload, UI_SIGNAL_TYPE_POINTER, pointer_equality, NULL,
+        UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_grid)->value_changed_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -123,7 +134,12 @@ ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_signal_destroy(grid->value_changed_signal);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(grid->value_changed_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

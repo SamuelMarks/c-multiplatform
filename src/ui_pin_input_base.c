@@ -216,7 +216,13 @@ ui_error_t ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input,
     goto cleanup;
   }
 
-  (void)ui_component_set_default_style(pin_input->component, default_style);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_set_default_style(pin_input->component, default_style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   pin_input->component->shadow_root = root_node;
   root_node = NULL;
@@ -233,10 +239,20 @@ ui_error_t ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input,
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (pin_input->component) {
-    (void)ui_component_destroy(pin_input->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(pin_input->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(pin_input->buffer);
   C_MULTIPLATFORM_FREE(pin_input);
@@ -252,7 +268,12 @@ ui_error_t ui_pin_input_base_destroy(struct ui_pin_input_base *pin_input) {
   if (!pin_input) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(pin_input->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(pin_input->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(pin_input->buffer);
   C_MULTIPLATFORM_FREE(pin_input);
   return UI_ERROR_NONE;

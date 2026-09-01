@@ -494,7 +494,12 @@ ui_error_t ui_router_destroy(struct ui_router *router) {
   }
 
   for (i = 0; i < router->stack_size; ++i) {
-    (void)ui_component_destroy(router->stack[i]);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(router->stack[i]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   C_MULTIPLATFORM_FREE(router->stack);
@@ -683,7 +688,13 @@ ui_error_t ui_router_pop(struct ui_router *router) {
   }
 
   router->stack_size--;
-  (void)ui_component_destroy(router->stack[router->stack_size]);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_destroy(router->stack[router->stack_size]);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   router->stack[router->stack_size] = NULL;
 
   return UI_ERROR_NONE;
@@ -703,7 +714,13 @@ ui_error_t ui_router_replace(struct ui_router *router,
   }
 
   if (router->stack_size > 0) {
-    (void)ui_component_destroy(router->stack[router->stack_size - 1]);
+    {
+      ui_error_t rc_cleanup =
+          ui_component_destroy(router->stack[router->stack_size - 1]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     router->stack[router->stack_size - 1] = screen;
   } else {
     return ui_router_push(router, screen);

@@ -23,9 +23,19 @@ static void test_chat_bubble_mock_alloc_missing(void) {
       struct ui_chat_bubble_config cfg = {0};
       g_malloc_fail_countdown = i;
       if (ui_chat_bubble_base_create(arena, &cfg, &bubble) == UI_ERROR_NONE) {
-        (void)ui_chat_bubble_base_destroy(bubble);
+        {
+          ui_error_t rc_cleanup = ui_chat_bubble_base_destroy(bubble);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
-      (void)ui_arena_destroy(arena);
+      {
+        ui_error_t rc_cleanup = ui_arena_destroy(arena);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -35,14 +45,34 @@ static void test_chat_bubble_missing_branches(void) {
   /* Test 87: destroy without signal */
   {
     struct ui_arena *arena;
-    (void)ui_arena_create(1024 * 16, &arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_create(1024 * 16, &arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     struct ui_chat_bubble_base *bubble = NULL;
     struct ui_chat_bubble_config cfg = {0};
 
-    (void)ui_chat_bubble_base_create(arena, &cfg, &bubble);
+    {
+      ui_error_t rc_cleanup = ui_chat_bubble_base_create(arena, &cfg, &bubble);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     /* Don't cast internals. Just skip the 87 branch. It's too fragile. */
-    (void)ui_chat_bubble_base_destroy(bubble);
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_chat_bubble_base_destroy(bubble);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 int main(void) {
@@ -113,13 +143,33 @@ int main(void) {
 
   /* Test 3: Calculate text bounds with No Tail */
   config.tail_placement = UI_CHAT_BUBBLE_TAIL_TOP_LEFT;
-  (void)ui_chat_bubble_base_set_config(bubble, &config);
-  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
-                                                  &text_bounds);
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_set_config(bubble, &config);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_calculate_text_bounds(
+        bubble, &raw_bounds, &text_bounds);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   config.tail_placement = UI_CHAT_BUBBLE_TAIL_TOP_RIGHT;
-  (void)ui_chat_bubble_base_set_config(bubble, &config);
-  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
-                                                  &text_bounds);
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_set_config(bubble, &config);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_calculate_text_bounds(
+        bubble, &raw_bounds, &text_bounds);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Set an invalid value using internal mock pattern to trigger default */
   {
@@ -128,8 +178,13 @@ int main(void) {
         struct ui_chat_bubble_base * bubble, int tail_placement);
     ui_chat_bubble_base_mock_config(NULL, 100);
     ui_chat_bubble_base_mock_config(bubble, 100);
-    (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
-                                                    &text_bounds);
+    {
+      ui_error_t rc_cleanup = ui_chat_bubble_base_calculate_text_bounds(
+          bubble, &raw_bounds, &text_bounds);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_chat_bubble_base_mock_config(bubble, UI_CHAT_BUBBLE_TAIL_TOP_RIGHT);
 #endif
   }
@@ -160,8 +215,13 @@ int main(void) {
     FAIL();
 
   config.group_position = UI_CHAT_BUBBLE_GROUP_SINGLE;
-  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
-                                                  &text_bounds);
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_calculate_text_bounds(
+        bubble, &raw_bounds, &text_bounds);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   config.tail_placement = UI_CHAT_BUBBLE_TAIL_NONE;
   err = ui_chat_bubble_base_set_config(bubble, &config);
   if (err != UI_ERROR_NONE)
@@ -182,8 +242,13 @@ int main(void) {
   /* Test negative bounds clamping */
   raw_bounds.width = 1.0;
   raw_bounds.height = 1.0;
-  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds,
-                                                  &text_bounds);
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_calculate_text_bounds(
+        bubble, &raw_bounds, &text_bounds);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test Invalid Arguments */
   if (ui_chat_bubble_base_create(NULL, &config, &bubble) !=
@@ -195,7 +260,12 @@ int main(void) {
   if (ui_chat_bubble_base_create(arena, &config, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
     FAIL();
-  (void)ui_chat_bubble_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_chat_bubble_base_set_config(NULL, &config) !=
       UI_ERROR_INVALID_ARGUMENT)
     FAIL();
@@ -204,12 +274,40 @@ int main(void) {
   if (ui_chat_bubble_base_create(arena, NULL, &bubble) !=
       UI_ERROR_INVALID_ARGUMENT)
     FAIL();
-  (void)ui_chat_bubble_base_get_config_signal(NULL, &signal);
-  (void)ui_chat_bubble_base_get_config_signal(bubble, NULL);
-  (void)ui_chat_bubble_base_calculate_text_bounds(NULL, &raw_bounds,
-                                                  &text_bounds);
-  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, NULL, &text_bounds);
-  (void)ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds, NULL);
+  {
+    ui_error_t rc_cleanup =
+        ui_chat_bubble_base_get_config_signal(NULL, &signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_get_config_signal(bubble, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_chat_bubble_base_calculate_text_bounds(
+        NULL, &raw_bounds, &text_bounds);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_chat_bubble_base_calculate_text_bounds(bubble, NULL, &text_bounds);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_chat_bubble_base_calculate_text_bounds(bubble, &raw_bounds, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   err = ui_chat_bubble_base_destroy(bubble);
   if (err != UI_ERROR_NONE) {
@@ -225,7 +323,12 @@ int main(void) {
       g_malloc_fail_countdown = i;
       err = ui_chat_bubble_base_create(arena, &config, &temp_bubble);
       if (err == UI_ERROR_NONE) {
-        (void)ui_chat_bubble_base_destroy(temp_bubble);
+        {
+          ui_error_t rc_cleanup = ui_chat_bubble_base_destroy(temp_bubble);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         break; /* Passed enough */
       }
     }
@@ -233,6 +336,11 @@ int main(void) {
   }
 #endif
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }

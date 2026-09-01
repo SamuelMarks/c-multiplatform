@@ -91,7 +91,12 @@ static int test_null_args(void) {
   failed |= (ui_table_base_create(NULL, &model) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_table_base_create(&table, NULL) != UI_ERROR_INVALID_ARGUMENT);
 
-  (void)ui_table_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   failed |= (ui_table_base_get_selection_model(NULL, &sel_model) !=
              UI_ERROR_INVALID_ARGUMENT);
@@ -115,7 +120,12 @@ static int test_null_args(void) {
              UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_table_base_render(table, NULL) != UI_ERROR_INVALID_ARGUMENT);
 
-  (void)ui_table_base_destroy(table);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -156,8 +166,18 @@ static int test_table_render_aria(void) {
   ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
   ACCUM_ERR(failed, ui_table_base_render(table, container));
 
-  (void)ui_table_base_destroy(table);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -193,8 +213,18 @@ static int test_table_pagination(void) {
   ACCUM_ERR(failed, ui_table_base_set_pagination_config(table, &page_cfg));
   ACCUM_ERR(failed, ui_table_base_render(table, container));
 
-  (void)ui_table_base_destroy(table);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -225,8 +255,18 @@ static int test_table_column_sizing(void) {
   ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
   ACCUM_ERR(failed, ui_table_base_render(table, container));
 
-  (void)ui_table_base_destroy(table);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -251,8 +291,18 @@ static int test_zero_cols(void) {
   ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
   ACCUM_ERR(failed, ui_table_base_render(table, container));
 
-  (void)ui_table_base_destroy(table);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -292,16 +342,31 @@ static int test_render_fails(void) {
   model.render_header = mock_render_header_fail;
   ACCUM_ERR(failed, ui_table_base_create(&table, &model));
   failed |= (ui_table_base_render(table, container) != UI_ERROR_UNKNOWN);
-  (void)ui_table_base_destroy(table);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test cell render fail */
   model.render_header = mock_render_header;
   model.render_cell = mock_render_cell_fail;
   ACCUM_ERR(failed, ui_table_base_create(&table, &model));
   failed |= (ui_table_base_render(table, container) != UI_ERROR_UNKNOWN);
-  (void)ui_table_base_destroy(table);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -348,8 +413,18 @@ static int test_oom(void) {
   }
   g_mock_append_child_fail_countdown = -1;
 
-  (void)ui_table_base_destroy(table);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
   return failed;
 }
@@ -383,8 +458,18 @@ static int test_sort_render_impl(void) {
   ui_table_base_set_sort_config(table, &sort_cfg);
   ui_table_base_render(table, container);
 
-  (void)ui_table_base_destroy(table);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_table_base_destroy(table);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

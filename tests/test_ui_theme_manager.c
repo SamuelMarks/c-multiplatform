@@ -30,7 +30,12 @@ static int test_theme_manager_lifecycle(void) {
   rc = ui_theme_manager_destroy(manager);
   failed |= (rc != UI_ERROR_NONE);
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -68,7 +73,12 @@ static int test_theme_manager_mode(void) {
   rc = ui_theme_manager_destroy(manager);
   failed |= (rc != UI_ERROR_NONE);
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -122,7 +132,12 @@ static int test_theme_manager_nulls(void) {
     manager->change_signal = old_signal;
   }
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }

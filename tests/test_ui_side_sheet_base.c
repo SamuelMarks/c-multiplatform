@@ -46,7 +46,12 @@ int main(void) {
   for (i = 0; i < 2; i++) {
     g_malloc_fail_countdown = i;
     if (ui_side_sheet_base_create(&sheet) == UI_ERROR_NONE) {
-      (void)ui_side_sheet_base_destroy(sheet);
+      {
+        ui_error_t rc_cleanup = ui_side_sheet_base_destroy(sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       return 1;
     }
   }
@@ -56,7 +61,12 @@ int main(void) {
   ASSERT_EQ(ui_side_sheet_base_create(NULL), UI_ERROR_INVALID_ARGUMENT);
 
   /* Destroy null */
-  (void)ui_side_sheet_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ASSERT_EQ(ui_side_sheet_base_set_content(NULL, NULL),
             UI_ERROR_INVALID_ARGUMENT);
@@ -132,7 +142,12 @@ int main(void) {
   ASSERT_SUCCESS(ui_side_sheet_base_set_open(sheet, 0));
   ASSERT_SUCCESS(ui_side_sheet_base_process_event(sheet, &ev, 0.0));
 
-  (void)ui_side_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   test_ui_side_sheet_errs();
   printf("All tests passed.\n");
@@ -149,32 +164,102 @@ static ui_error_t mock_on_close_fail(struct ui_side_sheet_base *sheet,
 void test_ui_side_sheet_errs(void) {
   struct ui_side_sheet_base *sheet = NULL;
   struct ui_event ev;
-  (void)ui_side_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_side_sheet_base_set_on_close(sheet, mock_on_close_fail, NULL);
-  (void)ui_side_sheet_base_set_open(sheet, 1);
+  {
+    ui_error_t rc_cleanup =
+        ui_side_sheet_base_set_on_close(sheet, mock_on_close_fail, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* Triggers the if (rc != UI_ERROR_NONE) return rc; inside set_open */
-  (void)ui_side_sheet_base_set_open(sheet, 0);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_side_sheet_base_set_open(sheet, 1);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
   /* Triggers set_open failing from process_event -> returns rc */
-  (void)ui_side_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Add missing branches for set_open */
-  (void)ui_side_sheet_base_set_open(sheet, 0); /* set to same state */
-  (void)ui_side_sheet_base_set_on_close(sheet, NULL,
-                                        NULL); /* no on_close callback */
-  (void)ui_side_sheet_base_set_open(sheet, 1);
-  (void)ui_side_sheet_base_set_open(sheet, 1); /* set to same state */
-  (void)ui_side_sheet_base_set_open(sheet, 0); /* close without callback */
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* set to same state */
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_on_close(sheet, NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* no on_close callback */
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* set to same state */
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* close without callback */
 
   /* Add missing branch for process_event: keydown but not escape */
-  (void)ui_side_sheet_base_set_open(sheet, 1);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = 'A'; /* not escape */
-  (void)ui_side_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_side_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

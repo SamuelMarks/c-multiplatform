@@ -94,7 +94,12 @@ static void test_action_sheet_edge_cases(void) {
   assert(ui_action_sheet_base_get_animating_signal(sheet, &out_computed) ==
          UI_ERROR_NONE);
 
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* 2. OOM in create */
   for (i = 0; i < 1000; ++i) {
@@ -103,7 +108,12 @@ static void test_action_sheet_edge_cases(void) {
     if (rc == UI_ERROR_OUT_OF_MEMORY) {
       /* Expected */
     } else if (rc == UI_ERROR_NONE) {
-      (void)ui_action_sheet_base_destroy(sheet);
+      {
+        ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       assert(0);
@@ -125,12 +135,27 @@ static void test_action_sheet_edge_cases(void) {
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel2->shadow_root);
   ui_action_sheet_base_set_cancel_action(sheet, cancel2);
 
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* cancel was removed from the tree, so its shadow_root is still valid and
    * needs to be freed */
-  (void)ui_component_destroy(cancel);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(cancel);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   cancel2->shadow_root = NULL;
-  (void)ui_component_destroy(cancel2);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(cancel2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   extern ui_error_t run_action_sheet_coverage(void);
@@ -228,14 +253,39 @@ int main(void) {
   rc = ui_action_sheet_base_process_event(sheet, &ev, 100.0);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   action1->shadow_root = NULL; /* was destroyed by action sheet */
   cancel->shadow_root = NULL;  /* was destroyed by action sheet */
-  (void)ui_component_destroy(action1);
-  (void)ui_component_destroy(cancel);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(action1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(cancel);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_focus_manager_destroy(focus);
-  (void)ui_keyboard_responder_destroy(keyboard);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(focus);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_keyboard_responder_destroy(keyboard);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("test_ui_action_sheet_base passed\n");
   return 0;

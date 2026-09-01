@@ -109,10 +109,20 @@ ui_section_index_base_create(struct ui_section_index_base **out_index) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (index && index->component) {
-    (void)ui_component_destroy(index->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(index->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (index) {
     C_MULTIPLATFORM_FREE(index);
@@ -135,7 +145,12 @@ ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
     C_MULTIPLATFORM_FREE(index->item_nodes);
   }
 
-  (void)ui_component_destroy(index->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(index->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(index);
   return UI_ERROR_NONE;
 }
@@ -220,7 +235,12 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
     if (rc == UI_ERROR_NONE) {
       rc = ui_dom_node_append_child(node, text_node);
     } else if (text_node) {
-      (void)ui_dom_node_destroy(text_node);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     if (rc == UI_ERROR_NONE) {
@@ -230,7 +250,12 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
     if (rc != UI_ERROR_NONE) {
       size_t j;
       if (node) {
-        (void)ui_dom_node_destroy(node);
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       for (j = 0; j < i; ++j) {
         ui_dom_node_remove_child(index->component->shadow_root,

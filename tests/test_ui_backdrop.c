@@ -56,7 +56,12 @@ static ui_error_t test_backdrop_escape_key(void) {
   ASSERT_EQ(UI_ERROR_NONE, err);
   ASSERT_EQ(0, should_dismiss);
 
-  (void)ui_backdrop_destroy(bd);
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(bd);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -168,7 +173,12 @@ static ui_error_t test_backdrop_click_outside(void) {
                                   &should_dismiss);
   ASSERT_EQ(0, should_dismiss); /* Should NOT dismiss */
 
-  (void)ui_backdrop_destroy(bd);
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(bd);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -262,7 +272,12 @@ static ui_error_t test_backdrop_other_events(void) {
                                   &should_dismiss);
   ASSERT_EQ(0, should_dismiss);
 
-  (void)ui_backdrop_destroy(bd);
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(bd);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -288,7 +303,12 @@ static ui_error_t test_invalid_args_and_oom(void) {
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
             ui_backdrop_process_event(bd, &ev, 0, 0, 100, 100, NULL));
 
-  (void)ui_backdrop_destroy(bd);
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(bd);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   bd = NULL;
 
   g_malloc_fail_countdown = 0;

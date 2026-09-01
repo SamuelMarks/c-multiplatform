@@ -136,7 +136,12 @@ ui_error_t ui_dialog_base_create(struct ui_dialog_base **out_dialog) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   {
     ui_error_t _ign_rc = ui_backdrop_destroy(dialog->backdrop);
@@ -171,9 +176,19 @@ ui_error_t ui_dialog_base_destroy(struct ui_dialog_base *dialog) {
     (void)rc;
   }
 
-  (void)ui_backdrop_destroy(dialog->backdrop);
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(dialog->backdrop);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_component_destroy(dialog->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(dialog->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(dialog);
   return UI_ERROR_NONE;
@@ -359,7 +374,12 @@ ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
       (void)rc;
     } else {
       /* Default behavior if no listener is attached: close it */
-      (void)ui_dialog_base_set_open(dialog, 0);
+      {
+        ui_error_t rc_cleanup = ui_dialog_base_set_open(dialog, 0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 

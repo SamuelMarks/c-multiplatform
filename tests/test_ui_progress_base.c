@@ -150,8 +150,18 @@ static int test_progress_lifecycle(void) {
    * successfully */
   printf("CSS looping parameter bounds verified.\n");
 
-  (void)ui_progress_base_destroy(progress);
-  (void)ui_progress_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_progress_base_destroy(progress);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_progress_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* test zero range */
   ui_progress_base_create(&progress);
@@ -170,7 +180,12 @@ static int test_progress_lifecycle(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_progress_base_destroy(progress);
+  {
+    ui_error_t rc_cleanup = ui_progress_base_destroy(progress);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -184,7 +199,12 @@ static int run_oom_tests(void) {
     g_malloc_fail_countdown = i;
     rc = ui_progress_base_create(&progress);
     if (rc == UI_ERROR_NONE) {
-      (void)ui_progress_base_destroy(progress);
+      {
+        ui_error_t rc_cleanup = ui_progress_base_destroy(progress);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

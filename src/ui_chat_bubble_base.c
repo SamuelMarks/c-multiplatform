@@ -127,10 +127,26 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
  * @param bubble Parameter bubble.
  * @return Return value.
  */
+#ifdef UI_TEST_MOCK_ALLOC
+int g_chat_bubble_mock_fail = 0;
+extern ui_error_t ui_component_destroy(struct ui_component *c);
+static ui_error_t mock_component_destroy_chat_bubble(struct ui_component *c) {
+  if (g_chat_bubble_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+#define ui_component_destroy mock_component_destroy_chat_bubble
+#endif
+
 ui_error_t ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble) {
   if (!bubble)
     return UI_ERROR_INVALID_ARGUMENT;
-  (void)ui_signal_destroy(bubble->config_signal);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(bubble->config_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 

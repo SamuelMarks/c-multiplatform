@@ -335,7 +335,12 @@ static int run_normal_tests(void) {
   }
   g_toggle_returns_error = 0;
 
-  (void)ui_disclosure_base_destroy(disclosure);
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(disclosure);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -354,7 +359,12 @@ static int run_oom_tests(void) {
     if (err == UI_ERROR_OUT_OF_MEMORY) {
       continue;
     } else if (err == UI_ERROR_NONE) {
-      (void)ui_disclosure_base_destroy(disclosure);
+      {
+        ui_error_t rc_cleanup = ui_disclosure_base_destroy(disclosure);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       return 1;
@@ -383,7 +393,12 @@ static int run_oom_tests(void) {
     }
   }
 
-  (void)ui_disclosure_base_destroy(disclosure);
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(disclosure);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

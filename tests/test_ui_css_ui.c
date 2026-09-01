@@ -116,7 +116,7 @@ static ui_error_t test_parse_outline(void) {
 
   /* Truncation tests */
   {
-    char long_buf[400];
+    char long_buf[2048];
     memset(long_buf, 'a', 399);
     long_buf[399] = '\0';
     err = ui_css_parse_outline(long_buf, &outline);
@@ -188,7 +188,7 @@ static ui_error_t test_parse_cursor(void) {
 
   /* Truncation tests */
   {
-    char long_buf[1200];
+    char long_buf[2048];
     memset(long_buf, 'a', 1199);
     long_buf[1199] = '\0';
     err = ui_css_parse_cursor(long_buf, &cursor);
@@ -440,7 +440,7 @@ static ui_error_t test_parse_overscroll_behavior(void) {
 
   /* Truncation tests */
   {
-    char long_buf[400];
+    char long_buf[2048];
     memset(long_buf, 'a', 399);
     long_buf[399] = '\0';
     err = ui_css_parse_overscroll_behavior(long_buf, &shorthand);

@@ -106,12 +106,22 @@ static ui_error_t update_dom_state(struct ui_select_base *select) {
     }
   } else {
     {
-      (void)ui_dom_node_remove_attribute(select->component->shadow_root,
-                                         "disabled");
+      {
+        ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
+            select->component->shadow_root, "disabled");
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     {
-      (void)ui_dom_node_remove_attribute(select->component->shadow_root,
-                                         "aria-disabled");
+      {
+        ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
+            select->component->shadow_root, "aria-disabled");
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   return UI_ERROR_NONE;
@@ -202,13 +212,29 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (sel->gesture_recognizer) {
-    (void)ui_gesture_recognizer_destroy(sel->gesture_recognizer);
+    {
+      ui_error_t rc_cleanup =
+          ui_gesture_recognizer_destroy(sel->gesture_recognizer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (sel->component) {
-    (void)ui_component_destroy(sel->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sel->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(sel);
   return rc;
@@ -222,10 +248,19 @@ cleanup:
 ui_error_t ui_select_base_destroy(struct ui_select_base *select) {
   if (!select)
     return UI_ERROR_NONE;
-  if (select->gesture_recognizer)
-    (void)ui_gesture_recognizer_destroy(select->gesture_recognizer);
-  if (select->component)
-    (void)ui_component_destroy(select->component);
+  if (select->gesture_recognizer) {
+    ui_error_t rc_cleanup =
+        ui_gesture_recognizer_destroy(select->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  if (select->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(select->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(select);
   return UI_ERROR_NONE;
 }
@@ -578,9 +613,7 @@ static ui_error_t select_on_change_wrapper(struct ui_select_base *select,
   if (wrap->callback) {
     union ui_signal_payload p;
     p.int_val = index;
-    {
-      (void)wrap->callback(p, wrap->user_data);
-    }
+    { (void)wrap->callback(p, wrap->user_data); }
   }
   return UI_ERROR_NONE;
 }
@@ -751,10 +784,20 @@ ui_error_t ui_select_base_add_option(struct ui_select_base *select,
 
 cleanup:
   if (text_node) {
-    (void)ui_dom_node_destroy(text_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (option_node) {
-    (void)ui_dom_node_destroy(option_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(option_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return rc;
 }

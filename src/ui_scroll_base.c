@@ -153,13 +153,29 @@ ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (scroll->gesture_recognizer) {
-    (void)ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
+    {
+      ui_error_t rc_cleanup =
+          ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (scroll->component) {
-    (void)ui_component_destroy(scroll->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(scroll->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(scroll);
   return rc;
@@ -174,8 +190,19 @@ cleanup:
 ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll) {
   if (!scroll)
     return UI_ERROR_NONE;
-  (void)ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
-  (void)ui_component_destroy(scroll->component);
+  {
+    ui_error_t rc_cleanup =
+        ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(scroll->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(scroll);
   return UI_ERROR_NONE;
 }

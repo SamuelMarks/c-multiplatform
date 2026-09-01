@@ -92,7 +92,12 @@ static int test_normal(void) {
   ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_CLOSE_BTN);
 
   ACCUM_ERR(failed, ui_titlebar_base_destroy(tb));
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Now test non-draggable drag area */
   ACCUM_ERR(failed, ui_arena_create(4096, &arena));
@@ -101,7 +106,12 @@ static int test_normal(void) {
   ACCUM_ERR(failed, ui_titlebar_base_hit_test(tb, 10.0f, 10.0f, &res));
   ACCUM_FAIL(failed, res != UI_TITLEBAR_HIT_TEST_NONE);
   ACCUM_ERR(failed, ui_titlebar_base_destroy(tb));
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }
@@ -132,7 +142,12 @@ static int test_oom(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_arena_destroy(small_arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
   return failed;
 }

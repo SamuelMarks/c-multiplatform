@@ -123,14 +123,29 @@ static int test_subscribers(void) {
     ui_computed_get(comp2, &out_val);
     ui_reactive_graph_set_current_node(NULL, NULL);
 
-    (void)ui_computed_destroy(comp2);
+    {
+      ui_error_t rc_cleanup = ui_computed_destroy(comp2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_computed_destroy(comp);
+  {
+    ui_error_t rc_cleanup = ui_computed_destroy(comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_computed_create(NULL, dummy_compute_fail, NULL, UI_SIGNAL_TYPE_INT32,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
   ui_computed_get(comp, &out_val);
-  (void)ui_computed_destroy(comp);
+  {
+    ui_error_t rc_cleanup = ui_computed_destroy(comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -166,17 +181,32 @@ static int test_computed(void) {
     ui_computed_create(NULL, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
                        UI_SIGNAL_MODE_MULTI_THREADED, &mtcomp);
     ui_computed_get(mtcomp, &out_val);
-    (void)ui_computed_destroy(mtcomp);
+    {
+      ui_error_t rc_cleanup = ui_computed_destroy(mtcomp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_computed_destroy(comp);
+  {
+    ui_error_t rc_cleanup = ui_computed_destroy(comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Null tests */
   ui_computed_create(NULL, NULL, NULL, 0, 0, &comp);
   ui_computed_create(NULL, dummy_compute, NULL, 0, 0, NULL);
   ui_computed_get(NULL, NULL);
   ui_computed_get(comp, NULL);
-  (void)ui_computed_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_computed_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Malloc fails */
   g_malloc_fail_countdown = 0;
@@ -197,16 +227,29 @@ static int test_computed(void) {
                        UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
     g_malloc_fail_countdown = -1;
 
-    if (comp)
-      (void)ui_computed_destroy(comp);
+    if (comp) {
+      ui_error_t rc_cleanup = ui_computed_destroy(comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     comp = NULL;
     ui_computed_create(arena, dummy_compute, &my_data, UI_SIGNAL_TYPE_INT32,
                        UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
-    if (comp)
-      (void)ui_computed_destroy(comp);
+    if (comp) {
+      ui_error_t rc_cleanup = ui_computed_destroy(comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;

@@ -149,15 +149,30 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dom_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(node->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(node->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(node);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(dom_node, "span");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(dom_node);
-    (void)ui_component_destroy(node->component);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(dom_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(node->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(node);
     return rc;
   }
@@ -165,9 +180,19 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
 
   rc = ui_text_layout_create(&node->layout);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(dom_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(dom_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     node->component->shadow_root = NULL;
-    (void)ui_component_destroy(node->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(node->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(node);
     return rc;
   }
@@ -179,18 +204,33 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
 ui_error_t ui_text_node_base_destroy(struct ui_text_node_base *node) {
   if (!node)
     return UI_ERROR_NONE;
-  if (node->layout)
-    (void)ui_text_layout_destroy(node->layout);
+  if (node->layout) {
+    ui_error_t rc_cleanup = ui_text_layout_destroy(node->layout);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (node->text)
     C_MULTIPLATFORM_FREE(node->text);
   if (node->font_family)
     C_MULTIPLATFORM_FREE(node->font_family);
   if (node->component) {
     if (node->component->shadow_root) {
-      (void)ui_dom_node_destroy(node->component->shadow_root);
+      {
+        ui_error_t rc_cleanup =
+            ui_dom_node_destroy(node->component->shadow_root);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       node->component->shadow_root = NULL;
     }
-    (void)ui_component_destroy(node->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(node->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(node);
   return UI_ERROR_NONE;

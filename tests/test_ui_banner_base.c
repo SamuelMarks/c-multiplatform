@@ -89,9 +89,24 @@ static void test_banner_base(void) {
   assert(ui_banner_base_get_animating_signal(banner, &anim_sig) ==
          UI_ERROR_NONE);
 
-  (void)ui_banner_base_destroy(banner);
-  (void)ui_signal_destroy(signal);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_banner_base_destroy(banner);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* OOM Loops */
   int i;
@@ -100,7 +115,12 @@ static void test_banner_base(void) {
     g_malloc_fail_countdown = i;
     err = ui_banner_base_create(&test_banner);
     if (err == UI_ERROR_NONE) {
-      (void)ui_banner_base_destroy(test_banner);
+      {
+        ui_error_t rc_cleanup = ui_banner_base_destroy(test_banner);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       assert(err == UI_ERROR_OUT_OF_MEMORY);
@@ -121,7 +141,12 @@ static void test_banner_base(void) {
     }
   }
   g_malloc_fail_countdown = -1;
-  (void)ui_banner_base_destroy(banner);
+  {
+    ui_error_t rc_cleanup = ui_banner_base_destroy(banner);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {

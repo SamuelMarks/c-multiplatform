@@ -149,7 +149,13 @@ static ui_error_t layout_block(struct ui_layout_node *node,
       child->y = current_y + child->margin[0];
 
       {
-        (void)ui_layout_compute(child, child_available_width, 0.0f);
+        {
+          ui_error_t rc_cleanup =
+              ui_layout_compute(child, child_available_width, 0.0f);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
 
       current_y = child->y + child->height + child->margin[2];
@@ -159,7 +165,13 @@ static ui_error_t layout_block(struct ui_layout_node *node,
       child->y = current_y + child->margin[0];
 
       {
-        (void)ui_layout_compute(child, child_available_width, 0.0f);
+        {
+          ui_error_t rc_cleanup =
+              ui_layout_compute(child, child_available_width, 0.0f);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
 
       current_x = child->x + child->width + child->margin[1];
@@ -301,7 +313,13 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
     struct ui_flex_line *current_line = &lines[line_count - 1];
 
     {
-      (void)ui_layout_compute(child, node->content_width, 0.0f);
+      {
+        ui_error_t rc_cleanup =
+            ui_layout_compute(child, node->content_width, 0.0f);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     if (child->flex_basis_type == UI_LAYOUT_SIZE_PIXELS) {
@@ -370,7 +388,13 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
         if (is_row) {
           child->width += extra;
           child->content_width += extra;
-          (void)ui_layout_compute(child, child->content_width, 0.0f);
+          {
+            ui_error_t rc_cleanup =
+                ui_layout_compute(child, child->content_width, 0.0f);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         } else {
           child->height += extra;
           child->content_height += extra;
@@ -390,7 +414,13 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
         if (is_row) {
           child->width -= shrink;
           child->content_width -= shrink;
-          (void)ui_layout_compute(child, child->content_width, 0.0f);
+          {
+            ui_error_t rc_cleanup =
+                ui_layout_compute(child, child->content_width, 0.0f);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         } else {
           child->height -= shrink;
           child->content_height -= shrink;

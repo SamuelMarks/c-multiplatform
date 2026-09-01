@@ -122,7 +122,12 @@ int main(void) {
         g_malloc_fail_countdown = -1;
         if (loupe_oom)
           ui_loupe_base_destroy(loupe_oom);
-        (void)ui_arena_destroy(small_arena);
+        {
+          ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -132,6 +137,11 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }

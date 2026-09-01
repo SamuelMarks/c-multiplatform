@@ -92,10 +92,20 @@ ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (masonry->component) {
-    (void)ui_component_destroy(masonry->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(masonry->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(masonry);
   return rc;
@@ -111,7 +121,12 @@ ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
   if (!masonry) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(masonry->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(masonry->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(masonry);
   return UI_ERROR_NONE;
 }

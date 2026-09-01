@@ -129,7 +129,12 @@ static void test_hotkey_registry_basic(void) {
   rc = ui_hotkey_registry_unregister(reg, id1);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_hotkey_registry_destroy(reg);
+  {
+    ui_error_t rc_cleanup = ui_hotkey_registry_destroy(reg);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_hotkey_registry_full(void) {
@@ -152,7 +157,12 @@ static void test_hotkey_registry_full(void) {
   rc = ui_hotkey_registry_register(reg, chord, mock_hotkey_callback, NULL, &id);
   assert(rc == UI_ERROR_OUT_OF_BOUNDS);
 
-  (void)ui_hotkey_registry_destroy(reg);
+  {
+    ui_error_t rc_cleanup = ui_hotkey_registry_destroy(reg);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void run_oom_tests_hotkey_registry(void) {
@@ -165,7 +175,12 @@ static void run_oom_tests_hotkey_registry(void) {
     rc = ui_hotkey_registry_create(&reg);
     g_malloc_fail_countdown = -1;
     if (rc == UI_ERROR_NONE) {
-      (void)ui_hotkey_registry_destroy(reg);
+      {
+        ui_error_t rc_cleanup = ui_hotkey_registry_destroy(reg);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

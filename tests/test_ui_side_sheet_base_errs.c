@@ -11,16 +11,47 @@ static void test_ui_side_sheet_errs(void) {
   struct ui_event ev;
   ui_side_sheet_base_create(&sheet);
 
-  (void)ui_side_sheet_base_set_on_close(sheet, mock_on_close_fail, NULL);
-  (void)ui_side_sheet_base_set_open(sheet, 1);
+  {
+    ui_error_t rc_cleanup =
+        ui_side_sheet_base_set_on_close(sheet, mock_on_close_fail, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* Triggers the if (rc != UI_ERROR_NONE) return rc; inside set_open */
-  (void)ui_side_sheet_base_set_open(sheet, 0);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_side_sheet_base_set_open(sheet, 1);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
   /* Triggers set_open failing from process_event -> returns rc */
-  (void)ui_side_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_side_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_side_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

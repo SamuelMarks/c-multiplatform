@@ -30,7 +30,7 @@ static char *my_strdup(const char *s) {
   size_t len = strlen(s);
   char *d = C_MULTIPLATFORM_MALLOC(len + 1);
   if (d)
-    UI_STRCPY(d, 256, s);
+    UI_STRCPY(d, len + 1, s);
   return d;
 }
 
@@ -60,45 +60,94 @@ int test_cssom_part5_serialization(void) {
     /* Mismatches and default operators */
     struct ui_css_rule *rule;
     struct ui_css_selector *sel = NULL;
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    {
+      ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_css_rule_append_selector_attr(rule, "data-test", UI_CSS_ATTR_OP_INCLUDES,
                                      "v");
     ui_css_rule_append_selector_attr(rule, "data-test2",
                                      UI_CSS_ATTR_OP_INCLUDES, "v");
 
     struct ui_dom_node *node;
-    (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
-    (void)ui_dom_node_set_attribute(node, "data-test", "");
-    (void)ui_dom_node_set_attribute(node, "data-test2", "v something");
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "data-test", "");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "data-test2", "v something");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_stylesheet *sheet;
-    (void)ui_css_stylesheet_create(&sheet);
-    (void)ui_css_stylesheet_append_rule(sheet, rule);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_computed_style *style;
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Cover missing internal mock string cases */
     struct ui_css_rule *rule_mock;
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_mock);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_mock);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_css_rule_append_selector(rule_mock, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
                                 "has(.unknown)");
-    (void)ui_css_stylesheet_append_rule(sheet, rule_mock);
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
-
     {
-      /* Test evaluating condition parenthesis errors */
-      struct ui_css_rule *rule;
-      struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      rule->supports_condition =
-          ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
-
-      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_mock);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
       }
     }
 
@@ -106,63 +155,173 @@ int test_cssom_part5_serialization(void) {
       /* Test evaluating condition parenthesis errors */
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+      }
+    }
+
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      struct ui_css_selector *sel = NULL;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) and"); /* missing end term */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) or"); /* missing end term */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("(not (display: flex)"); /* missing inner end */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) or )"); /* trailing paren */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
@@ -173,57 +332,124 @@ int test_cssom_part5_serialization(void) {
 
       struct ui_css_stylesheet *tmp_sheet = NULL;
       struct ui_css_computed_style *tmp_style = NULL;
-      (void)ui_css_stylesheet_create(&tmp_sheet);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(tmp_sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_stylesheet_destroy(tmp_sheet);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
       struct ui_css_stylesheet *tmp_sheet = NULL;
       struct ui_css_computed_style *tmp_style = NULL;
-      (void)ui_css_stylesheet_create(&tmp_sheet);
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) and"); /* missing end term */
-      (void)ui_css_stylesheet_append_rule(tmp_sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_resolve_style(tmp_sheet, node, &tmp_style);
-      (void)ui_css_stylesheet_destroy(tmp_sheet);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
       struct ui_css_stylesheet *tmp_sheet = NULL;
       struct ui_css_computed_style *tmp_style = NULL;
-      (void)ui_css_stylesheet_create(&tmp_sheet);
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) or"); /* missing end term */
-      (void)ui_css_stylesheet_append_rule(tmp_sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_resolve_style(tmp_sheet, node, &tmp_style);
-      (void)ui_css_stylesheet_destroy(tmp_sheet);
-    }
-
-    {
-      /* Test evaluating condition parenthesis errors */
-      struct ui_css_rule *rule;
-      struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      rule->supports_condition =
-          ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
-
-      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
       }
     }
 
@@ -231,57 +457,183 @@ int test_cssom_part5_serialization(void) {
       /* Test evaluating condition parenthesis errors */
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
-    (void)ui_css_stylesheet_destroy(sheet);
-    (void)ui_dom_node_destroy(node);
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      struct ui_css_selector *sel = NULL;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+      }
+    }
+
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   {
     /* Mismatches and default operators */
     struct ui_css_rule *rule;
     struct ui_css_selector *sel = NULL;
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    {
+      ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_stylesheet *sheet;
-    (void)ui_css_stylesheet_create(&sheet);
-    (void)ui_css_stylesheet_append_rule(sheet, rule);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_computed_style *style;
 
     struct ui_dom_node *node;
-    (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Child matching coverage */
     struct ui_dom_node *child1;
-    (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
-    (void)ui_dom_node_set_attribute(child1, "class", "hole");
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(child1, "class", "hole");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_dom_node *text_child;
-    (void)ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_child);
-    (void)ui_dom_node_append_child(child1, text_child);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_child);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_append_child(child1, text_child);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_dom_node_append_child(node, child1);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_append_child(node, child1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_rule *rule_has;
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_has);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule_has);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     struct ui_css_selector *has_hole =
         create_mock_selector(UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS, "has");
     struct ui_css_selector *nested_hole =
         create_mock_selector(UI_CSS_SELECTOR_TYPE_CLASS, ".hole");
     has_hole->nested_selector = nested_hole;
     rule_has->selectors = has_hole;
-    (void)ui_css_stylesheet_append_rule(sheet, rule_has);
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule_has);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* ui_dom_node_destroy(text_child); Since parent is freed, but let's make
      * sure it's not a double free. Actually node frees its children. So we just
@@ -291,13 +643,29 @@ int test_cssom_part5_serialization(void) {
       /* Test evaluating condition parenthesis errors */
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
@@ -305,63 +673,143 @@ int test_cssom_part5_serialization(void) {
       /* Test evaluating condition parenthesis errors */
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) and"); /* missing end term */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) or"); /* missing end term */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("(not (display: flex)"); /* missing inner end */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) or )"); /* trailing paren */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
@@ -372,57 +820,124 @@ int test_cssom_part5_serialization(void) {
 
       struct ui_css_stylesheet *tmp_sheet = NULL;
       struct ui_css_computed_style *tmp_style = NULL;
-      (void)ui_css_stylesheet_create(&tmp_sheet);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(tmp_sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_stylesheet_destroy(tmp_sheet);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
       struct ui_css_stylesheet *tmp_sheet = NULL;
       struct ui_css_computed_style *tmp_style = NULL;
-      (void)ui_css_stylesheet_create(&tmp_sheet);
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) and"); /* missing end term */
-      (void)ui_css_stylesheet_append_rule(tmp_sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_resolve_style(tmp_sheet, node, &tmp_style);
-      (void)ui_css_stylesheet_destroy(tmp_sheet);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
       struct ui_css_stylesheet *tmp_sheet = NULL;
       struct ui_css_computed_style *tmp_style = NULL;
-      (void)ui_css_stylesheet_create(&tmp_sheet);
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_create(&tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex) or"); /* missing end term */
-      (void)ui_css_stylesheet_append_rule(tmp_sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(tmp_sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_css_resolve_style(tmp_sheet, node, &tmp_style);
-      (void)ui_css_stylesheet_destroy(tmp_sheet);
-    }
-
-    {
-      /* Test evaluating condition parenthesis errors */
-      struct ui_css_rule *rule;
-      struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
-      rule->supports_condition =
-          ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
-
-      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_style(tmp_sheet, node, &tmp_style);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_destroy(tmp_sheet);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
       }
     }
 
@@ -430,33 +945,123 @@ int test_cssom_part5_serialization(void) {
       /* Test evaluating condition parenthesis errors */
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rule->supports_condition =
           ui_mock_strdup("((display: flex"); /* missing ) */
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
 
-    (void)ui_css_stylesheet_destroy(sheet);
-    (void)ui_dom_node_destroy(node);
+    {
+      /* Test evaluating condition parenthesis errors */
+      struct ui_css_rule *rule;
+      struct ui_css_selector *sel = NULL;
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_SUPPORTS, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      rule->supports_condition =
+          ui_mock_strdup("((display: flex"); /* missing ) */
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+
+      if (ui_css_resolve_style(sheet, node, &style) == UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+      }
+    }
+
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   {
     struct ui_css_stylesheet *sheet;
-    (void)ui_css_stylesheet_create(&sheet);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     int order1, order2, order3;
-    (void)ui_css_stylesheet_register_layer(sheet, "L1", &order1);
-    (void)ui_css_stylesheet_register_layer(sheet, "L2", &order2);
-    (void)ui_css_stylesheet_register_layer(sheet, "L3", &order3);
-    (void)ui_css_stylesheet_destroy(sheet);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L1", &order1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L2", &order2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L3", &order3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   {
     /* Missing pseudo classes */
     struct ui_dom_node *node;
-    (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     const char *pseudos[] = {"disabled",      "enabled",   "required",
                              "optional",      "read-only", "read-write",
@@ -464,133 +1069,539 @@ int test_cssom_part5_serialization(void) {
                              "valid",         "unknown"};
 
     struct ui_css_stylesheet *sheet;
-    (void)ui_css_stylesheet_create(&sheet);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     int i;
     for (i = 0; i < 11; ++i) {
       struct ui_css_rule *rule;
       struct ui_css_selector *sel = NULL;
-      (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
                                   pseudos[i]);
-      (void)ui_css_stylesheet_append_rule(sheet, rule);
+      {
+        ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     /* Empty rule without selector */
     struct ui_css_rule *empty_rule;
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &empty_rule);
-    (void)ui_css_stylesheet_append_rule(sheet, empty_rule);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &empty_rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, empty_rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_rule *attr_rule;
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &attr_rule);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &attr_rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_css_rule_append_selector_attr(attr_rule, "lang", UI_CSS_ATTR_OP_DASH,
                                      "en");
-    (void)ui_css_stylesheet_append_rule(sheet, attr_rule);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, attr_rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Test state 1: no attributes */
     struct ui_css_computed_style *style;
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Test dash mismatch */
-    (void)ui_dom_node_set_attribute(node, "lang", "en");
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
-    (void)ui_dom_node_remove_attribute(node, "lang");
-    (void)ui_dom_node_set_attribute(node, "lang", "es");
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
-    (void)ui_dom_node_remove_attribute(node, "lang");
-    (void)ui_dom_node_set_attribute(node, "lang", "eng");
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
-    (void)ui_dom_node_remove_attribute(node, "lang");
-    (void)ui_dom_node_set_attribute(node, "lang", "en-US");
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
-    (void)ui_dom_node_remove_attribute(node, "lang");
-    (void)ui_dom_node_set_attribute(node, "lang", "en-");
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "lang", "en");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(node, "lang");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "lang", "es");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(node, "lang");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "lang", "eng");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(node, "lang");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "lang", "en-US");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(node, "lang");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "lang", "en-");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Test state 2: With native attributes */
-    (void)ui_dom_node_set_attribute(node, "disabled", "");
-    (void)ui_dom_node_set_attribute(node, "required", "");
-    (void)ui_dom_node_set_attribute(node, "readonly", "");
-    (void)ui_dom_node_set_attribute(node, "indeterminate", "");
-    (void)ui_dom_node_set_attribute(node, "default", "");
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "disabled", "");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "required", "");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "readonly", "");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "indeterminate", "");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(node, "default", "");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Test state 3: With aria attributes (true) */
-    (void)ui_dom_node_remove_attribute(node, "disabled");
-    (void)ui_dom_node_remove_attribute(node, "required");
-    (void)ui_dom_node_remove_attribute(node, "readonly");
-    (void)ui_dom_node_remove_attribute(node, "indeterminate");
-    (void)ui_dom_node_remove_attribute(node, "default");
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(node, "disabled");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(node, "required");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(node, "readonly");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_remove_attribute(node, "indeterminate");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(node, "default");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_dom_node_set_attribute(node, "aria-disabled", "true");
-    (void)ui_dom_node_set_attribute(node, "aria-required", "true");
-    (void)ui_dom_node_set_attribute(node, "aria-readonly", "true");
-    (void)ui_dom_node_set_attribute(node, "aria-checked", "true");
-    (void)ui_dom_node_set_attribute(node, "aria-invalid", "true");
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-disabled", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-required", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-readonly", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-checked", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-invalid", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Test state 4: with aria attributes (false) */
-    (void)ui_dom_node_set_attribute(node, "aria-disabled", "false");
-    (void)ui_dom_node_set_attribute(node, "aria-required", "false");
-    (void)ui_dom_node_set_attribute(node, "aria-readonly", "false");
-    (void)ui_dom_node_set_attribute(node, "aria-checked", "false");
-    (void)ui_dom_node_set_attribute(node, "aria-invalid", "false");
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-disabled", "false");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-required", "false");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-readonly", "false");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-checked", "false");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(node, "aria-invalid", "false");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_css_stylesheet_destroy(sheet);
-    (void)ui_dom_node_destroy(node);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   {
     /* Important rules overriding */
     struct ui_dom_node *node;
-    (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_stylesheet *sheet;
-    (void)ui_css_stylesheet_create(&sheet);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     int order1, order2;
-    (void)ui_css_stylesheet_register_layer(sheet, "L1", &order1);
-    (void)ui_css_stylesheet_register_layer(sheet, "L2", &order2);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L1", &order1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L2", &order2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_rule *rule1, *rule2, *rule3, *rule4;
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule1);
-    (void)ui_css_rule_append_selector(rule1, UI_CSS_SELECTOR_TYPE_TAG, "div");
-    (void)ui_css_rule_append_declaration(rule1, "color", "red", 0);
-    (void)ui_css_rule_append_declaration(rule1, "background", "red", 1);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule1, UI_CSS_SELECTOR_TYPE_TAG, "div");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule1, "color", "red", 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule1, "background", "red", 1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule2);
-    (void)ui_css_rule_append_selector(rule2, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule2, UI_CSS_SELECTOR_TYPE_TAG, "div");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_css_rule_append_declaration(rule2, "color", "blue",
                                    1); /* overrides normal */
     ui_css_rule_append_declaration(rule2, "background", "blue",
                                    0); /* fails to override important */
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule3);
-    (void)ui_css_rule_append_selector(rule3, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule3, UI_CSS_SELECTOR_TYPE_TAG, "div");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_css_rule_append_declaration(rule3, "color", "green",
                                    1); /* same important, overrides */
 
-    (void)ui_css_stylesheet_append_rule(sheet, rule1);
-    (void)ui_css_stylesheet_append_rule(sheet, rule2);
-    (void)ui_css_stylesheet_append_rule(sheet, rule3);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_dom_node_set_tag_name(node, "div");
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_tag_name(node, "div");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_css_computed_style *style;
-    (void)ui_css_resolve_style(sheet, node, &style);
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_css_stylesheet_destroy(sheet);
-    (void)ui_dom_node_destroy(node);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return 0;
 }

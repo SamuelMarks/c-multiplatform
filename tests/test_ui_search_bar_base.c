@@ -77,7 +77,12 @@ static int test_search_bar_operations(void) {
   struct ui_component comp;
   ui_error_t err;
 
-  (void)ui_search_bar_base_init(&sb, &comp, NULL);
+  {
+    ui_error_t rc_cleanup = ui_search_bar_base_init(&sb, &comp, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   err = ui_search_bar_base_set_query(NULL, "hello");
   if (err != UI_ERROR_INVALID_ARGUMENT)
@@ -121,8 +126,18 @@ static int test_search_bar_operations(void) {
 
   /* cleanup with null query */
   struct ui_search_bar_base sb2;
-  (void)ui_search_bar_base_init(&sb2, &comp, NULL);
-  (void)ui_search_bar_base_cleanup(&sb2);
+  {
+    ui_error_t rc_cleanup = ui_search_bar_base_init(&sb2, &comp, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   err = ui_search_bar_base_cleanup(&sb);
   if (err != UI_ERROR_NONE)
@@ -131,7 +146,12 @@ static int test_search_bar_operations(void) {
     return 1;
 
   /* Test OOM */
-  (void)ui_search_bar_base_init(&sb, &comp, NULL);
+  {
+    ui_error_t rc_cleanup = ui_search_bar_base_init(&sb, &comp, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = 0;
   err = ui_search_bar_base_set_query(&sb, "oom text");
   if (err != UI_ERROR_OUT_OF_MEMORY)
@@ -146,7 +166,12 @@ static int test_search_bar_operations(void) {
   }
   g_mock_strcpy_fail = 0;
 
-  (void)ui_search_bar_base_cleanup(&sb);
+  {
+    ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -160,7 +185,12 @@ static int test_search_bar_cva(void) {
   void *ud1 = (void *)0x111;
   void *ud2 = (void *)0x222;
 
-  (void)ui_search_bar_base_init(&sb, &comp, &cva);
+  {
+    ui_error_t rc_cleanup = ui_search_bar_base_init(&sb, &comp, &cva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test invalid args to CVA functions */
   err = cva.write_value(NULL, val);
@@ -222,7 +252,12 @@ static int test_search_bar_cva(void) {
   if (strcmp(sb.query, "") != 0)
     return 1;
 
-  (void)ui_search_bar_base_cleanup(&sb);
+  {
+    ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

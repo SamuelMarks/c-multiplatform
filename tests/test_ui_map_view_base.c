@@ -13,7 +13,12 @@ static ui_error_t mock_eq_fail(union ui_signal_payload a,
 
 static void test_missing_map_coverage(void) {
   struct ui_map_view_base *map = NULL;
-  (void)ui_map_view_base_create(&map);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_create(&map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test missing null checks */
 
@@ -31,20 +36,60 @@ static void test_missing_map_coverage(void) {
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_rot);
 
   ui_map_view_base_bind_center(map, sig_center);
-  (void)ui_map_view_base_bind_zoom(map, sig_zoom);
-  (void)ui_map_view_base_bind_rotation(map, sig_rot);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_bind_zoom(map, sig_zoom);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_bind_rotation(map, sig_rot);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* This will call emit_center which calls ui_signal_set which will fail and
    * return error */
-  (void)ui_map_view_base_handle_pan(map, 10.0, 10.0);
-  (void)ui_map_view_base_handle_pinch(map, 2.0, 0, 0);
-  (void)ui_map_view_base_handle_rotate(map, 0.1, 0, 0);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_pan(map, 10.0, 10.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_pinch(map, 2.0, 0, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_rotate(map, 0.1, 0, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_map_view_base_destroy(map);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_destroy(map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test malloc fail on add marker */
-  (void)ui_map_view_base_create(&map);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_create(&map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   struct ui_map_marker m;
   m.coordinate.latitude = 0;
   m.coordinate.longitude = 0;
@@ -52,10 +97,20 @@ static void test_missing_map_coverage(void) {
   size_t id;
 
   g_malloc_fail_countdown = 0;
-  (void)ui_map_view_base_add_marker(map, &m, &id);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, &m, &id);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_map_view_base_destroy(map);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_destroy(map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_map_errors_and_methods(void) {
@@ -68,7 +123,12 @@ static void test_map_errors_and_methods(void) {
 
   if (ui_map_view_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
-  (void)ui_map_view_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_map_view_base_bind_center(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
@@ -91,7 +151,12 @@ static void test_map_errors_and_methods(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return;
 
-  (void)ui_map_view_base_create(&map);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_create(&map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_arena *arena;
   ui_arena_create(1024, &arena);
@@ -101,15 +166,36 @@ static void test_map_errors_and_methods(void) {
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
 
   ui_map_view_base_bind_center(map, sig);
-  (void)ui_map_view_base_bind_zoom(map, sig);
-  (void)ui_map_view_base_bind_rotation(map, sig);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_bind_zoom(map, sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_bind_rotation(map, sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   coord.latitude = 0;
   coord.longitude = 0;
 
   /* invalid marker removes */
-  (void)ui_map_view_base_remove_marker(map, 999);
-  (void)ui_map_view_base_get_marker_position(map, 999, &x, &y);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_remove_marker(map, 999);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_map_view_base_get_marker_position(map, 999, &x, &y);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* re-alloc test inside add marker by adding many */
   struct ui_map_marker marker;
@@ -118,61 +204,187 @@ static void test_map_errors_and_methods(void) {
   marker.user_data = NULL;
   int i;
   for (i = 0; i < 20; i++) {
-    (void)ui_map_view_base_add_marker(map, &marker, &id);
+    {
+      ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, &marker, &id);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Missing argument branches */
-  (void)ui_map_view_base_project(map, &coord, NULL, NULL);
-  (void)ui_map_view_base_project(map, NULL, &x, &y);
-  (void)ui_map_view_base_unproject(map, 0, 0, NULL);
-  (void)ui_map_view_base_add_marker(map, NULL, &id);
-  (void)ui_map_view_base_add_marker(map, &marker, NULL);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_project(map, &coord, NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_project(map, NULL, &x, &y);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_unproject(map, 0, 0, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, NULL, &id);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, &marker, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Missing argument branches */
   ui_map_view_base_set_tile_provider(NULL, NULL, NULL);
   ui_map_view_base_set_tile_provider(map, NULL, NULL);
-  (void)ui_map_view_base_handle_pan(NULL, 0, 0);
-  (void)ui_map_view_base_handle_pinch(NULL, 0, 0, 0);
-  (void)ui_map_view_base_handle_rotate(NULL, 0, 0, 0);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_pan(NULL, 0, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_pinch(NULL, 0, 0, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_rotate(NULL, 0, 0, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Trigger the center/zoom/rotation branches that update bound signals by
    * panning and zooming */
-  (void)ui_map_view_base_handle_pan(map, 10.0, 10.0);
-  (void)ui_map_view_base_handle_pinch(map, 2.0, 0, 0);
-  (void)ui_map_view_base_handle_rotate(map, 0.1, 0, 0);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_pan(map, 10.0, 10.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_pinch(map, 2.0, 0, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_handle_rotate(map, 0.1, 0, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* OOM and marker shifting */
   /* Remove a marker from the middle to trigger the shift */
-  (void)ui_map_view_base_add_marker(map, &marker, &id);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, &marker, &id);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   size_t id2, id3;
-  (void)ui_map_view_base_add_marker(map, &marker, &id2);
-  (void)ui_map_view_base_add_marker(map, &marker, &id3);
-  (void)ui_map_view_base_remove_marker(map, id2);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, &marker, &id2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, &marker, &id3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_remove_marker(map, id2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Negative zoom limit test */
-  (void)ui_map_view_base_handle_pinch(map, 0.000000000001, 0, 0);
+  {
+    ui_error_t rc_cleanup =
+        ui_map_view_base_handle_pinch(map, 0.000000000001, 0, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_map_view_base_get_marker_position(map, 0, NULL, NULL);
+  {
+    ui_error_t rc_cleanup =
+        ui_map_view_base_get_marker_position(map, 0, NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_map_view_base_destroy(map);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_destroy(map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
-    if (ui_map_view_base_create(&map) == UI_ERROR_NONE)
-      (void)ui_map_view_base_destroy(map);
+    if (ui_map_view_base_create(&map) == UI_ERROR_NONE) {
+      ui_error_t rc_cleanup = ui_map_view_base_destroy(map);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_malloc_fail_countdown = -1;
   }
 
-  (void)ui_map_view_base_create(&map);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_create(&map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   for (i = 0; i < 20; i++) {
-    (void)ui_map_view_base_add_marker(map, &marker, &id);
+    {
+      ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, &marker, &id);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   g_malloc_fail_countdown = 0;
-  (void)ui_map_view_base_add_marker(map, &marker, &id);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_add_marker(map, &marker, &id);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
-  (void)ui_map_view_base_destroy(map);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_destroy(map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
 }
 
@@ -184,18 +396,52 @@ static void test_map_math_errors(void) {
   ui_map_view_base_create(&map);
 
   /* Try to convert coord to pixel out of bounds */
-  (void)ui_map_view_base_project(map, &(struct ui_map_coordinate){2000.0, 0.0},
-                                 &out_x, &out_y);
-  (void)ui_map_view_base_project(map, &(struct ui_map_coordinate){0.0, 2000.0},
-                                 &out_x, &out_y);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_project(
+        map, &(struct ui_map_coordinate){2000.0, 0.0}, &out_x, &out_y);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_project(
+        map, &(struct ui_map_coordinate){0.0, 2000.0}, &out_x, &out_y);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Try to convert pixel to coord out of bounds */
-  (void)ui_map_view_base_unproject(map, 1000000000.0, 0.0, &coord);
-  (void)ui_map_view_base_unproject(map, 0.0, 1000000000.0, &coord);
+  {
+    ui_error_t rc_cleanup =
+        ui_map_view_base_unproject(map, 1000000000.0, 0.0, &coord);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_map_view_base_unproject(map, 0.0, 1000000000.0, &coord);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Pan by huge amounts to trigger errors during handle_pan */
-  (void)ui_map_view_base_handle_pan(map, -1000000000.0, 0.0);
-  (void)ui_map_view_base_handle_pan(map, 0.0, -1000000000.0);
+  {
+    ui_error_t rc_cleanup =
+        ui_map_view_base_handle_pan(map, -1000000000.0, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_map_view_base_handle_pan(map, 0.0, -1000000000.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ui_map_view_base_destroy(map);
 }
@@ -325,7 +571,12 @@ int main(void) {
       return 1;
   }
 
-  (void)ui_map_view_base_destroy(map);
+  {
+    ui_error_t rc_cleanup = ui_map_view_base_destroy(map);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }

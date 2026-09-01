@@ -109,7 +109,12 @@ TEST test_ui_aria_state_parse_empty(void) {
   node->type = UI_DOM_NODE_TYPE_ELEMENT;
 
   ui_aria_state_cleanup(&state);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* NULL cleanup test */
   ui_aria_state_cleanup(NULL);
@@ -207,7 +212,12 @@ TEST test_ui_aria_state_parse_implicit(void) {
   ASSERT_EQ(1, state.is_disabled);
   ui_aria_state_cleanup(&state);
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   PASS();
 }
 
@@ -324,14 +334,24 @@ TEST test_ui_aria_state_parse_explicit(void) {
   ui_aria_state_cleanup(&state);
 
   /* Fallback missing tag_name test */
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
   node->tag_name =
       NULL; /* forcefully remove string since constructor gives default */
   ui_aria_state_parse(node, &state);
   ASSERT_EQ(UI_ARIA_ROLE_NONE, state.role);
   ui_aria_state_cleanup(&state);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   PASS();
 }

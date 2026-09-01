@@ -24,6 +24,11 @@ void test_ui_rte_coverage_errs14(void) {
     cva.register_on_touched(rte, failing_cva_on_touched, NULL);
     ui_rich_text_editor_base_insert_text(rte, "foo"); /* hits 266 */
 
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }

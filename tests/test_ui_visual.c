@@ -141,8 +141,13 @@ int main(void) {
           ui_visual_generate_heatmap(native_pixels, gles_pixels, width, height,
                                      heatmap);
           g_mock_stbi_write_png_fail = 1;
-          (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png",
-                                                heatmap, width, height);
+          {
+            ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
+                "visual_diff_heatmap.png", heatmap, width, height);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
           g_mock_stbi_write_png_fail = 0;
           free(heatmap);
         }
@@ -179,13 +184,34 @@ int main(void) {
                                  native_pixels);
       ui_visual_generate_heatmap(native_pixels, gles_pixels, width, 0,
                                  native_pixels);
-      (void)ui_visual_write_heatmap_to_disk(NULL, native_pixels, width, height);
-      (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png", NULL,
-                                            width, height);
-      (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png",
-                                            native_pixels, 0, height);
-      (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png",
-                                            native_pixels, width, 0);
+      {
+        ui_error_t rc_cleanup =
+            ui_visual_write_heatmap_to_disk(NULL, native_pixels, width, height);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
+            "visual_diff_heatmap.png", NULL, width, height);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
+            "visual_diff_heatmap.png", native_pixels, 0, height);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
+            "visual_diff_heatmap.png", native_pixels, width, 0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       /* Make an exact match test case just for coverage */
       ui_visual_fuzzy_match(native_pixels, native_pixels, width, height,
@@ -194,9 +220,14 @@ int main(void) {
                                  gles_pixels);
 
       /* Test writing failure */
-      (void)ui_visual_write_heatmap_to_disk(
-          "/invalid/path/that/does/not/exist/heatmap.png", native_pixels, width,
-          height);
+      {
+        ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
+            "/invalid/path/that/does/not/exist/heatmap.png", native_pixels,
+            width, height);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       /* Intentionally cause an RMS mismatch */
       memset(gles_pixels, 255, width * height * 4);
@@ -228,8 +259,13 @@ int main(void) {
         ui_visual_generate_heatmap(native_pixels, gles_pixels, width, height,
                                    heatmap);
         g_mock_stbi_write_png_fail = 1;
-        (void)ui_visual_write_heatmap_to_disk("visual_diff_heatmap.png",
-                                              heatmap, width, height);
+        {
+          ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
+              "visual_diff_heatmap.png", heatmap, width, height);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         g_mock_stbi_write_png_fail = 0;
         free(heatmap);
       }

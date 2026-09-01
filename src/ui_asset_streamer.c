@@ -375,7 +375,13 @@ ui_error_t ui_asset_streamer_request(struct ui_asset_streamer *streamer,
 cleanup:
   if (rc != UI_ERROR_NONE) {
     if (promise) {
-      (void)ui_promise_destroy(promise);
+      {
+        ui_error_t rc_cleanup = ui_promise_destroy(promise);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE)
+            rc = rc_cleanup;
+        }
+      }
     }
     if (task) {
       if (task->url) {
@@ -405,9 +411,24 @@ ui_error_t run_asset_streamer_coverage(void) {
   FILE *dummy = NULL;
   struct ui_execution_context *ctx = NULL;
 
-  (void)ui_thread_pool_create(1, &pool);
-  (void)ui_execution_context_create(&ctx);
-  (void)ui_asset_streamer_create(pool, ctx, &streamer);
+  {
+    ui_error_t rc_cleanup = ui_thread_pool_create(1, &pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_execution_context_create(&ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_asset_streamer_create(pool, ctx, &streamer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
 #if defined(_MSC_VER)
   fopen_s(&dummy, "dummy_asset.txt", "wb");
@@ -423,13 +444,23 @@ ui_error_t run_asset_streamer_coverage(void) {
   memset(task, 0, sizeof(struct ui_asset_task));
   task->streamer = streamer;
   task->type = UI_ASSET_TYPE_BINARY;
-  (void)ui_promise_create(&task->promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&task->promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
   UI_STRCPY(task->url, 100, "dummy_asset.txt");
   g_mock_io_fail = 4; /* mock fopen fail */
   (void)asset_task_execute(task);
   g_mock_io_fail = 0;
-  (void)ui_execution_context_tick(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_tick(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* Mock 1: promise_resolve fails */
   task = (struct ui_asset_task *)C_MULTIPLATFORM_MALLOC(
@@ -437,14 +468,24 @@ ui_error_t run_asset_streamer_coverage(void) {
   memset(task, 0, sizeof(struct ui_asset_task));
   task->streamer = streamer;
   task->type = UI_ASSET_TYPE_BINARY;
-  (void)ui_promise_create(&task->promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&task->promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
   UI_STRCPY(task->url, 100, "dummy_asset.txt");
   (void)asset_task_execute(task);
   g_asset_streamer_mock_fail = 1; /* resolve fails */
   (void)asset_task_complete(task);
   g_asset_streamer_mock_fail = 0;
-  (void)ui_execution_context_tick(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_tick(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_malloc_fail_countdown = 0;
   (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
@@ -456,14 +497,24 @@ ui_error_t run_asset_streamer_coverage(void) {
   memset(task, 0, sizeof(struct ui_asset_task));
   task->streamer = streamer;
   task->type = UI_ASSET_TYPE_BINARY;
-  (void)ui_promise_create(&task->promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&task->promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
   UI_STRCPY(task->url, 100, "non_existent.txt");
   (void)asset_task_execute(task); /* IO fail */
   g_asset_streamer_mock_fail = 2; /* reject fails */
   (void)asset_task_complete(task);
   g_asset_streamer_mock_fail = 0;
-  (void)ui_execution_context_tick(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_tick(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_malloc_fail_countdown = 0;
   (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
   g_malloc_fail_countdown = -1;
@@ -474,13 +525,23 @@ ui_error_t run_asset_streamer_coverage(void) {
   memset(task, 0, sizeof(struct ui_asset_task));
   task->streamer = streamer;
   task->type = UI_ASSET_TYPE_BINARY;
-  (void)ui_promise_create(&task->promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&task->promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
   UI_STRCPY(task->url, 100, "dummy_asset.txt");
   g_mock_io_fail = 3; /* builtin mock for UI_FREAD to return 0 */
   (void)asset_task_execute(task);
   g_mock_io_fail = 0;
-  (void)ui_execution_context_tick(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_tick(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_malloc_fail_countdown = 0;
   (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
@@ -492,21 +553,36 @@ ui_error_t run_asset_streamer_coverage(void) {
   memset(task, 0, sizeof(struct ui_asset_task));
   task->streamer = streamer;
   task->type = UI_ASSET_TYPE_BINARY;
-  (void)ui_promise_create(&task->promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&task->promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
   UI_STRCPY(task->url, 100, "dummy_asset.txt");
   g_malloc_fail_countdown = 0;
   (void)asset_task_execute(task);
   g_malloc_fail_countdown = -1;
-  (void)ui_execution_context_tick(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_tick(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_malloc_fail_countdown = 0;
   (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
   g_malloc_fail_countdown = -1;
 
   /* ui_asset_streamer_request */
   g_asset_streamer_mock_fail = 4; /* schedule fails */
-  (void)ui_asset_streamer_request(streamer, "dummy_asset.txt",
-                                  UI_ASSET_TYPE_BINARY, &promise);
+  {
+    ui_error_t rc_cleanup = ui_asset_streamer_request(
+        streamer, "dummy_asset.txt", UI_ASSET_TYPE_BINARY, &promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_asset_streamer_mock_fail = 0;
 
   /* Mock OOM: asset url allocation fails */
@@ -515,7 +591,12 @@ ui_error_t run_asset_streamer_coverage(void) {
   memset(task, 0, sizeof(struct ui_asset_task));
   task->streamer = streamer;
   task->type = UI_ASSET_TYPE_BINARY;
-  (void)ui_promise_create(&task->promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&task->promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
   UI_STRCPY(task->url, 100, "dummy_asset.txt");
   g_malloc_fail_countdown = 2;
@@ -527,9 +608,24 @@ ui_error_t run_asset_streamer_coverage(void) {
   (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
   g_malloc_fail_countdown = -1;
 
-  (void)ui_asset_streamer_destroy(streamer);
-  (void)ui_thread_pool_destroy(pool);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_thread_pool_destroy(pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   return UI_ERROR_NONE;
 }
 #endif

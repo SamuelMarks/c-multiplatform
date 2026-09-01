@@ -153,7 +153,12 @@ static int test_mask_formatting(void) {
 
   ui_input_mask_destroy(mask);
 
-  (void)ui_input_base_destroy(input);
+  {
+    ui_error_t rc_cleanup = ui_input_base_destroy(input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

@@ -116,7 +116,12 @@ static int run_normal_tests(void) {
     return 1;
   }
 
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_execution_context_get_current(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -146,7 +151,12 @@ static int run_paradigm_tests(void) {
     ui_execution_context_tick(ctx);
     if (test_val != 42)
       return 1;
-    (void)ui_execution_context_destroy(ctx);
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_execution_context_set_current(NULL);
   }
 
@@ -184,8 +194,18 @@ static int run_paradigm_tests(void) {
         return 1;
     }
 
-    (void)ui_execution_context_destroy(ctxs[0]);
-    (void)ui_execution_context_destroy(ctxs[1]);
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctxs[0]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctxs[1]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;
@@ -221,11 +241,21 @@ static int test_execution_context_fail(void) {
   ui_execution_context_schedule(ctx, failing_task_cb, NULL);
 
   if (ui_execution_context_tick(ctx) != UI_ERROR_UNKNOWN) {
-    (void)ui_execution_context_destroy(ctx);
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return 1;
   }
 
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

@@ -225,9 +225,24 @@ static int test_normal(void) {
              UI_ERROR_INVALID_ARGUMENT);
   ACCUM_ERR(failed, ui_tooltip_base_get_animating_signal(tt, &anim_sig));
 
-  (void)ui_tooltip_base_destroy(tt);
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
+  {
+    ui_error_t rc_cleanup = ui_tooltip_base_destroy(tt);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -246,7 +261,12 @@ static int test_oom(void) {
   for (i = 0; i < 3; i++) {
     g_malloc_fail_countdown = i;
     if (ui_tooltip_base_create(&tt, &cfg) == UI_ERROR_NONE) {
-      (void)ui_tooltip_base_destroy(tt);
+      {
+        ui_error_t rc_cleanup = ui_tooltip_base_destroy(tt);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -297,9 +317,24 @@ static int test_oom(void) {
   ui_tooltip_base_hide(tt);
   ui_tooltip_base_render(tt, director, &trig_layout, &anchor, 800, 600);
 
-  (void)ui_tooltip_base_destroy(tt);
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
+  {
+    ui_error_t rc_cleanup = ui_tooltip_base_destroy(tt);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
   return failed;
 }

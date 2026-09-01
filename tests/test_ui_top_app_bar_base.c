@@ -92,8 +92,18 @@ static int test_top_app_bar_lifecycle(void) {
   rc = ui_top_app_bar_base_destroy(bar);
   failed |= (rc != UI_ERROR_NONE);
 
-  (void)ui_arena_destroy(arena);
-  (void)ui_arena_destroy(small_arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -160,7 +170,12 @@ static int test_top_app_bar_scroll(void) {
   rc = ui_top_app_bar_base_destroy(bar);
   failed |= (rc != UI_ERROR_NONE);
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 

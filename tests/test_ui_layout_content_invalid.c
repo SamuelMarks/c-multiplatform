@@ -54,7 +54,12 @@ void test_content_negative(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 /* clang-format off */
 #include "../include/ui_cssom.h"

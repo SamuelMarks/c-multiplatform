@@ -26,7 +26,12 @@ static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
 
   err = ui_dom_node_set_tag_name(*out_slot, "div");
   if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(*out_slot);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(*out_slot);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return err;
   }
 
@@ -34,7 +39,12 @@ static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
     ui_error_t set_rc =
         ui_dom_node_set_attribute(*out_slot, "data-slot", slot_name);
     if (set_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(*out_slot);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(*out_slot);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       return set_rc;
     }
   }
@@ -68,7 +78,12 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
   scaffold = (struct ui_scaffold_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_scaffold_base));
   if (!scaffold) {
-    (void)ui_component_destroy(base_comp);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -84,7 +99,12 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
 
   err = ui_dom_node_set_tag_name(scaffold->base.shadow_root, "ui-scaffold");
   if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(scaffold->base.shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(scaffold->base.shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(scaffold);
     return err;
   }

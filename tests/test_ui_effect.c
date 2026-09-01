@@ -62,10 +62,20 @@ static int test_effect(void) {
     ui_effect_create(NULL, dummy_effect, &data2, reactor, &eff2);
     g_malloc_fail_countdown = -1;
     ui_reactor_poll(reactor, 0);
-    (void)ui_effect_destroy(eff2);
+    {
+      ui_error_t rc_cleanup = ui_effect_destroy(eff2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_effect_destroy(eff);
+  {
+    ui_error_t rc_cleanup = ui_effect_destroy(eff);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_reactor_destroy(reactor);
 
   /* Test effect fn failure */
@@ -100,7 +110,12 @@ static int test_effect(void) {
   ui_effect_create(NULL, NULL, NULL, NULL, NULL);
   ui_effect_create(NULL, dummy_effect, NULL, NULL, NULL);
   ui_effect_create(NULL, NULL, NULL, NULL, &eff);
-  (void)ui_effect_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_effect_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_effect_evaluate(NULL);
 
   {
@@ -122,7 +137,12 @@ static int test_effect(void) {
     ui_arena_create(256, &arena);
 
     ui_effect_create(arena, dummy_effect, &my_data, NULL, &eff);
-    (void)ui_effect_destroy(eff);
+    {
+      ui_error_t rc_cleanup = ui_effect_destroy(eff);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Exhaust the arena */
     ui_arena_alloc(arena, 256, 8, &dummy);
@@ -134,7 +154,12 @@ static int test_effect(void) {
       return 1;
     }
     g_malloc_fail_countdown = -1;
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;

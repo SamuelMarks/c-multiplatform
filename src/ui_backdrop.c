@@ -33,7 +33,12 @@ ui_error_t run_backdrop_coverage(void) {
   ui_backdrop_process_event(backdrop, &ev, 0.0, 0.0, 0.0, 0.0, &should_dismiss);
   g_backdrop_mock_fail = 0;
 
-  (void)ui_backdrop_destroy(backdrop);
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(backdrop);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 #endif

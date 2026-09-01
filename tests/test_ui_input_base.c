@@ -287,7 +287,12 @@ static int run_normal_tests(void) {
   printf("Shift+Arrow Key highlight constraint checked.\n");
   /* Simulate Copy/Paste clipboard injection mapping */
   printf("Clipboard bindings constraint checked.\n");
-  (void)ui_input_base_destroy(input);
+  {
+    ui_error_t rc_cleanup = ui_input_base_destroy(input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -334,7 +339,12 @@ static int run_failure_tests(void) {
     EXPECT(err == UI_ERROR_NONE);
   }
 
-  (void)ui_input_base_destroy(input);
+  {
+    ui_error_t rc_cleanup = ui_input_base_destroy(input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 static int run_oom_tests(void) {
@@ -353,7 +363,12 @@ static int run_oom_tests(void) {
     err = ui_input_base_create(&input);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      (void)ui_input_base_destroy(input);
+      {
+        ui_error_t rc_cleanup = ui_input_base_destroy(input);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }
@@ -396,7 +411,12 @@ static int run_oom_tests(void) {
   g_malloc_fail_countdown = -1;
   EXPECT(err == UI_ERROR_OUT_OF_MEMORY);
 
-  (void)ui_input_base_destroy(input);
+  {
+    ui_error_t rc_cleanup = ui_input_base_destroy(input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }

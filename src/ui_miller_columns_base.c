@@ -109,7 +109,13 @@ ui_miller_columns_base_destroy(struct ui_miller_columns_base *miller) {
   }
 
   if (miller->topology_changed_signal) {
-    (void)ui_signal_destroy(miller->topology_changed_signal);
+    {
+      ui_error_t rc_cleanup =
+          ui_signal_destroy(miller->topology_changed_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;
@@ -168,9 +174,7 @@ ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
   payload.int_val = miller->active_column_count;
   {
     ui_error_t set_rc = ui_signal_set(miller->topology_changed_signal, payload);
-    {
-      (void)set_rc;
-    }
+    { (void)set_rc; }
   }
 
   return UI_ERROR_NONE;

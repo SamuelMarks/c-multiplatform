@@ -174,7 +174,7 @@ static void test_more_branches(void) {
   EXPECT_EQ(UI_ERROR_NONE, rc);
 
   /* very long shadow */
-  char long_shadow[256];
+  char long_shadow[1024];
   UI_STRCPY(long_shadow, 1024, "10px 10px ");
   memset(long_shadow + 10, 'A', 200);
   UI_STRCPY(long_shadow + 210, 1024 - 210, "px #fff");
@@ -208,7 +208,7 @@ static void test_more_branches(void) {
   rc = ui_css_parse_animation(long_trans, &anim);
   /* removed check */
 
-  char long_easing[256];
+  char long_easing[1024];
   UI_STRCPY(long_easing, 1024, "cubic-bezier(0.1, ");
   memset(long_easing + 18, ' ', 100);
   UI_STRCPY(long_easing + 118, 1024 - 118, "0.1, 0.1, 0.1)");
@@ -224,7 +224,7 @@ static void test_more_branches(void) {
   rc = ui_css_parse_animation(long_easing, &anim);
 
   /* very long filter */
-  char long_filter[256];
+  char long_filter[1024];
   UI_STRCPY(long_filter, 1024, "blur(");
   memset(long_filter + 5, '1', 200);
   UI_STRCPY(long_filter + 205, 1024 - 205, "px)");
@@ -370,7 +370,7 @@ static void test_more_branches_2(void) {
   struct ui_css_animation *a_anim = NULL;
   struct ui_css_transition *a_trans = NULL;
 
-  char long_easing[256];
+  char long_easing[1024];
   memset(long_easing, 'a', 255);
   long_easing[255] = '\0';
 
@@ -594,7 +594,7 @@ static void test_more_branches_5(void) {
   rc = ui_css_parse_filter("blur(10px", &filter);
 
   /* Shadow with long tokens */
-  char long_str[256];
+  char long_str[1024];
   memset(long_str, 'a', 150);
   long_str[150] = '\0';
   if (shadow) {
@@ -685,7 +685,7 @@ static void test_more_branches_6(void) {
                               &dash);
 
   /* shadow token too long */
-  char shadow_str[100];
+  char shadow_str[256];
   UI_STRCPY(shadow_str, 256, "10px 10px ");
   memset(shadow_str + 10, 'a', 50);
   shadow_str[60] = '\0';
@@ -708,7 +708,7 @@ static void test_more_branches_6(void) {
   }
   rc = ui_css_parse_filter("drop-shadow(red 10px 10px 5px)", &filter);
   {
-    char long_filter[400];
+    char long_filter[1024];
     UI_STRCPY(long_filter, 1024, "drop-shadow(");
     memset(long_filter + 12, '1', 350);
     UI_STRCPY(long_filter + 362, 1024 - 362, ")");
@@ -720,7 +720,7 @@ static void test_more_branches_6(void) {
   }
 
   /* transition / animation long easing */
-  char long_easing[100];
+  char long_easing[1024];
   UI_STRCPY(long_easing, 1024, "opacity 1s cubic-bezier(");
   memset(long_easing + 24, '1', 40);
   UI_STRCPY(long_easing + 64, 1024 - 64, ")");
@@ -888,7 +888,7 @@ static void test_missing_branches(void) {
 
   /* clip path long url */
   {
-    char long_clip_url[512];
+    char long_clip_url[1024];
     UI_STRCPY(long_clip_url, 1024, "url(");
     memset(long_clip_url + 4, 'B', 300);
     UI_STRCPY(long_clip_url + 304, 1024 - 304, ")");
@@ -904,7 +904,7 @@ static void test_missing_branches(void) {
 
   /* paint long url */
   {
-    char long_paint_url[512];
+    char long_paint_url[1024];
     UI_STRCPY(long_paint_url, 1024, "url(");
     memset(long_paint_url + 4, 'C', 300);
     UI_STRCPY(long_paint_url + 304, 1024 - 304, ")");
@@ -927,7 +927,7 @@ static void test_missing_branches(void) {
 
   /* clip path shape arguments long */
   {
-    char long_clip_shape[512];
+    char long_clip_shape[1024];
     UI_STRCPY(long_clip_shape, 1024, "circle(");
     memset(long_clip_shape + 7, 'a', 300);
     UI_STRCPY(long_clip_shape + 307, 1024 - 307, ")");
@@ -936,7 +936,7 @@ static void test_missing_branches(void) {
 
   /* shape outside arguments long */
   {
-    char long_shape[512];
+    char long_shape[1024];
     UI_STRCPY(long_shape, 1024, "circle(");
     memset(long_shape + 7, 'a', 300);
     UI_STRCPY(long_shape + 307, 1024 - 307, ")");
@@ -1095,7 +1095,7 @@ static void test_missing_branches(void) {
   anim = NULL;
 
   {
-    char long_name[256];
+    char long_name[1024];
     memset(long_name, 'a', 100);
     long_name[100] = '\0';
     strcat(long_name, " 1s");
@@ -1136,7 +1136,7 @@ static void test_missing_branches(void) {
 
   /* ui_css_parse_image too long url */
   {
-    char long_img[512];
+    char long_img[1024];
     UI_STRCPY(long_img, 1024, "url(");
     memset(long_img + 4, 'B', 300);
     UI_STRCPY(long_img + 304, 1024 - 304, ")");
@@ -1196,7 +1196,7 @@ static void test_missing_branches(void) {
   rc = ui_css_parse_clip_path("url(my-clip-path)", &clip);
 
   {
-    char long_clip_path[512];
+    char long_clip_path[1024];
     UI_STRCPY(long_clip_path, 1024, "url(");
     memset(long_clip_path + 4, 'a', 300);
     UI_STRCPY(long_clip_path + 304, 1024 - 304, ")");

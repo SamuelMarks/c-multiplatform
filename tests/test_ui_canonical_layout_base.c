@@ -70,7 +70,12 @@ static void test_canonical_layout_null_args_and_coverage(void) {
       g_malloc_fail_countdown = 1;
       ui_canonical_layout_base_create(small_arena, &config, &layout);
       g_malloc_fail_countdown = -1;
-      (void)ui_arena_destroy(small_arena);
+      {
+        ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 
@@ -85,7 +90,12 @@ static void test_canonical_layout_null_args_and_coverage(void) {
   }
 
   ui_canonical_layout_base_destroy(layout);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {
@@ -159,7 +169,12 @@ int main(void) {
     failed = 1;
   }
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     return 1;
   return 0;

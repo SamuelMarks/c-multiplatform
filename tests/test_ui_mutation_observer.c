@@ -445,7 +445,12 @@ static int run_normal_tests(void) {
     if (g_cb_called != 1)
       return 1;
 
-    (void)ui_dom_node_destroy(text_node2);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(text_node2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     {
       ui_error_t _ign = ui_mutation_observer_destroy(obs);
       (void)_ign;
@@ -491,7 +496,12 @@ static int run_normal_tests(void) {
     (void)_ign;
   } /* destroys child1, child2, text_node */
   for (i = 0; i < 10; i++) {
-    (void)ui_dom_node_destroy(nodes[i]);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(nodes[i]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Additional branch coverage tests */
@@ -626,16 +636,46 @@ static int run_oom_tests(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
-  (void)ui_dom_node_destroy(n1);
-  (void)ui_dom_node_destroy(n2);
-  (void)ui_dom_node_destroy(n3);
-  (void)ui_dom_node_destroy(n4);
-  (void)ui_dom_node_destroy(n5);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(n1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(n2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(n3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(n4);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(n5);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     ui_error_t _ign = ui_mutation_observer_destroy(obs);
     (void)_ign;
   }
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Trigger string OOM in attribute notify */
   {
@@ -679,7 +719,12 @@ static int run_oom_tests(void) {
     }
     g_malloc_fail_countdown = -1;
 
-    (void)ui_dom_node_destroy(test_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(test_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     {
       ui_error_t _ign = ui_mutation_observer_destroy(obs);
       (void)_ign;

@@ -235,7 +235,12 @@ cleanup:
     ui_layout_observer_destroy(layout_obs);
   }
   if (dispatcher) {
-    (void)ui_scroll_dispatcher_destroy(dispatcher);
+    {
+      ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(dispatcher);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   if (test_failed) {
@@ -291,9 +296,19 @@ void test_ui_scroll_dispatcher_oom(void) {
     g_malloc_fail_countdown = -1;
     ui_layout_observer_destroy(obs);
 
-    (void)ui_scroll_dispatcher_destroy(dispatcher);
+    {
+      ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(dispatcher);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_scroll_dispatcher_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_scroll_dispatcher_unregister(NULL, 0);
 }

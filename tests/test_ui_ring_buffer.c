@@ -94,7 +94,12 @@ static int run_normal_tests(void) {
   if (rc != UI_ERROR_QUEUE_EMPTY)
     return 1;
 
-  (void)ui_ring_buffer_destroy(rb);
+  {
+    ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rb = NULL;
 
   /* Test wrap-around math at exact byte boundaries */
@@ -106,21 +111,43 @@ static int run_normal_tests(void) {
     if (rc != UI_ERROR_NONE)
       return 1;
     /* push 5 */
-    for (i = 0; i < 5; i++)
-      (void)ui_ring_buffer_push(rb, &bytes[i]);
+    for (i = 0; i < 5; i++) {
+      ui_error_t rc_cleanup = ui_ring_buffer_push(rb, &bytes[i]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     /* pop 5 */
-    for (i = 0; i < 5; i++)
-      (void)ui_ring_buffer_pop(rb, &out_byte);
+    for (i = 0; i < 5; i++) {
+      ui_error_t rc_cleanup = ui_ring_buffer_pop(rb, &out_byte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     /* buffer head is now at 5. push 7 to cause wrap around */
-    for (i = 0; i < 7; i++)
-      (void)ui_ring_buffer_push(rb, &bytes[i]);
+    for (i = 0; i < 7; i++) {
+      ui_error_t rc_cleanup = ui_ring_buffer_push(rb, &bytes[i]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     /* pop 7 */
     for (i = 0; i < 7; i++) {
-      (void)ui_ring_buffer_pop(rb, &out_byte);
+      {
+        ui_error_t rc_cleanup = ui_ring_buffer_pop(rb, &out_byte);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       if (out_byte != bytes[i])
         return 1;
     }
-    (void)ui_ring_buffer_destroy(rb);
+    {
+      ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     rb = NULL;
   }
 
@@ -130,7 +157,13 @@ static int run_normal_tests(void) {
     rc = ui_ring_buffer_create(sizeof(int), 10, &rb);
     if (rc == UI_ERROR_NONE &&
         ui_thread_pool_create(1, &pool) == UI_ERROR_NONE) {
-      (void)ui_thread_pool_schedule(pool, thread_task_push_spsc, rb);
+      {
+        ui_error_t rc_cleanup =
+            ui_thread_pool_schedule(pool, thread_task_push_spsc, rb);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       for (i = 0; i < 20; i++) {
         while (ui_ring_buffer_pop(rb, &test_val) == UI_ERROR_QUEUE_EMPTY) {
           /* wait */
@@ -138,10 +171,20 @@ static int run_normal_tests(void) {
         if (test_val != i)
           return 1;
       }
-      (void)ui_thread_pool_destroy(pool);
+      {
+        ui_error_t rc_cleanup = ui_thread_pool_destroy(pool);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     if (rb) {
-      (void)ui_ring_buffer_destroy(rb);
+      {
+        ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rb = NULL;
     }
   }
@@ -154,17 +197,33 @@ static int run_normal_tests(void) {
     if (rc == UI_ERROR_NONE &&
         ui_thread_pool_create(10, &pool) == UI_ERROR_NONE) {
       for (i = 0; i < 10; i++) {
-        (void)ui_thread_pool_schedule(pool, thread_task_push_mp, rb);
+        {
+          ui_error_t rc_cleanup =
+              ui_thread_pool_schedule(pool, thread_task_push_mp, rb);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       while (pop_count < 50000) {
         if (ui_ring_buffer_pop(rb, &test_val) == UI_ERROR_NONE) {
           pop_count++;
         }
       }
-      (void)ui_thread_pool_destroy(pool);
+      {
+        ui_error_t rc_cleanup = ui_thread_pool_destroy(pool);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     if (rb) {
-      (void)ui_ring_buffer_destroy(rb);
+      {
+        ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       rb = NULL;
     }
   }
@@ -177,7 +236,12 @@ static int run_normal_tests(void) {
   if (ui_ring_buffer_create(10, 10, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_ring_buffer_create(sizeof(int), 3, &rb);
+  {
+    ui_error_t rc_cleanup = ui_ring_buffer_create(sizeof(int), 3, &rb);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_ring_buffer_push(NULL, &test_val) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_ring_buffer_push(rb, NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -193,7 +257,12 @@ static int run_normal_tests(void) {
   if (ui_ring_buffer_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_ring_buffer_destroy(rb);
+  {
+    ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }

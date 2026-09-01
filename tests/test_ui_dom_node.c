@@ -75,8 +75,18 @@ static void test_dom_node_mutation_failure(void) {
       text_node, "hello"); /* hits text content failure (line 387) */
 
   ui_mutation_observer_destroy(obs);
-  (void)ui_dom_node_destroy(node);
-  (void)ui_dom_node_destroy(text_node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {
@@ -290,9 +300,24 @@ int main(void) {
       return 1;
     }
 
-    (void)ui_dom_node_destroy(child1);
-    (void)ui_dom_node_destroy(child2);
-    (void)ui_dom_node_destroy(child3);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(child1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(child2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(child3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Re-append for cleanup */
@@ -371,8 +396,18 @@ int main(void) {
   /* Let the remaining listener be destroyed by ui_dom_node_destroy */
 
   /* Clean up the whole tree */
-  (void)ui_dom_node_destroy(root);
-  (void)ui_dom_node_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test 5: Error Percolation and Null Checks */
   if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, NULL) !=
@@ -433,15 +468,30 @@ int main(void) {
   if (ui_dom_node_set_text_content(text_node, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  (void)ui_dom_node_destroy(text_node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Comment node text content test */
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_COMMENT, &text_node);
   if (ui_dom_node_set_text_content(text_node, "comment") != UI_ERROR_NONE)
     return 1;
-  (void)ui_dom_node_destroy(text_node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test 6: Mock Malloc Failures */
   g_malloc_fail_countdown = 0;
@@ -494,9 +544,19 @@ int main(void) {
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY)
     return 1;
-  (void)ui_dom_node_destroy(text_node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("All dom node tests passed.\n");
   return 0;

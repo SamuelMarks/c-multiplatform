@@ -40,9 +40,7 @@ ui_error_t ui_css_parse_view_transition_name(
   if (!str || !out_name)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    (void)skip_whitespace(&str);
-  }
+  { (void)skip_whitespace(&str); }
 
   out_name->is_none = 0;
   out_name->name[0] = '\0';
@@ -97,9 +95,7 @@ ui_error_t ui_css_parse_view_transition_class(
   out_class->is_none = 0;
   out_class->names = NULL;
 
-  {
-    (void)skip_whitespace(&str);
-  }
+  { (void)skip_whitespace(&str); }
 
   if (strcmp(str, "none") == 0) {
     out_class->is_none = 1;
@@ -118,7 +114,13 @@ ui_error_t ui_css_parse_view_transition_class(
     if (!node) {
       out_class->names = head;
       {
-        (void)ui_css_view_transition_class_destroy(out_class);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_view_transition_class_destroy(out_class);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       return UI_ERROR_OUT_OF_MEMORY;
     }

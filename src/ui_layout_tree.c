@@ -144,7 +144,12 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
 
     if (disp_rc == UI_ERROR_NONE) {
       if (strcmp(display_val, "none") == 0) {
-        (void)ui_css_computed_style_destroy(style);
+        {
+          ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         return UI_ERROR_NONE; /* Skip this node and its children */
       }
     }
@@ -218,9 +223,7 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
               new_last = anon;
             }
           }
-          {
-            (void)append_layout_child(anon, curr);
-          }
+          { (void)append_layout_child(anon, curr); }
         } else {
           anon = NULL; /* Break the sequence of inlines */
           /* Append block child directly */
@@ -246,10 +249,20 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
 
 cleanup:
   if (style && !lnode) {
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (lnode) {
-    (void)ui_layout_tree_destroy(lnode);
+    {
+      ui_error_t rc_cleanup = ui_layout_tree_destroy(lnode);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return err;
 }
@@ -282,12 +295,23 @@ ui_error_t ui_layout_tree_destroy(struct ui_layout_node *node) {
   child = node->first_child;
   while (child) {
     next_child = child->next_sibling;
-    (void)ui_layout_tree_destroy(child);
+    {
+      ui_error_t rc_cleanup = ui_layout_tree_destroy(child);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     child = next_child;
   }
 
   if (node->computed_style) {
-    (void)ui_css_computed_style_destroy(node->computed_style);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_computed_style_destroy(node->computed_style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   C_MULTIPLATFORM_FREE(node);

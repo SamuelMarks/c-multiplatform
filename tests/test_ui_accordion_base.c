@@ -130,10 +130,30 @@ static int test_accordion_lifecycle(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_accordion_base_destroy(accordion);
-  (void)ui_disclosure_base_destroy(d1);
-  (void)ui_disclosure_base_destroy(d2);
-  (void)ui_disclosure_base_destroy(d3);
+  {
+    ui_error_t rc_cleanup = ui_accordion_base_destroy(accordion);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
 
   return 0;
 }
@@ -235,9 +255,24 @@ static int test_accordion_edge_cases(void) {
     ui_accordion_base_remove_disclosure(accordion, d3);
     ui_accordion_base_remove_disclosure(accordion, d4);
 
-    (void)ui_disclosure_base_destroy(d3);
-    (void)ui_disclosure_base_destroy(d4);
-    (void)ui_disclosure_base_destroy(d5);
+    {
+      ui_error_t rc_cleanup = ui_disclosure_base_destroy(d3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_disclosure_base_destroy(d4);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_disclosure_base_destroy(d5);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
+    }
   }
 
   /* 7. Remove active disclosure */
@@ -260,11 +295,31 @@ static int test_accordion_edge_cases(void) {
       d3, 0); /* triggers on_child_disclosure_toggle(!is_expanded) without
                  on_change */
   ui_accordion_base_remove_disclosure(accordion, d3);
-  (void)ui_disclosure_base_destroy(d3);
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
 
-  (void)ui_accordion_base_destroy(accordion);
-  (void)ui_disclosure_base_destroy(d1);
-  (void)ui_disclosure_base_destroy(d2);
+  {
+    ui_error_t rc_cleanup = ui_accordion_base_destroy(accordion);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   extern ui_error_t run_accordion_methods_coverage(void);

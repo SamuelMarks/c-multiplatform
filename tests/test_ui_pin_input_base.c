@@ -104,20 +104,60 @@ static void test_pin_input_creation_and_events(void) {
 
   /* Fail change */
   g_change_rc = UI_ERROR_INVALID_ARGUMENT;
-  (void)ui_pin_input_base_on_input(pin_input, 0, "5");
-  (void)ui_pin_input_base_on_backspace(pin_input, 0);
-  (void)ui_pin_input_base_on_paste(pin_input, "1");
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_on_input(pin_input, 0, "5");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_on_backspace(pin_input, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_on_paste(pin_input, "1");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_change_rc = UI_ERROR_NONE;
 
   /* Fail touched */
   g_touched_rc = UI_ERROR_INVALID_ARGUMENT;
-  (void)ui_pin_input_base_on_input(pin_input, 0, "5");
-  (void)ui_pin_input_base_on_backspace(pin_input, 0);
-  (void)ui_pin_input_base_on_paste(pin_input, "1");
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_on_input(pin_input, 0, "5");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_on_backspace(pin_input, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_on_paste(pin_input, "1");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_touched_rc = UI_ERROR_NONE;
 
-  (void)ui_pin_input_base_destroy(pin_input);
-  (void)ui_pin_input_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_destroy(pin_input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_pin_input_nulls(void) {
@@ -151,7 +191,12 @@ static void test_pin_input_nulls(void) {
   assert(ui_pin_input_base_on_paste(NULL, "5") == UI_ERROR_INVALID_ARGUMENT);
   assert(ui_pin_input_base_on_paste(dummy, NULL) == UI_ERROR_INVALID_ARGUMENT);
 
-  (void)ui_pin_input_base_destroy(dummy);
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_destroy(dummy);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_pin_input_oom(void) {
@@ -160,7 +205,12 @@ static void test_pin_input_oom(void) {
   for (i = 0; i < 100; i++) {
     g_malloc_fail_countdown = i;
     if (ui_pin_input_base_create(&pin_input, 4, NULL) == UI_ERROR_NONE) {
-      (void)ui_pin_input_base_destroy(pin_input);
+      {
+        ui_error_t rc_cleanup = ui_pin_input_base_destroy(pin_input);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -173,7 +223,12 @@ static void test_pin_input_oom(void) {
     /* But set_disabled_state is a normal function internally
        `ui_pin_input_base_set_disabled_state`? No, it is exposed via CVA. We
        need the cva. */
-    (void)ui_pin_input_base_destroy(pin_input);
+    {
+      ui_error_t rc_cleanup = ui_pin_input_base_destroy(pin_input);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   {
@@ -181,17 +236,32 @@ static void test_pin_input_oom(void) {
     if (ui_pin_input_base_create(&pin_input, 4, &cva) == UI_ERROR_NONE) {
       for (i = 0; i < 5; i++) {
         g_malloc_fail_countdown = i;
-        (void)ui_pin_input_base_on_input(pin_input, 0, "1");
+        {
+          ui_error_t rc_cleanup = ui_pin_input_base_on_input(pin_input, 0, "1");
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         g_malloc_fail_countdown = -1;
       }
       for (i = 0; i < 5; i++) {
         g_malloc_fail_countdown = i;
-        (void)ui_pin_input_base_on_backspace(pin_input, 1);
+        {
+          ui_error_t rc_cleanup = ui_pin_input_base_on_backspace(pin_input, 1);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         g_malloc_fail_countdown = -1;
       }
       for (i = 0; i < 5; i++) {
         g_malloc_fail_countdown = i;
-        (void)ui_pin_input_base_on_paste(pin_input, "123");
+        {
+          ui_error_t rc_cleanup = ui_pin_input_base_on_paste(pin_input, "123");
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         g_malloc_fail_countdown = -1;
       }
       for (i = 0; i < 5; i++) {
@@ -199,7 +269,12 @@ static void test_pin_input_oom(void) {
         (void)cva.set_disabled_state(pin_input, 1);
         g_malloc_fail_countdown = -1;
       }
-      (void)ui_pin_input_base_destroy(pin_input);
+      {
+        ui_error_t rc_cleanup = ui_pin_input_base_destroy(pin_input);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 }
@@ -219,7 +294,12 @@ int main(void) {
   ui_pin_input_base_on_input(unregistered, 0, "1");
   ui_pin_input_base_on_backspace(unregistered, 0);
   ui_pin_input_base_on_paste(unregistered, "12");
-  (void)ui_pin_input_base_destroy(unregistered);
+  {
+    ui_error_t rc_cleanup = ui_pin_input_base_destroy(unregistered);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("test_ui_pin_input_base passed\n");
   return 0;

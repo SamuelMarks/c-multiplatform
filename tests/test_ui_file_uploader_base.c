@@ -262,7 +262,12 @@ static int run_normal_tests(void) {
     if (ui_file_uploader_register_dropzone(&uploader, drag_ctx) !=
         UI_ERROR_NONE)
       return 1;
-    (void)ui_drag_drop_destroy(drag_ctx);
+    {
+      ui_error_t rc_cleanup = ui_drag_drop_destroy(drag_ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   ui_file_uploader_destroy(&uploader);

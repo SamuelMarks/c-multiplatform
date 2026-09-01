@@ -69,7 +69,12 @@ ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid) {
   if (!tree_grid) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(tree_grid->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(tree_grid->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(tree_grid);
   return UI_ERROR_NONE;
 }
@@ -174,8 +179,13 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
       (void)UI_TREE_GRID_IS_EXPAND_IGNORE(tree_grid, tree_grid->active_node,
                                           &expanded);
       if (expanded) {
-        (void)ui_tree_grid_base_set_expanded(tree_grid, tree_grid->active_node,
-                                             0);
+        {
+          ui_error_t rc_cleanup = ui_tree_grid_base_set_expanded(
+              tree_grid, tree_grid->active_node, 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       } else {
         /* Move focus to parent or prev col */
         if (tree_grid->active_col > 0)

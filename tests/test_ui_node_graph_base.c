@@ -215,7 +215,12 @@ int main(void) {
   ASSERT_SUCCESS(ui_node_graph_base_set_marquee_selection(graph, NULL));
 
   ASSERT_SUCCESS(ui_node_graph_base_destroy(graph));
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   test_extra_node_graph_more();
   test_extra_node_graph_error();
@@ -244,7 +249,12 @@ void test_extra_node_graph_error(void) {
   ui_node_graph_base_set_marquee_selection(NULL, NULL);
 }
 void test_extra_node_graph_errors(void) {
-  (void)ui_node_graph_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_node_graph_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_node_graph_base_pan(NULL, 0.0f, 0.0f);
   ui_node_graph_base_zoom(NULL, 0.0f, NULL);
   ui_node_graph_base_get_camera_signal(NULL, NULL);
@@ -304,11 +314,20 @@ void test_node_graph_oom_3(void) {
     if (ui_arena_create(16, &arena) == UI_ERROR_NONE) {
       g_malloc_fail_countdown = i;
       if (ui_node_graph_base_create(arena, &config, &graph) != UI_ERROR_NONE) {
-        if (graph)
-          (void)ui_node_graph_base_destroy(graph);
+        if (graph) {
+          ui_error_t rc_cleanup = ui_node_graph_base_destroy(graph);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       g_malloc_fail_countdown = -1;
-      (void)ui_arena_destroy(arena);
+      {
+        ui_error_t rc_cleanup = ui_arena_destroy(arena);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 }

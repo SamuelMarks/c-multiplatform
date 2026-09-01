@@ -85,22 +85,47 @@ ui_error_t ui_map_view_base_create(struct ui_map_view_base **out_map) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(map->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(map->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(map);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(root_node, "div");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(root_node);
-    (void)ui_component_destroy(map->component);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(map->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(map);
     return rc;
   }
   rc = ui_dom_node_set_attribute(root_node, "role", "application");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(root_node);
-    (void)ui_component_destroy(map->component);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(map->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(map);
     return rc;
   }
@@ -122,7 +147,12 @@ ui_error_t ui_map_view_base_destroy(struct ui_map_view_base *map) {
   if (!map) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)ui_component_destroy(map->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(map->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (map->markers) {
     C_MULTIPLATFORM_FREE(map->markers);
   }

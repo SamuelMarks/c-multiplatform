@@ -33,8 +33,18 @@ static int test_portal_lifecycle(void) {
   if (rc != UI_ERROR_NONE || out_content != content_node)
     return 1;
 
-  (void)ui_portal_destroy(portal);
-  (void)ui_dom_node_destroy(physical_target);
+  {
+    ui_error_t rc_cleanup = ui_portal_destroy(portal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(physical_target);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -55,7 +65,12 @@ static int test_portal_replacement(void) {
   ui_portal_set_content(portal, content2); /* Should destroy content1 */
 
   ui_portal_destroy(portal); /* Should destroy content2 */
-  (void)ui_dom_node_destroy(physical_target);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(physical_target);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -72,7 +87,12 @@ static int test_portal_nulls(void) {
   if (ui_portal_create(&portal, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_portal_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_portal_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ui_portal_create(&portal, node);
 
@@ -86,8 +106,18 @@ static int test_portal_nulls(void) {
   if (ui_portal_get_content(portal, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_portal_destroy(portal);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_portal_destroy(portal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -103,7 +133,12 @@ static int test_portal_oom(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -130,9 +165,19 @@ static int test_portal_content_moved(void) {
   ui_dom_node_remove_child(target, content2);
 
   /* Destroy, content2 is already detached */
-  (void)ui_portal_destroy(portal);
+  {
+    ui_error_t rc_cleanup = ui_portal_destroy(portal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_destroy(target);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(target);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -154,8 +199,18 @@ static int test_portal_append_fail(void) {
   if (ui_portal_set_content(portal, content) == UI_ERROR_NONE)
     return 1;
 
-  (void)ui_portal_destroy(portal);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_portal_destroy(portal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_dom_node_destroy(dummy_parent); /* also destroys content */
 
   return 0;

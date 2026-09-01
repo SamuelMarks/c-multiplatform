@@ -74,7 +74,12 @@ static int test_theme_provider(void) {
     FAIL_CHECK(__LINE__, err != UI_ERROR_NONE);
     err = ui_theme_provider_get(bad_node, &resolved_dict);
     FAIL_CHECK(__LINE__, err != UI_ERROR_NOT_FOUND);
-    (void)ui_dom_node_destroy(bad_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(bad_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test ui_theme_provider_get NOT_FOUND branch by getting from an unmounted
@@ -85,7 +90,12 @@ static int test_theme_provider(void) {
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &unmounted_node);
     err = ui_theme_provider_get(unmounted_node, &unmounted_dict);
     FAIL_CHECK(__LINE__, err != UI_ERROR_NOT_FOUND);
-    (void)ui_dom_node_destroy(unmounted_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(unmounted_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test invalid argument branches */
@@ -116,11 +126,26 @@ static int test_theme_provider(void) {
     err = ui_theme_provider_create(small_arena, &dict, &oom_provider);
     FAIL_CHECK(__LINE__, err != UI_ERROR_OUT_OF_MEMORY);
     g_malloc_fail_countdown = -1;
-    (void)ui_arena_destroy(small_arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_dom_node_destroy(root);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }

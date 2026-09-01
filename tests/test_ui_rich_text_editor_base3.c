@@ -13,6 +13,11 @@ void test_ui_rte_coverage_errs15(void) {
     cva.set_disabled_state(rte, 1);
     g_malloc_fail_countdown = -1;
 
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }

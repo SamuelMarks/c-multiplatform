@@ -14,7 +14,12 @@ static int test_gl1(void) {
 #ifdef __EMSCRIPTEN__
   if (ui_renderer_gl1_create(&backend) != UI_ERROR_UNSUPPORTED)
     return 1;
-  (void)ui_renderer_gl1_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_renderer_gl1_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 #else
 
@@ -44,27 +49,57 @@ static int test_gl1(void) {
 
   (void)backend->destroy_texture(backend, tex);
 
-  (void)ui_renderer_gl1_destroy(backend);
+  {
+    ui_error_t rc_cleanup = ui_renderer_gl1_destroy(backend);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Null checks */
-  (void)ui_renderer_gl1_create(NULL);
-  (void)ui_renderer_gl1_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_renderer_gl1_create(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_renderer_gl1_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   g_malloc_fail_countdown = 0;
   if (ui_renderer_gl1_create(&backend) != UI_ERROR_OUT_OF_MEMORY)
     return 1;
   g_malloc_fail_countdown = -1;
 
-  (void)ui_renderer_gl1_create(&backend);
+  {
+    ui_error_t rc_cleanup = ui_renderer_gl1_create(&backend);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = 0;
   if (backend->init(backend, NULL, NULL) != UI_ERROR_OUT_OF_MEMORY)
     return 1;
   g_malloc_fail_countdown = -1;
 
-  (void)ui_renderer_gl1_destroy(backend);
+  {
+    ui_error_t rc_cleanup = ui_renderer_gl1_destroy(backend);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* texture malloc fail */
-  (void)ui_renderer_gl1_create(&backend);
+  {
+    ui_error_t rc_cleanup = ui_renderer_gl1_create(&backend);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   (void)backend->init(backend, NULL, NULL);
   g_malloc_fail_countdown = 0;
   if (backend->create_texture(backend, 10, 10, &tex) != UI_ERROR_OUT_OF_MEMORY)
@@ -197,7 +232,12 @@ static int test_gl1(void) {
   (void)backend->draw_texture(backend, NULL, 0, 0, 0, 0, 0);
   (void)backend->read_pixels(NULL, 0, 0, NULL);
 
-  (void)ui_renderer_gl1_destroy(backend);
+  {
+    ui_error_t rc_cleanup = ui_renderer_gl1_destroy(backend);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 #endif

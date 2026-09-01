@@ -69,36 +69,108 @@ static int test_rich_text(void) {
   }
 
   /* format */
-  (void)ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD);
+  {
+    ui_error_t rc_cleanup =
+        ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_rich_text_base_undo(editor);
-  (void)ui_rich_text_base_redo(editor);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_undo(editor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_redo(editor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
-  (void)ui_rich_text_base_process_event(editor, &ev);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.keyboard.key_code = 'H';
-  (void)ui_rich_text_base_process_event(editor, &ev);
-  (void)ui_rich_text_base_process_event(
-      editor, &ev); /* Add a second one so prev/next exist */
-  (void)ui_rich_text_base_undo(editor);
-  (void)ui_rich_text_base_redo(editor);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* Add a second one so prev/next exist */
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_undo(editor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_redo(editor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Trigger OOM on snapshot allocation in process_event */
   g_malloc_fail_countdown = 1;
-  (void)ui_rich_text_base_process_event(editor, &ev);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_rich_text_base_set_ime_composition(editor, "nihao");
-  (void)ui_rich_text_base_set_ime_composition(editor, NULL);
-  (void)ui_rich_text_base_set_ime_composition(editor, "nihaoma");
+  {
+    ui_error_t rc_cleanup =
+        ui_rich_text_base_set_ime_composition(editor, "nihao");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_set_ime_composition(editor, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_rich_text_base_set_ime_composition(editor, "nihaoma");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_rich_text_base_bind_text(editor, NULL);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_bind_text(editor, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test non-keydown event (line 290) */
   ev.type = UI_EVENT_MOUSE_UP;
-  (void)ui_rich_text_base_process_event(editor, &ev);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test toggle_format with document_head == NULL (line 258) */
   {
@@ -106,7 +178,13 @@ static int test_rich_text(void) {
         (struct ui_rich_text_base_mock *)editor;
     struct ui_rich_text_run_mock *saved_head = meditor->document_head;
     meditor->document_head = NULL;
-    (void)ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD);
+    {
+      ui_error_t rc_cleanup =
+          ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     meditor->document_head = saved_head;
   }
 
@@ -123,14 +201,29 @@ static int test_rich_text(void) {
     meditor->document_head = new_run;
 
     char *txt = NULL;
-    (void)ui_rich_text_base_get_text(editor, &txt);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_base_get_text(editor, &txt);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     if (txt)
       free(txt);
   }
 
   /* Test set_text with NULL text (line 179) */
-  (void)ui_rich_text_base_set_text(editor, NULL);
-  (void)ui_rich_text_base_set_text(editor, "");
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_set_text(editor, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_set_text(editor, "");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test set_text with NULL component/shadow_root (line 194) */
   {
@@ -138,11 +231,22 @@ static int test_rich_text(void) {
         (struct ui_rich_text_base_mock *)editor;
     struct ui_dom_node *saved_sr = meditor->component->shadow_root;
     meditor->component->shadow_root = NULL;
-    (void)ui_rich_text_base_set_text(editor, "NoShadowRoot");
+    {
+      ui_error_t rc_cleanup =
+          ui_rich_text_base_set_text(editor, "NoShadowRoot");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     struct ui_component *saved_comp = meditor->component;
     meditor->component = NULL;
-    (void)ui_rich_text_base_set_text(editor, "NoComponent");
+    {
+      ui_error_t rc_cleanup = ui_rich_text_base_set_text(editor, "NoComponent");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     meditor->component = saved_comp;
     meditor->component->shadow_root = saved_sr;
@@ -167,8 +271,18 @@ static int test_rich_text(void) {
         meditor->history_current;
 
     meditor->history_current = NULL;
-    (void)ui_rich_text_base_undo(editor);
-    (void)ui_rich_text_base_redo(editor);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_base_undo(editor);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_rich_text_base_redo(editor);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     meditor->history_current = saved_hist;
   }
@@ -176,7 +290,12 @@ static int test_rich_text(void) {
   /* Test OOM on history entry creation (line 294) */
   g_malloc_fail_countdown = 0;
   ev.type = UI_EVENT_KEY_DOWN;
-  (void)ui_rich_text_base_process_event(editor, &ev);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
 
   /* Test destroy with ime_composition, NULL component, NULL shadow_root (lines
@@ -188,7 +307,12 @@ static int test_rich_text(void) {
     ui_dom_node_destroy(meditor->component->shadow_root);
     meditor->component->shadow_root = NULL;
   }
-  (void)ui_rich_text_base_destroy(editor);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_destroy(editor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Also test destroy with NULL component entirely */
   ui_rich_text_base_create(&editor);
@@ -198,11 +322,21 @@ static int test_rich_text(void) {
     ui_component_destroy(meditor->component);
     meditor->component = NULL;
   }
-  (void)ui_rich_text_base_destroy(editor);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_destroy(editor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* nulls */
   EXPECT(ui_rich_text_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
-  (void)ui_rich_text_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   EXPECT(ui_rich_text_base_get_component(NULL, NULL) ==
          UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_get_component(NULL, &comp) ==
@@ -212,7 +346,12 @@ static int test_rich_text(void) {
   EXPECT(ui_rich_text_base_set_text(NULL, NULL) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_get_text(NULL, NULL) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_get_text(editor, NULL) == UI_ERROR_INVALID_ARGUMENT);
-  (void)ui_rich_text_base_toggle_format(NULL, 0);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_toggle_format(NULL, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   EXPECT(ui_rich_text_base_undo(NULL) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_redo(NULL) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_process_event(NULL, NULL) ==
@@ -221,7 +360,12 @@ static int test_rich_text(void) {
          UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_set_ime_composition(NULL, NULL) ==
          UI_ERROR_INVALID_ARGUMENT);
-  (void)ui_rich_text_base_bind_text(NULL, NULL);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_bind_text(NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* alloc failures */
   for (i = 0; i < 20; ++i) {
@@ -230,7 +374,12 @@ static int test_rich_text(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_rich_text_base_create(&editor);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_create(&editor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   for (i = 0; i < 15; ++i) {
     g_malloc_fail_countdown = i;
@@ -255,7 +404,12 @@ static int test_rich_text(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_rich_text_base_destroy(editor);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_base_destroy(editor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }

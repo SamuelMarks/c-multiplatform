@@ -73,8 +73,13 @@ int main(void) {
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
 
   enum ui_segmented_control_mode mode;
-  (void)ui_segmented_control_base_set_mode(NULL,
-                                           UI_SEGMENTED_CONTROL_MODE_MULTI);
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_set_mode(
+        NULL, UI_SEGMENTED_CONTROL_MODE_MULTI);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
 
   err = ui_segmented_control_base_get_mode(NULL, &mode);
@@ -116,11 +121,21 @@ int main(void) {
   err = ui_segmented_button_base_get_component(NULL, &comp);
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
   err = ui_segmented_button_base_get_component((void *)1, NULL);
-  (void)ui_segmented_button_base_create(&btn1);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   err = ui_segmented_button_base_get_component(btn1, &comp);
   if (err != UI_ERROR_NONE)
     abort();
-  (void)ui_segmented_button_base_destroy(btn1);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   btn1 = NULL;
   /* if (err != UI_ERROR_INVALID_ARGUMENT) abort(); */
 
@@ -158,10 +173,32 @@ int main(void) {
 
   /* Append more to test reallocation */
   struct ui_segmented_button_base *btn4, *btn5;
-  (void)ui_segmented_button_base_create(&btn4);
-  (void)ui_segmented_button_base_create(&btn5);
-  (void)ui_segmented_control_base_append_segment(control, btn4);
-  (void)ui_segmented_control_base_append_segment(control, btn5);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn4);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn5);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_control_base_append_segment(control, btn4);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_control_base_append_segment(control, btn5);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* CVA registrations null checks */
   err = cva.register_on_change(NULL, dummy_change, NULL);
@@ -193,16 +230,33 @@ int main(void) {
     abort();
 
   /* Switch mode to SINGLE and select another */
-  (void)ui_segmented_control_base_set_mode(control,
-                                           UI_SEGMENTED_CONTROL_MODE_SINGLE);
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_set_mode(
+        control, UI_SEGMENTED_CONTROL_MODE_SINGLE);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   err = ui_segmented_button_base_set_selected(btn2, 1);
   if (err != UI_ERROR_NONE)
     abort();
 
-  (void)ui_segmented_button_base_get_selected(btn1, &selected);
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_button_base_get_selected(btn1, &selected);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (selected != 0)
     abort(); /* Single mode deselected btn1 */
-  (void)ui_segmented_button_base_get_selected(btn2, &selected);
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_button_base_get_selected(btn2, &selected);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (selected != 1)
     abort();
 
@@ -235,41 +289,135 @@ int main(void) {
   err = cva.write_value(control, pl);
   if (err != UI_ERROR_NONE)
     abort();
-  (void)ui_segmented_button_base_get_selected(btn1, &selected);
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_button_base_get_selected(btn1, &selected);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (selected != 1)
     abort();
-  (void)ui_segmented_button_base_get_selected(btn2, &selected);
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_button_base_get_selected(btn2, &selected);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (selected != 0)
     abort();
 
   /* Trigger paths with missing callbacks or missing parent */
   struct ui_segmented_button_base *btn_orphan;
-  (void)ui_segmented_button_base_create(&btn_orphan);
-  (void)ui_segmented_button_base_set_selected(btn_orphan, 1); /* no parent */
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn_orphan);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_button_base_set_selected(btn_orphan, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* no parent */
 
   /* Missing callbacks on control */
   struct ui_segmented_control_base *control_no_cva;
   struct ui_segmented_button_base *btn_nocva;
-  (void)ui_segmented_control_base_create(&control_no_cva, NULL);
-  (void)ui_segmented_button_base_create(&btn_nocva);
-  (void)ui_segmented_control_base_append_segment(control_no_cva, btn_nocva);
-  (void)ui_segmented_button_base_set_selected(
-      btn_nocva, 1); /* hits null checks in triggers */
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_control_base_create(&control_no_cva, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn_nocva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_control_base_append_segment(control_no_cva, btn_nocva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_set_selected(btn_nocva, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* hits null checks in triggers */
 
-  (void)ui_segmented_button_base_destroy(btn_nocva);
-  (void)ui_segmented_control_base_destroy(control_no_cva);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn_nocva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_destroy(control_no_cva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Double destroy safely */
-  (void)ui_segmented_control_base_destroy(NULL);
-  (void)ui_segmented_button_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_segmented_button_base_destroy(btn_orphan);
-  (void)ui_segmented_button_base_destroy(btn1);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn_orphan);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   btn1 = NULL;
-  (void)ui_segmented_button_base_destroy(btn2);
-  (void)ui_segmented_button_base_destroy(btn3);
-  (void)ui_segmented_button_base_destroy(btn4);
-  (void)ui_segmented_button_base_destroy(btn5);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn4);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn5);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Specifically test REALLOC failure */
   {
@@ -284,14 +432,25 @@ int main(void) {
             ui_segmented_control_base_append_segment(control, btn_realloc);
         g_malloc_fail_countdown = -1;
         if (realloc_rc == UI_ERROR_OUT_OF_MEMORY) {
-          (void)ui_segmented_button_base_destroy(btn_realloc);
+          {
+            ui_error_t rc_cleanup =
+                ui_segmented_button_base_destroy(btn_realloc);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
           break; /* We hit the REALLOC failure, test complete */
         }
       }
     }
   }
 
-  (void)ui_segmented_control_base_destroy(control);
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   control = NULL;
 
   /* Allocation failures */
@@ -320,8 +479,18 @@ int main(void) {
   }
 
   /* Append failure */
-  (void)ui_segmented_control_base_create(&control, NULL);
-  (void)ui_segmented_button_base_create(&btn1);
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_create(&control, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = 0;
   err = ui_segmented_control_base_append_segment(control, btn1);
   g_malloc_fail_countdown = -1;
@@ -329,9 +498,19 @@ int main(void) {
     printf("Failed to hit OOM\n");
   }
 
-  (void)ui_segmented_button_base_destroy(btn1);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   btn1 = NULL;
-  (void)ui_segmented_control_base_destroy(control);
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   control = NULL;
 
   printf("All tests passed.\n");
@@ -349,36 +528,101 @@ void test_ui_segmented_coverage_branches(void) {
   control = malloc(sizeof(struct ui_segmented_control_base));
   if (control) {
     memset(control, 0, sizeof(struct ui_segmented_control_base));
-    (void)ui_segmented_control_base_destroy(control);
+    {
+      ui_error_t rc_cleanup = ui_segmented_control_base_destroy(control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   btn1 = malloc(sizeof(struct ui_segmented_button_base));
   if (btn1) {
     memset(btn1, 0, sizeof(struct ui_segmented_button_base));
-    (void)ui_segmented_button_base_destroy(btn1);
+    {
+      ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_segmented_control_base_create(&control, &cva);
-  (void)ui_segmented_button_base_create(&btn1);
-  (void)ui_segmented_control_base_append_segment(control, btn1);
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_create(&control, &cva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_create(&btn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_segmented_control_base_append_segment(control, btn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   (void)cva.register_on_change(control, dummy_change, NULL);
   (void)cva.register_on_touched(control, dummy_touched, NULL);
 
   /* Already selected, so button->selected != selected is false */
-  (void)ui_segmented_button_base_set_selected(btn1, 0);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_set_selected(btn1, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_segmented_control_base_set_mode(control,
-                                           UI_SEGMENTED_CONTROL_MODE_SINGLE);
-  (void)ui_segmented_button_base_set_selected(btn1, 1);
-  (void)ui_segmented_button_base_set_selected(
-      btn1, 0); /* hits selected == 0 branch */
-  (void)ui_segmented_button_base_set_selected(btn1, 0); /* false path */
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_set_mode(
+        control, UI_SEGMENTED_CONTROL_MODE_SINGLE);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_set_selected(btn1, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_set_selected(btn1, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* hits selected == 0 branch */
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_set_selected(btn1, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* false path */
 
   /* Set cva on change to NULL to hit false branch */
   control->cva_on_change = NULL;
   control->cva_on_touched = NULL;
-  (void)ui_segmented_button_base_set_selected(btn1, 1);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_set_selected(btn1, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_segmented_button_base_destroy(btn1);
-  (void)ui_segmented_control_base_destroy(control);
+  {
+    ui_error_t rc_cleanup = ui_segmented_button_base_destroy(btn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_segmented_control_base_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

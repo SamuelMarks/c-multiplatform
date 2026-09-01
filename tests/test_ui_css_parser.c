@@ -1073,7 +1073,12 @@ int main(void) {
     }
 
     ui_css_computed_style_destroy(style);
-    (void)ui_dom_node_destroy(state_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(state_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test Conditional Rules */
@@ -1126,7 +1131,12 @@ int main(void) {
     }
 
     ui_css_computed_style_destroy(style);
-    (void)ui_dom_node_destroy(cond_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(cond_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test Scope Rules */
@@ -1198,7 +1208,12 @@ int main(void) {
     }
     ui_css_computed_style_destroy(style);
 
-    (void)ui_dom_node_destroy(card_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(card_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test Namespace Rules */
@@ -1266,7 +1281,12 @@ int main(void) {
     }
   }
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_css_stylesheet_destroy(sheet);
 
   /* Parser Recovery and Edge Cases */
@@ -1392,7 +1412,12 @@ int main(void) {
       return 1;
     }
     ui_css_computed_style_destroy(rec_style);
-    (void)ui_dom_node_destroy(rec_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(rec_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &rec_node);
     ui_dom_node_set_tag_name(rec_node, "span");
@@ -1404,7 +1429,12 @@ int main(void) {
       return 1;
     }
     ui_css_computed_style_destroy(rec_style);
-    (void)ui_dom_node_destroy(rec_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(rec_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &rec_node);
     ui_dom_node_set_tag_name(rec_node, "p");
@@ -1416,7 +1446,12 @@ int main(void) {
       return 1;
     }
     ui_css_computed_style_destroy(rec_style);
-    (void)ui_dom_node_destroy(rec_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(rec_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     ui_css_stylesheet_destroy(rec_sheet);
 

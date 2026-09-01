@@ -142,7 +142,13 @@ static ui_error_t run_normal_tests(void) {
       m->comp = NULL;
       m->sig1 = NULL;
       m->sig2 = NULL;
-      (void)ui_hover_card_base_destroy((struct ui_hover_card_base *)m);
+      {
+        ui_error_t rc_cleanup =
+            ui_hover_card_base_destroy((struct ui_hover_card_base *)m);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 
@@ -163,7 +169,12 @@ static ui_error_t run_oom_tests(void) {
     if (rc == UI_ERROR_NONE) {
       /* Reached success. The i-th allocation didn't fail because there are < i
        * allocations. */
-      (void)ui_hover_card_base_destroy(card);
+      {
+        ui_error_t rc_cleanup = ui_hover_card_base_destroy(card);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break; /* We've exhausted all error paths. */
     }
   }

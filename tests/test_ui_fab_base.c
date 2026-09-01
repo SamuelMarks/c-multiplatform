@@ -195,8 +195,18 @@ static int run_normal_tests(void) {
   if (rstate->active)
     return 1; /* Should be completed */
 
-  (void)ui_fab_base_destroy(fab);
-  (void)ui_fab_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_fab_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -228,15 +238,35 @@ static int run_oom_tests(void) {
   rc = ui_fab_base_add_action(fab, action_btn);
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    (void)ui_button_base_destroy(action_btn);
-    (void)ui_fab_base_destroy(fab);
+    {
+      ui_error_t rc_cleanup = ui_button_base_destroy(action_btn);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return 1;
   }
 
   /* Since we failed to add it, we must destroy it ourselves if not adopted */
-  (void)ui_button_base_destroy(action_btn);
+  {
+    ui_error_t rc_cleanup = ui_button_base_destroy(action_btn);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_fab_base_destroy(fab);
+  {
+    ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -307,6 +337,11 @@ static int run_coverage_tests(void) {
     return 1;
   }
 
-  (void)ui_fab_base_destroy(fab);
+  {
+    ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }

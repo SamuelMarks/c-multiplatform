@@ -47,7 +47,12 @@ ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(webview->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(webview->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(webview);
     return rc;
   }
@@ -70,7 +75,12 @@ ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview) {
   if (!webview) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)ui_component_destroy(webview->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(webview->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (webview->current_url) {
     C_MULTIPLATFORM_FREE(webview->current_url);
   }

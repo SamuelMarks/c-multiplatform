@@ -31,7 +31,12 @@ static int test_oom(void) {
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
     if (ui_text_node_base_create(&node) == UI_ERROR_NONE) {
-      (void)ui_text_node_base_destroy(node);
+      {
+        ui_error_t rc_cleanup = ui_text_node_base_destroy(node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -64,7 +69,12 @@ static int test_oom(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_text_node_base_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_text_node_base_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
   return failed;
 }
@@ -250,7 +260,12 @@ int main(void) {
   if (rc != UI_ERROR_NONE || comp == NULL)
     failed |= 1;
 
-  (void)ui_text_node_base_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_text_node_base_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ui_text_node_base_create(&node);
   if (node) {
@@ -294,9 +309,19 @@ int main(void) {
     ui_text_node_base_destroy(node);
   }
 
-  (void)ui_font_manager_destroy(font_mgr);
+  {
+    ui_error_t rc_cleanup = ui_font_manager_destroy(font_mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_text_node_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_text_node_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   failed |= test_oom();
 

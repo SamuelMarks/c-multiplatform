@@ -63,9 +63,7 @@ ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
   if (err != UI_ERROR_NONE) {
     if (prefix_copy)
       C_MULTIPLATFORM_FREE(prefix_copy);
-    {
-      return err;
-    }
+    { return err; }
   }
 
   ns = (struct ui_css_namespace *)C_MULTIPLATFORM_MALLOC(
@@ -493,9 +491,7 @@ ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
                : UI_ERROR_OUT_OF_MEMORY);
     if (err != UI_ERROR_NONE) {
       C_MULTIPLATFORM_FREE(name_copy);
-      {
-        return err;
-      }
+      { return err; }
     }
   }
 
@@ -564,9 +560,7 @@ ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
              : UI_ERROR_OUT_OF_MEMORY);
   if (err != UI_ERROR_NONE) {
     C_MULTIPLATFORM_FREE(name_copy);
-    {
-      return err;
-    }
+    { return err; }
   }
 
   decl = (struct ui_css_declaration *)C_MULTIPLATFORM_MALLOC(
@@ -1514,9 +1508,7 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
       ui_error_t rc = eval_cond_or(p, &res);
       if (rc != UI_ERROR_NONE)
         return rc;
-      {
-        cond_skip_ws(p);
-      }
+      { cond_skip_ws(p); }
       if (**p == ')')
         (*p)++;
       *out_matched = res;
@@ -1832,9 +1824,7 @@ ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
       ui_error_t _ign_rc = ui_css_computed_style_destroy(style);
       (void)_ign_rc;
     }
-    {
-      return err;
-    }
+    { return err; }
   }
 
   *out_style = style;

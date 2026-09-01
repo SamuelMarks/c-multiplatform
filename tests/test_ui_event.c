@@ -206,8 +206,18 @@ static void test_failing_events(void) {
   ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
   g_mock_focus_fail = 0;
 
-  (void)ui_focus_manager_destroy(focus_mgr);
-  (void)ui_dom_node_destroy(root_dom);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_dom);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {
@@ -518,8 +528,18 @@ int main(void) {
   ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
   g_mock_focus_fail = 0;
 
-  (void)ui_focus_manager_destroy(focus_mgr);
-  (void)ui_dom_node_destroy(root_dom);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_dom);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("All UI Event tests passed.\n");
   return 0;

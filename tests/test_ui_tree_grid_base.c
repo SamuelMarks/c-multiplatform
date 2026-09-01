@@ -95,7 +95,12 @@ static int test_tree_grid_lifecycle(void) {
   for (i = 0; i < 4; i++) {
     g_malloc_fail_countdown = i;
     if (ui_tree_grid_base_create(&tree_grid, &model) == UI_ERROR_NONE) {
-      (void)ui_tree_grid_base_destroy(tree_grid);
+      {
+        ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -123,8 +128,18 @@ static int test_tree_grid_lifecycle(void) {
   EXPECT_EQ(ui_tree_grid_base_get_component(tree_grid, &comp), UI_ERROR_NONE);
 
   /* Destructor null safe */
-  (void)ui_tree_grid_base_destroy(NULL);
-  (void)ui_tree_grid_base_destroy(tree_grid);
+  {
+    ui_error_t rc_cleanup = ui_tree_grid_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -200,7 +215,12 @@ static int test_tree_grid_expansion(void) {
   rc = ui_tree_grid_base_set_expanded(tree_grid, node1, 0);
   EXPECT_EQ(rc, UI_ERROR_NONE);
 
-  (void)ui_tree_grid_base_destroy(tree_grid);
+  {
+    ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -300,7 +320,12 @@ static int test_tree_grid_key_events(void) {
   EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev),
             UI_ERROR_OUT_OF_BOUNDS);
 
-  (void)ui_tree_grid_base_destroy(tree_grid);
+  {
+    ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -333,8 +358,18 @@ static int test_tree_grid_render(void) {
   rc = ui_tree_grid_base_render(tree_grid, container);
   EXPECT_EQ(rc, UI_ERROR_NONE);
 
-  (void)ui_tree_grid_base_destroy(tree_grid);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 

@@ -85,8 +85,18 @@ static int run_normal_tests(void) {
   ui_intersection_observer_disconnect(obs);
 
   ui_intersection_observer_destroy(obs);
-  (void)ui_dom_node_destroy(target);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(target);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -127,8 +137,12 @@ static int test_capacity_and_unobserve(void) {
   ui_intersection_observer_subscribe(obs, NULL, NULL);
   ui_intersection_observer_evaluate(obs);
 
-  for (i = 0; i < 8; i++)
-    (void)ui_dom_node_destroy(nodes[i]);
+  for (i = 0; i < 8; i++) {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(nodes[i]);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_intersection_observer_destroy(obs);
 
   return 0;
@@ -207,12 +221,42 @@ static int run_oom_tests(void) {
 
     ui_intersection_observer_evaluate(obs);
 
-    (void)ui_dom_node_destroy(target1);
-    (void)ui_dom_node_destroy(target2);
-    (void)ui_dom_node_destroy(target3);
-    (void)ui_dom_node_destroy(target4);
-    (void)ui_dom_node_destroy(target5);
-    (void)ui_dom_node_destroy(target6);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(target1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(target2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(target3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(target4);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(target5);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(target6);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_intersection_observer_destroy(obs);
   }
 
@@ -238,8 +282,18 @@ static int run_oom_tests(void) {
     ui_intersection_observer_evaluate(obs);
 
     ui_intersection_observer_destroy(obs);
-    (void)ui_dom_node_destroy(target);
-    (void)ui_dom_node_destroy(root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(target);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;

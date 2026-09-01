@@ -246,7 +246,12 @@ static int test_signal(void) {
     ui_reactive_graph_set_current_node(NULL, NULL);
   }
 
-  (void)ui_signal_destroy(sig);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Update with failure fn */
   {
@@ -256,7 +261,12 @@ static int test_signal(void) {
       printf("Failed at %d\n", __LINE__);
       return 1;
     }
-    (void)ui_signal_destroy(sig);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Fallback eq_fn test (NULL eq_fn) */
@@ -265,7 +275,12 @@ static int test_signal(void) {
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
     val.int_val = 25;
     ui_signal_set(sig, val);
-    (void)ui_signal_destroy(sig);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Multithreaded mode */
@@ -289,7 +304,12 @@ static int test_signal(void) {
       ui_thread_pool_destroy(pool);
     }
 
-    (void)ui_signal_destroy(mtsig);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(mtsig);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Nulls */
@@ -304,7 +324,12 @@ static int test_signal(void) {
 
   ui_signal_update(sig, NULL);
 
-  (void)ui_signal_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* malloc fails */
   g_malloc_fail_countdown = 0;
@@ -322,8 +347,18 @@ static int test_signal(void) {
     ui_arena_create(256, &arena);
     ui_signal_create(arena, val, UI_SIGNAL_TYPE_INT32, eq_fn, dest_fn,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
-    (void)ui_signal_destroy(sig);
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Arena alloc fail test */
@@ -334,7 +369,12 @@ static int test_signal(void) {
     ui_signal_create(arena, val, UI_SIGNAL_TYPE_INT32, eq_fn, dest_fn,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
     g_malloc_fail_countdown = -1;
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test ui_signal_update failure from set_value */
@@ -344,8 +384,18 @@ static int test_signal(void) {
     pv.int_val = 1;
     ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail, NULL,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
-    (void)ui_signal_update(sig_upd, mock_update);
-    (void)ui_signal_destroy(sig_upd);
+    {
+      ui_error_t rc_cleanup = ui_signal_update(sig_upd, mock_update);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig_upd);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test both eq_fn and dest_fn failing together */
@@ -357,8 +407,18 @@ static int test_signal(void) {
                      mock_destructor_fail, UI_SIGNAL_MODE_SINGLE_THREADED,
                      &sig_both);
     pv.int_val = 2;
-    (void)ui_signal_set(sig_both, pv);
-    (void)ui_signal_destroy(sig_both);
+    {
+      ui_error_t rc_cleanup = ui_signal_set(sig_both, pv);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig_both);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;
@@ -376,7 +436,12 @@ static int test_other_types(void) {
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_ptr);
   val.ptr_val = (void *)0x5678;
   ui_signal_set(sig_ptr, val);
-  (void)ui_signal_destroy(sig_ptr);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig_ptr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test destructor failure in set_value */
   {
@@ -387,7 +452,12 @@ static int test_other_types(void) {
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig_fail);
     pv.int_val = 2;
     ui_signal_set(sig_fail, pv);
-    (void)ui_signal_destroy(sig_fail);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig_fail);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   val.float_val = 1.0f;
@@ -395,21 +465,36 @@ static int test_other_types(void) {
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_float);
   val.float_val = 2.0f;
   ui_signal_set(sig_float, val);
-  (void)ui_signal_destroy(sig_float);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig_float);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   val.bool_val = 1;
   ui_signal_create(NULL, val, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_bool);
   val.bool_val = 0;
   ui_signal_set(sig_bool, val);
-  (void)ui_signal_destroy(sig_bool);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig_bool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   val.ptr_val = (void *)0x1111;
   ui_signal_create(NULL, val, 999 /* unknown type */, NULL, NULL,
                    UI_SIGNAL_MODE_SINGLE_THREADED, &sig_def);
   val.ptr_val = (void *)0x2222;
   ui_signal_set(sig_def, val);
-  (void)ui_signal_destroy(sig_def);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig_def);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test ui_signal_update failure from set_value */
   {
@@ -418,8 +503,18 @@ static int test_other_types(void) {
     pv.int_val = 1;
     ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail, NULL,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
-    (void)ui_signal_update(sig_upd, mock_update);
-    (void)ui_signal_destroy(sig_upd);
+    {
+      ui_error_t rc_cleanup = ui_signal_update(sig_upd, mock_update);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig_upd);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test both eq_fn and dest_fn failing together */
@@ -431,8 +526,18 @@ static int test_other_types(void) {
                      mock_destructor_fail, UI_SIGNAL_MODE_SINGLE_THREADED,
                      &sig_both);
     pv.int_val = 2;
-    (void)ui_signal_set(sig_both, pv);
-    (void)ui_signal_destroy(sig_both);
+    {
+      ui_error_t rc_cleanup = ui_signal_set(sig_both, pv);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig_both);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;
@@ -454,8 +559,18 @@ int main(void) {
     pv.int_val = 1;
     ui_signal_create(NULL, pv, UI_SIGNAL_TYPE_INT32, mock_eq_fail, NULL,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
-    (void)ui_signal_update(sig_upd, mock_update);
-    (void)ui_signal_destroy(sig_upd);
+    {
+      ui_error_t rc_cleanup = ui_signal_update(sig_upd, mock_update);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig_upd);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test both eq_fn and dest_fn failing together */
@@ -467,8 +582,18 @@ int main(void) {
                      mock_destructor_fail, UI_SIGNAL_MODE_SINGLE_THREADED,
                      &sig_both);
     pv.int_val = 2;
-    (void)ui_signal_set(sig_both, pv);
-    (void)ui_signal_destroy(sig_both);
+    {
+      ui_error_t rc_cleanup = ui_signal_set(sig_both, pv);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(sig_both);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;

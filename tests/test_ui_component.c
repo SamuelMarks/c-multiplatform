@@ -163,7 +163,12 @@ TEST run_normal_tests(void) {
   ASSERT_EQ(UI_ERROR_NONE, ui_component_destroy(comp));
 
   /* Clean up host node manually as it sits outside the component */
-  (void)ui_dom_node_destroy(host_node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(host_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* 2. Test Invalid Arguments */
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_component_create(NULL));

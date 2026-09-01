@@ -96,13 +96,29 @@ ui_canonical_layout_base_create(struct ui_arena *arena,
  * @param layout Parameter layout.
  * @return UI_ERROR_NONE on success.
  */
+#ifdef UI_TEST_MOCK_ALLOC
+int g_canonical_mock_fail = 0;
+extern ui_error_t ui_component_destroy(struct ui_component *c);
+static ui_error_t mock_component_destroy_canonical(struct ui_component *c) {
+  if (g_canonical_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+#define ui_component_destroy mock_component_destroy_canonical
+#endif
+
 ui_error_t
 ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout) {
   if (!layout) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_signal_destroy(layout->layout_changed_signal);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(layout->layout_changed_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

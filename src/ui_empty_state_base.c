@@ -30,7 +30,12 @@ ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
   state = (struct ui_empty_state_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_empty_state_base));
   if (!state) {
-    (void)ui_component_destroy(base_comp);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -45,7 +50,12 @@ ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
 
   err = ui_dom_node_set_tag_name(state->base.shadow_root, "ui-empty-state");
   if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(state->base.shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(state->base.shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(state);
     return err;
   }

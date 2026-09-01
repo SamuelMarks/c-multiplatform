@@ -65,9 +65,19 @@ int main(void) {
     ui_thread_pool_tick(pool);
   }
 
-  (void)ui_signal_destroy(sig);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("test_ui_concurrency passed\\n");
   return 0;

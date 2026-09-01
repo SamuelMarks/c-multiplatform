@@ -117,7 +117,12 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, status_payload, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                         mode, &ctrl->status_signal);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_signal_destroy(ctrl->value_signal);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return rc;
   }
 
@@ -125,27 +130,72 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         mode, &ctrl->touched_signal);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_signal_destroy(ctrl->status_signal);
-    (void)ui_signal_destroy(ctrl->value_signal);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->status_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return rc;
   }
 
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         mode, &ctrl->dirty_signal);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_signal_destroy(ctrl->touched_signal);
-    (void)ui_signal_destroy(ctrl->status_signal);
-    (void)ui_signal_destroy(ctrl->value_signal);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->touched_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->status_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return rc;
   }
 
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_POINTER, NULL, NULL,
                         mode, &ctrl->errors_signal);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_signal_destroy(ctrl->dirty_signal);
-    (void)ui_signal_destroy(ctrl->touched_signal);
-    (void)ui_signal_destroy(ctrl->status_signal);
-    (void)ui_signal_destroy(ctrl->value_signal);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->dirty_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->touched_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->status_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return rc;
   }
   ctrl->error_str = NULL;
@@ -153,7 +203,12 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   *out_control = ctrl;
 
   /* Initial validation */
-  (void)ui_form_control_run_validation(ctrl);
+  {
+    ui_error_t rc_cleanup = ui_form_control_run_validation(ctrl);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -204,7 +259,12 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
 
   /* Re-run validation */
   {
-    (void)ui_form_control_run_validation(control);
+    {
+      ui_error_t rc_cleanup = ui_form_control_run_validation(control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -260,7 +320,12 @@ ui_error_t ui_form_control_add_async_validator(
 
   /* Re-run validation */
   {
-    (void)ui_form_control_run_validation(control);
+    {
+      ui_error_t rc_cleanup = ui_form_control_run_validation(control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -406,7 +471,13 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
   if (control->async_validators_count > 0) {
     status_payload.int_val = (ui_int32)UI_FORM_STATUS_PENDING;
     {
-      (void)ui_signal_set(control->status_signal, status_payload);
+      {
+        ui_error_t rc_cleanup =
+            ui_signal_set(control->status_signal, status_payload);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     for (i = 0; i < control->async_validators_count; i++) {
@@ -473,13 +544,28 @@ ui_error_t ui_form_control_set_value(ui_form_control_t *control,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_signal_set(control->value_signal, new_value);
+  {
+    ui_error_t rc_cleanup = ui_signal_set(control->value_signal, new_value);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   dirty_payload.bool_val = UI_TRUE;
-  (void)ui_signal_set(control->dirty_signal, dirty_payload);
+  {
+    ui_error_t rc_cleanup = ui_signal_set(control->dirty_signal, dirty_payload);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   {
-    (void)ui_form_control_run_validation(control);
+    {
+      ui_error_t rc_cleanup = ui_form_control_run_validation(control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;
@@ -538,7 +624,12 @@ ui_error_t ui_form_control_enable(ui_form_control_t *control) {
 
   /* Re-evaluates validators */
   {
-    (void)ui_form_control_run_validation(control);
+    {
+      ui_error_t rc_cleanup = ui_form_control_run_validation(control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;
@@ -627,21 +718,11 @@ ui_error_t ui_form_control_destroy(ui_form_control_t *control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_signal_destroy(control->value_signal);
-  }
-  {
-    ui_signal_destroy(control->status_signal);
-  }
-  {
-    ui_signal_destroy(control->touched_signal);
-  }
-  {
-    ui_signal_destroy(control->dirty_signal);
-  }
-  {
-    ui_signal_destroy(control->errors_signal);
-  }
+  { ui_signal_destroy(control->value_signal); }
+  { ui_signal_destroy(control->status_signal); }
+  { ui_signal_destroy(control->touched_signal); }
+  { ui_signal_destroy(control->dirty_signal); }
+  { ui_signal_destroy(control->errors_signal); }
   if (control->error_str)
     C_MULTIPLATFORM_FREE(control->error_str);
 

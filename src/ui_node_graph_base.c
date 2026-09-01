@@ -83,7 +83,12 @@ static ui_error_t update_camera_matrix(struct ui_node_graph_base *graph) {
   ui_error_t rc;
 
   /* Construct simple 2D transform matrix (scale + translate) */
-  (void)ui_dom_matrix_init_identity(&graph->camera_matrix);
+  {
+    ui_error_t rc_cleanup = ui_dom_matrix_init_identity(&graph->camera_matrix);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   graph->camera_matrix.m11 = graph->zoom;
   graph->camera_matrix.m22 = graph->zoom;
@@ -130,7 +135,13 @@ ui_error_t ui_node_graph_base_create(
   (*out_graph)->camera_signal = NULL;
   (*out_graph)->topology_signal = NULL;
 
-  (void)ui_dom_matrix_init_identity(&(*out_graph)->camera_matrix);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_matrix_init_identity(&(*out_graph)->camera_matrix);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   initial_payload.ptr_val = &(*out_graph)->camera_matrix;
   err = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
@@ -159,10 +170,18 @@ ui_error_t ui_node_graph_base_create(
 ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
   if (!graph)
     return UI_ERROR_INVALID_ARGUMENT;
-  if (graph->camera_signal)
-    (void)ui_signal_destroy(graph->camera_signal);
-  if (graph->topology_signal)
-    (void)ui_signal_destroy(graph->topology_signal);
+  if (graph->camera_signal) {
+    ui_error_t rc_cleanup = ui_signal_destroy(graph->camera_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  if (graph->topology_signal) {
+    ui_error_t rc_cleanup = ui_signal_destroy(graph->topology_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -196,9 +215,7 @@ ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
   }
 
   rc = update_camera_matrix(graph);
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   return UI_ERROR_NONE;
 }
 
@@ -238,9 +255,7 @@ ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
   }
 
   rc = update_camera_matrix(graph);
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   return UI_ERROR_NONE;
 }
 

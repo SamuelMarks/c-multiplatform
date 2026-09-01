@@ -102,7 +102,12 @@ int run_normal_tests(void) {
                  surface, -1, &visual_index) != UI_ERROR_INVALID_ARGUMENT);
 
   /* Set up specific folds for visual line index test: Let's reset */
-  (void)ui_syntax_surface_base_destroy(surface);
+  {
+    ui_error_t rc_cleanup = ui_syntax_surface_base_destroy(surface);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_syntax_surface_base_create(arena, NULL, &surface);
 
   ui_syntax_surface_base_set_fold_region(surface, 10, 20, UI_TRUE);
@@ -168,7 +173,12 @@ int run_normal_tests(void) {
   ui_signal_set(a_sig, p1);
 
   ACCUM_ERR(failed, ui_syntax_surface_base_destroy(surface));
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Arena OOM tests */
   extern int g_malloc_fail_countdown;
@@ -179,9 +189,19 @@ int run_normal_tests(void) {
     if (ui_arena_create(64, &small_arena) == UI_ERROR_NONE) {
       if (ui_syntax_surface_base_create(small_arena, NULL, &s1) ==
           UI_ERROR_NONE) {
-        (void)ui_syntax_surface_base_destroy(s1);
+        {
+          ui_error_t rc_cleanup = ui_syntax_surface_base_destroy(s1);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
-      (void)ui_arena_destroy(small_arena);
+      {
+        ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;

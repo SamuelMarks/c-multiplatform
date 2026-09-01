@@ -59,7 +59,12 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(ink->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(ink->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(ink);
     return rc;
   }
@@ -67,8 +72,18 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
   {
     ui_error_t rc2 = ui_dom_node_set_tag_name(root_node, "canvas");
     if (rc2 != UI_ERROR_NONE) {
-      (void)ui_component_destroy(ink->component);
-      (void)ui_dom_node_destroy(root_node);
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(ink->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       C_MULTIPLATFORM_FREE(ink);
       return rc2;
     }
@@ -76,8 +91,18 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
   {
     ui_error_t rc3 = ui_dom_node_set_attribute(root_node, "role", "img");
     if (rc3 != UI_ERROR_NONE) {
-      (void)ui_component_destroy(ink->component);
-      (void)ui_dom_node_destroy(root_node);
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(ink->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       C_MULTIPLATFORM_FREE(ink);
       return rc3;
     }
@@ -98,7 +123,12 @@ ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (ink->component) {
-    (void)ui_component_destroy(ink->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(ink->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (ink->raw_points) {
     C_MULTIPLATFORM_FREE(ink->raw_points);

@@ -191,52 +191,136 @@ static int test_selection_flow(void) {
   enum ui_date_range_picker_state state;
   int called = 0;
 
-  (void)ui_date_range_picker_base_create(&picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_date_range_picker_base_set_on_change(picker, mock_on_change, &called);
 
-  (void)ui_date_range_picker_base_get_state(picker, &state);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_state(picker, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DATE_RANGE_PICKER_STATE_IDLE)
     return 1;
 
-  (void)ui_date_range_picker_base_select_date(picker, &start);
-  (void)ui_date_range_picker_base_get_state(picker, &state);
+  {
+    ui_error_t rc_cleanup =
+        ui_date_range_picker_base_select_date(picker, &start);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_state(picker, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DATE_RANGE_PICKER_STATE_SELECTING_END_DATE)
     return 1;
 
-  (void)ui_date_range_picker_base_set_hover_date(picker, &hover);
-  (void)ui_date_range_picker_base_get_range(picker, &range);
+  {
+    ui_error_t rc_cleanup =
+        ui_date_range_picker_base_set_hover_date(picker, &hover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_range(picker, &range);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (range.end_date.day != 12)
     return 1;
 
-  (void)ui_date_range_picker_base_set_hover_date(picker, &before_start);
-  (void)ui_date_range_picker_base_get_range(picker, &range);
+  {
+    ui_error_t rc_cleanup =
+        ui_date_range_picker_base_set_hover_date(picker, &before_start);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_range(picker, &range);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (range.end_date.day != 10)
     return 1;
 
-  (void)ui_date_range_picker_base_select_date(picker, &before_start);
-  (void)ui_date_range_picker_base_get_state(picker, &state);
+  {
+    ui_error_t rc_cleanup =
+        ui_date_range_picker_base_select_date(picker, &before_start);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_state(picker, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DATE_RANGE_PICKER_STATE_SELECTING_END_DATE)
     return 1;
-  (void)ui_date_range_picker_base_get_range(picker, &range);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_range(picker, &range);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (range.start_date.day != 5)
     return 1;
 
-  (void)ui_date_range_picker_base_select_date(picker, &end);
-  (void)ui_date_range_picker_base_get_state(picker, &state);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &end);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_state(picker, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DATE_RANGE_PICKER_STATE_IDLE)
     return 1;
   if (!called)
     return 1;
-  (void)ui_date_range_picker_base_get_range(picker, &range);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_range(picker, &range);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (range.start_date.day != 5 || range.end_date.day != 20)
     return 1;
 
   ui_date_range_picker_base_clear(picker);
-  (void)ui_date_range_picker_base_get_state(picker, &state);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_state(picker, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DATE_RANGE_PICKER_STATE_IDLE)
     return 1;
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -248,27 +332,57 @@ static int test_predicate(void) {
   enum ui_date_range_picker_state state;
   struct ui_date_range range;
 
-  (void)ui_date_range_picker_base_create(&picker);
-  (void)ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate,
-                                                        NULL);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_set_disable_predicate(
+        picker, mock_predicate, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Selecting disabled date directly fails */
   if (ui_date_range_picker_base_select_date(picker, &d2) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_date_range_picker_base_select_date(picker, &d1);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_date_range_picker_base_select_date(picker,
                                         &d3); /* crosses disabled date */
 
-  (void)ui_date_range_picker_base_get_state(picker, &state);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_state(picker, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DATE_RANGE_PICKER_STATE_SELECTING_END_DATE)
     return 1; /* restarted selection at d3 */
-  (void)ui_date_range_picker_base_get_range(picker, &range);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_range(picker, &range);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (range.start_date.day != 20)
     return 1;
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -276,7 +390,12 @@ static int test_invalid_dates(void) {
   struct ui_date_range_picker_base *picker = NULL;
   struct ui_date invalid = {2023, 13, 1};
 
-  (void)ui_date_range_picker_base_create(&picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_date_range_picker_base_select_date(picker, &invalid) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -284,7 +403,12 @@ static int test_invalid_dates(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -293,14 +417,39 @@ static int test_month_wrap(void) {
   struct ui_date d1 = {2023, 12, 30};
   struct ui_date d2 = {2024, 1, 2};
 
-  (void)ui_date_range_picker_base_create(&picker);
-  (void)ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate,
-                                                        NULL);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_set_disable_predicate(
+        picker, mock_predicate, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_date_range_picker_base_select_date(picker, &d1);
-  (void)ui_date_range_picker_base_select_date(picker, &d2);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -309,14 +458,39 @@ static int test_day_wrap_only(void) {
   struct ui_date d1 = {2023, 1, 30};
   struct ui_date d2 = {2023, 2, 2};
 
-  (void)ui_date_range_picker_base_create(&picker);
-  (void)ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate,
-                                                        NULL);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_set_disable_predicate(
+        picker, mock_predicate, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_date_range_picker_base_select_date(picker, &d1);
-  (void)ui_date_range_picker_base_select_date(picker, &d2);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -328,19 +502,50 @@ static int test_early_end_date(void) {
   struct ui_date_range range;
   int failed = 0;
 
-  (void)ui_date_range_picker_base_create(&picker);
-  (void)ui_date_range_picker_base_select_date(picker, &d1);
-  (void)ui_date_range_picker_base_set_hover_date(picker, &hover);
-  (void)ui_date_range_picker_base_get_range(picker, &range);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_date_range_picker_base_set_hover_date(picker, &hover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_range(picker, &range);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (range.start_date.day != 10 || range.end_date.day != 10)
     failed = 1;
 
   ui_date_range_picker_base_select_date(picker, &d2); /* should restart */
-  (void)ui_date_range_picker_base_get_range(picker, &range);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_get_range(picker, &range);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (range.start_date.day != 5 || range.end_date.day != 5)
     failed = 1;
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -348,11 +553,27 @@ static int test_hover_idle(void) {
   struct ui_date_range_picker_base *picker = NULL;
   struct ui_date hover = {2023, 1, 10};
 
-  (void)ui_date_range_picker_base_create(&picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* Hover while IDLE does nothing, state stays IDLE */
-  (void)ui_date_range_picker_base_set_hover_date(picker, &hover);
+  {
+    ui_error_t rc_cleanup =
+        ui_date_range_picker_base_set_hover_date(picker, &hover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -360,13 +581,28 @@ static int test_select_other_state(void) {
   struct ui_date_range_picker_base *picker = NULL;
   struct ui_date d1 = {2023, 1, 10};
 
-  (void)ui_date_range_picker_base_create(&picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   picker->state =
       (enum ui_date_range_picker_state)99; /* Force an unknown state to hit the
                                               else branch of select_date */
-  (void)ui_date_range_picker_base_select_date(picker, &d1);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -375,15 +611,40 @@ static int test_month_wrap_loop_end(void) {
   struct ui_date d1 = {2023, 12, 31};
   struct ui_date d2 = {2023, 12, 31};
 
-  (void)ui_date_range_picker_base_create(&picker);
-  (void)ui_date_range_picker_base_set_disable_predicate(picker, mock_predicate,
-                                                        NULL);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_create(&picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_set_disable_predicate(
+        picker, mock_predicate, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Trigger while loop breaking correctly on first compare */
-  (void)ui_date_range_picker_base_select_date(picker, &d1);
-  (void)ui_date_range_picker_base_select_date(picker, &d2);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_select_date(picker, &d2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_date_range_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_date_range_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -406,7 +667,12 @@ int main(void) {
   g_malloc_fail_countdown = 0;
   {
     struct ui_date_range_picker_base *p = NULL;
-    (void)ui_date_range_picker_base_create(&p);
+    {
+      ui_error_t rc_cleanup = ui_date_range_picker_base_create(&p);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   g_malloc_fail_countdown = -1;
 

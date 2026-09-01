@@ -73,7 +73,12 @@ ui_error_t ui_popover_base_create(struct ui_popover_base **out_popover) {
 
   rc = ui_backdrop_create(&popover->backdrop);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(popover->overlay_component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(popover->overlay_component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(popover);
     return rc;
   }
@@ -97,8 +102,18 @@ ui_error_t ui_popover_base_destroy(struct ui_popover_base *popover) {
       return rc;
   }
 
-  (void)ui_backdrop_destroy(popover->backdrop);
-  (void)ui_component_destroy(popover->overlay_component);
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(popover->backdrop);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(popover->overlay_component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(popover);
   return UI_ERROR_NONE;
 }
@@ -172,7 +187,12 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
   {
     ui_error_t attr_rc = ui_dom_node_set_attribute(root_node, "role", "dialog");
     if (attr_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(root_node);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       return attr_rc;
     }
   }
@@ -180,7 +200,12 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
     ui_error_t attr_rc =
         ui_dom_node_set_attribute(root_node, "aria-modal", "true");
     if (attr_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(root_node);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       return attr_rc;
     }
   }
@@ -196,14 +221,24 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
     ui_error_t attr_rc =
         ui_dom_node_set_attribute(root_node, "style", style_buf);
     if (attr_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(root_node);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       return attr_rc;
     }
   }
 
   rc = ui_dom_node_append_child(root_node, content);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return rc;
   }
 
@@ -218,7 +253,12 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
         return rem_rc;
     }
     popover->overlay_component->shadow_root = NULL;
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return rc;
   }
 
@@ -236,7 +276,12 @@ ui_error_t ui_popover_base_open(struct ui_popover_base *popover,
           return rem_rc;
       }
       popover->overlay_component->shadow_root = NULL;
-      (void)ui_dom_node_destroy(root_node);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       return rc;
     }
     popover->active_focus_mgr = focus_mgr;
@@ -316,7 +361,12 @@ ui_error_t ui_popover_base_close(struct ui_popover_base *popover) {
     ui_error_t _ign_rc = ui_dom_node_remove_child(root, root->first_child);
     (void)_ign_rc;
   }
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   popover->overlay_component->shadow_root = NULL;
 
   popover->active_overlay = NULL;

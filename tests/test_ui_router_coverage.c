@@ -38,7 +38,12 @@ void test_ui_router_coverage(void) {
     ui_route_request_get_path(NULL, &path);
     ui_route_request_get_state(NULL, &state);
 
-    (void)ui_router_destroy(router);
+    {
+      ui_error_t rc_cleanup = ui_router_destroy(router);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 
@@ -48,6 +53,11 @@ void test_ui_router_coverage2(void) {
   if (router) {
     ui_router_add_route(router, "/cov", cov_factory, NULL);
     ui_router_navigate_with_state(router, "/cov", (void *)0x123);
-    (void)ui_router_destroy(router);
+    {
+      ui_error_t rc_cleanup = ui_router_destroy(router);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }

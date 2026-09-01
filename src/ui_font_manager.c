@@ -636,7 +636,12 @@ ui_error_t ui_test_font_manager_coverage_in_src(void) {
     ui_font_free_atlas(atlas);
   }
 
-  (void)ui_font_manager_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_font_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 #endif

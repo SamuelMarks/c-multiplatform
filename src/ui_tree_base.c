@@ -312,7 +312,13 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
     int is_expanded = 0;
     (void)UI_TREE_IS_EXPAND_IGNORE(tree, tree->active_node, &is_expanded);
     if (is_expanded) {
-      (void)ui_tree_base_set_expanded(tree, tree->active_node, 0);
+      {
+        ui_error_t rc_cleanup =
+            ui_tree_base_set_expanded(tree, tree->active_node, 0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     } else {
       void *parent =
           tree->model.get_parent(tree->active_node, tree->model.user_data);
@@ -398,8 +404,13 @@ static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
 #endif
   (void)UI_DOM_SET_ATTR_IGNORE(item, "aria-setsize", buf);
 
-  (void)ui_selection_model_is_selected(tree->selection_model, node,
-                                       &is_selected);
+  {
+    ui_error_t rc_cleanup = ui_selection_model_is_selected(
+        tree->selection_model, node, &is_selected);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (is_selected) {
     (void)UI_DOM_SET_ATTR_IGNORE(item, "aria-selected", "true");
   }
@@ -461,7 +472,12 @@ ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
     void *root_node = tree->model.get_root_node(i, tree->model.user_data);
     rc = render_recursive(tree, root_node, tree_root, 1, i + 1, root_count);
     if (rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(tree_root);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(tree_root);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       return rc;
     }
   }

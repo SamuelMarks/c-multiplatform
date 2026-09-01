@@ -92,7 +92,12 @@ static void test_empty_state_base(void) {
     exit(1);
   }
 
-  (void)ui_component_destroy((struct ui_component *)state);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy((struct ui_component *)state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_oom(void) {
@@ -102,7 +107,13 @@ static void test_oom(void) {
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     if (ui_empty_state_base_create(&state) == UI_ERROR_NONE) {
-      (void)ui_component_destroy((struct ui_component *)state);
+      {
+        ui_error_t rc_cleanup =
+            ui_component_destroy((struct ui_component *)state);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     g_malloc_fail_countdown = -1;
   }

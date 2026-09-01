@@ -229,7 +229,12 @@ static int test_tree_render(void) {
   for (i = 0; i < 4; i++) {
     g_malloc_fail_countdown = i;
     if (ui_tree_base_create(&tree, &model) == UI_ERROR_NONE) {
-      (void)ui_tree_base_destroy(tree);
+      {
+        ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -302,7 +307,12 @@ static int test_tree_render(void) {
     g_malloc_fail_countdown = i;
     if (ui_tree_base_render(tree, container) == UI_ERROR_NONE) {
       if (container->first_child) {
-        (void)ui_dom_node_destroy(container->first_child);
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(container->first_child);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         container->first_child = NULL;
         container->last_child = NULL;
       }
@@ -317,8 +327,18 @@ static int test_tree_render(void) {
   rc = ui_tree_base_render(tree, container);
   EXPECT_EQ(rc, UI_ERROR_NONE);
 
-  (void)ui_tree_base_destroy(tree);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -522,24 +542,54 @@ static int test_tree_navigation(void) {
     for (j = 0; j < 3; j++) {
       struct ui_tree_base *mock_tree;
       g_malloc_fail_countdown = -1; /* Reset for tree creation */
-      (void)ui_tree_base_create(&mock_tree, &model);
+      {
+        ui_error_t rc_cleanup = ui_tree_base_create(&mock_tree, &model);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       g_malloc_fail_countdown = j;
       ui_tree_base_set_active_node(mock_tree, &root1);
       ev.key_code = UI_KEY_RIGHT;
-      (void)ui_tree_base_handle_key_event(mock_tree, &ev);
+      {
+        ui_error_t rc_cleanup = ui_tree_base_handle_key_event(mock_tree, &ev);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       g_malloc_fail_countdown = -1; /* Reset to allow cleanup */
-      (void)ui_tree_base_destroy(mock_tree);
+      {
+        ui_error_t rc_cleanup = ui_tree_base_destroy(mock_tree);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
-      (void)ui_tree_base_create(&mock_tree, &model);
+      {
+        ui_error_t rc_cleanup = ui_tree_base_create(&mock_tree, &model);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       g_malloc_fail_countdown = j;
       ui_tree_base_set_active_node(mock_tree, &root1);
       ev.key_code = UI_KEY_ENTER;
-      (void)ui_tree_base_handle_key_event(mock_tree, &ev);
+      {
+        ui_error_t rc_cleanup = ui_tree_base_handle_key_event(mock_tree, &ev);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       g_malloc_fail_countdown = -1;
-      (void)ui_tree_base_destroy(mock_tree);
+      {
+        ui_error_t rc_cleanup = ui_tree_base_destroy(mock_tree);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 #endif
@@ -575,7 +625,12 @@ static int test_tree_navigation(void) {
   EXPECT_EQ(model.get_child(&root1, 0, NULL), &child1_1);
   EXPECT_EQ(model.render_node(NULL, NULL, NULL), UI_ERROR_NONE);
 
-  (void)ui_tree_base_destroy(tree);
+  {
+    ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 

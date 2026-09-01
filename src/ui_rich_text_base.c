@@ -83,7 +83,12 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(editor->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(editor->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(editor);
     return rc;
   }
@@ -91,8 +96,18 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
   {
     ui_error_t set_rc = ui_dom_node_set_tag_name(root_node, "div");
     if (set_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(root_node);
-      (void)ui_component_destroy(editor->component);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(editor->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       C_MULTIPLATFORM_FREE(editor);
       return set_rc;
     }
@@ -101,8 +116,18 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
     ui_error_t set_rc =
         ui_dom_node_set_attribute(root_node, "contenteditable", "true");
     if (set_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(root_node);
-      (void)ui_component_destroy(editor->component);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(editor->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       C_MULTIPLATFORM_FREE(editor);
       return set_rc;
     }
@@ -110,8 +135,18 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
   {
     ui_error_t set_rc = ui_dom_node_set_attribute(root_node, "role", "textbox");
     if (set_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(root_node);
-      (void)ui_component_destroy(editor->component);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(editor->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       C_MULTIPLATFORM_FREE(editor);
       return set_rc;
     }
@@ -120,8 +155,18 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
     ui_error_t set_rc =
         ui_dom_node_set_attribute(root_node, "aria-multiline", "true");
     if (set_rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(root_node);
-      (void)ui_component_destroy(editor->component);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(editor->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       C_MULTIPLATFORM_FREE(editor);
       return set_rc;
     }
@@ -195,10 +240,21 @@ ui_error_t ui_rich_text_base_destroy(struct ui_rich_text_base *editor) {
 
   if (editor->component) {
     if (editor->component->shadow_root) {
-      (void)ui_dom_node_destroy(editor->component->shadow_root);
+      {
+        ui_error_t rc_cleanup =
+            ui_dom_node_destroy(editor->component->shadow_root);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       editor->component->shadow_root = NULL;
     }
-    (void)ui_component_destroy(editor->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(editor->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   C_MULTIPLATFORM_FREE(editor);
@@ -265,12 +321,22 @@ ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
           return txt_rc;
         txt_rc = ui_dom_node_set_text_content(text_node, text);
         if (txt_rc != UI_ERROR_NONE) {
-          (void)ui_dom_node_destroy(text_node);
+          {
+            ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
           return txt_rc;
         }
         /* TODO: clear existing children of shadow_root first */
-        (void)ui_dom_node_append_child(editor->component->shadow_root,
-                                       text_node);
+        {
+          ui_error_t rc_cleanup = ui_dom_node_append_child(
+              editor->component->shadow_root, text_node);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }

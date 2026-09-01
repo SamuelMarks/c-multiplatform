@@ -196,8 +196,8 @@ if(NOT UI_SINGLE_THREADED)
 endif()
 
 if(MSVC)
-    
-    target_compile_options(ui_engine PRIVATE /W4 /WX /Gy /wd4715 /wd4706 /wd4127)
+
+    target_compile_options(ui_engine PRIVATE /W4 /WX /Gy)
 
 else()
     target_compile_options(ui_engine PRIVATE -pedantic -Wall -Werror  )
@@ -322,8 +322,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     target_link_libraries(ui_engine_test PRIVATE c-abstract-http cfs c-orm)
 
     if(MSVC)
-        
-        target_compile_options(ui_engine_test PRIVATE /W4 /WX /Gy /wd4715 /wd4133 /wd4312 /wd4706 /wd4127)
+
+        target_compile_options(ui_engine_test PRIVATE /W4 /WX /Gy)
 
     else()
         target_compile_options(ui_engine_test PRIVATE -pedantic -Wall -Werror  )

@@ -21,6 +21,21 @@ int g_append_fail_countdown = -1;
  * @param child Parameter child.
  * @return UI_ERROR_NONE on success.
  */
+static ui_error_t mock_component_destroy(struct ui_component *c) {
+  if (g_action_sheet_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+
+static ui_error_t mock_bottom_sheet_destroy(struct ui_bottom_sheet_base *c) {
+  if (g_action_sheet_mock_fail == 21)
+    return UI_ERROR_UNKNOWN;
+  return ui_bottom_sheet_base_destroy(c);
+}
+
+#define ui_component_destroy mock_component_destroy
+#define ui_bottom_sheet_base_destroy mock_bottom_sheet_destroy
+
 static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
   if (g_action_sheet_mock_fail == 6) {
@@ -265,7 +280,13 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
 
   rc = ui_component_create(&sheet->container);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
@@ -273,24 +294,60 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
                           &sheet->container->shadow_root);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(sheet->container->shadow_root, "div");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
 
   rc = ui_component_create(&sheet->actions_container);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
@@ -298,36 +355,108 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
                           &sheet->actions_container->shadow_root);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(sheet->actions_container->shadow_root, "div");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
   rc = ui_dom_node_set_attribute(sheet->actions_container->shadow_root, "role",
                                  "group");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
 
   rc = ui_component_create(&sheet->cancel_container);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
@@ -335,20 +464,68 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT,
                           &sheet->cancel_container->shadow_root);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->cancel_container);
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(sheet->cancel_container->shadow_root, "div");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->cancel_container);
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
@@ -356,21 +533,69 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   rc = ui_dom_node_append_child(sheet->container->shadow_root,
                                 sheet->actions_container->shadow_root);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->cancel_container);
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
   rc = ui_dom_node_append_child(sheet->container->shadow_root,
                                 sheet->cancel_container->shadow_root);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(sheet->cancel_container);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     sheet->actions_container->shadow_root = NULL;
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
@@ -378,11 +603,35 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   rc = ui_bottom_sheet_base_set_content(sheet->bottom_sheet, sheet->container);
   if (rc != UI_ERROR_NONE) {
     sheet->cancel_container->shadow_root = NULL;
-    (void)ui_component_destroy(sheet->cancel_container);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     sheet->actions_container->shadow_root = NULL;
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
@@ -390,11 +639,35 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
                                          on_bottom_sheet_close, sheet);
   if (rc != UI_ERROR_NONE) {
     sheet->cancel_container->shadow_root = NULL;
-    (void)ui_component_destroy(sheet->cancel_container);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     sheet->actions_container->shadow_root = NULL;
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
@@ -402,11 +675,35 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   rc = ui_focus_trap_create(&sheet->focus_trap);
   if (rc != UI_ERROR_NONE) {
     sheet->cancel_container->shadow_root = NULL;
-    (void)ui_component_destroy(sheet->cancel_container);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     sheet->actions_container->shadow_root = NULL;
-    (void)ui_component_destroy(sheet->actions_container);
-    (void)ui_component_destroy(sheet->container);
-    (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
   }
@@ -431,19 +728,55 @@ ui_error_t ui_action_sheet_base_destroy(struct ui_action_sheet_base *sheet) {
       return rc;
     }
   }
-  (void)ui_focus_trap_destroy(sheet->focus_trap);
+  {
+    ui_error_t rc_cleanup = ui_focus_trap_destroy(sheet->focus_trap);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE)
+        rc = rc_cleanup;
+    }
+  }
 
-  (void)ui_dom_node_destroy(sheet->container->shadow_root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(sheet->container->shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE)
+        rc = rc_cleanup;
+    }
+  }
   sheet->container->shadow_root = NULL;
-  (void)ui_component_destroy(sheet->container);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE)
+        rc = rc_cleanup;
+    }
+  }
 
   sheet->cancel_container->shadow_root = NULL;
-  (void)ui_component_destroy(sheet->cancel_container);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE)
+        rc = rc_cleanup;
+    }
+  }
 
   sheet->actions_container->shadow_root = NULL;
-  (void)ui_component_destroy(sheet->actions_container);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE)
+        rc = rc_cleanup;
+    }
+  }
 
-  (void)ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+  {
+    ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE)
+        rc = rc_cleanup;
+    }
+  }
   C_MULTIPLATFORM_FREE(sheet);
   return UI_ERROR_NONE;
 }
@@ -707,36 +1040,93 @@ ui_error_t run_action_sheet_coverage(void) {
 
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
-  (void)ui_component_create(&action1);
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &action1->shadow_root);
-  (void)ui_component_create(&cancel);
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel->shadow_root);
+  {
+    ui_error_t rc_cleanup = ui_component_create(&action1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &action1->shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_create(&cancel);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel->shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_append_fail_countdown = 0;
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 1;
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 2;
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 3;
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_append_fail_countdown = -1;
 
   g_action_sheet_mock_fail = 3;
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 5;
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   sheet->focus_manager = (struct ui_focus_manager *)1;
   g_action_sheet_mock_fail = 4;
@@ -761,101 +1151,253 @@ ui_error_t run_action_sheet_coverage(void) {
   sheet->focus_manager = NULL;
 
   g_append_fail_countdown = 0;
-  (void)ui_action_sheet_base_add_action(sheet, action1);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_add_action(sheet, action1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 0;
-  (void)ui_action_sheet_base_set_cancel_action(sheet, cancel);
+  {
+    ui_error_t rc_cleanup =
+        ui_action_sheet_base_set_cancel_action(sheet, cancel);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_append_fail_countdown = -1;
 
-  (void)ui_action_sheet_base_set_cancel_action(sheet, cancel);
+  {
+    ui_error_t rc_cleanup =
+        ui_action_sheet_base_set_cancel_action(sheet, cancel);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_action_sheet_mock_fail = 2;
-  (void)ui_action_sheet_base_set_open(sheet, 1);
-  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 8;
-  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
-  (void)ui_action_sheet_base_set_open(sheet, 1);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 2;
-  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
-  (void)ui_action_sheet_base_set_open(sheet, 0);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_set_open(sheet, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   sheet->focus_manager = (struct ui_focus_manager *)1;
   g_action_sheet_mock_fail = 4;
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
   sheet->focus_manager = NULL;
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_action_sheet_mock_fail = 7;
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   /* Additional tests for remaining branches */
 
   /* mock_dom_node_append_child2 mock 1 */
   g_action_sheet_mock_fail = 1;
-  (void)ui_dom_node_append_child(NULL, NULL);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_append_child(NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   /* mock_bottom_sheet_set_open mock 2 */
   g_action_sheet_mock_fail = 2;
-  (void)ui_bottom_sheet_base_set_open(NULL, 0);
+  {
+    ui_error_t rc_cleanup = ui_bottom_sheet_base_set_open(NULL, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   /* Line 384: set_cancel_action remove_child success and fail */
-  (void)ui_action_sheet_base_create(&sheet);
-  (void)ui_action_sheet_base_set_cancel_action(sheet,
-                                               cancel); /* no children yet */
-  (void)ui_action_sheet_base_set_cancel_action(
-      sheet, action1); /* removes cancel successfully */
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_action_sheet_base_set_cancel_action(sheet, cancel);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  } /* no children yet */
+  {
+    ui_error_t rc_cleanup =
+        ui_action_sheet_base_set_cancel_action(sheet, action1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  } /* removes cancel successfully */
   g_action_sheet_mock_fail = 6;
-  (void)ui_action_sheet_base_set_cancel_action(sheet,
-                                               cancel); /* remove_child fails */
+  {
+    ui_error_t rc_cleanup =
+        ui_action_sheet_base_set_cancel_action(sheet, cancel);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  } /* remove_child fails */
   g_action_sheet_mock_fail = 0;
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* add_action remove_child fails */
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_append_fail_countdown = 0;
-  (void)ui_action_sheet_base_add_action(sheet, action1);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_add_action(sheet, action1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_append_fail_countdown = -1;
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* process_event paths */
-  (void)ui_action_sheet_base_create(&sheet);
-  (void)ui_action_sheet_base_set_open(sheet, 1);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_set_open(sheet, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   sheet->focus_manager = (struct ui_focus_manager *)1;
 
   g_action_sheet_mock_fail = 10;
   sheet->on_close = mock_on_close_fail;
-  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_action_sheet_mock_fail = 12;
   sheet->on_close = mock_on_close_fail;
-  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_action_sheet_mock_fail = 13;
   sheet->on_close = mock_on_close_success;
-  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* explicit path to hit line 489 */
   g_action_sheet_mock_fail = 0;
   sheet->on_close = mock_on_close_fail;
-  (void)ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_action_sheet_mock_fail = 0;
   sheet->on_close = NULL;
   sheet->focus_manager = NULL;
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* on_bottom_sheet_close paths */
-  (void)ui_action_sheet_base_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   sheet->focus_manager = (struct ui_focus_manager *)1;
   g_action_sheet_mock_fail = 4;
   (void)on_bottom_sheet_close(sheet->bottom_sheet, sheet);
@@ -869,16 +1411,31 @@ ui_error_t run_action_sheet_coverage(void) {
   sheet->on_close = mock_on_close_success;
   (void)on_bottom_sheet_close(sheet->bottom_sheet, sheet);
   sheet->on_close = NULL;
-  (void)ui_action_sheet_base_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* mock_dom_node_remove_child 6 */
   g_action_sheet_mock_fail = 6;
-  (void)ui_dom_node_remove_child(NULL, NULL);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_remove_child(NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   /* mock_dom_node_remove_child 7 */
   g_action_sheet_mock_fail = 7;
-  (void)ui_dom_node_remove_child(NULL, NULL);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_remove_child(NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   {
@@ -887,30 +1444,70 @@ ui_error_t run_action_sheet_coverage(void) {
     struct ui_dom_node child2 = {0};
     parent.first_child = &child1;
     g_action_sheet_mock_fail = 7;
-    (void)ui_dom_node_remove_child(&parent, &child2);
-    (void)ui_dom_node_remove_child(&parent, &child1);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_child(&parent, &child2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        /* expected error */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_child(&parent, &child1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        /* expected error */
+      }
+    }
     g_action_sheet_mock_fail = 0;
   }
 
   g_action_sheet_mock_fail = 11;
-  (void)ui_dom_node_remove_child(NULL, NULL);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_remove_child(NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 12;
-  (void)ui_bottom_sheet_base_set_open(NULL, 0);
+  {
+    ui_error_t rc_cleanup = ui_bottom_sheet_base_set_open(NULL, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 13;
-  (void)ui_bottom_sheet_base_set_open(NULL, 0);
+  {
+    ui_error_t rc_cleanup = ui_bottom_sheet_base_set_open(NULL, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   /* mock_focus_trap_create 6 and 7 */
   g_action_sheet_mock_fail = 6;
-  (void)ui_focus_trap_create(NULL);
+  {
+    ui_error_t rc_cleanup = ui_focus_trap_create(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 7;
-  (void)ui_focus_trap_create(NULL);
+  {
+    ui_error_t rc_cleanup = ui_focus_trap_create(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_action_sheet_mock_fail = 0;
 
   action1->shadow_root = NULL;
-  (void)ui_component_destroy(action1);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(action1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

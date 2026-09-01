@@ -16,7 +16,12 @@ static int test_dockable_layout_lifecycle(void) {
   /* Invalid args */
   if (ui_dockable_layout_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  (void)ui_dockable_layout_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_dockable_layout_base_get_component(NULL, &comp) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -45,7 +50,12 @@ static int test_dockable_layout_lifecycle(void) {
   if (rc != UI_ERROR_NONE || comp == NULL)
     return 1;
 
-  (void)ui_dockable_layout_base_destroy(layout);
+  {
+    ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -106,7 +116,12 @@ static int test_dockable_layout_docking(void) {
     return 1;
   }
 
-  (void)ui_dockable_layout_base_destroy(layout);
+  {
+    ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -167,7 +182,12 @@ static int test_dockable_layout_serialization(void) {
   if (ui_dockable_layout_base_deserialize(layout, "INVALID") != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_dockable_layout_base_destroy(layout);
+  {
+    ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -190,7 +210,12 @@ static int test_dockable_layout_integrate(void) {
           layout, (struct ui_drag_drop_context *)1) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_dockable_layout_base_destroy(layout);
+  {
+    ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -219,7 +244,12 @@ int main(void) {
     }
     /* This will fail to dock the 129th panel, hitting line 198! */
     ui_dockable_layout_base_deserialize(layout, big_buffer);
-    (void)ui_dockable_layout_base_destroy(layout);
+    {
+      ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   printf("All tests passed.\n");

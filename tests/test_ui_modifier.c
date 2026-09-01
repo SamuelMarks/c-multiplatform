@@ -52,7 +52,12 @@ static int run_normal_tests(void) {
     ui_error_t _ign = ui_modifier_destroy(modifier);
     (void)_ign;
   }
-  (void)ui_component_destroy(component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   modifier = NULL;
   component = NULL;
 
@@ -134,7 +139,12 @@ static int run_normal_tests(void) {
   if (err != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_component_destroy(component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     ui_error_t _ign = ui_modifier_destroy(modifier);
     (void)_ign;
@@ -167,7 +177,12 @@ static int run_normal_tests(void) {
   if (err != UI_ERROR_NOT_FOUND)
     return 1;
 
-  (void)ui_component_destroy(component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     ui_error_t _ign = ui_modifier_destroy(modifier);
     (void)_ign;
@@ -258,7 +273,12 @@ static int run_normal_tests(void) {
     return 1;
   }
 
-  (void)ui_component_destroy(component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     ui_error_t _ign = ui_modifier_destroy(modifier);
     (void)_ign;
@@ -401,7 +421,12 @@ static int run_oom_tests(void) {
   if (err != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 
-  (void)ui_component_destroy(component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     ui_error_t _ign = ui_modifier_destroy(modifier);
     (void)_ign;

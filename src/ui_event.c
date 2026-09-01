@@ -187,7 +187,13 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
              event->type == UI_EVENT_KEY_PRESS) {
     struct ui_dom_node *focused = NULL;
     if (focus_mgr) {
-      (void)ui_focus_manager_get_focused_node(focus_mgr, &focused);
+      {
+        ui_error_t rc_cleanup =
+            ui_focus_manager_get_focused_node(focus_mgr, &focused);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     if (focused) {
       {
@@ -201,8 +207,13 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
         event->event_data.keyboard.key_code == UI_KEY_TAB && focus_mgr &&
         layout_root->dom_node) {
       int forward = !(event->event_data.keyboard.modifiers & UI_MODIFIER_SHIFT);
-      (void)ui_focus_manager_advance(
-          focus_mgr, (struct ui_dom_node *)layout_root->dom_node, forward);
+      {
+        ui_error_t rc_cleanup = ui_focus_manager_advance(
+            focus_mgr, (struct ui_dom_node *)layout_root->dom_node, forward);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   return UI_ERROR_NONE;

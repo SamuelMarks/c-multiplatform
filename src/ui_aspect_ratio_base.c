@@ -21,6 +21,13 @@ mock_component_set_default_style(struct ui_component *component,
   }
   return (ui_component_set_default_style)(component, style);
 }
+
+static ui_error_t mock_component_destroy(struct ui_component *c) {
+  if (g_aspect_ratio_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+#define ui_component_destroy mock_component_destroy
 #undef ui_component_set_default_style
 /** @cond */
 #define ui_component_set_default_style mock_component_set_default_style
@@ -30,7 +37,12 @@ ui_error_t run_aspect_ratio_coverage(void);
 ui_error_t run_aspect_ratio_coverage(void) {
   struct ui_aspect_ratio_base *ar = NULL;
   g_aspect_ratio_mock_fail = 1;
-  (void)ui_aspect_ratio_base_create(&ar);
+  {
+    ui_error_t rc_cleanup = ui_aspect_ratio_base_create(&ar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_aspect_ratio_mock_fail = 0;
   return UI_ERROR_NONE;
 }
@@ -126,10 +138,22 @@ ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
   }
   if (ar->component) {
-    (void)ui_component_destroy(ar->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(ar->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(ar);
   return rc;
@@ -140,7 +164,12 @@ ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio) {
   if (!aspect_ratio) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)ui_component_destroy(aspect_ratio->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(aspect_ratio->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
   C_MULTIPLATFORM_FREE(aspect_ratio);
   return UI_ERROR_NONE;
 }

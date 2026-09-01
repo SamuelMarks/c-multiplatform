@@ -192,29 +192,68 @@ ui_error_t ui_card_base_create(struct ui_card_base **out_card) {
 
 cleanup:
   if (card->header_node && card->header_node->parent == NULL) {
-    (void)ui_dom_node_destroy(card->header_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(card->header_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (card->content_node && card->content_node->parent == NULL) {
-    (void)ui_dom_node_destroy(card->content_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(card->content_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (card->actions_node && card->actions_node->parent == NULL) {
-    (void)ui_dom_node_destroy(card->actions_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(card->actions_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (card->root_node) {
-    (void)ui_dom_node_destroy(card->root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(card->root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  if (card->component)
-    (void)ui_component_destroy(card->component);
+  if (card->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(card->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(card);
   return rc;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern ui_error_t ui_component_destroy(struct ui_component *c);
+static ui_error_t mock_component_destroy_card(struct ui_component *c) {
+  if (g_card_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+#define ui_component_destroy mock_component_destroy_card
+#endif
 
 ui_error_t ui_card_base_destroy(struct ui_card_base *card) {
   if (!card) {
     return UI_ERROR_NONE;
   }
   if (card->component) {
-    (void)ui_component_destroy(card->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(card->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(card);
   return UI_ERROR_NONE;

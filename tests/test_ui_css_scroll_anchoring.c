@@ -70,7 +70,12 @@ static void test_scroll_anchoring_cases(void) {
       "invalid", UI_CSS_OVERFLOW_ANCHOR_AUTO); /* fallback to auto on
                                                   invalid/unknown string */
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {

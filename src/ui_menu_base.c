@@ -96,33 +96,21 @@ ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu) {
   menu->user_data = NULL;
 
   rc = ui_component_create(&menu->component);
-  {
-    (void)rc;
-  }
+  { (void)rc; }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   rc = ui_dom_node_set_tag_name(root_node, "div");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   rc = ui_dom_node_set_attribute(root_node, "class", "ui-menu");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   rc = ui_dom_node_set_attribute(root_node, "role", "menu");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
 
   menu->container_node = root_node;
 
   rc = ui_css_parse_stylesheet(ui_menu_base_default_css, &default_style);
-  {
-    (void)rc;
-  }
+  { (void)rc; }
 
   rc = ui_component_set_default_style(menu->component, default_style);
   if (rc != UI_ERROR_NONE) {
@@ -137,10 +125,18 @@ ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu) {
   return UI_ERROR_NONE;
 
 cleanup:
-  if (root_node)
-    (void)ui_dom_node_destroy(root_node);
-  if (menu->component)
-    (void)ui_component_destroy(menu->component);
+  if (root_node) {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  if (menu->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(menu->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(menu);
   return rc;
 }
@@ -157,9 +153,7 @@ ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
 
   {
     ui_error_t cl_rc = ui_menu_base_close(menu);
-    {
-      (void)cl_rc;
-    }
+    { (void)cl_rc; }
   }
 
   for (i = 0; i < menu->item_count; i++) {
@@ -169,7 +163,12 @@ ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
     C_MULTIPLATFORM_FREE(menu->items);
   }
 
-  (void)ui_component_destroy(menu->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(menu->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(menu);
   return UI_ERROR_NONE;
@@ -227,39 +226,25 @@ ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
   }
 
   rc = ui_dom_node_set_attribute(label_node, "role", "menuitem");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   rc = ui_dom_node_set_attribute(label_node, "class", "ui-menu-item");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   rc = ui_dom_node_set_attribute(label_node, "tabindex", "-1");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   rc = ui_dom_node_set_attribute(label_node, "data-active", "false");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
 
   if (submenu) {
     rc = ui_dom_node_set_attribute(label_node, "aria-haspopup", "menu");
-    {
-      (void)rc;
-    }
+    { (void)rc; }
     submenu->parent_menu = menu;
   }
 
   rc = ui_dom_node_append_child(menu->container_node, label_node);
-  {
-    (void)rc;
-  }
+  { (void)rc; }
 
   rc = duplicate_string(item_id, &menu->items[menu->item_count].id);
-  {
-    (void)rc;
-  }
+  { (void)rc; }
 
   menu->items[menu->item_count].node = label_node;
   menu->items[menu->item_count].submenu = submenu;
@@ -267,13 +252,9 @@ ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
   if (menu->item_count == 0) {
     menu->active_index = 0;
     rc = ui_dom_node_set_attribute(label_node, "data-active", "true");
-    {
-      (void)rc;
-    }
+    { (void)rc; }
     rc = ui_dom_node_set_attribute(label_node, "tabindex", "0");
-    {
-      (void)rc;
-    }
+    { (void)rc; }
   }
 
   menu->item_count++;
@@ -326,9 +307,7 @@ ui_error_t ui_menu_base_open_at(struct ui_menu_base *menu,
   {
     ui_error_t attr_rc =
         ui_dom_node_set_attribute(menu->container_node, "style", style_buf);
-    {
-      (void)attr_rc;
-    }
+    { (void)attr_rc; }
   }
 
   menu->director = director;
@@ -357,13 +336,17 @@ ui_error_t ui_menu_base_close(struct ui_menu_base *menu) {
   for (i = 0; i < menu->item_count; i++) {
     if (menu->items[i].submenu) {
       ui_error_t close_rc = ui_menu_base_close(menu->items[i].submenu);
-      {
-        (void)close_rc;
-      }
+      { (void)close_rc; }
     }
   }
 
-  (void)ui_overlay_director_unmount(menu->director, menu->overlay_handle);
+  {
+    ui_error_t rc_cleanup =
+        ui_overlay_director_unmount(menu->director, menu->overlay_handle);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   menu->overlay_handle = NULL;
 
   menu->is_open = 0;
@@ -415,26 +398,18 @@ static ui_error_t update_active_index(struct ui_menu_base *menu,
   if (menu->active_index >= 0) {
     rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
                                    "data-active", "false");
-    {
-      (void)rc;
-    }
+    { (void)rc; }
     rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
                                    "tabindex", "-1");
-    {
-      (void)rc;
-    }
+    { (void)rc; }
   }
   menu->active_index = new_index;
   rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
                                  "data-active", "true");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
                                  "tabindex", "0");
-  {
-    (void)rc;
-  }
+  { (void)rc; }
   return UI_ERROR_NONE;
 }
 
@@ -464,18 +439,14 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
     if (menu->items[i].submenu) {
       ui_error_t check_rc =
           ui_menu_base_is_open(menu->items[i].submenu, &is_open);
-      {
-        (void)check_rc;
-      }
+      { (void)check_rc; }
       if (is_open) {
         /* If submenu handles it, we might want to return, but let's just
            process. Actually, we should return if submenu is open, so it takes
            focus. */
         ui_error_t proc_rc =
             ui_menu_base_process_event(menu->items[i].submenu, event);
-        {
-          (void)proc_rc;
-        }
+        { (void)proc_rc; }
         return UI_ERROR_NONE;
       }
     }
@@ -487,9 +458,7 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
     if (key == UI_KEY_DOWN) {
       int next = (menu->active_index + 1) % menu->item_count;
       ui_error_t up_rc = update_active_index(menu, next);
-      {
-        (void)up_rc;
-      }
+      { (void)up_rc; }
       handled = 1;
     } else if (key == UI_KEY_UP) {
       int prev = menu->active_index - 1;
@@ -497,9 +466,7 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
       if (prev < 0)
         prev = menu->item_count - 1;
       up_rc = update_active_index(menu, prev);
-      {
-        (void)up_rc;
-      }
+      { (void)up_rc; }
       handled = 1;
     } else if (key == UI_KEY_RIGHT) {
       if (menu->active_index >= 0) {
@@ -510,18 +477,14 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
           ui_error_t open_rc =
               ui_menu_base_open_at(sub, menu->director, menu->last_x + 100,
                                    menu->last_y + (menu->active_index * 24));
-          {
-            (void)open_rc;
-          }
+          { (void)open_rc; }
         }
       }
       handled = 1;
     } else if (key == UI_KEY_LEFT) {
       if (menu->parent_menu) {
         ui_error_t close_rc = ui_menu_base_close(menu);
-        {
-          (void)close_rc;
-        }
+        { (void)close_rc; }
       }
       handled = 1;
     } else if (key == UI_KEY_ENTER || key == UI_KEY_SPACE) {
@@ -531,17 +494,13 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
           ui_error_t open_rc =
               ui_menu_base_open_at(sub, menu->director, menu->last_x + 100,
                                    menu->last_y + (menu->active_index * 24));
-          {
-            (void)open_rc;
-          }
+          { (void)open_rc; }
         } else {
           if (menu->on_action) {
             {
               ui_error_t action_rc = menu->on_action(
                   menu, menu->items[menu->active_index].id, menu->user_data);
-              {
-                (void)action_rc;
-              }
+              { (void)action_rc; }
             }
           }
           /* Close the entire menu hierarchy */
@@ -552,9 +511,7 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
               root = root->parent_menu;
             }
             close_rc = ui_menu_base_close(root);
-            {
-              (void)close_rc;
-            }
+            { (void)close_rc; }
           }
         }
       }
@@ -562,9 +519,7 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
     } else if (key == UI_KEY_ESCAPE) {
       ui_error_t close_rc;
       close_rc = ui_menu_base_close(menu);
-      {
-        (void)close_rc;
-      }
+      { (void)close_rc; }
       handled = 1;
     }
   }

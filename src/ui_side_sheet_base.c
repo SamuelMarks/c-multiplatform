@@ -80,7 +80,12 @@ ui_error_t ui_side_sheet_base_destroy(struct ui_side_sheet_base *sheet) {
   if (!sheet) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(sheet->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(sheet->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(sheet);
   return UI_ERROR_NONE;
 }

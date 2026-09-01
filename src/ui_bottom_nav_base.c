@@ -59,11 +59,26 @@ ui_error_t ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav) {
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_bottom_nav_mock_fail = 0;
+static ui_error_t mock_component_destroy(struct ui_component *c) {
+  if (g_bottom_nav_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+#define ui_component_destroy mock_component_destroy
+#endif
+
 ui_error_t ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav) {
   if (!nav) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(nav->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(nav->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(nav);
   return UI_ERROR_NONE;
 }
@@ -119,7 +134,12 @@ ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item) {
   if (!item) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(item->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(item->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(item);
   return UI_ERROR_NONE;
 }

@@ -84,7 +84,12 @@ static int test_successful_load(void) {
 
   err = ui_asset_streamer_create(pool, ctx, &streamer);
   if (err != UI_ERROR_NONE) {
-    (void)ui_execution_context_destroy(ctx);
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_thread_pool_destroy(pool);
     return 1;
   }
@@ -92,8 +97,18 @@ static int test_successful_load(void) {
   err = ui_asset_streamer_request(streamer, "test_asset.txt",
                                   UI_ASSET_TYPE_TEXT, &promise);
   if (err != UI_ERROR_NONE) {
-    (void)ui_asset_streamer_destroy(streamer);
-    (void)ui_execution_context_destroy(ctx);
+    {
+      ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_thread_pool_destroy(pool);
     return 1;
   }
@@ -108,9 +123,24 @@ static int test_successful_load(void) {
     sleep_ms(10);
   }
 
-  (void)ui_promise_destroy(promise);
-  (void)ui_asset_streamer_destroy(streamer);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
 
   remove("test_asset.txt");
@@ -138,7 +168,12 @@ static int test_failed_load(void) {
 
   err = ui_asset_streamer_create(pool, ctx, &streamer);
   if (err != UI_ERROR_NONE) {
-    (void)ui_execution_context_destroy(ctx);
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_thread_pool_destroy(pool);
     return 1;
   }
@@ -146,8 +181,18 @@ static int test_failed_load(void) {
   err = ui_asset_streamer_request(streamer, "non_existent_file_12345.bin",
                                   UI_ASSET_TYPE_BINARY, &promise);
   if (err != UI_ERROR_NONE) {
-    (void)ui_asset_streamer_destroy(streamer);
-    (void)ui_execution_context_destroy(ctx);
+    {
+      ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_thread_pool_destroy(pool);
     return 1;
   }
@@ -162,9 +207,24 @@ static int test_failed_load(void) {
     sleep_ms(10);
   }
 
-  (void)ui_promise_destroy(promise);
-  (void)ui_asset_streamer_destroy(streamer);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
 
   return completed == -1 ? 0 : 1;
@@ -180,7 +240,12 @@ static int test_edge_cases(void) {
   FILE *f;
 
   /* NULL arguments */
-  (void)ui_asset_streamer_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_asset_streamer_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_asset_destroy(NULL);
 
   assert(ui_asset_streamer_create(NULL, NULL, NULL) ==
@@ -212,7 +277,12 @@ static int test_edge_cases(void) {
     g_malloc_fail_countdown = i;
     err = ui_asset_streamer_create(pool, ctx, &test_streamer);
     if (err == UI_ERROR_NONE) {
-      (void)ui_asset_streamer_destroy(test_streamer);
+      {
+        ui_error_t rc_cleanup = ui_asset_streamer_destroy(test_streamer);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       assert(err == UI_ERROR_OUT_OF_MEMORY);
@@ -259,7 +329,12 @@ static int test_edge_cases(void) {
           ticks++;
         }
       }
-      (void)ui_promise_destroy(p);
+      {
+        ui_error_t rc_cleanup = ui_promise_destroy(p);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       if (completed == 1) {
         break; /* OOM loop finished */
       }
@@ -287,7 +362,12 @@ static int test_edge_cases(void) {
           sleep_ms(10);
         }
       }
-      (void)ui_promise_destroy(p);
+      {
+        ui_error_t rc_cleanup = ui_promise_destroy(p);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       assert(completed == -1); /* Must reject */
     }
   }
@@ -306,7 +386,12 @@ static int test_edge_cases(void) {
         ui_execution_context_tick(ctx);
         sleep_ms(10);
       }
-      (void)ui_promise_destroy(p);
+      {
+        ui_error_t rc_cleanup = ui_promise_destroy(p);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 
@@ -338,7 +423,12 @@ static int test_edge_cases(void) {
                                     UI_ASSET_TYPE_TEXT, &p);
     if (err == UI_ERROR_NONE) {
       sleep_ms(50);
-      (void)ui_promise_destroy(p);
+      {
+        ui_error_t rc_cleanup = ui_promise_destroy(p);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     /* Do it again but with IO failure to test branches when asset is NULL */
@@ -347,7 +437,12 @@ static int test_edge_cases(void) {
                                     UI_ASSET_TYPE_TEXT, &p);
     if (err == UI_ERROR_NONE) {
       sleep_ms(50);
-      (void)ui_promise_destroy(p);
+      {
+        ui_error_t rc_cleanup = ui_promise_destroy(p);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     g_mock_io_fail = 0;
 
@@ -355,8 +450,18 @@ static int test_edge_cases(void) {
     hack->ctx = old_ctx;
   }
 
-  (void)ui_asset_streamer_destroy(streamer);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
 
 #ifdef UI_TEST_MOCK_ALLOC

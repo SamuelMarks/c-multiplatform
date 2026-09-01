@@ -40,9 +40,20 @@ static ui_error_t test_menubar_base(void) {
     fprintf(stderr, "menu item not appended correctly\n");
     exit(1);
   }
-  (void)ui_component_destroy((struct ui_component *)menubar);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_destroy((struct ui_component *)menubar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   menu_item->shadow_root = NULL;
-  (void)ui_component_destroy(menu_item);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(menu_item);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -59,13 +70,25 @@ static int test_edge_cases(void) {
 
   ui_menubar_base_create(&menubar);
   ui_menubar_base_bind_active_index(menubar, (struct ui_signal *)1);
-  (void)ui_component_destroy((struct ui_component *)menubar);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_destroy((struct ui_component *)menubar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   for (i = 0; i < 4; i++) {
     g_malloc_fail_countdown = i;
     err = ui_menubar_base_create(&menubar);
     if (err == UI_ERROR_NONE) {
-      (void)ui_component_destroy((struct ui_component *)menubar);
+      {
+        ui_error_t rc_cleanup =
+            ui_component_destroy((struct ui_component *)menubar);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;

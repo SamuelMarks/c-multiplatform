@@ -103,14 +103,24 @@ static int run_normal_tests(void) {
   if (ui_icon_base_bind_name(icon, (struct ui_signal *)1) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_icon_base_destroy(icon);
+  {
+    ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_icon_base_destroy(NULL); /* Should be safe */
 
   /* Test destroy with NULL data */
   {
     struct ui_icon_base *fresh_icon = NULL;
     ui_icon_base_create(&fresh_icon);
-    (void)ui_icon_base_destroy(fresh_icon);
+    {
+      ui_error_t rc_cleanup = ui_icon_base_destroy(fresh_icon);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test set_svg_path with NULL data */
@@ -118,7 +128,12 @@ static int run_normal_tests(void) {
     struct ui_icon_base *fresh_icon2 = NULL;
     ui_icon_base_create(&fresh_icon2);
     ui_icon_base_set_svg_path(fresh_icon2, "M10 10");
-    (void)ui_icon_base_destroy(fresh_icon2);
+    {
+      ui_error_t rc_cleanup = ui_icon_base_destroy(fresh_icon2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;
@@ -145,7 +160,12 @@ static int run_oom_tests(void) {
   rc = ui_icon_base_set_font_glyph(icon, &dummy_font, "star");
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    (void)ui_icon_base_destroy(icon);
+    {
+      ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return 1;
   }
 
@@ -168,11 +188,21 @@ static int run_oom_tests(void) {
   rc = ui_icon_base_set_svg_path(icon, "M1 1");
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    (void)ui_icon_base_destroy(icon);
+    {
+      ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return 1;
   }
 
-  (void)ui_icon_base_destroy(icon);
+  {
+    ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

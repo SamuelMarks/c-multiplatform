@@ -66,26 +66,56 @@ static ui_error_t run_mock_failures(void) {
   rc = ui_carousel_base_create(&carousel, &config);
   if (rc == UI_ERROR_NONE) {
     g_carousel_mock_fail = 0;
-    (void)ui_carousel_base_scroll_to_index(carousel, 2, 0);
+    {
+      ui_error_t rc_cleanup = ui_carousel_base_scroll_to_index(carousel, 2, 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_carousel_mock_fail = -1;
-    (void)ui_carousel_base_destroy(carousel);
+    {
+      ui_error_t rc_cleanup = ui_carousel_base_destroy(carousel);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   rc = ui_carousel_base_create(&carousel, &config);
   if (rc == UI_ERROR_NONE) {
     g_carousel_mock_fail = 1;
-    (void)ui_carousel_base_scroll_to_index(carousel, 2, 0);
+    {
+      ui_error_t rc_cleanup = ui_carousel_base_scroll_to_index(carousel, 2, 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_carousel_mock_fail = -1;
-    (void)ui_carousel_base_destroy(carousel);
+    {
+      ui_error_t rc_cleanup = ui_carousel_base_destroy(carousel);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   rc = ui_carousel_base_create(&carousel, &config);
   if (rc == UI_ERROR_NONE) {
     /* mock virtual scroll render fails inside tick */
     g_carousel_mock_fail = 0;
-    (void)ui_carousel_base_tick(carousel, 0.0);
+    {
+      ui_error_t rc_cleanup = ui_carousel_base_tick(carousel, 0.0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_carousel_mock_fail = -1;
-    (void)ui_carousel_base_destroy(carousel);
+    {
+      ui_error_t rc_cleanup = ui_carousel_base_destroy(carousel);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   g_carousel_mock_fail = -1;

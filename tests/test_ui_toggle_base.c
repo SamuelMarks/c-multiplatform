@@ -60,7 +60,12 @@ static int test_normal(void) {
   /* Null checks */
   failed |= (ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, NULL) !=
              UI_ERROR_INVALID_ARGUMENT);
-  (void)ui_toggle_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   failed |= (ui_toggle_base_set_disabled(NULL, 1) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_toggle_base_is_checked(NULL, &is_checked) !=
@@ -184,7 +189,12 @@ static int test_normal(void) {
   struct ui_toggle_base *rad4;
   ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &rad4));
   ACCUM_ERR(failed, ui_toggle_base_set_checked(rad4, 1));
-  (void)ui_toggle_base_destroy(rad4);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad4);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Tap rad2 again (already checked, radio does nothing) */
   g_change_called = 0;
@@ -286,7 +296,12 @@ static int test_normal(void) {
   ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &rad5));
   ui_toggle_base_set_checked(rad5, 1);
   ui_toggle_base_set_group_name(rad5, "g1"); /* Re-evaluates exclusion */
-  (void)ui_toggle_base_destroy(rad5);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad5);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Change group name of rad1 to NULL */
   ACCUM_ERR(failed, ui_toggle_base_set_group_name(rad1, NULL));
@@ -361,10 +376,30 @@ static int test_normal(void) {
   ui_toggle_base_destroy(chk_no_oc);
 
   /* Clean up */
-  (void)ui_toggle_base_destroy(chk1);
-  (void)ui_toggle_base_destroy(rad1);
-  (void)ui_toggle_base_destroy(rad2);
-  (void)ui_toggle_base_destroy(rad3);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(chk1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }
@@ -382,7 +417,12 @@ static int test_oom(void) {
     err = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      (void)ui_toggle_base_destroy(toggle);
+      {
+        ui_error_t rc_cleanup = ui_toggle_base_destroy(toggle);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   for (i = 0; i < 20; i++) {
@@ -390,7 +430,12 @@ static int test_oom(void) {
     err = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &toggle);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      (void)ui_toggle_base_destroy(toggle);
+      {
+        ui_error_t rc_cleanup = ui_toggle_base_destroy(toggle);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -428,7 +473,12 @@ static int test_oom(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_toggle_base_destroy(toggle);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(toggle);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
 
   ui_toggle_base_set_disabled(NULL, 1);
@@ -442,9 +492,24 @@ static int test_oom(void) {
     ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r2);
     ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r3);
 
-    (void)ui_toggle_base_destroy(r2);
-    (void)ui_toggle_base_destroy(r3);
-    (void)ui_toggle_base_destroy(r1);
+    {
+      ui_error_t rc_cleanup = ui_toggle_base_destroy(r2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_toggle_base_destroy(r3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return failed;

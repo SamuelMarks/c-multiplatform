@@ -24,7 +24,12 @@ static int test_ribbon_lifecycle(void) {
   if (ui_ribbon_base_destroy(ribbon) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -82,8 +87,18 @@ static int test_ribbon_groups(void) {
 
   ui_ribbon_base_get_group_state(ribbon, 1, &state);
 
-  (void)ui_ribbon_base_destroy(ribbon);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -110,8 +125,18 @@ static int test_ribbon_contextual_tabs(void) {
       is_active)
     return 1;
 
-  (void)ui_ribbon_base_destroy(ribbon);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -199,8 +224,18 @@ static int test_ribbon_nulls_and_errors(void) {
   if (ui_ribbon_base_recalculate_overflow(ribbon, 100) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_ribbon_base_destroy(ribbon);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -235,8 +270,18 @@ static int test_ribbon_limits(void) {
       UI_ERROR_OUT_OF_BOUNDS)
     return 1;
 
-  (void)ui_ribbon_base_destroy(ribbon);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

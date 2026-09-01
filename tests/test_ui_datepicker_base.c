@@ -77,7 +77,12 @@ static int test_errors(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_datepicker_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_datepicker_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_datepicker_parse_date(NULL, &parsed) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -100,9 +105,24 @@ static int test_errors(void) {
   if (ui_datepicker_base_sync(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_input_base_destroy(input);
-  (void)ui_popover_base_destroy(popover);
-  (void)ui_calendar_base_destroy(calendar);
+  {
+    ui_error_t rc_cleanup = ui_input_base_destroy(input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_calendar_base_destroy(calendar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -155,7 +175,13 @@ static int test_cva_functions(void) {
   if (ui_calendar_base_create(&calendar, NULL) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
+  {
+    ui_error_t rc_cleanup =
+        ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test write_value */
   payload.int_val = (2023 << 9) | (12 << 5) | 25;
@@ -227,7 +253,13 @@ static int test_callbacks_and_sync(void) {
     return 1;
   if (ui_calendar_base_create(&calendar, NULL) != UI_ERROR_NONE)
     return 1;
-  (void)ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
+  {
+    ui_error_t rc_cleanup =
+        ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Register mock callbacks via CVA */
   (void)cva.register_on_change(dp, mock_cva_on_change, &change_called);
@@ -236,7 +268,12 @@ static int test_callbacks_and_sync(void) {
   /* We need to be careful with is_syncing */
   dp->is_syncing = 0;
 
-  (void)ui_datepicker_base_sync(dp);
+  {
+    ui_error_t rc_cleanup = ui_datepicker_base_sync(dp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   dp->is_syncing = 0; /* Reset it just in case a mock leaked the state due to
                          early returns we force */
 
@@ -280,15 +317,46 @@ static int test_callbacks_and_sync(void) {
     (void)cva.write_value(dp, bad_payload);
   }
 
-  (void)ui_datepicker_base_destroy(dp);
+  {
+    ui_error_t rc_cleanup = ui_datepicker_base_destroy(dp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Create without CVA */
-  (void)ui_datepicker_base_create(&dp, input, popover, calendar, NULL);
-  (void)ui_datepicker_base_destroy(dp);
+  {
+    ui_error_t rc_cleanup =
+        ui_datepicker_base_create(&dp, input, popover, calendar, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_datepicker_base_destroy(dp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_input_base_destroy(input);
-  (void)ui_popover_base_destroy(popover);
-  (void)ui_calendar_base_destroy(calendar);
+  {
+    ui_error_t rc_cleanup = ui_input_base_destroy(input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_calendar_base_destroy(calendar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -305,7 +373,13 @@ static int test_sync_fail(void) {
     return 1;
   if (ui_calendar_base_create(&calendar, NULL) != UI_ERROR_NONE)
     return 1;
-  (void)ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
+  {
+    ui_error_t rc_cleanup =
+        ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* The input_base text could be failed by setting g_malloc_fail_countdown? No,
    * input_base doesn't fail unless it's NULL, which it isn't. Wait, the input
@@ -313,13 +387,38 @@ static int test_sync_fail(void) {
    * returns an allocated string? Our ui_input_base_get_text just sets a
    * pointer. It doesn't fail unless input is NULL. But we can't make input NULL
    * inside datepicker. We can manually destroy input? */
-  (void)ui_input_base_destroy(dp->input);
+  {
+    ui_error_t rc_cleanup = ui_input_base_destroy(dp->input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   dp->input = NULL;
-  (void)ui_datepicker_base_sync(dp); /* Hits failure */
+  {
+    ui_error_t rc_cleanup = ui_datepicker_base_sync(dp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* Hits failure */
 
-  (void)ui_datepicker_base_destroy(dp);
-  (void)ui_popover_base_destroy(popover);
-  (void)ui_calendar_base_destroy(calendar);
+  {
+    ui_error_t rc_cleanup = ui_datepicker_base_destroy(dp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_calendar_base_destroy(calendar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

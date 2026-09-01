@@ -174,7 +174,12 @@ int main(void) {
                          "writing-mode",
                          "z-index"};
 
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Force out_node NULL error */
   (void)create_layout_node(root, (struct ui_css_computed_style *)1, 0, NULL);

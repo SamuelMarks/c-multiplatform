@@ -59,7 +59,13 @@ static void test_page_control_base(void) {
     exit(1);
   }
 
-  (void)ui_component_destroy((struct ui_component *)control);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_destroy((struct ui_component *)control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_page_control_base_errors(void) {
@@ -107,7 +113,13 @@ static void test_page_control_base_errors(void) {
      Its own !control check is unreachable!
   */
 
-  (void)ui_component_destroy((struct ui_component *)control);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_destroy((struct ui_component *)control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_page_control_base_oom(void) {
@@ -117,7 +129,13 @@ static void test_page_control_base_oom(void) {
   for (countdown = 0; countdown < 5; countdown++) {
     g_malloc_fail_countdown = countdown;
     if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {
-      (void)ui_component_destroy((struct ui_component *)control);
+      {
+        ui_error_t rc_cleanup =
+            ui_component_destroy((struct ui_component *)control);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -125,15 +143,33 @@ static void test_page_control_base_oom(void) {
   if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {
     for (countdown = 0; countdown < 10; countdown++) {
       g_malloc_fail_countdown = countdown;
-      (void)ui_page_control_base_set_number_of_pages(control, 10);
+      {
+        ui_error_t rc_cleanup =
+            ui_page_control_base_set_number_of_pages(control, 10);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       g_malloc_fail_countdown = -1;
     }
     for (countdown = 0; countdown < 10; countdown++) {
       g_malloc_fail_countdown = countdown;
-      (void)ui_page_control_base_set_current_page(control, 5);
+      {
+        ui_error_t rc_cleanup =
+            ui_page_control_base_set_current_page(control, 5);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       g_malloc_fail_countdown = -1;
     }
-    (void)ui_component_destroy((struct ui_component *)control);
+    {
+      ui_error_t rc_cleanup =
+          ui_component_destroy((struct ui_component *)control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 

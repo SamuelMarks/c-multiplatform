@@ -139,12 +139,27 @@ int main(void) {
   /* Uniform failing location lookup */
   {
     float matrix[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-    (void)ui_shader_manager_set_uniform_matrix(manager, program_id1,
-                                               "invalid_u", matrix);
-    (void)ui_shader_manager_set_uniform_color(manager, program_id1, "invalid_u",
-                                              1.0f, 0.0f, 0.0f, 1.0f);
-    (void)ui_shader_manager_set_uniform_float(manager, program_id1, "invalid_u",
-                                              1.5f);
+    {
+      ui_error_t rc_cleanup = ui_shader_manager_set_uniform_matrix(
+          manager, program_id1, "invalid_u", matrix);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_shader_manager_set_uniform_color(
+          manager, program_id1, "invalid_u", 1.0f, 0.0f, 0.0f, 1.0f);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_shader_manager_set_uniform_float(
+          manager, program_id1, "invalid_u", 1.5f);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   rc = ui_shader_manager_destroy(manager);

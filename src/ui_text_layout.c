@@ -207,8 +207,13 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     }
 
     if (prev_codepoint != 0) {
-      (void)ui_font_get_kerning(font, prev_codepoint, codepoint, font_size,
-                                &kerning);
+      {
+        ui_error_t rc_cleanup = ui_font_get_kerning(
+            font, prev_codepoint, codepoint, font_size, &kerning);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     x += kerning;

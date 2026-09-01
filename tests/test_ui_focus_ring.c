@@ -27,6 +27,7 @@ static ui_error_t test_focus_ring(void) {
     fprintf(stderr, "ui_focus_ring_get_standard returned bad data\n");
     exit(1);
   }
+  return 0;
 }
 
 int main(void) {

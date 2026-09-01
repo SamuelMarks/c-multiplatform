@@ -100,9 +100,20 @@ static ui_error_t radio_group_cva_write_value(void *component,
   index = value.int_val;
 
   if (index >= 0 && index < (int)group->count) {
-    (void)ui_radio_group_base_set_active(group, group->toggles[index]);
+    {
+      ui_error_t rc_cleanup =
+          ui_radio_group_base_set_active(group, group->toggles[index]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   } else {
-    (void)ui_radio_group_base_set_active(group, NULL);
+    {
+      ui_error_t rc_cleanup = ui_radio_group_base_set_active(group, NULL);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;
@@ -223,9 +234,21 @@ static ui_error_t on_child_toggle_change(struct ui_toggle_base *toggle,
   for (i = 0; i < group->count; ++i) {
     int is_checked = 0;
     if (group->toggles[i] != toggle) {
-      (void)ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+      {
+        ui_error_t rc_cleanup =
+            ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       if (is_checked) {
-        (void)ui_toggle_base_set_checked(group->toggles[i], 0);
+        {
+          ui_error_t rc_cleanup =
+              ui_toggle_base_set_checked(group->toggles[i], 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -305,7 +328,13 @@ ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group) {
 
   /* Unhook callbacks to prevent dangling pointers */
   for (i = 0; i < group->count; ++i) {
-    (void)ui_toggle_base_set_on_change(group->toggles[i], NULL, NULL);
+    {
+      ui_error_t rc_cleanup =
+          ui_toggle_base_set_on_change(group->toggles[i], NULL, NULL);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   if (group->toggles) {
@@ -349,11 +378,22 @@ ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
   }
 
   group->toggles[group->count++] = toggle;
-  (void)ui_toggle_base_set_on_change(toggle, on_child_toggle_change, group);
+  {
+    ui_error_t rc_cleanup =
+        ui_toggle_base_set_on_change(toggle, on_child_toggle_change, group);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   {
     int is_checked = 0;
-    (void)ui_toggle_base_is_checked(toggle, &is_checked);
+    {
+      ui_error_t rc_cleanup = ui_toggle_base_is_checked(toggle, &is_checked);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     if (is_checked) {
       (void)on_child_toggle_change(toggle, 1, group);
     }
@@ -387,7 +427,12 @@ ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
   if (found < 0)
     return UI_ERROR_NOT_FOUND;
 
-  (void)ui_toggle_base_set_on_change(toggle, NULL, NULL);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_set_on_change(toggle, NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (group->active_toggle == toggle) {
     group->active_toggle = NULL;
@@ -430,12 +475,30 @@ ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
 
   for (i = 0; i < group->count; ++i) {
     if (group->toggles[i] == toggle) {
-      (void)ui_toggle_base_set_checked(group->toggles[i], 1);
+      {
+        ui_error_t rc_cleanup =
+            ui_toggle_base_set_checked(group->toggles[i], 1);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     } else {
       int is_checked = 0;
-      (void)ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+      {
+        ui_error_t rc_cleanup =
+            ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       if (is_checked) {
-        (void)ui_toggle_base_set_checked(group->toggles[i], 0);
+        {
+          ui_error_t rc_cleanup =
+              ui_toggle_base_set_checked(group->toggles[i], 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -531,7 +594,13 @@ ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
           next_idx = 0;
       }
 
-      (void)ui_toggle_base_set_checked(group->toggles[next_idx], 1);
+      {
+        ui_error_t rc_cleanup =
+            ui_toggle_base_set_checked(group->toggles[next_idx], 1);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       (void)on_child_toggle_change(group->toggles[next_idx], 1, group);
     }
   }

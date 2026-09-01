@@ -271,7 +271,12 @@ int main(void) {
     if (ui_renderer_gles2_create(&backend2) != UI_ERROR_OUT_OF_MEMORY)
       return 1;
     g_malloc_fail_countdown = -1;
-    (void)ui_renderer_gles2_create(&backend2);
+    {
+      ui_error_t rc_cleanup = ui_renderer_gles2_create(&backend2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_malloc_fail_countdown = 0;
     if (backend2->init(backend2, NULL, NULL) != UI_ERROR_OUT_OF_MEMORY)
       return 1;
@@ -281,7 +286,12 @@ int main(void) {
         UI_ERROR_OUT_OF_MEMORY)
       return 1;
     g_malloc_fail_countdown = -1;
-    (void)ui_renderer_gles2_destroy(backend2);
+    {
+      ui_error_t rc_cleanup = ui_renderer_gles2_destroy(backend2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* We need to fill the batch so that the subsequent draw commands trigger a
      * flush. */
@@ -425,7 +435,12 @@ void dummy_test_destroy_fail(void) {
     if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
       g_mock_gles2_destroy_fail = 1;
       (void)backend->destroy(backend);
-      (void)ui_renderer_gles2_destroy(backend);
+      {
+        ui_error_t rc_cleanup = ui_renderer_gles2_destroy(backend);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       g_mock_gles2_destroy_fail = 0;
 
       /* Zero out program to hit missing branch in destroy */

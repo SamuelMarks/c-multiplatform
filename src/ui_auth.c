@@ -175,20 +175,56 @@ ui_error_t run_auth_coverage(void) {
 
   config.reason = "Test";
 
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_auth_mock_fail = 1;
-  (void)ui_auth_request_async(&config, promise);
+  {
+    ui_error_t rc_cleanup = ui_auth_request_async(&config, promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_auth_mock_fail = 0;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_malloc_fail_countdown = 1;
   g_auth_mock_fail = 2;
-  (void)ui_auth_request_async(&config, promise);
+  {
+    ui_error_t rc_cleanup = ui_auth_request_async(&config, promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_malloc_fail_countdown = -1;
+  g_auth_mock_fail = 20;
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup == UI_ERROR_NONE)
+      return UI_ERROR_UNKNOWN;
+  }
   g_auth_mock_fail = 0;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

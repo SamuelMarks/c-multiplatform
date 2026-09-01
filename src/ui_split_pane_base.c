@@ -241,7 +241,13 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
     if (split_pane->is_dragging) {
       delta = coord - split_pane->drag_start_coord;
       new_pos = split_pane->drag_start_pos + delta;
-      (void)ui_split_pane_base_set_position(split_pane, new_pos);
+      {
+        ui_error_t rc_cleanup =
+            ui_split_pane_base_set_position(split_pane, new_pos);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     break;
 

@@ -266,7 +266,12 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     goto cleanup;
   rc = ui_dom_node_append_child(table_root, thead);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(thead);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(thead);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     goto cleanup;
   }
   (void)UI_DOM_SET_ATTR_IGNORE(thead, "role", "rowgroup");
@@ -276,7 +281,12 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     goto cleanup;
   rc = ui_dom_node_append_child(thead, header_row);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(header_row);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(header_row);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     goto cleanup;
   }
   (void)UI_DOM_SET_ATTR_IGNORE(header_row, "role", "row");
@@ -290,7 +300,12 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
     rc = ui_dom_node_append_child(header_row, header_cell);
     if (rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(header_cell);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(header_cell);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       goto cleanup;
     }
 
@@ -328,7 +343,12 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     goto cleanup;
   rc = ui_dom_node_append_child(table_root, tbody);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(tbody);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(tbody);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     goto cleanup;
   }
   (void)UI_DOM_SET_ATTR_IGNORE(tbody, "role", "rowgroup");
@@ -355,7 +375,12 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
     rc = ui_dom_node_append_child(tbody, row);
     if (rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(row);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(row);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       goto cleanup;
     }
 
@@ -376,7 +401,12 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
         goto cleanup;
       rc = ui_dom_node_append_child(row, cell);
       if (rc != UI_ERROR_NONE) {
-        (void)ui_dom_node_destroy(cell);
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(cell);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         goto cleanup;
       }
 
@@ -409,8 +439,12 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
 
   return UI_ERROR_NONE;
 
-cleanup:
-  (void)ui_dom_node_destroy(table_root);
+cleanup: {
+  ui_error_t rc_cleanup = ui_dom_node_destroy(table_root);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    (void)rc_cleanup; /* Avoid override */
+  }
+}
   return rc;
 }
 

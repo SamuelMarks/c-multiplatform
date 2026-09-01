@@ -66,30 +66,76 @@ ui_error_t run_banner_coverage(void) {
   union ui_signal_payload p;
   struct ui_signal *sig = NULL;
 
-  (void)ui_banner_base_create(&banner);
+  {
+    ui_error_t rc_cleanup = ui_banner_base_create(&banner);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   g_banner_mock_fail = 1;
-  (void)ui_banner_base_set_text(banner, "text");
+  {
+    ui_error_t rc_cleanup = ui_banner_base_set_text(banner, "text");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_banner_mock_fail = 0;
 
   g_banner_mock_fail = 2;
-  (void)ui_banner_base_set_open(banner, 1);
+  {
+    ui_error_t rc_cleanup = ui_banner_base_set_open(banner, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_banner_mock_fail = 0;
 
   g_banner_mock_fail = 3;
-  (void)ui_banner_base_set_open(banner, 0);
+  {
+    ui_error_t rc_cleanup = ui_banner_base_set_open(banner, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_banner_mock_fail = 0;
 
   p.bool_val = 1;
-  (void)ui_signal_create(NULL, p, UI_SIGNAL_TYPE_BOOL, NULL, NULL, 0, &sig);
+  {
+    ui_error_t rc_cleanup =
+        ui_signal_create(NULL, p, UI_SIGNAL_TYPE_BOOL, NULL, NULL, 0, &sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_banner_base_bind_open(banner, sig);
+  {
+    ui_error_t rc_cleanup = ui_banner_base_bind_open(banner, sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_banner_mock_fail = 4;
-  (void)ui_banner_base_set_open(banner, 1);
+  {
+    ui_error_t rc_cleanup = ui_banner_base_set_open(banner, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_banner_mock_fail = 0;
 
-  (void)ui_signal_destroy(sig);
-  (void)ui_banner_base_destroy(banner);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_banner_base_destroy(banner);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -124,7 +170,12 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   banner = (struct ui_banner_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_banner_base));
   if (!banner) {
-    (void)ui_component_destroy(base_comp);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -137,23 +188,43 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   err =
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &banner->base->shadow_root);
   if (err != UI_ERROR_NONE) {
-    (void)ui_component_destroy(banner->base);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(banner->base);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(banner);
     return err;
   }
 
   err = ui_dom_node_set_tag_name(banner->base->shadow_root, "ui-banner");
   if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(banner->base->shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(banner->base->shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     banner->base->shadow_root = NULL;
-    (void)ui_component_destroy(banner->base);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(banner->base);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(banner);
     return err;
   }
 
   err = ui_dom_node_set_attribute(banner->base->shadow_root, "role", "banner");
   if (err != UI_ERROR_NONE) {
-    (void)ui_component_destroy(banner->base);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(banner->base);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(banner);
     return err;
   }
@@ -179,7 +250,12 @@ ui_error_t ui_banner_base_set_text(struct ui_banner_base *banner,
     }
     err = ui_dom_node_append_child(banner->base->shadow_root, text_node);
     if (err != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(text_node);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       return err;
     }
   } else {
@@ -282,7 +358,12 @@ ui_error_t ui_banner_base_destroy(struct ui_banner_base *banner) {
   if (!banner) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(banner->base);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(banner->base);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* The banner allocation itself was flattened into base_comp, but then
      we allocated banner itself with C_MULTIPLATFORM_MALLOC so we need to free
      it. Note that ui_component_destroy only destroys internal fields, not the

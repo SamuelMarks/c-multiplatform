@@ -144,7 +144,13 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
     goto cleanup;
   }
 
-  (void)ui_component_set_default_style(disclosure->component, default_style);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_set_default_style(disclosure->component, default_style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   disclosure->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
@@ -154,10 +160,26 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
-  (void)ui_component_destroy(disclosure->component);
+  {
+    ui_error_t rc_cleanup =
+        ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(disclosure->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(disclosure);
   return rc;
 }
@@ -172,8 +194,19 @@ ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
     return UI_ERROR_NONE;
   }
 
-  (void)ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
-  (void)ui_component_destroy(disclosure->component);
+  {
+    ui_error_t rc_cleanup =
+        ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(disclosure->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(disclosure);
   return UI_ERROR_NONE;

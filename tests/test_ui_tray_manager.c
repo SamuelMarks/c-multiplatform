@@ -92,14 +92,29 @@ int main(void) {
   rc = ui_tray_manager_destroy(NULL);
   failed |= (rc != UI_ERROR_INVALID_ARGUMENT);
 
-  (void)ui_tray_manager_destroy(tray);
+  {
+    ui_error_t rc_cleanup = ui_tray_manager_destroy(tray);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test destroy while not visible */
   rc = ui_tray_manager_create(&tray);
   failed |= (rc != UI_ERROR_NONE);
-  (void)ui_tray_manager_destroy(tray);
+  {
+    ui_error_t rc_cleanup = ui_tray_manager_destroy(tray);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_menu_base_destroy(menu);
+  {
+    ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (!failed) {
     printf("test_ui_tray_manager passed\n");

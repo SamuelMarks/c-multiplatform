@@ -97,7 +97,12 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("test_ui_share passed\n");
   return 0;

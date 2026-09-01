@@ -153,10 +153,20 @@ static void test_ptr_basic(void) {
   }
   assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_RESTING);
 
-  (void)ui_pull_to_refresh_base_destroy(ptr);
+  {
+    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   spinner->shadow_root = NULL;
-  (void)ui_component_destroy(spinner);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(spinner);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_ptr_spring_back(void) {
@@ -220,7 +230,12 @@ static void test_ptr_spring_back(void) {
   /* This is not reachable via public API in the current mock setup, we'll
    * accept the partial branch */
 
-  (void)ui_pull_to_refresh_base_destroy(ptr);
+  {
+    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_ptr_push_up(void) {
@@ -286,7 +301,12 @@ static void test_ptr_push_up(void) {
     (void)_ign;
   }
 
-  (void)ui_pull_to_refresh_base_destroy(ptr);
+  {
+    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_ptr_cancel(void) {
@@ -338,7 +358,12 @@ static void test_ptr_cancel(void) {
   assert(ui_pull_to_refresh_base_get_state(ptr) ==
          UI_PULL_TO_REFRESH_REFRESHING);
 
-  (void)ui_pull_to_refresh_base_destroy(ptr);
+  {
+    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Now do it without crossing the threshold to hit the else branch */
   {
@@ -361,7 +386,13 @@ static void test_ptr_cancel(void) {
   }
 
   ev.type = UI_EVENT_TOUCH_CANCEL;
-  (void)ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
+  {
+    ui_error_t rc_cleanup =
+        ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_PULLING);
 
@@ -384,19 +415,35 @@ static void test_ptr_cancel(void) {
         (struct ui_pull_to_refresh_internal *)ptr;
 
     internal->state = (enum ui_pull_to_refresh_state)99;
-    (void)ui_pull_to_refresh_base_set_spinner(
-        ptr, NULL); /* hits update_dom_state with 99 */
+    {
+      ui_error_t rc_cleanup = ui_pull_to_refresh_base_set_spinner(ptr, NULL);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    } /* hits update_dom_state with 99 */
 
     internal->state = UI_PULL_TO_REFRESH_RESTING;
     {
       struct ui_event temp_ev;
       memset(&temp_ev, 0, sizeof(temp_ev));
       temp_ev.type = UI_EVENT_MOUSE_DOWN;
-      (void)ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 10.0);
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 10.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
       temp_ev.event_data.mouse.y = 50.0;
-      (void)ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 20.0);
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 20.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       /* This hits BEGAN and CHANGED, state is now PULLING */
 
       /* Spoof state during next move to hit `if (ptr->state ==
@@ -404,42 +451,85 @@ static void test_ptr_cancel(void) {
       internal->state = UI_PULL_TO_REFRESH_RESTING;
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
       temp_ev.event_data.mouse.y = 100.0;
-      (void)ui_pull_to_refresh_base_process_event(
-          ptr, &temp_ev, 30.0); /* Hits CHANGED with state=RESTING */
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 30.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      } /* Hits CHANGED with state=RESTING */
 
       /* Spoof state during up to hit `if (ptr->state ==
        * UI_PULL_TO_REFRESH_PULLING)` else branch inside ENDED */
       internal->state = UI_PULL_TO_REFRESH_RESTING;
       temp_ev.type = UI_EVENT_MOUSE_UP;
-      (void)ui_pull_to_refresh_base_process_event(
-          ptr, &temp_ev, 40.0); /* Hits ENDED with state=RESTING */
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 40.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      } /* Hits ENDED with state=RESTING */
 
       /* Spoof state before next BEGAN to hit `if (ptr->state ==
        * UI_PULL_TO_REFRESH_RESTING)` else branch inside BEGAN */
       internal->state =
           UI_PULL_TO_REFRESH_COMPLETING; /* Anything but RESTING */
       temp_ev.type = UI_EVENT_MOUSE_DOWN;
-      (void)ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 45.0);
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 45.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
       temp_ev.event_data.mouse.y = 150.0;
-      (void)ui_pull_to_refresh_base_process_event(
-          ptr, &temp_ev, 46.0); /* Hits BEGAN with state!=RESTING */
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 46.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      } /* Hits BEGAN with state!=RESTING */
       internal->state = UI_PULL_TO_REFRESH_RESTING; /* Reset for next */
       temp_ev.type = UI_EVENT_MOUSE_UP;
-      (void)ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 47.0);
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 47.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       /* Trigger CANCELLED state when NOT PULLING to hit the ge.state ==
        * UI_GESTURE_STATE_CANCELLED branch's else */
       temp_ev.type = UI_EVENT_MOUSE_DOWN;
-      (void)ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 40.0);
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 40.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
       temp_ev.event_data.mouse.y = 100.0;
-      (void)ui_pull_to_refresh_base_process_event(ptr, &temp_ev,
-                                                  50.0); /* PULLING */
-      internal->state = UI_PULL_TO_REFRESH_RESTING;      /* NOT PULLING */
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 50.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      } /* PULLING */
+      internal->state = UI_PULL_TO_REFRESH_RESTING; /* NOT PULLING */
       temp_ev.type = UI_EVENT_TOUCH_CANCEL;
-      (void)ui_pull_to_refresh_base_process_event(
-          ptr, &temp_ev, 60.0); /* Hits CANCELLED while NOT PULLING */
+      {
+        ui_error_t rc_cleanup =
+            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 60.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      } /* Hits CANCELLED while NOT PULLING */
 
       /* Hit the implicit 'else' for gesture states by passing a recognized
        * gesture that is in POSSIBLE state */
@@ -464,13 +554,23 @@ static void test_ptr_cancel(void) {
        * branch inside PULLING */
       internal->state = UI_PULL_TO_REFRESH_PULLING;
       internal->pull_distance = -1.0f;
-      (void)ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+      {
+        ui_error_t rc_cleanup = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 
       /* Spoof state during tick to hit `if (ptr->pull_distance <
        * UI_PTR_THRESHOLD)` else branch inside PULLING */
       internal->state = UI_PULL_TO_REFRESH_PULLING;
       internal->pull_distance = 1000.0f; /* Over threshold */
-      (void)ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+      {
+        ui_error_t rc_cleanup = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     {
@@ -521,7 +621,12 @@ static void test_ptr_cancel(void) {
     } /* Hit >= DELAY_MS */
   }
 
-  (void)ui_pull_to_refresh_base_destroy(ptr);
+  {
+    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_ptr_nulls(void) {
@@ -583,10 +688,20 @@ static void test_ptr_nulls(void) {
          UI_ERROR_NONE);
 
   if (comp) {
-    (void)ui_dom_node_destroy(comp->shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(comp->shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     comp->shadow_root = NULL;
   }
-  (void)ui_pull_to_refresh_base_destroy(ptr);
+  {
+    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_ptr_oom(void) {
@@ -595,7 +710,12 @@ static void test_ptr_oom(void) {
   for (i = 0; i < 10; i++) {
     g_malloc_fail_countdown = i;
     if (ui_pull_to_refresh_base_create(&ptr) == UI_ERROR_NONE) {
-      (void)ui_pull_to_refresh_base_destroy(ptr);
+      {
+        ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

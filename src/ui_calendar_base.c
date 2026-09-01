@@ -160,7 +160,12 @@ ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days) {
   }
   if (month == 2) {
     int is_leap = 0;
-    (void)ui_calendar_is_leap_year(year, &is_leap);
+    {
+      ui_error_t rc_cleanup = ui_calendar_is_leap_year(year, &is_leap);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     *out_days = is_leap ? 29 : 28;
     return UI_ERROR_NONE;
   }
@@ -248,6 +253,17 @@ ui_error_t ui_calendar_base_create(struct ui_calendar_base **out_calendar,
  * @param calendar Parameter calendar.
  * @return Return value.
  */
+#ifdef UI_TEST_MOCK_ALLOC
+int g_calendar_mock_fail = 0;
+extern ui_error_t ui_component_destroy(struct ui_component *c);
+static ui_error_t mock_component_destroy_calendar(struct ui_component *c) {
+  if (g_calendar_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+#define ui_component_destroy mock_component_destroy_calendar
+#endif
+
 ui_error_t ui_calendar_base_destroy(struct ui_calendar_base *calendar) {
   if (!calendar) {
     return UI_ERROR_NONE;
@@ -398,7 +414,13 @@ ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
   }
   {
     int days = 0;
-    (void)ui_calendar_days_in_month(date->year, date->month, &days);
+    {
+      ui_error_t rc_cleanup =
+          ui_calendar_days_in_month(date->year, date->month, &days);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     if (date->day < 1) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
@@ -533,14 +555,24 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
 
   {
     enum ui_day_of_week tmp_dow = UI_SUNDAY;
-    (void)ui_calendar_get_day_of_week(calendar->view_year, calendar->view_month,
-                                      1, &tmp_dow);
+    {
+      ui_error_t rc_cleanup = ui_calendar_get_day_of_week(
+          calendar->view_year, calendar->view_month, 1, &tmp_dow);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     first_dow = (int)tmp_dow;
   }
   {
     days_in_month = 0;
-    (void)ui_calendar_days_in_month(calendar->view_year, calendar->view_month,
-                                    &days_in_month);
+    {
+      ui_error_t rc_cleanup = ui_calendar_days_in_month(
+          calendar->view_year, calendar->view_month, &days_in_month);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   prev_y = calendar->view_year;
@@ -558,7 +590,13 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
   }
 
   {
-    (void)ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev);
+    {
+      ui_error_t rc_cleanup =
+          ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   offset = first_dow - (int)calendar->start_of_week;

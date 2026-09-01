@@ -316,7 +316,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
             return rc_top;
         }
         if (rc_top == UI_ERROR_NONE) {
-          (void)ui_css_parse_value(val_str, &out_props->padding.top);
+          {
+            ui_error_t rc_cleanup =
+                ui_css_parse_value(val_str, &out_props->padding.top);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       }
 
@@ -328,7 +334,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
             return rc_right;
         }
         if (rc_right == UI_ERROR_NONE) {
-          (void)ui_css_parse_value(val_str, &out_props->padding.right);
+          {
+            ui_error_t rc_cleanup =
+                ui_css_parse_value(val_str, &out_props->padding.right);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       }
 
@@ -340,7 +352,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
             return rc_bottom;
         }
         if (rc_bottom == UI_ERROR_NONE) {
-          (void)ui_css_parse_value(val_str, &out_props->padding.bottom);
+          {
+            ui_error_t rc_cleanup =
+                ui_css_parse_value(val_str, &out_props->padding.bottom);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       }
 
@@ -352,7 +370,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
             return rc_left;
         }
         if (rc_left == UI_ERROR_NONE) {
-          (void)ui_css_parse_value(val_str, &out_props->padding.left);
+          {
+            ui_error_t rc_cleanup =
+                ui_css_parse_value(val_str, &out_props->padding.left);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       }
 
@@ -378,7 +402,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
             return rc_top;
         }
         if (rc_top == UI_ERROR_NONE) {
-          (void)ui_css_parse_value(val_str, &out_props->margin.top);
+          {
+            ui_error_t rc_cleanup =
+                ui_css_parse_value(val_str, &out_props->margin.top);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       }
 
@@ -390,7 +420,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
             return rc_right;
         }
         if (rc_right == UI_ERROR_NONE) {
-          (void)ui_css_parse_value(val_str, &out_props->margin.right);
+          {
+            ui_error_t rc_cleanup =
+                ui_css_parse_value(val_str, &out_props->margin.right);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       }
 
@@ -402,7 +438,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
             return rc_bottom;
         }
         if (rc_bottom == UI_ERROR_NONE) {
-          (void)ui_css_parse_value(val_str, &out_props->margin.bottom);
+          {
+            ui_error_t rc_cleanup =
+                ui_css_parse_value(val_str, &out_props->margin.bottom);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       }
 
@@ -414,7 +456,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
             return rc_left;
         }
         if (rc_left == UI_ERROR_NONE) {
-          (void)ui_css_parse_value(val_str, &out_props->margin.left);
+          {
+            ui_error_t rc_cleanup =
+                ui_css_parse_value(val_str, &out_props->margin.left);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       }
 

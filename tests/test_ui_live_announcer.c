@@ -29,35 +29,95 @@ static int test_live_announcer_lifecycle(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_live_announcer_destroy(announcer);
+  {
+    ui_error_t rc_cleanup = ui_live_announcer_destroy(announcer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
 static int test_live_announcer_edge_cases(void) {
   struct ui_live_announcer *announcer;
-  (void)ui_live_announcer_create(&announcer);
+  {
+    ui_error_t rc_cleanup = ui_live_announcer_create(&announcer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_live_announcer_create(NULL);
-  (void)ui_live_announce(NULL, "a", UI_LIVE_POLITE);
-  (void)ui_live_announce(announcer, NULL, UI_LIVE_POLITE);
-  (void)ui_live_announcer_clear(NULL);
-  (void)ui_live_announcer_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_live_announcer_create(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_live_announce(NULL, "a", UI_LIVE_POLITE);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_live_announce(announcer, NULL, UI_LIVE_POLITE);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_live_announcer_clear(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_live_announcer_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   g_malloc_fail_countdown = 0;
-  (void)ui_live_announcer_create(&announcer);
+  {
+    ui_error_t rc_cleanup = ui_live_announcer_create(&announcer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_live_announcer_create(&announcer);
+  {
+    ui_error_t rc_cleanup = ui_live_announcer_create(&announcer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = 0;
-  (void)ui_live_announce(announcer, "a", UI_LIVE_POLITE);
+  {
+    ui_error_t rc_cleanup = ui_live_announce(announcer, "a", UI_LIVE_POLITE);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = 1;
-  (void)ui_live_announce(announcer, "b", UI_LIVE_POLITE);
+  {
+    ui_error_t rc_cleanup = ui_live_announce(announcer, "b", UI_LIVE_POLITE);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   g_malloc_fail_countdown = -1;
   g_mock_strcpy_fail = 1;
   ui_error_t mock_rc = ui_live_announce(announcer, "c", UI_LIVE_POLITE);
   printf("Mock rc: %d\n", mock_rc);
 
-  (void)ui_live_announcer_destroy(announcer);
+  {
+    ui_error_t rc_cleanup = ui_live_announcer_destroy(announcer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
   return 0;
 }

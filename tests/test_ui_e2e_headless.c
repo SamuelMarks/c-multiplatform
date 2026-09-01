@@ -258,11 +258,7 @@ int main(void) {
     for (i = 0; i < 255; i++) {
       ui_e2e_headless_push_event(ctx, &ev_fill);
     }
-#ifdef _WIN32
-    rc = backend->push_deep_link(backend, L"test");
-#else
     rc = backend->push_deep_link(backend, "test");
-#endif
     if (rc != UI_ERROR_OUT_OF_MEMORY)
       return 1;
 

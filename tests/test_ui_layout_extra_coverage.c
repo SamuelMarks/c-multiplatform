@@ -163,9 +163,19 @@ static void test_extra_coverage(void) {
     ui_css_stylesheet_destroy(mix_sheet);
   }
 
-  (void)ui_dom_node_destroy(mix_root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(mix_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_css_stylesheet_destroy(sheet);
 }
 
@@ -231,7 +241,12 @@ static void test_nested_overflow_violation(void) {
   }
 
   ui_css_stylesheet_destroy(sheet);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static int test_overflow_violation(void) {

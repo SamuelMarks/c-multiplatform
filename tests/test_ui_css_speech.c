@@ -42,7 +42,12 @@ static void test_properties(const char *decl_prop, const char *decl_val,
   }
 
   ui_css_computed_style_destroy(style);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_css_stylesheet_destroy(sheet);
 }
 
@@ -296,7 +301,12 @@ int main(void) {
 
   ui_css_speech_cleanup(&props);
   ui_css_computed_style_destroy(style);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_css_stylesheet_destroy(sheet);
 
   /* empty string edge cases to hit !str branches in parse_* inside
@@ -325,7 +335,12 @@ int main(void) {
 
   ui_css_speech_cleanup(&props);
   ui_css_computed_style_destroy(style);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_css_stylesheet_destroy(sheet);
 
   /* NULL pointer checks */
@@ -340,23 +355,78 @@ int main(void) {
     if (rc == UI_ERROR_NONE) {
       rc = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
       if (rc == UI_ERROR_NONE) {
-        (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG,
-                                          "div");
-        (void)ui_css_rule_append_declaration(rule, "cue-before",
-                                             "url('test.wav')", 0);
-        (void)ui_css_rule_append_declaration(rule, "voice-family", "male", 0);
-        (void)ui_css_rule_append_declaration(rule, "pause-before", "250ms", 0);
-        (void)ui_css_rule_append_declaration(rule, "rest-after", "strong", 0);
-        (void)ui_css_rule_append_declaration(rule, "voice-pitch",
-                                             "absolute 500Hz", 0);
-        (void)ui_css_rule_append_declaration(rule, "voice-rate", "x-fast", 0);
-        (void)ui_css_rule_append_declaration(rule, "voice-volume", "loud", 0);
-        (void)ui_css_stylesheet_append_rule(sheet, rule);
+        {
+          ui_error_t rc_cleanup = ui_css_rule_append_selector(
+              rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+        {
+          ui_error_t rc_cleanup = ui_css_rule_append_declaration(
+              rule, "cue-before", "url('test.wav')", 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+        {
+          ui_error_t rc_cleanup =
+              ui_css_rule_append_declaration(rule, "voice-family", "male", 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+        {
+          ui_error_t rc_cleanup =
+              ui_css_rule_append_declaration(rule, "pause-before", "250ms", 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+        {
+          ui_error_t rc_cleanup =
+              ui_css_rule_append_declaration(rule, "rest-after", "strong", 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+        {
+          ui_error_t rc_cleanup = ui_css_rule_append_declaration(
+              rule, "voice-pitch", "absolute 500Hz", 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+        {
+          ui_error_t rc_cleanup =
+              ui_css_rule_append_declaration(rule, "voice-rate", "x-fast", 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+        {
+          ui_error_t rc_cleanup =
+              ui_css_rule_append_declaration(rule, "voice-volume", "loud", 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
+        {
+          ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
 
       rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
       if (rc == UI_ERROR_NONE) {
-        (void)ui_dom_node_set_tag_name(node, "div");
+        {
+          ui_error_t rc_cleanup = ui_dom_node_set_tag_name(node, "div");
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         rc = ui_css_resolve_style(sheet, node, &style);
         if (rc == UI_ERROR_NONE) {
           int j;
@@ -373,7 +443,12 @@ int main(void) {
           g_malloc_fail_countdown = -1;
           ui_css_computed_style_destroy(style);
         }
-        (void)ui_dom_node_destroy(node);
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       ui_css_stylesheet_destroy(sheet);
     }
@@ -409,7 +484,12 @@ int main(void) {
           if (rc == UI_ERROR_NONE) {
             ui_css_computed_style_destroy(style);
           }
-          (void)ui_dom_node_destroy(node);
+          {
+            ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
         ui_css_stylesheet_destroy(sheet);
       }

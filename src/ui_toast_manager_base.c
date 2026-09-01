@@ -107,8 +107,12 @@ ui_toast_manager_base_create(struct ui_toast_manager_base **out_manager) {
 static ui_error_t free_toast_entry(struct ui_toast_entry *entry) {
   if (entry->message)
     C_MULTIPLATFORM_FREE(entry->message);
-  if (entry->overlay_component)
-    (void)ui_component_destroy(entry->overlay_component);
+  if (entry->overlay_component) {
+    ui_error_t rc_cleanup = ui_component_destroy(entry->overlay_component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(entry);
   return UI_ERROR_NONE;
 }
@@ -480,7 +484,13 @@ ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
       }
 
       if (entry->overlay_component->shadow_root) {
-        (void)ui_dom_node_destroy(entry->overlay_component->shadow_root);
+        {
+          ui_error_t rc_cleanup =
+              ui_dom_node_destroy(entry->overlay_component->shadow_root);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       entry->overlay_component->shadow_root = root_node;
       {

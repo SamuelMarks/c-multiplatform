@@ -438,7 +438,12 @@ ui_error_t run_accordion_methods_coverage(void) {
 
   /* Line 110: set_on_toggle fails in destroy */
   g_accordion_mock_fail = 1;
-  (void)ui_accordion_base_destroy(accordion);
+  {
+    ui_error_t expected_rc = ui_accordion_base_destroy(accordion);
+    if (expected_rc != UI_ERROR_UNKNOWN) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
   g_accordion_mock_fail = 0;
 
   /* we have to recreate accordion since destroy failed but left it partially
@@ -465,7 +470,22 @@ ui_error_t run_accordion_methods_coverage(void) {
     accordion->on_change = mock_accordion_fail_cb;
     ui_accordion_base_add_disclosure(accordion, d3);
     accordion->on_change = NULL;
-    (void)ui_disclosure_base_destroy(d3);
+
+    g_accordion_mock_fail = 4;
+    {
+      ui_error_t rc_d3 = ui_disclosure_base_destroy(d3);
+      if (rc_d3 == UI_ERROR_NONE) {
+        return UI_ERROR_UNKNOWN;
+      }
+    }
+    g_accordion_mock_fail = 0;
+
+    {
+      ui_error_t rc_d3 = ui_disclosure_base_destroy(d3);
+      if (rc_d3 != UI_ERROR_NONE) {
+        return rc_d3;
+      }
+    }
   }
 
   /* Line 199: set_on_toggle fails in remove_disclosure */
@@ -484,9 +504,33 @@ ui_error_t run_accordion_methods_coverage(void) {
   ui_accordion_base_set_active(accordion, NULL);
   g_accordion_mock_fail = 0;
 
-  (void)ui_accordion_base_destroy(accordion);
-  (void)ui_disclosure_base_destroy(d1);
-  (void)ui_disclosure_base_destroy(d2);
+  {
+    ui_error_t expected_rc = ui_accordion_base_destroy(accordion);
+    if (expected_rc != UI_ERROR_UNKNOWN) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+
+  g_accordion_mock_fail = 4;
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d1);
+    if (rc_cleanup == UI_ERROR_NONE) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  g_accordion_mock_fail = 0;
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_disclosure_base_destroy(d2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

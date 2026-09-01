@@ -241,7 +241,12 @@ slider->high_value;" so it sets to 40.0f */
     (void)_ign;
   }
 
-  (void)ui_range_slider_base_destroy(slider);
+  {
+    ui_error_t rc_cleanup = ui_range_slider_base_destroy(slider);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -301,7 +306,12 @@ static int test_range_slider_bounds(void) {
     return 1;
   }
 
-  (void)ui_range_slider_base_destroy(slider);
+  {
+    ui_error_t rc_cleanup = ui_range_slider_base_destroy(slider);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -521,7 +531,12 @@ static int test_range_slider_events(void) {
     (void)_ign;
   }
 
-  (void)ui_range_slider_base_destroy(slider);
+  {
+    ui_error_t rc_cleanup = ui_range_slider_base_destroy(slider);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -538,7 +553,12 @@ static int test_range_slider_nulls(void) {
 
   if (ui_range_slider_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  (void)ui_range_slider_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_range_slider_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_range_slider_base_set_min(NULL, 0) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -585,7 +605,12 @@ static int test_range_slider_nulls(void) {
   if (comp == NULL)
     return 1;
 
-  (void)ui_range_slider_base_destroy(slider);
+  {
+    ui_error_t rc_cleanup = ui_range_slider_base_destroy(slider);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -595,7 +620,12 @@ static int test_range_slider_oom(void) {
   for (i = 0; i < 100; i++) {
     g_malloc_fail_countdown = i;
     if (ui_range_slider_base_create(&slider) == UI_ERROR_NONE) {
-      (void)ui_range_slider_base_destroy(slider);
+      {
+        ui_error_t rc_cleanup = ui_range_slider_base_destroy(slider);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       printf("OOM loop broke at %d\n", i);
       printf("OOM loop broke at %d\n", i);
       printf("OOM loop broke at %d\n", i);
@@ -668,7 +698,12 @@ void test_extra_range(void) {
       (void)_ign;
     }
 
-    (void)ui_range_slider_base_destroy(slider);
+    {
+      ui_error_t rc_cleanup = ui_range_slider_base_destroy(slider);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_extra_range_more(void) {
@@ -698,6 +733,11 @@ void test_extra_range_more(void) {
       (void)_ign;
     }
 
-    (void)ui_range_slider_base_destroy(slider);
+    {
+      ui_error_t rc_cleanup = ui_range_slider_base_destroy(slider);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }

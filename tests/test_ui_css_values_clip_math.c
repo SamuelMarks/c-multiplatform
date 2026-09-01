@@ -60,7 +60,7 @@ int test_css_values_clip_math(void) {
     EXPECT_EQ(UI_ERROR_NONE, rc);
     EXPECT_EQ(UI_CSS_BASIC_SHAPE_INSET, clip.shape.type);
 
-    char long_shape[512];
+    char long_shape[1024];
     UI_STRCPY(long_shape, 1024, "circle(");
     memset(long_shape + 7, '0', 256);
     UI_STRCPY(long_shape + 263, 1024 - 263, ")");

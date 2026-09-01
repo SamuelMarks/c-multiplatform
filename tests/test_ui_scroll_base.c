@@ -207,7 +207,12 @@ static int run_normal_tests(void) {
       return 1; /* Should not fire again */
   }
 
-  (void)ui_scroll_base_destroy(scroll);
+  {
+    ui_error_t rc_cleanup = ui_scroll_base_destroy(scroll);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -231,7 +236,12 @@ static int run_oom_tests(void) {
     err = ui_scroll_base_create(&scroll);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      (void)ui_scroll_base_destroy(scroll);
+      {
+        ui_error_t rc_cleanup = ui_scroll_base_destroy(scroll);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

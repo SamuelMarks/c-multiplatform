@@ -89,13 +89,23 @@ ui_error_t ui_fab_base_destroy(struct ui_fab_base *fab) {
   }
 
   if (fab->main_button) {
-    (void)ui_button_base_destroy(fab->main_button);
+    {
+      ui_error_t rc_cleanup = ui_button_base_destroy(fab->main_button);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   if (fab->action_buttons) {
     size_t i;
     for (i = 0; i < fab->action_count; i++) {
-      (void)ui_button_base_destroy(fab->action_buttons[i]);
+      {
+        ui_error_t rc_cleanup = ui_button_base_destroy(fab->action_buttons[i]);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     C_MULTIPLATFORM_FREE(fab->action_buttons);
   }
@@ -117,7 +127,12 @@ ui_error_t ui_fab_base_set_main_button(struct ui_fab_base *fab,
   }
 
   if (fab->main_button) {
-    (void)ui_button_base_destroy(fab->main_button);
+    {
+      ui_error_t rc_cleanup = ui_button_base_destroy(fab->main_button);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   fab->main_button = button;

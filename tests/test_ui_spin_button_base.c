@@ -84,7 +84,12 @@ static int run_normal_tests(void) {
 
   /* Null checks */
   ASSERT_EQ(ui_spin_button_base_create(NULL, NULL), UI_ERROR_INVALID_ARGUMENT);
-  (void)ui_spin_button_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_spin_button_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ASSERT_EQ(ui_spin_button_base_set_min(NULL, 0.0), UI_ERROR_INVALID_ARGUMENT);
   ASSERT_EQ(ui_spin_button_base_set_max(NULL, 100.0),
@@ -349,7 +354,12 @@ static int run_normal_tests(void) {
   ASSERT_SUCCESS(ui_spin_button_base_set_min(sb, 14.0));
   ASSERT_SUCCESS(ui_spin_button_base_set_max(sb, 22.0));
 
-  (void)ui_spin_button_base_destroy(sb);
+  {
+    ui_error_t rc_cleanup = ui_spin_button_base_destroy(sb);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -614,7 +624,12 @@ static int run_edge_cases(void) {
         sb, 6.0); /* triggers !component branch in update_aria */
     sb->component = orig_comp;
 
-    (void)ui_dom_node_destroy(orig_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(orig_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     comp->shadow_root = NULL;
   }
 
@@ -627,7 +642,12 @@ static int run_edge_cases(void) {
     } while (0);
   }
 
-  (void)ui_spin_button_base_destroy(sb);
+  {
+    ui_error_t rc_cleanup = ui_spin_button_base_destroy(sb);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 /* Add mock failure */

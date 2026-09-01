@@ -12,7 +12,12 @@ static ui_error_t test_aspect_ratio_creation(void) {
   ui_error_t rc = ui_aspect_ratio_base_create(&ar);
   assert(rc == UI_ERROR_NONE);
   assert(ar != NULL);
-  (void)ui_aspect_ratio_base_destroy(ar);
+  {
+    ui_error_t rc_cleanup = ui_aspect_ratio_base_destroy(ar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_aspect_ratio_creation passed\n");
   return UI_ERROR_NONE;
 }
@@ -27,7 +32,12 @@ static ui_error_t test_aspect_ratio_set(void) {
   rc = ui_aspect_ratio_base_set_ratio(ar, 16.0f / 9.0f);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_aspect_ratio_base_destroy(ar);
+  {
+    ui_error_t rc_cleanup = ui_aspect_ratio_base_destroy(ar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_aspect_ratio_set passed\n");
   return UI_ERROR_NONE;
 }
@@ -67,14 +77,24 @@ static void test_aspect_ratio_edge_cases(void) {
   assert(ui_aspect_ratio_base_set_ratio(ar, 1.5f) == UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
-  (void)ui_aspect_ratio_base_destroy(ar);
+  {
+    ui_error_t rc_cleanup = ui_aspect_ratio_base_destroy(ar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* OOM loop */
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_aspect_ratio_base_create(&ar);
     if (rc == UI_ERROR_NONE) {
-      (void)ui_aspect_ratio_base_destroy(ar);
+      {
+        ui_error_t rc_cleanup = ui_aspect_ratio_base_destroy(ar);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

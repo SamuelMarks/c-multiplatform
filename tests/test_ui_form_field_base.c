@@ -60,9 +60,24 @@ static void run_basic_tests(void) {
   assert(rc == UI_ERROR_NONE);
 
   /* Set components */
-  (void)ui_component_create(&prefix);
-  (void)ui_component_create(&suffix);
-  (void)ui_component_create(&control_comp);
+  {
+    ui_error_t rc_cleanup = ui_component_create(&prefix);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_create(&suffix);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_create(&control_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_form_field_base_set_prefix(NULL, prefix);
   assert(rc == UI_ERROR_INVALID_ARGUMENT);
@@ -105,11 +120,36 @@ static void run_basic_tests(void) {
   rc = ui_form_field_base_bind_data(field, NULL);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_form_field_base_destroy(field);
-  (void)ui_form_field_base_destroy(NULL);
-  (void)ui_component_destroy(prefix);
-  (void)ui_component_destroy(suffix);
-  (void)ui_component_destroy(control_comp);
+  {
+    ui_error_t rc_cleanup = ui_form_field_base_destroy(field);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_field_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(prefix);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(suffix);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(control_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void run_binding_tests(void) {
@@ -120,11 +160,32 @@ static void run_binding_tests(void) {
   union ui_signal_payload val = {0};
   ui_error_t rc;
 
-  (void)ui_arena_create(1024, &arena);
-  (void)ui_reactor_create(&reactor);
-  (void)ui_form_control_create(arena, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+  {
+    ui_error_t rc_cleanup = ui_arena_create(1024, &arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_reactor_create(&reactor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_form_control_create(arena, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                                UI_SIGNAL_MODE_SINGLE_THREADED, &control);
-  (void)ui_form_field_base_create(&field);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_field_base_create(&field);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_form_field_base_bind_form_control(NULL, control, reactor);
   assert(rc == UI_ERROR_INVALID_ARGUMENT);
@@ -137,23 +198,63 @@ static void run_binding_tests(void) {
   assert(rc == UI_ERROR_NONE);
 
   /* Trigger error signal */
-  (void)ui_form_control_set_error(control, "Test error");
+  {
+    ui_error_t rc_cleanup = ui_form_control_set_error(control, "Test error");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown =
       0; /* fail ui_signal_get or ui_form_field_base_set_error inside effect */
-  (void)ui_reactor_poll(reactor, 100);
+  {
+    ui_error_t rc_cleanup = ui_reactor_poll(reactor, 100);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   g_malloc_fail_countdown = -1;
-  (void)ui_form_control_set_error(control, "Test error 2");
-  (void)ui_reactor_poll(reactor, 100);
+  {
+    ui_error_t rc_cleanup = ui_form_control_set_error(control, "Test error 2");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_reactor_poll(reactor, 100);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Second bind does nothing but returns UI_ERROR_NONE */
   rc = ui_form_field_base_bind_form_control(field, control, reactor);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_form_field_base_destroy(field);
-  (void)ui_form_control_destroy(control);
-  (void)ui_reactor_destroy(reactor);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_form_field_base_destroy(field);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_reactor_destroy(reactor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 void run_oom_tests_form_field_base(void) {
@@ -170,12 +271,22 @@ void run_oom_tests_form_field_base(void) {
     rc = ui_form_field_base_create(&field);
     g_malloc_fail_countdown = -1;
     if (rc == UI_ERROR_NONE) {
-      (void)ui_form_field_base_destroy(field);
+      {
+        ui_error_t rc_cleanup = ui_form_field_base_destroy(field);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }
 
-  (void)ui_form_field_base_create(&field);
+  {
+    ui_error_t rc_cleanup = ui_form_field_base_create(&field);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   for (i = 0; i < 50; i++) {
     g_malloc_fail_countdown = i;
@@ -213,10 +324,26 @@ void run_oom_tests_form_field_base(void) {
       break;
   }
 
-  (void)ui_arena_create(1024, &arena);
-  (void)ui_reactor_create(&reactor);
-  (void)ui_form_control_create(arena, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+  {
+    ui_error_t rc_cleanup = ui_arena_create(1024, &arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_reactor_create(&reactor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_form_control_create(arena, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                                UI_SIGNAL_MODE_SINGLE_THREADED, &control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   for (i = 0; i < 10; i++) {
     ui_error_t bind_rc;
@@ -228,10 +355,30 @@ void run_oom_tests_form_field_base(void) {
       break;
   }
 
-  (void)ui_form_field_base_destroy(field);
-  (void)ui_form_control_destroy(control);
-  (void)ui_reactor_destroy(reactor);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_form_field_base_destroy(field);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_reactor_destroy(reactor);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {

@@ -23,7 +23,12 @@ static ui_error_t test_invalid_args() {
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
 
   assert(ui_focus_manager_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
-  (void)ui_focus_manager_destroy(NULL); /* Should not crash */
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* Should not crash */
 
   ui_focus_manager_create(&manager);
 
@@ -51,8 +56,18 @@ static ui_error_t test_invalid_args() {
   /* Empty traps */
   assert(ui_focus_manager_pop_trap(manager) == UI_ERROR_INVALID_ARGUMENT);
 
-  (void)ui_focus_manager_destroy(manager);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -64,7 +79,12 @@ static ui_error_t test_focus_manager_create_destroy() {
   assert(err == UI_ERROR_NONE);
   assert(manager != NULL);
 
-  (void)ui_focus_manager_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_focus_manager_create_destroy passed\n");
   return UI_ERROR_NONE;
 }
@@ -79,8 +99,18 @@ static ui_error_t test_focus_manager_request_focus() {
   ui_focus_manager_request_focus(manager, node);
   assert(get_focused_node(manager) == node);
 
-  (void)ui_dom_node_destroy(node);
-  (void)ui_focus_manager_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_focus_manager_request_focus passed\n");
   return UI_ERROR_NONE;
 }
@@ -161,21 +191,46 @@ static ui_error_t test_focus_manager_advance() {
   ui_focus_manager_request_focus(manager, child2);
   ui_focus_manager_advance(manager, root, 1);
   assert(get_focused_node(manager) == root);
-  (void)ui_dom_node_destroy(child2);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(child2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test empty tree */
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_focus_manager_advance(manager, root, 1);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test text node is_focusable */
   ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &root);
   ui_focus_manager_advance(manager, root, 1);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_focus_manager_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_focus_manager_advance passed\n");
   return UI_ERROR_NONE;
 }
@@ -261,8 +316,18 @@ static ui_error_t test_focus_manager_traps() {
   ui_focus_manager_pop_trap(manager);
   assert(get_focused_node(manager) == root);
 
-  (void)ui_dom_node_destroy(root);
-  (void)ui_focus_manager_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_focus_manager_traps passed\n");
   return UI_ERROR_NONE;
 }
@@ -413,7 +478,12 @@ static ui_error_t test_focus_manager_navigate() {
   ui_dom_node_remove_attribute(&trap, "tabindex");
   ui_dom_node_remove_attribute(&tc1, "tabindex");
 
-  (void)ui_focus_manager_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_focus_manager_navigate passed\n");
   return UI_ERROR_NONE;
 }
@@ -493,8 +563,18 @@ static ui_error_t test_oom(void) {
   /* Instead of get_distance we are testing missing coverage on OOM conditions
    * and invalid argument checks. */
 
-  (void)ui_focus_manager_destroy(manager);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -544,8 +624,18 @@ static void test_focus_manager_coverage(void) {
   ui_focus_manager_navigate(mgr, &lnode, UI_FOCUS_DIRECTION_DOWN);
   ui_focus_manager_navigate(mgr, NULL, UI_FOCUS_DIRECTION_DOWN);
 
-  (void)ui_focus_manager_destroy(mgr);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main() {
@@ -630,7 +720,17 @@ static int run_coverage_focus(void) {
       ui_dom_node_remove_attribute(c[i], "tabindex");
   }
 
-  (void)ui_dom_node_destroy(root);
-  (void)ui_focus_manager_destroy(mgr);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }

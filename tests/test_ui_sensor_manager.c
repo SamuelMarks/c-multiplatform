@@ -96,10 +96,30 @@ static int test_sensor_manager_basic(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_signal_destroy(signal);
-  (void)ui_sensor_manager_destroy(manager);
-  (void)ui_execution_context_destroy(ctx);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -124,7 +144,12 @@ static int test_sensor_manager_nulls(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_sensor_manager_create(&manager);
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_create(&manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_sensor_manager_bind_orientation(manager, NULL) !=
       UI_ERROR_INVALID_ARGUMENT)
@@ -149,11 +174,21 @@ static int test_sensor_manager_nulls(void) {
     return 1; /* not running */
 
   /* tick mock without signal bounded */
-  (void)ui_sensor_manager_start(manager);
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_start(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_sensor_manager_tick_mock(manager) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_sensor_manager_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -191,27 +226,83 @@ static void test_sensor_manager_signal_err(void) {
   struct ui_signal *signal = NULL;
   union ui_signal_payload initial_payload = {0};
 
-  (void)ui_execution_context_create(&ctx);
-  (void)ui_arena_create(1024, &arena);
-  (void)ui_sensor_manager_create(&manager);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_create(&ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_create(1024, &arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_create(&manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   initial_payload.ptr_val = NULL;
-  (void)ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER, NULL,
+  {
+    ui_error_t rc_cleanup =
+        ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER, NULL,
                          NULL, UI_SIGNAL_MODE_SINGLE_THREADED, &signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_sensor_manager_bind_orientation(manager, signal);
-  (void)ui_sensor_manager_start(manager);
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_bind_orientation(manager, signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_start(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Corrupt signal type so ui_signal_set will fail */
   /* ui_signal is opaque here, we can't directly corrupt its type. */
   /* How can ui_signal_set fail? It allocates a copy of subscribers array. We
    * can trigger OOM. */
   g_malloc_fail_countdown = 0;
-  (void)ui_sensor_manager_tick_mock(manager);
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_tick_mock(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_signal_destroy(signal);
-  (void)ui_sensor_manager_destroy(manager);
-  (void)ui_execution_context_destroy(ctx);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_sensor_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

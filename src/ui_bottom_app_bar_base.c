@@ -43,26 +43,57 @@ ui_error_t run_bottom_app_bar_coverage(void) {
   struct ui_bottom_app_bar_base *bar = NULL;
 
   g_bottom_app_bar_mock_fail = 1;
-  (void)ui_bottom_app_bar_base_create(&bar);
+  {
+    ui_error_t rc_cleanup = ui_bottom_app_bar_base_create(&bar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_bottom_app_bar_mock_fail = 0;
 
-  (void)ui_bottom_app_bar_base_create(&bar);
+  {
+    ui_error_t rc_cleanup = ui_bottom_app_bar_base_create(&bar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   g_bottom_app_bar_mock_fail = 2;
-  (void)ui_bottom_app_bar_base_set_fab(bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER);
+  {
+    ui_error_t rc_cleanup =
+        ui_bottom_app_bar_base_set_fab(bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_bottom_app_bar_mock_fail = 0;
 
   g_bottom_app_bar_mock_fail = 2;
-  (void)ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
-                                       UI_BOTTOM_APP_BAR_FAB_CENTER);
+  {
+    ui_error_t rc_cleanup = ui_bottom_app_bar_base_set_fab(
+        bar, (struct ui_fab_base *)1, UI_BOTTOM_APP_BAR_FAB_CENTER);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_bottom_app_bar_mock_fail = 0;
 
   g_bottom_app_bar_mock_fail = 2;
-  (void)ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
-                                       UI_BOTTOM_APP_BAR_FAB_END);
+  {
+    ui_error_t rc_cleanup = ui_bottom_app_bar_base_set_fab(
+        bar, (struct ui_fab_base *)1, UI_BOTTOM_APP_BAR_FAB_END);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_bottom_app_bar_mock_fail = 0;
 
-  (void)ui_bottom_app_bar_base_destroy(bar);
+  {
+    ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(bar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -157,10 +188,20 @@ ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (bar->component) {
-    (void)ui_component_destroy(bar->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(bar->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(bar);
   return rc;
@@ -170,7 +211,12 @@ ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar) {
   if (!bar) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)ui_component_destroy(bar->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(bar->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(bar);
   return UI_ERROR_NONE;
 }

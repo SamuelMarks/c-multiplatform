@@ -73,9 +73,14 @@ ui_error_t ui_compositor_material_base_create(
 
   initial_payload.int_val = (ui_int32)config->initial_type;
   {
-    (void)ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_INT32,
-                           type_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
-                           &(*out_material)->type_signal);
+    {
+      ui_error_t rc_cleanup = ui_signal_create(
+          arena, initial_payload, UI_SIGNAL_TYPE_INT32, type_equality, NULL,
+          UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_material)->type_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;
@@ -86,13 +91,29 @@ ui_error_t ui_compositor_material_base_create(
  * @param material Parameter material.
  * @return Return value.
  */
+#ifdef UI_TEST_MOCK_ALLOC
+int g_compositor_mock_fail = 0;
+extern ui_error_t ui_component_destroy(struct ui_component *c);
+static ui_error_t mock_component_destroy_compositor(struct ui_component *c) {
+  if (g_compositor_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+#define ui_component_destroy mock_component_destroy_compositor
+#endif
+
 ui_error_t ui_compositor_material_base_destroy(
     struct ui_compositor_material_base *material) {
   if (!material) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_signal_destroy(material->type_signal);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(material->type_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -116,7 +137,12 @@ ui_error_t ui_compositor_material_base_set_type(
   payload.int_val = (ui_int32)type;
 
   {
-    (void)ui_signal_set(material->type_signal, payload);
+    {
+      ui_error_t rc_cleanup = ui_signal_set(material->type_signal, payload);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;

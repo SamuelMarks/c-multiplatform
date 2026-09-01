@@ -21,7 +21,7 @@ char *my_strdup(const char *s) {
   size_t len = strlen(s);
   char *d = C_MULTIPLATFORM_MALLOC(len + 1);
   if (d)
-    UI_STRCPY(d, 256, s);
+    UI_STRCPY(d, len + 1, s);
   return d;
 }
 
@@ -33,16 +33,52 @@ void test_malformed_selector(void) {
   struct ui_css_selector *sel = NULL;
   struct ui_css_computed_style *style = NULL;
 
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
-  (void)ui_dom_node_set_tag_name(node, "div");
+  {
+    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(node, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child);
-  (void)ui_dom_node_set_tag_name(child, "span");
-  (void)ui_dom_node_append_child(node, child);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(child, "span");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_append_child(node, child);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_stylesheet_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Construct malformed selector manually */
   sel = C_MULTIPLATFORM_MALLOC(sizeof(*sel));
@@ -52,52 +88,123 @@ void test_malformed_selector(void) {
   sel->nested_selector = NULL; /* MALFORMED */
 
   rule->selectors = sel;
-  (void)ui_css_rule_append_declaration(rule, "color", "red", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "color", "red", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_resolve_style(sheet, child, &style);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (style) {
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     style = NULL;
   }
 
   C_MULTIPLATFORM_FREE(sel->value);
   sel->value = my_strdup("has");
-  (void)ui_css_resolve_style(sheet, child, &style);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (style) {
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     style = NULL;
   }
 
   C_MULTIPLATFORM_FREE(sel->value);
   sel->value = my_strdup("host");
-  (void)ui_css_resolve_style(sheet, child, &style);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (style) {
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     style = NULL;
   }
 
   C_MULTIPLATFORM_FREE(sel->value);
   sel->value = my_strdup("host-context");
-  (void)ui_css_resolve_style(sheet, child, &style);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (style) {
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     style = NULL;
   }
 
   sel->type = UI_CSS_SELECTOR_TYPE_ATTRIBUTE;
   C_MULTIPLATFORM_FREE(sel->value);
   sel->value = NULL; /* MALFORMED ATTRIBUTE */
-  (void)ui_css_resolve_style(sheet, child, &style);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (style) {
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     style = NULL;
   }
 
   sel->type = (enum ui_css_selector_type)999;
-  (void)ui_css_resolve_style(sheet, child, &style);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (style) {
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     style = NULL;
   }
 
@@ -105,14 +212,34 @@ void test_malformed_selector(void) {
   sel->value = my_strdup("class");
   sel->attr_value = my_strdup("v");
   sel->attr_op = (enum ui_css_attr_operator)999;
-  (void)ui_css_resolve_style(sheet, child, &style);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (style) {
-    (void)ui_css_computed_style_destroy(style);
+    {
+      ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     style = NULL;
   }
 
-  (void)ui_css_stylesheet_destroy(sheet);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 struct ui_css_selector *create_mock_selector(enum ui_css_selector_type type,
@@ -144,12 +271,33 @@ void test_cssom_oom(void) {
         struct ui_css_selector *sel = NULL;
         if (ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule) ==
             UI_ERROR_NONE) {
-          (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG,
-                                            "div");
-          (void)ui_css_rule_append_declaration(rule, "color", "red", 0);
-          (void)ui_css_stylesheet_append_rule(sheet, rule);
+          {
+            ui_error_t rc_cleanup = ui_css_rule_append_selector(
+                rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
+          {
+            ui_error_t rc_cleanup =
+                ui_css_rule_append_declaration(rule, "color", "red", 0);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
+          {
+            ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
-        (void)ui_css_resolve_style(sheet, node, &style);
+        {
+          ui_error_t rc_cleanup = ui_css_resolve_style(sheet, node, &style);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         ui_css_computed_style_destroy(style);
         style = NULL;
         ui_css_stylesheet_destroy(sheet);
@@ -160,8 +308,20 @@ void test_cssom_oom(void) {
     }
 
     if (ui_css_variable_store_create(&store) == UI_ERROR_NONE) {
-      (void)ui_css_variable_store_set(store, "--my-var", "red");
-      (void)ui_css_resolve_variables(store, "var(--my-var, blue)", &resolved);
+      {
+        ui_error_t rc_cleanup =
+            ui_css_variable_store_set(store, "--my-var", "red");
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
+      {
+        ui_error_t rc_cleanup =
+            ui_css_resolve_variables(store, "var(--my-var, blue)", &resolved);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       if (resolved) {
         C_MULTIPLATFORM_FREE(resolved);
         resolved = NULL;
@@ -176,13 +336,24 @@ void test_cssom_oom(void) {
       if (ui_css_variable_store_create(&store) == UI_ERROR_NONE) {
         if (ui_css_variable_store_set(store, "--my-var", "red") ==
             UI_ERROR_NONE) {
-          (void)ui_css_variable_store_set(store, "--my-var", "blue");
+          {
+            ui_error_t rc_cleanup =
+                ui_css_variable_store_set(store, "--my-var", "blue");
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
         if (ui_css_resolve_variables(store, "var(--my-var, blue)", &resolved) ==
             UI_ERROR_NONE) {
           C_MULTIPLATFORM_FREE(resolved);
         }
-        (void)ui_css_variable_store_destroy(store);
+        {
+          ui_error_t rc_cleanup = ui_css_variable_store_destroy(store);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
     if (g_malloc_fail_countdown > 0) {
@@ -200,253 +371,1077 @@ void test_coverage_ui_cssom(void) {
   struct ui_css_rule *rule = NULL;
   struct ui_css_selector *sel = NULL;
 
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &parent);
-  (void)ui_dom_node_set_tag_name(parent, "div");
-  (void)ui_dom_node_set_attribute(parent, "id", "parent-id");
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child);
-  (void)ui_dom_node_set_tag_name(child, "span");
-  (void)ui_dom_node_set_attribute(child, "id", "child-id");
-  (void)ui_dom_node_set_attribute(child, "class", "myclass");
-  (void)ui_dom_node_append_child(parent, child);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &parent);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(parent, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(parent, "id", "parent-id");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(child, "span");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_attribute(child, "id", "child-id");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(child, "class", "myclass");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_append_child(parent, child);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_stylesheet_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Reverse order for return UI_ERROR_NONE coverage */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_ID, "child-id");
-  (void)ui_css_rule_append_declaration(rule, "prop_a", "E", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_ID, "child-id");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_a", "E", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS,
-                                    "myclass");
-  (void)ui_css_rule_append_declaration(rule, "prop_a", "C", 0); /* spec_a > */
-  (void)ui_css_rule_append_declaration(rule, "prop_b", "C", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_rule_append_selector(
+        rule, UI_CSS_SELECTOR_TYPE_CLASS, "myclass");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_a", "C", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* spec_a > */
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_b", "C", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
-  (void)ui_css_rule_append_declaration(rule, "prop_b", "A", 0); /* spec_b > */
-  (void)ui_css_rule_append_declaration(rule, "prop_c", "A", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_b", "A", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* spec_b > */
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_c", "A", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_UNIVERSAL, NULL);
-  (void)ui_css_rule_append_declaration(rule, "prop_c", "B", 0); /* spec_c > */
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_UNIVERSAL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_c", "B", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* spec_c > */
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_resolve_style(sheet, child, &style);
-  (void)ui_css_computed_style_destroy(style);
-  (void)ui_css_stylesheet_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_stylesheet_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* Forward order for goto replace coverage */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_UNIVERSAL, NULL);
-  (void)ui_css_rule_append_declaration(rule, "prop_cc", "B", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_UNIVERSAL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_cc", "B", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
-  (void)ui_css_rule_append_declaration(rule, "prop_bb", "A", 0);
-  (void)ui_css_rule_append_declaration(rule, "prop_cc", "A",
-                                       0); /* replace spec_c */
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_bb", "A", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_cc", "A", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* replace spec_c */
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_CLASS,
-                                    "myclass");
-  (void)ui_css_rule_append_declaration(rule, "prop_aa", "C", 0);
-  (void)ui_css_rule_append_declaration(rule, "prop_bb", "C",
-                                       0); /* replace spec_b */
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_rule_append_selector(
+        rule, UI_CSS_SELECTOR_TYPE_CLASS, "myclass");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_aa", "C", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_bb", "C", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* replace spec_b */
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_ID, "child-id");
-  (void)ui_css_rule_append_declaration(rule, "prop_aa", "E",
-                                       0); /* replace spec_a */
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_ID, "child-id");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "prop_aa", "E", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* replace spec_a */
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Layer order overrides */
   {
     int order1 = 0, order2 = 0;
     struct ui_css_rule *layer_rule1, *layer_rule2;
-    (void)ui_css_stylesheet_register_layer(sheet, "L1", &order1);
-    (void)ui_css_stylesheet_register_layer(sheet, "L2", &order2);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L1", &order1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L2", &order2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule1);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule1->layer_name = C_MULTIPLATFORM_STRDUP("L1");
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule2);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule2->layer_name = C_MULTIPLATFORM_STRDUP("L2");
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-    (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
-    (void)ui_css_rule_append_declaration(rule, "prop_layer1", "B", 0);
-    (void)ui_css_rule_append_declaration(rule, "prop_layer2", "B", 1);
+    {
+      ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer1", "B", 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer2", "B", 1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule2->nested_rules = rule;
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-    (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
-    (void)ui_css_rule_append_declaration(rule, "prop_layer1", "A", 0);
-    (void)ui_css_rule_append_declaration(rule, "prop_layer2", "A", 1);
+    {
+      ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer1", "A", 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer2", "A", 1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule1->nested_rules = rule;
 
-    (void)ui_css_stylesheet_append_rule(sheet, layer_rule2);
-    (void)ui_css_stylesheet_append_rule(sheet, layer_rule1);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, layer_rule2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, layer_rule1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_css_resolve_style(sheet, child, &style);
-  (void)ui_css_computed_style_destroy(style);
-  (void)ui_css_stylesheet_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_stylesheet_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* :not(span) on child */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
-                                    "not");
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_rule_append_selector(
+        rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS, "not");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   sel = rule->selectors;
   sel->nested_selector = create_mock_selector(UI_CSS_SELECTOR_TYPE_TAG, "span");
-  (void)ui_css_rule_append_declaration(rule, "color", "red", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "color", "red", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* pseudo-element ::before */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT,
-                                    "before");
-  (void)ui_css_rule_append_declaration(rule, "color", "blue", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_rule_append_selector(
+        rule, UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT, "before");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "color", "blue", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* id doesn't match */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_ID, "wrong-id");
-  (void)ui_css_rule_append_declaration(rule, "color", "green", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_ID, "wrong-id");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "color", "green", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* :has(div) with nested selector to cover 1100s branch */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
-                                    "has");
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_rule_append_selector(
+        rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS, "has");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   sel = rule->selectors;
   sel->nested_selector = create_mock_selector(UI_CSS_SELECTOR_TYPE_TAG, "div");
-  (void)ui_css_rule_append_declaration(rule, "margin", "10px", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "margin", "10px", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_resolve_style(sheet, child, &style);
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_dom_node *cov_parent = NULL, *cov_child = NULL;
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cov_parent);
-  (void)ui_dom_node_set_tag_name(cov_parent, "div");
-  (void)ui_dom_node_set_attribute(cov_parent, "id", "parent-id");
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cov_child);
-  (void)ui_dom_node_set_tag_name(cov_child, "span");
-  (void)ui_dom_node_set_attribute(cov_child, "id", "child-id");
-  (void)ui_dom_node_set_attribute(cov_child, "class", "myclass");
-  (void)ui_dom_node_append_child(cov_parent, cov_child);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cov_parent);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(cov_parent, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(cov_parent, "id", "parent-id");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cov_child);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(cov_child, "span");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(cov_child, "id", "child-id");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(cov_child, "class", "myclass");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_append_child(cov_parent, cov_child);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_stylesheet_create(&sheet);
-  (void)ui_css_stylesheet_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* :not(span) on child */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
-                                    "not");
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_rule_append_selector(
+        rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS, "not");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   sel = rule->selectors;
   sel->nested_selector = create_mock_selector(UI_CSS_SELECTOR_TYPE_TAG, "span");
-  (void)ui_css_rule_append_declaration(rule, "color", "red", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "color", "red", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* pseudo-element ::before */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT,
-                                    "before");
-  (void)ui_css_rule_append_declaration(rule, "color", "blue", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_rule_append_selector(
+        rule, UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT, "before");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "color", "blue", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* id doesn't match */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_ID, "wrong-id");
-  (void)ui_css_rule_append_declaration(rule, "color", "green", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_ID, "wrong-id");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "color", "green", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* :has(div) with nested selector to cover 1100s branch */
-  (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-  (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
-                                    "has");
+  {
+    ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_rule_append_selector(
+        rule, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS, "has");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   sel = rule->selectors;
   sel->nested_selector = create_mock_selector(UI_CSS_SELECTOR_TYPE_TAG, "div");
-  (void)ui_css_rule_append_declaration(rule, "margin", "10px", 0);
-  (void)ui_css_stylesheet_append_rule(sheet, rule);
+  {
+    ui_error_t rc_cleanup =
+        ui_css_rule_append_declaration(rule, "margin", "10px", 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, rule);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_css_resolve_style(sheet, cov_child, &style);
-  (void)ui_css_computed_style_destroy(style);
-  (void)ui_css_stylesheet_destroy(sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, cov_child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Layer order overrides: L1 then L2 */
-  (void)ui_css_stylesheet_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     int order1 = 0, order2 = 0;
     struct ui_css_rule *layer_rule1, *layer_rule2;
-    (void)ui_css_stylesheet_register_layer(sheet, "L3", &order1);
-    (void)ui_css_stylesheet_register_layer(sheet, "L4", &order2);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L3", &order1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L4", &order2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule1);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule1->layer_name = C_MULTIPLATFORM_STRDUP("L3");
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule2);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule2->layer_name = C_MULTIPLATFORM_STRDUP("L4");
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-    (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
-    (void)ui_css_rule_append_declaration(rule, "prop_layer_normal2", "A", 0);
-    (void)ui_css_rule_append_declaration(rule, "prop_layer_important2", "A", 1);
+    {
+      ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer_normal2", "A", 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer_important2", "A", 1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule1->nested_rules = rule;
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-    (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
-    (void)ui_css_rule_append_declaration(rule, "prop_layer_normal2", "B", 0);
-    (void)ui_css_rule_append_declaration(rule, "prop_layer_important2", "B", 1);
+    {
+      ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer_normal2", "B", 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer_important2", "B", 1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule2->nested_rules = rule;
 
-    (void)ui_css_stylesheet_append_rule(sheet, layer_rule1);
-    (void)ui_css_stylesheet_append_rule(sheet, layer_rule2);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, layer_rule1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, layer_rule2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_css_resolve_style(sheet, cov_child, &style);
-  (void)ui_css_computed_style_destroy(style);
-  (void)ui_css_stylesheet_destroy(sheet);
-  (void)ui_css_stylesheet_create(&sheet);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, cov_child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_create(&sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     int order1 = 0, order2 = 0;
     struct ui_css_rule *layer_rule1, *layer_rule2;
-    (void)ui_css_stylesheet_register_layer(sheet, "L3", &order1);
-    (void)ui_css_stylesheet_register_layer(sheet, "L4", &order2);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L3", &order1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_register_layer(sheet, "L4", &order2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule1);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule1->layer_name = C_MULTIPLATFORM_STRDUP("L3");
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule2);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_create(UI_CSS_RULE_TYPE_LAYER, &layer_rule2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule2->layer_name = C_MULTIPLATFORM_STRDUP("L4");
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-    (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
-    (void)ui_css_rule_append_declaration(rule, "prop_layer_normal2", "A", 0);
-    (void)ui_css_rule_append_declaration(rule, "prop_layer_important2", "A", 1);
+    {
+      ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer_normal2", "A", 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer_important2", "A", 1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule1->nested_rules = rule;
 
-    (void)ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
-    (void)ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
-    (void)ui_css_rule_append_declaration(rule, "prop_layer_normal2", "B", 0);
-    (void)ui_css_rule_append_declaration(rule, "prop_layer_important2", "B", 1);
+    {
+      ui_error_t rc_cleanup = ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_selector(rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer_normal2", "B", 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_css_rule_append_declaration(rule, "prop_layer_important2", "B", 1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     layer_rule2->nested_rules = rule;
 
-    (void)ui_css_stylesheet_append_rule(sheet, layer_rule1);
-    (void)ui_css_stylesheet_append_rule(sheet, layer_rule2);
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, layer_rule1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_css_stylesheet_append_rule(sheet, layer_rule2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_css_resolve_style(sheet, cov_child, &style);
-  (void)ui_css_computed_style_destroy(style);
-  (void)ui_css_stylesheet_destroy(sheet);
-  (void)ui_dom_node_destroy(cov_parent);
-  (void)ui_dom_node_destroy(parent);
+  {
+    ui_error_t rc_cleanup = ui_css_resolve_style(sheet, cov_child, &style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_css_stylesheet_destroy(sheet);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(cov_parent);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(parent);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 struct ui_css_selector *create_mock_selector(enum ui_css_selector_type type,

@@ -70,7 +70,12 @@ static int test_os_dialogs(void) {
 
   ui_thread_pool_destroy(pool);
   ui_reactor_destroy(reactor);
-  (void)ui_color_picker_base_destroy(color_picker);
+  {
+    ui_error_t rc_cleanup = ui_color_picker_base_destroy(color_picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_file_uploader_destroy(&uploader);
 
   return 0;

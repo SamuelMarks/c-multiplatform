@@ -24,12 +24,24 @@ static void test_chart_mock_failures(void) {
 
   for (i = 0; i < 2; i++) {
     g_chart_mock_fail = i;
-    (void)ui_chart_base_data_to_pixel(chart, 5.0, 5.0, &pixel_pt);
+    {
+      ui_error_t rc_cleanup =
+          ui_chart_base_data_to_pixel(chart, 5.0, 5.0, &pixel_pt);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_chart_mock_fail = -1;
   }
   for (i = 0; i < 2; i++) {
     g_chart_mock_fail = i;
-    (void)ui_chart_base_pixel_to_data(chart, 50.0, 50.0, &out_x, &out_y);
+    {
+      ui_error_t rc_cleanup =
+          ui_chart_base_pixel_to_data(chart, 50.0, 50.0, &out_x, &out_y);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_chart_mock_fail = -1;
   }
   ui_chart_base_destroy(chart);
@@ -38,12 +50,24 @@ static void test_chart_mock_failures(void) {
   ui_chart_base_set_draw_bounds(chart, &bounds);
   for (i = 0; i < 2; i++) {
     g_chart_mock_fail = i;
-    (void)ui_chart_base_data_to_pixel(chart, 5.0, 5.0, &pixel_pt);
+    {
+      ui_error_t rc_cleanup =
+          ui_chart_base_data_to_pixel(chart, 5.0, 5.0, &pixel_pt);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_chart_mock_fail = -1;
   }
   for (i = 0; i < 2; i++) {
     g_chart_mock_fail = i;
-    (void)ui_chart_base_pixel_to_data(chart, 50.0, 50.0, &out_x, &out_y);
+    {
+      ui_error_t rc_cleanup =
+          ui_chart_base_pixel_to_data(chart, 50.0, 50.0, &out_x, &out_y);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_chart_mock_fail = -1;
   }
 
@@ -68,8 +92,18 @@ static void test_chart_coord_missing(void) {
   double dx, dy;
   ui_chart_base_pixel_to_data(chart, 50.0, 50.0, &dx, &dy); /* Hits 256 false */
 
-  (void)ui_chart_base_destroy(chart);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_chart_base_destroy(chart);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 int main(void) {
   test_chart_mock_failures();
@@ -163,7 +197,12 @@ int main(void) {
       &out_y); /* unscale from log with negative domain bounds */
 
   /* Reset y scale */
-  (void)ui_chart_base_set_y_scale(chart, &y_scale);
+  {
+    ui_error_t rc_cleanup = ui_chart_base_set_y_scale(chart, &y_scale);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* pixel(60, 60) -> reverse -> log halfway -> data Y 10.0 */
   err = ui_chart_base_pixel_to_data(chart, 60.0, 60.0, &out_x, &out_y);
@@ -253,7 +292,12 @@ int main(void) {
     /* Negative angle */
     ui_chart_base_pixel_to_data(polar, 60.0, 10.0, &out_x, &out_y);
 
-    (void)ui_chart_base_destroy(polar);
+    {
+      ui_error_t rc_cleanup = ui_chart_base_destroy(polar);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test 8: Arena alloc failure / Signal create failure */
@@ -263,13 +307,23 @@ int main(void) {
     ui_arena_create(8, &small_arena); /* Too small for chart struct */
     ui_chart_base_create(small_arena, UI_CHART_COORDINATE_CARTESIAN,
                          &temp_chart);
-    (void)ui_arena_destroy(small_arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     ui_arena_create(200,
                     &small_arena); /* Big enough for chart, but not signal */
     ui_chart_base_create(small_arena, UI_CHART_COORDINATE_CARTESIAN,
                          &temp_chart);
-    (void)ui_arena_destroy(small_arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test 9: Zero range span */
@@ -293,7 +347,12 @@ int main(void) {
       err = ui_chart_base_create(arena, UI_CHART_COORDINATE_CARTESIAN,
                                  &oom_chart);
       if (err == UI_ERROR_NONE) {
-        (void)ui_chart_base_destroy(oom_chart);
+        {
+          ui_error_t rc_cleanup = ui_chart_base_destroy(oom_chart);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         break; /* Enough iterations to pass */
       }
     }
@@ -301,6 +360,11 @@ int main(void) {
   }
 #endif
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }

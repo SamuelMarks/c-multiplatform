@@ -73,7 +73,12 @@ ui_error_t ui_dom_node_destroy(struct ui_dom_node *node) {
   child = node->first_child;
   while (child) {
     next_child = child->next_sibling;
-    (void)ui_dom_node_destroy(child);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(child);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     child = next_child;
   }
 

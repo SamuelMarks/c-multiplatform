@@ -16,5 +16,10 @@ void test_ui_section_index_errs(void) {
   g_malloc_fail_countdown = 0;
   ui_section_index_base_set_active_section(index, 1);
   g_malloc_fail_countdown = -1;
-  (void)ui_section_index_base_destroy(index);
+  {
+    ui_error_t rc_cleanup = ui_section_index_base_destroy(index);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

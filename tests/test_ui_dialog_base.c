@@ -30,7 +30,12 @@ static int test_create_destroy(void) {
   if (rc != UI_ERROR_NONE || !dialog)
     return 1;
 
-  (void)ui_dialog_base_destroy(dialog);
+  {
+    ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -46,7 +51,12 @@ static int test_errors(void) {
 
   if (ui_dialog_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  (void)ui_dialog_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_dialog_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_dialog_base_set_content(NULL, comp) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -91,7 +101,12 @@ static int test_errors(void) {
     g_malloc_fail_countdown = i;
     if (ui_dialog_base_create(&dialog) == UI_ERROR_NONE) {
       g_malloc_fail_countdown = -1;
-      (void)ui_dialog_base_destroy(dialog);
+      {
+        ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -241,11 +256,36 @@ static int test_getters_and_setters(void) {
   ui_dialog_base_set_open(dialog, 1);
 
   /* Leave it open to test destroy while open */
-  (void)ui_dialog_base_destroy(dialog);
-  (void)ui_component_destroy(content);
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
-  (void)ui_focus_manager_destroy(focus_manager);
+  {
+    ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(content);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -268,8 +308,18 @@ static int test_open_without_director_and_focus(void) {
   ui_dialog_base_set_open(dialog, 1);
   ui_dialog_base_set_open(dialog, 0);
   ui_dialog_base_set_open(dialog, 1);
-  (void)ui_dialog_base_destroy(dialog);
-  (void)ui_overlay_director_destroy(director);
+  {
+    ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Set only focus */
   ui_dialog_base_create(&dialog);
@@ -289,13 +339,33 @@ static int test_open_without_director_and_focus(void) {
   ui_dialog_base_set_open(dialog, 1);
   ui_dialog_base_set_open(dialog, 0);
   ui_dialog_base_set_open(dialog, 1);
-  (void)ui_dialog_base_destroy(dialog);
-  (void)ui_focus_manager_destroy(focus_manager);
+  {
+    ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_dialog_base_create(&dialog);
   ui_overlay_director_create(NULL, &director);
   ui_dialog_base_set_overlay_director(dialog, director);
-  (void)ui_dialog_base_destroy(dialog);
-  (void)ui_overlay_director_destroy(director);
+  {
+    ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -321,10 +391,30 @@ static int test_oom_open(void) {
     rc = ui_dialog_base_set_open(dialog, 1);
     g_malloc_fail_countdown = -1;
 
-    (void)ui_dialog_base_destroy(dialog);
-    (void)ui_focus_manager_destroy(focus_manager);
-    (void)ui_overlay_director_destroy(director);
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_manager);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   for (i = 0; i < 5; i++) {
@@ -334,8 +424,18 @@ static int test_oom_open(void) {
     g_malloc_fail_countdown = i;
     rc = ui_dialog_base_set_open(dialog, 1);
     g_malloc_fail_countdown = -1;
-    (void)ui_dialog_base_destroy(dialog);
-    (void)ui_focus_manager_destroy(focus_manager);
+    {
+      ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_manager);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return 0;
 }

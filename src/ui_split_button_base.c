@@ -147,7 +147,12 @@ ui_split_button_base_create(struct ui_split_button_base **out_split_button) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (split_btn->trigger_button) {
     struct ui_component *tmp_comp;
@@ -157,7 +162,12 @@ cleanup:
       (void)_ign_rc;
     }
     tmp_comp->shadow_root = NULL;
-    (void)ui_button_base_destroy(split_btn->trigger_button);
+    {
+      ui_error_t rc_cleanup = ui_button_base_destroy(split_btn->trigger_button);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (split_btn->main_button) {
     struct ui_component *tmp_comp;
@@ -167,10 +177,20 @@ cleanup:
       (void)_ign_rc;
     }
     tmp_comp->shadow_root = NULL;
-    (void)ui_button_base_destroy(split_btn->main_button);
+    {
+      ui_error_t rc_cleanup = ui_button_base_destroy(split_btn->main_button);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (split_btn->component) {
-    (void)ui_component_destroy(split_btn->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(split_btn->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(split_btn);
   return rc;
@@ -196,7 +216,13 @@ ui_split_button_base_destroy(struct ui_split_button_base *split_button) {
     (void)_ign_rc;
   }
   tmp_comp->shadow_root = NULL;
-  (void)ui_button_base_destroy(split_button->trigger_button);
+  {
+    ui_error_t rc_cleanup =
+        ui_button_base_destroy(split_button->trigger_button);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Unlink from parent to prevent double free */
   {
@@ -205,9 +231,19 @@ ui_split_button_base_destroy(struct ui_split_button_base *split_button) {
     (void)_ign_rc;
   }
   tmp_comp->shadow_root = NULL;
-  (void)ui_button_base_destroy(split_button->main_button);
+  {
+    ui_error_t rc_cleanup = ui_button_base_destroy(split_button->main_button);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_component_destroy(split_button->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(split_button->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(split_button);
   return UI_ERROR_NONE;

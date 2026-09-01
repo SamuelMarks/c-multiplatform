@@ -28,7 +28,12 @@ static int test_popover_lifecycle(void) {
   if (is_open)
     return 1;
 
-  (void)ui_popover_base_destroy(popover);
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -96,11 +101,36 @@ static int test_popover_open_close(void) {
   if (is_open)
     return 1;
 
-  (void)ui_popover_base_destroy(popover);
-  (void)ui_focus_manager_destroy(focus_mgr);
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
-  (void)ui_dom_node_destroy(content_node);
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(content_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* Note: content_node is conceptually owned by the user, but since the popover
      mounted it, destroying the popover tree during close cleans it up. However,
      we removed it above, so we must free it. */
@@ -177,11 +207,31 @@ static int test_popover_click_outside(void) {
   /* Close via destroy while open */
   ui_popover_base_open(popover, content_node, director, NULL, &trigger, &anchor,
                        800.0f, 600.0f);
-  (void)ui_popover_base_destroy(popover);
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
-  (void)ui_dom_node_destroy(content_node);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(content_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -200,7 +250,12 @@ static int test_popover_nulls(void) {
 
   if (ui_popover_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  (void)ui_popover_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_popover_base_open(NULL, content, director, focus_mgr, &trigger,
                            &anchor, 800, 600) != UI_ERROR_INVALID_ARGUMENT)
@@ -247,7 +302,12 @@ static int test_popover_nulls(void) {
   if (ui_popover_base_get_animating_signal(popover, &comp) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_popover_base_destroy(popover);
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -269,7 +329,12 @@ static int test_popover_oom_and_errors(void) {
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     if (ui_popover_base_create(&popover) == UI_ERROR_NONE) {
-      (void)ui_popover_base_destroy(popover);
+      {
+        ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }
@@ -318,10 +383,30 @@ static int test_popover_oom_and_errors(void) {
 
   ui_dom_node_destroy(dummy_parent); /* also destroys content_node */
 
-  (void)ui_popover_base_destroy(popover);
-  (void)ui_focus_manager_destroy(focus_mgr);
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root_node);
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

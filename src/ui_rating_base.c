@@ -93,7 +93,12 @@ static ui_error_t rating_cva_write_value(void *component,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_rating_base_set_value(rating, value.float_val);
+  {
+    ui_error_t rc_cleanup = ui_rating_base_set_value(rating, value.float_val);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -230,8 +235,12 @@ ui_error_t ui_rating_base_create(struct ui_rating_base **out_rating,
   *out_rating = rating;
   return UI_ERROR_NONE;
 
-cleanup:
-  (void)ui_rating_base_destroy(rating);
+cleanup: {
+  ui_error_t rc_cleanup = ui_rating_base_destroy(rating);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    (void)rc_cleanup; /* Avoid override */
+  }
+}
   return rc;
 }
 
@@ -247,13 +256,28 @@ ui_error_t ui_rating_base_destroy(struct ui_rating_base *rating) {
   }
 
   if (rating->full_icon) {
-    (void)ui_icon_base_destroy(rating->full_icon);
+    {
+      ui_error_t rc_cleanup = ui_icon_base_destroy(rating->full_icon);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (rating->half_icon) {
-    (void)ui_icon_base_destroy(rating->half_icon);
+    {
+      ui_error_t rc_cleanup = ui_icon_base_destroy(rating->half_icon);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (rating->empty_icon) {
-    (void)ui_icon_base_destroy(rating->empty_icon);
+    {
+      ui_error_t rc_cleanup = ui_icon_base_destroy(rating->empty_icon);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   C_MULTIPLATFORM_FREE(rating);

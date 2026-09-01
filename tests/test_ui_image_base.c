@@ -107,7 +107,12 @@ static ui_error_t run_oom_tests(void) {
   struct ui_component comp;
   ui_error_t rc;
 
-  (void)ui_image_base_init(&image, &comp);
+  {
+    ui_error_t rc_cleanup = ui_image_base_init(&image, &comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   g_malloc_fail_countdown = 0;
   rc = ui_image_base_set_src(&image, "http://example.com/oom.png", 0);
@@ -117,7 +122,12 @@ static ui_error_t run_oom_tests(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_image_base_cleanup(&image);
+  {
+    ui_error_t rc_cleanup = ui_image_base_cleanup(&image);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 

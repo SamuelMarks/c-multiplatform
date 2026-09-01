@@ -13,9 +13,19 @@ static ui_error_t run_mock_failures(void) {
   for (i = 0; i < 5; i++) {
     struct ui_card_base *card = NULL;
     g_card_mock_fail = i;
-    (void)ui_card_base_create(&card);
+    {
+      ui_error_t rc_cleanup = ui_card_base_create(&card);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     if (card) {
-      (void)ui_card_base_destroy(card);
+      {
+        ui_error_t rc_cleanup = ui_card_base_destroy(card);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_card_mock_fail = -1;

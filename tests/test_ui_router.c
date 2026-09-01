@@ -306,7 +306,12 @@ static int run_normal_tests(void) {
   ui_router_install_os_hooks(router);
 
   printf("Testing ui_router_destroy...\n");
-  (void)ui_router_destroy(router);
+  {
+    ui_error_t rc_cleanup = ui_router_destroy(router);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -327,7 +332,12 @@ static int run_oom_tests(void) {
     if (err == UI_ERROR_OUT_OF_MEMORY) {
       continue;
     } else if (err == UI_ERROR_NONE) {
-      (void)ui_router_destroy(router);
+      {
+        ui_error_t rc_cleanup = ui_router_destroy(router);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       return 1;
@@ -390,9 +400,19 @@ static int run_oom_tests(void) {
     }
   }
 
-  (void)ui_router_destroy(router);
+  {
+    ui_error_t rc_cleanup = ui_router_destroy(router);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* Note screen was not successfully pushed, so we clean it up */
-  (void)ui_component_destroy(screen);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(screen);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -467,7 +487,12 @@ void test_ui_router_coverage(void) {
     ui_route_request_get_path(NULL, &path);
     ui_route_request_get_state(NULL, &state);
 
-    (void)ui_router_destroy(router);
+    {
+      ui_error_t rc_cleanup = ui_router_destroy(router);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 
@@ -477,7 +502,12 @@ void test_ui_router_coverage2(void) {
   if (router) {
     ui_router_add_route(router, "/cov", cov_factory, NULL);
     ui_router_navigate_with_state(router, "/cov", (void *)0x123);
-    (void)ui_router_destroy(router);
+    {
+      ui_error_t rc_cleanup = ui_router_destroy(router);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 
@@ -492,7 +522,12 @@ void test_ui_router_oom_add(void) {
       ui_router_add_route(router, "/my/route/pattern", NULL, NULL);
     }
     g_malloc_fail_countdown = -1;
-    (void)ui_router_destroy(router);
+    {
+      ui_error_t rc_cleanup = ui_router_destroy(router);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 
@@ -506,7 +541,12 @@ void test_ui_router_stack_realloc(void) {
       ui_component_create(&cmp);
       ui_router_push(router, cmp);
     }
-    (void)ui_router_destroy(router);
+    {
+      ui_error_t rc_cleanup = ui_router_destroy(router);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_ui_router_oom_add2(void) {
@@ -521,7 +561,12 @@ void test_ui_router_oom_add2(void) {
                           NULL);
     }
     g_malloc_fail_countdown = -1;
-    (void)ui_router_destroy(router);
+    {
+      ui_error_t rc_cleanup = ui_router_destroy(router);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 static ui_error_t cov_factory3(const struct ui_route_request *req,
@@ -538,7 +583,12 @@ void test_ui_router_missing_param(void) {
   if (router) {
     ui_router_add_route(router, "/missing/:id", cov_factory3, NULL);
     ui_router_navigate(router, "/missing/123");
-    (void)ui_router_destroy(router);
+    {
+      ui_error_t rc_cleanup = ui_router_destroy(router);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_ui_router_errs(void) {
@@ -551,5 +601,10 @@ void test_ui_router_extra2(void) {
   struct ui_router *router = NULL;
   ui_router_create(&router);
   ui_router_navigate(router, "/my/path?k=v");
-  (void)ui_router_destroy(router);
+  {
+    ui_error_t rc_cleanup = ui_router_destroy(router);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

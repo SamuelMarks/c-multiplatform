@@ -566,25 +566,67 @@ ui_autocomplete_base_create(struct ui_autocomplete_base **out_autocomplete,
 
 cleanup: {
   if (ac->popover) {
-    (void)ui_popover_base_destroy(ac->popover);
+    {
+      ui_error_t rc_cleanup = ui_popover_base_destroy(ac->popover);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
   }
   if (ac->listbox) {
-    (void)ui_listbox_base_destroy(ac->listbox);
+    {
+      ui_error_t rc_cleanup = ui_listbox_base_destroy(ac->listbox);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
   }
   if (ac->input) {
     struct ui_component *tmp_comp = NULL;
-    (void)ui_input_base_get_component(ac->input, &tmp_comp);
-    if (tmp_comp) {
-      (void)ui_dom_node_remove_child(ac->root_component->shadow_root,
-                                     tmp_comp->shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_input_base_get_component(ac->input, &tmp_comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
     }
-    (void)ui_input_base_destroy(ac->input);
+    if (tmp_comp) {
+      {
+        ui_error_t rc_cleanup = ui_dom_node_remove_child(
+            ac->root_component->shadow_root, tmp_comp->shadow_root);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE)
+            rc = rc_cleanup;
+        }
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_input_base_destroy(ac->input);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
   }
   if (ac->root_component) {
-    (void)ui_component_destroy(ac->root_component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(ac->root_component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
   }
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        if (rc == UI_ERROR_NONE)
+          rc = rc_cleanup;
+      }
+    }
   }
 }
   C_MULTIPLATFORM_FREE(ac);
@@ -602,16 +644,47 @@ ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete) {
   if (!autocomplete)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  (void)ui_popover_base_destroy(autocomplete->popover);
-  (void)ui_listbox_base_destroy(autocomplete->listbox);
-
-  (void)ui_input_base_get_component(autocomplete->input, &tmp_comp);
-  if (tmp_comp) {
-    (void)ui_dom_node_remove_child(autocomplete->root_component->shadow_root,
-                                   tmp_comp->shadow_root);
+  {
+    ui_error_t rc_cleanup = ui_popover_base_destroy(autocomplete->popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
   }
-  (void)ui_input_base_destroy(autocomplete->input);
-  (void)ui_component_destroy(autocomplete->root_component);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_destroy(autocomplete->listbox);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+
+  {
+    ui_error_t rc_cleanup =
+        ui_input_base_get_component(autocomplete->input, &tmp_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+  if (tmp_comp) {
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_child(
+          autocomplete->root_component->shadow_root, tmp_comp->shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return rc_cleanup;
+      }
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_input_base_destroy(autocomplete->input);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(autocomplete->root_component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
 
   C_MULTIPLATFORM_FREE(autocomplete);
   return UI_ERROR_NONE;
@@ -989,7 +1062,12 @@ ui_error_t run_ac_coverage(void) {
   g_ac_mock_fail = 17;
   ui_autocomplete_base_open(ac, (const struct ui_layout_node *)1, 0, 0);
   g_ac_mock_fail = 0;
-  (void)ui_autocomplete_base_destroy(ac);
+  {
+    ui_error_t rc_cleanup = ui_autocomplete_base_destroy(ac);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   ac = NULL;
 
   g_ac_mock_fail = 205; /* set_on_change fails, THEN component_destroy fails! */
@@ -1005,14 +1083,24 @@ ui_error_t run_ac_coverage(void) {
   g_ac_mock_fail = 5; /* get component fails inside open */
   ui_autocomplete_base_open(ac, (const struct ui_layout_node *)1, 0, 0);
   g_ac_mock_fail = 0;
-  (void)ui_autocomplete_base_destroy(ac);
+  {
+    ui_error_t rc_cleanup = ui_autocomplete_base_destroy(ac);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   ui_autocomplete_base_create(&ac, NULL);
   g_ac_mock_is_open = 0;
   g_ac_mock_fail = 7; /* popover open fails */
   ui_autocomplete_base_open(ac, (const struct ui_layout_node *)1, 0, 0);
   g_ac_mock_fail = 0;
-  (void)ui_autocomplete_base_destroy(ac);
+  {
+    ui_error_t rc_cleanup = ui_autocomplete_base_destroy(ac);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* set attribute fails inside open/close */
   ui_autocomplete_base_create(&ac, NULL);
@@ -1113,7 +1201,12 @@ ui_error_t run_ac_coverage(void) {
   ui_autocomplete_base_process_event(ac, &ev, 0.0);
   g_ac_mock_fail = 0;
 
-  (void)ui_autocomplete_base_destroy(ac);
+  {
+    ui_error_t rc_cleanup = ui_autocomplete_base_destroy(ac);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

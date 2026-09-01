@@ -46,7 +46,12 @@ int main(void) {
              (unsigned long)sizes[size_idx]);
       return 1;
     }
-    (void)ui_pool_destroy(pool);
+    {
+      ui_error_t rc_cleanup = ui_pool_destroy(pool);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test OOM on create */
@@ -79,7 +84,13 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_pool_get_metrics(pool, &free_count, &total_capacity);
+  {
+    ui_error_t rc_cleanup =
+        ui_pool_get_metrics(pool, &free_count, &total_capacity);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (free_count != 1 || total_capacity != 2) {
     printf("Metrics incorrect after alloc: %lu, %lu\n",
            (unsigned long)free_count, (unsigned long)total_capacity);
@@ -93,7 +104,13 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_pool_get_metrics(pool, &free_count, &total_capacity);
+  {
+    ui_error_t rc_cleanup =
+        ui_pool_get_metrics(pool, &free_count, &total_capacity);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (free_count != 0 || total_capacity != 2) {
     printf("Metrics incorrect after exhaustion: %lu, %lu\n",
            (unsigned long)free_count, (unsigned long)total_capacity);
@@ -107,7 +124,13 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_pool_get_metrics(pool, &free_count, &total_capacity);
+  {
+    ui_error_t rc_cleanup =
+        ui_pool_get_metrics(pool, &free_count, &total_capacity);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (free_count != 1 || total_capacity != 4) {
     printf("Metrics incorrect after dynamic chunk alloc: %lu, %lu\n",
            (unsigned long)free_count, (unsigned long)total_capacity);
@@ -121,7 +144,13 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_pool_get_metrics(pool, &free_count, &total_capacity);
+  {
+    ui_error_t rc_cleanup =
+        ui_pool_get_metrics(pool, &free_count, &total_capacity);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (free_count != 2 || total_capacity != 4) {
     printf("Metrics incorrect after free: %lu, %lu\n",
            (unsigned long)free_count, (unsigned long)total_capacity);
@@ -135,15 +164,31 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_pool_destroy(pool);
+  {
+    ui_error_t rc_cleanup = ui_pool_destroy(pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Fragmentation metrics: Verify pool does not permanently fragment on random
    * frees */
   rc = ui_pool_create(32, 10, &pool);
   for (i = 0; i < 50; i++) {
-    (void)ui_pool_alloc(pool, &ptrs[i]);
+    {
+      ui_error_t rc_cleanup = ui_pool_alloc(pool, &ptrs[i]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_pool_get_metrics(pool, &free_count, &total_capacity);
+  {
+    ui_error_t rc_cleanup =
+        ui_pool_get_metrics(pool, &free_count, &total_capacity);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (free_count != 0 || total_capacity != 50) {
     printf("Metrics incorrect after 50 allocs: %lu, %lu\n",
            (unsigned long)free_count, (unsigned long)total_capacity);
@@ -152,9 +197,20 @@ int main(void) {
 
   /* Free every other element */
   for (i = 0; i < 50; i += 2) {
-    (void)ui_pool_free(pool, ptrs[i]);
+    {
+      ui_error_t rc_cleanup = ui_pool_free(pool, ptrs[i]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_pool_get_metrics(pool, &free_count, &total_capacity);
+  {
+    ui_error_t rc_cleanup =
+        ui_pool_get_metrics(pool, &free_count, &total_capacity);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (free_count != 25 || total_capacity != 50) {
     printf("Metrics incorrect after freeing half: %lu, %lu\n",
            (unsigned long)free_count, (unsigned long)total_capacity);
@@ -163,21 +219,42 @@ int main(void) {
 
   /* Alloc 25 more elements, capacity should not increase */
   for (i = 0; i < 50; i += 2) {
-    (void)ui_pool_alloc(pool, &ptrs[i]);
+    {
+      ui_error_t rc_cleanup = ui_pool_alloc(pool, &ptrs[i]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_pool_get_metrics(pool, &free_count, &total_capacity);
+  {
+    ui_error_t rc_cleanup =
+        ui_pool_get_metrics(pool, &free_count, &total_capacity);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (free_count != 0 || total_capacity != 50) {
     printf("Metrics incorrect after re-allocating 25: %lu, %lu\n",
            (unsigned long)free_count, (unsigned long)total_capacity);
     return 1;
   }
 
-  (void)ui_pool_destroy(pool);
+  {
+    ui_error_t rc_cleanup = ui_pool_destroy(pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test NULL passing */
   if (ui_pool_alloc(NULL, &ptr1) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  (void)ui_pool_create(16, 10, &pool);
+  {
+    ui_error_t rc_cleanup = ui_pool_create(16, 10, &pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_pool_alloc(pool, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_pool_free(NULL, ptr1) != UI_ERROR_INVALID_ARGUMENT)
@@ -198,30 +275,65 @@ int main(void) {
   if (ui_pool_get_metrics(pool, NULL, &total_capacity) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_pool_destroy(pool);
+  {
+    ui_error_t rc_cleanup = ui_pool_destroy(pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test OOM on dynamic chunk alloc */
-  (void)ui_pool_create(16, 2, &pool);
-  (void)ui_pool_alloc(pool, &ptr1);
-  (void)ui_pool_alloc(pool, &ptr2);
+  {
+    ui_error_t rc_cleanup = ui_pool_create(16, 2, &pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_pool_alloc(pool, &ptr1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_pool_alloc(pool, &ptr2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = 0;
   if (ui_pool_alloc(pool, &ptr3) != UI_ERROR_OUT_OF_MEMORY)
     return 1;
   g_malloc_fail_countdown = -1;
-  (void)ui_pool_destroy(pool);
+  {
+    ui_error_t rc_cleanup = ui_pool_destroy(pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test pool element size auto-alignment */
   rc = ui_pool_create(1, 10, &pool); /* Will force element size up to at least
                                         sizeof(ui_pool_free_node) */
   if (rc != UI_ERROR_NONE)
     return 1;
-  (void)ui_pool_destroy(pool);
+  {
+    ui_error_t rc_cleanup = ui_pool_destroy(pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_pool_create(sizeof(void *) + 1, 10,
                       &pool); /* Will force alignment to pointer size */
   if (rc != UI_ERROR_NONE)
     return 1;
-  (void)ui_pool_destroy(pool);
+  {
+    ui_error_t rc_cleanup = ui_pool_destroy(pool);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("All pool tests passed.\n");
   return 0;

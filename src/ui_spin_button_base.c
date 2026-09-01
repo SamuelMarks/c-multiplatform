@@ -316,15 +316,30 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(spin_button->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(spin_button);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(root_node, "div");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(root_node);
-    (void)ui_component_destroy(spin_button->component);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(spin_button);
     return rc;
   }
@@ -373,7 +388,12 @@ ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button) {
   if (!spin_button) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(spin_button->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(spin_button);
   return UI_ERROR_NONE;
 }
@@ -519,7 +539,12 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
                                  "aria-disabled", "true");
     (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,
                                  "tabindex");
-    (void)ui_spin_button_base_stop_continuous(spin_button);
+    {
+      ui_error_t rc_cleanup = ui_spin_button_base_stop_continuous(spin_button);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   } else {
     (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,
                                  "aria-disabled");

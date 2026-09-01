@@ -147,7 +147,12 @@ int main(void) {
       ui_property_grid_base_set_group_collapsed(grid, "NewGroup33", UI_TRUE),
       UI_ERROR_OUT_OF_BOUNDS);
   ASSERT_SUCCESS(ui_property_grid_base_destroy(grid));
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("Test passed!\n");
   return 0;
 }

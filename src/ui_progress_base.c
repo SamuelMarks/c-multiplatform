@@ -43,20 +43,40 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
 
   if (progress->is_indeterminate) {
     {
-      (void)ui_dom_node_remove_attribute(progress->component->shadow_root,
-                                         "aria-valuenow");
+      {
+        ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
+            progress->component->shadow_root, "aria-valuenow");
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     {
-      (void)ui_dom_node_remove_attribute(progress->component->shadow_root,
-                                         "aria-valuemin");
+      {
+        ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
+            progress->component->shadow_root, "aria-valuemin");
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     {
-      (void)ui_dom_node_remove_attribute(progress->component->shadow_root,
-                                         "aria-valuemax");
+      {
+        ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
+            progress->component->shadow_root, "aria-valuemax");
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     {
-      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
-                                      "data-state", "indeterminate");
+      {
+        ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+            progress->component->shadow_root, "data-state", "indeterminate");
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   } else {
 #if defined(_MSC_VER)
@@ -65,8 +85,13 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
     sprintf(buf, "%f", progress->value);
 #endif
     {
-      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
-                                      "aria-valuenow", buf);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+            progress->component->shadow_root, "aria-valuenow", buf);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
 #if defined(_MSC_VER)
@@ -75,8 +100,13 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
     sprintf(buf, "%f", progress->min_val);
 #endif
     {
-      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
-                                      "aria-valuemin", buf);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+            progress->component->shadow_root, "aria-valuemin", buf);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
 #if defined(_MSC_VER)
@@ -85,13 +115,23 @@ static ui_error_t update_dom_state(struct ui_progress_base *progress) {
     sprintf(buf, "%f", progress->max_val);
 #endif
     {
-      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
-                                      "aria-valuemax", buf);
+      {
+        ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+            progress->component->shadow_root, "aria-valuemax", buf);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     {
-      (void)ui_dom_node_set_attribute(progress->component->shadow_root,
-                                      "data-state", "determinate");
+      {
+        ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+            progress->component->shadow_root, "data-state", "determinate");
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     /* We could also inject inline styles to drive the width of a child progress
@@ -159,10 +199,20 @@ ui_error_t ui_progress_base_create(struct ui_progress_base **out_progress) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (progress->component) {
-    (void)ui_component_destroy(progress->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(progress->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(progress);
   return rc;
@@ -176,7 +226,12 @@ cleanup:
  */
 ui_error_t ui_progress_base_destroy(struct ui_progress_base *progress) {
   if (progress) {
-    (void)ui_component_destroy(progress->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(progress->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(progress);
   }
   return UI_ERROR_NONE;

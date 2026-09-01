@@ -27,7 +27,12 @@ static void test_invalid_args(void) {
   assert(ui_breakpoint_observer_tick(NULL, 100.0f, 0.0) ==
          UI_ERROR_INVALID_ARGUMENT);
 
-  (void)ui_breakpoint_observer_destroy(observer);
+  {
+    ui_error_t rc_cleanup = ui_breakpoint_observer_destroy(observer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_oom(void) {
@@ -39,7 +44,12 @@ static void test_oom(void) {
     g_malloc_fail_countdown = i;
     rc = ui_breakpoint_observer_create(NULL, &observer);
     if (rc == UI_ERROR_NONE) {
-      (void)ui_breakpoint_observer_destroy(observer);
+      {
+        ui_error_t rc_cleanup = ui_breakpoint_observer_destroy(observer);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       assert(rc == UI_ERROR_OUT_OF_MEMORY);
@@ -77,7 +87,12 @@ static void test_widths(void) {
   ui_breakpoint_observer_tick(o, 1536.0, 500.0); /* xlarge lower bound */
   ui_breakpoint_observer_tick(o, 1536.0, 500.0 + 60.0);
 
-  (void)ui_breakpoint_observer_destroy(o);
+  {
+    ui_error_t rc_cleanup = ui_breakpoint_observer_destroy(o);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 int main(void) {
   test_widths();
@@ -146,7 +161,12 @@ int main(void) {
   /* Wait beyond debounce threshold with no width change */
   ui_breakpoint_observer_tick(observer, 1300.0f, 200.0);
 
-  (void)ui_breakpoint_observer_destroy(observer);
+  {
+    ui_error_t rc_cleanup = ui_breakpoint_observer_destroy(observer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_ui_breakpoint_observer passed\n");
   return 0;
 }

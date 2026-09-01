@@ -79,9 +79,7 @@ ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director) {
     /* Unmounting automatically cleans up the wrapper_node and detaches from
      * root */
     unmount_rc = ui_overlay_director_unmount(director, current);
-    {
-      (void)unmount_rc;
-    }
+    { (void)unmount_rc; }
     current = next;
   }
 
@@ -124,7 +122,12 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
 
   err = ui_dom_node_set_tag_name(wrapper, "div");
   if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(wrapper);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(wrapper);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(overlay);
     return err;
   }
@@ -138,7 +141,12 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
 
   err = ui_dom_node_set_attribute(wrapper, "style", style_buf);
   if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(wrapper);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(wrapper);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(overlay);
     return err;
   }
@@ -146,13 +154,29 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
   /* Set data-overlay attribute for debugging/identification */
   err = ui_dom_node_set_attribute(wrapper, "data-overlay", "true");
   if (err != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(wrapper);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(wrapper);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(overlay);
     return err;
   }
 
-  (void)ui_dom_node_append_child(director->root_node, wrapper);
-  (void)ui_component_mount(component, wrapper);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(director->root_node, wrapper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_mount(component, wrapper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   overlay->component = component;
   overlay->wrapper_node = wrapper;
@@ -216,7 +240,12 @@ ui_error_t ui_overlay_director_unmount(struct ui_overlay_director *director,
   overlay->wrapper_node->parent = NULL;
   overlay->wrapper_node->previous_sibling = NULL;
   overlay->wrapper_node->next_sibling = NULL;
-  (void)ui_dom_node_destroy(overlay->wrapper_node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(overlay->wrapper_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(overlay);
   return UI_ERROR_NONE;

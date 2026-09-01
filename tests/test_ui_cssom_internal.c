@@ -17,7 +17,12 @@ static void test_cascade_internal(void) {
   /* new has higher important */
   (void)append_computed_declaration(style, "color", "red2", 1, 0, 1, 2, 3, 10);
 
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   style = (struct ui_css_computed_style *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_css_computed_style));
   style->properties = NULL;
@@ -25,7 +30,12 @@ static void test_cascade_internal(void) {
   (void)append_computed_declaration(style, "color", "red2", 0, 0, 1, 2, 3, 10);
 
   /* layer order */
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   style = (struct ui_css_computed_style *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_css_computed_style));
   style->properties = NULL;
@@ -34,7 +44,12 @@ static void test_cascade_internal(void) {
   (void)append_computed_declaration(style, "color", "red3", 0, 0, 1, 2, 3, 10);
 
   /* layer order important inverted */
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   style = (struct ui_css_computed_style *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_css_computed_style));
   style->properties = NULL;
@@ -43,7 +58,12 @@ static void test_cascade_internal(void) {
   (void)append_computed_declaration(style, "color", "red3", 1, 0, 1, 2, 3, 10);
 
   /* spec a */
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   style = (struct ui_css_computed_style *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_css_computed_style));
   style->properties = NULL;
@@ -52,7 +72,12 @@ static void test_cascade_internal(void) {
   (void)append_computed_declaration(style, "color", "red3", 0, 0, 1, 2, 3, 10);
 
   /* spec b */
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   style = (struct ui_css_computed_style *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_css_computed_style));
   style->properties = NULL;
@@ -61,7 +86,12 @@ static void test_cascade_internal(void) {
   (void)append_computed_declaration(style, "color", "red3", 0, 0, 1, 1, 3, 10);
 
   /* spec c */
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   style = (struct ui_css_computed_style *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_css_computed_style));
   style->properties = NULL;
@@ -70,7 +100,12 @@ static void test_cascade_internal(void) {
   (void)append_computed_declaration(style, "color", "red3", 0, 0, 1, 1, 2, 10);
 
   /* source order */
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   style = (struct ui_css_computed_style *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_css_computed_style));
   style->properties = NULL;
@@ -78,7 +113,12 @@ static void test_cascade_internal(void) {
   (void)append_computed_declaration(style, "color", "red2", 0, 0, 1, 1, 1, 11);
   (void)append_computed_declaration(style, "color", "red3", 0, 0, 1, 1, 1, 9);
 
-  (void)ui_css_computed_style_destroy(style);
+  {
+    ui_error_t rc_cleanup = ui_css_computed_style_destroy(style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {

@@ -67,7 +67,12 @@ ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
   }
 
   if (manager->is_running) {
-    (void)ui_sensor_manager_stop(manager);
+    {
+      ui_error_t rc_cleanup = ui_sensor_manager_stop(manager);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Unbind from signals if necessary */
@@ -202,7 +207,13 @@ ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
     union ui_signal_payload payload;
     payload.ptr_val = &manager->current_quat;
     /* Send the pointer to current quat into the reactive graph */
-    (void)ui_signal_set(manager->orientation_signal, payload);
+    {
+      ui_error_t rc_cleanup =
+          ui_signal_set(manager->orientation_signal, payload);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;

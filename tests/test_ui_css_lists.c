@@ -72,7 +72,7 @@ static int test_parse_list_style_type(void) {
       strcmp(type.string_value, "->") != 0)
     return __LINE__;
 
-  char long_quote_str[600];
+  char long_quote_str[1024];
   long_quote_str[0] = '"';
   memset(long_quote_str + 1, 'a', 597);
   long_quote_str[598] = '"';
@@ -100,7 +100,7 @@ static int test_parse_list_style_type(void) {
 
   /* huge string */
   {
-    char long_str[600];
+    char long_str[1024];
     char css_str[1000];
     int i;
     for (i = 0; i < 550; i++)
@@ -280,7 +280,7 @@ static int test_parse_counter_action(void) {
     return __LINE__;
   ui_css_counter_action_destroy(head);
 
-  char long_str[600];
+  char long_str[1024];
   memset(long_str, 'a', 599);
   long_str[599] = '\0';
   if (ui_css_parse_counter_action(long_str, &head) != UI_ERROR_NONE || !head)

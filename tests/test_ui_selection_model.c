@@ -135,7 +135,12 @@ static int test_multi_select(void) {
   if (is_selected)
     return 1;
 
-  (void)ui_selection_model_clear(model);
+  {
+    ui_error_t rc_cleanup = ui_selection_model_clear(model);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_selection_model_get_selected_count(model, &count);
   if (count != 0)
     return 1;
@@ -322,22 +327,42 @@ static int test_coverage_branches(void) {
     return 1;
 
   /* Hit 152, 198: clear empty model */
-  (void)ui_selection_model_clear(model);
+  {
+    ui_error_t rc_cleanup = ui_selection_model_clear(model);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Hit 101: try to select multiple in single-select */
   ui_selection_model_select_all(model, (void **)arr, 2);
 
   /* Hit 159: toggle item that is NOT in model */
-  (void)ui_selection_model_clear(model);
+  {
+    ui_error_t rc_cleanup = ui_selection_model_clear(model);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_selection_model_toggle(model, (void *)(size_t)10);
   ui_selection_model_toggle(model, (void *)(size_t)20);
 
   /* Hit 81: set multi, add multiple, then set single */
-  (void)ui_selection_model_set_multi_select(model, 1);
+  {
+    ui_error_t rc_cleanup = ui_selection_model_set_multi_select(model, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_selection_model_select(model, (void *)(size_t)10);
   ui_selection_model_select(model, (void *)(size_t)20);
   ui_selection_model_select(model, (void *)(size_t)30);
-  (void)ui_selection_model_set_multi_select(model, 0); /* should trim to 1 */
+  {
+    ui_error_t rc_cleanup = ui_selection_model_set_multi_select(model, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* should trim to 1 */
 
   /* Hit 210: set_selected with count < 0 */
   ui_selection_model_select_all(model, (void **)arr, -1);

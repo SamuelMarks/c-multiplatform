@@ -193,13 +193,28 @@ static int run_extra_control(void) {
   ui_form_control_get_dirty_signal(NULL, NULL);
   ui_form_control_get_errors_signal(NULL, NULL);
   ui_form_control_set_error(NULL, NULL);
-  (void)ui_form_control_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ui_thread_pool_destroy(pool);
   ui_reactor_poll(reactor, 10);
-  (void)ui_form_control_destroy(control);
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_reactor_destroy(reactor);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -258,12 +273,32 @@ static int run_extra_control2_all(void) {
     ui_form_control_set_value(control3, dummy);
 
     ui_thread_pool_destroy(pool);
-    (void)ui_form_control_destroy(control3);
+    {
+      ui_error_t rc_cleanup = ui_form_control_destroy(control3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_form_control_destroy(control);
-  (void)ui_form_control_destroy(control2);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -294,8 +329,18 @@ static int run_extra_control3_all(void) {
       "this is a long error string that will be freed when we set it to null");
   ui_form_control_set_error(control, "another one");
 
-  (void)ui_form_control_destroy(control);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -388,13 +433,28 @@ static int run_oom_tests_control(void) {
     g_malloc_fail_countdown = -1;
     ui_thread_pool_destroy(pool);
     ui_reactor_poll(reactor, 10);
-    (void)ui_form_control_destroy(control4);
+    {
+      ui_error_t rc_cleanup = ui_form_control_destroy(control4);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_reactor_destroy(reactor);
   }
 
   g_malloc_fail_countdown = -1;
-  (void)ui_form_control_destroy(control);
-  (void)ui_arena_destroy(small_arena);
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
   return 0;
 }
@@ -505,7 +565,12 @@ int main(void) {
 
   rc = ui_form_control_destroy(control);
   ui_reactor_destroy(reactor);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   run_oom_tests_control();
 
@@ -544,13 +609,23 @@ int main(void) {
           }
         }
         g_malloc_fail_countdown = -1;
-        (void)ui_form_control_destroy(control);
+        {
+          ui_error_t rc_cleanup = ui_form_control_destroy(control);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
     g_malloc_fail_countdown = -1;
     ui_thread_pool_destroy(pool);
     ui_reactor_destroy(reactor);
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   printf("test_ui_form_control passed\n");

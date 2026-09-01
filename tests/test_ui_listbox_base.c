@@ -184,7 +184,12 @@ static int run_normal_tests(void) {
   }
 
   printf("Testing keyboard navigation...\n");
-  (void)ui_listbox_base_set_multi_select(listbox, 0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_set_multi_select(listbox, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_listbox_base_process_event(NULL, &ev, 0.0) !=
       UI_ERROR_INVALID_ARGUMENT)
     return __LINE__;
@@ -236,41 +241,101 @@ static int run_normal_tests(void) {
 
   /* END */
   ev.event_data.keyboard.key_code = UI_KEY_END;
-  (void)ui_listbox_base_process_event(listbox, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  (void)ui_listbox_base_process_event(listbox, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     int index = 0;
-    (void)ui_listbox_base_get_active_index(listbox, &index);
+    {
+      ui_error_t rc_cleanup = ui_listbox_base_get_active_index(listbox, &index);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     if (index != 5)
       return __LINE__;
   }
 
   /* Test keyboard navigation with multi_select=1 */
-  (void)ui_listbox_base_set_multi_select(listbox, 1);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_set_multi_select(listbox, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.event_data.keyboard.key_code = UI_KEY_UP;
-  (void)ui_listbox_base_process_event(listbox, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  (void)ui_listbox_base_process_event(listbox, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.keyboard.key_code = UI_KEY_HOME;
-  (void)ui_listbox_base_process_event(listbox, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.keyboard.key_code = UI_KEY_END;
-  (void)ui_listbox_base_process_event(listbox, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.keyboard.key_code = UI_KEY_ENTER;
-  (void)ui_listbox_base_process_event(listbox, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.keyboard.key_code = ' ';
-  (void)ui_listbox_base_process_event(listbox, &ev, 0.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 0.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Typeahead with multi select */
   ev.event_data.keyboard.key_code = 'E';
-  (void)ui_listbox_base_process_event(listbox, &ev, 50.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 50.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_listbox_base_set_multi_select(listbox, 0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_set_multi_select(listbox, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Typeahead search 'C' -> Ch (index 5) because active index was 4 */
   ev.event_data.keyboard.key_code = 'C';
@@ -322,23 +387,45 @@ static int run_normal_tests(void) {
 
   /* Typeahead timeout */
   ev.event_data.keyboard.key_code = 'B';
-  (void)ui_listbox_base_process_event(listbox, &ev, 3500.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 3500.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Overflow typeahead buffer (64 bytes) */
   {
     int i;
     for (i = 0; i < 70; i++) {
       ev.event_data.keyboard.key_code = 'A';
-      (void)ui_listbox_base_process_event(listbox, &ev, 3500.0 + i * 10);
+      {
+        ui_error_t rc_cleanup =
+            ui_listbox_base_process_event(listbox, &ev, 3500.0 + i * 10);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     /* Try overflowing with space as well */
     ev.event_data.keyboard.key_code = ' ';
-    (void)ui_listbox_base_process_event(listbox, &ev, 3500.0 + 70 * 10);
+    {
+      ui_error_t rc_cleanup =
+          ui_listbox_base_process_event(listbox, &ev, 3500.0 + 70 * 10);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   {
     int index = 0;
-    (void)ui_listbox_base_get_active_index(listbox, &index);
+    {
+      ui_error_t rc_cleanup = ui_listbox_base_get_active_index(listbox, &index);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Typeahead timeout space */
@@ -438,7 +525,12 @@ static int run_normal_tests(void) {
   }
 
   is_multi_select_cva = 0;
-  (void)ui_listbox_base_set_multi_select(listbox, 0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_set_multi_select(listbox, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* trigger shrinking list */
   ui_listbox_base_set_active_index(listbox, 5);
@@ -467,8 +559,18 @@ static int run_normal_tests(void) {
   ui_listbox_base_process_event(listbox, &ev, 7000.0);
 
   /* Restore item count for further tests */
-  (void)ui_listbox_base_set_item_count(listbox, 6);
-  (void)ui_listbox_base_set_active_index(listbox, 0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_set_item_count(listbox, 6);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_set_active_index(listbox, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Typeahead with NULL text provider */
   ui_listbox_base_set_item_text_provider(listbox, NULL, NULL);
@@ -480,20 +582,42 @@ static int run_normal_tests(void) {
   {
     struct ui_component *comp;
     struct ui_dom_node *saved_root;
-    (void)ui_listbox_base_get_component(listbox, &comp);
+    {
+      ui_error_t rc_cleanup = ui_listbox_base_get_component(listbox, &comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     saved_root = comp->shadow_root;
     comp->shadow_root = NULL;
 
     /* typeahead with no shadow root */
     ev.event_data.keyboard.key_code = 'A';
-    (void)ui_listbox_base_process_event(listbox, &ev, 8000.0);
+    {
+      ui_error_t rc_cleanup =
+          ui_listbox_base_process_event(listbox, &ev, 8000.0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* other keys with no shadow root */
     ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-    (void)ui_listbox_base_process_event(listbox, &ev, 8000.0);
+    {
+      ui_error_t rc_cleanup =
+          ui_listbox_base_process_event(listbox, &ev, 8000.0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* set_multi_select with no shadow root */
-    (void)ui_listbox_base_set_multi_select(listbox, 1);
+    {
+      ui_error_t rc_cleanup = ui_listbox_base_set_multi_select(listbox, 1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     comp->shadow_root = saved_root;
   }
@@ -501,32 +625,76 @@ static int run_normal_tests(void) {
   /* Test attribute missing branch */
   {
     struct ui_component *comp;
-    (void)ui_listbox_base_get_component(listbox, &comp);
-    (void)ui_dom_node_remove_attribute(comp->shadow_root,
-                                       "aria-multiselectable");
+    {
+      ui_error_t rc_cleanup = ui_listbox_base_get_component(listbox, &comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
+          comp->shadow_root, "aria-multiselectable");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     ev.event_data.keyboard.key_code = 'A';
-    (void)ui_listbox_base_process_event(listbox, &ev, 8100.0);
+    {
+      ui_error_t rc_cleanup =
+          ui_listbox_base_process_event(listbox, &ev, 8100.0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-    (void)ui_listbox_base_process_event(listbox, &ev, 8100.0);
+    {
+      ui_error_t rc_cleanup =
+          ui_listbox_base_process_event(listbox, &ev, 8100.0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test text_provider == NULL branch */
   {
-    (void)ui_listbox_base_set_item_text_provider(listbox, NULL, NULL);
+    {
+      ui_error_t rc_cleanup =
+          ui_listbox_base_set_item_text_provider(listbox, NULL, NULL);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ev.event_data.keyboard.key_code = 'A';
-    (void)ui_listbox_base_process_event(listbox, &ev, 8200.0);
+    {
+      ui_error_t rc_cleanup =
+          ui_listbox_base_process_event(listbox, &ev, 8200.0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* DEL key */
   ev.event_data.keyboard.key_code = 127;
-  (void)ui_listbox_base_process_event(listbox, &ev, 8250.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 8250.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Space with no active index */
   ui_listbox_base_set_active_index(listbox, -1);
   ev.event_data.keyboard.key_code = ' ';
-  (void)ui_listbox_base_process_event(listbox, &ev, 8300.0);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_process_event(listbox, &ev, 8300.0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* CVA register on change with NULL */
   if (cva.register_on_change)
@@ -544,8 +712,18 @@ static int run_normal_tests(void) {
     g_malloc_fail_countdown = -1;
   }
 
-  (void)ui_listbox_base_destroy(listbox);
-  (void)ui_listbox_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_destroy(listbox);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_listbox_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -560,7 +738,12 @@ static int run_oom_tests(void) {
     rc = ui_listbox_base_create(&listbox, NULL);
     printf("i=%d rc=%d\n", i, rc);
     if (rc == UI_ERROR_NONE) {
-      (void)ui_listbox_base_destroy(listbox);
+      {
+        ui_error_t rc_cleanup = ui_listbox_base_destroy(listbox);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

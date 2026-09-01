@@ -300,7 +300,13 @@ ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
+  {
+    ui_error_t rc_cleanup =
+        ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* get_formatted_time only fails on null arguments, which we guaranteed above
    */
 

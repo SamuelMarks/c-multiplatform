@@ -99,7 +99,12 @@ int main(void) {
   ui_error_t rc;
 
   ui_font_manager_create(NULL);
-  (void)ui_font_manager_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_font_manager_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ui_font_manager_create(&manager);
 
@@ -223,6 +228,11 @@ static int test_oom() {
                                    sizeof(tests_tiny_ttf), &font);
   g_malloc_fail_countdown = -1;
 
-  (void)ui_font_manager_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_font_manager_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }

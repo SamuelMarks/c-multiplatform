@@ -49,10 +49,20 @@ static int run_normal_tests(void) {
     struct ui_component *c;
     ui_slider_base_create(&s, NULL);
     ui_slider_base_get_component(s, &c);
-    (void)ui_component_destroy(c);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(c);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ((void **)s)[0] = NULL;
     ui_slider_base_set_value(s, 10.0f); /* Test update_dom_state silent abort */
-    (void)ui_slider_base_destroy(s);
+    {
+      ui_error_t rc_cleanup = ui_slider_base_destroy(s);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (ui_slider_base_set_min(NULL, 0.0f) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -431,7 +441,12 @@ static int run_normal_tests(void) {
   /* Re-assigning to mock gesture lack would require internal access.
      Instead we rely on the create/OOM checks to hit branches */
 
-  (void)ui_slider_base_destroy(slider);
+  {
+    ui_error_t rc_cleanup = ui_slider_base_destroy(slider);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -450,7 +465,12 @@ static int run_oom_tests(void) {
     if (err == UI_ERROR_OUT_OF_MEMORY) {
       continue;
     } else if (err == UI_ERROR_NONE) {
-      (void)ui_slider_base_destroy(slider);
+      {
+        ui_error_t rc_cleanup = ui_slider_base_destroy(slider);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       printf("OOM failed with err %d at i %d\n", err, i);

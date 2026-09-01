@@ -182,8 +182,13 @@ static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
         void *id = NULL;
         {
           /** @cond */
-          (void)ui_selection_model_get_selected(listbox->selection_model, &id,
-                                                1);
+          {
+            ui_error_t rc_cleanup = ui_selection_model_get_selected(
+                listbox->selection_model, &id, 1);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
         payload.int_val = (int)(size_t)id;
       } else {
@@ -438,7 +443,13 @@ ui_error_t ui_listbox_base_destroy(struct ui_listbox_base *listbox) {
   if (!listbox)
     return UI_ERROR_NONE;
 
-  (void)ui_selection_model_destroy(listbox->selection_model);
+  {
+    ui_error_t rc_cleanup =
+        ui_selection_model_destroy(listbox->selection_model);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   {
     ui_error_t _ign_rc = ui_component_destroy(listbox->component);
     (void)_ign_rc;

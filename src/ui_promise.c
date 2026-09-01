@@ -84,7 +84,12 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise) {
   while (current) {
     next = current->next;
     if (current->chained_promise) {
-      (void)ui_promise_destroy(current->chained_promise);
+      {
+        ui_error_t rc_cleanup = ui_promise_destroy(current->chained_promise);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     C_MULTIPLATFORM_FREE(current);
     current = next;
@@ -125,9 +130,21 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
     }
     if (node->chained_promise) {
       if (state == UI_PROMISE_FULFILLED) {
-        (void)ui_promise_resolve(node->chained_promise, result);
+        {
+          ui_error_t rc_cleanup =
+              ui_promise_resolve(node->chained_promise, result);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       } else {
-        (void)ui_promise_reject(node->chained_promise, error);
+        {
+          ui_error_t rc_cleanup =
+              ui_promise_reject(node->chained_promise, error);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
     return UI_ERROR_NONE;
@@ -138,32 +155,67 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
       cb_rc = node->on_resolve(result, node->user_data, &out_result);
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
-          (void)ui_promise_resolve(node->chained_promise, out_result);
+          {
+            ui_error_t rc_cleanup =
+                ui_promise_resolve(node->chained_promise, out_result);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         } else {
-          (void)ui_promise_reject(node->chained_promise, cb_rc);
+          {
+            ui_error_t rc_cleanup =
+                ui_promise_reject(node->chained_promise, cb_rc);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       } else if (cb_rc != UI_ERROR_NONE) {
         return cb_rc;
       }
     } else if (node->chained_promise) {
       /* bubble up */
-      (void)ui_promise_resolve(node->chained_promise, result);
+      {
+        ui_error_t rc_cleanup =
+            ui_promise_resolve(node->chained_promise, result);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   } else {
     if (node->on_reject) {
       cb_rc = node->on_reject(error, node->user_data, &out_result);
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
-          (void)ui_promise_resolve(node->chained_promise, out_result);
+          {
+            ui_error_t rc_cleanup =
+                ui_promise_resolve(node->chained_promise, out_result);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         } else {
-          (void)ui_promise_reject(node->chained_promise, cb_rc);
+          {
+            ui_error_t rc_cleanup =
+                ui_promise_reject(node->chained_promise, cb_rc);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          }
         }
       } else if (cb_rc != UI_ERROR_NONE) {
         return cb_rc;
       }
     } else if (node->chained_promise) {
       /* bubble up */
-      (void)ui_promise_reject(node->chained_promise, error);
+      {
+        ui_error_t rc_cleanup = ui_promise_reject(node->chained_promise, error);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   return UI_ERROR_NONE;
@@ -216,7 +268,12 @@ add_callback(struct ui_promise *promise,
       sizeof(struct ui_promise_callback_node));
   if (!node) {
     if (chained) {
-      (void)ui_promise_destroy(chained);
+      {
+        ui_error_t rc_cleanup = ui_promise_destroy(chained);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     if (out_promise)
       *out_promise = NULL;

@@ -78,7 +78,7 @@ static int test_parse_scrollbar_color(void) {
 
   /* Very long string that will trigger truncation */
   {
-    char long_str[300];
+    char long_str[1024];
     memset(long_str, 'x', 260);
     long_str[260] = ' ';
     UI_STRCPY(&long_str[261], 1024 - 261, "blue");

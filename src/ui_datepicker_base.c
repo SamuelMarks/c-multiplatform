@@ -69,7 +69,12 @@ static ui_error_t on_calendar_select(struct ui_calendar_base *calendar,
   }
   datepicker->is_syncing = 1;
 
-  (void)ui_datepicker_format_date(date, text, sizeof(text));
+  {
+    ui_error_t rc_cleanup = ui_datepicker_format_date(date, text, sizeof(text));
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_input_base_set_text(datepicker->input, text);
   if (rc != UI_ERROR_NONE) {
@@ -78,7 +83,12 @@ static ui_error_t on_calendar_select(struct ui_calendar_base *calendar,
   }
 
   /* Close popover after selection */
-  (void)ui_popover_base_close(datepicker->popover);
+  {
+    ui_error_t rc_cleanup = ui_popover_base_close(datepicker->popover);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = trigger_cva_change(datepicker, date);
   datepicker->is_syncing = 0;
@@ -128,7 +138,13 @@ static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
     }
   }
 
-  (void)ui_calendar_base_clear_selection(datepicker->calendar);
+  {
+    ui_error_t rc_cleanup =
+        ui_calendar_base_clear_selection(datepicker->calendar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = trigger_cva_change(datepicker, NULL);
   datepicker->is_syncing = 0;
   return rc;
@@ -186,7 +202,12 @@ static ui_error_t datepicker_cva_write_value(void *component,
       dp->is_syncing = 0;
       return rc;
     }
-    (void)ui_calendar_base_clear_selection(dp->calendar);
+    {
+      ui_error_t rc_cleanup = ui_calendar_base_clear_selection(dp->calendar);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     dp->is_syncing = 0;
     return UI_ERROR_NONE;
   } else {
@@ -194,7 +215,13 @@ static ui_error_t datepicker_cva_write_value(void *component,
     date.month = (value.int_val >> 5) & 0xF;
     date.day = value.int_val & 0x1F;
 
-    (void)ui_datepicker_format_date(&date, text, sizeof(text));
+    {
+      ui_error_t rc_cleanup =
+          ui_datepicker_format_date(&date, text, sizeof(text));
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     rc = ui_input_base_set_text(dp->input, text);
     if (rc != UI_ERROR_NONE) {
@@ -273,7 +300,12 @@ static ui_error_t datepicker_cva_set_disabled_state(void *component,
   dp->is_syncing = 1;
   dp->is_disabled = is_disabled;
 
-  (void)ui_input_base_set_disabled(dp->input, is_disabled);
+  {
+    ui_error_t rc_cleanup = ui_input_base_set_disabled(dp->input, is_disabled);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   dp->is_syncing = 0;
   return UI_ERROR_NONE;
 }
@@ -313,8 +345,20 @@ ui_error_t ui_datepicker_base_create(
   dp->is_disabled = 0;
   dp->is_syncing = 0;
 
-  (void)ui_calendar_base_set_on_select(calendar, on_calendar_select, dp);
-  (void)ui_input_base_set_on_change(input, on_input_change, dp);
+  {
+    ui_error_t rc_cleanup =
+        ui_calendar_base_set_on_select(calendar, on_calendar_select, dp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_input_base_set_on_change(input, on_input_change, dp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (out_cva) {
     out_cva->write_value = datepicker_cva_write_value;
@@ -338,8 +382,20 @@ ui_error_t ui_datepicker_base_destroy(struct ui_datepicker_base *datepicker) {
   }
 
   /* Unhook to prevent dangling pointer if input/calendar outlives datepicker */
-  (void)ui_calendar_base_set_on_select(datepicker->calendar, NULL, NULL);
-  (void)ui_input_base_set_on_change(datepicker->input, NULL, NULL);
+  {
+    ui_error_t rc_cleanup =
+        ui_calendar_base_set_on_select(datepicker->calendar, NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_input_base_set_on_change(datepicker->input, NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(datepicker);
   return UI_ERROR_NONE;
@@ -373,7 +429,12 @@ ui_error_t ui_datepicker_parse_date(const char *text,
   }
   {
     int days = 0;
-    (void)ui_calendar_days_in_month(y, m, &days);
+    {
+      ui_error_t rc_cleanup = ui_calendar_days_in_month(y, m, &days);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     if (d < 1 || d > days) {
       return UI_ERROR_INVALID_ARGUMENT;
@@ -422,7 +483,12 @@ ui_error_t ui_datepicker_base_sync(struct ui_datepicker_base *datepicker) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_input_base_get_text(datepicker->input, &text);
+  {
+    ui_error_t rc_cleanup = ui_input_base_get_text(datepicker->input, &text);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = on_input_change(datepicker->input, text, datepicker);
   if (rc != UI_ERROR_NONE) {
     return rc;

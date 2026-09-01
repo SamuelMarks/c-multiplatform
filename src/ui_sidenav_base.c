@@ -342,10 +342,24 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   *out_sidenav = sidenav;
   return UI_ERROR_NONE;
 
-cleanup:
-  (void)ui_dom_node_destroy(sidenav->root_node);
-  (void)ui_backdrop_destroy(sidenav->backdrop_logic);
-  (void)ui_component_destroy(sidenav->component);
+cleanup: {
+  ui_error_t rc_cleanup = ui_dom_node_destroy(sidenav->root_node);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    (void)rc_cleanup; /* Avoid override */
+  }
+}
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(sidenav->backdrop_logic);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(sidenav->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(sidenav);
   return rc;
 }
@@ -363,9 +377,24 @@ ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
     if (rc != UI_ERROR_NONE)
       return rc;
   }
-  (void)ui_component_destroy(sidenav->backdrop_component);
-  (void)ui_backdrop_destroy(sidenav->backdrop_logic);
-  (void)ui_component_destroy(sidenav->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(sidenav->backdrop_component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_backdrop_destroy(sidenav->backdrop_logic);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(sidenav->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(sidenav);
   return UI_ERROR_NONE;
 }

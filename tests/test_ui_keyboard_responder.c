@@ -149,7 +149,12 @@ static ui_error_t run_normal_tests(void) {
   if (handled != 0)
     return UI_ERROR_UNKNOWN;
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   node = NULL;
 
   /* Destroy tests */
@@ -201,7 +206,12 @@ static ui_error_t run_oom_tests(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_keyboard_responder_destroy(responder);
+  {
+    ui_error_t rc_cleanup = ui_keyboard_responder_destroy(responder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -226,9 +236,19 @@ static ui_error_t run_error_paths(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_keyboard_responder_destroy(responder);
+  {
+    ui_error_t rc_cleanup = ui_keyboard_responder_destroy(responder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 

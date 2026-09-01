@@ -110,7 +110,12 @@ static int run_normal_tests(void) {
   if (test_val != 42)
     return 1;
 
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test rejection */
   rc = ui_promise_create(&promise);
@@ -139,10 +144,20 @@ static int run_normal_tests(void) {
   if (test_err != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test catch and finally */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   finally_called = 0;
   ui_promise_catch(promise, test_reject_cb, &test_err, &chained);
   ui_promise_finally(chained, test_finally_cb, &finally_called, NULL);
@@ -152,10 +167,20 @@ static int run_normal_tests(void) {
     return 1;
   if (finally_called != 1)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test memory bounds: 500 chained promises */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   chained = promise;
   for (i = 0; i < 500; i++) {
     ui_promise_then(chained, test_resolve_cb, NULL, NULL, &chained2);
@@ -166,19 +191,39 @@ static int run_normal_tests(void) {
   ui_promise_resolve(promise, (void *)123);
   if (finally_called != 1)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test invalid state ignores */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_promise_reject(promise, UI_ERROR_INVALID_ARGUMENT);
   /* rejecting an already rejected promise should return UI_ERROR_NONE and do
    * nothing */
   if (ui_promise_reject(promise, UI_ERROR_OUT_OF_MEMORY) != UI_ERROR_NONE)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test then bubbling (no resolve handler, but chained) */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_promise_then(promise, NULL, NULL, NULL, &chained);
   ui_promise_then(chained, test_resolve_cb, NULL, &test_val, NULL);
   /* Test empty handler with no chained promise */
@@ -187,10 +232,20 @@ static int run_normal_tests(void) {
   ui_promise_resolve(promise, (void *)1234);
   if (test_val != 1234)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test catch bubbling (no reject handler, but chained) */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_promise_then(promise, NULL, NULL, NULL, &chained);
   ui_promise_catch(chained, test_reject_cb, &test_err, NULL);
   /* Test empty catch with no chained promise */
@@ -199,30 +254,60 @@ static int run_normal_tests(void) {
   ui_promise_reject(promise, UI_ERROR_OUT_OF_BOUNDS);
   if (test_err != UI_ERROR_OUT_OF_BOUNDS)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test handler failure chaining (resolve) */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_promise_then(promise, test_fail_resolve_cb, NULL, NULL, &chained);
   ui_promise_catch(chained, test_reject_cb, &test_err, NULL);
   test_err = UI_ERROR_NONE;
   ui_promise_resolve(promise, (void *)1);
   if (test_err != UI_ERROR_UNKNOWN)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test handler failure chaining (reject) */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_promise_catch(promise, test_fail_reject_cb, NULL, &chained);
   ui_promise_catch(chained, test_reject_cb, &test_err, NULL);
   test_err = UI_ERROR_NONE;
   ui_promise_reject(promise, UI_ERROR_OUT_OF_MEMORY);
   if (test_err != UI_ERROR_UNKNOWN)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test finally bubbling */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_promise_finally(promise, test_finally_cb, &finally_called, &chained);
   ui_promise_then(chained, test_resolve_cb, NULL, &test_val, NULL);
   test_val = 0;
@@ -232,9 +317,19 @@ static int run_normal_tests(void) {
     return 1;
   if (test_val != 5678)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_promise_finally(promise, test_finally_cb, &finally_called, &chained);
   ui_promise_catch(chained, test_reject_cb, &test_err, NULL);
   test_err = UI_ERROR_NONE;
@@ -244,7 +339,12 @@ static int run_normal_tests(void) {
     return 1;
   if (test_err != UI_ERROR_NOT_FOUND)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_promise_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_promise_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -259,10 +359,20 @@ static int run_normal_tests(void) {
   if (ui_promise_get_state(NULL, &state) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (ui_promise_get_state(promise, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -276,7 +386,12 @@ static int run_async_tests(void) {
 
   /* Test resolution asynchronously (next tick) in single-threaded context */
   ui_execution_context_create(&ctx);
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ui_promise_then(promise, test_resolve_cb, NULL, &test_val, NULL);
 
@@ -290,8 +405,18 @@ static int run_async_tests(void) {
   if (test_val != 100)
     return 1; /* should be resolved now */
 
-  (void)ui_promise_destroy(promise);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -312,11 +437,21 @@ static int run_oom_tests(void) {
   rc = ui_promise_create(&promise);
   if (rc != UI_ERROR_NONE)
     return 1;
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   promise = NULL;
 
   /* Test chained promise create fail */
-  (void)ui_promise_create(&promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_create(&promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = 0;
   rc =
       ui_promise_then(promise, test_resolve_cb, test_reject_cb, NULL, &chained);
@@ -339,7 +474,12 @@ static int run_oom_tests(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }

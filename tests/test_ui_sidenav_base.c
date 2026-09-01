@@ -70,7 +70,12 @@ int main(void) {
 
   /* Null checks */
   ASSERT_EQ(ui_sidenav_base_create(NULL), UI_ERROR_INVALID_ARGUMENT);
-  (void)ui_sidenav_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_sidenav_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ASSERT_EQ(ui_sidenav_base_set_mode(NULL, UI_SIDENAV_MODE_OVER),
             UI_ERROR_INVALID_ARGUMENT);
@@ -319,7 +324,12 @@ int main(void) {
     for (i = 0; i < 200; i++) {
       g_malloc_fail_countdown = i;
       if (ui_sidenav_base_create(&sidenav) == UI_ERROR_NONE) {
-        (void)ui_sidenav_base_destroy(sidenav);
+        {
+          ui_error_t rc_cleanup = ui_sidenav_base_destroy(sidenav);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         break;
       }
     }
@@ -333,19 +343,49 @@ int main(void) {
       ui_sidenav_base_set_overlay_director(sidenav, director);
       g_malloc_fail_countdown = i;
       if (ui_sidenav_base_set_open(sidenav, 1) == UI_ERROR_NONE) {
-        (void)ui_sidenav_base_destroy(sidenav);
+        {
+          ui_error_t rc_cleanup = ui_sidenav_base_destroy(sidenav);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         break;
       }
       g_malloc_fail_countdown = -1;
-      (void)ui_sidenav_base_destroy(sidenav);
+      {
+        ui_error_t rc_cleanup = ui_sidenav_base_destroy(sidenav);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
 
-  (void)ui_component_destroy(content_comp1);
-  (void)ui_component_destroy(content_comp2);
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(content_comp1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(content_comp2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("All tests passed.\n");
   return 0;

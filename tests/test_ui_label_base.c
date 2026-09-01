@@ -40,9 +40,19 @@ static ui_error_t test_label_creation(void) {
   assert(rc == UI_ERROR_NONE);
   assert(lbl != NULL);
 
-  (void)ui_label_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_label_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_label_base_destroy(lbl);
+  {
+    ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_label_creation passed\n");
   return UI_ERROR_NONE;
 }
@@ -70,7 +80,12 @@ static ui_error_t test_label_set_for(void) {
   assert(rc == UI_ERROR_NONE);
 
   /* Destroy label while it has a target_id */
-  (void)ui_label_base_destroy(lbl);
+  {
+    ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_label_base_create(&lbl);
   assert(rc == UI_ERROR_NONE);
@@ -79,18 +94,33 @@ static ui_error_t test_label_set_for(void) {
   rc = ui_label_base_set_for(lbl, NULL);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_label_base_destroy(lbl);
+  {
+    ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test with broken shadow_root to hit paths */
   rc = ui_label_base_create(&lbl);
   if (rc == UI_ERROR_NONE) {
     struct ui_component *comp;
     ui_label_base_get_component(lbl, &comp);
-    (void)ui_dom_node_destroy(comp->shadow_root);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(comp->shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     comp->shadow_root = NULL;
     ui_label_base_set_for(lbl, "fail-target");
     ui_label_base_set_for(lbl, NULL);
-    (void)ui_label_base_destroy(lbl);
+    {
+      ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   extern ui_error_t ui_test_label_base_set_for_no_component(void);
@@ -135,7 +165,12 @@ static ui_error_t test_label_misc(void) {
   rc = ui_label_base_process_event(lbl, &ev, 0.0);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_label_base_destroy(lbl);
+  {
+    ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_label_misc passed\n");
   return UI_ERROR_NONE;
 }

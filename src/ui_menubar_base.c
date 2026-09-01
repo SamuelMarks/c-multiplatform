@@ -30,7 +30,12 @@ ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar) {
   menubar = (struct ui_menubar_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_menubar_base));
   if (!menubar) {
-    (void)ui_component_destroy(base_comp);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -39,24 +44,16 @@ ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar) {
 
   err =
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &menubar->base.shadow_root);
-  {
-    (void)err;
-  }
+  { (void)err; }
 
   err = ui_dom_node_set_tag_name(menubar->base.shadow_root, "ui-menubar");
-  {
-    (void)err;
-  }
+  { (void)err; }
 
   err = ui_dom_node_set_attribute(menubar->base.shadow_root, "role", "menubar");
-  {
-    (void)err;
-  }
+  { (void)err; }
   err = ui_dom_node_set_attribute(menubar->base.shadow_root, "tabindex",
                                   "0"); /* Focusable context */
-  {
-    (void)err;
-  }
+  { (void)err; }
 
   *out_menubar = menubar;
   return UI_ERROR_NONE;

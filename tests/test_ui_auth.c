@@ -67,7 +67,12 @@ int main(void) {
   /* OOM loops */
   for (i = 0; i < 2; i++) {
     struct ui_promise *p = NULL;
-    (void)ui_promise_create(&p);
+    {
+      ui_error_t rc_cleanup = ui_promise_create(&p);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     g_malloc_fail_countdown = i;
     rc = ui_auth_request_async(&config, p);
     if (rc == UI_ERROR_NONE) {
@@ -75,7 +80,12 @@ int main(void) {
        * returns NONE */
     }
     g_malloc_fail_countdown = -1;
-    (void)ui_promise_destroy(p);
+    {
+      ui_error_t rc_cleanup = ui_promise_destroy(p);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   rc = ui_promise_then(promise, on_auth_resolved, on_auth_rejected, NULL, NULL);
@@ -95,7 +105,12 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   extern ui_error_t run_auth_coverage(void);

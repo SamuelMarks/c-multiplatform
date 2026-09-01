@@ -130,11 +130,36 @@ static int test_radio_group_basic(void) {
   ui_radio_group_base_remove_toggle(group, r2);
 
   ui_radio_group_base_destroy(group);
-  (void)ui_toggle_base_destroy(r1);
-  (void)ui_toggle_base_destroy(r2);
-  (void)ui_toggle_base_destroy(r3);
-  (void)ui_toggle_base_destroy(r4);
-  (void)ui_toggle_base_destroy(r5);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r4);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r5);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -217,9 +242,24 @@ static int test_radio_group_keyboard(void) {
     return 1;
 
   ui_radio_group_base_destroy(group);
-  (void)ui_toggle_base_destroy(r1);
-  (void)ui_toggle_base_destroy(r2);
-  (void)ui_toggle_base_destroy(r3);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -293,8 +333,18 @@ static int test_radio_group_nulls(void) {
   ui_radio_group_base_add_toggle(group, checked);
 
   ui_radio_group_base_destroy(group);
-  (void)ui_toggle_base_destroy(r1);
-  (void)ui_toggle_base_destroy(checked);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(checked);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -320,14 +370,24 @@ static int test_radio_group_oom(void) {
     rc = ui_radio_group_base_add_toggle(group, t);
     g_malloc_fail_countdown = -1;
     if (rc == UI_ERROR_OUT_OF_MEMORY) {
-      (void)ui_toggle_base_destroy(t);
+      {
+        ui_error_t rc_cleanup = ui_toggle_base_destroy(t);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     } else {
       /* Added */
     }
   }
 
   ui_radio_group_base_destroy(group);
-  (void)ui_toggle_base_destroy(r1);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -382,8 +442,18 @@ static int test_radio_group_edge_cases(void) {
   mock_on_change_fail = 0;
 
   ui_radio_group_base_destroy(group);
-  (void)ui_toggle_base_destroy(r1);
-  (void)ui_toggle_base_destroy(r2);
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toggle_base_destroy(r2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }

@@ -239,10 +239,30 @@ TEST test_autocomplete_edge_cases(void) {
             ui_autocomplete_base_open(autocomplete, &layout, 100, 100));
   ASSERT_EQ(UI_ERROR_NONE, ui_autocomplete_base_close(autocomplete));
 
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_focus_manager_destroy(focus);
-  (void)ui_autocomplete_base_destroy(autocomplete);
-  (void)ui_dom_node_destroy(dummy_root);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(focus);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_autocomplete_base_destroy(autocomplete);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(dummy_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* OOM loop for create */
   for (i = 0; i < 1000; i++) {
@@ -250,7 +270,12 @@ TEST test_autocomplete_edge_cases(void) {
     g_malloc_fail_countdown = i;
     rc = ui_autocomplete_base_create(&test_ac, NULL);
     if (rc == UI_ERROR_NONE) {
-      (void)ui_autocomplete_base_destroy(test_ac);
+      {
+        ui_error_t rc_cleanup = ui_autocomplete_base_destroy(test_ac);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);

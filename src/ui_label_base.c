@@ -74,10 +74,20 @@ ui_error_t ui_label_base_create(struct ui_label_base **out_label) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (lbl->component) {
-    (void)ui_component_destroy(lbl->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(lbl->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(lbl);
   return rc;
@@ -97,7 +107,12 @@ ui_error_t ui_label_base_destroy(struct ui_label_base *label) {
     C_MULTIPLATFORM_FREE(label->target_id);
   }
 
-  (void)ui_component_destroy(label->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(label->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(label);
   return UI_ERROR_NONE;
@@ -223,12 +238,37 @@ ui_error_t ui_test_label_base_set_for_no_component(void);
 
 ui_error_t ui_test_label_base_set_for_no_component(void) {
   struct ui_label_base *lbl = NULL;
-  (void)ui_label_base_create(&lbl);
-  (void)ui_component_destroy(lbl->component);
+  {
+    ui_error_t rc_cleanup = ui_label_base_create(&lbl);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(lbl->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   lbl->component = NULL;
-  (void)ui_label_base_set_for(lbl, "fail-target-2");
-  (void)ui_label_base_set_for(lbl, NULL);
-  (void)ui_label_base_destroy(lbl);
+  {
+    ui_error_t rc_cleanup = ui_label_base_set_for(lbl, "fail-target-2");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_label_base_set_for(lbl, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 #endif

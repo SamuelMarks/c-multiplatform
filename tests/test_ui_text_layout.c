@@ -121,7 +121,12 @@ static int test_text_layout(void) {
   ACCUM_ERR(failed, ui_text_layout_get_glyphs(layout, &glyphs, &count));
   ACCUM_ERR(failed, ui_text_layout_get_bounds(layout, &w, &h));
 
-  (void)ui_text_layout_destroy(layout);
+  {
+    ui_error_t rc_cleanup = ui_text_layout_destroy(layout);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   failed |= (ui_text_layout_create(NULL) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_text_layout_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT);
@@ -169,7 +174,12 @@ static int test_text_layout(void) {
                             UI_TEXT_DIRECTION_LTR) != UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
-  (void)ui_text_layout_destroy(layout);
+  {
+    ui_error_t rc_cleanup = ui_text_layout_destroy(layout);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }

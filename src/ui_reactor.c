@@ -303,13 +303,25 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
   {
     int is_swapped = 0;
     for (;;) {
-      (void)ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+      {
+        ui_error_t rc_cleanup =
+            ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 #ifdef UI_TEST_MOCK_ALLOC
       {
         extern int g_mock_lock_contention;
         if (g_mock_lock_contention) {
           int unused;
-          (void)ui_atomic_cas(&reactor->lock, 1, 0, &unused); /* release lock */
+          {
+            ui_error_t rc_cleanup =
+                ui_atomic_cas(&reactor->lock, 1, 0, &unused);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          } /* release lock */
           is_swapped = 0;
           g_mock_lock_contention = 0;
         }
@@ -327,7 +339,12 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
   }
   reactor->tasks_tail = task;
 
-  (void)ui_atomic_store(&reactor->lock, 0);
+  {
+    ui_error_t rc_cleanup = ui_atomic_store(&reactor->lock, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -604,13 +621,25 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
     struct ui_reactor_task *tasks_to_run = NULL;
     int is_swapped = 0;
     for (;;) {
-      (void)ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+      {
+        ui_error_t rc_cleanup =
+            ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 #ifdef UI_TEST_MOCK_ALLOC
       {
         extern int g_mock_lock_contention;
         if (g_mock_lock_contention) {
           int unused;
-          (void)ui_atomic_cas(&reactor->lock, 1, 0, &unused); /* release lock */
+          {
+            ui_error_t rc_cleanup =
+                ui_atomic_cas(&reactor->lock, 1, 0, &unused);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup; /* Avoid override */
+            }
+          } /* release lock */
           is_swapped = 0;
           g_mock_lock_contention = 0;
         }
@@ -622,7 +651,12 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
     tasks_to_run = reactor->tasks_head;
     reactor->tasks_head = NULL;
     reactor->tasks_tail = NULL;
-    (void)ui_atomic_store(&reactor->lock, 0);
+    {
+      ui_error_t rc_cleanup = ui_atomic_store(&reactor->lock, 0);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     while (tasks_to_run) {
       struct ui_reactor_task *next = tasks_to_run->next;

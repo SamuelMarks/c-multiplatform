@@ -96,7 +96,7 @@ int test_css_values_animation(void) {
     ui_css_animation_destroy(anim);
     anim = NULL;
 
-    char long_name[256];
+    char long_name[1024];
     memset(long_name, 'A', 200);
     long_name[200] = '\0';
     if (anim) {

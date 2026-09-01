@@ -20,17 +20,32 @@ static int test_safe_area_lifecycle(void) {
 
   rc = ui_safe_area_manager_create(arena, &manager);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return 1;
   }
 
   rc = ui_safe_area_manager_destroy(manager);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return 1;
   }
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -83,7 +98,12 @@ static int test_safe_area_insets(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -174,7 +194,12 @@ static int test_safe_area_edge_cases(void) {
 #endif
 
   ui_safe_area_manager_destroy(manager);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

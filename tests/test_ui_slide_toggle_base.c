@@ -346,7 +346,12 @@ static int run_normal_tests(void) {
     internal->recognizer = old_recognizer;
   }
 
-  (void)ui_slide_toggle_base_destroy(toggle);
+  {
+    ui_error_t rc_cleanup = ui_slide_toggle_base_destroy(toggle);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_slide_toggle_base_destroy(NULL); /* Safe */
 
   return 0;
@@ -367,7 +372,12 @@ static int run_oom_tests(void) {
   rc = ui_slide_toggle_base_create(&toggle, NULL);
   g_malloc_fail_countdown = -1;
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
-    (void)ui_slide_toggle_base_destroy(toggle);
+    {
+      ui_error_t rc_cleanup = ui_slide_toggle_base_destroy(toggle);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return 1;
   }
 
@@ -375,7 +385,12 @@ static int run_oom_tests(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_slide_toggle_base_destroy(toggle);
+  {
+    ui_error_t rc_cleanup = ui_slide_toggle_base_destroy(toggle);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

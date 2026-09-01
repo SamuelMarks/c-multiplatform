@@ -17,9 +17,9 @@ static void add_prop(struct ui_css_computed_style *style, const char *name,
       (struct ui_css_computed_property *)C_MULTIPLATFORM_MALLOC(sizeof(*p));
   memset(p, 0, sizeof(*p));
   p->property_name = (char *)C_MULTIPLATFORM_MALLOC(strlen(name) + 1);
-  UI_STRCPY(p->property_name, sizeof(p->property_name), name);
+  UI_STRCPY(p->property_name, strlen(name) + 1, name);
   p->property_value = (char *)C_MULTIPLATFORM_MALLOC(strlen(val) + 1);
-  UI_STRCPY(p->property_value, sizeof(p->property_value), val);
+  UI_STRCPY(p->property_value, strlen(val) + 1, val);
   p->next = style->properties;
   style->properties = p;
 }

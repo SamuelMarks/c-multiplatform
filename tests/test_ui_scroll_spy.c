@@ -48,7 +48,12 @@ static int test_scroll_spy_lifecycle(void) {
   /* Destroy with NULL */
   rc = ui_scroll_spy_destroy(NULL);
   if (rc != UI_ERROR_INVALID_ARGUMENT) {
-    (void)ui_scroll_spy_destroy(spy);
+    {
+      ui_error_t rc_cleanup = ui_scroll_spy_destroy(spy);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return 1;
   }
 
@@ -153,7 +158,12 @@ static int test_scroll_spy_targets(void) {
 
   /* Force spy->observer = NULL by failing set_root explicitly */
   g_malloc_fail_countdown = 0;
-  (void)ui_scroll_spy_set_root(spy, NULL, 0);
+  {
+    ui_error_t rc_cleanup = ui_scroll_spy_set_root(spy, NULL, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
 
   struct ui_scroll_spy_internal {
@@ -162,11 +172,26 @@ static int test_scroll_spy_targets(void) {
   printf("OBS SERVER: %p\n", ((struct ui_scroll_spy_internal *)spy)->obs);
 
   /* Now add and remove with observer == NULL to hit missing branches */
-  (void)ui_scroll_spy_add_target(spy, target3, 3);
-  (void)ui_scroll_spy_remove_target(spy, target3);
+  {
+    ui_error_t rc_cleanup = ui_scroll_spy_add_target(spy, target3, 3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_scroll_spy_remove_target(spy, target3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Restore observer so rest of test doesn't crash if it needs it */
-  (void)ui_scroll_spy_set_root(spy, NULL, 0);
+  {
+    ui_error_t rc_cleanup = ui_scroll_spy_set_root(spy, NULL, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test remove_target */
   rc = ui_scroll_spy_remove_target(NULL, target1);
@@ -184,7 +209,12 @@ static int test_scroll_spy_targets(void) {
   if (rc != UI_ERROR_NOT_FOUND)
     return 1;
 
-  (void)ui_scroll_spy_destroy(spy);
+  {
+    ui_error_t rc_cleanup = ui_scroll_spy_destroy(spy);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -246,27 +276,57 @@ static int test_scroll_spy_signal(void) {
 
     void *saved_obs = internal->observer;
     internal->observer = NULL;
-    (void)ui_scroll_spy_add_target(spy, ghost, 4);
+    {
+      ui_error_t rc_cleanup = ui_scroll_spy_add_target(spy, ghost, 4);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* This removes ghost from spy->targets but NOT from the observer...
      * actually if we added it when observer was NULL, it was NEVER added to the
      * observer! */
-    (void)ui_scroll_spy_remove_target(spy, ghost);
+    {
+      ui_error_t rc_cleanup = ui_scroll_spy_remove_target(spy, ghost);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Wait! If we want it in the observer but not in targets, we must add it
      * when observer is NOT NULL, then remove it when observer IS NULL! */
     internal->observer = saved_obs;
-    (void)ui_scroll_spy_add_target(spy, ghost, 4);
+    {
+      ui_error_t rc_cleanup = ui_scroll_spy_add_target(spy, ghost, 4);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     internal->observer = NULL;
-    (void)ui_scroll_spy_remove_target(spy, ghost);
+    {
+      ui_error_t rc_cleanup = ui_scroll_spy_remove_target(spy, ghost);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     internal->observer = saved_obs;
     /* Observer still tracks ghost, but spy doesn't know about it. Evaluates it
      * -> hits loop finish AND best_id == -1 with active_signal */
-    (void)ui_scroll_spy_evaluate(spy);
+    {
+      ui_error_t rc_cleanup = ui_scroll_spy_evaluate(spy);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     /* Clean up observer so it doesn't crash */
-    (void)ui_intersection_observer_unobserve(
-        (struct ui_intersection_observer *)internal->observer, ghost);
+    {
+      ui_error_t rc_cleanup = ui_intersection_observer_unobserve(
+          (struct ui_intersection_observer *)internal->observer, ghost);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   rc = ui_scroll_spy_add_target(spy, target1, 1);
@@ -283,9 +343,24 @@ static int test_scroll_spy_signal(void) {
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_effect_destroy(eff);
-  (void)ui_signal_destroy(sig);
-  (void)ui_scroll_spy_destroy(spy);
+  {
+    ui_error_t rc_cleanup = ui_effect_destroy(eff);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_scroll_spy_destroy(spy);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

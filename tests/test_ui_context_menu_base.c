@@ -98,8 +98,18 @@ static int test_context_menu_clamping(void) {
   g_malloc_fail_countdown = -1;
 #endif
 
-  (void)ui_overlay_director_destroy(director);
-  (void)ui_dom_node_destroy(body);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(body);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

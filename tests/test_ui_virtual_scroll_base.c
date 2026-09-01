@@ -88,7 +88,12 @@ static int test_fixed_size_math(void) {
                                                 &offset_y);
   failed |= (rc != UI_ERROR_NONE || start != 0 || end != 0);
 
-  (void)ui_virtual_scroll_base_destroy(vs);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_fixed_size_math failed\n");
   return failed;
@@ -139,7 +144,12 @@ static int test_variable_size_math(void) {
                                                 &offset_y);
   failed |= (rc != UI_ERROR_NONE || start != 0 || end != 0);
 
-  (void)ui_virtual_scroll_base_destroy(vs);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_variable_size_math failed\n");
   return failed;
@@ -180,8 +190,18 @@ static int test_dom_recycling(void) {
   rc = ui_virtual_scroll_base_render(vs, 0.0f);
   failed |= (rc != UI_ERROR_NONE);
 
-  (void)ui_virtual_scroll_base_destroy(vs);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_dom_recycling failed\n");
   return failed;
@@ -222,8 +242,18 @@ static int test_dom_recycling_variable(void) {
   rc = ui_virtual_scroll_base_render(vs, 0.0f);
   failed |= (rc != UI_ERROR_NONE);
 
-  (void)ui_virtual_scroll_base_destroy(vs);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_dom_recycling_variable failed\n");
   return failed;
@@ -277,7 +307,12 @@ static int test_error_handling(void) {
   config.fixed_item_size = 50.0f;
   CHECK_FAIL(ui_virtual_scroll_base_create(&vs, &config) != UI_ERROR_NONE);
 
-  (void)ui_virtual_scroll_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   CHECK_FAIL(ui_virtual_scroll_base_set_item_count(NULL, 10) !=
              UI_ERROR_INVALID_ARGUMENT);
@@ -320,7 +355,12 @@ static int test_error_handling(void) {
              UI_ERROR_INVALID_ARGUMENT);
   ui_dom_node_destroy(container);
 
-  (void)ui_virtual_scroll_base_destroy(vs);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = 0;
@@ -373,8 +413,18 @@ static int test_error_handling(void) {
     ui_virtual_scroll_base_destroy(vs_empty);
   }
 
-  (void)ui_virtual_scroll_base_destroy(vs);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
 
   if (failed)
@@ -403,7 +453,12 @@ static int test_empty_scroll(void) {
 
   ui_virtual_scroll_base_get_total_height(vs, &offset_y);
 
-  (void)ui_virtual_scroll_base_destroy(vs);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_empty_scroll failed\n");
   return failed;
@@ -430,7 +485,12 @@ static int test_empty_scroll_variable(void) {
 
   ui_virtual_scroll_base_get_total_height(vs, &offset_y);
 
-  (void)ui_virtual_scroll_base_destroy(vs);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_empty_scroll_variable failed\n");
   return failed;
@@ -468,8 +528,18 @@ static int test_render_fail(void) {
   rc = ui_virtual_scroll_base_render(vs, 0.0f);
   failed |= (rc != UI_ERROR_OUT_OF_MEMORY);
 
-  (void)ui_virtual_scroll_base_destroy(vs);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_render_fail failed\n");
   return failed;
@@ -508,8 +578,18 @@ static int test_render_update_fail(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY)
     failed = 1;
 
-  (void)ui_virtual_scroll_base_destroy(vs);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_render_update_fail failed\n");
   return failed;
@@ -540,8 +620,18 @@ static int test_horizontal_orientation(void) {
   if (rc != UI_ERROR_NONE)
     failed = 1;
 
-  (void)ui_virtual_scroll_base_destroy(vs);
-  (void)ui_dom_node_destroy(container);
+  {
+    ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (failed)
     printf("test_horizontal_orientation failed\n");
   return failed;

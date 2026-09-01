@@ -42,7 +42,12 @@ static int run_normal_tests(void) {
 
   /* Missing destroy fn in api! Just free for tests */
   if (surface) {
-    (void)ui_component_destroy(&surface->base);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(&surface->base);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;

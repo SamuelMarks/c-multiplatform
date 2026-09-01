@@ -282,7 +282,12 @@ static int test_manager_state(void) {
 #endif
 
   ui_color_picker_base_create(&p2, NULL);
-  (void)ui_color_picker_base_destroy(p2);
+  {
+    ui_error_t rc_cleanup = ui_color_picker_base_destroy(p2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Hit trigger_cva_change when cva_on_change is NULL */
   rgb.r = 255;
@@ -335,7 +340,12 @@ static int test_manager_state(void) {
   if (rgb.r != 0 || rgb.g != 0 || rgb.b != 255)
     return 1;
 
-  (void)ui_color_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_color_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -355,7 +365,12 @@ static int test_oom(void) {
     rc = ui_color_picker_base_create(&picker, NULL);
     g_malloc_fail_countdown = -1;
     if (rc == UI_ERROR_NONE) {
-      (void)ui_color_picker_base_destroy(picker);
+      {
+        ui_error_t rc_cleanup = ui_color_picker_base_destroy(picker);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else if (rc != UI_ERROR_OUT_OF_MEMORY) {
       printf("OOM test failed with unexpected error %d\n", rc);
@@ -373,7 +388,12 @@ static int test_oom(void) {
       g_color_picker_mock_current = 0;
       rc = ui_color_picker_base_create(&picker, NULL);
       if (rc == UI_ERROR_NONE) {
-        (void)ui_color_picker_base_destroy(picker);
+        {
+          ui_error_t rc_cleanup = ui_color_picker_base_destroy(picker);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         picker = NULL;
       }
     }
@@ -401,7 +421,12 @@ static int test_oom(void) {
       g_color_picker_mock_target = t;
       g_color_picker_mock_current = 0;
       ui_color_picker_base_create(&picker, NULL);
-      (void)ui_color_picker_base_destroy(picker);
+      {
+        ui_error_t rc_cleanup = ui_color_picker_base_destroy(picker);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_color_picker_mock_fail = 0;

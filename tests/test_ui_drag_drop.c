@@ -8,11 +8,21 @@
 extern int g_malloc_fail_countdown;
 static void test_missing_coverage(void) {
   struct ui_drag_drop_context *d_ctx_empty;
-  (void)ui_drag_drop_create(&d_ctx_empty);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_create(&d_ctx_empty);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   (void)(void)ui_drag_drop_destroy(d_ctx_empty);
 
   struct ui_drag_drop_context *d_ctx;
-  (void)ui_drag_drop_create(&d_ctx);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_create(&d_ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
@@ -21,19 +31,39 @@ static void test_missing_coverage(void) {
   d_list_v_empty.width = 100;
   d_list_v_empty.height = 100;
   d_list_v_empty.orientation = UI_DRAG_LIST_ORIENTATION_VERTICAL;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_invalid = d_list_v_empty;
   struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   d_list_invalid.item_count = 0;
   d_list_invalid.items = &dummy_item;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   d_list_invalid.item_count = 1;
   d_list_invalid.items = &dummy_item;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_v = {0};
   d_list_v.list_id = 1;
@@ -50,88 +80,178 @@ static void test_missing_coverage(void) {
   d_item.height = 10;
   d_list_v.items = &d_item;
   d_list_v.item_count = 1;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_v);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_v);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_event ev = {0};
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 250;
   ev.event_data.mouse.y = 250;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* PENDING */
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 5;
   ev.event_data.mouse.y = 5;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* AGAIN -> early return */
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 5;
   ev.event_data.mouse.y = 5;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Start drag */
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 50;
   ev.event_data.mouse.y = 50;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Move to nowhere (x=900) to hit update_placeholder return */
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 900;
   ev.event_data.mouse.y = 900;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Missing item -> early return at bottom */
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 250;
   ev.event_data.mouse.y = 250;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 900;
   ev.event_data.mouse.y = 900;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.type = (enum ui_event_type)999;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
   ev.event_data.touch.points[0].x = 250;
   ev.event_data.touch.points[0].y = 250;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 0;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_TOUCH_MOVE;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_TOUCH_END;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_TOUCH_CANCEL;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.type = UI_EVENT_TOUCH_END;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 2;
-  (void)ui_drag_drop_process_event(d_ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   (void)(void)ui_drag_drop_destroy(d_ctx);
 }
@@ -210,11 +330,21 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.x = 50;
   ev.event_data.mouse.y = 25;
 
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_drag_drop_get_state(NULL, &state) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  (void)ui_drag_drop_get_state(ctx, &state);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_state(ctx, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DRAG_STATE_PENDING) {
     printf("State not PENDING after mouse down.\n");
     return 1;
@@ -224,9 +354,19 @@ static int run_normal_tests(void) {
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 52;
   ev.event_data.mouse.y = 27;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_drag_drop_get_state(ctx, &state);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_state(ctx, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DRAG_STATE_PENDING) {
     printf("State should still be PENDING.\n");
     return 1;
@@ -238,9 +378,19 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 50;
   ev.event_data.mouse.y = 100;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_drag_drop_get_state(ctx, &state);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_state(ctx, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DRAG_STATE_DRAGGING) {
     printf("State not DRAGGING after move.\n");
     return 1;
@@ -284,9 +434,19 @@ static int run_normal_tests(void) {
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_drag_drop_get_state(ctx, &state);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_state(ctx, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DRAG_STATE_IDLE) {
     printf("State not IDLE after drop.\n");
     return 1;
@@ -352,7 +512,12 @@ static int run_normal_tests(void) {
   ev.event_data.touch.points[0].id = 1;
   ev.event_data.touch.points[0].x = 50;
   ev.event_data.touch.points[0].y = 25;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_MOVE;
@@ -360,15 +525,30 @@ static int run_normal_tests(void) {
   ev.event_data.touch.points[0].id = 1;
   ev.event_data.touch.points[0].x = 50;
   ev.event_data.touch.points[0].y = 100;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Cancel event */
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_CANCEL;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
-  (void)ui_drag_drop_process_event(ctx, &ev);
-  (void)ui_drag_drop_get_state(ctx, &state);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_state(ctx, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DRAG_STATE_IDLE)
     return 1;
 
@@ -377,8 +557,18 @@ static int run_normal_tests(void) {
   ev.type = UI_EVENT_TOUCH_START;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
-  (void)ui_drag_drop_process_event(ctx, &ev);
-  (void)ui_drag_drop_get_state(ctx, &state);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_state(ctx, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DRAG_STATE_PENDING)
     return 1;
 
@@ -387,8 +577,18 @@ static int run_normal_tests(void) {
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 2; /* Wrong pointer id */
   ev.event_data.touch.points[0].y = 200;
-  (void)ui_drag_drop_process_event(ctx, &ev);
-  (void)ui_drag_drop_get_state(ctx, &state);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_state(ctx, &state);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (state != UI_DRAG_STATE_PENDING)
     return 1; /* Did not drag */
 
@@ -396,19 +596,34 @@ static int run_normal_tests(void) {
   ev.type = UI_EVENT_TOUCH_END;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 2;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_CANCEL;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 2;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_END;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test Horizontal List */
   struct ui_drag_list hlist;
@@ -435,7 +650,12 @@ static int run_normal_tests(void) {
   hlist.items = hitems;
   hlist.item_count = 2;
 
-  (void)ui_drag_drop_add_list(ctx, &hlist);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &hlist);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Start dragging an item into the horizontal list */
   memset(&ev, 0, sizeof(ev));
@@ -443,66 +663,131 @@ static int run_normal_tests(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 210;
   ev.event_data.mouse.y = 250;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 260;
   ev.event_data.mouse.y = 250;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_drag_drop_get_placeholder(ctx, &placeholder);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_placeholder(ctx, &placeholder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (!placeholder.active || placeholder.list_id != 2)
     return 1;
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Horizontal list empty */
   hlist.item_count = 0;
   hlist.list_id = 3;
-  (void)ui_drag_drop_add_list(ctx, &hlist);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &hlist);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Vertical list empty */
   list.item_count = 0;
   list.list_id = 4;
-  (void)ui_drag_drop_add_list(ctx, &list);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 210; /* item 301 x */
   ev.event_data.mouse.y = 250; /* item 301 y */
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 200; /* hlist x */
   ev.event_data.mouse.y = 200; /* hlist y */
-  (void)ui_drag_drop_process_event(ctx, &ev);
-  (void)ui_drag_drop_get_placeholder(ctx, &placeholder);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_placeholder(ctx, &placeholder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 0; /* vlist x */
   ev.event_data.mouse.y = 0; /* vlist y */
-  (void)ui_drag_drop_process_event(ctx, &ev);
-  (void)ui_drag_drop_get_placeholder(ctx, &placeholder);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_placeholder(ctx, &placeholder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 0;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Re-alloc limits tests */
   int i;
   for (i = 0; i < 10; i++) {
-    (void)ui_drag_drop_add_list(ctx, &list);
+    {
+      ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test clear and destruction */
@@ -534,7 +819,12 @@ static int run_error_paths(void) {
   g_malloc_fail_countdown = -1;
 
   /* Just checking normal create destroys correctly */
-  (void)ui_drag_drop_create(&ctx);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_create(&ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   list.list_id = 2;
   list.x = 0;
@@ -557,10 +847,30 @@ static int run_error_paths(void) {
 
   list.item_count = 0;
 
-  (void)ui_drag_drop_add_list(ctx, &list);
-  (void)ui_drag_drop_add_list(ctx, &list);
-  (void)ui_drag_drop_add_list(ctx, &list);
-  (void)ui_drag_drop_add_list(ctx, &list);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   g_malloc_fail_countdown = 0;
   if (ui_drag_drop_add_list(ctx, &list) != UI_ERROR_OUT_OF_MEMORY)
@@ -574,9 +884,20 @@ static int run_error_paths(void) {
 
 static void test_dragged_item_idle(void) {
   struct ui_drag_drop_context *d_ctx;
-  (void)ui_drag_drop_create(&d_ctx);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_create(&d_ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   int i, s, x, y;
-  (void)ui_drag_drop_get_dragged_item(d_ctx, &i, &s, &x, &y);
+  {
+    ui_error_t rc_cleanup =
+        ui_drag_drop_get_dragged_item(d_ctx, &i, &s, &x, &y);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
@@ -585,19 +906,39 @@ static void test_dragged_item_idle(void) {
   d_list_v_empty.width = 100;
   d_list_v_empty.height = 100;
   d_list_v_empty.orientation = UI_DRAG_LIST_ORIENTATION_VERTICAL;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_invalid = d_list_v_empty;
   struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   d_list_invalid.item_count = 0;
   d_list_invalid.items = &dummy_item;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   d_list_invalid.item_count = 1;
   d_list_invalid.items = &dummy_item;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_h_empty = {0};
   d_list_h_empty.list_id = 3;
@@ -606,14 +947,24 @@ static void test_dragged_item_idle(void) {
   d_list_h_empty.width = 100;
   d_list_h_empty.height = 100;
   d_list_h_empty.orientation = UI_DRAG_LIST_ORIENTATION_HORIZONTAL;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_h_empty);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_h_empty);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   (void)(void)ui_drag_drop_destroy(d_ctx);
 }
 
 static void test_drag_drop_coverage(void) {
   struct ui_drag_drop_context *d_ctx;
-  (void)ui_drag_drop_create(&d_ctx);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_create(&d_ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_v_empty = {0};
   d_list_v_empty.list_id = 2;
@@ -622,19 +973,39 @@ static void test_drag_drop_coverage(void) {
   d_list_v_empty.width = 100;
   d_list_v_empty.height = 100;
   d_list_v_empty.orientation = UI_DRAG_LIST_ORIENTATION_VERTICAL;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_v_empty);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_invalid = d_list_v_empty;
   struct ui_drag_item dummy_item = {0};
   d_list_invalid.item_count = 1;
   d_list_invalid.items = NULL;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   d_list_invalid.item_count = 0;
   d_list_invalid.items = &dummy_item;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   d_list_invalid.item_count = 1;
   d_list_invalid.items = &dummy_item;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_h_empty = {0};
   d_list_h_empty.list_id = 3;
@@ -643,7 +1014,12 @@ static void test_drag_drop_coverage(void) {
   d_list_h_empty.width = 100;
   d_list_h_empty.height = 100;
   d_list_h_empty.orientation = UI_DRAG_LIST_ORIENTATION_HORIZONTAL;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_h_empty);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_h_empty);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_drag_list d_list_v = {0};
   d_list_v.list_id = 1;
@@ -660,31 +1036,61 @@ static void test_drag_drop_coverage(void) {
   d_item.height = 10;
   d_list_v.items = &d_item;
   d_list_v.item_count = 1;
-  (void)ui_drag_drop_add_list(d_ctx, &d_list_v);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(d_ctx, &d_list_v);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   struct ui_event m_ev = {0};
   m_ev.type = UI_EVENT_MOUSE_DOWN;
   m_ev.event_data.mouse.x = 5;
   m_ev.event_data.mouse.y = 5;
-  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &m_ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   m_ev.type = UI_EVENT_MOUSE_MOVE;
   m_ev.event_data.mouse.x = 250;
   m_ev.event_data.mouse.y = 250;
-  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &m_ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   m_ev.event_data.mouse.x = 450;
   m_ev.event_data.mouse.y = 450;
-  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &m_ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   m_ev.type = UI_EVENT_MOUSE_UP;
-  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &m_ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Mouse down without move */
   m_ev.type = UI_EVENT_MOUSE_DOWN;
   m_ev.event_data.mouse.x = 5;
   m_ev.event_data.mouse.y = 5;
-  (void)ui_drag_drop_process_event(d_ctx, &m_ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(d_ctx, &m_ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   (void)(void)ui_drag_drop_destroy(d_ctx);
 }
@@ -720,14 +1126,24 @@ static void test_extra_branches(void) {
   int drop_item_id, drop_from_list, drop_to_list, drop_to_index;
   int dropped = 0;
 
-  (void)ui_drag_drop_create(&ctx);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_create(&ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&list, 0, sizeof(list));
   list.item_count = 1;
   item.item_id = 99;
   list.items = &item;
   g_malloc_fail_countdown = 1;
-  (void)ui_drag_drop_add_list(ctx, &list);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_malloc_fail_countdown = -1;
 
   memset(&list, 0, sizeof(list));
@@ -742,46 +1158,101 @@ static void test_extra_branches(void) {
   item.width = 100;
   item.height = 100;
   list.items = &item;
-  (void)ui_drag_drop_add_list(ctx, &list);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 20;
   ev.event_data.mouse.y = 200;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.mouse.x = 200;
   ev.event_data.mouse.y = 20;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.mouse.x = 200;
   ev.event_data.mouse.y = 200;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.mouse.button = 1;
   ev.event_data.mouse.x = 20;
   ev.event_data.mouse.y = 20;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.type = UI_EVENT_MOUSE_UP;
   ev.event_data.mouse.button = 1; /* Non-zero button mouse up */
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ev.event_data.mouse.button = 0; /* Zero button mouse up */
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 30;
   ev.event_data.mouse.y = 30;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_drag_drop_get_drop_event(ctx, &dropped, &drop_item_id,
-                                    &drop_from_list, &drop_to_list,
-                                    &drop_to_index);
-  (void)ui_drag_drop_get_drop_event(NULL, &dropped, &drop_item_id,
-                                    &drop_from_list, &drop_to_list,
-                                    &drop_to_index);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_drop_event(
+        ctx, &dropped, &drop_item_id, &drop_from_list, &drop_to_list,
+        &drop_to_index);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_drop_event(
+        NULL, &dropped, &drop_item_id, &drop_from_list, &drop_to_list,
+        &drop_to_index);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_drag_drop_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 static void test_bounds_exhaustive(void) {
@@ -791,7 +1262,12 @@ static void test_bounds_exhaustive(void) {
   struct ui_event ev;
   int state;
 
-  (void)ui_drag_drop_create(&ctx);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_create(&ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   memset(&list, 0, sizeof(list));
   list.x = 100;
@@ -805,11 +1281,21 @@ static void test_bounds_exhaustive(void) {
   item.width = 50;
   item.height = 50;
   list.items = &item;
-  (void)ui_drag_drop_add_list(ctx, &list);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* 1. Item count > 0 but items == NULL */
   list.items = NULL;
-  (void)ui_drag_drop_add_list(ctx, &list);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_add_list(ctx, &list);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Pointer Down Bounds Checks */
   memset(&ev, 0, sizeof(ev));
@@ -819,38 +1305,73 @@ static void test_bounds_exhaustive(void) {
   /* Fail x >= item->x */
   ev.event_data.mouse.x = 105;
   ev.event_data.mouse.y = 120;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Fail x < item->x + item->width */
   ev.event_data.mouse.x = 165;
   ev.event_data.mouse.y = 120;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Fail y >= item->y */
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 105;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Fail y < item->y + item->height */
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 165;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Success */
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 120;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Pointer Move Bounds Checks (Placeholder update) */
   /* Start drag */
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 120; /* threshold not reached */
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ev.event_data.mouse.x = 500;
   ev.event_data.mouse.y = 500; /* reach threshold */
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Now we are dragging. Update placeholder does bounds checks on lists.
      drag_center_x/y is current_x/y - offset + width/2.
@@ -861,28 +1382,53 @@ static void test_bounds_exhaustive(void) {
   /* Fail drag_center_x >= list->x */
   ev.event_data.mouse.x = -1000;
   ev.event_data.mouse.y = 150;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Fail drag_center_x < list->x + list->width */
   ev.event_data.mouse.x = 1000;
   ev.event_data.mouse.y = 150;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Fail drag_center_y >= list->y */
   ev.event_data.mouse.x = 150;
   ev.event_data.mouse.y = -1000;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Fail drag_center_y < list->y + list->height */
   ev.event_data.mouse.x = 150;
   ev.event_data.mouse.y = 1000;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Pointer cancel */
   ev.type = UI_EVENT_TOUCH_CANCEL;
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 0;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* And handle_pointer_move when pointer down is false */
   /* This happens naturally after a pointer cancel because active_pointer_id
@@ -892,23 +1438,48 @@ static void test_bounds_exhaustive(void) {
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 120;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* And handle_pointer_move when pointer down is true but id doesn't match */
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.button = 0;
   ev.event_data.mouse.x = 120;
   ev.event_data.mouse.y = 120;
-  (void)ui_drag_drop_process_event(ctx, &ev); /* pointer is down, id is 0 */
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* pointer is down, id is 0 */
 
   ev.type = UI_EVENT_TOUCH_MOVE; /* moves pointer 1 */
   ev.event_data.touch.num_points = 1;
   ev.event_data.touch.points[0].id = 1;
   ev.event_data.touch.points[0].x = 150;
   ev.event_data.touch.points[0].y = 150;
-  (void)ui_drag_drop_process_event(ctx, &ev);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_process_event(ctx, &ev);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_drag_drop_get_state(ctx, NULL); /* missing get_state branch */
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_get_state(ctx, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  } /* missing get_state branch */
 
-  (void)ui_drag_drop_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_drag_drop_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

@@ -99,7 +99,12 @@ static int test_creation() {
   rc = ui_wheel_picker_base_create(&picker, &cva);
   ASSERT_EQ(rc, UI_ERROR_NONE);
   ASSERT_TRUE(picker != NULL);
-  (void)ui_wheel_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   for (i = 0; i < 4; i++) {
     g_malloc_fail_countdown = i;
@@ -135,7 +140,12 @@ static int test_items() {
               UI_ERROR_OUT_OF_MEMORY);
     g_malloc_fail_countdown = -1;
   }
-  (void)ui_wheel_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }
@@ -186,7 +196,12 @@ static int test_cva_and_events() {
   ui_wheel_picker_base_process_event(picker, &ev, 0.0);
   ASSERT_EQ(last_selected_index, 1); /* 0 + 1 = 1 */
 
-  (void)ui_wheel_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return failed;
 }
 
@@ -300,7 +315,12 @@ static int test_physics() {
   ui_wheel_picker_base_set_items(picker, NULL, 3);
   ui_wheel_picker_base_set_items(picker, NULL, 0);
 
-  (void)ui_wheel_picker_base_destroy(picker);
+  {
+    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   picker = NULL;
 
   return failed;
@@ -569,8 +589,18 @@ static int test_getters_and_misc() {
     ui_wheel_picker_base_destroy(picker2);
   }
 
-  (void)ui_wheel_picker_base_destroy(picker);
-  (void)ui_wheel_picker_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return failed;
 }

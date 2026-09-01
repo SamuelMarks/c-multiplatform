@@ -61,7 +61,13 @@ static ui_error_t thread_spam_schedule(void *user_data) {
   struct ui_reactor *r = (struct ui_reactor *)user_data;
   int i;
   for (i = 0; i < 5000; i++) {
-    (void)ui_reactor_schedule(r, test_schedule_callback, NULL);
+    {
+      ui_error_t rc_cleanup =
+          ui_reactor_schedule(r, test_schedule_callback, NULL);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -173,7 +179,13 @@ int main(void) {
                            UI_REACTOR_EVENT_WRITE, test_callback, &test_val);
   if (rc == UI_ERROR_NONE) {
     rc = ui_reactor_poll(reactor, 0);
-    (void)ui_reactor_unregister(reactor, (void *)(size_t)pipes[1]);
+    {
+      ui_error_t rc_cleanup =
+          ui_reactor_unregister(reactor, (void *)(size_t)pipes[1]);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test error event */
@@ -190,13 +202,23 @@ int main(void) {
   /* Test kq_fd < 0 destroy */
   {
     struct ui_reactor *bad_reactor = NULL;
-    (void)ui_reactor_create(&bad_reactor);
+    {
+      ui_error_t rc_cleanup = ui_reactor_create(&bad_reactor);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
     if (bad_reactor) {
       int old_fd = bad_reactor->kq_fd;
       bad_reactor->kq_fd = -1;
-      (void)ui_reactor_destroy(bad_reactor);
+      {
+        ui_error_t rc_cleanup = ui_reactor_destroy(bad_reactor);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       close(old_fd);
     }
 #endif
@@ -204,7 +226,12 @@ int main(void) {
     if (bad_reactor) {
       int old_fd = bad_reactor->epoll_fd;
       bad_reactor->epoll_fd = -1;
-      (void)ui_reactor_destroy(bad_reactor);
+      {
+        ui_error_t rc_cleanup = ui_reactor_destroy(bad_reactor);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       close(old_fd);
     }
 #endif
@@ -228,10 +255,21 @@ int main(void) {
     if (rc == UI_ERROR_NONE &&
         ui_thread_pool_create(10, &pool) == UI_ERROR_NONE) {
       for (i = 0; i < 10; i++) {
-        (void)ui_thread_pool_schedule(pool, thread_spam_schedule, reactor);
+        {
+          ui_error_t rc_cleanup =
+              ui_thread_pool_schedule(pool, thread_spam_schedule, reactor);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       for (i = 0; i < 50000; i++) {
-        (void)ui_reactor_poll(reactor, 0);
+        {
+          ui_error_t rc_cleanup = ui_reactor_poll(reactor, 0);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       ui_thread_pool_destroy(pool);
     }

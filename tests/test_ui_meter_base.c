@@ -45,7 +45,12 @@ static ui_error_t test_meter_base(void) {
     exit(1);
   }
 
-  (void)ui_component_destroy((struct ui_component *)meter);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy((struct ui_component *)meter);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -61,12 +66,23 @@ static int test_edge_cases(void) {
 
   ui_meter_base_create(&meter);
   ui_meter_base_bind_value(meter, (struct ui_signal *)1);
-  (void)ui_component_destroy((struct ui_component *)meter);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy((struct ui_component *)meter);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   for (i = 0; i < 4; i++) {
     g_malloc_fail_countdown = i;
     if (ui_meter_base_create(&meter) == UI_ERROR_NONE) {
-      (void)ui_component_destroy((struct ui_component *)meter);
+      {
+        ui_error_t rc_cleanup =
+            ui_component_destroy((struct ui_component *)meter);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;

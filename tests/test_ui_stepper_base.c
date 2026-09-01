@@ -47,8 +47,18 @@ static int test_ui_stepper_base_create_destroy(void) {
   if (!stepper)
     return 1;
 
-  (void)ui_stepper_base_destroy(stepper);
-  (void)ui_stepper_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_stepper_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -63,7 +73,12 @@ static int test_ui_stepper_base_get_component(void) {
             UI_ERROR_INVALID_ARGUMENT);
   ASSERT_SUCCESS(ui_stepper_base_get_component(stepper, &comp));
 
-  (void)ui_stepper_base_destroy(stepper);
+  {
+    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -76,7 +91,12 @@ static int test_ui_stepper_base_mode(void) {
   ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_NON_LINEAR));
   ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_LINEAR));
 
-  (void)ui_stepper_base_destroy(stepper);
+  {
+    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -219,7 +239,12 @@ static int test_ui_stepper_base_add_and_navigate(void) {
   ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
   ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_DEFAULT);
 
-  (void)ui_stepper_base_destroy(stepper);
+  {
+    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -234,7 +259,12 @@ static int test_ui_stepper_base_bindings(void) {
   ASSERT_EQ(ui_stepper_base_set_validate_hook(NULL, NULL, NULL),
             UI_ERROR_INVALID_ARGUMENT);
 
-  (void)ui_stepper_base_destroy(stepper);
+  {
+    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -255,7 +285,12 @@ static int test_ui_stepper_base_allocation_failures(void) {
     err = ui_stepper_base_create(&stepper);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      (void)ui_stepper_base_destroy(stepper);
+      {
+        ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }
@@ -275,11 +310,26 @@ static int test_ui_stepper_base_allocation_failures(void) {
     }
 
     ASSERT_EQ(err, UI_ERROR_OUT_OF_MEMORY);
-    (void)ui_dom_node_destroy(h1);
-    (void)ui_dom_node_destroy(c1);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(h1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(c1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_stepper_base_destroy(stepper);
+  {
+    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
   return 0;
 }
@@ -321,7 +371,12 @@ static int test_ui_stepper_base_edge_cases(void) {
   ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 0));
   ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1));
 
-  (void)ui_stepper_base_destroy(stepper);
+  {
+    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

@@ -10,7 +10,12 @@ static ui_error_t test_masonry_creation(void) {
   ui_error_t rc = ui_masonry_layout_base_create(&masonry);
   assert(rc == UI_ERROR_NONE);
   assert(masonry != NULL);
-  (void)ui_masonry_layout_base_destroy(masonry);
+  {
+    ui_error_t rc_cleanup = ui_masonry_layout_base_destroy(masonry);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_masonry_creation passed\n");
   return UI_ERROR_NONE;
 }
@@ -25,7 +30,12 @@ static ui_error_t test_masonry_reflow(void) {
   rc = ui_masonry_layout_base_reflow(masonry);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_masonry_layout_base_destroy(masonry);
+  {
+    ui_error_t rc_cleanup = ui_masonry_layout_base_destroy(masonry);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_masonry_reflow passed\n");
   return UI_ERROR_NONE;
 }
@@ -39,7 +49,12 @@ static void test_masonry_errors(void) {
   if (ui_masonry_layout_base_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
 
-  (void)ui_masonry_layout_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_masonry_layout_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_masonry_layout_base_reflow(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return;
@@ -61,7 +76,12 @@ static void test_masonry_errors(void) {
     return;
   ui_masonry_layout_base_get_component(masonry, &comp);
   ui_masonry_layout_base_bind_data(masonry, NULL);
-  (void)ui_masonry_layout_base_destroy(masonry);
+  {
+    ui_error_t rc_cleanup = ui_masonry_layout_base_destroy(masonry);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   int i;
   for (i = 0; i < 20; i++) {

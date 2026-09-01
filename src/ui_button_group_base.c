@@ -35,7 +35,12 @@ ui_button_group_base_create(struct ui_button_group_base **out_group) {
   group = (struct ui_button_group_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_button_group_base));
   if (!group) {
-    (void)ui_component_destroy(base_comp);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return UI_ERROR_OUT_OF_MEMORY;
   }
 

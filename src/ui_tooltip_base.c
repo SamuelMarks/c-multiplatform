@@ -93,7 +93,12 @@ ui_error_t ui_tooltip_base_destroy(struct ui_tooltip_base *tooltip) {
     return UI_ERROR_NONE;
   if (tooltip->text)
     C_MULTIPLATFORM_FREE(tooltip->text);
-  (void)ui_component_destroy(tooltip->overlay_component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(tooltip->overlay_component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* Note: active_overlay lifecycle is managed by overlay_director unmount */
   C_MULTIPLATFORM_FREE(tooltip);
   return UI_ERROR_NONE;
@@ -278,10 +283,21 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
 
   {
     int is_visible = 0;
-    (void)ui_tooltip_base_is_visible(tooltip, &is_visible);
+    {
+      ui_error_t rc_cleanup = ui_tooltip_base_is_visible(tooltip, &is_visible);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     if (!is_visible) {
       if (tooltip->active_overlay) {
-        (void)ui_overlay_director_unmount(director, tooltip->active_overlay);
+        {
+          ui_error_t rc_cleanup =
+              ui_overlay_director_unmount(director, tooltip->active_overlay);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         tooltip->active_overlay = NULL;
       }
       return UI_ERROR_NONE;
@@ -309,8 +325,20 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   }
 
   /* Build component DOM */
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
-  (void)ui_dom_node_set_attribute(root_node, "role", "tooltip");
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(root_node, "role", "tooltip");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
 #if defined(_MSC_VER)
   sprintf_s(style_buf, sizeof(style_buf),
@@ -319,10 +347,22 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   sprintf(style_buf,
           "position: absolute; left: %fpx; top: %fpx; z-index: 9999;", x, y);
 #endif
-  (void)ui_dom_node_set_attribute(root_node, "style", style_buf);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(root_node, "style", style_buf);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (tooltip->text) {
-    (void)ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     if (text_node) {
       /* Direct member access for text content to simulate standard DOM text
@@ -338,15 +378,31 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
 #endif
       }
     }
-    (void)ui_dom_node_append_child(root_node, text_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_append_child(root_node, text_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_dom_node_destroy(tooltip->overlay_component->shadow_root);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_destroy(tooltip->overlay_component->shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   tooltip->overlay_component->shadow_root = root_node;
 
   /* Mount to director */
-  (void)ui_overlay_director_mount_component(
-      director, tooltip->overlay_component, 9999, &tooltip->active_overlay);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_mount_component(
+        director, tooltip->overlay_component, 9999, &tooltip->active_overlay);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

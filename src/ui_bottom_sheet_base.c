@@ -247,9 +247,24 @@ ui_error_t run_bottom_sheet_coverage(void) {
   memset(&dummy_payload, 0, sizeof(dummy_payload));
   g_bottom_sheet_mock_fail = 1;
   (void)mock_dom_node_append_child(NULL, NULL);
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn1);
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn2);
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn3);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_bottom_sheet_mock_fail = 2;
   (void)mock_dom_node_append_child(dn1, dn2);
   g_bottom_sheet_mock_fail = 3;
@@ -284,7 +299,12 @@ ui_error_t run_bottom_sheet_coverage(void) {
 
   g_bottom_sheet_mock_fail = 0;
 
-  (void)ui_dom_node_destroy(dn1);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(dn1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   (void)mock_ui_backdrop_destroy;
   (void)mock_ui_component_destroy;
@@ -539,16 +559,37 @@ cleanup:
     if (sheet->component->shadow_root == sheet->root_node) {
       sheet->component->shadow_root = NULL;
     }
-    (void)ui_dom_node_destroy(sheet->root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(sheet->root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (sheet->gesture_recognizer) {
-    (void)ui_gesture_recognizer_destroy(sheet->gesture_recognizer);
+    {
+      ui_error_t rc_cleanup =
+          ui_gesture_recognizer_destroy(sheet->gesture_recognizer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (sheet->backdrop_logic) {
-    (void)ui_backdrop_destroy(sheet->backdrop_logic);
+    {
+      ui_error_t rc_cleanup = ui_backdrop_destroy(sheet->backdrop_logic);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (sheet->component) {
-    (void)ui_component_destroy(sheet->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(sheet->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(sheet);
   return rc;

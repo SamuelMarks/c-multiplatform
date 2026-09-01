@@ -10,7 +10,12 @@ static ui_error_t test_rte_creation(void) {
   ui_error_t rc = ui_rich_text_editor_base_create(&rte, NULL);
   assert(rc == UI_ERROR_NONE);
   assert(rte != NULL);
-  (void)ui_rich_text_editor_base_destroy(rte);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_rte_creation passed\n");
   return UI_ERROR_NONE;
 }
@@ -43,7 +48,12 @@ static ui_error_t test_rte_operations(void) {
   rc = ui_rich_text_editor_base_ime_end(rte);
   assert(rc == UI_ERROR_NONE);
 
-  (void)ui_rich_text_editor_base_destroy(rte);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   printf("test_rte_operations passed\n");
   return UI_ERROR_NONE;
 }
@@ -96,7 +106,12 @@ void test_ui_rte_coverage_errs(void) {
   g_malloc_fail_countdown = -1;
 }
 void test_ui_rte_errors3(void) {
-  (void)ui_rich_text_editor_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_rich_text_editor_base_get_component(NULL, NULL);
   struct ui_component *comp;
   ui_rich_text_editor_base_get_component(NULL, &comp);
@@ -185,7 +200,12 @@ void test_ui_rte_cva3(void) {
     struct ui_component *cmp;
     ui_rich_text_editor_base_get_component(rte, &cmp);
 
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 
@@ -201,7 +221,12 @@ void test_ui_rte_cva_nulls3(void) {
     cva.set_disabled_state(NULL, 1);
     cva.register_on_change(NULL, NULL, NULL);
     cva.register_on_touched(NULL, NULL, NULL);
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_ui_rte_coverage_errs4(void) {
@@ -235,7 +260,12 @@ void test_ui_rte_coverage_errs4(void) {
              "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     g_malloc_fail_countdown = -1;
 
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_ui_rte_coverage_errs5(void) {
@@ -268,7 +298,12 @@ void test_ui_rte_coverage_errs6(void) {
     val.ptr_val = NULL;
     cva.write_value(rte, val);
 
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_ui_rte_coverage_errs7(void) {
@@ -277,7 +312,12 @@ void test_ui_rte_coverage_errs7(void) {
   ui_rich_text_editor_base_create(&rte, &cva);
   if (rte) {
     ui_rich_text_editor_base_insert_text(rte, "foo");
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 
@@ -300,7 +340,12 @@ void test_ui_rte_coverage_errs8(void) {
     cva.register_on_change(rte, my_cva_on_change, NULL);
     cva.register_on_touched(rte, my_cva_on_touched, NULL);
     ui_rich_text_editor_base_insert_text(rte, "foo");
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 
@@ -387,7 +432,12 @@ void test_ui_rte_extra(void) {
     cva.register_on_touched(NULL, NULL, NULL);
     ui_rich_text_editor_base_get_component(NULL, &comp);
 
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* trigger oom */
@@ -414,7 +464,12 @@ void test_ui_rte_extra_more(void) {
     cva.register_on_change(rte, dummy_on_change, NULL);
     cva.register_on_touched(rte, dummy_on_touched, NULL);
     ui_rich_text_editor_base_insert_text(rte, "triggertouchandchange");
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_ui_rte_cva(void) {
@@ -429,7 +484,12 @@ void test_ui_rte_cva(void) {
     ui_rich_text_editor_base_insert_text(rte, "foo");
     cva.register_on_change(rte, NULL, NULL);
     cva.register_on_touched(rte, NULL, NULL);
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_ui_rte_cva_nulls(void) {
@@ -444,7 +504,12 @@ void test_ui_rte_cva_nulls(void) {
     cva.set_disabled_state(NULL, 1);
     cva.register_on_change(NULL, NULL, NULL);
     cva.register_on_touched(NULL, NULL, NULL);
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 void test_ui_rte_cva2(void) {
@@ -471,7 +536,12 @@ void test_ui_rte_cva2(void) {
 
     struct ui_component *comp;
     ui_rich_text_editor_base_get_component(rte, &comp);
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 #include "ui_rich_text_editor_base.h"
@@ -498,7 +568,12 @@ void test_ui_rte_coverage_errs14(void) {
     cva.register_on_touched(rte, failing_cva_on_touched, NULL);
     ui_rich_text_editor_base_insert_text(rte, "foo"); /* hits 266 */
 
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }
 
@@ -516,6 +591,11 @@ void test_ui_rte_coverage_errs15(void) {
     cva.set_disabled_state(rte, 1);
     g_malloc_fail_countdown = -1;
 
-    (void)ui_rich_text_editor_base_destroy(rte);
+    {
+      ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 }

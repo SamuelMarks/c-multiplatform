@@ -47,8 +47,18 @@ static int test_ui_split_button_base_create_destroy(void) {
   if (!btn)
     return 1;
 
-  (void)ui_split_button_base_destroy(btn);
-  (void)ui_split_button_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_split_button_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -78,7 +88,12 @@ static int test_ui_split_button_base_getters(void) {
             UI_ERROR_INVALID_ARGUMENT);
   ASSERT_SUCCESS(ui_split_button_base_get_component(btn, &comp));
 
-  (void)ui_split_button_base_destroy(btn);
+  {
+    ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -92,7 +107,12 @@ static int test_ui_split_button_base_disabled(void) {
   ASSERT_SUCCESS(ui_split_button_base_set_disabled(btn, 1));
   ASSERT_SUCCESS(ui_split_button_base_set_disabled(btn, 0));
 
-  (void)ui_split_button_base_destroy(btn);
+  {
+    ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -109,7 +129,12 @@ static int test_ui_split_button_base_bindings(void) {
             UI_ERROR_INVALID_ARGUMENT);
   ASSERT_SUCCESS(ui_split_button_base_bind_text(btn, NULL));
 
-  (void)ui_split_button_base_destroy(btn);
+  {
+    ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -129,7 +154,12 @@ static int test_ui_split_button_base_allocation_failures(void) {
     err = ui_split_button_base_create(&btn);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      (void)ui_split_button_base_destroy(btn);
+      {
+        ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

@@ -39,8 +39,18 @@ static int test_ui_toast_manager_base_create_destroy(void) {
   if (!manager)
     return 1;
 
-  (void)ui_toast_manager_base_destroy(manager);
-  (void)ui_toast_manager_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -78,7 +88,12 @@ static int test_ui_toast_manager_base_show_dismiss(void) {
   ASSERT_SUCCESS(ui_toast_manager_base_dismiss(
       manager, id1)); /* Dismissing again is valid if it's animating */
 
-  (void)ui_toast_manager_base_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -118,7 +133,12 @@ static int test_ui_toast_manager_base_tick(void) {
       ui_toast_manager_base_tick(manager, 3.5)); /* Slide out starts */
   ASSERT_SUCCESS(ui_toast_manager_base_tick(manager, 4.0)); /* Removed */
 
-  (void)ui_toast_manager_base_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -198,7 +218,12 @@ static int test_ui_toast_manager_base_events(void) {
       ui_toast_manager_base_tick(manager, 4.0)); /* Now they dismiss */
   ASSERT_SUCCESS(ui_toast_manager_base_tick(manager, 4.5)); /* Cleaned up */
 
-  (void)ui_toast_manager_base_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -267,8 +292,18 @@ static int test_ui_toast_manager_base_render(void) {
   ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
   ASSERT_SUCCESS(ui_toast_manager_base_render(manager, director));
 
-  (void)ui_toast_manager_base_destroy(manager);
-  (void)ui_overlay_director_destroy(director);
+  {
+    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -301,7 +336,12 @@ static int test_ui_toast_manager_base_allocation_failures(void) {
     ASSERT_EQ(err, UI_ERROR_OUT_OF_MEMORY);
   }
 
-  (void)ui_toast_manager_base_destroy(manager);
+  {
+    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
   return 0;
 }

@@ -30,7 +30,7 @@ static void test_scroll_snap_cases(void) {
   ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule);
 
   /* long length truncation */
-  char long_str[200];
+  char long_str[1024];
   memset(long_str, 'a', 190);
   long_str[190] = '\0';
   ui_css_rule_append_declaration(rule, "scroll-snap-type", long_str, 0);
@@ -293,7 +293,12 @@ static void test_scroll_snap_cases(void) {
         TEST_ASSERT(p.padding.top.value == 0.0f);
       });
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {

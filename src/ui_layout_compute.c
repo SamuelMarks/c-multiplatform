@@ -352,9 +352,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           node->computed_style, "text-decoration", &val);
       if (attr_rc2 == UI_ERROR_NONE) {
         /* Basic shorthand fallback */
-        {
-          (void)parse_text_decoration_line(val, &node->text_decoration_line);
-        }
+        { (void)parse_text_decoration_line(val, &node->text_decoration_line); }
       }
     }
   }
@@ -374,7 +372,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "text-decoration-color", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_color(val, &node->text_decoration_color);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_color(val, &node->text_decoration_color);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -413,7 +417,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "text-emphasis-color", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_color(val, &node->text_emphasis_color);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_color(val, &node->text_emphasis_color);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -423,7 +433,12 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         ui_css_computed_style_get_property(node->computed_style, "color", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_color(val, &node->text_color);
+        {
+          ui_error_t rc_cleanup = ui_css_parse_color(val, &node->text_color);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -433,7 +448,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "background-color", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_color(val, &node->background_color);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_color(val, &node->background_color);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -445,7 +466,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
       /* For multiple backgrounds we'd ideally split by comma. For Level 3/4
        * mock, we'll parse the first one */
       {
-        (void)ui_css_parse_image(val, &node->background_image[0]);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_image(val, &node->background_image[0]);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
       node->background_image_count = 1;
     }
@@ -476,7 +503,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "border-image-source", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_image(val, &node->border_image_source);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_image(val, &node->border_image_source);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -485,7 +518,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "border-image", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_image(val, &node->border_image_source);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_image(val, &node->border_image_source);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       } /* Very basic shorthand fallback */
     }
   }
@@ -592,7 +631,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "border-top-color", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_color(val, &node->border_color[0]);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_color(val, &node->border_color[0]);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -601,7 +646,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "border-right-color", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_color(val, &node->border_color[1]);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_color(val, &node->border_color[1]);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -610,7 +661,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "border-bottom-color", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_color(val, &node->border_color[2]);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_color(val, &node->border_color[2]);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -619,7 +676,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "border-left-color", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)ui_css_parse_color(val, &node->border_color[3]);
+        {
+          ui_error_t rc_cleanup =
+              ui_css_parse_color(val, &node->border_color[3]);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
     }
   }
@@ -866,9 +929,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
       {
         (void)parse_overflow(val, &node->overflow_x);
       }
-      {
-        (void)parse_overflow(val, &node->overflow_y);
-      }
+      { (void)parse_overflow(val, &node->overflow_y); }
     }
   }
   {

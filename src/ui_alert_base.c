@@ -62,38 +62,115 @@ ui_error_t run_alert_coverage(void) {
   struct ui_signal *sig = NULL;
 
   union ui_signal_payload initial;
-  (void)ui_alert_base_create(&alert);
+  {
+    ui_error_t rc_cleanup = ui_alert_base_create(&alert);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   initial.bool_val = 0;
-  (void)ui_signal_create(NULL, initial, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
+  {
+    ui_error_t rc_cleanup =
+        ui_signal_create(NULL, initial, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                          UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* Line 261: on_dismiss fails */
-  (void)ui_alert_base_set_dismissible(alert, 1);
-  (void)ui_alert_base_set_on_dismiss(alert, mock_on_dismiss_fail, NULL);
-  (void)ui_alert_base_set_open(alert, 1);
-  (void)ui_alert_base_set_open(alert, 0); /* actually triggers dismiss */
-  (void)ui_alert_base_set_on_dismiss(alert, NULL, NULL);
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_dismissible(alert, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_alert_base_set_on_dismiss(alert, mock_on_dismiss_fail, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  } /* actually triggers dismiss */
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_on_dismiss(alert, NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   /* Line 272: signal_set fails */
-  (void)ui_alert_base_bind_open(alert, sig);
+  {
+    ui_error_t rc_cleanup = ui_alert_base_bind_open(alert, sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_alert_mock_fail = 1;
-  (void)ui_alert_base_set_open(alert, 1);
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_alert_mock_fail = 0;
 
   /* Line 279: set_attribute fails */
-  (void)ui_alert_base_set_open(alert, 0);
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_alert_mock_fail = 2;
-  (void)ui_alert_base_set_open(alert, 1);
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_alert_mock_fail = 0;
 
   /* Line 283: remove_attribute fails */
-  (void)ui_alert_base_set_open(alert, 1); /* open first */
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  } /* open first */
   g_alert_mock_fail = 3;
-  (void)ui_alert_base_set_open(alert, 0);
+  {
+    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 0);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   g_alert_mock_fail = 0;
 
-  (void)ui_signal_destroy(sig);
-  (void)ui_alert_base_destroy(alert);
+  {
+    ui_error_t rc_cleanup = ui_signal_destroy(sig);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_alert_base_destroy(alert);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   return UI_ERROR_NONE;
 }
 #endif
@@ -148,21 +225,39 @@ ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert) {
     struct ui_dom_node *root_node = NULL;
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
     if (rc != UI_ERROR_NONE) {
-      (void)ui_component_destroy(alert->component);
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(alert->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE)
+            rc = rc_cleanup;
+        }
+      }
       C_MULTIPLATFORM_FREE(alert);
       return rc;
     }
 
     rc = ui_dom_node_set_tag_name(root_node, "dialog");
     if (rc != UI_ERROR_NONE) {
-      (void)ui_component_destroy(alert->component);
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(alert->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE)
+            rc = rc_cleanup;
+        }
+      }
       C_MULTIPLATFORM_FREE(alert);
       return rc;
     }
 
     rc = ui_dom_node_set_attribute(root_node, "role", "alert");
     if (rc != UI_ERROR_NONE) {
-      (void)ui_component_destroy(alert->component);
+      {
+        ui_error_t rc_cleanup = ui_component_destroy(alert->component);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          if (rc == UI_ERROR_NONE)
+            rc = rc_cleanup;
+        }
+      }
       C_MULTIPLATFORM_FREE(alert);
       return rc;
     }
@@ -181,7 +276,12 @@ ui_error_t ui_alert_base_destroy(struct ui_alert_base *alert) {
   if (!alert) {
     return UI_ERROR_NONE;
   }
-  (void)ui_component_destroy(alert->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(alert->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
   C_MULTIPLATFORM_FREE(alert);
   return UI_ERROR_NONE;
 }

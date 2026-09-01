@@ -69,7 +69,12 @@ static int test_ink_smoothing(void) {
       return 1;
   }
 
-  (void)ui_ink_base_destroy(ink);
+  {
+    ui_error_t rc_cleanup = ui_ink_base_destroy(ink);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -108,7 +113,12 @@ static int test_ink_oom_and_args(void) {
     g_malloc_fail_countdown = i;
     rc = ui_ink_base_create(&ink);
     if (rc == UI_ERROR_NONE) {
-      (void)ui_ink_base_destroy(ink);
+      {
+        ui_error_t rc_cleanup = ui_ink_base_destroy(ink);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }
@@ -131,9 +141,19 @@ static int test_ink_oom_and_args(void) {
     struct ui_ink_base *ink2;
     ui_ink_base_create(&ink2);
     ui_ink_base_get_component(ink2, &comp);
-    (void)ui_component_destroy(comp);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ((void **)ink2)[0] = NULL;
-    (void)ui_ink_base_destroy(ink2);
+    {
+      ui_error_t rc_cleanup = ui_ink_base_destroy(ink2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Force OOM during loop by adding lots of events */
@@ -158,13 +178,23 @@ static int test_ink_oom_and_args(void) {
     ui_ink_base_create(&ink3);
     ui_ink_base_add_event(ink3, &ev1);
     ui_ink_base_finish_stroke(ink3);
-    (void)ui_ink_base_destroy(ink3);
+    {
+      ui_error_t rc_cleanup = ui_ink_base_destroy(ink3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
 
     ui_ink_base_create(&ink3);
     ui_ink_base_add_event(ink3, &ev1);
     ui_ink_base_add_event(ink3, &ev2);
     ui_ink_base_finish_stroke(ink3);
-    (void)ui_ink_base_destroy(ink3);
+    {
+      ui_error_t rc_cleanup = ui_ink_base_destroy(ink3);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test OOM paths inside finish_stroke and append_smoothed_segment */
@@ -210,7 +240,12 @@ static int test_ink_oom_and_args(void) {
         return 1;
       g_malloc_fail_countdown = -1;
 
-      (void)ui_ink_base_destroy(ink_first);
+      {
+        ui_error_t rc_cleanup = ui_ink_base_destroy(ink_first);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     /* OOM inside finish_stroke when raw_count == 2 */
@@ -233,13 +268,28 @@ static int test_ink_oom_and_args(void) {
          g_malloc_fail_countdown = 0 to fail ANY realloc, but there is no
          realloc here.
       */
-      (void)ui_ink_base_destroy(ink_two);
+      {
+        ui_error_t rc_cleanup = ui_ink_base_destroy(ink_two);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
-    (void)ui_ink_base_destroy(ink_oom);
+    {
+      ui_error_t rc_cleanup = ui_ink_base_destroy(ink_oom);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_ink_base_destroy(ink);
+  {
+    ui_error_t rc_cleanup = ui_ink_base_destroy(ink);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 

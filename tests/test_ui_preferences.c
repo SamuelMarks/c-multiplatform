@@ -44,13 +44,23 @@ static int test_preferences_lifecycle(void) {
 
   err = ui_preferences_create(pool, ctx, &prefs);
   if (err != UI_ERROR_NONE) {
-    (void)ui_execution_context_destroy(ctx);
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_thread_pool_destroy(pool);
     return 1;
   }
 
   ui_preferences_destroy(prefs);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
 
   return 0;
@@ -90,7 +100,12 @@ static int test_preferences_set_get(void) {
 #endif
 
   ui_preferences_destroy(prefs);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
 
   return 0;
@@ -114,14 +129,24 @@ static int test_preferences_save_binary(void) {
     return 1;
 
 #if defined(__EMSCRIPTEN__)
-  /* Resolves eventually via JS */
+    /* Resolves eventually via JS */
 #else
-  /* Rejected natively currently */
+    /* Rejected natively currently */
 #endif
 
-  (void)ui_promise_destroy(promise);
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_preferences_destroy(prefs);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
 
   return 0;
@@ -176,7 +201,12 @@ static int test_preferences_nulls(void) {
     return 1;
 
   ui_preferences_destroy(prefs);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
   return 0;
 }
@@ -204,7 +234,12 @@ static int test_preferences_oom(void) {
   g_malloc_fail_countdown = -1;
 
   ui_preferences_destroy(prefs);
-  (void)ui_execution_context_destroy(ctx);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_thread_pool_destroy(pool);
   return 0;
 }

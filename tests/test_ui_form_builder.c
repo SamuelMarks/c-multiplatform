@@ -37,7 +37,12 @@ static int test_form_builder_oom(void) {
     ui_form_builder_group_start(dummy_builder, "nested");
     g_malloc_fail_countdown = -1;
 
-    (void)ui_form_builder_destroy(dummy_builder);
+    {
+      ui_error_t rc_cleanup = ui_form_builder_destroy(dummy_builder);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test group_start nested group add_node fail */
@@ -50,7 +55,12 @@ static int test_form_builder_oom(void) {
     ui_form_builder_group_start(dummy_builder, "nested");
     g_malloc_fail_countdown = -1;
 
-    (void)ui_form_builder_destroy(dummy_builder);
+    {
+      ui_error_t rc_cleanup = ui_form_builder_destroy(dummy_builder);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test array_start fail */
@@ -62,7 +72,12 @@ static int test_form_builder_oom(void) {
     ui_form_builder_array_start(dummy_builder, "arr");
     g_malloc_fail_countdown = -1;
 
-    (void)ui_form_builder_destroy(dummy_builder);
+    {
+      ui_error_t rc_cleanup = ui_form_builder_destroy(dummy_builder);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test array_start nested array push fail */
@@ -75,7 +90,12 @@ static int test_form_builder_oom(void) {
     ui_form_builder_array_start(dummy_builder, "arr2");
     g_malloc_fail_countdown = -1;
 
-    (void)ui_form_builder_destroy(dummy_builder);
+    {
+      ui_error_t rc_cleanup = ui_form_builder_destroy(dummy_builder);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Test control_create fail and add_validator fail and array_push fail */
@@ -89,7 +109,12 @@ static int test_form_builder_oom(void) {
                             dummy_validate_fail2, NULL);
     g_malloc_fail_countdown = -1;
 
-    (void)ui_form_builder_destroy(dummy_builder);
+    {
+      ui_error_t rc_cleanup = ui_form_builder_destroy(dummy_builder);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Build without root */
@@ -97,10 +122,20 @@ static int test_form_builder_oom(void) {
     ui_form_group_t *root = NULL;
     ui_form_builder_create(tiny_arena, &dummy_builder);
     ui_form_builder_build(dummy_builder, &root);
-    (void)ui_form_builder_destroy(dummy_builder);
+    {
+      ui_error_t rc_cleanup = ui_form_builder_destroy(dummy_builder);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_arena_destroy(tiny_arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(tiny_arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -148,7 +183,12 @@ static int test_form_builder(void) {
   if (ui_form_builder_build(builder, &root) != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_form_builder_destroy(builder);
+  {
+    ui_error_t rc_cleanup = ui_form_builder_destroy(builder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Null checks */
   ui_form_builder_create(NULL, NULL);
@@ -159,7 +199,12 @@ static int test_form_builder(void) {
   ui_form_builder_array_end(NULL);
   ui_form_builder_control(NULL, NULL, dummy, 0, NULL, NULL);
   ui_form_builder_build(NULL, NULL);
-  (void)ui_form_builder_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_form_builder_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Error states */
   ui_form_builder_create(arena, &builder);
@@ -179,7 +224,12 @@ static int test_form_builder(void) {
   }
   ui_form_builder_group_start(builder, "nested");     /* 32nd should fail */
   ui_form_builder_array_start(builder, "nested_arr"); /* should fail */
-  (void)ui_form_builder_destroy(builder);
+  {
+    ui_error_t rc_cleanup = ui_form_builder_destroy(builder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Test Extra builder errors */
   ui_form_builder_create(arena, &builder);
@@ -194,7 +244,12 @@ static int test_form_builder(void) {
   ui_form_builder_build(
       builder, (ui_form_group_t **)&dummy.ptr_val); /* error depth!=0 */
 
-  (void)ui_form_builder_destroy(builder);
+  {
+    ui_error_t rc_cleanup = ui_form_builder_destroy(builder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ui_form_builder_create(arena, &builder);
   ui_form_builder_build(builder,
@@ -205,13 +260,23 @@ static int test_form_builder(void) {
                           dummy_validate_fail2, NULL);
   ui_form_builder_group_end(builder);
   ui_form_builder_build(builder, &root);
-  (void)ui_form_builder_destroy(builder);
+  {
+    ui_error_t rc_cleanup = ui_form_builder_destroy(builder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   {
     ui_form_node_t n;
     ui_form_group_get_node(root, "ctrl", &n);
     ui_form_control_set_value(n.node.control, dummy); /* triggers equality */
-    (void)ui_form_control_destroy(n.node.control);
+    {
+      ui_error_t rc_cleanup = ui_form_control_destroy(n.node.control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   g_malloc_fail_countdown = 0;
@@ -219,7 +284,12 @@ static int test_form_builder(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -242,6 +312,16 @@ static void force_depth_error(void) {
   ui_form_builder_group_start(builder, "root");
   ui_form_builder_group_start(builder, "child");
   ui_form_builder_build(builder, &root); /* triggers depth!=0 error */
-  (void)ui_form_builder_destroy(builder);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_form_builder_destroy(builder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }

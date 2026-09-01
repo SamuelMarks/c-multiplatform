@@ -113,7 +113,13 @@ static ui_error_t update_dom_state(struct ui_form_field_base *field) {
     if (rc != UI_ERROR_NONE)
       goto cleanup;
   } else {
-    (void)ui_dom_node_remove_attribute(field->root_node, "class");
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_remove_attribute(field->root_node, "class");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   if (field->error_text && field->error_text[0] != '\0') {
@@ -121,7 +127,13 @@ static ui_error_t update_dom_state(struct ui_form_field_base *field) {
     if (rc != UI_ERROR_NONE)
       goto cleanup;
   } else {
-    (void)ui_dom_node_remove_attribute(field->root_node, "data-error");
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_remove_attribute(field->root_node, "data-error");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   rc = ui_dom_node_set_text_content(field->label_node->first_child,
@@ -173,49 +185,108 @@ ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field) {
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->root_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->root_node, "div");
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(field->root_node, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->wrapper_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->wrapper_node, "div");
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_tag_name(field->wrapper_node, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = ui_dom_node_set_attribute(field->wrapper_node, "class", "wrapper");
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_append_child(field->root_node, field->wrapper_node);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(field->root_node, field->wrapper_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->prefix_container);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->prefix_container, "div");
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_tag_name(field->prefix_container, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = ui_dom_node_set_attribute(field->prefix_container, "class", "prefix");
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_append_child(field->wrapper_node, field->prefix_container);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(field->wrapper_node, field->prefix_container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->control_container);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->control_container, "div");
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_tag_name(field->control_container, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = ui_dom_node_set_attribute(field->control_container, "class",
                                  "control-container");
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_append_child(field->wrapper_node, field->control_container);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(field->wrapper_node, field->control_container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->suffix_container);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->suffix_container, "div");
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_tag_name(field->suffix_container, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = ui_dom_node_set_attribute(field->suffix_container, "class", "suffix");
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_append_child(field->wrapper_node, field->suffix_container);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(field->wrapper_node, field->suffix_container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->label_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->label_node, "label");
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_tag_name(field->label_node, "label");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = ui_dom_node_set_attribute(field->label_node, "class", "label");
   if (rc != UI_ERROR_NONE)
     goto cleanup;
@@ -224,23 +295,52 @@ ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field) {
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
     if (rc != UI_ERROR_NONE)
       goto cleanup;
-    (void)ui_dom_node_append_child(field->label_node, text_node);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_append_child(field->label_node, text_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_dom_node_append_child(field->wrapper_node, field->label_node);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(field->wrapper_node, field->label_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->subscript_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->subscript_node, "div");
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_tag_name(field->subscript_node, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = ui_dom_node_set_attribute(field->subscript_node, "class", "subscript");
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_append_child(field->root_node, field->subscript_node);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(field->root_node, field->subscript_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->hint_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->hint_node, "div");
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(field->hint_node, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = ui_dom_node_set_attribute(field->hint_node, "class", "hint");
   if (rc != UI_ERROR_NONE)
     goto cleanup;
@@ -249,14 +349,31 @@ ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field) {
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
     if (rc != UI_ERROR_NONE)
       goto cleanup;
-    (void)ui_dom_node_append_child(field->hint_node, text_node);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_append_child(field->hint_node, text_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_dom_node_append_child(field->subscript_node, field->hint_node);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(field->subscript_node, field->hint_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &field->error_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)ui_dom_node_set_tag_name(field->error_node, "div");
+  {
+    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(field->error_node, "div");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   rc = ui_dom_node_set_attribute(field->error_node, "class", "error-text");
   if (rc != UI_ERROR_NONE)
     goto cleanup;
@@ -265,15 +382,33 @@ ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field) {
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
     if (rc != UI_ERROR_NONE)
       goto cleanup;
-    (void)ui_dom_node_append_child(field->error_node, text_node);
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_append_child(field->error_node, text_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
-  (void)ui_dom_node_append_child(field->subscript_node, field->error_node);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_append_child(field->subscript_node, field->error_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rc = ui_css_parse_stylesheet(ui_form_field_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  (void)ui_component_set_default_style(field->component, default_style);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_set_default_style(field->component, default_style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   field->component->shadow_root = field->root_node;
 
@@ -281,9 +416,18 @@ ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field) {
   return UI_ERROR_NONE;
 
 cleanup:
-  if (field->root_node)
-    (void)ui_dom_node_destroy(field->root_node);
-  (void)ui_component_destroy(field->component);
+  if (field->root_node) {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(field->root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(field->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(field);
   return rc;
 }
@@ -297,10 +441,20 @@ ui_error_t ui_form_field_base_destroy(struct ui_form_field_base *field) {
   if (!field)
     return UI_ERROR_NONE;
   if (field->binding_effect) {
-    (void)ui_effect_destroy(field->binding_effect);
+    {
+      ui_error_t rc_cleanup = ui_effect_destroy(field->binding_effect);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (field->binding_arena) {
-    (void)ui_arena_destroy(field->binding_arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(field->binding_arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (field->label_text)
     C_MULTIPLATFORM_FREE(field->label_text);
@@ -308,7 +462,12 @@ ui_error_t ui_form_field_base_destroy(struct ui_form_field_base *field) {
     C_MULTIPLATFORM_FREE(field->hint_text);
   if (field->error_text)
     C_MULTIPLATFORM_FREE(field->error_text);
-  (void)ui_component_destroy(field->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(field->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(field);
   return UI_ERROR_NONE;
 }
@@ -536,7 +695,12 @@ static ui_error_t error_effect_runner(void *user_data) {
   union ui_signal_payload val;
   val.ptr_val = NULL;
 
-  (void)ui_signal_get(data->errors_signal, &val);
+  {
+    ui_error_t rc_cleanup = ui_signal_get(data->errors_signal, &val);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return ui_form_field_base_set_error(data->field, (const char *)val.ptr_val);
 }
 
@@ -586,13 +750,24 @@ ui_form_field_base_bind_form_control(struct ui_form_field_base *field,
 
   rc = ui_arena_alloc(arena, sizeof(*data), 8, (void **)&data);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_arena_destroy(arena);
+    {
+      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     return rc;
   }
   data->field = field;
   data->errors_signal = err_sig;
 
-  (void)ui_effect_create(arena, error_effect_runner, data, reactor, &eff);
+  {
+    ui_error_t rc_cleanup =
+        ui_effect_create(arena, error_effect_runner, data, reactor, &eff);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   field->binding_arena = arena;
   field->binding_effect = eff;

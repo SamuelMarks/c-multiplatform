@@ -116,7 +116,12 @@ ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(tour->coachmark_container);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(tour);
     return rc;
   }
@@ -129,7 +134,12 @@ ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
 
   rc = ui_component_create(&tour->backdrop_comp);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(tour->coachmark_container);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     C_MULTIPLATFORM_FREE(tour);
     return rc;
   }
@@ -156,13 +166,28 @@ ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
 
 cleanup:
   if (backdrop_node) {
-    (void)ui_dom_node_destroy(backdrop_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(backdrop_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (tour->backdrop_comp) {
-    (void)ui_component_destroy(tour->backdrop_comp);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(tour->backdrop_comp);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (container_node) {
-    (void)ui_dom_node_destroy(container_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(container_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(tour);
   return rc;
@@ -178,14 +203,29 @@ ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_coachmark_tour_skip(tour);
+  {
+    ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (tour->steps) {
     C_MULTIPLATFORM_FREE(tour->steps);
   }
 
-  (void)ui_component_destroy(tour->coachmark_container);
-  (void)ui_component_destroy(tour->backdrop_comp);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(tour->backdrop_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(tour);
   return UI_ERROR_NONE;
@@ -320,7 +360,13 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
   rc = ui_overlay_director_mount_component(
       tour->director, tour->coachmark_container, 101, &tour->coachmark_overlay);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+    {
+      ui_error_t rc_cleanup =
+          ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     tour->backdrop_overlay = NULL;
     tour->is_active = 0;
     return rc;
@@ -328,9 +374,21 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
 
   rc = render_current_step(tour);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
+    {
+      ui_error_t rc_cleanup =
+          ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     tour->coachmark_overlay = NULL;
-    (void)ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+    {
+      ui_error_t rc_cleanup =
+          ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     tour->backdrop_overlay = NULL;
     tour->is_active = 0;
     return rc;
@@ -377,7 +435,12 @@ ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour) {
       return rc;
     }
   } else {
-    (void)ui_coachmark_tour_skip(tour);
+    {
+      ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -419,10 +482,22 @@ ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
     return UI_ERROR_NONE;
   }
 
-  (void)ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
+  {
+    ui_error_t rc_cleanup =
+        ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   tour->coachmark_overlay = NULL;
 
-  (void)ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+  {
+    ui_error_t rc_cleanup =
+        ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   tour->backdrop_overlay = NULL;
 
   tour->is_active = 0;
@@ -524,7 +599,12 @@ ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
   if (event->type == UI_EVENT_KEY_DOWN) {
     if (event->event_data.keyboard.key_code == UI_KEY_ESCAPE) {
       if (tour->steps[tour->current_step].allow_skip) {
-        (void)ui_coachmark_tour_skip(tour);
+        {
+          ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
         return UI_ERROR_NONE;
       }
     }

@@ -119,7 +119,12 @@ static int run_oom_tests(void) {
       ui_divider_base_set_inset(divider, 0);
       g_malloc_fail_countdown = -1;
 
-      (void)ui_divider_base_destroy(divider);
+      {
+        ui_error_t rc_cleanup = ui_divider_base_destroy(divider);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 

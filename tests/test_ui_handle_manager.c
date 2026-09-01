@@ -113,7 +113,12 @@ static void run_oom_tests_handle_manager(void) {
     rc = ui_handle_manager_create(10, &mgr);
     g_malloc_fail_countdown = -1;
     if (rc == UI_ERROR_NONE) {
-      (void)ui_handle_manager_destroy(mgr);
+      {
+        ui_error_t rc_cleanup = ui_handle_manager_destroy(mgr);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

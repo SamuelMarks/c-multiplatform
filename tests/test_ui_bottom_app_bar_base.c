@@ -18,7 +18,12 @@ static void test_bottom_app_bar_edge_cases(void) {
 
   /* Invalid arguments */
   assert(ui_bottom_app_bar_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
-  (void)ui_bottom_app_bar_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   assert(ui_bottom_app_bar_base_get_component(NULL, &comp) ==
          UI_ERROR_INVALID_ARGUMENT);
@@ -47,8 +52,18 @@ static void test_bottom_app_bar_edge_cases(void) {
   assert(ui_bottom_app_bar_base_set_fab(
              bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER) == UI_ERROR_NONE);
 
-  (void)ui_bottom_app_bar_base_destroy(bar);
-  (void)ui_fab_base_destroy(fab);
+  {
+    ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(bar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* OOM loop */
   for (i = 0; i < 20; i++) {
@@ -56,7 +71,12 @@ static void test_bottom_app_bar_edge_cases(void) {
     struct ui_bottom_app_bar_base *test_bar = NULL;
     rc = ui_bottom_app_bar_base_create(&test_bar);
     if (rc == UI_ERROR_NONE) {
-      (void)ui_bottom_app_bar_base_destroy(test_bar);
+      {
+        ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(test_bar);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     } else {
       assert(rc == UI_ERROR_OUT_OF_MEMORY);
@@ -102,8 +122,18 @@ int main(void) {
     return 1;
   }
 
-  (void)ui_bottom_app_bar_base_destroy(bar);
-  (void)ui_fab_base_destroy(fab);
+  {
+    ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(bar);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   test_bottom_app_bar_edge_cases();
 

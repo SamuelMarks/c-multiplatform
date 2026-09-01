@@ -61,7 +61,12 @@ static int run_normal_tests(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   /* trigger UI_STRCPY fail if mock alloc enabled */
   g_mock_strcpy_fail = 1;
-  (void)ui_toolbar_base_set_title(tb, "Test fail");
+  {
+    ui_error_t rc_cleanup = ui_toolbar_base_set_title(tb, "Test fail");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   g_mock_strcpy_fail = 0;
 #endif
 

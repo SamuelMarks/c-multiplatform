@@ -289,7 +289,13 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
     goto cleanup;
   }
 
-  (void)ui_component_set_default_style(rte->component, default_style);
+  {
+    ui_error_t rc_cleanup =
+        ui_component_set_default_style(rte->component, default_style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   rte->component->shadow_root = root_node;
   root_node = NULL;
@@ -306,10 +312,20 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (rte->component) {
-    (void)ui_component_destroy(rte->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(rte->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(rte);
   return rc;
@@ -327,7 +343,12 @@ ui_rich_text_editor_base_destroy(struct ui_rich_text_editor_base *rte) {
     return UI_ERROR_NONE;
   }
   if (rte->component) {
-    (void)ui_component_destroy(rte->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(rte->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (rte->html_buffer) {
     C_MULTIPLATFORM_FREE(rte->html_buffer);

@@ -116,9 +116,19 @@ static void test_miller_errors(void) {
       ui_miller_columns_base_create(small_arena, &model, NULL, &miller_small);
       g_malloc_fail_countdown = -1;
       if (miller_small) {
-        (void)ui_miller_columns_base_destroy(miller_small);
+        {
+          ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller_small);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
-      (void)ui_arena_destroy(small_arena);
+      {
+        ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 
@@ -128,7 +138,12 @@ static void test_miller_errors(void) {
     struct ui_miller_columns_base *miller2 = NULL;
     ui_miller_columns_base_create(arena, &model, NULL, &miller2);
     ui_miller_columns_base_select_item(miller2, 0, &mock_fs[1]);
-    (void)ui_miller_columns_base_destroy(miller2);
+    {
+      ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller2);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   model.get_child_count = mock_get_child_count;
 
@@ -170,8 +185,18 @@ static void test_miller_errors(void) {
   ui_miller_columns_base_navigate_left(miller);
   ui_miller_columns_base_navigate_right(miller);
 
-  (void)ui_miller_columns_base_destroy(miller);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 extern int g_malloc_fail_countdown;
@@ -196,7 +221,12 @@ static void test_oom(void) {
     ui_miller_columns_base_create(arena, &model, NULL, &miller);
     g_malloc_fail_countdown = -1;
     if (miller) {
-      (void)ui_miller_columns_base_destroy(miller);
+      {
+        ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
 
@@ -207,8 +237,18 @@ static void test_oom(void) {
     g_malloc_fail_countdown = -1;
   }
 
-  (void)ui_miller_columns_base_destroy(miller);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
 }
 
@@ -227,7 +267,12 @@ static void test_miller_missing_coverage(void) {
   ui_miller_columns_base_navigate_left(NULL);
   ui_miller_columns_base_navigate_right(NULL);
   ui_miller_columns_base_create(NULL, NULL, NULL, NULL);
-  (void)ui_miller_columns_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_miller_columns_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_miller_columns_base_select_item(NULL, 0, NULL);
   ui_miller_columns_base_get_column_count(NULL, NULL);
   ui_miller_columns_base_get_topology_changed_signal(NULL, NULL);
@@ -246,8 +291,18 @@ static void test_miller_missing_coverage(void) {
   for (i = 0; i < 10; i++) {
     ui_miller_columns_base_navigate_right(miller);
   }
-  (void)ui_miller_columns_base_destroy(miller);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {
@@ -321,6 +376,11 @@ int main(void) {
   if (err != UI_ERROR_NONE)
     return 1;
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }

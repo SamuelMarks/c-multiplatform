@@ -66,7 +66,13 @@ static ui_error_t test_link_base(void) {
                 "Click Again") == 0);
 
   /* Set text with OOM for text node creation */
-  (void)ui_dom_node_destroy(link->base.shadow_root->first_child);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_destroy(link->base.shadow_root->first_child);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   link->base.shadow_root->first_child = NULL;
 
   g_malloc_fail_countdown = 0;
@@ -83,7 +89,12 @@ static ui_error_t test_link_base(void) {
   assert(err == UI_ERROR_NONE);
   assert(link->text_signal == signal);
 
-  (void)ui_component_destroy((struct ui_component *)link);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy((struct ui_component *)link);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

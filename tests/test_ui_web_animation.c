@@ -77,7 +77,10 @@ static int test_web_animation_lifecycle(void) {
   }
 
   ui_web_animation_destroy(animation);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+  }
   return failed;
 }
 
@@ -127,7 +130,10 @@ static int test_web_animation_reverse(void) {
   }
 
   ui_web_animation_destroy(animation);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+  }
   return failed;
 }
 
@@ -159,7 +165,10 @@ static int test_scroll_driven_timelines(void) {
   ui_web_animation_timeline_destroy(scroll_timeline);
   ui_web_animation_timeline_destroy(view_timeline);
   ui_web_animation_timeline_destroy(pointer_timeline);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+  }
   return failed;
 }
 
@@ -232,7 +241,10 @@ static int test_web_animation_extra(void) {
   ui_web_animation_effect_create_keyframe_effect(node, NULL, &timing, &effect);
   ui_web_animation_effect_destroy(effect);
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+  }
   return failed;
 }
 
@@ -379,7 +391,10 @@ static int test_web_animation_coverage(void) {
   ui_web_animation_tick(animation, 2000.0);
 
   ui_web_animation_destroy(animation);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+  }
   return failed;
 }
 
@@ -482,7 +497,10 @@ static int test_web_animation_more_coverage(void) {
   ui_web_animation_set_current_time(animation, -500.0);
 
   ui_web_animation_destroy(animation);
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+  }
 
   return failed;
 }

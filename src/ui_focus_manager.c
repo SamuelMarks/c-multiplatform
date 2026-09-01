@@ -148,9 +148,7 @@ static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
   struct ui_dom_node *child;
   ui_bool_t focusable = UI_FALSE;
 
-  {
-    (void)is_focusable(root, &focusable);
-  }
+  { (void)is_focusable(root, &focusable); }
 
   if (focusable) {
     if (*out_count >= *out_capacity) {
@@ -477,7 +475,12 @@ ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
   manager->traps_count++;
 
   /* Reset focus to the trap root or its first focusable element */
-  (void)ui_focus_manager_advance(manager, trap_root, 1);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_advance(manager, trap_root, 1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }

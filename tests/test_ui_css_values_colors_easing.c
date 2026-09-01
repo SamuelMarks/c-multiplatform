@@ -73,7 +73,7 @@ int test_css_values_colors_easing(void) {
   ext_val = NULL;
 
   /* Test env() parsing failures and truncation */
-  char long_env[128];
+  char long_env[1024];
   UI_STRCPY(long_env, 1024, "env(");
   memset(long_env + 4, 'B', 100);
   UI_STRCPY(long_env + 104, 1024 - 104, ")");

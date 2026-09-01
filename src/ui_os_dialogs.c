@@ -59,8 +59,19 @@ struct ui_os_color_task {
 ui_error_t ui_os_file_completion(void *user_data) {
   struct ui_os_file_task *task = (struct ui_os_file_task *)user_data;
   ui_error_t rc = UI_ERROR_NONE;
-  (void)ui_file_uploader_drop_file(task->uploader, task->result_path);
-  (void)ui_file_uploader_read_files(task->uploader);
+  {
+    ui_error_t rc_cleanup =
+        ui_file_uploader_drop_file(task->uploader, task->result_path);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_file_uploader_read_files(task->uploader);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(task);
   return rc;
 }

@@ -76,7 +76,12 @@ ui_error_t ui_engine_create(const struct ui_engine_config *config,
     goto cleanup;
   }
 
-  (void)ui_timer_create_monotonic(&engine->timer);
+  {
+    ui_error_t rc_cleanup = ui_timer_create_monotonic(&engine->timer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   *out_engine = engine;
   engine = NULL;
@@ -85,11 +90,21 @@ cleanup:
   if (engine) {
     if (engine->thread_pool) {
 #ifndef UI_SINGLE_THREADED
-      (void)ui_thread_pool_destroy(engine->thread_pool);
+      {
+        ui_error_t rc_cleanup = ui_thread_pool_destroy(engine->thread_pool);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
 #endif
     }
     if (engine->tick_engine) {
-      (void)ui_tick_engine_destroy(engine->tick_engine);
+      {
+        ui_error_t rc_cleanup = ui_tick_engine_destroy(engine->tick_engine);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
     C_MULTIPLATFORM_FREE(engine);
   }
@@ -107,18 +122,38 @@ ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   }
 
   if (engine->timer) {
-    (void)ui_timer_destroy(engine->timer);
+    {
+      ui_error_t rc_cleanup = ui_timer_destroy(engine->timer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (engine->reactor) {
-    (void)ui_reactor_destroy(engine->reactor);
+    {
+      ui_error_t rc_cleanup = ui_reactor_destroy(engine->reactor);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 #ifndef UI_SINGLE_THREADED
   if (engine->thread_pool) {
-    (void)ui_thread_pool_destroy(engine->thread_pool);
+    {
+      ui_error_t rc_cleanup = ui_thread_pool_destroy(engine->thread_pool);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 #endif
   if (engine->tick_engine) {
-    (void)ui_tick_engine_destroy(engine->tick_engine);
+    {
+      ui_error_t rc_cleanup = ui_tick_engine_destroy(engine->tick_engine);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   C_MULTIPLATFORM_FREE(engine);

@@ -46,8 +46,18 @@ int main(void) {
     }
 
     g_malloc_fail_countdown = -1;
-    (void)ui_asset_streamer_destroy(streamer);
-    (void)ui_execution_context_destroy(ctx);
+    {
+      ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     ui_thread_pool_destroy(pool);
   }
 

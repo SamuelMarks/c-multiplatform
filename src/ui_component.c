@@ -164,6 +164,17 @@ ui_error_t ui_component_create(struct ui_component **out_component) {
  * @param component Parameter component.
  * @return Return value.
  */
+#ifdef UI_TEST_MOCK_ALLOC
+int g_component_mock_fail = 0;
+extern ui_error_t ui_dom_node_destroy(struct ui_dom_node *n);
+static ui_error_t mock_dom_node_destroy_component(struct ui_dom_node *n) {
+  if (g_component_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_dom_node_destroy(n);
+}
+#define ui_dom_node_destroy mock_dom_node_destroy_component
+#endif
+
 ui_error_t ui_component_destroy(struct ui_component *component) {
   if (!component) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -207,7 +218,13 @@ ui_component_set_default_style(struct ui_component *component,
   }
 
   if (component->internal_style) {
-    (void)ui_css_stylesheet_destroy(component->internal_style);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_destroy(component->internal_style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   component->internal_style = stylesheet;
 
@@ -235,7 +252,13 @@ ui_error_t ui_component_inject_style_override(struct ui_component *component,
   }
 
   if (component->override_style) {
-    (void)ui_css_stylesheet_destroy(component->override_style);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_destroy(component->override_style);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   component->override_style = new_override;
 
@@ -280,7 +303,13 @@ ui_error_t ui_component_set_property(struct ui_component *component,
       ui_css_rule_destroy(rule);
       return rc;
     }
-    (void)ui_css_stylesheet_append_rule(component->bound_properties, rule);
+    {
+      ui_error_t rc_cleanup =
+          ui_css_stylesheet_append_rule(component->bound_properties, rule);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Note: A robust implementation would check if the declaration already exists

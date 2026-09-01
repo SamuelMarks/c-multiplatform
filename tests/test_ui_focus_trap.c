@@ -99,9 +99,24 @@ static int run_normal_tests(void) {
   }
 
   ui_focus_trap_destroy(trap);
-  (void)ui_keyboard_responder_destroy(kbd);
-  (void)ui_focus_manager_destroy(mgr);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_keyboard_responder_destroy(kbd);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = -1;
@@ -151,8 +166,18 @@ static int run_oom_tests(void) {
 
   /* We manually popped, so just destroy */
   ui_focus_trap_destroy(trap);
-  (void)ui_focus_manager_destroy(mgr);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = -1;
@@ -245,9 +270,24 @@ static int run_coverage_tests(void) {
   trap_test->manager = NULL;
   ui_focus_trap_destroy(trap);
 
-  (void)ui_keyboard_responder_destroy(kbd);
-  (void)ui_focus_manager_destroy(mgr);
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_keyboard_responder_destroy(kbd);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_focus_manager_destroy(mgr);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
 #ifdef UI_TEST_MOCK_ALLOC
   g_malloc_fail_countdown = -1;

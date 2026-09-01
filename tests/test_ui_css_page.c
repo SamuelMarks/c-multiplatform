@@ -181,7 +181,12 @@ static void test_page_parse_cases(void) {
     ui_css_page_properties_cleanup(&p);
   }
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 }
 
 int main(void) {

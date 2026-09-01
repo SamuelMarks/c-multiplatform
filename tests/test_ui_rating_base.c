@@ -217,7 +217,12 @@ static int run_normal_tests(void) {
   if (rc != UI_ERROR_NONE || !icon)
     return 1;
 
-  (void)ui_rating_base_destroy(rating);
+  {
+    ui_error_t rc_cleanup = ui_rating_base_destroy(rating);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   {
     /* Test destruction branch when only some icons were allocated due to
@@ -240,7 +245,12 @@ static int run_normal_tests(void) {
     ui_rating_base_create(&rating3, NULL);
     g_malloc_fail_countdown = -1;
 
-    (void)ui_rating_base_destroy(NULL);
+    {
+      ui_error_t rc_cleanup = ui_rating_base_destroy(NULL);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return 0;

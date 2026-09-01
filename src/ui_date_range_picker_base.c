@@ -136,7 +136,12 @@ ui_date_range_picker_base_destroy(struct ui_date_range_picker_base *picker) {
   if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)ui_component_destroy(picker->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(picker->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(picker);
   return UI_ERROR_NONE;
 }

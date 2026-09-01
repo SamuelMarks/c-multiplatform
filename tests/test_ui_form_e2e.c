@@ -35,9 +35,19 @@ int main(void) {
 
   /* Imagine simulating E2E events here checking validation blocking */
 
-  (void)ui_form_builder_destroy(builder);
+  {
+    ui_error_t rc_cleanup = ui_form_builder_destroy(builder);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_form_group_destroy(group);
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   printf("test_ui_form_e2e passed\\n");
   return 0;

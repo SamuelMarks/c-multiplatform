@@ -96,9 +96,19 @@ static int run_normal_tests(void) {
     return 1;
 
   ui_nav_rail_item_base_destroy(item);
-  (void)ui_nav_rail_base_destroy(rail);
+  {
+    ui_error_t rc_cleanup = ui_nav_rail_base_destroy(rail);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_nav_rail_item_base_destroy(NULL);
-  (void)ui_nav_rail_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_nav_rail_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   {
     struct ui_nav_rail_base *empty_rail;
@@ -132,7 +142,12 @@ static int run_oom_tests(void) {
       return 1;
     }
     if (rc == UI_ERROR_NONE) {
-      (void)ui_nav_rail_base_destroy(rail);
+      {
+        ui_error_t rc_cleanup = ui_nav_rail_base_destroy(rail);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }

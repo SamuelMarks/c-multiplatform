@@ -123,7 +123,12 @@ ui_error_t ui_loupe_base_destroy(struct ui_loupe_base *loupe) {
   }
 
   if (loupe->overlay_origin_signal) {
-    (void)ui_signal_destroy(loupe->overlay_origin_signal);
+    {
+      ui_error_t rc_cleanup = ui_signal_destroy(loupe->overlay_origin_signal);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;

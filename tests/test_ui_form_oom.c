@@ -31,9 +31,19 @@ int main(void) {
                                   NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                                   &control);
       if (rc == UI_ERROR_NONE) {
-        (void)ui_form_control_destroy(control);
+        {
+          ui_error_t rc_cleanup = ui_form_control_destroy(control);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup; /* Avoid override */
+          }
+        }
       }
-      (void)ui_arena_destroy(arena);
+      {
+        ui_error_t rc_cleanup = ui_arena_destroy(arena);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
 
     ui_mock_alloc_fail_enabled = 0;

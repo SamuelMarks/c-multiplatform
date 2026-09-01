@@ -60,7 +60,12 @@ static int test_form_node(void) {
   node.type = 99;
   _ui_form_node_get_status_internal(node, &status, 0);
 
-  (void)ui_form_control_destroy(ctrl);
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(ctrl);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   ui_form_group_destroy(grp);
   ui_form_array_destroy(arr);
 
@@ -111,7 +116,12 @@ static int run_extra_form_node(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)ui_arena_destroy(arena);
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }

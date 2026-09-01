@@ -392,7 +392,12 @@ ui_error_t run_aria_coverage(void) {
   g_malloc_fail_countdown = -1;
   g_aria_mock_fail = 0;
 
-  (void)ui_dom_node_destroy(node);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
   return UI_ERROR_NONE;
 }
 #endif

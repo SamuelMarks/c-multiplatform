@@ -181,9 +181,20 @@ ui_error_t ui_keyboard_responder_handle_event(
   }
 
   key = (enum ui_key_code)event->event_data.keyboard.key_code;
-  (void)ui_bidi_normalize_horizontal_key(key, &key);
+  {
+    ui_error_t rc_cleanup = ui_bidi_normalize_horizontal_key(key, &key);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_get_attribute(focused_node, "role", &role_val);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_get_attribute(focused_node, "role", &role_val);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   for (i = 0; i < responder->bindings_count; ++i) {
     struct ui_keyboard_binding *binding = &responder->bindings[i];

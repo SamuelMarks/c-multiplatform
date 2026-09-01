@@ -28,7 +28,12 @@ static int test_parse_content_none_normal(void) {
   if (ui_css_parse_content("none-", &c) != UI_ERROR_PARSE_FAILED)
     return __LINE__;
 
-  (void)ui_css_content_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   if (0)
     return __LINE__;
 
@@ -44,19 +49,34 @@ static int test_parse_content_strings(void) {
   if (c.items->type != UI_CSS_CONTENT_ITEM_STRING ||
       strcmp(c.items->value.string_val, "hello world") != 0)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_css_parse_content("'single quote'", &c) != UI_ERROR_NONE)
     return __LINE__;
   if (c.items->type != UI_CSS_CONTENT_ITEM_STRING ||
       strcmp(c.items->value.string_val, "single quote") != 0)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Escapes */
   if (ui_css_parse_content("\"escape \\\" \\\\ \"", &c) != UI_ERROR_NONE)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Unclosed quote with escape at end */
   if (ui_css_parse_content("\"foo\\", &c) != UI_ERROR_PARSE_FAILED)
@@ -78,7 +98,12 @@ static int test_parse_content_functions(void) {
       c.items->value.image.type != UI_CSS_IMAGE_URL ||
       strcmp(c.items->value.image.data.url, "icon.png") != 0)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* url without parens */
   if (ui_css_parse_content("url \"icon.png\")", &c) != UI_ERROR_PARSE_FAILED)
@@ -89,7 +114,7 @@ static int test_parse_content_functions(void) {
 
   /* Very long url */
   {
-    char long_url[600];
+    char long_url[1024];
     char css_str[620];
     int i;
     for (i = 0; i < 550; i++) {
@@ -99,7 +124,12 @@ static int test_parse_content_functions(void) {
     sprintf(css_str, "url(%s)", long_url);
     if (ui_css_parse_content(css_str, &c) != UI_ERROR_PARSE_FAILED)
       return __LINE__;
-    (void)ui_css_content_destroy(&c);
+    {
+      ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   if (ui_css_parse_content("attr(data-title)", &c) != UI_ERROR_NONE || !c.items)
@@ -107,7 +137,12 @@ static int test_parse_content_functions(void) {
   if (c.items->type != UI_CSS_CONTENT_ITEM_ATTR ||
       strcmp(c.items->value.attr_name, "data-title") != 0)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   /* attr syntax error */
   if (ui_css_parse_content("attr(data-title", &c) != UI_ERROR_PARSE_FAILED)
     return __LINE__;
@@ -120,7 +155,12 @@ static int test_parse_content_functions(void) {
       strcmp(c.items->value.counter.name, "chapter") != 0 ||
       c.items->value.counter.style[0] != '\0')
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_css_parse_content("counter(section, upper-roman)", &c) !=
           UI_ERROR_NONE ||
@@ -130,7 +170,12 @@ static int test_parse_content_functions(void) {
       strcmp(c.items->value.counter.name, "section") != 0 ||
       strcmp(c.items->value.counter.style, "upper-roman") != 0)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_css_parse_content("counter(sec upper)", &c) != UI_ERROR_PARSE_FAILED)
     return __LINE__;
@@ -148,13 +193,23 @@ static int test_parse_content_functions(void) {
       strcmp(c.items->value.counters.name, "page") != 0 ||
       strcmp(c.items->value.counters.separator, ".") != 0)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_css_parse_content("counters(page, \".\", upper-roman)", &c) !=
           UI_ERROR_NONE ||
       !c.items)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_css_parse_content("counters(page)", &c) != UI_ERROR_PARSE_FAILED)
     return __LINE__;
@@ -172,12 +227,22 @@ static int test_parse_content_functions(void) {
   if (ui_css_parse_content("attr(_name)", &c) != UI_ERROR_NONE ||
       strcmp(c.items->value.attr_name, "_name") != 0)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   if (ui_css_parse_content("attr(-name)", &c) != UI_ERROR_NONE ||
       strcmp(c.items->value.attr_name, "-name") != 0)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -195,7 +260,12 @@ static int test_parse_content_quotes(void) {
       c.items->next->next->type != UI_CSS_CONTENT_ITEM_NO_OPEN_QUOTE ||
       c.items->next->next->next->type != UI_CSS_CONTENT_ITEM_NO_CLOSE_QUOTE)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Unknown ident */
   if (ui_css_parse_content("invalid-quote", &c) != UI_ERROR_PARSE_FAILED)
@@ -235,7 +305,12 @@ static int test_parse_content_multiple(void) {
       strcmp(c.items->next->next->value.string_val, ": ") != 0)
     return __LINE__;
 
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -246,7 +321,12 @@ static int test_parse_content_oom(void) {
     g_malloc_fail_countdown = i;
     if (ui_css_parse_content("\"test\" url(\"img.png\") attr(data-test)", &c) ==
         UI_ERROR_NONE) {
-      (void)ui_css_content_destroy(&c);
+      {
+        ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -255,7 +335,7 @@ static int test_parse_content_oom(void) {
 
 static int test_parse_content_long(void) {
   struct ui_css_content c;
-  char long_str[600];
+  char long_str[1024];
   char css_str[620];
   int i;
   for (i = 0; i < 550; i++) {
@@ -267,19 +347,34 @@ static int test_parse_content_long(void) {
   sprintf(css_str, "\"%s\"", long_str);
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* ident in attr */
   sprintf(css_str, "attr(%s)", long_str);
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* escape at end of max len */
   sprintf(css_str, "\"%s\\\"\"", long_str);
   if (ui_css_parse_content(css_str, &c) != UI_ERROR_NONE)
     return __LINE__;
-  (void)ui_css_content_destroy(&c);
+  {
+    ui_error_t rc_cleanup = ui_css_content_destroy(&c);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }

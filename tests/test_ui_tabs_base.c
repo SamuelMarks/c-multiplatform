@@ -48,8 +48,18 @@ static int test_ui_tabs_base_create_destroy(void) {
   if (!tabs)
     return 1;
 
-  (void)ui_tabs_base_destroy(tabs);
-  (void)ui_tabs_base_destroy(NULL);
+  {
+    ui_error_t rc_cleanup = ui_tabs_base_destroy(tabs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_tabs_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -63,7 +73,12 @@ static int test_ui_tabs_base_get_component(void) {
   ASSERT_EQ(ui_tabs_base_get_component(tabs, NULL), UI_ERROR_INVALID_ARGUMENT);
   ASSERT_SUCCESS(ui_tabs_base_get_component(tabs, &comp));
 
-  (void)ui_tabs_base_destroy(tabs);
+  {
+    ui_error_t rc_cleanup = ui_tabs_base_destroy(tabs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -217,7 +232,12 @@ static int test_ui_tabs_base_add_and_navigate(void) {
               UI_ERROR_INVALID_ARGUMENT);
   }
 
-  (void)ui_tabs_base_destroy(tabs);
+  {
+    ui_error_t rc_cleanup = ui_tabs_base_destroy(tabs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Empty tabs process_event */
   ASSERT_SUCCESS(ui_tabs_base_create(&tabs));
@@ -227,7 +247,12 @@ static int test_ui_tabs_base_add_and_navigate(void) {
     ev.type = UI_EVENT_KEY_DOWN;
     ASSERT_SUCCESS(ui_tabs_base_process_event(tabs, &ev, 0.0));
   }
-  (void)ui_tabs_base_destroy(tabs);
+  {
+    ui_error_t rc_cleanup = ui_tabs_base_destroy(tabs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return 0;
 }
@@ -240,7 +265,12 @@ static int test_ui_tabs_base_bindings(void) {
   ASSERT_EQ(ui_tabs_base_bind_active_index(NULL, NULL),
             UI_ERROR_INVALID_ARGUMENT);
   ASSERT_SUCCESS(ui_tabs_base_bind_active_index(tabs, NULL));
-  (void)ui_tabs_base_destroy(tabs);
+  {
+    ui_error_t rc_cleanup = ui_tabs_base_destroy(tabs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return 0;
 }
 
@@ -261,7 +291,12 @@ static int test_ui_tabs_base_allocation_failures(void) {
     err = ui_tabs_base_create(&tabs);
     g_malloc_fail_countdown = -1;
     if (err == UI_ERROR_NONE) {
-      (void)ui_tabs_base_destroy(tabs);
+      {
+        ui_error_t rc_cleanup = ui_tabs_base_destroy(tabs);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          (void)rc_cleanup; /* Avoid override */
+        }
+      }
       break;
     }
   }
@@ -283,11 +318,26 @@ static int test_ui_tabs_base_allocation_failures(void) {
     }
 
     ASSERT_EQ(err, UI_ERROR_OUT_OF_MEMORY);
-    (void)ui_dom_node_destroy(h1);
-    (void)ui_dom_node_destroy(c1);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(h1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(c1);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
-  (void)ui_tabs_base_destroy(tabs);
+  {
+    ui_error_t rc_cleanup = ui_tabs_base_destroy(tabs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 #endif
   return 0;
 }

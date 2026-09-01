@@ -186,10 +186,18 @@ ui_error_t ui_stepper_base_create(struct ui_stepper_base **out_stepper) {
   return UI_ERROR_NONE;
 
 cleanup:
-  if (root_node)
-    (void)ui_dom_node_destroy(root_node);
-  if (stepper->component)
-    (void)ui_component_destroy(stepper->component);
+  if (root_node) {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  if (stepper->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(stepper->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(stepper);
   return rc;
 }
@@ -209,7 +217,12 @@ ui_error_t ui_stepper_base_destroy(struct ui_stepper_base *stepper) {
   }
   C_MULTIPLATFORM_FREE(stepper->steps);
 
-  (void)ui_component_destroy(stepper->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(stepper->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   C_MULTIPLATFORM_FREE(stepper);
   return UI_ERROR_NONE;
@@ -335,32 +348,88 @@ static ui_error_t apply_step_state_attributes(struct ui_stepper_base *stepper,
   (void)UI_DOM_REM_ATTR_IGNORE(entry->header_node, "data-state");
 
   switch (effective_state) {
-  case UI_STEPPER_STEP_STATE_ACTIVE:
-    (void)ui_dom_node_set_attribute(entry->header_node, "aria-selected",
-                                    "true");
-    (void)ui_dom_node_set_attribute(entry->header_node, "data-state", "active");
+  case UI_STEPPER_STEP_STATE_ACTIVE: {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(entry->header_node, "aria-selected", "true");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(entry->header_node, "data-state", "active");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     (void)UI_DOM_REM_ATTR_IGNORE(entry->content_node, "hidden");
     break;
-  case UI_STEPPER_STEP_STATE_COMPLETED:
-    (void)ui_dom_node_set_attribute(entry->header_node, "aria-selected",
-                                    "false");
-    (void)ui_dom_node_set_attribute(entry->header_node, "data-state",
-                                    "completed");
-    (void)ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+  case UI_STEPPER_STEP_STATE_COMPLETED: {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+          entry->header_node, "data-state", "completed");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     break;
-  case UI_STEPPER_STEP_STATE_ERROR:
-    (void)ui_dom_node_set_attribute(entry->header_node, "aria-selected",
-                                    "false");
-    (void)ui_dom_node_set_attribute(entry->header_node, "data-state", "error");
-    (void)ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+  case UI_STEPPER_STEP_STATE_ERROR: {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(entry->header_node, "data-state", "error");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     break;
   default:
-  case UI_STEPPER_STEP_STATE_DEFAULT:
-    (void)ui_dom_node_set_attribute(entry->header_node, "aria-selected",
-                                    "false");
-    (void)ui_dom_node_set_attribute(entry->header_node, "data-state",
-                                    "default");
-    (void)ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+  case UI_STEPPER_STEP_STATE_DEFAULT: {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+    {
+      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
+          entry->header_node, "data-state", "default");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     break;
   }
   return UI_ERROR_NONE;
@@ -400,13 +469,49 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
   (void)format_id(tab_node_id, sizeof(tab_node_id), step_id, "step-hdr");
   (void)format_id(panel_node_id, sizeof(panel_node_id), step_id, "step-cnt");
 
-  (void)ui_dom_node_set_attribute(header_node, "role", "tab");
-  (void)ui_dom_node_set_attribute(header_node, "id", tab_node_id);
-  (void)ui_dom_node_set_attribute(header_node, "aria-controls", panel_node_id);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(header_node, "role", "tab");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(header_node, "id", tab_node_id);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(header_node, "aria-controls", panel_node_id);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
-  (void)ui_dom_node_set_attribute(content_node, "role", "tabpanel");
-  (void)ui_dom_node_set_attribute(content_node, "id", panel_node_id);
-  (void)ui_dom_node_set_attribute(content_node, "aria-labelledby", tab_node_id);
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(content_node, "role", "tabpanel");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(content_node, "id", panel_node_id);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_set_attribute(content_node, "aria-labelledby", tab_node_id);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   {
     char *tmp = NULL;

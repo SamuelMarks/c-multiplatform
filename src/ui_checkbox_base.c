@@ -178,10 +178,20 @@ ui_error_t ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox) {
 
 cleanup:
   if (root_node) {
-    (void)ui_dom_node_destroy(root_node);
+    {
+      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   if (checkbox->component) {
-    (void)ui_component_destroy(checkbox->component);
+    {
+      ui_error_t rc_cleanup = ui_component_destroy(checkbox->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
   C_MULTIPLATFORM_FREE(checkbox);
   return rc;
@@ -192,11 +202,26 @@ cleanup:
  * @param checkbox Parameter checkbox.
  * @return Return value.
  */
+#ifdef UI_TEST_MOCK_ALLOC
+extern ui_error_t ui_component_destroy(struct ui_component *c);
+static ui_error_t mock_component_destroy_checkbox(struct ui_component *c) {
+  if (g_checkbox_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_component_destroy(c);
+}
+#define ui_component_destroy mock_component_destroy_checkbox
+#endif
+
 ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox) {
   if (!checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)ui_component_destroy(checkbox->component);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(checkbox->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   C_MULTIPLATFORM_FREE(checkbox);
   return UI_ERROR_NONE;
 }

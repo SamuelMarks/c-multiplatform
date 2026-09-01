@@ -67,11 +67,36 @@ static ui_error_t test_invalid_args(void) {
 
   ASSERT_EQ(UI_ERROR_NOT_FOUND, ui_overlay_director_unmount(dir2, overlay));
 
-  (void)ui_overlay_director_destroy(dir2);
-  (void)ui_dom_node_destroy(root2);
-  (void)ui_overlay_director_destroy(dir);
-  (void)ui_dom_node_destroy(root);
-  (void)ui_component_destroy(comp);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(dir2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(dir);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -120,19 +145,34 @@ static ui_error_t test_overlay_director_lifecycle(void) {
   /* Destroy component manually since we unmounted it, wait, ui_component_mount
      transfers ownership? No, ui_component_destroy must be called by the user.
    */
-  (void)ui_component_destroy(comp1);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(comp1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Destroy director (should unmount overlay2 automatically) */
   err = ui_overlay_director_destroy(dir);
   ASSERT_EQ(UI_ERROR_NONE, err);
 
-  (void)ui_component_destroy(comp2);
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(comp2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   /* Root node should have 0 children now */
   ASSERT_TRUE(root->first_child == NULL);
   ASSERT_TRUE(root->last_child == NULL);
 
-  (void)ui_dom_node_destroy(root);
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -187,9 +227,24 @@ static ui_error_t test_oom(void) {
     }
   }
 
-  (void)ui_overlay_director_destroy(dir);
-  (void)ui_dom_node_destroy(root);
-  (void)ui_component_destroy(comp);
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(dir);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return UI_ERROR_NONE;
 }
 

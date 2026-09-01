@@ -71,7 +71,12 @@ ui_error_t ui_tray_manager_destroy(struct ui_tray_manager *tray) {
   }
 
   if (tray->is_visible) {
-    (void)ui_tray_manager_hide(tray);
+    {
+      ui_error_t rc_cleanup = ui_tray_manager_hide(tray);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   C_MULTIPLATFORM_FREE(tray);

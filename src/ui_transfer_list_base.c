@@ -383,14 +383,10 @@ ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list) {
     return UI_ERROR_NONE;
   }
 
-  {
-    (void)free_list(list->left_list);
-  }
+  { (void)free_list(list->left_list); }
   list->left_list = NULL;
 
-  {
-    (void)free_list(list->right_list);
-  }
+  { (void)free_list(list->right_list); }
   list->right_list = NULL;
   return UI_ERROR_NONE;
 }

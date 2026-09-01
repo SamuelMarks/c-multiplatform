@@ -300,15 +300,44 @@ static int test_ui_form_group(void) {
     goto cleanup;
   }
 
-  (void)ui_form_control_destroy(control1);
-  (void)ui_form_control_destroy(control2);
-  (void)ui_form_control_destroy(control_invalid);
-  (void)ui_form_control_destroy(control_pending);
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control_invalid);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_control_destroy(control_pending);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   ret = 0;
-cleanup:
-  (void)ui_arena_destroy(arena);
-  (void)ui_arena_destroy(tiny_arena);
+cleanup: {
+  ui_error_t rc_cleanup = ui_arena_destroy(arena);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    (void)rc_cleanup; /* Avoid override */
+  }
+}
+  {
+    ui_error_t rc_cleanup = ui_arena_destroy(tiny_arena);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
   return ret;
 }
 

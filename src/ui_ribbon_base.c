@@ -127,7 +127,13 @@ ui_error_t ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_signal_destroy(ribbon->group_state_changed_signal);
+  {
+    ui_error_t rc_cleanup =
+        ui_signal_destroy(ribbon->group_state_changed_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   return UI_ERROR_NONE;
 }
@@ -267,7 +273,13 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     gs->current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_COMPACT;
 
     payload.int_val = gs->config.group_id;
-    (void)ui_signal_set(ribbon->group_state_changed_signal, payload);
+    {
+      ui_error_t rc_cleanup =
+          ui_signal_set(ribbon->group_state_changed_signal, payload);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   /* Step 2: If we still overflow, collapse low-priority groups entirely */
@@ -279,7 +291,13 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     gs->current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_COLLAPSED;
 
     payload.int_val = gs->config.group_id;
-    (void)ui_signal_set(ribbon->group_state_changed_signal, payload);
+    {
+      ui_error_t rc_cleanup =
+          ui_signal_set(ribbon->group_state_changed_signal, payload);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
   }
 
   return UI_ERROR_NONE;
