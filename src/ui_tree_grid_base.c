@@ -14,11 +14,6 @@
 /** @brief internal */
 #define MAX_EXPANDED_NODES 256
 
-/** @cond */
-#define UI_TREE_GRID_IS_EXPAND_IGNORE(t, n, o)                                 \
-  ui_tree_grid_base_is_expanded((t), (n), (o))
-/** @endcond */
-
 /**
  * @struct ui_tree_grid_base
  * @struct ui_tree_grid_base
@@ -112,12 +107,16 @@ ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
                                           void *node_id, int expanded) {
   int currently_expanded = 0;
   size_t i;
+  ui_error_t rc;
 
   if (!tree_grid || !node_id) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)UI_TREE_GRID_IS_EXPAND_IGNORE(tree_grid, node_id, &currently_expanded);
+  rc = ui_tree_grid_base_is_expanded(tree_grid, node_id, &currently_expanded);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (expanded && !currently_expanded) {
     if (tree_grid->expanded_count < MAX_EXPANDED_NODES) {
@@ -141,8 +140,12 @@ ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
 ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
                                          void *node_id) {
   int expanded = 0;
+  ui_error_t rc;
 
-  (void)UI_TREE_GRID_IS_EXPAND_IGNORE(tree_grid, node_id, &expanded);
+  rc = ui_tree_grid_base_is_expanded(tree_grid, node_id, &expanded);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   return ui_tree_grid_base_set_expanded(tree_grid, node_id, !expanded);
 }
@@ -160,8 +163,11 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   if (event->key_code == UI_KEY_RIGHT) {
     if (tree_grid->active_node) {
       int expanded = 0;
-      (void)UI_TREE_GRID_IS_EXPAND_IGNORE(tree_grid, tree_grid->active_node,
-                                          &expanded);
+      ui_error_t rc_exp = ui_tree_grid_base_is_expanded(
+          tree_grid, tree_grid->active_node, &expanded);
+      if (rc_exp != UI_ERROR_NONE) {
+        return rc_exp;
+      }
       if (!expanded) {
         ui_error_t set_exp_rc = ui_tree_grid_base_set_expanded(
             tree_grid, tree_grid->active_node, 1);
@@ -176,8 +182,11 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   } else if (event->key_code == UI_KEY_LEFT) {
     if (tree_grid->active_node) {
       int expanded = 0;
-      (void)UI_TREE_GRID_IS_EXPAND_IGNORE(tree_grid, tree_grid->active_node,
-                                          &expanded);
+      ui_error_t rc_exp = ui_tree_grid_base_is_expanded(
+          tree_grid, tree_grid->active_node, &expanded);
+      if (rc_exp != UI_ERROR_NONE) {
+        return rc_exp;
+      }
       if (expanded) {
         {
           ui_error_t rc_cleanup = ui_tree_grid_base_set_expanded(
@@ -203,12 +212,7 @@ ui_error_t ui_tree_grid_base_render(struct ui_tree_grid_base *tree_grid,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-/** @cond */
-#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
-  /** @endcond */
-  (void)UI_DOM_SET_ATTR_IGNORE(container, "role", "treegrid");
-
   /* Rendering recursion would go here. */
 
-  return UI_ERROR_NONE;
+  return ui_dom_node_set_attribute(container, "role", "treegrid");
 }

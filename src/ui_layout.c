@@ -8,21 +8,6 @@
  */
 /* clang-format off */
 #include "ui_layout.h"
-
-/**
- * @brief local_strcmp.
- * @param a Parameter a.
- * @param b Parameter b.
- * @return Return value.
- */
-static int local_strcmp(const char *a, const char *b) {
-  while (*a && (*a == *b)) {
-    a++;
-    b++;
-  }
-  return *(const unsigned char *)a - *(const unsigned char *)b;
-}
-
 #include "ui_css_values.h"
 #include "ui_internal_mem.h"
 #include "ui_web_bridge.h"
@@ -182,12 +167,22 @@ ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
   (void)available_height;
 
   if (node->display_inside == UI_LAYOUT_DISPLAY_INSIDE_FLEX) {
-    (void)layout_flex(node, available_width);
+    ui_error_t rc;
+    rc = layout_flex(node, available_width);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
     return UI_ERROR_NONE;
   }
 
   /* Basic block layout */
-  (void)layout_block(node, available_width);
+  {
+    ui_error_t rc;
+    rc = layout_block(node, available_width);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+  }
 
 #if defined(__EMSCRIPTEN__)
   if (node->dom_node) {

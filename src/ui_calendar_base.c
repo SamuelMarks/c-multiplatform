@@ -419,13 +419,19 @@ ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
   }
 
   if (calendar->has_min) {
-    (void)compare_dates(date, &calendar->min_date, &cmp_res);
+    ui_error_t rc_cmp = compare_dates(date, &calendar->min_date, &cmp_res);
+    if (rc_cmp != UI_ERROR_NONE) {
+      return rc_cmp;
+    }
     if (cmp_res < 0) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
   }
   if (calendar->has_max) {
-    (void)compare_dates(date, &calendar->max_date, &cmp_res);
+    ui_error_t rc_cmp = compare_dates(date, &calendar->max_date, &cmp_res);
+    if (rc_cmp != UI_ERROR_NONE) {
+      return rc_cmp;
+    }
     if (cmp_res > 0) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }

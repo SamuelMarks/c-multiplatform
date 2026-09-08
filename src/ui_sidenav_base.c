@@ -136,6 +136,7 @@ struct ui_sidenav_base {
 static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
   const char *mode_str = "over";
   const char *pos_str = "start";
+  ui_error_t rc;
 
   if (sidenav->mode == UI_SIDENAV_MODE_PUSH)
     mode_str = "push";
@@ -145,27 +146,46 @@ static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
   if (sidenav->position == UI_SIDENAV_POSITION_END)
     pos_str = "end";
 
-/** @cond */
-#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
-/** @endcond */
-/** @cond */
-#define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
-/** @endcond */
-/** @cond */
-#define UI_DOM_APP_CHILD_IGNORE(p, c) ui_dom_node_append_child((p), (c))
-  /** @endcond */
-
-  (void)UI_DOM_SET_ATTR_IGNORE(sidenav->drawer_node, "data-mode", mode_str);
-  (void)UI_DOM_SET_ATTR_IGNORE(sidenav->drawer_node, "data-position", pos_str);
+  rc = ui_dom_node_set_attribute(sidenav->drawer_node, "data-mode", mode_str);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc =
+      ui_dom_node_set_attribute(sidenav->drawer_node, "data-position", pos_str);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (sidenav->is_open) {
-    (void)UI_DOM_SET_ATTR_IGNORE(sidenav->drawer_node, "data-open", "true");
-    (void)UI_DOM_SET_ATTR_IGNORE(sidenav->root_node, "data-mode", mode_str);
-    (void)UI_DOM_SET_ATTR_IGNORE(sidenav->root_node, "data-open", "true");
-    (void)UI_DOM_SET_ATTR_IGNORE(sidenav->root_node, "data-position", pos_str);
+    rc = ui_dom_node_set_attribute(sidenav->drawer_node, "data-open", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(sidenav->root_node, "data-mode", mode_str);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(sidenav->root_node, "data-open", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc =
+        ui_dom_node_set_attribute(sidenav->root_node, "data-position", pos_str);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    (void)UI_DOM_REM_ATTR_IGNORE(sidenav->drawer_node, "data-open");
-    (void)UI_DOM_REM_ATTR_IGNORE(sidenav->root_node, "data-open");
+    rc = ui_dom_node_remove_attribute(sidenav->drawer_node, "data-open");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_remove_attribute(sidenav->root_node, "data-open");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
+
+  if (sidenav->drawer_node->parent == sidenav->root_node) {
+    rc = ui_dom_node_remove_child(sidenav->root_node, sidenav->drawer_node);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+  }
+  if (sidenav->main_node->parent == sidenav->root_node) {
+    rc = ui_dom_node_remove_child(sidenav->root_node, sidenav->main_node);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   /* Adjust DOM ordering for SIDE/PUSH modes so flex layout works properly
@@ -174,16 +194,28 @@ static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
        sidenav->mode == UI_SIDENAV_MODE_PUSH) &&
       sidenav->is_open) {
     if (sidenav->position == UI_SIDENAV_POSITION_START) {
-      (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->drawer_node);
-      (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->main_node);
+      rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     } else {
-      (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->main_node);
-      (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->drawer_node);
+      rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   } else {
     /* Default overlay rendering order (drawer on top) */
-    (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->main_node);
-    (void)UI_DOM_APP_CHILD_IGNORE(sidenav->root_node, sidenav->drawer_node);
+    rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
@@ -335,10 +367,9 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   sidenav->mode = UI_SIDENAV_MODE_OVER;
   sidenav->position = UI_SIDENAV_POSITION_START;
 
-/** @cond */
-#define UI_UPDATE_DOM_STATE_IGNORE(s) update_dom_state((s))
-  /** @endcond */
-  (void)UI_UPDATE_DOM_STATE_IGNORE(sidenav);
+  rc = update_dom_state(sidenav);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   *out_sidenav = sidenav;
   return UI_ERROR_NONE;
@@ -408,20 +439,21 @@ ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
  */
 ui_error_t ui_sidenav_base_set_mode(struct ui_sidenav_base *sidenav,
                                     enum ui_sidenav_mode mode) {
+  ui_error_t rc;
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   sidenav->mode = mode;
-/** @cond */
-#define UI_UPDATE_DOM_STATE_IGNORE(s) update_dom_state((s))
-  /** @endcond */
-  (void)UI_UPDATE_DOM_STATE_IGNORE(sidenav);
+  rc = update_dom_state(sidenav);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (sidenav->mode != UI_SIDENAV_MODE_OVER && sidenav->is_open) {
-    ui_error_t rc = unmount_backdrop(sidenav);
+    rc = unmount_backdrop(sidenav);
     if (rc != UI_ERROR_NONE)
       return rc;
   } else if (sidenav->mode == UI_SIDENAV_MODE_OVER && sidenav->is_open) {
-    ui_error_t rc = mount_backdrop(sidenav);
-    (void)rc;
+    rc = mount_backdrop(sidenav);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
@@ -437,11 +469,7 @@ ui_error_t ui_sidenav_base_set_position(struct ui_sidenav_base *sidenav,
   if (!sidenav)
     return UI_ERROR_INVALID_ARGUMENT;
   sidenav->position = position;
-/** @cond */
-#define UI_UPDATE_DOM_STATE_IGNORE(s) update_dom_state((s))
-  /** @endcond */
-  (void)UI_UPDATE_DOM_STATE_IGNORE(sidenav);
-  return UI_ERROR_NONE;
+  return update_dom_state(sidenav);
 }
 
 /**
@@ -494,10 +522,9 @@ ui_error_t ui_sidenav_base_set_open(struct ui_sidenav_base *sidenav,
     return UI_ERROR_NONE;
 
   sidenav->is_open = is_open;
-/** @cond */
-#define UI_UPDATE_DOM_STATE_IGNORE(s) update_dom_state((s))
-  /** @endcond */
-  (void)UI_UPDATE_DOM_STATE_IGNORE(sidenav);
+  rc = update_dom_state(sidenav);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (is_open && (sidenav->mode == UI_SIDENAV_MODE_OVER ||
                   sidenav->mode == UI_SIDENAV_MODE_PUSH)) {

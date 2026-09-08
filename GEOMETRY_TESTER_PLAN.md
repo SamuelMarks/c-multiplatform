@@ -5,15 +5,15 @@ This document outlines the fundamentally exhaustive, step-by-step implementation
 ## Phase 1: Engine Infrastructure & Precise Data Exposure
 *Goal: Ensure the layout engine exposes exhaustive, sub-pixel accurate metrics, stacking contexts, and typographic baselines needed for pixel-perfect validation.*
 
-- [x] Define `cmp_rect_t` (integer bounds) and `cmp_rect_f_t` (sub-pixel float bounds) for precision handling.  
+- [x] Define `cmp_rect_t` (integer bounds) and `cmp_rect_f_t` (sub-pixel float bounds) for precision handling.
 - [x] Implement `cmp_node_get_margin_box(node)` to fetch outer bounds.
 - [x] Implement `cmp_node_get_border_box(node)` to fetch border bounds (standard layout bounds).
 - [x] Implement `cmp_node_get_padding_box(node)` to fetch inner border bounds.
 - [x] Implement `cmp_node_get_content_box(node)` to fetch innermost content bounds.
 - [x] Implement `cmp_node_get_scroll_bounds(node)` to fetch the total scrollable overflow dimensions.
-- [x] Implement `cmp_node_get_baseline_y(node)` to expose the primary text baseline for typography alignment.   
+- [x] Implement `cmp_node_get_baseline_y(node)` to expose the primary text baseline for typography alignment.
 - [x] Implement `cmp_node_get_transform_matrix(node)` to expose 2D/3D transformed geometry states.
-- [x] Implement `cmp_node_get_z_index(node)` and expose stacking context IDs for depth sorting validation.      
+- [x] Implement `cmp_node_get_z_index(node)` and expose stacking context IDs for depth sorting validation.
 - [x] Expose global mock environment modifiers: `cmp_env_set_dpi_scale(scale)`, `cmp_env_set_safe_areas(top, right, bottom, left)`.
 - [x] Add event hooks for `cmp_on_layout_pass_start()` and `cmp_on_layout_pass_complete()` to measure layout thrashing/performance.
 - [x] Ensure the entire layout pipeline can execute in a strict headless mode without window creation, OS font-linking, or GPU context overhead.

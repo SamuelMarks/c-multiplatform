@@ -297,7 +297,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "block-step-size", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      if (local_strcmp(val, "none") == 0) {
+      if (strcmp(val, "none") == 0) {
         node->block_step_size = 0.0f;
       } else {
         {

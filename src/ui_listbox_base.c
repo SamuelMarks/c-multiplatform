@@ -17,11 +17,6 @@
 /* MSVC Safe CRT */
 #endif
 
-/** @def UI_CVA_ON_CHANGE_IGNORE
- * @brief Ignore on change return
- */
-#define UI_CVA_ON_CHANGE_IGNORE(cb, p, u) (cb)((p), (u))
-
 /** @brief Default CSS stylesheet */
 static const char *ui_listbox_base_default_css = "div[role=\"listbox\"] { "
                                                  "display: flex; "
@@ -127,11 +122,11 @@ static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
     return UI_ERROR_NONE;
 
   {
-
-    ui_error_t _ign_rc =
+    ui_error_t rc_cnt =
         ui_selection_model_get_selected_count(listbox->selection_model, &count);
-
-    (void)_ign_rc;
+    if (rc_cnt != UI_ERROR_NONE) {
+      return rc_cnt;
+    }
   }
 
   /* The prompt mentions: Payload Type: UI_SIGNAL_TYPE_INT32 (Single) or
@@ -153,42 +148,25 @@ static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
     }
 
     if (is_multi) {
-      /* We would need an array. We can allocate one from arena or expect the
-         user to handle the raw array. For CVA, we can use an internal
-         static/dynamic buffer or arena. Wait, for now, let's pass the raw
-         internal array if possible, or just build one. We can temporarily
-         allocate or use a buffer. Wait, actually we can just pass the first
-         item if single, or for multi, passing an array is tricky without arena.
-         Let's implement single select for INT32, and for multi, we can pass a
-         dummy or allocate via arena. Actually, let's just pass `ids` array
-         directly. */
-      /* Note: C89 struct/union initialization. */
       ids = (void **)C_MULTIPLATFORM_MALLOC((size_t)count * sizeof(void *));
       if (ids) {
-        {
-          ui_error_t _ign_rc = ui_selection_model_get_selected(
-              listbox->selection_model, ids, count);
-          (void)_ign_rc;
+        ui_error_t rc = ui_selection_model_get_selected(
+            listbox->selection_model, ids, count);
+        if (rc != UI_ERROR_NONE) {
+          C_MULTIPLATFORM_FREE(ids);
+          return rc;
         }
         payload.ptr_val = ids;
-        (void)UI_CVA_ON_CHANGE_IGNORE(listbox->cva_on_change, payload,
+        return listbox->cva_on_change(payload,
                                       listbox->cva_on_change_user_data);
-        /* The consumer of the signal must free it, or it leaks, but this is a
-           standard problem with CVA arrays unless backed by an arena. For now,
-           this is what other widgets do. */
       }
     } else {
       if (count > 0) {
         void *id = NULL;
-        {
-          /** @cond */
-          {
-            ui_error_t rc_cleanup = ui_selection_model_get_selected(
-                listbox->selection_model, &id, 1);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
-          }
+        ui_error_t rc_sel =
+            ui_selection_model_get_selected(listbox->selection_model, &id, 1);
+        if (rc_sel != UI_ERROR_NONE) {
+          return rc_sel;
         }
         payload.int_val = (int)(size_t)id;
       } else {
@@ -224,6 +202,7 @@ static ui_error_t listbox_cva_write_value(void *component,
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
   int is_multi = 0;
   const char *attr = NULL;
+  ui_error_t rc;
 
   if (!listbox)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -239,17 +218,17 @@ static ui_error_t listbox_cva_write_value(void *component,
   }
 
   /* Clear existing */
-  {
-    ui_error_t _ign_rc = ui_selection_model_clear(listbox->selection_model);
-    (void)_ign_rc;
+  rc = ui_selection_model_clear(listbox->selection_model);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (!is_multi) {
     if (value.int_val >= 0) {
-      {
-        ui_error_t _ign_rc = ui_selection_model_select(
-            listbox->selection_model, (void *)(size_t)value.int_val);
-        (void)_ign_rc;
+      rc = ui_selection_model_select(listbox->selection_model,
+                                     (void *)(size_t)value.int_val);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
       }
     }
   } else {
@@ -619,19 +598,19 @@ static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
     const char *text =
         listbox->text_provider(listbox, idx, listbox->text_user_data);
     int is_match = 0;
-/** @cond */
-#define UI_PREFIX_MATCH_IGNORE(s, p, l, o) prefix_match((s), (p), (l), (o))
-    /** @endcond */
-    (void)UI_PREFIX_MATCH_IGNORE(text, listbox->typeahead_buffer,
-                                 listbox->typeahead_len, &is_match);
+    ui_error_t rc_pm = prefix_match(text, listbox->typeahead_buffer,
+                                    listbox->typeahead_len, &is_match);
+    if (rc_pm != UI_ERROR_NONE) {
+      return rc_pm;
+    }
     if (is_match) {
       listbox->active_index = idx;
 
       if (!is_multi) {
-        {
-          ui_error_t _ign_rc = ui_selection_model_select(
-              listbox->selection_model, (void *)(size_t)idx);
-          (void)_ign_rc;
+        ui_error_t rc_sel = ui_selection_model_select(listbox->selection_model,
+                                                      (void *)(size_t)idx);
+        if (rc_sel != UI_ERROR_NONE) {
+          return rc_sel;
         }
       }
       break;
@@ -662,11 +641,11 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
   }
 
   if (listbox->cva_on_touched) {
-/** @cond */
-#define UI_CVA_ON_TOUCH_IGNORE(cb, u) (cb)((u))
-    /** @endcond */
-    (void)UI_CVA_ON_TOUCH_IGNORE(listbox->cva_on_touched,
-                                 listbox->cva_on_touched_user_data);
+    ui_error_t rc_touch =
+        listbox->cva_on_touched(listbox->cva_on_touched_user_data);
+    if (rc_touch != UI_ERROR_NONE) {
+      return rc_touch;
+    }
   }
 
   {
@@ -693,11 +672,10 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
           listbox->active_index++;
         }
         if (!is_multi) {
-          {
-            ui_error_t _ign_rc = ui_selection_model_select(
-                listbox->selection_model,
-                (void *)(size_t)listbox->active_index);
-            (void)_ign_rc;
+          ui_error_t rc_sel = ui_selection_model_select(
+              listbox->selection_model, (void *)(size_t)listbox->active_index);
+          if (rc_sel != UI_ERROR_NONE) {
+            return rc_sel;
           }
         }
       }
@@ -708,11 +686,10 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
           listbox->active_index--;
         }
         if (!is_multi) {
-          {
-            ui_error_t _ign_rc = ui_selection_model_select(
-                listbox->selection_model,
-                (void *)(size_t)listbox->active_index);
-            (void)_ign_rc;
+          ui_error_t rc_sel = ui_selection_model_select(
+              listbox->selection_model, (void *)(size_t)listbox->active_index);
+          if (rc_sel != UI_ERROR_NONE) {
+            return rc_sel;
           }
         }
       }
@@ -721,11 +698,10 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
       if (listbox->num_items > 0) {
         listbox->active_index = 0;
         if (!is_multi) {
-          {
-            ui_error_t _ign_rc = ui_selection_model_select(
-                listbox->selection_model,
-                (void *)(size_t)listbox->active_index);
-            (void)_ign_rc;
+          ui_error_t rc_sel = ui_selection_model_select(
+              listbox->selection_model, (void *)(size_t)listbox->active_index);
+          if (rc_sel != UI_ERROR_NONE) {
+            return rc_sel;
           }
         }
       }
@@ -734,11 +710,10 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
       if (listbox->num_items > 0) {
         listbox->active_index = listbox->num_items - 1;
         if (!is_multi) {
-          {
-            ui_error_t _ign_rc = ui_selection_model_select(
-                listbox->selection_model,
-                (void *)(size_t)listbox->active_index);
-            (void)_ign_rc;
+          ui_error_t rc_sel = ui_selection_model_select(
+              listbox->selection_model, (void *)(size_t)listbox->active_index);
+          if (rc_sel != UI_ERROR_NONE) {
+            return rc_sel;
           }
         }
       }
@@ -750,26 +725,28 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
           listbox->typeahead_buffer[listbox->typeahead_len++] = ' ';
           listbox->last_typeahead_time_ms = timestamp_ms;
           {
-            ui_error_t _ign_ta_rc = perform_typeahead(listbox);
-            (void)_ign_ta_rc;
+            ui_error_t rc_ta = perform_typeahead(listbox);
+            if (rc_ta != UI_ERROR_NONE) {
+              return rc_ta;
+            }
           }
         }
       } else {
         listbox->typeahead_len = 0;
         if (listbox->active_index >= 0) {
           if (is_multi && kc == UI_KEY_SPACE) {
-            {
-              ui_error_t _ign_rc = ui_selection_model_toggle(
-                  listbox->selection_model,
-                  (void *)(size_t)listbox->active_index);
-              (void)_ign_rc;
+            ui_error_t rc_tog = ui_selection_model_toggle(
+                listbox->selection_model,
+                (void *)(size_t)listbox->active_index);
+            if (rc_tog != UI_ERROR_NONE) {
+              return rc_tog;
             }
           } else if (!is_multi) {
-            {
-              ui_error_t _ign_rc = ui_selection_model_select(
-                  listbox->selection_model,
-                  (void *)(size_t)listbox->active_index);
-              (void)_ign_rc;
+            ui_error_t rc_sel = ui_selection_model_select(
+                listbox->selection_model,
+                (void *)(size_t)listbox->active_index);
+            if (rc_sel != UI_ERROR_NONE) {
+              return rc_sel;
             }
           }
         }
@@ -779,8 +756,10 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         listbox->typeahead_buffer[listbox->typeahead_len++] = (char)kc;
         listbox->last_typeahead_time_ms = timestamp_ms;
         {
-          ui_error_t _ign_ta_rc = perform_typeahead(listbox);
-          (void)_ign_ta_rc;
+          ui_error_t rc_ta = perform_typeahead(listbox);
+          if (rc_ta != UI_ERROR_NONE) {
+            return rc_ta;
+          }
         }
       }
     }

@@ -209,16 +209,24 @@ ui_error_t ui_table_base_set_pagination_config(
 /**
  * @brief Helper function to get ARIA string for sort direction.
  * @param dir The sort direction.
- * @return The corresponding ARIA string.
+ * @param out_str Pointer to receive the corresponding ARIA string.
+ * @return UI_ERROR_NONE on success, or an error code.
  */
-static const char *get_aria_sort_string(enum ui_table_sort_direction dir) {
+static ui_error_t get_aria_sort_string(enum ui_table_sort_direction dir,
+                                       const char **out_str) {
+  if (!out_str) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   switch (dir) {
   case UI_TABLE_SORT_ASCENDING:
-    return "ascending";
+    *out_str = "ascending";
+    return UI_ERROR_NONE;
   case UI_TABLE_SORT_DESCENDING:
-    return "descending";
+    *out_str = "descending";
+    return UI_ERROR_NONE;
   default:
-    return "none";
+    *out_str = "none";
+    return UI_ERROR_NONE;
   }
 }
 
@@ -250,11 +258,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
   if (rc != UI_ERROR_NONE)
     return rc;
 
-/** @cond */
-#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
-  /** @endcond */
-
-  (void)UI_DOM_SET_ATTR_IGNORE(table_root, "role", "grid");
+  rc = ui_dom_node_set_attribute(table_root, "role", "grid");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   /* Construct the table inside table_root.
      Eagerly appending ensures a single ui_dom_node_destroy on table_root
@@ -274,7 +280,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     }
     goto cleanup;
   }
-  (void)UI_DOM_SET_ATTR_IGNORE(thead, "role", "rowgroup");
+  rc = ui_dom_node_set_attribute(thead, "role", "rowgroup");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &header_row);
   if (rc != UI_ERROR_NONE)
@@ -289,7 +297,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     }
     goto cleanup;
   }
-  (void)UI_DOM_SET_ATTR_IGNORE(header_row, "role", "row");
+  rc = ui_dom_node_set_attribute(header_row, "role", "row");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   for (j = 0; j < total_cols; j++) {
     struct ui_dom_node *header_cell;
@@ -309,12 +319,18 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
     }
 
-    ui_dom_node_set_attribute(header_cell, "role", "columnheader");
+    rc = ui_dom_node_set_attribute(header_cell, "role", "columnheader");
+    if (rc != UI_ERROR_NONE)
+      goto cleanup;
 
     if (table->sort_config.active_column_index == j) {
-      ui_dom_node_set_attribute(
-          header_cell, "aria-sort",
-          get_aria_sort_string(table->sort_config.direction));
+      const char *sort_str = NULL;
+      rc = get_aria_sort_string(table->sort_config.direction, &sort_str);
+      if (rc != UI_ERROR_NONE)
+        goto cleanup;
+      rc = ui_dom_node_set_attribute(header_cell, "aria-sort", sort_str);
+      if (rc != UI_ERROR_NONE)
+        goto cleanup;
     }
 
     if (cfg->sizing == UI_TABLE_COLUMN_FLEX) {
@@ -330,7 +346,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       sprintf(style_buf, "width: %fpx;", cfg->width);
 #endif
     }
-    ui_dom_node_set_attribute(header_cell, "style", style_buf);
+    rc = ui_dom_node_set_attribute(header_cell, "style", style_buf);
+    if (rc != UI_ERROR_NONE)
+      goto cleanup;
 
     rc = table->model.render_header(j, header_cell, table->model.user_data);
     if (rc != UI_ERROR_NONE)
@@ -351,7 +369,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     }
     goto cleanup;
   }
-  (void)UI_DOM_SET_ATTR_IGNORE(tbody, "role", "rowgroup");
+  rc = ui_dom_node_set_attribute(tbody, "role", "rowgroup");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   start_row = 0;
   end_row = total_rows;
@@ -384,12 +404,20 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
     }
 
-    ui_dom_node_set_attribute(row, "role", "row");
+    rc = ui_dom_node_set_attribute(row, "role", "row");
+    if (rc != UI_ERROR_NONE)
+      goto cleanup;
 
-    ui_selection_model_is_selected(table->selection_model, (void *)(size_t)i,
-                                   &is_selected);
+    if (table->selection_model) {
+      rc = ui_selection_model_is_selected(table->selection_model,
+                                          (void *)(size_t)i, &is_selected);
+      if (rc != UI_ERROR_NONE)
+        goto cleanup;
+    }
     if (is_selected) {
-      ui_dom_node_set_attribute(row, "aria-selected", "true");
+      rc = ui_dom_node_set_attribute(row, "aria-selected", "true");
+      if (rc != UI_ERROR_NONE)
+        goto cleanup;
     }
 
     for (j = 0; j < total_cols; j++) {
@@ -410,7 +438,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
         goto cleanup;
       }
 
-      ui_dom_node_set_attribute(cell, "role", "gridcell");
+      rc = ui_dom_node_set_attribute(cell, "role", "gridcell");
+      if (rc != UI_ERROR_NONE)
+        goto cleanup;
 
       if (cfg->sizing == UI_TABLE_COLUMN_FLEX) {
 #if defined(_MSC_VER)
@@ -425,7 +455,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
         sprintf(style_buf, "width: %fpx;", cfg->width);
 #endif
       }
-      ui_dom_node_set_attribute(cell, "style", style_buf);
+      rc = ui_dom_node_set_attribute(cell, "style", style_buf);
+      if (rc != UI_ERROR_NONE)
+        goto cleanup;
 
       rc = table->model.render_cell(i, j, cell, table->model.user_data);
       if (rc != UI_ERROR_NONE)

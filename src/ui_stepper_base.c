@@ -338,14 +338,13 @@ static ui_error_t apply_step_state_attributes(struct ui_stepper_base *stepper,
 
   /** @cond */
   /** @endcond */
-/** @cond */
-#define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
-/** @endcond */
-/** @cond */
-#define ui_dom_node_set_tag_name(n, t) ui_dom_node_set_tag_name((n), (t))
-  /** @endcond */
-
-  (void)UI_DOM_REM_ATTR_IGNORE(entry->header_node, "data-state");
+  {
+    ui_error_t rc_cleanup =
+        ui_dom_node_remove_attribute(entry->header_node, "data-state");
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
+  }
 
   switch (effective_state) {
   case UI_STEPPER_STEP_STATE_ACTIVE: {
@@ -362,7 +361,13 @@ static ui_error_t apply_step_state_attributes(struct ui_stepper_base *stepper,
         (void)rc_cleanup; /* Avoid override */
       }
     }
-    (void)UI_DOM_REM_ATTR_IGNORE(entry->content_node, "hidden");
+    {
+      ui_error_t rc_cleanup =
+          ui_dom_node_remove_attribute(entry->content_node, "hidden");
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
+    }
     break;
   case UI_STEPPER_STEP_STATE_COMPLETED: {
     ui_error_t rc_cleanup =
@@ -466,8 +471,20 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
     stepper->step_capacity = new_cap;
   }
 
-  (void)format_id(tab_node_id, sizeof(tab_node_id), step_id, "step-hdr");
-  (void)format_id(panel_node_id, sizeof(panel_node_id), step_id, "step-cnt");
+  {
+    ui_error_t rc_fmt =
+        format_id(tab_node_id, sizeof(tab_node_id), step_id, "step-hdr");
+    if (rc_fmt != UI_ERROR_NONE) {
+      return rc_fmt;
+    }
+  }
+  {
+    ui_error_t rc_fmt =
+        format_id(panel_node_id, sizeof(panel_node_id), step_id, "step-cnt");
+    if (rc_fmt != UI_ERROR_NONE) {
+      return rc_fmt;
+    }
+  }
 
   {
     ui_error_t rc_cleanup =
@@ -543,10 +560,13 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
     stepper->active_index = 0;
   }
 
-/** @cond */
-#define UI_STEP_APPLY_ATTR_IGNORE(s, i) apply_step_state_attributes((s), (i))
-  /** @endcond */
-  (void)UI_STEP_APPLY_ATTR_IGNORE(stepper, stepper->step_count);
+  {
+    ui_error_t rc_apply =
+        apply_step_state_attributes(stepper, stepper->step_count);
+    if (rc_apply != UI_ERROR_NONE) {
+      return rc_apply;
+    }
+  }
 
   stepper->step_count++;
 
@@ -589,7 +609,10 @@ ui_error_t ui_stepper_base_set_active_index(struct ui_stepper_base *stepper,
   stepper->active_index = index;
 
   for (i = 0; i < stepper->step_count; i++) {
-    (void)UI_STEP_APPLY_ATTR_IGNORE(stepper, i);
+    ui_error_t rc_step = apply_step_state_attributes(stepper, i);
+    if (rc_step != UI_ERROR_NONE) {
+      return rc_step;
+    }
   }
 
   return UI_ERROR_NONE;
@@ -626,9 +649,7 @@ ui_error_t ui_stepper_base_set_step_state(struct ui_stepper_base *stepper,
     return UI_ERROR_OUT_OF_BOUNDS;
 
   stepper->steps[index].explicit_state = state;
-  (void)UI_STEP_APPLY_ATTR_IGNORE(stepper, index);
-
-  return UI_ERROR_NONE;
+  return apply_step_state_attributes(stepper, index);
 }
 
 /**

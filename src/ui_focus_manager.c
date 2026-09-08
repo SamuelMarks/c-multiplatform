@@ -147,8 +147,12 @@ static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
                                          size_t *out_capacity) {
   struct ui_dom_node *child;
   ui_bool_t focusable = UI_FALSE;
+  ui_error_t rc;
 
-  { (void)is_focusable(root, &focusable); }
+  rc = is_focusable(root, &focusable);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (focusable) {
     if (*out_count >= *out_capacity) {
@@ -265,8 +269,10 @@ gather_focusable_layout_nodes(struct ui_layout_node *node,
   struct ui_layout_node *child;
   ui_bool_t focusable = UI_FALSE;
   if (node->dom_node) {
-    {
-      (void)is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
+    ui_error_t rc;
+    rc = is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 

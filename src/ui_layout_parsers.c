@@ -219,7 +219,7 @@ static ui_error_t parse_overflow(const char *val,
     *out_val = UI_LAYOUT_OVERFLOW_SCROLL;
     return UI_ERROR_NONE;
   }
-  if (local_strcmp(val, "auto") == 0) {
+  if (strcmp(val, "auto") == 0) {
     *out_val = UI_LAYOUT_OVERFLOW_AUTO;
     return UI_ERROR_NONE;
   }
@@ -237,7 +237,7 @@ static ui_error_t parse_overflow(const char *val,
  */
 static ui_error_t parse_wrap_flow(const char *val,
                                   enum ui_layout_wrap_flow *out_val) {
-  if (local_strcmp(val, "auto") == 0) {
+  if (strcmp(val, "auto") == 0) {
     *out_val = UI_LAYOUT_WRAP_FLOW_AUTO;
     return UI_ERROR_NONE;
   }
@@ -283,7 +283,7 @@ static ui_error_t parse_wrap_through(const char *val,
     *out_val = UI_LAYOUT_WRAP_THROUGH_WRAP;
     return UI_ERROR_NONE;
   }
-  if (local_strcmp(val, "none") == 0) {
+  if (strcmp(val, "none") == 0) {
     *out_val = UI_LAYOUT_WRAP_THROUGH_NONE;
     return UI_ERROR_NONE;
   }
@@ -301,7 +301,7 @@ static ui_error_t parse_wrap_through(const char *val,
  */
 static ui_error_t parse_white_space(const char *val,
                                     enum ui_layout_white_space *out_val) {
-  if (local_strcmp(val, "normal") == 0) {
+  if (strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_WHITE_SPACE_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -385,7 +385,7 @@ static ui_error_t parse_text_align(const char *val,
  */
 static ui_error_t parse_word_break(const char *val,
                                    enum ui_layout_word_break *out_val) {
-  if (local_strcmp(val, "normal") == 0) {
+  if (strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_WORD_BREAK_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -415,7 +415,7 @@ static ui_error_t parse_word_break(const char *val,
  */
 static ui_error_t parse_hyphens(const char *val,
                                 enum ui_layout_hyphens *out_val) {
-  if (local_strcmp(val, "none") == 0) {
+  if (strcmp(val, "none") == 0) {
     *out_val = UI_LAYOUT_HYPHENS_NONE;
     return UI_ERROR_NONE;
   }
@@ -423,7 +423,7 @@ static ui_error_t parse_hyphens(const char *val,
     *out_val = UI_LAYOUT_HYPHENS_MANUAL;
     return UI_ERROR_NONE;
   }
-  if (local_strcmp(val, "auto") == 0) {
+  if (strcmp(val, "auto") == 0) {
     *out_val = UI_LAYOUT_HYPHENS_AUTO;
     return UI_ERROR_NONE;
   }
@@ -489,7 +489,7 @@ static ui_error_t parse_direction(const char *val,
  */
 static ui_error_t parse_unicode_bidi(const char *val,
                                      enum ui_layout_unicode_bidi *out_val) {
-  if (local_strcmp(val, "normal") == 0) {
+  if (strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_UNICODE_BIDI_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -667,7 +667,7 @@ parse_block_step_round(const char *val,
 static ui_error_t parse_color_scheme(const char *val,
                                      enum ui_layout_color_scheme *out_val) {
   int mask = UI_LAYOUT_COLOR_SCHEME_NORMAL;
-  if (local_strcmp(val, "normal") == 0) {
+  if (strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_COLOR_SCHEME_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -709,7 +709,7 @@ static ui_error_t
  */
 parse_forced_color_adjust(const char *val,
                           enum ui_layout_forced_color_adjust *out_val) {
-  if (local_strcmp(val, "none") == 0) {
+  if (strcmp(val, "none") == 0) {
     *out_val = UI_LAYOUT_FORCED_COLOR_ADJUST_NONE;
     return UI_ERROR_NONE;
   }
@@ -758,7 +758,7 @@ parse_text_orientation(const char *val,
  */
 static ui_error_t parse_text_decoration_line(const char *val, int *out_val) {
   int mask = UI_LAYOUT_TEXT_DECORATION_LINE_NONE;
-  if (local_strcmp(val, "none") == 0) {
+  if (strcmp(val, "none") == 0) {
     *out_val = mask;
     return UI_ERROR_NONE;
   }
@@ -882,7 +882,7 @@ static ui_error_t parse_font_stretch(const char *val,
  * @return Return value.
  */
 static ui_error_t parse_font_weight(const char *val, int *out_val) {
-  if (local_strcmp(val, "normal") == 0) {
+  if (strcmp(val, "normal") == 0) {
     *out_val = 400;
     return UI_ERROR_NONE;
   }
@@ -917,7 +917,7 @@ parse_text_size_adjust(const char *val,
 
   out_adjust->type = UI_LAYOUT_TEXT_SIZE_ADJUST_AUTO;
   out_adjust->percentage = 100.0f;
-  if (local_strcmp(val, "auto") == 0) {
+  if (strcmp(val, "auto") == 0) {
     out_adjust->type = UI_LAYOUT_TEXT_SIZE_ADJUST_AUTO;
   } else if (strcmp(val, "none") == 0) {
     out_adjust->type = UI_LAYOUT_TEXT_SIZE_ADJUST_NONE;
@@ -1054,7 +1054,7 @@ static ui_error_t parse_box_shadow(const char *val,
                                    struct ui_layout_box_shadow *shadows,
                                    int *count) {
   *count = 0;
-  if (local_strcmp(val, "none") == 0) {
+  if (strcmp(val, "none") == 0) {
     return UI_ERROR_NONE;
   }
   /* Simplified parser for a single shadow for mock Level 4 */
@@ -1085,11 +1085,11 @@ static ui_error_t parse_box_shadow(const char *val,
 static ui_error_t parse_alignment(const char *val,
                                   enum ui_layout_alignment default_val,
                                   enum ui_layout_alignment *out_val) {
-  if (local_strcmp(val, "auto") == 0) {
+  if (strcmp(val, "auto") == 0) {
     *out_val = UI_LAYOUT_ALIGN_AUTO;
     return UI_ERROR_NONE;
   }
-  if (local_strcmp(val, "normal") == 0) {
+  if (strcmp(val, "normal") == 0) {
     *out_val = UI_LAYOUT_ALIGN_NORMAL;
     return UI_ERROR_NONE;
   }
@@ -1226,7 +1226,7 @@ static ui_error_t parse_margin_trim(const char *val,
 static ui_error_t parse_aspect_ratio(const char *val, float *out_val) {
   float w = 1.0f, h = 1.0f;
   const char *slash;
-  if (local_strcmp(val, "auto") == 0) {
+  if (strcmp(val, "auto") == 0) {
     *out_val = 0.0f;
     return UI_ERROR_NONE;
   }

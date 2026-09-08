@@ -242,6 +242,7 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
   int indices[UI_RIBBON_MAX_GROUPS];
   int i;
   int current_width = 0;
+  ui_error_t rc;
 
   union ui_signal_payload payload;
 
@@ -261,7 +262,10 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     ribbon->groups[i].current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_NORMAL;
   }
 
-  (void)sort_indices_by_priority(ribbon, indices);
+  rc = sort_indices_by_priority(ribbon, indices);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* Step 1: Collapse low-priority groups to COMPACT if we overflow */
   for (i = 0; i < ribbon->num_groups && current_width > available_width; ++i) {
@@ -313,13 +317,17 @@ ui_error_t
 ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
                                int group_id,
                                enum ui_ribbon_group_collapse_state *out_state) {
-  struct ui_ribbon_group_state *gs;
+  struct ui_ribbon_group_state *gs = NULL;
+  ui_error_t rc;
 
   if (!ribbon || !out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)find_group_state(ribbon, group_id, &gs);
+  rc = find_group_state(ribbon, group_id, &gs);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   if (!gs) {
     return UI_ERROR_NOT_FOUND;
   }

@@ -799,17 +799,12 @@ has_matching_descendant(const struct ui_css_selector *selectors_list,
  * @brief cssom_get_attr.
  * @param node Parameter node.
  * @param name Parameter name.
+ * @param out_val Parameter out_val.
  * @return Return value.
  */
-static const char *cssom_get_attr(const struct ui_dom_node *node,
-                                  const char *name) {
-  struct ui_dom_attribute *attr = node->attributes;
-  while (attr) {
-    if (strcmp(attr->name, name) == 0)
-      return attr->value;
-    attr = attr->next;
-  }
-  return NULL;
+static ui_error_t cssom_get_attr(const struct ui_dom_node *node,
+                                 const char *name, const char **out_val) {
+  return ui_dom_node_get_attribute(node, name, out_val);
 }
 
 /**
@@ -901,7 +896,8 @@ has_matching_ancestor(const struct ui_css_selector *selectors_list,
 static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
                                        const struct ui_dom_node *node,
                                        int *out_matched) {
-  const char *attr_val;
+  const char *attr_val = NULL;
+  ui_error_t attr_rc;
   if (strcmp(selector->value, "first-child") == 0) {
     {
       *out_matched = (node->previous_sibling == NULL);
@@ -980,16 +976,17 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     return UI_ERROR_NONE;
   } else if (strcmp(selector->value, "checked") == 0) {
     {
-      attr_val = cssom_get_attr(node, "checked");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "checked", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-checked");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-checked", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -1001,16 +998,17 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "disabled") == 0) {
     {
-      attr_val = cssom_get_attr(node, "disabled");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "disabled", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-disabled");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-disabled", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -1022,16 +1020,17 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "enabled") == 0) {
     {
-      attr_val = cssom_get_attr(node, "disabled");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "disabled", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-disabled");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-disabled", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;
@@ -1043,16 +1042,17 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "required") == 0) {
     {
-      attr_val = cssom_get_attr(node, "required");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "required", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-required");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-required", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -1064,16 +1064,17 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "optional") == 0) {
     {
-      attr_val = cssom_get_attr(node, "required");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "required", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-required");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-required", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;
@@ -1085,16 +1086,17 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "read-only") == 0) {
     {
-      attr_val = cssom_get_attr(node, "readonly");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "readonly", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-readonly");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-readonly", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -1106,32 +1108,34 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "read-write") == 0) {
     {
-      attr_val = cssom_get_attr(node, "readonly");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "readonly", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-readonly");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-readonly", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "disabled");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "disabled", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-disabled");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-disabled", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;
@@ -1143,16 +1147,17 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "indeterminate") == 0) {
     {
-      attr_val = cssom_get_attr(node, "indeterminate");
-      if (attr_val) {
+      attr_rc = cssom_get_attr(node, "indeterminate", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
     }
     {
-      attr_val = cssom_get_attr(node, "aria-checked");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-checked", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -1163,13 +1168,14 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
       return UI_ERROR_NONE;
     }
   } else if (strcmp(selector->value, "default") == 0) {
-    ui_error_t attr_rc = ui_dom_node_get_attribute(node, "default", &attr_val);
+    attr_rc = ui_dom_node_get_attribute(node, "default", &attr_val);
     *out_matched = (attr_rc == UI_ERROR_NONE);
     return UI_ERROR_NONE;
   } else if (strcmp(selector->value, "invalid") == 0) {
     {
-      attr_val = cssom_get_attr(node, "aria-invalid");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-invalid", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -1181,8 +1187,9 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
     }
   } else if (strcmp(selector->value, "valid") == 0) {
     {
-      attr_val = cssom_get_attr(node, "aria-invalid");
-      if (attr_val && strcmp(attr_val, "true") == 0) {
+      attr_rc = cssom_get_attr(node, "aria-invalid", &attr_val);
+      if (attr_rc == UI_ERROR_NONE && attr_val &&
+          strcmp(attr_val, "true") == 0) {
 
         *out_matched = 0;
         return UI_ERROR_NONE;

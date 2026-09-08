@@ -325,21 +325,15 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   if (node->font_manager) {
     const char *primary_font =
         node->font_family ? node->font_family : "sans-serif";
-/** @cond */
-#define UI_FONT_FIND_IGNORE_PRIM(mgr, fam, w, it, outf)                        \
-  ui_font_manager_find_font((mgr), (fam), (w), (it), (outf))
-    /** @endcond */
-    rc = UI_FONT_FIND_IGNORE_PRIM(node->font_manager, primary_font, 400, 0,
-                                  &font);
+    rc = ui_font_manager_find_font(node->font_manager, primary_font, 400, 0,
+                                   &font);
     if (rc != UI_ERROR_NONE) {
       /* Fallback to system-ui */
-/** @cond */
-#define UI_FONT_FIND_IGNORE(mgr, fam, w, it, outf)                             \
-  ui_font_manager_find_font((mgr), (fam), (w), (it), (outf))
-      /** @endcond */
-      (void)UI_FONT_FIND_IGNORE(node->font_manager, "system-ui", 400, 0, &font);
-      /* If no font can be found, we just proceed with NULL and
-       * ui_text_layout_shape will fail or mock it */
+      ui_error_t fb_rc = ui_font_manager_find_font(node->font_manager,
+                                                   "system-ui", 400, 0, &font);
+      if (fb_rc != UI_ERROR_NONE) {
+        font = NULL;
+      }
     }
   }
 

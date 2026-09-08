@@ -376,7 +376,10 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
   slider->component->shadow_root = root_node;
   root_node = NULL;
 
-  (void)update_dom_state(slider);
+  rc = update_dom_state(slider);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   *out_slider = slider;
   return UI_ERROR_NONE;
@@ -461,8 +464,7 @@ ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
       }
     }
   }
-  (void)update_dom_state(slider);
-  return UI_ERROR_NONE;
+  return update_dom_state(slider);
 }
 
 /**
@@ -488,8 +490,7 @@ ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
       }
     }
   }
-  (void)update_dom_state(slider);
-  return UI_ERROR_NONE;
+  return update_dom_state(slider);
 }
 
 /**
@@ -535,12 +536,19 @@ ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
   }
 
   if (slider->low_value != new_low || slider->high_value != new_high) {
+    ui_error_t rc_dom;
     slider->low_value = new_low;
     slider->high_value = new_high;
-    (void)update_dom_state(slider);
+    rc_dom = update_dom_state(slider);
+    if (rc_dom != UI_ERROR_NONE) {
+      return rc_dom;
+    }
     if (slider->on_change) {
-      (void)slider->on_change(slider, slider->low_value, slider->high_value,
-                              slider->user_data);
+      ui_error_t rc_chg = slider->on_change(
+          slider, slider->low_value, slider->high_value, slider->user_data);
+      if (rc_chg != UI_ERROR_NONE) {
+        return rc_chg;
+      }
     }
   }
 
@@ -596,8 +604,7 @@ ui_range_slider_base_set_disabled(struct ui_range_slider_base *slider,
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
   slider->disabled = disabled;
-  (void)update_dom_state(slider);
-  return UI_ERROR_NONE;
+  return update_dom_state(slider);
 }
 
 /**

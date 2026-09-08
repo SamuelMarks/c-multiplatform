@@ -152,7 +152,10 @@ ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider) {
   divider->orientation = UI_DIVIDER_ORIENTATION_HORIZONTAL;
   divider->inset = 0;
 
-  (void)update_dom_state(divider);
+  rc = update_dom_state(divider);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   *out_divider = divider;
   return UI_ERROR_NONE;

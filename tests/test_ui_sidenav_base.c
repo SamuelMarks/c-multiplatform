@@ -18,6 +18,7 @@ struct ui_sidenav_base {
   struct ui_overlay *backdrop_overlay;
   ui_sidenav_on_close_t on_close;
   void *user_data;
+  struct ui_signal *active_index_signal;
 };
 
 #include "ui_event.h"

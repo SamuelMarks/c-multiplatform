@@ -173,7 +173,10 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
     size_t len = strlen(config->message);
     entry->message = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
     if (!entry->message) {
-      (void)free_toast_entry(entry);
+      ui_error_t rc_cleanup = free_toast_entry(entry);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
 #if defined(_MSC_VER)
@@ -185,7 +188,10 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
 
   rc = ui_component_create(&entry->overlay_component);
   if (rc != UI_ERROR_NONE) {
-    (void)free_toast_entry(entry);
+    ui_error_t rc_cleanup = free_toast_entry(entry);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup; /* Avoid override */
+    }
     return rc;
   }
 
@@ -196,7 +202,10 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
         (struct ui_toast_entry **)C_MULTIPLATFORM_REALLOC(
             stack->toasts, (size_t)new_cap * sizeof(struct ui_toast_entry *));
     if (!new_arr) {
-      (void)free_toast_entry(entry);
+      ui_error_t rc_cleanup = free_toast_entry(entry);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        (void)rc_cleanup; /* Avoid override */
+      }
       return UI_ERROR_OUT_OF_MEMORY;
     }
     stack->toasts = new_arr;
@@ -391,6 +400,7 @@ ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
                                         struct ui_overlay_director *director) {
   int i;
   size_t j;
+  ui_error_t rc;
 
   if (!manager || !director)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -413,73 +423,133 @@ ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
 
     for (j = 0; j < stack->count; j++) {
       struct ui_toast_entry *entry = stack->toasts[j];
-      struct ui_dom_node *root_node;
-      struct ui_dom_node *text_node;
+      struct ui_dom_node *root_node = NULL;
+      struct ui_dom_node *text_node = NULL;
+      const char *region_style = "";
       char style_buf[512];
 
       if (entry->active_overlay) {
         /* Unmount old so we can rebuild. In a full diff engine, this is
          * optimized. */
-        ui_overlay_director_unmount(director, entry->active_overlay);
+        rc = ui_overlay_director_unmount(director, entry->active_overlay);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
         entry->active_overlay = NULL;
       }
 
-      if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node) !=
-          UI_ERROR_NONE)
+      rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
+      if (rc != UI_ERROR_NONE)
         continue;
 
-      ui_dom_node_set_attribute(root_node, "role",
-                                entry->config.is_error ? "alert" : "status");
-      ui_dom_node_set_attribute(root_node, "aria-live", "polite");
+      rc = ui_dom_node_set_attribute(
+          root_node, "role", entry->config.is_error ? "alert" : "status");
+      if (rc != UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup;
+          }
+        }
+        return rc;
+      }
+
+      rc = ui_dom_node_set_attribute(root_node, "aria-live", "polite");
+      if (rc != UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup;
+          }
+        }
+        return rc;
+      }
+
+      rc = get_region_style((enum ui_toast_region)i, &region_style);
+      if (rc != UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup;
+          }
+        }
+        return rc;
+      }
 
       /* Apply stack offset. e.g. j * 60px down or up depending on region */
       if (i >= UI_TOAST_REGION_BOTTOM_LEFT) {
 #if defined(_MSC_VER)
-        const char *region_style = "";
-        (void)get_region_style((enum ui_toast_region)i, &region_style);
-        (void)sprintf_s(style_buf, sizeof(style_buf),
-                        "%s margin-bottom: %lupx;", region_style,
-                        (unsigned long)(j * 60));
+        sprintf_s(style_buf, sizeof(style_buf), "%s margin-bottom: %lupx;",
+                  region_style, (unsigned long)(j * 60));
 #else
-        const char *region_style = "";
-        (void)get_region_style((enum ui_toast_region)i, &region_style);
-        (void)sprintf(style_buf, "%s margin-bottom: %lupx;", region_style,
-                      (unsigned long)(j * 60));
+        sprintf(style_buf, "%s margin-bottom: %lupx;", region_style,
+                (unsigned long)(j * 60));
 #endif
       } else {
 #if defined(_MSC_VER)
-        const char *region_style = "";
-        (void)get_region_style((enum ui_toast_region)i, &region_style);
-        (void)sprintf_s(style_buf, sizeof(style_buf), "%s margin-top: %lupx;",
-                        region_style, (unsigned long)(j * 60));
+        sprintf_s(style_buf, sizeof(style_buf), "%s margin-top: %lupx;",
+                  region_style, (unsigned long)(j * 60));
 #else
-        const char *region_style = "";
-        (void)get_region_style((enum ui_toast_region)i, &region_style);
-        (void)sprintf(style_buf, "%s margin-top: %lupx;", region_style,
-                      (unsigned long)(j * 60));
+        sprintf(style_buf, "%s margin-top: %lupx;", region_style,
+                (unsigned long)(j * 60));
 #endif
       }
 
-      ui_dom_node_set_attribute(root_node, "style", style_buf);
+      rc = ui_dom_node_set_attribute(root_node, "style", style_buf);
+      if (rc != UI_ERROR_NONE) {
+        {
+          ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            (void)rc_cleanup;
+          }
+        }
+        return rc;
+      }
 
       if (entry->message) {
         size_t len;
-        {
-          ui_error_t _ign_rc =
-              ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
-          (void)_ign_rc;
+        rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+        if (rc != UI_ERROR_NONE) {
+          {
+            ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup;
+            }
+          }
+          return rc;
         }
         len = strlen(entry->message);
         text_node->text_content = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+        if (!text_node->text_content) {
+          {
+            ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup;
+            }
+          }
+          {
+            ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup;
+            }
+          }
+          return UI_ERROR_OUT_OF_MEMORY;
+        }
 #if defined(_MSC_VER)
-        (void)strcpy_s(text_node->text_content, len + 1, entry->message);
+        strcpy_s(text_node->text_content, len + 1, entry->message);
 #else
         UI_STRCPY(text_node->text_content, sizeof(text_node->text_content),
                   entry->message);
 #endif
-        {
-          ui_error_t _ign_rc = ui_dom_node_append_child(root_node, text_node);
-          (void)_ign_rc;
+        rc = ui_dom_node_append_child(root_node, text_node);
+        if (rc != UI_ERROR_NONE) {
+          {
+            ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+            if (rc_cleanup != UI_ERROR_NONE) {
+              (void)rc_cleanup;
+            }
+          }
+          return rc;
         }
       }
 
@@ -493,11 +563,11 @@ ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
         }
       }
       entry->overlay_component->shadow_root = root_node;
-      {
-        ui_error_t _ign_rc = ui_overlay_director_mount_component(
-            director, entry->overlay_component, 10000 + (int)j,
-            &entry->active_overlay);
-        (void)_ign_rc;
+      rc = ui_overlay_director_mount_component(
+          director, entry->overlay_component, 10000 + (int)j,
+          &entry->active_overlay);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
       }
     }
   }

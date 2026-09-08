@@ -209,28 +209,39 @@ struct gdiplus_context {
 /**
  * @brief ui_color_to_argb.
  * @param c Parameter c.
+ * @param out_argb Parameter out_argb.
  * @return Return value.
  */
-static ARGB ui_color_to_argb(const struct ui_color *c) {
-  BYTE a = (BYTE)(c->a * 255.0f);
-  BYTE r = (BYTE)(c->r * 255.0f);
-  BYTE g = (BYTE)(c->g * 255.0f);
-  BYTE b = (BYTE)(c->b * 255.0f);
-  return ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
+static ui_error_t ui_color_to_argb(const struct ui_color *c, ARGB *out_argb) {
+  BYTE a, r, g, b;
+  if (!c || !out_argb)
+    return UI_ERROR_INVALID_ARGUMENT;
+  a = (BYTE)(c->a * 255.0f);
+  r = (BYTE)(c->r * 255.0f);
+  g = (BYTE)(c->g * 255.0f);
+  b = (BYTE)(c->b * 255.0f);
+  *out_argb = ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
+  return UI_ERROR_NONE;
 }
 
 /**
  * @brief ui_css_color_to_argb.
  * @param c Parameter c.
+ * @param out_argb Parameter out_argb.
  * @return Return value.
  */
-static ARGB ui_css_color_to_argb(const struct ui_css_color *c) {
+static ui_error_t ui_css_color_to_argb(const struct ui_css_color *c,
+                                       ARGB *out_argb) {
+  BYTE a, r, g, b;
+  if (!c || !out_argb)
+    return UI_ERROR_INVALID_ARGUMENT;
   /* Assuming SRGB for now */
-  BYTE a = (BYTE)(c->components[3] * 255.0f);
-  BYTE r = (BYTE)(c->components[0] * 255.0f);
-  BYTE g = (BYTE)(c->components[1] * 255.0f);
-  BYTE b = (BYTE)(c->components[2] * 255.0f);
-  return ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
+  a = (BYTE)(c->components[3] * 255.0f);
+  r = (BYTE)(c->components[0] * 255.0f);
+  g = (BYTE)(c->components[1] * 255.0f);
+  b = (BYTE)(c->components[2] * 255.0f);
+  *out_argb = ((ARGB)a << 24) | ((ARGB)r << 16) | ((ARGB)g << 8) | (ARGB)b;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -299,11 +310,17 @@ static ui_error_t gdiplus_draw_rect(void *ctx, const struct ui_rect *r,
                                     const struct ui_color *c) {
   struct gdiplus_context *gctx = (struct gdiplus_context *)ctx;
   GpSolidFill *brush = NULL;
+  ARGB argb = 0;
+  ui_error_t rc;
 
   if (!gctx || !gctx->graphics || !r || !c)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  if (GdipCreateSolidFill(ui_color_to_argb(c), &brush) == Ok) {
+  rc = ui_color_to_argb(c, &argb);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  if (GdipCreateSolidFill(argb, &brush) == Ok) {
     GdipFillRectangle(gctx->graphics, (GpBrush *)brush, r->x, r->y, r->width,
                       r->height);
     GdipDeleteBrush((GpBrush *)brush);
@@ -396,10 +413,14 @@ static ui_error_t gdiplus_draw_text(void *ctx, const char *text,
   rect.Width = r->width;
   rect.Height = r->height;
 
-  if (GdipCreateSolidFill(ui_color_to_argb(&text_color), &brush) == Ok) {
-    GdipDrawString(gctx->graphics, wtext, text_len - 1, font, &rect, NULL,
-                   (GpBrush *)brush);
-    GdipDeleteBrush((GpBrush *)brush);
+  {
+    ARGB argb = 0;
+    ui_error_t c_rc = ui_color_to_argb(&text_color, &argb);
+    if (c_rc == UI_ERROR_NONE && GdipCreateSolidFill(argb, &brush) == Ok) {
+      GdipDrawString(gctx->graphics, wtext, text_len - 1, font, &rect, NULL,
+                     (GpBrush *)brush);
+      GdipDeleteBrush((GpBrush *)brush);
+    }
   }
 
   GdipDeleteFont(font);
@@ -466,8 +487,8 @@ static ui_error_t gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
           (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * (size_t)count);
       if (colors && positions) {
         for (i = 0; i < count; ++i) {
-          colors[i] = ui_css_color_to_argb(
-              &gradient->data.linear_gradient.stops[i].color);
+          (void)ui_css_color_to_argb(
+              &gradient->data.linear_gradient.stops[i].color, &colors[i]);
           /* Approximate positions */
           positions[i] = (float)i / (float)(count - 1);
         }
@@ -517,7 +538,7 @@ static ui_error_t gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
 
           /* PathGradient supports PresetBlend */
           for (i = 0; i < count; ++i) {
-            colors[i] = ui_css_color_to_argb(&stops[i].color);
+            (void)ui_css_color_to_argb(&stops[i].color, &colors[i]);
             positions[i] = (float)i / (float)(count - 1);
           }
           /* For PathGradient, position 0 is center, 1 is boundary.
@@ -588,9 +609,13 @@ static ui_error_t gdiplus_draw_path(void *ctx, const struct ui_path *p,
     }
   }
 
-  if (GdipCreateSolidFill(ui_color_to_argb(c), &brush) == Ok) {
-    GdipFillPath(gctx->graphics, (GpBrush *)brush, path);
-    GdipDeleteBrush((GpBrush *)brush);
+  {
+    ARGB argb = 0;
+    ui_error_t c_rc = ui_color_to_argb(c, &argb);
+    if (c_rc == UI_ERROR_NONE && GdipCreateSolidFill(argb, &brush) == Ok) {
+      GdipFillPath(gctx->graphics, (GpBrush *)brush, path);
+      GdipDeleteBrush((GpBrush *)brush);
+    }
   }
 
   GdipDeletePath(path);

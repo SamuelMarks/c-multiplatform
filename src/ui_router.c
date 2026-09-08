@@ -177,31 +177,38 @@ static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
  * @param val_len Parameter val_len.
  * @return Return value.
  */
-static int add_param(struct ui_route_param **params, size_t *size,
-                     const char *key, size_t key_len, const char *value,
-                     size_t val_len) {
+static ui_error_t add_param(struct ui_route_param **params, size_t *size,
+                            const char *key, size_t key_len, const char *value,
+                            size_t val_len) {
   struct ui_route_param *new_params;
   char *k = NULL, *v = NULL;
+  ui_error_t rc;
+
+  if (!params || !size) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   if (key_len > 0) {
-    if (internal_strndup(key, key_len, &k) != UI_ERROR_NONE)
-      return 0;
+    rc = internal_strndup(key, key_len, &k);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
     k = C_MULTIPLATFORM_STRDUP("");
     if (!k)
-      return 0;
+      return UI_ERROR_OUT_OF_MEMORY;
   }
 
   if (val_len > 0) {
-    if (internal_strndup(value, val_len, &v) != UI_ERROR_NONE) {
+    rc = internal_strndup(value, val_len, &v);
+    if (rc != UI_ERROR_NONE) {
       C_MULTIPLATFORM_FREE(k);
-      return 0;
+      return rc;
     }
   } else {
     v = C_MULTIPLATFORM_STRDUP("");
     if (!v) {
       C_MULTIPLATFORM_FREE(k);
-      return 0;
+      return UI_ERROR_OUT_OF_MEMORY;
     }
   }
 
@@ -210,7 +217,7 @@ static int add_param(struct ui_route_param **params, size_t *size,
   if (!new_params) {
     C_MULTIPLATFORM_FREE(k);
     C_MULTIPLATFORM_FREE(v);
-    return 0;
+    return UI_ERROR_OUT_OF_MEMORY;
   }
 
   if (*size > 0) {
@@ -223,7 +230,7 @@ static int add_param(struct ui_route_param **params, size_t *size,
   new_params[*size].value = v;
   *params = new_params;
   (*size)++;
-  return 1;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -251,6 +258,7 @@ static ui_error_t match_route(const char *pattern, const char *url,
   const char *param_start = NULL;
   const char *val_start = NULL;
   struct ui_route_request *req;
+  ui_error_t rc;
 
   if (!pattern || !url || !out_req || !out_match)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -279,11 +287,12 @@ static ui_error_t match_route(const char *pattern, const char *url,
       while (*t && *t != '/' && *t != '?') {
         t++;
       }
-      if (!add_param(&req->params, &req->params_size, param_start,
+      rc = add_param(&req->params, &req->params_size, param_start,
                      (size_t)(p - param_start), val_start,
-                     (size_t)(t - val_start))) {
+                     (size_t)(t - val_start));
+      if (rc != UI_ERROR_NONE) {
         (void)request_free(req);
-        return UI_ERROR_NONE;
+        return rc;
       }
     } else if (*p == *t) {
       p++;
@@ -339,11 +348,12 @@ static ui_error_t match_route(const char *pattern, const char *url,
         v_end = t;
       }
 
-      if (!add_param(&req->queries, &req->queries_size, k_start,
+      rc = add_param(&req->queries, &req->queries_size, k_start,
                      (size_t)(k_end - k_start), v_start,
-                     (size_t)(v_end - v_start))) {
+                     (size_t)(v_end - v_start));
+      if (rc != UI_ERROR_NONE) {
         (void)request_free(req);
-        return UI_ERROR_NONE;
+        return rc;
       }
 
       if (*t == '&') {

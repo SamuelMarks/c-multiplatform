@@ -1,7 +1,7 @@
 # Exhaustive Multipass Layout Architecture Plan (Strict C89 & Core Mandate Compliant)
 
 ## 1. Executive Summary & Architecture Paradigm
-Currently, `c-multiplatform` utilizes a simplified, single-pass conceptual model for flex layout. Without an intrinsic measurement pass, leaf nodes (Text, Buttons, Sliders) with `width = -1.0f` and `height = -1.0f` (auto-size) evaluate to `0x0`. 
+Currently, `c-multiplatform` utilizes a simplified, single-pass conceptual model for flex layout. Without an intrinsic measurement pass, leaf nodes (Text, Buttons, Sliders) with `width = -1.0f` and `height = -1.0f` (auto-size) evaluate to `0x0`.
 
 To solve this, we are migrating to a **Multipass Intrinsic Measurement Architecture**. This plan ensures that all changes rigidly adhere to the project's Core Workflow Mandates, specifically strict ISO C90 (C89) compliance, assertive error percolation, 100% Doxygen/Test coverage, and MSVC/cross-platform build stability.
 

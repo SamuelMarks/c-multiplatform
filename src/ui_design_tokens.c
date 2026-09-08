@@ -48,17 +48,24 @@ ui_error_t ui_design_token_dict_init(struct ui_arena *arena,
  * @brief find_token.
  * @param dict Parameter dict.
  * @param name Parameter name.
+ * @param out_token Parameter out_token.
  * @return Return value.
  */
-static struct ui_design_token *
-find_token(const struct ui_design_token_dict *dict, const char *name) {
+static ui_error_t find_token(const struct ui_design_token_dict *dict,
+                             const char *name,
+                             struct ui_design_token **out_token) {
   ui_uint32 i;
+  if (!dict || !name || !out_token) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_token = NULL;
   for (i = 0; i < dict->count; ++i) {
     if (strcmp(dict->tokens[i].name, name) == 0) {
-      return &dict->tokens[i];
+      *out_token = (struct ui_design_token *)&dict->tokens[i];
+      return UI_ERROR_NONE;
     }
   }
-  return NULL;
+  return UI_ERROR_NOT_FOUND;
 }
 
 /**
@@ -137,27 +144,25 @@ static ui_error_t ensure_capacity(struct ui_design_token_dict *dict) {
 static ui_error_t get_or_create_token(struct ui_design_token_dict *dict,
                                       const char *name,
                                       struct ui_design_token **out_token) {
-  struct ui_design_token *token = find_token(dict, name);
+  struct ui_design_token *token = NULL;
+  ui_error_t rc;
 
-  if (token) {
+  rc = find_token(dict, name, &token);
+  if (rc == UI_ERROR_NONE && token) {
     *out_token = token;
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t rc = ensure_capacity(dict);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+  rc = ensure_capacity(dict);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   token = &dict->tokens[dict->count++];
-  {
-    ui_error_t dup_err = duplicate_string(dict->arena, name, &token->name);
-    if (dup_err != UI_ERROR_NONE) {
-      dict->count--; /* Revert */
-      return dup_err;
-    }
+  rc = duplicate_string(dict->arena, name, &token->name);
+  if (rc != UI_ERROR_NONE) {
+    dict->count--; /* Revert */
+    return rc;
   }
 
   *out_token = token;
@@ -295,14 +300,15 @@ static ui_error_t resolve_token(const struct ui_design_token_dict *dict,
                                 const char *name,
                                 struct ui_design_token **out_token) {
   ui_uint32 depth = 0;
-  struct ui_design_token *token;
+  struct ui_design_token *token = NULL;
   const char *current_name = name;
+  ui_error_t rc;
 
   *out_token = NULL;
 
   while (depth < UI_MAX_ALIAS_DEPTH) {
-    token = find_token(dict, current_name);
-    if (!token) {
+    rc = find_token(dict, current_name, &token);
+    if (rc != UI_ERROR_NONE || !token) {
       return UI_ERROR_NOT_FOUND;
     }
 

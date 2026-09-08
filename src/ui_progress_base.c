@@ -192,7 +192,10 @@ ui_error_t ui_progress_base_create(struct ui_progress_base **out_progress) {
   progress->component->shadow_root = root_node;
   root_node = NULL;
 
-  (void)update_dom_state(progress);
+  rc = update_dom_state(progress);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   *out_progress = progress;
   return UI_ERROR_NONE;

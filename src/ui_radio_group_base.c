@@ -263,7 +263,9 @@ static ui_error_t on_child_toggle_change(struct ui_toggle_base *toggle,
 
   for (i = 0; i < group->count; ++i) {
     if (group->toggles[i] == toggle) {
-      (void)trigger_cva_change(group, (int)i);
+      rc = trigger_cva_change(group, (int)i);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
   return UI_ERROR_NONE;
@@ -395,7 +397,10 @@ ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
       }
     }
     if (is_checked) {
-      (void)on_child_toggle_change(toggle, 1, group);
+      ui_error_t rc_toggle = on_child_toggle_change(toggle, 1, group);
+      if (rc_toggle != UI_ERROR_NONE) {
+        return rc_toggle;
+      }
     }
   }
 
@@ -556,6 +561,7 @@ ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
   int active_idx = -1;
   size_t i;
   int next_idx;
+  ui_error_t rc;
 
   if (!group || !event)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -563,7 +569,9 @@ ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
   if (group->is_disabled)
     return UI_ERROR_NONE;
 
-  (void)trigger_cva_touched(group);
+  rc = trigger_cva_touched(group);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (group->count == 0)
     return UI_ERROR_NONE;
@@ -594,14 +602,13 @@ ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
           next_idx = 0;
       }
 
-      {
-        ui_error_t rc_cleanup =
-            ui_toggle_base_set_checked(group->toggles[next_idx], 1);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
-      (void)on_child_toggle_change(group->toggles[next_idx], 1, group);
+      rc = ui_toggle_base_set_checked(group->toggles[next_idx], 1);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+
+      rc = on_child_toggle_change(group->toggles[next_idx], 1, group);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
 

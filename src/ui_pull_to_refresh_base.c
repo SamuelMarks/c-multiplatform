@@ -190,7 +190,11 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
     return rc;
   }
 
-  (void)update_dom_state(ptr);
+  rc = update_dom_state(ptr);
+  if (rc != UI_ERROR_NONE) {
+    ui_pull_to_refresh_base_destroy(ptr);
+    return rc;
+  }
 
   *out_ptr = ptr;
   return UI_ERROR_NONE;
@@ -270,7 +274,7 @@ ui_pull_to_refresh_base_complete(struct ui_pull_to_refresh_base *ptr) {
   if (ptr->state == UI_PULL_TO_REFRESH_REFRESHING) {
     ptr->state = UI_PULL_TO_REFRESH_COMPLETING;
     ptr->completion_timer_ms = 0.0f;
-    (void)update_dom_state(ptr);
+    return update_dom_state(ptr);
   }
 
   return UI_ERROR_NONE;
@@ -323,6 +327,7 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
                                       const struct ui_event *event,
                                       double timestamp_ms) {
   struct ui_gesture_event ge = {0};
+  ui_error_t rc;
 
   if (!ptr || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -333,19 +338,20 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
     return UI_ERROR_NONE; /* Ignore gestures while refreshing/completing */
   }
 
-  {
-
-    ui_error_t _ign_rc = ui_gesture_recognizer_process_event(
-        ptr->gesture_recognizer, event, timestamp_ms, &ge);
-
-    (void)_ign_rc;
+  rc = ui_gesture_recognizer_process_event(ptr->gesture_recognizer, event,
+                                           timestamp_ms, &ge);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (ge.type == UI_GESTURE_PAN) {
     if (ge.state == UI_GESTURE_STATE_BEGAN) {
       if (ptr->state == UI_PULL_TO_REFRESH_RESTING) {
         ptr->state = UI_PULL_TO_REFRESH_PULLING;
-        (void)update_dom_state(ptr);
+        rc = update_dom_state(ptr);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
       }
     } else if (ge.state == UI_GESTURE_STATE_CHANGED) {
       if (ptr->state == UI_PULL_TO_REFRESH_PULLING) {
@@ -356,13 +362,19 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
           if (resistance < 0.1f)
             resistance = 0.1f;
           ptr->pull_distance += ge.delta_y * resistance;
-          (void)update_dom_state(ptr);
+          rc = update_dom_state(ptr);
+          if (rc != UI_ERROR_NONE) {
+            return rc;
+          }
         } else {
           ptr->pull_distance += ge.delta_y; /* pushing back up */
           if (ptr->pull_distance < 0.0f) {
             ptr->pull_distance = 0.0f;
           }
-          (void)update_dom_state(ptr);
+          rc = update_dom_state(ptr);
+          if (rc != UI_ERROR_NONE) {
+            return rc;
+          }
         }
       }
     } else {
@@ -370,9 +382,15 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
         if (ptr->pull_distance >= UI_PTR_THRESHOLD) {
           ptr->state = UI_PULL_TO_REFRESH_REFRESHING;
           ptr->pull_distance = UI_PTR_THRESHOLD; /* lock to target threshold */
-          (void)update_dom_state(ptr);
+          rc = update_dom_state(ptr);
+          if (rc != UI_ERROR_NONE) {
+            return rc;
+          }
           if (ptr->on_refresh) {
-            (void)ptr->on_refresh(ptr, ptr->on_refresh_user_data);
+            rc = ptr->on_refresh(ptr, ptr->on_refresh_user_data);
+            if (rc != UI_ERROR_NONE) {
+              return rc;
+            }
           }
         } else {
           /* Did not reach threshold, let the tick loop spring it back */
@@ -417,7 +435,7 @@ ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
         ptr->pull_distance = 0.0f;
         ptr->state = UI_PULL_TO_REFRESH_RESTING;
       }
-      (void)update_dom_state(ptr);
+      return update_dom_state(ptr);
     }
   } else if (ptr->state == UI_PULL_TO_REFRESH_COMPLETING) {
     ptr->completion_timer_ms += (float)delta_ms;
@@ -429,10 +447,8 @@ ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
         ptr->pull_distance < 1.0f) {
       ptr->state = UI_PULL_TO_REFRESH_RESTING;
       ptr->pull_distance = 0.0f;
-      (void)update_dom_state(ptr);
-    } else {
-      (void)update_dom_state(ptr);
     }
+    return update_dom_state(ptr);
   }
 
   return UI_ERROR_NONE;

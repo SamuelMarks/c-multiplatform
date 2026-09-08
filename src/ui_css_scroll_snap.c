@@ -270,7 +270,11 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       if (0)
         return prop_rc;
     } else {
-      (void)parse_snap_type(val_str, &out_props->type);
+      ui_error_t rc_snap = parse_snap_type(val_str, &out_props->type);
+      if (rc_snap != UI_ERROR_NONE) {
+        out_props->type.axis = UI_CSS_SCROLL_SNAP_AXIS_NONE;
+        out_props->type.strictness = UI_CSS_SCROLL_SNAP_STRICTNESS_NONE;
+      }
     }
   }
 
@@ -283,7 +287,11 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       if (0)
         return prop_rc;
     } else {
-      (void)parse_snap_align(val_str, &out_props->align);
+      ui_error_t rc_align = parse_snap_align(val_str, &out_props->align);
+      if (rc_align != UI_ERROR_NONE) {
+        out_props->align.block = UI_CSS_SCROLL_SNAP_ALIGN_NONE;
+        out_props->align.inline_axis = UI_CSS_SCROLL_SNAP_ALIGN_NONE;
+      }
     }
   }
 
@@ -381,9 +389,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       }
 
     } else {
-      (void)parse_quad_shorthand(
+      ui_error_t rc_quad = parse_quad_shorthand(
           val_str, &out_props->padding.top, &out_props->padding.right,
           &out_props->padding.bottom, &out_props->padding.left);
+      if (rc_quad != UI_ERROR_NONE) {
+        set_quad_default(&out_props->padding.top, &out_props->padding.right,
+                         &out_props->padding.bottom, &out_props->padding.left);
+      }
     }
   }
 
@@ -467,9 +479,13 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       }
 
     } else {
-      (void)parse_quad_shorthand(
+      ui_error_t rc_quad = parse_quad_shorthand(
           val_str, &out_props->margin.top, &out_props->margin.right,
           &out_props->margin.bottom, &out_props->margin.left);
+      if (rc_quad != UI_ERROR_NONE) {
+        set_quad_default(&out_props->margin.top, &out_props->margin.right,
+                         &out_props->margin.bottom, &out_props->margin.left);
+      }
     }
   }
 

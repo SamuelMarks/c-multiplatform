@@ -180,17 +180,25 @@ ui_mutation_observer_disconnect(struct ui_mutation_observer *observer) {
  * @brief Checks if a node is an ancestor of another node.
  * @param[in] ancestor The potential ancestor node.
  * @param[in] node The child node.
- * @return 1 if true, 0 otherwise.
+ * @param[out] out_is_ancestor Pointer to receive 1 if true, 0 otherwise.
+ * @return UI_ERROR_NONE on success, or an error code.
  */
-static int is_ancestor(struct ui_dom_node *ancestor, struct ui_dom_node *node) {
-  struct ui_dom_node *curr = node;
+static ui_error_t is_ancestor(struct ui_dom_node *ancestor,
+                              struct ui_dom_node *node, int *out_is_ancestor) {
+  struct ui_dom_node *curr;
+  if (!out_is_ancestor) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_is_ancestor = 0;
+  curr = node;
   while (curr != NULL) {
     if (curr == ancestor) {
-      return 1;
+      *out_is_ancestor = 1;
+      return UI_ERROR_NONE;
     }
     curr = curr->parent;
   }
-  return 0;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -203,9 +211,7 @@ static ui_error_t dispatch_record(struct ui_mutation_observer *observer,
                                   struct ui_mutation_record *record) {
   ui_error_t cb_rc =
       observer->callback(observer, record, 1, observer->user_data);
-  {
-    (void)cb_rc;
-  }
+  { (void)cb_rc; }
   return cb_rc;
 }
 
@@ -241,8 +247,9 @@ ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        if (is_ancestor(tinfo->target, target)) {
-          is_match = 1;
+        rc = is_ancestor(tinfo->target, target, &is_match);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
         }
       }
       if (is_match) {
@@ -307,8 +314,9 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        if (is_ancestor(tinfo->target, target)) {
-          is_match = 1;
+        rc = is_ancestor(tinfo->target, target, &is_match);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
         }
       }
       if (is_match) {
@@ -404,8 +412,9 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        if (is_ancestor(tinfo->target, target)) {
-          is_match = 1;
+        rc = is_ancestor(tinfo->target, target, &is_match);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
         }
       }
       if (is_match) {
