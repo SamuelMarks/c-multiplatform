@@ -36,7 +36,8 @@ struct ui_progress_base;
  * @param out_progress Pointer to receive the allocated progress component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_progress_base_create(struct ui_progress_base **out_progress);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_progress_base_create(struct ui_progress_base **out_progress);
 
 /**
  * @brief Destroys a progress component.
@@ -44,7 +45,8 @@ ui_error_t ui_progress_base_create(struct ui_progress_base **out_progress);
  * @param progress The progress component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_progress_base_destroy(struct ui_progress_base *progress);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_progress_base_destroy(struct ui_progress_base *progress);
 
 /**
  * @brief Sets the component to determinate mode and updates the value.
@@ -55,8 +57,8 @@ ui_error_t ui_progress_base_destroy(struct ui_progress_base *progress);
  * @param max The maximum possible value (e.g., 100.0f).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_progress_base_set_determinate(struct ui_progress_base *progress,
-                                            float value, float min, float max);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_progress_base_set_determinate(
+    struct ui_progress_base *progress, float value, float min, float max);
 
 /**
  * @brief Sets the component to indeterminate mode.
@@ -64,7 +66,7 @@ ui_error_t ui_progress_base_set_determinate(struct ui_progress_base *progress,
  * @param progress The progress component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_progress_base_set_indeterminate(struct ui_progress_base *progress);
 
 /**
@@ -74,8 +76,8 @@ ui_progress_base_set_indeterminate(struct ui_progress_base *progress);
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_progress_base_get_component(struct ui_progress_base *progress,
-                                          struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_progress_base_get_component(
+    struct ui_progress_base *progress, struct ui_component **out_component);
 
 /**
  * @brief Gets the current normalized percentage [0.0, 1.0].
@@ -85,7 +87,8 @@ ui_error_t ui_progress_base_get_component(struct ui_progress_base *progress,
  * @param out_percentage Pointer to receive the normalized percentage.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_progress_base_get_normalized_percentage(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_progress_base_get_normalized_percentage(
     const struct ui_progress_base *progress, float *out_percentage);
 
 /**
@@ -95,9 +98,8 @@ ui_error_t ui_progress_base_get_normalized_percentage(
  * @param out_is_indeterminate Pointer to receive the indeterminate state.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_progress_base_is_indeterminate(const struct ui_progress_base *progress,
-                                  int *out_is_indeterminate);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_progress_base_is_indeterminate(
+    const struct ui_progress_base *progress, int *out_is_indeterminate);
 
 /**
  * @brief Binds the value property.
@@ -106,11 +108,11 @@ ui_progress_base_is_indeterminate(const struct ui_progress_base *progress,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_progress_base_bind_value(struct ui_progress_base *widget,
-                                       struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_progress_base_bind_value(
+    struct ui_progress_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_PROGRESS_BASE_H */

@@ -8,6 +8,10 @@
 #define C_CI_NO_DISCARD_H
 /** @endcond */
 
+/* clang-format off */
+#include "ui_export.h"
+/* clang-format on */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

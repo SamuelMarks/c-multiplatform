@@ -1,6 +1,6 @@
+/* clang-format off */
 #include "../src/ui_internal_mem.h"
 #include <stdlib.h>
-/* clang-format off */
 #include <stdio.h>
 #include <string.h>
 #include "ui_css_scrollbars.h"

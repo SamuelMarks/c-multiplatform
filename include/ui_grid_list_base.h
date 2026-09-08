@@ -44,8 +44,8 @@ struct ui_grid_list_item {
  * @return `UI_ERROR_NONE` on success, `UI_ERROR_OUT_OF_MEMORY` on allocation
  * failure, `UI_ERROR_INVALID_ARGUMENT` if columns < 1.
  */
-ui_error_t ui_grid_list_base_create(struct ui_grid_list_base **out_grid_list,
-                                    int columns);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_grid_list_base_create(struct ui_grid_list_base **out_grid_list, int columns);
 
 /**
  * @brief Destroys a grid list base component and frees all items.
@@ -53,7 +53,8 @@ ui_error_t ui_grid_list_base_create(struct ui_grid_list_base **out_grid_list,
  * @param grid_list Pointer to the grid list to destroy.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list);
 
 /**
  * @brief Sets the number of columns in the grid.
@@ -63,8 +64,8 @@ ui_error_t ui_grid_list_base_destroy(struct ui_grid_list_base *grid_list);
  * @return `UI_ERROR_NONE` on success, `UI_ERROR_INVALID_ARGUMENT` on null
  * pointer or columns < 1.
  */
-ui_error_t ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
-                                         int columns);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list, int columns);
 
 /**
  * @brief Gets the number of columns in the grid.
@@ -74,9 +75,8 @@ ui_error_t ui_grid_list_base_set_columns(struct ui_grid_list_base *grid_list,
  * @return `UI_ERROR_NONE` on success, `UI_ERROR_INVALID_ARGUMENT` on null
  * pointer.
  */
-ui_error_t
-ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
-                              int *out_columns);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_grid_list_base_get_columns(
+    const struct ui_grid_list_base *grid_list, int *out_columns);
 
 /**
  * @brief Adds an item to the grid list with specified row and column span.
@@ -87,8 +87,8 @@ ui_grid_list_base_get_columns(const struct ui_grid_list_base *grid_list,
  * @return `UI_ERROR_NONE` on success, `UI_ERROR_INVALID_ARGUMENT` on null
  * pointer or invalid spans, `UI_ERROR_OUT_OF_MEMORY` on allocation failure.
  */
-ui_error_t ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
-                                      int rowspan, int colspan);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_grid_list_base_add_item(
+    struct ui_grid_list_base *grid_list, int rowspan, int colspan);
 
 /**
  * @brief Gets the number of items in the grid list.
@@ -98,9 +98,8 @@ ui_error_t ui_grid_list_base_add_item(struct ui_grid_list_base *grid_list,
  * @return `UI_ERROR_NONE` on success, `UI_ERROR_INVALID_ARGUMENT` on null
  * pointer.
  */
-ui_error_t
-ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
-                                 size_t *out_count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_grid_list_base_get_item_count(
+    const struct ui_grid_list_base *grid_list, size_t *out_count);
 
 /**
  * @brief Gets the item at the specified index.
@@ -111,10 +110,9 @@ ui_grid_list_base_get_item_count(const struct ui_grid_list_base *grid_list,
  * @return `UI_ERROR_NONE` on success, `UI_ERROR_INVALID_ARGUMENT` on null
  * pointer, `UI_ERROR_OUT_OF_BOUNDS` if index is invalid.
  */
-ui_error_t
-ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
-                           size_t index,
-                           const struct ui_grid_list_item **out_item);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_grid_list_base_get_item(
+    const struct ui_grid_list_base *grid_list, size_t index,
+    const struct ui_grid_list_item **out_item);
 
 /**
  * @brief Calculates the layout, determining the maximum number of rows based on
@@ -128,9 +126,8 @@ ui_grid_list_base_get_item(const struct ui_grid_list_base *grid_list,
  * @return `UI_ERROR_NONE` on success, `UI_ERROR_INVALID_ARGUMENT` on null
  * pointer, `UI_ERROR_OUT_OF_MEMORY` on temporary allocation failure.
  */
-ui_error_t
-ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
-                                 int *out_rows);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_grid_list_base_calculate_rows(
+    const struct ui_grid_list_base *grid_list, int *out_rows);
 
 /**
  * @brief Binds a data signal to the grid list.
@@ -139,11 +136,11 @@ ui_grid_list_base_calculate_rows(const struct ui_grid_list_base *grid_list,
  * @param signal Pointer to the computed signal to bind to.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_grid_list_base_bind_data(struct ui_grid_list_base *widget,
-                                       struct ui_computed *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_grid_list_base_bind_data(
+    struct ui_grid_list_base *widget, struct ui_computed *signal);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_GRID_LIST_BASE_H */

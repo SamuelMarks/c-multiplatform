@@ -33,7 +33,8 @@ struct ui_card_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY if allocation fails,
  * or UI_ERROR_INVALID_ARGUMENT if out_card is null.
  */
-ui_error_t ui_card_base_create(struct ui_card_base **out_card);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_card_base_create(struct ui_card_base **out_card);
 
 /**
  * @brief Destroys a card instance and frees its resources.
@@ -41,7 +42,8 @@ ui_error_t ui_card_base_create(struct ui_card_base **out_card);
  * @param card The card instance to destroy. If null, does nothing.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_card_base_destroy(struct ui_card_base *card);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_card_base_destroy(struct ui_card_base *card);
 
 /**
  * @brief Sets the header content of the card.
@@ -52,8 +54,8 @@ ui_error_t ui_card_base_destroy(struct ui_card_base *card);
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if card is
  * null.
  */
-ui_error_t ui_card_base_set_header(struct ui_card_base *card,
-                                   struct ui_component *header_content);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_card_base_set_header(
+    struct ui_card_base *card, struct ui_component *header_content);
 
 /**
  * @brief Sets the main content of the card.
@@ -63,8 +65,8 @@ ui_error_t ui_card_base_set_header(struct ui_card_base *card,
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if card is
  * null.
  */
-ui_error_t ui_card_base_set_content(struct ui_card_base *card,
-                                    struct ui_component *content);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_card_base_set_content(
+    struct ui_card_base *card, struct ui_component *content);
 
 /**
  * @brief Sets the action area content of the card.
@@ -74,8 +76,8 @@ ui_error_t ui_card_base_set_content(struct ui_card_base *card,
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if card is
  * null.
  */
-ui_error_t ui_card_base_set_actions(struct ui_card_base *card,
-                                    struct ui_component *actions);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_card_base_set_actions(
+    struct ui_card_base *card, struct ui_component *actions);
 
 /**
  * @brief Retrieves the underlying component of the card.
@@ -84,8 +86,8 @@ ui_error_t ui_card_base_set_actions(struct ui_card_base *card,
  * @param out_component Pointer to receive the underlying ui_component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_card_base_get_component(struct ui_card_base *card,
-                                      struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_card_base_get_component(
+    struct ui_card_base *card, struct ui_component **out_component);
 
 /**
  * @brief Binds the data property.
@@ -94,8 +96,8 @@ ui_error_t ui_card_base_get_component(struct ui_card_base *card,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_card_base_bind_data(struct ui_card_base *widget,
-                                  struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_card_base_bind_data(struct ui_card_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

@@ -41,7 +41,8 @@ typedef ui_error_t (*ui_tabs_on_change_t)(struct ui_tabs_base *tabs,
  * @param out_tabs Pointer to receive the allocated tabs base.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_tabs_base_create(struct ui_tabs_base **out_tabs);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tabs_base_create(struct ui_tabs_base **out_tabs);
 
 /**
  * @brief Destroys a tabs base component.
@@ -49,7 +50,8 @@ ui_error_t ui_tabs_base_create(struct ui_tabs_base **out_tabs);
  * @param tabs The tabs component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tabs_base_destroy(struct ui_tabs_base *tabs);
 
 /**
  * @brief Adds a tab to the tabs group.
@@ -62,9 +64,9 @@ ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs);
  * @param panel_node The DOM node representing the tab content.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
-                                struct ui_dom_node *title_node,
-                                struct ui_dom_node *panel_node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tabs_base_add_tab(
+    struct ui_tabs_base *tabs, const char *tab_id,
+    struct ui_dom_node *title_node, struct ui_dom_node *panel_node);
 
 /**
  * @brief Sets the active tab index.
@@ -74,7 +76,8 @@ ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
  * @param index The index of the tab to activate.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_tabs_base_set_active_index(struct ui_tabs_base *tabs, int index);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tabs_base_set_active_index(struct ui_tabs_base *tabs, int index);
 
 /**
  * @brief Gets the currently active tab index.
@@ -83,8 +86,8 @@ ui_error_t ui_tabs_base_set_active_index(struct ui_tabs_base *tabs, int index);
  * @param out_index Pointer to receive the active index.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_tabs_base_get_active_index(const struct ui_tabs_base *tabs,
-                                         int *out_index);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tabs_base_get_active_index(const struct ui_tabs_base *tabs, int *out_index);
 
 /**
  * @brief Sets the callback for tab changes.
@@ -94,9 +97,8 @@ ui_error_t ui_tabs_base_get_active_index(const struct ui_tabs_base *tabs,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_tabs_base_set_on_change(struct ui_tabs_base *tabs,
-                                      ui_tabs_on_change_t on_change,
-                                      void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tabs_base_set_on_change(
+    struct ui_tabs_base *tabs, ui_tabs_on_change_t on_change, void *user_data);
 
 /**
  * @brief Processes an input event (e.g., keyboard navigation across headers).
@@ -106,9 +108,9 @@ ui_error_t ui_tabs_base_set_on_change(struct ui_tabs_base *tabs,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_tabs_base_process_event(struct ui_tabs_base *tabs,
-                                      const struct ui_event *event,
-                                      double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tabs_base_process_event(struct ui_tabs_base *tabs,
+                           const struct ui_event *event, double timestamp_ms);
 
 /**
  * @brief Gets the underlying UI component.
@@ -117,8 +119,8 @@ ui_error_t ui_tabs_base_process_event(struct ui_tabs_base *tabs,
  * @param out_component Pointer to receive the underlying component.
  * @return ui_error_t `UI_ERROR_NONE` on success.
  */
-ui_error_t ui_tabs_base_get_component(struct ui_tabs_base *tabs,
-                                      struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tabs_base_get_component(
+    struct ui_tabs_base *tabs, struct ui_component **out_component);
 
 /**
  * @brief Binds the active state/index to a signal.
@@ -127,8 +129,8 @@ ui_error_t ui_tabs_base_get_component(struct ui_tabs_base *tabs,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_tabs_base_bind_active_index(struct ui_tabs_base *widget,
-                                          struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tabs_base_bind_active_index(
+    struct ui_tabs_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

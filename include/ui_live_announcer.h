@@ -31,7 +31,8 @@ enum ui_live_politeness {
  * @param out_announcer Pointer to receive the allocated live announcer.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_live_announcer_create(struct ui_live_announcer **out_announcer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_live_announcer_create(struct ui_live_announcer **out_announcer);
 
 /**
  * @brief Destroys a live announcer manager.
@@ -39,7 +40,8 @@ ui_error_t ui_live_announcer_create(struct ui_live_announcer **out_announcer);
  * @param announcer The live announcer manager to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_live_announcer_destroy(struct ui_live_announcer *announcer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_live_announcer_destroy(struct ui_live_announcer *announcer);
 
 /**
  * @brief Queues text to be announced by the screen reader.
@@ -49,9 +51,9 @@ ui_error_t ui_live_announcer_destroy(struct ui_live_announcer *announcer);
  * @param politeness The politeness level (polite or assertive).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_live_announce(struct ui_live_announcer *announcer,
-                            const char *message,
-                            enum ui_live_politeness politeness);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_live_announce(struct ui_live_announcer *announcer, const char *message,
+                 enum ui_live_politeness politeness);
 
 /**
  * @brief Clears any pending announcements in the queue.
@@ -59,10 +61,11 @@ ui_error_t ui_live_announce(struct ui_live_announcer *announcer,
  * @param announcer The live announcer manager.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_live_announcer_clear(struct ui_live_announcer *announcer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_live_announcer_clear(struct ui_live_announcer *announcer);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_LIVE_ANNOUNCER_H */

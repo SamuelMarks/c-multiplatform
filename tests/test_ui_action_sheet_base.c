@@ -5,10 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-/* clang-format on */
-
 #undef NDEBUG
 #include <assert.h>
+/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 

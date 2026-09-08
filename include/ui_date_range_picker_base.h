@@ -71,7 +71,7 @@ typedef ui_error_t (*ui_date_range_on_change_cb)(
  * @param out_picker Pointer to receive the allocated base structure.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_date_range_picker_base_create(struct ui_date_range_picker_base **out_picker);
 
 /**
@@ -80,7 +80,7 @@ ui_date_range_picker_base_create(struct ui_date_range_picker_base **out_picker);
  * @param picker Pointer to the picker base to destroy.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_date_range_picker_base_destroy(struct ui_date_range_picker_base *picker);
 
 /**
@@ -91,7 +91,8 @@ ui_date_range_picker_base_destroy(struct ui_date_range_picker_base *picker);
  * @param user_data Opaque user data provided to the callback.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_date_range_picker_base_set_disable_predicate(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_date_range_picker_base_set_disable_predicate(
     struct ui_date_range_picker_base *picker, ui_date_predicate_cb predicate,
     void *user_data);
 
@@ -104,7 +105,8 @@ ui_error_t ui_date_range_picker_base_set_disable_predicate(
  * @param user_data Opaque user data provided to the callback.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_date_range_picker_base_set_on_change(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_date_range_picker_base_set_on_change(
     struct ui_date_range_picker_base *picker,
     ui_date_range_on_change_cb on_change, void *user_data);
 
@@ -117,9 +119,8 @@ ui_error_t ui_date_range_picker_base_set_on_change(
  * @return `UI_ERROR_NONE` on success, or an error if the date is invalid or
  * disabled.
  */
-ui_error_t
-ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
-                                      const struct ui_date *date);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_date_range_picker_base_select_date(
+    struct ui_date_range_picker_base *picker, const struct ui_date *date);
 
 /**
  * @brief Sets the hovered date during end-date selection to calculate the
@@ -129,7 +130,8 @@ ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
  * @param date Pointer to the hovered date.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_date_range_picker_base_set_hover_date(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_date_range_picker_base_set_hover_date(
     struct ui_date_range_picker_base *picker, const struct ui_date *date);
 
 /**
@@ -139,7 +141,7 @@ ui_error_t ui_date_range_picker_base_set_hover_date(
  * @param out_state Pointer to receive the current selection state.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_date_range_picker_base_get_state(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_date_range_picker_base_get_state(
     const struct ui_date_range_picker_base *picker,
     enum ui_date_range_picker_state *out_state);
 
@@ -151,7 +153,7 @@ ui_error_t ui_date_range_picker_base_get_state(
  * the `end_date` will match the hover date or start date.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_date_range_picker_base_get_range(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_date_range_picker_base_get_range(
     const struct ui_date_range_picker_base *picker,
     struct ui_date_range *out_range);
 
@@ -161,7 +163,7 @@ ui_error_t ui_date_range_picker_base_get_range(
  * @param picker Pointer to the picker base.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_date_range_picker_base_clear(struct ui_date_range_picker_base *picker);
 
 /**
@@ -173,8 +175,8 @@ ui_date_range_picker_base_clear(struct ui_date_range_picker_base *picker);
  * a == b, >0 if a > b.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_date_compare(const struct ui_date *a, const struct ui_date *b,
-                           int *out_result);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_date_compare(
+    const struct ui_date *a, const struct ui_date *b, int *out_result);
 
 /**
  * @brief Validates if a date is logically valid.
@@ -184,8 +186,8 @@ ui_error_t ui_date_compare(const struct ui_date *a, const struct ui_date *b,
  * otherwise).
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_date_is_valid(const struct ui_date *date,
-                            ui_bool_t *out_is_valid);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_date_is_valid(const struct ui_date *date, ui_bool_t *out_is_valid);
 
 #ifdef __cplusplus
 }

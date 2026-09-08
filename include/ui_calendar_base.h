@@ -47,8 +47,9 @@ enum ui_day_of_week {
  * @param out_cva Optional pointer to receive the control value accessor.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_base_create(struct ui_calendar_base **out_calendar,
-                                   struct ui_control_value_accessor *out_cva);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_calendar_base_create(struct ui_calendar_base **out_calendar,
+                        struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Destroys a calendar base component.
@@ -56,7 +57,8 @@ ui_error_t ui_calendar_base_create(struct ui_calendar_base **out_calendar,
  * @param calendar The calendar to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_base_destroy(struct ui_calendar_base *calendar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_calendar_base_destroy(struct ui_calendar_base *calendar);
 
 /**
  * @brief Checks if a year is a leap year.
@@ -64,7 +66,8 @@ ui_error_t ui_calendar_base_destroy(struct ui_calendar_base *calendar);
  * @param out_is_leap Pointer to receive 1 if leap year, 0 otherwise.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_is_leap_year(int year, int *out_is_leap);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_calendar_is_leap_year(int year, int *out_is_leap);
 
 /**
  * @brief Gets the number of days in a month for a specific year.
@@ -74,7 +77,8 @@ ui_error_t ui_calendar_is_leap_year(int year, int *out_is_leap);
  * month.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_calendar_days_in_month(int year, int month, int *out_days);
 
 /**
  * @brief Gets the day of the week for a specific date using Sakamoto's
@@ -85,8 +89,8 @@ ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days);
  * @param out_dow Pointer to receive the day of the week, where 0 = Sunday.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_get_day_of_week(int year, int month, int day,
-                                       enum ui_day_of_week *out_dow);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_get_day_of_week(
+    int year, int month, int day, enum ui_day_of_week *out_dow);
 
 /**
  * @brief Sets the starting day of the week (e.g., UI_SUNDAY or UI_MONDAY).
@@ -95,8 +99,8 @@ ui_error_t ui_calendar_get_day_of_week(int year, int month, int day,
  * @param start_day The start day.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_base_set_start_of_week(struct ui_calendar_base *calendar,
-                                              enum ui_day_of_week start_day);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_base_set_start_of_week(
+    struct ui_calendar_base *calendar, enum ui_day_of_week start_day);
 
 /**
  * @brief Sets the minimum allowed date. Pass NULL to remove the constraint.
@@ -105,8 +109,8 @@ ui_error_t ui_calendar_base_set_start_of_week(struct ui_calendar_base *calendar,
  * @param min_date The minimum date or NULL.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_base_set_min_date(struct ui_calendar_base *calendar,
-                                         const struct ui_date *min_date);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_base_set_min_date(
+    struct ui_calendar_base *calendar, const struct ui_date *min_date);
 
 /**
  * @brief Sets the maximum allowed date. Pass NULL to remove the constraint.
@@ -115,8 +119,8 @@ ui_error_t ui_calendar_base_set_min_date(struct ui_calendar_base *calendar,
  * @param max_date The maximum date or NULL.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_base_set_max_date(struct ui_calendar_base *calendar,
-                                         const struct ui_date *max_date);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_base_set_max_date(
+    struct ui_calendar_base *calendar, const struct ui_date *max_date);
 
 /**
  * @brief Sets the currently viewed month and year.
@@ -126,8 +130,8 @@ ui_error_t ui_calendar_base_set_max_date(struct ui_calendar_base *calendar,
  * @param month The month (1-12).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_base_set_view_month(struct ui_calendar_base *calendar,
-                                           int year, int month);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_base_set_view_month(
+    struct ui_calendar_base *calendar, int year, int month);
 
 /**
  * @brief Gets the currently viewed month and year.
@@ -137,9 +141,8 @@ ui_error_t ui_calendar_base_set_view_month(struct ui_calendar_base *calendar,
  * @param out_month Pointer to receive the month.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_calendar_base_get_view_month(const struct ui_calendar_base *calendar,
-                                int *out_year, int *out_month);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_base_get_view_month(
+    const struct ui_calendar_base *calendar, int *out_year, int *out_month);
 
 /**
  * @brief Selects a specific date. Validates against min/max and valid month
@@ -150,8 +153,8 @@ ui_calendar_base_get_view_month(const struct ui_calendar_base *calendar,
  * @return UI_ERROR_OUT_OF_BOUNDS if date is out of range, UI_ERROR_NONE on
  * success.
  */
-ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
-                                        const struct ui_date *date);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_base_select_date(
+    struct ui_calendar_base *calendar, const struct ui_date *date);
 
 /**
  * @brief Gets the currently selected date.
@@ -160,9 +163,8 @@ ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
  * @param out_date Pointer to receive the selected date.
  * @return UI_ERROR_NOT_FOUND if no date is selected, UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_calendar_base_get_selected_date(const struct ui_calendar_base *calendar,
-                                   struct ui_date *out_date);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_base_get_selected_date(
+    const struct ui_calendar_base *calendar, struct ui_date *out_date);
 
 /**
  * @brief Clears the current selection.
@@ -170,7 +172,8 @@ ui_calendar_base_get_selected_date(const struct ui_calendar_base *calendar,
  * @param calendar The calendar.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_base_clear_selection(struct ui_calendar_base *calendar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_calendar_base_clear_selection(struct ui_calendar_base *calendar);
 
 /**
  * @brief Callback invoked when a calendar date is selected.
@@ -187,9 +190,9 @@ typedef ui_error_t (*ui_calendar_on_select_t)(struct ui_calendar_base *calendar,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_calendar_base_set_on_select(struct ui_calendar_base *calendar,
-                                          ui_calendar_on_select_t on_select,
-                                          void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_calendar_base_set_on_select(
+    struct ui_calendar_base *calendar, ui_calendar_on_select_t on_select,
+    void *user_data);
 
 /**
  * @brief Retrieves the calendar grid for the current view month.
@@ -201,7 +204,7 @@ ui_error_t ui_calendar_base_set_on_select(struct ui_calendar_base *calendar,
  * 42).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
                                 struct ui_date *out_grid, int *out_count);
 

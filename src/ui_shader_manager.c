@@ -9,8 +9,12 @@
 #include <GL/gl.h>
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
-#elif defined(__linux__) || defined(__unix__) || defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__)
 #include <GLES2/gl2.h>
+#elif defined(HAVE_GLES2)
+#include <GLES2/gl2.h>
+#elif defined(HAVE_X11)
+#include <GL/gl.h>
 #endif
 
 #include <string.h>
@@ -40,7 +44,7 @@
    avoid undefined reference errors during compile-time unless we are strictly
    linking against an extension wrapper. */
 #if defined(UI_TEST_MOCK_ALLOC) || defined(_WIN32) || defined(__CYGWIN__) ||   \
-    defined(__APPLE__)
+    defined(__APPLE__) || !defined(__EMSCRIPTEN__)
 /** @brief Internal mock fail flag for shader. */
 int g_mock_shader_fail = 0;
 /** @brief Internal mock fail flag for program. */

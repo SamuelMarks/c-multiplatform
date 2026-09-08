@@ -720,9 +720,10 @@ struct ui_layout_node {
  * @param out_layout_root Pointer to receive the generated layout tree.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_layout_tree_generate(const struct ui_dom_node *dom_root,
-                                   const struct ui_css_stylesheet *stylesheet,
-                                   struct ui_layout_node **out_layout_root);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_layout_tree_generate(const struct ui_dom_node *dom_root,
+                        const struct ui_css_stylesheet *stylesheet,
+                        struct ui_layout_node **out_layout_root);
 
 /**
  * @brief Viewport Root Solver: Forces the root html/body elements to strictly
@@ -733,8 +734,8 @@ ui_error_t ui_layout_tree_generate(const struct ui_dom_node *dom_root,
  * @param window_height The OS window height.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_layout_solve_viewport(struct ui_layout_node *root,
-                                    float window_width, float window_height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_layout_solve_viewport(
+    struct ui_layout_node *root, float window_width, float window_height);
 
 /**
  * @brief Computes the final geometric layout (x, y, width, height) recursively.
@@ -744,8 +745,8 @@ ui_error_t ui_layout_solve_viewport(struct ui_layout_node *root,
  * @param available_height The viewport or containing block height.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
-                             float available_height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_layout_compute(
+    struct ui_layout_node *node, float available_width, float available_height);
 
 /**
  * @brief Containment Sanity Checks: Traverses the tree and asserts that
@@ -755,7 +756,8 @@ ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
  * @return `UI_ERROR_NONE` if valid, `UI_ERROR_LAYOUT_VIOLATION` if containment
  * is breached, or an appropriate error code.
  */
-ui_error_t ui_layout_sanity_check(const struct ui_layout_node *node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_layout_sanity_check(const struct ui_layout_node *node);
 
 /**
  * @brief Recursively destroys a layout tree.
@@ -763,7 +765,8 @@ ui_error_t ui_layout_sanity_check(const struct ui_layout_node *node);
  * @param node Pointer to the layout tree root to destroy.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_layout_tree_destroy(struct ui_layout_node *node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_layout_tree_destroy(struct ui_layout_node *node);
 
 #ifdef __cplusplus
 }

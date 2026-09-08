@@ -54,8 +54,9 @@ typedef ui_error_t (*ui_slider_on_change_t)(struct ui_slider_base *slider,
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_slider_base_create(struct ui_slider_base **out_slider,
-                                 struct ui_control_value_accessor *out_cva);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_create(struct ui_slider_base **out_slider,
+                      struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Destroys a slider base component.
@@ -63,7 +64,8 @@ ui_error_t ui_slider_base_create(struct ui_slider_base **out_slider,
  * @param slider The slider to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_destroy(struct ui_slider_base *slider);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_destroy(struct ui_slider_base *slider);
 
 /**
  * @brief Sets the minimum value of the slider.
@@ -72,7 +74,8 @@ ui_error_t ui_slider_base_destroy(struct ui_slider_base *slider);
  * @param min The minimum value.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_set_min(struct ui_slider_base *slider, float min);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_set_min(struct ui_slider_base *slider, float min);
 
 /**
  * @brief Sets the maximum value of the slider.
@@ -81,7 +84,8 @@ ui_error_t ui_slider_base_set_min(struct ui_slider_base *slider, float min);
  * @param max The maximum value.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_set_max(struct ui_slider_base *slider, float max);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_set_max(struct ui_slider_base *slider, float max);
 
 /**
  * @brief Sets the current value of the slider.
@@ -90,7 +94,8 @@ ui_error_t ui_slider_base_set_max(struct ui_slider_base *slider, float max);
  * @param value The current value.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_set_value(struct ui_slider_base *slider, float value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_set_value(struct ui_slider_base *slider, float value);
 
 /**
  * @brief Gets the current value of the slider.
@@ -99,8 +104,8 @@ ui_error_t ui_slider_base_set_value(struct ui_slider_base *slider, float value);
  * @param out_value Pointer to receive the current value.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_get_value(const struct ui_slider_base *slider,
-                                    float *out_value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_get_value(const struct ui_slider_base *slider, float *out_value);
 
 /**
  * @brief Sets the step increment. If 0.0, the slider is continuous.
@@ -109,7 +114,8 @@ ui_error_t ui_slider_base_get_value(const struct ui_slider_base *slider,
  * @param step The step increment.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_set_step(struct ui_slider_base *slider, float step);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_set_step(struct ui_slider_base *slider, float step);
 
 /**
  * @brief Sets the disabled state of the slider.
@@ -119,8 +125,8 @@ ui_error_t ui_slider_base_set_step(struct ui_slider_base *slider, float step);
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_set_disabled(struct ui_slider_base *slider,
-                                       int disabled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_set_disabled(struct ui_slider_base *slider, int disabled);
 
 /**
  * @brief Sets the change handler for the slider.
@@ -130,9 +136,9 @@ ui_error_t ui_slider_base_set_disabled(struct ui_slider_base *slider,
  * @param user_data Opaque user data passed to the callback.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_set_on_change(struct ui_slider_base *slider,
-                                        ui_slider_on_change_t on_change,
-                                        void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_set_on_change(struct ui_slider_base *slider,
+                             ui_slider_on_change_t on_change, void *user_data);
 
 /**
  * @brief Processes an incoming input event to trigger slider interactions.
@@ -146,8 +152,8 @@ ui_error_t ui_slider_base_set_on_change(struct ui_slider_base *slider,
  * position on the track.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_set_normalized_value(struct ui_slider_base *slider,
-                                               float normalized_position);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slider_base_set_normalized_value(
+    struct ui_slider_base *slider, float normalized_position);
 
 /**
  * @brief Processes an incoming input event (e.g., keyboard interactions like
@@ -158,9 +164,9 @@ ui_error_t ui_slider_base_set_normalized_value(struct ui_slider_base *slider,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_process_event(struct ui_slider_base *slider,
-                                        const struct ui_event *event,
-                                        double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slider_base_process_event(struct ui_slider_base *slider,
+                             const struct ui_event *event, double timestamp_ms);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -170,8 +176,8 @@ ui_error_t ui_slider_base_process_event(struct ui_slider_base *slider,
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slider_base_get_component(struct ui_slider_base *slider,
-                                        struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slider_base_get_component(
+    struct ui_slider_base *slider, struct ui_component **out_component);
 
 #ifdef __cplusplus
 }

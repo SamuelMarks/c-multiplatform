@@ -25,7 +25,8 @@ struct ui_input_mask;
  * @param out_mask Pointer to store the created mask.
  * @return ui_error_t
  */
-ui_error_t ui_input_mask_create(struct ui_input_mask **out_mask);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_mask_create(struct ui_input_mask **out_mask);
 
 /**
  * @brief Destroys the input mask behavior.
@@ -33,7 +34,8 @@ ui_error_t ui_input_mask_create(struct ui_input_mask **out_mask);
  * @param mask The mask behavior.
  * @return ui_error_t
  */
-ui_error_t ui_input_mask_destroy(struct ui_input_mask *mask);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_mask_destroy(struct ui_input_mask *mask);
 
 /**
  * @brief Binds the mask behavior to an input base component.
@@ -42,8 +44,8 @@ ui_error_t ui_input_mask_destroy(struct ui_input_mask *mask);
  * @param input The input base component to bind to.
  * @return ui_error_t
  */
-ui_error_t ui_input_mask_bind(struct ui_input_mask *mask,
-                              struct ui_input_base *input);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_mask_bind(struct ui_input_mask *mask, struct ui_input_base *input);
 
 /**
  * @brief Sets the declarative mask syntax (e.g., "(999) 999-9999").
@@ -53,8 +55,8 @@ ui_error_t ui_input_mask_bind(struct ui_input_mask *mask,
  * @param pattern The mask pattern.
  * @return ui_error_t
  */
-ui_error_t ui_input_mask_set_pattern(struct ui_input_mask *mask,
-                                     const char *pattern);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_mask_set_pattern(struct ui_input_mask *mask, const char *pattern);
 
 /**
  * @brief Gets the raw, unformatted value.
@@ -63,8 +65,8 @@ ui_error_t ui_input_mask_set_pattern(struct ui_input_mask *mask,
  * @param out_raw Pointer to store the raw value string pointer.
  * @return ui_error_t
  */
-ui_error_t ui_input_mask_get_raw_value(struct ui_input_mask *mask,
-                                       const char **out_raw);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_mask_get_raw_value(struct ui_input_mask *mask, const char **out_raw);
 
 /**
  * @brief Intercepts input changes to format the text and update raw value.
@@ -74,8 +76,8 @@ ui_error_t ui_input_mask_get_raw_value(struct ui_input_mask *mask,
  * @param text The newly input text.
  * @return ui_error_t
  */
-ui_error_t ui_input_mask_process_text(struct ui_input_mask *mask,
-                                      const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_mask_process_text(struct ui_input_mask *mask, const char *text);
 
 #ifdef __cplusplus
 }

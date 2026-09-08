@@ -13,6 +13,9 @@ static ui_error_t dummy_validate_fail2(struct ui_form_control *control,
                                        union ui_signal_payload value,
                                        void *user_data,
                                        ui_bool_t *out_is_valid) {
+  (void)control;
+  (void)value;
+  (void)user_data;
   *out_is_valid = 0;
   return UI_ERROR_NONE;
 }
@@ -21,7 +24,7 @@ static int test_form_builder_oom(void) {
   struct ui_arena *tiny_arena = NULL;
   ui_form_builder_t *dummy_builder = NULL;
   union ui_signal_payload dummy;
-  int i, countdown;
+  int countdown;
   dummy.int_val = 1;
 
   if (ui_arena_create(1, &tiny_arena) != UI_ERROR_NONE)

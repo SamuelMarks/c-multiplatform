@@ -44,7 +44,7 @@ struct ui_reactive_node {
  * @param out_node Pointer to store the result.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_reactive_graph_get_current_node(struct ui_reactive_node **out_node);
 
 /**
@@ -54,9 +54,8 @@ ui_reactive_graph_get_current_node(struct ui_reactive_node **out_node);
  * @param out_prev_node Pointer to store the previously active node.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_reactive_graph_set_current_node(struct ui_reactive_node *node,
-                                   struct ui_reactive_node **out_prev_node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_reactive_graph_set_current_node(
+    struct ui_reactive_node *node, struct ui_reactive_node **out_prev_node);
 
 #ifdef __cplusplus
 }

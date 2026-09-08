@@ -58,12 +58,13 @@ enum ui_css_physical_edge {
  * @param logical_edge The logical edge to map.
  * @param writing_mode The current writing mode.
  * @param direction The current text direction.
- * @return The corresponding physical edge.
+ * @param out_physical_edge Pointer to receive the mapped physical edge.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT.
  */
-enum ui_css_physical_edge
-ui_css_logical_to_physical_edge(enum ui_css_logical_edge logical_edge,
-                                enum ui_css_writing_mode writing_mode,
-                                enum ui_css_direction direction);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_logical_to_physical_edge(
+    enum ui_css_logical_edge logical_edge,
+    enum ui_css_writing_mode writing_mode, enum ui_css_direction direction,
+    enum ui_css_physical_edge *out_physical_edge);
 
 /**
  * @brief Maps logical size (inline-size, block-size) to physical size (width,
@@ -75,7 +76,7 @@ ui_css_logical_to_physical_edge(enum ui_css_logical_edge logical_edge,
  * width, 0 if physical height.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_css_logical_to_physical_size(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_logical_to_physical_size(
     int is_inline, enum ui_css_writing_mode writing_mode, int *out_is_width);
 
 #ifdef __cplusplus

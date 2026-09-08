@@ -491,13 +491,14 @@ static ui_error_t test_fail_finally_cb(void *user_data) {
 
 static int test_bubbling_failure(void) {
   struct ui_promise *p1 = NULL, *p2 = NULL;
+  ui_error_t rc;
 
   /* Test finally returning error (resolve) */
   ui_promise_create(&p1);
   ui_promise_finally(p1, test_fail_finally_cb, NULL, &p2);
-  ui_error_t rc1 = ui_promise_resolve(p1, NULL);
-  if (rc1 != UI_ERROR_UNKNOWN) {
-    printf("fail1 %d\n", rc1);
+  rc = ui_promise_resolve(p1, NULL);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("fail1 %d\n", rc);
     return 1;
   }
   ui_promise_destroy(p1);
@@ -505,9 +506,9 @@ static int test_bubbling_failure(void) {
   /* Test finally returning error (reject) */
   ui_promise_create(&p1);
   ui_promise_finally(p1, test_fail_finally_cb, NULL, &p2);
-  ui_error_t rc4 = ui_promise_reject(p1, UI_ERROR_NOT_FOUND);
-  if (rc4 != UI_ERROR_UNKNOWN) {
-    printf("fail4 %d\n", rc4);
+  rc = ui_promise_reject(p1, UI_ERROR_NOT_FOUND);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("fail4 %d\n", rc);
     return 1;
   }
   ui_promise_destroy(p1);
@@ -515,9 +516,9 @@ static int test_bubbling_failure(void) {
   /* Test then on already resolved, callback returns error */
   ui_promise_create(&p1);
   ui_promise_resolve(p1, NULL);
-  ui_error_t rc2 = ui_promise_then(p1, test_fail_resolve_cb, NULL, NULL, NULL);
-  if (rc2 != UI_ERROR_UNKNOWN) {
-    printf("fail2 %d\n", rc2);
+  rc = ui_promise_then(p1, test_fail_resolve_cb, NULL, NULL, NULL);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("fail2 %d\n", rc);
     return 1;
   }
   ui_promise_destroy(p1);
@@ -525,9 +526,9 @@ static int test_bubbling_failure(void) {
   /* Test catch on already rejected, callback returns error */
   ui_promise_create(&p1);
   ui_promise_reject(p1, UI_ERROR_NOT_FOUND);
-  ui_error_t rc3 = ui_promise_catch(p1, test_fail_reject_cb, NULL, NULL);
-  if (rc3 != UI_ERROR_UNKNOWN) {
-    printf("fail3 %d\n", rc3);
+  rc = ui_promise_catch(p1, test_fail_reject_cb, NULL, NULL);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("fail3 %d\n", rc);
     return 1;
   }
   ui_promise_destroy(p1);

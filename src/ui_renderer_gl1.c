@@ -16,12 +16,14 @@
 #include <GL/gl.h>
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
-#elif defined(__linux__) || defined(__unix__)
+#elif (defined(__linux__) || defined(__unix__)) && defined(HAVE_OPENGL)
 #include <GL/gl.h>
 #endif
 #endif /* !__EMSCRIPTEN__ */
 
-#ifdef UI_TEST_MOCK_ALLOC
+#if defined(UI_TEST_MOCK_ALLOC) ||                                             \
+    (!defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__) &&    \
+     !defined(HAVE_OPENGL))
 #undef glViewport
 /** @brief internal */
 #define glViewport(x, y, w, h) do { (void)(x); (void)(y); (void)(w); (void)(h); } while(0)
@@ -103,6 +105,31 @@ ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
 #ifndef GL_COLOR_BUFFER_BIT
 /* \brief Fallback GL_COLOR_BUFFER_BIT */
 #define GL_COLOR_BUFFER_BIT 0x00004000
+#endif
+
+#ifndef GL_RGBA
+/* \brief Fallback GL_RGBA */
+#define GL_RGBA 0x1908
+#endif
+
+#ifndef GL_UNSIGNED_BYTE
+/* \brief Fallback GL_UNSIGNED_BYTE */
+#define GL_UNSIGNED_BYTE 0x1401
+#endif
+
+#ifndef GL_PROJECTION
+/* \brief Fallback GL_PROJECTION */
+#define GL_PROJECTION 0x1701
+#endif
+
+#ifndef GL_MODELVIEW
+/* \brief Fallback GL_MODELVIEW */
+#define GL_MODELVIEW 0x1700
+#endif
+
+#ifndef GL_TRIANGLES
+/* \brief Fallback GL_TRIANGLES */
+#define GL_TRIANGLES 0x0004
 #endif
 
 /** @def GL1_MAX_VERTICES

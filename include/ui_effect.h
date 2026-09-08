@@ -37,9 +37,9 @@ typedef ui_error_t (*ui_effect_fn)(void *user_data);
  * @param out_effect The pointer to store the created effect.
  * @return ui_error_t
  */
-ui_error_t ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
-                            void *user_data, struct ui_reactor *target_reactor,
-                            ui_effect_t **out_effect);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effect_create(
+    struct ui_arena *arena, ui_effect_fn effect_fn, void *user_data,
+    struct ui_reactor *target_reactor, ui_effect_t **out_effect);
 
 /**
  * @brief Destroys the effect.
@@ -47,7 +47,7 @@ ui_error_t ui_effect_create(struct ui_arena *arena, ui_effect_fn effect_fn,
  * @param effect The effect.
  * @return ui_error_t
  */
-ui_error_t ui_effect_destroy(ui_effect_t *effect);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effect_destroy(ui_effect_t *effect);
 
 #ifdef __cplusplus
 }

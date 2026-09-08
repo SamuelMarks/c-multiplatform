@@ -58,9 +58,9 @@ struct ui_css_highlight;
  * \param out_highlight Pointer to receive the created highlight.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_highlight_create(enum ui_css_highlight_type type,
-                                   const char *custom_name,
-                                   struct ui_css_highlight **out_highlight);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_highlight_create(
+    enum ui_css_highlight_type type, const char *custom_name,
+    struct ui_css_highlight **out_highlight);
 
 /**
  * \brief Adds a text range to the highlight.
@@ -70,8 +70,8 @@ ui_error_t ui_css_highlight_create(enum ui_css_highlight_type type,
  * \param end_offset End offset in the text.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_highlight_add_range(struct ui_css_highlight *highlight,
-                                      size_t start_offset, size_t end_offset);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_highlight_add_range(
+    struct ui_css_highlight *highlight, size_t start_offset, size_t end_offset);
 
 /**
  * \brief Destroys a CSS custom highlight context.
@@ -79,7 +79,8 @@ ui_error_t ui_css_highlight_add_range(struct ui_css_highlight *highlight,
  * \param highlight The highlight to destroy.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_highlight_destroy(struct ui_css_highlight *highlight);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_highlight_destroy(struct ui_css_highlight *highlight);
 
 #ifdef __cplusplus
 }

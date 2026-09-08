@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "ui_transfer_list_base.h"
 #include "ui_error.h"
@@ -29,8 +30,11 @@ static int test_transfer_list_init(void) {
   struct ui_transfer_list_base list;
   struct ui_component comp;
   struct ui_control_value_accessor cva;
+  union ui_signal_payload empty_payload;
   ui_error_t err;
   int failed = 0;
+
+  memset(&empty_payload, 0, sizeof(empty_payload));
 
   err = ui_transfer_list_base_init(NULL, &comp, NULL);
   failed |= (err != UI_ERROR_INVALID_ARGUMENT);
@@ -45,8 +49,7 @@ static int test_transfer_list_init(void) {
   failed |= (list.right_list != NULL);
 
   /* CVA methods */
-  failed |= (cva.write_value(NULL, (union ui_signal_payload){0}) !=
-             UI_ERROR_INVALID_ARGUMENT);
+  failed |= (cva.write_value(NULL, empty_payload) != UI_ERROR_INVALID_ARGUMENT);
   failed |=
       (cva.register_on_change(NULL, NULL, NULL) != UI_ERROR_INVALID_ARGUMENT);
   failed |=
@@ -69,19 +72,22 @@ static int test_transfer_list_init(void) {
   failed |= (cva.set_disabled_state(&list, 0) != UI_ERROR_NONE);
 
   /* write_value */
-  struct ui_transfer_list_payload *pl =
-      (struct ui_transfer_list_payload *)malloc(
-          sizeof(struct ui_transfer_list_payload));
-  union ui_signal_payload sp = {0};
-  if (pl) {
-    pl->left_list = NULL;
-    pl->right_list = NULL;
-    sp.ptr_val = pl;
+  {
+    struct ui_transfer_list_payload *pl =
+        (struct ui_transfer_list_payload *)malloc(
+            sizeof(struct ui_transfer_list_payload));
+    union ui_signal_payload sp;
+    memset(&sp, 0, sizeof(sp));
+    if (pl) {
+      pl->left_list = NULL;
+      pl->right_list = NULL;
+      sp.ptr_val = pl;
+      failed |= (cva.write_value(&list, sp) != UI_ERROR_NONE);
+    }
+
+    sp.ptr_val = NULL;
     failed |= (cva.write_value(&list, sp) != UI_ERROR_NONE);
   }
-
-  sp.ptr_val = NULL;
-  failed |= (cva.write_value(&list, sp) != UI_ERROR_NONE);
 
   /* Trigger change logic while CVA is registered */
   ui_transfer_list_base_add_item(&list, 0, 99, NULL);

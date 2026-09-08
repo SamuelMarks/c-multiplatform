@@ -50,7 +50,8 @@ struct ui_timeline_node;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-ui_error_t ui_timeline_base_create(struct ui_timeline_base **out_timeline);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_timeline_base_create(struct ui_timeline_base **out_timeline);
 
 /**
  * @brief Destroys a timeline base component and frees all nodes.
@@ -58,7 +59,8 @@ ui_error_t ui_timeline_base_create(struct ui_timeline_base **out_timeline);
  * @param timeline The timeline to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_timeline_base_destroy(struct ui_timeline_base *timeline);
 
 /**
  * @brief Sets the alignment of the timeline.
@@ -67,8 +69,8 @@ ui_error_t ui_timeline_base_destroy(struct ui_timeline_base *timeline);
  * @param alignment The alignment to set.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
-                                          enum ui_timeline_alignment alignment);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_timeline_base_set_alignment(
+    struct ui_timeline_base *timeline, enum ui_timeline_alignment alignment);
 
 /**
  * @brief Gets the alignment of the timeline.
@@ -77,7 +79,7 @@ ui_error_t ui_timeline_base_set_alignment(struct ui_timeline_base *timeline,
  * @param out_alignment Pointer to receive the alignment.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
                                enum ui_timeline_alignment *out_alignment);
 
@@ -90,9 +92,9 @@ ui_timeline_base_get_alignment(const struct ui_timeline_base *timeline,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointers,
  * UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-ui_error_t ui_timeline_base_add_node(struct ui_timeline_base *timeline,
-                                     const char *title,
-                                     const char *description);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_timeline_base_add_node(struct ui_timeline_base *timeline, const char *title,
+                          const char *description);
 
 /**
  * @brief Gets the number of nodes in the timeline.
@@ -101,9 +103,8 @@ ui_error_t ui_timeline_base_add_node(struct ui_timeline_base *timeline,
  * @param out_count Pointer to receive the number of nodes.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
-                                size_t *out_count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_timeline_base_get_node_count(
+    const struct ui_timeline_base *timeline, size_t *out_count);
 
 /**
  * @brief Retrieves a specific node's data from the timeline.
@@ -117,9 +118,9 @@ ui_timeline_base_get_node_count(const struct ui_timeline_base *timeline,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointers,
  * UI_ERROR_OUT_OF_BOUNDS if index is invalid.
  */
-ui_error_t ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
-                                     size_t index, const char **out_title,
-                                     const char **out_description);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_timeline_base_get_node(const struct ui_timeline_base *timeline, size_t index,
+                          const char **out_title, const char **out_description);
 
 /**
  * @brief A stub rendering routine for the timeline.
@@ -129,7 +130,8 @@ ui_error_t ui_timeline_base_get_node(const struct ui_timeline_base *timeline,
  * @param timeline The timeline.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_timeline_base_render(struct ui_timeline_base *timeline);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_timeline_base_render(struct ui_timeline_base *timeline);
 
 /**
  * @brief Binds the data property.
@@ -138,11 +140,11 @@ ui_error_t ui_timeline_base_render(struct ui_timeline_base *timeline);
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_timeline_base_bind_data(struct ui_timeline_base *widget,
-                                      struct ui_computed *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_timeline_base_bind_data(
+    struct ui_timeline_base *widget, struct ui_computed *signal);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_TIMELINE_BASE_H */

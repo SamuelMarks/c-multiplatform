@@ -14,3 +14,4 @@ extern int g_malloc_called;
 #include "test_ui_layout_main_tests.c"
 #include "test_ui_layout_bounds_percentage.c"
 #include "test_ui_layout_content_invalid.c"
+/* clang-format on */

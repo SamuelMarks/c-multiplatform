@@ -4,10 +4,9 @@
 #include "../include/ui_arena.h"
 #include <stdio.h>
 #include <string.h>
-/* clang-format on */
-
 #include "../include/ui_atomic.h"
 #include <ui_reactive_graph.h>
+/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 

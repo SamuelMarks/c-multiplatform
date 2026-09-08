@@ -29,8 +29,8 @@ struct ui_pool;
  * @param out_pool Pointer to receive the new pool handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_pool_create(size_t element_size, size_t chunk_capacity,
-                          struct ui_pool **out_pool);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pool_create(
+    size_t element_size, size_t chunk_capacity, struct ui_pool **out_pool);
 
 /**
  * @brief Destroys a pool and frees all its associated memory chunks.
@@ -38,7 +38,7 @@ ui_error_t ui_pool_create(size_t element_size, size_t chunk_capacity,
  * @param pool The pool to destroy.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if pool is NULL.
  */
-ui_error_t ui_pool_destroy(struct ui_pool *pool);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pool_destroy(struct ui_pool *pool);
 
 /**
  * @brief Allocates an element from the pool.
@@ -47,7 +47,8 @@ ui_error_t ui_pool_destroy(struct ui_pool *pool);
  * @param out_ptr Pointer to receive the allocated element's memory address.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_pool_alloc(struct ui_pool *pool, void **out_ptr);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pool_alloc(struct ui_pool *pool,
+                                                       void **out_ptr);
 
 /**
  * @brief Frees an element back to the pool, making it available for reuse.
@@ -57,7 +58,8 @@ ui_error_t ui_pool_alloc(struct ui_pool *pool, void **out_ptr);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on invalid
  * inputs.
  */
-ui_error_t ui_pool_free(struct ui_pool *pool, void *ptr);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pool_free(struct ui_pool *pool,
+                                                      void *ptr);
 
 /**
  * @brief Gets fragmentation metrics (e.g., number of available free elements).
@@ -68,8 +70,8 @@ ui_error_t ui_pool_free(struct ui_pool *pool, void *ptr);
  * chunks.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_pool_get_metrics(struct ui_pool *pool, size_t *out_free_count,
-                               size_t *out_total_capacity);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pool_get_metrics(
+    struct ui_pool *pool, size_t *out_free_count, size_t *out_total_capacity);
 
 #ifdef __cplusplus
 }

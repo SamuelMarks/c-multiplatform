@@ -70,8 +70,9 @@ struct ui_css_computed_style;
  * @param out_props Pointer to the structure to populate with parsed properties.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_page_parse(const struct ui_css_computed_style *style,
-                             struct ui_css_page_properties *out_props);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_page_parse(const struct ui_css_computed_style *style,
+                  struct ui_css_page_properties *out_props);
 
 /**
  * @brief Destroys string allocations within page properties.
@@ -79,7 +80,8 @@ ui_error_t ui_css_page_parse(const struct ui_css_computed_style *style,
  * @param props Pointer to the properties structure to clean up.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_page_properties_cleanup(struct ui_css_page_properties *props);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_page_properties_cleanup(struct ui_css_page_properties *props);
 
 #ifdef __cplusplus
 }

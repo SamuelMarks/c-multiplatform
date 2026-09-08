@@ -33,7 +33,7 @@ struct ui_rich_text_editor_base;
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
                                 struct ui_control_value_accessor *out_cva);
 
@@ -43,7 +43,7 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
  * @param rte The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_rich_text_editor_base_destroy(struct ui_rich_text_editor_base *rte);
 
 /**
@@ -53,9 +53,8 @@ ui_rich_text_editor_base_destroy(struct ui_rich_text_editor_base *rte);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_rich_text_editor_base_get_component(struct ui_rich_text_editor_base *rte,
-                                       struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_rich_text_editor_base_get_component(
+    struct ui_rich_text_editor_base *rte, struct ui_component **out_component);
 
 /**
  * @brief Handles text insertion, updating the AST and caret position.
@@ -64,9 +63,8 @@ ui_rich_text_editor_base_get_component(struct ui_rich_text_editor_base *rte,
  * @param text The text to insert.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
-                                     const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_rich_text_editor_base_insert_text(
+    struct ui_rich_text_editor_base *rte, const char *text);
 
 /**
  * @brief Maps screen coordinates to an exact caret position.
@@ -76,7 +74,8 @@ ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
  * @param y Screen Y coordinate.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_editor_base_set_caret_from_point(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_editor_base_set_caret_from_point(
     struct ui_rich_text_editor_base *rte, float x, float y);
 
 /**
@@ -85,7 +84,8 @@ ui_error_t ui_rich_text_editor_base_set_caret_from_point(
  * @param rte The rich text editor component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_editor_base_undo(struct ui_rich_text_editor_base *rte);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_editor_base_undo(struct ui_rich_text_editor_base *rte);
 
 /**
  * @brief Performs a redo operation.
@@ -93,7 +93,8 @@ ui_error_t ui_rich_text_editor_base_undo(struct ui_rich_text_editor_base *rte);
  * @param rte The rich text editor component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_editor_base_redo(struct ui_rich_text_editor_base *rte);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_editor_base_redo(struct ui_rich_text_editor_base *rte);
 
 /**
  * @brief Starts IME composition.
@@ -101,7 +102,7 @@ ui_error_t ui_rich_text_editor_base_redo(struct ui_rich_text_editor_base *rte);
  * @param rte The rich text editor component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_rich_text_editor_base_ime_start(struct ui_rich_text_editor_base *rte);
 
 /**
@@ -111,9 +112,8 @@ ui_rich_text_editor_base_ime_start(struct ui_rich_text_editor_base *rte);
  * @param composition The ongoing composition text.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_rich_text_editor_base_ime_update(struct ui_rich_text_editor_base *rte,
-                                    const char *composition);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_rich_text_editor_base_ime_update(
+    struct ui_rich_text_editor_base *rte, const char *composition);
 
 /**
  * @brief Ends IME composition, confirming the final text.
@@ -121,7 +121,7 @@ ui_rich_text_editor_base_ime_update(struct ui_rich_text_editor_base *rte,
  * @param rte The rich text editor component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_rich_text_editor_base_ime_end(struct ui_rich_text_editor_base *rte);
 
 #ifdef __cplusplus

@@ -27,7 +27,8 @@ struct ui_execution_context;
  * @param out_ctx Pointer to receive the new context handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_execution_context_create(struct ui_execution_context **out_ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_execution_context_create(struct ui_execution_context **out_ctx);
 
 /**
  * @brief Destroys an execution context and frees its resources.
@@ -35,7 +36,8 @@ ui_error_t ui_execution_context_create(struct ui_execution_context **out_ctx);
  * @param ctx The context to destroy.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if ctx is NULL.
  */
-ui_error_t ui_execution_context_destroy(struct ui_execution_context *ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_execution_context_destroy(struct ui_execution_context *ctx);
 
 /**
  * @brief Schedules a task for execution in the context.
@@ -45,9 +47,9 @@ ui_error_t ui_execution_context_destroy(struct ui_execution_context *ctx);
  * @param user_data Opaque pointer passed to the callback.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_execution_context_schedule(struct ui_execution_context *ctx,
-                                         ui_error_t (*callback)(void *),
-                                         void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_execution_context_schedule(struct ui_execution_context *ctx,
+                              ui_error_t (*callback)(void *), void *user_data);
 
 /**
  * @brief Processes scheduled tasks.
@@ -55,7 +57,8 @@ ui_error_t ui_execution_context_schedule(struct ui_execution_context *ctx,
  * @param ctx The context to tick.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_execution_context_tick(struct ui_execution_context *ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_execution_context_tick(struct ui_execution_context *ctx);
 
 /**
  * @brief Sets the current execution context for the calling thread.
@@ -63,7 +66,8 @@ ui_error_t ui_execution_context_tick(struct ui_execution_context *ctx);
  * @param ctx The execution context to set.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_execution_context_set_current(struct ui_execution_context *ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_execution_context_set_current(struct ui_execution_context *ctx);
 
 /**
  * @brief Retrieves the current execution context for the calling thread.
@@ -71,7 +75,7 @@ ui_error_t ui_execution_context_set_current(struct ui_execution_context *ctx);
  * @param out_ctx Pointer to receive the current execution context.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_execution_context_get_current(struct ui_execution_context **out_ctx);
 
 /**
@@ -80,7 +84,8 @@ ui_execution_context_get_current(struct ui_execution_context **out_ctx);
  * @param ctx The context to cancel.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_execution_context_cancel(struct ui_execution_context *ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_execution_context_cancel(struct ui_execution_context *ctx);
 
 #ifdef __cplusplus
 }

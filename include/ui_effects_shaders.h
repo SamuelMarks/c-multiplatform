@@ -27,9 +27,8 @@ struct ui_shader_manager;
  * @param out_program_id Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_effects_shaders_get_blur_h_program(struct ui_shader_manager *manager,
-                                      unsigned int *out_program_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effects_shaders_get_blur_h_program(
+    struct ui_shader_manager *manager, unsigned int *out_program_id);
 
 /**
  * @brief Compiles and retrieves a Gaussian Blur shader program (vertical pass).
@@ -38,9 +37,8 @@ ui_effects_shaders_get_blur_h_program(struct ui_shader_manager *manager,
  * @param out_program_id Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_effects_shaders_get_blur_v_program(struct ui_shader_manager *manager,
-                                      unsigned int *out_program_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effects_shaders_get_blur_v_program(
+    struct ui_shader_manager *manager, unsigned int *out_program_id);
 
 /**
  * @brief Compiles and retrieves a blend shader program for a specific CSS blend
@@ -51,10 +49,9 @@ ui_effects_shaders_get_blur_v_program(struct ui_shader_manager *manager,
  * @param out_program_id Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_effects_shaders_get_blend_program(struct ui_shader_manager *manager,
-                                     enum ui_css_blend_mode mode,
-                                     unsigned int *out_program_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_effects_shaders_get_blend_program(
+    struct ui_shader_manager *manager, enum ui_css_blend_mode mode,
+    unsigned int *out_program_id);
 
 /**
  * @brief Compiles and retrieves a color filter shader program.
@@ -64,7 +61,7 @@ ui_effects_shaders_get_blend_program(struct ui_shader_manager *manager,
  * @param out_program Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_effects_shaders_get_color_filter_program(struct ui_shader_manager *manager,
                                             enum ui_css_filter_type type,
                                             unsigned int *out_program);
@@ -76,7 +73,7 @@ ui_effects_shaders_get_color_filter_program(struct ui_shader_manager *manager,
  * @param out_program Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_effects_shaders_get_drop_shadow_program(struct ui_shader_manager *manager,
                                            unsigned int *out_program);
 #ifdef __cplusplus

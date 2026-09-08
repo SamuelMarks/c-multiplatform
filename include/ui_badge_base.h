@@ -30,7 +30,8 @@ struct ui_badge_base;
  * @param out_badge Pointer to receive the allocated badge component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_badge_base_create(struct ui_badge_base **out_badge);
 
 /**
  * @brief Destroys a badge base component.
@@ -38,7 +39,8 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge);
  * @param badge The badge component to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_badge_base_destroy(struct ui_badge_base *badge);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_badge_base_destroy(struct ui_badge_base *badge);
 
 /**
  * @brief Sets the value to display in the badge.
@@ -49,8 +51,8 @@ ui_error_t ui_badge_base_destroy(struct ui_badge_base *badge);
  * @param max_value The maximum value before adding a '+' suffix (e.g., 99).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_badge_base_set_value(struct ui_badge_base *badge, int value,
-                                   int max_value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_badge_base_set_value(struct ui_badge_base *badge, int value, int max_value);
 
 /**
  * @brief Sets the content of the badge to a custom text string, overriding
@@ -60,8 +62,8 @@ ui_error_t ui_badge_base_set_value(struct ui_badge_base *badge, int value,
  * @param text The custom text to display.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_badge_base_set_text(struct ui_badge_base *badge,
-                                  const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_badge_base_set_text(struct ui_badge_base *badge, const char *text);
 
 /**
  * @brief Hides or shows the badge. Useful for hiding empty badges.
@@ -70,7 +72,8 @@ ui_error_t ui_badge_base_set_text(struct ui_badge_base *badge,
  * @param is_hidden 1 to hide, 0 to show.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_badge_base_set_hidden(struct ui_badge_base *badge, int is_hidden);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_badge_base_set_hidden(struct ui_badge_base *badge, int is_hidden);
 
 /**
  * @brief Gets the underlying component for rendering.
@@ -79,8 +82,8 @@ ui_error_t ui_badge_base_set_hidden(struct ui_badge_base *badge, int is_hidden);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_badge_base_get_component(struct ui_badge_base *badge,
-                                       struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_badge_base_get_component(
+    struct ui_badge_base *badge, struct ui_component **out_component);
 
 /**
  * @brief Binds the text property.
@@ -89,8 +92,8 @@ ui_error_t ui_badge_base_get_component(struct ui_badge_base *badge,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_badge_base_bind_text(struct ui_badge_base *widget,
-                                   struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_badge_base_bind_text(struct ui_badge_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

@@ -55,7 +55,8 @@ typedef ui_error_t (*ui_side_sheet_on_close_t)(struct ui_side_sheet_base *sheet,
  * @param out_sheet Pointer to receive the allocated side sheet instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_create(struct ui_side_sheet_base **out_sheet);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_side_sheet_base_create(struct ui_side_sheet_base **out_sheet);
 
 /**
  * @brief Destroys a side sheet instance.
@@ -63,7 +64,8 @@ ui_error_t ui_side_sheet_base_create(struct ui_side_sheet_base **out_sheet);
  * @param sheet The side sheet.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_side_sheet_base_destroy(struct ui_side_sheet_base *sheet);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_side_sheet_base_destroy(struct ui_side_sheet_base *sheet);
 
 /**
  * @brief Sets the content component to render inside the side sheet.
@@ -72,8 +74,8 @@ ui_error_t ui_side_sheet_base_destroy(struct ui_side_sheet_base *sheet);
  * @param content The component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_set_content(struct ui_side_sheet_base *sheet,
-                                          struct ui_component *content);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_side_sheet_base_set_content(
+    struct ui_side_sheet_base *sheet, struct ui_component *content);
 
 /**
  * @brief Sets the edge (left or right) the sheet is anchored to.
@@ -82,8 +84,8 @@ ui_error_t ui_side_sheet_base_set_content(struct ui_side_sheet_base *sheet,
  * @param edge The edge.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_set_edge(struct ui_side_sheet_base *sheet,
-                                       enum ui_side_sheet_edge edge);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_side_sheet_base_set_edge(
+    struct ui_side_sheet_base *sheet, enum ui_side_sheet_edge edge);
 
 /**
  * @brief Sets the interaction mode (slide over or push).
@@ -92,8 +94,8 @@ ui_error_t ui_side_sheet_base_set_edge(struct ui_side_sheet_base *sheet,
  * @param mode The mode.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_set_mode(struct ui_side_sheet_base *sheet,
-                                       enum ui_side_sheet_mode mode);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_side_sheet_base_set_mode(
+    struct ui_side_sheet_base *sheet, enum ui_side_sheet_mode mode);
 
 /**
  * @brief Toggles the open state of the side sheet.
@@ -102,8 +104,8 @@ ui_error_t ui_side_sheet_base_set_mode(struct ui_side_sheet_base *sheet,
  * @param is_open 1 to open, 0 to close.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_set_open(struct ui_side_sheet_base *sheet,
-                                       int is_open);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_side_sheet_base_set_open(struct ui_side_sheet_base *sheet, int is_open);
 
 /**
  * @brief Checks if the side sheet is currently open.
@@ -112,8 +114,8 @@ ui_error_t ui_side_sheet_base_set_open(struct ui_side_sheet_base *sheet,
  * @param out_is_open Pointer to store result.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_is_open(const struct ui_side_sheet_base *sheet,
-                                      int *out_is_open);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_side_sheet_base_is_open(
+    const struct ui_side_sheet_base *sheet, int *out_is_open);
 
 /**
  * @brief Sets the overlay director used to mount the side sheet.
@@ -123,7 +125,7 @@ ui_error_t ui_side_sheet_base_is_open(const struct ui_side_sheet_base *sheet,
  * @param director The overlay director.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_side_sheet_base_set_overlay_director(struct ui_side_sheet_base *sheet,
                                         struct ui_overlay_director *director);
 
@@ -135,9 +137,9 @@ ui_side_sheet_base_set_overlay_director(struct ui_side_sheet_base *sheet,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_set_on_close(struct ui_side_sheet_base *sheet,
-                                           ui_side_sheet_on_close_t on_close,
-                                           void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_side_sheet_base_set_on_close(
+    struct ui_side_sheet_base *sheet, ui_side_sheet_on_close_t on_close,
+    void *user_data);
 
 /**
  * @brief Processes input events to handle backdrop clicks and escape key
@@ -148,9 +150,9 @@ ui_error_t ui_side_sheet_base_set_on_close(struct ui_side_sheet_base *sheet,
  * @param timestamp_ms The current timestamp.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_process_event(struct ui_side_sheet_base *sheet,
-                                            const struct ui_event *event,
-                                            double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_side_sheet_base_process_event(
+    struct ui_side_sheet_base *sheet, const struct ui_event *event,
+    double timestamp_ms);
 
 /**
  * @brief Retrieves the underlying component wrapper.
@@ -159,9 +161,8 @@ ui_error_t ui_side_sheet_base_process_event(struct ui_side_sheet_base *sheet,
  * @param out_component Pointer to receive the underlying component.
  * @return ui_error_t `UI_ERROR_NONE` on success.
  */
-ui_error_t
-ui_side_sheet_base_get_component(struct ui_side_sheet_base *sheet,
-                                 struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_side_sheet_base_get_component(
+    struct ui_side_sheet_base *sheet, struct ui_component **out_component);
 
 /**
  * @brief Binds the side sheet's open state to a signal.
@@ -170,8 +171,8 @@ ui_side_sheet_base_get_component(struct ui_side_sheet_base *sheet,
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_side_sheet_base_bind_open(struct ui_side_sheet_base *sheet,
-                                        struct ui_signal *open_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_side_sheet_base_bind_open(
+    struct ui_side_sheet_base *sheet, struct ui_signal *open_signal);
 
 #ifdef __cplusplus
 }

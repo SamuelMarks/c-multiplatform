@@ -7,9 +7,8 @@
  * \brief Implementation of the UI Segmented Control Base component.
  */
 
-#include "ui_segmented_control_base.h"
-
 /* clang-format off */
+#include "ui_segmented_control_base.h"
 #include "ui_aria.h"
 #include "ui_component.h"
 #include "ui_internal_mem.h"

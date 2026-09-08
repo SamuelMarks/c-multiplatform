@@ -54,8 +54,8 @@ struct ui_coachmark_step {
  * @param out_tour Pointer to receive the allocated tour instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
-                                    struct ui_coachmark_tour **out_tour);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_coachmark_tour_create(
+    struct ui_overlay_director *director, struct ui_coachmark_tour **out_tour);
 
 /**
  * @brief Destroys a coachmark tour component.
@@ -63,7 +63,8 @@ ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
  * @param tour The tour instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Sets the steps for the tour.
@@ -73,9 +74,9 @@ ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour);
  * @param step_count Total number of steps.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
-                                       const struct ui_coachmark_step *steps,
-                                       int step_count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_coachmark_tour_set_steps(
+    struct ui_coachmark_tour *tour, const struct ui_coachmark_step *steps,
+    int step_count);
 
 /**
  * @brief Sets a callback for when the step changes.
@@ -85,10 +86,9 @@ ui_error_t ui_coachmark_tour_set_steps(struct ui_coachmark_tour *tour,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
-                                     ui_coachmark_on_step_change_t on_change,
-                                     void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_coachmark_tour_set_on_step_change(
+    struct ui_coachmark_tour *tour, ui_coachmark_on_step_change_t on_change,
+    void *user_data);
 
 /**
  * @brief Starts the tour at step 0.
@@ -96,7 +96,8 @@ ui_coachmark_tour_set_on_step_change(struct ui_coachmark_tour *tour,
  * @param tour The tour instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coachmark_tour_start(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Advances to the next step.
@@ -104,7 +105,8 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour);
  * @param tour The tour instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coachmark_tour_next(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Goes back to the previous step.
@@ -112,7 +114,8 @@ ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour);
  * @param tour The tour instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_prev(struct ui_coachmark_tour *tour);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coachmark_tour_prev(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Skips/ends the tour.
@@ -120,7 +123,8 @@ ui_error_t ui_coachmark_tour_prev(struct ui_coachmark_tour *tour);
  * @param tour The tour instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coachmark_tour_skip(struct ui_coachmark_tour *tour);
 
 /**
  * @brief Binds the coachmark tour's open state to a signal.
@@ -129,8 +133,8 @@ ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour);
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
-                                       struct ui_signal *open_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_coachmark_tour_bind_open(
+    struct ui_coachmark_tour *tour, struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the tour is animating.
@@ -139,9 +143,8 @@ ui_error_t ui_coachmark_tour_bind_open(struct ui_coachmark_tour *tour,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_coachmark_tour_get_animating_signal(struct ui_coachmark_tour *tour,
-                                       struct ui_computed **out_animating);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_coachmark_tour_get_animating_signal(
+    struct ui_coachmark_tour *tour, struct ui_computed **out_animating);
 
 /**
  * @brief Updates layout/positioning for the current step (useful on window
@@ -152,9 +155,9 @@ ui_coachmark_tour_get_animating_signal(struct ui_coachmark_tour *tour,
  * @param viewport_height Height of the viewport.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
-                                           float viewport_width,
-                                           float viewport_height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
+                                float viewport_width, float viewport_height);
 
 /**
  * @brief Processes input events for the coachmark (keyboard navigation like
@@ -164,8 +167,8 @@ ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
  * @param event The input event.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
-                                           const struct ui_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_coachmark_tour_process_event(
+    struct ui_coachmark_tour *tour, const struct ui_event *event);
 
 #ifdef __cplusplus
 }

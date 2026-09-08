@@ -57,8 +57,8 @@ typedef ui_error_t (*ui_toggle_on_change_t)(struct ui_toggle_base *toggle,
  * @param out_toggle Pointer to receive the allocated toggle base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_toggle_base_create(enum ui_toggle_type type,
-                                 struct ui_toggle_base **out_toggle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toggle_base_create(
+    enum ui_toggle_type type, struct ui_toggle_base **out_toggle);
 
 /**
  * @brief Destroys a toggle base component.
@@ -66,7 +66,8 @@ ui_error_t ui_toggle_base_create(enum ui_toggle_type type,
  * @param toggle The toggle to destroy.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_toggle_base_destroy(struct ui_toggle_base *toggle);
 
 /**
  * @brief Sets the disabled state of the toggle.
@@ -76,8 +77,8 @@ ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle);
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
-                                       int disabled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_toggle_base_set_disabled(struct ui_toggle_base *toggle, int disabled);
 
 /**
  * @brief Gets the current checked state of the toggle.
@@ -86,8 +87,8 @@ ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
  * @param out_is_checked Pointer to receive 1 if checked, 0 if unchecked.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
-                                     int *out_is_checked);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toggle_base_is_checked(
+    const struct ui_toggle_base *toggle, int *out_is_checked);
 
 /**
  * @brief Programmatically sets the checked state of the toggle.
@@ -97,8 +98,8 @@ ui_error_t ui_toggle_base_is_checked(const struct ui_toggle_base *toggle,
  * @param checked 1 to check, 0 to uncheck.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
-                                      int checked);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_toggle_base_set_checked(struct ui_toggle_base *toggle, int checked);
 
 /**
  * @brief Sets the group name for radio buttons.
@@ -108,8 +109,8 @@ ui_error_t ui_toggle_base_set_checked(struct ui_toggle_base *toggle,
  * @param group_name The group name string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
-                                         const char *group_name);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toggle_base_set_group_name(
+    struct ui_toggle_base *toggle, const char *group_name);
 
 /**
  * @brief Sets the change handler for the toggle.
@@ -120,9 +121,9 @@ ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
  * @param user_data Opaque user data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_toggle_base_set_on_change(struct ui_toggle_base *toggle,
-                                        ui_toggle_on_change_t on_change,
-                                        void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_toggle_base_set_on_change(struct ui_toggle_base *toggle,
+                             ui_toggle_on_change_t on_change, void *user_data);
 
 /**
  * @brief Processes an incoming input event to trigger toggling.
@@ -132,9 +133,9 @@ ui_error_t ui_toggle_base_set_on_change(struct ui_toggle_base *toggle,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
-                                        const struct ui_event *event,
-                                        double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_toggle_base_process_event(struct ui_toggle_base *toggle,
+                             const struct ui_event *event, double timestamp_ms);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -144,8 +145,8 @@ ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toggle_base_get_component(struct ui_toggle_base *toggle,
-                                        struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toggle_base_get_component(
+    struct ui_toggle_base *toggle, struct ui_component **out_component);
 
 /**
  * @brief Retrieves the Control Value Accessor for this toggle.
@@ -154,11 +155,11 @@ ui_error_t ui_toggle_base_get_component(struct ui_toggle_base *toggle,
  * @param out_cva Pointer to receive the populated CVA structure.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_toggle_base_get_cva(struct ui_toggle_base *toggle,
-                                  struct ui_control_value_accessor *out_cva);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toggle_base_get_cva(
+    struct ui_toggle_base *toggle, struct ui_control_value_accessor *out_cva);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_TOGGLE_BASE_H */

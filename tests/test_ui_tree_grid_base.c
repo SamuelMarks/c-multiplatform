@@ -15,8 +15,9 @@ extern int g_malloc_fail_countdown;
 
 #define EXPECT_EQ(actual, expected)                                            \
   if ((size_t)(actual) != (size_t)(expected)) {                                \
-    printf("Failed at %d: %zu != %zu\n", __LINE__, (size_t)(actual),           \
-           (size_t)(expected));                                                \
+    printf("Failed at %d: %lu != %lu\n", __LINE__,                             \
+           (unsigned long)(size_t)(actual),                                    \
+           (unsigned long)(size_t)(expected));                                 \
     failed = 1;                                                                \
   }
 
@@ -74,8 +75,12 @@ static ui_error_t mock_render_cell(void *node_id, size_t col_index,
 static int test_tree_grid_lifecycle(void) {
   struct ui_tree_grid_base *tree_grid = NULL;
   struct ui_tree_grid_model model;
+  struct ui_component *comp = NULL;
   ui_error_t rc;
   int failed = 0;
+#ifdef UI_TEST_MOCK_ALLOC
+  int i;
+#endif
 
   model.get_root_count = mock_get_root_count;
   model.get_root_node = mock_get_root_node;
@@ -91,7 +96,6 @@ static int test_tree_grid_lifecycle(void) {
             UI_ERROR_INVALID_ARGUMENT);
 
 #ifdef UI_TEST_MOCK_ALLOC
-  int i;
   for (i = 0; i < 4; i++) {
     g_malloc_fail_countdown = i;
     if (ui_tree_grid_base_create(&tree_grid, &model) == UI_ERROR_NONE) {
@@ -120,7 +124,6 @@ static int test_tree_grid_lifecycle(void) {
             UI_ERROR_NONE);
 
   /* Get component */
-  struct ui_component *comp;
   EXPECT_EQ(ui_tree_grid_base_get_component(NULL, &comp),
             UI_ERROR_INVALID_ARGUMENT);
   EXPECT_EQ(ui_tree_grid_base_get_component(tree_grid, NULL),
@@ -149,6 +152,8 @@ static int test_tree_grid_expansion(void) {
   ui_error_t rc;
   int expanded;
   void *node1 = (void *)0x1;
+  void *node2 = (void *)0x2;
+  int j;
   int failed = 0;
 
   model.get_root_count = mock_get_root_count;
@@ -191,11 +196,9 @@ static int test_tree_grid_expansion(void) {
   EXPECT_EQ(rc, UI_ERROR_NONE);
 
   /* Test out of bounds on fixed array */
-  int j;
   for (j = 0; j < 256; j++) {
     ui_tree_grid_base_set_expanded(tree_grid, (void *)((size_t)0x100 + j), 1);
   }
-  void *node2 = (void *)0x2;
   rc = ui_tree_grid_base_set_expanded(tree_grid, node2, 1);
   EXPECT_EQ(rc, UI_ERROR_OUT_OF_BOUNDS);
 
@@ -239,6 +242,7 @@ static int test_tree_grid_key_events(void) {
   struct ui_tree_grid_model model;
   struct ui_keyboard_event ev;
   ui_error_t rc;
+  int expanded = 0;
   void *node1 = (void *)0x1;
   int failed = 0;
 
@@ -266,7 +270,6 @@ static int test_tree_grid_key_events(void) {
   /* Test right key on unexpanded */
   ev.key_code = UI_KEY_RIGHT;
   EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
-  int expanded;
   ui_tree_grid_base_is_expanded(tree_grid, node1, &expanded);
   EXPECT_EQ(expanded, 1);
 

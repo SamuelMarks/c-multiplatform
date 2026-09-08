@@ -11,55 +11,85 @@
  * @param logical_edge Parameter logical_edge.
  * @param writing_mode Parameter writing_mode.
  * @param direction Parameter direction.
- * @return Return value.
+ * @param out_physical_edge Pointer to receive the mapped physical edge.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT.
  */
-enum ui_css_physical_edge
+ui_error_t
 ui_css_logical_to_physical_edge(enum ui_css_logical_edge logical_edge,
                                 enum ui_css_writing_mode writing_mode,
-                                enum ui_css_direction direction) {
+                                enum ui_css_direction direction,
+                                enum ui_css_physical_edge *out_physical_edge) {
+  if (!out_physical_edge) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (writing_mode == UI_CSS_WRITING_MODE_HORIZONTAL_TB) {
-    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_START)
-      return UI_CSS_PHYSICAL_EDGE_TOP;
-    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_END)
-      return UI_CSS_PHYSICAL_EDGE_BOTTOM;
+    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_START) {
+      *out_physical_edge = UI_CSS_PHYSICAL_EDGE_TOP;
+      return UI_ERROR_NONE;
+    }
+    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_END) {
+      *out_physical_edge = UI_CSS_PHYSICAL_EDGE_BOTTOM;
+      return UI_ERROR_NONE;
+    }
     if (logical_edge == UI_CSS_LOGICAL_EDGE_INLINE_START) {
-      return (direction == UI_CSS_DIRECTION_LTR) ? UI_CSS_PHYSICAL_EDGE_LEFT
-                                                 : UI_CSS_PHYSICAL_EDGE_RIGHT;
+      *out_physical_edge = (direction == UI_CSS_DIRECTION_LTR)
+                               ? UI_CSS_PHYSICAL_EDGE_LEFT
+                               : UI_CSS_PHYSICAL_EDGE_RIGHT;
+      return UI_ERROR_NONE;
     }
     if (logical_edge == UI_CSS_LOGICAL_EDGE_INLINE_END) {
-      return (direction == UI_CSS_DIRECTION_LTR) ? UI_CSS_PHYSICAL_EDGE_RIGHT
-                                                 : UI_CSS_PHYSICAL_EDGE_LEFT;
+      *out_physical_edge = (direction == UI_CSS_DIRECTION_LTR)
+                               ? UI_CSS_PHYSICAL_EDGE_RIGHT
+                               : UI_CSS_PHYSICAL_EDGE_LEFT;
+      return UI_ERROR_NONE;
     }
   } else if (writing_mode == UI_CSS_WRITING_MODE_VERTICAL_RL) {
-    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_START)
-      return UI_CSS_PHYSICAL_EDGE_RIGHT;
-    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_END)
-      return UI_CSS_PHYSICAL_EDGE_LEFT;
+    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_START) {
+      *out_physical_edge = UI_CSS_PHYSICAL_EDGE_RIGHT;
+      return UI_ERROR_NONE;
+    }
+    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_END) {
+      *out_physical_edge = UI_CSS_PHYSICAL_EDGE_LEFT;
+      return UI_ERROR_NONE;
+    }
     if (logical_edge == UI_CSS_LOGICAL_EDGE_INLINE_START) {
-      return (direction == UI_CSS_DIRECTION_LTR) ? UI_CSS_PHYSICAL_EDGE_TOP
-                                                 : UI_CSS_PHYSICAL_EDGE_BOTTOM;
+      *out_physical_edge = (direction == UI_CSS_DIRECTION_LTR)
+                               ? UI_CSS_PHYSICAL_EDGE_TOP
+                               : UI_CSS_PHYSICAL_EDGE_BOTTOM;
+      return UI_ERROR_NONE;
     }
     if (logical_edge == UI_CSS_LOGICAL_EDGE_INLINE_END) {
-      return (direction == UI_CSS_DIRECTION_LTR) ? UI_CSS_PHYSICAL_EDGE_BOTTOM
-                                                 : UI_CSS_PHYSICAL_EDGE_TOP;
+      *out_physical_edge = (direction == UI_CSS_DIRECTION_LTR)
+                               ? UI_CSS_PHYSICAL_EDGE_BOTTOM
+                               : UI_CSS_PHYSICAL_EDGE_TOP;
+      return UI_ERROR_NONE;
     }
   } else if (writing_mode == UI_CSS_WRITING_MODE_VERTICAL_LR) {
-    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_START)
-      return UI_CSS_PHYSICAL_EDGE_LEFT;
-    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_END)
-      return UI_CSS_PHYSICAL_EDGE_RIGHT;
+    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_START) {
+      *out_physical_edge = UI_CSS_PHYSICAL_EDGE_LEFT;
+      return UI_ERROR_NONE;
+    }
+    if (logical_edge == UI_CSS_LOGICAL_EDGE_BLOCK_END) {
+      *out_physical_edge = UI_CSS_PHYSICAL_EDGE_RIGHT;
+      return UI_ERROR_NONE;
+    }
     if (logical_edge == UI_CSS_LOGICAL_EDGE_INLINE_START) {
-      return (direction == UI_CSS_DIRECTION_LTR) ? UI_CSS_PHYSICAL_EDGE_TOP
-                                                 : UI_CSS_PHYSICAL_EDGE_BOTTOM;
+      *out_physical_edge = (direction == UI_CSS_DIRECTION_LTR)
+                               ? UI_CSS_PHYSICAL_EDGE_TOP
+                               : UI_CSS_PHYSICAL_EDGE_BOTTOM;
+      return UI_ERROR_NONE;
     }
     if (logical_edge == UI_CSS_LOGICAL_EDGE_INLINE_END) {
-      return (direction == UI_CSS_DIRECTION_LTR) ? UI_CSS_PHYSICAL_EDGE_BOTTOM
-                                                 : UI_CSS_PHYSICAL_EDGE_TOP;
+      *out_physical_edge = (direction == UI_CSS_DIRECTION_LTR)
+                               ? UI_CSS_PHYSICAL_EDGE_BOTTOM
+                               : UI_CSS_PHYSICAL_EDGE_TOP;
+      return UI_ERROR_NONE;
     }
   }
 
   /* Fallback */
-  return UI_CSS_PHYSICAL_EDGE_TOP;
+  *out_physical_edge = UI_CSS_PHYSICAL_EDGE_TOP;
+  return UI_ERROR_NONE;
 }
 
 /* \brief ui_css_logical_to_physical_size

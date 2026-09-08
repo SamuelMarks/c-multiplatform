@@ -1,25 +1,49 @@
 cmake_minimum_required(VERSION 3.15)
-project(c-multiplatform-engine C)
-if (MSVC AND CMAKE_HOST_UNIX)
+
+if (CMAKE_HOST_UNIX AND ((DEFINED CMAKE_C_COMPILER AND CMAKE_C_COMPILER MATCHES "(^|[/\\])cl(\\.exe)?$") OR (DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER MATCHES "(^|[/\\])cl(\\.exe)?$")))
     # Workaround for MSVC hanging under Wine on macOS/Linux due to mspdbsrv.exe and incremental linking
-    # Replace flags in default debug variables
-    string(REPLACE "/debug" "/DEBUG:NONE" CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
-    string(REPLACE "/debug" "/DEBUG:NONE" CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
-    string(REPLACE "/INCREMENTAL" "/INCREMENTAL:NO" CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
-    string(REPLACE "/INCREMENTAL" "/INCREMENTAL:NO" CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
-    string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
-    string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "Embedded" CACHE STRING "")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG:NONE /INCREMENTAL:NO" CACHE STRING "")
+    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "/DEBUG:NONE /INCREMENTAL:NO" CACHE STRING "")
+    set(CMAKE_MODULE_LINKER_FLAGS_DEBUG "/DEBUG:NONE /INCREMENTAL:NO" CACHE STRING "")
+    list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
+         CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
+         CMAKE_EXE_LINKER_FLAGS_DEBUG
+         CMAKE_SHARED_LINKER_FLAGS_DEBUG
+         CMAKE_MODULE_LINKER_FLAGS_DEBUG)
+endif()
+
+project(c-multiplatform-engine C)
+
+if (MSVC AND CMAKE_HOST_UNIX)
+    string(REGEX REPLACE "/[dD][eE][bB][uU][gG](:[a-zA-Z]+)?" "/DEBUG:NONE" CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+    string(REGEX REPLACE "/[dD][eE][bB][uU][gG](:[a-zA-Z]+)?" "/DEBUG:NONE" CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
+    string(REGEX REPLACE "/[dD][eE][bB][uU][gG](:[a-zA-Z]+)?" "/DEBUG:NONE" CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG}")
+    string(REGEX REPLACE "/[iI][nN][cC][rR][eE][mM][eE][nN][tT][aA][lL](:[a-zA-Z]+)?" "/INCREMENTAL:NO" CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
+    string(REGEX REPLACE "/[iI][nN][cC][rR][eE][mM][eE][nN][tT][aA][lL](:[a-zA-Z]+)?" "/INCREMENTAL:NO" CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
+    string(REGEX REPLACE "/[iI][nN][cC][rR][eE][mM][eE][nN][tT][aA][lL](:[a-zA-Z]+)?" "/INCREMENTAL:NO" CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG}")
+    string(REGEX REPLACE "/Z[iI]" "/Z7" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    string(REGEX REPLACE "/Z[iI]" "/Z7" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REGEX REPLACE "/Z[iI]" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
+    string(REGEX REPLACE "/Z[iI]" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    string(REGEX REPLACE "/Z[iI]" "/Z7" CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+    string(REGEX REPLACE "/Z[iI]" "/Z7" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+    string(REGEX REPLACE "/[fF][sS]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    string(REGEX REPLACE "/[fF][sS]" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
 
     # Propagate to TryCompile
     list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
          CMAKE_EXE_LINKER_FLAGS_DEBUG
          CMAKE_SHARED_LINKER_FLAGS_DEBUG
+         CMAKE_MODULE_LINKER_FLAGS_DEBUG
          CMAKE_C_FLAGS_DEBUG
-         CMAKE_CXX_FLAGS_DEBUG)
+         CMAKE_CXX_FLAGS_DEBUG
+         CMAKE_C_FLAGS_RELWITHDEBINFO
+         CMAKE_CXX_FLAGS_RELWITHDEBINFO)
 
     # Forcefully apply to all downstream targets, overriding any individual target settings
     add_compile_options("/Z7")
-    add_link_options("/DEBUG:NONE" "/INCREMENTAL:NO")
+    add_link_options("/DEBUG:NONE" "/INCREMENTAL:NO" "/MANIFEST:NO")
 endif()
 
 # Set C89 standard strictly
@@ -34,6 +58,65 @@ option(UI_SINGLE_THREADED "Disable Multi-threading" OFF)
 option(UI_ENABLE_LTO "Enable Link-Time Optimization" OFF)
 option(UI_ENABLE_WAYLAND "Enable Wayland Support on Linux" ON)
 option(UI_USE_HARFBUZZ "Enable HarfBuzz integration for complex text shaping" OFF)
+option(UI_SHARED_LIB "Build as Shared Library" OFF)
+option(UI_MSVC_RUNTIME_CHECKS "Enable MSVC /RTC1, /RTCs, /RTCu" OFF)
+option(BUILD_VISUAL_TESTS "Build and run visual fuzzy-match tests" ON)
+option(UI_ENABLE_ASAN "Enable AddressSanitizer (ASAN)" OFF)
+
+# Synchronize with CDD / external matrix variables
+if(DEFINED BUILD_SHARED_LIBS)
+    set(UI_SHARED_LIB ${BUILD_SHARED_LIBS})
+else()
+    set(BUILD_SHARED_LIBS ${UI_SHARED_LIB})
+endif()
+
+if(DEFINED CDD_CHARSET)
+    if(CDD_CHARSET STREQUAL "UNICODE")
+        set(UI_ENABLE_UNICODE ON)
+    elseif(CDD_CHARSET STREQUAL "ANSI")
+        set(UI_ENABLE_UNICODE OFF)
+    endif()
+endif()
+
+if(DEFINED CDD_THREADING)
+    if(CDD_THREADING)
+        set(UI_SINGLE_THREADED OFF)
+    else()
+        set(UI_SINGLE_THREADED ON)
+    endif()
+endif()
+
+if(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+    set(UI_ENABLE_LTO ON)
+endif()
+
+if(DEFINED CDD_CRT_LINKAGE)
+    if(CDD_CRT_LINKAGE STREQUAL "Static")
+        set(UI_CRT_STATIC ON)
+    elseif(CDD_CRT_LINKAGE STREQUAL "Shared")
+        set(UI_CRT_STATIC OFF)
+    endif()
+endif()
+
+if(DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
+    if(CMAKE_MSVC_RUNTIME_LIBRARY MATCHES "DLL")
+        set(UI_CRT_STATIC OFF)
+    elseif(CMAKE_MSVC_RUNTIME_LIBRARY MATCHES "MultiThreaded")
+        set(UI_CRT_STATIC ON)
+    endif()
+endif()
+
+if(DEFINED CDD_MSVC_RTC)
+    if(CDD_MSVC_RTC AND NOT CDD_MSVC_RTC STREQUAL "OFF")
+        set(UI_MSVC_RUNTIME_CHECKS ON)
+        set(CFS_MSVC_RTC "${CDD_MSVC_RTC}" CACHE STRING "" FORCE)
+        set(CDD_MSVC_RTC "${CDD_MSVC_RTC}" CACHE STRING "" FORCE)
+    else()
+        set(UI_MSVC_RUNTIME_CHECKS OFF)
+        set(CFS_MSVC_RTC "" CACHE STRING "" FORCE)
+        set(CDD_MSVC_RTC "" CACHE STRING "" FORCE)
+    endif()
+endif()
 
 if(UI_USE_HARFBUZZ)
     message(STATUS "Fetching harfbuzz via FetchContent")
@@ -47,11 +130,6 @@ if(UI_USE_HARFBUZZ)
     set(HB_BUILD_SUBDIR_ALREADY_CONFIGURED ON)
     FetchContent_MakeAvailable(harfbuzz)
 endif()
-option(UI_SHARED_LIB "Build as Shared Library" OFF)
-option(UI_MSVC_RUNTIME_CHECKS "Enable MSVC /RTC1, /RTCs, /RTCu" OFF)
-option(BUILD_VISUAL_TESTS "Build and run visual fuzzy-match tests" ON)
-
-option(UI_ENABLE_ASAN "Enable AddressSanitizer (ASAN)" OFF)
 
 if(UI_ENABLE_ASAN)
     if(MSVC)
@@ -63,13 +141,9 @@ if(UI_ENABLE_ASAN)
 endif()
 
 if(UI_CRT_STATIC AND MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-
-if(CMAKE_MSVC_RUNTIME_LIBRARY MATCHES "DLL")
-    set(UI_CRT_STATIC OFF)
-elseif(CMAKE_MSVC_RUNTIME_LIBRARY MATCHES "MultiThreaded")
-    set(UI_CRT_STATIC ON)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
+elseif(MSVC AND NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "" FORCE)
 endif()
 
 # Pass down CRT static options to dependencies
@@ -99,8 +173,18 @@ if(UI_ENABLE_UNICODE)
     add_compile_definitions(UNICODE _UNICODE)
 endif()
 
-if(UI_MSVC_RUNTIME_CHECKS AND MSVC)
-    add_compile_options(/RTC1 /RTCs /RTCu)
+if(MSVC)
+    if(CDD_MSVC_RTC AND NOT CDD_MSVC_RTC STREQUAL "OFF")
+        add_compile_options("/${CDD_MSVC_RTC}")
+    elseif(UI_MSVC_RUNTIME_CHECKS)
+        if(UI_MSVC_RUNTIME_CHECKS STREQUAL "RTCs")
+            add_compile_options(/RTCs)
+        elseif(UI_MSVC_RUNTIME_CHECKS STREQUAL "RTCu")
+            add_compile_options(/RTCu)
+        else()
+            add_compile_options(/RTC1)
+        endif()
+    endif()
 endif()
 
 if(UI_ENABLE_LTO)
@@ -143,7 +227,7 @@ endif()
 
 
 if(MSVC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Gy /wd4701")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Gy")
 
 
 
@@ -155,23 +239,42 @@ endif()
 
 if(UNIX AND NOT APPLE AND NOT CYGWIN AND NOT EMSCRIPTEN)
     if(UI_ENABLE_WAYLAND)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(WAYLAND REQUIRED wayland-client wayland-egl egl wayland-cursor xkbcommon)
+        find_package(PkgConfig QUIET)
+        if(PKG_CONFIG_FOUND)
+            pkg_check_modules(WAYLAND wayland-client wayland-egl egl wayland-cursor xkbcommon)
+            find_program(WAYLAND_SCANNER wayland-scanner)
+        endif()
 
-        find_program(WAYLAND_SCANNER wayland-scanner REQUIRED)
-        execute_process(
-            COMMAND ${WAYLAND_SCANNER} client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-client-protocol.h
-        )
-        execute_process(
-            COMMAND ${WAYLAND_SCANNER} private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c
-        )
-        include_directories(${CMAKE_CURRENT_BINARY_DIR})
+        if(WAYLAND_FOUND AND WAYLAND_SCANNER AND EXISTS "/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml")
+            execute_process(
+                COMMAND ${WAYLAND_SCANNER} client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-client-protocol.h
+            )
+            execute_process(
+                COMMAND ${WAYLAND_SCANNER} private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c
+            )
+            include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-        set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_wayland.c ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c)
-        set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c PROPERTIES COMPILE_FLAGS " -Dinline=__inline__")
-        set_source_files_properties(src/ui_window_backend_linux_wayland.c PROPERTIES COMPILE_FLAGS " -Dinline=__inline__")
-
+            set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_wayland.c ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c)
+            set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c PROPERTIES COMPILE_FLAGS " -Dinline=__inline__")
+            set_source_files_properties(src/ui_window_backend_linux_wayland.c PROPERTIES COMPILE_FLAGS " -Dinline=__inline__")
+        else()
+            message(STATUS "Wayland dependencies not found; falling back to X11")
+            set(UI_ENABLE_WAYLAND OFF)
+            find_package(X11 QUIET)
+            if(X11_FOUND)
+                add_definitions(-DHAVE_X11)
+                include_directories(${X11_INCLUDE_DIR})
+                set(HAVE_X11 ON)
+            endif()
+            set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_x11.c)
+        endif()
     else()
+        find_package(X11 QUIET)
+        if(X11_FOUND)
+            add_definitions(-DHAVE_X11)
+            include_directories(${X11_INCLUDE_DIR})
+            set(HAVE_X11 ON)
+        endif()
         set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_x11.c)
     endif()
 else()
@@ -191,20 +294,24 @@ endif()
 
 target_link_platform_libraries(ui_engine PUBLIC)
 
+if(UI_SHARED_LIB)
+    target_compile_definitions(ui_engine PUBLIC C_MULTIPLATFORM_BUILD_SHARED)
+    target_compile_definitions(ui_engine PRIVATE ui_engine_EXPORTS)
+endif()
+
 if(NOT UI_SINGLE_THREADED)
     target_link_libraries(ui_engine PRIVATE Threads::Threads)
 endif()
-
 if(MSVC)
-
     target_compile_options(ui_engine PRIVATE /W4 /WX /Gy)
-
 else()
-    target_compile_options(ui_engine PRIVATE -pedantic -Wall -Werror  )
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    target_compile_options(ui_engine PRIVATE -pedantic -Wall -Wextra -Werror -Wdeclaration-after-statement)
+    if(ENABLE_COVERAGE)
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "")
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")
-        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+            set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+        endif()
     endif()
 endif()
 
@@ -248,19 +355,31 @@ UI_FetchDependencyLocalOrArchive(c_cdd "cdd-c" "SamuelMarks/cdd-c")
 UI_FetchDependencyLocalOrArchive(c-abstract-http "c-abstract-http" "SamuelMarks/c-abstract-http")
 UI_FetchDependencyLocalOrArchive(c_orm "c-orm" "SamuelMarks/c-orm")
 
-foreach(dep c_cdd c_str_span c-abstract-http c-orm c89stringutils parson cfs)
+foreach(dep c_cdd c_cdd_compiler_flags c_str_span c_str_span_compiler_flags c-abstract-http c-orm c-orm-async c89stringutils c89stringutils_compiler_flags parson cfs)
     if(TARGET ${dep})
-        if(NOT MSVC)
-            set_property(TARGET ${dep} PROPERTY COMPILE_OPTIONS "")
-            set_property(TARGET ${dep} PROPERTY INTERFACE_COMPILE_OPTIONS "")
-        endif()
+        set_property(TARGET ${dep} PROPERTY COMPILE_OPTIONS "")
+        set_property(TARGET ${dep} PROPERTY INTERFACE_COMPILE_OPTIONS "")
         set_property(TARGET ${dep} PROPERTY LINK_OPTIONS "")
         set_property(TARGET ${dep} PROPERTY INTERFACE_LINK_OPTIONS "")
     endif()
 endforeach()
 if(TARGET c_cdd_compiler_flags)
+    set_property(TARGET c_cdd_compiler_flags PROPERTY COMPILE_OPTIONS "")
+    set_property(TARGET c_cdd_compiler_flags PROPERTY INTERFACE_COMPILE_OPTIONS "")
     set_property(TARGET c_cdd_compiler_flags PROPERTY LINK_OPTIONS "")
     set_property(TARGET c_cdd_compiler_flags PROPERTY INTERFACE_LINK_OPTIONS "")
+endif()
+if(TARGET c_str_span_compiler_flags)
+    set_property(TARGET c_str_span_compiler_flags PROPERTY COMPILE_OPTIONS "")
+    set_property(TARGET c_str_span_compiler_flags PROPERTY INTERFACE_COMPILE_OPTIONS "")
+    set_property(TARGET c_str_span_compiler_flags PROPERTY LINK_OPTIONS "")
+    set_property(TARGET c_str_span_compiler_flags PROPERTY INTERFACE_LINK_OPTIONS "")
+endif()
+if(TARGET c89stringutils_compiler_flags)
+    set_property(TARGET c89stringutils_compiler_flags PROPERTY COMPILE_OPTIONS "")
+    set_property(TARGET c89stringutils_compiler_flags PROPERTY INTERFACE_COMPILE_OPTIONS "")
+    set_property(TARGET c89stringutils_compiler_flags PROPERTY LINK_OPTIONS "")
+    set_property(TARGET c89stringutils_compiler_flags PROPERTY INTERFACE_LINK_OPTIONS "")
 endif()
 
 if(NOT MSVC)
@@ -273,18 +392,19 @@ endif()
 
 
 # Strip coverage flags that bleed from dependencies in Debug mode
-foreach(DEP_TARGET c_cdd c-abstract-http cfs c-orm c-orm-async c_str_span c89stringutils parson)
+foreach(DEP_TARGET c_cdd c_cdd_compiler_flags c-abstract-http cfs c-orm c-orm-async c_str_span c_str_span_compiler_flags c89stringutils c89stringutils_compiler_flags parson)
     if(TARGET ${DEP_TARGET})
         set_target_properties(${DEP_TARGET} PROPERTIES INTERFACE_COMPILE_OPTIONS "")
         set_target_properties(${DEP_TARGET} PROPERTIES INTERFACE_LINK_OPTIONS "")
     endif()
 endforeach()
 
-if(TARGET c_cdd AND MSVC)
-    target_compile_options(c_cdd PRIVATE "/wd4005" "/wd4996")
-endif()
-if(TARGET c_cdd)
-    target_compile_definitions(c_cdd PUBLIC CDD_BUILD_TESTS=1)
+if(TARGET cfs AND MSVC)
+    get_target_property(_cfs_opts cfs COMPILE_OPTIONS)
+    if(_cfs_opts)
+        list(REMOVE_ITEM _cfs_opts "/OFF")
+        set_target_properties(cfs PROPERTIES COMPILE_OPTIONS "${_cfs_opts}")
+    endif()
 endif()
 
 target_link_libraries(ui_engine PRIVATE c-abstract-http cfs c-orm)
@@ -322,11 +442,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     target_link_libraries(ui_engine_test PRIVATE c-abstract-http cfs c-orm)
 
     if(MSVC)
-
         target_compile_options(ui_engine_test PRIVATE /W4 /WX /Gy)
-
     else()
-        target_compile_options(ui_engine_test PRIVATE -pedantic -Wall -Werror  )
+        target_compile_options(ui_engine_test PRIVATE -pedantic -Wall -Wextra -Werror -Wdeclaration-after-statement)
         if(ENABLE_COVERAGE)
             set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage")

@@ -34,16 +34,16 @@ struct ui_overlay;
  * @param out_director Pointer to receive the allocated director.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_overlay_director_create(struct ui_dom_node *root_node,
-                           struct ui_overlay_director **out_director);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_overlay_director_create(
+    struct ui_dom_node *root_node, struct ui_overlay_director **out_director);
 
 /**
  * @brief Destroys an overlay director and unmounts all active overlays.
  * @param director The director to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_overlay_director_destroy(struct ui_overlay_director *director);
 
 /**
  * @brief Mounts a component as a top-level overlay.
@@ -53,10 +53,9 @@ ui_error_t ui_overlay_director_destroy(struct ui_overlay_director *director);
  * @param out_overlay Pointer to receive the overlay instance handle.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_overlay_director_mount_component(struct ui_overlay_director *director,
-                                    struct ui_component *component, int z_index,
-                                    struct ui_overlay **out_overlay);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_overlay_director_mount_component(
+    struct ui_overlay_director *director, struct ui_component *component,
+    int z_index, struct ui_overlay **out_overlay);
 
 /**
  * @brief Unmounts and destroys an active overlay.
@@ -64,8 +63,8 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
  * @param overlay The overlay to unmount.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_overlay_director_unmount(struct ui_overlay_director *director,
-                                       struct ui_overlay *overlay);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_overlay_director_unmount(
+    struct ui_overlay_director *director, struct ui_overlay *overlay);
 
 #ifdef __cplusplus
 }

@@ -184,8 +184,6 @@ static int test_ui_section_index_base_sections(void) {
   return 0;
 }
 
-#include "ui_dom_node.h"
-
 struct ui_section_index_base {
   struct ui_component *component;
   struct ui_dom_node **item_nodes;

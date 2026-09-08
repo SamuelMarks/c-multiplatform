@@ -84,10 +84,10 @@ dummy.c
 !CMakeLists.txt
 !README.md
 !LICENSE-*
-!scripts/update_shields.py
 
 # Python
 *.py
+!scripts/update_shields.py
 *.pyc
 *.pyo
 __pycache__/

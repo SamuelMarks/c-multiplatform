@@ -39,7 +39,8 @@ struct ui_icon_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-ui_error_t ui_icon_base_create(struct ui_icon_base **out_icon);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_icon_base_create(struct ui_icon_base **out_icon);
 
 /**
  * @brief Destroys an icon base component and frees all resources.
@@ -47,7 +48,8 @@ ui_error_t ui_icon_base_create(struct ui_icon_base **out_icon);
  * @param icon The icon to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_icon_base_destroy(struct ui_icon_base *icon);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_icon_base_destroy(struct ui_icon_base *icon);
 
 /**
  * @brief Sets the icon to use a font glyph (e.g., Material Icons).
@@ -61,9 +63,9 @@ ui_error_t ui_icon_base_destroy(struct ui_icon_base *icon);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointers,
  * UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-ui_error_t ui_icon_base_set_font_glyph(struct ui_icon_base *icon,
-                                       struct ui_font *font,
-                                       const char *glyph_name_or_code);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_icon_base_set_font_glyph(struct ui_icon_base *icon, struct ui_font *font,
+                            const char *glyph_name_or_code);
 
 /**
  * @brief Sets the icon to use raw SVG path data.
@@ -75,8 +77,8 @@ ui_error_t ui_icon_base_set_font_glyph(struct ui_icon_base *icon,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer,
  * UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-ui_error_t ui_icon_base_set_svg_path(struct ui_icon_base *icon,
-                                     const char *svg_path_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_icon_base_set_svg_path(struct ui_icon_base *icon, const char *svg_path_data);
 
 /**
  * @brief Gets the current backing type of the icon.
@@ -85,8 +87,8 @@ ui_error_t ui_icon_base_set_svg_path(struct ui_icon_base *icon,
  * @param out_type Pointer to receive the type.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_icon_base_get_type(const struct ui_icon_base *icon,
-                                 enum ui_icon_type *out_type);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_icon_base_get_type(
+    const struct ui_icon_base *icon, enum ui_icon_type *out_type);
 
 /**
  * @brief Gets the string identifier data configured for the icon.
@@ -98,8 +100,8 @@ ui_error_t ui_icon_base_get_type(const struct ui_icon_base *icon,
  * @param out_data Pointer to receive the string data (owned by the icon).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_icon_base_get_data(const struct ui_icon_base *icon,
-                                 const char **out_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_icon_base_get_data(const struct ui_icon_base *icon, const char **out_data);
 
 /**
  * @brief Binds the name property.
@@ -108,11 +110,11 @@ ui_error_t ui_icon_base_get_data(const struct ui_icon_base *icon,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_icon_base_bind_name(struct ui_icon_base *widget,
-                                  struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_icon_base_bind_name(struct ui_icon_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_ICON_BASE_H */

@@ -31,7 +31,7 @@ struct ui_css_computed_style; /* Forward declare */
  * @param out_anchor Pointer to the enum to populate.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_css_scroll_anchoring_parse(const struct ui_css_computed_style *style,
                               enum ui_css_overflow_anchor *out_anchor);
 

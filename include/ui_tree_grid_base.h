@@ -102,8 +102,9 @@ struct ui_tree_grid_model {
  * @param model Data model providing dimensions, traversal, and rendering.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
-                                    const struct ui_tree_grid_model *model);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
+                         const struct ui_tree_grid_model *model);
 
 /**
  * @brief Destroys a tree grid component.
@@ -111,7 +112,8 @@ ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
  * @param tree_grid The tree grid.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid);
 
 /**
  * @brief Gets the underlying component instance for DOM mounting.
@@ -120,8 +122,8 @@ ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid);
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_grid_base_get_component(struct ui_tree_grid_base *tree_grid,
-                                           struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_grid_base_get_component(
+    struct ui_tree_grid_base *tree_grid, struct ui_component **out_component);
 
 /**
  * @brief Sets the expanded state of a specific node.
@@ -131,8 +133,8 @@ ui_error_t ui_tree_grid_base_get_component(struct ui_tree_grid_base *tree_grid,
  * @param expanded 1 to expand, 0 to collapse.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
-                                          void *node_id, int expanded);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_grid_base_set_expanded(
+    struct ui_tree_grid_base *tree_grid, void *node_id, int expanded);
 
 /**
  * @brief Toggles the expanded state of a specific node.
@@ -141,8 +143,8 @@ ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
  * @param node_id The stable node identifier.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
-                                         void *node_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_grid_base_toggle_node(
+    struct ui_tree_grid_base *tree_grid, void *node_id);
 
 /**
  * @brief Checks if a specific node is expanded.
@@ -153,7 +155,7 @@ ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
  * collapsed).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
                               void *node_id, int *out_is_expanded);
 
@@ -165,9 +167,8 @@ ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
  * @param event The keyboard event.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
-                                   const struct ui_keyboard_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_grid_base_handle_key_event(
+    struct ui_tree_grid_base *tree_grid, const struct ui_keyboard_event *event);
 
 /**
  * @brief Renders the tree grid into a container.
@@ -176,8 +177,8 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
  * @param container The container DOM node.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_grid_base_render(struct ui_tree_grid_base *tree_grid,
-                                    struct ui_dom_node *container);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_grid_base_render(
+    struct ui_tree_grid_base *tree_grid, struct ui_dom_node *container);
 
 #ifdef __cplusplus
 }

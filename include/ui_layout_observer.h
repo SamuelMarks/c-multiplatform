@@ -39,7 +39,8 @@ typedef ui_error_t (*ui_layout_observer_cb_t)(
  * @param out_observer Pointer to receive the created observer.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_layout_observer_create(struct ui_layout_observer **out_observer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_layout_observer_create(struct ui_layout_observer **out_observer);
 
 /**
  * @brief Destroys a layout breakpoint observer.
@@ -47,7 +48,8 @@ ui_error_t ui_layout_observer_create(struct ui_layout_observer **out_observer);
  * @param observer The observer to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_layout_observer_destroy(struct ui_layout_observer *observer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_layout_observer_destroy(struct ui_layout_observer *observer);
 
 /**
  * @brief Adds a new breakpoint constraint to the observer.
@@ -62,10 +64,9 @@ ui_error_t ui_layout_observer_destroy(struct ui_layout_observer *observer);
  * @param out_breakpoint_id Pointer to receive the generated breakpoint ID.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
-                                  int min_width, int max_width, int min_height,
-                                  int max_height, int *out_breakpoint_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_layout_observer_add_breakpoint(
+    struct ui_layout_observer *observer, int min_width, int max_width,
+    int min_height, int max_height, int *out_breakpoint_id);
 
 /**
  * @brief Subscribes a callback to be notified of breakpoint state changes.
@@ -75,9 +76,9 @@ ui_layout_observer_add_breakpoint(struct ui_layout_observer *observer,
  * @param user_data Opaque data to pass to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_layout_observer_subscribe(struct ui_layout_observer *observer,
-                                        ui_layout_observer_cb_t callback,
-                                        void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_layout_observer_subscribe(struct ui_layout_observer *observer,
+                             ui_layout_observer_cb_t callback, void *user_data);
 
 /**
  * @brief Notifies the observer of a window resize event, evaluating all
@@ -88,8 +89,8 @@ ui_error_t ui_layout_observer_subscribe(struct ui_layout_observer *observer,
  * @param height The new window height.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_layout_observer_notify_resize(struct ui_layout_observer *observer,
-                                            int width, int height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_layout_observer_notify_resize(
+    struct ui_layout_observer *observer, int width, int height);
 
 /**
  * @brief Checks if a specific breakpoint is currently active based on the last
@@ -101,7 +102,7 @@ ui_error_t ui_layout_observer_notify_resize(struct ui_layout_observer *observer,
  * ID.
  * @return ui_error_t `UI_ERROR_NONE` on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_layout_observer_is_active(const struct ui_layout_observer *observer,
                              int breakpoint_id, int *out_is_active);
 

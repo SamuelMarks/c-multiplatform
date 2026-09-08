@@ -3,9 +3,8 @@
  * @brief Implementation of alert base component.
  */
 
-#include "ui_alert_base.h"
-
 /* clang-format off */
+#include "ui_alert_base.h"
 #include "ui_aria.h"
 #include "ui_component.h"
 #include <stdlib.h>

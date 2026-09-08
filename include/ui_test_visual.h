@@ -34,11 +34,9 @@ struct ui_visual_test_config {
  * @param out_matched Pointer to an integer, set to non-zero if images match.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_visual_fuzzy_match(const unsigned char *img_a,
-                                 const unsigned char *img_b, int width,
-                                 int height,
-                                 const struct ui_visual_test_config *config,
-                                 int *out_matched);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_visual_fuzzy_match(
+    const unsigned char *img_a, const unsigned char *img_b, int width,
+    int height, const struct ui_visual_test_config *config, int *out_matched);
 
 /**
  * @brief Generate a heatmap based on the difference.
@@ -54,10 +52,9 @@ ui_error_t ui_visual_fuzzy_match(const unsigned char *img_a,
  * @param output_heatmap Buffer to store the resulting heatmap RGBA pixels.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
-                                      const unsigned char *img_b, int width,
-                                      int height,
-                                      unsigned char *output_heatmap);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_visual_generate_heatmap(
+    const unsigned char *img_a, const unsigned char *img_b, int width,
+    int height, unsigned char *output_heatmap);
 
 /**
  * @brief Writes a heatmap RGBA buffer to disk as a PNG using stb_image_write.
@@ -68,12 +65,12 @@ ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
  * @param height Height of the heatmap.
  * @return UI_ERROR_NONE on success, UI_ERROR_IO on write failure.
  */
-ui_error_t ui_visual_write_heatmap_to_disk(const char *filepath,
-                                           const unsigned char *heatmap_data,
-                                           int width, int height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_visual_write_heatmap_to_disk(
+    const char *filepath, const unsigned char *heatmap_data, int width,
+    int height);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_TEST_VISUAL_H */

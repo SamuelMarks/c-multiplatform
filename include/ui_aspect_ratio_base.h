@@ -30,7 +30,7 @@ struct ui_aspect_ratio_base;
  * @param out_aspect_ratio Pointer to receive the allocated component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio);
 
 /**
@@ -39,7 +39,7 @@ ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio);
  * @param aspect_ratio The component to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio);
 
 /**
@@ -49,9 +49,8 @@ ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio);
  * @param ratio The aspect ratio float value (e.g., 16.0f / 9.0f).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
-                               float ratio);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_aspect_ratio_base_set_ratio(
+    struct ui_aspect_ratio_base *aspect_ratio, float ratio);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -61,7 +60,7 @@ ui_aspect_ratio_base_set_ratio(struct ui_aspect_ratio_base *aspect_ratio,
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,
                                    struct ui_component **out_component);
 
@@ -72,8 +71,8 @@ ui_aspect_ratio_base_get_component(struct ui_aspect_ratio_base *aspect_ratio,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_aspect_ratio_base_bind_ratio(struct ui_aspect_ratio_base *widget,
-                                           struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_aspect_ratio_base_bind_ratio(
+    struct ui_aspect_ratio_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

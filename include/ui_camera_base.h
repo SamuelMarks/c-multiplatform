@@ -52,7 +52,8 @@ typedef ui_error_t (*ui_camera_frame_callback)(struct ui_camera_base *camera,
  * @param out_camera Pointer to output the initialized camera component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_create(struct ui_camera_base **out_camera);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_camera_base_create(struct ui_camera_base **out_camera);
 
 /**
  * @brief Destroys a camera base component.
@@ -60,7 +61,8 @@ ui_error_t ui_camera_base_create(struct ui_camera_base **out_camera);
  * @param camera The camera component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_camera_base_destroy(struct ui_camera_base *camera);
 
 /**
  * @brief Retrieves the base component.
@@ -69,8 +71,8 @@ ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera);
  * @param out_component Pointer to receive the underlying base component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_get_component(struct ui_camera_base *camera,
-                                        struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_camera_base_get_component(
+    struct ui_camera_base *camera, struct ui_component **out_component);
 
 /**
  * @brief Requests camera permissions asynchronously.
@@ -78,7 +80,8 @@ ui_error_t ui_camera_base_get_component(struct ui_camera_base *camera,
  * @param camera The camera component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_request_permission(struct ui_camera_base *camera);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_camera_base_request_permission(struct ui_camera_base *camera);
 
 /**
  * @brief Starts the camera stream.
@@ -86,7 +89,8 @@ ui_error_t ui_camera_base_request_permission(struct ui_camera_base *camera);
  * @param camera The camera component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_start_stream(struct ui_camera_base *camera);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_camera_base_start_stream(struct ui_camera_base *camera);
 
 /**
  * @brief Stops the camera stream.
@@ -94,7 +98,8 @@ ui_error_t ui_camera_base_start_stream(struct ui_camera_base *camera);
  * @param camera The camera component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_stop_stream(struct ui_camera_base *camera);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_camera_base_stop_stream(struct ui_camera_base *camera);
 
 /**
  * @brief Gets the current state of the camera.
@@ -103,8 +108,8 @@ ui_error_t ui_camera_base_stop_stream(struct ui_camera_base *camera);
  * @param out_state Pointer to receive the state.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_get_state(struct ui_camera_base *camera,
-                                    enum ui_camera_state *out_state);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_camera_base_get_state(
+    struct ui_camera_base *camera, enum ui_camera_state *out_state);
 
 /**
  * @brief Registers a callback for receiving frame data.
@@ -114,9 +119,9 @@ ui_error_t ui_camera_base_get_state(struct ui_camera_base *camera,
  * @param user_data User data to pass to the callback.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_set_frame_callback(struct ui_camera_base *camera,
-                                             ui_camera_frame_callback callback,
-                                             void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_camera_base_set_frame_callback(
+    struct ui_camera_base *camera, ui_camera_frame_callback callback,
+    void *user_data);
 
 /**
  * @brief Mocks an incoming frame (for testing).
@@ -124,7 +129,8 @@ ui_error_t ui_camera_base_set_frame_callback(struct ui_camera_base *camera,
  * @param camera The camera component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_camera_base_mock_frame(struct ui_camera_base *camera);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_camera_base_mock_frame(struct ui_camera_base *camera);
 
 /**
  * @brief Mocks a permission response (for testing).
@@ -133,7 +139,7 @@ ui_error_t ui_camera_base_mock_frame(struct ui_camera_base *camera);
  * @param granted Non-zero to simulate permission granted, zero for denied.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_camera_base_mock_permission_response(struct ui_camera_base *camera,
                                         int granted);
 

@@ -81,16 +81,18 @@ struct ui_css_content {
  * \param out_content Pointer to receive the parsed content object.
  * \return UI_ERROR_NONE on success.
  */
-ui_error_t ui_css_parse_content(const char *str,
-                                struct ui_css_content *out_content);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_content(const char *str, struct ui_css_content *out_content);
 
 /**
  * \brief Destroys a parsed CSS content object, freeing any allocated strings or
  * list items.
  *
  * \param content The content object to destroy.
+ * \return UI_ERROR_NONE on success.
  */
-ui_error_t ui_css_content_destroy(struct ui_css_content *content);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_content_destroy(struct ui_css_content *content);
 
 #ifdef __cplusplus
 }

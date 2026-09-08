@@ -30,7 +30,8 @@ struct ui_bottom_nav_item_base;
  * @param out_nav Pointer to receive the allocated bottom nav base.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav);
 
 /**
  * @brief Destroys a bottom navigation component.
@@ -38,7 +39,8 @@ ui_error_t ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav);
  * @param nav The bottom nav to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav);
 
 /**
  * @brief Gets the underlying component for the bottom navigation.
@@ -47,9 +49,8 @@ ui_error_t ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_bottom_nav_base_get_component(struct ui_bottom_nav_base *nav,
-                                 struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bottom_nav_base_get_component(
+    struct ui_bottom_nav_base *nav, struct ui_component **out_component);
 
 /**
  * @brief Appends an item to the bottom navigation.
@@ -58,8 +59,8 @@ ui_bottom_nav_base_get_component(struct ui_bottom_nav_base *nav,
  * @param item The item to append.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_bottom_nav_base_append_item(struct ui_bottom_nav_base *nav,
-                                          struct ui_bottom_nav_item_base *item);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bottom_nav_base_append_item(
+    struct ui_bottom_nav_base *nav, struct ui_bottom_nav_item_base *item);
 
 /**
  * @brief Creates a new unstyled bottom navigation item component.
@@ -67,7 +68,7 @@ ui_error_t ui_bottom_nav_base_append_item(struct ui_bottom_nav_base *nav,
  * @param out_item Pointer to receive the allocated item base.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item);
 
 /**
@@ -76,7 +77,7 @@ ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item);
  * @param item The item to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item);
 
 /**
@@ -86,9 +87,8 @@ ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_bottom_nav_item_base_get_component(struct ui_bottom_nav_item_base *item,
-                                      struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bottom_nav_item_base_get_component(
+    struct ui_bottom_nav_item_base *item, struct ui_component **out_component);
 
 /**
  * @brief Sets the active (selected) state of the bottom navigation item.
@@ -97,9 +97,8 @@ ui_bottom_nav_item_base_get_component(struct ui_bottom_nav_item_base *item,
  * @param active True if active, false otherwise.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
-                                   int active);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bottom_nav_item_base_set_active(
+    struct ui_bottom_nav_item_base *item, int active);
 
 /**
  * @brief Gets the active (selected) state of the bottom navigation item.
@@ -108,9 +107,8 @@ ui_bottom_nav_item_base_set_active(struct ui_bottom_nav_item_base *item,
  * @param out_active Pointer to receive the active state.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_bottom_nav_item_base_get_active(struct ui_bottom_nav_item_base *item,
-                                   int *out_active);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bottom_nav_item_base_get_active(
+    struct ui_bottom_nav_item_base *item, int *out_active);
 
 /**
  * @brief Binds the active state/index to a signal.
@@ -119,9 +117,8 @@ ui_bottom_nav_item_base_get_active(struct ui_bottom_nav_item_base *item,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_bottom_nav_base_bind_active_index(struct ui_bottom_nav_base *widget,
-                                     struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bottom_nav_base_bind_active_index(
+    struct ui_bottom_nav_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

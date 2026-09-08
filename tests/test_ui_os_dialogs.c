@@ -81,9 +81,6 @@ static int test_os_dialogs(void) {
   return 0;
 }
 
-#include <stdlib.h>
-#include <string.h>
-
 struct ui_os_file_task {
   struct ui_file_uploader_base *uploader;
   char result_path[256];

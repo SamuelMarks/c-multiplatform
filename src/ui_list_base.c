@@ -6,9 +6,8 @@
  * @file ui_list_base.c
  * @brief Implementation of the generic list base component.
  */
-#include "ui_list_base.h"
-
 /* clang-format off */
+#include "ui_list_base.h"
 #include "ui_aria.h"
 #include "ui_component.h"
 #include <stdlib.h>

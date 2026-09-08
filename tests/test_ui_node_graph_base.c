@@ -336,8 +336,6 @@ void test_node_graph_update_camera_matrix_err(void) {
      outside We'll just have to sed that check away safely.
   */
 }
-#include "ui_node_graph_base.h"
-
 void test_extra_node_graph(void) {
   ui_node_graph_base_add_connection(NULL, NULL);
 }

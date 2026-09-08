@@ -59,8 +59,8 @@ struct ui_css_caret_color {
  * \return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT or
  * UI_ERROR_INVALID_FORMAT on error.
  */
-ui_error_t ui_css_parse_field_sizing(const char *str,
-                                     enum ui_css_field_sizing *out_sizing);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_field_sizing(
+    const char *str, enum ui_css_field_sizing *out_sizing);
 
 /**
  * \brief Parses the accent-color CSS property.
@@ -69,8 +69,8 @@ ui_error_t ui_css_parse_field_sizing(const char *str,
  * \param out_color Pointer to receive the parsed accent-color structure.
  * \return UI_ERROR_NONE on success, error code otherwise.
  */
-ui_error_t ui_css_parse_accent_color(const char *str,
-                                     struct ui_css_accent_color *out_color);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_accent_color(
+    const char *str, struct ui_css_accent_color *out_color);
 
 /**
  * \brief Parses the caret-color CSS property.
@@ -79,8 +79,8 @@ ui_error_t ui_css_parse_accent_color(const char *str,
  * \param out_color Pointer to receive the parsed caret-color structure.
  * \return UI_ERROR_NONE on success, error code otherwise.
  */
-ui_error_t ui_css_parse_caret_color(const char *str,
-                                    struct ui_css_caret_color *out_color);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_caret_color(const char *str, struct ui_css_caret_color *out_color);
 
 #ifdef __cplusplus
 }

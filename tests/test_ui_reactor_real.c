@@ -1,7 +1,11 @@
 /* clang-format off */
 #include "../include/ui_reactor.h"
+#include "../include/ui_thread_pool.h"
 #include <stdio.h>
 #include <stdlib.h>
+#if defined(__APPLE__) || defined(__FreeBSD__)
+#include <sys/event.h>
+#endif
 #ifndef _WIN32
 #include <unistd.h>
 #else
@@ -107,7 +111,6 @@ int main(void) {
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
   {
-#include <sys/event.h>
     struct kevent kev;
     /* Add a user event with udata = NULL to trigger node == NULL */
     EV_SET(&kev, 12345, EVFILT_USER, EV_ADD | EV_CLEAR, 0, 0, NULL);
@@ -248,7 +251,6 @@ int main(void) {
 
   /* Test lock contention in schedule and poll */
   {
-#include "../include/ui_thread_pool.h"
     struct ui_thread_pool *pool = NULL;
     int i;
     rc = ui_reactor_create(&reactor);

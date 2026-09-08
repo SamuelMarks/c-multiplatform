@@ -5,6 +5,7 @@
 #include "../include/ui_form_array.h"
 #include "../include/ui_error.h"
 #include <stdio.h>
+#include <string.h>
 /* clang-format on */
 
 struct dummy_ui_form_control {
@@ -14,14 +15,16 @@ struct dummy_ui_form_control {
 };
 
 static int test_form_node(void) {
-  ui_form_node_t node = {0};
+  ui_form_node_t node;
   enum ui_form_status status;
   struct ui_form_control *ctrl = NULL;
   struct ui_form_group *grp = NULL;
   struct ui_form_array *arr = NULL;
-  struct dummy_ui_form_control dummy_ctrl = {0};
-
+  struct dummy_ui_form_control dummy_ctrl;
   union ui_signal_payload dummy;
+
+  memset(&node, 0, sizeof(node));
+  memset(&dummy_ctrl, 0, sizeof(dummy_ctrl));
   dummy.int_val = 0;
   ui_form_control_create(NULL, dummy, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                          UI_SIGNAL_MODE_SINGLE_THREADED, &ctrl);
@@ -82,16 +85,20 @@ int main(void) {
 }
 
 static int run_extra_form_node(void) {
-  ui_form_node_t node = {0};
+  ui_form_node_t node;
   enum ui_form_status status;
   struct ui_arena *arena;
+  union ui_signal_payload default_payload;
+
+  memset(&node, 0, sizeof(node));
+  memset(&default_payload, 0, sizeof(default_payload));
 
   ui_arena_create(1024, &arena);
 
   node.type = UI_FORM_NODE_CONTROL;
-  ui_form_control_create(arena, (union ui_signal_payload){0},
-                         UI_SIGNAL_TYPE_INT32, NULL, NULL,
-                         UI_SIGNAL_MODE_SINGLE_THREADED, &node.node.control);
+  ui_form_control_create(arena, default_payload, UI_SIGNAL_TYPE_INT32, NULL,
+                         NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
+                         &node.node.control);
   _ui_form_node_get_status_internal(node, &status, 0);
 
   /* Test null status to trigger UI_ERROR_INVALID_ARGUMENT check */

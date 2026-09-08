@@ -26,7 +26,7 @@ extern "C" {
  * @param out_backend Pointer to receive the allocated backend instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_window_backend_android_create(struct ui_window_backend **out_backend);
 
 /**
@@ -35,7 +35,8 @@ ui_window_backend_android_create(struct ui_window_backend **out_backend);
  * @param backend The backend instance to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_window_backend_android_destroy(struct ui_window_backend *backend);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_window_backend_android_destroy(struct ui_window_backend *backend);
 
 /** @} */
 

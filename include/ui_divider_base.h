@@ -41,7 +41,8 @@ struct ui_divider_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY if allocation fails,
  * or UI_ERROR_INVALID_ARGUMENT if out_divider is null.
  */
-ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_divider_base_create(struct ui_divider_base **out_divider);
 
 /**
  * @brief Destroys a divider instance and frees its resources.
@@ -49,7 +50,8 @@ ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider);
  * @param divider The divider instance to destroy. If null, does nothing.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_divider_base_destroy(struct ui_divider_base *divider);
 
 /**
  * @brief Sets the orientation of the divider.
@@ -58,9 +60,8 @@ ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider);
  * @param orientation Horizontal or Vertical.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t
-ui_divider_base_set_orientation(struct ui_divider_base *divider,
-                                enum ui_divider_orientation orientation);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_divider_base_set_orientation(
+    struct ui_divider_base *divider, enum ui_divider_orientation orientation);
 
 /**
  * @brief Sets whether the divider should have an inset margin.
@@ -69,8 +70,8 @@ ui_divider_base_set_orientation(struct ui_divider_base *divider,
  * @param inset 1 for inset, 0 for full-bleed.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
-                                     int inset);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_divider_base_set_inset(struct ui_divider_base *divider, int inset);
 
 /**
  * @brief Retrieves the underlying component of the divider.
@@ -79,8 +80,8 @@ ui_error_t ui_divider_base_set_inset(struct ui_divider_base *divider,
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
-                                         struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_divider_base_get_component(
+    struct ui_divider_base *divider, struct ui_component **out_component);
 
 /**
  * @brief Binds the data property.
@@ -89,8 +90,8 @@ ui_error_t ui_divider_base_get_component(struct ui_divider_base *divider,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_divider_base_bind_data(struct ui_divider_base *widget,
-                                     struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_divider_base_bind_data(
+    struct ui_divider_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

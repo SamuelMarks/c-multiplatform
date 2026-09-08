@@ -106,7 +106,8 @@ typedef ui_error_t (*ui_data_source_apply_filter_fn)(
  * @param out_ds Pointer to store the created data source.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_data_source_create(struct ui_data_source **out_ds);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_data_source_create(struct ui_data_source **out_ds);
 
 /**
  * @brief Destroys the data source.
@@ -114,7 +115,8 @@ ui_error_t ui_data_source_create(struct ui_data_source **out_ds);
  * @param ds Pointer to the data source to destroy.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_data_source_destroy(struct ui_data_source *ds);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_data_source_destroy(struct ui_data_source *ds);
 
 /**
  * @brief Sets the callback for fetching a page.
@@ -124,10 +126,9 @@ ui_error_t ui_data_source_destroy(struct ui_data_source *ds);
  * @param user_data Opaque user data for the callback.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t
-ui_data_source_set_fetch_page_callback(struct ui_data_source *ds,
-                                       ui_data_source_fetch_page_fn fetch_page,
-                                       void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_data_source_set_fetch_page_callback(
+    struct ui_data_source *ds, ui_data_source_fetch_page_fn fetch_page,
+    void *user_data);
 
 /**
  * @brief Sets the callback for sorting.
@@ -137,10 +138,9 @@ ui_data_source_set_fetch_page_callback(struct ui_data_source *ds,
  * @param user_data Opaque user data for the callback.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t
-ui_data_source_set_apply_sort_callback(struct ui_data_source *ds,
-                                       ui_data_source_apply_sort_fn apply_sort,
-                                       void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_data_source_set_apply_sort_callback(
+    struct ui_data_source *ds, ui_data_source_apply_sort_fn apply_sort,
+    void *user_data);
 
 /**
  * @brief Sets the callback for filtering.
@@ -150,7 +150,8 @@ ui_data_source_set_apply_sort_callback(struct ui_data_source *ds,
  * @param user_data Opaque user data for the callback.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_data_source_set_apply_filter_callback(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_data_source_set_apply_filter_callback(
     struct ui_data_source *ds, ui_data_source_apply_filter_fn apply_filter,
     void *user_data);
 
@@ -162,8 +163,8 @@ ui_error_t ui_data_source_set_apply_filter_callback(
  * @param limit The maximum number of items to fetch.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_data_source_fetch_page(struct ui_data_source *ds,
-                                     ui_uint32 offset, ui_uint32 limit);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_data_source_fetch_page(
+    struct ui_data_source *ds, ui_uint32 offset, ui_uint32 limit);
 
 /**
  * @brief Applies sorts to the data via the registered callback.
@@ -173,9 +174,9 @@ ui_error_t ui_data_source_fetch_page(struct ui_data_source *ds,
  * @param num_sorts Number of sort descriptors in the array.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_data_source_apply_sort(struct ui_data_source *ds,
-                                     const struct ui_sort_descriptor *sorts,
-                                     ui_uint32 num_sorts);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_data_source_apply_sort(
+    struct ui_data_source *ds, const struct ui_sort_descriptor *sorts,
+    ui_uint32 num_sorts);
 
 /**
  * @brief Applies filters to the data via the registered callback.
@@ -185,10 +186,9 @@ ui_error_t ui_data_source_apply_sort(struct ui_data_source *ds,
  * @param num_filters Number of filter descriptors in the array.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t
-ui_data_source_apply_filter(struct ui_data_source *ds,
-                            const struct ui_filter_descriptor *filters,
-                            ui_uint32 num_filters);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_data_source_apply_filter(
+    struct ui_data_source *ds, const struct ui_filter_descriptor *filters,
+    ui_uint32 num_filters);
 
 /**
  * @brief Binds the data source state to a signal.
@@ -198,8 +198,8 @@ ui_data_source_apply_filter(struct ui_data_source *ds,
  * pointer to `ui_data_source_state`.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_data_source_bind_state(struct ui_data_source *ds,
-                                     struct ui_signal *state_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_data_source_bind_state(
+    struct ui_data_source *ds, struct ui_signal *state_signal);
 
 /**
  * @brief Binds the data change notification to a signal.
@@ -208,8 +208,8 @@ ui_error_t ui_data_source_bind_state(struct ui_data_source *ds,
  * @param data_signal The signal to bind to.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_data_source_bind_data(struct ui_data_source *ds,
-                                    struct ui_signal *data_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_data_source_bind_data(
+    struct ui_data_source *ds, struct ui_signal *data_signal);
 
 #ifdef __cplusplus
 }

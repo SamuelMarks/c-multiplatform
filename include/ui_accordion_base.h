@@ -43,7 +43,8 @@ typedef ui_error_t (*ui_accordion_on_change_t)(
  * @param out_accordion Pointer to receive the allocated accordion.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_accordion_base_create(struct ui_accordion_base **out_accordion);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_accordion_base_create(struct ui_accordion_base **out_accordion);
 
 /**
  * @brief Destroys an accordion base manager.
@@ -52,7 +53,8 @@ ui_error_t ui_accordion_base_create(struct ui_accordion_base **out_accordion);
  * @param accordion The accordion to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_accordion_base_destroy(struct ui_accordion_base *accordion);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_accordion_base_destroy(struct ui_accordion_base *accordion);
 
 /**
  * @brief Adds a disclosure to the accordion group.
@@ -61,9 +63,8 @@ ui_error_t ui_accordion_base_destroy(struct ui_accordion_base *accordion);
  * @param disclosure The disclosure component to add.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_accordion_base_add_disclosure(struct ui_accordion_base *accordion,
-                                 struct ui_disclosure_base *disclosure);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_accordion_base_add_disclosure(
+    struct ui_accordion_base *accordion, struct ui_disclosure_base *disclosure);
 
 /**
  * @brief Removes a disclosure from the accordion group.
@@ -72,9 +73,8 @@ ui_accordion_base_add_disclosure(struct ui_accordion_base *accordion,
  * @param disclosure The disclosure component to remove.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_accordion_base_remove_disclosure(struct ui_accordion_base *accordion,
-                                    struct ui_disclosure_base *disclosure);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_accordion_base_remove_disclosure(
+    struct ui_accordion_base *accordion, struct ui_disclosure_base *disclosure);
 
 /**
  * @brief Sets the currently active (expanded) disclosure in the group.
@@ -84,8 +84,8 @@ ui_accordion_base_remove_disclosure(struct ui_accordion_base *accordion,
  * @param disclosure The disclosure to set as active. If NULL, collapses all.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_accordion_base_set_active(struct ui_accordion_base *accordion,
-                                        struct ui_disclosure_base *disclosure);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_accordion_base_set_active(
+    struct ui_accordion_base *accordion, struct ui_disclosure_base *disclosure);
 
 /**
  * @brief Retrieves the currently active (expanded) disclosure in the group.
@@ -95,7 +95,7 @@ ui_error_t ui_accordion_base_set_active(struct ui_accordion_base *accordion,
  * are expanded.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_accordion_base_get_active(const struct ui_accordion_base *accordion,
                              struct ui_disclosure_base **out_active);
 
@@ -107,9 +107,9 @@ ui_accordion_base_get_active(const struct ui_accordion_base *accordion,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_accordion_base_set_on_change(struct ui_accordion_base *accordion,
-                                           ui_accordion_on_change_t on_change,
-                                           void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_accordion_base_set_on_change(
+    struct ui_accordion_base *accordion, ui_accordion_on_change_t on_change,
+    void *user_data);
 
 /**
  * @brief Binds the data property.
@@ -118,8 +118,8 @@ ui_error_t ui_accordion_base_set_on_change(struct ui_accordion_base *accordion,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_accordion_base_bind_data(struct ui_accordion_base *widget,
-                                       struct ui_computed *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_accordion_base_bind_data(
+    struct ui_accordion_base *widget, struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

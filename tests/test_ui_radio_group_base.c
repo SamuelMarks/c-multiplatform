@@ -1,5 +1,5 @@
-#include <string.h>
 /* clang-format off */
+#include <string.h>
 #include "../include/ui_radio_group_base.h"
 #include "../include/ui_toggle_base.h"
 #include "../include/ui_error.h"

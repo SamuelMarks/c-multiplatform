@@ -32,8 +32,8 @@ struct ui_handle_manager;
  * @param out_manager Pointer to receive the new handle manager.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_handle_manager_create(ui_uint32 capacity,
-                                    struct ui_handle_manager **out_manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_handle_manager_create(
+    ui_uint32 capacity, struct ui_handle_manager **out_manager);
 
 /**
  * @brief Destroys a handle manager.
@@ -41,7 +41,8 @@ ui_error_t ui_handle_manager_create(ui_uint32 capacity,
  * @param manager The manager to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_handle_manager_destroy(struct ui_handle_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_handle_manager_destroy(struct ui_handle_manager *manager);
 
 /**
  * @brief Allocates a new handle and associates it with the given data pointer.
@@ -51,8 +52,8 @@ ui_error_t ui_handle_manager_destroy(struct ui_handle_manager *manager);
  * @param out_handle Pointer to receive the allocated handle.
  * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_FULL if out of handles.
  */
-ui_error_t ui_handle_manager_alloc(struct ui_handle_manager *manager,
-                                   void *data, ui_uint64 *out_handle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_handle_manager_alloc(
+    struct ui_handle_manager *manager, void *data, ui_uint64 *out_handle);
 
 /**
  * @brief Gets the data pointer associated with a handle.
@@ -63,8 +64,8 @@ ui_error_t ui_handle_manager_alloc(struct ui_handle_manager *manager,
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if invalid or
  * expired handle.
  */
-ui_error_t ui_handle_manager_get(struct ui_handle_manager *manager,
-                                 ui_uint64 handle, void **out_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_handle_manager_get(
+    struct ui_handle_manager *manager, ui_uint64 handle, void **out_data);
 
 /**
  * @brief Frees a handle, making its slot available for reuse and incrementing
@@ -74,8 +75,8 @@ ui_error_t ui_handle_manager_get(struct ui_handle_manager *manager,
  * @param handle The handle to free.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if invalid.
  */
-ui_error_t ui_handle_manager_free(struct ui_handle_manager *manager,
-                                  ui_uint64 handle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_handle_manager_free(struct ui_handle_manager *manager, ui_uint64 handle);
 
 #ifdef __cplusplus
 }

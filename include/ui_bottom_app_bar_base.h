@@ -41,7 +41,7 @@ enum ui_bottom_app_bar_fab_alignment {
  * @param out_bar Pointer to receive the allocated bottom app bar base.
  * @return UI_ERROR_NONE on success, or an appropriate error enum.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar);
 
 /**
@@ -50,7 +50,8 @@ ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar);
  * @param bar The bottom app bar to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar);
 
 /**
  * @brief Gets the underlying component.
@@ -59,9 +60,8 @@ ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
-                                     struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bottom_app_bar_base_get_component(
+    struct ui_bottom_app_bar_base *bar, struct ui_component **out_component);
 
 /**
  * @brief Attaches a FAB to the app bar to generate the cutout geometry.
@@ -74,10 +74,9 @@ ui_bottom_app_bar_base_get_component(struct ui_bottom_app_bar_base *bar,
  * @param alignment The alignment of the FAB (center or end).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
-                               struct ui_fab_base *fab,
-                               enum ui_bottom_app_bar_fab_alignment alignment);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bottom_app_bar_base_set_fab(
+    struct ui_bottom_app_bar_base *bar, struct ui_fab_base *fab,
+    enum ui_bottom_app_bar_fab_alignment alignment);
 
 /**
  * @brief Binds the active state/index to a signal.
@@ -86,7 +85,7 @@ ui_bottom_app_bar_base_set_fab(struct ui_bottom_app_bar_base *bar,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_bottom_app_bar_base_bind_active_index(struct ui_bottom_app_bar_base *widget,
                                          struct ui_signal *signal);
 

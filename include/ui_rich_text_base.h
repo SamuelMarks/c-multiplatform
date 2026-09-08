@@ -49,7 +49,8 @@ enum ui_rich_text_format {
  * @param out_editor Pointer to receive the allocated component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_base_create(struct ui_rich_text_base **out_editor);
 
 /**
  * @brief Destroys a rich text editor base component.
@@ -57,7 +58,8 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor);
  * @param editor The rich text editor.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_destroy(struct ui_rich_text_base *editor);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_base_destroy(struct ui_rich_text_base *editor);
 
 /**
  * @brief Gets the underlying component.
@@ -66,8 +68,8 @@ ui_error_t ui_rich_text_base_destroy(struct ui_rich_text_base *editor);
  * @param out_component Output pointer.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_get_component(struct ui_rich_text_base *editor,
-                                           struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_rich_text_base_get_component(
+    struct ui_rich_text_base *editor, struct ui_component **out_component);
 
 /**
  * @brief Sets the content of the editor.
@@ -76,8 +78,8 @@ ui_error_t ui_rich_text_base_get_component(struct ui_rich_text_base *editor,
  * @param text The text to set.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
-                                      const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_base_set_text(struct ui_rich_text_base *editor, const char *text);
 
 /**
  * @brief Gets the content of the editor.
@@ -88,8 +90,8 @@ ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
  * @param out_text Pointer to receive the allocated string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_get_text(struct ui_rich_text_base *editor,
-                                      char **out_text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_base_get_text(struct ui_rich_text_base *editor, char **out_text);
 
 /**
  * @brief Toggles a specific format on the current selection.
@@ -98,8 +100,8 @@ ui_error_t ui_rich_text_base_get_text(struct ui_rich_text_base *editor,
  * @param format The format flag to toggle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_toggle_format(struct ui_rich_text_base *editor,
-                                           enum ui_rich_text_format format);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_rich_text_base_toggle_format(
+    struct ui_rich_text_base *editor, enum ui_rich_text_format format);
 
 /**
  * @brief Performs undo.
@@ -107,7 +109,8 @@ ui_error_t ui_rich_text_base_toggle_format(struct ui_rich_text_base *editor,
  * @param editor The rich text editor.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_undo(struct ui_rich_text_base *editor);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_base_undo(struct ui_rich_text_base *editor);
 
 /**
  * @brief Performs redo.
@@ -115,7 +118,8 @@ ui_error_t ui_rich_text_base_undo(struct ui_rich_text_base *editor);
  * @param editor The rich text editor.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_redo(struct ui_rich_text_base *editor);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_rich_text_base_redo(struct ui_rich_text_base *editor);
 
 /**
  * @brief Processes an input event (keyboard, mouse).
@@ -124,8 +128,8 @@ ui_error_t ui_rich_text_base_redo(struct ui_rich_text_base *editor);
  * @param event The input event.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_process_event(struct ui_rich_text_base *editor,
-                                           const struct ui_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_rich_text_base_process_event(
+    struct ui_rich_text_base *editor, const struct ui_event *event);
 
 /**
  * @brief Sets the IME composition text (called from window backends during IME
@@ -135,9 +139,8 @@ ui_error_t ui_rich_text_base_process_event(struct ui_rich_text_base *editor,
  * @param composition_text The composition string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_rich_text_base_set_ime_composition(struct ui_rich_text_base *editor,
-                                      const char *composition_text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_rich_text_base_set_ime_composition(
+    struct ui_rich_text_base *editor, const char *composition_text);
 
 /**
  * @brief Binds the text property.
@@ -146,8 +149,8 @@ ui_rich_text_base_set_ime_composition(struct ui_rich_text_base *editor,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_rich_text_base_bind_text(struct ui_rich_text_base *widget,
-                                       struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_rich_text_base_bind_text(
+    struct ui_rich_text_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

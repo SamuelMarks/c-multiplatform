@@ -3,9 +3,6 @@
  * @brief Implementation of generic form node utilities.
  */
 
-#include "ui_form_array.h"
-#include "ui_form_group.h"
-#include "ui_form_node_internal.h"
 /* clang-format off */
 #include "ui_form_node_internal.h"
 #include "ui_form_group.h"

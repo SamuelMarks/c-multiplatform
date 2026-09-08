@@ -79,6 +79,7 @@ static int run_normal_tests(void) {
   struct ui_spin_button_base *sb = NULL;
   struct ui_control_value_accessor cva;
   struct ui_component *comp = NULL;
+  union ui_signal_payload payload;
   double val;
   struct ui_event ev;
 
@@ -135,9 +136,8 @@ static int run_normal_tests(void) {
   }
 
   /* CVA functions */
-  ASSERT_EQ(
-      cva.write_value(NULL, (union ui_signal_payload){.float_val = 10.0f}),
-      UI_ERROR_INVALID_ARGUMENT);
+  payload.float_val = 10.0f;
+  ASSERT_EQ(cva.write_value(NULL, payload), UI_ERROR_INVALID_ARGUMENT);
   ASSERT_EQ(cva.register_on_change(NULL, on_cva_change, NULL),
             UI_ERROR_INVALID_ARGUMENT);
   ASSERT_EQ(cva.register_on_touched(NULL, on_cva_touched, NULL),
@@ -198,8 +198,8 @@ static int run_normal_tests(void) {
   }
 
   /* CVA Write Value */
-  ASSERT_SUCCESS(
-      cva.write_value(sb, (union ui_signal_payload){.float_val = 18.0f}));
+  payload.float_val = 18.0f;
+  ASSERT_SUCCESS(cva.write_value(sb, payload));
   ASSERT_SUCCESS(ui_spin_button_base_get_value(sb, &val));
   if (val != 18.0) {
     printf("Failed at %d\n", __LINE__);
@@ -449,6 +449,7 @@ static int run_error_bubbles(void) {
   struct ui_spin_button_base *sb = NULL;
   struct ui_control_value_accessor cva;
   struct ui_event ev;
+  union ui_signal_payload payload;
   ui_spin_button_base_create(&sb, &cva);
 
   /* 1. cva_set_disabled_state error bubbling */
@@ -471,8 +472,8 @@ static int run_error_bubbles(void) {
       printf("Failed at %d\n", __LINE__);
       return 1;
     } while (0);
-  if (cva.write_value(sb, (union ui_signal_payload){.float_val = 2.0f}) !=
-      UI_ERROR_UNKNOWN)
+  payload.float_val = 2.0f;
+  if (cva.write_value(sb, payload) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
       return 1;

@@ -62,9 +62,9 @@ struct ui_chart_base;
  * @param out_chart Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_chart_base_create(struct ui_arena *arena,
-                                enum ui_chart_coordinate_system coord_system,
-                                struct ui_chart_base **out_chart);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chart_base_create(
+    struct ui_arena *arena, enum ui_chart_coordinate_system coord_system,
+    struct ui_chart_base **out_chart);
 
 /**
  * @brief Destroys a chart base component.
@@ -72,7 +72,8 @@ ui_error_t ui_chart_base_create(struct ui_arena *arena,
  * @param chart The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_chart_base_destroy(struct ui_chart_base *chart);
 
 /**
  * @brief Configures the primary X (or Angle) axis scale.
@@ -81,9 +82,8 @@ ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart);
  * @param config The scale configuration.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_chart_base_set_x_scale(struct ui_chart_base *chart,
-                          const struct ui_chart_scale_config *config);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chart_base_set_x_scale(
+    struct ui_chart_base *chart, const struct ui_chart_scale_config *config);
 
 /**
  * @brief Configures the primary Y (or Radius) axis scale.
@@ -92,9 +92,8 @@ ui_chart_base_set_x_scale(struct ui_chart_base *chart,
  * @param config The scale configuration.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_chart_base_set_y_scale(struct ui_chart_base *chart,
-                          const struct ui_chart_scale_config *config);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chart_base_set_y_scale(
+    struct ui_chart_base *chart, const struct ui_chart_scale_config *config);
 
 /**
  * @brief Translates an abstract data coordinate into a physical pixel location
@@ -106,9 +105,9 @@ ui_chart_base_set_y_scale(struct ui_chart_base *chart,
  * @param out_pixel_point Pointer to receive the physical coordinate.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_chart_base_data_to_pixel(const struct ui_chart_base *chart,
-                                       double data_x, double data_y,
-                                       struct ui_dom_point *out_pixel_point);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chart_base_data_to_pixel(
+    const struct ui_chart_base *chart, double data_x, double data_y,
+    struct ui_dom_point *out_pixel_point);
 
 /**
  * @brief Performs a hit test, translating a physical pixel location back into
@@ -122,9 +121,9 @@ ui_error_t ui_chart_base_data_to_pixel(const struct ui_chart_base *chart,
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if the pixel is
  * outside the chart bounds.
  */
-ui_error_t ui_chart_base_pixel_to_data(const struct ui_chart_base *chart,
-                                       double pixel_x, double pixel_y,
-                                       double *out_data_x, double *out_data_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chart_base_pixel_to_data(
+    const struct ui_chart_base *chart, double pixel_x, double pixel_y,
+    double *out_data_x, double *out_data_y);
 
 /**
  * @brief Sets the physical bounding box where the actual chart data is drawn
@@ -134,8 +133,8 @@ ui_error_t ui_chart_base_pixel_to_data(const struct ui_chart_base *chart,
  * @param bounds The drawing area boundaries.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_chart_base_set_draw_bounds(struct ui_chart_base *chart,
-                                         const struct ui_dom_rect *bounds);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chart_base_set_draw_bounds(
+    struct ui_chart_base *chart, const struct ui_dom_rect *bounds);
 
 /**
  * @brief Retrieves the signal emitted when a scale or bound changes,
@@ -145,8 +144,8 @@ ui_error_t ui_chart_base_set_draw_bounds(struct ui_chart_base *chart,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_chart_base_get_topology_signal(struct ui_chart_base *chart,
-                                             ui_signal_t **out_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chart_base_get_topology_signal(
+    struct ui_chart_base *chart, ui_signal_t **out_signal);
 
 #ifdef __cplusplus
 }

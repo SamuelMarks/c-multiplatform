@@ -25,8 +25,8 @@ extern "C" {
  * @param out_stylesheet Pointer to receive the parsed stylesheet.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_stylesheet(const char *css_text,
-                                   struct ui_css_stylesheet **out_stylesheet);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_stylesheet(
+    const char *css_text, struct ui_css_stylesheet **out_stylesheet);
 
 #ifdef __cplusplus
 }

@@ -39,10 +39,10 @@ typedef ui_error_t (*ui_compute_fn)(void *user_data,
  * @param out_computed The pointer to store the created computed signal.
  * @return ui_error_t
  */
-ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
-                              void *user_data, enum ui_signal_type type,
-                              enum ui_signal_mode mode,
-                              ui_computed_t **out_computed);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
+                   void *user_data, enum ui_signal_type type,
+                   enum ui_signal_mode mode, ui_computed_t **out_computed);
 
 /**
  * @brief Gets the current value of the computed signal.
@@ -51,8 +51,8 @@ ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
  * @param out_value The pointer to store the current value.
  * @return ui_error_t
  */
-ui_error_t ui_computed_get(ui_computed_t *computed,
-                           union ui_signal_payload *out_value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_computed_get(ui_computed_t *computed, union ui_signal_payload *out_value);
 
 /**
  * @brief Destroys the computed signal.
@@ -60,7 +60,8 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
  * @param computed The computed signal.
  * @return ui_error_t
  */
-ui_error_t ui_computed_destroy(ui_computed_t *computed);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_computed_destroy(ui_computed_t *computed);
 
 #ifdef __cplusplus
 }

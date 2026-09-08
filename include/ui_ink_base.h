@@ -44,7 +44,8 @@ struct ui_ink_base;
  * @param out_ink Pointer to output the initialized ink component structure.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_ink_base_create(struct ui_ink_base **out_ink);
 
 /**
  * @brief Destroys an ink base component.
@@ -52,7 +53,8 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink);
  * @param ink Pointer to the ink component to destroy.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_ink_base_destroy(struct ui_ink_base *ink);
 
 /**
  * @brief Retrieves the underlying base component from an ink structure.
@@ -61,8 +63,8 @@ ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink);
  * @param out_component Pointer to receive the underlying `ui_component`.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_ink_base_get_component(struct ui_ink_base *ink,
-                                     struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_ink_base_get_component(
+    struct ui_ink_base *ink, struct ui_component **out_component);
 
 /**
  * @brief Adds a new stylus event to the current stroke.
@@ -71,8 +73,8 @@ ui_error_t ui_ink_base_get_component(struct ui_ink_base *ink,
  * @param event Pointer to the stylus event data.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_ink_base_add_event(struct ui_ink_base *ink,
-                                 const struct ui_ink_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_ink_base_add_event(
+    struct ui_ink_base *ink, const struct ui_ink_event *event);
 
 /**
  * @brief Finalizes the current stroke.
@@ -80,7 +82,8 @@ ui_error_t ui_ink_base_add_event(struct ui_ink_base *ink,
  * @param ink Pointer to the ink component.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_ink_base_finish_stroke(struct ui_ink_base *ink);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_ink_base_finish_stroke(struct ui_ink_base *ink);
 
 /**
  * @brief Gets the number of smoothed points in the current/last stroke.
@@ -89,8 +92,8 @@ ui_error_t ui_ink_base_finish_stroke(struct ui_ink_base *ink);
  * @param out_count Pointer to receive the point count.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
-                                                 size_t *out_count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_ink_base_get_smoothed_points_count(
+    struct ui_ink_base *ink, size_t *out_count);
 
 /**
  * @brief Gets the smoothed point at the specified index.
@@ -100,8 +103,8 @@ ui_error_t ui_ink_base_get_smoothed_points_count(struct ui_ink_base *ink,
  * @param out_point Pointer to receive the smoothed point data.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_ink_base_get_smoothed_point(struct ui_ink_base *ink, size_t index,
-                                          struct ui_ink_event *out_point);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_ink_base_get_smoothed_point(
+    struct ui_ink_base *ink, size_t index, struct ui_ink_event *out_point);
 
 #ifdef __cplusplus
 }

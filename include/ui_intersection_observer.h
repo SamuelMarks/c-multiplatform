@@ -55,17 +55,16 @@ typedef ui_error_t (*ui_intersection_observer_cb_t)(
  * @param out_observer Pointer to receive the new observer instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_intersection_observer_create(struct ui_dom_node *root, int root_margin_px,
-                                const float *thresholds, int threshold_count,
-                                struct ui_intersection_observer **out_observer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_intersection_observer_create(
+    struct ui_dom_node *root, int root_margin_px, const float *thresholds,
+    int threshold_count, struct ui_intersection_observer **out_observer);
 
 /**
  * @brief Destroys an intersection observer.
  * @param observer The observer to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_intersection_observer_destroy(struct ui_intersection_observer *observer);
 
 /**
@@ -74,9 +73,8 @@ ui_intersection_observer_destroy(struct ui_intersection_observer *observer);
  * @param target The DOM node to observe.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_intersection_observer_observe(struct ui_intersection_observer *observer,
-                                 struct ui_dom_node *target);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_intersection_observer_observe(
+    struct ui_intersection_observer *observer, struct ui_dom_node *target);
 
 /**
  * @brief Stops observing a target element.
@@ -84,16 +82,15 @@ ui_intersection_observer_observe(struct ui_intersection_observer *observer,
  * @param target The DOM node to stop observing.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_intersection_observer_unobserve(struct ui_intersection_observer *observer,
-                                   struct ui_dom_node *target);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_intersection_observer_unobserve(
+    struct ui_intersection_observer *observer, struct ui_dom_node *target);
 
 /**
  * @brief Disconnects the observer, stopping observation of all targets.
  * @param observer The observer instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_intersection_observer_disconnect(struct ui_intersection_observer *observer);
 
 /**
@@ -103,10 +100,9 @@ ui_intersection_observer_disconnect(struct ui_intersection_observer *observer);
  * @param user_data Opaque pointer to pass to the callback.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
-                                   ui_intersection_observer_cb_t callback,
-                                   void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_intersection_observer_subscribe(
+    struct ui_intersection_observer *observer,
+    ui_intersection_observer_cb_t callback, void *user_data);
 
 /**
  * @brief Triggers an evaluation of intersections. Typically called during the
@@ -114,7 +110,7 @@ ui_intersection_observer_subscribe(struct ui_intersection_observer *observer,
  * @param observer The observer instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_intersection_observer_evaluate(struct ui_intersection_observer *observer);
 
 #ifdef __cplusplus

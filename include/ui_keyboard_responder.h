@@ -27,7 +27,7 @@ struct ui_keyboard_responder;
  * @param out_responder Pointer to receive the new responder.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder);
 
 /**
@@ -36,7 +36,7 @@ ui_keyboard_responder_create(struct ui_keyboard_responder **out_responder);
  * @param responder The responder.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder);
 
 /**
@@ -51,7 +51,7 @@ ui_keyboard_responder_destroy(struct ui_keyboard_responder *responder);
  * @param user_data Optional user data to pass to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_keyboard_responder_bind_key(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_keyboard_responder_bind_key(
     struct ui_keyboard_responder *responder, const char *role_or_tag,
     enum ui_key_code key_code,
     ui_error_t (*callback)(struct ui_dom_node *node, void *user_data),
@@ -68,7 +68,7 @@ ui_error_t ui_keyboard_responder_bind_key(
  * otherwise.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_keyboard_responder_handle_event(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_keyboard_responder_handle_event(
     struct ui_keyboard_responder *responder, struct ui_dom_node *focused_node,
     const struct ui_event *event, int *out_handled);
 

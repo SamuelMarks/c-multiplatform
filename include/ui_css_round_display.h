@@ -47,8 +47,8 @@ enum ui_css_border_boundary {
  * @param out_shape Pointer to receive the parsed shape.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_shape_inside(const char *str,
-                                     struct ui_css_shape_inside *out_shape);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_shape_inside(
+    const char *str, struct ui_css_shape_inside *out_shape);
 
 /**
  * @brief Parses CSS border-boundary.
@@ -57,9 +57,8 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
  * @param out_boundary Pointer to receive the parsed boundary value.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t
-ui_css_parse_border_boundary(const char *str,
-                             enum ui_css_border_boundary *out_boundary);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_border_boundary(
+    const char *str, enum ui_css_border_boundary *out_boundary);
 
 #ifdef __cplusplus
 }

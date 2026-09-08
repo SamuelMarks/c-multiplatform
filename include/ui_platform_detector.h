@@ -33,7 +33,7 @@ struct ui_platform_detector;
  * @param out_detector Pointer to receive the new instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_platform_detector_create(struct ui_platform_detector **out_detector);
 
 /**
@@ -41,7 +41,8 @@ ui_platform_detector_create(struct ui_platform_detector **out_detector);
  * @param detector The instance to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_platform_detector_destroy(struct ui_platform_detector *detector);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_platform_detector_destroy(struct ui_platform_detector *detector);
 
 /**
  * @brief Gets the capabilities of the current platform.
@@ -49,9 +50,8 @@ ui_error_t ui_platform_detector_destroy(struct ui_platform_detector *detector);
  * @param out_capabilities Pointer to receive the capabilities bitmask.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_platform_detector_get_capabilities(struct ui_platform_detector *detector,
-                                      unsigned int *out_capabilities);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_platform_detector_get_capabilities(
+    struct ui_platform_detector *detector, unsigned int *out_capabilities);
 
 /**
  * @brief Checks if the platform has a specific capability.
@@ -60,10 +60,9 @@ ui_platform_detector_get_capabilities(struct ui_platform_detector *detector,
  * @param out_has_capability Pointer to receive 1 if true, 0 if false.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_platform_detector_has_capability(struct ui_platform_detector *detector,
-                                    unsigned int capability,
-                                    int *out_has_capability);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_platform_detector_has_capability(
+    struct ui_platform_detector *detector, unsigned int capability,
+    int *out_has_capability);
 
 #ifdef __cplusplus
 }

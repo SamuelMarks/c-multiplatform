@@ -6,11 +6,6 @@
 #include "ui_color_quantization.h"
 #include "ui_internal_mem.h"
 #include <stddef.h>
-#if defined(_MSC_VER) && _MSC_VER < 1600
-typedef __int64 int64_t;
-#else
-#include <stdint.h>
-#endif
 /* clang-format on */
 
 /**
@@ -26,11 +21,11 @@ struct ui_cluster {
   /* @brief Current cluster center Blue component. */
   int b; /**< b */
   /* @brief Accumulated Red for centroid recalculation. */
-  int64_t sum_r; /**< sum_r */
+  ui_int64 sum_r; /**< sum_r */
   /* @brief Accumulated Green for centroid recalculation. */
-  int64_t sum_g; /**< sum_g */
+  ui_int64 sum_g; /**< sum_g */
   /* @brief Accumulated Blue for centroid recalculation. */
-  int64_t sum_b; /**< sum_b */
+  ui_int64 sum_b; /**< sum_b */
   /* @brief Number of pixels assigned to this cluster. */
   int count; /**< count */
 };

@@ -30,8 +30,8 @@ struct ui_shader_manager;
  * @param out_program_id Pointer to receive the compiled program ID.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_video_shaders_get_yuv_program(struct ui_shader_manager *manager,
-                                            unsigned int *out_program_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_video_shaders_get_yuv_program(
+    struct ui_shader_manager *manager, unsigned int *out_program_id);
 
 /** @} */
 

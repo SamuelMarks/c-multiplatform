@@ -48,7 +48,7 @@ struct ui_textarea_autosize_state {
  * @param out_config Pointer to the config struct to initialize.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_textarea_autosize_config_init(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_textarea_autosize_config_init(
     struct ui_textarea_autosize_config *out_config);
 
 /**
@@ -61,10 +61,9 @@ ui_error_t ui_textarea_autosize_config_init(
  * dimensions.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t
-ui_textarea_autosize_calculate(const struct ui_textarea_autosize_config *config,
-                               size_t num_lines,
-                               struct ui_textarea_autosize_state *out_state);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_textarea_autosize_calculate(
+    const struct ui_textarea_autosize_config *config, size_t num_lines,
+    struct ui_textarea_autosize_state *out_state);
 
 #ifdef __cplusplus
 }

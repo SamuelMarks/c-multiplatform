@@ -149,10 +149,12 @@ static int run_oom_tests(void) {
 }
 
 static ui_error_t test_callback_fail(void *user_data) {
+  (void)user_data;
   return UI_ERROR_UNKNOWN;
 }
 
 static ui_error_t test_callback_fail_other(void *user_data) {
+  (void)user_data;
   return UI_ERROR_OUT_OF_MEMORY;
 }
 

@@ -75,7 +75,7 @@ struct ui_node_graph_camera_config {
  * @param out_graph Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_node_graph_base_create(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_node_graph_base_create(
     struct ui_arena *arena,
     const struct ui_node_graph_camera_config *camera_config,
     struct ui_node_graph_base **out_graph);
@@ -86,7 +86,8 @@ ui_error_t ui_node_graph_base_create(
  * @param graph The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_node_graph_base_destroy(struct ui_node_graph_base *graph);
 
 /**
  * @brief Applies a pan offset to the 2D camera.
@@ -96,8 +97,8 @@ ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph);
  * @param delta_y The vertical pan delta in pixels.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
-                                  float delta_x, float delta_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_node_graph_base_pan(
+    struct ui_node_graph_base *graph, float delta_x, float delta_y);
 
 /**
  * @brief Sets the zoom level of the 2D camera.
@@ -108,8 +109,9 @@ ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
  * NULL, zooms to center.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
-                                   const struct ui_dom_point *focal_point);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
+                        const struct ui_dom_point *focal_point);
 
 /**
  * @brief Retrieves the signal emitted when the camera matrix changes.
@@ -119,9 +121,8 @@ ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_node_graph_base_get_camera_signal(struct ui_node_graph_base *graph,
-                                     ui_signal_t **out_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_node_graph_base_get_camera_signal(
+    struct ui_node_graph_base *graph, ui_signal_t **out_signal);
 
 /**
  * @brief Transforms a point from screen space (viewport) into graph space
@@ -132,7 +133,7 @@ ui_node_graph_base_get_camera_signal(struct ui_node_graph_base *graph,
  * @param out_graph_point Pointer to receive the point in graph space.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_node_graph_base_screen_to_graph(const struct ui_node_graph_base *graph,
                                    const struct ui_dom_point *screen_point,
                                    struct ui_dom_point *out_graph_point);
@@ -144,7 +145,7 @@ ui_node_graph_base_screen_to_graph(const struct ui_node_graph_base *graph,
  * @param connection The connection details.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_node_graph_base_add_connection(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_node_graph_base_add_connection(
     struct ui_node_graph_base *graph,
     const struct ui_node_graph_connection *connection);
 
@@ -158,7 +159,8 @@ ui_error_t ui_node_graph_base_add_connection(
  * clear.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_node_graph_base_set_marquee_selection(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_node_graph_base_set_marquee_selection(
     struct ui_node_graph_base *graph, const struct ui_dom_rect *selection_rect);
 
 /**
@@ -169,9 +171,8 @@ ui_error_t ui_node_graph_base_set_marquee_selection(
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_node_graph_base_get_topology_signal(struct ui_node_graph_base *graph,
-                                       ui_signal_t **out_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_node_graph_base_get_topology_signal(
+    struct ui_node_graph_base *graph, ui_signal_t **out_signal);
 
 #ifdef __cplusplus
 }

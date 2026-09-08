@@ -34,7 +34,8 @@ struct ui_button_group_base {
  * @param out_group Pointer to output the initialized button group.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_button_group_base_create(struct ui_button_group_base **out_group);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_button_group_base_create(struct ui_button_group_base **out_group);
 
 /**
  * @brief Sets the orientation of the button group.
@@ -43,9 +44,8 @@ ui_error_t ui_button_group_base_create(struct ui_button_group_base **out_group);
  * @param is_vertical 1 for vertical orientation, 0 for horizontal.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_button_group_base_set_orientation(struct ui_button_group_base *group,
-                                     int is_vertical);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_button_group_base_set_orientation(
+    struct ui_button_group_base *group, int is_vertical);
 
 /**
  * @brief Appends a button (or any component) to the group.
@@ -54,9 +54,8 @@ ui_button_group_base_set_orientation(struct ui_button_group_base *group,
  * @param child The component to append as a child.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_button_group_base_append_button(struct ui_button_group_base *group,
-                                   struct ui_component *child);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_button_group_base_append_button(
+    struct ui_button_group_base *group, struct ui_component *child);
 
 /**
  * @brief Binds the disabled state to a boolean signal.
@@ -65,9 +64,8 @@ ui_button_group_base_append_button(struct ui_button_group_base *group,
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_button_group_base_bind_disabled(struct ui_button_group_base *widget,
-                                   struct ui_signal *disabled_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_button_group_base_bind_disabled(
+    struct ui_button_group_base *widget, struct ui_signal *disabled_signal);
 
 /**
  * @brief Binds the text content to a string signal for dynamic
@@ -77,8 +75,8 @@ ui_button_group_base_bind_disabled(struct ui_button_group_base *widget,
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_button_group_base_bind_text(struct ui_button_group_base *widget,
-                                          struct ui_signal *text_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_button_group_base_bind_text(
+    struct ui_button_group_base *widget, struct ui_signal *text_signal);
 
 #ifdef __cplusplus
 }

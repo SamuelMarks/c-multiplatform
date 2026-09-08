@@ -38,9 +38,8 @@
 #include <sys/select.h>
 #include <sys/time.h>
 #endif
-/* clang-format on */
-
 #include "ui_atomic.h"
+/* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
@@ -422,7 +421,7 @@ ui_error_t ui_reactor_unregister(struct ui_reactor *reactor, void *os_handle) {
  */
 ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
   ui_error_t poll_rc = UI_ERROR_NONE;
-#if defined(UI_USE_EPOLL)
+#if defined(UI_USE_EPOLL) && !defined(UI_TEST_MOCK_ALLOC)
   struct epoll_event events[64];
   int n, i;
 #elif defined(UI_USE_KQUEUE) && !defined(UI_TEST_MOCK_ALLOC)
@@ -544,7 +543,7 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
   if (max_fd == -1) {
     /* Nothing to poll, wait or return */
 #if defined(_WIN32)
-    Sleep(timeout_ms >= 0 ? timeout_ms : 100);
+    Sleep(timeout_ms >= 0 ? (DWORD)timeout_ms : (DWORD)100);
 #else
     {
       struct timeval wtv;

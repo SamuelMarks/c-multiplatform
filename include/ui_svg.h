@@ -168,7 +168,8 @@ struct ui_svg_geometry {
  * @param path Pointer to the path to initialize.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_svg_path_init(struct ui_svg_path *path);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_svg_path_init(struct ui_svg_path *path);
 
 /**
  * @brief Destroy an SVG path and free its resources.
@@ -176,7 +177,8 @@ ui_error_t ui_svg_path_init(struct ui_svg_path *path);
  * @param path Pointer to the path to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_svg_path_destroy(struct ui_svg_path *path);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_svg_path_destroy(struct ui_svg_path *path);
 
 /**
  * @brief Parse an SVG path 'd' attribute string into a list of commands.
@@ -185,7 +187,8 @@ ui_error_t ui_svg_path_destroy(struct ui_svg_path *path);
  * @param d_attr The 'd' attribute string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr);
 
 /**
  * @brief Initialize a new, empty flattened path.
@@ -193,7 +196,8 @@ ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr);
  * @param path Pointer to the flattened path to initialize.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_svg_flattened_path_init(struct ui_svg_flattened_path *path);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_svg_flattened_path_init(struct ui_svg_flattened_path *path);
 
 /**
  * @brief Destroy a flattened path and free its resources.
@@ -201,7 +205,8 @@ ui_error_t ui_svg_flattened_path_init(struct ui_svg_flattened_path *path);
  * @param path Pointer to the flattened path to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_svg_flattened_path_destroy(struct ui_svg_flattened_path *path);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_svg_flattened_path_destroy(struct ui_svg_flattened_path *path);
 
 /**
  * @brief Flattens an SVG path into line segments.
@@ -211,8 +216,9 @@ ui_error_t ui_svg_flattened_path_destroy(struct ui_svg_flattened_path *path);
  * @param tolerance Maximum allowed error (distance from true curve).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_svg_path_flatten(struct ui_svg_flattened_path *flattened,
-                               const struct ui_svg_path *path, float tolerance);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_svg_path_flatten(struct ui_svg_flattened_path *flattened,
+                    const struct ui_svg_path *path, float tolerance);
 
 /**
  * @brief Initialize a new geometry structure.
@@ -220,7 +226,8 @@ ui_error_t ui_svg_path_flatten(struct ui_svg_flattened_path *flattened,
  * @param geom Pointer to the geometry structure to initialize.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_svg_geometry_init(struct ui_svg_geometry *geom);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_svg_geometry_init(struct ui_svg_geometry *geom);
 
 /**
  * @brief Destroy a geometry structure.
@@ -228,7 +235,8 @@ ui_error_t ui_svg_geometry_init(struct ui_svg_geometry *geom);
  * @param geom Pointer to the geometry structure to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_svg_geometry_destroy(struct ui_svg_geometry *geom);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_svg_geometry_destroy(struct ui_svg_geometry *geom);
 
 /**
  * @brief Tessellates a flattened path for filling (using ear-clipping).
@@ -237,7 +245,7 @@ ui_error_t ui_svg_geometry_destroy(struct ui_svg_geometry *geom);
  * @param flattened Pointer to the flattened path.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
                        const struct ui_svg_flattened_path *flattened);
 
@@ -249,10 +257,9 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
  * @param stroke_width The width of the stroke.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_svg_tessellate_stroke(struct ui_svg_geometry *geom,
-                         const struct ui_svg_flattened_path *flattened,
-                         float stroke_width);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_svg_tessellate_stroke(
+    struct ui_svg_geometry *geom, const struct ui_svg_flattened_path *flattened,
+    float stroke_width);
 
 #ifdef __cplusplus
 }

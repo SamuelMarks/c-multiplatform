@@ -3,9 +3,8 @@
  * @brief Implementation of the bottom navigation base component.
  */
 
-#include "ui_bottom_nav_base.h"
-
 /* clang-format off */
+#include "ui_bottom_nav_base.h"
 #include "ui_aria.h"
 #include "ui_component.h"
 #include <stdlib.h>

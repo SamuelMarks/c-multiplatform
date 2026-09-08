@@ -51,8 +51,8 @@ struct ui_vibrancy_params {
  * @param material The preset material to apply.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_vibrancy_params_init(struct ui_vibrancy_params *params,
-                                   enum ui_vibrancy_material material);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_vibrancy_params_init(
+    struct ui_vibrancy_params *params, enum ui_vibrancy_material material);
 
 /** @} */
 

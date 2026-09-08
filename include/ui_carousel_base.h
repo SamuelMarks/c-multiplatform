@@ -57,8 +57,9 @@ struct ui_carousel_config {
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY if allocation fails,
  * or UI_ERROR_INVALID_ARGUMENT if args are null.
  */
-ui_error_t ui_carousel_base_create(struct ui_carousel_base **out_carousel,
-                                   const struct ui_carousel_config *config);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_carousel_base_create(struct ui_carousel_base **out_carousel,
+                        const struct ui_carousel_config *config);
 
 /**
  * @brief Destroys the carousel.
@@ -66,7 +67,8 @@ ui_error_t ui_carousel_base_create(struct ui_carousel_base **out_carousel,
  * @param carousel The carousel to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_carousel_base_destroy(struct ui_carousel_base *carousel);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_carousel_base_destroy(struct ui_carousel_base *carousel);
 
 /**
  * @brief Sets the number of items in the carousel.
@@ -75,8 +77,8 @@ ui_error_t ui_carousel_base_destroy(struct ui_carousel_base *carousel);
  * @param count The number of items.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t ui_carousel_base_set_item_count(struct ui_carousel_base *carousel,
-                                           size_t count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_carousel_base_set_item_count(
+    struct ui_carousel_base *carousel, size_t count);
 
 /**
  * @brief Sets the viewport size.
@@ -86,8 +88,8 @@ ui_error_t ui_carousel_base_set_item_count(struct ui_carousel_base *carousel,
  * @param height Viewport height.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
-                                              float width, float height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_carousel_base_set_viewport_size(
+    struct ui_carousel_base *carousel, float width, float height);
 
 /**
  * @brief Gets the underlying component.
@@ -96,8 +98,8 @@ ui_error_t ui_carousel_base_set_viewport_size(struct ui_carousel_base *carousel,
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t ui_carousel_base_get_component(struct ui_carousel_base *carousel,
-                                          struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_carousel_base_get_component(
+    struct ui_carousel_base *carousel, struct ui_component **out_component);
 
 /**
  * @brief Feeds a raw event into the carousel for gesture paging.
@@ -107,9 +109,9 @@ ui_error_t ui_carousel_base_get_component(struct ui_carousel_base *carousel,
  * @param timestamp_ms Current timestamp.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t ui_carousel_base_process_event(struct ui_carousel_base *carousel,
-                                          const struct ui_event *event,
-                                          double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_carousel_base_process_event(
+    struct ui_carousel_base *carousel, const struct ui_event *event,
+    double timestamp_ms);
 
 /**
  * @brief Updates the carousel per frame (for scroll animations/snapping).
@@ -118,8 +120,8 @@ ui_error_t ui_carousel_base_process_event(struct ui_carousel_base *carousel,
  * @param timestamp_ms Current timestamp.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t ui_carousel_base_tick(struct ui_carousel_base *carousel,
-                                 double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_carousel_base_tick(struct ui_carousel_base *carousel, double timestamp_ms);
 
 /**
  * @brief Scrolls to a specific index.
@@ -130,8 +132,8 @@ ui_error_t ui_carousel_base_tick(struct ui_carousel_base *carousel,
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if index is out of
  * range, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t ui_carousel_base_scroll_to_index(struct ui_carousel_base *carousel,
-                                            size_t index, int smooth);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_carousel_base_scroll_to_index(
+    struct ui_carousel_base *carousel, size_t index, int smooth);
 
 /**
  * @brief Binds the data property.
@@ -140,8 +142,8 @@ ui_error_t ui_carousel_base_scroll_to_index(struct ui_carousel_base *carousel,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_carousel_base_bind_data(struct ui_carousel_base *widget,
-                                      struct ui_computed *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_carousel_base_bind_data(
+    struct ui_carousel_base *widget, struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

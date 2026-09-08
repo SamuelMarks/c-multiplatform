@@ -30,7 +30,8 @@ typedef ui_error_t (*ui_webview_ipc_callback)(struct ui_webview_base *webview,
  * @param out_webview Pointer to output the initialized webview component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_webview_base_create(struct ui_webview_base **out_webview);
 
 /**
  * @brief Destroys a webview component.
@@ -38,7 +39,8 @@ ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview);
  * @param webview The webview component.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_webview_base_destroy(struct ui_webview_base *webview);
 
 /**
  * @brief Retrieves the base component.
@@ -47,8 +49,8 @@ ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview);
  * @param out_component Pointer to receive the underlying component.
  * @return ui_error_t `UI_ERROR_NONE` on success.
  */
-ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
-                                         struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_webview_base_get_component(
+    struct ui_webview_base *webview, struct ui_component **out_component);
 
 /**
  * @brief Sets the URL to load in the webview.
@@ -57,8 +59,8 @@ ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
  * @param url The URL to load.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_webview_base_set_url(struct ui_webview_base *webview,
-                                   const char *url);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_webview_base_set_url(struct ui_webview_base *webview, const char *url);
 
 /**
  * @brief Sets raw HTML content for the webview.
@@ -67,8 +69,8 @@ ui_error_t ui_webview_base_set_url(struct ui_webview_base *webview,
  * @param html The HTML content.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_webview_base_set_html(struct ui_webview_base *webview,
-                                    const char *html);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_webview_base_set_html(struct ui_webview_base *webview, const char *html);
 
 /**
  * @brief Binds the URL property to a signal.
@@ -77,8 +79,8 @@ ui_error_t ui_webview_base_set_html(struct ui_webview_base *webview,
  * @param signal The signal.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_webview_base_bind_url(struct ui_webview_base *webview,
-                                    struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_webview_base_bind_url(
+    struct ui_webview_base *webview, struct ui_signal *signal);
 
 /**
  * @brief Evaluates JavaScript asynchronously in the webview context.
@@ -87,8 +89,8 @@ ui_error_t ui_webview_base_bind_url(struct ui_webview_base *webview,
  * @param script The JavaScript string.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_webview_base_evaluate_js(struct ui_webview_base *webview,
-                                       const char *script);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_webview_base_evaluate_js(
+    struct ui_webview_base *webview, const char *script);
 
 /**
  * @brief Registers a callback for receiving IPC messages from JavaScript.
@@ -98,9 +100,9 @@ ui_error_t ui_webview_base_evaluate_js(struct ui_webview_base *webview,
  * @param user_data User data to pass to the callback.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
-                                            ui_webview_ipc_callback callback,
-                                            void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_webview_base_set_ipc_callback(
+    struct ui_webview_base *webview, ui_webview_ipc_callback callback,
+    void *user_data);
 
 /**
  * @brief Simulates an incoming IPC message (for internal routing/testing).
@@ -109,8 +111,8 @@ ui_error_t ui_webview_base_set_ipc_callback(struct ui_webview_base *webview,
  * @param message The message content.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
-                                                const char *message);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_webview_base_dispatch_ipc_message(
+    struct ui_webview_base *webview, const char *message);
 
 #ifdef __cplusplus
 }

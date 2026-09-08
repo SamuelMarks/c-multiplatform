@@ -84,9 +84,8 @@ typedef ui_error_t (*ui_property_editor_factory_fn)(
  * @param out_grid Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_property_grid_base_create(struct ui_arena *arena,
-                             struct ui_property_grid_base **out_grid);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_property_grid_base_create(
+    struct ui_arena *arena, struct ui_property_grid_base **out_grid);
 
 /**
  * @brief Destroys a Property Grid base component.
@@ -94,7 +93,8 @@ ui_property_grid_base_create(struct ui_arena *arena,
  * @param grid The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_property_grid_base_destroy(struct ui_property_grid_base *grid);
 
 /**
  * @brief Registers a property row in the grid data model.
@@ -103,9 +103,8 @@ ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid);
  * @param row The property row definition.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_property_grid_base_add_property(struct ui_property_grid_base *grid,
-                                   const struct ui_property_row *row);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_property_grid_base_add_property(
+    struct ui_property_grid_base *grid, const struct ui_property_row *row);
 
 /**
  * @brief Sets a custom factory function for instantiating inline editors for
@@ -116,7 +115,8 @@ ui_property_grid_base_add_property(struct ui_property_grid_base *grid,
  * @param user_data Opaque data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_property_grid_base_set_editor_factory(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_property_grid_base_set_editor_factory(
     struct ui_property_grid_base *grid,
     ui_property_editor_factory_fn factory_fn, void *user_data);
 
@@ -127,8 +127,8 @@ ui_error_t ui_property_grid_base_set_editor_factory(
  * @param search_query The string to filter by (filters against labels).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
-                                            const char *search_query);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_property_grid_base_set_filter(
+    struct ui_property_grid_base *grid, const char *search_query);
 
 /**
  * @brief Toggles the collapsed/expanded state of a specific property group.
@@ -138,7 +138,7 @@ ui_error_t ui_property_grid_base_set_filter(struct ui_property_grid_base *grid,
  * @param is_collapsed True to collapse, false to expand.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
                                           const char *group_id,
                                           ui_bool_t is_collapsed);
@@ -151,7 +151,8 @@ ui_property_grid_base_set_group_collapsed(struct ui_property_grid_base *grid,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_property_grid_base_get_value_changed_signal(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_property_grid_base_get_value_changed_signal(
     struct ui_property_grid_base *grid, ui_signal_t **out_signal);
 
 /**

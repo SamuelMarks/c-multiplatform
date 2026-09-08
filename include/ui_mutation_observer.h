@@ -76,7 +76,7 @@ typedef ui_error_t (*ui_mutation_observer_cb_t)(
  * @param out_observer Pointer to receive the new observer instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
                             struct ui_mutation_observer **out_observer);
 
@@ -85,7 +85,8 @@ ui_mutation_observer_create(ui_mutation_observer_cb_t callback, void *user_data,
  * @param observer The observer to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_mutation_observer_destroy(struct ui_mutation_observer *observer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_mutation_observer_destroy(struct ui_mutation_observer *observer);
 
 /**
  * @brief Starts observing a target element.
@@ -94,10 +95,9 @@ ui_error_t ui_mutation_observer_destroy(struct ui_mutation_observer *observer);
  * @param options The initialization options.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_mutation_observer_observe(struct ui_mutation_observer *observer,
-                             struct ui_dom_node *target,
-                             const struct ui_mutation_observer_init *options);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_mutation_observer_observe(
+    struct ui_mutation_observer *observer, struct ui_dom_node *target,
+    const struct ui_mutation_observer_init *options);
 
 /**
  * @brief Disconnects the observer, stopping observation of all targets and
@@ -105,7 +105,7 @@ ui_mutation_observer_observe(struct ui_mutation_observer *observer,
  * @param observer The observer instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_mutation_observer_disconnect(struct ui_mutation_observer *observer);
 
 /**
@@ -115,9 +115,9 @@ ui_mutation_observer_disconnect(struct ui_mutation_observer *observer);
  * @param removed The node removed (or NULL).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
-                                                  struct ui_dom_node *added,
-                                                  struct ui_dom_node *removed);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_mutation_observer_notify_child_list(
+    struct ui_dom_node *target, struct ui_dom_node *added,
+    struct ui_dom_node *removed);
 
 /**
  * @brief Internal notification hook when an attribute is modified.
@@ -126,9 +126,8 @@ ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
  * @param old_value The previous value (or NULL).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
-                                                 const char *name,
-                                                 const char *old_value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_mutation_observer_notify_attribute(
+    struct ui_dom_node *target, const char *name, const char *old_value);
 
 /**
  * @brief Internal notification hook when text content is modified.
@@ -136,7 +135,7 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
  * @param old_value The previous text content (or NULL).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
                                            const char *old_value);
 

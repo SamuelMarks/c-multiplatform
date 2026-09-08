@@ -38,7 +38,7 @@ enum ui_dock_edge {
  * @param out_layout Pointer to receive the allocated layout.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout);
 
 /**
@@ -47,7 +47,7 @@ ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout);
  * @param layout The layout to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout);
 
 /**
@@ -57,7 +57,7 @@ ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout);
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
                                       struct ui_component **out_component);
 
@@ -71,10 +71,9 @@ ui_dockable_layout_base_get_component(struct ui_dockable_layout_base *layout,
  * @param edge The edge to dock onto.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
-                                   int panel_id, int target_panel_id,
-                                   enum ui_dock_edge edge);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_dockable_layout_base_dock_panel(
+    struct ui_dockable_layout_base *layout, int panel_id, int target_panel_id,
+    enum ui_dock_edge edge);
 
 /**
  * @brief Removes a panel from the layout.
@@ -83,9 +82,8 @@ ui_dockable_layout_base_dock_panel(struct ui_dockable_layout_base *layout,
  * @param panel_id The unique ID of the panel to remove.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
-                                     int panel_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_dockable_layout_base_remove_panel(
+    struct ui_dockable_layout_base *layout, int panel_id);
 
 /**
  * @brief Serializes the layout state into a string format.
@@ -95,7 +93,7 @@ ui_dockable_layout_base_remove_panel(struct ui_dockable_layout_base *layout,
  * @param buffer_size Size of the buffer.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
                                   char *out_buffer, size_t buffer_size);
 
@@ -106,9 +104,8 @@ ui_dockable_layout_base_serialize(struct ui_dockable_layout_base *layout,
  * @param buffer The serialized layout string.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
-                                    const char *buffer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_dockable_layout_base_deserialize(
+    struct ui_dockable_layout_base *layout, const char *buffer);
 
 /**
  * @brief Integrates the layout with a drag and drop context, allowing it
@@ -118,7 +115,8 @@ ui_dockable_layout_base_deserialize(struct ui_dockable_layout_base *layout,
  * @param drag_ctx The drag and drop context to integrate with.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_dockable_layout_base_integrate_drag_drop(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_dockable_layout_base_integrate_drag_drop(
     struct ui_dockable_layout_base *layout,
     struct ui_drag_drop_context *drag_ctx);
 

@@ -26,7 +26,9 @@ extern "C" {
  * @param out_size Pointer to receive the size of the read data.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_fs_read_file(const char *path, void **out_data, size_t *out_size);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_fs_read_file(const char *path,
+                                                         void **out_data,
+                                                         size_t *out_size);
 
 /**
  * @brief Writes data to a file.
@@ -36,7 +38,9 @@ ui_error_t ui_fs_read_file(const char *path, void **out_data, size_t *out_size);
  * @param size The size of the data in bytes.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_fs_write_file(const char *path, const void *data, size_t size);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_fs_write_file(const char *path,
+                                                          const void *data,
+                                                          size_t size);
 
 /**
  * @brief Writes a file synchronously using OPFS in WebAssembly (requires
@@ -49,10 +53,10 @@ ui_error_t ui_fs_write_file(const char *path, const void *data, size_t size);
  * @return UI_ERROR_NONE on success, UI_ERROR_UNSUPPORTED if OPFS is not
  * available or called on main thread without support.
  */
-ui_error_t ui_fs_write_file_opfs_sync(const char *path, const void *data,
-                                      size_t size);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_fs_write_file_opfs_sync(const char *path, const void *data, size_t size);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 #endif /* UI_FS_H */

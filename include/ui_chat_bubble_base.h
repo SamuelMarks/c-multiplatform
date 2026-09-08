@@ -70,10 +70,9 @@ struct ui_chat_bubble_config {
  * @param out_bubble Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_chat_bubble_base_create(struct ui_arena *arena,
-                           const struct ui_chat_bubble_config *config,
-                           struct ui_chat_bubble_base **out_bubble);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chat_bubble_base_create(
+    struct ui_arena *arena, const struct ui_chat_bubble_config *config,
+    struct ui_chat_bubble_base **out_bubble);
 
 /**
  * @brief Destroys a chat bubble base component.
@@ -81,7 +80,8 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
  * @param bubble The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble);
 
 /**
  * @brief Updates the structural configuration of the bubble.
@@ -92,7 +92,7 @@ ui_error_t ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble);
  * @param config The new structural configuration.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_chat_bubble_base_set_config(struct ui_chat_bubble_base *bubble,
                                const struct ui_chat_bubble_config *config);
 
@@ -104,9 +104,8 @@ ui_chat_bubble_base_set_config(struct ui_chat_bubble_base *bubble,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_chat_bubble_base_get_config_signal(struct ui_chat_bubble_base *bubble,
-                                      ui_signal_t **out_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_chat_bubble_base_get_config_signal(
+    struct ui_chat_bubble_base *bubble, ui_signal_t **out_signal);
 
 /**
  * @brief A helper to calculate the optimal text wrapping bounds within the
@@ -118,7 +117,8 @@ ui_chat_bubble_base_get_config_signal(struct ui_chat_bubble_base *bubble,
  * layout.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_chat_bubble_base_calculate_text_bounds(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_chat_bubble_base_calculate_text_bounds(
     const struct ui_chat_bubble_base *bubble,
     const struct ui_dom_rect *raw_bounds, struct ui_dom_rect *out_text_bounds);
 

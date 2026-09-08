@@ -2,10 +2,10 @@
  * @file ui_window_backend_linux_wayland.c
  * @brief ui_window_backend_linux_wayland.c implementation.
  */
-#if defined(__linux__) || defined(__FreeBSD__)
-
 /* clang-format off */
 #include "../include/ui_window_backend_linux.h"
+#include <stddef.h>
+#if defined(__linux__) || defined(__FreeBSD__)
 #include "../include/ui_event.h"
 #include "ui_internal_mem.h"
 
@@ -13,15 +13,11 @@
 #include <wayland-egl.h>
 #include <EGL/egl.h>
 #include <string.h>
-
-
-#if defined(__GNUC__) || defined(__clang__)
-#endif
 #include "xdg-shell-client-protocol.h"
-#if defined(__GNUC__) || defined(__clang__)
 #endif
-
 /* clang-format on */
+
+#if defined(__linux__) || defined(__FreeBSD__)
 
 /**
  * @struct ui_window
@@ -518,8 +514,6 @@ ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
 
 #else
 /* Non-Linux Platform Stub */
-#include "../include/ui_window_backend_linux.h"
-#include <stddef.h>
 
 ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {

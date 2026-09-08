@@ -52,9 +52,8 @@ struct ui_window_controls_base;
  * @param out_controls Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_window_controls_base_create(struct ui_arena *arena,
-                               struct ui_window_controls_base **out_controls);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_window_controls_base_create(
+    struct ui_arena *arena, struct ui_window_controls_base **out_controls);
 
 /**
  * @brief Destroys a window controls base component.
@@ -62,7 +61,7 @@ ui_window_controls_base_create(struct ui_arena *arena,
  * @param controls The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_window_controls_base_destroy(struct ui_window_controls_base *controls);
 
 /**
@@ -72,9 +71,8 @@ ui_window_controls_base_destroy(struct ui_window_controls_base *controls);
  * @param state The new state.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
-                                  enum ui_window_state state);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_window_controls_base_set_state(
+    struct ui_window_controls_base *controls, enum ui_window_state state);
 
 /**
  * @brief Retrieves the signal for window state changes.
@@ -84,7 +82,8 @@ ui_window_controls_base_set_state(struct ui_window_controls_base *controls,
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_window_controls_base_get_state_signal(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_window_controls_base_get_state_signal(
     struct ui_window_controls_base *controls, ui_signal_t **out_signal);
 
 /**
@@ -98,10 +97,9 @@ ui_error_t ui_window_controls_base_get_state_signal(
  * @param out_region Pointer to receive the hit region.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_window_controls_base_hit_test(struct ui_window_controls_base *controls,
-                                 int x, int y,
-                                 enum ui_window_control_hit_region *out_region);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_window_controls_base_hit_test(
+    struct ui_window_controls_base *controls, int x, int y,
+    enum ui_window_control_hit_region *out_region);
 
 /**
  * @brief Sets the bounding box for a specific control region.
@@ -114,7 +112,8 @@ ui_window_controls_base_hit_test(struct ui_window_controls_base *controls,
  * @param height The height of the region.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_window_controls_base_set_region_rect(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_window_controls_base_set_region_rect(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region, int x, int y, int width,
     int height);
@@ -127,7 +126,8 @@ ui_error_t ui_window_controls_base_set_region_rect(
  * @param region The region being hovered.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_window_controls_base_trigger_hover_intent(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_window_controls_base_trigger_hover_intent(
     struct ui_window_controls_base *controls,
     enum ui_window_control_hit_region region);
 

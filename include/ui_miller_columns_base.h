@@ -48,7 +48,7 @@ struct ui_miller_column_state {
  * @param out_miller Pointer to receive the created component handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_miller_columns_base_create(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_miller_columns_base_create(
     struct ui_arena *arena, const struct ui_tree_model *tree_model,
     void *model_user_data, struct ui_miller_columns_base **out_miller);
 
@@ -58,7 +58,7 @@ ui_error_t ui_miller_columns_base_create(
  * @param miller The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_miller_columns_base_destroy(struct ui_miller_columns_base *miller);
 
 /**
@@ -71,9 +71,8 @@ ui_miller_columns_base_destroy(struct ui_miller_columns_base *miller);
  * @param node_id The ID of the item being selected.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
-                                   int column_index, void *node_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_miller_columns_base_select_item(
+    struct ui_miller_columns_base *miller, int column_index, void *node_id);
 
 /**
  * @brief Navigates left (focus parent column).
@@ -81,7 +80,7 @@ ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
  * @param miller The component.
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if already at root.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_miller_columns_base_navigate_left(struct ui_miller_columns_base *miller);
 
 /**
@@ -91,7 +90,7 @@ ui_miller_columns_base_navigate_left(struct ui_miller_columns_base *miller);
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if no child column
  * exists.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_miller_columns_base_navigate_right(struct ui_miller_columns_base *miller);
 
 /**
@@ -101,7 +100,8 @@ ui_miller_columns_base_navigate_right(struct ui_miller_columns_base *miller);
  * @param out_count Pointer to receive the count.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_miller_columns_base_get_column_count(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_miller_columns_base_get_column_count(
     const struct ui_miller_columns_base *miller, int *out_count);
 
 /**
@@ -113,7 +113,8 @@ ui_error_t ui_miller_columns_base_get_column_count(
  * @param out_signal Pointer to receive the signal handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_miller_columns_base_get_topology_changed_signal(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_miller_columns_base_get_topology_changed_signal(
     struct ui_miller_columns_base *miller, ui_signal_t **out_signal);
 
 #ifdef __cplusplus

@@ -94,9 +94,8 @@ struct ui_css_counter_action {
  * \param out_type Pointer to receive the parsed type.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_css_parse_list_style_type(const char *str,
-                             struct ui_css_list_style_type_ext *out_type);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_list_style_type(
+    const char *str, struct ui_css_list_style_type_ext *out_type);
 
 /**
  * \brief Parses CSS list-style-position.
@@ -105,9 +104,8 @@ ui_css_parse_list_style_type(const char *str,
  * \param out_position Pointer to receive the parsed position.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_css_parse_list_style_position(const char *str,
-                                 enum ui_css_list_style_position *out_position);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_list_style_position(
+    const char *str, enum ui_css_list_style_position *out_position);
 
 /**
  * \brief Parses CSS list-style-image.
@@ -117,9 +115,8 @@ ui_css_parse_list_style_position(const char *str,
  * \param out_is_none Pointer to receive whether the value was 'none'.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_list_style_image(const char *str,
-                                         struct ui_css_image *out_image,
-                                         int *out_is_none);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_list_style_image(
+    const char *str, struct ui_css_image *out_image, int *out_is_none);
 
 /**
  * \brief Parses CSS list-style shorthand.
@@ -128,8 +125,8 @@ ui_error_t ui_css_parse_list_style_image(const char *str,
  * \param out_style Pointer to receive the parsed shorthand.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_list_style(const char *str,
-                                   struct ui_css_list_style *out_style);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_list_style(const char *str, struct ui_css_list_style *out_style);
 
 /**
  * \brief Parses CSS counter-reset, counter-increment, counter-set.
@@ -139,9 +136,8 @@ ui_error_t ui_css_parse_list_style(const char *str,
  * \param out_actions Pointer to receive the parsed actions linked list.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_css_parse_counter_action(const char *str,
-                            struct ui_css_counter_action **out_actions);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_counter_action(
+    const char *str, struct ui_css_counter_action **out_actions);
 
 /**
  * \brief Frees a list of counter actions.
@@ -149,7 +145,8 @@ ui_css_parse_counter_action(const char *str,
  * \param actions The list to free.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_counter_action_destroy(struct ui_css_counter_action *actions);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_counter_action_destroy(struct ui_css_counter_action *actions);
 
 #ifdef __cplusplus
 }

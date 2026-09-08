@@ -283,6 +283,7 @@ static int test_signal(void) {
     }
   }
 
+#ifndef UI_SINGLE_THREADED
   /* Multithreaded mode */
   {
     ui_signal_t *mtsig = NULL;
@@ -311,6 +312,7 @@ static int test_signal(void) {
       }
     }
   }
+#endif
 
   /* Nulls */
   ui_signal_create(NULL, val, UI_SIGNAL_TYPE_INT32, NULL, NULL, 0, NULL);

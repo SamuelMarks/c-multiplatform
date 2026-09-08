@@ -48,7 +48,8 @@ struct ui_meter_base {
  * @param out_meter Pointer to output the initialized meter.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_meter_base_create(struct ui_meter_base **out_meter);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_meter_base_create(struct ui_meter_base **out_meter);
 
 /**
  * @brief Sets the current value of the meter.
@@ -57,7 +58,8 @@ ui_error_t ui_meter_base_create(struct ui_meter_base **out_meter);
  * @param value The value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_meter_base_set_value(struct ui_meter_base *meter, float value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_meter_base_set_value(struct ui_meter_base *meter, float value);
 
 /**
  * @brief Sets the minimum and maximum boundaries of the meter.
@@ -67,8 +69,8 @@ ui_error_t ui_meter_base_set_value(struct ui_meter_base *meter, float value);
  * @param max_val The maximum value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_meter_base_set_bounds(struct ui_meter_base *meter, float min_val,
-                                    float max_val);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_meter_base_set_bounds(
+    struct ui_meter_base *meter, float min_val, float max_val);
 
 /**
  * @brief Sets the gauge thresholds for low, high, and optimum ranges.
@@ -79,9 +81,9 @@ ui_error_t ui_meter_base_set_bounds(struct ui_meter_base *meter, float min_val,
  * @param optimum_val The optimum value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_meter_base_set_thresholds(struct ui_meter_base *meter,
-                                        float low_val, float high_val,
-                                        float optimum_val);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_meter_base_set_thresholds(struct ui_meter_base *meter, float low_val,
+                             float high_val, float optimum_val);
 
 /**
  * @brief Binds the value property.
@@ -90,8 +92,8 @@ ui_error_t ui_meter_base_set_thresholds(struct ui_meter_base *meter,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_meter_base_bind_value(struct ui_meter_base *widget,
-                                    struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_meter_base_bind_value(
+    struct ui_meter_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

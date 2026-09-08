@@ -16,7 +16,10 @@ static ui_error_t test_callback(void *user_data) {
   return UI_ERROR_NONE;
 }
 
-static ui_error_t failing_callback(void *user_data) { return UI_ERROR_UNKNOWN; }
+static ui_error_t failing_callback(void *user_data) {
+  (void)user_data;
+  return UI_ERROR_UNKNOWN;
+}
 
 static ui_error_t test_cancel_callback(void *user_data) {
   int *val = (int *)user_data;
@@ -140,10 +143,10 @@ static int run_paradigm_tests(void) {
   /* Single-Threaded environment */
   {
     struct ui_execution_context *ctx = NULL;
+    struct ui_execution_context *get_ctx = NULL;
     int test_val = 0;
     ui_execution_context_create(&ctx);
     ui_execution_context_set_current(ctx);
-    struct ui_execution_context *get_ctx = NULL;
     ui_execution_context_get_current(&get_ctx);
     if (get_ctx != ctx)
       return 1;
@@ -232,7 +235,10 @@ static int run_oom_tests(void) {
   return 0;
 }
 
-static ui_error_t failing_task_cb(void *user_data) { return UI_ERROR_UNKNOWN; }
+static ui_error_t failing_task_cb(void *user_data) {
+  (void)user_data;
+  return UI_ERROR_UNKNOWN;
+}
 
 static int test_execution_context_fail(void) {
   struct ui_execution_context *ctx = NULL;
@@ -265,6 +271,7 @@ int main(void) {
   failed |= run_normal_tests();
   failed |= run_paradigm_tests();
   failed |= run_oom_tests();
+  failed |= test_execution_context_fail();
 
   if (failed) {
     printf("Tests failed.\n");

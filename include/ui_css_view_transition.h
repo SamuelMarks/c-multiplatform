@@ -51,9 +51,8 @@ struct ui_css_view_transition_class {
  * @param out_name Pointer to receive the parsed name.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t
-ui_css_parse_view_transition_name(const char *str,
-                                  struct ui_css_view_transition_name *out_name);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_view_transition_name(
+    const char *str, struct ui_css_view_transition_name *out_name);
 
 /**
  * @brief Parses the view-transition-class CSS property.
@@ -62,7 +61,7 @@ ui_css_parse_view_transition_name(const char *str,
  * @param out_class Pointer to receive the parsed classes.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_view_transition_class(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_view_transition_class(
     const char *str, struct ui_css_view_transition_class *out_class);
 
 /**
@@ -71,7 +70,7 @@ ui_error_t ui_css_parse_view_transition_class(
  * @param vt_class Pointer to the class struct to free.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_css_view_transition_class_destroy(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_view_transition_class_destroy(
     struct ui_css_view_transition_class *vt_class);
 
 #ifdef __cplusplus

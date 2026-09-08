@@ -58,9 +58,9 @@ struct ui_search_bar_base {
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_search_bar_base_init(struct ui_search_bar_base *search_bar,
-                                   struct ui_component *component,
-                                   struct ui_control_value_accessor *out_cva);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_search_bar_base_init(
+    struct ui_search_bar_base *search_bar, struct ui_component *component,
+    struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Sets the text query in the search bar.
@@ -69,8 +69,8 @@ ui_error_t ui_search_bar_base_init(struct ui_search_bar_base *search_bar,
  * @param query The query text.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
-                                        const char *query);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_search_bar_base_set_query(
+    struct ui_search_bar_base *search_bar, const char *query);
 
 /**
  * @brief Sets whether the search bar is in a loading state.
@@ -79,8 +79,8 @@ ui_error_t ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
  * @param is_loading The new loading state (non-zero for loading).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_search_bar_base_set_loading(struct ui_search_bar_base *search_bar,
-                                          int is_loading);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_search_bar_base_set_loading(
+    struct ui_search_bar_base *search_bar, int is_loading);
 
 /**
  * @brief Cleans up resources allocated by the search bar base.
@@ -88,7 +88,8 @@ ui_error_t ui_search_bar_base_set_loading(struct ui_search_bar_base *search_bar,
  * @param search_bar Pointer to the search bar base struct.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_search_bar_base_cleanup(struct ui_search_bar_base *search_bar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_search_bar_base_cleanup(struct ui_search_bar_base *search_bar);
 
 #ifdef __cplusplus
 }

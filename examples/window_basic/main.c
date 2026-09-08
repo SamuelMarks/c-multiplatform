@@ -21,11 +21,10 @@
 #elif defined(__linux__) || defined(__unix__)
 #include "ui_window_backend_linux.h"
 #endif
-/* clang-format on */
-
 #if defined(__EMSCRIPTEN__)
 #include <emscripten.h>
 #endif
+/* clang-format on */
 
 static const char *WINDOW_CSS = "#app {"
                                 "  display: flex;"

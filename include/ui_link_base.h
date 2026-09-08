@@ -36,7 +36,8 @@ struct ui_link_base {
  * @param out_link Pointer to output the initialized link.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_link_base_create(struct ui_link_base **out_link);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_link_base_create(struct ui_link_base **out_link);
 
 /**
  * @brief Sets the href (URL destination) for the link.
@@ -45,7 +46,8 @@ ui_error_t ui_link_base_create(struct ui_link_base **out_link);
  * @param url The destination URL.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_link_base_set_href(struct ui_link_base *link, const char *url);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_link_base_set_href(struct ui_link_base *link, const char *url);
 
 /**
  * @brief Sets the label/text content of the link.
@@ -54,7 +56,8 @@ ui_error_t ui_link_base_set_href(struct ui_link_base *link, const char *url);
  * @param text The text to display.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_link_base_set_text(struct ui_link_base *link, const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_link_base_set_text(struct ui_link_base *link, const char *text);
 
 /**
  * @brief Binds the disabled state to a boolean signal.
@@ -63,8 +66,8 @@ ui_error_t ui_link_base_set_text(struct ui_link_base *link, const char *text);
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_link_base_bind_disabled(struct ui_link_base *widget,
-                                      struct ui_signal *disabled_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_link_base_bind_disabled(
+    struct ui_link_base *widget, struct ui_signal *disabled_signal);
 
 /**
  * @brief Binds the text content to a string signal for dynamic
@@ -74,8 +77,8 @@ ui_error_t ui_link_base_bind_disabled(struct ui_link_base *widget,
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_link_base_bind_text(struct ui_link_base *widget,
-                                  struct ui_signal *text_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_link_base_bind_text(
+    struct ui_link_base *widget, struct ui_signal *text_signal);
 
 #ifdef __cplusplus
 }

@@ -24,7 +24,6 @@
 #include <string.h>
 #include <stdio.h>
 #include "strtok_posix.h"
-/* clang-format on */
 
 #if defined(_MSC_VER)
 /** @cond */
@@ -35,6 +34,11 @@
 #define UI_STRTOK(str, delim, ctx) strtok_r((str), (delim), (ctx))
 /** @endcond */
 #endif
+
+static void skip_whitespace(const char **p_str);
+static ui_error_t ui_css_parse_value_internal(const char **p_str, struct ui_css_value *out_value);
+#include "ui_css_values_chunks.c"
+/* clang-format on */
 
 /**
  * @brief parse_css_unit.
@@ -316,22 +320,14 @@ static void destroy_math_node(struct ui_css_math_expr *math) {
   if (!math)
     return;
 
-  {
-    ui_css_value_ext_destroy(math->left);
-  }
-  {
-    ui_css_value_ext_destroy(math->right);
-  }
-  {
-    ui_css_value_ext_destroy(math->ext);
-  }
+  { ui_css_value_ext_destroy(math->left); }
+  { ui_css_value_ext_destroy(math->right); }
+  { ui_css_value_ext_destroy(math->ext); }
 
   while (math->next) {
     struct ui_css_math_expr *next = math->next;
     math->next = next->next;
-    {
-      ui_css_value_ext_destroy(next->left);
-    }
+    { ui_css_value_ext_destroy(next->left); }
     C_MULTIPLATFORM_FREE(next);
   }
   C_MULTIPLATFORM_FREE(math);
@@ -377,9 +373,7 @@ static ui_error_t parse_function(const char **p_str,
     if (rc != UI_ERROR_NONE)
       return rc;
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
       {
         ui_css_value_ext_destroy(*out_expr);
@@ -397,9 +391,7 @@ static ui_error_t parse_function(const char **p_str,
     if (rc != UI_ERROR_NONE)
       return rc;
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
       {
         ui_css_value_ext_destroy(*out_expr);
@@ -426,9 +418,7 @@ static ui_error_t parse_function(const char **p_str,
       return rc;
     }
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     while (**p_str == ',') {
       struct ui_css_math_expr *next_arg = NULL;
       (*p_str)++;
@@ -445,9 +435,7 @@ static ui_error_t parse_function(const char **p_str,
 
       tail->next = next_arg;
       tail = next_arg;
-      {
-        skip_whitespace(p_str);
-      }
+      { skip_whitespace(p_str); }
     }
 
     if (**p_str != ')') {
@@ -462,9 +450,7 @@ static ui_error_t parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_min: {
-    {
-      destroy_math_node(node);
-    }
+    { destroy_math_node(node); }
     return rc;
   }
   }
@@ -484,9 +470,7 @@ static ui_error_t parse_function(const char **p_str,
       return rc;
     }
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     while (**p_str == ',') {
       struct ui_css_math_expr *next_arg = NULL;
       (*p_str)++;
@@ -503,9 +487,7 @@ static ui_error_t parse_function(const char **p_str,
 
       tail->next = next_arg;
       tail = next_arg;
-      {
-        skip_whitespace(p_str);
-      }
+      { skip_whitespace(p_str); }
     }
 
     if (**p_str != ')') {
@@ -520,9 +502,7 @@ static ui_error_t parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_max: {
-    {
-      destroy_math_node(node);
-    }
+    { destroy_math_node(node); }
     return rc;
   }
   }
@@ -540,9 +520,7 @@ static ui_error_t parse_function(const char **p_str,
       return rc;
     }
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -554,9 +532,7 @@ static ui_error_t parse_function(const char **p_str,
       goto cleanup_clamp;
     }
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -568,9 +544,7 @@ static ui_error_t parse_function(const char **p_str,
       goto cleanup_clamp;
     }
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_clamp;
@@ -583,9 +557,7 @@ static ui_error_t parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_clamp: {
-    {
-      destroy_math_node(node);
-    }
+    { destroy_math_node(node); }
     return rc;
   }
   }
@@ -603,9 +575,7 @@ static ui_error_t parse_function(const char **p_str,
       return rc;
     }
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str != ',') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_atan2;
@@ -617,9 +587,7 @@ static ui_error_t parse_function(const char **p_str,
       goto cleanup_atan2;
     }
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
       rc = UI_ERROR_PARSE_FAILED;
       goto cleanup_atan2;
@@ -632,9 +600,7 @@ static ui_error_t parse_function(const char **p_str,
     return UI_ERROR_NONE;
 
   cleanup_atan2: {
-    {
-      destroy_math_node(node);
-    }
+    { destroy_math_node(node); }
     return rc;
   }
   }
@@ -644,9 +610,7 @@ static ui_error_t parse_function(const char **p_str,
     char name[64];
     struct ui_css_value_ext *fallback = NULL;
     size_t n = 0;
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
 
     while (**p_str && **p_str != ',' && **p_str != ')' &&
            !isspace((unsigned char)**p_str)) {
@@ -657,23 +621,17 @@ static ui_error_t parse_function(const char **p_str,
     }
     name[n] = '\0';
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str == ',') {
       (*p_str)++;
-      {
-        skip_whitespace(p_str);
-      }
+      { skip_whitespace(p_str); }
       rc = parse_expression(p_str, &fallback);
       if (rc != UI_ERROR_NONE) {
         return rc;
       }
     }
 
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str != ')') {
       {
         ui_css_value_ext_destroy(fallback);
@@ -718,9 +676,7 @@ static ui_error_t parse_function(const char **p_str,
         return rc;
       }
 
-      {
-        skip_whitespace(p_str);
-      }
+      { skip_whitespace(p_str); }
       if (**p_str != ')') {
         {
           destroy_math_node(node);
@@ -771,9 +727,7 @@ static ui_error_t parse_term(const char **p_str,
 
   for (;;) {
     const char *saved = *p_str;
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
     if (**p_str == '*' || **p_str == '/') {
       char op_char = **p_str;
       struct ui_css_value_ext *right = NULL;
@@ -831,9 +785,7 @@ static ui_error_t parse_expression(const char **p_str,
   for (;;) {
     const char *saved = *p_str;
     int has_leading_space = isspace((unsigned char)**p_str);
-    {
-      skip_whitespace(p_str);
-    }
+    { skip_whitespace(p_str); }
 
     if (**p_str == '+' || **p_str == '-') {
       char op_char = **p_str;
@@ -909,9 +861,7 @@ ui_error_t ui_css_parse_value_ext(const char *str,
     return rc;
   }
 
-  {
-    skip_whitespace(&str);
-  }
+  { skip_whitespace(&str); }
   if (*str != '\0') {
     {
       ui_css_value_ext_destroy(*out_value);
@@ -986,9 +936,7 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
   out_color->components[2] = 0.0f;
   out_color->components[3] = 1.0f;
 
-  {
-    skip_whitespace(&str);
-  }
+  { skip_whitespace(&str); }
 
   if (str[0] == '#') {
     return parse_hex_color(str, out_color);
@@ -1179,4 +1127,3 @@ ui_error_t ui_css_parse_color(const char *str, struct ui_css_color *out_color) {
  * @param out_image Parameter out_image.
  * @return Return value.
  */
-#include "ui_css_values_chunks.c"

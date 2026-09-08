@@ -51,7 +51,7 @@ struct ui_split_pane_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_split_pane_base_create(struct ui_split_pane_base **out_split_pane);
 
 /**
@@ -60,7 +60,8 @@ ui_split_pane_base_create(struct ui_split_pane_base **out_split_pane);
  * @param split_pane The split pane to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_split_pane_base_destroy(struct ui_split_pane_base *split_pane);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_split_pane_base_destroy(struct ui_split_pane_base *split_pane);
 
 /**
  * @brief Sets the orientation of the split pane.
@@ -69,7 +70,7 @@ ui_error_t ui_split_pane_base_destroy(struct ui_split_pane_base *split_pane);
  * @param orientation The orientation to set.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_split_pane_base_set_orientation(struct ui_split_pane_base *split_pane,
                                    enum ui_split_pane_orientation orientation);
 
@@ -80,7 +81,7 @@ ui_split_pane_base_set_orientation(struct ui_split_pane_base *split_pane,
  * @param out_orientation Pointer to receive the orientation.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_split_pane_base_get_orientation(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_pane_base_get_orientation(
     const struct ui_split_pane_base *split_pane,
     enum ui_split_pane_orientation *out_orientation);
 
@@ -91,9 +92,8 @@ ui_error_t ui_split_pane_base_get_orientation(
  * @param position The position in pixels.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_split_pane_base_set_position(struct ui_split_pane_base *split_pane,
-                                int position);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_pane_base_set_position(
+    struct ui_split_pane_base *split_pane, int position);
 
 /**
  * @brief Gets the split position.
@@ -102,9 +102,8 @@ ui_split_pane_base_set_position(struct ui_split_pane_base *split_pane,
  * @param out_position Pointer to receive the position.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_split_pane_base_get_position(const struct ui_split_pane_base *split_pane,
-                                int *out_position);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_pane_base_get_position(
+    const struct ui_split_pane_base *split_pane, int *out_position);
 
 /**
  * @brief Sets the minimum and maximum boundaries for the resizer.
@@ -114,8 +113,8 @@ ui_split_pane_base_get_position(const struct ui_split_pane_base *split_pane,
  * @param max_position The maximum allowed position.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_split_pane_base_set_bounds(struct ui_split_pane_base *split_pane,
-                                         int min_position, int max_position);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_pane_base_set_bounds(
+    struct ui_split_pane_base *split_pane, int min_position, int max_position);
 
 /**
  * @brief Processes an input event for dragging the resizer.
@@ -126,9 +125,8 @@ ui_error_t ui_split_pane_base_set_bounds(struct ui_split_pane_base *split_pane,
  * @param event The input event.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointers.
  */
-ui_error_t
-ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
-                                 const struct ui_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_pane_base_process_event(
+    struct ui_split_pane_base *split_pane, const struct ui_event *event);
 
 /**
  * @brief Binds the data property.
@@ -137,12 +135,12 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_split_pane_base_bind_data(struct ui_split_pane_base *widget,
-                                        struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_pane_base_bind_data(
+    struct ui_split_pane_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_SPLIT_PANE_BASE_H */
 

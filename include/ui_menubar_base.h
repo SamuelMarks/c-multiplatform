@@ -34,7 +34,8 @@ struct ui_menubar_base {
  * @param out_menubar Pointer to output the initialized menubar.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_menubar_base_create(struct ui_menubar_base **out_menubar);
 
 /**
  * @brief Appends a top-level menu item to the menubar.
@@ -43,8 +44,8 @@ ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar);
  * @param item The menu item to append.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_menubar_base_append_item(struct ui_menubar_base *menubar,
-                                       struct ui_component *item);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_menubar_base_append_item(
+    struct ui_menubar_base *menubar, struct ui_component *item);
 
 /**
  * @brief Binds the active state/index to a signal.
@@ -53,8 +54,8 @@ ui_error_t ui_menubar_base_append_item(struct ui_menubar_base *menubar,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_menubar_base_bind_active_index(struct ui_menubar_base *widget,
-                                             struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_menubar_base_bind_active_index(
+    struct ui_menubar_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

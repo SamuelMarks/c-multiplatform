@@ -12,10 +12,8 @@
 /* clang-format off */
 #include "../include/ui_renderer.h"
 #include "../include/ui_error.h"
-/* clang-format on */
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-/* clang-format off */
 #include <winsock2.h>
 #include <GL/gl.h>
 #include <stddef.h>
@@ -117,15 +115,50 @@ static ui_error_t load_gl_extensions(void) {
 /** @brief internal */
 #define load_gl_extensions()
 #elif defined(__linux__) || defined(__unix__)
+#if defined(HAVE_GLES2)
+#include <GLES2/gl2.h>
+/** @brief internal */
+#define load_gl_extensions()
+#elif defined(HAVE_OPENGL)
 /** @brief internal */
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/gl.h>
 #include <GL/glext.h>
 /** @brief internal */
 #define load_gl_extensions()
+#else
+#include <stddef.h>
+/** @brief internal */
+#define load_gl_extensions()
+typedef unsigned int GLuint;
+typedef int GLint;
+typedef unsigned int GLenum;
+typedef float GLfloat;
+typedef int GLsizei;
+typedef char GLchar;
+typedef ptrdiff_t GLsizeiptr;
+typedef ptrdiff_t GLintptr;
+#define GL_FALSE 0
+#define GL_TRUE 1
+#define GL_TRIANGLES 0x0004
+#define GL_TRIANGLE_FAN 0x0006
+#define GL_ARRAY_BUFFER 0x8892
+#define GL_ELEMENT_ARRAY_BUFFER 0x8893
+#define GL_STATIC_DRAW 0x88E4
+#define GL_DYNAMIC_DRAW 0x88E8
+#define GL_FLOAT 0x1406
+#define GL_UNSIGNED_SHORT 0x1403
+#define GL_VERTEX_SHADER 0x8B31
+#define GL_FRAGMENT_SHADER 0x8B30
+#define GL_COLOR_BUFFER_BIT 0x00004000
+#define GL_RGBA 0x1908
+#define GL_UNSIGNED_BYTE 0x1401
+#endif
 #endif
 
-#ifdef UI_TEST_MOCK_ALLOC
+#if defined(UI_TEST_MOCK_ALLOC) ||                                             \
+    (!defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__) &&    \
+     !defined(HAVE_GLES2) && !defined(HAVE_OPENGL))
 #undef glCreateProgram
 /** @brief internal */
 #define glCreateProgram() 1

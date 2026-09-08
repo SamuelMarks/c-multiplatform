@@ -52,8 +52,8 @@ struct ui_image_base {
  * @param component Pointer to the UI component to bind to.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_image_base_init(struct ui_image_base *image,
-                              struct ui_component *component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_image_base_init(struct ui_image_base *image, struct ui_component *component);
 
 /**
  * @brief Sets the image source URL and optional lazy load behavior.
@@ -63,8 +63,8 @@ ui_error_t ui_image_base_init(struct ui_image_base *image,
  * @param lazy_load 1 if the image should load lazily, 0 for immediate load.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_image_base_set_src(struct ui_image_base *image,
-                                 const char *src_url, int lazy_load);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_image_base_set_src(
+    struct ui_image_base *image, const char *src_url, int lazy_load);
 
 /**
  * @brief Cleans up resources allocated by the image base.
@@ -72,7 +72,8 @@ ui_error_t ui_image_base_set_src(struct ui_image_base *image,
  * @param image Pointer to the image base struct.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_image_base_cleanup(struct ui_image_base *image);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_image_base_cleanup(struct ui_image_base *image);
 
 /**
  * @brief Binds a signal to the image source property.
@@ -81,8 +82,8 @@ ui_error_t ui_image_base_cleanup(struct ui_image_base *image);
  * @param signal Pointer to the signal to bind to.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_image_base_bind_src(struct ui_image_base *widget,
-                                  struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_image_base_bind_src(struct ui_image_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

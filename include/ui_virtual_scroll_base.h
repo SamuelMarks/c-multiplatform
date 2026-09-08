@@ -103,7 +103,7 @@ struct ui_virtual_scroll_config {
  * @param config Configuration for the virtual scroller.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_virtual_scroll_base_create(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_virtual_scroll_base_create(
     struct ui_virtual_scroll_base **out_virtual_scroll,
     const struct ui_virtual_scroll_config *config);
 
@@ -113,7 +113,8 @@ ui_error_t ui_virtual_scroll_base_create(
  * @param vs The virtual scroll area to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_virtual_scroll_base_destroy(struct ui_virtual_scroll_base *vs);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_virtual_scroll_base_destroy(struct ui_virtual_scroll_base *vs);
 
 /**
  * @brief Sets the number of items in the dataset.
@@ -122,9 +123,8 @@ ui_error_t ui_virtual_scroll_base_destroy(struct ui_virtual_scroll_base *vs);
  * @param count The number of items.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
-                                      size_t count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_virtual_scroll_base_set_item_count(
+    struct ui_virtual_scroll_base *vs, size_t count);
 
 /**
  * @brief Sets the viewport size for visible range calculations.
@@ -134,7 +134,7 @@ ui_virtual_scroll_base_set_item_count(struct ui_virtual_scroll_base *vs,
  * @param height The viewport height.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_virtual_scroll_base_set_viewport_size(struct ui_virtual_scroll_base *vs,
                                          float width, float height);
 
@@ -147,7 +147,7 @@ ui_virtual_scroll_base_set_viewport_size(struct ui_virtual_scroll_base *vs,
  * height.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_virtual_scroll_base_get_total_height(const struct ui_virtual_scroll_base *vs,
                                         float *out_height);
 
@@ -162,7 +162,8 @@ ui_virtual_scroll_base_get_total_height(const struct ui_virtual_scroll_base *vs,
  * @param out_offset_y Pointer to receive the Y offset of the start index.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_virtual_scroll_base_get_visible_range(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_virtual_scroll_base_get_visible_range(
     const struct ui_virtual_scroll_base *vs, float scroll_y,
     size_t *out_start_index, size_t *out_end_index, float *out_offset_y);
 
@@ -173,8 +174,8 @@ ui_error_t ui_virtual_scroll_base_get_visible_range(
  * @param scroll_y The vertical scroll position.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
-                                         float scroll_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_virtual_scroll_base_render(
+    struct ui_virtual_scroll_base *vs, float scroll_y);
 
 /**
  * @brief Mounts the virtual scroller to a container DOM node.
@@ -183,8 +184,8 @@ ui_error_t ui_virtual_scroll_base_render(struct ui_virtual_scroll_base *vs,
  * @param container The container DOM node.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_virtual_scroll_base_mount(struct ui_virtual_scroll_base *vs,
-                                        struct ui_dom_node *container);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_virtual_scroll_base_mount(
+    struct ui_virtual_scroll_base *vs, struct ui_dom_node *container);
 
 /**
  * @brief Binds the data property.
@@ -193,9 +194,8 @@ ui_error_t ui_virtual_scroll_base_mount(struct ui_virtual_scroll_base *vs,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_virtual_scroll_base_bind_data(struct ui_virtual_scroll_base *widget,
-                                 struct ui_computed *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_virtual_scroll_base_bind_data(
+    struct ui_virtual_scroll_base *widget, struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

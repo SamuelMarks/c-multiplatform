@@ -251,7 +251,8 @@ struct ui_renderer {
  * renderer.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_renderer_create(struct ui_renderer **out_renderer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_renderer_create(struct ui_renderer **out_renderer);
 
 /**
  * @brief Initializes the native backend.
@@ -260,7 +261,8 @@ ui_error_t ui_renderer_create(struct ui_renderer **out_renderer);
  * @return UI_ERROR_NONE on success, or an appropriate error code (e.g. no
  * native backend or init failed).
  */
-ui_error_t ui_renderer_native_init(struct ui_renderer *renderer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_renderer_native_init(struct ui_renderer *renderer);
 
 /**
  * @brief Initializes the GLES 2.0 fallback backend.
@@ -268,7 +270,8 @@ ui_error_t ui_renderer_native_init(struct ui_renderer *renderer);
  * @param renderer The renderer to initialize with GLES2.
  * @return UI_ERROR_NONE on success, or an appropriate error code on failure.
  */
-ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *renderer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_renderer_gles_fallback_init(struct ui_renderer *renderer);
 
 /**
  * @brief Destroys the given renderer.
@@ -276,7 +279,8 @@ ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *renderer);
  * @param renderer The renderer to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_renderer_destroy(struct ui_renderer *renderer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_renderer_destroy(struct ui_renderer *renderer);
 
 /**
  * @struct ui_vertex

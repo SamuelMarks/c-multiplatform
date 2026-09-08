@@ -1,5 +1,6 @@
 /* clang-format off */
 #include <stdio.h>
+#include <string.h>
 #include "../include/ui_engine.h"
 #include "../include/ui_error.h"
 #include "../include/ui_reactor.h"
@@ -60,17 +61,21 @@ static int run_normal_tests(void) {
 }
 
 static void run_extra_engine_tests(void) {
+  struct ui_engine *engine = NULL;
+  struct ui_engine_config config;
+
+  memset(&config, 0, sizeof(config));
+
   g_malloc_fail_countdown = 2;
-  struct ui_engine *engine;
-  ui_engine_create(&(struct ui_engine_config){0}, &engine);
+  ui_engine_create(&config, &engine);
   g_malloc_fail_countdown = -1;
 
   g_malloc_fail_countdown = 3;
-  ui_engine_create(&(struct ui_engine_config){0}, &engine);
+  ui_engine_create(&config, &engine);
   g_malloc_fail_countdown = -1;
 
   g_malloc_fail_countdown = 4;
-  ui_engine_create(&(struct ui_engine_config){0}, &engine);
+  ui_engine_create(&config, &engine);
   g_malloc_fail_countdown = -1;
 }
 
@@ -78,7 +83,6 @@ static int run_oom_tests(void) {
   struct ui_engine *engine = NULL;
   struct ui_engine_config config;
   ui_error_t rc;
-  int countdown = 0;
   int i;
   int max_fails =
       10; /* engine struct, tick_engine, thread_pool, reactor, timer */
@@ -130,10 +134,15 @@ struct ui_engine_hack {
 
 static int run_coverage_tests(void) {
   struct ui_engine *engine = NULL;
+  struct ui_engine *null_engine = NULL;
   struct ui_engine_config config;
   struct ui_engine_hack *hack;
   struct ui_reactor *tmp_reactor;
   struct ui_tick_engine *tmp_tick;
+  struct ui_timer *tmp_timer;
+#ifndef UI_SINGLE_THREADED
+  struct ui_thread_pool *tmp_pool;
+#endif
 
   config.num_threads = 1;
   if (ui_engine_create(&config, &engine) != UI_ERROR_NONE)
@@ -157,14 +166,15 @@ static int run_coverage_tests(void) {
   ui_engine_destroy(engine);
 
   /* Test ui_engine_destroy with NULL components to hit branches */
-  struct ui_engine *null_engine = NULL;
   ui_engine_create(&config, &null_engine);
   hack = (struct ui_engine_hack *)null_engine;
 
   tmp_reactor = hack->reactor;
   tmp_tick = hack->tick_engine;
-  struct ui_timer *tmp_timer = hack->timer;
-  struct ui_thread_pool *tmp_pool = hack->thread_pool;
+  tmp_timer = hack->timer;
+#ifndef UI_SINGLE_THREADED
+  tmp_pool = hack->thread_pool;
+#endif
 
   hack->reactor = NULL;
   hack->tick_engine = NULL;

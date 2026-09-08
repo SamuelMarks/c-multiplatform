@@ -58,7 +58,8 @@ enum ui_text_direction {
  * @param out_layout Pointer to receive the text layout object.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_text_layout_create(struct ui_text_layout **out_layout);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_text_layout_create(struct ui_text_layout **out_layout);
 
 /**
  * @brief Destroys a text layout object.
@@ -66,7 +67,8 @@ ui_error_t ui_text_layout_create(struct ui_text_layout **out_layout);
  * @param layout The layout object to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_text_layout_destroy(struct ui_text_layout *layout);
 
 /**
  * @brief Shapes text into positioned glyphs, handling BiDi (stubbed), kerning,
@@ -81,10 +83,9 @@ ui_error_t ui_text_layout_destroy(struct ui_text_layout *layout);
  * @param direction The base text direction.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
-                                struct ui_font *font, float font_size,
-                                const char *text, float max_width,
-                                enum ui_text_direction direction);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_text_layout_shape(
+    struct ui_text_layout *layout, struct ui_font *font, float font_size,
+    const char *text, float max_width, enum ui_text_direction direction);
 
 /**
  * @brief Retrieves the positioned glyphs.
@@ -94,10 +95,9 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
  * @param out_count Pointer to receive the number of glyphs in the array.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_text_layout_get_glyphs(struct ui_text_layout *layout,
-                          const struct ui_positioned_glyph **out_glyphs,
-                          size_t *out_count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_text_layout_get_glyphs(
+    struct ui_text_layout *layout,
+    const struct ui_positioned_glyph **out_glyphs, size_t *out_count);
 
 /**
  * @brief Retrieves the computed bounding box of the shaped text.
@@ -107,8 +107,8 @@ ui_text_layout_get_glyphs(struct ui_text_layout *layout,
  * @param out_height Pointer to receive the height of the bounding box.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_text_layout_get_bounds(struct ui_text_layout *layout,
-                                     float *out_width, float *out_height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_text_layout_get_bounds(
+    struct ui_text_layout *layout, float *out_width, float *out_height);
 
 #ifdef __cplusplus
 }

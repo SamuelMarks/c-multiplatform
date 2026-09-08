@@ -65,7 +65,7 @@ struct ui_sort_state {
  * @param out_sort_header Pointer to receive the allocated sort header base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_sort_header_base_create(struct ui_sort_header_base **out_sort_header);
 
 /**
@@ -74,7 +74,8 @@ ui_sort_header_base_create(struct ui_sort_header_base **out_sort_header);
  * @param sort_header The sort header manager.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header);
 
 /**
  * @brief Sets whether multi-column sorting is enabled.
@@ -84,9 +85,8 @@ ui_error_t ui_sort_header_base_destroy(struct ui_sort_header_base *sort_header);
  * @param is_multi 1 for multi-column sort, 0 for single-column sort.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
-                                   int is_multi);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_sort_header_base_set_multi_sort(
+    struct ui_sort_header_base *sort_header, int is_multi);
 
 /**
  * @brief Toggles the sort direction for a given ID (column).
@@ -97,8 +97,8 @@ ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
  * @param id The identifier for the column/header being sorted.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
-                                      void *id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header, void *id);
 
 /**
  * @brief Explicitly sets the sort direction for a given ID.
@@ -108,7 +108,7 @@ ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
  * @param direction The desired sort direction.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_sort_header_base_set_direction(struct ui_sort_header_base *sort_header,
                                   void *id, enum ui_sort_direction direction);
 
@@ -121,10 +121,9 @@ ui_sort_header_base_set_direction(struct ui_sort_header_base *sort_header,
  * UI_SORT_NONE if not found.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_sort_header_base_get_direction(const struct ui_sort_header_base *sort_header,
-                                  void *id,
-                                  enum ui_sort_direction *out_direction);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_sort_header_base_get_direction(
+    const struct ui_sort_header_base *sort_header, void *id,
+    enum ui_sort_direction *out_direction);
 
 /**
  * @brief Retrieves the active sort states in order of prioritization.
@@ -137,7 +136,7 @@ ui_sort_header_base_get_direction(const struct ui_sort_header_base *sort_header,
  * @param out_count Pointer to receive the actual number of populated states.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sort_header_base_get_active_sorts(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_sort_header_base_get_active_sorts(
     const struct ui_sort_header_base *sort_header,
     struct ui_sort_state *out_states, size_t capacity, size_t *out_count);
 
@@ -147,7 +146,8 @@ ui_error_t ui_sort_header_base_get_active_sorts(
  * @param sort_header The sort header manager.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_sort_header_base_clear(struct ui_sort_header_base *sort_header);
 
 /**
  * @page ui_sort_table_integration Integration Flow with ui_table_base
@@ -190,9 +190,8 @@ ui_error_t ui_sort_header_base_clear(struct ui_sort_header_base *sort_header);
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_sort_header_base_bind_direction(struct ui_sort_header_base *widget,
-                                   struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_sort_header_base_bind_direction(
+    struct ui_sort_header_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

@@ -27,14 +27,16 @@ struct ui_focus_trap;
  * @param out_trap Pointer to receive the new focus trap instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_trap_create(struct ui_focus_trap **out_trap);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_focus_trap_create(struct ui_focus_trap **out_trap);
 
 /**
  * @brief Destroys a focus trap.
  * @param trap The trap to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_focus_trap_destroy(struct ui_focus_trap *trap);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_focus_trap_destroy(struct ui_focus_trap *trap);
 
 /**
  * @brief Initializes the trap for a given DOM node.
@@ -45,9 +47,9 @@ ui_error_t ui_focus_trap_destroy(struct ui_focus_trap *trap);
  * @param root The root DOM node of the area to trap focus within.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_trap_activate(struct ui_focus_trap *trap,
-                                  struct ui_focus_manager *manager,
-                                  struct ui_dom_node *root);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_trap_activate(
+    struct ui_focus_trap *trap, struct ui_focus_manager *manager,
+    struct ui_dom_node *root);
 
 /**
  * @brief Deactivates the trap, popping it from the focus manager and restoring
@@ -57,8 +59,8 @@ ui_error_t ui_focus_trap_activate(struct ui_focus_trap *trap,
  * @param manager The focus manager.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_trap_deactivate(struct ui_focus_trap *trap,
-                                    struct ui_focus_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_trap_deactivate(
+    struct ui_focus_trap *trap, struct ui_focus_manager *manager);
 
 /**
  * @brief Hooks the trap into the keyboard responder to listen for Tab/Shift-Tab
@@ -69,9 +71,8 @@ ui_error_t ui_focus_trap_deactivate(struct ui_focus_trap *trap,
  * @param responder The keyboard responder.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_focus_trap_attach_keyboard(struct ui_focus_trap *trap,
-                              struct ui_keyboard_responder *responder);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_trap_attach_keyboard(
+    struct ui_focus_trap *trap, struct ui_keyboard_responder *responder);
 
 #ifdef __cplusplus
 }

@@ -2,8 +2,8 @@
  * @file ui_toggle_base.c
  * @brief Implementation of the toggle base component (checkbox and radio).
  */
-#include "../include/ui_web_bridge.h"
 /* clang-format off */
+#include "../include/ui_web_bridge.h"
 #include "ui_toggle_base.h"
 #include "ui_internal_mem.h"
 #include "ui_css_parser.h"

@@ -253,17 +253,6 @@ ui_error_t ui_calendar_base_create(struct ui_calendar_base **out_calendar,
  * @param calendar Parameter calendar.
  * @return Return value.
  */
-#ifdef UI_TEST_MOCK_ALLOC
-int g_calendar_mock_fail = 0;
-extern ui_error_t ui_component_destroy(struct ui_component *c);
-static ui_error_t mock_component_destroy_calendar(struct ui_component *c) {
-  if (g_calendar_mock_fail == 20)
-    return UI_ERROR_UNKNOWN;
-  return ui_component_destroy(c);
-}
-#define ui_component_destroy mock_component_destroy_calendar
-#endif
-
 ui_error_t ui_calendar_base_destroy(struct ui_calendar_base *calendar) {
   if (!calendar) {
     return UI_ERROR_NONE;

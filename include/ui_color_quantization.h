@@ -45,11 +45,10 @@ struct ui_color_quantization_options {
  * extracted.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
-                         size_t height, int channels,
-                         const struct ui_color_quantization_options *options,
-                         ui_color_t *out_colors, size_t *out_color_count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_color_quantize_kmeans(
+    const unsigned char *pixels, size_t width, size_t height, int channels,
+    const struct ui_color_quantization_options *options, ui_color_t *out_colors,
+    size_t *out_color_count);
 
 #ifdef __cplusplus
 }

@@ -250,8 +250,11 @@ static int run_normal_tests(void) {
 
   EXPECT(ui_input_base_get_cva(input, &cva) == UI_ERROR_NONE);
 
-  EXPECT(cva.write_value(NULL, (union ui_signal_payload){0}) ==
-         UI_ERROR_INVALID_ARGUMENT);
+  {
+    union ui_signal_payload empty_payload;
+    memset(&empty_payload, 0, sizeof(empty_payload));
+    EXPECT(cva.write_value(NULL, empty_payload) == UI_ERROR_INVALID_ARGUMENT);
+  }
 
   {
     union ui_signal_payload val;

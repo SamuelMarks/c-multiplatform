@@ -54,7 +54,8 @@ typedef ui_error_t (*ui_input_on_change_t)(struct ui_input_base *input,
  * @param out_input Pointer to receive the allocated input base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_create(struct ui_input_base **out_input);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_base_create(struct ui_input_base **out_input);
 
 /**
  * @brief Destroys an input base component.
@@ -62,7 +63,8 @@ ui_error_t ui_input_base_create(struct ui_input_base **out_input);
  * @param input The input to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_destroy(struct ui_input_base *input);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_base_destroy(struct ui_input_base *input);
 
 /**
  * @brief Sets the text of the input.
@@ -71,8 +73,8 @@ ui_error_t ui_input_base_destroy(struct ui_input_base *input);
  * @param text The text string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_set_text(struct ui_input_base *input,
-                                  const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_base_set_text(struct ui_input_base *input, const char *text);
 
 /**
  * @brief Gets the current text of the input.
@@ -81,8 +83,8 @@ ui_error_t ui_input_base_set_text(struct ui_input_base *input,
  * @param out_text Pointer to receive the current text string pointer.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_get_text(const struct ui_input_base *input,
-                                  const char **out_text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_input_base_get_text(
+    const struct ui_input_base *input, const char **out_text);
 
 /**
  * @brief Sets the input type (e.g., "password", "number", "email", "tel").
@@ -93,8 +95,8 @@ ui_error_t ui_input_base_get_text(const struct ui_input_base *input,
  * @param type The input type string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_set_type(struct ui_input_base *input,
-                                  const char *type);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_base_set_type(struct ui_input_base *input, const char *type);
 
 /**
  * @brief Sets the placeholder text.
@@ -103,8 +105,8 @@ ui_error_t ui_input_base_set_type(struct ui_input_base *input,
  * @param placeholder The placeholder string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_set_placeholder(struct ui_input_base *input,
-                                         const char *placeholder);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_input_base_set_placeholder(
+    struct ui_input_base *input, const char *placeholder);
 
 /**
  * @brief Sets the disabled state of the input.
@@ -114,8 +116,8 @@ ui_error_t ui_input_base_set_placeholder(struct ui_input_base *input,
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_set_disabled(struct ui_input_base *input,
-                                      int disabled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_base_set_disabled(struct ui_input_base *input, int disabled);
 
 /**
  * @brief Sets the change handler for the input.
@@ -125,9 +127,9 @@ ui_error_t ui_input_base_set_disabled(struct ui_input_base *input,
  * @param user_data Opaque user data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_set_on_change(struct ui_input_base *input,
-                                       ui_input_on_change_t on_change,
-                                       void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_base_set_on_change(struct ui_input_base *input,
+                            ui_input_on_change_t on_change, void *user_data);
 
 /**
  * @brief Processes an incoming input event to trigger typing.
@@ -137,9 +139,9 @@ ui_error_t ui_input_base_set_on_change(struct ui_input_base *input,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_input_base_process_event(struct ui_input_base *input,
-                                       const struct ui_event *event,
-                                       double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_input_base_process_event(struct ui_input_base *input,
+                            const struct ui_event *event, double timestamp_ms);
 
 /**
  * @brief Gets the CVA vtable for this component.
@@ -148,8 +150,8 @@ ui_error_t ui_input_base_process_event(struct ui_input_base *input,
  * @param out_cva Pointer to store the vtable.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_input_base_get_cva(struct ui_input_base *input,
-                                 struct ui_control_value_accessor *out_cva);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_input_base_get_cva(
+    struct ui_input_base *input, struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -159,8 +161,8 @@ ui_error_t ui_input_base_get_cva(struct ui_input_base *input,
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_input_base_get_component(struct ui_input_base *input,
-                                       struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_input_base_get_component(
+    struct ui_input_base *input, struct ui_component **out_component);
 
 #ifdef __cplusplus
 }

@@ -61,7 +61,7 @@ typedef ui_error_t (*ui_autocomplete_on_text_change_t)(
  * @param out_cva Optional pointer to receive the control value accessor.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_autocomplete_base_create(struct ui_autocomplete_base **out_autocomplete,
                             struct ui_control_value_accessor *out_cva);
 
@@ -71,7 +71,7 @@ ui_autocomplete_base_create(struct ui_autocomplete_base **out_autocomplete,
  * @param autocomplete The autocomplete to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete);
 
 /**
@@ -81,7 +81,7 @@ ui_autocomplete_base_destroy(struct ui_autocomplete_base *autocomplete);
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_autocomplete_base_get_component(struct ui_autocomplete_base *autocomplete,
                                    struct ui_component **out_component);
 
@@ -92,7 +92,7 @@ ui_autocomplete_base_get_component(struct ui_autocomplete_base *autocomplete,
  * @param out_input Pointer to receive the input base.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_autocomplete_base_get_input(struct ui_autocomplete_base *autocomplete,
                                struct ui_input_base **out_input);
 
@@ -103,7 +103,7 @@ ui_autocomplete_base_get_input(struct ui_autocomplete_base *autocomplete,
  * @param out_listbox Pointer to receive the listbox base.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_autocomplete_base_get_listbox(struct ui_autocomplete_base *autocomplete,
                                  struct ui_listbox_base **out_listbox);
 
@@ -115,7 +115,8 @@ ui_autocomplete_base_get_listbox(struct ui_autocomplete_base *autocomplete,
  * @param focus_mgr The global focus manager.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_autocomplete_base_set_overlay_dependencies(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_autocomplete_base_set_overlay_dependencies(
     struct ui_autocomplete_base *autocomplete,
     struct ui_overlay_director *director, struct ui_focus_manager *focus_mgr);
 
@@ -127,7 +128,8 @@ ui_error_t ui_autocomplete_base_set_overlay_dependencies(
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_autocomplete_base_set_on_text_change(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_autocomplete_base_set_on_text_change(
     struct ui_autocomplete_base *autocomplete,
     ui_autocomplete_on_text_change_t on_text_change, void *user_data);
 
@@ -139,7 +141,7 @@ ui_error_t ui_autocomplete_base_set_on_text_change(
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_autocomplete_base_set_on_selection(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_autocomplete_base_set_on_selection(
     struct ui_autocomplete_base *autocomplete,
     ui_autocomplete_on_selection_t on_selection, void *user_data);
 
@@ -152,7 +154,7 @@ ui_error_t ui_autocomplete_base_set_on_selection(
  * @param viewport_height Total viewport height.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_autocomplete_base_open(struct ui_autocomplete_base *autocomplete,
                           const struct ui_layout_node *trigger_layout,
                           float viewport_width, float viewport_height);
@@ -163,7 +165,7 @@ ui_autocomplete_base_open(struct ui_autocomplete_base *autocomplete,
  * @param autocomplete The autocomplete.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_autocomplete_base_close(struct ui_autocomplete_base *autocomplete);
 
 /**
@@ -175,10 +177,9 @@ ui_autocomplete_base_close(struct ui_autocomplete_base *autocomplete);
  * @param timestamp_ms Current time in ms.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_autocomplete_base_process_event(struct ui_autocomplete_base *autocomplete,
-                                   const struct ui_event *event,
-                                   double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_autocomplete_base_process_event(
+    struct ui_autocomplete_base *autocomplete, const struct ui_event *event,
+    double timestamp_ms);
 
 #ifdef __cplusplus
 }

@@ -24,12 +24,15 @@ static ui_error_t mock_cva_on_touched(void *user_data) {
 static int run_normal_tests(void) {
   struct ui_slide_toggle_base *toggle = NULL;
   struct ui_control_value_accessor cva;
+  union ui_signal_payload empty_payload;
   ui_error_t rc;
   int state;
   float offset;
   struct ui_event ev;
   int change_called = -1;
   int touched_called = 0;
+
+  memset(&empty_payload, 0, sizeof(empty_payload));
 
   printf("Testing ui_slide_toggle_base_create...\n");
   if (ui_slide_toggle_base_create(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -42,8 +45,7 @@ static int run_normal_tests(void) {
   }
 
   /* Test cva failure paths */
-  if (cva.write_value(NULL, (union ui_signal_payload){0}) !=
-      UI_ERROR_INVALID_ARGUMENT)
+  if (cva.write_value(NULL, empty_payload) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (cva.register_on_change(NULL, mock_cva_on_change, &change_called) !=
       UI_ERROR_INVALID_ARGUMENT)

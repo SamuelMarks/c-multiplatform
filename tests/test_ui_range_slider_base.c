@@ -656,8 +656,6 @@ int main(void) {
   printf("test_ui_range_slider_base passed\n");
   return 0;
 }
-#include "ui_range_slider_base.h"
-
 void test_extra_range(void) {
   struct ui_range_slider_base *slider = NULL;
   {

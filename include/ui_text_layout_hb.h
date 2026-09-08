@@ -28,7 +28,7 @@ extern "C" {
  * @return UI_ERROR_NONE on success, UI_ERROR_UNSUPPORTED if HarfBuzz is not
  * compiled in.
  */
-ui_error_t ui_text_layout_hb_init(void);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_text_layout_hb_init(void);
 
 /**
  * @brief Shapes text using HarfBuzz, outputting into the standard
@@ -44,11 +44,9 @@ ui_error_t ui_text_layout_hb_init(void);
  * @param direction The base text direction.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_text_layout_shape_with_harfbuzz(struct ui_text_layout *layout,
-                                              struct ui_font *font,
-                                              float font_size, const char *text,
-                                              float max_width,
-                                              enum ui_text_direction direction);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_text_layout_shape_with_harfbuzz(
+    struct ui_text_layout *layout, struct ui_font *font, float font_size,
+    const char *text, float max_width, enum ui_text_direction direction);
 
 #ifdef __cplusplus
 }

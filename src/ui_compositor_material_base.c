@@ -91,17 +91,6 @@ ui_error_t ui_compositor_material_base_create(
  * @param material Parameter material.
  * @return Return value.
  */
-#ifdef UI_TEST_MOCK_ALLOC
-int g_compositor_mock_fail = 0;
-extern ui_error_t ui_component_destroy(struct ui_component *c);
-static ui_error_t mock_component_destroy_compositor(struct ui_component *c) {
-  if (g_compositor_mock_fail == 20)
-    return UI_ERROR_UNKNOWN;
-  return ui_component_destroy(c);
-}
-#define ui_component_destroy mock_component_destroy_compositor
-#endif
-
 ui_error_t ui_compositor_material_base_destroy(
     struct ui_compositor_material_base *material) {
   if (!material) {

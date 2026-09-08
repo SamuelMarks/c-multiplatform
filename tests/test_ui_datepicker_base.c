@@ -1,6 +1,7 @@
 /* clang-format off */
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include "../include/ui_datepicker_base.h"
 #include "../include/ui_input_base.h"
 #include "../include/ui_popover_base.h"
@@ -244,8 +245,11 @@ static int test_callbacks_and_sync(void) {
   struct ui_calendar_base *calendar = NULL;
   struct ui_control_value_accessor cva;
   struct ui_date date = {2023, 1, 10};
+  union ui_signal_payload empty_payload;
   int change_called = 0;
   int touched_called = 0;
+
+  memset(&empty_payload, 0, sizeof(empty_payload));
 
   if (ui_input_base_create(&input) != UI_ERROR_NONE)
     return 1;
@@ -294,7 +298,7 @@ static int test_callbacks_and_sync(void) {
   (void)cva.register_on_change(dp, NULL, NULL);
   (void)cva.register_on_touched(dp, NULL, NULL);
   (void)cva.set_disabled_state(dp, 1);
-  (void)cva.write_value(dp, (union ui_signal_payload){0});
+  (void)cva.write_value(dp, empty_payload);
   dp->is_syncing = 0;
 
   /* Call register and set_disabled normally */
@@ -430,8 +434,10 @@ static int test_oom_simulation(void) {
   struct ui_calendar_base *calendar = NULL;
   struct ui_control_value_accessor cva;
   union ui_signal_payload payload;
+  union ui_signal_payload empty_payload;
   struct ui_date date = {2024, 1, 1};
 
+  memset(&empty_payload, 0, sizeof(empty_payload));
   payload.ptr_val = &date;
 
   for (i = 1; i < 50; i++) {
@@ -456,7 +462,7 @@ static int test_oom_simulation(void) {
 
       g_malloc_fail_countdown = i;
       if (cva.write_value)
-        (void)cva.write_value(dp, (union ui_signal_payload){0});
+        (void)cva.write_value(dp, empty_payload);
       g_malloc_fail_countdown = -1;
 
       g_malloc_fail_countdown = i;

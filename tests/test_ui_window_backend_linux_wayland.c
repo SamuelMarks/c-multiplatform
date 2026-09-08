@@ -74,11 +74,14 @@ static int test_wayland(void) {
                 UI_ERROR_NONE);
 
     ASSERT_EQ(ui_window_backend_linux_destroy(backend), UI_ERROR_NONE);
-  }
 
-  g_malloc_fail_countdown = 0;
-  ASSERT_EQ(ui_window_backend_linux_create(&backend), UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+    g_malloc_fail_countdown = 0;
+    ASSERT_EQ(ui_window_backend_linux_create(&backend), UI_ERROR_OUT_OF_MEMORY);
+    g_malloc_fail_countdown = -1;
+  } else {
+    backend = (struct ui_window_backend *)(void *)1;
+    ASSERT_EQ(ui_window_backend_linux_destroy(backend), UI_ERROR_UNKNOWN);
+  }
 #else
   ASSERT_EQ(ui_window_backend_linux_create(&backend), UI_ERROR_UNKNOWN);
   /* The stub platform sets backend to NULL. Let's create a fake one to test the

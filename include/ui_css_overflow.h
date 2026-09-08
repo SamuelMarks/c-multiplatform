@@ -86,8 +86,8 @@ struct ui_css_max_lines {
  * \param out_overflow Pointer to receive the parsed overflow value.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_overflow(const char *str,
-                                 enum ui_css_overflow *out_overflow);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_overflow(const char *str, enum ui_css_overflow *out_overflow);
 
 /**
  * \brief Parses CSS text-overflow.
@@ -96,9 +96,8 @@ ui_error_t ui_css_parse_overflow(const char *str,
  * \param out_overflow Pointer to receive the parsed text-overflow value.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_css_parse_text_overflow(const char *str,
-                           struct ui_css_text_overflow *out_overflow);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_text_overflow(
+    const char *str, struct ui_css_text_overflow *out_overflow);
 
 /**
  * \brief Parses CSS block-ellipsis.
@@ -107,9 +106,8 @@ ui_css_parse_text_overflow(const char *str,
  * \param out_ellipsis Pointer to receive the parsed block-ellipsis value.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_css_parse_block_ellipsis(const char *str,
-                            struct ui_css_block_ellipsis *out_ellipsis);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_block_ellipsis(
+    const char *str, struct ui_css_block_ellipsis *out_ellipsis);
 
 /**
  * \brief Parses CSS line-clamp.
@@ -118,8 +116,8 @@ ui_css_parse_block_ellipsis(const char *str,
  * \param out_clamp Pointer to receive the parsed line-clamp value.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_line_clamp(const char *str,
-                                   struct ui_css_line_clamp *out_clamp);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_line_clamp(const char *str, struct ui_css_line_clamp *out_clamp);
 
 /**
  * \brief Parses CSS max-lines.
@@ -128,8 +126,8 @@ ui_error_t ui_css_parse_line_clamp(const char *str,
  * \param out_max_lines Pointer to receive the parsed max-lines value.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_max_lines(const char *str,
-                                  struct ui_css_max_lines *out_max_lines);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_max_lines(const char *str, struct ui_css_max_lines *out_max_lines);
 
 /**
  * \brief Parses CSS overflow-clip-margin.
@@ -138,8 +136,8 @@ ui_error_t ui_css_parse_max_lines(const char *str,
  * \param out_margin Pointer to receive the parsed overflow-clip-margin value.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_overflow_clip_margin(const char *str,
-                                             struct ui_css_value *out_margin);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_overflow_clip_margin(
+    const char *str, struct ui_css_value *out_margin);
 
 #ifdef __cplusplus
 }

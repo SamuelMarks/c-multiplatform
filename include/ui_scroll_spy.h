@@ -34,7 +34,8 @@ struct ui_scroll_spy;
  * @param out_spy Pointer to receive the allocated scroll spy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_spy_create(struct ui_scroll_spy **out_spy);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_spy_create(struct ui_scroll_spy **out_spy);
 
 /**
  * @brief Destroys a scroll spy instance.
@@ -42,7 +43,8 @@ ui_error_t ui_scroll_spy_create(struct ui_scroll_spy **out_spy);
  * @param spy The scroll spy to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_spy_destroy(struct ui_scroll_spy *spy);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_spy_destroy(struct ui_scroll_spy *spy);
 
 /**
  * @brief Sets the root scrolling container and its observation margin.
@@ -53,8 +55,8 @@ ui_error_t ui_scroll_spy_destroy(struct ui_scroll_spy *spy);
  * trigger early).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
-                                  struct ui_dom_node *root, int root_margin_px);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_spy_set_root(
+    struct ui_scroll_spy *spy, struct ui_dom_node *root, int root_margin_px);
 
 /**
  * @brief Adds a target section to be tracked by the scroll spy.
@@ -64,8 +66,8 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
  * @param section_id The unique user-defined ID for this section.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_spy_add_target(struct ui_scroll_spy *spy,
-                                    struct ui_dom_node *target, int section_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_spy_add_target(
+    struct ui_scroll_spy *spy, struct ui_dom_node *target, int section_id);
 
 /**
  * @brief Removes a target section from the scroll spy.
@@ -75,8 +77,8 @@ ui_error_t ui_scroll_spy_add_target(struct ui_scroll_spy *spy,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND, or an appropriate error
  * code.
  */
-ui_error_t ui_scroll_spy_remove_target(struct ui_scroll_spy *spy,
-                                       struct ui_dom_node *target);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_spy_remove_target(
+    struct ui_scroll_spy *spy, struct ui_dom_node *target);
 
 /**
  * @brief Binds a signal that will receive the active section ID.
@@ -86,8 +88,8 @@ ui_error_t ui_scroll_spy_remove_target(struct ui_scroll_spy *spy,
  * @param active_signal The signal to update when the active section changes.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_spy_bind_active_section(struct ui_scroll_spy *spy,
-                                             struct ui_signal *active_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_spy_bind_active_section(
+    struct ui_scroll_spy *spy, struct ui_signal *active_signal);
 
 /**
  * @brief Triggers an evaluation of the underlying intersection observer.
@@ -96,7 +98,8 @@ ui_error_t ui_scroll_spy_bind_active_section(struct ui_scroll_spy *spy,
  * @param spy The scroll spy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_spy_evaluate(struct ui_scroll_spy *spy);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_spy_evaluate(struct ui_scroll_spy *spy);
 
 #ifdef __cplusplus
 }

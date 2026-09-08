@@ -116,12 +116,11 @@ typedef ui_error_t (*ui_update_fn)(union ui_signal_payload current_value,
  * @param out_signal The pointer to store the created signal.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_signal_create(struct ui_arena *arena,
-                            union ui_signal_payload initial_value,
-                            enum ui_signal_type type,
-                            ui_equality_fn equality_fn,
-                            ui_destructor_fn destructor_fn,
-                            enum ui_signal_mode mode, ui_signal_t **out_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_signal_create(struct ui_arena *arena, union ui_signal_payload initial_value,
+                 enum ui_signal_type type, ui_equality_fn equality_fn,
+                 ui_destructor_fn destructor_fn, enum ui_signal_mode mode,
+                 ui_signal_t **out_signal);
 
 /**
  * @brief Gets the current value of the signal.
@@ -130,8 +129,8 @@ ui_error_t ui_signal_create(struct ui_arena *arena,
  * @param out_value The pointer to store the current value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_signal_get(ui_signal_t *signal,
-                         union ui_signal_payload *out_value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_signal_get(ui_signal_t *signal, union ui_signal_payload *out_value);
 
 /**
  * @brief Sets the value of the signal.
@@ -140,8 +139,8 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
  * @param new_value The new value to set.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_signal_set(ui_signal_t *signal,
-                         union ui_signal_payload new_value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_signal_set(ui_signal_t *signal, union ui_signal_payload new_value);
 
 /**
  * @brief Updates the value of the signal using an update function.
@@ -150,7 +149,8 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
  * @param update_fn The update function.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn);
 
 /**
  * @brief Destroys the signal.
@@ -158,7 +158,7 @@ ui_error_t ui_signal_update(ui_signal_t *signal, ui_update_fn update_fn);
  * @param signal The signal.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_signal_destroy(ui_signal_t *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_signal_destroy(ui_signal_t *signal);
 
 #ifdef __cplusplus
 }

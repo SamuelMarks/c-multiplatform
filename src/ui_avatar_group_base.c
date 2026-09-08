@@ -3,9 +3,8 @@
  * @brief Implementation of the avatar group component.
  */
 
-#include "ui_avatar_group_base.h"
-
 /* clang-format off */
+#include "ui_avatar_group_base.h"
 #include "ui_aria.h"
 #include "ui_component.h"
 #include <stdlib.h>

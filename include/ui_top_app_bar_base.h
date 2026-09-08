@@ -61,10 +61,9 @@ struct ui_top_app_bar_config {
  * @param out_bar Output pointer for the created component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_top_app_bar_base_create(struct ui_arena *arena,
-                           const struct ui_top_app_bar_config *config,
-                           struct ui_top_app_bar_base **out_bar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_top_app_bar_base_create(
+    struct ui_arena *arena, const struct ui_top_app_bar_config *config,
+    struct ui_top_app_bar_base **out_bar);
 
 /**
  * @brief Destroys a top app bar base component.
@@ -72,7 +71,8 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
  * @param bar The component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar);
 
 /**
  * @brief Handles scroll events.
@@ -82,8 +82,8 @@ ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar);
  * @param delta_y The change in scroll position.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
-                                             float scroll_y, float delta_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_top_app_bar_base_handle_scroll(
+    struct ui_top_app_bar_base *bar, float scroll_y, float delta_y);
 
 /**
  * @brief Gets the signal for the current state.
@@ -93,8 +93,8 @@ ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
  * @param out_signal Output pointer for the signal.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
-                                                ui_signal_t **out_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_top_app_bar_base_get_state_signal(
+    struct ui_top_app_bar_base *bar, ui_signal_t **out_signal);
 
 /**
  * @brief Gets the signal for the current height.
@@ -104,9 +104,8 @@ ui_error_t ui_top_app_bar_base_get_state_signal(struct ui_top_app_bar_base *bar,
  * @param out_signal Output pointer for the signal.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_top_app_bar_base_get_height_signal(struct ui_top_app_bar_base *bar,
-                                      ui_signal_t **out_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_top_app_bar_base_get_height_signal(
+    struct ui_top_app_bar_base *bar, ui_signal_t **out_signal);
 
 #ifdef __cplusplus
 }

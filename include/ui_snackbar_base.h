@@ -80,9 +80,9 @@ struct ui_snackbar_config {
  * @param out_snackbar Pointer to receive the allocated snackbar instance.
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY if allocation fails.
  */
-ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
-                                   struct ui_overlay_director *director,
-                                   struct ui_snackbar_base **out_snackbar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_snackbar_base_create(
+    struct ui_timer *timer, struct ui_overlay_director *director,
+    struct ui_snackbar_base **out_snackbar);
 
 /**
  * @brief Destroys a snackbar instance and frees its resources.
@@ -90,7 +90,8 @@ ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
  * @param snackbar The snackbar instance to destroy. If null, does nothing.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar);
 
 /**
  * @brief Enqueues a snackbar to be shown.
@@ -99,8 +100,8 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar);
  * @param config The configuration for the snackbar to show.
  * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT if null.
  */
-ui_error_t ui_snackbar_base_enqueue(struct ui_snackbar_base *snackbar,
-                                    const struct ui_snackbar_config *config);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_snackbar_base_enqueue(
+    struct ui_snackbar_base *snackbar, const struct ui_snackbar_config *config);
 
 /**
  * @brief Dismisses the currently active snackbar.
@@ -108,7 +109,8 @@ ui_error_t ui_snackbar_base_enqueue(struct ui_snackbar_base *snackbar,
  * @param snackbar The snackbar base manager.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar);
 
 /**
  * @brief Ticks the snackbar logic to handle timers and queue progression.
@@ -116,7 +118,8 @@ ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar);
  * @param snackbar The snackbar base manager.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_snackbar_base_tick(struct ui_snackbar_base *snackbar);
 
 /**
  * @brief Process events (like clicks on the action button).
@@ -126,9 +129,9 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar);
  * @param timestamp_ms Event timestamp in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
-                                          const struct ui_event *event,
-                                          double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_snackbar_base_process_event(
+    struct ui_snackbar_base *snackbar, const struct ui_event *event,
+    double timestamp_ms);
 
 /**
  * @brief Binds the open state to a signal.
@@ -137,8 +140,8 @@ ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_snackbar_base_bind_open(struct ui_snackbar_base *widget,
-                                      struct ui_signal *open_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_snackbar_base_bind_open(
+    struct ui_snackbar_base *widget, struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the widget is animating.
@@ -147,9 +150,8 @@ ui_error_t ui_snackbar_base_bind_open(struct ui_snackbar_base *widget,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_snackbar_base_get_animating_signal(struct ui_snackbar_base *widget,
-                                      struct ui_computed **out_animating);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_snackbar_base_get_animating_signal(
+    struct ui_snackbar_base *widget, struct ui_computed **out_animating);
 
 #ifdef __cplusplus
 }

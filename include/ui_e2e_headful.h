@@ -30,9 +30,9 @@ struct ui_e2e_headful_ctx;
  * @param out_ctx Pointer to receive the headful context.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_e2e_headful_create(struct ui_window_backend *backend,
-                                 struct ui_window *window,
-                                 struct ui_e2e_headful_ctx **out_ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_e2e_headful_create(
+    struct ui_window_backend *backend, struct ui_window *window,
+    struct ui_e2e_headful_ctx **out_ctx);
 
 /**
  * @brief Destroys the headful E2E context.
@@ -40,7 +40,8 @@ ui_error_t ui_e2e_headful_create(struct ui_window_backend *backend,
  * @param ctx The headful context.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx);
 
 /**
  * @brief Synthesizes a sequence of pointer (mouse) events for a full click at
@@ -55,7 +56,8 @@ ui_error_t ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx);
  * @return UI_ERROR_NONE on success, UI_ERROR_UNSUPPORTED if OS injection is not
  * implemented on this platform.
  */
-ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y);
 
 /**
  * @brief Synthesizes a sequence of keyboard events for a single keystroke.
@@ -66,8 +68,8 @@ ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y);
  * @return UI_ERROR_NONE on success, UI_ERROR_UNSUPPORTED if OS injection is not
  * implemented on this platform.
  */
-ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
-                                   unsigned int modifiers);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_e2e_headful_type_key(
+    struct ui_e2e_headful_ctx *ctx, int key_code, unsigned int modifiers);
 
 #ifdef __cplusplus
 }

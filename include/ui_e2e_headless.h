@@ -31,8 +31,8 @@ struct ui_e2e_headless_ctx;
  * @param out_ctx Pointer to receive the headless context.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_e2e_headless_create(int width, int height,
-                                  struct ui_e2e_headless_ctx **out_ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_e2e_headless_create(
+    int width, int height, struct ui_e2e_headless_ctx **out_ctx);
 
 /**
  * @brief Destroys the headless E2E context.
@@ -40,7 +40,8 @@ ui_error_t ui_e2e_headless_create(int width, int height,
  * @param ctx The headless context.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_e2e_headless_destroy(struct ui_e2e_headless_ctx *ctx);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_e2e_headless_destroy(struct ui_e2e_headless_ctx *ctx);
 
 /**
  * @brief Gets the underlying window backend which can be injected into the
@@ -50,8 +51,8 @@ ui_error_t ui_e2e_headless_destroy(struct ui_e2e_headless_ctx *ctx);
  * @param out_backend Output pointer for the backend.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_e2e_headless_get_backend(struct ui_e2e_headless_ctx *ctx,
-                                       struct ui_window_backend **out_backend);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_e2e_headless_get_backend(
+    struct ui_e2e_headless_ctx *ctx, struct ui_window_backend **out_backend);
 
 /**
  * @brief Directly pushes a synthetic input event into the headless event queue.
@@ -60,8 +61,8 @@ ui_error_t ui_e2e_headless_get_backend(struct ui_e2e_headless_ctx *ctx,
  * @param event The event to push.
  * @return UI_ERROR_NONE on success, or UI_ERROR_OUT_OF_MEMORY.
  */
-ui_error_t ui_e2e_headless_push_event(struct ui_e2e_headless_ctx *ctx,
-                                      const struct ui_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_e2e_headless_push_event(
+    struct ui_e2e_headless_ctx *ctx, const struct ui_event *event);
 
 /**
  * @brief Convenience function to synthesize a sequence of pointer (mouse)
@@ -74,7 +75,8 @@ ui_error_t ui_e2e_headless_push_event(struct ui_e2e_headless_ctx *ctx,
  * @param y The Y coordinate.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_e2e_headless_click(struct ui_e2e_headless_ctx *ctx, int x, int y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_e2e_headless_click(struct ui_e2e_headless_ctx *ctx, int x, int y);
 
 /**
  * @brief Convenience function to synthesize a sequence of keyboard events for a
@@ -87,8 +89,8 @@ ui_error_t ui_e2e_headless_click(struct ui_e2e_headless_ctx *ctx, int x, int y);
  * @param modifiers The active modifier flags.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_e2e_headless_type_key(struct ui_e2e_headless_ctx *ctx,
-                                    int key_code, unsigned int modifiers);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_e2e_headless_type_key(
+    struct ui_e2e_headless_ctx *ctx, int key_code, unsigned int modifiers);
 
 /**
  * @brief Advances the virtual time in the headless context to trigger
@@ -98,8 +100,8 @@ ui_error_t ui_e2e_headless_type_key(struct ui_e2e_headless_ctx *ctx,
  * @param delta_ms The time in milliseconds to advance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_e2e_advance_time(struct ui_e2e_headless_ctx *ctx,
-                               double delta_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_e2e_advance_time(struct ui_e2e_headless_ctx *ctx, double delta_ms);
 
 #ifdef __cplusplus
 }

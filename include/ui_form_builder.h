@@ -31,8 +31,8 @@ typedef struct ui_form_builder ui_form_builder_t;
  * @param out_builder Pointer to store the created form builder.
  * @return ui_error_t
  */
-ui_error_t ui_form_builder_create(struct ui_arena *arena,
-                                  ui_form_builder_t **out_builder);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_builder_create(struct ui_arena *arena, ui_form_builder_t **out_builder);
 
 /**
  * @brief Starts a new form group in the current hierarchy.
@@ -41,8 +41,8 @@ ui_error_t ui_form_builder_create(struct ui_arena *arena,
  * @param name The name of the group (if within another group) or NULL for root.
  * @return ui_error_t
  */
-ui_error_t ui_form_builder_group_start(ui_form_builder_t *builder,
-                                       const char *name);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_builder_group_start(ui_form_builder_t *builder, const char *name);
 
 /**
  * @brief Ends the current form group.
@@ -50,7 +50,8 @@ ui_error_t ui_form_builder_group_start(ui_form_builder_t *builder,
  * @param builder The form builder.
  * @return ui_error_t
  */
-ui_error_t ui_form_builder_group_end(ui_form_builder_t *builder);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_builder_group_end(ui_form_builder_t *builder);
 
 /**
  * @brief Starts a new form array in the current hierarchy.
@@ -59,8 +60,8 @@ ui_error_t ui_form_builder_group_end(ui_form_builder_t *builder);
  * @param name The name of the array (if within a group).
  * @return ui_error_t
  */
-ui_error_t ui_form_builder_array_start(ui_form_builder_t *builder,
-                                       const char *name);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_builder_array_start(ui_form_builder_t *builder, const char *name);
 
 /**
  * @brief Ends the current form array.
@@ -68,7 +69,8 @@ ui_error_t ui_form_builder_array_start(ui_form_builder_t *builder,
  * @param builder The form builder.
  * @return ui_error_t
  */
-ui_error_t ui_form_builder_array_end(ui_form_builder_t *builder);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_builder_array_end(ui_form_builder_t *builder);
 
 /**
  * @brief Adds a control to the current group or array.
@@ -82,10 +84,10 @@ ui_error_t ui_form_builder_array_end(ui_form_builder_t *builder);
  * @param user_data User data for the validator.
  * @return ui_error_t
  */
-ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
-                                   union ui_signal_payload initial_value,
-                                   enum ui_signal_type type,
-                                   ui_validator_fn validator, void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_builder_control(
+    ui_form_builder_t *builder, const char *name,
+    union ui_signal_payload initial_value, enum ui_signal_type type,
+    ui_validator_fn validator, void *user_data);
 
 /**
  * @brief Finalizes the form construction and retrieves the root form group.
@@ -95,8 +97,8 @@ ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
  * @param out_root Pointer to store the finalized root form group.
  * @return ui_error_t
  */
-ui_error_t ui_form_builder_build(ui_form_builder_t *builder,
-                                 ui_form_group_t **out_root);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_builder_build(ui_form_builder_t *builder, ui_form_group_t **out_root);
 
 /**
  * @brief Destroys the form builder and frees its internal resources.
@@ -106,7 +108,8 @@ ui_error_t ui_form_builder_build(ui_form_builder_t *builder,
  * @param builder The form builder.
  * @return ui_error_t
  */
-ui_error_t ui_form_builder_destroy(ui_form_builder_t *builder);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_builder_destroy(ui_form_builder_t *builder);
 
 #ifdef __cplusplus
 }

@@ -42,9 +42,9 @@ struct ui_route_request;
  * found.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_route_request_get_param(const struct ui_route_request *req,
-                                      const char *param_name,
-                                      const char **out_param);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_route_request_get_param(const struct ui_route_request *req,
+                           const char *param_name, const char **out_param);
 
 /**
  * @brief Gets a query string parameter (e.g. from "?tab=2") by name.
@@ -55,9 +55,9 @@ ui_error_t ui_route_request_get_param(const struct ui_route_request *req,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if not present,
  *         or an appropriate error code.
  */
-ui_error_t ui_route_request_get_query(const struct ui_route_request *req,
-                                      const char *query_name,
-                                      const char **out_query);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_route_request_get_query(const struct ui_route_request *req,
+                           const char *query_name, const char **out_query);
 
 /**
  * @brief Gets the exact path string that was requested (excluding query
@@ -67,8 +67,8 @@ ui_error_t ui_route_request_get_query(const struct ui_route_request *req,
  * @param out_path Pointer to receive the path string.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_route_request_get_path(const struct ui_route_request *req,
-                                     const char **out_path);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_route_request_get_path(
+    const struct ui_route_request *req, const char **out_path);
 
 /**
  * @brief Callback function to instantiate a screen component for a matched
@@ -89,7 +89,8 @@ typedef ui_error_t (*ui_route_factory_t)(const struct ui_route_request *req,
  * @param out_router Pointer to receive the allocated router.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_router_create(struct ui_router **out_router);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_create(struct ui_router **out_router);
 
 /**
  * @brief Destroys a router and all screens in its stack.
@@ -97,7 +98,8 @@ ui_error_t ui_router_create(struct ui_router **out_router);
  * @param router The router to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_router_destroy(struct ui_router *router);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_destroy(struct ui_router *router);
 
 /**
  * @brief Registers a route pattern mapping to a screen factory.
@@ -108,8 +110,9 @@ ui_error_t ui_router_destroy(struct ui_router *router);
  * @param user_data Opaque data passed to the factory.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
-                               ui_route_factory_t factory, void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_add_route(struct ui_router *router, const char *pattern,
+                    ui_route_factory_t factory, void *user_data);
 
 /**
  * @brief Navigates to a specific URL by matching it against registered routes
@@ -120,7 +123,8 @@ ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if no matching route is
  * found, or an appropriate error code.
  */
-ui_error_t ui_router_navigate(struct ui_router *router, const char *path);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_navigate(struct ui_router *router, const char *path);
 
 /**
  * @brief Gets the custom state pointer passed during navigation.
@@ -129,8 +133,8 @@ ui_error_t ui_router_navigate(struct ui_router *router, const char *path);
  * @param out_state Pointer to receive the state, or NULL if none.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_route_request_get_state(const struct ui_route_request *req,
-                                      void **out_state);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_route_request_get_state(
+    const struct ui_route_request *req, void **out_state);
 
 /**
  * @brief Navigates to a specific URL with an optional state payload.
@@ -141,8 +145,8 @@ ui_error_t ui_route_request_get_state(const struct ui_route_request *req,
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if no matching route is
  * found, or an appropriate error code.
  */
-ui_error_t ui_router_navigate_with_state(struct ui_router *router,
-                                         const char *path, void *state);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_router_navigate_with_state(
+    struct ui_router *router, const char *path, void *state);
 
 /**
  * @brief Pushes a new screen component onto the navigation stack.
@@ -151,8 +155,8 @@ ui_error_t ui_router_navigate_with_state(struct ui_router *router,
  * @param screen The screen component to push.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_router_push(struct ui_router *router,
-                          struct ui_component *screen);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_push(struct ui_router *router, struct ui_component *screen);
 
 /**
  * @brief Pops the top screen from the navigation stack and destroys it.
@@ -160,7 +164,8 @@ ui_error_t ui_router_push(struct ui_router *router,
  * @param router The router.
  * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_EMPTY if the stack is empty.
  */
-ui_error_t ui_router_pop(struct ui_router *router);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_pop(struct ui_router *router);
 
 /**
  * @brief Replaces the current top screen with a new screen component.
@@ -169,8 +174,8 @@ ui_error_t ui_router_pop(struct ui_router *router);
  * @param screen The new screen component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_router_replace(struct ui_router *router,
-                             struct ui_component *screen);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_replace(struct ui_router *router, struct ui_component *screen);
 
 /**
  * @brief Gets the current top screen from the navigation stack.
@@ -180,8 +185,8 @@ ui_error_t ui_router_replace(struct ui_router *router,
  * if the stack is empty.
  * @return UI_ERROR_NONE on success, UI_ERROR_NOT_FOUND if empty.
  */
-ui_error_t ui_router_get_current(struct ui_router *router,
-                                 struct ui_component **out_current);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_router_get_current(
+    struct ui_router *router, struct ui_component **out_current);
 
 /** \brief Forward declaration of ui_event */
 struct ui_event;
@@ -194,8 +199,8 @@ struct ui_event;
  * @param event The event to process.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_router_process_event(struct ui_router *router,
-                                   const struct ui_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_process_event(struct ui_router *router, const struct ui_event *event);
 
 /**
  * @brief Installs OS-level integration for the router (e.g., HTML5 History API
@@ -204,7 +209,8 @@ ui_error_t ui_router_process_event(struct ui_router *router,
  * @param router The router instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_router_install_os_hooks(struct ui_router *router);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_router_install_os_hooks(struct ui_router *router);
 
 #ifdef __cplusplus
 }

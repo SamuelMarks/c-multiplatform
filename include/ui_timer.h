@@ -45,8 +45,8 @@ struct ui_timer_config {
  * @param out_timer Pointer to receive the new timer handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_timer_create_custom(const struct ui_timer_config *config,
-                                  struct ui_timer **out_timer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_timer_create_custom(
+    const struct ui_timer_config *config, struct ui_timer **out_timer);
 
 /**
  * @brief Creates a timer slaved to the OS monotonic clock.
@@ -54,7 +54,8 @@ ui_error_t ui_timer_create_custom(const struct ui_timer_config *config,
  * @param out_timer Pointer to receive the new timer handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_timer_create_monotonic(struct ui_timer **out_timer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_timer_create_monotonic(struct ui_timer **out_timer);
 
 /**
  * @brief Destroys a timer and frees its resources.
@@ -62,7 +63,8 @@ ui_error_t ui_timer_create_monotonic(struct ui_timer **out_timer);
  * @param timer The timer to destroy.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if timer is NULL.
  */
-ui_error_t ui_timer_destroy(struct ui_timer *timer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_timer_destroy(struct ui_timer *timer);
 
 /**
  * @brief Gets the current time from the timer in seconds.
@@ -71,7 +73,8 @@ ui_error_t ui_timer_destroy(struct ui_timer *timer);
  * @param out_time_secs Pointer to receive the time.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_timer_now(struct ui_timer *timer, double *out_time_secs);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_timer_now(struct ui_timer *timer,
+                                                      double *out_time_secs);
 
 #ifdef __cplusplus
 }

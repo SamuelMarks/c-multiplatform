@@ -25,7 +25,8 @@ struct ui_selection_model;
  * @param out_model Pointer to receive the allocated selection model.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_selection_model_create(struct ui_selection_model **out_model);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_selection_model_create(struct ui_selection_model **out_model);
 
 /**
  * @brief Destroys a selection model.
@@ -33,7 +34,8 @@ ui_error_t ui_selection_model_create(struct ui_selection_model **out_model);
  * @param model The selection model.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_selection_model_destroy(struct ui_selection_model *model);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_selection_model_destroy(struct ui_selection_model *model);
 
 /**
  * @brief Sets whether the selection model allows multiple selections.
@@ -42,8 +44,8 @@ ui_error_t ui_selection_model_destroy(struct ui_selection_model *model);
  * @param is_multi 1 for multi-select, 0 for single-select.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_selection_model_set_multi_select(struct ui_selection_model *model,
-                                               int is_multi);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_selection_model_set_multi_select(
+    struct ui_selection_model *model, int is_multi);
 
 /**
  * @brief Selects an item by ID/index.
@@ -52,8 +54,8 @@ ui_error_t ui_selection_model_set_multi_select(struct ui_selection_model *model,
  * @param id The item ID.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_selection_model_select(struct ui_selection_model *model,
-                                     void *id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_selection_model_select(struct ui_selection_model *model, void *id);
 
 /**
  * @brief Deselects an item by ID/index.
@@ -62,8 +64,8 @@ ui_error_t ui_selection_model_select(struct ui_selection_model *model,
  * @param id The item ID.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_selection_model_deselect(struct ui_selection_model *model,
-                                       void *id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_selection_model_deselect(struct ui_selection_model *model, void *id);
 
 /**
  * @brief Toggles the selection state of an item.
@@ -72,8 +74,8 @@ ui_error_t ui_selection_model_deselect(struct ui_selection_model *model,
  * @param id The item ID.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_selection_model_toggle(struct ui_selection_model *model,
-                                     void *id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_selection_model_toggle(struct ui_selection_model *model, void *id);
 
 /**
  * @brief Clears all selections.
@@ -81,7 +83,8 @@ ui_error_t ui_selection_model_toggle(struct ui_selection_model *model,
  * @param model The selection model.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_selection_model_clear(struct ui_selection_model *model);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_selection_model_clear(struct ui_selection_model *model);
 
 /**
  * @brief Selects all items from an array of IDs.
@@ -94,8 +97,8 @@ ui_error_t ui_selection_model_clear(struct ui_selection_model *model);
  * @param count Number of items in the array.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_selection_model_select_all(struct ui_selection_model *model,
-                                         void **ids, int count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_selection_model_select_all(
+    struct ui_selection_model *model, void **ids, int count);
 
 /**
  * @brief Checks if an item is selected.
@@ -105,9 +108,8 @@ ui_error_t ui_selection_model_select_all(struct ui_selection_model *model,
  * @param out_is_selected Pointer to receive 1 if selected, 0 otherwise.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_selection_model_is_selected(const struct ui_selection_model *model, void *id,
-                               int *out_is_selected);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_selection_model_is_selected(
+    const struct ui_selection_model *model, void *id, int *out_is_selected);
 
 /**
  * @brief Gets the number of selected items.
@@ -116,9 +118,8 @@ ui_selection_model_is_selected(const struct ui_selection_model *model, void *id,
  * @param out_count Pointer to receive the count.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_selection_model_get_selected_count(const struct ui_selection_model *model,
-                                      int *out_count);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_selection_model_get_selected_count(
+    const struct ui_selection_model *model, int *out_count);
 
 /**
  * @brief Gets the selected item IDs.
@@ -128,9 +129,8 @@ ui_selection_model_get_selected_count(const struct ui_selection_model *model,
  * @param capacity The maximum number of IDs to write to out_ids.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_selection_model_get_selected(const struct ui_selection_model *model,
-                                void **out_ids, int capacity);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_selection_model_get_selected(
+    const struct ui_selection_model *model, void **out_ids, int capacity);
 
 /**
  * @brief Callback invoked when the selection changes.
@@ -149,10 +149,9 @@ typedef ui_error_t (*ui_selection_model_on_change_t)(
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_selection_model_set_on_change(struct ui_selection_model *model,
-                                 ui_selection_model_on_change_t callback,
-                                 void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_selection_model_set_on_change(
+    struct ui_selection_model *model, ui_selection_model_on_change_t callback,
+    void *user_data);
 
 #ifdef __cplusplus
 }

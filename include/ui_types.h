@@ -6,6 +6,10 @@
 #ifndef UI_TYPES_H
 #define UI_TYPES_H
 
+/* clang-format off */
+#include "ui_export.h"
+/* clang-format on */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

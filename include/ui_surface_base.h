@@ -49,7 +49,8 @@ struct ui_surface_base {
  * @param out_surface Pointer to output the initialized surface.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_surface_base_create(struct ui_surface_base **out_surface);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_surface_base_create(struct ui_surface_base **out_surface);
 
 /**
  * @brief Sets the elevation level of the surface.
@@ -58,8 +59,8 @@ ui_error_t ui_surface_base_create(struct ui_surface_base **out_surface);
  * @param level The new elevation level.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_surface_base_set_elevation(struct ui_surface_base *surface,
-                                         enum ui_elevation_level level);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_surface_base_set_elevation(
+    struct ui_surface_base *surface, enum ui_elevation_level level);
 
 /**
  * @brief Binds the data property.
@@ -68,8 +69,8 @@ ui_error_t ui_surface_base_set_elevation(struct ui_surface_base *surface,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_surface_base_bind_data(struct ui_surface_base *widget,
-                                     struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_surface_base_bind_data(
+    struct ui_surface_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

@@ -25,7 +25,8 @@ struct ui_i18n;
  * @param out_i18n Pointer to store the created i18n engine.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_create(struct ui_i18n **out_i18n);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_i18n_create(struct ui_i18n **out_i18n);
 
 /**
  * @brief Destroys the i18n engine.
@@ -33,7 +34,7 @@ ui_error_t ui_i18n_create(struct ui_i18n **out_i18n);
  * @param i18n The i18n engine.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_destroy(struct ui_i18n *i18n);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_i18n_destroy(struct ui_i18n *i18n);
 
 /**
  * @brief Sets the current locale (e.g., "en-US", "ar-SA", "he-IL").
@@ -43,7 +44,8 @@ ui_error_t ui_i18n_destroy(struct ui_i18n *i18n);
  * @param locale The locale string.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_set_locale(struct ui_i18n *i18n, const char *locale);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_i18n_set_locale(struct ui_i18n *i18n, const char *locale);
 
 /**
  * @brief Gets the current locale.
@@ -52,7 +54,8 @@ ui_error_t ui_i18n_set_locale(struct ui_i18n *i18n, const char *locale);
  * @param out_locale Pointer to store the locale string pointer.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_get_locale(struct ui_i18n *i18n, const char **out_locale);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_i18n_get_locale(struct ui_i18n *i18n, const char **out_locale);
 
 /**
  * @brief Binds the locale state to a signal for global reactive updates.
@@ -62,8 +65,8 @@ ui_error_t ui_i18n_get_locale(struct ui_i18n *i18n, const char **out_locale);
  * @param locale_signal The signal to bind to.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_bind_locale_signal(struct ui_i18n *i18n,
-                                      struct ui_signal *locale_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_i18n_bind_locale_signal(
+    struct ui_i18n *i18n, struct ui_signal *locale_signal);
 
 /**
  * @brief Formats a number according to the current locale.
@@ -75,8 +78,9 @@ ui_error_t ui_i18n_bind_locale_signal(struct ui_i18n *i18n,
  * @param out_len Size of the buffer.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_format_number(struct ui_i18n *i18n, double value,
-                                 int decimals, char *out_str, size_t out_len);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_i18n_format_number(struct ui_i18n *i18n, double value, int decimals,
+                      char *out_str, size_t out_len);
 
 /**
  * @brief Formats currency according to the current locale.
@@ -88,9 +92,9 @@ ui_error_t ui_i18n_format_number(struct ui_i18n *i18n, double value,
  * @param out_len Size of the buffer.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_format_currency(struct ui_i18n *i18n, double amount,
-                                   const char *currency_code, char *out_str,
-                                   size_t out_len);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_i18n_format_currency(
+    struct ui_i18n *i18n, double amount, const char *currency_code,
+    char *out_str, size_t out_len);
 
 /**
  * @brief Formats a date/time (Unix timestamp in ms) according to the current
@@ -104,9 +108,9 @@ ui_error_t ui_i18n_format_currency(struct ui_i18n *i18n, double amount,
  * @param out_len Size of the buffer.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_format_date(struct ui_i18n *i18n, double timestamp_ms,
-                               const char *format_str, char *out_str,
-                               size_t out_len);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_i18n_format_date(struct ui_i18n *i18n, double timestamp_ms,
+                    const char *format_str, char *out_str, size_t out_len);
 
 /**
  * @brief Selects the correct pluralized string based on count.
@@ -120,9 +124,9 @@ ui_error_t ui_i18n_format_date(struct ui_i18n *i18n, double timestamp_ms,
  * @param out_len Size of the buffer.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_pluralize(struct ui_i18n *i18n, int count, const char *zero,
-                             const char *one, const char *other, char *out_str,
-                             size_t out_len);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_i18n_pluralize(
+    struct ui_i18n *i18n, int count, const char *zero, const char *one,
+    const char *other, char *out_str, size_t out_len);
 
 /**
  * @brief Interpolates values into a template string (e.g. "Hello {{name}}!").
@@ -136,9 +140,9 @@ ui_error_t ui_i18n_pluralize(struct ui_i18n *i18n, int count, const char *zero,
  * @param out_len Size of the buffer.
  * @return ui_error_t
  */
-ui_error_t ui_i18n_interpolate(struct ui_i18n *i18n, const char *template_str,
-                               const char **keys, const char **values,
-                               size_t count, char *out_str, size_t out_len);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_i18n_interpolate(
+    struct ui_i18n *i18n, const char *template_str, const char **keys,
+    const char **values, size_t count, char *out_str, size_t out_len);
 
 #ifdef __cplusplus
 }

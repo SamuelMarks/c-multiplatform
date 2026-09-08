@@ -2,10 +2,11 @@
  * @file ui_window_backend_linux_x11.c
  * @brief ui_window_backend_linux_x11.c implementation.
  */
-#if defined(__linux__) || defined(__FreeBSD__)
 
 /* clang-format off */
 #include "../include/ui_window_backend_linux.h"
+#include <stddef.h>
+#if (defined(__linux__) || defined(__FreeBSD__)) && defined(HAVE_X11)
 #include "../include/ui_event.h"
 #include "ui_internal_mem.h"
 
@@ -13,7 +14,10 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 #include <GL/gl.h>
+#endif
 /* clang-format on */
+
+#if (defined(__linux__) || defined(__FreeBSD__)) && defined(HAVE_X11)
 
 /**
  * @struct ui_window
@@ -266,8 +270,6 @@ ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
 
 #else
 /* Non-Linux Platform Stub */
-#include "../include/ui_window_backend_linux.h"
-#include <stddef.h>
 
 ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {

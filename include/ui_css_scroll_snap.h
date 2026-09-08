@@ -119,7 +119,7 @@ struct ui_css_computed_style;
  * @param out_props Pointer to the structure to populate with parsed properties.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
                          struct ui_css_scroll_snap_properties *out_props);
 

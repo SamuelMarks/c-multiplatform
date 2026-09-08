@@ -104,10 +104,14 @@ TEST test_autocomplete_edge_cases(void) {
   struct ui_component *tmp_comp = NULL;
   struct ui_input_base *tmp_input = NULL;
   struct ui_listbox_base *tmp_listbox = NULL;
+  union ui_signal_payload dummy_payload;
   ui_error_t rc;
   int i;
+  int cva_change_cnt = 0;
+  int cva_touched_cnt = 0;
 
   memset(&cva, 0, sizeof(cva));
+  memset(&dummy_payload, 0, sizeof(dummy_payload));
 
   rc = ui_autocomplete_base_create(&autocomplete, &cva);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -119,16 +123,12 @@ TEST test_autocomplete_edge_cases(void) {
   ASSERT(cva.set_disabled_state != NULL);
 
   /* CVA NULL checks */
-  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
-            cva.write_value(NULL, (union ui_signal_payload){.ptr_val = NULL}));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, cva.write_value(NULL, dummy_payload));
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
             cva.register_on_change(NULL, dummy_cva_on_change, NULL));
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
             cva.register_on_touched(NULL, dummy_cva_on_touched, NULL));
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, cva.set_disabled_state(NULL, 1));
-
-  int cva_change_cnt = 0;
-  int cva_touched_cnt = 0;
 
   ASSERT_EQ(UI_ERROR_NONE,
             cva.register_on_change(autocomplete, dummy_cva_on_change,

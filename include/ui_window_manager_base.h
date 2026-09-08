@@ -35,7 +35,7 @@ struct ui_window_manager_base;
  * @param out_window_manager Pointer to receive the allocated component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_window_manager_base_create(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_window_manager_base_create(
     struct ui_window_manager_base **out_window_manager);
 
 /**
@@ -44,7 +44,7 @@ ui_error_t ui_window_manager_base_create(
  * @param window_manager The component to destroy.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager);
 
 /**
@@ -54,7 +54,7 @@ ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager);
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_window_manager_base_get_component(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_window_manager_base_get_component(
     struct ui_window_manager_base *window_manager,
     struct ui_component **out_component);
 
@@ -65,7 +65,7 @@ ui_error_t ui_window_manager_base_get_component(
  * @param window_id Identifier for the internal window.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_window_manager_base_bring_to_front(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_window_manager_base_bring_to_front(
     struct ui_window_manager_base *window_manager, int window_id);
 
 /**
@@ -77,7 +77,7 @@ ui_error_t ui_window_manager_base_bring_to_front(
  * @param delta_y Y-axis drag delta.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
                             int window_id, float delta_x, float delta_y);
 
@@ -88,9 +88,8 @@ ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_window_manager_base_bind_data(struct ui_window_manager_base *widget,
-                                 struct ui_computed *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_window_manager_base_bind_data(
+    struct ui_window_manager_base *widget, struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

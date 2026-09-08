@@ -25,14 +25,16 @@ struct ui_backdrop;
  * @param out_backdrop Pointer to receive the allocated backdrop.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_backdrop_create(struct ui_backdrop **out_backdrop);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_backdrop_create(struct ui_backdrop **out_backdrop);
 
 /**
  * @brief Destroys a backdrop manager.
  * @param backdrop The backdrop to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_backdrop_destroy(struct ui_backdrop *backdrop);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_backdrop_destroy(struct ui_backdrop *backdrop);
 
 /**
  * @brief Sets whether the backdrop is active.
@@ -40,7 +42,8 @@ ui_error_t ui_backdrop_destroy(struct ui_backdrop *backdrop);
  * @param is_active 1 if active, 0 if inactive.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_backdrop_set_active(struct ui_backdrop *backdrop, int is_active);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_backdrop_set_active(struct ui_backdrop *backdrop, int is_active);
 
 /**
  * @brief Processes an input event to detect if the backdrop should dismiss the
@@ -56,11 +59,10 @@ ui_error_t ui_backdrop_set_active(struct ui_backdrop *backdrop, int is_active);
  * triggered, 0 otherwise.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_backdrop_process_event(struct ui_backdrop *backdrop,
-                                     const struct ui_event *event,
-                                     float content_x, float content_y,
-                                     float content_width, float content_height,
-                                     int *out_should_dismiss);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_backdrop_process_event(
+    struct ui_backdrop *backdrop, const struct ui_event *event, float content_x,
+    float content_y, float content_width, float content_height,
+    int *out_should_dismiss);
 
 #ifdef __cplusplus
 }

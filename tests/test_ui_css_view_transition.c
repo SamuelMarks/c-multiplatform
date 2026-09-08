@@ -66,6 +66,7 @@ static ui_error_t test_parse_view_transition_class(void) {
   EXPECT_EQ(NULL, vt_class.names->next->next->next);
 
   ui_css_view_transition_class_destroy(&vt_class);
+  return UI_ERROR_NONE;
 }
 
 extern int g_malloc_fail_countdown;

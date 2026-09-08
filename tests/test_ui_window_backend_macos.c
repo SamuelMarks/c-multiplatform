@@ -3,6 +3,10 @@
 #include "../include/ui_error.h"
 #include "../include/ui_event.h"
 #include <stdio.h>
+#if defined(__APPLE__) && defined(__MACH__)
+#include <TargetConditionals.h>
+#endif
+/* clang-format on */
 
 extern ui_error_t
 ui_window_backend_macos_create(struct ui_window_backend **out_backend);
@@ -24,8 +28,6 @@ int main(void) {
 
   err = ui_window_backend_macos_create(&backend);
 #if defined(__APPLE__) && defined(__MACH__)
-#include <TargetConditionals.h>
-/* clang-format on */
 #if TARGET_OS_MAC && !TARGET_OS_IPHONE
   failed |= (err != UI_ERROR_NONE);
   if (backend) {
@@ -98,7 +100,6 @@ int main(void) {
   failed |= (err != UI_ERROR_UNKNOWN);
 #endif
 #else
-  /* clang-format on */
   failed |= (err != UI_ERROR_UNKNOWN);
   err = ui_window_backend_macos_destroy((struct ui_window_backend *)0x1234);
   failed |= (err != UI_ERROR_UNKNOWN);

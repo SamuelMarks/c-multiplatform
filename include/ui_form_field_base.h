@@ -33,7 +33,8 @@ struct ui_form_field_base;
  * @param out_field Pointer to receive the allocated form field instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_field_base_create(struct ui_form_field_base **out_field);
 
 /**
  * @brief Destroys a form field instance.
@@ -41,7 +42,8 @@ ui_error_t ui_form_field_base_create(struct ui_form_field_base **out_field);
  * @param field The form field.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_destroy(struct ui_form_field_base *field);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_field_base_destroy(struct ui_form_field_base *field);
 
 /**
  * @brief Sets the floating label text.
@@ -50,8 +52,8 @@ ui_error_t ui_form_field_base_destroy(struct ui_form_field_base *field);
  * @param label The label text.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_set_label(struct ui_form_field_base *field,
-                                        const char *label);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_set_label(
+    struct ui_form_field_base *field, const char *label);
 
 /**
  * @brief Sets the hint text displayed below the field.
@@ -60,8 +62,8 @@ ui_error_t ui_form_field_base_set_label(struct ui_form_field_base *field,
  * @param hint The hint text.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_set_hint(struct ui_form_field_base *field,
-                                       const char *hint);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_field_base_set_hint(struct ui_form_field_base *field, const char *hint);
 
 /**
  * @brief Sets the error text and transitions the field to an error state.
@@ -70,8 +72,8 @@ ui_error_t ui_form_field_base_set_hint(struct ui_form_field_base *field,
  * @param error_msg The error message (or NULL to clear the error state).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_set_error(struct ui_form_field_base *field,
-                                        const char *error_msg);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_set_error(
+    struct ui_form_field_base *field, const char *error_msg);
 
 /**
  * @brief Sets a prefix component (e.g., an icon) to display before the control.
@@ -80,8 +82,8 @@ ui_error_t ui_form_field_base_set_error(struct ui_form_field_base *field,
  * @param prefix The prefix component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_set_prefix(struct ui_form_field_base *field,
-                                         struct ui_component *prefix);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_set_prefix(
+    struct ui_form_field_base *field, struct ui_component *prefix);
 
 /**
  * @brief Sets a suffix component (e.g., an icon) to display after the control.
@@ -90,8 +92,8 @@ ui_error_t ui_form_field_base_set_prefix(struct ui_form_field_base *field,
  * @param suffix The suffix component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_set_suffix(struct ui_form_field_base *field,
-                                         struct ui_component *suffix);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_set_suffix(
+    struct ui_form_field_base *field, struct ui_component *suffix);
 
 /**
  * @brief Sets the inner control component (e.g., a ui_input_base or
@@ -101,8 +103,8 @@ ui_error_t ui_form_field_base_set_suffix(struct ui_form_field_base *field,
  * @param control The underlying control component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_set_control(struct ui_form_field_base *field,
-                                          struct ui_component *control);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_set_control(
+    struct ui_form_field_base *field, struct ui_component *control);
 
 /**
  * @brief Coordinates the focused state (animates floating label).
@@ -111,8 +113,8 @@ ui_error_t ui_form_field_base_set_control(struct ui_form_field_base *field,
  * @param is_focused 1 if focused, 0 if blurred.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_set_focused(struct ui_form_field_base *field,
-                                          int is_focused);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_set_focused(
+    struct ui_form_field_base *field, int is_focused);
 
 /**
  * @brief Coordinates the value state (keeps label floated if true).
@@ -121,8 +123,8 @@ ui_error_t ui_form_field_base_set_focused(struct ui_form_field_base *field,
  * @param has_value 1 if the inner control has a value, 0 if empty.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_set_has_value(struct ui_form_field_base *field,
-                                            int has_value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_set_has_value(
+    struct ui_form_field_base *field, int has_value);
 
 struct ui_form_control;
 struct ui_reactor;
@@ -135,10 +137,9 @@ struct ui_reactor;
  * @param reactor The reactor for signal updates.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_form_field_base_bind_form_control(struct ui_form_field_base *field,
-                                     struct ui_form_control *form_control,
-                                     struct ui_reactor *reactor);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_bind_form_control(
+    struct ui_form_field_base *field, struct ui_form_control *form_control,
+    struct ui_reactor *reactor);
 
 /**
  * @brief Retrieves the underlying component instance for style injection and
@@ -148,9 +149,8 @@ ui_form_field_base_bind_form_control(struct ui_form_field_base *field,
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_form_field_base_get_component(struct ui_form_field_base *field,
-                                 struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_get_component(
+    struct ui_form_field_base *field, struct ui_component **out_component);
 
 /**
  * @brief Binds the data property.
@@ -159,8 +159,8 @@ ui_form_field_base_get_component(struct ui_form_field_base *field,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_form_field_base_bind_data(struct ui_form_field_base *widget,
-                                        struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_field_base_bind_data(
+    struct ui_form_field_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

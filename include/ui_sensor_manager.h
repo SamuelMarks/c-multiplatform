@@ -58,7 +58,8 @@ struct ui_sensor_manager;
  * @param out_manager Pointer to receive the manager instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sensor_manager_create(struct ui_sensor_manager **out_manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_sensor_manager_create(struct ui_sensor_manager **out_manager);
 
 /**
  * @brief Destroys the sensor manager and releases hardware handles.
@@ -66,7 +67,8 @@ ui_error_t ui_sensor_manager_create(struct ui_sensor_manager **out_manager);
  * @param manager The manager instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_sensor_manager_destroy(struct ui_sensor_manager *manager);
 
 /**
  * @brief Starts polling hardware sensors and computing smoothed orientation
@@ -75,7 +77,8 @@ ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager);
  * @param manager The manager instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sensor_manager_start(struct ui_sensor_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_sensor_manager_start(struct ui_sensor_manager *manager);
 
 /**
  * @brief Stops polling hardware sensors to conserve battery.
@@ -83,7 +86,8 @@ ui_error_t ui_sensor_manager_start(struct ui_sensor_manager *manager);
  * @param manager The manager instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sensor_manager_stop(struct ui_sensor_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_sensor_manager_stop(struct ui_sensor_manager *manager);
 
 /**
  * @brief Binds a reactive signal to the smoothed quaternion output.
@@ -93,8 +97,8 @@ ui_error_t ui_sensor_manager_stop(struct ui_sensor_manager *manager);
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
-                                              struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_sensor_manager_bind_orientation(
+    struct ui_sensor_manager *manager, struct ui_signal *signal);
 
 /**
  * @brief Retrieves the latest raw accelerometer vector data.
@@ -103,9 +107,8 @@ ui_error_t ui_sensor_manager_bind_orientation(struct ui_sensor_manager *manager,
  * @param out_accel Pointer to receive the vector data.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
-                                    struct ui_sensor_vector3 *out_accel);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_sensor_manager_get_accelerometer(
+    struct ui_sensor_manager *manager, struct ui_sensor_vector3 *out_accel);
 
 /**
  * @brief Retrieves the latest raw gyroscope vector data.
@@ -114,8 +117,8 @@ ui_sensor_manager_get_accelerometer(struct ui_sensor_manager *manager,
  * @param out_gyro Pointer to receive the vector data.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_sensor_manager_get_gyroscope(struct ui_sensor_manager *manager,
-                                           struct ui_sensor_vector3 *out_gyro);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_sensor_manager_get_gyroscope(
+    struct ui_sensor_manager *manager, struct ui_sensor_vector3 *out_gyro);
 
 #ifdef __cplusplus
 }

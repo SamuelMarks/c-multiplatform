@@ -43,7 +43,7 @@ struct ui_split_button_base;
  * @param out_split_button Pointer to receive the allocated split button base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_split_button_base_create(struct ui_split_button_base **out_split_button);
 
 /**
@@ -52,7 +52,7 @@ ui_split_button_base_create(struct ui_split_button_base **out_split_button);
  * @param split_button The split button to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_split_button_base_destroy(struct ui_split_button_base *split_button);
 
 /**
@@ -62,9 +62,8 @@ ui_split_button_base_destroy(struct ui_split_button_base *split_button);
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_split_button_base_set_disabled(struct ui_split_button_base *split_button,
-                                  int disabled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_button_base_set_disabled(
+    struct ui_split_button_base *split_button, int disabled);
 
 /**
  * @brief Gets the underlying primary action button component.
@@ -73,7 +72,7 @@ ui_split_button_base_set_disabled(struct ui_split_button_base *split_button,
  * @param out_main_btn Pointer to receive the primary button.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_split_button_base_get_main_button(struct ui_split_button_base *split_button,
                                      struct ui_button_base **out_main_btn);
 
@@ -84,7 +83,8 @@ ui_split_button_base_get_main_button(struct ui_split_button_base *split_button,
  * @param out_trigger_btn Pointer to receive the trigger button.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_split_button_base_get_trigger_button(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_split_button_base_get_trigger_button(
     struct ui_split_button_base *split_button,
     struct ui_button_base **out_trigger_btn);
 
@@ -96,7 +96,7 @@ ui_error_t ui_split_button_base_get_trigger_button(
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_split_button_base_get_component(struct ui_split_button_base *split_button,
                                    struct ui_component **out_component);
 
@@ -107,9 +107,8 @@ ui_split_button_base_get_component(struct ui_split_button_base *split_button,
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_split_button_base_bind_disabled(struct ui_split_button_base *widget,
-                                   struct ui_signal *disabled_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_button_base_bind_disabled(
+    struct ui_split_button_base *widget, struct ui_signal *disabled_signal);
 
 /**
  * @brief Binds the text content to a string signal for dynamic
@@ -119,8 +118,8 @@ ui_split_button_base_bind_disabled(struct ui_split_button_base *widget,
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_split_button_base_bind_text(struct ui_split_button_base *widget,
-                                          struct ui_signal *text_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_split_button_base_bind_text(
+    struct ui_split_button_base *widget, struct ui_signal *text_signal);
 
 #ifdef __cplusplus
 }

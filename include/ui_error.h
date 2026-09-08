@@ -10,6 +10,7 @@
 /** @endcond */
 
 #include "no_discard.h"
+#include "ui_export.h"
 /* clang-format on */
 
 #ifdef __cplusplus

@@ -115,11 +115,12 @@ static ui_error_t run_normal_tests(void) {
     if (ptr_val != dummy_ptr1)
       return UI_ERROR_UNKNOWN;
   }
-
   /* Test concurrent add with thread pool */
   {
     struct ui_thread_pool *pool = NULL;
     int i;
+    long final_val = 0;
+
     rc = ui_atomic_store(&val, 0);
     if (rc != UI_ERROR_NONE)
       return rc;
@@ -139,10 +140,10 @@ static ui_error_t run_normal_tests(void) {
     if (rc != UI_ERROR_NONE)
       return rc;
 
-    long final_val = 0;
     rc = ui_atomic_load(&val, &final_val);
-    if (rc != UI_ERROR_NONE)
+    if (rc != UI_ERROR_NONE) {
       return rc;
+    }
     if (final_val != 100) {
       printf("Concurrent add failed, expected 100, got %ld\n", final_val);
       return UI_ERROR_UNKNOWN;

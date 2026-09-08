@@ -9,8 +9,8 @@
 __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #else
 #include <unistd.h>
-/* clang-format on */
 #endif
+/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 
@@ -21,6 +21,19 @@ static ui_error_t sleep_ms(int ms) {
   usleep(ms * 1000);
 #endif
   return UI_ERROR_NONE;
+}
+
+static void wait_tick(struct ui_execution_context *ctx,
+                      struct ui_thread_pool *pool) {
+#ifdef UI_SINGLE_THREADED
+  if (pool) {
+    ui_thread_pool_tick(pool);
+  }
+#else
+  (void)pool;
+#endif
+  ui_execution_context_tick(ctx);
+  sleep_ms(10);
 }
 
 static int run_test(const char *name, int (*test_fn)(void)) {
@@ -119,8 +132,7 @@ static int test_successful_load(void) {
 
   /* Wait for background thread to load and push to ctx */
   while (completed == 0) {
-    ui_execution_context_tick(ctx);
-    sleep_ms(10);
+    wait_tick(ctx, pool);
   }
 
   {
@@ -203,8 +215,7 @@ static int test_failed_load(void) {
 
   /* Wait for background thread to fail and push to ctx */
   while (completed == 0) {
-    ui_execution_context_tick(ctx);
-    sleep_ms(10);
+    wait_tick(ctx, pool);
   }
 
   {
@@ -314,9 +325,9 @@ static int test_edge_cases(void) {
       /* Wait for background thread to hit OOM (or pass) */
       err = ui_promise_then(p, on_resolve, on_reject, &completed, NULL);
       if (err == UI_ERROR_NONE) {
-        while (completed == 0) {
-          ui_execution_context_tick(ctx);
-          sleep_ms(10);
+        int wait_limit = 0;
+        while (completed == 0 && ++wait_limit < 100) {
+          wait_tick(ctx, pool);
         }
       } else {
         /* Even if promise_then fails, the background task is running.
@@ -324,8 +335,7 @@ static int test_edge_cases(void) {
            ctx->task. We can just tick a few times to let it finish. */
         int ticks = 0;
         while (ticks < 10) {
-          ui_execution_context_tick(ctx);
-          sleep_ms(10);
+          wait_tick(ctx, pool);
           ticks++;
         }
       }
@@ -357,9 +367,9 @@ static int test_edge_cases(void) {
     if (err == UI_ERROR_NONE) {
       err = ui_promise_then(p, on_resolve, on_reject, &completed, NULL);
       if (err == UI_ERROR_NONE) {
-        while (completed == 0) {
-          ui_execution_context_tick(ctx);
-          sleep_ms(10);
+        int wait_limit = 0;
+        while (completed == 0 && ++wait_limit < 100) {
+          wait_tick(ctx, pool);
         }
       }
       {
@@ -382,7 +392,8 @@ static int test_edge_cases(void) {
     err = ui_asset_streamer_request(streamer, ".", UI_ASSET_TYPE_BINARY, &p);
     if (err == UI_ERROR_NONE) {
       ui_promise_then(p, on_resolve, on_reject, &completed, NULL);
-      while (completed == 0) {
+      int wait_limit = 0;
+      while (completed == 0 && ++wait_limit < 100) {
         ui_execution_context_tick(ctx);
         sleep_ms(10);
       }
@@ -422,7 +433,11 @@ static int test_edge_cases(void) {
     err = ui_asset_streamer_request(streamer, "test_asset_sched_fail.txt",
                                     UI_ASSET_TYPE_TEXT, &p);
     if (err == UI_ERROR_NONE) {
+#ifdef UI_SINGLE_THREADED
+      ui_thread_pool_tick(pool);
+#else
       sleep_ms(50);
+#endif
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
@@ -436,7 +451,11 @@ static int test_edge_cases(void) {
     err = ui_asset_streamer_request(streamer, "test_asset_sched_fail.txt",
                                     UI_ASSET_TYPE_TEXT, &p);
     if (err == UI_ERROR_NONE) {
+#ifdef UI_SINGLE_THREADED
+      ui_thread_pool_tick(pool);
+#else
       sleep_ms(50);
+#endif
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {

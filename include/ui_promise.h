@@ -39,7 +39,8 @@ enum ui_promise_state {
  * @param out_promise Pointer to receive the new promise handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_promise_create(struct ui_promise **out_promise);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_promise_create(struct ui_promise **out_promise);
 
 /**
  * @brief Destroys a promise and frees its resources.
@@ -47,7 +48,8 @@ ui_error_t ui_promise_create(struct ui_promise **out_promise);
  * @param promise The promise to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_promise_destroy(struct ui_promise *promise);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_promise_destroy(struct ui_promise *promise);
 
 /**
  * @brief Adds callbacks to be executed when the promise is settled.
@@ -60,10 +62,11 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise);
  * @param out_promise Pointer to receive the chained promise.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_promise_then(struct ui_promise *promise,
-                           ui_error_t (*on_resolve)(void *, void *, void **),
-                           ui_error_t (*on_reject)(ui_error_t, void *, void **),
-                           void *user_data, struct ui_promise **out_promise);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_promise_then(struct ui_promise *promise,
+                ui_error_t (*on_resolve)(void *, void *, void **),
+                ui_error_t (*on_reject)(ui_error_t, void *, void **),
+                void *user_data, struct ui_promise **out_promise);
 
 /**
  * @brief Adds a rejection callback to the promise.
@@ -74,10 +77,10 @@ ui_error_t ui_promise_then(struct ui_promise *promise,
  * @param out_promise Pointer to receive the chained promise.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_promise_catch(struct ui_promise *promise,
-                            ui_error_t (*on_reject)(ui_error_t, void *,
-                                                    void **),
-                            void *user_data, struct ui_promise **out_promise);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_promise_catch(struct ui_promise *promise,
+                 ui_error_t (*on_reject)(ui_error_t, void *, void **),
+                 void *user_data, struct ui_promise **out_promise);
 
 /**
  * @brief Adds a finally callback to the promise.
@@ -88,9 +91,9 @@ ui_error_t ui_promise_catch(struct ui_promise *promise,
  * @param out_promise Pointer to receive the chained promise.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_promise_finally(struct ui_promise *promise,
-                              ui_error_t (*on_finally)(void *), void *user_data,
-                              struct ui_promise **out_promise);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_promise_finally(struct ui_promise *promise, ui_error_t (*on_finally)(void *),
+                   void *user_data, struct ui_promise **out_promise);
 
 /**
  * @brief Resolves the promise with a value, triggering on_resolve callbacks.
@@ -99,7 +102,8 @@ ui_error_t ui_promise_finally(struct ui_promise *promise,
  * @param result The result value (cast to void*).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_promise_resolve(struct ui_promise *promise, void *result);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_promise_resolve(struct ui_promise *promise, void *result);
 
 /**
  * @brief Rejects the promise with an error, triggering on_reject callbacks.
@@ -108,7 +112,8 @@ ui_error_t ui_promise_resolve(struct ui_promise *promise, void *result);
  * @param error The error discriminant.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_promise_reject(struct ui_promise *promise, ui_error_t error);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_promise_reject(struct ui_promise *promise, ui_error_t error);
 
 /**
  * @brief Gets the current state of the promise.
@@ -117,8 +122,8 @@ ui_error_t ui_promise_reject(struct ui_promise *promise, ui_error_t error);
  * @param out_state Pointer to receive the current state.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_promise_get_state(struct ui_promise *promise,
-                                enum ui_promise_state *out_state);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_promise_get_state(
+    struct ui_promise *promise, enum ui_promise_state *out_state);
 
 #ifdef __cplusplus
 }

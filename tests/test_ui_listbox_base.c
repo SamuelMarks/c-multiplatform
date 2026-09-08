@@ -1,5 +1,5 @@
-#include "../src/ui_internal_mem.h"
 /* clang-format off */
+#include "../src/ui_internal_mem.h"
 #include "ui_listbox_base.h"
 #include "ui_selection_model.h"
 #include "ui_control_value_accessor.h"

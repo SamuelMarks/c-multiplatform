@@ -27,8 +27,8 @@ struct ui_portal;
  * rendered.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_portal_create(struct ui_portal **out_portal,
-                            struct ui_dom_node *physical_target);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_portal_create(
+    struct ui_portal **out_portal, struct ui_dom_node *physical_target);
 
 /**
  * @brief Destroys a portal, safely unmounting and destroying its content to
@@ -37,7 +37,8 @@ ui_error_t ui_portal_create(struct ui_portal **out_portal,
  * @param portal The portal to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_portal_destroy(struct ui_portal *portal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_portal_destroy(struct ui_portal *portal);
 
 /**
  * @brief Sets the content of the portal. This appends the content to the
@@ -48,8 +49,8 @@ ui_error_t ui_portal_destroy(struct ui_portal *portal);
  * @param content_node The node to render within the portal.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_portal_set_content(struct ui_portal *portal,
-                                 struct ui_dom_node *content_node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_portal_set_content(
+    struct ui_portal *portal, struct ui_dom_node *content_node);
 
 /**
  * @brief Retrieves the content node of the portal.
@@ -58,11 +59,11 @@ ui_error_t ui_portal_set_content(struct ui_portal *portal,
  * @param out_content Pointer to receive the content node.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_portal_get_content(const struct ui_portal *portal,
-                                 struct ui_dom_node **out_content);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_portal_get_content(
+    const struct ui_portal *portal, struct ui_dom_node **out_content);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_PORTAL_H */

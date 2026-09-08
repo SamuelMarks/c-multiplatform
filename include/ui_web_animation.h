@@ -176,7 +176,8 @@ struct ui_web_animation;
  * @param out_effect Pointer to receive the new effect.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_effect_create_keyframe_effect(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_effect_create_keyframe_effect(
     struct ui_dom_node *target, struct ui_web_animation_keyframe *keyframes,
     const struct ui_web_animation_timing *timing,
     struct ui_web_animation_effect **out_effect);
@@ -187,7 +188,7 @@ ui_error_t ui_web_animation_effect_create_keyframe_effect(
  * @param effect The effect to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_web_animation_effect_destroy(struct ui_web_animation_effect *effect);
 
 /**
@@ -196,7 +197,8 @@ ui_web_animation_effect_destroy(struct ui_web_animation_effect *effect);
  * @param out_timeline Pointer to receive the new timeline.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_timeline_create_document_timeline(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_timeline_create_document_timeline(
     struct ui_web_animation_timeline **out_timeline);
 
 /**
@@ -207,7 +209,8 @@ ui_error_t ui_web_animation_timeline_create_document_timeline(
  * @param out_timeline Pointer to receive the new timeline.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_timeline_create_scroll_timeline(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_timeline_create_scroll_timeline(
     struct ui_dom_node *source, enum ui_web_animation_scroll_axis axis,
     struct ui_web_animation_timeline **out_timeline);
 
@@ -219,7 +222,8 @@ ui_error_t ui_web_animation_timeline_create_scroll_timeline(
  * @param out_timeline Pointer to receive the new timeline.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_timeline_create_view_timeline(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_timeline_create_view_timeline(
     struct ui_dom_node *subject, enum ui_web_animation_scroll_axis axis,
     struct ui_web_animation_timeline **out_timeline);
 
@@ -231,7 +235,8 @@ ui_error_t ui_web_animation_timeline_create_view_timeline(
  * @param out_timeline Pointer to receive the new timeline.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_timeline_create_pointer_timeline(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_timeline_create_pointer_timeline(
     struct ui_dom_node *target, enum ui_web_animation_pointer_axis axis,
     struct ui_web_animation_timeline **out_timeline);
 
@@ -243,7 +248,8 @@ ui_error_t ui_web_animation_timeline_create_pointer_timeline(
  * @param time The current progress time.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_timeline_set_current_time(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_timeline_set_current_time(
     struct ui_web_animation_timeline *timeline, double time);
 
 /**
@@ -252,7 +258,7 @@ ui_error_t ui_web_animation_timeline_set_current_time(
  * @param timeline The timeline to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_web_animation_timeline_destroy(struct ui_web_animation_timeline *timeline);
 
 /**
@@ -263,9 +269,10 @@ ui_web_animation_timeline_destroy(struct ui_web_animation_timeline *timeline);
  * @param out_animation Pointer to receive the new animation.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_create(struct ui_web_animation_effect *effect,
-                                   struct ui_web_animation_timeline *timeline,
-                                   struct ui_web_animation **out_animation);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_create(struct ui_web_animation_effect *effect,
+                        struct ui_web_animation_timeline *timeline,
+                        struct ui_web_animation **out_animation);
 
 /**
  * @brief Destroys a Web Animation.
@@ -273,7 +280,8 @@ ui_error_t ui_web_animation_create(struct ui_web_animation_effect *effect,
  * @param animation The animation to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_destroy(struct ui_web_animation *animation);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_destroy(struct ui_web_animation *animation);
 
 /**
  * @brief Plays the animation.
@@ -281,7 +289,8 @@ ui_error_t ui_web_animation_destroy(struct ui_web_animation *animation);
  * @param animation The animation.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_play(struct ui_web_animation *animation);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_play(struct ui_web_animation *animation);
 
 /**
  * @brief Pauses the animation.
@@ -289,7 +298,8 @@ ui_error_t ui_web_animation_play(struct ui_web_animation *animation);
  * @param animation The animation.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_pause(struct ui_web_animation *animation);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_pause(struct ui_web_animation *animation);
 
 /**
  * @brief Reverses the animation playback direction.
@@ -297,7 +307,8 @@ ui_error_t ui_web_animation_pause(struct ui_web_animation *animation);
  * @param animation The animation.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_reverse(struct ui_web_animation *animation);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_reverse(struct ui_web_animation *animation);
 
 /**
  * @brief Cancels the animation.
@@ -305,7 +316,8 @@ ui_error_t ui_web_animation_reverse(struct ui_web_animation *animation);
  * @param animation The animation.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_cancel(struct ui_web_animation *animation);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_cancel(struct ui_web_animation *animation);
 
 /**
  * @brief Finishes the animation.
@@ -313,7 +325,8 @@ ui_error_t ui_web_animation_cancel(struct ui_web_animation *animation);
  * @param animation The animation.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_finish(struct ui_web_animation *animation);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_finish(struct ui_web_animation *animation);
 
 /**
  * @brief Gets the current play state.
@@ -322,7 +335,7 @@ ui_error_t ui_web_animation_finish(struct ui_web_animation *animation);
  * @param out_state Pointer to receive the state.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_web_animation_get_play_state(const struct ui_web_animation *animation,
                                 enum ui_web_animation_play_state *out_state);
 
@@ -333,9 +346,8 @@ ui_web_animation_get_play_state(const struct ui_web_animation *animation,
  * @param out_time Pointer to receive the current time.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_web_animation_get_current_time(const struct ui_web_animation *animation,
-                                  double *out_time);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_web_animation_get_current_time(
+    const struct ui_web_animation *animation, double *out_time);
 
 /**
  * @brief Sets the current time of the animation.
@@ -344,8 +356,8 @@ ui_web_animation_get_current_time(const struct ui_web_animation *animation,
  * @param time The new current time.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_set_current_time(struct ui_web_animation *animation,
-                                             double time);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_web_animation_set_current_time(
+    struct ui_web_animation *animation, double time);
 
 /**
  * @brief Gets the playback rate.
@@ -354,9 +366,8 @@ ui_error_t ui_web_animation_set_current_time(struct ui_web_animation *animation,
  * @param out_rate Pointer to receive the playback rate.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_web_animation_get_playback_rate(const struct ui_web_animation *animation,
-                                   double *out_rate);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_web_animation_get_playback_rate(
+    const struct ui_web_animation *animation, double *out_rate);
 
 /**
  * @brief Sets the playback rate.
@@ -365,9 +376,8 @@ ui_web_animation_get_playback_rate(const struct ui_web_animation *animation,
  * @param rate The new playback rate.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_web_animation_set_playback_rate(struct ui_web_animation *animation,
-                                   double rate);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_web_animation_set_playback_rate(
+    struct ui_web_animation *animation, double rate);
 
 /**
  * @brief Advances the timeline for the given animation.
@@ -376,8 +386,8 @@ ui_web_animation_set_playback_rate(struct ui_web_animation *animation,
  * @param delta_time_ms Delta time in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_web_animation_tick(struct ui_web_animation *animation,
-                                 double delta_time_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_web_animation_tick(struct ui_web_animation *animation, double delta_time_ms);
 
 #ifdef __cplusplus
 }

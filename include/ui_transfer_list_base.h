@@ -87,10 +87,9 @@ struct ui_transfer_list_base {
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_transfer_list_base_init(struct ui_transfer_list_base *list,
-                           struct ui_component *component,
-                           struct ui_control_value_accessor *out_cva);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_transfer_list_base_init(
+    struct ui_transfer_list_base *list, struct ui_component *component,
+    struct ui_control_value_accessor *out_cva);
 
 /**
  * @brief Adds an item to one of the lists.
@@ -101,8 +100,8 @@ ui_transfer_list_base_init(struct ui_transfer_list_base *list,
  * @param data User data associated with the item.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
-                                          int to_right, int id, void *data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_transfer_list_base_add_item(
+    struct ui_transfer_list_base *list, int to_right, int id, void *data);
 
 /**
  * @brief Selects or unselects an item by ID.
@@ -112,9 +111,8 @@ ui_error_t ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
  * @param selected The selection state to apply (non-zero for selected).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
-                                   int selected);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_transfer_list_base_set_selected(
+    struct ui_transfer_list_base *list, int id, int selected);
 
 /**
  * @brief Moves selected items between lists.
@@ -124,9 +122,8 @@ ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
  * to left.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
-                                    int to_right);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_transfer_list_base_move_selected(
+    struct ui_transfer_list_base *list, int to_right);
 
 /**
  * @brief Moves all items between lists regardless of selection state.
@@ -136,8 +133,8 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
  * left.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
-                                          int to_right);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_transfer_list_base_move_all(
+    struct ui_transfer_list_base *list, int to_right);
 
 /**
  * @brief Cleans up resources allocated by the transfer list.
@@ -145,7 +142,8 @@ ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
  * @param list Pointer to the transfer list struct.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list);
 
 #ifdef __cplusplus
 }

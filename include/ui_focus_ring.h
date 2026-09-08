@@ -34,8 +34,8 @@ struct ui_focus_ring {
  * @param out_ring Pointer to store the focus ring properties.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_ring_get_standard(ui_color_t theme_primary_color,
-                                      struct ui_focus_ring *out_ring);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_ring_get_standard(
+    ui_color_t theme_primary_color, struct ui_focus_ring *out_ring);
 
 #ifdef __cplusplus
 }

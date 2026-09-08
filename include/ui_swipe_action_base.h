@@ -70,8 +70,8 @@ struct ui_swipe_action_base {
  * @param component The UI component to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
-                                     struct ui_component *component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_swipe_action_base_init(
+    struct ui_swipe_action_base *swipe_action, struct ui_component *component);
 
 /**
  * @brief Updates the swipe position.
@@ -80,9 +80,8 @@ ui_error_t ui_swipe_action_base_init(struct ui_swipe_action_base *swipe_action,
  * @param delta_x The change in X position (positive means swiping right).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
-                            float delta_x);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_swipe_action_base_update(
+    struct ui_swipe_action_base *swipe_action, float delta_x);
 
 /**
  * @brief Commits the swipe gesture.
@@ -93,7 +92,7 @@ ui_swipe_action_base_update(struct ui_swipe_action_base *swipe_action,
  * @param swipe_action Pointer to the swipe action base struct.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action);
 
 /**
@@ -102,7 +101,7 @@ ui_swipe_action_base_commit(struct ui_swipe_action_base *swipe_action);
  * @param swipe_action Pointer to the swipe action base struct.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action);
 
 /**
@@ -112,9 +111,8 @@ ui_swipe_action_base_reset(struct ui_swipe_action_base *swipe_action);
  * @param disabled_signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
-                                   struct ui_signal *disabled_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_swipe_action_base_bind_disabled(
+    struct ui_swipe_action_base *widget, struct ui_signal *disabled_signal);
 
 /**
  * @brief Binds the text content to a string signal for dynamic
@@ -124,8 +122,8 @@ ui_swipe_action_base_bind_disabled(struct ui_swipe_action_base *widget,
  * @param text_signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_swipe_action_base_bind_text(struct ui_swipe_action_base *widget,
-                                          struct ui_signal *text_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_swipe_action_base_bind_text(
+    struct ui_swipe_action_base *widget, struct ui_signal *text_signal);
 
 #ifdef __cplusplus
 }

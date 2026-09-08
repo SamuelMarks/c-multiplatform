@@ -55,7 +55,7 @@ typedef ui_error_t (*ui_range_slider_on_change_t)(
  * @param out_slider Pointer to receive the allocated range slider base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_range_slider_base_create(struct ui_range_slider_base **out_slider);
 
 /**
@@ -64,7 +64,8 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider);
  * @param slider The range slider to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_range_slider_base_destroy(struct ui_range_slider_base *slider);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_range_slider_base_destroy(struct ui_range_slider_base *slider);
 
 /**
  * @brief Sets the minimum possible value of the range slider.
@@ -73,8 +74,8 @@ ui_error_t ui_range_slider_base_destroy(struct ui_range_slider_base *slider);
  * @param min The new minimum value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
-                                        float min);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_range_slider_base_set_min(struct ui_range_slider_base *slider, float min);
 
 /**
  * @brief Sets the maximum possible value of the range slider.
@@ -83,8 +84,8 @@ ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
  * @param max The new maximum value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
-                                        float max);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_range_slider_base_set_max(struct ui_range_slider_base *slider, float max);
 
 /**
  * @brief Sets the current values of the range slider.
@@ -94,8 +95,8 @@ ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
  * @param high_value The new high value (clamped to bounds).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
-                                           float low_value, float high_value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_range_slider_base_set_values(
+    struct ui_range_slider_base *slider, float low_value, float high_value);
 
 /**
  * @brief Gets the current values of the range slider.
@@ -105,9 +106,8 @@ ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
  * @param out_high Pointer to receive the high value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_range_slider_base_get_values(const struct ui_range_slider_base *slider,
-                                float *out_low, float *out_high);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_range_slider_base_get_values(
+    const struct ui_range_slider_base *slider, float *out_low, float *out_high);
 
 /**
  * @brief Sets the step increment. If 0.0, the slider is continuous.
@@ -116,8 +116,8 @@ ui_range_slider_base_get_values(const struct ui_range_slider_base *slider,
  * @param step The step increment value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_range_slider_base_set_step(struct ui_range_slider_base *slider,
-                                         float step);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_range_slider_base_set_step(struct ui_range_slider_base *slider, float step);
 
 /**
  * @brief Sets the disabled state of the range slider.
@@ -126,9 +126,8 @@ ui_error_t ui_range_slider_base_set_step(struct ui_range_slider_base *slider,
  * @param disabled Non-zero to disable, 0 to enable.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_range_slider_base_set_disabled(struct ui_range_slider_base *slider,
-                                  int disabled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_range_slider_base_set_disabled(
+    struct ui_range_slider_base *slider, int disabled);
 
 /**
  * @brief Sets the change handler for the range slider.
@@ -138,10 +137,9 @@ ui_range_slider_base_set_disabled(struct ui_range_slider_base *slider,
  * @param user_data Opaque pointer passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_range_slider_base_set_on_change(struct ui_range_slider_base *slider,
-                                   ui_range_slider_on_change_t on_change,
-                                   void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_range_slider_base_set_on_change(
+    struct ui_range_slider_base *slider, ui_range_slider_on_change_t on_change,
+    void *user_data);
 
 /**
  * @brief Processes an incoming input event to trigger slider interactions based
@@ -153,7 +151,7 @@ ui_range_slider_base_set_on_change(struct ui_range_slider_base *slider,
  * to 1.0).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_range_slider_base_set_normalized_value(struct ui_range_slider_base *slider,
                                           enum ui_range_slider_thumb thumb,
                                           float normalized_position);
@@ -168,7 +166,7 @@ ui_range_slider_base_set_normalized_value(struct ui_range_slider_base *slider,
  * @param timestamp_ms Event timestamp in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_range_slider_base_process_event(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_range_slider_base_process_event(
     struct ui_range_slider_base *slider, const struct ui_event *event,
     enum ui_range_slider_thumb active_thumb, double timestamp_ms);
 
@@ -180,9 +178,8 @@ ui_error_t ui_range_slider_base_process_event(
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_range_slider_base_get_component(struct ui_range_slider_base *slider,
-                                   struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_range_slider_base_get_component(
+    struct ui_range_slider_base *slider, struct ui_component **out_component);
 
 #ifdef __cplusplus
 }

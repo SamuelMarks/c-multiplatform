@@ -73,7 +73,8 @@ struct ui_css_contain_intrinsic_size {
  * \param out_flags Pointer to receive the parsed flags.
  * \return UI_ERROR_NONE on success.
  */
-ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_contain(const char *str, unsigned int *out_flags);
 
 /**
  * \brief Parses the CSS 'content-visibility' property.
@@ -82,9 +83,8 @@ ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags);
  * \param out_visibility Pointer to receive the parsed visibility.
  * \return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_css_parse_content_visibility(const char *str,
-                                enum ui_css_content_visibility *out_visibility);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_content_visibility(
+    const char *str, enum ui_css_content_visibility *out_visibility);
 
 /**
  * \brief Parses the CSS 'contain-intrinsic-size' property.
@@ -93,7 +93,7 @@ ui_css_parse_content_visibility(const char *str,
  * \param out_size Pointer to receive the parsed intrinsic size.
  * \return UI_ERROR_NONE on success.
  */
-ui_error_t ui_css_parse_contain_intrinsic_size(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_contain_intrinsic_size(
     const char *str, struct ui_css_contain_intrinsic_size *out_size);
 
 #ifdef __cplusplus

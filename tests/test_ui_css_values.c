@@ -6,7 +6,6 @@
 #include "../include/ui_css_values.h"
 #include "ui_types.h"
 #include <string.h>
-/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 extern int g_mock_strcpy_fail;
@@ -22,6 +21,29 @@ extern int g_mock_strcpy_fail;
   } while (0)
 
 static int float_eq(float a, float b) { return fabs(a - b) < 0.001; }
+
+static struct ui_css_value val;
+static struct ui_css_value_ext *ext_val;
+static ui_error_t rc;
+
+static void test_colors_extended(void);
+static void test_fill_stroke(void);
+static void test_easing_extended(void);
+static void test_more_branches(void);
+static void test_more_branches_2(void);
+static void test_more_branches_3(void);
+static void test_more_branches_4(void);
+static void test_more_branches_5(void);
+static void test_more_branches_6(void);
+static void test_coverage_gaps(void);
+static void test_missing_branches(void);
+
+#include "test_ui_css_values_animation.c"
+#include "test_ui_css_values_clip_math.c"
+#include "test_ui_css_values_colors_easing.c"
+#include "test_ui_css_values_scalar_calc.c"
+#include "test_ui_css_values_shape_outside.c"
+/* clang-format on */
 
 static void test_colors_extended(void) {
   struct ui_css_color color;
@@ -1223,16 +1245,6 @@ static void test_missing_branches(void) {
   rc = ui_css_parse_transition("cubic-bezier(0,0,1,1", &trans);
   rc = ui_css_parse_transition("steps(1,start", &trans);
 }
-
-static struct ui_css_value val;
-static struct ui_css_value_ext *ext_val = NULL;
-static ui_error_t rc;
-
-#include "test_ui_css_values_animation.c"
-#include "test_ui_css_values_clip_math.c"
-#include "test_ui_css_values_colors_easing.c"
-#include "test_ui_css_values_scalar_calc.c"
-#include "test_ui_css_values_shape_outside.c"
 
 int main(void) {
   if (test_css_values_colors_easing() != 0)

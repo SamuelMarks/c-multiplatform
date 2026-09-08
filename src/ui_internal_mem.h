@@ -71,9 +71,7 @@ extern char *ui_mock_strdup(const char *src);
 #if defined(_MSC_VER)
 #define C_MULTIPLATFORM_STRDUP _strdup
 #else
-#if defined(__CYGWIN__)
 char *strdup(const char *);
-#endif
 #define C_MULTIPLATFORM_STRDUP strdup
 #endif
 #endif

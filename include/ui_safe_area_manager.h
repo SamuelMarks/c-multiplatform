@@ -48,9 +48,8 @@ struct ui_arena;
  * @param out_manager Output pointer for the created manager.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_safe_area_manager_create(struct ui_arena *arena,
-                            struct ui_safe_area_manager **out_manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_safe_area_manager_create(
+    struct ui_arena *arena, struct ui_safe_area_manager **out_manager);
 
 /**
  * @brief Destroys a safe area manager.
@@ -58,7 +57,8 @@ ui_safe_area_manager_create(struct ui_arena *arena,
  * @param manager The safe area manager to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager);
 
 /**
  * @brief Sets the current safe area insets (usually called by window backends).
@@ -67,7 +67,7 @@ ui_error_t ui_safe_area_manager_destroy(struct ui_safe_area_manager *manager);
  * @param insets The new insets to apply.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
                                 const struct ui_safe_area_insets *insets);
 
@@ -78,7 +78,7 @@ ui_safe_area_manager_set_insets(struct ui_safe_area_manager *manager,
  * @param out_insets Output pointer to receive the current insets.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
                                 struct ui_safe_area_insets *out_insets);
 
@@ -90,9 +90,8 @@ ui_safe_area_manager_get_insets(struct ui_safe_area_manager *manager,
  * @param out_signal Output pointer for the signal.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_safe_area_manager_get_change_signal(struct ui_safe_area_manager *manager,
-                                       ui_signal_t **out_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_safe_area_manager_get_change_signal(
+    struct ui_safe_area_manager *manager, ui_signal_t **out_signal);
 
 #ifdef __cplusplus
 }

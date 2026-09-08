@@ -52,8 +52,8 @@ struct ui_os_file_picker_config {
  * @param type The type/icon of the message box.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_os_dialog_show_message_box(const char *title, const char *message,
-                                         enum ui_os_message_box_type type);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_os_dialog_show_message_box(
+    const char *title, const char *message, enum ui_os_message_box_type type);
 
 /**
  * @brief Opens a native file picker asynchronously, bridging results directly
@@ -65,7 +65,7 @@ ui_error_t ui_os_dialog_show_message_box(const char *title, const char *message,
  * @param pool The thread pool to run the blocking dialog on.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_os_dialog_open_file_picker_async(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_os_dialog_open_file_picker_async(
     struct ui_file_uploader_base *uploader,
     const struct ui_os_file_picker_config *config, struct ui_reactor *reactor,
     struct ui_thread_pool *pool);
@@ -79,10 +79,9 @@ ui_error_t ui_os_dialog_open_file_picker_async(
  * @param pool The thread pool to run the blocking dialog on.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_os_dialog_open_color_picker_async(struct ui_color_picker_base *picker,
-                                     struct ui_reactor *reactor,
-                                     struct ui_thread_pool *pool);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_os_dialog_open_color_picker_async(
+    struct ui_color_picker_base *picker, struct ui_reactor *reactor,
+    struct ui_thread_pool *pool);
 
 /**
  * @brief Callback function used when a file operation completes.
@@ -90,7 +89,7 @@ ui_os_dialog_open_color_picker_async(struct ui_color_picker_base *picker,
  * @param user_data Opaque pointer to user data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_os_file_completion(void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_os_file_completion(void *user_data);
 
 #ifdef __cplusplus
 }

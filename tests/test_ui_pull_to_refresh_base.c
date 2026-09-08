@@ -5,10 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-/* clang-format on */
-
 #undef NDEBUG
 #include <assert.h>
+/* clang-format on */
 
 extern int g_malloc_fail_countdown;
 
@@ -25,6 +24,7 @@ static ui_error_t on_refresh(struct ui_pull_to_refresh_base *ptr,
 static void test_ptr_basic(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
   struct ui_component *spinner = NULL;
+  enum ui_pull_to_refresh_state current_state;
   ui_error_t rc;
 
   refresh_count = 0;
@@ -47,7 +47,9 @@ static void test_ptr_basic(void) {
   rc = ui_pull_to_refresh_base_set_on_refresh(ptr, on_refresh, NULL);
   assert(rc == UI_ERROR_NONE);
 
-  assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_RESTING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_RESTING);
   {
     float progress = 0.0f;
     {
@@ -91,7 +93,9 @@ static void test_ptr_basic(void) {
 
   /* State should now be pulling because it moved enough to trigger a pan
    * gesture */
-  assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_PULLING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_PULLING);
 
   /* Send a negative delta_y to push back up, hitting the ge.delta_y <= 0.0f
      branch inside the PULLING state */
@@ -110,8 +114,9 @@ static void test_ptr_basic(void) {
   assert(rc == UI_ERROR_NONE);
 
   /* State should now be refreshing */
-  assert(ui_pull_to_refresh_base_get_state(ptr) ==
-         UI_PULL_TO_REFRESH_REFRESHING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_REFRESHING);
   assert(refresh_count == 1);
 
   /* Process event while refreshing */
@@ -123,8 +128,9 @@ static void test_ptr_basic(void) {
   /* Mark complete */
   rc = ui_pull_to_refresh_base_complete(ptr);
   assert(rc == UI_ERROR_NONE);
-  assert(ui_pull_to_refresh_base_get_state(ptr) ==
-         UI_PULL_TO_REFRESH_COMPLETING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_COMPLETING);
 
   /* Process event while completing */
   rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 3300.0);
@@ -151,7 +157,9 @@ static void test_ptr_basic(void) {
     ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 150.0);
     (void)_ign;
   }
-  assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_RESTING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_RESTING);
 
   {
     ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
@@ -171,6 +179,8 @@ static void test_ptr_basic(void) {
 
 static void test_ptr_spring_back(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
+  enum ui_pull_to_refresh_state current_state;
+  ui_error_t rc;
   struct ui_event ev;
   memset(&ev, 0, sizeof(ev));
 
@@ -205,7 +215,9 @@ static void test_ptr_spring_back(void) {
     (void)_ign;
   }
 
-  assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_PULLING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_PULLING);
 
   /* Tick should spring it back to resting */
   {
@@ -224,7 +236,9 @@ static void test_ptr_spring_back(void) {
     }
   }
 
-  assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_RESTING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_RESTING);
 
   /* Send an event where pull_distance < 0.0f and state is PULLING */
   /* This is not reachable via public API in the current mock setup, we'll
@@ -311,6 +325,8 @@ static void test_ptr_push_up(void) {
 
 static void test_ptr_cancel(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
+  enum ui_pull_to_refresh_state current_state;
+  ui_error_t rc;
   struct ui_event ev;
   memset(&ev, 0, sizeof(ev));
 
@@ -355,8 +371,9 @@ static void test_ptr_cancel(void) {
    * identically so if we cross the threshold it goes to REFRESHING. If we
    * wanted to test the CANCEL fallback, we'd need to NOT cross the threshold.
    */
-  assert(ui_pull_to_refresh_base_get_state(ptr) ==
-         UI_PULL_TO_REFRESH_REFRESHING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_REFRESHING);
 
   {
     ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
@@ -394,7 +411,9 @@ static void test_ptr_cancel(void) {
     }
   }
 
-  assert(ui_pull_to_refresh_base_get_state(ptr) == UI_PULL_TO_REFRESH_PULLING);
+  rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
+  assert(rc == UI_ERROR_NONE);
+  assert(current_state == UI_PULL_TO_REFRESH_PULLING);
 
   /* Force state to unmapped value to test switch default branch in dom update
    */
@@ -634,6 +653,7 @@ static void test_ptr_nulls(void) {
   struct ui_component *comp = NULL;
   struct ui_signal *sig = (struct ui_signal *)0x123;
   struct ui_computed *comp_sig = NULL;
+  enum ui_pull_to_refresh_state dummy_state;
   float progress;
   struct ui_event ev;
 
@@ -651,7 +671,10 @@ static void test_ptr_nulls(void) {
 
   assert(ui_pull_to_refresh_base_complete(NULL) == UI_ERROR_INVALID_ARGUMENT);
 
-  assert(ui_pull_to_refresh_base_get_state(NULL) == UI_PULL_TO_REFRESH_RESTING);
+  assert(ui_pull_to_refresh_base_get_state(NULL, &dummy_state) ==
+         UI_ERROR_INVALID_ARGUMENT);
+  assert(ui_pull_to_refresh_base_get_state(ptr, NULL) ==
+         UI_ERROR_INVALID_ARGUMENT);
 
   assert(ui_pull_to_refresh_base_get_progress(NULL, &progress) ==
          UI_ERROR_INVALID_ARGUMENT);

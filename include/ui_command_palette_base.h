@@ -56,7 +56,7 @@ struct ui_command_palette_base {
  * @param list Pointer to the virtualized list component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_command_palette_base_init(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_command_palette_base_init(
     struct ui_command_palette_base *palette, struct ui_component *component,
     struct ui_autocomplete_base *autocomplete, struct ui_dialog_base *dialog,
     struct ui_virtual_scroll_base *list);
@@ -67,7 +67,7 @@ ui_error_t ui_command_palette_base_init(
  * @param palette Pointer to the command palette base struct.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_command_palette_base_open(struct ui_command_palette_base *palette);
 
 /**
@@ -76,7 +76,7 @@ ui_command_palette_base_open(struct ui_command_palette_base *palette);
  * @param palette Pointer to the command palette base struct.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_command_palette_base_close(struct ui_command_palette_base *palette);
 
 /**
@@ -86,9 +86,8 @@ ui_command_palette_base_close(struct ui_command_palette_base *palette);
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_command_palette_base_bind_open(struct ui_command_palette_base *widget,
-                                  struct ui_signal *open_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_command_palette_base_bind_open(
+    struct ui_command_palette_base *widget, struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the widget is animating.
@@ -97,7 +96,8 @@ ui_command_palette_base_bind_open(struct ui_command_palette_base *widget,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_command_palette_base_get_animating_signal(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_command_palette_base_get_animating_signal(
     struct ui_command_palette_base *widget, struct ui_computed **out_animating);
 
 #ifdef __cplusplus

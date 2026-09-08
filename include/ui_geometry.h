@@ -84,8 +84,8 @@ struct ui_dom_matrix {
  * @param w The w coordinate.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_dom_point_init(struct ui_dom_point *point, double x, double y,
-                             double z, double w);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_dom_point_init(
+    struct ui_dom_point *point, double x, double y, double z, double w);
 
 /**
  * @brief Initializes a DOMRect, automatically computing top/right/bottom/left.
@@ -97,8 +97,8 @@ ui_error_t ui_dom_point_init(struct ui_dom_point *point, double x, double y,
  * @param height The height.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
-                            double width, double height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_dom_rect_init(
+    struct ui_dom_rect *rect, double x, double y, double width, double height);
 
 /**
  * @brief Initializes a DOMQuad from 4 points.
@@ -110,11 +110,10 @@ ui_error_t ui_dom_rect_init(struct ui_dom_rect *rect, double x, double y,
  * @param p4 Pointer to the fourth point.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_dom_quad_init(struct ui_dom_quad *quad,
-                            const struct ui_dom_point *p1,
-                            const struct ui_dom_point *p2,
-                            const struct ui_dom_point *p3,
-                            const struct ui_dom_point *p4);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_dom_quad_init(struct ui_dom_quad *quad, const struct ui_dom_point *p1,
+                 const struct ui_dom_point *p2, const struct ui_dom_point *p3,
+                 const struct ui_dom_point *p4);
 
 /**
  * @brief Initializes a DOMMatrix to the identity matrix.
@@ -122,7 +121,8 @@ ui_error_t ui_dom_quad_init(struct ui_dom_quad *quad,
  * @param matrix Pointer to the matrix to initialize.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_dom_matrix_init_identity(struct ui_dom_matrix *matrix);
 
 #ifdef __cplusplus
 }

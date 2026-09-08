@@ -341,10 +341,13 @@ ui_error_t ui_avatar_base_get_image_url(const struct ui_avatar_base *avatar,
  */
 ui_error_t ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
                                             struct ui_icon_base *icon) {
+  ui_error_t rc;
+
   if (!avatar || !icon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
+  rc = UI_ERROR_NONE;
   if (avatar->fallback_icon) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(avatar->fallback_icon);
@@ -356,7 +359,7 @@ ui_error_t ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
   }
 
   avatar->fallback_icon = icon;
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

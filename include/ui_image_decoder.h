@@ -85,8 +85,9 @@ struct ui_image_decoder_backend {
  * @param out_image Pointer to receive the decoded image structure.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_image_decode_memory(enum ui_image_format format, const void *data,
-                                  size_t size, struct ui_image *out_image);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_image_decode_memory(enum ui_image_format format, const void *data,
+                       size_t size, struct ui_image *out_image);
 
 /**
  * @brief Frees a decoded image.
@@ -94,7 +95,7 @@ ui_error_t ui_image_decode_memory(enum ui_image_format format, const void *data,
  * @param image Pointer to the image to free.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_image_free(struct ui_image *image);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_image_free(struct ui_image *image);
 
 #ifdef __cplusplus
 }

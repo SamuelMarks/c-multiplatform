@@ -8,6 +8,8 @@
 #include "ui_internal_mem.h"
 #include <stdio.h>
 #include <string.h>
+#ifdef __EMSCRIPTEN__
+#endif
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -44,7 +46,6 @@ static ui_error_t mock_promise_reject(struct ui_promise *promise,
 #define ui_promise_reject mock_promise_reject
 /** @endcond */
 
-#include "ui_thread_pool.h"
 static ui_error_t mock_thread_pool_schedule(struct ui_thread_pool *pool,
                                             ui_error_t (*task)(void *),
                                             void *user_data) {
@@ -84,7 +85,6 @@ extern int g_mock_io_fail;
 #endif
 
 #if defined(__EMSCRIPTEN__)
-#include <emscripten.h>
 extern int fetch_asset_js(const char *url_cstr, int task_ptr);
 #endif
 
@@ -476,16 +476,15 @@ ui_error_t run_asset_streamer_coverage(void) {
   }
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
   UI_STRCPY(task->url, 100, "dummy_asset.txt");
-  (void)asset_task_execute(task);
   g_asset_streamer_mock_fail = 1; /* resolve fails */
-  (void)asset_task_complete(task);
-  g_asset_streamer_mock_fail = 0;
+  (void)asset_task_execute(task);
   {
     ui_error_t rc_cleanup = ui_execution_context_tick(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
       /* expected error */
     }
   }
+  g_asset_streamer_mock_fail = 0;
 
   g_malloc_fail_countdown = 0;
   (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
@@ -505,16 +504,15 @@ ui_error_t run_asset_streamer_coverage(void) {
   }
   task->url = (char *)C_MULTIPLATFORM_MALLOC(100);
   UI_STRCPY(task->url, 100, "non_existent.txt");
-  (void)asset_task_execute(task); /* IO fail */
   g_asset_streamer_mock_fail = 2; /* reject fails */
-  (void)asset_task_complete(task);
-  g_asset_streamer_mock_fail = 0;
+  (void)asset_task_execute(task); /* IO fail */
   {
     ui_error_t rc_cleanup = ui_execution_context_tick(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
       /* expected error */
     }
   }
+  g_asset_streamer_mock_fail = 0;
   g_malloc_fail_countdown = 0;
   (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));
   g_malloc_fail_countdown = -1;
@@ -602,7 +600,12 @@ ui_error_t run_asset_streamer_coverage(void) {
   g_malloc_fail_countdown = 2;
   (void)asset_task_execute(task);
   g_malloc_fail_countdown = -1;
-  (void)asset_task_complete(task);
+  {
+    ui_error_t rc_cleanup = ui_execution_context_tick(ctx);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      /* expected error */
+    }
+  }
 
   g_malloc_fail_countdown = 0;
   (void)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_asset_task));

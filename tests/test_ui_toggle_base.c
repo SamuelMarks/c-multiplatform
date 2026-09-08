@@ -53,6 +53,7 @@ static int test_normal(void) {
   struct ui_toggle_base *rad3 = NULL;
   struct ui_component *comp;
   struct ui_control_value_accessor cva;
+  union ui_signal_payload payload;
   int is_checked;
   struct ui_event ev;
   int failed = 0;
@@ -105,8 +106,10 @@ static int test_normal(void) {
 
   /* Set cva_on_change to NULL then trigger check */
   cva.register_on_change(chk1, NULL, NULL);
-  cva.write_value(chk1, (union ui_signal_payload){.bool_val = 1});
-  cva.write_value(chk1, (union ui_signal_payload){.bool_val = 0});
+  payload.bool_val = 1;
+  cva.write_value(chk1, payload);
+  payload.bool_val = 0;
+  cva.write_value(chk1, payload);
   cva.register_on_touched(chk1, NULL, NULL);
 
   ACCUM_ERR(failed, cva.register_on_change(chk1, on_cva_change, NULL));

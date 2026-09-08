@@ -41,6 +41,7 @@ static ui_error_t test_callback_fail(void *os_handle, int events,
 }
 
 static ui_error_t test_schedule_callback(void *user_data) {
+  (void)user_data;
   return UI_ERROR_UNKNOWN;
 }
 
@@ -49,15 +50,17 @@ static ui_error_t run_normal_tests(void) {
   ui_error_t rc;
   int test_val = 0;
   int pipes[2];
+  void *fake_handle1 = NULL;
+  void *fake_handle2 = (void *)(size_t)43;
+  void *fake_handle3 = (void *)(size_t)44;
+
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
   pipe(pipes);
 #else
   pipes[0] = 42;
   pipes[1] = 43;
 #endif
-  void *fake_handle1 = (void *)(size_t)pipes[0];
-  void *fake_handle2 = (void *)(size_t)43;
-  void *fake_handle3 = (void *)(size_t)44;
+  fake_handle1 = (void *)(size_t)pipes[0];
 
   printf("Running normal reactor tests...\n");
 
@@ -345,17 +348,17 @@ void test_ui_reactor_oom(void) {
   if (rc == UI_ERROR_NONE && reactor) {
     g_malloc_fail_countdown = 0;
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
     (void)rc;
     g_malloc_fail_countdown = -1;
 
     /* Cover destroy while having tasks and nodes */
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
     (void)rc;
-    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
     (void)rc;
-    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
     (void)rc;
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
@@ -380,11 +383,11 @@ void test_ui_reactor_destroy_populated(void) {
   rc = ui_reactor_create(&reactor);
   if (rc == UI_ERROR_NONE && reactor) {
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
-                             (ui_error_t (*)(void *, int, void *))0x1, NULL);
+                             (ui_error_t(*)(void *, int, void *))0x1, NULL);
     (void)rc;
-    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
     (void)rc;
-    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
     (void)rc;
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
@@ -405,14 +408,17 @@ void test_ui_reactor_poll_error(void) {
   rc = ui_reactor_create(&reactor);
   if (rc == UI_ERROR_NONE && reactor) {
     /* To get cb_rc != UI_ERROR_NONE in the task queue */
-    rc = ui_reactor_schedule(reactor, (ui_error_t (*)(void *))0x1, NULL);
+    rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
     (void)rc;
     /* Actually that will crash if it tries to execute 0x1. We need a real
      * callback. */
   }
 }
 
-static ui_error_t my_failing_task(void *data) { return UI_ERROR_OUT_OF_MEMORY; }
+static ui_error_t my_failing_task(void *data) {
+  (void)data;
+  return UI_ERROR_OUT_OF_MEMORY;
+}
 
 void test_ui_reactor_poll_error2(void) {
   struct ui_reactor *reactor = NULL;

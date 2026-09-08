@@ -5,6 +5,7 @@
 
 /* clang-format off */
 #include <stddef.h>
+#include <string.h>
 #include "../include/ui_arena.h"
 #include "../include/ui_types.h"
 #include "ui_internal_mem.h"

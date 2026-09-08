@@ -36,11 +36,10 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #elif defined(__linux__) || defined(__unix__)
 #include "ui_window_backend_linux.h"
 #endif
-/* clang-format on */
-
 #if defined(__EMSCRIPTEN__)
 #include <emscripten.h>
 #endif
+/* clang-format on */
 
 static const char *APP_CSS = "body {"
                              "  width: 100%;"

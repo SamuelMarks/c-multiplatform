@@ -22,7 +22,8 @@ struct ui_shader_manager;
  * @param out_manager Pointer to receive the allocated manager.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_shader_manager_create(struct ui_shader_manager **out_manager);
 
 /**
  * @brief Destroys a shader manager, freeing all cached shaders.
@@ -30,7 +31,8 @@ ui_error_t ui_shader_manager_create(struct ui_shader_manager **out_manager);
  * @param manager The manager to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_shader_manager_destroy(struct ui_shader_manager *manager);
 
 /**
  * @brief Compiles and links a shader program, or returns it from the cache if
@@ -43,11 +45,10 @@ ui_error_t ui_shader_manager_destroy(struct ui_shader_manager *manager);
  * @param out_program_id Pointer to receive the compiled program ID (GLuint).
  * @return UI_ERROR_NONE on success, or UI_ERROR_UNKNOWN if compilation fails.
  */
-ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
-                                         const char *name,
-                                         const char *vertex_source,
-                                         const char *fragment_source,
-                                         unsigned int *out_program_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_shader_manager_get_program(
+    struct ui_shader_manager *manager, const char *name,
+    const char *vertex_source, const char *fragment_source,
+    unsigned int *out_program_id);
 
 /**
  * @brief Sets a matrix uniform for the current shader.
@@ -57,10 +58,9 @@ ui_error_t ui_shader_manager_get_program(struct ui_shader_manager *manager,
  * @param matrix The 4x4 matrix data.
  * @return ui_error_t `UI_ERROR_NONE` on success.
  */
-ui_error_t
-ui_shader_manager_set_uniform_matrix(struct ui_shader_manager *manager,
-                                     unsigned int location, const char *name,
-                                     const float *matrix);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_shader_manager_set_uniform_matrix(
+    struct ui_shader_manager *manager, unsigned int location, const char *name,
+    const float *matrix);
 /**
  * @brief Sets a color uniform for the current shader.
  * @param manager The shader manager.
@@ -72,10 +72,9 @@ ui_shader_manager_set_uniform_matrix(struct ui_shader_manager *manager,
  * @param a The alpha channel (0-1).
  * @return ui_error_t `UI_ERROR_NONE` on success.
  */
-ui_error_t
-ui_shader_manager_set_uniform_color(struct ui_shader_manager *manager,
-                                    unsigned int location, const char *name,
-                                    float r, float g, float b, float a);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_shader_manager_set_uniform_color(
+    struct ui_shader_manager *manager, unsigned int location, const char *name,
+    float r, float g, float b, float a);
 /**
  * @brief Sets a float uniform for the current shader.
  * @param manager The shader manager.
@@ -84,10 +83,9 @@ ui_shader_manager_set_uniform_color(struct ui_shader_manager *manager,
  * @param value The float value.
  * @return ui_error_t `UI_ERROR_NONE` on success.
  */
-ui_error_t
-ui_shader_manager_set_uniform_float(struct ui_shader_manager *manager,
-                                    unsigned int location, const char *name,
-                                    float value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_shader_manager_set_uniform_float(
+    struct ui_shader_manager *manager, unsigned int location, const char *name,
+    float value);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

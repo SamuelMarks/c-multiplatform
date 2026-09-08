@@ -53,7 +53,8 @@ struct ui_toolbar_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-ui_error_t ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar);
 
 /**
  * @brief Destroys a toolbar base component and frees its title if allocated.
@@ -61,7 +62,8 @@ ui_error_t ui_toolbar_base_create(struct ui_toolbar_base **out_toolbar);
  * @param toolbar The toolbar to destroy.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar);
 
 /**
  * @brief Sets the title of the toolbar.
@@ -73,8 +75,8 @@ ui_error_t ui_toolbar_base_destroy(struct ui_toolbar_base *toolbar);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer,
  * UI_ERROR_OUT_OF_MEMORY on allocation failure.
  */
-ui_error_t ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
-                                     const char *title);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar, const char *title);
 
 /**
  * @brief Gets the title of the toolbar.
@@ -84,8 +86,8 @@ ui_error_t ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
  * toolbar).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toolbar_base_get_title(const struct ui_toolbar_base *toolbar,
-                                     const char **out_title);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toolbar_base_get_title(
+    const struct ui_toolbar_base *toolbar, const char **out_title);
 
 /**
  * @brief Sets the layout mode of the toolbar.
@@ -94,8 +96,8 @@ ui_error_t ui_toolbar_base_get_title(const struct ui_toolbar_base *toolbar,
  * @param mode The mode to set.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toolbar_base_set_mode(struct ui_toolbar_base *toolbar,
-                                    enum ui_toolbar_mode mode);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toolbar_base_set_mode(
+    struct ui_toolbar_base *toolbar, enum ui_toolbar_mode mode);
 
 /**
  * @brief Gets the layout mode of the toolbar.
@@ -104,8 +106,8 @@ ui_error_t ui_toolbar_base_set_mode(struct ui_toolbar_base *toolbar,
  * @param out_mode Pointer to receive the mode.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toolbar_base_get_mode(const struct ui_toolbar_base *toolbar,
-                                    enum ui_toolbar_mode *out_mode);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toolbar_base_get_mode(
+    const struct ui_toolbar_base *toolbar, enum ui_toolbar_mode *out_mode);
 
 /**
  * @brief Sets the alignment of the toolbar contents.
@@ -114,8 +116,8 @@ ui_error_t ui_toolbar_base_get_mode(const struct ui_toolbar_base *toolbar,
  * @param alignment The alignment to set (row or column).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
-                                         enum ui_toolbar_alignment alignment);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toolbar_base_set_alignment(
+    struct ui_toolbar_base *toolbar, enum ui_toolbar_alignment alignment);
 
 /**
  * @brief Gets the alignment of the toolbar contents.
@@ -124,7 +126,7 @@ ui_error_t ui_toolbar_base_set_alignment(struct ui_toolbar_base *toolbar,
  * @param out_alignment Pointer to receive the alignment.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_toolbar_base_get_alignment(const struct ui_toolbar_base *toolbar,
                               enum ui_toolbar_alignment *out_alignment);
 
@@ -135,11 +137,11 @@ ui_toolbar_base_get_alignment(const struct ui_toolbar_base *toolbar,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_toolbar_base_bind_data(struct ui_toolbar_base *toolbar,
-                                     struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_toolbar_base_bind_data(
+    struct ui_toolbar_base *toolbar, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_TOOLBAR_BASE_H */

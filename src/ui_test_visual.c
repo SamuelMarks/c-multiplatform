@@ -5,8 +5,10 @@
 
 /* clang-format off */
 #include "../include/ui_test_visual.h"
+#ifdef UI_TEST_MOCK_ALLOC
 /** @brief Mock stbi write png fail */
 extern int g_mock_stbi_write_png_fail;
+#endif
 
 #include <math.h>
 #include <stdlib.h>
@@ -286,9 +288,11 @@ ui_error_t ui_visual_write_heatmap_to_disk(const char *filepath,
   }
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
   if (g_mock_stbi_write_png_fail)
     rc = 0;
   else
+#endif
     rc = stbi_write_png_to_func(log_stbi_write_c_file, f, width, height, 4,
                                 heatmap_data, width * 4);
   fclose(f);

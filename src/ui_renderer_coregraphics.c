@@ -63,7 +63,6 @@ static ui_error_t cg_begin_frame(void *ctx, int width, int height) {
   if (!cgc)
     return UI_ERROR_INVALID_ARGUMENT;
 
-#include <stdio.h>
   printf("begin_frame: cw=%d w=%d ch=%d h=%d ctx=%p\n", cgc->current_width,
          width, cgc->current_height, height, (void *)cgc->context);
 

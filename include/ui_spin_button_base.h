@@ -51,7 +51,7 @@ typedef ui_error_t (*ui_spin_button_on_change_t)(
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
                            struct ui_control_value_accessor *out_cva);
 
@@ -61,7 +61,8 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
  * @param spin_button The spin button to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button);
 
 /**
  * @brief Sets the minimum value.
@@ -70,8 +71,8 @@ ui_error_t ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button);
  * @param min The minimum value.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
-                                       double min);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_set_min(
+    struct ui_spin_button_base *spin_button, double min);
 
 /**
  * @brief Sets the maximum value.
@@ -80,8 +81,8 @@ ui_error_t ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
  * @param max The maximum value.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
-                                       double max);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_set_max(
+    struct ui_spin_button_base *spin_button, double max);
 
 /**
  * @brief Sets the current value. Clamps to min/max.
@@ -90,9 +91,8 @@ ui_error_t ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
  * @param value The current value.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
-                              double value);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_set_value(
+    struct ui_spin_button_base *spin_button, double value);
 
 /**
  * @brief Gets the current value.
@@ -101,9 +101,8 @@ ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
  * @param out_val Pointer to receive the current value.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_spin_button_base_get_value(const struct ui_spin_button_base *spin_button,
-                              double *out_val);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_get_value(
+    const struct ui_spin_button_base *spin_button, double *out_val);
 
 /**
  * @brief Sets the step increment.
@@ -112,8 +111,8 @@ ui_spin_button_base_get_value(const struct ui_spin_button_base *spin_button,
  * @param step The step increment.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
-                                        double step);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_set_step(
+    struct ui_spin_button_base *spin_button, double step);
 
 /**
  * @brief Sets the disabled state.
@@ -122,9 +121,8 @@ ui_error_t ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
  * @param disabled 1 to disable, 0 to enable.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
-                                 int disabled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_set_disabled(
+    struct ui_spin_button_base *spin_button, int disabled);
 
 /**
  * @brief Sets the change handler.
@@ -134,10 +132,9 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
  * @param user_data Opaque user data.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_spin_button_base_set_on_change(struct ui_spin_button_base *spin_button,
-                                  ui_spin_button_on_change_t on_change,
-                                  void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_set_on_change(
+    struct ui_spin_button_base *spin_button,
+    ui_spin_button_on_change_t on_change, void *user_data);
 
 /**
  * @brief Increments the value by one step.
@@ -145,7 +142,7 @@ ui_spin_button_base_set_on_change(struct ui_spin_button_base *spin_button,
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_spin_button_base_increment(struct ui_spin_button_base *spin_button);
 
 /**
@@ -154,7 +151,7 @@ ui_spin_button_base_increment(struct ui_spin_button_base *spin_button);
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_spin_button_base_decrement(struct ui_spin_button_base *spin_button);
 
 /**
@@ -163,7 +160,8 @@ ui_spin_button_base_decrement(struct ui_spin_button_base *spin_button);
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_spin_button_base_start_continuous_increment(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_spin_button_base_start_continuous_increment(
     struct ui_spin_button_base *spin_button);
 
 /**
@@ -172,7 +170,8 @@ ui_error_t ui_spin_button_base_start_continuous_increment(
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_spin_button_base_start_continuous_decrement(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_spin_button_base_start_continuous_decrement(
     struct ui_spin_button_base *spin_button);
 
 /**
@@ -181,7 +180,7 @@ ui_error_t ui_spin_button_base_start_continuous_decrement(
  * @param spin_button The spin button.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_spin_button_base_stop_continuous(struct ui_spin_button_base *spin_button);
 
 /**
@@ -191,8 +190,8 @@ ui_spin_button_base_stop_continuous(struct ui_spin_button_base *spin_button);
  * @param delta_ms The time passed since last tick in milliseconds.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
-                                       double delta_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_on_tick(
+    struct ui_spin_button_base *spin_button, double delta_ms);
 
 /**
  * @brief Processes an incoming input event (e.g., Up/Down arrows).
@@ -201,9 +200,8 @@ ui_error_t ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
  * @param event The input event.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
-                                  const struct ui_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_spin_button_base_process_event(
+    struct ui_spin_button_base *spin_button, const struct ui_event *event);
 
 /**
  * @brief Gets the underlying component instance.
@@ -212,7 +210,7 @@ ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_spin_button_base_get_component(struct ui_spin_button_base *spin_button,
                                   struct ui_component **out_component);
 

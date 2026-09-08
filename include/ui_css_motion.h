@@ -98,8 +98,8 @@ struct ui_css_offset_rotate {
  * \param out_path Pointer to receive the parsed offset path.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_offset_path(const char *str,
-                                    struct ui_css_offset_path *out_path);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_offset_path(const char *str, struct ui_css_offset_path *out_path);
 
 /**
  * \brief Parses the offset-distance CSS property.
@@ -108,8 +108,8 @@ ui_error_t ui_css_parse_offset_path(const char *str,
  * \param out_distance Pointer to receive the parsed offset distance.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_offset_distance(const char *str,
-                                        struct ui_css_value *out_distance);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_offset_distance(
+    const char *str, struct ui_css_value *out_distance);
 
 /**
  * \brief Parses the offset-position CSS property.
@@ -118,9 +118,8 @@ ui_error_t ui_css_parse_offset_distance(const char *str,
  * \param out_position Pointer to receive the parsed offset position.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_css_parse_offset_position(const char *str,
-                             struct ui_css_offset_position *out_position);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_offset_position(
+    const char *str, struct ui_css_offset_position *out_position);
 
 /**
  * \brief Parses the offset-anchor CSS property.
@@ -129,8 +128,8 @@ ui_css_parse_offset_position(const char *str,
  * \param out_anchor Pointer to receive the parsed offset anchor.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_offset_anchor(const char *str,
-                                      struct ui_css_offset_anchor *out_anchor);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_offset_anchor(
+    const char *str, struct ui_css_offset_anchor *out_anchor);
 
 /**
  * \brief Parses the offset-rotate CSS property.
@@ -139,8 +138,8 @@ ui_error_t ui_css_parse_offset_anchor(const char *str,
  * \param out_rotate Pointer to receive the parsed offset rotate.
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_css_parse_offset_rotate(const char *str,
-                                      struct ui_css_offset_rotate *out_rotate);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_offset_rotate(
+    const char *str, struct ui_css_offset_rotate *out_rotate);
 
 #ifdef __cplusplus
 }

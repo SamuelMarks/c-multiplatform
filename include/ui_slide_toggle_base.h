@@ -35,7 +35,7 @@ struct ui_slide_toggle_base;
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_MEMORY on allocation
  * failure.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_slide_toggle_base_create(struct ui_slide_toggle_base **out_toggle,
                             struct ui_control_value_accessor *out_cva);
 
@@ -45,7 +45,8 @@ ui_slide_toggle_base_create(struct ui_slide_toggle_base **out_toggle,
  * @param toggle The slide toggle to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle);
 
 /**
  * @brief Sets the boolean state of the toggle.
@@ -54,8 +55,8 @@ ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle);
  * @param checked Non-zero for true/checked, zero for false/unchecked.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
-                                            int checked);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slide_toggle_base_set_checked(
+    struct ui_slide_toggle_base *toggle, int checked);
 
 /**
  * @brief Gets the boolean state of the toggle.
@@ -64,9 +65,8 @@ ui_error_t ui_slide_toggle_base_set_checked(struct ui_slide_toggle_base *toggle,
  * @param out_checked Pointer to receive the checked state (1 or 0).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_slide_toggle_base_get_checked(const struct ui_slide_toggle_base *toggle,
-                                 int *out_checked);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slide_toggle_base_get_checked(
+    const struct ui_slide_toggle_base *toggle, int *out_checked);
 
 /**
  * @brief Sets whether the toggle is disabled.
@@ -75,9 +75,8 @@ ui_slide_toggle_base_get_checked(const struct ui_slide_toggle_base *toggle,
  * @param disabled Non-zero to disable interaction.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_slide_toggle_base_set_disabled(struct ui_slide_toggle_base *toggle,
-                                  int disabled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slide_toggle_base_set_disabled(
+    struct ui_slide_toggle_base *toggle, int disabled);
 
 /**
  * @brief Gets whether the toggle is disabled.
@@ -86,9 +85,8 @@ ui_slide_toggle_base_set_disabled(struct ui_slide_toggle_base *toggle,
  * @param out_disabled Pointer to receive the disabled state.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_slide_toggle_base_get_disabled(const struct ui_slide_toggle_base *toggle,
-                                  int *out_disabled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slide_toggle_base_get_disabled(
+    const struct ui_slide_toggle_base *toggle, int *out_disabled);
 
 /**
  * @brief Toggles the current state if not disabled.
@@ -96,7 +94,8 @@ ui_slide_toggle_base_get_disabled(const struct ui_slide_toggle_base *toggle,
  * @param toggle The slide toggle.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle);
 
 /**
  * @brief Processes an input event (click, touch, or drag) through the internal
@@ -110,10 +109,9 @@ ui_error_t ui_slide_toggle_base_toggle(struct ui_slide_toggle_base *toggle);
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
-                                   const struct ui_event *event,
-                                   double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slide_toggle_base_process_event(
+    struct ui_slide_toggle_base *toggle, const struct ui_event *event,
+    double timestamp_ms);
 
 /**
  * @brief Gets the visual drag offset if the user is currently panning the
@@ -125,9 +123,8 @@ ui_slide_toggle_base_process_event(struct ui_slide_toggle_base *toggle,
  * @param out_offset_x Pointer to receive the pan offset in pixels.
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_slide_toggle_base_get_drag_offset(const struct ui_slide_toggle_base *toggle,
-                                     float *out_offset_x);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slide_toggle_base_get_drag_offset(
+    const struct ui_slide_toggle_base *toggle, float *out_offset_x);
 
 /**
  * @brief Indicates whether the user is actively dragging the thumb.
@@ -137,13 +134,12 @@ ui_slide_toggle_base_get_drag_offset(const struct ui_slide_toggle_base *toggle,
  * idle).
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on null pointer.
  */
-ui_error_t
-ui_slide_toggle_base_is_dragging(const struct ui_slide_toggle_base *toggle,
-                                 int *out_is_dragging);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_slide_toggle_base_is_dragging(
+    const struct ui_slide_toggle_base *toggle, int *out_is_dragging);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* UI_SLIDE_TOGGLE_BASE_H */
 

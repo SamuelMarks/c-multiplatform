@@ -29,7 +29,8 @@ enum ui_bidi_direction {
  * @param direction The new global direction (LTR or RTL).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_bidi_set_direction(enum ui_bidi_direction direction);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_bidi_set_direction(enum ui_bidi_direction direction);
 
 /**
  * @brief Gets the current global bidirectional text direction.
@@ -37,7 +38,8 @@ ui_error_t ui_bidi_set_direction(enum ui_bidi_direction direction);
  * @param out_dir Pointer to receive the current global direction.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_bidi_get_direction(enum ui_bidi_direction *out_dir);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_bidi_get_direction(enum ui_bidi_direction *out_dir);
 
 /**
  * @brief Normalizes a horizontal key code based on the current global
@@ -47,8 +49,8 @@ ui_error_t ui_bidi_get_direction(enum ui_bidi_direction *out_dir);
  * @param out_key Pointer to receive the normalized key code.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_bidi_normalize_horizontal_key(enum ui_key_code key,
-                                            enum ui_key_code *out_key);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_bidi_normalize_horizontal_key(
+    enum ui_key_code key, enum ui_key_code *out_key);
 
 #ifdef __cplusplus
 }

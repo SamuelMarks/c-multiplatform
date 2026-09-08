@@ -335,7 +335,9 @@ ui_error_t ui_thread_pool_destroy(struct ui_thread_pool *pool) {
   if (!pool)
     return UI_ERROR_INVALID_ARGUMENT;
 
-#ifndef UI_SINGLE_THREADED
+#ifdef UI_SINGLE_THREADED
+  (void)ui_thread_pool_tick(pool);
+#else
 #ifdef _WIN32
   WaitForSingleObject(pool->mutex, UI_INFINITE);
   pool->shutdown = 1;
@@ -427,6 +429,7 @@ ui_error_t ui_thread_pool_tick(struct ui_thread_pool *pool) {
 #ifdef UI_SINGLE_THREADED
   {
     struct ui_task_node *current = pool->head;
+    struct ui_task_node *next = NULL;
     pool->head = NULL;
     pool->tail = NULL;
 

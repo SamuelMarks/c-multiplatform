@@ -41,7 +41,8 @@ extern "C" {
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on parsing
  * failure.
  */
-ui_error_t ui_coerce_string_to_bool(const char *str, int *out_val);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coerce_string_to_bool(const char *str, int *out_val);
 
 /**
  * @brief Safely parses a string into an integer.
@@ -51,7 +52,8 @@ ui_error_t ui_coerce_string_to_bool(const char *str, int *out_val);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on parsing
  * failure.
  */
-ui_error_t ui_coerce_string_to_int(const char *str, int *out_val);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coerce_string_to_int(const char *str, int *out_val);
 
 /**
  * @brief Safely parses a string into a float.
@@ -61,7 +63,8 @@ ui_error_t ui_coerce_string_to_int(const char *str, int *out_val);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT on parsing
  * failure.
  */
-ui_error_t ui_coerce_string_to_float(const char *str, float *out_val);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_coerce_string_to_float(const char *str, float *out_val);
 
 /**
  * @brief Safely copies a string, guaranteeing null termination.
@@ -72,7 +75,9 @@ ui_error_t ui_coerce_string_to_float(const char *str, float *out_val);
  * @param src The source string to copy.
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if truncated.
  */
-ui_error_t ui_safe_string_copy(char *dest, size_t dest_size, const char *src);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_safe_string_copy(char *dest,
+                                                             size_t dest_size,
+                                                             const char *src);
 
 #if defined(__GNUC__) || defined(__clang__)
 __attribute__((format(printf, 3, 4)))
@@ -87,8 +92,8 @@ __attribute__((format(printf, 3, 4)))
  * @param ... Variadic arguments for the format string.
  * @return UI_ERROR_NONE on success, UI_ERROR_OUT_OF_BOUNDS if truncated.
  */
-ui_error_t ui_safe_string_format(char *dest, size_t dest_size,
-                                 const char *format, ...);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_safe_string_format(char *dest, size_t dest_size, const char *format, ...);
 
 #ifdef __cplusplus
 }

@@ -50,7 +50,8 @@ struct ui_map_view_base;
  * @param out_map Pointer to receive the map view base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_create(struct ui_map_view_base **out_map);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_map_view_base_create(struct ui_map_view_base **out_map);
 
 /**
  * @brief Destroys a map view base instance.
@@ -58,7 +59,8 @@ ui_error_t ui_map_view_base_create(struct ui_map_view_base **out_map);
  * @param map The map view base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_destroy(struct ui_map_view_base *map);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_map_view_base_destroy(struct ui_map_view_base *map);
 
 /**
  * @brief Binds a signal to the map's center coordinate.
@@ -67,8 +69,8 @@ ui_error_t ui_map_view_base_destroy(struct ui_map_view_base *map);
  * @param signal The signal (must contain pointer to struct ui_map_coordinate).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_bind_center(struct ui_map_view_base *map,
-                                        struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_bind_center(
+    struct ui_map_view_base *map, struct ui_signal *signal);
 
 /**
  * @brief Binds a signal to the map's zoom level.
@@ -77,8 +79,8 @@ ui_error_t ui_map_view_base_bind_center(struct ui_map_view_base *map,
  * @param signal The signal (must contain float32).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_bind_zoom(struct ui_map_view_base *map,
-                                      struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_bind_zoom(
+    struct ui_map_view_base *map, struct ui_signal *signal);
 
 /**
  * @brief Binds a signal to the map's rotation (in radians).
@@ -87,8 +89,8 @@ ui_error_t ui_map_view_base_bind_zoom(struct ui_map_view_base *map,
  * @param signal The signal (must contain float32).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_bind_rotation(struct ui_map_view_base *map,
-                                          struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_bind_rotation(
+    struct ui_map_view_base *map, struct ui_signal *signal);
 
 /**
  * @brief Handles a pan gesture, logically translating the map center.
@@ -98,8 +100,8 @@ ui_error_t ui_map_view_base_bind_rotation(struct ui_map_view_base *map,
  * @param delta_y Y-axis delta in logical pixels.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_handle_pan(struct ui_map_view_base *map,
-                                       double delta_x, double delta_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_handle_pan(
+    struct ui_map_view_base *map, double delta_x, double delta_y);
 
 /**
  * @brief Handles a pinch-to-zoom gesture.
@@ -110,9 +112,8 @@ ui_error_t ui_map_view_base_handle_pan(struct ui_map_view_base *map,
  * @param focal_y Y-axis focal point.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_handle_pinch(struct ui_map_view_base *map,
-                                         double scale, double focal_x,
-                                         double focal_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_handle_pinch(
+    struct ui_map_view_base *map, double scale, double focal_x, double focal_y);
 
 /**
  * @brief Handles a rotate gesture.
@@ -123,9 +124,8 @@ ui_error_t ui_map_view_base_handle_pinch(struct ui_map_view_base *map,
  * @param focal_y Y-axis focal point.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_handle_rotate(struct ui_map_view_base *map,
-                                          double angle, double focal_x,
-                                          double focal_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_handle_rotate(
+    struct ui_map_view_base *map, double angle, double focal_x, double focal_y);
 
 /**
  * @brief Projects a geographic coordinate into view-space pixels using Web
@@ -137,9 +137,9 @@ ui_error_t ui_map_view_base_handle_rotate(struct ui_map_view_base *map,
  * @param out_y Pointer to receive Y view-space coordinate.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_project(struct ui_map_view_base *map,
-                                    const struct ui_map_coordinate *coord,
-                                    double *out_x, double *out_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_project(
+    struct ui_map_view_base *map, const struct ui_map_coordinate *coord,
+    double *out_x, double *out_y);
 
 /**
  * @brief Unprojects view-space pixels into a geographic coordinate.
@@ -150,9 +150,9 @@ ui_error_t ui_map_view_base_project(struct ui_map_view_base *map,
  * @param out_coord Pointer to receive the geographic coordinate.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_unproject(struct ui_map_view_base *map, double x,
-                                      double y,
-                                      struct ui_map_coordinate *out_coord);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_map_view_base_unproject(struct ui_map_view_base *map, double x, double y,
+                           struct ui_map_coordinate *out_coord);
 
 /**
  * @brief Tile request callback definition.
@@ -176,9 +176,8 @@ typedef ui_error_t (*ui_map_tile_request_cb)(struct ui_map_view_base *map,
  * @param user_data User data.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_set_tile_provider(struct ui_map_view_base *map,
-                                              ui_map_tile_request_cb cb,
-                                              void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_set_tile_provider(
+    struct ui_map_view_base *map, ui_map_tile_request_cb cb, void *user_data);
 
 /**
  * @brief Adds an unstyled overlay marker to track coordinates.
@@ -188,9 +187,9 @@ ui_error_t ui_map_view_base_set_tile_provider(struct ui_map_view_base *map,
  * @param out_id Pointer to receive the generated marker ID.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_add_marker(struct ui_map_view_base *map,
-                                       const struct ui_map_marker *marker,
-                                       size_t *out_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_map_view_base_add_marker(struct ui_map_view_base *map,
+                            const struct ui_map_marker *marker, size_t *out_id);
 
 /**
  * @brief Removes an existing overlay marker.
@@ -199,8 +198,8 @@ ui_error_t ui_map_view_base_add_marker(struct ui_map_view_base *map,
  * @param id The marker ID.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_remove_marker(struct ui_map_view_base *map,
-                                          size_t id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_map_view_base_remove_marker(struct ui_map_view_base *map, size_t id);
 
 /**
  * @brief Retrieves the projected view-space position of a marker.
@@ -211,9 +210,8 @@ ui_error_t ui_map_view_base_remove_marker(struct ui_map_view_base *map,
  * @param out_y Pointer to receive Y coordinate.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_map_view_base_get_marker_position(struct ui_map_view_base *map,
-                                                size_t id, double *out_x,
-                                                double *out_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_map_view_base_get_marker_position(
+    struct ui_map_view_base *map, size_t id, double *out_x, double *out_y);
 
 #ifdef __cplusplus
 }

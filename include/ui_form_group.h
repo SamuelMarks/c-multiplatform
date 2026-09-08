@@ -32,9 +32,9 @@ typedef struct ui_form_group ui_form_group_t;
  * @param out_group The pointer to store the created form group.
  * @return ui_error_t
  */
-ui_error_t ui_form_group_create(struct ui_arena *arena,
-                                enum ui_signal_mode mode,
-                                ui_form_group_t **out_group);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_group_create(struct ui_arena *arena, enum ui_signal_mode mode,
+                     ui_form_group_t **out_group);
 
 /**
  * @brief Adds a node to the form group.
@@ -44,8 +44,8 @@ ui_error_t ui_form_group_create(struct ui_arena *arena,
  * @param node The form node to add.
  * @return ui_error_t
  */
-ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
-                                  ui_form_node_t node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_group_add_node(
+    ui_form_group_t *group, const char *name, ui_form_node_t node);
 
 /**
  * @brief Gets a node from the form group.
@@ -55,8 +55,8 @@ ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
  * @param out_node The pointer to store the retrieved node.
  * @return ui_error_t
  */
-ui_error_t ui_form_group_get_node(ui_form_group_t *group, const char *name,
-                                  ui_form_node_t *out_node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_group_get_node(
+    ui_form_group_t *group, const char *name, ui_form_node_t *out_node);
 
 /**
  * @brief Adds a control to the form group (helper).
@@ -66,8 +66,8 @@ ui_error_t ui_form_group_get_node(ui_form_group_t *group, const char *name,
  * @param control The control to add.
  * @return ui_error_t
  */
-ui_error_t ui_form_group_add_control(ui_form_group_t *group, const char *name,
-                                     ui_form_control_t *control);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_group_add_control(
+    ui_form_group_t *group, const char *name, ui_form_control_t *control);
 
 /**
  * @brief Gets a control from the form group (helper).
@@ -77,8 +77,8 @@ ui_error_t ui_form_group_add_control(ui_form_group_t *group, const char *name,
  * @param out_control The pointer to store the retrieved control.
  * @return ui_error_t
  */
-ui_error_t ui_form_group_get_control(ui_form_group_t *group, const char *name,
-                                     ui_form_control_t **out_control);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_group_get_control(
+    ui_form_group_t *group, const char *name, ui_form_control_t **out_control);
 
 /**
  * @brief Traverses the form group and computes its aggregated status.
@@ -87,8 +87,8 @@ ui_error_t ui_form_group_get_control(ui_form_group_t *group, const char *name,
  * @param out_status The computed status.
  * @return ui_error_t
  */
-ui_error_t ui_form_group_get_status(ui_form_group_t *group,
-                                    enum ui_form_status *out_status);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_group_get_status(
+    ui_form_group_t *group, enum ui_form_status *out_status);
 
 /**
  * @brief Computes whether the form group is valid.
@@ -97,7 +97,8 @@ ui_error_t ui_form_group_get_status(ui_form_group_t *group,
  * @param out_valid True if valid.
  * @return ui_error_t
  */
-ui_error_t ui_form_group_is_valid(ui_form_group_t *group, ui_bool_t *out_valid);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_group_is_valid(ui_form_group_t *group, ui_bool_t *out_valid);
 
 /**
  * @brief Destroys the form group.
@@ -105,7 +106,8 @@ ui_error_t ui_form_group_is_valid(ui_form_group_t *group, ui_bool_t *out_valid);
  * @param group The form group.
  * @return ui_error_t
  */
-ui_error_t ui_form_group_destroy(ui_form_group_t *group);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_group_destroy(ui_form_group_t *group);
 
 #ifdef __cplusplus
 }

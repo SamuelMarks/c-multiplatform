@@ -19,6 +19,7 @@ static ui_error_t test_callback(void *user_data) {
 }
 
 static ui_error_t test_callback_fail(void *user_data) {
+  (void)user_data;
   return UI_ERROR_UNKNOWN;
 }
 
@@ -152,6 +153,7 @@ static int run_oom_tests(void) {
   return failed;
 }
 
+#ifndef UI_SINGLE_THREADED
 extern int g_mock_thread_fail;
 
 static int run_thread_fail_tests(void) {
@@ -192,6 +194,7 @@ static int run_thread_fail_tests(void) {
   ui_thread_pool_destroy(pool);
   return failed;
 }
+#endif
 
 int main(void) {
   int failed = 0;
@@ -207,10 +210,12 @@ int main(void) {
     printf("run_oom_tests failed\n");
   failed |= res;
 
+#ifndef UI_SINGLE_THREADED
   res = run_thread_fail_tests();
   if (res)
     printf("run_thread_fail_tests failed\n");
   failed |= res;
+#endif
 
   if (!failed) {
     printf("All test_ui_thread_pool passed.\n");

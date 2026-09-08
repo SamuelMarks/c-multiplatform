@@ -34,7 +34,8 @@ struct ui_banner_base;
  * @param out_banner Pointer to output the initialized banner.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_banner_base_create(struct ui_banner_base **out_banner);
 
 /**
  * @brief Sets the text message of the banner.
@@ -43,8 +44,8 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner);
  * @param text The message text.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_banner_base_set_text(struct ui_banner_base *banner,
-                                   const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_banner_base_set_text(struct ui_banner_base *banner, const char *text);
 
 /**
  * @brief Toggles whether the banner is user-dismissible (adds/removes a close
@@ -54,8 +55,8 @@ ui_error_t ui_banner_base_set_text(struct ui_banner_base *banner,
  * @param is_dismissible 1 if dismissible, 0 otherwise.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_banner_base_set_dismissible(struct ui_banner_base *banner,
-                                          int is_dismissible);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_banner_base_set_dismissible(
+    struct ui_banner_base *banner, int is_dismissible);
 
 /**
  * @brief Sets the open state of the banner.
@@ -64,7 +65,8 @@ ui_error_t ui_banner_base_set_dismissible(struct ui_banner_base *banner,
  * @param is_open 1 to open, 0 to close (dismiss).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_banner_base_set_open(struct ui_banner_base *banner, int is_open);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_banner_base_set_open(struct ui_banner_base *banner, int is_open);
 
 /**
  * @brief Checks if the banner is currently open.
@@ -73,8 +75,8 @@ ui_error_t ui_banner_base_set_open(struct ui_banner_base *banner, int is_open);
  * @param out_is_open Pointer to receive the open state.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_banner_base_is_open(const struct ui_banner_base *banner,
-                                  int *out_is_open);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_banner_base_is_open(const struct ui_banner_base *banner, int *out_is_open);
 
 /**
  * @brief Binds the banner's open state to a signal.
@@ -83,8 +85,8 @@ ui_error_t ui_banner_base_is_open(const struct ui_banner_base *banner,
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_banner_base_bind_open(struct ui_banner_base *banner,
-                                    struct ui_signal *open_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_banner_base_bind_open(
+    struct ui_banner_base *banner, struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the banner is animating.
@@ -93,9 +95,8 @@ ui_error_t ui_banner_base_bind_open(struct ui_banner_base *banner,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_banner_base_get_animating_signal(struct ui_banner_base *banner,
-                                    struct ui_computed **out_animating);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_banner_base_get_animating_signal(
+    struct ui_banner_base *banner, struct ui_computed **out_animating);
 
 /**
  * @brief Gets the underlying component for the banner.
@@ -104,8 +105,8 @@ ui_banner_base_get_animating_signal(struct ui_banner_base *banner,
  * @param out_component Pointer to receive the component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_banner_base_get_component(struct ui_banner_base *banner,
-                                        struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_banner_base_get_component(
+    struct ui_banner_base *banner, struct ui_component **out_component);
 
 /**
  * @brief Destroys a banner base component.
@@ -113,7 +114,8 @@ ui_error_t ui_banner_base_get_component(struct ui_banner_base *banner,
  * @param banner The banner to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_banner_base_destroy(struct ui_banner_base *banner);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_banner_base_destroy(struct ui_banner_base *banner);
 
 #ifdef __cplusplus
 }

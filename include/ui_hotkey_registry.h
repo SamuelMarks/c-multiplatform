@@ -47,7 +47,8 @@ struct ui_hotkey_chord {
  * @param out_registry Pointer to receive the allocated registry.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_hotkey_registry_create(struct ui_hotkey_registry **out_registry);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_hotkey_registry_create(struct ui_hotkey_registry **out_registry);
 
 /**
  * @brief Destroys a hotkey registry.
@@ -55,7 +56,8 @@ ui_error_t ui_hotkey_registry_create(struct ui_hotkey_registry **out_registry);
  * @param registry Pointer to the registry to destroy.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_hotkey_registry_destroy(struct ui_hotkey_registry *registry);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_hotkey_registry_destroy(struct ui_hotkey_registry *registry);
 
 /**
  * @brief Registers a hotkey chord with a callback.
@@ -68,10 +70,9 @@ ui_error_t ui_hotkey_registry_destroy(struct ui_hotkey_registry *registry);
  * unregistering.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_hotkey_registry_register(struct ui_hotkey_registry *registry,
-                                       struct ui_hotkey_chord chord,
-                                       ui_hotkey_callback_t callback,
-                                       void *user_data, int *out_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_hotkey_registry_register(
+    struct ui_hotkey_registry *registry, struct ui_hotkey_chord chord,
+    ui_hotkey_callback_t callback, void *user_data, int *out_id);
 
 /**
  * @brief Unregisters a previously registered hotkey chord.
@@ -80,8 +81,8 @@ ui_error_t ui_hotkey_registry_register(struct ui_hotkey_registry *registry,
  * @param id The unique registration ID.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_hotkey_registry_unregister(struct ui_hotkey_registry *registry,
-                                         int id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_hotkey_registry_unregister(struct ui_hotkey_registry *registry, int id);
 
 /**
  * @brief Processes an incoming event against the registry.
@@ -94,9 +95,9 @@ ui_error_t ui_hotkey_registry_unregister(struct ui_hotkey_registry *registry,
  * otherwise.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_hotkey_registry_process_event(struct ui_hotkey_registry *registry,
-                                            const struct ui_event *event,
-                                            int *out_handled);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_hotkey_registry_process_event(
+    struct ui_hotkey_registry *registry, const struct ui_event *event,
+    int *out_handled);
 
 #ifdef __cplusplus
 }

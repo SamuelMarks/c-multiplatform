@@ -9,9 +9,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "ui_types.h"
-
 /* clang-format off */
+#include "ui_types.h"
 #include "ui_error.h"
 #include "ui_dom_node.h"
 #include "ui_layout.h"
@@ -35,7 +34,8 @@ struct ui_focus_manager;
  * @param out_manager Pointer to receive the new focus manager.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_focus_manager_create(struct ui_focus_manager **out_manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_focus_manager_create(struct ui_focus_manager **out_manager);
 
 /**
  * @brief Destroys a focus manager instance.
@@ -43,7 +43,8 @@ ui_error_t ui_focus_manager_create(struct ui_focus_manager **out_manager);
  * @param manager The focus manager.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_manager_destroy(struct ui_focus_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_focus_manager_destroy(struct ui_focus_manager *manager);
 
 /**
  * @brief Requests focus for a specific DOM node.
@@ -52,8 +53,8 @@ ui_error_t ui_focus_manager_destroy(struct ui_focus_manager *manager);
  * @param node The DOM node to focus.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_manager_request_focus(struct ui_focus_manager *manager,
-                                          struct ui_dom_node *node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_manager_request_focus(
+    struct ui_focus_manager *manager, struct ui_dom_node *node);
 
 /**
  * @brief Gets the currently focused DOM node.
@@ -62,9 +63,8 @@ ui_error_t ui_focus_manager_request_focus(struct ui_focus_manager *manager,
  * @param out_node Pointer to receive the focused DOM node.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_focus_manager_get_focused_node(const struct ui_focus_manager *manager,
-                                  struct ui_dom_node **out_node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_manager_get_focused_node(
+    const struct ui_focus_manager *manager, struct ui_dom_node **out_node);
 
 /**
  * @brief Advances focus to the next/previous focusable node (Tab indexing).
@@ -74,8 +74,8 @@ ui_focus_manager_get_focused_node(const struct ui_focus_manager *manager,
  * @param forward 1 for forward (Tab), 0 for backward (Shift+Tab).
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
-                                    struct ui_dom_node *root, int forward);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_manager_advance(
+    struct ui_focus_manager *manager, struct ui_dom_node *root, int forward);
 
 /**
  * @brief Moves focus spatially based on geometry (D-pad or arrow keys).
@@ -85,9 +85,9 @@ ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
  * @param direction The direction to navigate.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
-                                     struct ui_layout_node *layout_root,
-                                     enum ui_focus_direction direction);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_manager_navigate(
+    struct ui_focus_manager *manager, struct ui_layout_node *layout_root,
+    enum ui_focus_direction direction);
 
 /**
  * @brief Pushes a focus trap (e.g., a Dialog). All focus movement is
@@ -97,8 +97,8 @@ ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
  * @param trap_root The root DOM node of the trap.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
-                                      struct ui_dom_node *trap_root);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_focus_manager_push_trap(
+    struct ui_focus_manager *manager, struct ui_dom_node *trap_root);
 
 /**
  * @brief Pops the top-most focus trap and restores focus to the previously
@@ -107,7 +107,8 @@ ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
  * @param manager The focus manager.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_focus_manager_pop_trap(struct ui_focus_manager *manager);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_focus_manager_pop_trap(struct ui_focus_manager *manager);
 
 #ifdef __cplusplus
 }

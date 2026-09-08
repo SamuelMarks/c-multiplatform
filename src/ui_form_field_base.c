@@ -8,6 +8,8 @@
 #include "ui_internal_mem.h"
 #include "ui_css_parser.h"
 #include "ui_effect.h"
+#include "ui_form_control.h"
+#include "ui_signal.h"
 #include <stddef.h>
 #include <string.h>
 /* clang-format on */
@@ -668,10 +670,6 @@ ui_form_field_base_get_component(struct ui_form_field_base *field,
   *out_component = field->component;
   return UI_ERROR_NONE;
 }
-
-#include "ui_effect.h"
-#include "ui_form_control.h"
-#include "ui_signal.h"
 
 /* @brief field_effect_data
  */

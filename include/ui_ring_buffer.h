@@ -35,8 +35,8 @@ struct ui_ring_buffer;
  * @param out_buffer Pointer to receive the ring buffer handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_ring_buffer_create(size_t item_size, size_t capacity,
-                                 struct ui_ring_buffer **out_buffer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_ring_buffer_create(
+    size_t item_size, size_t capacity, struct ui_ring_buffer **out_buffer);
 
 /**
  * @brief Destroys a ring buffer and frees its memory.
@@ -44,7 +44,8 @@ ui_error_t ui_ring_buffer_create(size_t item_size, size_t capacity,
  * @param buffer The buffer to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_ring_buffer_destroy(struct ui_ring_buffer *buffer);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_ring_buffer_destroy(struct ui_ring_buffer *buffer);
 
 /**
  * @brief Pushes an item into the ring buffer.
@@ -55,7 +56,8 @@ ui_error_t ui_ring_buffer_destroy(struct ui_ring_buffer *buffer);
  * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_FULL if there is no space,
  *         or another appropriate error code.
  */
-ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer, const void *item);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_ring_buffer_push(struct ui_ring_buffer *buffer, const void *item);
 
 /**
  * @brief Pops an item from the ring buffer.
@@ -67,7 +69,8 @@ ui_error_t ui_ring_buffer_push(struct ui_ring_buffer *buffer, const void *item);
  * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_EMPTY if there are no items,
  *         or another appropriate error code.
  */
-ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item);
 
 /**
  * @brief Pushes an item into the ring buffer safely from multiple threads.
@@ -78,8 +81,8 @@ ui_error_t ui_ring_buffer_pop(struct ui_ring_buffer *buffer, void *out_item);
  * @return UI_ERROR_NONE on success, UI_ERROR_QUEUE_FULL if there is no space,
  *         or another appropriate error code.
  */
-ui_error_t ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer,
-                                  const void *item);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_ring_buffer_push_mp(struct ui_ring_buffer *buffer, const void *item);
 
 #ifdef __cplusplus
 }

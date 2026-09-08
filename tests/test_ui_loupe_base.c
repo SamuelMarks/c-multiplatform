@@ -1,10 +1,10 @@
+/* clang-format off */
 #include <math.h>
 
 #ifndef NAN
 #define NAN (0.0f / 0.0f)
 #endif
 
-/* clang-format off */
 #include "ui_loupe_base.h"
 #include "ui_arena.h"
 #include "ui_error.h"

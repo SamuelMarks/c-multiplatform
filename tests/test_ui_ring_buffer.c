@@ -8,6 +8,7 @@
 
 extern int g_malloc_fail_countdown;
 
+#ifndef UI_SINGLE_THREADED
 static ui_error_t thread_task_push_mp(void *user_data) {
   struct ui_ring_buffer *rb = (struct ui_ring_buffer *)user_data;
   int item = 1;
@@ -30,6 +31,7 @@ static ui_error_t thread_task_push_spsc(void *user_data) {
   }
   return UI_ERROR_NONE;
 }
+#endif
 
 static int run_normal_tests(void) {
   struct ui_ring_buffer *rb = NULL;
@@ -151,6 +153,7 @@ static int run_normal_tests(void) {
     rb = NULL;
   }
 
+#ifndef UI_SINGLE_THREADED
   /* Test single-producer, single-consumer thread safety */
   {
     struct ui_thread_pool *pool = NULL;
@@ -227,6 +230,7 @@ static int run_normal_tests(void) {
       rb = NULL;
     }
   }
+#endif
 
   /* Invalid args */
   if (ui_ring_buffer_create(0, 10, &rb) != UI_ERROR_INVALID_ARGUMENT)

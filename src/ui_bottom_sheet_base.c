@@ -10,6 +10,7 @@
 #include "ui_backdrop.h"
 #include "ui_gesture.h"
 #include <stddef.h>
+#include <string.h>
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC

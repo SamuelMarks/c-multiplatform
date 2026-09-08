@@ -60,7 +60,8 @@ typedef ui_error_t (*ui_scroll_on_change_t)(struct ui_scroll_base *scroll,
  * @param out_scroll Pointer to receive the allocated scroll base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_base_create(struct ui_scroll_base **out_scroll);
 
 /**
  * @brief Destroys a scroll area component.
@@ -68,7 +69,8 @@ ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll);
  * @param scroll The scroll area to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_base_destroy(struct ui_scroll_base *scroll);
 
 /**
  * @brief Sets the scroll position.
@@ -78,8 +80,8 @@ ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll);
  * @param y The vertical scroll position.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
-                                         float y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x, float y);
 
 /**
  * @brief Gets the horizontal scroll position.
@@ -88,8 +90,8 @@ ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
  * @param out_x Pointer to receive the horizontal scroll position.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
-                                       float *out_x);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll, float *out_x);
 
 /**
  * @brief Gets the vertical scroll position.
@@ -98,8 +100,8 @@ ui_error_t ui_scroll_base_get_scroll_x(const struct ui_scroll_base *scroll,
  * @param out_y Pointer to receive the vertical scroll position.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
-                                       float *out_y);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll, float *out_y);
 
 /**
  * @brief Sets the content dimensions for overflow calculations.
@@ -109,8 +111,8 @@ ui_error_t ui_scroll_base_get_scroll_y(const struct ui_scroll_base *scroll,
  * @param height The content height.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
-                                           float width, float height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_base_set_content_size(
+    struct ui_scroll_base *scroll, float width, float height);
 
 /**
  * @brief Sets the viewport dimensions for overflow calculations.
@@ -120,8 +122,8 @@ ui_error_t ui_scroll_base_set_content_size(struct ui_scroll_base *scroll,
  * @param height The viewport height.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
-                                            float width, float height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_base_set_viewport_size(
+    struct ui_scroll_base *scroll, float width, float height);
 
 /**
  * @brief Sets the change handler for the scroll area.
@@ -131,9 +133,9 @@ ui_error_t ui_scroll_base_set_viewport_size(struct ui_scroll_base *scroll,
  * @param user_data Opaque user data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
-                                        ui_scroll_on_change_t on_change,
-                                        void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
+                             ui_scroll_on_change_t on_change, void *user_data);
 
 /**
  * @brief Processes an incoming input event to trigger scrolling (e.g., mouse
@@ -144,9 +146,9 @@ ui_error_t ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_process_event(struct ui_scroll_base *scroll,
-                                        const struct ui_event *event,
-                                        double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_scroll_base_process_event(struct ui_scroll_base *scroll,
+                             const struct ui_event *event, double timestamp_ms);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -156,8 +158,8 @@ ui_error_t ui_scroll_base_process_event(struct ui_scroll_base *scroll,
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_get_component(struct ui_scroll_base *scroll,
-                                        struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_base_get_component(
+    struct ui_scroll_base *scroll, struct ui_component **out_component);
 
 /**
  * @brief Binds the data property.
@@ -166,8 +168,8 @@ ui_error_t ui_scroll_base_get_component(struct ui_scroll_base *scroll,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_scroll_base_bind_data(struct ui_scroll_base *widget,
-                                    struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_scroll_base_bind_data(
+    struct ui_scroll_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

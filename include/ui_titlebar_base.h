@@ -58,9 +58,9 @@ struct ui_titlebar_config {
  * @param out_titlebar Output pointer for the created component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_titlebar_base_create(struct ui_arena *arena,
-                                   const struct ui_titlebar_config *config,
-                                   struct ui_titlebar_base **out_titlebar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_titlebar_base_create(
+    struct ui_arena *arena, const struct ui_titlebar_config *config,
+    struct ui_titlebar_base **out_titlebar);
 
 /**
  * @brief Destroys a custom titlebar component.
@@ -68,7 +68,8 @@ ui_error_t ui_titlebar_base_create(struct ui_arena *arena,
  * @param titlebar The component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar);
 
 /**
  * @brief Performs a hit test to determine what area was clicked.
@@ -79,7 +80,7 @@ ui_error_t ui_titlebar_base_destroy(struct ui_titlebar_base *titlebar);
  * @param out_result Output pointer for the hit test result.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_titlebar_base_hit_test(struct ui_titlebar_base *titlebar, float x, float y,
                           enum ui_titlebar_hit_test_result *out_result);
 
@@ -94,7 +95,7 @@ ui_titlebar_base_hit_test(struct ui_titlebar_base *titlebar, float x, float y,
  * @param h The height of the rect.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_titlebar_base_add_button_rect(struct ui_titlebar_base *titlebar,
                                  enum ui_titlebar_hit_test_result btn_type,
                                  float x, float y, float w, float h);

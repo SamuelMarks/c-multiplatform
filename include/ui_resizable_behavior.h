@@ -56,7 +56,7 @@ typedef ui_error_t (*ui_resizable_on_resize_t)(int new_width, int new_height,
  * @param out_behavior Pointer to receive the allocated behavior.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior);
 
 /**
@@ -65,7 +65,7 @@ ui_resizable_behavior_create(struct ui_resizable_behavior **out_behavior);
  * @param behavior The behavior to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior);
 
 /**
@@ -80,10 +80,9 @@ ui_resizable_behavior_destroy(struct ui_resizable_behavior *behavior);
  * @param max_height Maximum height (or -1 for none).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
-                                unsigned int edges, int min_width,
-                                int min_height, int max_width, int max_height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_resizable_behavior_configure(
+    struct ui_resizable_behavior *behavior, unsigned int edges, int min_width,
+    int min_height, int max_width, int max_height);
 
 /**
  * @brief Sets the callback to be invoked when a resize is requested.
@@ -93,10 +92,9 @@ ui_resizable_behavior_configure(struct ui_resizable_behavior *behavior,
  * @param user_data Opaque user data for the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
-                                    ui_resizable_on_resize_t on_resize,
-                                    void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_resizable_behavior_set_on_resize(
+    struct ui_resizable_behavior *behavior, ui_resizable_on_resize_t on_resize,
+    void *user_data);
 
 /**
  * @brief Processes input events to handle drag-to-resize logic.
@@ -108,7 +106,7 @@ ui_resizable_behavior_set_on_resize(struct ui_resizable_behavior *behavior,
  * @param hit_test_thickness Thickness of the draggable edge area in pixels.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_resizable_behavior_process_event(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_resizable_behavior_process_event(
     struct ui_resizable_behavior *behavior, const struct ui_event *event,
     int current_width, int current_height, int hit_test_thickness);
 

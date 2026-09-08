@@ -130,16 +130,6 @@ ui_error_t ui_chart_base_create(struct ui_arena *arena,
  * @param chart Parameter chart.
  * @return UI_ERROR_NONE on success.
  */
-#ifdef UI_TEST_MOCK_ALLOC
-extern ui_error_t ui_component_destroy(struct ui_component *c);
-static ui_error_t mock_component_destroy_chart(struct ui_component *c) {
-  if (g_chart_mock_fail == 20)
-    return UI_ERROR_UNKNOWN;
-  return ui_component_destroy(c);
-}
-#define ui_component_destroy mock_component_destroy_chart
-#endif
-
 ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart) {
   if (!chart)
     return UI_ERROR_INVALID_ARGUMENT;

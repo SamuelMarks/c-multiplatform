@@ -397,15 +397,19 @@ static void test_map_math_errors(void) {
 
   /* Try to convert coord to pixel out of bounds */
   {
-    ui_error_t rc_cleanup = ui_map_view_base_project(
-        map, &(struct ui_map_coordinate){2000.0, 0.0}, &out_x, &out_y);
+    ui_error_t rc_cleanup;
+    coord.latitude = 2000.0;
+    coord.longitude = 0.0;
+    rc_cleanup = ui_map_view_base_project(map, &coord, &out_x, &out_y);
     if (rc_cleanup != UI_ERROR_NONE) {
       (void)rc_cleanup; /* Avoid override */
     }
   }
   {
-    ui_error_t rc_cleanup = ui_map_view_base_project(
-        map, &(struct ui_map_coordinate){0.0, 2000.0}, &out_x, &out_y);
+    ui_error_t rc_cleanup;
+    coord.latitude = 0.0;
+    coord.longitude = 2000.0;
+    rc_cleanup = ui_map_view_base_project(map, &coord, &out_x, &out_y);
     if (rc_cleanup != UI_ERROR_NONE) {
       (void)rc_cleanup; /* Avoid override */
     }

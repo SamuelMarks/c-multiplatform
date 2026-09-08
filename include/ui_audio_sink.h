@@ -115,7 +115,7 @@ struct ui_audio_sink_backend {
  * @param out_backend Pointer to receive the backend struct.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend);
 
 #ifdef __cplusplus

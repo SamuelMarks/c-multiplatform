@@ -8,6 +8,7 @@
 #include "ui_css_parser.h"
 #include "ui_backdrop.h"
 #include <stddef.h>
+#include <string.h>
 /* clang-format on */
 
 /*

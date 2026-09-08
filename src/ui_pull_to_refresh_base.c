@@ -280,14 +280,17 @@ ui_pull_to_refresh_base_complete(struct ui_pull_to_refresh_base *ptr) {
  * \brief Gets the current state of the pull-to-refresh mechanism.
  *
  * \param ptr The component.
- * \return The current state enum.
+ * \param out_state Pointer to receive the current state enum.
+ * \return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT.
  */
-enum ui_pull_to_refresh_state
-ui_pull_to_refresh_base_get_state(const struct ui_pull_to_refresh_base *ptr) {
-  if (!ptr) {
-    return UI_PULL_TO_REFRESH_RESTING;
+ui_error_t
+ui_pull_to_refresh_base_get_state(const struct ui_pull_to_refresh_base *ptr,
+                                  enum ui_pull_to_refresh_state *out_state) {
+  if (!ptr || !out_state) {
+    return UI_ERROR_INVALID_ARGUMENT;
   }
-  return ptr->state;
+  *out_state = ptr->state;
+  return UI_ERROR_NONE;
 }
 
 /**

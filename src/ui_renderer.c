@@ -34,8 +34,10 @@ ui_error_t ui_renderer_gles_fallback_init(struct ui_renderer *renderer);
  */
 ui_error_t ui_renderer_create(struct ui_renderer **out_renderer) {
   struct ui_renderer *renderer;
+#ifdef UI_TEST_MOCK_ALLOC
   extern int g_native_init_fail;
   extern int g_gles_init_fail;
+#endif
 
   if (!out_renderer) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -52,14 +54,22 @@ ui_error_t ui_renderer_create(struct ui_renderer **out_renderer) {
 
   /* 1. Runtime Probing: Attempt to initialize Native backend first */
   {
+#ifdef UI_TEST_MOCK_ALLOC
     ui_error_t init_rc = g_native_init_fail ? UI_ERROR_UNKNOWN
                                             : ui_renderer_native_init(renderer);
+#else
+    ui_error_t init_rc = ui_renderer_native_init(renderer);
+#endif
     if (init_rc != UI_ERROR_NONE) {
       /* 2. Seamless fallback to GLES 2.0 */
       {
+#ifdef UI_TEST_MOCK_ALLOC
         ui_error_t fb_rc = g_gles_init_fail
                                ? UI_ERROR_UNKNOWN
                                : ui_renderer_gles_fallback_init(renderer);
+#else
+        ui_error_t fb_rc = ui_renderer_gles_fallback_init(renderer);
+#endif
         if (fb_rc != UI_ERROR_NONE) {
           C_MULTIPLATFORM_FREE(renderer);
           return UI_ERROR_UNKNOWN;

@@ -342,15 +342,6 @@ STBIWDEF unsigned char *stbi_write_png_to_mem(const unsigned char *pixels, int s
 
 #ifdef STB_IMAGE_WRITE_IMPLEMENTATION
 
-#ifdef _WIN32
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-#ifndef _CRT_NONSTDC_NO_DEPRECATE
-#define _CRT_NONSTDC_NO_DEPRECATE
-#endif
-#endif
-
 #ifndef STBI_WRITE_NO_STDIO
 #include <stdio.h>
 #endif
@@ -1809,7 +1800,11 @@ static int stbiw__jpg_processDU(stbi__write_context *s, int *bitBuf,
   unsigned short EOB[2];
   unsigned short M16zeroes[2];
   int dataOff, i, j, n, diff, end0pos, x, y;
-  int DU[64]; EOB[0] = HTAC[0x00][0]; EOB[1] = HTAC[0x00][1]; M16zeroes[0] = HTAC[0xF0][0]; M16zeroes[1] = HTAC[0xF0][1];
+  int DU[64];
+  EOB[0] = HTAC[0x00][0];
+  EOB[1] = HTAC[0x00][1];
+  M16zeroes[0] = HTAC[0xF0][0];
+  M16zeroes[1] = HTAC[0xF0][1];
 
   for (dataOff = 0, n = du_stride * 8; dataOff < n; dataOff += du_stride) {
     stbiw__jpg_DCT(&CDU[dataOff], &CDU[dataOff + 1], &CDU[dataOff + 2],
@@ -2098,13 +2093,15 @@ static int stbi_write_jpg_core(stbi__write_context *s, int width, int height,
         0,    0,    1,    0,    1, 0,    0,   0xFF, 0xDB, 0,   0x84, 0};
     static const unsigned char head2[] = {0xFF, 0xDA, 0, 0xC,  3, 1,    0,
                                           2,    0x11, 3, 0x11, 0, 0x3F, 0};
-    unsigned char head1[24] = {0xFF, 0xC0, 0, 0x11, 8, 0, 0, 0, 0, 3, 1, 0, 0, 2, 0x11, 1, 3, 0x11, 1, 0xFF, 0xC4, 0x01, 0xA2, 0};
+    unsigned char head1[24] = {0xFF, 0xC0, 0, 0x11, 8,    0,    0,    0,
+                               0,    3,    1, 0,    0,    2,    0x11, 1,
+                               3,    0x11, 1, 0xFF, 0xC4, 0x01, 0xA2, 0};
     head1[5] = (unsigned char)(height >> 8);
     head1[6] = STBIW_UCHAR(height);
     head1[7] = (unsigned char)(width >> 8);
     head1[8] = STBIW_UCHAR(width);
     head1[11] = (unsigned char)(subsample ? 0x22 : 0x11);
-    
+
     s->func(s->context, (void *)head0, sizeof(head0));
     s->func(s->context, (void *)YTable, sizeof(YTable));
     stbiw__putc(s, 1);

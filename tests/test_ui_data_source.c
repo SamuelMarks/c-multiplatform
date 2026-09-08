@@ -9,8 +9,10 @@
 static ui_error_t dummy_fetch_page(struct ui_data_source *ds, ui_uint32 offset,
                                    ui_uint32 limit, void *user_data) {
   int *called = (int *)user_data;
+  (void)ds;
+  (void)offset;
+  (void)limit;
   *called = 1;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 
@@ -18,8 +20,10 @@ static ui_error_t dummy_apply_sort(struct ui_data_source *ds,
                                    const struct ui_sort_descriptor *sorts,
                                    ui_uint32 num_sorts, void *user_data) {
   int *called = (int *)user_data;
+  (void)ds;
+  (void)sorts;
+  (void)num_sorts;
   *called = 1;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 
@@ -27,6 +31,9 @@ static ui_error_t dummy_apply_filter(struct ui_data_source *ds,
                                      const struct ui_filter_descriptor *filters,
                                      ui_uint32 num_filters, void *user_data) {
   int *called = (int *)user_data;
+  (void)ds;
+  (void)filters;
+  (void)num_filters;
   *called = 1;
   return UI_ERROR_NONE;
 }
@@ -34,12 +41,20 @@ static ui_error_t dummy_apply_filter(struct ui_data_source *ds,
 static ui_error_t dummy_fetch_page_err(struct ui_data_source *ds,
                                        ui_uint32 offset, ui_uint32 limit,
                                        void *user_data) {
+  (void)ds;
+  (void)offset;
+  (void)limit;
+  (void)user_data;
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
 static ui_error_t dummy_apply_sort_err(struct ui_data_source *ds,
                                        const struct ui_sort_descriptor *sorts,
                                        ui_uint32 num_sorts, void *user_data) {
+  (void)ds;
+  (void)sorts;
+  (void)num_sorts;
+  (void)user_data;
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
@@ -47,6 +62,10 @@ static ui_error_t
 dummy_apply_filter_err(struct ui_data_source *ds,
                        const struct ui_filter_descriptor *filters,
                        ui_uint32 num_filters, void *user_data) {
+  (void)ds;
+  (void)filters;
+  (void)num_filters;
+  (void)user_data;
   return UI_ERROR_OUT_OF_MEMORY;
 }
 

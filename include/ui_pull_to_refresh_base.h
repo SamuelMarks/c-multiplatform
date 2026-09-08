@@ -57,7 +57,7 @@ typedef ui_error_t (*ui_pull_to_refresh_on_refresh_t)(
  * @param out_ptr Pointer to receive the allocated component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr);
 
 /**
@@ -66,7 +66,8 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr);
  * @param ptr The component to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr);
 
 /**
  * @brief Sets the callback for when the refresh action is fully triggered.
@@ -76,7 +77,7 @@ ui_error_t ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr);
  * @param user_data Opaque pointer passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_pull_to_refresh_base_set_on_refresh(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pull_to_refresh_base_set_on_refresh(
     struct ui_pull_to_refresh_base *ptr,
     ui_pull_to_refresh_on_refresh_t on_refresh, void *user_data);
 
@@ -87,17 +88,19 @@ ui_error_t ui_pull_to_refresh_base_set_on_refresh(
  * @param ptr The component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_pull_to_refresh_base_complete(struct ui_pull_to_refresh_base *ptr);
 
 /**
  * @brief Gets the current state of the pull-to-refresh mechanism.
  *
  * @param ptr The component.
- * @return The current state enum.
+ * @param out_state Pointer to receive the current state enum.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_INVALID_ARGUMENT.
  */
-enum ui_pull_to_refresh_state
-ui_pull_to_refresh_base_get_state(const struct ui_pull_to_refresh_base *ptr);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_pull_to_refresh_base_get_state(const struct ui_pull_to_refresh_base *ptr,
+                                  enum ui_pull_to_refresh_state *out_state);
 
 /**
  * @brief Gets the current pull progress (0.0 to 1.0+).
@@ -106,9 +109,8 @@ ui_pull_to_refresh_base_get_state(const struct ui_pull_to_refresh_base *ptr);
  * @param out_progress Pointer to receive the progress value.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_pull_to_refresh_base_get_progress(const struct ui_pull_to_refresh_base *ptr,
-                                     float *out_progress);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pull_to_refresh_base_get_progress(
+    const struct ui_pull_to_refresh_base *ptr, float *out_progress);
 
 /**
  * @brief Processes an incoming input event (gesture/pan tracking).
@@ -118,10 +120,9 @@ ui_pull_to_refresh_base_get_progress(const struct ui_pull_to_refresh_base *ptr,
  * @param timestamp_ms The timestamp in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
-                                      const struct ui_event *event,
-                                      double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pull_to_refresh_base_process_event(
+    struct ui_pull_to_refresh_base *ptr, const struct ui_event *event,
+    double timestamp_ms);
 
 /**
  * @brief Integrates physics and timers (springing back, state transitions).
@@ -130,8 +131,8 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
  * @param delta_ms The time delta in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
-                                           double delta_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pull_to_refresh_base_on_tick(
+    struct ui_pull_to_refresh_base *ptr, double delta_ms);
 
 /**
  * @brief Retrieves the underlying container component.
@@ -140,9 +141,8 @@ ui_error_t ui_pull_to_refresh_base_on_tick(struct ui_pull_to_refresh_base *ptr,
  * @param out_component Pointer to receive the underlying component.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_pull_to_refresh_base_get_component(struct ui_pull_to_refresh_base *ptr,
-                                      struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pull_to_refresh_base_get_component(
+    struct ui_pull_to_refresh_base *ptr, struct ui_component **out_component);
 
 /**
  * @brief Sets the spinner component that visually represents the progress.
@@ -151,9 +151,8 @@ ui_pull_to_refresh_base_get_component(struct ui_pull_to_refresh_base *ptr,
  * @param spinner_comp The spinner component to attach.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
-                                    struct ui_component *spinner_comp);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_pull_to_refresh_base_set_spinner(
+    struct ui_pull_to_refresh_base *ptr, struct ui_component *spinner_comp);
 
 /**
  * @brief Binds the refreshing state to a signal.
@@ -162,7 +161,7 @@ ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
  * @param refreshing_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_pull_to_refresh_base_bind_refreshing(struct ui_pull_to_refresh_base *widget,
                                         struct ui_signal *refreshing_signal);
 
@@ -173,7 +172,8 @@ ui_pull_to_refresh_base_bind_refreshing(struct ui_pull_to_refresh_base *widget,
  * @param out_refreshing Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_pull_to_refresh_base_get_refreshing_signal(
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_pull_to_refresh_base_get_refreshing_signal(
     struct ui_pull_to_refresh_base *widget,
     struct ui_computed **out_refreshing);
 

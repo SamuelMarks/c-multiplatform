@@ -128,7 +128,7 @@ struct ui_video_decoder_backend {
  * @param out_backend Pointer to receive the backend struct.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_video_decoder_get_default_backend(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_video_decoder_get_default_backend(
     struct ui_video_decoder_backend *out_backend);
 
 /** @} */

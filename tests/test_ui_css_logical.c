@@ -3,131 +3,139 @@
 #include "ui_css_logical.h"
 /* clang-format on */
 
+static int check_edge(enum ui_css_logical_edge le, enum ui_css_writing_mode wm,
+                      enum ui_css_direction dir,
+                      enum ui_css_physical_edge expected) {
+  enum ui_css_physical_edge out_edge = (enum ui_css_physical_edge)0;
+  ui_error_t rc = ui_css_logical_to_physical_edge(le, wm, dir, &out_edge);
+  if (rc != UI_ERROR_NONE || out_edge != expected)
+    return 1;
+  return 0;
+}
+
 static int test_logical_to_physical_edge(void) {
-  /* Horizontal TB, LTR */
   if (ui_css_logical_to_physical_edge(
           UI_CSS_LOGICAL_EDGE_BLOCK_START, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_TOP)
+          UI_CSS_DIRECTION_LTR, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_BOTTOM)
+
+  /* Horizontal TB, LTR */
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_START,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_START, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_LEFT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_END,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_BOTTOM) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_END, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_RIGHT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_START,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_LEFT) != 0)
+    return 1;
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_END,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_RIGHT) != 0)
     return 1;
 
   /* Horizontal TB, RTL */
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_START, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_START,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_BOTTOM)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_END,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_BOTTOM) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_START, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_RIGHT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_START,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_RIGHT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_END, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_LEFT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_END,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_LEFT) != 0)
     return 1;
 
   /* Vertical RL, LTR */
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_START, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_RIGHT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_START,
+                 UI_CSS_WRITING_MODE_VERTICAL_RL, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_RIGHT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_LEFT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_VERTICAL_RL,
+                 UI_CSS_DIRECTION_LTR, UI_CSS_PHYSICAL_EDGE_LEFT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_START, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_START,
+                 UI_CSS_WRITING_MODE_VERTICAL_RL, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_END, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_BOTTOM)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_END,
+                 UI_CSS_WRITING_MODE_VERTICAL_RL, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_BOTTOM) != 0)
     return 1;
 
   /* Vertical RL, RTL */
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_START, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_RIGHT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_START,
+                 UI_CSS_WRITING_MODE_VERTICAL_RL, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_RIGHT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_LEFT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_VERTICAL_RL,
+                 UI_CSS_DIRECTION_RTL, UI_CSS_PHYSICAL_EDGE_LEFT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_START, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_BOTTOM)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_START,
+                 UI_CSS_WRITING_MODE_VERTICAL_RL, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_BOTTOM) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_END, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_END,
+                 UI_CSS_WRITING_MODE_VERTICAL_RL, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
 
   /* Vertical LR, LTR */
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_START, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_LEFT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_START,
+                 UI_CSS_WRITING_MODE_VERTICAL_LR, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_LEFT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_RIGHT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_VERTICAL_LR,
+                 UI_CSS_DIRECTION_LTR, UI_CSS_PHYSICAL_EDGE_RIGHT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_START, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_START,
+                 UI_CSS_WRITING_MODE_VERTICAL_LR, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_END, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_BOTTOM)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_END,
+                 UI_CSS_WRITING_MODE_VERTICAL_LR, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_BOTTOM) != 0)
     return 1;
 
   /* Vertical LR, RTL */
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_START, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_LEFT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_START,
+                 UI_CSS_WRITING_MODE_VERTICAL_LR, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_LEFT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_RIGHT)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_BLOCK_END, UI_CSS_WRITING_MODE_VERTICAL_LR,
+                 UI_CSS_DIRECTION_RTL, UI_CSS_PHYSICAL_EDGE_RIGHT) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_START, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_BOTTOM)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_START,
+                 UI_CSS_WRITING_MODE_VERTICAL_LR, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_BOTTOM) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          UI_CSS_LOGICAL_EDGE_INLINE_END, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_RTL) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge(UI_CSS_LOGICAL_EDGE_INLINE_END,
+                 UI_CSS_WRITING_MODE_VERTICAL_LR, UI_CSS_DIRECTION_RTL,
+                 UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
 
   /* Fallback */
-  if (ui_css_logical_to_physical_edge(
-          (enum ui_css_logical_edge)99, (enum ui_css_writing_mode)99,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge((enum ui_css_logical_edge)99, (enum ui_css_writing_mode)99,
+                 UI_CSS_DIRECTION_LTR, UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          (enum ui_css_logical_edge)99, UI_CSS_WRITING_MODE_HORIZONTAL_TB,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge((enum ui_css_logical_edge)99,
+                 UI_CSS_WRITING_MODE_HORIZONTAL_TB, UI_CSS_DIRECTION_LTR,
+                 UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          (enum ui_css_logical_edge)99, UI_CSS_WRITING_MODE_VERTICAL_RL,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge((enum ui_css_logical_edge)99, UI_CSS_WRITING_MODE_VERTICAL_RL,
+                 UI_CSS_DIRECTION_LTR, UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
-  if (ui_css_logical_to_physical_edge(
-          (enum ui_css_logical_edge)99, UI_CSS_WRITING_MODE_VERTICAL_LR,
-          UI_CSS_DIRECTION_LTR) != UI_CSS_PHYSICAL_EDGE_TOP)
+  if (check_edge((enum ui_css_logical_edge)99, UI_CSS_WRITING_MODE_VERTICAL_LR,
+                 UI_CSS_DIRECTION_LTR, UI_CSS_PHYSICAL_EDGE_TOP) != 0)
     return 1;
 
   return 0;

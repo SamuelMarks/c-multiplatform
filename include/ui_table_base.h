@@ -139,8 +139,8 @@ struct ui_table_model {
  * @param model Data model providing dimensions and rendering callbacks.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_table_base_create(struct ui_table_base **out_table,
-                                const struct ui_table_model *model);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_table_base_create(
+    struct ui_table_base **out_table, const struct ui_table_model *model);
 
 /**
  * @brief Destroys a table component.
@@ -148,7 +148,8 @@ ui_error_t ui_table_base_create(struct ui_table_base **out_table,
  * @param table The table to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_table_base_destroy(struct ui_table_base *table);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_table_base_destroy(struct ui_table_base *table);
 
 /**
  * @brief Gets the selection model attached to this table.
@@ -157,9 +158,8 @@ ui_error_t ui_table_base_destroy(struct ui_table_base *table);
  * @param out_model Pointer to receive the selection model.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_table_base_get_selection_model(struct ui_table_base *table,
-                                  struct ui_selection_model **out_model);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_table_base_get_selection_model(
+    struct ui_table_base *table, struct ui_selection_model **out_model);
 
 /**
  * @brief Sets constraints and sizing rules for a specific column.
@@ -169,7 +169,7 @@ ui_table_base_get_selection_model(struct ui_table_base *table,
  * @param config The column sizing configuration.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
                                 const struct ui_table_column_config *config);
 
@@ -180,9 +180,8 @@ ui_table_base_set_column_config(struct ui_table_base *table, size_t col_index,
  * @param config The sort configuration.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_table_base_set_sort_config(struct ui_table_base *table,
-                              const struct ui_table_sort_config *config);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_table_base_set_sort_config(
+    struct ui_table_base *table, const struct ui_table_sort_config *config);
 
 /**
  * @brief Sets pagination parameters.
@@ -191,7 +190,7 @@ ui_table_base_set_sort_config(struct ui_table_base *table,
  * @param config The pagination configuration.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_table_base_set_pagination_config(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_table_base_set_pagination_config(
     struct ui_table_base *table,
     const struct ui_table_pagination_config *config);
 
@@ -204,8 +203,8 @@ ui_error_t ui_table_base_set_pagination_config(
  * be appended.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_table_base_render(struct ui_table_base *table,
-                                struct ui_dom_node *container);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_table_base_render(
+    struct ui_table_base *table, struct ui_dom_node *container);
 
 /**
  * @brief Binds the data property.
@@ -214,8 +213,8 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_table_base_bind_data(struct ui_table_base *widget,
-                                   struct ui_computed *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_table_base_bind_data(
+    struct ui_table_base *widget, struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

@@ -38,7 +38,8 @@ struct ui_label_base;
  * @param out_label Pointer to receive the allocated label base.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_label_base_create(struct ui_label_base **out_label);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_label_base_create(struct ui_label_base **out_label);
 
 /**
  * @brief Destroys a label base component.
@@ -46,7 +47,8 @@ ui_error_t ui_label_base_create(struct ui_label_base **out_label);
  * @param label The label to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_label_base_destroy(struct ui_label_base *label);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_label_base_destroy(struct ui_label_base *label);
 
 /**
  * @brief Sets the "for" attribute equivalent, linking this label to a target
@@ -56,8 +58,8 @@ ui_error_t ui_label_base_destroy(struct ui_label_base *label);
  * @param target_id The ID of the target DOM node.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_label_base_set_for(struct ui_label_base *label,
-                                 const char *target_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_label_base_set_for(struct ui_label_base *label, const char *target_id);
 
 /**
  * @brief Binds a specific target DOM node to the label, bypassing ID lookup.
@@ -66,8 +68,8 @@ ui_error_t ui_label_base_set_for(struct ui_label_base *label,
  * @param target_node The DOM node to associate with this label.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_label_base_set_target_node(struct ui_label_base *label,
-                                         struct ui_dom_node *target_node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_label_base_set_target_node(
+    struct ui_label_base *label, struct ui_dom_node *target_node);
 
 /**
  * @brief Processes an incoming input event to trigger forwarding to the target.
@@ -77,9 +79,9 @@ ui_error_t ui_label_base_set_target_node(struct ui_label_base *label,
  * @param timestamp_ms Current time in milliseconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_label_base_process_event(struct ui_label_base *label,
-                                       const struct ui_event *event,
-                                       double timestamp_ms);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_label_base_process_event(struct ui_label_base *label,
+                            const struct ui_event *event, double timestamp_ms);
 
 /**
  * @brief Gets the underlying component instance for style injection and DOM
@@ -89,8 +91,8 @@ ui_error_t ui_label_base_process_event(struct ui_label_base *label,
  * @param out_component Pointer to receive the underlying component.
  * @return ui_error_t `UI_ERROR_NONE` on success.
  */
-ui_error_t ui_label_base_get_component(struct ui_label_base *label,
-                                       struct ui_component **out_component);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_label_base_get_component(
+    struct ui_label_base *label, struct ui_component **out_component);
 
 /**
  * @brief Binds the text property.
@@ -99,8 +101,8 @@ ui_error_t ui_label_base_get_component(struct ui_label_base *label,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_label_base_bind_text(struct ui_label_base *widget,
-                                   struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_label_base_bind_text(struct ui_label_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

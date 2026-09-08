@@ -96,8 +96,8 @@ struct ui_tree_model {
  * callbacks.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_create(struct ui_tree_base **out_tree,
-                               const struct ui_tree_model *model);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_base_create(
+    struct ui_tree_base **out_tree, const struct ui_tree_model *model);
 
 /**
  * @brief Destroys a tree component.
@@ -105,7 +105,8 @@ ui_error_t ui_tree_base_create(struct ui_tree_base **out_tree,
  * @param tree The tree to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_destroy(struct ui_tree_base *tree);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tree_base_destroy(struct ui_tree_base *tree);
 
 /**
  * @brief Gets the selection model attached to this tree.
@@ -114,9 +115,8 @@ ui_error_t ui_tree_base_destroy(struct ui_tree_base *tree);
  * @param out_model Pointer to receive the selection model, or NULL.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_tree_base_get_selection_model(struct ui_tree_base *tree,
-                                 struct ui_selection_model **out_model);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_base_get_selection_model(
+    struct ui_tree_base *tree, struct ui_selection_model **out_model);
 
 /**
  * @brief Checks if a specific node is expanded.
@@ -127,8 +127,8 @@ ui_tree_base_get_selection_model(struct ui_tree_base *tree,
  * 0 if collapsed).
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_is_expanded(const struct ui_tree_base *tree,
-                                    void *node_id, int *out_is_expanded);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_base_is_expanded(
+    const struct ui_tree_base *tree, void *node_id, int *out_is_expanded);
 
 /**
  * @brief Sets the expanded state of a specific node.
@@ -138,8 +138,8 @@ ui_error_t ui_tree_base_is_expanded(const struct ui_tree_base *tree,
  * @param expanded 1 to expand, 0 to collapse.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
-                                     int expanded);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_base_set_expanded(
+    struct ui_tree_base *tree, void *node_id, int expanded);
 
 /**
  * @brief Toggles the expanded state of a specific node.
@@ -148,7 +148,8 @@ ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
  * @param node_id The stable node identifier.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_toggle_node(struct ui_tree_base *tree, void *node_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tree_base_toggle_node(struct ui_tree_base *tree, void *node_id);
 
 /**
  * @brief Sets the active/focused node for keyboard navigation.
@@ -157,8 +158,8 @@ ui_error_t ui_tree_base_toggle_node(struct ui_tree_base *tree, void *node_id);
  * @param node_id The stable node identifier, or NULL to clear focus.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_set_active_node(struct ui_tree_base *tree,
-                                        void *node_id);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tree_base_set_active_node(struct ui_tree_base *tree, void *node_id);
 
 /**
  * @brief Gets the active/focused node.
@@ -168,8 +169,8 @@ ui_error_t ui_tree_base_set_active_node(struct ui_tree_base *tree,
  * none.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_get_active_node(const struct ui_tree_base *tree,
-                                        void **out_node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tree_base_get_active_node(const struct ui_tree_base *tree, void **out_node);
 
 /**
  * @brief Handles keyboard events for ARIA standard tree traversal.
@@ -181,8 +182,8 @@ ui_error_t ui_tree_base_get_active_node(const struct ui_tree_base *tree,
  * @param event The keyboard event.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_handle_key_event(struct ui_tree_base *tree,
-                                         const struct ui_keyboard_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_tree_base_handle_key_event(
+    struct ui_tree_base *tree, const struct ui_keyboard_event *event);
 
 /**
  * @brief Generates the tree DOM structure including full ARIA mappings
@@ -193,8 +194,8 @@ ui_error_t ui_tree_base_handle_key_event(struct ui_tree_base *tree,
  * appended.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
-                               struct ui_dom_node *container);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tree_base_render(struct ui_tree_base *tree, struct ui_dom_node *container);
 
 /**
  * @brief Binds the data property.
@@ -203,8 +204,8 @@ ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tree_base_bind_data(struct ui_tree_base *widget,
-                                  struct ui_computed *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tree_base_bind_data(struct ui_tree_base *widget, struct ui_computed *signal);
 
 #ifdef __cplusplus
 }

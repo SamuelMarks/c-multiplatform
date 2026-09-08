@@ -2,6 +2,7 @@
 #include "ui_rich_text_editor_base.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 /* clang-format on */
 
@@ -280,21 +281,24 @@ void test_ui_rte_coverage_errs5(void) {
 void test_ui_rte_coverage_errs6(void) {
   struct ui_control_value_accessor cva;
   struct ui_rich_text_editor_base *rte = NULL;
+  struct ui_component *cmp;
+  union ui_signal_payload val;
+
+  memset(&val, 0, sizeof(val));
+
   ui_rich_text_editor_base_create(&rte, &cva);
   if (rte) {
     ui_rich_text_editor_base_insert_text(rte, "foo");
-    struct ui_component *cmp;
     ui_rich_text_editor_base_get_component(
         rte, &cmp); /* Need something to trigger change */
 
     /* Cover missing rte */
-    cva.write_value(NULL, (union ui_signal_payload){0});
+    cva.write_value(NULL, val);
     cva.register_on_change(NULL, NULL, NULL);
     cva.register_on_touched(NULL, NULL, NULL);
     cva.set_disabled_state(NULL, 1);
 
     /* Cover empty str */
-    union ui_signal_payload val;
     val.ptr_val = NULL;
     cva.write_value(rte, val);
 
@@ -544,10 +548,6 @@ void test_ui_rte_cva2(void) {
     }
   }
 }
-#include "ui_rich_text_editor_base.h"
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 static ui_error_t failing_cva_on_change(union ui_signal_payload payload,
                                         void *user_data) {

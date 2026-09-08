@@ -32,7 +32,8 @@ struct ui_context_menu_base;
  * @param out_menu Pointer to receive the allocated context menu base.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_context_menu_base_create(struct ui_context_menu_base **out_menu);
 
 /**
  * @brief Destroys a context menu component.
@@ -40,7 +41,8 @@ ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu);
  * @param menu The context menu component to destroy.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_context_menu_base_destroy(struct ui_context_menu_base *menu);
 
 /**
  * @brief Gets the underlying ui_menu_base to allow adding items.
@@ -49,8 +51,8 @@ ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu);
  * @param out_menu Pointer to receive the underlying menu component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
-                                         struct ui_menu_base **out_menu);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_context_menu_base_get_menu(
+    struct ui_context_menu_base *menu, struct ui_menu_base **out_menu);
 
 /**
  * @brief Opens the context menu at specific screen coordinates, clamping it to
@@ -66,12 +68,10 @@ ui_error_t ui_context_menu_base_get_menu(struct ui_context_menu_base *menu,
  * @param viewport_height The maximum height of the viewport.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_context_menu_base_open_at(struct ui_context_menu_base *menu,
-                                        struct ui_overlay_director *director,
-                                        int target_x, int target_y,
-                                        int menu_width, int menu_height,
-                                        int viewport_width,
-                                        int viewport_height);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_context_menu_base_open_at(
+    struct ui_context_menu_base *menu, struct ui_overlay_director *director,
+    int target_x, int target_y, int menu_width, int menu_height,
+    int viewport_width, int viewport_height);
 
 /**
  * @brief Binds the open state to a signal.
@@ -80,8 +80,8 @@ ui_error_t ui_context_menu_base_open_at(struct ui_context_menu_base *menu,
  * @param open_signal The boolean signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
-                                          struct ui_signal *open_signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_context_menu_base_bind_open(
+    struct ui_context_menu_base *widget, struct ui_signal *open_signal);
 
 /**
  * @brief Retrieves the computed signal indicating if the widget is animating.
@@ -90,7 +90,7 @@ ui_error_t ui_context_menu_base_bind_open(struct ui_context_menu_base *widget,
  * @param out_animating Pointer to receive the computed signal.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_context_menu_base_get_animating_signal(struct ui_context_menu_base *widget,
                                           struct ui_computed **out_animating);
 

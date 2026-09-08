@@ -35,7 +35,7 @@ struct ui_toggle_base;
  * @param out_cva Optional pointer to receive the CVA interface.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_radio_group_base_create(struct ui_radio_group_base **out_group,
                            struct ui_control_value_accessor *out_cva);
 
@@ -46,7 +46,8 @@ ui_radio_group_base_create(struct ui_radio_group_base **out_group,
  * @param group The radio group manager to destroy.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_radio_group_base_destroy(struct ui_radio_group_base *group);
 
 /**
  * @brief Adds a toggle (radio button) to the group.
@@ -55,8 +56,8 @@ ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group);
  * @param toggle The toggle component to add.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
-                                          struct ui_toggle_base *toggle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_radio_group_base_add_toggle(
+    struct ui_radio_group_base *group, struct ui_toggle_base *toggle);
 
 /**
  * @brief Removes a toggle from the group.
@@ -66,8 +67,8 @@ ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
  * @return UI_ERROR_NONE on success, or UI_ERROR_NOT_FOUND if it was not in the
  * group.
  */
-ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
-                                             struct ui_toggle_base *toggle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_radio_group_base_remove_toggle(
+    struct ui_radio_group_base *group, struct ui_toggle_base *toggle);
 
 /**
  * @brief Manually sets the active (checked) toggle in the group.
@@ -77,8 +78,8 @@ ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
  * @param toggle The toggle to set as active. If NULL, unchecks all.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
-                                          struct ui_toggle_base *toggle);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_radio_group_base_set_active(
+    struct ui_radio_group_base *group, struct ui_toggle_base *toggle);
 
 /**
  * @brief Retrieves the currently active (checked) toggle in the group.
@@ -87,7 +88,7 @@ ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
  * @param out_toggle Pointer to receive the active toggle, or NULL if none.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_radio_group_base_get_active(const struct ui_radio_group_base *group,
                                struct ui_toggle_base **out_toggle);
 
@@ -111,10 +112,9 @@ typedef ui_error_t (*ui_radio_group_on_change_t)(
  * @param user_data Opaque user data passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_radio_group_base_set_on_change(struct ui_radio_group_base *group,
-                                  ui_radio_group_on_change_t on_change,
-                                  void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_radio_group_base_set_on_change(
+    struct ui_radio_group_base *group, ui_radio_group_on_change_t on_change,
+    void *user_data);
 
 /**
  * @brief Processes an input event for keyboard routing (Arrow keys) to cycle
@@ -125,8 +125,8 @@ ui_radio_group_base_set_on_change(struct ui_radio_group_base *group,
  * @param event The input event.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_radio_group_base_process_event(struct ui_radio_group_base *group,
-                                             const struct ui_event *event);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_radio_group_base_process_event(
+    struct ui_radio_group_base *group, const struct ui_event *event);
 
 #ifdef __cplusplus
 }

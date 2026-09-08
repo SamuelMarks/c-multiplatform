@@ -9,3 +9,5 @@ on:
 jobs:
   build:
     uses: SamuelMarks/c-ci/.github/workflows/c-cmake-ci.yml@master
+    with:
+      extra_apt_packages: "libwayland-dev wayland-protocols libegl1-mesa-dev libxkbcommon-dev libx11-dev libgl1-mesa-dev"

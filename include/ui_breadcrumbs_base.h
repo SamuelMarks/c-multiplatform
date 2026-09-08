@@ -30,9 +30,8 @@ struct ui_breadcrumbs_base;
  * @param out_breadcrumbs Pointer to receive the allocated breadcrumbs instance.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_breadcrumbs_base_create(struct ui_router *router,
-                           struct ui_breadcrumbs_base **out_breadcrumbs);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_breadcrumbs_base_create(
+    struct ui_router *router, struct ui_breadcrumbs_base **out_breadcrumbs);
 
 /**
  * @brief Destroys the breadcrumbs instance.
@@ -40,7 +39,8 @@ ui_breadcrumbs_base_create(struct ui_router *router,
  * @param breadcrumbs The breadcrumbs instance.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs);
 
 /**
  * @brief Gets the underlying UI component for rendering.
@@ -49,7 +49,7 @@ ui_error_t ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs);
  * @param out_component Pointer to receive the underlying ui_component.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_breadcrumbs_base_get_component(struct ui_breadcrumbs_base *breadcrumbs,
                                   struct ui_component **out_component);
 
@@ -60,8 +60,8 @@ ui_breadcrumbs_base_get_component(struct ui_breadcrumbs_base *breadcrumbs,
  * @param path The URL path (e.g., "/settings/profile/security").
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_breadcrumbs_base_set_path(struct ui_breadcrumbs_base *breadcrumbs,
-                                        const char *path);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_breadcrumbs_base_set_path(
+    struct ui_breadcrumbs_base *breadcrumbs, const char *path);
 
 /**
  * @brief Simulates a click on a breadcrumb item at the given index, triggering
@@ -71,9 +71,8 @@ ui_error_t ui_breadcrumbs_base_set_path(struct ui_breadcrumbs_base *breadcrumbs,
  * @param index The index of the item to click.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
-ui_breadcrumbs_base_simulate_click(struct ui_breadcrumbs_base *breadcrumbs,
-                                   size_t index);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_breadcrumbs_base_simulate_click(
+    struct ui_breadcrumbs_base *breadcrumbs, size_t index);
 
 /**
  * @brief Binds the active state/index to a signal.
@@ -82,9 +81,8 @@ ui_breadcrumbs_base_simulate_click(struct ui_breadcrumbs_base *breadcrumbs,
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t
-ui_breadcrumbs_base_bind_active_index(struct ui_breadcrumbs_base *widget,
-                                      struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_breadcrumbs_base_bind_active_index(
+    struct ui_breadcrumbs_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

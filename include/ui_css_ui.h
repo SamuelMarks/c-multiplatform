@@ -181,8 +181,8 @@ struct ui_css_overscroll_behavior_shorthand {
  * @param out_width Pointer to receive the parsed width.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_outline_width(const char *str,
-                                      struct ui_css_value *out_width);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_outline_width(const char *str, struct ui_css_value *out_width);
 
 /**
  * @brief Parses the outline-style CSS property.
@@ -191,8 +191,8 @@ ui_error_t ui_css_parse_outline_width(const char *str,
  * @param out_style Pointer to receive the parsed style.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_outline_style(const char *str,
-                                      enum ui_css_outline_style *out_style);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_outline_style(
+    const char *str, enum ui_css_outline_style *out_style);
 
 /**
  * @brief Parses the outline shorthand CSS property.
@@ -201,8 +201,8 @@ ui_error_t ui_css_parse_outline_style(const char *str,
  * @param out_outline Pointer to receive the parsed outline struct.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_outline(const char *str,
-                                struct ui_css_outline *out_outline);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_outline(const char *str, struct ui_css_outline *out_outline);
 
 /**
  * @brief Destroys a parsed cursor property (frees linked images).
@@ -210,7 +210,8 @@ ui_error_t ui_css_parse_outline(const char *str,
  * @param cursor Pointer to the cursor to clean up.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_cursor_destroy(struct ui_css_cursor *cursor);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_cursor_destroy(struct ui_css_cursor *cursor);
 
 /**
  * @brief Parses the cursor CSS property.
@@ -219,8 +220,8 @@ ui_error_t ui_css_cursor_destroy(struct ui_css_cursor *cursor);
  * @param out_cursor Pointer to receive the parsed cursor property.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_cursor(const char *str,
-                               struct ui_css_cursor *out_cursor);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_cursor(const char *str, struct ui_css_cursor *out_cursor);
 
 /**
  * @brief Parses the user-select CSS property.
@@ -229,8 +230,8 @@ ui_error_t ui_css_parse_cursor(const char *str,
  * @param out_select Pointer to receive the parsed user-select value.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_user_select(const char *str,
-                                    enum ui_css_user_select *out_select);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_css_parse_user_select(const char *str, enum ui_css_user_select *out_select);
 
 /**
  * @brief Parses the appearance CSS property.
@@ -239,8 +240,8 @@ ui_error_t ui_css_parse_user_select(const char *str,
  * @param out_appearance Pointer to receive the parsed appearance value.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_appearance(const char *str,
-                                   enum ui_css_appearance *out_appearance);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_appearance(
+    const char *str, enum ui_css_appearance *out_appearance);
 
 /**
  * @brief Parses the pointer-events CSS property.
@@ -249,8 +250,8 @@ ui_error_t ui_css_parse_appearance(const char *str,
  * @param out_events Pointer to receive the parsed pointer-events value.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_pointer_events(const char *str,
-                                       enum ui_css_pointer_events *out_events);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_pointer_events(
+    const char *str, enum ui_css_pointer_events *out_events);
 
 /**
  * @brief Parses the overscroll-behavior-x or overscroll-behavior-y CSS
@@ -260,7 +261,7 @@ ui_error_t ui_css_parse_pointer_events(const char *str,
  * @param out_behavior Pointer to receive the parsed behavior.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_overscroll_behavior_axis(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_overscroll_behavior_axis(
     const char *str, enum ui_css_overscroll_behavior *out_behavior);
 
 /**
@@ -271,7 +272,7 @@ ui_error_t ui_css_parse_overscroll_behavior_axis(
  * structure.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code on failure.
  */
-ui_error_t ui_css_parse_overscroll_behavior(
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_css_parse_overscroll_behavior(
     const char *str,
     struct ui_css_overscroll_behavior_shorthand *out_shorthand);
 

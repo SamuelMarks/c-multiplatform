@@ -24,7 +24,8 @@ struct ui_tick_engine;
  * @param out_engine Pointer to receive the new engine handle.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tick_engine_create(struct ui_tick_engine **out_engine);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tick_engine_create(struct ui_tick_engine **out_engine);
 
 /**
  * @brief Destroys a tick engine and frees its resources.
@@ -33,7 +34,8 @@ ui_error_t ui_tick_engine_create(struct ui_tick_engine **out_engine);
  * @return UI_ERROR_NONE on success, UI_ERROR_INVALID_ARGUMENT if engine is
  * NULL.
  */
-ui_error_t ui_tick_engine_destroy(struct ui_tick_engine *engine);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tick_engine_destroy(struct ui_tick_engine *engine);
 
 /**
  * @brief Schedules a task for execution on the next tick.
@@ -43,9 +45,9 @@ ui_error_t ui_tick_engine_destroy(struct ui_tick_engine *engine);
  * @param user_data Opaque pointer passed to the callback.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_tick_engine_schedule(struct ui_tick_engine *engine,
-                                   ui_error_t (*callback)(void *),
-                                   void *user_data);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tick_engine_schedule(struct ui_tick_engine *engine,
+                        ui_error_t (*callback)(void *), void *user_data);
 
 /**
  * @brief Processes all scheduled tasks in the queue.
@@ -53,7 +55,8 @@ ui_error_t ui_tick_engine_schedule(struct ui_tick_engine *engine,
  * @param engine The engine to tick.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t ui_tick_engine_tick(struct ui_tick_engine *engine);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_tick_engine_tick(struct ui_tick_engine *engine);
 
 #ifdef __cplusplus
 }

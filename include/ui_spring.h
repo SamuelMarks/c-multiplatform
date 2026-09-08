@@ -53,10 +53,10 @@ struct ui_spring_state {
  * @param out_state Pointer to receive the new state.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_spring_update(const struct ui_spring_config *config,
-                            const struct ui_spring_state *current, float target,
-                            float delta_time_s,
-                            struct ui_spring_state *out_state);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_spring_update(const struct ui_spring_config *config,
+                 const struct ui_spring_state *current, float target,
+                 float delta_time_s, struct ui_spring_state *out_state);
 
 #ifdef __cplusplus
 }

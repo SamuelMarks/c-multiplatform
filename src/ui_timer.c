@@ -51,6 +51,8 @@ extern int UI_WINAPI QueryPerformanceFrequency(UI_TIMER_INT64* lpFrequency);
 
 #else
 #include <time.h>
+#ifdef __EMSCRIPTEN__
+#endif
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -60,7 +62,6 @@ extern int g_ui_timer_clock_gettime_fail;
 #endif
 
 #if defined(__EMSCRIPTEN__)
-#include <emscripten.h>
 #endif
 
 /** @brief internal */

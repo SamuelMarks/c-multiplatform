@@ -32,9 +32,9 @@ typedef struct ui_form_array ui_form_array_t;
  * @param out_array The pointer to store the created form array.
  * @return ui_error_t
  */
-ui_error_t ui_form_array_create(struct ui_arena *arena,
-                                enum ui_signal_mode mode,
-                                ui_form_array_t **out_array);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_array_create(struct ui_arena *arena, enum ui_signal_mode mode,
+                     ui_form_array_t **out_array);
 
 /**
  * @brief Pushes a node to the end of the form array.
@@ -43,7 +43,8 @@ ui_error_t ui_form_array_create(struct ui_arena *arena,
  * @param node The form node to push.
  * @return ui_error_t
  */
-ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_array_push(ui_form_array_t *array, ui_form_node_t node);
 
 /**
  * @brief Inserts a node at the specified index.
@@ -53,8 +54,8 @@ ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node);
  * @param node The form node to insert.
  * @return ui_error_t
  */
-ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
-                                   ui_form_node_t node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_array_insert_at(
+    ui_form_array_t *array, size_t index, ui_form_node_t node);
 
 /**
  * @brief Removes a node at the specified index.
@@ -63,7 +64,8 @@ ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
  * @param index The index to remove.
  * @return ui_error_t
  */
-ui_error_t ui_form_array_remove_at(ui_form_array_t *array, size_t index);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_array_remove_at(ui_form_array_t *array, size_t index);
 
 /**
  * @brief Clears all nodes from the form array.
@@ -71,7 +73,8 @@ ui_error_t ui_form_array_remove_at(ui_form_array_t *array, size_t index);
  * @param array The form array.
  * @return ui_error_t
  */
-ui_error_t ui_form_array_clear(ui_form_array_t *array);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_array_clear(ui_form_array_t *array);
 
 /**
  * @brief Gets a node from the form array.
@@ -81,8 +84,8 @@ ui_error_t ui_form_array_clear(ui_form_array_t *array);
  * @param out_node The pointer to store the retrieved node.
  * @return ui_error_t
  */
-ui_error_t ui_form_array_get_node(ui_form_array_t *array, size_t index,
-                                  ui_form_node_t *out_node);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_array_get_node(
+    ui_form_array_t *array, size_t index, ui_form_node_t *out_node);
 
 /**
  * @brief Traverses the form array and computes its aggregated status.
@@ -91,8 +94,8 @@ ui_error_t ui_form_array_get_node(ui_form_array_t *array, size_t index,
  * @param out_status The computed status.
  * @return ui_error_t
  */
-ui_error_t ui_form_array_get_status(ui_form_array_t *array,
-                                    enum ui_form_status *out_status);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_array_get_status(
+    ui_form_array_t *array, enum ui_form_status *out_status);
 
 /**
  * @brief Destroys the form array.
@@ -100,7 +103,8 @@ ui_error_t ui_form_array_get_status(ui_form_array_t *array,
  * @param array The form array.
  * @return ui_error_t
  */
-ui_error_t ui_form_array_destroy(ui_form_array_t *array);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_form_array_destroy(ui_form_array_t *array);
 
 #ifdef __cplusplus
 }

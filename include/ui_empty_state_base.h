@@ -37,7 +37,8 @@ struct ui_empty_state_base {
  * @param out_state Pointer to output the initialized empty state structure.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_empty_state_base_create(struct ui_empty_state_base **out_state);
 
 /**
  * @brief Sets the title text of the empty state.
@@ -46,8 +47,8 @@ ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state);
  * @param text The title text to set.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_empty_state_base_set_title(struct ui_empty_state_base *state,
-                                         const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_empty_state_base_set_title(
+    struct ui_empty_state_base *state, const char *text);
 
 /**
  * @brief Sets the description text of the empty state.
@@ -56,9 +57,8 @@ ui_error_t ui_empty_state_base_set_title(struct ui_empty_state_base *state,
  * @param text The description text to set.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t
-ui_empty_state_base_set_description(struct ui_empty_state_base *state,
-                                    const char *text);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_empty_state_base_set_description(
+    struct ui_empty_state_base *state, const char *text);
 
 /**
  * @brief Binds a data signal to the empty state.
@@ -67,8 +67,8 @@ ui_empty_state_base_set_description(struct ui_empty_state_base *state,
  * @param signal Pointer to the signal to bind to.
  * @return `UI_ERROR_NONE` on success, or an appropriate error code.
  */
-ui_error_t ui_empty_state_base_bind_data(struct ui_empty_state_base *widget,
-                                         struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_empty_state_base_bind_data(
+    struct ui_empty_state_base *widget, struct ui_signal *signal);
 
 #ifdef __cplusplus
 }

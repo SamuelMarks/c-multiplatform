@@ -54,9 +54,9 @@ struct ui_video_player_base {
  * @param av_sync Pointer to the AV sync engine.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_video_player_base_init(struct ui_video_player_base *player,
-                                     struct ui_component *component,
-                                     struct ui_av_sync *av_sync);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_video_player_base_init(
+    struct ui_video_player_base *player, struct ui_component *component,
+    struct ui_av_sync *av_sync);
 
 /**
  * @brief Toggles play/pause state.
@@ -64,7 +64,7 @@ ui_error_t ui_video_player_base_init(struct ui_video_player_base *player,
  * @param player Pointer to the video player base struct.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_video_player_base_toggle_play(struct ui_video_player_base *player);
 
 /**
@@ -74,8 +74,8 @@ ui_video_player_base_toggle_play(struct ui_video_player_base *player);
  * @param time Time in seconds.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_video_player_base_seek(struct ui_video_player_base *player,
-                                     float time);
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_video_player_base_seek(struct ui_video_player_base *player, float time);
 
 /**
  * @brief Sets the player volume.
@@ -84,8 +84,8 @@ ui_error_t ui_video_player_base_seek(struct ui_video_player_base *player,
  * @param volume Volume level from 0.0 to 1.0.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_video_player_base_set_volume(struct ui_video_player_base *player,
-                                           float volume);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_video_player_base_set_volume(
+    struct ui_video_player_base *player, float volume);
 
 /**
  * @brief Toggles fullscreen mode.
@@ -93,7 +93,7 @@ ui_error_t ui_video_player_base_set_volume(struct ui_video_player_base *player,
  * @param player Pointer to the video player base struct.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t
+extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player);
 
 /**
@@ -103,8 +103,8 @@ ui_video_player_base_toggle_fullscreen(struct ui_video_player_base *player);
  * @param signal The signal to bind to.
  * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-ui_error_t ui_video_player_base_bind_src(struct ui_video_player_base *widget,
-                                         struct ui_signal *signal);
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_video_player_base_bind_src(
+    struct ui_video_player_base *widget, struct ui_signal *signal);
 
 /** @} */
 
