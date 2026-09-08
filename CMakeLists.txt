@@ -201,7 +201,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb")
 if(EMSCRIPTEN)
-    set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    if(BUILD_TESTING)
+        set(CMAKE_EXECUTABLE_SUFFIX ".js")
+    else()
+        set(CMAKE_EXECUTABLE_SUFFIX ".html")
+    endif()
 
     # Exported functions and methods
     set(UI_WASM_EXPORTED_FUNCS "_main,_malloc,_free,_ui_engine_tick,_ui_web_bridge_dispatch_event,_ui_web_bridge_dispatch_resize,_ui_web_bridge_dispatch_key")
@@ -252,7 +256,12 @@ if(UNIX AND NOT APPLE AND NOT CYGWIN AND NOT EMSCRIPTEN)
             execute_process(
                 COMMAND ${WAYLAND_SCANNER} private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c
             )
-            include_directories(${CMAKE_CURRENT_BINARY_DIR})
+            if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-client-protocol.h")
+                file(READ "${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-client-protocol.h" _xdg_hdr)
+                string(REGEX REPLACE ",([ \t\r\n]*})" "\\1" _xdg_hdr "${_xdg_hdr}")
+                file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-client-protocol.h" "${_xdg_hdr}")
+            endif()
+            include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR})
 
             set(UI_WINDOW_BACKEND_LINUX_SRC src/ui_window_backend_linux_wayland.c ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c)
             set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c PROPERTIES COMPILE_FLAGS " -Dinline=__inline__")
@@ -1260,7 +1269,7 @@ add_test(NAME test_ui_breakpoint_observer COMMAND test_ui_breakpoint_observer)
     target_link_libraries(test_ui_web_bridge ui_engine_test)
     add_test(NAME test_ui_web_bridge COMMAND test_ui_web_bridge)
 
-    add_executable(test_ui_reactive_graph tests/test_ui_reactive_graph.c)
+    add_executable(test_ui_reactive_graph tests/test_ui_reactive_graph.c tests/ui_test_mock_mem.c)
     target_link_libraries(test_ui_reactive_graph ui_engine_test)
     add_test(NAME test_ui_reactive_graph COMMAND test_ui_reactive_graph)
 

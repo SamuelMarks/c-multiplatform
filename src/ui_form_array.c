@@ -62,6 +62,7 @@ ui_error_t ui_form_array_create(struct ui_arena *arena,
 ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
   ui_form_node_t *new_nodes = NULL;
   size_t new_cap;
+  ui_error_t rc;
 
   if (!array) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -69,10 +70,11 @@ ui_error_t ui_form_array_push(ui_form_array_t *array, ui_form_node_t node) {
 
   if (array->count >= array->capacity) {
     new_cap = array->capacity == 0 ? 4 : array->capacity * 2;
-    ui_arena_alloc(array->arena, (size_t)new_cap * sizeof(ui_form_node_t), 8,
-                   (void **)&new_nodes);
-    if (!new_nodes)
-      return UI_ERROR_OUT_OF_MEMORY;
+    rc = ui_arena_alloc(array->arena, (size_t)new_cap * sizeof(ui_form_node_t),
+                        8, (void **)&new_nodes);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
 
     if (array->count > 0) {
       memcpy(new_nodes, array->nodes,
@@ -99,6 +101,7 @@ ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
                                    ui_form_node_t node) {
   ui_form_node_t *new_nodes = NULL;
   size_t new_cap, i;
+  ui_error_t rc;
 
   if (!array)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -107,10 +110,11 @@ ui_error_t ui_form_array_insert_at(ui_form_array_t *array, size_t index,
 
   if (array->count >= array->capacity) {
     new_cap = array->capacity == 0 ? 4 : array->capacity * 2;
-    ui_arena_alloc(array->arena, (size_t)new_cap * sizeof(ui_form_node_t), 8,
-                   (void **)&new_nodes);
-    if (!new_nodes)
-      return UI_ERROR_OUT_OF_MEMORY;
+    rc = ui_arena_alloc(array->arena, (size_t)new_cap * sizeof(ui_form_node_t),
+                        8, (void **)&new_nodes);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
 
     if (array->count > 0) {
       memcpy(new_nodes, array->nodes,

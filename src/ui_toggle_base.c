@@ -68,7 +68,7 @@ static ui_error_t update_dom_state(struct ui_toggle_base *toggle) {
   {
     const char *checked_strs[] = {"false", "true"};
     ui_web_bridge_set_property(
-        (uint32_t)(uintptr_t)toggle->component->shadow_root, "checked",
+        (ui_uint32)(ui_uintptr)toggle->component->shadow_root, "checked",
         checked_strs[!!toggle->checked]);
   }
 #endif

@@ -79,10 +79,10 @@ struct ui_checkbox_base {
 static ui_error_t update_dom_state(struct ui_checkbox_base *checkbox) {
 #if defined(__EMSCRIPTEN__)
   ui_web_bridge_set_property(
-      (uint32_t)(uintptr_t)checkbox->component->shadow_root, "checked",
+      (ui_uint32)(ui_uintptr)checkbox->component->shadow_root, "checked",
       checkbox->state == UI_CHECKBOX_STATE_CHECKED ? "true" : "false");
   ui_web_bridge_set_property(
-      (uint32_t)(uintptr_t)checkbox->component->shadow_root, "indeterminate",
+      (ui_uint32)(ui_uintptr)checkbox->component->shadow_root, "indeterminate",
       checkbox->state == UI_CHECKBOX_STATE_INDETERMINATE ? "true" : "false");
 #endif
   if (checkbox->state == UI_CHECKBOX_STATE_CHECKED) {

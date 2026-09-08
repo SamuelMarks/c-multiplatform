@@ -290,7 +290,7 @@ ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
   if (em_rc != UI_ERROR_NONE) {
     role_str = NULL;
   }
-  em_rc = ui_web_bridge_set_aria((uint32_t)(uintptr_t)node, role_str,
+  em_rc = ui_web_bridge_set_aria((ui_uint32)(ui_uintptr)node, role_str,
                                  out_state->label, out_state->is_hidden,
                                  out_state->is_disabled, out_state->is_expanded,
                                  out_state->is_checked);

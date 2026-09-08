@@ -52,6 +52,7 @@ extern int UI_WINAPI QueryPerformanceFrequency(UI_TIMER_INT64* lpFrequency);
 #else
 #include <time.h>
 #ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 #endif
 /* clang-format on */
 
@@ -59,9 +60,6 @@ extern int UI_WINAPI QueryPerformanceFrequency(UI_TIMER_INT64* lpFrequency);
 extern int g_ui_timer_clock_gettime_fail;
 #endif
 
-#endif
-
-#if defined(__EMSCRIPTEN__)
 #endif
 
 /** @brief internal */

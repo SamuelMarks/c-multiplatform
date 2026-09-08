@@ -85,18 +85,17 @@ static ui_error_t group_id_equality(union ui_signal_payload a,
  */
 ui_error_t ui_ribbon_base_create(struct ui_arena *arena,
                                  struct ui_ribbon_base **out_ribbon) {
-
-  void *ptr;
+  void *ptr = NULL;
+  ui_error_t rc;
   union ui_signal_payload initial_payload;
 
   if (!arena || !out_ribbon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t _ign_rc =
-        ui_arena_alloc(arena, sizeof(struct ui_ribbon_base), 8, &ptr);
-    (void)_ign_rc;
+  rc = ui_arena_alloc(arena, sizeof(struct ui_ribbon_base), 8, &ptr);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   *out_ribbon = (struct ui_ribbon_base *)ptr;
@@ -105,12 +104,11 @@ ui_error_t ui_ribbon_base_create(struct ui_arena *arena,
   (*out_ribbon)->num_contextual_tabs = 0;
 
   initial_payload.int_val = -1; /* -1 means no group has changed yet */
-  {
-    ui_error_t _ign_rc = ui_signal_create(
-        arena, initial_payload, UI_SIGNAL_TYPE_INT32, group_id_equality, NULL,
-        UI_SIGNAL_MODE_SINGLE_THREADED,
-        &(*out_ribbon)->group_state_changed_signal);
-    (void)_ign_rc;
+  rc = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_INT32,
+                        group_id_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
+                        &(*out_ribbon)->group_state_changed_signal);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   return UI_ERROR_NONE;

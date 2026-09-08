@@ -32,17 +32,12 @@ static int run_test(const char *name, int (*test_fn)(void)) {
 static int test_fs_read_write(void) {
   int failed = 0;
   ui_error_t err;
-  const char *path =
-      "/preload.txt"; /* Should exist in Wasm due to --preload-file, fallback to
-                         write for native */
+  const char *path = "test_fs_temp.txt";
   void *data = NULL;
   size_t size = 0;
 
-#if !defined(__EMSCRIPTEN__)
-  path = "test_fs_temp.txt";
   err = ui_fs_write_file(path, "test_data", 9);
   EXPECT(err == UI_ERROR_NONE);
-#endif
 
   err = ui_fs_read_file(path, &data, &size);
   EXPECT(err == UI_ERROR_NONE);
@@ -51,9 +46,7 @@ static int test_fs_read_write(void) {
 
   free(data); /* JS _malloced buffer or native MALLOC */
 
-#if !defined(__EMSCRIPTEN__)
   remove(path);
-#endif
 
   return failed;
 }
@@ -105,7 +98,7 @@ static int test_fs_errors(void) {
   EXPECT(ui_fs_read_file(".", &data, &size) == UI_ERROR_IO_FAILED);
   EXPECT(ui_fs_write_file(".", "data", 4) == UI_ERROR_IO_FAILED);
 
-#ifdef UI_TEST_MOCK_ALLOC
+#if defined(UI_TEST_MOCK_ALLOC) && !defined(__EMSCRIPTEN__)
   {
     /* Test OOM during read */
     const char *path = "test_fs_temp2.txt";
@@ -118,7 +111,7 @@ static int test_fs_errors(void) {
   }
 #endif
 
-#ifdef UI_TEST_MOCK_ALLOC
+#if defined(UI_TEST_MOCK_ALLOC) && !defined(__EMSCRIPTEN__)
   {
     const char *path = "test_fs_mock.txt";
     ui_fs_write_file(path, "data", 4);

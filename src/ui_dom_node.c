@@ -47,7 +47,7 @@ ui_error_t ui_dom_node_create(enum ui_dom_node_type type,
     const char *tag = "div";
     if (type == UI_DOM_NODE_TYPE_TEXT)
       tag = "span";
-    ui_web_bridge_create_node((uint32_t)(uintptr_t)node, tag);
+    ui_web_bridge_create_node((ui_uint32)(ui_uintptr)node, tag);
   }
 #endif
   return UI_ERROR_NONE;
@@ -105,7 +105,7 @@ ui_error_t ui_dom_node_destroy(struct ui_dom_node *node) {
 
   /* Phase 3 Web Bridge Hook */
 #if defined(__EMSCRIPTEN__)
-  ui_web_bridge_destroy_node((uint32_t)(uintptr_t)node);
+  ui_web_bridge_destroy_node((ui_uint32)(ui_uintptr)node);
 #endif
 
   C_MULTIPLATFORM_FREE(node);
@@ -244,8 +244,8 @@ ui_error_t ui_dom_node_set_attribute(struct ui_dom_node *node, const char *name,
 
 #if defined(__EMSCRIPTEN__)
       {
-        ui_error_t bridge_rc =
-            ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, value);
+        ui_error_t bridge_rc = ui_web_bridge_set_attribute(
+            (ui_uint32)(ui_uintptr)node, name, value);
         if (bridge_rc != UI_ERROR_NONE) {
           C_MULTIPLATFORM_FREE(old_val_ptr);
           return bridge_rc;
@@ -296,7 +296,7 @@ ui_error_t ui_dom_node_set_attribute(struct ui_dom_node *node, const char *name,
 #if defined(__EMSCRIPTEN__)
   {
     ui_error_t bridge_rc =
-        ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, value);
+        ui_web_bridge_set_attribute((ui_uint32)(ui_uintptr)node, name, value);
     if (bridge_rc != UI_ERROR_NONE)
       return bridge_rc;
   }
@@ -382,8 +382,8 @@ ui_error_t ui_dom_node_remove_attribute(struct ui_dom_node *node,
 
 #if defined(__EMSCRIPTEN__)
       {
-        ui_error_t bridge_rc =
-            ui_web_bridge_set_attribute((uint32_t)(uintptr_t)node, name, NULL);
+        ui_error_t bridge_rc = ui_web_bridge_set_attribute(
+            (ui_uint32)(ui_uintptr)node, name, NULL);
         if (bridge_rc != UI_ERROR_NONE)
           return bridge_rc;
       }
@@ -489,7 +489,7 @@ ui_error_t ui_dom_node_set_text_content(struct ui_dom_node *node,
   }
 
 #if defined(__EMSCRIPTEN__)
-  err = ui_web_bridge_set_text((uint32_t)(uintptr_t)node, node->text_content);
+  err = ui_web_bridge_set_text((ui_uint32)(ui_uintptr)node, node->text_content);
   if (err != UI_ERROR_NONE)
     return err;
 #endif

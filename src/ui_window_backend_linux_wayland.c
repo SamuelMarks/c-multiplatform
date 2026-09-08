@@ -54,12 +54,11 @@ struct ui_window {
  * @param width Parameter width.
  * @param height Parameter height.
  * @param states Parameter states.
- * @return Return value.
  */
-static ui_error_t log_xdg_toplevel_configure(void *data,
-                                             struct xdg_toplevel *xdg_toplevel,
-                                             int32_t width, int32_t height,
-                                             struct wl_array *states) {
+static void log_xdg_toplevel_configure(void *data,
+                                       struct xdg_toplevel *xdg_toplevel,
+                                       int32_t width, int32_t height,
+                                       struct wl_array *states) {
   struct ui_window *win = (struct ui_window *)data;
   (void)xdg_toplevel;
   (void)states;
@@ -76,23 +75,20 @@ static ui_error_t log_xdg_toplevel_configure(void *data,
     win->pending_event.event_data.window.height = height;
     win->has_pending_event = 1;
   }
-  return UI_ERROR_NONE;
 }
 
 /**
  * @brief log_xdg_toplevel_close.
  * @param data Parameter data.
  * @param xdg_toplevel Parameter xdg_toplevel.
- * @return Return value.
  */
-static ui_error_t log_xdg_toplevel_close(void *data,
-                                         struct xdg_toplevel *xdg_toplevel) {
+static void log_xdg_toplevel_close(void *data,
+                                   struct xdg_toplevel *xdg_toplevel) {
   struct ui_window *win = (struct ui_window *)data;
   (void)xdg_toplevel;
   win->is_closing = 1;
   win->pending_event.type = UI_EVENT_WINDOW_CLOSE;
   win->has_pending_event = 1;
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -101,16 +97,14 @@ static ui_error_t log_xdg_toplevel_close(void *data,
  * @param xdg_toplevel Parameter xdg_toplevel.
  * @param width Parameter width.
  * @param height Parameter height.
- * @return Return value.
  */
-static ui_error_t
-log_xdg_toplevel_configure_bounds(void *data, struct xdg_toplevel *xdg_toplevel,
-                                  int32_t width, int32_t height) {
+static void log_xdg_toplevel_configure_bounds(void *data,
+                                              struct xdg_toplevel *xdg_toplevel,
+                                              int32_t width, int32_t height) {
   (void)data;
   (void)xdg_toplevel;
   (void)width;
   (void)height;
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -118,15 +112,13 @@ log_xdg_toplevel_configure_bounds(void *data, struct xdg_toplevel *xdg_toplevel,
  * @param data Parameter data.
  * @param xdg_toplevel Parameter xdg_toplevel.
  * @param capabilities Parameter capabilities.
- * @return Return value.
  */
-static ui_error_t
-log_xdg_toplevel_wm_capabilities(void *data, struct xdg_toplevel *xdg_toplevel,
-                                 struct wl_array *capabilities) {
+static void log_xdg_toplevel_wm_capabilities(void *data,
+                                             struct xdg_toplevel *xdg_toplevel,
+                                             struct wl_array *capabilities) {
   (void)data;
   (void)xdg_toplevel;
   (void)capabilities;
-  return UI_ERROR_NONE;
 }
 
 static const struct xdg_toplevel_listener xdg_toplevel_listener = {
@@ -138,15 +130,13 @@ static const struct xdg_toplevel_listener xdg_toplevel_listener = {
  * @param data Parameter data.
  * @param xdg_surface Parameter xdg_surface.
  * @param serial Parameter serial.
- * @return Return value.
  */
-static ui_error_t log_xdg_surface_configure(void *data,
-                                            struct xdg_surface *xdg_surface,
-                                            uint32_t serial) {
+static void log_xdg_surface_configure(void *data,
+                                      struct xdg_surface *xdg_surface,
+                                      uint32_t serial) {
   struct ui_window *win = (struct ui_window *)data;
   (void)win;
   xdg_surface_ack_configure(xdg_surface, serial);
-  return UI_ERROR_NONE;
 }
 
 static const struct xdg_surface_listener xdg_surface_listener = {
@@ -157,14 +147,11 @@ static const struct xdg_surface_listener xdg_surface_listener = {
  * @param data Parameter data.
  * @param xdg_wm_base Parameter xdg_wm_base.
  * @param serial Parameter serial.
- * @return Return value.
  */
-static ui_error_t log_xdg_wm_base_ping(void *data,
-                                       struct xdg_wm_base *xdg_wm_base,
-                                       uint32_t serial) {
+static void log_xdg_wm_base_ping(void *data, struct xdg_wm_base *xdg_wm_base,
+                                 uint32_t serial) {
   (void)data;
   xdg_wm_base_pong(xdg_wm_base, serial);
-  return UI_ERROR_NONE;
 }
 
 static const struct xdg_wm_base_listener xdg_wm_base_listener = {
@@ -177,11 +164,10 @@ static const struct xdg_wm_base_listener xdg_wm_base_listener = {
  * @param id Parameter id.
  * @param interface Parameter interface.
  * @param version Parameter version.
- * @return Return value.
  */
-static ui_error_t log_registry_handler(void *data, struct wl_registry *registry,
-                                       uint32_t id, const char *interface,
-                                       uint32_t version) {
+static void log_registry_handler(void *data, struct wl_registry *registry,
+                                 uint32_t id, const char *interface,
+                                 uint32_t version) {
   struct ui_window *win = (struct ui_window *)data;
   (void)version;
   if (strcmp(interface, "wl_compositor") == 0) {
@@ -192,7 +178,6 @@ static ui_error_t log_registry_handler(void *data, struct wl_registry *registry,
         registry, id, &xdg_wm_base_interface, 1);
     xdg_wm_base_add_listener(win->xdg_wm_base, &xdg_wm_base_listener, win);
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -200,14 +185,12 @@ static ui_error_t log_registry_handler(void *data, struct wl_registry *registry,
  * @param data Parameter data.
  * @param registry Parameter registry.
  * @param id Parameter id.
- * @return Return value.
  */
-static ui_error_t log_registry_remover(void *data, struct wl_registry *registry,
-                                       uint32_t id) {
+static void log_registry_remover(void *data, struct wl_registry *registry,
+                                 uint32_t id) {
   (void)data;
   (void)registry;
   (void)id;
-  return UI_ERROR_NONE;
 }
 
 static const struct wl_registry_listener registry_listener = {

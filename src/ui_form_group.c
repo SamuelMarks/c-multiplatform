@@ -100,11 +100,12 @@ ui_error_t ui_form_group_add_node(ui_form_group_t *group, const char *name,
 
   if (group->count >= group->capacity) {
     new_cap = group->capacity == 0 ? 4 : group->capacity * 2;
-    ui_arena_alloc(group->arena,
-                   (size_t)new_cap * sizeof(struct ui_form_group_entry), 8,
-                   (void **)&new_entries);
-    if (!new_entries)
-      return UI_ERROR_OUT_OF_MEMORY;
+    rc = ui_arena_alloc(group->arena,
+                        (size_t)new_cap * sizeof(struct ui_form_group_entry), 8,
+                        (void **)&new_entries);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
 
     if (group->count > 0) {
       memcpy(new_entries, group->entries,

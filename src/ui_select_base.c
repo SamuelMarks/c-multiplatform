@@ -434,8 +434,8 @@ ui_error_t ui_select_base_set_selected_index(struct ui_select_base *select,
       sprintf(idx_str, "%d", index);
 #endif
       ui_web_bridge_set_property(
-          (uint32_t)(uintptr_t)select->component->shadow_root, "selectedIndex",
-          idx_str);
+          (ui_uint32)(ui_uintptr)select->component->shadow_root,
+          "selectedIndex", idx_str);
     }
 #endif
 

@@ -68,7 +68,7 @@ static ui_error_t update_dom_state(struct ui_input_base *input) {
 #if defined(__EMSCRIPTEN__)
   if (input->text) {
     ui_error_t wb_rc = ui_web_bridge_set_property(
-        (uint32_t)(uintptr_t)input->component->shadow_root, "value",
+        (ui_uint32)(ui_uintptr)input->component->shadow_root, "value",
         input->text);
     if (wb_rc != UI_ERROR_NONE)
       return wb_rc;

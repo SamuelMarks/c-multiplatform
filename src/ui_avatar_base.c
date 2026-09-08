@@ -146,7 +146,9 @@ ui_error_t run_avatar_coverage(void);
  */
 ui_error_t run_avatar_coverage(void) {
   char initials[8];
-  struct ui_avatar_base *avatar;
+  struct ui_avatar_base *avatar = NULL;
+  ui_error_t rc;
+
   g_avatar_mock_fail = 1;
   extract_initials("John Doe", initials);
   g_avatar_mock_fail = 0;
@@ -154,7 +156,10 @@ ui_error_t run_avatar_coverage(void) {
   g_avatar_mock_fail = 2;
   extract_initials("John Doe", initials);
   g_avatar_mock_fail = 0;
-  ui_avatar_base_create(&avatar);
+  rc = ui_avatar_base_create(&avatar);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   g_avatar_mock_fail = 3;
   ui_avatar_base_set_name(avatar, "John Doe");

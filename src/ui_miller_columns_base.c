@@ -60,7 +60,7 @@ ui_error_t ui_miller_columns_base_create(
     struct ui_arena *arena, const struct ui_tree_model *tree_model,
     void *model_user_data, struct ui_miller_columns_base **out_miller) {
   ui_error_t err;
-  void *ptr;
+  void *ptr = NULL;
   union ui_signal_payload initial_payload;
 
   if (!arena || !tree_model || !out_miller) {
@@ -86,12 +86,11 @@ ui_error_t ui_miller_columns_base_create(
   (*out_miller)->columns[0].selected_child_id = NULL;
 
   initial_payload.int_val = 1;
-  {
-    ui_error_t _ign_rc = ui_signal_create(
-        arena, initial_payload, UI_SIGNAL_TYPE_INT32, topology_equality, NULL,
-        UI_SIGNAL_MODE_SINGLE_THREADED,
-        &(*out_miller)->topology_changed_signal);
-    (void)_ign_rc;
+  err = ui_signal_create(
+      arena, initial_payload, UI_SIGNAL_TYPE_INT32, topology_equality, NULL,
+      UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_miller)->topology_changed_signal);
+  if (err != UI_ERROR_NONE) {
+    return err;
   }
 
   return UI_ERROR_NONE;

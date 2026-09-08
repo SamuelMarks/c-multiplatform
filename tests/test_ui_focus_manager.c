@@ -688,6 +688,7 @@ static int run_coverage_focus(void) {
 
   ui_dom_node_set_attribute(root, "tabindex", "0");
 
+#if defined(UI_TEST_MOCK_ALLOC) && !defined(__EMSCRIPTEN__)
   /* Trigger OOM by failing the first allocation in gather array */
   /* Re-alloc failure when cap > 0 */
   /* We can make a deep tree and fail during it */
@@ -719,6 +720,7 @@ static int run_coverage_focus(void) {
     for (i = 0; i < 20; i++)
       ui_dom_node_remove_attribute(c[i], "tabindex");
   }
+#endif
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);

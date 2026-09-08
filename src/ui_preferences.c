@@ -68,16 +68,28 @@ ui_error_t ui_preferences_destroy(struct ui_preferences *prefs) {
 #if defined(__EMSCRIPTEN__)
 EM_JS(void, set_local_storage_js, (const char *key, const char *value), {
   try {
-    localStorage.setItem(UTF8ToString(key), UTF8ToString(value));
+    const k = UTF8ToString(key), v = UTF8ToString(value);
+    if (typeof localStorage != = 'undefined') {
+      localStorage.setItem(k, v);
+    } else {
+      if (!globalThis._mock_ls)
+        globalThis._mock_ls = new Map();
+      globalThis._mock_ls.set(k, v);
+    }
   } catch (e) {
-    console.error("localStorage setItem failed", e);
   }
 })
 
 EM_JS(char *, get_local_storage_js, (const char *key), {
   try {
-    const val = localStorage.getItem(UTF8ToString(key));
-    if (val == = null)
+    const k = UTF8ToString(key);
+    let val = null;
+    if (typeof localStorage != = 'undefined') {
+      val = localStorage.getItem(k);
+    } else if (globalThis._mock_ls) {
+      val = globalThis._mock_ls.get(k) || null;
+    }
+    if (!val)
       return 0;
     const lengthBytes = lengthBytesUTF8(val) + 1;
     const stringOnWasmHeap = _malloc(lengthBytes);
@@ -86,7 +98,6 @@ EM_JS(char *, get_local_storage_js, (const char *key), {
     }
     return stringOnWasmHeap;
   } catch (e) {
-    console.error("localStorage getItem failed", e);
     return 0;
   }
 })
@@ -144,61 +155,6 @@ ui_error_t ui_preferences_get_string(struct ui_preferences *prefs,
 #endif
 }
 
-#if defined(__EMSCRIPTEN__)
-EM_JS(int, idb_save_js,
-      (const char *key_cstr, const uint8_t *data, size_t length,
-       int promise_id),
-      {
-        const key = UTF8ToString(key_cstr);
-        const u8 = new Uint8Array(HEAPU8.buffer, data, length)
-                       .slice(); /* copy to avoid heap mutation issues */
-        if (!window._ui_idb) {
-          const req = indexedDB.open("UIFrameworkDB", 1);
-          req.onupgradeneeded = (e) = > {
-            const db = e.target.result;
-            if (!db.objectStoreNames.contains("assets")) {
-              db.createObjectStore("assets");
-            }
-          };
-          req.onsuccess = (e) = > {
-            window._ui_idb = e.target.result;
-            _do_save();
-          };
-          req.onerror = (e) = > {
-            console.error("IDB Open Failed", e);
-            _ui_web_bridge_promise_reject_js(promise_id, 2); /* io error */
-          };
-        } else {
-          _do_save();
-        }
-
-        function _do_save() {
-          const tx = window._ui_idb.transaction("assets", "readwrite");
-          const store = tx.objectStore("assets");
-          const req = store.put(u8, key);
-          req.onsuccess = () = > {
-            _ui_web_bridge_promise_resolve_js(promise_id, 0);
-          };
-          req.onerror = (e) = > {
-            console.error("IDB Put Failed", e);
-            _ui_web_bridge_promise_reject_js(promise_id, 2);
-          };
-        }
-        return 0;
-      })
-#endif
-
-/**
- * @brief Asynchronously saves a binary blob (e.g. via IndexedDB or background
- * file write).
- * @param[in,out] prefs The preferences context.
- * @param[in] key The preference key.
- * @param[in] data The binary data to save.
- * @param[in] length The length of the binary data in bytes.
- * @param[out] out_promise Pointer to store the promise tracking the save
- * operation.
- * @return UI_ERROR_NONE on success.
- */
 ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
                                             const char *key, const void *data,
                                             size_t length,
@@ -214,23 +170,12 @@ ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
   if (rc != UI_ERROR_NONE)
     return rc;
 
-#if defined(__EMSCRIPTEN__)
-  {
-    int js_promise_id;
-    rc = ui_web_bridge_promise_to_js(promise, &js_promise_id);
-    if (rc == UI_ERROR_NONE) {
-      idb_save_js(key, (const uint8_t *)data, length, js_promise_id);
-    }
-  }
-#else
-  /* Native implementation stub */
   {
     ui_error_t rc_cleanup = ui_promise_reject(promise, UI_ERROR_UNSUPPORTED);
     if (rc_cleanup != UI_ERROR_NONE) {
       (void)rc_cleanup; /* Avoid override */
     }
   }
-#endif
 
   *out_promise = promise;
   (void)length;

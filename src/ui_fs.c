@@ -16,7 +16,9 @@ int g_ui_fs_fseek_fail = 0;
 int g_ui_fs_ftell_fail = 0;
 int g_ui_fs_fread_fail = 0;
 int g_ui_fs_fwrite_fail = 0;
+#endif
 
+#if defined(UI_TEST_MOCK_ALLOC) && !defined(__EMSCRIPTEN__)
 /**
  * @brief mock_fseek.
  * @param stream Parameter stream.
@@ -112,9 +114,7 @@ EM_JS(int, fs_read_file_js,
           setValue(out_ptr, ptr, "i32");
           setValue(out_size, length, "i32");
           return 0; /* Success */
-        }
-        catch(e) {
-          console.error("FS.readFile failed", e);
+        } catch (e) {
           return 2; /* IO Error */
         }
       })
@@ -126,9 +126,7 @@ EM_JS(int, fs_write_file_js,
           const u8 = new Uint8Array(HEAPU8.buffer, data, size);
           FS.writeFile(path, u8);
           return 0; /* Success */
-        }
-        catch(e) {
-          console.error("FS.writeFile failed", e);
+        } catch (e) {
           return 2; /* IO Error */
         }
       })
@@ -253,26 +251,12 @@ ui_error_t ui_fs_write_file(const char *path, const void *data, size_t size) {
 #if defined(__EMSCRIPTEN__)
 EM_JS(int, fs_opfs_write_sync_js,
       (const char *path_cstr, const void *data, int size), {
-        const path = UTF8ToString(path_cstr);
-        const u8 = new Uint8Array(HEAPU8.buffer, data, size);
-
         try {
           if (!navigator.storage || !navigator.storage.getDirectory) {
-            console.error("OPFS not supported");
-            return 3; /* Unsupported */
+            return 3;
           }
-
-          /* This is a naive */ synchronous wrapper attempt (in a real WebWorker
-          /* this would use */ createSyncAccessHandle) Since we cannot block the
-          /* main thread synchronously */ in JS easily without Asyncify, we will
-          /* simulate the error */ code return for now in non-worker environments
-          /* if true sync */ OPFS is requested on main thread.
-          console.error("Synchronous OPFS writes must be performed in a "
-                        "WebWorker context.");
           return 3;
-        }
-        catch(e) {
-          console.error("OPFS sync write failed", e);
+        } catch (e) {
           return 2;
         }
       })

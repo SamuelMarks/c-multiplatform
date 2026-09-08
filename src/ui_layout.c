@@ -191,7 +191,7 @@ ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
 
 #if defined(__EMSCRIPTEN__)
   if (node->dom_node) {
-    ui_web_bridge_set_bounds((uint32_t)(uintptr_t)node->dom_node, node->x,
+    ui_web_bridge_set_bounds((ui_uint32)(ui_uintptr)node->dom_node, node->x,
                              node->y, node->width, node->height);
   }
 #endif

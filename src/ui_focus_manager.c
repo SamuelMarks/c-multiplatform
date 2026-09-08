@@ -209,11 +209,17 @@ ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
     ui_error_t g_rc =
         gather_focusable_nodes(target_root, &nodes, &count, &capacity);
     if (g_rc != UI_ERROR_NONE) {
+      if (nodes) {
+        C_MULTIPLATFORM_FREE(nodes);
+      }
       return g_rc;
     }
   }
 
   if (count == 0) {
+    if (nodes) {
+      C_MULTIPLATFORM_FREE(nodes);
+    }
     return UI_ERROR_NONE;
   }
 
@@ -381,6 +387,9 @@ ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
     ui_error_t g_rc =
         gather_focusable_layout_nodes(layout_root, &nodes, &count, &capacity);
     if (g_rc != UI_ERROR_NONE) {
+      if (nodes) {
+        C_MULTIPLATFORM_FREE(nodes);
+      }
       return g_rc;
     }
   }

@@ -313,7 +313,10 @@ static void main_loop_step(void) {
     }
   } while (has_event);
 
-  return do_render(&g_rctx);
+  {
+    ui_error_t rc_render = do_render(&g_rctx);
+    (void)rc_render;
+  }
 }
 #endif
 

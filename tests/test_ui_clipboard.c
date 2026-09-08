@@ -1,8 +1,12 @@
 /* clang-format off */
 #include "ui_clipboard.h"
+#if !defined(_WIN32)
+#include <signal.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+/* clang-format on */
 
 static void check_cond_impl(int cond, int *failed, int line) {
   if (cond) {
@@ -11,13 +15,6 @@ static void check_cond_impl(int cond, int *failed, int line) {
   }
 }
 #define check_cond(cond, failed) check_cond_impl(cond, failed, __LINE__)
-
-
-
-#if !defined(_WIN32)
-#include <signal.h>
-/* clang-format on */
-#endif
 
 extern int g_malloc_fail_countdown;
 extern int g_ui_clipboard_force_fallback;
@@ -174,7 +171,7 @@ static int run_normal_tests(void) {
 
   g_ui_clipboard_force_fallback = 0;
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
   printf("Testing large text for real clipboard realloc...\n");
   {
     char large_text[1500];

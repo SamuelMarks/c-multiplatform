@@ -87,19 +87,17 @@ static ui_error_t pointer_equality(union ui_signal_payload a,
 ui_error_t
 ui_property_grid_base_create(struct ui_arena *arena,
                              struct ui_property_grid_base **out_grid) {
-  void *ptr;
+  void *ptr = NULL;
+  ui_error_t rc;
   union ui_signal_payload initial_payload;
 
   if (!arena || !out_grid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_arena_alloc(arena, sizeof(struct ui_property_grid_base), 8, &ptr);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+  rc = ui_arena_alloc(arena, sizeof(struct ui_property_grid_base), 8, &ptr);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   *out_grid = (struct ui_property_grid_base *)ptr;
@@ -111,13 +109,11 @@ ui_property_grid_base_create(struct ui_arena *arena,
   (*out_grid)->current_filter = NULL;
 
   initial_payload.ptr_val = NULL;
-  {
-    ui_error_t rc_cleanup = ui_signal_create(
-        arena, initial_payload, UI_SIGNAL_TYPE_POINTER, pointer_equality, NULL,
-        UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_grid)->value_changed_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+  rc = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
+                        pointer_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
+                        &(*out_grid)->value_changed_signal);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   return UI_ERROR_NONE;

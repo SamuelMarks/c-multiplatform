@@ -603,14 +603,15 @@ ui_error_t ui_router_navigate_with_state(struct ui_router *router,
       {
         char script[1024];
 #if defined(_MSC_VER)
-        sprintf_s(
-            script, sizeof(script),
-            "if(window.history) window.history.pushState(null, '', '%s');",
-            path);
+        sprintf_s(script, sizeof(script),
+                  "if(typeof window !== 'undefined' && window.history) "
+                  "window.history.pushState(null, '', '%s');",
+                  path);
 #else
         /* Using safe formatting */
         sprintf(script,
-                "if(window.history) window.history.pushState(null, '', '%s');",
+                "if(typeof window !== 'undefined' && window.history) "
+                "window.history.pushState(null, '', '%s');",
                 path);
 #endif
         emscripten_run_script(script);

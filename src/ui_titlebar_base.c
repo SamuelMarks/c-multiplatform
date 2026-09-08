@@ -45,13 +45,17 @@ struct ui_titlebar_base {
 ui_error_t ui_titlebar_base_create(struct ui_arena *arena,
                                    const struct ui_titlebar_config *config,
                                    struct ui_titlebar_base **out_titlebar) {
-  void *ptr;
+  void *ptr = NULL;
+  ui_error_t rc;
 
   if (!arena || !config || !out_titlebar) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  ui_arena_alloc(arena, sizeof(struct ui_titlebar_base), 8, &ptr);
+  rc = ui_arena_alloc(arena, sizeof(struct ui_titlebar_base), 8, &ptr);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   *out_titlebar = (struct ui_titlebar_base *)ptr;
   (*out_titlebar)->arena = arena;
@@ -71,13 +75,18 @@ ui_error_t
 ui_titlebar_base_add_button_rect(struct ui_titlebar_base *titlebar,
                                  enum ui_titlebar_hit_test_result btn_type,
                                  float x, float y, float w, float h) {
-  void *ptr;
+  void *ptr = NULL;
   struct ui_titlebar_btn_rect *rect;
+  ui_error_t rc;
 
   if (!titlebar)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  ui_arena_alloc(titlebar->arena, sizeof(struct ui_titlebar_btn_rect), 8, &ptr);
+  rc = ui_arena_alloc(titlebar->arena, sizeof(struct ui_titlebar_btn_rect), 8,
+                      &ptr);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   rect = (struct ui_titlebar_btn_rect *)ptr;
   rect->btn_type = btn_type;

@@ -19,6 +19,13 @@ int main(void) {
     return 1;
   }
 
+#if defined(__EMSCRIPTEN__)
+  printf("Skipping GLES2 rendering calls under headless Emscripten Node "
+         "runner.\n");
+  ui_renderer_gles2_destroy(backend);
+  return 0;
+#endif
+
   rc = backend->init(backend, NULL, NULL);
   if (rc != UI_ERROR_NONE) {
     printf("Failed to init GLES2 renderer backend.\n");
@@ -296,8 +303,8 @@ int main(void) {
     /* We need to fill the batch so that the subsequent draw commands trigger a
      * flush. */
     {
-      struct ui_vertex dummy_verts[8192];
-      unsigned short dummy_indices[8192];
+      static struct ui_vertex dummy_verts[8192];
+      static unsigned short dummy_indices[8192];
       int i;
       for (i = 0; i < 8192; ++i) {
         dummy_indices[i] = 0;

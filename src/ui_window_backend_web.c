@@ -27,7 +27,7 @@ struct ui_window {
  * \brief web_backend_data
  */
 struct web_backend_data {
-    void (*resize_cb)(void*, int, int); /**< int) */
+    ui_error_t (*resize_cb)(void*, int, int); /**< resize_cb */
     void* resize_user_data; /**< resize_user_data */
     struct ui_window* active_window; /**< active_window */
 };
@@ -177,9 +177,13 @@ static ui_error_t web_swap_buffers(struct ui_window_backend* backend, struct ui_
  * @param userData Parameter userData.
  * @return Return value.
  */
+#if defined(__GNUC__) || defined(__clang__)
+__extension__
+#endif
 static EM_BOOL web_resize_callback(int eventType, const EmscriptenUiEvent *uiEvent, void *userData) {
     struct ui_window_backend* backend = (struct ui_window_backend*)userData;
     struct web_backend_data* bdata;
+    ui_error_t rc_cb;
     int w, h;
     (void)eventType;
 
@@ -192,7 +196,8 @@ static EM_BOOL web_resize_callback(int eventType, const EmscriptenUiEvent *uiEve
         emscripten_set_canvas_element_size("#canvas", w, h);
         bdata->active_window->canvas_width = w;
         bdata->active_window->canvas_height = h;
-        bdata->resize_cb(bdata->resize_user_data, w, h);
+        rc_cb = bdata->resize_cb(bdata->resize_user_data, w, h);
+        (void)rc_cb;
     }
     return EM_TRUE;
 }

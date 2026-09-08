@@ -52,169 +52,235 @@ static ui_error_t ensure_buffer(size_t words_needed) {
 }
 
 #if defined(__EMSCRIPTEN__)
-/* EM_JS is the C89 safe way to do this in emscripten */
-EM_JS(void, flush_to_js, (ui_uint32 * buf, ui_uint32 len), {
-  const memBuf = new Uint32Array(wasmMemory.buffer, buf, len);
-  const floatBuf = new Float32Array(wasmMemory.buffer, buf, len);
-  let pos = 0;
+EM_JS(void, js_create_node, (ui_uint32 id, const char *t_ptr), {
+  const g = typeof window != = 'undefined' ? window : globalThis;
+  if (!g.uiNodeMap)
+    g.uiNodeMap = new Map();
+  if (typeof document == = 'undefined') {
+    g.uiNodeMap.set(id, {});
+    return;
+  }
+  const t = UTF8ToString(t_ptr);
+  const isSvg =
+      (t == 'svg' || t == 'path' || t == 'g' || t == 'circle' || t == 'rect');
+  const el = isSvg ? document.createElementNS('http://www.w3.org/2000/svg', t)
+                   : document.createElement(t);
+  g.uiNodeMap.set(id, el);
+})
 
-  while (pos < len) {
-    const opcode = memBuf[pos++];
-    if (opcode == 1) {
-      const id = memBuf[pos++];
-      const strPtr = memBuf[pos++];
-      const tag = UTF8ToString(strPtr);
-      if (!window.uiNodeMap)
-        window.uiNodeMap = new Map();
-      let el;
-      if (tag == 'svg' || tag == 'path' || tag == 'g' || tag == 'circle' ||
-          tag == 'rect') {
-        el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-      } else {
-        el = document.createElement(tag);
-      }
-      window.uiNodeMap.set(id, el);
-    } else if (opcode == 2) {
-      const id = memBuf[pos++];
-      if (window.uiNodeMap) {
-        const el = window.uiNodeMap.get(id);
-        if (el) {
-          el.remove();
-          window.uiNodeMap.delete(id);
-        }
-      }
-    } else if (opcode == 3) {
-      const id = memBuf[pos++];
-      const strPtr = memBuf[pos++];
-      const text = UTF8ToString(strPtr);
-      if (window.uiNodeMap) {
-        const el = window.uiNodeMap.get(id);
-        if (el) {
-          el.textContent = text;
-        }
-      }
-    } else if (opcode == 4) {
-      const parentId = memBuf[pos++];
-      const childId = memBuf[pos++];
-      if (window.uiNodeMap) {
-        const parentEl = parentId == 0 ? document.getElementById('app-root')
-                                       : window.uiNodeMap.get(parentId);
-        const childEl = window.uiNodeMap.get(childId);
-        if (parentEl && childEl)
-          parentEl.appendChild(childEl);
-      }
-    } else if (opcode == 6) {
-      const parentId = memBuf[pos++];
-      const childId = memBuf[pos++];
-      if (window.uiNodeMap) {
-        const parentEl = parentId == 0 ? document.getElementById('app-root')
-                                       : window.uiNodeMap.get(parentId);
-        const childEl = window.uiNodeMap.get(childId);
-        if (parentEl && childEl && childEl.parentNode == parentEl) {
-          parentEl.removeChild(childEl);
-        }
-      }
-    } else if (opcode == 7) {
-      const id = memBuf[pos++];
-      const x = floatBuf[pos++];
-      const y = floatBuf[pos++];
-      const w = floatBuf[pos++];
-      const h = floatBuf[pos++];
-      if (window.uiNodeMap) {
-        const el = window.uiNodeMap.get(id);
-        if (el) {
-          el.style.left = x + 'px';
-          el.style.top = y + 'px';
-          el.style.width = w + 'px';
-          el.style.height = h + 'px';
-        }
-      }
-    } else if (opcode == 8) {
-      const id = memBuf[pos++];
-      const propPtr = memBuf[pos++];
-      const valPtr = memBuf[pos++];
-      const prop = UTF8ToString(propPtr);
-      const val = UTF8ToString(valPtr);
-      if (window.uiNodeMap) {
-        const el = window.uiNodeMap.get(id);
-        if (el)
-          el.style.setProperty(prop, val);
-      }
-    } else if (opcode == 9) {
-      const id = memBuf[pos++];
-      const rolePtr = memBuf[pos++];
-      const labelPtr = memBuf[pos++];
-      const hidden = memBuf[pos++];
-      const disabled = memBuf[pos++];
-      const expanded = memBuf[pos++];
-      const checked = memBuf[pos++];
-      if (window.uiNodeMap) {
-        const el = window.uiNodeMap.get(id);
-        if (el) {
-          if (rolePtr)
-            el.setAttribute('role', UTF8ToString(rolePtr));
-          if (labelPtr)
-            el.setAttribute('aria-label', UTF8ToString(labelPtr));
-          if (hidden)
-            el.setAttribute('aria-hidden', 'true');
-          if (disabled)
-            el.setAttribute('aria-disabled', 'true');
-          if (expanded != 0xFFFFFFFF)
-            el.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-          if (checked != 0xFFFFFFFF)
-            el.setAttribute('aria-checked', checked == 2
-                                                ? 'mixed'
-                                                : (checked ? 'true' : 'false'));
-        }
-      }
-    } else if (opcode == 10) {
-      const id = memBuf[pos++]; /* unused id */
-      const strPtr = memBuf[pos++];
-      const path = UTF8ToString(strPtr);
-      window.history.pushState({}, "", path);
-    } else if (opcode == 11) {
-      const id = memBuf[pos++]; /* unused id */
-      const strPtr = memBuf[pos++];
-      const path = UTF8ToString(strPtr);
-      window.history.replaceState({}, "", path);
-    } else if (opcode == 12) {
-      const id = memBuf[pos++];
-      const namePtr = memBuf[pos++];
-      const valPtr = memBuf[pos++];
-      const name = UTF8ToString(namePtr);
-      if (window.uiNodeMap) {
-        const el = window.uiNodeMap.get(id);
-        if (el) {
-          if (valPtr == 0) {
-            el.removeAttribute(name);
-          } else {
-            el.setAttribute(name, UTF8ToString(valPtr));
-          }
-        }
-      }
-    } else if (opcode == 13) {
-      const id = memBuf[pos++];
-      const namePtr = memBuf[pos++];
-      const valPtr = memBuf[pos++];
-      const name = UTF8ToString(namePtr);
-      const valStr = valPtr ? UTF8ToString(valPtr) : "";
-      if (window.uiNodeMap) {
-        const el = window.uiNodeMap.get(id);
-        if (el) {
-          if (valStr == "true")
-            el[name] = true;
-          else if (valStr == "false")
-            el[name] = false;
-          else
-            el[name] = valStr;
-        }
-      }
-    } else {
-      console.error("Unknown Wasm bridge opcode:", opcode);
-      break;
+EM_JS(void, js_destroy_node, (ui_uint32 id), {
+  const g = typeof window != = 'undefined' ? window : globalThis;
+  if (g.uiNodeMap) {
+    const el = g.uiNodeMap.get(id);
+    if (el) {
+      if (el.remove)
+        el.remove();
+      g.uiNodeMap.delete(id);
     }
   }
 })
+
+EM_JS(void, js_set_text, (ui_uint32 id, const char *text_ptr), {
+  const g = typeof window != = 'undefined' ? window : globalThis;
+  if (g.uiNodeMap) {
+    const el = g.uiNodeMap.get(id);
+    if (el)
+      el.textContent = UTF8ToString(text_ptr);
+  }
+})
+
+EM_JS(void, js_append_child, (ui_uint32 parent_id, ui_uint32 child_id), {
+  const g = typeof window != = 'undefined' ? window : globalThis;
+  if (g.uiNodeMap &&typeof document != = 'undefined') {
+    const parentEl = parent_id == 0 ? document.getElementById('app-root')
+                                    : g.uiNodeMap.get(parent_id);
+    const childEl = g.uiNodeMap.get(child_id);
+    if (parentEl && childEl && parentEl.appendChild)
+      parentEl.appendChild(childEl);
+  }
+})
+
+EM_JS(void, js_remove_child, (ui_uint32 parent_id, ui_uint32 child_id), {
+  const g = typeof window != = 'undefined' ? window : globalThis;
+  if (g.uiNodeMap &&typeof document != = 'undefined') {
+    const parentEl = parent_id == 0 ? document.getElementById('app-root')
+                                    : g.uiNodeMap.get(parent_id);
+    const childEl = g.uiNodeMap.get(child_id);
+    if (parentEl && childEl && childEl.parentNode == parentEl &&
+        parentEl.removeChild) {
+      parentEl.removeChild(childEl);
+    }
+  }
+})
+
+EM_JS(void, js_set_bounds, (ui_uint32 id, float x, float y, float w, float h), {
+  const g = typeof window != = 'undefined' ? window : globalThis;
+  if (g.uiNodeMap) {
+    const el = g.uiNodeMap.get(id);
+    if (el && el.style) {
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.width = w + 'px';
+      el.style.height = h + 'px';
+    }
+  }
+})
+
+EM_JS(void, js_set_style,
+      (ui_uint32 id, const char *prop_ptr, const char *val_ptr), {
+        const g = typeof window != = 'undefined' ? window : globalThis;
+        if (g.uiNodeMap) {
+          const el = g.uiNodeMap.get(id);
+          if (el && el.style && el.style.setProperty)
+            el.style.setProperty(UTF8ToString(prop_ptr), UTF8ToString(val_ptr));
+        }
+      })
+
+EM_JS(void, js_set_aria_role_label,
+      (ui_uint32 id, const char *role, const char *label), {
+        const g = typeof window != = 'undefined' ? window : globalThis;
+        const el = g.uiNodeMap ? g.uiNodeMap.get(id) : null;
+        if (!el || !el.setAttribute)
+          return;
+        if (role)
+          el.setAttribute('role', UTF8ToString(role));
+        if (label)
+          el.setAttribute('aria-label', UTF8ToString(label));
+      })
+
+EM_JS(void, js_set_aria_state, (ui_uint32 id, int h, int d, int exp, int chk), {
+  const g = typeof window != = 'undefined' ? window : globalThis;
+  const el = g.uiNodeMap ? g.uiNodeMap.get(id) : null;
+  if (!el || !el.setAttribute)
+    return;
+  if (h)
+    el.setAttribute('aria-hidden', 'true');
+  if (d)
+    el.setAttribute('aria-disabled', 'true');
+  if (exp != -1)
+    el.setAttribute('aria-expanded', exp ? 'true' : 'false');
+  if (chk != -1)
+    el.setAttribute('aria-checked',
+                    chk == 2 ? 'mixed' : (chk ? 'true' : 'false'));
+})
+
+EM_JS(void, js_push_state, (const char *path_ptr), {
+  if (typeof window != = 'undefined' && window.history)
+    window.history.pushState({}, "", UTF8ToString(path_ptr));
+})
+
+EM_JS(void, js_replace_state, (const char *path_ptr), {
+  if (typeof window != = 'undefined' && window.history)
+    window.history.replaceState({}, "", UTF8ToString(path_ptr));
+})
+
+EM_JS(void, js_set_attribute,
+      (ui_uint32 id, const char *name_ptr, const char *val_ptr), {
+        const g = typeof window != = 'undefined' ? window : globalThis;
+        if (g.uiNodeMap) {
+          const el = g.uiNodeMap.get(id);
+          if (el) {
+            if (val_ptr == 0 && el.removeAttribute) {
+              el.removeAttribute(UTF8ToString(name_ptr));
+            } else if (el.setAttribute) {
+              el.setAttribute(UTF8ToString(name_ptr), UTF8ToString(val_ptr));
+            }
+          }
+        }
+      })
+
+EM_JS(void, js_set_property,
+      (ui_uint32 id, const char *name_ptr, const char *val_ptr), {
+        const g = typeof window != = 'undefined' ? window : globalThis;
+        if (g.uiNodeMap) {
+          const el = g.uiNodeMap.get(id);
+          if (el) {
+            const name = UTF8ToString(name_ptr);
+            const valStr = val_ptr ? UTF8ToString(val_ptr) : "";
+            if (valStr == "true")
+              el[name] = true;
+            else if (valStr == "false")
+              el[name] = false;
+            else
+              el[name] = valStr;
+          }
+        }
+      })
+
+static void flush_to_js(ui_uint32 *buf, ui_uint32 len) {
+  ui_uint32 pos = 0;
+  float *float_buf = (float *)buf;
+  ui_uint32 opcode, id, parent_id, child_id;
+  const char *str_ptr, *prop_ptr, *val_ptr, *role_ptr, *label_ptr, *name_ptr;
+  float x, y, w, h;
+  int hidden, disabled, expanded, checked;
+
+  while (pos < len) {
+    opcode = buf[pos++];
+    if (opcode == 1) {
+      id = buf[pos++];
+      str_ptr = (const char *)(ui_uintptr)buf[pos++];
+      js_create_node(id, str_ptr);
+    } else if (opcode == 2) {
+      id = buf[pos++];
+      js_destroy_node(id);
+    } else if (opcode == 3) {
+      id = buf[pos++];
+      str_ptr = (const char *)(ui_uintptr)buf[pos++];
+      js_set_text(id, str_ptr);
+    } else if (opcode == 4) {
+      parent_id = buf[pos++];
+      child_id = buf[pos++];
+      js_append_child(parent_id, child_id);
+    } else if (opcode == 6) {
+      parent_id = buf[pos++];
+      child_id = buf[pos++];
+      js_remove_child(parent_id, child_id);
+    } else if (opcode == 7) {
+      id = buf[pos++];
+      x = float_buf[pos++];
+      y = float_buf[pos++];
+      w = float_buf[pos++];
+      h = float_buf[pos++];
+      js_set_bounds(id, x, y, w, h);
+    } else if (opcode == 8) {
+      id = buf[pos++];
+      prop_ptr = (const char *)(ui_uintptr)buf[pos++];
+      val_ptr = (const char *)(ui_uintptr)buf[pos++];
+      js_set_style(id, prop_ptr, val_ptr);
+    } else if (opcode == 9) {
+      id = buf[pos++];
+      role_ptr = (const char *)(ui_uintptr)buf[pos++];
+      label_ptr = (const char *)(ui_uintptr)buf[pos++];
+      hidden = (int)buf[pos++];
+      disabled = (int)buf[pos++];
+      expanded = (int)buf[pos++];
+      checked = (int)buf[pos++];
+      js_set_aria_role_label(id, role_ptr, label_ptr);
+      js_set_aria_state(id, hidden, disabled, expanded, checked);
+    } else if (opcode == 10) {
+      pos++; /* unused id */
+      str_ptr = (const char *)(ui_uintptr)buf[pos++];
+      js_push_state(str_ptr);
+    } else if (opcode == 11) {
+      pos++; /* unused id */
+      str_ptr = (const char *)(ui_uintptr)buf[pos++];
+      js_replace_state(str_ptr);
+    } else if (opcode == 12) {
+      id = buf[pos++];
+      name_ptr = (const char *)(ui_uintptr)buf[pos++];
+      val_ptr = (const char *)(ui_uintptr)buf[pos++];
+      js_set_attribute(id, name_ptr, val_ptr);
+    } else if (opcode == 13) {
+      id = buf[pos++];
+      name_ptr = (const char *)(ui_uintptr)buf[pos++];
+      val_ptr = (const char *)(ui_uintptr)buf[pos++];
+      js_set_property(id, name_ptr, val_ptr);
+    } else {
+      break;
+    }
+  }
+}
 #endif
 
 /**
