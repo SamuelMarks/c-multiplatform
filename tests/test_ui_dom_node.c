@@ -18,8 +18,11 @@ static ui_error_t failing_mut_cb(struct ui_mutation_observer *observer,
 static void test_dom_node_mutation_failure(void) {
   struct ui_dom_node *node = NULL;
   struct ui_dom_node *text_node = NULL;
+  struct ui_dom_node *dummy_child = NULL;
+  struct ui_dom_node *dummy_child2 = NULL;
   struct ui_mutation_observer *obs = NULL;
   struct ui_mutation_observer_init init;
+  ui_error_t rc;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
   ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
@@ -37,9 +40,6 @@ static void test_dom_node_mutation_failure(void) {
   init.subtree = 1;
   init.attribute_old_value = 1;
 
-  /* These will fail because the callback returns UI_ERROR_UNKNOWN */
-  ui_error_t rc;
-
   /* Hit append failure for empty parent */
   ui_mutation_observer_observe(obs, node, &init);
   rc = ui_dom_node_append_child(node, text_node); /* hits append failure */
@@ -49,19 +49,23 @@ static void test_dom_node_mutation_failure(void) {
   ui_mutation_observer_disconnect(obs);
 
   /* Hit append failure for non-empty parent */
-  struct ui_dom_node *dummy_child = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy_child);
   ui_dom_node_append_child(node, dummy_child);
 
   ui_mutation_observer_observe(obs, node, &init);
   ui_mutation_observer_observe(obs, text_node, &init);
 
-  struct ui_dom_node *dummy_child2 = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy_child2);
   rc = ui_dom_node_append_child(
       node, dummy_child2); /* hits append failure with previous_sibling */
   if (rc == UI_ERROR_NONE) {
     /* Handle unexpected success, though it shouldn't happen */
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(dummy_child2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      (void)rc_cleanup;
+    }
   }
   rc = ui_dom_node_set_attribute(node, "new_attr",
                                  "val"); /* hits creation failure (line 251) */

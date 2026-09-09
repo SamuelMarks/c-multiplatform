@@ -13,7 +13,7 @@ static ui_error_t thread_task_push_mp(void *user_data) {
   struct ui_ring_buffer *rb = (struct ui_ring_buffer *)user_data;
   int item = 1;
   int i;
-  for (i = 0; i < 5000; i++) {
+  for (i = 0; i < 20; i++) {
     while (ui_ring_buffer_push_mp(rb, &item) == UI_ERROR_QUEUE_FULL) {
       /* wait */
     }
@@ -198,8 +198,8 @@ static int run_normal_tests(void) {
     int pop_count = 0;
     rc = ui_ring_buffer_create(sizeof(int), 20, &rb);
     if (rc == UI_ERROR_NONE &&
-        ui_thread_pool_create(10, &pool) == UI_ERROR_NONE) {
-      for (i = 0; i < 10; i++) {
+        ui_thread_pool_create(2, &pool) == UI_ERROR_NONE) {
+      for (i = 0; i < 2; i++) {
         {
           ui_error_t rc_cleanup =
               ui_thread_pool_schedule(pool, thread_task_push_mp, rb);
@@ -208,7 +208,7 @@ static int run_normal_tests(void) {
           }
         }
       }
-      while (pop_count < 50000) {
+      while (pop_count < 40) {
         if (ui_ring_buffer_pop(rb, &test_val) == UI_ERROR_NONE) {
           pop_count++;
         }

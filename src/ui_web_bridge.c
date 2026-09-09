@@ -53,10 +53,10 @@ static ui_error_t ensure_buffer(size_t words_needed) {
 
 #if defined(__EMSCRIPTEN__)
 EM_JS(void, js_create_node, (ui_uint32 id, const char *t_ptr), {
-  const g = typeof window != = 'undefined' ? window : globalThis;
+  const g = typeof window != 'undefined' ? window : globalThis;
   if (!g.uiNodeMap)
     g.uiNodeMap = new Map();
-  if (typeof document == = 'undefined') {
+  if (typeof document == 'undefined') {
     g.uiNodeMap.set(id, {});
     return;
   }
@@ -69,7 +69,7 @@ EM_JS(void, js_create_node, (ui_uint32 id, const char *t_ptr), {
 })
 
 EM_JS(void, js_destroy_node, (ui_uint32 id), {
-  const g = typeof window != = 'undefined' ? window : globalThis;
+  const g = typeof window != 'undefined' ? window : globalThis;
   if (g.uiNodeMap) {
     const el = g.uiNodeMap.get(id);
     if (el) {
@@ -81,7 +81,7 @@ EM_JS(void, js_destroy_node, (ui_uint32 id), {
 })
 
 EM_JS(void, js_set_text, (ui_uint32 id, const char *text_ptr), {
-  const g = typeof window != = 'undefined' ? window : globalThis;
+  const g = typeof window != 'undefined' ? window : globalThis;
   if (g.uiNodeMap) {
     const el = g.uiNodeMap.get(id);
     if (el)
@@ -90,8 +90,8 @@ EM_JS(void, js_set_text, (ui_uint32 id, const char *text_ptr), {
 })
 
 EM_JS(void, js_append_child, (ui_uint32 parent_id, ui_uint32 child_id), {
-  const g = typeof window != = 'undefined' ? window : globalThis;
-  if (g.uiNodeMap &&typeof document != = 'undefined') {
+  const g = typeof window != 'undefined' ? window : globalThis;
+  if (g.uiNodeMap && typeof document != 'undefined') {
     const parentEl = parent_id == 0 ? document.getElementById('app-root')
                                     : g.uiNodeMap.get(parent_id);
     const childEl = g.uiNodeMap.get(child_id);
@@ -101,8 +101,8 @@ EM_JS(void, js_append_child, (ui_uint32 parent_id, ui_uint32 child_id), {
 })
 
 EM_JS(void, js_remove_child, (ui_uint32 parent_id, ui_uint32 child_id), {
-  const g = typeof window != = 'undefined' ? window : globalThis;
-  if (g.uiNodeMap &&typeof document != = 'undefined') {
+  const g = typeof window != 'undefined' ? window : globalThis;
+  if (g.uiNodeMap && typeof document != 'undefined') {
     const parentEl = parent_id == 0 ? document.getElementById('app-root')
                                     : g.uiNodeMap.get(parent_id);
     const childEl = g.uiNodeMap.get(child_id);
@@ -114,7 +114,7 @@ EM_JS(void, js_remove_child, (ui_uint32 parent_id, ui_uint32 child_id), {
 })
 
 EM_JS(void, js_set_bounds, (ui_uint32 id, float x, float y, float w, float h), {
-  const g = typeof window != = 'undefined' ? window : globalThis;
+  const g = typeof window != 'undefined' ? window : globalThis;
   if (g.uiNodeMap) {
     const el = g.uiNodeMap.get(id);
     if (el && el.style) {
@@ -128,7 +128,7 @@ EM_JS(void, js_set_bounds, (ui_uint32 id, float x, float y, float w, float h), {
 
 EM_JS(void, js_set_style,
       (ui_uint32 id, const char *prop_ptr, const char *val_ptr), {
-        const g = typeof window != = 'undefined' ? window : globalThis;
+        const g = typeof window != 'undefined' ? window : globalThis;
         if (g.uiNodeMap) {
           const el = g.uiNodeMap.get(id);
           if (el && el.style && el.style.setProperty)
@@ -138,7 +138,7 @@ EM_JS(void, js_set_style,
 
 EM_JS(void, js_set_aria_role_label,
       (ui_uint32 id, const char *role, const char *label), {
-        const g = typeof window != = 'undefined' ? window : globalThis;
+        const g = typeof window != 'undefined' ? window : globalThis;
         const el = g.uiNodeMap ? g.uiNodeMap.get(id) : null;
         if (!el || !el.setAttribute)
           return;
@@ -149,7 +149,7 @@ EM_JS(void, js_set_aria_role_label,
       })
 
 EM_JS(void, js_set_aria_state, (ui_uint32 id, int h, int d, int exp, int chk), {
-  const g = typeof window != = 'undefined' ? window : globalThis;
+  const g = typeof window != 'undefined' ? window : globalThis;
   const el = g.uiNodeMap ? g.uiNodeMap.get(id) : null;
   if (!el || !el.setAttribute)
     return;
@@ -165,18 +165,18 @@ EM_JS(void, js_set_aria_state, (ui_uint32 id, int h, int d, int exp, int chk), {
 })
 
 EM_JS(void, js_push_state, (const char *path_ptr), {
-  if (typeof window != = 'undefined' && window.history)
+  if (typeof window != 'undefined' && window.history)
     window.history.pushState({}, "", UTF8ToString(path_ptr));
 })
 
 EM_JS(void, js_replace_state, (const char *path_ptr), {
-  if (typeof window != = 'undefined' && window.history)
+  if (typeof window != 'undefined' && window.history)
     window.history.replaceState({}, "", UTF8ToString(path_ptr));
 })
 
 EM_JS(void, js_set_attribute,
       (ui_uint32 id, const char *name_ptr, const char *val_ptr), {
-        const g = typeof window != = 'undefined' ? window : globalThis;
+        const g = typeof window != 'undefined' ? window : globalThis;
         if (g.uiNodeMap) {
           const el = g.uiNodeMap.get(id);
           if (el) {
@@ -191,7 +191,7 @@ EM_JS(void, js_set_attribute,
 
 EM_JS(void, js_set_property,
       (ui_uint32 id, const char *name_ptr, const char *val_ptr), {
-        const g = typeof window != = 'undefined' ? window : globalThis;
+        const g = typeof window != 'undefined' ? window : globalThis;
         if (g.uiNodeMap) {
           const el = g.uiNodeMap.get(id);
           if (el) {

@@ -69,7 +69,7 @@ ui_error_t ui_preferences_destroy(struct ui_preferences *prefs) {
 EM_JS(void, set_local_storage_js, (const char *key, const char *value), {
   try {
     const k = UTF8ToString(key), v = UTF8ToString(value);
-    if (typeof localStorage != = 'undefined') {
+    if (typeof localStorage != 'undefined') {
       localStorage.setItem(k, v);
     } else {
       if (!globalThis._mock_ls)
@@ -84,7 +84,7 @@ EM_JS(char *, get_local_storage_js, (const char *key), {
   try {
     const k = UTF8ToString(key);
     let val = null;
-    if (typeof localStorage != = 'undefined') {
+    if (typeof localStorage != 'undefined') {
       val = localStorage.getItem(k);
     } else if (globalThis._mock_ls) {
       val = globalThis._mock_ls.get(k) || null;
