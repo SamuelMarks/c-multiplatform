@@ -268,6 +268,33 @@ ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Creates a Linux Wayland window backend stub when Wayland is disabled.
+ * @param out_backend Parameter out_backend.
+ * @return Return value.
+ */
+ui_error_t
+ui_window_backend_linux_wayland_create(struct ui_window_backend **out_backend) {
+  if (!out_backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_backend = NULL;
+  return UI_ERROR_UNKNOWN;
+}
+
+/**
+ * @brief Destroys a Linux Wayland window backend stub when Wayland is disabled.
+ * @param backend Parameter backend.
+ * @return Return value.
+ */
+ui_error_t
+ui_window_backend_linux_wayland_destroy(struct ui_window_backend *backend) {
+  if (!backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
 #else
 /* Non-Linux Platform Stub */
 
@@ -283,6 +310,33 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
 /* \brief ui_error
  */
 ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
+  if (!backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+/**
+ * @brief Creates a Linux Wayland window backend stub on non-Wayland platforms.
+ * @param out_backend Parameter out_backend.
+ * @return Return value.
+ */
+ui_error_t
+ui_window_backend_linux_wayland_create(struct ui_window_backend **out_backend) {
+  if (!out_backend) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_backend = NULL;
+  return UI_ERROR_UNKNOWN;
+}
+
+/**
+ * @brief Destroys a Linux Wayland window backend stub on non-Wayland platforms.
+ * @param backend Parameter backend.
+ * @return Return value.
+ */
+ui_error_t
+ui_window_backend_linux_wayland_destroy(struct ui_window_backend *backend) {
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

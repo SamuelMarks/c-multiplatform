@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include "c89stringutils_string_extras.h"
 /* clang-format on */
 
 /**
@@ -39,7 +40,8 @@ static ui_error_t emit_printf(struct emit_buffer *eb, const char *format, ...) {
   written =
       vsnprintf_s(eb->buf + eb->length, available, _TRUNCATE, format, args);
 #else
-  written = vsnprintf(eb->buf + eb->length, available, format, args);
+  written =
+      c89stringutils_vsnprintf(eb->buf + eb->length, available, format, args);
 #endif
   va_end(args);
 
