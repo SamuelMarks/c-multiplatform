@@ -65,6 +65,16 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_button_base_set_disabled(struct ui_button_base *button, int disabled);
 
 /**
+ * @brief Sets the static text content of the button.
+ *
+ * @param button The button widget.
+ * @param text The text string to set.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_button_base_set_text(struct ui_button_base *button, const char *text);
+
+/**
  * @brief Sets the click handler for the button.
  *
  * @param button The button.

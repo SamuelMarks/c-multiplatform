@@ -501,19 +501,9 @@ ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
     event.event_data.mouse.wheel_x = x;
     event.event_data.mouse.wheel_y = y;
   } else if (type == 30) {
-    const char *uri_ptr = (const char *)(ui_uintptr)x;
-    if (uri_ptr) {
-#if defined(_MSC_VER)
-      strncpy_s(event.event_data.deep_link.uri,
-                sizeof(event.event_data.deep_link.uri), uri_ptr, _TRUNCATE);
-#else
-      /* Use strncpy since uri is a char[1024] array */
-      strncpy(event.event_data.deep_link.uri, uri_ptr,
-              sizeof(event.event_data.deep_link.uri) - 1);
-      event.event_data.deep_link
-          .uri[sizeof(event.event_data.deep_link.uri) - 1] = '\0';
-#endif
-    }
+    (void)x;
+    (void)y;
+    (void)buttons;
   }
 
   return UI_ERROR_NONE;

@@ -257,16 +257,12 @@ cleanup:
   if (sb->root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(sb->root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (sb->component) {
     ui_error_t rc_cleanup = ui_component_destroy(sb->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (sb->queue)
     ui_ring_buffer_destroy(sb->queue);
@@ -318,9 +314,7 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
     ui_ring_buffer_destroy(snackbar->queue);
   if (snackbar->component) {
     ui_error_t rc_cleanup = ui_component_destroy(snackbar->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(snackbar);
   return UI_ERROR_NONE;

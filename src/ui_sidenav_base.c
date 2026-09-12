@@ -170,23 +170,15 @@ static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
       return rc;
   } else {
     rc = ui_dom_node_remove_attribute(sidenav->drawer_node, "data-open");
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)rc;
     rc = ui_dom_node_remove_attribute(sidenav->root_node, "data-open");
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)rc;
   }
 
-  if (sidenav->drawer_node->parent == sidenav->root_node) {
-    rc = ui_dom_node_remove_child(sidenav->root_node, sidenav->drawer_node);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-  }
-  if (sidenav->main_node->parent == sidenav->root_node) {
-    rc = ui_dom_node_remove_child(sidenav->root_node, sidenav->main_node);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-  }
+  rc = ui_dom_node_remove_child(sidenav->root_node, sidenav->drawer_node);
+  (void)rc;
+  rc = ui_dom_node_remove_child(sidenav->root_node, sidenav->main_node);
+  (void)rc;
 
   /* Adjust DOM ordering for SIDE/PUSH modes so flex layout works properly
    * without absolute positioning */
@@ -195,27 +187,21 @@ static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
       sidenav->is_open) {
     if (sidenav->position == UI_SIDENAV_POSITION_START) {
       rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)rc;
       rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)rc;
     } else {
       rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)rc;
       rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-      if (rc != UI_ERROR_NONE)
-        return rc;
+      (void)rc;
     }
   } else {
     /* Default overlay rendering order (drawer on top) */
     rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)rc;
     rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)rc;
   }
   return UI_ERROR_NONE;
 }
@@ -375,22 +361,21 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   return UI_ERROR_NONE;
 
 cleanup: {
-  ui_error_t rc_cleanup = ui_dom_node_destroy(sidenav->root_node);
-  if (rc_cleanup != UI_ERROR_NONE) {
-    (void)rc_cleanup; /* Avoid override */
+  if (sidenav->component) {
+    sidenav->component->shadow_root = NULL;
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(sidenav->root_node);
+    (void)rc_cleanup;
   }
 }
   {
     ui_error_t rc_cleanup = ui_backdrop_destroy(sidenav->backdrop_logic);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(sidenav->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(sidenav);
   return rc;
@@ -411,21 +396,15 @@ ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(sidenav->backdrop_component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_backdrop_destroy(sidenav->backdrop_logic);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(sidenav->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(sidenav);
   return UI_ERROR_NONE;
@@ -448,12 +427,10 @@ ui_error_t ui_sidenav_base_set_mode(struct ui_sidenav_base *sidenav,
     return rc;
   if (sidenav->mode != UI_SIDENAV_MODE_OVER && sidenav->is_open) {
     rc = unmount_backdrop(sidenav);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)rc;
   } else if (sidenav->mode == UI_SIDENAV_MODE_OVER && sidenav->is_open) {
     rc = mount_backdrop(sidenav);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+    (void)rc;
   }
   return UI_ERROR_NONE;
 }

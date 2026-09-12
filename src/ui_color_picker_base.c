@@ -466,13 +466,7 @@ ui_error_t ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
   }
 
   picker->rgb = *rgb;
-  {
-    ui_error_t rc_cleanup =
-        ui_color_picker_rgb_to_hsv(&picker->rgb, &picker->hsv);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_color_picker_rgb_to_hsv(&picker->rgb, &picker->hsv);
   return trigger_cva_change(picker);
 }
 
@@ -489,12 +483,6 @@ ui_error_t ui_color_picker_base_set_hsv(struct ui_color_picker_base *picker,
   }
 
   picker->hsv = *hsv;
-  {
-    ui_error_t rc_cleanup =
-        ui_color_picker_hsv_to_rgb(&picker->hsv, &picker->rgb);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_color_picker_hsv_to_rgb(&picker->hsv, &picker->rgb);
   return trigger_cva_change(picker);
 }

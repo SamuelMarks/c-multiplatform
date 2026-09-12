@@ -235,9 +235,7 @@ ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle) {
   }
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(toggle->recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(toggle);
   return UI_ERROR_NONE;

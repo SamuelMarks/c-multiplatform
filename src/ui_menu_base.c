@@ -127,15 +127,11 @@ ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu) {
 cleanup:
   if (root_node) {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (menu->component) {
     ui_error_t rc_cleanup = ui_component_destroy(menu->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(menu);
   return rc;
@@ -165,9 +161,7 @@ ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
 
   {
     ui_error_t rc_cleanup = ui_component_destroy(menu->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(menu);
@@ -191,7 +185,7 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
 #if defined(_MSC_VER)
   strcpy_s(dst, len + 1, src);
 #else
-  UI_STRCPY(dst, 256, src);
+  strcpy(dst, src);
 #endif
   *out_str = dst;
   return UI_ERROR_NONE;
@@ -343,9 +337,7 @@ ui_error_t ui_menu_base_close(struct ui_menu_base *menu) {
   {
     ui_error_t rc_cleanup =
         ui_overlay_director_unmount(menu->director, menu->overlay_handle);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   menu->overlay_handle = NULL;
 

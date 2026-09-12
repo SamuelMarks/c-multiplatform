@@ -54,6 +54,10 @@ struct ui_form_control {
 
   ui_int32 validation_generation; /**< validation_generation */
   size_t pending_async_count;     /**< pending_async_count */
+
+  struct ui_control_value_accessor cva; /**< Bound CVA interface */
+  ui_bool_t has_cva;                    /**< Whether a CVA is bound */
+  ui_bool_t in_cva_update; /**< Reentrancy guard during CVA updates */
 };
 
 /* Forward declarations */
@@ -106,6 +110,9 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   ctrl->reactor = NULL;
   ctrl->validation_generation = 0;
   ctrl->pending_async_count = 0;
+  ctrl->has_cva = UI_FALSE;
+  ctrl->in_cva_update = UI_FALSE;
+  memset(&ctrl->cva, 0, sizeof(ctrl->cva));
 
   rc = ui_signal_create(arena, initial_value, type, equality_fn, destructor_fn,
                         mode, &ctrl->value_signal);
@@ -117,12 +124,8 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, status_payload, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                         mode, &ctrl->status_signal);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
+    (void)rc_cleanup;
     return rc;
   }
 
@@ -130,72 +133,39 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         mode, &ctrl->touched_signal);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->status_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    ui_error_t rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->status_signal);
+    (void)rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->value_signal);
+    (void)rc_cleanup;
     return rc;
   }
 
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         mode, &ctrl->dirty_signal);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->touched_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->status_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    ui_error_t rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->touched_signal);
+    (void)rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->status_signal);
+    (void)rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->value_signal);
+    (void)rc_cleanup;
     return rc;
   }
 
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_POINTER, NULL, NULL,
                         mode, &ctrl->errors_signal);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->dirty_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->touched_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->status_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    ui_error_t rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->dirty_signal);
+    (void)rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->touched_signal);
+    (void)rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->status_signal);
+    (void)rc_cleanup;
+    rc_cleanup = ui_signal_destroy(ctrl->value_signal);
+    (void)rc_cleanup;
     return rc;
   }
   ctrl->error_str = NULL;
@@ -203,12 +173,8 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   *out_control = ctrl;
 
   /* Initial validation */
-  {
-    ui_error_t rc_cleanup = ui_form_control_run_validation(ctrl);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_form_control_run_validation(ctrl);
+  (void)rc;
 
   return UI_ERROR_NONE;
 }
@@ -225,6 +191,7 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
                                          void *user_data) {
   ui_validator_t *new_validators = NULL;
   size_t new_cap;
+  ui_error_t rc;
 
   if (!control || !validator)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -258,14 +225,8 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
   control->sync_validators_count++;
 
   /* Re-run validation */
-  {
-    {
-      ui_error_t rc_cleanup = ui_form_control_run_validation(control);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-  }
+  rc = ui_form_control_run_validation(control);
+  (void)rc;
   return UI_ERROR_NONE;
 }
 
@@ -284,6 +245,7 @@ ui_error_t ui_form_control_add_async_validator(
     struct ui_reactor *reactor) {
   ui_async_validator_t *new_validators = NULL;
   size_t new_cap;
+  ui_error_t rc;
 
   if (!control || !validator || !thread_pool)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -319,14 +281,8 @@ ui_error_t ui_form_control_add_async_validator(
   control->async_validators_count++;
 
   /* Re-run validation */
-  {
-    {
-      ui_error_t rc_cleanup = ui_form_control_run_validation(control);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-  }
+  rc = ui_form_control_run_validation(control);
+  (void)rc;
   return UI_ERROR_NONE;
 }
 
@@ -384,8 +340,6 @@ static ui_error_t ui_form_control_async_worker(void *user_data) {
 
   rc = task->validator(task->control, task->value, task->user_data, &is_valid);
   if (rc != UI_ERROR_NONE) {
-    if (0)
-      return rc;
     is_valid = UI_FALSE;
   }
 
@@ -426,8 +380,7 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
   {
     ui_error_t sig_rc = ui_signal_get(control->status_signal, &status_payload);
     if (sig_rc != UI_ERROR_NONE) {
-      if (0)
-        return sig_rc;
+      return sig_rc;
     }
   }
   if (status_payload.int_val == UI_FORM_STATUS_DISABLED) {
@@ -471,13 +424,8 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
   if (control->async_validators_count > 0) {
     status_payload.int_val = (ui_int32)UI_FORM_STATUS_PENDING;
     {
-      {
-        ui_error_t rc_cleanup =
-            ui_signal_set(control->status_signal, status_payload);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      ui_error_t set_rc = ui_signal_set(control->status_signal, status_payload);
+      (void)set_rc;
     }
 
     for (i = 0; i < control->async_validators_count; i++) {
@@ -539,32 +487,28 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
 ui_error_t ui_form_control_set_value(ui_form_control_t *control,
                                      union ui_signal_payload new_value) {
   union ui_signal_payload dirty_payload = {0};
+  ui_error_t rc;
 
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_signal_set(control->value_signal, new_value);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_signal_set(control->value_signal, new_value);
+  (void)rc;
 
   dirty_payload.bool_val = UI_TRUE;
-  {
-    ui_error_t rc_cleanup = ui_signal_set(control->dirty_signal, dirty_payload);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_signal_set(control->dirty_signal, dirty_payload);
+  (void)rc;
 
-  {
-    {
-      ui_error_t rc_cleanup = ui_form_control_run_validation(control);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+  rc = ui_form_control_run_validation(control);
+  (void)rc;
+
+  if (control->has_cva && !control->in_cva_update && control->cva.write_value) {
+    control->in_cva_update = UI_TRUE;
+    rc = control->cva.write_value(control->cva.component, new_value);
+    control->in_cva_update = UI_FALSE;
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 
@@ -604,8 +548,17 @@ ui_error_t ui_form_control_mark_as_touched(ui_form_control_t *control) {
  */
 ui_error_t ui_form_control_disable(ui_form_control_t *control) {
   union ui_signal_payload status_payload = {0};
+  ui_error_t rc;
+
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  if (control->has_cva && control->cva.set_disabled_state) {
+    rc = control->cva.set_disabled_state(control->cva.component, UI_TRUE);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
 
   status_payload.int_val = (ui_int32)UI_FORM_STATUS_DISABLED;
@@ -618,17 +571,103 @@ ui_error_t ui_form_control_disable(ui_form_control_t *control) {
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_form_control_enable(ui_form_control_t *control) {
+  ui_error_t rc;
+
   if (!control) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
+  if (control->has_cva && control->cva.set_disabled_state) {
+    rc = control->cva.set_disabled_state(control->cva.component, UI_FALSE);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+  }
+
   /* Re-evaluates validators */
-  {
-    {
-      ui_error_t rc_cleanup = ui_form_control_run_validation(control);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+  rc = ui_form_control_run_validation(control);
+  (void)rc;
+
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief Callback invoked by CVA when view value changes.
+ * @param new_val The updated payload.
+ * @param user_data Pointer to the form control.
+ * @return UI_ERROR_NONE on success.
+ */
+static ui_error_t ui_form_control_cva_on_change(union ui_signal_payload new_val,
+                                                void *user_data) {
+  ui_form_control_t *control = (ui_form_control_t *)user_data;
+  ui_error_t rc;
+  if (!control) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  control->in_cva_update = UI_TRUE;
+  rc = ui_form_control_set_value(control, new_val);
+  control->in_cva_update = UI_FALSE;
+  return rc;
+}
+
+/**
+ * @brief Callback invoked by CVA when view is touched.
+ * @param user_data Pointer to the form control.
+ * @return UI_ERROR_NONE on success.
+ */
+static ui_error_t ui_form_control_cva_on_touched(void *user_data) {
+  ui_form_control_t *control = (ui_form_control_t *)user_data;
+  if (!control) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  return ui_form_control_mark_as_touched(control);
+}
+
+/**
+ * @brief Binds a form control to a Control Value Accessor (CVA) interface.
+ * @param control The form control to bind.
+ * @param cva The CVA interface containing callbacks and component reference.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+ui_error_t
+ui_form_control_bind_cva(ui_form_control_t *control,
+                         const struct ui_control_value_accessor *cva) {
+  ui_error_t rc;
+  union ui_signal_payload cur_val;
+
+  if (!control || !cva) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  control->cva = *cva;
+  control->has_cva = UI_TRUE;
+
+  if (control->cva.register_on_change) {
+    rc = control->cva.register_on_change(
+        control->cva.component, ui_form_control_cva_on_change, control);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+  }
+
+  if (control->cva.register_on_touched) {
+    rc = control->cva.register_on_touched(
+        control->cva.component, ui_form_control_cva_on_touched, control);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+  }
+
+  if (control->cva.write_value) {
+    rc = ui_signal_get(control->value_signal, &cur_val);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    control->in_cva_update = UI_TRUE;
+    rc = control->cva.write_value(control->cva.component, cur_val);
+    control->in_cva_update = UI_FALSE;
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 
@@ -770,11 +809,11 @@ ui_error_t ui_form_control_set_error(ui_form_control_t *control,
     control->error_str = (char *)C_MULTIPLATFORM_MALLOC(l + 1);
     if (!control->error_str)
       return UI_ERROR_OUT_OF_MEMORY;
-#if defined(_MSC_VER)
-    strcpy_s(control->error_str, l + 1, error_msg);
-#else
-    UI_STRCPY(control->error_str, sizeof(control->error_str), error_msg);
-#endif
+    if (UI_STRCPY(control->error_str, l + 1, error_msg) != 0) {
+      C_MULTIPLATFORM_FREE(control->error_str);
+      control->error_str = NULL;
+      return UI_ERROR_UNKNOWN;
+    }
   }
   payload.ptr_val = control->error_str;
   return ui_signal_set(control->errors_signal, payload);

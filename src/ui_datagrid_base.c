@@ -84,9 +84,7 @@ ui_error_t ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid) {
   {
     ui_error_t rc_cleanup =
         ui_component_set_default_style(datagrid->component, default_style);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   datagrid->component->shadow_root = root_node;
@@ -99,17 +97,13 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (datagrid->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(datagrid->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(datagrid);
@@ -127,9 +121,7 @@ ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(datagrid->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(datagrid);
   return UI_ERROR_NONE;

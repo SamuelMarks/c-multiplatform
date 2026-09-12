@@ -29,11 +29,13 @@ static int test_wayland(void) {
   int has_event = 0;
   int failed = 0;
 
-  ASSERT_EQ(ui_window_backend_linux_create(NULL), UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_window_backend_linux_destroy(NULL), UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_window_backend_linux_wayland_create(NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(ui_window_backend_linux_wayland_destroy(NULL),
+            UI_ERROR_INVALID_ARGUMENT);
 
-#if defined(__linux__) || defined(__FreeBSD__)
-  if (ui_window_backend_linux_create(&backend) == UI_ERROR_NONE) {
+#if defined(UI_ENABLE_WAYLAND) && (defined(__linux__) || defined(__FreeBSD__))
+  if (ui_window_backend_linux_wayland_create(&backend) == UI_ERROR_NONE) {
     ASSERT_TRUE(backend != NULL);
 
     ASSERT_EQ(backend->create_window(NULL, "test", 800, 600, &win),
@@ -65,29 +67,27 @@ static int test_wayland(void) {
     ASSERT_EQ(backend->swap_buffers(NULL, win), UI_ERROR_INVALID_ARGUMENT);
     ASSERT_EQ(backend->swap_buffers(backend, NULL), UI_ERROR_INVALID_ARGUMENT);
 
-    /* Test wayland specific mocking (which doesn't exist yet but we test
-     * creation) */
-    /* Due to wayland connection failures in test environment,
-     * wl_display_connect will likely return NULL */
-    /* and create_window will fail. We should test that behavior. */
+    /* Test wayland specific mocking */
     ASSERT_TRUE(backend->create_window(backend, "test", 800, 600, &win) !=
                 UI_ERROR_NONE);
 
-    ASSERT_EQ(ui_window_backend_linux_destroy(backend), UI_ERROR_NONE);
+    ASSERT_EQ(ui_window_backend_linux_wayland_destroy(backend), UI_ERROR_NONE);
 
     g_malloc_fail_countdown = 0;
-    ASSERT_EQ(ui_window_backend_linux_create(&backend), UI_ERROR_OUT_OF_MEMORY);
+    ASSERT_EQ(ui_window_backend_linux_wayland_create(&backend),
+              UI_ERROR_OUT_OF_MEMORY);
     g_malloc_fail_countdown = -1;
   } else {
     backend = (struct ui_window_backend *)(void *)1;
-    ASSERT_EQ(ui_window_backend_linux_destroy(backend), UI_ERROR_UNKNOWN);
+    ASSERT_EQ(ui_window_backend_linux_wayland_destroy(backend),
+              UI_ERROR_UNKNOWN);
   }
 #else
-  ASSERT_EQ(ui_window_backend_linux_create(&backend), UI_ERROR_UNKNOWN);
+  ASSERT_EQ(ui_window_backend_linux_wayland_create(&backend), UI_ERROR_UNKNOWN);
   /* The stub platform sets backend to NULL. Let's create a fake one to test the
    * backend check in destroy */
   backend = (struct ui_window_backend *)(void *)1;
-  ASSERT_EQ(ui_window_backend_linux_destroy(backend), UI_ERROR_UNKNOWN);
+  ASSERT_EQ(ui_window_backend_linux_wayland_destroy(backend), UI_ERROR_UNKNOWN);
 #endif
 
   return failed;

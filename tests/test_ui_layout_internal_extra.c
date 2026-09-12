@@ -21,4 +21,20 @@ void test_ui_layout_internal_extra(void) {
 
   /* Line 2865: ui_layout_box_model_calculate(NULL) */
   ui_layout_box_model_calculate(NULL, 0.0f, 0.0f);
+
+  /* ui_layout_tree_destroy(NULL) */
+  ui_layout_tree_destroy(NULL);
+
+  {
+    struct ui_dom_node dummy_dom;
+    struct ui_css_stylesheet dummy_sheet;
+    struct ui_layout_node *out_l = NULL;
+
+    memset(&dummy_dom, 0, sizeof(dummy_dom));
+    memset(&dummy_sheet, 0, sizeof(dummy_sheet));
+
+    ui_layout_tree_generate(NULL, &dummy_sheet, &out_l);
+    ui_layout_tree_generate(&dummy_dom, NULL, &out_l);
+    ui_layout_tree_generate(&dummy_dom, &dummy_sheet, NULL);
+  }
 }

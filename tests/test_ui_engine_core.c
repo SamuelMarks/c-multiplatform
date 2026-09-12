@@ -85,7 +85,7 @@ static int run_oom_tests(void) {
   ui_error_t rc;
   int i;
   int max_fails =
-      10; /* engine struct, tick_engine, thread_pool, reactor, timer */
+      25; /* engine struct, tick_engine, thread_pool, reactor, timer */
 
   config.num_threads = 1;
 

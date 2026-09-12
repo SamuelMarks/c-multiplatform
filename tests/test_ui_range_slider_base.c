@@ -15,6 +15,15 @@ static ui_error_t test_on_change(struct ui_range_slider_base *slider, float low,
   return UI_ERROR_NONE;
 }
 
+static ui_error_t test_on_change_err(struct ui_range_slider_base *slider,
+                                     float low, float high, void *user_data) {
+  (void)slider;
+  (void)low;
+  (void)high;
+  (void)user_data;
+  return UI_ERROR_INVALID_ARGUMENT;
+}
+
 static int test_range_slider_basic(void) {
   struct ui_range_slider_base *slider = NULL;
   ui_error_t rc;
@@ -51,6 +60,15 @@ static int test_range_slider_basic(void) {
     fprintf(stderr, "Values not set correctly\n");
     return 1;
   }
+
+  /* Test on_change returning error */
+  ui_range_slider_base_set_on_change(slider, test_on_change_err, NULL);
+  if (ui_range_slider_base_set_values(slider, 21.0f, 41.0f) !=
+      UI_ERROR_INVALID_ARGUMENT) {
+    return 1;
+  }
+  ui_range_slider_base_set_on_change(slider, test_on_change, vals);
+  ui_range_slider_base_set_values(slider, 20.0f, 40.0f);
 
   if (vals[0] != 20.0f || vals[1] != 40.0f) {
     fprintf(stderr, "Callback not called correctly\n");

@@ -1,10 +1,18 @@
 /* clang-format off */
 #include "ui_checkbox_base.h"
+#include "ui_component.h"
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+
+struct ui_checkbox_base_internal {
+  struct ui_component *component;
+  enum ui_checkbox_state state;
+  ui_signal_t *state_signal;
+  ui_signal_t *disabled_signal;
+};
 
 static ui_error_t run_normal_tests(void) {
   struct ui_checkbox_base *cb = NULL;
@@ -152,6 +160,65 @@ static ui_error_t run_normal_tests(void) {
       state == UI_CHECKBOX_STATE_INDETERMINATE) {
     printf("Checkbox dash visual metrics satisfied.\n");
   }
+
+  {
+    struct ui_component *comp = NULL;
+    rc = ui_checkbox_base_get_component(NULL, &comp);
+    if (rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+    rc = ui_checkbox_base_get_component(cb, NULL);
+    if (rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+    rc = ui_checkbox_base_get_component(cb, &comp);
+    if (rc != UI_ERROR_NONE || comp == NULL)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  }
+
+  rc = ui_checkbox_base_set_label(NULL, "Label");
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_checkbox_base_set_label(cb, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_checkbox_base_set_label(cb, "Accept Terms");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  {
+    struct ui_checkbox_base_internal *cbi =
+        (struct ui_checkbox_base_internal *)cb;
+    struct ui_component *saved_c = cbi->component;
+    cbi->component = NULL;
+    rc = ui_checkbox_base_set_label(cb, "No Comp");
+    if (rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+    cbi->component = saved_c;
+    {
+      struct ui_dom_node *saved_sr = cbi->component->shadow_root;
+      cbi->component->shadow_root = NULL;
+      rc = ui_checkbox_base_set_label(cb, "No Shadow");
+      if (rc != UI_ERROR_INVALID_ARGUMENT)
+        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+      cbi->component->shadow_root = saved_sr;
+    }
+  }
+
+  rc = ui_checkbox_base_set_checked(NULL, 1);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_checkbox_base_set_checked(cb, 1);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_checkbox_base_get_state(cb, &state);
+  if (rc != UI_ERROR_NONE || state != UI_CHECKBOX_STATE_CHECKED)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_checkbox_base_set_checked(cb, 0);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_checkbox_base_get_state(cb, &state);
+  if (rc != UI_ERROR_NONE || state != UI_CHECKBOX_STATE_UNCHECKED)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
   rc = ui_checkbox_base_destroy(cb);
   if (rc != UI_ERROR_NONE)
     return rc;

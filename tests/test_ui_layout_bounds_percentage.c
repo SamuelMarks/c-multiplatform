@@ -70,10 +70,6 @@ void test_coverage_layout(void) {
   struct ui_layout_node *lroot = NULL;
   struct ui_css_rule *rule = NULL;
 
-  ui_layout_tree_generate(NULL, NULL, NULL); /* covers early exit */
-  ui_layout_tree_generate(root, NULL, NULL);
-  ui_layout_tree_generate(root, sheet, NULL);
-
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_set_tag_name(root, "div");
 
@@ -83,6 +79,10 @@ void test_coverage_layout(void) {
   ui_css_stylesheet_append_rule(sheet, rule);
 
   ui_css_rule_append_declaration(rule, "width", "100px", 0);
+
+  ui_layout_tree_generate(NULL, sheet, &lroot); /* covers !dom_root */
+  ui_layout_tree_generate(root, NULL, &lroot);  /* covers !stylesheet */
+  ui_layout_tree_generate(root, sheet, NULL);   /* covers !out_layout_root */
   ui_css_rule_append_declaration(rule, "max-width", "50px", 0);
   ui_css_rule_append_declaration(rule, "height", "10px", 0);
   ui_css_rule_append_declaration(rule, "min-height", "50px", 0);

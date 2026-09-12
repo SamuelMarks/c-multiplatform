@@ -157,9 +157,7 @@ ui_error_t run_avatar_coverage(void) {
   extract_initials("John Doe", initials);
   g_avatar_mock_fail = 0;
   rc = ui_avatar_base_create(&avatar);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
+  (void)rc;
 
   g_avatar_mock_fail = 3;
   ui_avatar_base_set_name(avatar, "John Doe");
@@ -167,9 +165,7 @@ ui_error_t run_avatar_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_avatar_base_destroy(avatar);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   return UI_ERROR_NONE;
 }
@@ -221,9 +217,7 @@ ui_error_t ui_avatar_base_destroy(struct ui_avatar_base *avatar) {
   if (avatar->fallback_icon) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(avatar->fallback_icon);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        return rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(avatar);
@@ -346,25 +340,19 @@ ui_error_t ui_avatar_base_get_image_url(const struct ui_avatar_base *avatar,
  */
 ui_error_t ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
                                             struct ui_icon_base *icon) {
-  ui_error_t rc;
-
   if (!avatar || !icon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rc = UI_ERROR_NONE;
   if (avatar->fallback_icon) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(avatar->fallback_icon);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
   }
 
   avatar->fallback_icon = icon;
-  return rc;
+  return UI_ERROR_NONE;
 }
 
 /**

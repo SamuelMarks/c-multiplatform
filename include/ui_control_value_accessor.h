@@ -68,6 +68,7 @@ typedef ui_error_t (*ui_cva_set_disabled_state_fn)(void *component,
  * Bridges a UI component and a form control.
  */
 struct ui_control_value_accessor {
+  void *component; /**< Pointer to the underlying component instance */
   ui_cva_write_value_fn
       write_value; /**< Function to write a value to the component */
   ui_cva_register_on_change_fn

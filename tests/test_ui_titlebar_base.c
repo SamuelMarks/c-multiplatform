@@ -122,31 +122,34 @@ static int test_oom(void) {
   struct ui_arena *small_arena;
   struct ui_titlebar_config config;
   struct ui_titlebar_base *tb;
+  void *dummy = NULL;
 
   ui_arena_create(4096, &small_arena);
-  g_malloc_fail_countdown = 1;
+  ui_arena_alloc(small_arena, 4096, 8, &dummy);
+  g_malloc_fail_countdown = 0;
   {
     ui_error_t rc = ui_titlebar_base_create(small_arena, &config, &tb);
     if (rc == UI_ERROR_NONE) {
+      failed |= 1;
     }
   }
   g_malloc_fail_countdown = -1;
 
   ui_titlebar_base_create(small_arena, &config, &tb);
-  g_malloc_fail_countdown = 1;
+  ui_arena_alloc(small_arena, 4096, 8, &dummy);
+  g_malloc_fail_countdown = 0;
   {
     ui_error_t rc = ui_titlebar_base_add_button_rect(
         tb, UI_TITLEBAR_HIT_TEST_CLOSE_BTN, 0, 0, 10, 10);
     if (rc == UI_ERROR_NONE) {
+      failed |= 1;
     }
   }
   g_malloc_fail_countdown = -1;
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 #endif
   return failed;

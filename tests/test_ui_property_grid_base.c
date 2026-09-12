@@ -41,9 +41,10 @@ int main(void) {
   struct ui_property_row row1;
   struct ui_property_row row2;
   ui_error_t err;
-  ui_signal_t *signal = NULL;
+  struct ui_signal *signal = NULL;
   int i;
   char group_id_buf[128][32];
+  char dynamic_group_id[32];
 
   if (ui_arena_create(1024 * 64, &arena) != UI_ERROR_NONE) {
     return 1;
@@ -98,7 +99,6 @@ int main(void) {
   ASSERT_EQ(ui_property_grid_base_set_group_collapsed(grid, NULL, UI_TRUE),
             UI_ERROR_INVALID_ARGUMENT);
 
-  char dynamic_group_id[32];
   UI_STRCPY(dynamic_group_id, sizeof(dynamic_group_id), "Appearance");
   ASSERT_SUCCESS(ui_property_grid_base_set_group_collapsed(
       grid, dynamic_group_id, UI_TRUE));
@@ -154,12 +154,31 @@ int main(void) {
     }
   }
   printf("Test passed!\n");
+  test_property_grid_extra_err();
   return 0;
 }
 void test_property_grid_extra_err(void) {
-  /* To hit out_group=NULL in get_or_create_group, we need to call it. But it's
-  static and called via add_property and set_group_collapsed which don't pass
-  NULL. So we can't easily hit it without modifying the source. Wait,
-  ui_property_grid_base.c is compiled into the test directly? No, it's in
-  libui_engine_test.a. */
+#ifdef UI_TEST_MOCK_ALLOC
+  struct ui_arena *small_arena = NULL;
+  struct ui_property_grid_base *grid = NULL;
+  void *dummy = NULL;
+  extern int g_malloc_fail_countdown;
+
+  ui_arena_create(4096, &small_arena);
+  ui_arena_alloc(small_arena, 4096, 8, &dummy);
+  g_malloc_fail_countdown = 0;
+  if (ui_property_grid_base_create(small_arena, &grid) == UI_ERROR_NONE) {
+    printf("Expected create to fail with exhausted arena\n");
+  }
+  g_malloc_fail_countdown = -1;
+  ui_arena_destroy(small_arena);
+
+  ui_arena_create(64 * 1024, &small_arena);
+  g_malloc_fail_countdown = 1;
+  if (ui_property_grid_base_create(small_arena, &grid) == UI_ERROR_NONE) {
+    printf("Expected create to fail with mock malloc fail\n");
+  }
+  g_malloc_fail_countdown = -1;
+  ui_arena_destroy(small_arena);
+#endif
 }

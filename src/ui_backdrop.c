@@ -35,9 +35,7 @@ ui_error_t run_backdrop_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_backdrop_destroy(backdrop);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   return UI_ERROR_NONE;
 }

@@ -13,45 +13,45 @@ This plan details the implementation strategy for supporting runtime-defined wid
 ## 1. Schema & Component Introspection
 To dynamically construct widgets from a serialized format (JSON/XML) while adhering to the engine's strict memory and threading models, we need a lightweight introspection layer.
 
-- [ ] **Define the UI Schema Format:** Create a formalized schema (e.g., JSON) representing the widget tree. This format must be governed by a formal, verifiable **JSON Schema definition** with strict `additionalProperties: false` (or equivalent) across all objects. Rejecting unknown fields prevents silent failures from typos (e.g., `bordr_radius`), simplifies the C-side parser, and guarantees structural 1:1 mapping with the target C structs. It must capture:
+- [x] **Define the UI Schema Format:** Create a formalized schema (e.g., JSON) representing the widget tree. This format must be governed by a formal, verifiable **JSON Schema definition** with strict `additionalProperties: false` (or equivalent) across all objects. Rejecting unknown fields prevents silent failures from typos (e.g., `bordr_radius`), simplifies the C-side parser, and guarantees structural 1:1 mapping with the target C structs. It must capture:
   - **Component Types & Layouts:** Standard widgets, plus layout primitives (`row`, `column`, `grid`) that map directly to the engine's CSS layout algorithms. *When generated from OpenAPI, these are driven by `x-ui-widget` extensions.*
   - **Static Properties:** (`props`) such as text, colors, and default sizes. *Can be mapped via `x-ui-props` extensions.*
   - **Reactive Bindings:** (`bind_signal`, `bind_cva`) mapping to the dynamic data context.
   - **Validation & Conditional Logic:** Visibility rules, regex patterns, and required fields. *These must be structurally compatible with OpenAPI 3.1 Schema Objects to allow deriving UI validation directly from API definitions.*
   - **Event Hooks & Workflows:** Action chains mapping to UI events (e.g., `on_click`). *The workflow structure should align with the Arazzo Specification to standardize how sequences of API calls, data extraction, and state mutations are defined.*
   - **Routing Definitions:** A manifest of application pages/screens and their hierarchical or flat relationships.
-- [ ] **Component Registry (`ui_component_registry`):** Implement a global or thread-local registry that maps schema strings (e.g., `"ui_button_base"`) to their factory functions and binding vtables.
+- [x] **Component Registry (`ui_component_registry`):** Implement a global or thread-local registry that maps schema strings (e.g., `"ui_button_base"`) to their factory functions and binding vtables.
   - *Example:* Registering `"ui_input_base"` will store function pointers to `ui_input_base_create` and its CVA extraction logic.
-- [ ] **Property Type Coercion:** Build utilities (leveraging `ui_coercion_utils.h`) to convert string-based schema values into native C types (enums, ints, floats, `ui_color`) required by the `bind_<property>` functions.
+- [x] **Property Type Coercion:** Build utilities (leveraging `ui_coercion_utils.h`) to convert string-based schema values into native C types (enums, ints, floats, `ui_color`) required by the `bind_<property>` functions.
 
 ## 2. Dynamic Data Context, App State & Routing
 Runtime widgets cannot use hardcoded C variables for their reactive state. We need a robust dictionary-based context and state manager to bridge string identifiers from the schema to actual native instances.
 
-- [ ] **Global App State (`ui_app_state_registry`):** Create a global registry to hold top-level application state (global signals, user sessions, theme configurations) so widgets on different pages can communicate seamlessly.
-- [ ] **Dynamic Context (`ui_dynamic_context`):** Create an arena-allocated dictionary for localized scope (page-level or component-level) that stores named signals, computed values, and form groups.
-- [ ] **Form Control Resolution:** Implement logic to parse `bind_cva: "user.email"` from the schema, look up the `"user"` form group in the dynamic context, extract the `"email"` control, and bind it to the instantiated widget's CVA interface.
-- [ ] **Signal Resolution & Widget Linking:** Parse `bind_text: "app.cart_count"`. This enables widget-to-widget linking (e.g., a "Add to Cart" button's workflow updates the global `app.cart_count` signal, automatically updating the Header's Badge component).
-- [ ] **Dynamic Router (`ui_runtime_router`):** Implement a navigation controller that reads the schema's routing manifest, managing push/pop transitions between dynamically constructed DOM trees representing different screens.
+- [x] **Global App State (`ui_app_state_registry`):** Create a global registry to hold top-level application state (global signals, user sessions, theme configurations) so widgets on different pages can communicate seamlessly.
+- [x] **Dynamic Context (`ui_dynamic_context`):** Create an arena-allocated dictionary for localized scope (page-level or component-level) that stores named signals, computed values, and form groups.
+- [x] **Form Control Resolution:** Implement logic to parse `bind_cva: "user.email"` from the schema, look up the `"user"` form group in the dynamic context, extract the `"email"` control, and bind it to the instantiated widget's CVA interface.
+- [x] **Signal Resolution & Widget Linking:** Parse `bind_text: "app.cart_count"`. This enables widget-to-widget linking (e.g., a "Add to Cart" button's workflow updates the global `app.cart_count` signal, automatically updating the Header's Badge component).
+- [x] **Dynamic Router (`ui_runtime_router`):** Implement a navigation controller that reads the schema's routing manifest, managing push/pop transitions between dynamically constructed DOM trees representing different screens.
 
 ## 3. Runtime Builder (Interpreter)
 The interpreter consumes the schema and constructs the live DOM tree during the `ui_execution_context` tick loop.
 
-- [ ] **Strict Schema Validation:** Before instantiation, validate incoming payloads against the formal JSON Schema. Any payload containing unregistered components, mismatched types, or undeclared additional fields MUST be hard-rejected, safely bubbling an error enum up to the host application instead of attempting partial renders.
-- [ ] **Schema Parser:** Integrate a lightweight JSON/XML parser to deserialize the UI Schema into an internal AST (Abstract Syntax Tree) allocated on a transient `ui_arena`.
-- [ ] **Tree Instantiation (`ui_runtime_build`):**
+- [x] **Strict Schema Validation:** Before instantiation, validate incoming payloads against the formal JSON Schema. Any payload containing unregistered components, mismatched types, or undeclared additional fields MUST be hard-rejected, safely bubbling an error enum up to the host application instead of attempting partial renders.
+- [x] **Schema Parser:** Integrate a lightweight JSON/XML parser to deserialize the UI Schema into an internal AST (Abstract Syntax Tree) allocated on a transient `ui_arena`.
+- [x] **Tree Instantiation (`ui_runtime_build`):**
   1. Recursively traverse the AST.
   2. Query the `ui_component_registry` to allocate the C structs (e.g., `ui_card_base`, `ui_row`, `ui_column`).
   3. Resolve properties and apply one-way bindings (Presentational Widgets).
   4. Resolve and attach CVAs (Form Controls) to the dynamic context.
   5. Assemble the internal DOM hierarchy ensuring flex/grid layout constraints are applied.
-- [ ] **Multi-platform Canvas Previews (`ui_runtime_preview_viewport`):** Add support to render the interpreted DOM within a simulated sandbox. Expose an API to artificially constrain the `<html>`/`<body>` dimensions (e.g., 390x844 for iOS, 1920x1080 for Desktop) overriding the true OS window dimensions, enabling WYSIWYG editors to show responsive reflows live.
-- [ ] **Event Bridging & Workflow Execution:** Map named event hooks in the schema (e.g., `"on_click"`) to a unified workflow engine. This engine executes sequential action blocks using **Arazzo Specification** semantics. Instead of proprietary action arrays, the engine processes standardized Arazzo `steps`—making HTTP requests, parsing responses via `outputs`, evaluating `successCriteria`, mutating the `ui_app_state_registry`, or triggering `ui_runtime_router` navigation—without needing recompiled C code.
+- [x] **Multi-platform Canvas Previews (`ui_runtime_preview_viewport`):** Add support to render the interpreted DOM within a simulated sandbox. Expose an API to artificially constrain the `<html>`/`<body>` dimensions (e.g., 390x844 for iOS, 1920x1080 for Desktop) overriding the true OS window dimensions, enabling WYSIWYG editors to show responsive reflows live.
+- [x] **Event Bridging & Workflow Execution:** Map named event hooks in the schema (e.g., `"on_click"`) to a unified workflow engine. This engine executes sequential action blocks using **Arazzo Specification** semantics. Instead of proprietary action arrays, the engine processes standardized Arazzo `steps`—making HTTP requests, parsing responses via `outputs`, evaluating `successCriteria`, mutating the `ui_app_state_registry`, or triggering `ui_runtime_router` navigation—without needing recompiled C code.
 
 ## 4. AoT Code Generator (Ejector)
 To achieve zero-overhead performance on subsequent runs, the runtime format must be ejectable to native C code. This process bypasses the schema parser, string lookups, and dynamic context entirely.
 
-- [ ] **Ejector Traversal (`ui_runtime_eject`):** Write a code generator that traverses the loaded UI Schema AST.
-- [ ] **C Code Emission:** For each node in the AST, output the exact C API calls as strings to a file (`.c` and `.h`).
+- [x] **Ejector Traversal (`ui_runtime_eject`):** Write a code generator that traverses the loaded UI Schema AST.
+- [x] **C Code Emission:** For each node in the AST, output the exact C API calls as strings to a file (`.c` and `.h`).
   - *Example output for instantiation:*
     ```c
     ui_error_t rc;
@@ -101,20 +101,20 @@ To achieve zero-overhead performance on subsequent runs, the runtime format must
     rc = ui_form_control_add_validator(ctrl_email, pat_val);
     if (rc != UI_ERROR_NONE) goto cleanup;
     ```
-- [ ] **Identifier Generation:** Generate unique, safe C variable names based on the schema's IDs or hierarchy depth to prevent symbol collisions in the generated code.
-- [ ] **Memory & Error Handling Emission:** Ensure the generated code strictly adheres to the engine's `goto cleanup` error percolation strategy. Every generated `_create` call must check for `NULL` or failure enum and jump to a generated cleanup block, ensuring safe memory management under the Arena/Pool models.
-- [ ] **C89 & Quality Plan Compliance (Emission):** The generated `.c` and `.h` files must strictly adhere to the `PLAN_QUALITY.md` constraints. This includes emitting C89-compliant code, wrapping generated headers in `extern "C"` for C++ interop, utilizing MSVC Safe CRT fallbacks conditionally, injecting Doxygen-compliant comments for the exported mount functions, and wrapping generated `#include` blocks in `/* clang-format off */` / `/* clang-format on */`.
+- [x] **Identifier Generation:** Generate unique, safe C variable names based on the schema's IDs or hierarchy depth to prevent symbol collisions in the generated code.
+- [x] **Memory & Error Handling Emission:** Ensure the generated code strictly adheres to the engine's `goto cleanup` error percolation strategy. Every generated `_create` call must check for `NULL` or failure enum and jump to a generated cleanup block, ensuring safe memory management under the Arena/Pool models.
+- [x] **C89 & Quality Plan Compliance (Emission):** The generated `.c` and `.h` files must strictly adhere to the `PLAN_QUALITY.md` constraints. This includes emitting C89-compliant code, wrapping generated headers in `extern "C"` for C++ interop, utilizing MSVC Safe CRT fallbacks conditionally, injecting Doxygen-compliant comments for the exported mount functions, and wrapping generated `#include` blocks in `/* clang-format off */` / `/* clang-format on */`.
 
 ## 5. Isomorphic Execution Model (Runtime & AoT Parity)
 A fundamental requirement of this architecture is strict behavioral equivalence between the interpreted and compiled states. The host application must work seamlessly in either mode without changing its core integration logic.
 
-- [ ] **Unified App Loader (`ui_app_load`):** Expose a single abstraction for mounting a UI tree. In Runtime mode, this accepts a serialized schema payload. In AoT mode, it accepts the root function pointer of the generated C code. The host application's initialization code remains completely agnostic.
-- [ ] **1:1 Native Mapping Guarantee:** The `ui_runtime_build` interpreter must strictly utilize the *exact same public C API functions* that the `ui_runtime_eject` generator emits. There are no "interpreter-only" layout algorithms or state shortcuts.
-- [ ] **Unified Data Ingestion:** Supplying external data (e.g., API responses, local storage) to the UI must behave identically. Both Runtime and AoT modes rely on the same `ui_app_state_registry` and native `ui_signal_set()` calls to hydrate the UI.
-- [ ] **Hybrid Operation (Remote Over-The-Air Updates):** An application compiled entirely AoT must retain the ability to mount dynamically downloaded Runtime schema snippets. For instance, a statically compiled C dashboard can fetch a JSON schema from a server to render a custom promotional banner, seamlessly integrating the dynamic nodes into the native DOM tree.
+- [x] **Unified App Loader (`ui_app_load`):** Expose a single abstraction for mounting a UI tree. In Runtime mode, this accepts a serialized schema payload. In AoT mode, it accepts the root function pointer of the generated C code. The host application's initialization code remains completely agnostic.
+- [x] **1:1 Native Mapping Guarantee:** The `ui_runtime_build` interpreter must strictly utilize the *exact same public C API functions* that the `ui_runtime_eject` generator emits. There are no "interpreter-only" layout algorithms or state shortcuts.
+- [x] **Unified Data Ingestion:** Supplying external data (e.g., API responses, local storage) to the UI must behave identically. Both Runtime and AoT modes rely on the same `ui_app_state_registry` and native `ui_signal_set()` calls to hydrate the UI.
+- [x] **Hybrid Operation (Remote Over-The-Air Updates):** An application compiled entirely AoT must retain the ability to mount dynamically downloaded Runtime schema snippets. For instance, a statically compiled C dashboard can fetch a JSON schema from a server to render a custom promotional banner, seamlessly integrating the dynamic nodes into the native DOM tree.
 
 ## 6. Integration & Workflow
-- [ ] **Form Builder Example:** Create a new example application under `examples/form_builder/` demonstrating the full lifecycle:
+- [x] **Form Builder Example:** Create a new example application under `examples/form_builder/` demonstrating the full lifecycle:
   1. User builds a UI visually (which generates the JSON Schema).
   2. The application renders the schema live using `ui_runtime_build`.
   3. The application triggers `ui_runtime_eject` to write `generated_form.c`.
@@ -170,10 +170,10 @@ By aligning the engine's data context and workflow execution with OpenAPI and Ar
 ## 10. Quality Assurance, Testing & Bindings Mandates
 To satisfy the 100% coverage and architectural mandates outlined in `PLAN_QUALITY.md`, the runtime and AoT systems must implement rigorous verification pipelines:
 
-- [ ] **Runtime vs. AoT Equivalence Assertions:** Using the Headless E2E Automation framework, implement automated test suites that mount a UI schema dynamically (`ui_runtime_build`) and simultaneously mount the compiled output of `ui_runtime_eject` for the exact same schema. The resulting DOM trees (box geometry, text styling, and reactive signal state) must mathematically match 100%.
-- [ ] **Parser Error Path & Fuzzing (Zero-Leak):** The dynamic JSON/XML schema parser must undergo strict error path stress testing (mocking `malloc` failures during string parsing, supplying malformed JSON structures, providing invalid component names) to mathematically prove the Arena allocator and `goto cleanup` percolation prevents memory leaks (verified via ASAN and Valgrind).
-- [ ] **Dynamic Context Memory Safety:** The `ui_dynamic_context` bridging dictionary must be exhaustively tested to ensure dynamically bound form controls and signals correctly sever their references during unmount, preventing dangling pointers when navigating between pages in Runtime mode.
-- [ ] **FFI Bindings for Schema Injection:** The unified `ui_app_load` function must be safely exposed via automated FFI bindings (Rust's `sys` crate, C#'s `DllImport`, Python/Go extensions). This allows host applications written in managed languages to push JSON schema payloads or pre-compiled C function pointers down into the native engine seamlessly across the language boundary.
+- [x] **Runtime vs. AoT Equivalence Assertions:** Using the Headless E2E Automation framework, implement automated test suites that mount a UI schema dynamically (`ui_runtime_build`) and simultaneously mount the compiled output of `ui_runtime_eject` for the exact same schema. The resulting DOM trees (box geometry, text styling, and reactive signal state) must mathematically match 100%.
+- [x] **Parser Error Path & Fuzzing (Zero-Leak):** The dynamic JSON/XML schema parser must undergo strict error path stress testing (mocking `malloc` failures during string parsing, supplying malformed JSON structures, providing invalid component names) to mathematically prove the Arena allocator and `goto cleanup` percolation prevents memory leaks (verified via ASAN and Valgrind).
+- [x] **Dynamic Context Memory Safety:** The `ui_dynamic_context` bridging dictionary must be exhaustively tested to ensure dynamically bound form controls and signals correctly sever their references during unmount, preventing dangling pointers when navigating between pages in Runtime mode.
+- [x] **FFI Bindings for Schema Injection:** The unified `ui_app_load` function must be safely exposed via automated FFI bindings (Rust's `sys` crate, C#'s `DllImport`, Python/Go extensions). This allows host applications written in managed languages to push JSON schema payloads or pre-compiled C function pointers down into the native engine seamlessly across the language boundary.
 
 ## 11. Core Quality, Architecture & Build Mandates
 To ensure the highest level of robustness and cross-platform compatibility, the following mandates must be strictly adhered to across all implementations (Runtime, AoT, and Core Engine):

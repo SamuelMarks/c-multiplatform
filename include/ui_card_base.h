@@ -80,6 +80,26 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t ui_card_base_set_actions(
     struct ui_card_base *card, struct ui_component *actions);
 
 /**
+ * @brief Sets the title text of the card.
+ *
+ * @param card The card instance.
+ * @param title The title text string.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_card_base_set_title(struct ui_card_base *card, const char *title);
+
+/**
+ * @brief Sets the subtitle text of the card.
+ *
+ * @param card The card instance.
+ * @param subtitle The subtitle text string.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_card_base_set_subtitle(struct ui_card_base *card, const char *subtitle);
+
+/**
  * @brief Retrieves the underlying component of the card.
  *
  * @param card The card instance.

@@ -365,17 +365,13 @@ cleanup:
   if (bc->nav_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(bc->nav_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (bc->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(bc->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(bc);
@@ -736,21 +732,15 @@ ui_error_t run_bc_coverage(void) {
   /* Create dummy node for child tests */
   {
     ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_append_child(dn1, dn2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   g_breadcrumbs_mock_fail = 3;
@@ -762,121 +752,87 @@ ui_error_t run_bc_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(dn1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup = ui_router_create(&dummy_router);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   /* component fail */
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 5;
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 0;
 
   /* free_segments fail */
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test/a/b");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 4; /* free segments fail (destroy) */
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test2");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test/a/b");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 3; /* free segments fail (remove child) */
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test2");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 2; /* component default style */
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 130;
   (void)mock_dom_node_append_child(NULL, NULL); /* count=1 -> fail */
@@ -912,23 +868,17 @@ ui_error_t run_bc_coverage(void) {
   (void)mock_dom_node_append_child(NULL, NULL);
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   g_breadcrumbs_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup = ui_router_destroy(dummy_router);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;

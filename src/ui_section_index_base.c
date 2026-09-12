@@ -111,22 +111,16 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
-  if (index && index->component) {
+  if (index->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(index->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
-  if (index) {
-    C_MULTIPLATFORM_FREE(index);
-  }
+  C_MULTIPLATFORM_FREE(index);
   return rc;
 }
 
@@ -147,9 +141,7 @@ ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
 
   {
     ui_error_t rc_cleanup = ui_component_destroy(index->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(index);
   return UI_ERROR_NONE;
@@ -237,9 +229,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
     } else if (text_node) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
     }
 
@@ -252,9 +242,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
       if (node) {
         {
           ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)rc_cleanup;
         }
       }
       for (j = 0; j < i; ++j) {

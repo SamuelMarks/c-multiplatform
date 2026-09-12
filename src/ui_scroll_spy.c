@@ -150,12 +150,7 @@ ui_error_t ui_scroll_spy_destroy(struct ui_scroll_spy *spy) {
   }
 
   if (spy->observer) {
-    {
-      ui_error_t rc_cleanup = ui_intersection_observer_destroy(spy->observer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    (void)ui_intersection_observer_destroy(spy->observer);
   }
   C_MULTIPLATFORM_FREE(spy);
   return UI_ERROR_NONE;
@@ -185,12 +180,7 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
   spy->root_margin_px = root_margin_px;
 
   if (spy->observer) {
-    {
-      ui_error_t rc_cleanup = ui_intersection_observer_destroy(spy->observer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    (void)ui_intersection_observer_destroy(spy->observer);
     spy->observer = NULL;
   }
 

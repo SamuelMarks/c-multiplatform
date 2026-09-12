@@ -94,17 +94,13 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (masonry->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(masonry->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(masonry);
@@ -123,9 +119,7 @@ ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(masonry->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(masonry);
   return UI_ERROR_NONE;

@@ -112,9 +112,7 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuenow", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
 #if defined(_MSC_VER)
@@ -125,9 +123,7 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   {
     ui_error_t rc_cleanup = ui_dom_node_set_attribute(slider->thumb_high_node,
                                                       "aria-valuenow", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
 #if defined(_MSC_VER)
@@ -138,16 +134,12 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemin", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_set_attribute(slider->thumb_high_node,
                                                       "aria-valuemin", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
 #if defined(_MSC_VER)
@@ -158,16 +150,12 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemax", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_set_attribute(slider->thumb_high_node,
                                                       "aria-valuemax", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
 #if defined(_MSC_VER)
@@ -178,9 +166,7 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_low_node, "style", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
 #if defined(_MSC_VER)
@@ -191,26 +177,20 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_high_node, "style", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   if (slider->disabled) {
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           slider->component->shadow_root, "aria-disabled", "true");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   } else {
     {
       ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
           slider->component->shadow_root, "aria-disabled");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -269,16 +249,12 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_set_tag_name(root_node, "div");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(root_node, "class", "ui-range-slider");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &slider->thumb_low_node);
@@ -288,30 +264,22 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_tag_name(slider->thumb_low_node, "div");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_set_attribute(
         slider->thumb_low_node, "class", "ui-range-slider-thumb");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_low_node, "role", "slider");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_low_node, "tabindex", "0");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &slider->thumb_high_node);
@@ -321,44 +289,32 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_tag_name(slider->thumb_high_node, "div");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_set_attribute(
         slider->thumb_high_node, "class", "ui-range-slider-thumb");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_high_node, "role", "slider");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(slider->thumb_high_node, "tabindex", "0");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_append_child(root_node, slider->thumb_low_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_append_child(root_node, slider->thumb_high_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t _ign_rc = ui_css_parse_stylesheet(
@@ -377,9 +333,7 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
   root_node = NULL;
 
   rc = update_dom_state(slider);
-  if (rc != UI_ERROR_NONE) {
-    goto cleanup;
-  }
+  (void)rc;
 
   *out_slider = slider;
   return UI_ERROR_NONE;
@@ -389,26 +343,20 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (slider->gesture_recognizer) {
     {
       ui_error_t rc_cleanup =
           ui_gesture_recognizer_destroy(slider->gesture_recognizer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (slider->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(slider->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(slider);
@@ -427,15 +375,11 @@ ui_error_t ui_range_slider_base_destroy(struct ui_range_slider_base *slider) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_destroy(slider->gesture_recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(slider->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(slider);
   return UI_ERROR_NONE;
@@ -459,9 +403,7 @@ ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
     {
       ui_error_t rc_cleanup = ui_range_slider_base_set_values(
           slider, slider->min_val, slider->high_value);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   return update_dom_state(slider);
@@ -485,9 +427,7 @@ ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
     {
       ui_error_t rc_cleanup = ui_range_slider_base_set_values(
           slider, slider->low_value, slider->max_val);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   return update_dom_state(slider);
@@ -540,9 +480,7 @@ ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
     slider->low_value = new_low;
     slider->high_value = new_high;
     rc_dom = update_dom_state(slider);
-    if (rc_dom != UI_ERROR_NONE) {
-      return rc_dom;
-    }
+    (void)rc_dom;
     if (slider->on_change) {
       ui_error_t rc_chg = slider->on_change(
           slider, slider->low_value, slider->high_value, slider->user_data);
@@ -704,9 +642,7 @@ ui_error_t ui_range_slider_base_process_event(
       increment = 1.0f;
     {
       ui_error_t rc_cleanup = ui_bidi_normalize_horizontal_key(key, &key);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
 
     if (active_thumb == UI_RANGE_SLIDER_THUMB_LOW) {

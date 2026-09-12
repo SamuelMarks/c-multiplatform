@@ -322,7 +322,7 @@ int main(void) {
   printf("Testing OOM on create...\n");
   {
     int i;
-    for (i = 0; i < 200; i++) {
+    for (i = 0; i < 600; i++) {
       g_malloc_fail_countdown = i;
       if (ui_sidenav_base_create(&sidenav) == UI_ERROR_NONE) {
         {
@@ -335,6 +335,15 @@ int main(void) {
       }
     }
     g_malloc_fail_countdown = -1;
+  }
+
+  {
+    ui_sidenav_base_create(&sidenav);
+    g_malloc_fail_countdown = 0;
+    ui_sidenav_base_set_mode(sidenav, UI_SIDENAV_MODE_PUSH);
+    g_malloc_fail_countdown = -1;
+    ui_sidenav_base_destroy(sidenav);
+    sidenav = NULL;
   }
 
   {

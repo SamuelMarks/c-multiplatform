@@ -44,12 +44,8 @@ static ui_error_t ui_computed_lock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     ui_int32 is_swapped = 0;
     while (!is_swapped) {
-      {
-        ui_error_t rc_cleanup = ui_atomic_cas(&comp->lock, 0, 1, &is_swapped);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      ui_error_t _ign_rc = ui_atomic_cas(&comp->lock, 0, 1, &is_swapped);
+      (void)_ign_rc;
     }
   }
   return UI_ERROR_NONE;
@@ -62,12 +58,8 @@ static ui_error_t ui_computed_lock(ui_computed_t *comp) {
  */
 static ui_error_t ui_computed_unlock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
-    {
-      ui_error_t rc_cleanup = ui_atomic_store(&comp->lock, 0);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    ui_error_t _ign_rc = ui_atomic_store(&comp->lock, 0);
+    (void)_ign_rc;
   }
   return UI_ERROR_NONE;
 }
@@ -119,18 +111,14 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   ui_error_t rc;
 
   {
-    ui_error_t rc_cleanup = ui_computed_lock(comp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ui_error_t _ign_rc = ui_computed_lock(comp);
+    (void)_ign_rc;
   }
 
   if (comp->is_dirty) {
     {
-      ui_error_t rc_cleanup = ui_computed_unlock(comp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      ui_error_t _ign_rc = ui_computed_unlock(comp);
+      (void)_ign_rc;
     }
     return UI_ERROR_NONE; /* Already dirty, no need to re-notify */
   }
@@ -150,10 +138,8 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   }
 
   {
-    ui_error_t rc_cleanup = ui_computed_unlock(comp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ui_error_t _ign_rc = ui_computed_unlock(comp);
+    (void)_ign_rc;
   }
 
   if (subs_copy) {
@@ -193,11 +179,9 @@ ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
   if (arena) {
     void *ptr = NULL;
     {
-      ui_error_t rc_cleanup =
+      ui_error_t _ign_rc =
           ui_arena_alloc(arena, sizeof(ui_computed_t), sizeof(void *), &ptr);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)_ign_rc;
     }
     if (!ptr)
       return UI_ERROR_OUT_OF_MEMORY;
@@ -245,28 +229,22 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
   }
 
   {
-    ui_error_t rc_cleanup = ui_computed_lock(computed);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ui_error_t _ign_rc = ui_computed_lock(computed);
+    (void)_ign_rc;
   }
 
   /* Dependency tracking */
   {
-    ui_error_t rc_cleanup = ui_reactive_graph_get_current_node(&current_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ui_error_t _ign_rc = ui_reactive_graph_get_current_node(&current_node);
+    (void)_ign_rc;
   }
 
   if (current_node && current_node != &computed->self_node) {
     rc = ui_computed_add_subscriber(computed, current_node);
     if (rc != UI_ERROR_NONE) {
       {
-        ui_error_t rc_cleanup = ui_computed_unlock(computed);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        ui_error_t _ign_rc = ui_computed_unlock(computed);
+        (void)_ign_rc;
       }
       return rc;
     }
@@ -275,37 +253,28 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
   if (computed->is_dirty) {
     /* Push self to graph to track inner dependencies */
     {
-      ui_error_t rc_cleanup =
+      ui_error_t _ign_rc =
           ui_reactive_graph_set_current_node(&computed->self_node, &prev_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)_ign_rc;
     }
 
     rc = computed->compute_fn(computed->user_data, &computed->cached_value);
     if (rc != UI_ERROR_NONE) {
       {
-        ui_error_t rc_cleanup =
+        ui_error_t _ign_rc =
             ui_reactive_graph_set_current_node(prev_node, NULL);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)_ign_rc;
       }
       {
-        ui_error_t rc_cleanup = ui_computed_unlock(computed);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        ui_error_t _ign_rc = ui_computed_unlock(computed);
+        (void)_ign_rc;
       }
       return rc;
     }
 
     {
-      ui_error_t rc_cleanup =
-          ui_reactive_graph_set_current_node(prev_node, NULL);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      ui_error_t _ign_rc = ui_reactive_graph_set_current_node(prev_node, NULL);
+      (void)_ign_rc;
     }
     computed->is_dirty = UI_FALSE;
   }

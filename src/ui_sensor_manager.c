@@ -69,9 +69,7 @@ ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
   if (manager->is_running) {
     {
       ui_error_t rc_cleanup = ui_sensor_manager_stop(manager);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -210,9 +208,7 @@ ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
     {
       ui_error_t rc_cleanup =
           ui_signal_set(manager->orientation_signal, payload);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 

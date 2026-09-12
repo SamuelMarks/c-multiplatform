@@ -21,6 +21,8 @@ static ui_error_t mock_ui_font_manager_find_font(struct ui_font_manager *m,
   (void)i;
   if (g_mock_font_fail == 1)
     return UI_ERROR_NOT_FOUND;
+  if (g_mock_font_fail == 7)
+    return UI_ERROR_NOT_FOUND;
   *out = (struct ui_font *)1; /* Fake font */
   return UI_ERROR_NONE;
 }
@@ -151,27 +153,20 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(node->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(node);
     return rc;
   }
-
   rc = ui_dom_node_set_tag_name(dom_node, "span");
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(dom_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(node->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(node);
     return rc;
@@ -182,16 +177,12 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(dom_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     node->component->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(node->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(node);
     return rc;
@@ -206,9 +197,7 @@ ui_error_t ui_text_node_base_destroy(struct ui_text_node_base *node) {
     return UI_ERROR_NONE;
   if (node->layout) {
     ui_error_t rc_cleanup = ui_text_layout_destroy(node->layout);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (node->text)
     C_MULTIPLATFORM_FREE(node->text);
@@ -219,17 +208,13 @@ ui_error_t ui_text_node_base_destroy(struct ui_text_node_base *node) {
       {
         ui_error_t rc_cleanup =
             ui_dom_node_destroy(node->component->shadow_root);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       node->component->shadow_root = NULL;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(node->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(node);
@@ -329,11 +314,8 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
                                    &font);
     if (rc != UI_ERROR_NONE) {
       /* Fallback to system-ui */
-      ui_error_t fb_rc = ui_font_manager_find_font(node->font_manager,
-                                                   "system-ui", 400, 0, &font);
-      if (fb_rc != UI_ERROR_NONE) {
-        font = NULL;
-      }
+      (void)ui_font_manager_find_font(node->font_manager, "system-ui", 400, 0,
+                                      &font);
     }
   }
 
@@ -385,7 +367,7 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
             strcpy_s(trunc_str + target_len, 4, "...");
 #else
             strncpy(trunc_str, node->text, target_len);
-            UI_STRCPY(trunc_str + target_len, 256 - target_len, "...");
+            memcpy(trunc_str + target_len, "...", 4);
 #endif
             rc = ui_text_layout_shape(node->layout, font, node->font_size,
                                       trunc_str, node->max_width,

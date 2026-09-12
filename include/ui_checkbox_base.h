@@ -100,6 +100,36 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_checkbox_base_get_cva(struct ui_checkbox_base *checkbox,
                          struct ui_control_value_accessor *out_cva);
 
+/**
+ * @brief Retrieves the underlying component of the checkbox.
+ *
+ * @param checkbox The checkbox instance.
+ * @param out_component Pointer to receive the underlying component.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_checkbox_base_get_component(
+    struct ui_checkbox_base *checkbox, struct ui_component **out_component);
+
+/**
+ * @brief Sets the text label for the checkbox.
+ *
+ * @param checkbox The checkbox instance.
+ * @param label The label text string.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_checkbox_base_set_label(
+    struct ui_checkbox_base *checkbox, const char *label);
+
+/**
+ * @brief Sets the checked boolean state of the checkbox.
+ *
+ * @param checkbox The checkbox instance.
+ * @param checked True for checked, false for unchecked.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_checkbox_base_set_checked(struct ui_checkbox_base *checkbox, int checked);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

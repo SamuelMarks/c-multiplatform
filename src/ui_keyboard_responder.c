@@ -128,7 +128,7 @@ ui_error_t ui_keyboard_responder_bind_key(
 #if defined(_MSC_VER)
       strcpy_s(role_copy, len + 1, role_or_tag);
 #else
-      UI_STRCPY(role_copy, sizeof(role_copy), role_or_tag);
+      memcpy(role_copy, role_or_tag, len + 1);
 #endif
     }
   }
@@ -183,17 +183,13 @@ ui_error_t ui_keyboard_responder_handle_event(
   key = (enum ui_key_code)event->event_data.keyboard.key_code;
   {
     ui_error_t rc_cleanup = ui_bidi_normalize_horizontal_key(key, &key);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup =
         ui_dom_node_get_attribute(focused_node, "role", &role_val);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   for (i = 0; i < responder->bindings_count; ++i) {

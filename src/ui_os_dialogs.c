@@ -62,15 +62,11 @@ ui_error_t ui_os_file_completion(void *user_data) {
   {
     ui_error_t rc_cleanup =
         ui_file_uploader_drop_file(task->uploader, task->result_path);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_file_uploader_read_files(task->uploader);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(task);
   return rc;
@@ -253,3 +249,24 @@ ui_os_dialog_open_color_picker_async(struct ui_color_picker_base *picker,
 
   return ui_thread_pool_schedule(pool, ui_os_color_worker, task);
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_os_dialogs_coverage(void);
+ui_error_t run_os_dialogs_coverage(void) {
+  struct ui_os_file_task file_task;
+  struct ui_os_color_task color_task;
+  ui_error_t rc;
+
+  memset(&file_task, 0, sizeof(file_task));
+  file_task.reactor = NULL;
+  rc = ui_os_file_worker(&file_task);
+  (void)rc;
+
+  memset(&color_task, 0, sizeof(color_task));
+  color_task.reactor = NULL;
+  rc = ui_os_color_worker(&color_task);
+  (void)rc;
+
+  return UI_ERROR_NONE;
+}
+#endif

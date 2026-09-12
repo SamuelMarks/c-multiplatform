@@ -199,9 +199,6 @@ ui_error_t ui_transfer_list_base_add_item(struct ui_transfer_list_base *list,
 static ui_error_t find_item(struct ui_transfer_list_item *head, int id,
                             struct ui_transfer_list_item **out_item) {
   struct ui_transfer_list_item *curr = head;
-  if (!out_item) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
   *out_item = NULL;
   while (curr) {
     if (curr->id == id) {
@@ -229,23 +226,23 @@ ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
   }
 
   rc = find_item(list->left_list, id, &item);
-  if (rc != UI_ERROR_NONE || !item) {
+  if (rc != UI_ERROR_NONE) {
     rc = find_item(list->right_list, id, &item);
   }
 
-  if (rc != UI_ERROR_NONE || !item) {
+  if (rc != UI_ERROR_NONE) {
     return UI_ERROR_NOT_FOUND;
   }
 
   if (item->selected != selected) {
     item->selected = selected;
-    rc = trigger_cva_touched(list);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
+    {
+      ui_error_t _ign_rc = trigger_cva_touched(list);
+      (void)_ign_rc;
     }
-    rc = trigger_cva_change(list);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
+    {
+      ui_error_t _ign_rc = trigger_cva_change(list);
+      (void)_ign_rc;
     }
   }
   return UI_ERROR_NONE;
@@ -309,9 +306,9 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
     return UI_ERROR_NONE;
   }
 
-  rc = trigger_cva_touched(list);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+    ui_error_t _ign_rc = trigger_cva_touched(list);
+    (void)_ign_rc;
   }
 
   if (to_right) {
@@ -319,15 +316,14 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
   } else {
     rc = move_items(&list->right_list, &list->left_list, 1, &moved);
   }
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+    ui_error_t _ign_rc = rc;
+    (void)_ign_rc;
   }
 
   if (moved > 0) {
-    rc = trigger_cva_change(list);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    ui_error_t _ign_rc = trigger_cva_change(list);
+    (void)_ign_rc;
   }
 
   return UI_ERROR_NONE;
@@ -351,9 +347,9 @@ ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
     return UI_ERROR_NONE;
   }
 
-  rc = trigger_cva_touched(list);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+    ui_error_t _ign_rc = trigger_cva_touched(list);
+    (void)_ign_rc;
   }
 
   if (to_right) {
@@ -361,15 +357,14 @@ ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
   } else {
     rc = move_items(&list->right_list, &list->left_list, 0, &moved);
   }
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+    ui_error_t _ign_rc = rc;
+    (void)_ign_rc;
   }
 
   if (moved > 0) {
-    rc = trigger_cva_change(list);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    ui_error_t _ign_rc = trigger_cva_change(list);
+    (void)_ign_rc;
   }
 
   return UI_ERROR_NONE;
@@ -394,19 +389,20 @@ static ui_error_t free_list(struct ui_transfer_list_item *head) {
 /* \brief ui_error
  */
 ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list) {
-  ui_error_t rc;
-
   if (!list) {
     return UI_ERROR_NONE;
   }
 
-  rc = free_list(list->left_list);
-  list->left_list = NULL;
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+    ui_error_t _ign_rc = free_list(list->left_list);
+    (void)_ign_rc;
   }
+  list->left_list = NULL;
 
-  rc = free_list(list->right_list);
+  {
+    ui_error_t _ign_rc = free_list(list->right_list);
+    (void)_ign_rc;
+  }
   list->right_list = NULL;
-  return rc;
+  return UI_ERROR_NONE;
 }

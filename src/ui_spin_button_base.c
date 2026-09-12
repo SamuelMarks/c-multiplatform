@@ -318,9 +318,7 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(spin_button);
     return rc;
@@ -330,15 +328,11 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(spin_button);
     return rc;
@@ -390,9 +384,7 @@ ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(spin_button);
   return UI_ERROR_NONE;
@@ -541,9 +533,7 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
                                  "tabindex");
     {
       ui_error_t rc_cleanup = ui_spin_button_base_stop_continuous(spin_button);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   } else {
     (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,

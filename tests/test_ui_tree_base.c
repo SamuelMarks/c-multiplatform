@@ -328,6 +328,25 @@ static int test_tree_render(void) {
   EXPECT_EQ(rc, UI_ERROR_NONE);
 
   {
+    /* Test rendering when selection_model is NULL */
+    struct ui_tree_base_mock {
+      struct ui_tree_model model;
+      void **expanded_nodes;
+      size_t num_expanded;
+      size_t expanded_cap;
+      void *active_node;
+      struct ui_selection_model *selection_model;
+      struct ui_computed *data_signal;
+    };
+    struct ui_tree_base_mock *m = (struct ui_tree_base_mock *)tree;
+    struct ui_selection_model *saved_sm = m->selection_model;
+    m->selection_model = NULL;
+    rc = ui_tree_base_render(tree, container);
+    EXPECT_EQ(rc, UI_ERROR_NONE);
+    m->selection_model = saved_sm;
+  }
+
+  {
     ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
     if (rc_cleanup != UI_ERROR_NONE) {
       (void)rc_cleanup; /* Avoid override */

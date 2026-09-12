@@ -5,25 +5,27 @@
 #include <stdlib.h>
 /* clang-format on */
 
-#if defined(_WIN32)
-extern ui_error_t ui_renderer_native_init(struct ui_renderer *renderer);
-
 int main(void) {
   struct ui_renderer renderer;
 
-  if (ui_renderer_native_init(NULL) != UI_ERROR_INVALID_ARGUMENT) {
+  if (ui_renderer_gdiplus_init(NULL) != UI_ERROR_INVALID_ARGUMENT) {
     fprintf(stderr, "Expected UI_ERROR_INVALID_ARGUMENT for NULL renderer\n");
     return 1;
   }
 
-  /* Ignore other failures in tests because we might not have a full environment
-   * setup */
+#if defined(_WIN32)
+  if (ui_renderer_native_init(NULL) != UI_ERROR_INVALID_ARGUMENT) {
+    fprintf(stderr, "Expected UI_ERROR_INVALID_ARGUMENT for NULL renderer in "
+                    "native_init\n");
+    return 1;
+  }
+#else
+  if (ui_renderer_gdiplus_init(&renderer) != UI_ERROR_UNKNOWN) {
+    fprintf(stderr, "Expected UI_ERROR_UNKNOWN for stub on non-Windows\n");
+    return 1;
+  }
+#endif
+
   printf("test_ui_renderer_gdiplus passed\n");
   return 0;
 }
-#else
-int main(void) {
-  printf("test_ui_renderer_gdiplus skipped (not WIN32)\n");
-  return 0;
-}
-#endif

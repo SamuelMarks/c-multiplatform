@@ -19,6 +19,73 @@
 /** @brief Global scope counter for generating unique IDs */
 static int g_scope_counter = 0;
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_component_mock_fail = 0;
+extern ui_error_t ui_dom_node_destroy(struct ui_dom_node *n);
+/**
+ * @brief mock_dom_node_destroy_component.
+ * @param n Node.
+ * @return Return code.
+ */
+static ui_error_t mock_dom_node_destroy_component(struct ui_dom_node *n) {
+  if (g_component_mock_fail == 20)
+    return UI_ERROR_UNKNOWN;
+  return ui_dom_node_destroy(n);
+}
+#define ui_dom_node_destroy mock_dom_node_destroy_component
+
+extern ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *s);
+/**
+ * @brief mock_css_stylesheet_destroy_component.
+ * @param s Stylesheet.
+ * @return Return code.
+ */
+static ui_error_t
+mock_css_stylesheet_destroy_component(struct ui_css_stylesheet *s) {
+  if (g_component_mock_fail == 21 || g_component_mock_fail == 22 ||
+      g_component_mock_fail == 23 || g_component_mock_fail == 24 ||
+      g_component_mock_fail == 25)
+    return UI_ERROR_UNKNOWN;
+  return ui_css_stylesheet_destroy(s);
+}
+#define ui_css_stylesheet_destroy mock_css_stylesheet_destroy_component
+
+extern ui_error_t ui_css_stylesheet_append_rule(struct ui_css_stylesheet *s,
+                                                struct ui_css_rule *r);
+/**
+ * @brief mock_css_stylesheet_append_rule_component.
+ * @param s Stylesheet.
+ * @param r Rule.
+ * @return Return code.
+ */
+static ui_error_t
+mock_css_stylesheet_append_rule_component(struct ui_css_stylesheet *s,
+                                          struct ui_css_rule *r) {
+  if (g_component_mock_fail == 26)
+    return UI_ERROR_UNKNOWN;
+  return ui_css_stylesheet_append_rule(s, r);
+}
+#define ui_css_stylesheet_append_rule mock_css_stylesheet_append_rule_component
+
+extern ui_error_t ui_dom_node_set_attribute(struct ui_dom_node *node,
+                                            const char *key, const char *val);
+/**
+ * @brief mock_dom_node_set_attribute_component.
+ * @param node Node.
+ * @param key Attribute key.
+ * @param val Attribute value.
+ * @return Return code.
+ */
+static ui_error_t
+mock_dom_node_set_attribute_component(struct ui_dom_node *node, const char *key,
+                                      const char *val) {
+  if (g_component_mock_fail == 27)
+    return UI_ERROR_UNKNOWN;
+  return ui_dom_node_set_attribute(node, key, val);
+}
+#define ui_dom_node_set_attribute mock_dom_node_set_attribute_component
+#endif
+
 /**
  * @brief rewrite_classes_for_node.
  * @param node Parameter node.
@@ -66,7 +133,7 @@ static ui_error_t rewrite_classes_for_node(struct ui_dom_node *node,
 #if defined(_MSC_VER)
           strcpy_s(dst, new_len - (dst - new_classes), scope_id);
 #else
-          UI_STRCPY(dst, 256, scope_id);
+          strcpy(dst, scope_id);
 #endif
           dst += strlen(scope_id);
         }
@@ -164,17 +231,6 @@ ui_error_t ui_component_create(struct ui_component **out_component) {
  * @param component Parameter component.
  * @return Return value.
  */
-#ifdef UI_TEST_MOCK_ALLOC
-int g_component_mock_fail = 0;
-extern ui_error_t ui_dom_node_destroy(struct ui_dom_node *n);
-static ui_error_t mock_dom_node_destroy_component(struct ui_dom_node *n) {
-  if (g_component_mock_fail == 20)
-    return UI_ERROR_UNKNOWN;
-  return ui_dom_node_destroy(n);
-}
-#define ui_dom_node_destroy mock_dom_node_destroy_component
-#endif
-
 ui_error_t ui_component_destroy(struct ui_component *component) {
   if (!component) {
     return UI_ERROR_INVALID_ARGUMENT;

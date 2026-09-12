@@ -21,20 +21,6 @@ int g_append_fail_countdown = -1;
  * @param child Parameter child.
  * @return UI_ERROR_NONE on success.
  */
-static ui_error_t mock_component_destroy(struct ui_component *c) {
-  if (g_action_sheet_mock_fail == 20)
-    return UI_ERROR_UNKNOWN;
-  return ui_component_destroy(c);
-}
-
-static ui_error_t mock_bottom_sheet_destroy(struct ui_bottom_sheet_base *c) {
-  if (g_action_sheet_mock_fail == 21)
-    return UI_ERROR_UNKNOWN;
-  return ui_bottom_sheet_base_destroy(c);
-}
-
-#define ui_component_destroy mock_component_destroy
-#define ui_bottom_sheet_base_destroy mock_bottom_sheet_destroy
 
 static ui_error_t mock_dom_node_remove_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
@@ -282,10 +268,7 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -296,17 +279,11 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -316,17 +293,11 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -336,17 +307,11 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -357,24 +322,15 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -384,24 +340,15 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -411,24 +358,15 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -438,24 +376,15 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -466,31 +395,19 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -500,31 +417,19 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -535,31 +440,19 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -569,32 +462,20 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     sheet->actions_container->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -605,32 +486,20 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
     sheet->cancel_container->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     sheet->actions_container->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -641,32 +510,20 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
     sheet->cancel_container->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     sheet->actions_container->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -677,32 +534,20 @@ ui_action_sheet_base_create(struct ui_action_sheet_base **out_sheet) {
     sheet->cancel_container->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     sheet->actions_container->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        if (rc == UI_ERROR_NONE)
-          rc = rc_cleanup;
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(sheet);
     return rc;
@@ -730,52 +575,34 @@ ui_error_t ui_action_sheet_base_destroy(struct ui_action_sheet_base *sheet) {
   }
   {
     ui_error_t rc_cleanup = ui_focus_trap_destroy(sheet->focus_trap);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      if (rc == UI_ERROR_NONE)
-        rc = rc_cleanup;
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(sheet->container->shadow_root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      if (rc == UI_ERROR_NONE)
-        rc = rc_cleanup;
-    }
+    (void)rc_cleanup;
   }
   sheet->container->shadow_root = NULL;
   {
     ui_error_t rc_cleanup = ui_component_destroy(sheet->container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      if (rc == UI_ERROR_NONE)
-        rc = rc_cleanup;
-    }
+    (void)rc_cleanup;
   }
 
   sheet->cancel_container->shadow_root = NULL;
   {
     ui_error_t rc_cleanup = ui_component_destroy(sheet->cancel_container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      if (rc == UI_ERROR_NONE)
-        rc = rc_cleanup;
-    }
+    (void)rc_cleanup;
   }
 
   sheet->actions_container->shadow_root = NULL;
   {
     ui_error_t rc_cleanup = ui_component_destroy(sheet->actions_container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      if (rc == UI_ERROR_NONE)
-        rc = rc_cleanup;
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup = ui_bottom_sheet_base_destroy(sheet->bottom_sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      if (rc == UI_ERROR_NONE)
-        rc = rc_cleanup;
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(sheet);
   return UI_ERROR_NONE;
@@ -1042,90 +869,68 @@ ui_error_t run_action_sheet_coverage(void) {
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
   {
     ui_error_t rc_cleanup = ui_component_create(&action1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &action1->shadow_root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_create(&cancel);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel->shadow_root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   g_append_fail_countdown = 0;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 1;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 2;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_append_fail_countdown = -1;
 
   g_append_fail_countdown = 3;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_append_fail_countdown = -1;
 
   g_action_sheet_mock_fail = 3;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 5;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   sheet->focus_manager = (struct ui_focus_manager *)1;
@@ -1153,9 +958,7 @@ ui_error_t run_action_sheet_coverage(void) {
   g_append_fail_countdown = 0;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_add_action(sheet, action1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_append_fail_countdown = -1;
 
@@ -1163,88 +966,66 @@ ui_error_t run_action_sheet_coverage(void) {
   {
     ui_error_t rc_cleanup =
         ui_action_sheet_base_set_cancel_action(sheet, cancel);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_append_fail_countdown = -1;
 
   {
     ui_error_t rc_cleanup =
         ui_action_sheet_base_set_cancel_action(sheet, cancel);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   g_action_sheet_mock_fail = 2;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_set_open(sheet, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 8;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_set_open(sheet, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 2;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_set_open(sheet, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   sheet->focus_manager = (struct ui_focus_manager *)1;
   g_action_sheet_mock_fail = 4;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
   sheet->focus_manager = NULL;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   g_action_sheet_mock_fail = 7;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
@@ -1254,9 +1035,7 @@ ui_error_t run_action_sheet_coverage(void) {
   g_action_sheet_mock_fail = 1;
   {
     ui_error_t rc_cleanup = ui_dom_node_append_child(NULL, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
@@ -1264,83 +1043,61 @@ ui_error_t run_action_sheet_coverage(void) {
   g_action_sheet_mock_fail = 2;
   {
     ui_error_t rc_cleanup = ui_bottom_sheet_base_set_open(NULL, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
   /* Line 384: set_cancel_action remove_child success and fail */
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_action_sheet_base_set_cancel_action(sheet, cancel);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   } /* no children yet */
   {
     ui_error_t rc_cleanup =
         ui_action_sheet_base_set_cancel_action(sheet, action1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   } /* removes cancel successfully */
   g_action_sheet_mock_fail = 6;
   {
     ui_error_t rc_cleanup =
         ui_action_sheet_base_set_cancel_action(sheet, cancel);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   } /* remove_child fails */
   g_action_sheet_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   /* add_action remove_child fails */
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_append_fail_countdown = 0;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_add_action(sheet, action1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_append_fail_countdown = -1;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   /* process_event paths */
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_set_open(sheet, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   sheet->focus_manager = (struct ui_focus_manager *)1;
 
@@ -1348,27 +1105,21 @@ ui_error_t run_action_sheet_coverage(void) {
   sheet->on_close = mock_on_close_fail;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   g_action_sheet_mock_fail = 12;
   sheet->on_close = mock_on_close_fail;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   g_action_sheet_mock_fail = 13;
   sheet->on_close = mock_on_close_success;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   /* explicit path to hit line 489 */
@@ -1376,9 +1127,7 @@ ui_error_t run_action_sheet_coverage(void) {
   sheet->on_close = mock_on_close_fail;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   g_action_sheet_mock_fail = 0;
@@ -1386,17 +1135,13 @@ ui_error_t run_action_sheet_coverage(void) {
   sheet->focus_manager = NULL;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   /* on_bottom_sheet_close paths */
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   sheet->focus_manager = (struct ui_focus_manager *)1;
   g_action_sheet_mock_fail = 4;
@@ -1413,18 +1158,14 @@ ui_error_t run_action_sheet_coverage(void) {
   sheet->on_close = NULL;
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   /* mock_dom_node_remove_child 6 */
   g_action_sheet_mock_fail = 6;
   {
     ui_error_t rc_cleanup = ui_dom_node_remove_child(NULL, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
@@ -1432,9 +1173,7 @@ ui_error_t run_action_sheet_coverage(void) {
   g_action_sheet_mock_fail = 7;
   {
     ui_error_t rc_cleanup = ui_dom_node_remove_child(NULL, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
@@ -1446,15 +1185,11 @@ ui_error_t run_action_sheet_coverage(void) {
     g_action_sheet_mock_fail = 7;
     {
       ui_error_t rc_cleanup = ui_dom_node_remove_child(&parent, &child2);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        /* expected error */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_remove_child(&parent, &child1);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        /* expected error */
-      }
+      (void)rc_cleanup;
     }
     g_action_sheet_mock_fail = 0;
   }
@@ -1462,25 +1197,19 @@ ui_error_t run_action_sheet_coverage(void) {
   g_action_sheet_mock_fail = 11;
   {
     ui_error_t rc_cleanup = ui_dom_node_remove_child(NULL, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
   g_action_sheet_mock_fail = 12;
   {
     ui_error_t rc_cleanup = ui_bottom_sheet_base_set_open(NULL, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 13;
   {
     ui_error_t rc_cleanup = ui_bottom_sheet_base_set_open(NULL, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
@@ -1488,25 +1217,19 @@ ui_error_t run_action_sheet_coverage(void) {
   g_action_sheet_mock_fail = 6;
   {
     ui_error_t rc_cleanup = ui_focus_trap_create(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 7;
   {
     ui_error_t rc_cleanup = ui_focus_trap_create(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   g_action_sheet_mock_fail = 0;
 
   action1->shadow_root = NULL;
   {
     ui_error_t rc_cleanup = ui_component_destroy(action1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;

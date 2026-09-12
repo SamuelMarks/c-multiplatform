@@ -240,23 +240,17 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(toggle->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(toggle);
   return rc;
@@ -284,15 +278,11 @@ ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(toggle->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(toggle);

@@ -377,26 +377,20 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (slider->gesture_recognizer) {
     {
       ui_error_t rc_cleanup =
           ui_gesture_recognizer_destroy(slider->gesture_recognizer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (slider->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(slider->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(slider);
@@ -414,15 +408,11 @@ ui_error_t ui_slider_base_destroy(struct ui_slider_base *slider) {
   if (slider->gesture_recognizer) {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_destroy(slider->gesture_recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (slider->component) {
     ui_error_t rc_cleanup = ui_component_destroy(slider->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(slider);
   return UI_ERROR_NONE;

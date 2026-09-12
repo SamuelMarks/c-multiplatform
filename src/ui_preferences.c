@@ -172,9 +172,7 @@ ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
 
   {
     ui_error_t rc_cleanup = ui_promise_reject(promise, UI_ERROR_UNSUPPORTED);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   *out_promise = promise;

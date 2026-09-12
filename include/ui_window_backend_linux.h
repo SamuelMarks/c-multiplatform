@@ -38,6 +38,24 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend);
 extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_window_backend_linux_destroy(struct ui_window_backend *backend);
 
+/**
+ * @brief Creates a Linux Wayland (EGL) backend instance.
+ *
+ * @param out_backend Pointer to receive the allocated backend instance.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_window_backend_linux_wayland_create(struct ui_window_backend **out_backend);
+
+/**
+ * @brief Destroys a Linux Wayland backend instance.
+ *
+ * @param backend The backend instance to destroy.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_window_backend_linux_wayland_destroy(struct ui_window_backend *backend);
+
 /** @} */
 
 #ifdef __cplusplus

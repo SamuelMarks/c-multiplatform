@@ -128,9 +128,7 @@ ui_error_t ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon) {
   {
     ui_error_t rc_cleanup =
         ui_signal_destroy(ribbon->group_state_changed_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;
@@ -179,18 +177,16 @@ ui_ribbon_base_add_group_config(struct ui_ribbon_base *ribbon,
  * @param out_state Parameter out_state.
  * @return Return value.
  */
-static ui_error_t find_group_state(const struct ui_ribbon_base *ribbon,
-                                   int group_id,
-                                   struct ui_ribbon_group_state **out_state) {
+static void find_group_state(const struct ui_ribbon_base *ribbon, int group_id,
+                             struct ui_ribbon_group_state **out_state) {
   int i;
   *out_state = NULL;
   for (i = 0; i < ribbon->num_groups; ++i) {
     if (ribbon->groups[i].config.group_id == group_id) {
       *out_state = (struct ui_ribbon_group_state *)&ribbon->groups[i];
-      return UI_ERROR_NONE;
+      return;
     }
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -199,16 +195,14 @@ static ui_error_t find_group_state(const struct ui_ribbon_base *ribbon,
  *
  * \param ribbon The component.
  * \param indices Array of indices to sort.
- * \return UI_ERROR_NONE on success.
  */
 /**
  * @brief sort_indices_by_priority.
  * @param ribbon Parameter ribbon.
  * @param indices Parameter indices.
- * @return Return value.
  */
-static ui_error_t sort_indices_by_priority(const struct ui_ribbon_base *ribbon,
-                                           int *indices) {
+static void sort_indices_by_priority(const struct ui_ribbon_base *ribbon,
+                                     int *indices) {
   int i, j, temp;
   for (i = 0; i < ribbon->num_groups - 1; i++) {
     for (j = 0; j < ribbon->num_groups - i - 1; j++) {
@@ -225,7 +219,6 @@ static ui_error_t sort_indices_by_priority(const struct ui_ribbon_base *ribbon,
       }
     }
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -242,7 +235,6 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
   int indices[UI_RIBBON_MAX_GROUPS];
   int i;
   int current_width = 0;
-  ui_error_t rc;
 
   union ui_signal_payload payload;
 
@@ -262,10 +254,7 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     ribbon->groups[i].current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_NORMAL;
   }
 
-  rc = sort_indices_by_priority(ribbon, indices);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
+  sort_indices_by_priority(ribbon, indices);
 
   /* Step 1: Collapse low-priority groups to COMPACT if we overflow */
   for (i = 0; i < ribbon->num_groups && current_width > available_width; ++i) {
@@ -278,9 +267,7 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     {
       ui_error_t rc_cleanup =
           ui_signal_set(ribbon->group_state_changed_signal, payload);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -296,9 +283,7 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     {
       ui_error_t rc_cleanup =
           ui_signal_set(ribbon->group_state_changed_signal, payload);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -318,16 +303,12 @@ ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
                                int group_id,
                                enum ui_ribbon_group_collapse_state *out_state) {
   struct ui_ribbon_group_state *gs = NULL;
-  ui_error_t rc;
 
   if (!ribbon || !out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rc = find_group_state(ribbon, group_id, &gs);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
+  find_group_state(ribbon, group_id, &gs);
   if (!gs) {
     return UI_ERROR_NOT_FOUND;
   }

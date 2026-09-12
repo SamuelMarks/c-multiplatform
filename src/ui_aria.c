@@ -256,7 +256,7 @@ ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
 #if defined(_MSC_VER)
     strcpy_s(out_state->label, len + 1, val);
 #else
-    UI_STRCPY(out_state->label, sizeof(out_state->label), val);
+    memcpy(out_state->label, val, len + 1);
 #endif
   }
 
@@ -278,7 +278,7 @@ ui_error_t ui_aria_state_parse(const struct ui_dom_node *node,
 #if defined(_MSC_VER)
     strcpy_s(out_state->description, len + 1, val);
 #else
-    UI_STRCPY(out_state->description, sizeof(out_state->description), val);
+    memcpy(out_state->description, val, len + 1);
 #endif
   }
 
@@ -385,6 +385,18 @@ ui_error_t run_aria_coverage(void) {
   ui_dom_node_set_attribute(node, "aria-pressed", "mixed");
   ui_aria_state_parse(node, &state);
 
+  ui_dom_node_set_attribute(node, "aria-label", "label_test");
+  g_malloc_fail_countdown = 0;
+  ui_aria_state_parse(node, &state);
+  g_malloc_fail_countdown = -1;
+  ui_dom_node_remove_attribute(node, "aria-label");
+
+  ui_dom_node_set_attribute(node, "aria-description", "desc_test");
+  g_malloc_fail_countdown = 0;
+  ui_aria_state_parse(node, &state);
+  g_malloc_fail_countdown = -1;
+  ui_dom_node_remove_attribute(node, "aria-description");
+
   g_aria_mock_fail = 4;
   ui_dom_node_set_attribute(node, "aria-description", "foo");
   g_malloc_fail_countdown = 0;
@@ -394,9 +406,7 @@ ui_error_t run_aria_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
+    (void)rc_cleanup;
   }
   return UI_ERROR_NONE;
 }

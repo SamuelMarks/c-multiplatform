@@ -192,17 +192,13 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (tabs->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(tabs->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(tabs);
@@ -222,9 +218,7 @@ ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs) {
 
   {
     ui_error_t rc_cleanup = ui_component_destroy(tabs->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(tabs);
@@ -248,7 +242,7 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
 #if defined(_MSC_VER)
   (void)strcpy_s(dst, len + 1, src);
 #else
-  UI_STRCPY(dst, 256, src);
+  strcpy(dst, src);
 #endif
   *out_str = dst;
   return UI_ERROR_NONE;
@@ -313,46 +307,34 @@ ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(title_node, "role", "tab");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(title_node, "id", tab_node_id);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(title_node, "aria-controls", panel_node_id);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   /* Setup panel_node ARIA/role attributes */
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(panel_node, "role", "tabpanel");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(panel_node, "id", panel_node_id);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(panel_node, "aria-labelledby", tab_node_id);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   /* Default state: hidden/inactive if not the first tab */
@@ -360,38 +342,28 @@ ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(title_node, "aria-selected", "true");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(title_node, "tabindex", "0");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   } else {
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(title_node, "aria-selected", "false");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(title_node, "tabindex", "-1");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(panel_node, "hidden", "true");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -445,39 +417,29 @@ ui_error_t ui_tabs_base_set_active_index(struct ui_tabs_base *tabs, int index) {
       {
         ui_error_t rc_cleanup = ui_dom_node_set_attribute(
             entry->header_node, "aria-selected", "true");
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup =
             ui_dom_node_set_attribute(entry->header_node, "tabindex", "0");
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       (void)UI_DOM_REM_ATTR_IGNORE(entry->panel_node, "hidden");
     } else {
       {
         ui_error_t rc_cleanup = ui_dom_node_set_attribute(
             entry->header_node, "aria-selected", "false");
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup =
             ui_dom_node_set_attribute(entry->header_node, "tabindex", "-1");
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup =
             ui_dom_node_set_attribute(entry->panel_node, "hidden", "true");
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
     }
   }

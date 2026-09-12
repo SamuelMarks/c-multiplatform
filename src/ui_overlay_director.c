@@ -124,9 +124,7 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(wrapper);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(overlay);
     return err;
@@ -143,9 +141,7 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(wrapper);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(overlay);
     return err;
@@ -156,9 +152,7 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(wrapper);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(overlay);
     return err;
@@ -167,15 +161,11 @@ ui_overlay_director_mount_component(struct ui_overlay_director *director,
   {
     ui_error_t rc_cleanup =
         ui_dom_node_append_child(director->root_node, wrapper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_mount(component, wrapper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   overlay->component = component;
@@ -242,9 +232,7 @@ ui_error_t ui_overlay_director_unmount(struct ui_overlay_director *director,
   overlay->wrapper_node->next_sibling = NULL;
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(overlay->wrapper_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(overlay);

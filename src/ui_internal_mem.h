@@ -119,12 +119,12 @@ static int mock_strcpy_fail_check(void) {
  * @brief Safe strcpy wrapper
  */
 #define UI_STRCPY(dest, destsz, src)                                           \
-  (mock_strcpy_fail_check() ? -1 : (strcpy((dest), (src)) == NULL ? -1 : 0))
+  (mock_strcpy_fail_check() ? -1 : (strcpy((dest), (src)), 0))
 /** @def UI_STRNCPY
  * @brief Safe strncpy wrapper
  */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
-#define UI_STRCAT(dest, destsz, src) (strcat((dest), (src)) == NULL ? -1 : 0)
+#define UI_STRCAT(dest, destsz, src) (strcat((dest), (src)), 0)
 #endif
 #else
 #if defined(_MSC_VER)
@@ -142,12 +142,12 @@ static int mock_strcpy_fail_check(void) {
 /** @def UI_STRCPY
  * @brief Safe strcpy wrapper
  */
-#define UI_STRCPY(dest, destsz, src) (strcpy((dest), (src)) == NULL ? -1 : 0)
+#define UI_STRCPY(dest, destsz, src) (strcpy((dest), (src)), 0)
 /** @def UI_STRNCPY
  * @brief Safe strncpy wrapper
  */
 #define UI_STRNCPY(dest, destsz, src, count) strncpy((dest), (src), (count))
-#define UI_STRCAT(dest, destsz, src) (strcat((dest), (src)) == NULL ? -1 : 0)
+#define UI_STRCAT(dest, destsz, src) (strcat((dest), (src)), 0)
 #endif
 #endif
 

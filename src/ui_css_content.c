@@ -149,12 +149,7 @@ ui_error_t ui_css_parse_content(const char *str,
         sizeof(struct ui_css_content_item));
     if (!item) {
       out_content->items = head;
-      {
-        ui_error_t rc_cleanup = ui_css_content_destroy(out_content);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      (void)ui_css_content_destroy(out_content);
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memset(item, 0, sizeof(struct ui_css_content_item));
@@ -312,12 +307,7 @@ ui_error_t ui_css_parse_content(const char *str,
 parse_failed:
   C_MULTIPLATFORM_FREE(item);
   out_content->items = head;
-  {
-    ui_error_t rc_cleanup = ui_css_content_destroy(out_content);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_css_content_destroy(out_content);
   return rc != UI_ERROR_NONE ? rc : UI_ERROR_PARSE_FAILED;
 }
 

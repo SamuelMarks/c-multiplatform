@@ -257,9 +257,7 @@ ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
     if (rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_form_control_destroy(ctrl);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       return rc;
     }

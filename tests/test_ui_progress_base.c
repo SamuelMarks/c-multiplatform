@@ -195,7 +195,7 @@ static int run_oom_tests(void) {
   ui_error_t rc;
   int i;
 
-  for (i = 0; i < 5; i++) {
+  for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_progress_base_create(&progress);
     if (rc == UI_ERROR_NONE) {

@@ -104,6 +104,16 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t ui_label_base_get_component(
 extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_label_base_bind_text(struct ui_label_base *widget, struct ui_signal *signal);
 
+/**
+ * @brief Sets the static text content of the label.
+ *
+ * @param label The label widget.
+ * @param text The text string to set.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_label_base_set_text(struct ui_label_base *label, const char *text);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

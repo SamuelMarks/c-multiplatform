@@ -52,6 +52,7 @@ static int test_web_bridge(void) {
   ui_web_bridge_dispatch_resize(800, 600, 1.0f);
   ui_web_bridge_dispatch_key(10, "A", 0); /* KEY_DOWN */
   ui_web_bridge_dispatch_key(11, "A", 0); /* KEY_UP */
+  ui_web_bridge_dispatch_key(10, NULL, 0);
 
   /* Exceed buffer to hit flush branch */
   ui_web_bridge_set_bounds(1, 0, 0, 100, 100);

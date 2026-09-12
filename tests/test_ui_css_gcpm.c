@@ -119,6 +119,28 @@ static int test_gcpm_parse(void) {
     return 1;
   ui_css_gcpm_properties_cleanup(&props);
   free_props(&style);
+  style.properties = NULL;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_mock_strcpy_fail;
+    add_prop(&style, "string-set", "val");
+    g_mock_strcpy_fail = 1;
+    ui_css_gcpm_parse(&style, &props);
+    g_mock_strcpy_fail = 0;
+    ui_css_gcpm_properties_cleanup(&props);
+    free_props(&style);
+    style.properties = NULL;
+
+    add_prop(&style, "bookmark-label", "val");
+    g_mock_strcpy_fail = 1;
+    ui_css_gcpm_parse(&style, &props);
+    g_mock_strcpy_fail = 0;
+    ui_css_gcpm_properties_cleanup(&props);
+    free_props(&style);
+    style.properties = NULL;
+  }
+#endif
 
   return 0;
 }

@@ -3,12 +3,38 @@
 #include "ui_arena.h"
 #include "ui_error.h"
 #include <stdio.h>
+#include <string.h>
 /* clang-format on */
+
+extern int g_malloc_fail_countdown;
 
 static int test_ribbon_lifecycle(void) {
   struct ui_arena *arena;
   struct ui_ribbon_base *ribbon = NULL;
   ui_signal_t *signal = NULL;
+
+  /* OOM tests on ribbon create */
+  {
+    struct ui_arena *small_arena = NULL;
+    struct ui_ribbon_base *fail_ribbon = NULL;
+    void *dummy = NULL;
+    ui_arena_create(64, &small_arena);
+    ui_arena_alloc(small_arena, 64, 8, &dummy);
+
+    /* Countdown 0: ribbon struct alloc fails */
+    g_malloc_fail_countdown = 0;
+    if (ui_ribbon_base_create(small_arena, &fail_ribbon) == UI_ERROR_NONE)
+      return 1;
+    g_malloc_fail_countdown = -1;
+
+    /* Countdown 1: ribbon struct succeeds, signal alloc fails */
+    g_malloc_fail_countdown = 1;
+    if (ui_ribbon_base_create(small_arena, &fail_ribbon) == UI_ERROR_NONE)
+      return 1;
+    g_malloc_fail_countdown = -1;
+
+    ui_arena_destroy(small_arena);
+  }
 
   if (ui_arena_create(1024 * 16, &arena) != UI_ERROR_NONE) {
     return 1;
@@ -87,6 +113,29 @@ static int test_ribbon_groups(void) {
 
   ui_ribbon_base_get_group_state(ribbon, 1, &state);
 
+  /* Test 4: Extreme shrink to 10px so all groups collapse and loops terminate
+   * via i == num_groups */
+  ui_ribbon_base_recalculate_overflow(ribbon, 10);
+
+  /* Test 5: Ascending priority sorting */
+  {
+    struct ui_ribbon_base *asc_ribbon = NULL;
+    struct ui_ribbon_group_config g1, g2;
+    ui_ribbon_base_create(arena, &asc_ribbon);
+    g1.group_id = 10;
+    g1.priority = 1;
+    g1.min_width_normal = 200;
+    g1.min_width_compact = 100;
+    g2.group_id = 20;
+    g2.priority = 10;
+    g2.min_width_normal = 200;
+    g2.min_width_compact = 100;
+    ui_ribbon_base_add_group_config(asc_ribbon, &g1);
+    ui_ribbon_base_add_group_config(asc_ribbon, &g2);
+    ui_ribbon_base_recalculate_overflow(asc_ribbon, 250);
+    ui_ribbon_base_destroy(asc_ribbon);
+  }
+
   {
     ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
     if (rc_cleanup != UI_ERROR_NONE) {
@@ -147,6 +196,8 @@ static int test_ribbon_nulls_and_errors(void) {
   enum ui_ribbon_group_collapse_state state;
   ui_signal_t *signal;
   ui_bool_t is_active;
+
+  memset(&group, 0, sizeof(group));
 
   ui_arena_create(1024 * 16, &arena);
 

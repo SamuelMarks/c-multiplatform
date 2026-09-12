@@ -83,9 +83,7 @@ static ui_error_t update_dom_state(struct ui_wheel_picker_base *picker) {
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           picker->component->shadow_root, "aria-valuenow", buf);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -222,9 +220,7 @@ ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(picker->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(picker);
     return rc;
@@ -238,16 +234,12 @@ ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(root_node, "role", "listbox");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(root_node, "tabindex", "0");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   picker->component->shadow_root = root_node;
 
@@ -255,16 +247,12 @@ ui_wheel_picker_base_create(struct ui_wheel_picker_base **out_picker,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     picker->component->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(picker->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(picker);
     return rc;
@@ -305,9 +293,7 @@ ui_error_t ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker) {
     {
       ui_error_t rc_cleanup =
           ui_gesture_recognizer_destroy(picker->gesture_recognizer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -316,17 +302,13 @@ ui_error_t ui_wheel_picker_base_destroy(struct ui_wheel_picker_base *picker) {
       {
         ui_error_t rc_cleanup =
             ui_dom_node_destroy(picker->component->shadow_root);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       picker->component->shadow_root = NULL;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(picker->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(picker);
@@ -477,18 +459,14 @@ ui_wheel_picker_base_process_event(struct ui_wheel_picker_base *picker,
       {
         ui_error_t rc_cleanup = ui_wheel_picker_base_set_selected_index(
             picker, picker->selected_index - 1);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       return UI_ERROR_NONE;
     } else if (event->event_data.keyboard.key_code == UI_KEY_DOWN) {
       {
         ui_error_t rc_cleanup = ui_wheel_picker_base_set_selected_index(
             picker, picker->selected_index + 1);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       return UI_ERROR_NONE;
     }

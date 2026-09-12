@@ -79,9 +79,7 @@ ui_error_t ui_list_base_destroy(struct ui_list_base *list) {
   if (list->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(list->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(list);
@@ -196,9 +194,7 @@ ui_error_t ui_list_item_base_destroy(struct ui_list_item_base *item) {
   if (item->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(item->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(item);

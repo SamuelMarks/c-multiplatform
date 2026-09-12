@@ -1,0 +1,160 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UI Runtime Widget Schema",
+  "description": "Formal verifiable schema definition for runtime-defined UI widgets and applications with strict additionalProperties rejection.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["routes"],
+  "properties": {
+    "app_id": {
+      "type": "string"
+    },
+    "initial_route": {
+      "type": "string"
+    },
+    "global_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z0-9_.]+$": {
+          "type": ["string", "number", "boolean"]
+        }
+      }
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "root"],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "root": {
+            "$ref": "#/definitions/Node"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z0-9_-]+$": {
+              "type": ["string", "number", "boolean"]
+            }
+          }
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "bind_cva": {
+              "type": "string"
+            },
+            "bind_text": {
+              "type": "string"
+            },
+            "bind_disabled": {
+              "type": "string"
+            },
+            "bind_visibility": {
+              "type": "string"
+            },
+            "bind_signal": {
+              "type": "string"
+            }
+          }
+        },
+        "validators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["required", "pattern", "min_length", "max_length"]
+              },
+              "pattern": {
+                "type": "string"
+              },
+              "min_length": {
+                "type": "integer"
+              },
+              "max_length": {
+                "type": "integer"
+              },
+              "value": {
+                "type": ["string", "number"]
+              }
+            }
+          }
+        },
+        "events": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^(on_click|on_change|on_submit|on_blur)$": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["steps"],
+              "properties": {
+                "steps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["action"],
+                    "properties": {
+                      "stepId": {
+                        "type": "string"
+                      },
+                      "action": {
+                        "type": "string",
+                        "enum": ["mutate_state", "navigate", "http_request"]
+                      },
+                      "target": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      },
+                      "successCriteria": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Node"
+          }
+        }
+      }
+    }
+  }
+}

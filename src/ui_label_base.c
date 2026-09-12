@@ -76,17 +76,13 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (lbl->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(lbl->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(lbl);
@@ -109,11 +105,8 @@ ui_error_t ui_label_base_destroy(struct ui_label_base *label) {
 
   {
     ui_error_t rc_cleanup = ui_component_destroy(label->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
-
   C_MULTIPLATFORM_FREE(label);
   return UI_ERROR_NONE;
 }
@@ -127,8 +120,6 @@ ui_error_t ui_label_base_destroy(struct ui_label_base *label) {
  */
 ui_error_t ui_label_base_set_for(struct ui_label_base *label,
                                  const char *target_id) {
-  size_t len;
-
   if (!label) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -139,16 +130,10 @@ ui_error_t ui_label_base_set_for(struct ui_label_base *label,
   }
 
   if (target_id) {
-    len = strlen(target_id);
-    label->target_id = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+    label->target_id = C_MULTIPLATFORM_STRDUP(target_id);
     if (!label->target_id) {
       return UI_ERROR_OUT_OF_MEMORY;
     }
-#if defined(_MSC_VER)
-    strcpy_s(label->target_id, len + 1, target_id);
-#else
-    UI_STRCPY(label->target_id, sizeof(label->target_id), target_id);
-#endif
 
     if (label->component && label->component->shadow_root) {
       ui_dom_node_set_attribute(label->component->shadow_root, "for",
@@ -233,6 +218,40 @@ ui_error_t ui_label_base_bind_text(struct ui_label_base *widget,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Sets the static text content of the label.
+ * @param[in,out] label The label component.
+ * @param[in] text The text string to set.
+ * @return UI_ERROR_NONE on success.
+ */
+ui_error_t ui_label_base_set_text(struct ui_label_base *label,
+                                  const char *text) {
+  struct ui_dom_node *text_node = NULL;
+  ui_error_t rc;
+
+  if (!label || !text || !label->component || !label->component->shadow_root) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  if (label->component->shadow_root->first_child &&
+      label->component->shadow_root->first_child->type ==
+          UI_DOM_NODE_TYPE_TEXT) {
+    text_node = label->component->shadow_root->first_child;
+  } else {
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    {
+      ui_error_t rc_append =
+          ui_dom_node_append_child(label->component->shadow_root, text_node);
+      (void)rc_append;
+    }
+  }
+
+  return ui_dom_node_set_text_content(text_node, text);
+}
+
 #ifdef UI_TEST_MOCK_ALLOC
 ui_error_t ui_test_label_base_set_for_no_component(void);
 
@@ -240,34 +259,24 @@ ui_error_t ui_test_label_base_set_for_no_component(void) {
   struct ui_label_base *lbl = NULL;
   {
     ui_error_t rc_cleanup = ui_label_base_create(&lbl);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(lbl->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   lbl->component = NULL;
   {
     ui_error_t rc_cleanup = ui_label_base_set_for(lbl, "fail-target-2");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_label_base_set_for(lbl, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   return UI_ERROR_NONE;
 }

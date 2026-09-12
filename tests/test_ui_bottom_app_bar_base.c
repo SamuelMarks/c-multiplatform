@@ -11,7 +11,9 @@ extern int g_malloc_fail_countdown;
 
 static void test_bottom_app_bar_edge_cases(void) {
   struct ui_bottom_app_bar_base *bar = NULL;
+  struct ui_bottom_app_bar_base *test_bar = NULL;
   struct ui_component *comp = NULL;
+  struct ui_fab_base *fab = NULL;
   struct ui_signal *signal = (struct ui_signal *)0x123;
   int i;
   ui_error_t rc;
@@ -42,7 +44,6 @@ static void test_bottom_app_bar_edge_cases(void) {
          UI_ERROR_NONE);
 
   /* Fab alignment END */
-  struct ui_fab_base *fab = NULL;
   assert(ui_fab_base_create(&fab) == UI_ERROR_NONE);
 
   assert(ui_bottom_app_bar_base_set_fab(bar, fab, UI_BOTTOM_APP_BAR_FAB_END) ==
@@ -68,7 +69,6 @@ static void test_bottom_app_bar_edge_cases(void) {
   /* OOM loop */
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
-    struct ui_bottom_app_bar_base *test_bar = NULL;
     rc = ui_bottom_app_bar_base_create(&test_bar);
     if (rc == UI_ERROR_NONE) {
       {
@@ -87,16 +87,15 @@ static void test_bottom_app_bar_edge_cases(void) {
 }
 
 int main(void) {
+  struct ui_bottom_app_bar_base *bar = NULL;
+  struct ui_fab_base *fab = NULL;
+  struct ui_component *comp = NULL;
+  ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
   extern ui_error_t run_bottom_app_bar_coverage(void);
   run_bottom_app_bar_coverage();
 #endif
-
-  struct ui_bottom_app_bar_base *bar = NULL;
-  struct ui_fab_base *fab = NULL;
-  struct ui_component *comp = NULL;
-  ui_error_t rc;
 
   rc = ui_bottom_app_bar_base_create(&bar);
   if (rc != UI_ERROR_NONE) {

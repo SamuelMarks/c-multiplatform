@@ -180,17 +180,13 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (checkbox->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(checkbox->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(checkbox);
@@ -202,25 +198,13 @@ cleanup:
  * @param checkbox Parameter checkbox.
  * @return Return value.
  */
-#ifdef UI_TEST_MOCK_ALLOC
-extern ui_error_t ui_component_destroy(struct ui_component *c);
-static ui_error_t mock_component_destroy_checkbox(struct ui_component *c) {
-  if (g_checkbox_mock_fail == 20)
-    return UI_ERROR_UNKNOWN;
-  return ui_component_destroy(c);
-}
-#define ui_component_destroy mock_component_destroy_checkbox
-#endif
-
 ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox) {
   if (!checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(checkbox->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(checkbox);
   return UI_ERROR_NONE;
@@ -376,4 +360,48 @@ ui_error_t ui_checkbox_base_toggle(struct ui_checkbox_base *checkbox) {
     checkbox->state = UI_CHECKBOX_STATE_CHECKED;
   }
   return update_dom_state(checkbox);
+}
+
+/**
+ * @brief Retrieves the underlying component of the checkbox.
+ * @param checkbox The checkbox instance.
+ * @param out_component Pointer to receive the component.
+ * @return UI_ERROR_NONE on success.
+ */
+ui_error_t ui_checkbox_base_get_component(struct ui_checkbox_base *checkbox,
+                                          struct ui_component **out_component) {
+  if (!checkbox || !out_component) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_component = checkbox->component;
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief Sets the text label for the checkbox.
+ * @param checkbox The checkbox instance.
+ * @param label The label text.
+ * @return UI_ERROR_NONE on success.
+ */
+ui_error_t ui_checkbox_base_set_label(struct ui_checkbox_base *checkbox,
+                                      const char *label) {
+  if (!checkbox || !label || !checkbox->component ||
+      !checkbox->component->shadow_root) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  return ui_dom_node_set_attribute(checkbox->component->shadow_root,
+                                   "aria-label", label);
+}
+
+/**
+ * @brief Sets the checked boolean state of the checkbox.
+ * @param checkbox The checkbox instance.
+ * @param checked 1 for checked, 0 for unchecked.
+ * @return UI_ERROR_NONE on success.
+ */
+ui_error_t ui_checkbox_base_set_checked(struct ui_checkbox_base *checkbox,
+                                        int checked) {
+  return ui_checkbox_base_set_state(checkbox,
+                                    checked ? UI_CHECKBOX_STATE_CHECKED
+                                            : UI_CHECKBOX_STATE_UNCHECKED);
 }

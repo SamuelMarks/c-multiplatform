@@ -235,9 +235,7 @@ cleanup:
   if (carousel->virtual_scroll) {
     ui_error_t rc_cleanup =
         ui_virtual_scroll_base_destroy(carousel->virtual_scroll);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   if (carousel->component &&
@@ -252,30 +250,16 @@ cleanup:
 
   if (carousel->root_node) {
     ui_error_t rc_cleanup = ui_dom_node_destroy(carousel->root_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (carousel->component) {
     ui_error_t rc_cleanup = ui_component_destroy(carousel->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(carousel);
   return rc;
 }
-
-#ifdef UI_TEST_MOCK_ALLOC
-extern ui_error_t ui_component_destroy(struct ui_component *c);
-static ui_error_t mock_component_destroy_carousel(struct ui_component *c) {
-  if (g_carousel_mock_fail == 20)
-    return UI_ERROR_UNKNOWN;
-  return ui_component_destroy(c);
-}
-#define ui_component_destroy mock_component_destroy_carousel
-#endif
 
 ui_error_t ui_carousel_base_destroy(struct ui_carousel_base *carousel) {
   if (!carousel)
@@ -283,22 +267,16 @@ ui_error_t ui_carousel_base_destroy(struct ui_carousel_base *carousel) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(carousel->gesture);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_virtual_scroll_base_destroy(carousel->virtual_scroll);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(carousel->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(carousel);

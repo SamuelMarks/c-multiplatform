@@ -11,6 +11,7 @@
 #include "ui_property_grid_base.h"
 #include "ui_arena.h"
 #include "ui_error.h"
+#include "ui_internal_mem.h"
 #include <string.h>
 /* clang-format on */
 
@@ -112,6 +113,16 @@ ui_property_grid_base_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER,
                         pointer_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                         &(*out_grid)->value_changed_signal);
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    void *dummy = C_MULTIPLATFORM_MALLOC(1);
+    if (!dummy) {
+      rc = UI_ERROR_OUT_OF_MEMORY;
+    } else {
+      C_MULTIPLATFORM_FREE(dummy);
+    }
+  }
+#endif
   if (rc != UI_ERROR_NONE) {
     return rc;
   }
@@ -132,9 +143,7 @@ ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid) {
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(grid->value_changed_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;

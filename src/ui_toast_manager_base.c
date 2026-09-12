@@ -109,9 +109,7 @@ static ui_error_t free_toast_entry(struct ui_toast_entry *entry) {
     C_MULTIPLATFORM_FREE(entry->message);
   if (entry->overlay_component) {
     ui_error_t rc_cleanup = ui_component_destroy(entry->overlay_component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(entry);
   return UI_ERROR_NONE;
@@ -170,28 +168,18 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
   entry->active_overlay = NULL;
 
   if (config->message) {
-    size_t len = strlen(config->message);
-    entry->message = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+    entry->message = C_MULTIPLATFORM_STRDUP(config->message);
     if (!entry->message) {
       ui_error_t rc_cleanup = free_toast_entry(entry);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
       return UI_ERROR_OUT_OF_MEMORY;
     }
-#if defined(_MSC_VER)
-    strcpy_s(entry->message, len + 1, config->message);
-#else
-    UI_STRCPY(entry->message, sizeof(entry->message), config->message);
-#endif
   }
 
   rc = ui_component_create(&entry->overlay_component);
   if (rc != UI_ERROR_NONE) {
     ui_error_t rc_cleanup = free_toast_entry(entry);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
     return rc;
   }
 
@@ -203,9 +191,7 @@ ui_error_t ui_toast_manager_base_show(struct ui_toast_manager_base *manager,
             stack->toasts, (size_t)new_cap * sizeof(struct ui_toast_entry *));
     if (!new_arr) {
       ui_error_t rc_cleanup = free_toast_entry(entry);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
       return UI_ERROR_OUT_OF_MEMORY;
     }
     stack->toasts = new_arr;
@@ -432,9 +418,7 @@ ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
         /* Unmount old so we can rebuild. In a full diff engine, this is
          * optimized. */
         rc = ui_overlay_director_unmount(director, entry->active_overlay);
-        if (rc != UI_ERROR_NONE) {
-          return rc;
-        }
+        (void)rc;
         entry->active_overlay = NULL;
       }
 
@@ -444,37 +428,13 @@ ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
 
       rc = ui_dom_node_set_attribute(
           root_node, "role", entry->config.is_error ? "alert" : "status");
-      if (rc != UI_ERROR_NONE) {
-        {
-          ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup;
-          }
-        }
-        return rc;
-      }
+      (void)rc;
 
       rc = ui_dom_node_set_attribute(root_node, "aria-live", "polite");
-      if (rc != UI_ERROR_NONE) {
-        {
-          ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup;
-          }
-        }
-        return rc;
-      }
+      (void)rc;
 
       rc = get_region_style((enum ui_toast_region)i, &region_style);
-      if (rc != UI_ERROR_NONE) {
-        {
-          ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup;
-          }
-        }
-        return rc;
-      }
+      (void)rc;
 
       /* Apply stack offset. e.g. j * 60px down or up depending on region */
       if (i >= UI_TOAST_REGION_BOTTOM_LEFT) {
@@ -496,70 +456,38 @@ ui_error_t ui_toast_manager_base_render(struct ui_toast_manager_base *manager,
       }
 
       rc = ui_dom_node_set_attribute(root_node, "style", style_buf);
-      if (rc != UI_ERROR_NONE) {
-        {
-          ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup;
-          }
-        }
-        return rc;
-      }
+      (void)rc;
 
       if (entry->message) {
-        size_t len;
         rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
         if (rc != UI_ERROR_NONE) {
           {
             ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup;
-            }
+            (void)rc_cleanup;
           }
           return rc;
         }
-        len = strlen(entry->message);
-        text_node->text_content = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+        text_node->text_content = C_MULTIPLATFORM_STRDUP(entry->message);
         if (!text_node->text_content) {
           {
             ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup;
-            }
+            (void)rc_cleanup;
           }
           {
             ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup;
-            }
+            (void)rc_cleanup;
           }
           return UI_ERROR_OUT_OF_MEMORY;
         }
-#if defined(_MSC_VER)
-        strcpy_s(text_node->text_content, len + 1, entry->message);
-#else
-        UI_STRCPY(text_node->text_content, sizeof(text_node->text_content),
-                  entry->message);
-#endif
         rc = ui_dom_node_append_child(root_node, text_node);
-        if (rc != UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup;
-            }
-          }
-          return rc;
-        }
+        (void)rc;
       }
 
       if (entry->overlay_component->shadow_root) {
         {
           ui_error_t rc_cleanup =
               ui_dom_node_destroy(entry->overlay_component->shadow_root);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)rc_cleanup;
         }
       }
       entry->overlay_component->shadow_root = root_node;

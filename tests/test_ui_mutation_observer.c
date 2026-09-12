@@ -537,27 +537,38 @@ static int run_normal_tests(void) {
   }
 
   {
+    struct ui_dom_node *live_root = NULL;
+    struct ui_dom_node *live_child = NULL;
     struct ui_dom_node *disjoint = NULL;
-    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &disjoint);
-
     struct ui_mutation_observer *sobs = NULL;
-    ui_mutation_observer_create(mutation_cb, NULL, &sobs);
-    struct ui_mutation_observer_init opt_sub = {1, 1, 1, 1, 1};
-    ui_mutation_observer_observe(sobs, root, &opt_sub);
-
-    struct ui_mutation_observer_init opt_no_sub = {1, 1, 1, 0, 0};
     struct ui_mutation_observer *sobs2 = NULL;
+    struct ui_mutation_observer_init opt_sub = {1, 1, 1, 1, 1};
+    struct ui_mutation_observer_init opt_no_sub = {1, 1, 1, 0, 0};
+
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &live_root);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &live_child);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &disjoint);
+    ui_dom_node_append_child(live_root, live_child);
+
+    ui_mutation_observer_create(mutation_cb, NULL, &sobs);
+    ui_mutation_observer_observe(sobs, live_root, &opt_sub);
+
     ui_mutation_observer_create(mutation_cb, NULL, &sobs2);
-    ui_mutation_observer_observe(sobs2, root, &opt_no_sub);
+    ui_mutation_observer_observe(sobs2, live_root, &opt_no_sub);
+
+    ui_mutation_observer_notify_child_list(live_child, NULL, NULL);
+    ui_mutation_observer_notify_attribute(live_child, "test", "test");
+    ui_mutation_observer_notify_character_data(live_child, "test");
 
     ui_mutation_observer_notify_child_list(disjoint, NULL, NULL);
-    ui_mutation_observer_notify_attribute(root, NULL, NULL);
+    ui_mutation_observer_notify_attribute(live_root, NULL, NULL);
     ui_mutation_observer_notify_attribute(disjoint, "test", "test");
     ui_mutation_observer_notify_character_data(disjoint, "test");
-    ui_mutation_observer_notify_attribute(root, "test", "test");
+    ui_mutation_observer_notify_attribute(live_root, "test", "test");
 
     ui_mutation_observer_destroy(sobs);
     ui_mutation_observer_destroy(sobs2);
+    ui_dom_node_destroy(live_root);
     ui_dom_node_destroy(disjoint);
   }
 

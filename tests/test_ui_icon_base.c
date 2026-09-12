@@ -103,6 +103,17 @@ static int run_normal_tests(void) {
   if (ui_icon_base_bind_name(icon, (struct ui_signal *)1) != UI_ERROR_NONE)
     return 1;
 
+#if defined(UI_TEST_MOCK_ALLOC)
+  {
+    extern int g_mock_strcpy_fail;
+    g_mock_strcpy_fail = 1;
+    ui_icon_base_set_font_glyph(icon, &dummy_font, "star");
+    g_mock_strcpy_fail = 1;
+    ui_icon_base_set_svg_path(icon, "M0 0");
+    g_mock_strcpy_fail = 0;
+  }
+#endif
+
   {
     ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
     if (rc_cleanup != UI_ERROR_NONE) {

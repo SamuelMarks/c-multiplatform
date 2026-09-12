@@ -170,6 +170,31 @@ static void test_page_parse_cases(void) {
     ui_css_stylesheet_destroy(sh);
   }
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    struct ui_css_stylesheet *sh;
+    struct ui_css_rule *r;
+    struct ui_css_computed_style *s;
+    struct ui_css_page_properties p;
+    extern int g_mock_strcpy_fail;
+    ui_css_stylesheet_create(&sh);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &r);
+    ui_css_rule_append_selector(r, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(r, "page", "custom-page", 0);
+    ui_css_stylesheet_append_rule(sh, r);
+    ui_css_resolve_style(sh, node, &s);
+
+    g_mock_strcpy_fail = 1;
+    rc = ui_css_page_parse(s, &p);
+    (void)rc;
+    g_mock_strcpy_fail = 0;
+
+    ui_css_page_properties_cleanup(&p);
+    ui_css_computed_style_destroy(s);
+    ui_css_stylesheet_destroy(sh);
+  }
+#endif
+
   /* ui_css_page_properties_cleanup with NULL properties or already freed name
    */
   ui_css_page_properties_cleanup(NULL);

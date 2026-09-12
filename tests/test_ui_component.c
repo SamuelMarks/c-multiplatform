@@ -10,6 +10,7 @@
 
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
+extern int g_component_mock_fail;
 
 TEST run_normal_tests(void) {
   struct ui_component *comp = NULL;
@@ -303,9 +304,136 @@ TEST run_oom_tests(void) {
   PASS();
 }
 
+TEST run_mock_fail_tests(void) {
+  struct ui_component *comp = NULL;
+  struct ui_dom_node *shadow_root = NULL;
+  struct ui_dom_node *btn_node = NULL;
+  struct ui_css_stylesheet *style = NULL;
+  struct ui_css_stylesheet *style2 = NULL;
+  ui_error_t rc;
+
+  /* 1. Mock fail 20: shadow_root destroy fails */
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &shadow_root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  comp->shadow_root = shadow_root;
+  g_component_mock_fail = 20;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_component_mock_fail = 0;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 2. Mock fail 21: internal_style destroy fails in ui_component_destroy */
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_css_stylesheet_create(&style);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  comp->internal_style = style;
+  g_component_mock_fail = 21;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_component_mock_fail = 0;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 3. Mock fail 22: override_style destroy fails in ui_component_destroy */
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_css_stylesheet_create(&style);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  comp->override_style = style;
+  g_component_mock_fail = 22;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_component_mock_fail = 0;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 4. Mock fail 23: bound_properties destroy fails in ui_component_destroy */
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_css_stylesheet_create(&style);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  comp->bound_properties = style;
+  g_component_mock_fail = 23;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_component_mock_fail = 0;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 5. Mock fail 24: internal_style cleanup branch in set_default_style */
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_css_stylesheet_create(&style);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_component_set_default_style(comp, style);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_css_stylesheet_create(&style2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_component_mock_fail = 24;
+  rc = ui_component_set_default_style(comp, style2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_component_mock_fail = 0;
+  rc = ui_css_stylesheet_destroy(style);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 6. Mock fail 25: override_style cleanup branch in inject_style_override */
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_component_inject_style_override(comp, ".btn { color: red; }");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  style = comp->override_style;
+  g_component_mock_fail = 25;
+  rc = ui_component_inject_style_override(comp, ".btn { color: blue; }");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_component_mock_fail = 0;
+  rc = ui_css_stylesheet_destroy(style);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 7. Mock fail 26: append_rule cleanup branch in set_property */
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_component_mock_fail = 26;
+  rc = ui_component_set_property(comp, "--mock-color", "#123");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_component_mock_fail = 0;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 8. Mock fail 27: ui_dom_node_set_attribute fails in
+   * rewrite_classes_for_node */
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &shadow_root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &btn_node);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_set_attribute(btn_node, "class", "active");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_append_child(shadow_root, btn_node);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  comp->shadow_root = shadow_root;
+  g_component_mock_fail = 27;
+  rc = ui_component_scope_styles(comp);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_component_mock_fail = 0;
+  rc = ui_component_destroy(comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
 SUITE(ui_component_suite) {
   RUN_TEST(run_normal_tests);
   RUN_TEST(run_oom_tests);
+  RUN_TEST(run_mock_fail_tests);
 }
 
 GREATEST_MAIN_DEFS();

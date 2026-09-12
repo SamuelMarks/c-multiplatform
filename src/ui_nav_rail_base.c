@@ -73,9 +73,7 @@ ui_error_t ui_nav_rail_base_destroy(struct ui_nav_rail_base *rail) {
   if (rail->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(rail->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(rail);
@@ -155,9 +153,7 @@ ui_error_t ui_nav_rail_item_base_destroy(struct ui_nav_rail_item_base *item) {
   if (item->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(item->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(item);

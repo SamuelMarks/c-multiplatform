@@ -7,6 +7,18 @@
 extern int g_malloc_fail_countdown;
 extern int g_card_mock_fail;
 
+struct ui_card_base_internal {
+  struct ui_component *component;
+  struct ui_dom_node *root_node;
+  struct ui_dom_node *header_node;
+  struct ui_dom_node *content_node;
+  struct ui_dom_node *actions_node;
+  struct ui_component *header_content;
+  struct ui_component *main_content;
+  struct ui_component *actions_content;
+  struct ui_signal *data_signal;
+};
+
 static ui_error_t run_mock_failures(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   int i;
@@ -109,6 +121,48 @@ static ui_error_t run_normal_tests(void) {
   rc = ui_card_base_bind_data(card, NULL);
   if (rc != UI_ERROR_NONE)
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+
+  rc = ui_card_base_set_title(NULL, "Title");
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_card_base_set_title(card, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_card_base_set_title(card, "Card Title");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  rc = ui_card_base_set_subtitle(NULL, "Subtitle");
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_card_base_set_subtitle(card, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  rc = ui_card_base_set_subtitle(card, "Card Subtitle");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  {
+    struct ui_card_base_internal *ci = (struct ui_card_base_internal *)card;
+    struct ui_dom_node *orig_header = ci->header_node;
+    struct ui_dom_node *orig_root = ci->root_node;
+
+    ci->header_node = NULL;
+    rc = ui_card_base_set_title(card, "No Header");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+
+    ci->root_node = NULL;
+    rc = ui_card_base_set_title(card, "No Root");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_card_base_set_subtitle(card, "No Root Sub");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+
+    ci->header_node = orig_header;
+    ci->root_node = orig_root;
+  }
 
   rc = ui_card_base_destroy(card);
 

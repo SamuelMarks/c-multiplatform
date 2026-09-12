@@ -756,11 +756,11 @@ static const struct ui_renderer_vtable gdiplus_vtable = {
     gdiplus_destroy};
 
 /**
- * @brief ui_renderer_native_init.
+ * @brief Initializes the Windows GDI+ native renderer backend.
  * @param renderer Parameter renderer.
  * @return Return value.
  */
-ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
+ui_error_t ui_renderer_gdiplus_init(struct ui_renderer *renderer) {
   struct gdiplus_context *gctx;
   struct GdiplusStartupInput input;
   ULONG_PTR token;
@@ -794,5 +794,29 @@ ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
   renderer->ctx = gctx;
 
   return UI_ERROR_NONE;
+}
+
+/**
+ * @brief Initializes the native renderer backend on Windows.
+ * @param renderer Parameter renderer.
+ * @return Return value.
+ */
+ui_error_t ui_renderer_native_init(struct ui_renderer *renderer) {
+  return ui_renderer_gdiplus_init(renderer);
+}
+#else
+/**
+ * @brief Initializes the Windows GDI+ native renderer backend stub on
+ * non-Windows.
+ *
+ * @param renderer The renderer to initialize.
+ * @return ui_error_t UI_ERROR_INVALID_ARGUMENT if renderer is NULL,
+ * UI_ERROR_UNKNOWN on non-Windows.
+ */
+ui_error_t ui_renderer_gdiplus_init(struct ui_renderer *renderer) {
+  if (!renderer) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  return UI_ERROR_UNKNOWN;
 }
 #endif

@@ -265,6 +265,15 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_renderer_native_init(struct ui_renderer *renderer);
 
 /**
+ * @brief Initializes the Windows GDI+ native renderer backend.
+ *
+ * @param renderer The renderer to initialize with GDI+.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_renderer_gdiplus_init(struct ui_renderer *renderer);
+
+/**
  * @brief Initializes the GLES 2.0 fallback backend.
  *
  * @param renderer The renderer to initialize with GLES2.

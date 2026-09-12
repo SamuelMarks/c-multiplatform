@@ -56,7 +56,7 @@ ui_error_t ui_engine_create(const struct ui_engine_config *config,
   engine->reactor = NULL;
   engine->timer = NULL;
 
-  rc = ui_tick_engine_create(&engine->tick_engine);
+  rc = ui_reactor_create(&engine->reactor);
   if (rc != UI_ERROR_NONE) {
     goto cleanup;
   }
@@ -71,16 +71,14 @@ ui_error_t ui_engine_create(const struct ui_engine_config *config,
   engine->thread_pool = NULL; /* No thread pool in single threaded mode */
 #endif
 
-  rc = ui_reactor_create(&engine->reactor);
+  rc = ui_timer_create_monotonic(&engine->timer);
   if (rc != UI_ERROR_NONE) {
     goto cleanup;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_timer_create_monotonic(&engine->timer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+  rc = ui_tick_engine_create(&engine->tick_engine);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   *out_engine = engine;
@@ -88,23 +86,21 @@ ui_error_t ui_engine_create(const struct ui_engine_config *config,
 
 cleanup:
   if (engine) {
+    if (engine->timer) {
+      ui_error_t rc_cleanup = ui_timer_destroy(engine->timer);
+      (void)rc_cleanup;
+    }
+    if (engine->reactor) {
+      ui_error_t rc_cleanup = ui_reactor_destroy(engine->reactor);
+      (void)rc_cleanup;
+    }
     if (engine->thread_pool) {
 #ifndef UI_SINGLE_THREADED
       {
         ui_error_t rc_cleanup = ui_thread_pool_destroy(engine->thread_pool);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
 #endif
-    }
-    if (engine->tick_engine) {
-      {
-        ui_error_t rc_cleanup = ui_tick_engine_destroy(engine->tick_engine);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
     }
     C_MULTIPLATFORM_FREE(engine);
   }
@@ -124,35 +120,27 @@ ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   if (engine->timer) {
     {
       ui_error_t rc_cleanup = ui_timer_destroy(engine->timer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (engine->reactor) {
     {
       ui_error_t rc_cleanup = ui_reactor_destroy(engine->reactor);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 #ifndef UI_SINGLE_THREADED
   if (engine->thread_pool) {
     {
       ui_error_t rc_cleanup = ui_thread_pool_destroy(engine->thread_pool);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 #endif
   if (engine->tick_engine) {
     {
       ui_error_t rc_cleanup = ui_tick_engine_destroy(engine->tick_engine);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 

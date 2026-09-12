@@ -118,6 +118,51 @@ struct ui_audio_sink_backend {
 extern C_MULTIPLATFORM_EXPORT ui_error_t
 ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend);
 
+/**
+ * @brief Gets the ALSA audio sink backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_audio_sink_alsa_get_backend(struct ui_audio_sink_backend *out_backend);
+
+/**
+ * @brief Gets the OpenSL ES audio sink backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_audio_sink_opensles_get_backend(struct ui_audio_sink_backend *out_backend);
+
+/**
+ * @brief Gets the WASAPI audio sink backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_audio_sink_wasapi_get_backend(struct ui_audio_sink_backend *out_backend);
+
+/**
+ * @brief Gets the WebAudio audio sink backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_audio_sink_webaudio_get_backend(struct ui_audio_sink_backend *out_backend);
+
+/**
+ * @brief Gets the CoreAudio audio sink backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_audio_sink_coreaudio_get_backend(struct ui_audio_sink_backend *out_backend);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

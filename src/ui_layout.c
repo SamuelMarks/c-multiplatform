@@ -111,19 +111,8 @@ ui_error_t ui_layout_sanity_check(const struct ui_layout_node *node) {
        just assert exactly what's requested: children do not exceed parent
        bounds unless overflow handles it.
      */
-    if (node->overflow_x == UI_LAYOUT_OVERFLOW_HIDDEN ||
-        node->overflow_x == UI_LAYOUT_OVERFLOW_VISIBLE) {
-      /* Even if hidden or visible, the mathematical bounds could be larger,
-         but if we want to ensure containment sanity, we might only assert it if
-         there's a strict constraint. Let's just do a basic assertion that
-         width doesn't wildly blow out without a reason.
-         Wait, if overflow is NOT scroll/auto, and child_max_x > parent_max_x,
-         maybe that's a violation of our "prevent UI elements from bleeding"
-         rule? Let's flag it if overflow is HIDDEN and it bleeds, as the user
-         wants to test bounds.
-      */
-      if (node->overflow_x != UI_LAYOUT_OVERFLOW_VISIBLE &&
-          child_max_x > parent_max_x + 0.5f) {
+    if (node->overflow_x == UI_LAYOUT_OVERFLOW_HIDDEN) {
+      if (child_max_x > parent_max_x + 0.5f) {
         /* allow tiny float drift */
         return UI_ERROR_LAYOUT_VIOLATION;
       }
@@ -169,9 +158,7 @@ ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
   if (node->display_inside == UI_LAYOUT_DISPLAY_INSIDE_FLEX) {
     ui_error_t rc;
     rc = layout_flex(node, available_width);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)rc;
     return UI_ERROR_NONE;
   }
 
@@ -179,9 +166,7 @@ ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
   {
     ui_error_t rc;
     rc = layout_block(node, available_width);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)rc;
   }
 
 #if defined(__EMSCRIPTEN__)

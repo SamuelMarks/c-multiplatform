@@ -33,9 +33,7 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
   if (!control) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -57,9 +55,7 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(control->base.shadow_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(control);
     return err;

@@ -135,9 +135,7 @@ ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart) {
     return UI_ERROR_INVALID_ARGUMENT;
   {
     ui_error_t rc_cleanup = ui_signal_destroy(chart->topology_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   return UI_ERROR_NONE;
 }

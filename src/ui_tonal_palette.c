@@ -6,6 +6,10 @@
 #include "ui_tonal_palette.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_tonal_palette_mock_fail = 0;
+#endif
+
 /**
  * @brief ui_tonal_palette_from_color.
  * @param argb Parameter argb.
@@ -22,6 +26,11 @@ ui_error_t ui_tonal_palette_from_color(ui_color_t argb,
   }
 
   err = ui_color_argb_to_hct(argb, &hct);
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_tonal_palette_mock_fail) {
+    err = UI_ERROR_UNKNOWN;
+  }
+#endif
   if (err != UI_ERROR_NONE) {
     return err;
   }

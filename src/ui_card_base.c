@@ -194,54 +194,34 @@ cleanup:
   if (card->header_node && card->header_node->parent == NULL) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(card->header_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (card->content_node && card->content_node->parent == NULL) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(card->content_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (card->actions_node && card->actions_node->parent == NULL) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(card->actions_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (card->root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(card->root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (card->component) {
     ui_error_t rc_cleanup = ui_component_destroy(card->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(card);
   return rc;
 }
-
-#ifdef UI_TEST_MOCK_ALLOC
-extern ui_error_t ui_component_destroy(struct ui_component *c);
-static ui_error_t mock_component_destroy_card(struct ui_component *c) {
-  if (g_card_mock_fail == 20)
-    return UI_ERROR_UNKNOWN;
-  return ui_component_destroy(c);
-}
-#define ui_component_destroy mock_component_destroy_card
-#endif
 
 ui_error_t ui_card_base_destroy(struct ui_card_base *card) {
   if (!card) {
@@ -250,9 +230,7 @@ ui_error_t ui_card_base_destroy(struct ui_card_base *card) {
   if (card->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(card->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(card);
@@ -291,6 +269,43 @@ ui_error_t ui_card_base_set_actions(struct ui_card_base *card,
   card->actions_content = actions;
   if (actions) {
     return ui_component_mount(actions, card->actions_node);
+  }
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief Sets the title text of the card.
+ * @param card The card instance.
+ * @param title The title text string.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+ui_error_t ui_card_base_set_title(struct ui_card_base *card,
+                                  const char *title) {
+  if (!card || !title) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (card->header_node) {
+    ui_dom_node_set_text_content(card->header_node, title);
+  }
+  if (card->root_node) {
+    ui_dom_node_set_attribute(card->root_node, "title", title);
+  }
+  return UI_ERROR_NONE;
+}
+
+/**
+ * @brief Sets the subtitle text of the card.
+ * @param card The card instance.
+ * @param subtitle The subtitle text string.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+ui_error_t ui_card_base_set_subtitle(struct ui_card_base *card,
+                                     const char *subtitle) {
+  if (!card || !subtitle) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (card->root_node) {
+    ui_dom_node_set_attribute(card->root_node, "data-subtitle", subtitle);
   }
   return UI_ERROR_NONE;
 }

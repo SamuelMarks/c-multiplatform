@@ -66,6 +66,16 @@ static ui_error_t run_normal_tests(void) {
   if (image.state != UI_IMAGE_STATE_IDLE)
     return UI_ERROR_UNKNOWN;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_mock_strcpy_fail;
+    g_mock_strcpy_fail = 1;
+    rc = ui_image_base_set_src(&image, "http://example.com/mock.png", 0);
+    (void)rc;
+    g_mock_strcpy_fail = 0;
+  }
+#endif
+
   printf("Testing ui_image_base_bind_src...\n");
   rc = ui_image_base_bind_src(NULL, (struct ui_signal *)1);
   if (rc != UI_ERROR_INVALID_ARGUMENT)

@@ -132,9 +132,7 @@ ui_error_t ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble) {
     return UI_ERROR_INVALID_ARGUMENT;
   {
     ui_error_t rc_cleanup = ui_signal_destroy(bubble->config_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   return UI_ERROR_NONE;
 }

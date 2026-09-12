@@ -149,9 +149,7 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (split_btn->trigger_button) {
@@ -164,9 +162,7 @@ cleanup:
     tmp_comp->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_button_base_destroy(split_btn->trigger_button);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (split_btn->main_button) {
@@ -179,17 +175,13 @@ cleanup:
     tmp_comp->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_button_base_destroy(split_btn->main_button);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (split_btn->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(split_btn->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(split_btn);
@@ -219,9 +211,7 @@ ui_split_button_base_destroy(struct ui_split_button_base *split_button) {
   {
     ui_error_t rc_cleanup =
         ui_button_base_destroy(split_button->trigger_button);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   /* Unlink from parent to prevent double free */
@@ -233,16 +223,12 @@ ui_split_button_base_destroy(struct ui_split_button_base *split_button) {
   tmp_comp->shadow_root = NULL;
   {
     ui_error_t rc_cleanup = ui_button_base_destroy(split_button->main_button);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup = ui_component_destroy(split_button->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(split_button);

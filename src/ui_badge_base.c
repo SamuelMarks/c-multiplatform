@@ -143,9 +143,7 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(badge);
     return rc;
@@ -155,15 +153,11 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(badge);
     return rc;
@@ -172,15 +166,11 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(badge);
     return rc;
@@ -193,15 +183,11 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
     if (rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(badge);
       return rc;
@@ -210,21 +196,15 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
     if (rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(badge);
       return rc;
@@ -247,9 +227,7 @@ ui_error_t ui_badge_base_destroy(struct ui_badge_base *badge) {
     if (badge->component) {
       {
         ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
     }
     C_MULTIPLATFORM_FREE(badge);

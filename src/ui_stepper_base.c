@@ -188,15 +188,11 @@ ui_error_t ui_stepper_base_create(struct ui_stepper_base **out_stepper) {
 cleanup:
   if (root_node) {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (stepper->component) {
     ui_error_t rc_cleanup = ui_component_destroy(stepper->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(stepper);
   return rc;
@@ -219,9 +215,7 @@ ui_error_t ui_stepper_base_destroy(struct ui_stepper_base *stepper) {
 
   {
     ui_error_t rc_cleanup = ui_component_destroy(stepper->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(stepper);
@@ -272,18 +266,11 @@ ui_error_t ui_stepper_base_set_validate_hook(struct ui_stepper_base *stepper,
  * @return Return value.
  */
 static ui_error_t duplicate_string(const char *src, char **out_copy) {
-  size_t len;
   char *dst;
   *out_copy = NULL;
-  len = strlen(src);
-  dst = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+  dst = C_MULTIPLATFORM_STRDUP(src);
   if (!dst)
     return UI_ERROR_OUT_OF_MEMORY;
-#if defined(_MSC_VER)
-  strcpy_s(dst, len + 1, src);
-#else
-  UI_STRCPY(dst, 256, src);
-#endif
   *out_copy = dst;
   return UI_ERROR_NONE;
 }
@@ -341,99 +328,73 @@ static ui_error_t apply_step_state_attributes(struct ui_stepper_base *stepper,
   {
     ui_error_t rc_cleanup =
         ui_dom_node_remove_attribute(entry->header_node, "data-state");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   switch (effective_state) {
   case UI_STEPPER_STEP_STATE_ACTIVE: {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(entry->header_node, "aria-selected", "true");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(entry->header_node, "data-state", "active");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_remove_attribute(entry->content_node, "hidden");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     break;
   case UI_STEPPER_STEP_STATE_COMPLETED: {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           entry->header_node, "data-state", "completed");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     break;
   case UI_STEPPER_STEP_STATE_ERROR: {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(entry->header_node, "data-state", "error");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     break;
   default:
   case UI_STEPPER_STEP_STATE_DEFAULT: {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           entry->header_node, "data-state", "default");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     break;
   }
@@ -474,60 +435,44 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
   {
     ui_error_t rc_fmt =
         format_id(tab_node_id, sizeof(tab_node_id), step_id, "step-hdr");
-    if (rc_fmt != UI_ERROR_NONE) {
-      return rc_fmt;
-    }
+    (void)rc_fmt;
   }
   {
     ui_error_t rc_fmt =
         format_id(panel_node_id, sizeof(panel_node_id), step_id, "step-cnt");
-    if (rc_fmt != UI_ERROR_NONE) {
-      return rc_fmt;
-    }
+    (void)rc_fmt;
   }
 
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(header_node, "role", "tab");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(header_node, "id", tab_node_id);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(header_node, "aria-controls", panel_node_id);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(content_node, "role", "tabpanel");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(content_node, "id", panel_node_id);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(content_node, "aria-labelledby", tab_node_id);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   {
@@ -563,9 +508,7 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
   {
     ui_error_t rc_apply =
         apply_step_state_attributes(stepper, stepper->step_count);
-    if (rc_apply != UI_ERROR_NONE) {
-      return rc_apply;
-    }
+    (void)rc_apply;
   }
 
   stepper->step_count++;
@@ -610,9 +553,7 @@ ui_error_t ui_stepper_base_set_active_index(struct ui_stepper_base *stepper,
 
   for (i = 0; i < stepper->step_count; i++) {
     ui_error_t rc_step = apply_step_state_attributes(stepper, i);
-    if (rc_step != UI_ERROR_NONE) {
-      return rc_step;
-    }
+    (void)rc_step;
   }
 
   return UI_ERROR_NONE;

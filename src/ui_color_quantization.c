@@ -145,7 +145,7 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
   if (num_clusters == 0) {
     size_t idx = 0;
     for (; idx < width * height * (size_t)channels; idx += (size_t)channels) {
-      if (channels < 4 || pixels[idx + 3] >= 128) {
+      if (pixels[idx + 3] >= 128) {
         clusters[0].r = pixels[idx];
         clusters[0].g = pixels[idx + 1];
         clusters[0].b = pixels[idx + 2];

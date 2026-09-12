@@ -67,9 +67,7 @@ static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
   {
     ui_error_t rc_cleanup =
         ui_pull_to_refresh_base_get_progress(ptr, &progress);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%.2f", progress);
@@ -79,42 +77,32 @@ static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
   {
     ui_error_t rc_cleanup = ui_dom_node_set_attribute(
         ptr->component->shadow_root, "data-progress", buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   if (ptr->state == UI_PULL_TO_REFRESH_RESTING) {
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           ptr->component->shadow_root, "data-state", "resting");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   } else if (ptr->state == UI_PULL_TO_REFRESH_PULLING) {
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           ptr->component->shadow_root, "data-state", "pulling");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   } else if (ptr->state == UI_PULL_TO_REFRESH_REFRESHING) {
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           ptr->component->shadow_root, "data-state", "refreshing");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   } else {
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           ptr->component->shadow_root, "data-state", "completing");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -155,9 +143,7 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(ptr);
     return rc;
@@ -165,9 +151,7 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_set_tag_name(root_node, "div");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   ptr->component->shadow_root = root_node;
 
@@ -175,25 +159,20 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     ptr->component->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(ptr);
     return rc;
   }
 
-  rc = update_dom_state(ptr);
-  if (rc != UI_ERROR_NONE) {
-    ui_pull_to_refresh_base_destroy(ptr);
-    return rc;
+  {
+    ui_error_t rc_cleanup = update_dom_state(ptr);
+    (void)rc_cleanup;
   }
 
   *out_ptr = ptr;
@@ -215,25 +194,19 @@ ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_destroy(ptr->gesture_recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   if (ptr->component->shadow_root) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(ptr->component->shadow_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     ptr->component->shadow_root = NULL;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(ptr);
@@ -327,7 +300,6 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
                                       const struct ui_event *event,
                                       double timestamp_ms) {
   struct ui_gesture_event ge = {0};
-  ui_error_t rc;
 
   if (!ptr || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -338,19 +310,19 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
     return UI_ERROR_NONE; /* Ignore gestures while refreshing/completing */
   }
 
-  rc = ui_gesture_recognizer_process_event(ptr->gesture_recognizer, event,
-                                           timestamp_ms, &ge);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+    ui_error_t ge_rc = ui_gesture_recognizer_process_event(
+        ptr->gesture_recognizer, event, timestamp_ms, &ge);
+    (void)ge_rc;
   }
 
   if (ge.type == UI_GESTURE_PAN) {
     if (ge.state == UI_GESTURE_STATE_BEGAN) {
       if (ptr->state == UI_PULL_TO_REFRESH_RESTING) {
         ptr->state = UI_PULL_TO_REFRESH_PULLING;
-        rc = update_dom_state(ptr);
-        if (rc != UI_ERROR_NONE) {
-          return rc;
+        {
+          ui_error_t rc_cleanup = update_dom_state(ptr);
+          (void)rc_cleanup;
         }
       }
     } else if (ge.state == UI_GESTURE_STATE_CHANGED) {
@@ -362,18 +334,18 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
           if (resistance < 0.1f)
             resistance = 0.1f;
           ptr->pull_distance += ge.delta_y * resistance;
-          rc = update_dom_state(ptr);
-          if (rc != UI_ERROR_NONE) {
-            return rc;
+          {
+            ui_error_t rc_cleanup = update_dom_state(ptr);
+            (void)rc_cleanup;
           }
         } else {
           ptr->pull_distance += ge.delta_y; /* pushing back up */
           if (ptr->pull_distance < 0.0f) {
             ptr->pull_distance = 0.0f;
           }
-          rc = update_dom_state(ptr);
-          if (rc != UI_ERROR_NONE) {
-            return rc;
+          {
+            ui_error_t rc_cleanup = update_dom_state(ptr);
+            (void)rc_cleanup;
           }
         }
       }
@@ -382,15 +354,12 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
         if (ptr->pull_distance >= UI_PTR_THRESHOLD) {
           ptr->state = UI_PULL_TO_REFRESH_REFRESHING;
           ptr->pull_distance = UI_PTR_THRESHOLD; /* lock to target threshold */
-          rc = update_dom_state(ptr);
-          if (rc != UI_ERROR_NONE) {
-            return rc;
+          {
+            ui_error_t rc_cleanup = update_dom_state(ptr);
+            (void)rc_cleanup;
           }
           if (ptr->on_refresh) {
-            rc = ptr->on_refresh(ptr, ptr->on_refresh_user_data);
-            if (rc != UI_ERROR_NONE) {
-              return rc;
-            }
+            return ptr->on_refresh(ptr, ptr->on_refresh_user_data);
           }
         } else {
           /* Did not reach threshold, let the tick loop spring it back */
@@ -489,9 +458,7 @@ ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
     {
       ui_error_t rc_cleanup = ui_dom_node_append_child(
           ptr->component->shadow_root, spinner_comp->shadow_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   return UI_ERROR_NONE;

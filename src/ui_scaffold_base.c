@@ -28,9 +28,7 @@ static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(*out_slot);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     return err;
   }
@@ -41,9 +39,7 @@ static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
     if (set_rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(*out_slot);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       return set_rc;
     }
@@ -80,9 +76,7 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
   if (!scaffold) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -101,9 +95,7 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(scaffold->base.shadow_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(scaffold);
     return err;

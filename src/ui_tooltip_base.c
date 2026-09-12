@@ -95,9 +95,7 @@ ui_error_t ui_tooltip_base_destroy(struct ui_tooltip_base *tooltip) {
     C_MULTIPLATFORM_FREE(tooltip->text);
   {
     ui_error_t rc_cleanup = ui_component_destroy(tooltip->overlay_component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   /* Note: active_overlay lifecycle is managed by overlay_director unmount */
   C_MULTIPLATFORM_FREE(tooltip);
@@ -123,7 +121,7 @@ ui_error_t ui_tooltip_base_set_text(struct ui_tooltip_base *tooltip,
 #if defined(_MSC_VER)
     strcpy_s(tooltip->text, len + 1, text);
 #else
-    UI_STRCPY(tooltip->text, sizeof(tooltip->text), text);
+    strcpy(tooltip->text, text);
 #endif
   }
   return UI_ERROR_NONE;
@@ -285,18 +283,14 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
     int is_visible = 0;
     {
       ui_error_t rc_cleanup = ui_tooltip_base_is_visible(tooltip, &is_visible);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     if (!is_visible) {
       if (tooltip->active_overlay) {
         {
           ui_error_t rc_cleanup =
               ui_overlay_director_unmount(director, tooltip->active_overlay);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)rc_cleanup;
         }
         tooltip->active_overlay = NULL;
       }
@@ -328,16 +322,12 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   {
     ui_error_t rc_cleanup =
         ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(root_node, "role", "tooltip");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
 #if defined(_MSC_VER)
@@ -350,18 +340,14 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   {
     ui_error_t rc_cleanup =
         ui_dom_node_set_attribute(root_node, "style", style_buf);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   if (tooltip->text) {
     {
       ui_error_t rc_cleanup =
           ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
 
     if (text_node) {
@@ -373,25 +359,20 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
 #if defined(_MSC_VER)
         strcpy_s(text_node->text_content, len + 1, tooltip->text);
 #else
-        UI_STRCPY(text_node->text_content, sizeof(text_node->text_content),
-                  tooltip->text);
+        strcpy(text_node->text_content, tooltip->text);
 #endif
       }
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_append_child(root_node, text_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
   {
     ui_error_t rc_cleanup =
         ui_dom_node_destroy(tooltip->overlay_component->shadow_root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   tooltip->overlay_component->shadow_root = root_node;
 
@@ -399,9 +380,7 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   {
     ui_error_t rc_cleanup = ui_overlay_director_mount_component(
         director, tooltip->overlay_component, 9999, &tooltip->active_overlay);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;

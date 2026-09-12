@@ -73,14 +73,10 @@ ui_error_t ui_compositor_material_base_create(
 
   initial_payload.int_val = (ui_int32)config->initial_type;
   {
-    {
-      ui_error_t rc_cleanup = ui_signal_create(
-          arena, initial_payload, UI_SIGNAL_TYPE_INT32, type_equality, NULL,
-          UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_material)->type_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    ui_error_t rc_cleanup = ui_signal_create(
+        arena, initial_payload, UI_SIGNAL_TYPE_INT32, type_equality, NULL,
+        UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_material)->type_signal);
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;
@@ -99,9 +95,7 @@ ui_error_t ui_compositor_material_base_destroy(
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(material->type_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;
@@ -126,12 +120,8 @@ ui_error_t ui_compositor_material_base_set_type(
   payload.int_val = (ui_int32)type;
 
   {
-    {
-      ui_error_t rc_cleanup = ui_signal_set(material->type_signal, payload);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    ui_error_t rc_cleanup = ui_signal_set(material->type_signal, payload);
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;

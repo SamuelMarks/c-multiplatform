@@ -67,6 +67,7 @@ static ui_error_t test_argb_to_cam16(void) {
 static ui_error_t test_edge_cases(void) {
   ui_color_t black =
       UI_COLOR_ARGB(255, 1, 1, 1); /* Near black to hit low value branches */
+  ui_color_t blue = UI_COLOR_ARGB(255, 0, 0, 255);
   struct ui_color_hct hct;
   struct ui_color_cam16 cam16;
   ui_color_t back;
@@ -93,7 +94,6 @@ static ui_error_t test_edge_cases(void) {
   ui_color_cam16_to_argb(&cam16, &back);
 
   /* Test with a blue color to hit b > 0.04045 branches */
-  ui_color_t blue = UI_COLOR_ARGB(255, 0, 0, 255);
   ui_color_argb_to_hct(blue, &hct);
   ui_color_hct_to_argb(&hct, &back);
 

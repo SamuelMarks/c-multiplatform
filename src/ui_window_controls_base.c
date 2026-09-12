@@ -94,9 +94,7 @@ ui_window_controls_base_destroy(struct ui_window_controls_base *controls) {
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(controls->state_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;

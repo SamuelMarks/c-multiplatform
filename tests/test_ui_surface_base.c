@@ -72,9 +72,9 @@ static int run_oom_tests(void) {
 }
 
 int main(void) {
+  struct ui_surface_base *s2;
   if (run_normal_tests() != 0)
     return 1;
-  struct ui_surface_base *s2;
   g_malloc_fail_countdown = 2;
   ui_surface_base_create(&s2);
   g_malloc_fail_countdown = 3;

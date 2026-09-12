@@ -104,9 +104,7 @@ ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout) {
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(layout->layout_changed_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;

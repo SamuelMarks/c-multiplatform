@@ -85,10 +85,8 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise) {
     next = current->next;
     if (current->chained_promise) {
       {
-        ui_error_t rc_cleanup = ui_promise_destroy(current->chained_promise);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        ui_error_t _ign_rc = ui_promise_destroy(current->chained_promise);
+        (void)_ign_rc;
       }
     }
     C_MULTIPLATFORM_FREE(current);
@@ -131,19 +129,14 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
     if (node->chained_promise) {
       if (state == UI_PROMISE_FULFILLED) {
         {
-          ui_error_t rc_cleanup =
+          ui_error_t _ign_rc =
               ui_promise_resolve(node->chained_promise, result);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)_ign_rc;
         }
       } else {
         {
-          ui_error_t rc_cleanup =
-              ui_promise_reject(node->chained_promise, error);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          ui_error_t _ign_rc = ui_promise_reject(node->chained_promise, error);
+          (void)_ign_rc;
         }
       }
     }
@@ -156,19 +149,15 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
           {
-            ui_error_t rc_cleanup =
+            ui_error_t _ign_rc =
                 ui_promise_resolve(node->chained_promise, out_result);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+            (void)_ign_rc;
           }
         } else {
           {
-            ui_error_t rc_cleanup =
+            ui_error_t _ign_rc =
                 ui_promise_reject(node->chained_promise, cb_rc);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+            (void)_ign_rc;
           }
         }
       } else if (cb_rc != UI_ERROR_NONE) {
@@ -177,11 +166,8 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
     } else if (node->chained_promise) {
       /* bubble up */
       {
-        ui_error_t rc_cleanup =
-            ui_promise_resolve(node->chained_promise, result);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        ui_error_t _ign_rc = ui_promise_resolve(node->chained_promise, result);
+        (void)_ign_rc;
       }
     }
   } else {
@@ -190,19 +176,15 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
           {
-            ui_error_t rc_cleanup =
+            ui_error_t _ign_rc =
                 ui_promise_resolve(node->chained_promise, out_result);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+            (void)_ign_rc;
           }
         } else {
           {
-            ui_error_t rc_cleanup =
+            ui_error_t _ign_rc =
                 ui_promise_reject(node->chained_promise, cb_rc);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+            (void)_ign_rc;
           }
         }
       } else if (cb_rc != UI_ERROR_NONE) {
@@ -211,10 +193,8 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
     } else if (node->chained_promise) {
       /* bubble up */
       {
-        ui_error_t rc_cleanup = ui_promise_reject(node->chained_promise, error);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        ui_error_t _ign_rc = ui_promise_reject(node->chained_promise, error);
+        (void)_ign_rc;
       }
     }
   }
@@ -269,10 +249,8 @@ add_callback(struct ui_promise *promise,
   if (!node) {
     if (chained) {
       {
-        ui_error_t rc_cleanup = ui_promise_destroy(chained);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        ui_error_t _ign_rc = ui_promise_destroy(chained);
+        (void)_ign_rc;
       }
     }
     if (out_promise)

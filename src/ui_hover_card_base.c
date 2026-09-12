@@ -90,9 +90,7 @@ ui_hover_card_base_create(struct ui_hover_card_base **out_hover_card) {
   {
     ui_error_t rc_cleanup =
         ui_component_set_default_style(hover_card->component, default_style);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   hover_card->component->shadow_root = root_node;
@@ -105,17 +103,13 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (hover_card->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(hover_card->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(hover_card);
@@ -134,9 +128,7 @@ ui_error_t ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card) {
   if (hover_card->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(hover_card->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(hover_card);

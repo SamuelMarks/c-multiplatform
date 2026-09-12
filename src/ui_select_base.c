@@ -106,22 +106,14 @@ static ui_error_t update_dom_state(struct ui_select_base *select) {
     }
   } else {
     {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
-            select->component->shadow_root, "disabled");
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
+          select->component->shadow_root, "disabled");
+      (void)rc_cleanup;
     }
     {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
-            select->component->shadow_root, "aria-disabled");
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
+          select->component->shadow_root, "aria-disabled");
+      (void)rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -214,26 +206,20 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (sel->gesture_recognizer) {
     {
       ui_error_t rc_cleanup =
           ui_gesture_recognizer_destroy(sel->gesture_recognizer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (sel->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(sel->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(sel);
@@ -251,15 +237,11 @@ ui_error_t ui_select_base_destroy(struct ui_select_base *select) {
   if (select->gesture_recognizer) {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_destroy(select->gesture_recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (select->component) {
     ui_error_t rc_cleanup = ui_component_destroy(select->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(select);
   return UI_ERROR_NONE;
@@ -786,17 +768,13 @@ cleanup:
   if (text_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (option_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(option_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   return rc;

@@ -93,17 +93,13 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (wm->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(wm->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(wm);
@@ -118,9 +114,7 @@ ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager) {
   if (window_manager->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(window_manager->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(window_manager);

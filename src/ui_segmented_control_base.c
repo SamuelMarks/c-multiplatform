@@ -275,12 +275,7 @@ ui_segmented_control_base_destroy(struct ui_segmented_control_base *control) {
     return UI_ERROR_NONE;
   }
   if (control->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(control->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    (void)ui_component_destroy(control->component);
   }
   if (control->buttons) {
     C_MULTIPLATFORM_FREE(control->buttons);
@@ -426,12 +421,7 @@ ui_segmented_button_base_destroy(struct ui_segmented_button_base *button) {
     return UI_ERROR_NONE;
   }
   if (button->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(button->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    (void)ui_component_destroy(button->component);
   }
   C_MULTIPLATFORM_FREE(button);
   return UI_ERROR_NONE;

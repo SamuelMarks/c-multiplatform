@@ -62,6 +62,19 @@ static int run_normal_tests(void) {
   component = NULL;
 
   printf("Testing add class and style...\n");
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    struct ui_modifier *mock_mod = NULL;
+    extern int g_mock_strcpy_fail;
+    ui_modifier_create(&mock_mod);
+    g_mock_strcpy_fail = 1;
+    err = ui_modifier_add_class(mock_mod, "mock_class");
+    (void)err;
+    g_mock_strcpy_fail = 0;
+    ui_modifier_destroy(mock_mod);
+  }
+#endif
+
   err = ui_modifier_create(&modifier);
   if (err != UI_ERROR_NONE)
     return 1;

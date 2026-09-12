@@ -146,6 +146,57 @@ static ui_error_t mock_ui_ripple_start(struct ui_ripple_config *config, float x,
 /** @cond */
 #define ui_ripple_start mock_ui_ripple_start
 /** @endcond */
+
+/**
+ * @brief mock_ui_dom_node_create.
+ * @param type Parameter type.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_ui_dom_node_create(enum ui_dom_node_type type,
+                                          struct ui_dom_node **node) {
+  if (g_button_mock_fail == 310) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_create(type, node);
+}
+/** @cond */
+#define ui_dom_node_create mock_ui_dom_node_create
+/** @endcond */
+
+/**
+ * @brief mock_ui_dom_node_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
+static ui_error_t mock_ui_dom_node_append_child(struct ui_dom_node *parent,
+                                                struct ui_dom_node *child) {
+  if (g_button_mock_fail == 311) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_append_child(parent, child);
+}
+/** @cond */
+#define ui_dom_node_append_child mock_ui_dom_node_append_child
+/** @endcond */
+
+/**
+ * @brief mock_ui_dom_node_set_tag_name.
+ * @param node Parameter node.
+ * @param tag Parameter tag.
+ * @return Return value.
+ */
+static ui_error_t mock_ui_dom_node_set_tag_name(struct ui_dom_node *node,
+                                                const char *tag) {
+  if (g_button_mock_fail == 312) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_set_tag_name(node, tag);
+}
+/** @cond */
+#define ui_dom_node_set_tag_name mock_ui_dom_node_set_tag_name
+/** @endcond */
 #endif
 
 /**
@@ -250,26 +301,20 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (btn->gesture_recognizer) {
     {
       ui_error_t rc_cleanup =
           ui_gesture_recognizer_destroy(btn->gesture_recognizer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (btn->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(btn->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(btn);
@@ -289,15 +334,11 @@ ui_error_t ui_button_base_destroy(struct ui_button_base *button) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_destroy(button->gesture_recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(button->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(button);
@@ -448,6 +489,44 @@ ui_error_t ui_button_base_get_component(struct ui_button_base *button,
 }
 
 /**
+ * @brief Sets the static text content of the button.
+ * @param button The button widget.
+ * @param text The text string to set.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+ui_error_t ui_button_base_set_text(struct ui_button_base *button,
+                                   const char *text) {
+  struct ui_dom_node *text_node = NULL;
+  ui_error_t rc;
+
+  if (!button || !text || !button->component ||
+      !button->component->shadow_root) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  if (button->component->shadow_root->first_child &&
+      button->component->shadow_root->first_child->type ==
+          UI_DOM_NODE_TYPE_TEXT) {
+    text_node = button->component->shadow_root->first_child;
+  } else {
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    rc = ui_dom_node_append_child(button->component->shadow_root, text_node);
+    if (rc != UI_ERROR_NONE) {
+      {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
+        (void)rc_cleanup;
+      }
+      return rc;
+    }
+  }
+
+  return ui_dom_node_set_text_content(text_node, text);
+}
+
+/**
  * @brief ui_button_base_bind_disabled.
  * @param widget Parameter widget.
  * @param disabled_signal Parameter disabled_signal.
@@ -491,3 +570,51 @@ ui_error_t ui_button_base_get_ripple_state(struct ui_button_base *button,
   *out_state = button->ripple_state;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_button_coverage(void);
+/**
+ * @brief run_button_coverage.
+ * @return Return value.
+ */
+ui_error_t run_button_coverage(void) {
+  struct ui_button_base *btn = NULL;
+  struct ui_component *saved_comp = NULL;
+  struct ui_dom_node *saved_root = NULL;
+  struct ui_dom_node *elem_child = NULL;
+  struct ui_dom_node *saved_child = NULL;
+
+  (void)ui_button_base_create(&btn);
+
+  saved_comp = btn->component;
+  btn->component = NULL;
+  (void)ui_button_base_set_text(btn, "txt");
+  btn->component = saved_comp;
+
+  saved_root = btn->component->shadow_root;
+  btn->component->shadow_root = NULL;
+  (void)ui_button_base_set_text(btn, "txt");
+  btn->component->shadow_root = saved_root;
+
+  saved_child = btn->component->shadow_root->first_child;
+  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &elem_child);
+  btn->component->shadow_root->first_child = elem_child;
+  (void)ui_button_base_set_text(btn, "Elem text");
+  (void)ui_dom_node_destroy(elem_child);
+  btn->component->shadow_root->first_child = saved_child;
+
+  saved_child = btn->component->shadow_root->first_child;
+  btn->component->shadow_root->first_child = NULL;
+  g_button_mock_fail = 310;
+  (void)ui_button_base_set_text(btn, "fail");
+  g_button_mock_fail = 0;
+
+  g_button_mock_fail = 311;
+  (void)ui_button_base_set_text(btn, "fail");
+  g_button_mock_fail = 0;
+  btn->component->shadow_root->first_child = saved_child;
+
+  (void)ui_button_base_destroy(btn);
+  return UI_ERROR_NONE;
+}
+#endif

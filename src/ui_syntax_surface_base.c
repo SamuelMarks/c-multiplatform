@@ -142,18 +142,8 @@ ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_signal_destroy(surface->fold_changed_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_signal_destroy(surface->active_line_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_signal_destroy(surface->fold_changed_signal);
+  (void)ui_signal_destroy(surface->active_line_signal);
 
   return UI_ERROR_NONE;
 }

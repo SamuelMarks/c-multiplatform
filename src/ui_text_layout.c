@@ -189,10 +189,7 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     int codepoint = 0;
     struct ui_glyph_metrics metrics;
     float kerning = 0.0f;
-    rc = decode_utf8(&text, &codepoint);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    (void)decode_utf8(&text, &codepoint);
 
     if (codepoint == '\n') {
       x = 0.0f;
@@ -207,13 +204,8 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     }
 
     if (prev_codepoint != 0) {
-      {
-        ui_error_t rc_cleanup = ui_font_get_kerning(
-            font, prev_codepoint, codepoint, font_size, &kerning);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      (void)ui_font_get_kerning(font, prev_codepoint, codepoint, font_size,
+                                &kerning);
     }
 
     x += kerning;

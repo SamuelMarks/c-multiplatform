@@ -114,13 +114,8 @@ ui_error_t ui_css_parse_view_transition_class(
     if (!node) {
       out_class->names = head;
       {
-        {
-          ui_error_t rc_cleanup =
-              ui_css_view_transition_class_destroy(out_class);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
-        }
+        ui_error_t rc_cleanup = ui_css_view_transition_class_destroy(out_class);
+        (void)rc_cleanup;
       }
       return UI_ERROR_OUT_OF_MEMORY;
     }

@@ -61,9 +61,7 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(ink->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(ink);
     return rc;
@@ -74,15 +72,11 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
     if (rc2 != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_component_destroy(ink->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(ink);
       return rc2;
@@ -93,15 +87,11 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
     if (rc3 != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_component_destroy(ink->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(ink);
       return rc3;
@@ -125,9 +115,7 @@ ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink) {
   if (ink->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(ink->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (ink->raw_points) {

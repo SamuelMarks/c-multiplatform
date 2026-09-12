@@ -37,9 +37,7 @@ ui_button_group_base_create(struct ui_button_group_base **out_group) {
   if (!group) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }

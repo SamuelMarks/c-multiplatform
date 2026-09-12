@@ -75,6 +75,94 @@ typedef struct ui_async_validator {
   void *user_data; /**< Opaque user data for the async validator. */
 } ui_async_validator_t;
 
+/**
+ * @brief Standard built-in required field validator.
+ *
+ * @param control The form control.
+ * @param value The value payload.
+ * @param user_data Unused (NULL).
+ * @param out_is_valid Pointer to store validity result.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_validator_required(
+    struct ui_form_control *control, union ui_signal_payload value,
+    void *user_data, ui_bool_t *out_is_valid);
+
+/**
+ * @brief Retrieves the standard required validator function.
+ *
+ * @param out_fn Pointer to receive validator function.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_validators_required(ui_validator_fn *out_fn);
+
+/**
+ * @brief Standard built-in regex pattern validator.
+ *
+ * @param control The form control.
+ * @param value The value payload.
+ * @param user_data String pattern to match against.
+ * @param out_is_valid Pointer to store validity result.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_validator_pattern(
+    struct ui_form_control *control, union ui_signal_payload value,
+    void *user_data, ui_bool_t *out_is_valid);
+
+/**
+ * @brief Retrieves the standard pattern validator function.
+ *
+ * @param out_fn Pointer to receive validator function.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_validators_pattern(ui_validator_fn *out_fn);
+
+/**
+ * @brief Standard built-in min length validator.
+ *
+ * @param control The form control.
+ * @param value The value payload.
+ * @param user_data Pointer to int representing minimum length.
+ * @param out_is_valid Pointer to store validity result.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_validator_min_length(
+    struct ui_form_control *control, union ui_signal_payload value,
+    void *user_data, ui_bool_t *out_is_valid);
+
+/**
+ * @brief Retrieves the standard min length validator function.
+ *
+ * @param out_fn Pointer to receive validator function.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_validators_min_length(ui_validator_fn *out_fn);
+
+/**
+ * @brief Standard built-in max length validator.
+ *
+ * @param control The form control.
+ * @param value The value payload.
+ * @param user_data Pointer to int representing maximum length.
+ * @param out_is_valid Pointer to store validity result.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_validator_max_length(
+    struct ui_form_control *control, union ui_signal_payload value,
+    void *user_data, ui_bool_t *out_is_valid);
+
+/**
+ * @brief Retrieves the standard max length validator function.
+ *
+ * @param out_fn Pointer to receive validator function.
+ * @return UI_ERROR_NONE on success.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_validators_max_length(ui_validator_fn *out_fn);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

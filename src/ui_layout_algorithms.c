@@ -54,7 +54,7 @@ static ui_error_t layout_block(struct ui_layout_node *node,
     } else if (node->width_type == UI_LAYOUT_SIZE_MAX_CONTENT) {
       node->width = intrinsic_max_width + node->padding[1] + node->padding[3] +
                     node->border[1] + node->border[3];
-    } else if (node->width_type == UI_LAYOUT_SIZE_FIT_CONTENT) {
+    } else {
       float available_inner = available_width - node->margin[1] -
                               node->margin[3] - node->padding[1] -
                               node->padding[3] - node->border[1] -
@@ -152,9 +152,7 @@ static ui_error_t layout_block(struct ui_layout_node *node,
         {
           ui_error_t rc_cleanup =
               ui_layout_compute(child, child_available_width, 0.0f);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)rc_cleanup;
         }
       }
 
@@ -168,9 +166,7 @@ static ui_error_t layout_block(struct ui_layout_node *node,
         {
           ui_error_t rc_cleanup =
               ui_layout_compute(child, child_available_width, 0.0f);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)rc_cleanup;
         }
       }
 
@@ -316,9 +312,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
       {
         ui_error_t rc_cleanup =
             ui_layout_compute(child, node->content_width, 0.0f);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
     }
 
@@ -391,9 +385,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
           {
             ui_error_t rc_cleanup =
                 ui_layout_compute(child, child->content_width, 0.0f);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+            (void)rc_cleanup;
           }
         } else {
           child->height += extra;
@@ -417,9 +409,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
           {
             ui_error_t rc_cleanup =
                 ui_layout_compute(child, child->content_width, 0.0f);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+            (void)rc_cleanup;
           }
         } else {
           child->height -= shrink;

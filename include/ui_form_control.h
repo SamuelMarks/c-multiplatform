@@ -12,6 +12,7 @@
 #include "ui_arena.h"
 #include "ui_signal.h"
 #include "ui_form_validators.h"
+#include "ui_control_value_accessor.h"
 /* clang-format on */
 
 #ifdef __cplusplus
@@ -197,6 +198,16 @@ extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_control_add_async_validator(
     ui_form_control_t *control, ui_async_validator_fn validator,
     void *user_data, struct ui_thread_pool *thread_pool,
     struct ui_reactor *reactor);
+
+/**
+ * @brief Binds a form control to a Control Value Accessor (CVA) interface.
+ *
+ * @param control The form control to bind.
+ * @param cva The CVA interface containing callbacks and component reference.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_form_control_bind_cva(
+    ui_form_control_t *control, const struct ui_control_value_accessor *cva);
 
 #ifdef __cplusplus
 }

@@ -186,9 +186,6 @@ ui_mutation_observer_disconnect(struct ui_mutation_observer *observer) {
 static ui_error_t is_ancestor(struct ui_dom_node *ancestor,
                               struct ui_dom_node *node, int *out_is_ancestor) {
   struct ui_dom_node *curr;
-  if (!out_is_ancestor) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
   *out_is_ancestor = 0;
   curr = node;
   while (curr != NULL) {
@@ -247,10 +244,8 @@ ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        rc = is_ancestor(tinfo->target, target, &is_match);
-        if (rc != UI_ERROR_NONE) {
-          return rc;
-        }
+        ui_error_t rc_anc = is_ancestor(tinfo->target, target, &is_match);
+        (void)rc_anc;
       }
       if (is_match) {
         record.type = UI_MUTATION_TYPE_CHILD_LIST;
@@ -314,10 +309,8 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        rc = is_ancestor(tinfo->target, target, &is_match);
-        if (rc != UI_ERROR_NONE) {
-          return rc;
-        }
+        ui_error_t rc_anc = is_ancestor(tinfo->target, target, &is_match);
+        (void)rc_anc;
       }
       if (is_match) {
         record.type = UI_MUTATION_TYPE_ATTRIBUTES;
@@ -329,46 +322,27 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
         record.attribute_name = NULL;
         record.old_value = NULL;
 
-#if defined(_MSC_VER)
         {
           size_t name_len = strlen(name);
           record.attribute_name = (char *)C_MULTIPLATFORM_MALLOC(name_len + 1);
           if (record.attribute_name != NULL) {
-            strcpy_s(record.attribute_name, name_len + 1, name);
+            memcpy(record.attribute_name, name, name_len + 1);
           }
         }
-#else
-        {
-          size_t name_len = strlen(name);
-          record.attribute_name = (char *)C_MULTIPLATFORM_MALLOC(name_len + 1);
-          if (record.attribute_name != NULL) {
-            UI_STRCPY(record.attribute_name, sizeof(record.attribute_name),
-                      name);
-          }
-        }
-#endif
 
         if (tinfo->options.attribute_old_value && old_value != NULL) {
           old_val_len = strlen(old_value);
           old_val_copy = (char *)C_MULTIPLATFORM_MALLOC(old_val_len + 1);
           if (old_val_copy != NULL) {
-#if defined(_MSC_VER)
-            strcpy_s(old_val_copy, old_val_len + 1, old_value);
-#else
-            UI_STRCPY(old_val_copy, 256, old_value);
-#endif
+            memcpy(old_val_copy, old_value, old_val_len + 1);
             record.old_value = old_val_copy;
           }
         }
 
         rc = dispatch_record(obs, &record);
 
-        if (record.attribute_name != NULL) {
-          C_MULTIPLATFORM_FREE(record.attribute_name);
-        }
-        if (record.old_value != NULL) {
-          C_MULTIPLATFORM_FREE(record.old_value);
-        }
+        C_MULTIPLATFORM_FREE(record.attribute_name);
+        C_MULTIPLATFORM_FREE(record.old_value);
         if (rc != UI_ERROR_NONE) {
           return rc;
         }
@@ -412,10 +386,8 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        rc = is_ancestor(tinfo->target, target, &is_match);
-        if (rc != UI_ERROR_NONE) {
-          return rc;
-        }
+        ui_error_t rc_anc = is_ancestor(tinfo->target, target, &is_match);
+        (void)rc_anc;
       }
       if (is_match) {
         record.type = UI_MUTATION_TYPE_CHARACTER_DATA;
@@ -431,20 +403,14 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
           old_val_len = strlen(old_value);
           old_val_copy = (char *)C_MULTIPLATFORM_MALLOC(old_val_len + 1);
           if (old_val_copy != NULL) {
-#if defined(_MSC_VER)
-            strcpy_s(old_val_copy, old_val_len + 1, old_value);
-#else
-            UI_STRCPY(old_val_copy, 256, old_value);
-#endif
+            memcpy(old_val_copy, old_value, old_val_len + 1);
             record.old_value = old_val_copy;
           }
         }
 
         rc = dispatch_record(obs, &record);
 
-        if (record.old_value != NULL) {
-          C_MULTIPLATFORM_FREE(record.old_value);
-        }
+        C_MULTIPLATFORM_FREE(record.old_value);
         if (rc != UI_ERROR_NONE) {
           return rc;
         }

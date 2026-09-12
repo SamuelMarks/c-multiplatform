@@ -131,6 +131,44 @@ struct ui_video_decoder_backend {
 extern C_MULTIPLATFORM_EXPORT ui_error_t ui_video_decoder_get_default_backend(
     struct ui_video_decoder_backend *out_backend);
 
+/**
+ * @brief Gets the FFmpeg video decoder backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t ui_video_decoder_ffmpeg_get_backend(
+    struct ui_video_decoder_backend *out_backend);
+
+/**
+ * @brief Gets the MediaCodec video decoder backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_video_decoder_mediacodec_get_backend(
+    struct ui_video_decoder_backend *out_backend);
+
+/**
+ * @brief Gets the MediaFoundation video decoder backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_video_decoder_mf_get_backend(struct ui_video_decoder_backend *out_backend);
+
+/**
+ * @brief Gets the AVFoundation video decoder backend.
+ *
+ * @param out_backend Pointer to receive the backend struct.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
+ */
+extern C_MULTIPLATFORM_EXPORT ui_error_t
+ui_video_decoder_avfoundation_get_backend(
+    struct ui_video_decoder_backend *out_backend);
+
 /** @} */
 
 #ifdef __cplusplus

@@ -55,9 +55,6 @@ static ui_error_t find_token(const struct ui_design_token_dict *dict,
                              const char *name,
                              struct ui_design_token **out_token) {
   ui_uint32 i;
-  if (!dict || !name || !out_token) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
   *out_token = NULL;
   for (i = 0; i < dict->count; ++i) {
     if (strcmp(dict->tokens[i].name, name) == 0) {
@@ -148,7 +145,7 @@ static ui_error_t get_or_create_token(struct ui_design_token_dict *dict,
   ui_error_t rc;
 
   rc = find_token(dict, name, &token);
-  if (rc == UI_ERROR_NONE && token) {
+  if (rc == UI_ERROR_NONE) {
     *out_token = token;
     return UI_ERROR_NONE;
   }
@@ -308,7 +305,7 @@ static ui_error_t resolve_token(const struct ui_design_token_dict *dict,
 
   while (depth < UI_MAX_ALIAS_DEPTH) {
     rc = find_token(dict, current_name, &token);
-    if (rc != UI_ERROR_NONE || !token) {
+    if (rc != UI_ERROR_NONE) {
       return UI_ERROR_NOT_FOUND;
     }
 

@@ -40,6 +40,16 @@ static int test_tonal_palette(void) {
   err = ui_tonal_palette_get_tone(&palette, 50.0f, NULL);
   failed |= (err != UI_ERROR_INVALID_ARGUMENT);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_tonal_palette_mock_fail;
+    g_tonal_palette_mock_fail = 1;
+    err = ui_tonal_palette_from_color(key_color, &palette);
+    failed |= (err != UI_ERROR_UNKNOWN);
+    g_tonal_palette_mock_fail = 0;
+  }
+#endif
+
   return failed;
 }
 

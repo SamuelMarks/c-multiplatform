@@ -62,17 +62,13 @@ static ui_error_t update_dom_state(struct ui_divider_base *divider) {
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           divider->root_node, "data-orientation", "vertical");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   } else {
     {
       ui_error_t rc_cleanup = ui_dom_node_set_attribute(
           divider->root_node, "data-orientation", "horizontal");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -80,17 +76,13 @@ static ui_error_t update_dom_state(struct ui_divider_base *divider) {
     {
       ui_error_t rc_cleanup =
           ui_dom_node_set_attribute(divider->root_node, "data-inset", "true");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   } else {
     {
       ui_error_t rc_cleanup =
           ui_dom_node_remove_attribute(divider->root_node, "data-inset");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -143,18 +135,16 @@ ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider) {
   {
     ui_error_t rc_cleanup =
         ui_component_set_default_style(divider->component, default_style);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   divider->component->shadow_root = divider->root_node;
   divider->orientation = UI_DIVIDER_ORIENTATION_HORIZONTAL;
   divider->inset = 0;
 
-  rc = update_dom_state(divider);
-  if (rc != UI_ERROR_NONE) {
-    goto cleanup;
+  {
+    ui_error_t rc_cleanup = update_dom_state(divider);
+    (void)rc_cleanup;
   }
 
   *out_divider = divider;
@@ -164,17 +154,13 @@ cleanup:
   if (divider->root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(divider->root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (divider->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(divider->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(divider);
@@ -192,9 +178,7 @@ ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(divider->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(divider);
   return UI_ERROR_NONE;

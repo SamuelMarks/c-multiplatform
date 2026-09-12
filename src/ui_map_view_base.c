@@ -87,9 +87,7 @@ ui_error_t ui_map_view_base_create(struct ui_map_view_base **out_map) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(map->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(map);
     return rc;
@@ -99,15 +97,11 @@ ui_error_t ui_map_view_base_create(struct ui_map_view_base **out_map) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(map->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(map);
     return rc;
@@ -116,15 +110,11 @@ ui_error_t ui_map_view_base_create(struct ui_map_view_base **out_map) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(map->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(map);
     return rc;
@@ -149,9 +139,7 @@ ui_error_t ui_map_view_base_destroy(struct ui_map_view_base *map) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(map->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (map->markers) {
     C_MULTIPLATFORM_FREE(map->markers);

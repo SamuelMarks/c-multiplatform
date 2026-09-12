@@ -162,9 +162,7 @@ ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days) {
     int is_leap = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_is_leap_year(year, &is_leap);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     *out_days = is_leap ? 29 : 28;
     return UI_ERROR_NONE;
@@ -406,9 +404,7 @@ ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
     {
       ui_error_t rc_cleanup =
           ui_calendar_days_in_month(date->year, date->month, &days);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     if (date->day < 1) {
       return UI_ERROR_OUT_OF_BOUNDS;
@@ -419,19 +415,13 @@ ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
   }
 
   if (calendar->has_min) {
-    ui_error_t rc_cmp = compare_dates(date, &calendar->min_date, &cmp_res);
-    if (rc_cmp != UI_ERROR_NONE) {
-      return rc_cmp;
-    }
+    (void)compare_dates(date, &calendar->min_date, &cmp_res);
     if (cmp_res < 0) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
   }
   if (calendar->has_max) {
-    ui_error_t rc_cmp = compare_dates(date, &calendar->max_date, &cmp_res);
-    if (rc_cmp != UI_ERROR_NONE) {
-      return rc_cmp;
-    }
+    (void)compare_dates(date, &calendar->max_date, &cmp_res);
     if (cmp_res > 0) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
@@ -553,9 +543,7 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     {
       ui_error_t rc_cleanup = ui_calendar_get_day_of_week(
           calendar->view_year, calendar->view_month, 1, &tmp_dow);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     first_dow = (int)tmp_dow;
   }
@@ -564,9 +552,7 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     {
       ui_error_t rc_cleanup = ui_calendar_days_in_month(
           calendar->view_year, calendar->view_month, &days_in_month);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -588,9 +574,7 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     {
       ui_error_t rc_cleanup =
           ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 

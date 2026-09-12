@@ -183,9 +183,7 @@ ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(observer->arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(observer);

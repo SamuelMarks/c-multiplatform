@@ -413,6 +413,8 @@ static void test_coverage(void) {
   struct ui_button_base *btn = NULL;
   struct ui_event ev = {0};
 
+  ui_button_base_destroy(NULL);
+
   /* Extended mock failures */
   /* 126: append child fail */
   g_button_mock_fail = 126;
@@ -493,11 +495,28 @@ static void test_coverage(void) {
   ui_button_base_set_disabled(btn, 0);
   g_button_mock_fail = 0;
   ui_button_base_destroy(btn);
+
+  /* 312: set tag name fail during create */
+  g_button_mock_fail = 312;
+  ui_button_base_create(&btn);
+  g_button_mock_fail = 0;
+
+  /* Test ui_button_base_set_text public API */
+  ui_button_base_create(&btn);
+  ui_button_base_set_text(NULL, "txt");
+  ui_button_base_set_text(btn, NULL);
+  ui_button_base_set_text(btn, "Click 1");
+  ui_button_base_set_text(btn, "Click 2");
+  ui_button_base_destroy(btn);
 }
 
 int main(void) {
   ui_error_t rc;
   int failed = 0;
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_button_coverage(void);
+  run_button_coverage();
+#endif
   failed |= run_normal_tests();
   failed |= run_oom_tests();
   test_coverage();

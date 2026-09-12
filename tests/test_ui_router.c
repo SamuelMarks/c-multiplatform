@@ -423,6 +423,9 @@ void test_ui_router_oom_add(void);
 void test_ui_router_stack_realloc(void);
 void test_ui_router_oom_add2(void);
 void test_ui_router_missing_param(void);
+void test_ui_router_errs(void);
+void test_ui_router_extra2(void);
+void test_router_param_oom(void);
 int main(void) {
   int failed = 0;
   failed |= run_normal_tests();
@@ -432,6 +435,9 @@ int main(void) {
   test_ui_router_oom_add();
   test_ui_router_oom_add2();
   test_ui_router_stack_realloc();
+  test_ui_router_errs();
+  test_ui_router_extra2();
+  test_router_param_oom();
   failed |= run_oom_tests();
 
   if (failed) {
@@ -606,5 +612,31 @@ void test_ui_router_extra2(void) {
     if (rc_cleanup != UI_ERROR_NONE) {
       (void)rc_cleanup; /* Avoid override */
     }
+  }
+}
+
+void test_router_param_oom(void) {
+  struct ui_router *r = NULL;
+  ui_error_t err;
+  int countdown;
+
+  for (countdown = 0; countdown < 10; countdown++) {
+    ui_router_create(&r);
+    ui_router_add_route(r, "/user/:id", mock_factory_success, NULL);
+    g_malloc_fail_countdown = countdown;
+    err = ui_router_navigate(r, "/user/42?page=1");
+    g_malloc_fail_countdown = -1;
+    (void)err;
+    ui_router_destroy(r);
+  }
+
+  for (countdown = 0; countdown < 8; countdown++) {
+    ui_router_create(&r);
+    ui_router_add_route(r, "/q", mock_factory_success, NULL);
+    g_malloc_fail_countdown = countdown;
+    err = ui_router_navigate(r, "/q?=&val");
+    g_malloc_fail_countdown = -1;
+    (void)err;
+    ui_router_destroy(r);
   }
 }

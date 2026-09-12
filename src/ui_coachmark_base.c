@@ -118,9 +118,7 @@ ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(tour);
     return rc;
@@ -136,9 +134,7 @@ ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(tour);
     return rc;
@@ -168,25 +164,19 @@ cleanup:
   if (backdrop_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(backdrop_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (tour->backdrop_comp) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(tour->backdrop_comp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (container_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(container_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(tour);
@@ -205,9 +195,7 @@ ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour) {
 
   {
     ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   if (tour->steps) {
@@ -216,15 +204,11 @@ ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour) {
 
   {
     ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(tour->backdrop_comp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   C_MULTIPLATFORM_FREE(tour);
@@ -363,9 +347,7 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
     {
       ui_error_t rc_cleanup =
           ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     tour->backdrop_overlay = NULL;
     tour->is_active = 0;
@@ -377,17 +359,13 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
     {
       ui_error_t rc_cleanup =
           ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     tour->coachmark_overlay = NULL;
     {
       ui_error_t rc_cleanup =
           ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     tour->backdrop_overlay = NULL;
     tour->is_active = 0;
@@ -437,9 +415,7 @@ ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour) {
   } else {
     {
       ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -485,18 +461,14 @@ ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
   {
     ui_error_t rc_cleanup =
         ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   tour->coachmark_overlay = NULL;
 
   {
     ui_error_t rc_cleanup =
         ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   tour->backdrop_overlay = NULL;
 
@@ -601,9 +573,7 @@ ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
       if (tour->steps[tour->current_step].allow_skip) {
         {
           ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)rc_cleanup;
         }
         return UI_ERROR_NONE;
       }

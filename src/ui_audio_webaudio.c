@@ -8,9 +8,6 @@
 #include "ui_error.h"
 /* clang-format on */
 
-#if defined(__EMSCRIPTEN__)
-/* WebAudio implementation stub */
-
 /**
  * @brief Retrieves the default WebAudio audio sink backend.
  *
@@ -18,7 +15,7 @@
  * @return ui_error_t `UI_ERROR_NONE` on success, or an appropriate error code.
  */
 ui_error_t
-ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend) {
+ui_audio_sink_webaudio_get_backend(struct ui_audio_sink_backend *out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -34,4 +31,15 @@ ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend) {
   return UI_ERROR_UNKNOWN; /* TODO: Implement WebAudio */
 }
 
+#if defined(__EMSCRIPTEN__)
+/**
+ * @brief Retrieves the default audio sink backend on Web/Emscripten.
+ *
+ * @param out_backend Pointer to the backend structure to populate.
+ * @return ui_error_t `UI_ERROR_NONE` on success, or an appropriate error code.
+ */
+ui_error_t
+ui_audio_sink_get_default_backend(struct ui_audio_sink_backend *out_backend) {
+  return ui_audio_sink_webaudio_get_backend(out_backend);
+}
 #endif

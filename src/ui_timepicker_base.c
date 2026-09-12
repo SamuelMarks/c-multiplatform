@@ -303,9 +303,7 @@ ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
   {
     ui_error_t rc_cleanup =
         ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   /* get_formatted_time only fails on null arguments, which we guaranteed above
    */

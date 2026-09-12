@@ -243,8 +243,13 @@ int main(void) {
   g_mock_font_fail = 1; /* font not found */
   rc = ui_text_node_base_update_layout(node);
 
+  ui_text_node_base_set_font_family(node, "Arial");
+  g_mock_font_fail = 7;
+  rc = ui_text_node_base_update_layout(node); /* primary and fallback fail */
+  g_mock_font_fail = 0;
   ui_text_node_base_set_font_family(node, NULL);
-  rc = ui_text_node_base_update_layout(node); /* fallback to system-ui */
+  rc = ui_text_node_base_update_layout(
+      node); /* fallback to system-ui succeeds */
 
   if (ui_text_node_base_get_layout(NULL, &layout) != UI_ERROR_INVALID_ARGUMENT)
     failed |= 1;

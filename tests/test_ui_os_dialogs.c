@@ -116,5 +116,12 @@ int main(void) {
 
   if (test_os_dialogs())
     return 1;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern ui_error_t run_os_dialogs_coverage(void);
+    run_os_dialogs_coverage();
+  }
+#endif
   return 0;
 }

@@ -94,25 +94,19 @@ struct ui_router {
  */
 static ui_error_t request_free(struct ui_route_request *req) {
   size_t i;
-  if (!req)
-    return UI_ERROR_NONE;
   if (req->path)
     C_MULTIPLATFORM_FREE(req->path);
   if (req->params) {
     for (i = 0; i < req->params_size; ++i) {
-      if (req->params[i].key)
-        C_MULTIPLATFORM_FREE(req->params[i].key);
-      if (req->params[i].value)
-        C_MULTIPLATFORM_FREE(req->params[i].value);
+      C_MULTIPLATFORM_FREE(req->params[i].key);
+      C_MULTIPLATFORM_FREE(req->params[i].value);
     }
     C_MULTIPLATFORM_FREE(req->params);
   }
   if (req->queries) {
     for (i = 0; i < req->queries_size; ++i) {
-      if (req->queries[i].key)
-        C_MULTIPLATFORM_FREE(req->queries[i].key);
-      if (req->queries[i].value)
-        C_MULTIPLATFORM_FREE(req->queries[i].value);
+      C_MULTIPLATFORM_FREE(req->queries[i].key);
+      C_MULTIPLATFORM_FREE(req->queries[i].value);
     }
     C_MULTIPLATFORM_FREE(req->queries);
   }
@@ -137,9 +131,6 @@ static ui_error_t request_free(struct ui_route_request *req) {
  */
 static ui_error_t internal_strndup(const char *src, size_t n, char **out_str) {
   char *copy;
-
-  if (!src || !out_str)
-    return UI_ERROR_INVALID_ARGUMENT;
 
   copy = (char *)C_MULTIPLATFORM_MALLOC(n + 1);
   if (!copy)
@@ -183,10 +174,6 @@ static ui_error_t add_param(struct ui_route_param **params, size_t *size,
   struct ui_route_param *new_params;
   char *k = NULL, *v = NULL;
   ui_error_t rc;
-
-  if (!params || !size) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
 
   if (key_len > 0) {
     rc = internal_strndup(key, key_len, &k);
@@ -259,9 +246,6 @@ static ui_error_t match_route(const char *pattern, const char *url,
   const char *val_start = NULL;
   struct ui_route_request *req;
   ui_error_t rc;
-
-  if (!pattern || !url || !out_req || !out_match)
-    return UI_ERROR_INVALID_ARGUMENT;
 
   *out_match = 0;
 
@@ -506,9 +490,7 @@ ui_error_t ui_router_destroy(struct ui_router *router) {
   for (i = 0; i < router->stack_size; ++i) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(router->stack[i]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -535,7 +517,6 @@ ui_error_t ui_router_destroy(struct ui_router *router) {
  */
 ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
                                ui_route_factory_t factory, void *user_data) {
-  size_t len;
   char *p;
   struct ui_route *new_routes;
   size_t new_capacity;
@@ -558,17 +539,10 @@ ui_error_t ui_router_add_route(struct ui_router *router, const char *pattern,
     router->routes_capacity = new_capacity;
   }
 
-  len = strlen(pattern);
-  p = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
+  p = C_MULTIPLATFORM_STRDUP(pattern);
   if (!p) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
-
-#if defined(_MSC_VER)
-  strcpy_s(p, len + 1, pattern);
-#else
-  UI_STRCPY(p, 256, pattern);
-#endif
 
   router->routes[router->routes_size].pattern = p;
   router->routes[router->routes_size].factory = factory;
@@ -702,9 +676,7 @@ ui_error_t ui_router_pop(struct ui_router *router) {
   {
     ui_error_t rc_cleanup =
         ui_component_destroy(router->stack[router->stack_size]);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   router->stack[router->stack_size] = NULL;
 
@@ -728,9 +700,7 @@ ui_error_t ui_router_replace(struct ui_router *router,
     {
       ui_error_t rc_cleanup =
           ui_component_destroy(router->stack[router->stack_size - 1]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     router->stack[router->stack_size - 1] = screen;
   } else {

@@ -293,6 +293,30 @@ static void test_scroll_snap_cases(void) {
         TEST_ASSERT(p.padding.top.value == 0.0f);
       });
 
+  /* Invalid values in longhands to trigger rc_cleanup != UI_ERROR_NONE */
+  TEST_SCROLL_SNAP(
+      {
+        ui_css_rule_append_declaration(r, "scroll-padding-top", "invalid", 0);
+        ui_css_rule_append_declaration(r, "scroll-padding-right", "invalid", 0);
+        ui_css_rule_append_declaration(r, "scroll-padding-bottom", "invalid",
+                                       0);
+        ui_css_rule_append_declaration(r, "scroll-padding-left", "invalid", 0);
+        ui_css_rule_append_declaration(r, "scroll-margin-top", "invalid", 0);
+        ui_css_rule_append_declaration(r, "scroll-margin-right", "invalid", 0);
+        ui_css_rule_append_declaration(r, "scroll-margin-bottom", "invalid", 0);
+        ui_css_rule_append_declaration(r, "scroll-margin-left", "invalid", 0);
+      },
+      {
+        TEST_ASSERT(p.padding.top.value == 0.0f);
+        TEST_ASSERT(p.padding.right.value == 0.0f);
+        TEST_ASSERT(p.padding.bottom.value == 0.0f);
+        TEST_ASSERT(p.padding.left.value == 0.0f);
+        TEST_ASSERT(p.margin.top.value == 0.0f);
+        TEST_ASSERT(p.margin.right.value == 0.0f);
+        TEST_ASSERT(p.margin.bottom.value == 0.0f);
+        TEST_ASSERT(p.margin.left.value == 0.0f);
+      });
+
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
     if (rc_cleanup != UI_ERROR_NONE) {

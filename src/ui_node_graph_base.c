@@ -85,9 +85,7 @@ static ui_error_t update_camera_matrix(struct ui_node_graph_base *graph) {
   /* Construct simple 2D transform matrix (scale + translate) */
   {
     ui_error_t rc_cleanup = ui_dom_matrix_init_identity(&graph->camera_matrix);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   graph->camera_matrix.m11 = graph->zoom;
@@ -138,9 +136,7 @@ ui_error_t ui_node_graph_base_create(
   {
     ui_error_t rc_cleanup =
         ui_dom_matrix_init_identity(&(*out_graph)->camera_matrix);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   initial_payload.ptr_val = &(*out_graph)->camera_matrix;
@@ -172,15 +168,11 @@ ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
     return UI_ERROR_INVALID_ARGUMENT;
   if (graph->camera_signal) {
     ui_error_t rc_cleanup = ui_signal_destroy(graph->camera_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   if (graph->topology_signal) {
     ui_error_t rc_cleanup = ui_signal_destroy(graph->topology_signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   return UI_ERROR_NONE;
 }

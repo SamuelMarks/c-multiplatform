@@ -11,6 +11,8 @@ extern int g_malloc_fail_countdown;
 static int group_changed_count = 0;
 static struct ui_toggle_base *last_active = NULL;
 static int mock_on_change_fail = 0;
+static int mock_cva_change_fail = 0;
+static int mock_cva_touched_fail = 0;
 static int cva_change_called = 0;
 static int cva_touched_called = 0;
 
@@ -28,12 +30,19 @@ static ui_error_t on_group_change(struct ui_radio_group_base *group,
 
 static ui_error_t on_cva_change(union ui_signal_payload new_value,
                                 void *user_data) {
+  (void)new_value;
+  (void)user_data;
   cva_change_called++;
+  if (mock_cva_change_fail)
+    return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t on_cva_touched(void *user_data) {
+  (void)user_data;
   cva_touched_called++;
+  if (mock_cva_touched_fail)
+    return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;
 }
 
@@ -399,6 +408,8 @@ static int test_radio_group_edge_cases(void) {
   struct ui_event ev;
 
   ui_radio_group_base_create(&group, &cva);
+  cva.register_on_change(group, on_cva_change, NULL);
+  cva.register_on_touched(group, on_cva_touched, NULL);
   ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &r1);
   ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r2);
 
@@ -440,6 +451,86 @@ static int test_radio_group_edge_cases(void) {
   ev.type = UI_EVENT_MOUSE_UP;
   ui_toggle_base_process_event(r2, &ev, 400.0);
   mock_on_change_fail = 0;
+
+  /* mock_cva_change_fail */
+  ui_radio_group_base_set_active(group, r1);
+  mock_cva_change_fail = 1;
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.button = 0;
+  ui_toggle_base_process_event(r2, &ev, 500.0);
+  ev.type = UI_EVENT_MOUSE_UP;
+  ui_toggle_base_process_event(r2, &ev, 600.0);
+  mock_cva_change_fail = 0;
+
+  /* mock_cva_touched_fail in process_event */
+  mock_cva_touched_fail = 1;
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  if (ui_radio_group_base_process_event(group, &ev) !=
+      UI_ERROR_INVALID_ARGUMENT) {
+    return 1;
+  }
+  mock_cva_touched_fail = 0;
+
+  /* Keyboard event when child toggle change fails */
+  mock_on_change_fail = 1;
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  if (ui_radio_group_base_process_event(group, &ev) !=
+      UI_ERROR_INVALID_ARGUMENT) {
+    return 1;
+  }
+  mock_on_change_fail = 0;
+
+  /* Adding a toggle that is already checked with failing on_change */
+  {
+    struct ui_radio_group_base *g_err = NULL;
+    struct ui_toggle_base *t_err = NULL;
+    ui_radio_group_base_create(&g_err, NULL);
+    ui_radio_group_base_set_on_change(g_err, on_group_change, NULL);
+    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &t_err);
+    ui_toggle_base_set_checked(t_err, 1);
+    mock_on_change_fail = 1;
+    if (ui_radio_group_base_add_toggle(g_err, t_err) !=
+        UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
+    }
+    mock_on_change_fail = 0;
+    ui_radio_group_base_destroy(g_err);
+    ui_toggle_base_destroy(t_err);
+  }
+
+  /* Keyboard event when ui_toggle_base_set_checked fails via OOM */
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    struct ui_radio_group_base *g_oom = NULL;
+    struct ui_toggle_base *t_oom1 = NULL;
+    struct ui_toggle_base *t_oom2 = NULL;
+    ui_radio_group_base_create(&g_oom, NULL);
+    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &t_oom1);
+    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &t_oom2);
+    ui_radio_group_base_add_toggle(g_oom, t_oom1);
+    ui_radio_group_base_add_toggle(g_oom, t_oom2);
+    ui_radio_group_base_set_active(g_oom, t_oom1);
+
+    memset(&ev, 0, sizeof(ev));
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+    g_malloc_fail_countdown = 0;
+    if (ui_radio_group_base_process_event(g_oom, &ev) !=
+        UI_ERROR_OUT_OF_MEMORY) {
+      g_malloc_fail_countdown = -1;
+      return 1;
+    }
+    g_malloc_fail_countdown = -1;
+    ui_radio_group_base_destroy(g_oom);
+    ui_toggle_base_destroy(t_oom1);
+    ui_toggle_base_destroy(t_oom2);
+  }
+#endif
 
   ui_radio_group_base_destroy(group);
   {

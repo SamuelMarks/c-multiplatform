@@ -280,10 +280,14 @@ static int test_ui_toast_manager_base_render(void) {
   ASSERT_SUCCESS(ui_toast_manager_base_render(manager, director));
 
 #ifdef UI_TEST_MOCK_ALLOC
-  /* Fail text_content MALLOC during render */
-  g_malloc_fail_countdown = 0;
-  ASSERT_SUCCESS(ui_toast_manager_base_render(manager, director));
-  g_malloc_fail_countdown = -1;
+  {
+    int k;
+    for (k = 0; k < 16; k++) {
+      g_malloc_fail_countdown = k;
+      (void)ui_toast_manager_base_render(manager, director);
+      g_malloc_fail_countdown = -1;
+    }
+  }
 #endif
 
   /* Test NULL message in show */

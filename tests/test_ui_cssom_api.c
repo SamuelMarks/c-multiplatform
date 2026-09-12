@@ -77,6 +77,15 @@ int main(void) {
   TEST_ASSERT(rc == UI_ERROR_OUT_OF_MEMORY);
 
   /* Set Property (Overwrite) */
+#if defined(UI_TEST_MOCK_ALLOC)
+  {
+    extern int g_mock_strcpy_fail;
+    g_mock_strcpy_fail = 1;
+    rc = ui_cssom_set_property(rule, "color", "red", 1);
+    (void)rc;
+    g_mock_strcpy_fail = 0;
+  }
+#endif
   rc = ui_cssom_set_property(rule, "color", "blue", 1);
   TEST_ASSERT(rc == UI_ERROR_NONE);
 

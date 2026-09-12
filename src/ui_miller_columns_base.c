@@ -111,9 +111,7 @@ ui_miller_columns_base_destroy(struct ui_miller_columns_base *miller) {
     {
       ui_error_t rc_cleanup =
           ui_signal_destroy(miller->topology_changed_signal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 

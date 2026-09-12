@@ -11,6 +11,65 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_banner_mock_fail = 0;
+
+/**
+ * @brief mock_component_create.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_component_create(struct ui_component **comp) {
+  if (g_banner_mock_fail == 10) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_create)(comp);
+}
+#undef ui_component_create
+/** @cond */
+#define ui_component_create mock_component_create
+/** @endcond */
+
+/**
+ * @brief mock_dom_node_create.
+ * @param type Parameter type.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_dom_node_create(enum ui_dom_node_type type,
+                                       struct ui_dom_node **node) {
+  if (g_banner_mock_fail == 11) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_create)(type, node);
+}
+#undef ui_dom_node_create
+/** @cond */
+#define ui_dom_node_create mock_dom_node_create
+/** @endcond */
+
+/**
+ * @brief mock_dom_node_set_tag_name.
+ * @param node Parameter node.
+ * @param tag Parameter tag.
+ * @return Return value.
+ */
+static ui_error_t mock_dom_node_set_tag_name(struct ui_dom_node *node,
+                                             const char *tag) {
+  if (g_banner_mock_fail == 12) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_set_tag_name)(node, tag);
+}
+#undef ui_dom_node_set_tag_name
+/** @cond */
+#define ui_dom_node_set_tag_name mock_dom_node_set_tag_name
+/** @endcond */
+
+/**
+ * @brief mock_dom_node_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
                                              struct ui_dom_node *child) {
   if (g_banner_mock_fail == 1) {
@@ -23,9 +82,19 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
 #define ui_dom_node_append_child mock_dom_node_append_child
 /** @endcond */
 
+/**
+ * @brief mock_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param k Parameter k.
+ * @param v Parameter v.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *k, const char *v) {
   if (g_banner_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_banner_mock_fail == 13) {
     return UI_ERROR_UNKNOWN;
   }
   return (ui_dom_node_set_attribute)(node, k, v);
@@ -35,6 +104,12 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
 /** @endcond */
 
+/**
+ * @brief mock_dom_node_remove_attribute.
+ * @param node Parameter node.
+ * @param k Parameter k.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
                                                  const char *k) {
   if (g_banner_mock_fail == 3) {
@@ -47,6 +122,12 @@ static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
 #define ui_dom_node_remove_attribute mock_dom_node_remove_attribute
 /** @endcond */
 
+/**
+ * @brief mock_signal_set.
+ * @param signal Parameter signal.
+ * @param p Parameter p.
+ * @return Return value.
+ */
 static ui_error_t mock_signal_set(struct ui_signal *signal,
                                   union ui_signal_payload p) {
   if (g_banner_mock_fail == 4) {
@@ -60,82 +141,59 @@ static ui_error_t mock_signal_set(struct ui_signal *signal,
 /** @endcond */
 
 ui_error_t run_banner_coverage(void);
+/**
+ * @brief run_banner_coverage.
+ * @return Return value.
+ */
 ui_error_t run_banner_coverage(void) {
-
   struct ui_banner_base *banner = NULL;
   union ui_signal_payload p;
   struct ui_signal *sig = NULL;
 
-  {
-    ui_error_t rc_cleanup = ui_banner_base_create(&banner);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  g_banner_mock_fail = 10;
+  (void)ui_banner_base_create(&banner);
+  g_banner_mock_fail = 0;
+
+  g_banner_mock_fail = 11;
+  (void)ui_banner_base_create(&banner);
+  g_banner_mock_fail = 0;
+
+  g_banner_mock_fail = 12;
+  (void)ui_banner_base_create(&banner);
+  g_banner_mock_fail = 0;
+
+  g_banner_mock_fail = 13;
+  (void)ui_banner_base_create(&banner);
+  g_banner_mock_fail = 0;
+
+  (void)ui_banner_base_create(&banner);
+
+  g_banner_mock_fail = 11;
+  (void)ui_banner_base_set_text(banner, "text");
+  g_banner_mock_fail = 0;
 
   g_banner_mock_fail = 1;
-  {
-    ui_error_t rc_cleanup = ui_banner_base_set_text(banner, "text");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_banner_base_set_text(banner, "text");
   g_banner_mock_fail = 0;
 
   g_banner_mock_fail = 2;
-  {
-    ui_error_t rc_cleanup = ui_banner_base_set_open(banner, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_banner_base_set_open(banner, 1);
   g_banner_mock_fail = 0;
 
   g_banner_mock_fail = 3;
-  {
-    ui_error_t rc_cleanup = ui_banner_base_set_open(banner, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_banner_base_set_open(banner, 0);
   g_banner_mock_fail = 0;
 
   p.bool_val = 1;
-  {
-    ui_error_t rc_cleanup =
-        ui_signal_create(NULL, p, UI_SIGNAL_TYPE_BOOL, NULL, NULL, 0, &sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_signal_create(NULL, p, UI_SIGNAL_TYPE_BOOL, NULL, NULL, 0, &sig);
+  (void)ui_banner_base_bind_open(banner, sig);
 
-  {
-    ui_error_t rc_cleanup = ui_banner_base_bind_open(banner, sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
   g_banner_mock_fail = 4;
-  {
-    ui_error_t rc_cleanup = ui_banner_base_set_open(banner, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_banner_base_set_open(banner, 1);
   g_banner_mock_fail = 0;
 
-  {
-    ui_error_t rc_cleanup = ui_signal_destroy(sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_banner_base_destroy(banner);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  (void)ui_signal_destroy(sig);
+  (void)ui_banner_base_destroy(banner);
 
   return UI_ERROR_NONE;
 }
@@ -172,9 +230,7 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   if (!banner) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -190,9 +246,7 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(banner->base);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(banner);
     return err;
@@ -202,16 +256,12 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(banner->base->shadow_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     banner->base->shadow_root = NULL;
     {
       ui_error_t rc_cleanup = ui_component_destroy(banner->base);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(banner);
     return err;
@@ -221,9 +271,7 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(banner->base);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(banner);
     return err;
@@ -252,9 +300,7 @@ ui_error_t ui_banner_base_set_text(struct ui_banner_base *banner,
     if (err != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       return err;
     }
@@ -360,9 +406,7 @@ ui_error_t ui_banner_base_destroy(struct ui_banner_base *banner) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(banner->base);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   /* The banner allocation itself was flattened into base_comp, but then
      we allocated banner itself with C_MULTIPLATFORM_MALLOC so we need to free

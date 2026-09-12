@@ -212,21 +212,14 @@ ui_error_t ui_table_base_set_pagination_config(
  * @param out_str Pointer to receive the corresponding ARIA string.
  * @return UI_ERROR_NONE on success, or an error code.
  */
-static ui_error_t get_aria_sort_string(enum ui_table_sort_direction dir,
-                                       const char **out_str) {
-  if (!out_str) {
-    return UI_ERROR_INVALID_ARGUMENT;
-  }
+static const char *get_aria_sort_string(enum ui_table_sort_direction dir) {
   switch (dir) {
   case UI_TABLE_SORT_ASCENDING:
-    *out_str = "ascending";
-    return UI_ERROR_NONE;
+    return "ascending";
   case UI_TABLE_SORT_DESCENDING:
-    *out_str = "descending";
-    return UI_ERROR_NONE;
+    return "descending";
   default:
-    *out_str = "none";
-    return UI_ERROR_NONE;
+    return "none";
   }
 }
 
@@ -274,9 +267,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(thead);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     goto cleanup;
   }
@@ -291,9 +282,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(header_row);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     goto cleanup;
   }
@@ -312,9 +301,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     if (rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(header_cell);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       goto cleanup;
     }
@@ -324,10 +311,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
 
     if (table->sort_config.active_column_index == j) {
-      const char *sort_str = NULL;
-      rc = get_aria_sort_string(table->sort_config.direction, &sort_str);
-      if (rc != UI_ERROR_NONE)
-        goto cleanup;
+      const char *sort_str = get_aria_sort_string(table->sort_config.direction);
       rc = ui_dom_node_set_attribute(header_cell, "aria-sort", sort_str);
       if (rc != UI_ERROR_NONE)
         goto cleanup;
@@ -363,9 +347,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(tbody);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     goto cleanup;
   }
@@ -397,9 +379,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     if (rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(row);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       goto cleanup;
     }
@@ -408,16 +388,15 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     if (rc != UI_ERROR_NONE)
       goto cleanup;
 
-    if (table->selection_model) {
-      rc = ui_selection_model_is_selected(table->selection_model,
-                                          (void *)(size_t)i, &is_selected);
-      if (rc != UI_ERROR_NONE)
-        goto cleanup;
-    }
+    (void)ui_selection_model_is_selected(table->selection_model,
+                                         (void *)(size_t)i, &is_selected);
+
     if (is_selected) {
-      rc = ui_dom_node_set_attribute(row, "aria-selected", "true");
-      if (rc != UI_ERROR_NONE)
-        goto cleanup;
+      {
+        ui_error_t rc_cleanup =
+            ui_dom_node_set_attribute(row, "aria-selected", "true");
+        (void)rc_cleanup;
+      }
     }
 
     for (j = 0; j < total_cols; j++) {
@@ -431,9 +410,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       if (rc != UI_ERROR_NONE) {
         {
           ui_error_t rc_cleanup = ui_dom_node_destroy(cell);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)rc_cleanup;
         }
         goto cleanup;
       }
@@ -473,9 +450,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
 
 cleanup: {
   ui_error_t rc_cleanup = ui_dom_node_destroy(table_root);
-  if (rc_cleanup != UI_ERROR_NONE) {
-    (void)rc_cleanup; /* Avoid override */
-  }
+  (void)rc_cleanup;
 }
   return rc;
 }

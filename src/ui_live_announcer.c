@@ -70,13 +70,15 @@ ui_error_t ui_live_announcer_create(struct ui_live_announcer **out_announcer) {
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_live_announcer_destroy(struct ui_live_announcer *announcer) {
-  if (announcer) {
-    ui_error_t rc = ui_live_announcer_clear(announcer);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-    C_MULTIPLATFORM_FREE(announcer);
+  ui_error_t rc;
+
+  if (!announcer) {
+    return UI_ERROR_INVALID_ARGUMENT;
   }
-  return UI_ERROR_NONE;
+
+  rc = ui_live_announcer_clear(announcer);
+  C_MULTIPLATFORM_FREE(announcer);
+  return rc;
 }
 
 /**

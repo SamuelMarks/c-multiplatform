@@ -1179,5 +1179,154 @@ int test_cssom_part2_rules(void) {
       }
     }
   }
+
+  {
+    /* Test style rule specificity comparison when selector has same specificity
+     * as best */
+    struct ui_css_rule *tie_rule = NULL;
+    struct ui_dom_node *tie_node = NULL;
+    struct ui_css_stylesheet *tie_sheet = NULL;
+    struct ui_css_computed_style *tie_style = NULL;
+
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &tie_node);
+    ui_dom_node_set_tag_name(tie_node, "div");
+
+    ui_css_stylesheet_create(&tie_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &tie_rule);
+    ui_css_rule_append_selector(tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_selector(tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(tie_rule, "color", "blue", 0);
+    ui_css_stylesheet_append_rule(tie_sheet, tie_rule);
+
+    ui_css_resolve_style(tie_sheet, tie_node, &tie_style);
+
+    if (tie_style) {
+      ui_css_computed_style_destroy(tie_style);
+    }
+    if (tie_sheet) {
+      ui_css_stylesheet_destroy(tie_sheet);
+    }
+    if (tie_node) {
+      ui_dom_node_destroy(tie_node);
+    }
+  }
+
+  {
+    /* Test selector where a == best_a but b < best_b */
+    struct ui_css_rule *b_tie_rule = NULL;
+    struct ui_dom_node *b_tie_node = NULL;
+    struct ui_css_stylesheet *b_tie_sheet = NULL;
+    struct ui_css_computed_style *b_tie_style = NULL;
+
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &b_tie_node);
+    ui_dom_node_set_tag_name(b_tie_node, "div");
+    ui_dom_node_set_attribute(b_tie_node, "class", "mycls");
+
+    ui_css_stylesheet_create(&b_tie_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &b_tie_rule);
+    ui_css_rule_append_selector(b_tie_rule, UI_CSS_SELECTOR_TYPE_CLASS,
+                                "mycls");
+    ui_css_rule_append_selector(b_tie_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(b_tie_rule, "color", "cyan", 0);
+    ui_css_stylesheet_append_rule(b_tie_sheet, b_tie_rule);
+
+    ui_css_resolve_style(b_tie_sheet, b_tie_node, &b_tie_style);
+
+    if (b_tie_style) {
+      ui_css_computed_style_destroy(b_tie_style);
+    }
+    if (b_tie_sheet) {
+      ui_css_stylesheet_destroy(b_tie_sheet);
+    }
+    if (b_tie_node) {
+      ui_dom_node_destroy(b_tie_node);
+    }
+  }
+
+  {
+    /* Test class list whitespace termination branches: ' ', '\t', '\r', '\n',
+     * '\0' */
+    static const char *classes[5];
+    int ci;
+    classes[0] = "x foo";
+    classes[1] = "x\tfoo";
+    classes[2] = "x\rfoo";
+    classes[3] = "x\nfoo";
+    classes[4] = "x";
+    for (ci = 0; ci < 5; ci++) {
+      struct ui_dom_node *c_node = NULL;
+      struct ui_css_stylesheet *c_sheet = NULL;
+      struct ui_css_rule *c_rule = NULL;
+      struct ui_css_computed_style *c_style = NULL;
+
+      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_node);
+      ui_dom_node_set_tag_name(c_node, "div");
+      ui_dom_node_set_attribute(c_node, "class", classes[ci]);
+
+      ui_css_stylesheet_create(&c_sheet);
+      ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &c_rule);
+      ui_css_rule_append_selector(c_rule, UI_CSS_SELECTOR_TYPE_CLASS, "foo");
+      ui_css_rule_append_declaration(c_rule, "color", "green", 0);
+      ui_css_stylesheet_append_rule(c_sheet, c_rule);
+
+      ui_css_resolve_style(c_sheet, c_node, &c_style);
+
+      if (c_style) {
+        ui_css_computed_style_destroy(c_style);
+      }
+      if (c_sheet) {
+        ui_css_stylesheet_destroy(c_sheet);
+      }
+      if (c_node) {
+        ui_dom_node_destroy(c_node);
+      }
+    }
+  }
+
+  {
+    /* Specificity for attribute selector and nested pseudo-element in :is() */
+    struct ui_dom_node *sp_node = NULL;
+    struct ui_css_stylesheet *sp_sheet = NULL;
+    struct ui_css_rule *sp_rule = NULL;
+    struct ui_css_rule *sp_rule2 = NULL;
+    struct ui_css_selector *is_sel = NULL;
+    struct ui_css_selector *pe_sel = NULL;
+    struct ui_css_computed_style *sp_style = NULL;
+
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sp_node);
+    ui_dom_node_set_tag_name(sp_node, "div");
+    ui_dom_node_set_attribute(sp_node, "data-test", "val");
+
+    ui_css_stylesheet_create(&sp_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &sp_rule);
+    ui_css_rule_append_selector_attr(sp_rule, "data-test",
+                                     UI_CSS_ATTR_OP_EQUALS, "val");
+    ui_css_rule_append_declaration(sp_rule, "color", "red", 0);
+    ui_css_stylesheet_append_rule(sp_sheet, sp_rule);
+
+    /* Rule with :is(::before) */
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &sp_rule2);
+    ui_css_rule_append_selector(sp_rule2, UI_CSS_SELECTOR_TYPE_PSEUDO_CLASS,
+                                "is");
+    is_sel = sp_rule2->selectors;
+    pe_sel =
+        create_mock_selector(UI_CSS_SELECTOR_TYPE_PSEUDO_ELEMENT, "before");
+    is_sel->nested_selector = pe_sel;
+    ui_css_rule_append_declaration(sp_rule2, "color", "purple", 0);
+    ui_css_stylesheet_append_rule(sp_sheet, sp_rule2);
+
+    ui_css_resolve_style(sp_sheet, sp_node, &sp_style);
+
+    if (sp_style) {
+      ui_css_computed_style_destroy(sp_style);
+    }
+    if (sp_sheet) {
+      ui_css_stylesheet_destroy(sp_sheet);
+    }
+    if (sp_node) {
+      ui_dom_node_destroy(sp_node);
+    }
+  }
+
   return 0;
 }

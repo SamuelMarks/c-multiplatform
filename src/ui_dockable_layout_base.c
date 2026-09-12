@@ -87,9 +87,7 @@ ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(layout->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(layout);
   return UI_ERROR_NONE;

@@ -66,9 +66,7 @@ ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(tree_grid->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(tree_grid);
   return UI_ERROR_NONE;
@@ -107,16 +105,12 @@ ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
                                           void *node_id, int expanded) {
   int currently_expanded = 0;
   size_t i;
-  ui_error_t rc;
 
   if (!tree_grid || !node_id) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  rc = ui_tree_grid_base_is_expanded(tree_grid, node_id, &currently_expanded);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
-  }
+  (void)ui_tree_grid_base_is_expanded(tree_grid, node_id, &currently_expanded);
 
   if (expanded && !currently_expanded) {
     if (tree_grid->expanded_count < MAX_EXPANDED_NODES) {
@@ -163,16 +157,11 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   if (event->key_code == UI_KEY_RIGHT) {
     if (tree_grid->active_node) {
       int expanded = 0;
-      ui_error_t rc_exp = ui_tree_grid_base_is_expanded(
-          tree_grid, tree_grid->active_node, &expanded);
-      if (rc_exp != UI_ERROR_NONE) {
-        return rc_exp;
-      }
+      (void)ui_tree_grid_base_is_expanded(tree_grid, tree_grid->active_node,
+                                          &expanded);
       if (!expanded) {
-        ui_error_t set_exp_rc = ui_tree_grid_base_set_expanded(
-            tree_grid, tree_grid->active_node, 1);
-        if (set_exp_rc != UI_ERROR_NONE)
-          return set_exp_rc;
+        return ui_tree_grid_base_set_expanded(tree_grid, tree_grid->active_node,
+                                              1);
       } else {
         /* If already expanded, might move focus to first child or next column
          */
@@ -182,19 +171,11 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   } else if (event->key_code == UI_KEY_LEFT) {
     if (tree_grid->active_node) {
       int expanded = 0;
-      ui_error_t rc_exp = ui_tree_grid_base_is_expanded(
-          tree_grid, tree_grid->active_node, &expanded);
-      if (rc_exp != UI_ERROR_NONE) {
-        return rc_exp;
-      }
+      (void)ui_tree_grid_base_is_expanded(tree_grid, tree_grid->active_node,
+                                          &expanded);
       if (expanded) {
-        {
-          ui_error_t rc_cleanup = ui_tree_grid_base_set_expanded(
-              tree_grid, tree_grid->active_node, 0);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
-        }
+        return ui_tree_grid_base_set_expanded(tree_grid, tree_grid->active_node,
+                                              0);
       } else {
         /* Move focus to parent or prev col */
         if (tree_grid->active_col > 0)

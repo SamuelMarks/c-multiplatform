@@ -85,9 +85,7 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
   if (rc != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(editor);
     return rc;
@@ -98,15 +96,11 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
     if (set_rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(editor);
       return set_rc;
@@ -118,15 +112,11 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
     if (set_rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(editor);
       return set_rc;
@@ -137,15 +127,11 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
     if (set_rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(editor);
       return set_rc;
@@ -157,15 +143,11 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
     if (set_rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       {
         ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(editor);
       return set_rc;
@@ -243,17 +225,13 @@ ui_error_t ui_rich_text_base_destroy(struct ui_rich_text_base *editor) {
       {
         ui_error_t rc_cleanup =
             ui_dom_node_destroy(editor->component->shadow_root);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        (void)rc_cleanup;
       }
       editor->component->shadow_root = NULL;
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
 
@@ -323,9 +301,7 @@ ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
         if (txt_rc != UI_ERROR_NONE) {
           {
             ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+            (void)rc_cleanup;
           }
           return txt_rc;
         }
@@ -333,9 +309,7 @@ ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
         {
           ui_error_t rc_cleanup = ui_dom_node_append_child(
               editor->component->shadow_root, text_node);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          (void)rc_cleanup;
         }
       }
     }

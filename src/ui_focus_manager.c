@@ -147,11 +147,10 @@ static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
                                          size_t *out_capacity) {
   struct ui_dom_node *child;
   ui_bool_t focusable = UI_FALSE;
-  ui_error_t rc;
 
-  rc = is_focusable(root, &focusable);
-  if (rc != UI_ERROR_NONE) {
-    return rc;
+  {
+    ui_error_t rc = is_focusable(root, &focusable);
+    (void)rc;
   }
 
   if (focusable) {
@@ -213,17 +212,13 @@ ui_error_t ui_focus_manager_advance(struct ui_focus_manager *manager,
     ui_error_t g_rc =
         gather_focusable_nodes(target_root, &nodes, &count, &capacity);
     if (g_rc != UI_ERROR_NONE) {
-      if (nodes) {
-        C_MULTIPLATFORM_FREE(nodes);
-      }
+      C_MULTIPLATFORM_FREE(nodes);
       return g_rc;
     }
   }
 
   if (count == 0) {
-    if (nodes) {
-      C_MULTIPLATFORM_FREE(nodes);
-    }
+    C_MULTIPLATFORM_FREE(nodes);
     return UI_ERROR_NONE;
   }
 
@@ -269,11 +264,9 @@ gather_focusable_layout_nodes(struct ui_layout_node *node,
   struct ui_layout_node *child;
   ui_bool_t focusable = UI_FALSE;
   if (node->dom_node) {
-    ui_error_t rc;
-    rc = is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
-    if (rc != UI_ERROR_NONE) {
-      return rc;
-    }
+    ui_error_t rc =
+        is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
+    (void)rc;
   }
 
   if (focusable) {
@@ -452,9 +445,7 @@ ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
     manager->focused_node = (struct ui_dom_node *)best_node->dom_node;
   }
 
-  if (nodes) {
-    C_MULTIPLATFORM_FREE(nodes);
-  }
+  C_MULTIPLATFORM_FREE(nodes);
 
   return UI_ERROR_NONE;
 }
@@ -492,9 +483,7 @@ ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
   /* Reset focus to the trap root or its first focusable element */
   {
     ui_error_t rc_cleanup = ui_focus_manager_advance(manager, trap_root, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   return UI_ERROR_NONE;

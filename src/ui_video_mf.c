@@ -7,11 +7,14 @@
 #include "ui_error.h"
 /* clang-format on */
 
-#if defined(_WIN32) || defined(__CYGWIN__)
-/* MediaFoundation implementation stub */
-
-ui_error_t ui_video_decoder_get_default_backend(
-    struct ui_video_decoder_backend *out_backend) {
+/**
+ * @brief Retrieves the MediaFoundation hardware video decoder backend.
+ *
+ * @param out_backend Pointer to the backend structure to populate.
+ * @return ui_error_t `UI_ERROR_NONE` on success, or an appropriate error code.
+ */
+ui_error_t
+ui_video_decoder_mf_get_backend(struct ui_video_decoder_backend *out_backend) {
   if (!out_backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -26,4 +29,15 @@ ui_error_t ui_video_decoder_get_default_backend(
   return UI_ERROR_UNKNOWN; /* TODO: Implement MediaFoundation */
 }
 
+#if defined(_WIN32) || defined(__CYGWIN__)
+/**
+ * @brief Retrieves the default video decoder backend on Windows.
+ *
+ * @param out_backend Pointer to the backend structure to populate.
+ * @return ui_error_t `UI_ERROR_NONE` on success, or an appropriate error code.
+ */
+ui_error_t ui_video_decoder_get_default_backend(
+    struct ui_video_decoder_backend *out_backend) {
+  return ui_video_decoder_mf_get_backend(out_backend);
+}
 #endif

@@ -493,4 +493,297 @@ static void test_extra_coverage_2(void) {
 
   ui_dom_node_destroy(root);
   ui_css_stylesheet_destroy(sheet);
+
+  /* color and background-color branch coverage (both valid and invalid) */
+  {
+    struct ui_dom_node *c_root = NULL;
+    struct ui_css_stylesheet *c_sheet = NULL;
+    struct ui_css_rule *c_rule = NULL;
+    struct ui_layout_node *c_lroot = NULL;
+
+    /* Valid color test */
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_root);
+    ui_dom_node_set_tag_name(c_root, "div");
+    ui_css_stylesheet_create(&c_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &c_rule);
+    ui_css_rule_append_selector(c_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(c_rule, "color", "red", 0);
+    ui_css_rule_append_declaration(c_rule, "background-color", "blue", 0);
+    ui_css_stylesheet_append_rule(c_sheet, c_rule);
+    ui_layout_tree_generate(c_root, c_sheet, &c_lroot);
+    ui_layout_compute(c_lroot, 100.0f, 100.0f);
+    ui_layout_tree_destroy(c_lroot);
+    ui_dom_node_destroy(c_root);
+    ui_css_stylesheet_destroy(c_sheet);
+
+    /* Invalid color test */
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c_root);
+    ui_dom_node_set_tag_name(c_root, "div");
+    ui_css_stylesheet_create(&c_sheet);
+    ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &c_rule);
+    ui_css_rule_append_selector(c_rule, UI_CSS_SELECTOR_TYPE_TAG, "div");
+    ui_css_rule_append_declaration(c_rule, "color", "not-a-color-at-all", 0);
+    ui_css_rule_append_declaration(c_rule, "background-color",
+                                   "not-a-color-either", 0);
+    ui_css_stylesheet_append_rule(c_sheet, c_rule);
+    ui_layout_tree_generate(c_root, c_sheet, &c_lroot);
+    ui_layout_compute(c_lroot, 100.0f, 100.0f);
+    ui_layout_tree_destroy(c_lroot);
+    ui_dom_node_destroy(c_root);
+    ui_css_stylesheet_destroy(c_sheet);
+  }
+
+  /* ui_layout_solve_viewport and sanity check branch coverage */
+  {
+    struct ui_layout_node r_node;
+    struct ui_layout_node c_node;
+    struct ui_dom_node r_dom;
+    struct ui_dom_node c_dom;
+    ui_error_t s_rc;
+
+    /* A. root has dom_node with NULL tag_name */
+    memset(&r_node, 0, sizeof(r_node));
+    memset(&r_dom, 0, sizeof(r_dom));
+    r_dom.tag_name = NULL;
+    r_node.dom_node = &r_dom;
+    ui_layout_solve_viewport(&r_node, 800.0f, 600.0f);
+
+    /* B. root is "body" */
+    memset(&r_node, 0, sizeof(r_node));
+    memset(&r_dom, 0, sizeof(r_dom));
+    r_dom.tag_name = (char *)"body";
+    r_node.dom_node = &r_dom;
+    ui_layout_solve_viewport(&r_node, 800.0f, 600.0f);
+
+    /* C. root has dom_node with tag "div" (neither html nor body) */
+    memset(&r_node, 0, sizeof(r_node));
+    memset(&r_dom, 0, sizeof(r_dom));
+    r_dom.tag_name = (char *)"div";
+    r_node.dom_node = &r_dom;
+    ui_layout_solve_viewport(&r_node, 800.0f, 600.0f);
+
+    /* D. root is "html" with huge padding/borders so content_height < 0 */
+    memset(&r_node, 0, sizeof(r_node));
+    memset(&r_dom, 0, sizeof(r_dom));
+    r_dom.tag_name = (char *)"html";
+    r_node.dom_node = &r_dom;
+    r_node.padding[0] = 500.0f;
+    r_node.padding[2] = 500.0f;
+    r_node.padding[1] = 500.0f;
+    r_node.padding[3] = 500.0f;
+    ui_layout_solve_viewport(&r_node, 100.0f, 100.0f);
+
+    /* E. child with NULL tag_name */
+    memset(&r_node, 0, sizeof(r_node));
+    memset(&c_node, 0, sizeof(c_node));
+    memset(&r_dom, 0, sizeof(r_dom));
+    memset(&c_dom, 0, sizeof(c_dom));
+    r_dom.tag_name = (char *)"html";
+    c_dom.tag_name = NULL;
+    r_node.dom_node = &r_dom;
+    c_node.dom_node = &c_dom;
+    r_node.first_child = &c_node;
+    ui_layout_solve_viewport(&r_node, 800.0f, 600.0f);
+
+    /* F. child with dom_node == NULL */
+    memset(&r_node, 0, sizeof(r_node));
+    memset(&c_node, 0, sizeof(c_node));
+    memset(&r_dom, 0, sizeof(r_dom));
+    r_dom.tag_name = (char *)"html";
+    r_node.dom_node = &r_dom;
+    c_node.dom_node = NULL;
+    r_node.first_child = &c_node;
+    ui_layout_solve_viewport(&r_node, 800.0f, 600.0f);
+
+    /* G. child whose tag_name is "body" */
+    memset(&r_node, 0, sizeof(r_node));
+    memset(&c_node, 0, sizeof(c_node));
+    memset(&r_dom, 0, sizeof(r_dom));
+    memset(&c_dom, 0, sizeof(c_dom));
+    r_dom.tag_name = (char *)"html";
+    c_dom.tag_name = (char *)"body";
+    r_node.dom_node = &r_dom;
+    c_node.dom_node = &c_dom;
+    r_node.first_child = &c_node;
+    ui_layout_solve_viewport(&r_node, 800.0f, 600.0f);
+
+    /* H. sanity check: overflow_x == HIDDEN with child NOT bleeding */
+    memset(&r_node, 0, sizeof(r_node));
+    memset(&c_node, 0, sizeof(c_node));
+    r_node.width = 100.0f;
+    r_node.height = 100.0f;
+    r_node.overflow_x = UI_LAYOUT_OVERFLOW_HIDDEN;
+    r_node.overflow_y = UI_LAYOUT_OVERFLOW_VISIBLE;
+    c_node.x = 0.0f;
+    c_node.width = 50.0f;
+    c_node.height = 50.0f;
+    r_node.first_child = &c_node;
+    s_rc = ui_layout_sanity_check(&r_node);
+    (void)s_rc;
+
+    /* I. sanity check: overflow_x == HIDDEN with child bleeding */
+    c_node.width = 200.0f;
+    s_rc = ui_layout_sanity_check(&r_node);
+    (void)s_rc;
+  }
+
+  {
+    struct ui_layout_node parent;
+    struct ui_layout_node c1;
+    struct ui_layout_node c2;
+    struct ui_layout_node children[70];
+    ui_error_t rc;
+    int k;
+
+    /* 1. Multiple children intrinsic sizing */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    memset(&c2, 0, sizeof(c2));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLOW;
+    parent.width_type = UI_LAYOUT_SIZE_MIN_CONTENT;
+    parent.first_child = &c1;
+    c1.next_sibling = &c2;
+    parent.last_child = &c2;
+    rc = ui_layout_compute(&parent, 200.0f, 200.0f);
+    (void)rc;
+
+    /* 2. Fit content where fit < intrinsic_min_width */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLOW;
+    parent.width_type = UI_LAYOUT_SIZE_FIT_CONTENT;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    rc = ui_layout_compute(&parent, 10.0f, 200.0f);
+    (void)rc;
+
+    /* 3. break_before and break_after in multi-column and single column */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLOW;
+    parent.column_count = 1;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    c1.break_before = UI_LAYOUT_BREAK_COLUMN;
+    c1.break_after = UI_LAYOUT_BREAK_COLUMN;
+    rc = ui_layout_compute(&parent, 200.0f, 200.0f);
+    (void)rc;
+
+    parent.column_count = 2;
+    parent.width = 200.0f;
+    c1.break_before = UI_LAYOUT_BREAK_PAGE;
+    c1.break_after = UI_LAYOUT_BREAK_PAGE;
+    rc = ui_layout_compute(&parent, 200.0f, 200.0f);
+    (void)rc;
+
+    c1.break_before = UI_LAYOUT_BREAK_ALWAYS;
+    c1.break_after = UI_LAYOUT_BREAK_ALWAYS;
+    rc = ui_layout_compute(&parent, 200.0f, 200.0f);
+    (void)rc;
+
+    /* 4. flex_direction ROW_REVERSE and flex_wrap WRAP_REVERSE */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    parent.flex_direction = UI_LAYOUT_FLEX_DIRECTION_ROW_REVERSE;
+    parent.flex_wrap = UI_LAYOUT_FLEX_WRAP_WRAP_REVERSE;
+    parent.width = 200.0f;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    rc = ui_layout_compute(&parent, 200.0f, 200.0f);
+    (void)rc;
+
+    /* 5. Flex wrap line_count >= 64 */
+    memset(&parent, 0, sizeof(parent));
+    memset(children, 0, sizeof(children));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    parent.flex_wrap = UI_LAYOUT_FLEX_WRAP_WRAP;
+    parent.width = 50.0f;
+    parent.content_width = 50.0f;
+    for (k = 0; k < 68; k++) {
+      children[k].width = 60.0f;
+      children[k].flex_basis_type = UI_LAYOUT_SIZE_PIXELS;
+      children[k].flex_basis = 60.0f;
+      if (k > 0) {
+        children[k - 1].next_sibling = &children[k];
+        children[k].previous_sibling = &children[k - 1];
+      }
+    }
+    parent.first_child = &children[0];
+    parent.last_child = &children[67];
+    rc = ui_layout_compute(&parent, 50.0f, 200.0f);
+    (void)rc;
+
+    /* 6. Flex shrink conditions */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    parent.flex_direction = UI_LAYOUT_FLEX_DIRECTION_ROW;
+    parent.flex_wrap = UI_LAYOUT_FLEX_WRAP_WRAP;
+    parent.width = 50.0f;
+    parent.content_width = 50.0f;
+    c1.width = 100.0f;
+    c1.flex_shrink = 1.0f;
+    c1.flex_basis_type = UI_LAYOUT_SIZE_PIXELS;
+    c1.flex_basis = 100.0f;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    rc = ui_layout_compute(&parent, 50.0f, 200.0f);
+    (void)rc;
+
+    parent.flex_wrap = UI_LAYOUT_FLEX_WRAP_NOWRAP;
+    c1.flex_shrink = 0.0f;
+    rc = ui_layout_compute(&parent, 50.0f, 200.0f);
+    (void)rc;
+
+    /* 7. Flex column with justify_content == UI_LAYOUT_ALIGN_CENTER */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    parent.flex_direction = UI_LAYOUT_FLEX_DIRECTION_COLUMN;
+    parent.justify_content = UI_LAYOUT_ALIGN_CENTER;
+    parent.width = 100.0f;
+    parent.height = 300.0f;
+    c1.height = 50.0f;
+    c1.flex_basis_type = UI_LAYOUT_SIZE_PIXELS;
+    c1.flex_basis = 50.0f;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    rc = ui_layout_compute(&parent, 100.0f, 300.0f);
+    (void)rc;
+
+    /* 8. Flex node with width == 0.0f but width_type == PIXELS */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    parent.width = 0.0f;
+    parent.width_type = UI_LAYOUT_SIZE_PIXELS;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    (void)rc;
+
+    /* 9. Flex node with justify_content == SPACE_BETWEEN and only 1 child */
+    memset(&parent, 0, sizeof(parent));
+    memset(&c1, 0, sizeof(c1));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    parent.justify_content = UI_LAYOUT_ALIGN_SPACE_BETWEEN;
+    parent.width = 100.0f;
+    c1.width = 30.0f;
+    c1.flex_basis_type = UI_LAYOUT_SIZE_PIXELS;
+    c1.flex_basis = 30.0f;
+    parent.first_child = &c1;
+    parent.last_child = &c1;
+    rc = ui_layout_compute(&parent, 100.0f, 100.0f);
+    (void)rc;
+
+    /* 10. Aspect ratio > 0 with height == 0 in block layout */
+    memset(&parent, 0, sizeof(parent));
+    parent.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLOW;
+    parent.aspect_ratio = 1.5f;
+    parent.width = 150.0f;
+    parent.height = 0.0f;
+    rc = ui_layout_compute(&parent, 200.0f, 200.0f);
+    (void)rc;
+  }
 }

@@ -40,6 +40,18 @@ static int test_highlight_create(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_mock_strcpy_fail;
+    g_mock_strcpy_fail = 1;
+    if (ui_css_highlight_create(UI_CSS_HIGHLIGHT_TYPE_CUSTOM, "my-hl", &hl) ==
+        UI_ERROR_NONE) {
+      ui_css_highlight_destroy(hl);
+    }
+    g_mock_strcpy_fail = 0;
+  }
+#endif
+
   return 0;
 }
 

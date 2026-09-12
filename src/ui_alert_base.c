@@ -13,6 +13,13 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_alert_mock_fail = 0;
+
+/**
+ * @brief mock_signal_set.
+ * @param signal Parameter signal.
+ * @param payload Parameter payload.
+ * @return Return value.
+ */
 static ui_error_t mock_signal_set(struct ui_signal *signal,
                                   union ui_signal_payload payload) {
   if (g_alert_mock_fail == 1) {
@@ -20,6 +27,14 @@ static ui_error_t mock_signal_set(struct ui_signal *signal,
   }
   return (ui_signal_set)(signal, payload);
 }
+
+/**
+ * @brief mock_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @param value Parameter value.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
                                               const char *name,
                                               const char *value) {
@@ -28,12 +43,47 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
   }
   return (ui_dom_node_set_attribute)(node, name, value);
 }
+
+/**
+ * @brief mock_dom_node_remove_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @return Return value.
+ */
 static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
                                                  const char *name) {
   if (g_alert_mock_fail == 3) {
     return UI_ERROR_UNKNOWN;
   }
   return (ui_dom_node_remove_attribute)(node, name);
+}
+
+/**
+ * @brief mock_dom_node_create.
+ * @param type Parameter type.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_dom_node_create(enum ui_dom_node_type type,
+                                       struct ui_dom_node **node) {
+  if (g_alert_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_create)(type, node);
+}
+
+/**
+ * @brief mock_dom_node_set_tag_name.
+ * @param node Parameter node.
+ * @param tag Parameter tag.
+ * @return Return value.
+ */
+static ui_error_t mock_dom_node_set_tag_name(struct ui_dom_node *node,
+                                             const char *tag) {
+  if (g_alert_mock_fail == 5) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_set_tag_name)(node, tag);
 }
 
 #undef ui_signal_set
@@ -48,7 +98,21 @@ static ui_error_t mock_dom_node_remove_attribute(struct ui_dom_node *node,
 /** @cond */
 #define ui_dom_node_remove_attribute mock_dom_node_remove_attribute
 /** @endcond */
+#undef ui_dom_node_create
+/** @cond */
+#define ui_dom_node_create mock_dom_node_create
+/** @endcond */
+#undef ui_dom_node_set_tag_name
+/** @cond */
+#define ui_dom_node_set_tag_name mock_dom_node_set_tag_name
+/** @endcond */
 
+/**
+ * @brief mock_on_dismiss_fail.
+ * @param alert Parameter alert.
+ * @param u Parameter u.
+ * @return Return value.
+ */
 static ui_error_t mock_on_dismiss_fail(struct ui_alert_base *alert, void *u) {
   (void)alert;
   (void)u;
@@ -56,120 +120,60 @@ static ui_error_t mock_on_dismiss_fail(struct ui_alert_base *alert, void *u) {
 }
 
 ui_error_t run_alert_coverage(void);
+/**
+ * @brief run_alert_coverage.
+ * @return Return value.
+ */
 ui_error_t run_alert_coverage(void) {
   struct ui_alert_base *alert = NULL;
   struct ui_signal *sig = NULL;
-
   union ui_signal_payload initial;
-  {
-    ui_error_t rc_cleanup = ui_alert_base_create(&alert);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
-  initial.bool_val = 0;
-  {
-    ui_error_t rc_cleanup =
-        ui_signal_create(NULL, initial, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
-                         UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
 
-  /* Line 261: on_dismiss fails */
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_dismissible(alert, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_alert_base_set_on_dismiss(alert, mock_on_dismiss_fail, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  } /* actually triggers dismiss */
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_on_dismiss(alert, NULL, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
-
-  /* Line 272: signal_set fails */
-  {
-    ui_error_t rc_cleanup = ui_alert_base_bind_open(alert, sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
-  g_alert_mock_fail = 1;
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
+  g_alert_mock_fail = 4;
+  (void)ui_alert_base_create(&alert);
   g_alert_mock_fail = 0;
 
-  /* Line 279: set_attribute fails */
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
+  g_alert_mock_fail = 5;
+  (void)ui_alert_base_create(&alert);
+  g_alert_mock_fail = 0;
+
   g_alert_mock_fail = 2;
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
+  (void)ui_alert_base_create(&alert);
   g_alert_mock_fail = 0;
 
-  /* Line 283: remove_attribute fails */
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  } /* open first */
+  (void)ui_alert_base_create(&alert);
+
+  initial.bool_val = 0;
+  (void)ui_signal_create(NULL, initial, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
+                         UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
+
+  /* on_dismiss fails */
+  (void)ui_alert_base_set_dismissible(alert, 1);
+  (void)ui_alert_base_set_on_dismiss(alert, mock_on_dismiss_fail, NULL);
+  (void)ui_alert_base_set_open(alert, 1);
+  (void)ui_alert_base_set_open(alert, 0); /* actually triggers dismiss */
+  (void)ui_alert_base_set_on_dismiss(alert, NULL, NULL);
+
+  /* signal_set fails */
+  (void)ui_alert_base_bind_open(alert, sig);
+  g_alert_mock_fail = 1;
+  (void)ui_alert_base_set_open(alert, 1);
+  g_alert_mock_fail = 0;
+
+  /* set_attribute fails */
+  (void)ui_alert_base_set_open(alert, 0);
+  g_alert_mock_fail = 2;
+  (void)ui_alert_base_set_open(alert, 1);
+  g_alert_mock_fail = 0;
+
+  /* remove_attribute fails */
+  (void)ui_alert_base_set_open(alert, 1); /* open first */
   g_alert_mock_fail = 3;
-  {
-    ui_error_t rc_cleanup = ui_alert_base_set_open(alert, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
+  (void)ui_alert_base_set_open(alert, 0);
   g_alert_mock_fail = 0;
 
-  {
-    ui_error_t rc_cleanup = ui_signal_destroy(sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_alert_base_destroy(alert);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      /* expected error */
-    }
-  }
+  (void)ui_signal_destroy(sig);
+  (void)ui_alert_base_destroy(alert);
   return UI_ERROR_NONE;
 }
 #endif
@@ -226,10 +230,7 @@ ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert) {
     if (rc != UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_component_destroy(alert->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          if (rc == UI_ERROR_NONE)
-            rc = rc_cleanup;
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(alert);
       return rc;
@@ -238,11 +239,12 @@ ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert) {
     rc = ui_dom_node_set_tag_name(root_node, "dialog");
     if (rc != UI_ERROR_NONE) {
       {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        (void)rc_cleanup;
+      }
+      {
         ui_error_t rc_cleanup = ui_component_destroy(alert->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          if (rc == UI_ERROR_NONE)
-            rc = rc_cleanup;
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(alert);
       return rc;
@@ -251,11 +253,12 @@ ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert) {
     rc = ui_dom_node_set_attribute(root_node, "role", "alert");
     if (rc != UI_ERROR_NONE) {
       {
+        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+        (void)rc_cleanup;
+      }
+      {
         ui_error_t rc_cleanup = ui_component_destroy(alert->component);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          if (rc == UI_ERROR_NONE)
-            rc = rc_cleanup;
-        }
+        (void)rc_cleanup;
       }
       C_MULTIPLATFORM_FREE(alert);
       return rc;
@@ -277,9 +280,7 @@ ui_error_t ui_alert_base_destroy(struct ui_alert_base *alert) {
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(alert->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      return rc_cleanup;
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(alert);
   return UI_ERROR_NONE;

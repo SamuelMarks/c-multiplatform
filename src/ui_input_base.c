@@ -186,9 +186,7 @@ ui_error_t ui_input_base_create(struct ui_input_base **out_input) {
   {
     ui_error_t rc_cleanup =
         ui_component_set_default_style(input->component, default_style);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
 
   input->component->shadow_root = root_node;
@@ -201,26 +199,20 @@ cleanup:
   if (root_node) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (input->gesture_recognizer) {
     {
       ui_error_t rc_cleanup =
           ui_gesture_recognizer_destroy(input->gesture_recognizer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   if (input->component) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(input->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      (void)rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(input);
@@ -254,15 +246,11 @@ ui_error_t ui_input_base_destroy(struct ui_input_base *input) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_destroy(input->gesture_recognizer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(input->component);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    (void)rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(input);
   return UI_ERROR_NONE;
@@ -627,6 +615,7 @@ ui_error_t ui_input_base_get_cva(struct ui_input_base *input,
                                  struct ui_control_value_accessor *out_cva) {
   if (!input || !out_cva)
     return UI_ERROR_INVALID_ARGUMENT;
+  out_cva->component = input;
   out_cva->write_value = input_cva_write_value;
   out_cva->register_on_change = input_cva_register_on_change;
   out_cva->register_on_touched = input_cva_register_on_touched;

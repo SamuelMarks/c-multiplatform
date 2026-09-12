@@ -43,6 +43,11 @@ static ui_error_t dummy_on_touched(void *user_data) {
   return UI_ERROR_NONE;
 }
 
+static ui_error_t dummy_on_touched_err(void *user_data) {
+  (void)user_data;
+  return UI_ERROR_INVALID_ARGUMENT;
+}
+
 static int run_normal_tests(void) {
   struct ui_listbox_base *listbox = NULL;
   struct ui_selection_model *model = NULL;
@@ -489,6 +494,11 @@ static int run_normal_tests(void) {
     cva.register_on_touched(listbox, dummy_on_touched, &on_touched_called);
     ev.type = UI_EVENT_KEY_UP;
     ui_listbox_base_process_event(listbox, &ev, 5900.0);
+
+    /* Test touched returning error */
+    cva.register_on_touched(listbox, dummy_on_touched_err, NULL);
+    ui_listbox_base_process_event(listbox, &ev, 5950.0);
+    cva.register_on_touched(listbox, dummy_on_touched, &on_touched_called);
   }
 
   if (cva.set_disabled_state) {

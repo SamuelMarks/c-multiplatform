@@ -5,6 +5,8 @@
 #include "../include/ui_reactor.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #ifndef _WIN32
 #include <unistd.h>
 #else
@@ -104,6 +106,230 @@ static ui_error_t dummy_async_err(struct ui_form_control *control,
   (void)user_data;
   *out_is_valid = 1;
   return UI_ERROR_OUT_OF_MEMORY;
+}
+
+static ui_error_t s_cva_write_val_last_rc = UI_ERROR_NONE;
+static union ui_signal_payload s_cva_last_written_val;
+static ui_error_t mock_cva_write_value(void *comp,
+                                       union ui_signal_payload val) {
+  (void)comp;
+  s_cva_last_written_val = val;
+  return s_cva_write_val_last_rc;
+}
+
+static ui_error_t s_cva_reg_change_rc = UI_ERROR_NONE;
+static ui_error_t (*s_cva_on_change_cb)(union ui_signal_payload, void *) = NULL;
+static void *s_cva_on_change_ud = NULL;
+static ui_error_t mock_cva_register_on_change(
+    void *comp,
+    ui_error_t (*callback)(union ui_signal_payload new_value, void *user_data),
+    void *user_data) {
+  (void)comp;
+  s_cva_on_change_cb = callback;
+  s_cva_on_change_ud = user_data;
+  return s_cva_reg_change_rc;
+}
+
+static ui_error_t s_cva_reg_touch_rc = UI_ERROR_NONE;
+static ui_error_t (*s_cva_on_touch_cb)(void *) = NULL;
+static void *s_cva_on_touch_ud = NULL;
+static ui_error_t mock_cva_register_on_touched(
+    void *comp, ui_error_t (*callback)(void *user_data), void *user_data) {
+  (void)comp;
+  s_cva_on_touch_cb = callback;
+  s_cva_on_touch_ud = user_data;
+  return s_cva_reg_touch_rc;
+}
+
+static ui_error_t s_cva_set_dis_rc = UI_ERROR_NONE;
+static ui_bool_t s_cva_last_disabled = UI_FALSE;
+static ui_error_t mock_cva_set_disabled_state(void *comp, ui_bool_t disabled) {
+  (void)comp;
+  s_cva_last_disabled = disabled;
+  return s_cva_set_dis_rc;
+}
+
+static void run_cva_and_edge_tests(void) {
+  struct ui_arena *arena = NULL;
+  ui_form_control_t *control = NULL;
+  struct ui_control_value_accessor cva;
+  struct ui_control_value_accessor cva_null;
+  union ui_signal_payload init_val;
+  union ui_signal_payload test_val;
+  ui_error_t rc;
+  extern int g_malloc_fail_countdown;
+
+  init_val.int_val = 42;
+  test_val.int_val = 99;
+
+  rc = ui_arena_create(2048, &arena);
+  assert(rc == UI_ERROR_NONE);
+
+  rc = ui_form_control_create(arena, init_val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+                              UI_SIGNAL_MODE_SINGLE_THREADED, &control);
+  assert(rc == UI_ERROR_NONE);
+
+  /* NULL checks on bind_cva */
+  memset(&cva, 0, sizeof(cva));
+  cva.component = (void *)0x1234;
+  cva.write_value = mock_cva_write_value;
+  cva.register_on_change = mock_cva_register_on_change;
+  cva.register_on_touched = mock_cva_register_on_touched;
+  cva.set_disabled_state = mock_cva_set_disabled_state;
+
+  rc = ui_form_control_bind_cva(NULL, &cva);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_form_control_bind_cva(control, NULL);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  /* Failure in register_on_change */
+  s_cva_reg_change_rc = UI_ERROR_UNKNOWN;
+  rc = ui_form_control_bind_cva(control, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  s_cva_reg_change_rc = UI_ERROR_NONE;
+
+  /* Failure in register_on_touched */
+  s_cva_reg_touch_rc = UI_ERROR_UNKNOWN;
+  rc = ui_form_control_bind_cva(control, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  s_cva_reg_touch_rc = UI_ERROR_NONE;
+
+  /* Failure in write_value during initial bind */
+  s_cva_write_val_last_rc = UI_ERROR_UNKNOWN;
+  rc = ui_form_control_bind_cva(control, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  s_cva_write_val_last_rc = UI_ERROR_NONE;
+
+  /* Successful bind */
+  rc = ui_form_control_bind_cva(control, &cva);
+  assert(rc == UI_ERROR_NONE);
+  assert(s_cva_on_change_cb != NULL);
+  assert(s_cva_on_touch_cb != NULL);
+
+  /* Test callbacks with NULL user_data */
+  rc = s_cva_on_change_cb(test_val, NULL);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+  rc = s_cva_on_touch_cb(NULL);
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+  /* Test callbacks with valid user_data */
+  rc = s_cva_on_change_cb(test_val, control);
+  assert(rc == UI_ERROR_NONE);
+  rc = s_cva_on_touch_cb(control);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test set_value with CVA write_value success & failure */
+  s_cva_write_val_last_rc = UI_ERROR_NONE;
+  rc = ui_form_control_set_value(control, test_val);
+  assert(rc == UI_ERROR_NONE);
+  s_cva_write_val_last_rc = UI_ERROR_UNKNOWN;
+  rc = ui_form_control_set_value(control, test_val);
+  assert(rc == UI_ERROR_UNKNOWN);
+  s_cva_write_val_last_rc = UI_ERROR_NONE;
+
+  /* Test disable with CVA set_disabled_state success & failure */
+  s_cva_set_dis_rc = UI_ERROR_NONE;
+  rc = ui_form_control_disable(control);
+  assert(rc == UI_ERROR_NONE);
+  s_cva_set_dis_rc = UI_ERROR_UNKNOWN;
+  rc = ui_form_control_disable(control);
+  assert(rc == UI_ERROR_UNKNOWN);
+  s_cva_set_dis_rc = UI_ERROR_NONE;
+
+  /* Test enable with CVA set_disabled_state success & failure */
+  s_cva_set_dis_rc = UI_ERROR_NONE;
+  rc = ui_form_control_enable(control);
+  assert(rc == UI_ERROR_NONE);
+  s_cva_set_dis_rc = UI_ERROR_UNKNOWN;
+  rc = ui_form_control_enable(control);
+  assert(rc == UI_ERROR_UNKNOWN);
+  s_cva_set_dis_rc = UI_ERROR_NONE;
+
+  /* Test binding with NULL callbacks inside CVA struct */
+  memset(&cva_null, 0, sizeof(cva_null));
+  rc = ui_form_control_bind_cva(control, &cva_null);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_form_control_set_value(control, test_val);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_form_control_disable(control);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_form_control_enable(control);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test ui_form_control_set_error: NULL check, valid, replace, clear, OOM,
+   * strcpy fail */
+  rc = ui_form_control_set_error(NULL, "error");
+  assert(rc == UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_form_control_set_error(control, "first error");
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_form_control_set_error(control, "second longer error message");
+  assert(rc == UI_ERROR_NONE);
+  g_malloc_fail_countdown = 0;
+  rc = ui_form_control_set_error(control, "oom failure");
+  assert(rc == UI_ERROR_OUT_OF_MEMORY);
+  g_malloc_fail_countdown = -1;
+  {
+    extern int g_mock_strcpy_fail;
+    g_mock_strcpy_fail = 1;
+    rc = ui_form_control_set_error(control, "strcpy fail");
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_mock_strcpy_fail = 0;
+  }
+  rc = ui_form_control_set_error(control, NULL);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test value_signal NULL in bind_cva */
+  {
+    ui_signal_t **val_sig_ptr =
+        (ui_signal_t **)((char *)control + sizeof(void *));
+    ui_signal_t *old_val_sig = *val_sig_ptr;
+    *val_sig_ptr = NULL;
+    rc = ui_form_control_bind_cva(control, &cva);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
+    *val_sig_ptr = old_val_sig;
+  }
+
+  /* Test status_signal NULL check in run_validation */
+  {
+    ui_signal_t **status_sig_ptr =
+        (ui_signal_t **)((char *)control + 2 * sizeof(void *));
+    ui_signal_t *old_status = *status_sig_ptr;
+    *status_sig_ptr = NULL;
+    rc = ui_form_control_enable(control);
+    *status_sig_ptr = old_status;
+  }
+
+  /* Test ui_thread_pool_schedule failure branch in run_validation */
+  {
+    struct ui_thread_pool *pool = NULL;
+    struct ui_reactor *reactor = NULL;
+    struct ui_thread_pool **pool_ptr;
+    struct ui_thread_pool *old_pool;
+    rc = ui_thread_pool_create(1, &pool);
+    assert(rc == UI_ERROR_NONE);
+    rc = ui_reactor_create(&reactor);
+    assert(rc == UI_ERROR_NONE);
+
+    rc = ui_form_control_add_async_validator(control, dummy_async_valid, NULL,
+                                             pool, reactor);
+    assert(rc == UI_ERROR_NONE);
+
+    pool_ptr = (struct ui_thread_pool **)((char *)control + 7 * sizeof(void *) +
+                                          6 * sizeof(size_t));
+    old_pool = *pool_ptr;
+    *pool_ptr = NULL;
+    rc = ui_form_control_set_value(control, test_val);
+    assert(rc == UI_ERROR_NONE);
+    *pool_ptr = old_pool;
+
+    ui_thread_pool_destroy(pool);
+    ui_reactor_destroy(reactor);
+  }
+
+  rc = ui_form_control_destroy(control);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_arena_destroy(arena);
+  assert(rc == UI_ERROR_NONE);
 }
 
 static int run_extra_control(void) {
@@ -413,11 +639,11 @@ static int run_oom_tests_control(void) {
   {
     struct ui_thread_pool *pool;
     struct ui_reactor *reactor;
+    ui_form_control_t *control4 = NULL;
     g_malloc_fail_countdown = -1;
     ui_thread_pool_create(2, &pool);
     ui_reactor_create(&reactor);
 
-    ui_form_control_t *control4 = NULL;
     ui_form_control_create(small_arena, dummy, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                            UI_SIGNAL_MODE_SINGLE_THREADED, &control4);
 
@@ -460,8 +686,6 @@ static int run_oom_tests_control(void) {
 }
 
 int main(void) {
-  setvbuf(stdout, NULL, _IONBF, 0);
-  printf("Starting test_ui_form_control\n");
   struct ui_arena *arena;
   ui_form_control_t *control;
   struct ui_thread_pool *pool;
@@ -469,6 +693,9 @@ int main(void) {
   ui_error_t rc;
   union ui_signal_payload initial_value = {0}, get_val;
   ui_signal_t *sig;
+
+  setvbuf(stdout, NULL, _IONBF, 0);
+  printf("Starting test_ui_form_control\n");
 
   rc = ui_arena_create(1024, &arena);
 
@@ -527,10 +754,10 @@ int main(void) {
 
   {
     union ui_signal_payload new_val;
+    int iter;
     new_val.int_val = 25;
     rc = ui_form_control_set_value(control, new_val);
 
-    int iter;
     for (iter = 0; iter < 50; ++iter) {
       ui_reactor_poll(reactor, 100);
       usleep(2000);
@@ -551,6 +778,7 @@ int main(void) {
   run_extra_control();
   run_extra_control2_all();
   run_extra_control3_all();
+  run_cva_and_edge_tests();
   printf("Running run_oom_tests_control\n");
   {
     /* Cover ui_signal_get failure in run_validation */
@@ -576,41 +804,44 @@ int main(void) {
 
   {
     int i;
-    struct ui_arena *arena;
-    struct ui_thread_pool *pool;
-    struct ui_reactor *reactor;
-    ui_arena_create(1024, &arena);
-    ui_thread_pool_create(2, &pool);
-    ui_reactor_create(&reactor);
+    struct ui_arena *arena2;
+    struct ui_thread_pool *pool2;
+    struct ui_reactor *reactor2;
+    ui_arena_create(1024, &arena2);
+    ui_thread_pool_create(2, &pool2);
+    ui_reactor_create(&reactor2);
 
     for (i = 0; i < 400; i++) {
-      ui_form_control_t *control = NULL;
-      extern int g_malloc_fail_countdown;
-      g_malloc_fail_countdown = -1;
+      ui_form_control_t *control_oom = NULL;
       union ui_signal_payload dummy;
+      ui_error_t rc_oom;
+      extern int g_malloc_fail_countdown;
+
+      g_malloc_fail_countdown = -1;
       dummy.int_val = 0;
-      ui_error_t rc =
-          ui_form_control_create(arena, dummy, UI_SIGNAL_TYPE_INT32, NULL, NULL,
-                                 UI_SIGNAL_MODE_SINGLE_THREADED, &control);
-      if (rc == UI_ERROR_NONE && control) {
-        rc = ui_form_control_add_validator(control, sync_validator, NULL);
-        if (rc == UI_ERROR_NONE) {
-          rc = ui_form_control_add_async_validator(control, dummy_async_valid,
-                                                   NULL, pool, reactor);
-          if (rc == UI_ERROR_NONE) {
+      rc_oom = ui_form_control_create(arena2, dummy, UI_SIGNAL_TYPE_INT32, NULL,
+                                      NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
+                                      &control_oom);
+      if (rc_oom == UI_ERROR_NONE && control_oom) {
+        rc_oom =
+            ui_form_control_add_validator(control_oom, sync_validator, NULL);
+        if (rc_oom == UI_ERROR_NONE) {
+          rc_oom = ui_form_control_add_async_validator(
+              control_oom, dummy_async_valid, NULL, pool2, reactor2);
+          if (rc_oom == UI_ERROR_NONE) {
             g_malloc_fail_countdown = i;
-            ui_form_control_set_value(control, dummy);
+            ui_form_control_set_value(control_oom, dummy);
             g_malloc_fail_countdown = i;
-            ui_form_control_mark_as_touched(control);
+            ui_form_control_mark_as_touched(control_oom);
             g_malloc_fail_countdown = i;
-            ui_form_control_disable(control);
+            ui_form_control_disable(control_oom);
             g_malloc_fail_countdown = i;
-            ui_form_control_enable(control);
+            ui_form_control_enable(control_oom);
           }
         }
         g_malloc_fail_countdown = -1;
         {
-          ui_error_t rc_cleanup = ui_form_control_destroy(control);
+          ui_error_t rc_cleanup = ui_form_control_destroy(control_oom);
           if (rc_cleanup != UI_ERROR_NONE) {
             (void)rc_cleanup; /* Avoid override */
           }
@@ -618,10 +849,10 @@ int main(void) {
       }
     }
     g_malloc_fail_countdown = -1;
-    ui_thread_pool_destroy(pool);
-    ui_reactor_destroy(reactor);
+    ui_thread_pool_destroy(pool2);
+    ui_reactor_destroy(reactor2);
     {
-      ui_error_t rc_cleanup = ui_arena_destroy(arena);
+      ui_error_t rc_cleanup = ui_arena_destroy(arena2);
       if (rc_cleanup != UI_ERROR_NONE) {
         (void)rc_cleanup; /* Avoid override */
       }
