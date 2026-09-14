@@ -309,9 +309,14 @@ static int test_overflow_violation(void) {
 
 static void test_extra_coverage_2(void) {
   struct ui_dom_node *root = NULL, *child1 = NULL, *child2 = NULL;
+  struct ui_dom_node *grandchild = NULL, *flex_child = NULL,
+                     *flex_child2 = NULL;
+  struct ui_dom_node *wrap_children[65];
   struct ui_css_stylesheet *sheet = NULL;
-  struct ui_css_rule *rule1 = NULL, *rule2 = NULL, *rule3 = NULL;
+  struct ui_css_rule *rule1 = NULL, *rule2 = NULL, *rule3 = NULL,
+                     *span_rule = NULL;
   struct ui_layout_node *lroot = NULL;
+  int i;
 
   /* ui_layout_solve_viewport(NULL) */
   ui_layout_solve_viewport(NULL, 100.0f, 100.0f);
@@ -354,7 +359,6 @@ static void test_extra_coverage_2(void) {
   /* fit-content test */
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &child1);
-  struct ui_dom_node *grandchild = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &grandchild);
   ui_dom_node_append_child(child1, grandchild);
   ui_dom_node_append_child(root, child1);
@@ -444,7 +448,6 @@ static void test_extra_coverage_2(void) {
   ui_css_rule_append_declaration(rule3, "flex-basis", "50%", 0);
   ui_css_stylesheet_append_rule(sheet, rule3);
 
-  struct ui_dom_node *flex_child = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &flex_child);
   ui_dom_node_set_tag_name(flex_child, "span");
   ui_dom_node_append_child(root, flex_child);
@@ -459,14 +462,12 @@ static void test_extra_coverage_2(void) {
   ui_css_rule_append_declaration(rule2, "width", "10px",
                                  0); /* very narrow container */
 
-  struct ui_css_rule *span_rule = NULL;
+  span_rule = NULL;
   ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &span_rule);
   ui_css_rule_append_selector(span_rule, UI_CSS_SELECTOR_TYPE_TAG, "span");
   ui_css_rule_append_declaration(span_rule, "width", "20px", 0);
   ui_css_stylesheet_append_rule(sheet, span_rule);
 
-  struct ui_dom_node *wrap_children[65];
-  int i;
   for (i = 0; i < 65; i++) {
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &wrap_children[i]);
     ui_dom_node_set_tag_name(wrap_children[i], "span");
@@ -482,7 +483,6 @@ static void test_extra_coverage_2(void) {
   ui_css_rule_append_declaration(rule2, "justify-content", "space-between", 0);
   ui_css_rule_append_declaration(rule2, "width", "100px", 0);
 
-  struct ui_dom_node *flex_child2 = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &flex_child2);
   ui_dom_node_set_tag_name(flex_child2, "span");
   ui_dom_node_append_child(root, flex_child2);
@@ -631,7 +631,7 @@ static void test_extra_coverage_2(void) {
     struct ui_layout_node parent;
     struct ui_layout_node c1;
     struct ui_layout_node c2;
-    struct ui_layout_node children[70];
+    static struct ui_layout_node children[70];
     ui_error_t rc;
     int k;
 
