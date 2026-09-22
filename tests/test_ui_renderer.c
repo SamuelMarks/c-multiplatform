@@ -4,6 +4,13 @@
 #include <stdlib.h>
 /* clang-format on */
 
+static ui_error_t mock_destroy_fail(void *ctx) {
+  if (ctx) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
 void test_ui_renderer_oom_fallback(void);
 void test_ui_renderer_oom_fallback_error(void);
 void test_ui_renderer_oom_real(void);
@@ -239,7 +246,9 @@ int main(void) {
   {
     struct ui_renderer *r1 = NULL;
     struct ui_renderer *r2 = NULL;
+    struct ui_renderer *r3 = NULL;
     struct ui_renderer_vtable vtable_no_destroy = {0};
+    struct ui_renderer_vtable vtable_destroy_fail = {0};
 
     ui_renderer_create(&r1);
     r1->vtable = NULL;
@@ -248,6 +257,17 @@ int main(void) {
     ui_renderer_create(&r2);
     r2->vtable = &vtable_no_destroy;
     ui_renderer_destroy(r2);
+
+    vtable_destroy_fail.destroy = mock_destroy_fail;
+    rc = ui_renderer_create(&r3);
+    if (rc == UI_ERROR_NONE) {
+      r3->vtable = &vtable_destroy_fail;
+      rc = ui_renderer_destroy(r3);
+      if (rc != UI_ERROR_UNKNOWN) {
+        printf("Expected UI_ERROR_UNKNOWN from mock_destroy_fail\n");
+        return 1;
+      }
+    }
   }
   printf("ui_renderer tests passed.\n");
   return 0;

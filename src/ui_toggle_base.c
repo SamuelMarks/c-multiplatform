@@ -15,6 +15,126 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_toggle_mock_fail = 0;
+int g_toggle_mock_remove_attr_fail_target = 0;
+int g_toggle_mock_set_attr_fail_target = 0;
+static int g_toggle_remove_attr_counter = 0;
+static int g_toggle_set_attr_counter = 0;
+
+/**
+ * @brief mock_toggle_dom_node_remove_attribute.
+ * @param node Node.
+ * @param name Attribute name.
+ * @return Return value.
+ */
+static ui_error_t
+mock_toggle_dom_node_remove_attribute(struct ui_dom_node *node,
+                                      const char *name) {
+  if (g_toggle_mock_remove_attr_fail_target > 0) {
+    if (++g_toggle_remove_attr_counter ==
+        g_toggle_mock_remove_attr_fail_target) {
+      g_toggle_remove_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_remove_attribute(node, name);
+}
+/** @cond */
+#define ui_dom_node_remove_attribute mock_toggle_dom_node_remove_attribute
+/** @endcond */
+
+/**
+ * @brief mock_toggle_dom_node_set_attribute.
+ * @param node Node.
+ * @param name Attribute name.
+ * @param val Attribute value.
+ * @return Return value.
+ */
+static ui_error_t mock_toggle_dom_node_set_attribute(struct ui_dom_node *node,
+                                                     const char *name,
+                                                     const char *val) {
+  if (g_toggle_mock_set_attr_fail_target > 0) {
+    if (++g_toggle_set_attr_counter == g_toggle_mock_set_attr_fail_target) {
+      g_toggle_set_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_set_attribute(node, name, val);
+}
+/** @cond */
+#define ui_dom_node_set_attribute mock_toggle_dom_node_set_attribute
+/** @endcond */
+
+/**
+ * @brief mock_toggle_gesture_recognizer_process_event.
+ * @param recognizer Recognizer.
+ * @param event Event.
+ * @param timestamp_ms Timestamp.
+ * @param out_event Output event.
+ * @return Return value.
+ */
+static ui_error_t mock_toggle_gesture_recognizer_process_event(
+    struct ui_gesture_recognizer *recognizer, const struct ui_event *event,
+    double timestamp_ms, struct ui_gesture_event *out_event) {
+  if (g_toggle_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_gesture_recognizer_process_event(recognizer, event, timestamp_ms,
+                                             out_event);
+}
+/** @cond */
+#define ui_gesture_recognizer_process_event                                    \
+  mock_toggle_gesture_recognizer_process_event
+/** @endcond */
+
+/**
+ * @brief mock_toggle_dom_node_destroy.
+ * @param node Node.
+ * @return Return value.
+ */
+static ui_error_t mock_toggle_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_toggle_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(node);
+}
+/** @cond */
+#define ui_dom_node_destroy mock_toggle_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief mock_toggle_gesture_recognizer_destroy.
+ * @param recognizer Recognizer.
+ * @return Return value.
+ */
+static ui_error_t mock_toggle_gesture_recognizer_destroy(
+    struct ui_gesture_recognizer *recognizer) {
+  if (g_toggle_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_gesture_recognizer_destroy(recognizer);
+}
+/** @cond */
+#define ui_gesture_recognizer_destroy mock_toggle_gesture_recognizer_destroy
+/** @endcond */
+
+/**
+ * @brief mock_toggle_component_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_toggle_component_destroy(struct ui_component *comp) {
+  if (g_toggle_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_destroy(comp);
+}
+/** @cond */
+#define ui_component_destroy mock_toggle_component_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_toggle_base
  * @struct ui_toggle_base
@@ -85,10 +205,13 @@ static ui_error_t update_dom_state(struct ui_toggle_base *toggle) {
       if (toggle->checked) {
         rc = ui_dom_node_set_attribute(toggle->component->shadow_root,
                                        "checked", "");
+        if (rc != UI_ERROR_NONE)
+          return rc;
       } else {
-        ui_error_t _ign_rc = ui_dom_node_remove_attribute(
-            toggle->component->shadow_root, "checked");
-        (void)_ign_rc;
+        rc = ui_dom_node_remove_attribute(toggle->component->shadow_root,
+                                          "checked");
+        if (rc != UI_ERROR_NONE)
+          return rc;
       }
     }
   }
@@ -149,6 +272,7 @@ ui_error_t ui_toggle_base_create(enum ui_toggle_type type,
                                  struct ui_toggle_base **out_toggle) {
   struct ui_toggle_base *toggle;
   ui_error_t rc;
+  ui_error_t rc_cleanup;
   struct ui_dom_node *root_node = NULL;
 
   if (!out_toggle) {
@@ -238,25 +362,31 @@ ui_error_t ui_toggle_base_create(enum ui_toggle_type type,
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
-    (void)rc_cleanup;
+  if (toggle->gesture_recognizer) {
+    rc_cleanup = ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(toggle->component);
-    (void)rc_cleanup;
+  if (toggle->component) {
+    rc_cleanup = ui_component_destroy(toggle->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(toggle);
   return rc;
 }
 
 ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!toggle) {
     return UI_ERROR_NONE;
   }
@@ -275,18 +405,21 @@ ui_error_t ui_toggle_base_destroy(struct ui_toggle_base *toggle) {
   if (toggle->group_name) {
     C_MULTIPLATFORM_FREE(toggle->group_name);
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
-    (void)rc_cleanup;
+  if (toggle->gesture_recognizer) {
+    rc_cleanup = ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(toggle->component);
-    (void)rc_cleanup;
+  if (toggle->component) {
+    rc_cleanup = ui_component_destroy(toggle->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
 
   C_MULTIPLATFORM_FREE(toggle);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
@@ -321,13 +454,10 @@ ui_error_t ui_toggle_base_set_disabled(struct ui_toggle_base *toggle,
       if (rc != UI_ERROR_NONE)
         return rc;
 
-      {
-
-        ui_error_t _ign_rc = ui_dom_node_remove_attribute(
-            toggle->component->shadow_root, "disabled");
-
-        (void)_ign_rc;
-      }
+      rc = ui_dom_node_remove_attribute(toggle->component->shadow_root,
+                                        "disabled");
+      if (rc != UI_ERROR_NONE)
+        return rc;
 
       rc = ui_dom_node_set_attribute(toggle->component->shadow_root, "tabindex",
                                      "0");
@@ -403,12 +533,9 @@ ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
       }
     }
   } else {
-    if (1) {
-      {
-        ui_error_t _ign_rc = ui_dom_node_remove_attribute(
-            toggle->component->shadow_root, "name");
-        (void)_ign_rc;
-      }
+    rc = ui_dom_node_remove_attribute(toggle->component->shadow_root, "name");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 
@@ -419,7 +546,9 @@ ui_error_t ui_toggle_base_set_group_name(struct ui_toggle_base *toggle,
                                                 : 0)
                                          : 0;
     if (should_enforce) {
-      (void)enforce_radio_exclusion(toggle);
+      rc = enforce_radio_exclusion(toggle);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
 
@@ -452,12 +581,10 @@ ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
     return UI_ERROR_NONE;
   }
 
-  {
-
-    ui_error_t _ign_rc = ui_gesture_recognizer_process_event(
-        toggle->gesture_recognizer, event, timestamp_ms, &gesture_evt);
-
-    (void)_ign_rc;
+  rc = ui_gesture_recognizer_process_event(toggle->gesture_recognizer, event,
+                                           timestamp_ms, &gesture_evt);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (gesture_evt.type == UI_GESTURE_TAP) {
@@ -490,7 +617,10 @@ ui_error_t ui_toggle_base_process_event(struct ui_toggle_base *toggle,
         int should_enforce =
             toggle->checked ? (toggle->type == UI_TOGGLE_TYPE_RADIO) : 0;
         if (should_enforce) {
-          (void)enforce_radio_exclusion(toggle);
+          rc = enforce_radio_exclusion(toggle);
+          if (rc != UI_ERROR_NONE) {
+            return rc;
+          }
         }
       }
 

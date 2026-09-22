@@ -20,8 +20,10 @@ static ui_error_t mock_ffi_aot(struct ui_dom_node *parent,
                                struct ui_dom_node **out_root) {
   struct ui_dom_node *node = NULL;
   ui_error_t rc;
-  (void)ctx;
-  (void)app_state;
+  if (ctx) {
+  }
+  if (app_state) {
+  }
 
   if (!out_root) {
     return UI_ERROR_INVALID_ARGUMENT;

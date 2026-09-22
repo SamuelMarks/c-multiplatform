@@ -9,6 +9,46 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_portal_mock_fail = 0;
+
+/**
+ * @brief mock_portal_dom_node_remove_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
+static ui_error_t mock_portal_dom_node_remove_child(struct ui_dom_node *parent,
+                                                    struct ui_dom_node *child) {
+  if (g_portal_mock_fail == 1) {
+    (ui_dom_node_remove_child)(parent, child);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_remove_child)(parent, child);
+}
+#undef ui_dom_node_remove_child
+/** @cond */
+#define ui_dom_node_remove_child mock_portal_dom_node_remove_child
+/** @endcond */
+
+/**
+ * @brief mock_portal_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_portal_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_portal_mock_fail == 2) {
+    (ui_dom_node_destroy)(node);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_portal_dom_node_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_portal
  * @brief Maintains state for portaling a DOM node to a different target.
@@ -51,6 +91,9 @@ ui_error_t ui_portal_create(struct ui_portal **out_portal,
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_portal_destroy(struct ui_portal *portal) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!portal) {
     return UI_ERROR_NONE;
   }
@@ -59,20 +102,21 @@ ui_error_t ui_portal_destroy(struct ui_portal *portal) {
   if (portal->content_node) {
     /* Unmount from physical target if attached */
     if (portal->content_node->parent == portal->physical_target) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_remove_child(
-            portal->physical_target, portal->content_node);
-        (void)rc_cleanup;
+      rc_cleanup = ui_dom_node_remove_child(portal->physical_target,
+                                            portal->content_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
       }
     }
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(portal->content_node);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(portal->content_node);
+    portal->content_node = NULL;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
 
   C_MULTIPLATFORM_FREE(portal);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -84,6 +128,7 @@ ui_error_t ui_portal_destroy(struct ui_portal *portal) {
 ui_error_t ui_portal_set_content(struct ui_portal *portal,
                                  struct ui_dom_node *content_node) {
   ui_error_t rc;
+  ui_error_t rc_cleanup;
 
   if (!portal || !content_node) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -91,15 +136,16 @@ ui_error_t ui_portal_set_content(struct ui_portal *portal,
 
   if (portal->content_node) {
     if (portal->content_node->parent == portal->physical_target) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_remove_child(
-            portal->physical_target, portal->content_node);
-        (void)rc_cleanup;
+      rc_cleanup = ui_dom_node_remove_child(portal->physical_target,
+                                            portal->content_node);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return rc_cleanup;
       }
     }
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(portal->content_node);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(portal->content_node);
+    portal->content_node = NULL;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
   }
 

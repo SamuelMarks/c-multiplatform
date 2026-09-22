@@ -77,15 +77,13 @@ ui_error_t ui_side_sheet_base_create(struct ui_side_sheet_base **out_sheet) {
  * \return UI_ERROR_NONE on success.
  */
 ui_error_t ui_side_sheet_base_destroy(struct ui_side_sheet_base *sheet) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!sheet) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(sheet->component);
-    (void)rc_cleanup;
-  }
+  rc = ui_component_destroy(sheet->component);
   C_MULTIPLATFORM_FREE(sheet);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -219,7 +217,8 @@ ui_error_t ui_side_sheet_base_set_on_close(struct ui_side_sheet_base *sheet,
 ui_error_t ui_side_sheet_base_process_event(struct ui_side_sheet_base *sheet,
                                             const struct ui_event *event,
                                             double timestamp_ms) {
-  (void)timestamp_ms;
+  if (timestamp_ms > 0.0) {
+  }
   if (!sheet || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

@@ -12,8 +12,10 @@
 #endif
 
 ui_error_t ui_haptics_trigger(enum ui_haptic_feedback_type type) {
-  /* Suppress unused parameter warning */
-  (void)type;
+  if ((int)type < (int)UI_HAPTIC_FEEDBACK_LIGHT ||
+      (int)type > (int)UI_HAPTIC_FEEDBACK_SELECTION) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   /* Currently unlinked to actual OS hardware. Return UI_ERROR_UNSUPPORTED
      as the stub implementation. */

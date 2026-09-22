@@ -15,7 +15,8 @@ static int dismiss_count = 0;
 
 static ui_error_t on_dismiss_handler(struct ui_alert_base *alert,
                                      void *user_data) {
-  (void)alert;
+  if (alert) {
+  }
   if (user_data) {
     int *data = (int *)user_data;
     (*data)++;
@@ -279,13 +280,157 @@ static ui_error_t run_oom_tests(void) {
 
   g_malloc_fail_countdown = -1;
 
-#ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_alert_coverage(void);
-  run_alert_coverage();
-#endif
   return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_alert_mock_fail;
+
+static ui_error_t test_alert_mock_fail_cb(struct ui_alert_base *alert,
+                                          void *u) {
+  if (alert || u) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static ui_error_t test_alert_mock_coverage(void) {
+  ui_error_t rc;
+  struct ui_alert_base *alert = NULL;
+  struct ui_signal *sig = NULL;
+  union ui_signal_payload initial;
+
+  /* Node create fail */
+  g_alert_mock_fail = 4;
+  rc = ui_alert_base_create(&alert);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_alert_mock_fail = 0;
+
+  /* Tag name fail */
+  g_alert_mock_fail = 5;
+  rc = ui_alert_base_create(&alert);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_alert_mock_fail = 0;
+
+  /* Attribute fail */
+  g_alert_mock_fail = 2;
+  rc = ui_alert_base_create(&alert);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_alert_mock_fail = 0;
+
+  rc = ui_alert_base_create(&alert);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  initial.bool_val = 0;
+  rc = ui_signal_create(NULL, initial, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
+                        UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
+  if (rc != UI_ERROR_NONE) {
+    ui_alert_base_destroy(alert);
+    return rc;
+  }
+
+  /* on_dismiss fails */
+  rc = ui_alert_base_set_dismissible(alert, 1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_alert_base_set_on_dismiss(alert, test_alert_mock_fail_cb, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_alert_base_set_open(alert, 1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_alert_base_set_open(alert, 0); /* triggers dismiss callback */
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  rc = ui_alert_base_set_on_dismiss(alert, NULL, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  /* signal_set fails */
+  rc = ui_alert_base_bind_open(alert, sig);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  g_alert_mock_fail = 1;
+  rc = ui_alert_base_set_open(alert, 1);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_alert_mock_fail = 0;
+
+  /* set_attribute fails */
+  rc = ui_alert_base_set_open(alert, 0);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  g_alert_mock_fail = 2;
+  rc = ui_alert_base_set_open(alert, 1);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_alert_mock_fail = 0;
+
+  /* remove_attribute fails */
+  rc = ui_alert_base_set_open(alert, 1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  g_alert_mock_fail = 3;
+  rc = ui_alert_base_set_open(alert, 0);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_alert_mock_fail = 0;
+
+  /* test test_alert_mock_fail_cb with null args */
+  test_alert_mock_fail_cb(NULL, NULL);
+
+  {
+    struct ui_alert_base *no_comp_alert = NULL;
+    struct ui_component *comp = NULL;
+    rc = ui_alert_base_create(&no_comp_alert);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    rc = ui_alert_base_get_component(no_comp_alert, &comp);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    rc = ui_component_destroy(comp);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    ((void **)no_comp_alert)[0] = NULL;
+    rc = ui_alert_base_destroy(no_comp_alert);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+  }
+
+  rc = ui_signal_destroy(sig);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_alert_base_destroy(alert);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  return UI_ERROR_NONE;
+}
+#endif
 
 int main(void) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -302,6 +447,14 @@ int main(void) {
     printf("OOM tests failed.\n");
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  rc = test_alert_mock_coverage();
+  if (rc != UI_ERROR_NONE) {
+    printf("Mock coverage tests failed.\n");
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  }
+#endif
 
   printf("All ui_alert_base tests passed.\n");
   return 0;

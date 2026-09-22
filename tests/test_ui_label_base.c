@@ -9,7 +9,6 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
-extern ui_error_t ui_test_label_base_set_for_no_component(void);
 
 struct ui_label_base {
   struct ui_component *component;
@@ -51,15 +50,13 @@ static ui_error_t test_label_creation(void) {
 
   {
     ui_error_t rc_cleanup = ui_label_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   printf("test_label_creation passed\n");
@@ -92,7 +89,7 @@ static ui_error_t test_label_set_for(void) {
   {
     ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
 
@@ -106,7 +103,7 @@ static ui_error_t test_label_set_for(void) {
   {
     ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
 
@@ -118,21 +115,26 @@ static ui_error_t test_label_set_for(void) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(comp->shadow_root);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return rc_cleanup;
       }
     }
     comp->shadow_root = NULL;
     ui_label_base_set_for(lbl, "fail-target");
     ui_label_base_set_for(lbl, NULL);
+
+    /* Test label->component == NULL in set_for */
+    lbl->component = NULL;
+    ui_label_base_set_for(lbl, "no-comp-target");
+    ui_label_base_set_for(lbl, NULL);
+    lbl->component = comp;
+
     {
       ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return rc_cleanup;
       }
     }
   }
-
-  ui_test_label_base_set_for_no_component();
 
   printf("test_label_set_for passed\n");
   return UI_ERROR_NONE;
@@ -175,9 +177,27 @@ static ui_error_t test_label_misc(void) {
   rc = ui_label_base_process_event(lbl, &ev, 0.0);
   assert(rc == UI_ERROR_NONE);
 
+  /* Test timestamp_ms > 0.0 in process_event */
+  rc = ui_label_base_process_event(lbl, &ev, 10.0);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test label destroy when label->component is NULL */
+  {
+    struct ui_label_base *lbl_no_comp = NULL;
+    rc = ui_label_base_create(&lbl_no_comp);
+    assert(rc == UI_ERROR_NONE);
+    rc = ui_component_destroy(lbl_no_comp->component);
+    assert(rc == UI_ERROR_NONE);
+    lbl_no_comp->component = NULL;
+    rc = ui_label_base_destroy(lbl_no_comp);
+    assert(rc == UI_ERROR_NONE);
+  }
+
   {
     ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
   }
   printf("test_label_misc passed\n");
   return UI_ERROR_NONE;
@@ -241,6 +261,20 @@ static ui_error_t test_label_set_text(void) {
     assert(rc == UI_ERROR_NONE);
     ui_label_base_destroy(lbl);
   }
+
+  /* Test append_child failure */
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_label_mock_fail;
+    rc = ui_label_base_create(&lbl);
+    assert(rc == UI_ERROR_NONE);
+    g_label_mock_fail = 1;
+    rc = ui_label_base_set_text(lbl, "fail append");
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_label_mock_fail = 0;
+    ui_label_base_destroy(lbl);
+  }
+#endif
 
   printf("test_label_set_text passed\n");
   return UI_ERROR_NONE;

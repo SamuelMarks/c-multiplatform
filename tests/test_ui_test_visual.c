@@ -145,5 +145,68 @@ int main(void) {
                          "/invalid/path/that/does/not/exist.png", heatmap, 2,
                          2) != UI_ERROR_IO_FAILED);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_mock_rgb_to_lab_fail;
+    extern int g_mock_delta_e_fail;
+    extern int g_mock_stbi_write_png_fail;
+    extern ui_error_t ui_test_rgb_to_lab(unsigned char r, unsigned char g,
+                                         unsigned char b, double *L, double *a,
+                                         double *b_lab);
+    extern ui_error_t ui_test_calculate_delta_e(
+        unsigned char r1, unsigned char g1, unsigned char b1, unsigned char r2,
+        unsigned char g2, unsigned char b2, double *delta_e);
+    double L, a, b_lab, delta_e;
+
+    ACCUM_FAIL(failed, ui_test_rgb_to_lab(0, 0, 0, NULL, &a, &b_lab) !=
+                           UI_ERROR_INVALID_ARGUMENT);
+    ACCUM_FAIL(failed, ui_test_rgb_to_lab(0, 0, 0, &L, NULL, &b_lab) !=
+                           UI_ERROR_INVALID_ARGUMENT);
+    ACCUM_FAIL(failed, ui_test_rgb_to_lab(0, 0, 0, &L, &a, NULL) !=
+                           UI_ERROR_INVALID_ARGUMENT);
+
+    ACCUM_FAIL(failed, ui_test_calculate_delta_e(0, 0, 0, 0, 0, 0, NULL) !=
+                           UI_ERROR_INVALID_ARGUMENT);
+
+    /* Fail first rgb_to_lab in calculate_delta_e */
+    g_mock_rgb_to_lab_fail = 1;
+    ACCUM_FAIL(failed, ui_test_calculate_delta_e(0, 0, 0, 0, 0, 0, &delta_e) !=
+                           UI_ERROR_UNKNOWN);
+    g_mock_rgb_to_lab_fail = 0;
+
+    /* Fail second rgb_to_lab in calculate_delta_e */
+    g_mock_rgb_to_lab_fail = 2;
+    ACCUM_FAIL(failed, ui_test_calculate_delta_e(0, 0, 0, 0, 0, 0, &delta_e) !=
+                           UI_ERROR_UNKNOWN);
+    g_mock_rgb_to_lab_fail = 0;
+
+    /* Fail calculate_delta_e in fuzzy match */
+    g_mock_delta_e_fail = 1;
+    ACCUM_FAIL(failed, ui_visual_fuzzy_match(img1, img3, 2, 2, &cfg,
+                                             &matched) != UI_ERROR_UNKNOWN);
+    g_mock_delta_e_fail = 0;
+
+    /* Exercise countdown branch (> 1) in calculate_delta_e */
+    g_mock_delta_e_fail = 2;
+    ACCUM_ERR(failed, ui_test_calculate_delta_e(0, 0, 0, 0, 0, 0, &delta_e));
+    ACCUM_FAIL(failed, ui_test_calculate_delta_e(0, 0, 0, 0, 0, 0, &delta_e) !=
+                           UI_ERROR_UNKNOWN);
+    g_mock_delta_e_fail = 0;
+
+    /* Fail calculate_delta_e in generate heatmap */
+    g_mock_delta_e_fail = 1;
+    ACCUM_FAIL(failed, ui_visual_generate_heatmap(img1, img3, 2, 2, heatmap) !=
+                           UI_ERROR_UNKNOWN);
+    g_mock_delta_e_fail = 0;
+
+    /* Fail stbi_write_png */
+    g_mock_stbi_write_png_fail = 1;
+    ACCUM_FAIL(failed,
+               ui_visual_write_heatmap_to_disk("test_heatmap.png", heatmap, 2,
+                                               2) != UI_ERROR_IO_FAILED);
+    g_mock_stbi_write_png_fail = 0;
+  }
+#endif
+
   return failed;
 }

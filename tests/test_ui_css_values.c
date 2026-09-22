@@ -457,6 +457,11 @@ static void test_more_branches_2(void) {
     ui_css_filter_destroy(filter);
     filter = NULL;
   }
+  rc = ui_css_parse_filter("drop-shadow(10px 10px notacolor)", &filter);
+  if (filter) {
+    ui_css_filter_destroy(filter);
+    filter = NULL;
+  }
   rc = ui_css_parse_filter(
       "blur(this_is_a_very_long_string_that_exceeds_32_bytes_long_enough)",
       &filter);

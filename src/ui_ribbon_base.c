@@ -14,6 +14,35 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_ribbon_mock_signal_fail = 0;
+int g_ribbon_mock_sort_fail = 0;
+
+/**
+ * @brief mock_ribbon_signal_set.
+ * @param signal Parameter signal.
+ * @param payload Parameter payload.
+ * @return Return value.
+ */
+static ui_error_t mock_ribbon_signal_set(struct ui_signal *signal,
+                                         union ui_signal_payload payload) {
+  if (g_ribbon_mock_signal_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_ribbon_mock_signal_fail > 1) {
+    g_ribbon_mock_signal_fail--;
+    if (g_ribbon_mock_signal_fail == 1) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_signal_set)(signal, payload);
+}
+#undef ui_signal_set
+/** @cond */
+#define ui_signal_set mock_ribbon_signal_set
+/** @endcond */
+#endif
+
 /* \brief Maximum number of ribbon groups */
 /** @def UI_RIBBON_MAX_GROUPS
  * @brief Maximum groups
@@ -125,13 +154,7 @@ ui_error_t ui_ribbon_base_destroy(struct ui_ribbon_base *ribbon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_signal_destroy(ribbon->group_state_changed_signal);
-    (void)rc_cleanup;
-  }
-
-  return UI_ERROR_NONE;
+  return ui_signal_destroy(ribbon->group_state_changed_signal);
 }
 
 /**
@@ -177,16 +200,23 @@ ui_ribbon_base_add_group_config(struct ui_ribbon_base *ribbon,
  * @param out_state Parameter out_state.
  * @return Return value.
  */
-static void find_group_state(const struct ui_ribbon_base *ribbon, int group_id,
-                             struct ui_ribbon_group_state **out_state) {
+static ui_error_t find_group_state(const struct ui_ribbon_base *ribbon,
+                                   int group_id,
+                                   struct ui_ribbon_group_state **out_state) {
   int i;
+
+  if (!ribbon || !out_state) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
   *out_state = NULL;
   for (i = 0; i < ribbon->num_groups; ++i) {
     if (ribbon->groups[i].config.group_id == group_id) {
       *out_state = (struct ui_ribbon_group_state *)&ribbon->groups[i];
-      return;
+      return UI_ERROR_NONE;
     }
   }
+  return UI_ERROR_NOT_FOUND;
 }
 
 /**
@@ -195,15 +225,22 @@ static void find_group_state(const struct ui_ribbon_base *ribbon, int group_id,
  *
  * \param ribbon The component.
  * \param indices Array of indices to sort.
+ * \return Return value.
  */
 /**
  * @brief sort_indices_by_priority.
  * @param ribbon Parameter ribbon.
  * @param indices Parameter indices.
+ * @return Return value.
  */
-static void sort_indices_by_priority(const struct ui_ribbon_base *ribbon,
-                                     int *indices) {
+static ui_error_t sort_indices_by_priority(const struct ui_ribbon_base *ribbon,
+                                           int *indices) {
   int i, j, temp;
+
+  if (!ribbon || !indices) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
   for (i = 0; i < ribbon->num_groups - 1; i++) {
     for (j = 0; j < ribbon->num_groups - i - 1; j++) {
       /* Compare priorities. Wait, if we want lower priority to collapse first,
@@ -219,6 +256,7 @@ static void sort_indices_by_priority(const struct ui_ribbon_base *ribbon,
       }
     }
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -254,7 +292,17 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
     ribbon->groups[i].current_state = UI_RIBBON_GROUP_COLLAPSE_STATE_NORMAL;
   }
 
-  sort_indices_by_priority(ribbon, indices);
+  {
+    ui_error_t rc_sort = sort_indices_by_priority(ribbon, indices);
+#ifdef UI_TEST_MOCK_ALLOC
+    if (g_ribbon_mock_sort_fail != 0) {
+      rc_sort = UI_ERROR_UNKNOWN;
+    }
+#endif
+    if (rc_sort != UI_ERROR_NONE) {
+      return rc_sort;
+    }
+  }
 
   /* Step 1: Collapse low-priority groups to COMPACT if we overflow */
   for (i = 0; i < ribbon->num_groups && current_width > available_width; ++i) {
@@ -265,9 +313,11 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
 
     payload.int_val = gs->config.group_id;
     {
-      ui_error_t rc_cleanup =
+      ui_error_t rc_sig =
           ui_signal_set(ribbon->group_state_changed_signal, payload);
-      (void)rc_cleanup;
+      if (rc_sig != UI_ERROR_NONE) {
+        return rc_sig;
+      }
     }
   }
 
@@ -281,9 +331,11 @@ ui_error_t ui_ribbon_base_recalculate_overflow(struct ui_ribbon_base *ribbon,
 
     payload.int_val = gs->config.group_id;
     {
-      ui_error_t rc_cleanup =
+      ui_error_t rc_sig =
           ui_signal_set(ribbon->group_state_changed_signal, payload);
-      (void)rc_cleanup;
+      if (rc_sig != UI_ERROR_NONE) {
+        return rc_sig;
+      }
     }
   }
 
@@ -303,14 +355,15 @@ ui_ribbon_base_get_group_state(const struct ui_ribbon_base *ribbon,
                                int group_id,
                                enum ui_ribbon_group_collapse_state *out_state) {
   struct ui_ribbon_group_state *gs = NULL;
+  ui_error_t rc;
 
   if (!ribbon || !out_state) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  find_group_state(ribbon, group_id, &gs);
-  if (!gs) {
-    return UI_ERROR_NOT_FOUND;
+  rc = find_group_state(ribbon, group_id, &gs);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   *out_state = gs->current_state;
@@ -400,3 +453,30 @@ ui_ribbon_base_get_contextual_tab_active(const struct ui_ribbon_base *ribbon,
 
   return UI_ERROR_NOT_FOUND;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief ui_test_ribbon_find_group_state.
+ * @param ribbon Parameter ribbon.
+ * @param group_id Parameter group_id.
+ * @param out_state Parameter out_state.
+ * @return Return value.
+ */
+ui_error_t
+ui_test_ribbon_find_group_state(const struct ui_ribbon_base *ribbon,
+                                int group_id,
+                                struct ui_ribbon_group_state **out_state) {
+  return find_group_state(ribbon, group_id, out_state);
+}
+
+/**
+ * @brief ui_test_ribbon_sort_indices.
+ * @param ribbon Parameter ribbon.
+ * @param indices Parameter indices.
+ * @return Return value.
+ */
+ui_error_t ui_test_ribbon_sort_indices(const struct ui_ribbon_base *ribbon,
+                                       int *indices) {
+  return sort_indices_by_priority(ribbon, indices);
+}
+#endif

@@ -14,6 +14,46 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_section_index_mock_set_style_fail = 0;
+int g_section_index_mock_comp_destroy_fail = 0;
+
+/**
+ * @brief mock_section_index_set_style.
+ * @param comp Component.
+ * @param sheet Stylesheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_section_index_set_style(struct ui_component *comp,
+                             struct ui_css_stylesheet *sheet) {
+  if (g_section_index_mock_set_style_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_section_index_set_style
+/** @endcond */
+
+/**
+ * @brief mock_section_index_comp_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_section_index_comp_destroy(struct ui_component *comp) {
+  if (g_section_index_mock_comp_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_section_index_comp_destroy
+/** @endcond */
+#endif
+
 /* \brief Default CSS stylesheet for the section index base */
 /** @brief Default CSS stylesheet */
 static const char *ui_section_index_default_css =
@@ -95,10 +135,10 @@ ui_section_index_base_create(struct ui_section_index_base **out_index) {
     goto cleanup;
   }
 
-  {
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(index->component, default_style);
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(index->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   index->component->shadow_root = root_node;
@@ -109,16 +149,10 @@ ui_section_index_base_create(struct ui_section_index_base **out_index) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (index->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(index->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(index->component);
   }
   C_MULTIPLATFORM_FREE(index);
   return rc;
@@ -131,6 +165,9 @@ cleanup:
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!index) {
     return UI_ERROR_NONE;
   }
@@ -139,12 +176,12 @@ ui_error_t ui_section_index_base_destroy(struct ui_section_index_base *index) {
     C_MULTIPLATFORM_FREE(index->item_nodes);
   }
 
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(index->component);
-    (void)rc_cleanup;
+  rc_cleanup = ui_component_destroy(index->component);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(index);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -227,10 +264,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
     if (rc == UI_ERROR_NONE) {
       rc = ui_dom_node_append_child(node, text_node);
     } else if (text_node) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-        (void)rc_cleanup;
-      }
+      ui_dom_node_destroy(text_node);
     }
 
     if (rc == UI_ERROR_NONE) {
@@ -240,10 +274,7 @@ ui_section_index_base_set_sections(struct ui_section_index_base *index,
     if (rc != UI_ERROR_NONE) {
       size_t j;
       if (node) {
-        {
-          ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-          (void)rc_cleanup;
-        }
+        ui_dom_node_destroy(node);
       }
       for (j = 0; j < i; ++j) {
         ui_dom_node_remove_child(index->component->shadow_root,

@@ -30,7 +30,8 @@ struct ui_focus_trap {
 static ui_error_t trap_keyboard_handler(struct ui_dom_node *node,
                                         void *user_data) {
   struct ui_focus_trap *trap = (struct ui_focus_trap *)user_data;
-  (void)node;
+  struct ui_dom_node *unused_node = node;
+  node = unused_node;
   if (trap->is_active) {
     /* Default advance forward. If shift was held, should be backward.
        For scaffolding, we'll just test the integration plumbing calling

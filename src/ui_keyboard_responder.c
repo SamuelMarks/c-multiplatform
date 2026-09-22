@@ -14,6 +14,48 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_keyboard_responder_mock_fail = 0;
+
+/**
+ * @brief mock_keyboard_bidi_normalize.
+ * @param key Parameter key.
+ * @param out_key Parameter out_key.
+ * @return Return value.
+ */
+static ui_error_t mock_keyboard_bidi_normalize(enum ui_key_code key,
+                                               enum ui_key_code *out_key) {
+  if (g_keyboard_responder_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_bidi_normalize_horizontal_key)(key, out_key);
+}
+#undef ui_bidi_normalize_horizontal_key
+/** @cond */
+#define ui_bidi_normalize_horizontal_key mock_keyboard_bidi_normalize
+/** @endcond */
+
+/**
+ * @brief mock_keyboard_get_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @param out_val Parameter out_val.
+ * @return Return value.
+ */
+static ui_error_t mock_keyboard_get_attribute(struct ui_dom_node *node,
+                                              const char *name,
+                                              const char **out_val) {
+  if (g_keyboard_responder_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_get_attribute)(node, name, out_val);
+}
+#undef ui_dom_node_get_attribute
+/** @cond */
+#define ui_dom_node_get_attribute mock_keyboard_get_attribute
+/** @endcond */
+#endif
+
 /**
  * @struct ui_keyboard_binding
  * @struct ui_keyboard_binding
@@ -183,13 +225,17 @@ ui_error_t ui_keyboard_responder_handle_event(
   key = (enum ui_key_code)event->event_data.keyboard.key_code;
   {
     ui_error_t rc_cleanup = ui_bidi_normalize_horizontal_key(key, &key);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
   }
 
   {
     ui_error_t rc_cleanup =
         ui_dom_node_get_attribute(focused_node, "role", &role_val);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE && rc_cleanup != UI_ERROR_NOT_FOUND) {
+      return rc_cleanup;
+    }
   }
 
   for (i = 0; i < responder->bindings_count; ++i) {

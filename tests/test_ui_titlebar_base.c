@@ -2,6 +2,7 @@
 #include "ui_titlebar_base.h"
 #include "ui_arena.h"
 #include "ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -94,9 +95,7 @@ static int test_normal(void) {
   ACCUM_ERR(failed, ui_titlebar_base_destroy(tb));
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Now test non-draggable drag area */
@@ -108,9 +107,7 @@ static int test_normal(void) {
   ACCUM_ERR(failed, ui_titlebar_base_destroy(tb));
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return failed;
@@ -149,7 +146,7 @@ static int test_oom(void) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-    (void)rc_cleanup;
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 #endif
   return failed;

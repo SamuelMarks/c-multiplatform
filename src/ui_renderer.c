@@ -93,15 +93,19 @@ ui_error_t ui_renderer_create(struct ui_renderer **out_renderer) {
  * @return Return value.
  */
 ui_error_t ui_renderer_destroy(struct ui_renderer *renderer) {
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!renderer) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (renderer->vtable && renderer->vtable->destroy) {
     ui_error_t destroy_rc = renderer->vtable->destroy(renderer->ctx);
-    (void)destroy_rc;
+    if (destroy_rc != UI_ERROR_NONE) {
+      rc = destroy_rc;
+    }
   }
 
   C_MULTIPLATFORM_FREE(renderer);
-  return UI_ERROR_NONE;
+  return rc;
 }

@@ -10,13 +10,36 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_ptr_mock_create_node_fail;
+extern int g_ptr_mock_set_attr_fail;
+extern int g_ptr_mock_tag_fail;
+extern int g_ptr_mock_create_gesture_fail;
+extern int g_ptr_mock_destroy_gesture_fail;
+extern int g_ptr_mock_destroy_node_fail;
+extern int g_ptr_mock_destroy_comp_fail;
+extern int g_ptr_mock_gesture_process_fail;
+extern void ui_pull_to_refresh_base_test_clear_component(
+    struct ui_pull_to_refresh_base *ptr);
+#endif
+
+static ui_error_t on_refresh_fail(struct ui_pull_to_refresh_base *ptr,
+                                  void *user_data) {
+  if (ptr) {
+  }
+  if (user_data) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
 
 static int refresh_count = 0;
 
 static ui_error_t on_refresh(struct ui_pull_to_refresh_base *ptr,
                              void *user_data) {
-  (void)ptr;
-  (void)user_data;
+  if (ptr) {
+  }
+  if (user_data) {
+  }
   refresh_count++;
   return UI_ERROR_NONE;
 }
@@ -24,7 +47,9 @@ static ui_error_t on_refresh(struct ui_pull_to_refresh_base *ptr,
 static void test_ptr_basic(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
   struct ui_component *spinner = NULL;
+  struct ui_event ev;
   enum ui_pull_to_refresh_state current_state;
+  float progress = 0.0f;
   ui_error_t rc;
 
   refresh_count = 0;
@@ -35,11 +60,8 @@ static void test_ptr_basic(void) {
 
   rc = ui_component_create(&spinner);
   assert(rc == UI_ERROR_NONE);
-  {
-    ui_error_t _ign =
-        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &spinner->shadow_root);
-    (void)_ign;
-  }
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &spinner->shadow_root);
+  assert(rc == UI_ERROR_NONE);
 
   rc = ui_pull_to_refresh_base_set_spinner(ptr, spinner);
   assert(rc == UI_ERROR_NONE);
@@ -50,23 +72,16 @@ static void test_ptr_basic(void) {
   rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
   assert(rc == UI_ERROR_NONE);
   assert(current_state == UI_PULL_TO_REFRESH_RESTING);
-  {
-    float progress = 0.0f;
-    {
-      ui_error_t _ign = ui_pull_to_refresh_base_get_progress(ptr, &progress);
-      (void)_ign;
-    }
-    assert(progress == 0.0f);
-  }
+
+  rc = ui_pull_to_refresh_base_get_progress(ptr, &progress);
+  assert(rc == UI_ERROR_NONE);
+  assert(progress == 0.0f);
 
   /* Call complete when not refreshing */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_complete(ptr);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_complete(ptr);
+  assert(rc == UI_ERROR_NONE);
 
   /* Send Gesture Pan Began */
-  struct ui_event ev;
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
   ev.event_data.mouse.x = 0;
@@ -138,43 +153,27 @@ static void test_ptr_basic(void) {
 
   /* Tick until resting */
   /* Hit else branch in completing */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* Hit pull_distance < 1.0f or completion_timer_ms >=
    * UI_PTR_COMPLETION_DELAY_MS */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 100.0);
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 100.0);
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 150.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_on_tick(ptr, 100.0);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_pull_to_refresh_base_on_tick(ptr, 100.0);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_pull_to_refresh_base_on_tick(ptr, 150.0);
+  assert(rc == UI_ERROR_NONE);
   rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
   assert(rc == UI_ERROR_NONE);
   assert(current_state == UI_PULL_TO_REFRESH_RESTING);
 
-  {
-    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_NONE);
 
   spinner->shadow_root = NULL;
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(spinner);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_component_destroy(spinner);
+  assert(rc == UI_ERROR_NONE);
 }
 
 static void test_ptr_spring_back(void) {
@@ -182,58 +181,44 @@ static void test_ptr_spring_back(void) {
   enum ui_pull_to_refresh_state current_state;
   ui_error_t rc;
   struct ui_event ev;
+  int i;
   memset(&ev, 0, sizeof(ev));
 
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_create(&ptr);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_MOUSE_DOWN;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.y = 20;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  assert(rc == UI_ERROR_NONE);
 
   ev.event_data.mouse.y = 50;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* End without crossing threshold */
   ev.type = UI_EVENT_MOUSE_UP;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
+  assert(rc == UI_ERROR_NONE);
 
   rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
   assert(rc == UI_ERROR_NONE);
   assert(current_state == UI_PULL_TO_REFRESH_PULLING);
 
   /* Tick should spring it back to resting */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
-    (void)_ign;
-  } /* Hit the spring condition once before loop */
+  rc = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+  assert(rc == UI_ERROR_NONE); /* Hit the spring condition once before loop */
 
   /* Wait, 100 ticks is not a loop, we might need multiple ticks.
      Spring rate is 0.85, 20 * 0.85^n < 1.0.
      20 * 0.85^20 < 1.0 */
-  int i;
   for (i = 0; i < 20; i++) {
-    {
-      ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 16.0);
-      (void)_ign;
-    }
+    rc = ui_pull_to_refresh_base_on_tick(ptr, 16.0);
+    assert(rc == UI_ERROR_NONE);
   }
 
   rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
@@ -244,83 +229,57 @@ static void test_ptr_spring_back(void) {
   /* This is not reachable via public API in the current mock setup, we'll
    * accept the partial branch */
 
-  {
-    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_NONE);
 }
 
 static void test_ptr_push_up(void) {
   struct ui_pull_to_refresh_base *ptr = NULL;
   struct ui_event ev;
-  float progress = 0.0f;
+  ui_error_t rc;
   memset(&ev, 0, sizeof(ev));
 
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_create(&ptr);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.x = 0;
-  ev.event_data.mouse.y = 0;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* Trigger BEGAN (pull_distance = 0) */
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.x = 0;
   ev.event_data.mouse.y = 50;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* Trigger CHANGED down way past threshold to hit resistance < 0.1f */
   ev.event_data.mouse.y = 1000;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* Now pull_distance is very large. Send another positive delta_y to hit the
    * resistance < 0.1f branch. */
   ev.event_data.mouse.y = 1100;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1250.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1250.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* Trigger CHANGED up slightly (delta_y = -10, pull_distance >= 0 branch) */
   ev.event_data.mouse.y = 990;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1300.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1300.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* Trigger CHANGED up massively to go negative (< 0 branch) */
   ev.event_data.mouse.y = -500;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1400.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1400.0);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_TOUCH_CANCEL;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1500.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1500.0);
+  assert(rc == UI_ERROR_NONE);
 
-  {
-    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_NONE);
 }
 
 static void test_ptr_cancel(void) {
@@ -330,41 +289,29 @@ static void test_ptr_cancel(void) {
   struct ui_event ev;
   memset(&ev, 0, sizeof(ev));
 
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_create(&ptr);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_MOUSE_DOWN;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* trigger a 0 pull distance */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.y = 50;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  assert(rc == UI_ERROR_NONE);
   ev.event_data.mouse.y = 300; /* past threshold */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* cancel */
   ev.type = UI_EVENT_TOUCH_CANCEL; /* mapped to gesture cancel */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
+  assert(rc == UI_ERROR_NONE);
 
   /* Wait, our gesture recognizer maps TOUCH_CANCEL to GESTURE_STATE_CANCELLED
    * The logic in ui_pull_to_refresh_base.c treats ENDED and CANCELLED
@@ -375,41 +322,26 @@ static void test_ptr_cancel(void) {
   assert(rc == UI_ERROR_NONE);
   assert(current_state == UI_PULL_TO_REFRESH_REFRESHING);
 
-  {
-    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_NONE);
 
   /* Now do it without crossing the threshold to hit the else branch */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_create(&ptr);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_MOUSE_DOWN;
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_MOUSE_MOVE;
   ev.event_data.mouse.y =
       50; /* start pan, moved significantly, not past threshold */
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
-    (void)_ign;
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  assert(rc == UI_ERROR_NONE);
 
   ev.type = UI_EVENT_TOUCH_CANCEL;
-  {
-    ui_error_t rc_cleanup =
-        ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
+  assert(rc == UI_ERROR_NONE);
 
   rc = ui_pull_to_refresh_base_get_state(ptr, &current_state);
   assert(rc == UI_ERROR_NONE);
@@ -418,10 +350,6 @@ static void test_ptr_cancel(void) {
   /* Force state to unmapped value to test switch default branch in dom update
    */
   {
-    /* Use pointer arithmetic to hit state (it's the second int/enum in the
-     * struct) */
-    /* Wait, the struct starts with component, then state, then floats. */
-    /* Let's redefine a local struct mapping to manipulate internals safely */
     struct ui_pull_to_refresh_internal {
       struct ui_component *component;
       struct ui_component *spinner_comp;
@@ -434,35 +362,21 @@ static void test_ptr_cancel(void) {
         (struct ui_pull_to_refresh_internal *)ptr;
 
     internal->state = (enum ui_pull_to_refresh_state)99;
-    {
-      ui_error_t rc_cleanup = ui_pull_to_refresh_base_set_spinner(ptr, NULL);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    } /* hits update_dom_state with 99 */
+    rc = ui_pull_to_refresh_base_set_spinner(ptr, NULL);
+    assert(rc == UI_ERROR_NONE); /* hits update_dom_state with 99 */
 
     internal->state = UI_PULL_TO_REFRESH_RESTING;
     {
       struct ui_event temp_ev;
       memset(&temp_ev, 0, sizeof(temp_ev));
       temp_ev.type = UI_EVENT_MOUSE_DOWN;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 10.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 10.0);
+      assert(rc == UI_ERROR_NONE);
 
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
       temp_ev.event_data.mouse.y = 50.0;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 20.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 20.0);
+      assert(rc == UI_ERROR_NONE);
       /* This hits BEGAN and CHANGED, state is now PULLING */
 
       /* Spoof state during next move to hit `if (ptr->state ==
@@ -470,126 +384,59 @@ static void test_ptr_cancel(void) {
       internal->state = UI_PULL_TO_REFRESH_RESTING;
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
       temp_ev.event_data.mouse.y = 100.0;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 30.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      } /* Hits CHANGED with state=RESTING */
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 30.0);
+      assert(rc == UI_ERROR_NONE); /* Hits CHANGED with state=RESTING */
 
       /* Spoof state during up to hit `if (ptr->state ==
        * UI_PULL_TO_REFRESH_PULLING)` else branch inside ENDED */
       internal->state = UI_PULL_TO_REFRESH_RESTING;
       temp_ev.type = UI_EVENT_MOUSE_UP;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 40.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      } /* Hits ENDED with state=RESTING */
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 40.0);
+      assert(rc == UI_ERROR_NONE); /* Hits ENDED with state=RESTING */
 
       /* Spoof state before next BEGAN to hit `if (ptr->state ==
        * UI_PULL_TO_REFRESH_RESTING)` else branch inside BEGAN */
       internal->state =
           UI_PULL_TO_REFRESH_COMPLETING; /* Anything but RESTING */
       temp_ev.type = UI_EVENT_MOUSE_DOWN;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 45.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 45.0);
+      assert(rc == UI_ERROR_NONE);
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
       temp_ev.event_data.mouse.y = 150.0;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 46.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      } /* Hits BEGAN with state!=RESTING */
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 46.0);
+      assert(rc == UI_ERROR_NONE); /* Hits BEGAN with state!=RESTING */
       internal->state = UI_PULL_TO_REFRESH_RESTING; /* Reset for next */
       temp_ev.type = UI_EVENT_MOUSE_UP;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 47.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 47.0);
+      assert(rc == UI_ERROR_NONE);
 
       /* Trigger CANCELLED state when NOT PULLING to hit the ge.state ==
        * UI_GESTURE_STATE_CANCELLED branch's else */
       temp_ev.type = UI_EVENT_MOUSE_DOWN;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 40.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 40.0);
+      assert(rc == UI_ERROR_NONE);
       temp_ev.type = UI_EVENT_MOUSE_MOVE;
       temp_ev.event_data.mouse.y = 100.0;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 50.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      } /* PULLING */
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 50.0);
+      assert(rc == UI_ERROR_NONE);                  /* PULLING */
       internal->state = UI_PULL_TO_REFRESH_RESTING; /* NOT PULLING */
       temp_ev.type = UI_EVENT_TOUCH_CANCEL;
-      {
-        ui_error_t rc_cleanup =
-            ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 60.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      } /* Hits CANCELLED while NOT PULLING */
-
-      /* Hit the implicit 'else' for gesture states by passing a recognized
-       * gesture that is in POSSIBLE state */
-      /* Or rather, just manually call the private function? No, we can't.
-         But wait! The gesture recognizer doesn't emit POSSIBLE events. It only
-         emits BEGAN, CHANGED, ENDED, CANCELLED. So it's IMPOSSIBLE to hit the
-         final else branch through process_event unless we spoof the
-         recognizer's internal state. Actually, the gesture event struct is
-         passed directly to the callback. But the callback is static! Wait... we
-         have `internal->gesture_recognizer`. We can't spoof `ge.state` directly
-         without calling the callback. Wait, we CAN! We can just modify
-         `tests/test_ui_pull_to_refresh_base.c` to not worry about that
-         unreachable implicit branch, BUT wait... Wait, I need 100% branch
-         coverage! How do I cover the final implicit else? If `ge.state` is none
-         of those, then the `if` fails and does nothing. But since we can't
-         trigger it, is there any way? Yes! Change `else if (ge.state ==
-         UI_GESTURE_STATE_ENDED || ge.state == UI_GESTURE_STATE_CANCELLED)` to
-         just `else` in `src/ui_pull_to_refresh_base.c` because ENDED and
-         CANCELLED are the only remaining states that `ui_gesture` emits! */
+      rc = ui_pull_to_refresh_base_process_event(ptr, &temp_ev, 60.0);
+      assert(rc == UI_ERROR_NONE); /* Hits CANCELLED while NOT PULLING */
 
       /* Spoof state during tick to hit `if (ptr->pull_distance > 0.0f)` else
        * branch inside PULLING */
       internal->state = UI_PULL_TO_REFRESH_PULLING;
       internal->pull_distance = -1.0f;
-      {
-        ui_error_t rc_cleanup = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      rc = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+      assert(rc == UI_ERROR_NONE);
 
       /* Spoof state during tick to hit `if (ptr->pull_distance <
        * UI_PTR_THRESHOLD)` else branch inside PULLING */
       internal->state = UI_PULL_TO_REFRESH_PULLING;
       internal->pull_distance = 1000.0f; /* Over threshold */
-      {
-        ui_error_t rc_cleanup = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      rc = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+      assert(rc == UI_ERROR_NONE);
     }
 
     {
@@ -601,51 +448,24 @@ static void test_ptr_cancel(void) {
       ge.state = UI_GESTURE_STATE_CHANGED;
       ge.delta_y = 10.0f;
       internal->state = UI_PULL_TO_REFRESH_RESTING;
-      /* call ptr_on_gesture directly? It's a private function... wait, we can't
-       * unless we include the c file or it's accessible. But it's registered on
-       * the gesture recognizer! */
-      /* Actually we can just let process_event run, but wait, process_event
-       * will trigger the gesture recognizer, which might just change the
-       * ptr->state back! */
-      /* Let's look at ptr_on_gesture in src/ui_pull_to_refresh_base.c.
-       * If ge.state == UI_GESTURE_STATE_STARTED, it changes state to PULLING!
-       * So when we do MOUSE_DOWN, it starts a PAN gesture, changing state to
-       * PULLING. Then we do MOUSE_MOVE, which triggers CHANGED, so state is
-       * ALREADY PULLING. If we want to hit CHANGED when state is NOT PULLING,
-       * we can't easily do it via MOUSE events because MOUSE_DOWN sets it to
-       * PULLING. Unless we set state to RESTING *AFTER* MOUSE_DOWN but *BEFORE*
-       * MOUSE_MOVE. Which is exactly what I did! */
-
-      /* Wait, why didn't it work? Let's check `test_ui_pull_to_refresh_base.c`
-       * again. */
     }
     internal->state = UI_PULL_TO_REFRESH_COMPLETING;
     internal->completion_timer_ms = 0.0f;
     internal->pull_distance = 100.0f;
-    {
-      ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
-      (void)_ign;
-    } /* Hit else (not rested yet) */
+    rc = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+    assert(rc == UI_ERROR_NONE);    /* Hit else (not rested yet) */
     internal->pull_distance = 0.5f; /* Test < 1.0f branch */
-    {
-      ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
-      (void)_ign;
-    }
+    rc = ui_pull_to_refresh_base_on_tick(ptr, 10.0);
+    assert(rc == UI_ERROR_NONE);
     internal->state = UI_PULL_TO_REFRESH_COMPLETING;
     internal->pull_distance = 100.0f; /* Keep distance up */
     internal->completion_timer_ms = 0.0f;
-    {
-      ui_error_t _ign = ui_pull_to_refresh_base_on_tick(ptr, 3000.0);
-      (void)_ign;
-    } /* Hit >= DELAY_MS */
+    rc = ui_pull_to_refresh_base_on_tick(ptr, 3000.0);
+    assert(rc == UI_ERROR_NONE); /* Hit >= DELAY_MS */
   }
 
-  {
-    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_NONE);
 }
 
 static void test_ptr_nulls(void) {
@@ -657,10 +477,7 @@ static void test_ptr_nulls(void) {
   float progress;
   struct ui_event ev;
 
-  {
-    ui_error_t _ign = ui_pull_to_refresh_base_create(&ptr);
-    (void)_ign;
-  }
+  assert(ui_pull_to_refresh_base_create(&ptr) == UI_ERROR_NONE);
 
   assert(ui_pull_to_refresh_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
 
@@ -711,20 +528,10 @@ static void test_ptr_nulls(void) {
          UI_ERROR_NONE);
 
   if (comp) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(comp->shadow_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    assert(ui_dom_node_destroy(comp->shadow_root) == UI_ERROR_NONE);
     comp->shadow_root = NULL;
   }
-  {
-    ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  assert(ui_pull_to_refresh_base_destroy(ptr) == UI_ERROR_NONE);
 }
 
 static void test_ptr_oom(void) {
@@ -733,17 +540,239 @@ static void test_ptr_oom(void) {
   for (i = 0; i < 10; i++) {
     g_malloc_fail_countdown = i;
     if (ui_pull_to_refresh_base_create(&ptr) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_pull_to_refresh_base_destroy(ptr);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      assert(ui_pull_to_refresh_base_destroy(ptr) == UI_ERROR_NONE);
       break;
     }
   }
   g_malloc_fail_countdown = -1;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+static void test_ptr_mock_failures(void) {
+  struct ui_pull_to_refresh_base *ptr = NULL;
+  struct ui_event ev;
+  ui_error_t rc;
+
+  /* 1. create: dom_node_create fails, component_destroy succeeds */
+  g_ptr_mock_create_node_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 1b. create: dom_node_create fails, component_destroy fails */
+  g_ptr_mock_create_node_fail = 1;
+  g_ptr_mock_destroy_comp_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 2. create: set_tag_name fails, node_destroy succeeds, comp_destroy succeeds
+   */
+  g_ptr_mock_tag_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 3. create: set_tag_name fails, node_destroy fails */
+  g_ptr_mock_tag_fail = 1;
+  g_ptr_mock_destroy_node_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 4. create: set_tag_name fails, node_destroy succeeds, comp_destroy fails */
+  g_ptr_mock_tag_fail = 1;
+  g_ptr_mock_destroy_comp_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 5. create: gesture_create fails, node_destroy succeeds, comp_destroy
+   * succeeds */
+  g_ptr_mock_create_gesture_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 6. create: gesture_create fails, node_destroy fails */
+  g_ptr_mock_create_gesture_fail = 1;
+  g_ptr_mock_destroy_node_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 7. create: gesture_create fails, node_destroy succeeds, comp_destroy fails
+   */
+  g_ptr_mock_create_gesture_fail = 1;
+  g_ptr_mock_destroy_comp_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 8. create: update_dom_state fails: gesture_destroy succeeds, node_destroy
+   * succeeds, comp_destroy succeeds */
+  g_ptr_mock_set_attr_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 9. create: update_dom_state fails: gesture_destroy fails */
+  g_ptr_mock_set_attr_fail = 1;
+  g_ptr_mock_destroy_gesture_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 10. create: update_dom_state fails: gesture_destroy succeeds, node_destroy
+   * fails */
+  g_ptr_mock_set_attr_fail = 1;
+  g_ptr_mock_destroy_node_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 11. create: update_dom_state fails: gesture_destroy succeeds, node_destroy
+   * succeeds, comp_destroy fails */
+  g_ptr_mock_set_attr_fail = 1;
+  g_ptr_mock_destroy_comp_fail = 1;
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 12. destroy: gesture_destroy fails -> rc becomes UNKNOWN */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  g_ptr_mock_destroy_gesture_fail = 1;
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 13. destroy: node_destroy fails while rc == NONE -> rc becomes UNKNOWN */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  g_ptr_mock_destroy_node_fail = 1;
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 14. destroy: comp_destroy fails while rc == NONE -> rc becomes UNKNOWN */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  g_ptr_mock_destroy_comp_fail = 1;
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 15. destroy: gesture_destroy fails AND node_destroy fails AND comp_destroy
+   * fails (rc != NONE branches) */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  g_ptr_mock_destroy_gesture_fail = 1;
+  g_ptr_mock_destroy_node_fail = 1;
+  g_ptr_mock_destroy_comp_fail = 1;
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* 16. process_event: pan began, update_dom_state fails */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 50;
+  g_ptr_mock_set_attr_fail = 1; /* update_dom_state fails on pan began */
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  ui_pull_to_refresh_base_destroy(ptr);
+
+  /* 17. process_event: pan changed dragging down, update_dom_state fails */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 50;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  ev.event_data.mouse.y = 80;
+  g_ptr_mock_set_attr_fail = 1; /* update_dom_state fails on delta_y > 0 */
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  ui_pull_to_refresh_base_destroy(ptr);
+
+  /* 18. process_event: pan changed pushing up, update_dom_state fails */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 50;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  ev.event_data.mouse.y = 30;
+  g_ptr_mock_set_attr_fail = 1; /* update_dom_state fails on delta_y < 0 */
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  ui_pull_to_refresh_base_destroy(ptr);
+
+  /* 19. process_event: threshold reached, update_dom_state fails */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.x = 0;
+  ev.event_data.mouse.y = 0;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 50;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.y = 50;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 100;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1300.0);
+  ev.event_data.mouse.y = 80;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1400.0);
+  ev.event_data.mouse.y = 200;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
+  ev.type = UI_EVENT_MOUSE_UP;
+  g_ptr_mock_set_attr_fail = 1;
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 3100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  ui_pull_to_refresh_base_destroy(ptr);
+
+  /* 20. process_event: on_refresh returns error */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  ui_pull_to_refresh_base_set_on_refresh(ptr, on_refresh_fail, NULL);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.x = 0;
+  ev.event_data.mouse.y = 0;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 50;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1100.0);
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.y = 50;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1200.0);
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.y = 100;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1300.0);
+  ev.event_data.mouse.y = 80;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 1400.0);
+  ev.event_data.mouse.y = 200;
+  ui_pull_to_refresh_base_process_event(ptr, &ev, 2100.0);
+  ev.type = UI_EVENT_MOUSE_UP;
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 3100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  ui_pull_to_refresh_base_destroy(ptr);
+
+  /* 21. process_event: gesture_process_event fails */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  g_ptr_mock_gesture_process_fail = 1;
+  rc = ui_pull_to_refresh_base_process_event(ptr, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  ui_pull_to_refresh_base_destroy(ptr);
+
+  /* 22. destroy when ptr->component is NULL */
+  rc = ui_pull_to_refresh_base_create(&ptr);
+  assert(rc == UI_ERROR_NONE);
+  ui_pull_to_refresh_base_test_clear_component(ptr);
+  rc = ui_pull_to_refresh_base_destroy(ptr);
+  assert(rc == UI_ERROR_NONE);
+}
+#endif
 
 int main(void) {
   test_ptr_basic();
@@ -752,6 +781,9 @@ int main(void) {
   test_ptr_cancel();
   test_ptr_nulls();
   test_ptr_oom();
+#ifdef UI_TEST_MOCK_ALLOC
+  test_ptr_mock_failures();
+#endif
 
   printf("test_ui_pull_to_refresh_base passed\n");
   return 0;

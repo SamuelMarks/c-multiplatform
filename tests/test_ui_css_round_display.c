@@ -165,6 +165,44 @@ static int test_parse_border_boundary(void) {
 int main(void) {
   test_parse_shape_inside();
   test_parse_border_boundary();
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_round_display_mock_fail;
+    struct ui_css_shape_inside shape;
+    enum ui_css_border_boundary boundary;
+
+    /* skip_whitespace fails in ui_css_parse_shape_inside */
+    g_round_display_mock_fail = 1;
+    TEST_ASSERT(ui_css_parse_shape_inside("circle(50%)", &shape) ==
+                UI_ERROR_UNKNOWN);
+
+    /* skip_whitespace fails in ui_css_parse_border_boundary */
+    TEST_ASSERT(ui_css_parse_border_boundary("display", &boundary) ==
+                UI_ERROR_UNKNOWN);
+    g_round_display_mock_fail = 0;
+
+    /* parse_geometry_box fails when parsing box alone */
+    g_round_display_mock_fail = 2;
+    TEST_ASSERT(ui_css_parse_shape_inside("margin-box", &shape) ==
+                UI_ERROR_UNKNOWN);
+
+    /* parse_geometry_box fails when parsing box after paren */
+    TEST_ASSERT(ui_css_parse_shape_inside("circle(50%) margin-box", &shape) ==
+                UI_ERROR_UNKNOWN);
+    g_round_display_mock_fail = 0;
+
+    /* Cover internal skip_whitespace NULL branches */
+    TEST_ASSERT(ui_css_parse_shape_inside(NULL, &shape) ==
+                UI_ERROR_INVALID_ARGUMENT);
+
+    {
+      extern ui_error_t run_round_display_coverage(void);
+      TEST_ASSERT(run_round_display_coverage() == UI_ERROR_NONE);
+    }
+  }
+#endif
+
   printf("test_ui_css_round_display passed\n");
   return 0;
 }

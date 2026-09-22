@@ -11,6 +11,27 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_bottom_nav_mock_fail = 0;
+
+/**
+ * @brief mock_bottom_nav_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_bottom_nav_component_destroy(struct ui_component *comp) {
+  if (g_bottom_nav_mock_fail == 1) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_bottom_nav_component_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_bottom_nav_base
  * @struct ui_bottom_nav_base
@@ -59,15 +80,18 @@ ui_error_t ui_bottom_nav_base_create(struct ui_bottom_nav_base **out_nav) {
 }
 
 ui_error_t ui_bottom_nav_base_destroy(struct ui_bottom_nav_base *nav) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!nav) {
     return UI_ERROR_NONE;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(nav->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(nav);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t
@@ -118,15 +142,18 @@ ui_bottom_nav_item_base_create(struct ui_bottom_nav_item_base **out_item) {
 
 ui_error_t
 ui_bottom_nav_item_base_destroy(struct ui_bottom_nav_item_base *item) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!item) {
     return UI_ERROR_NONE;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(item->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(item);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t

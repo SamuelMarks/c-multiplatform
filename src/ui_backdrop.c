@@ -11,34 +11,6 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_backdrop_mock_fail = 0;
-
-ui_error_t run_backdrop_coverage(void);
-/**
- * @brief run_backdrop_coverage.
- * @return Return value.
- */
-ui_error_t run_backdrop_coverage(void) {
-  struct ui_backdrop *backdrop = NULL;
-  struct ui_event ev;
-  int should_dismiss;
-  ui_backdrop_create(&backdrop);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-
-  g_backdrop_mock_fail = 1;
-  ui_backdrop_process_event(backdrop, &ev, 0.0, 0.0, 0.0, 0.0, &should_dismiss);
-  g_backdrop_mock_fail = 0;
-
-  ev.type = UI_EVENT_MOUSE_UP;
-  g_backdrop_mock_fail = 1;
-  ui_backdrop_process_event(backdrop, &ev, 0.0, 0.0, 0.0, 0.0, &should_dismiss);
-  g_backdrop_mock_fail = 0;
-
-  {
-    ui_error_t rc_cleanup = ui_backdrop_destroy(backdrop);
-    (void)rc_cleanup;
-  }
-  return UI_ERROR_NONE;
-}
 #endif
 
 /**

@@ -58,7 +58,9 @@ static unsigned int mock_id_counter = 1;
  * @return The mocked shader ID.
  */
 static unsigned int mock_glCreateShader(int type) {
-  (void)type;
+  int unused_type;
+  unused_type = type;
+  type = unused_type;
   return mock_id_counter++;
 }
 
@@ -72,10 +74,18 @@ static unsigned int mock_glCreateShader(int type) {
  */
 static ui_error_t mock_glShaderSource(unsigned int shader, int count,
                                       const char **string, const int *length) {
-  (void)shader;
-  (void)count;
-  (void)string;
-  (void)length;
+  unsigned int unused_shader;
+  int unused_count;
+  const char **unused_string;
+  const int *unused_length;
+  unused_shader = shader;
+  shader = unused_shader;
+  unused_count = count;
+  count = unused_count;
+  unused_string = string;
+  string = unused_string;
+  unused_length = length;
+  length = unused_length;
   return UI_ERROR_NONE;
 }
 
@@ -85,7 +95,9 @@ static ui_error_t mock_glShaderSource(unsigned int shader, int count,
  * @return UI_ERROR_NONE.
  */
 static ui_error_t mock_glCompileShader(unsigned int shader) {
-  (void)shader;
+  unsigned int unused_shader;
+  unused_shader = shader;
+  shader = unused_shader;
   return UI_ERROR_NONE;
 }
 
@@ -98,8 +110,9 @@ static ui_error_t mock_glCompileShader(unsigned int shader) {
  */
 static ui_error_t mock_glGetShaderiv(unsigned int shader, int pname,
                                      int *params) {
-  (void)shader;
-  (void)pname;
+  int unused_pname;
+  unused_pname = pname;
+  pname = unused_pname;
   *params = (g_mock_shader_fail == (int)shader) ? 0 : 1;
   return UI_ERROR_NONE;
 }
@@ -118,8 +131,12 @@ static unsigned int mock_glCreateProgram(void) { return mock_id_counter++; }
  */
 static ui_error_t mock_glAttachShader(unsigned int program,
                                       unsigned int shader) {
-  (void)program;
-  (void)shader;
+  unsigned int unused_prog;
+  unsigned int unused_shdr;
+  unused_prog = program;
+  program = unused_prog;
+  unused_shdr = shader;
+  shader = unused_shdr;
   return UI_ERROR_NONE;
 }
 
@@ -129,7 +146,9 @@ static ui_error_t mock_glAttachShader(unsigned int program,
  * @return UI_ERROR_NONE.
  */
 static ui_error_t mock_glLinkProgram(unsigned int program) {
-  (void)program;
+  unsigned int unused_prog;
+  unused_prog = program;
+  program = unused_prog;
   return UI_ERROR_NONE;
 }
 
@@ -142,8 +161,12 @@ static ui_error_t mock_glLinkProgram(unsigned int program) {
  */
 static ui_error_t mock_glGetProgramiv(unsigned int program, int pname,
                                       int *params) {
-  (void)program;
-  (void)pname;
+  unsigned int unused_prog;
+  int unused_pname;
+  unused_prog = program;
+  program = unused_prog;
+  unused_pname = pname;
+  pname = unused_pname;
   *params = g_mock_program_fail ? 0 : 1;
   return UI_ERROR_NONE;
 }
@@ -154,7 +177,9 @@ static ui_error_t mock_glGetProgramiv(unsigned int program, int pname,
  * @return UI_ERROR_NONE.
  */
 static ui_error_t mock_glDeleteShader(unsigned int shader) {
-  (void)shader;
+  unsigned int unused_shader;
+  unused_shader = shader;
+  shader = unused_shader;
   return UI_ERROR_NONE;
 }
 
@@ -164,7 +189,9 @@ static ui_error_t mock_glDeleteShader(unsigned int shader) {
  * @return UI_ERROR_NONE.
  */
 static ui_error_t mock_glDeleteProgram(unsigned int program) {
-  (void)program;
+  unsigned int unused_prog;
+  unused_prog = program;
+  program = unused_prog;
   return UI_ERROR_NONE;
 }
 
@@ -175,7 +202,9 @@ static ui_error_t mock_glDeleteProgram(unsigned int program) {
  * @return The mocked location index.
  */
 static int mock_glGetUniformLocation(unsigned int program, const char *name) {
-  (void)program;
+  unsigned int unused_prog;
+  unused_prog = program;
+  program = unused_prog;
   if (name[0] == 'i')
     return -1;
   return 1;
@@ -192,10 +221,18 @@ static int mock_glGetUniformLocation(unsigned int program, const char *name) {
 static ui_error_t mock_glUniformMatrix4fv(int location, int count,
                                           unsigned char transpose,
                                           const float *value) {
-  (void)location;
-  (void)count;
-  (void)transpose;
-  (void)value;
+  int unused_loc;
+  int unused_cnt;
+  unsigned char unused_trans;
+  const float *unused_val;
+  unused_loc = location;
+  location = unused_loc;
+  unused_cnt = count;
+  count = unused_cnt;
+  unused_trans = transpose;
+  transpose = unused_trans;
+  unused_val = value;
+  value = unused_val;
   return UI_ERROR_NONE;
 }
 
@@ -210,11 +247,18 @@ static ui_error_t mock_glUniformMatrix4fv(int location, int count,
  */
 static ui_error_t mock_glUniform4f(int location, float v0, float v1, float v2,
                                    float v3) {
-  (void)location;
-  (void)v0;
-  (void)v1;
-  (void)v2;
-  (void)v3;
+  int unused_loc;
+  float unused_v0, unused_v1, unused_v2, unused_v3;
+  unused_loc = location;
+  location = unused_loc;
+  unused_v0 = v0;
+  v0 = unused_v0;
+  unused_v1 = v1;
+  v1 = unused_v1;
+  unused_v2 = v2;
+  v2 = unused_v2;
+  unused_v3 = v3;
+  v3 = unused_v3;
   return UI_ERROR_NONE;
 }
 
@@ -225,8 +269,12 @@ static ui_error_t mock_glUniform4f(int location, float v0, float v1, float v2,
  * @return UI_ERROR_NONE.
  */
 static ui_error_t mock_glUniform1f(int location, float v0) {
-  (void)location;
-  (void)v0;
+  int unused_loc;
+  float unused_v0;
+  unused_loc = location;
+  location = unused_loc;
+  unused_v0 = v0;
+  v0 = unused_v0;
   return UI_ERROR_NONE;
 }
 

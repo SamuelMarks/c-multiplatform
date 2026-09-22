@@ -8,6 +8,10 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include "ui_internal_mem.h"
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_overflow_mock_fail = 0;
+#endif
 /* clang-format on */
 
 /**
@@ -15,10 +19,19 @@
  * @param p_str Parameter p_str.
  * @return Return value.
  */
-static void skip_whitespace(const char **p_str) {
+static ui_error_t skip_whitespace(const char **p_str) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_overflow_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+  if (!p_str || !*p_str) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -29,10 +42,14 @@ static void skip_whitespace(const char **p_str) {
  */
 ui_error_t ui_css_parse_overflow(const char *str,
                                  enum ui_css_overflow *out_overflow) {
+  ui_error_t rc;
   if (!str || !out_overflow)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "visible") == 0) {
     *out_overflow = UI_CSS_OVERFLOW_VISIBLE;
@@ -59,10 +76,14 @@ ui_error_t ui_css_parse_overflow(const char *str,
 ui_error_t
 ui_css_parse_text_overflow(const char *str,
                            struct ui_css_text_overflow *out_overflow) {
+  ui_error_t rc;
   if (!str || !out_overflow)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   out_overflow->string[0] = '\0';
 
@@ -95,10 +116,14 @@ ui_css_parse_text_overflow(const char *str,
 ui_error_t
 ui_css_parse_block_ellipsis(const char *str,
                             struct ui_css_block_ellipsis *out_ellipsis) {
+  ui_error_t rc;
   if (!str || !out_ellipsis)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   out_ellipsis->string[0] = '\0';
 
@@ -134,10 +159,14 @@ ui_css_parse_block_ellipsis(const char *str,
  */
 ui_error_t ui_css_parse_line_clamp(const char *str,
                                    struct ui_css_line_clamp *out_clamp) {
+  ui_error_t rc;
   if (!str || !out_clamp)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "none") == 0) {
     out_clamp->is_none = 1;
@@ -167,10 +196,14 @@ ui_error_t ui_css_parse_line_clamp(const char *str,
  */
 ui_error_t ui_css_parse_max_lines(const char *str,
                                   struct ui_css_max_lines *out_max_lines) {
+  ui_error_t rc;
   if (!str || !out_max_lines)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "none") == 0) {
     out_max_lines->is_none = 1;
@@ -196,9 +229,29 @@ ui_error_t ui_css_parse_max_lines(const char *str,
  */
 ui_error_t ui_css_parse_overflow_clip_margin(const char *str,
                                              struct ui_css_value *out_margin) {
+  ui_error_t rc;
   if (!str || !out_margin)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   return ui_css_parse_value(str, out_margin);
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief run_overflow_coverage.
+ * @return Return value.
+ */
+ui_error_t run_overflow_coverage(void);
+ui_error_t run_overflow_coverage(void) {
+  const char *null_str = NULL;
+
+  skip_whitespace(NULL);
+  skip_whitespace(&null_str);
+
+  return UI_ERROR_NONE;
+}
+#endif

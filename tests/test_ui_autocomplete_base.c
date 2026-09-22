@@ -18,37 +18,215 @@
 
 extern int g_ac_mock_fail;
 
-extern int g_ac_mock_fail;
+static ui_error_t failing_cva_on_change(union ui_signal_payload payload,
+                                        void *user_data) {
+  if (payload.ptr_val || user_data) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
 
-extern int g_ac_mock_fail;
+static ui_error_t failing_text_change(struct ui_autocomplete_base *ac,
+                                      const char *text, void *user_data) {
+  if (ac || text || user_data) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
 
-static void test_autocomplete_process_event_explicit() {
-  struct ui_autocomplete_base *autocomplete = NULL;
+static void test_autocomplete_process_event_explicit(void) {
+  struct ui_autocomplete_base *ac = NULL;
+  struct ui_layout_node dummy_layout;
   struct ui_event ev;
-  ui_autocomplete_base_create(&autocomplete, NULL);
+  ui_error_t rc;
 
-  /* Mock popover closed */
-  g_ac_mock_fail = 5; /* mock_popover_is_open return 0 */
+  memset(&dummy_layout, 0, sizeof(dummy_layout));
+
+  /* Test create failures */
+  g_ac_mock_fail = 1;
+  rc = ui_autocomplete_base_create(&ac, NULL);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  g_ac_mock_fail = 2;
+  rc = ui_autocomplete_base_create(&ac, NULL);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  g_ac_mock_fail = 5;
+  rc = ui_autocomplete_base_create(&ac, NULL);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  g_ac_mock_fail = 15;
+  rc = ui_autocomplete_base_create(&ac, NULL);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  g_ac_mock_fail = 16;
+  rc = ui_autocomplete_base_create(&ac, NULL);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Successful create for open/close/event testing */
+  rc = ui_autocomplete_base_create(&ac, NULL);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Open failure: popover_is_open fails */
+  g_ac_mock_fail = 12;
+  rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Open failure: listbox get_comp fails */
+  g_ac_mock_fail = 17;
+  rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Open failure: popover open fails */
+  g_ac_mock_fail = 7;
+  rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Open failure: set_attribute fails */
+  extern int g_ac_mock_is_open;
+  g_ac_mock_is_open = 0;
+  g_ac_mock_fail = 8;
+  rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Successfully open */
+  g_ac_mock_is_open = 0;
+  rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Open again when already open */
+  rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Close failure: popover_is_open fails */
+  g_ac_mock_fail = 12;
+  rc = ui_autocomplete_base_close(ac);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Close failure: popover_close fails */
+  g_ac_mock_fail = 9;
+  rc = ui_autocomplete_base_close(ac);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Close failure: set_attribute fails */
+  g_ac_mock_fail = 8;
+  rc = ui_autocomplete_base_close(ac);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Re-open for process_event tests */
+  rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
+  assert(rc == UI_ERROR_NONE);
+
+  /* process_event: popover_is_open fails */
+  memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = 'A';
-  ui_autocomplete_base_process_event(autocomplete, &ev, 100.0);
-
+  g_ac_mock_fail = 12;
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
   g_ac_mock_fail = 0;
 
-  /* Mock ui_dom_node_set_attribute failure inside process_event */
-  ev.type = UI_EVENT_CLICK;
-  g_ac_mock_fail = 23; /* mock_dom_node_set_attribute fails */
-  ui_autocomplete_base_process_event(autocomplete, &ev, 100.0);
+  /* process_event: popover_process_event fails */
+  g_ac_mock_fail = 13;
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
   g_ac_mock_fail = 0;
 
-  /* Mock ui_listbox_base_get_active_index fails */
+  /* process_event: second popover_is_open fails */
+  extern int g_popover_is_open_calls;
+  g_popover_is_open_calls = 0;
+  g_ac_mock_fail = 19;
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* process_event: mouse click outside closes popover, set_attribute fails */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  g_ac_mock_fail = 8;
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Re-open for keyboard tests */
+  g_ac_mock_is_open = 0;
+  rc = ui_autocomplete_base_open(ac, &dummy_layout, 100.0f, 100.0f);
+  assert(rc == UI_ERROR_NONE);
+  g_ac_mock_is_open = 1;
+
+  /* ENTER key: get_active_index fails */
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ENTER;
-  g_ac_mock_fail = 24;
-  ui_autocomplete_base_process_event(autocomplete, &ev, 100.0);
+  g_ac_mock_fail = 18;
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
   g_ac_mock_fail = 0;
 
-  ui_autocomplete_base_destroy(autocomplete);
+  /* ENTER key: get_selection_model fails */
+  g_ac_mock_fail = 10;
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* ENTER key: select fails */
+  g_ac_mock_fail = 11;
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Successfully handle ENTER */
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Fallback: when popover is closed, input_process_event fails */
+  rc = ui_autocomplete_base_close(ac);
+  assert(rc == UI_ERROR_NONE);
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = 'B';
+  g_ac_mock_fail = 14;
+  rc = ui_autocomplete_base_process_event(ac, &ev, 100.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_ac_mock_fail = 0;
+
+  /* Test on_input_text_change callback errors */
+  {
+    struct ui_control_value_accessor cva;
+    struct ui_input_base *inp = NULL;
+    ui_autocomplete_base_destroy(ac);
+    ac = NULL;
+
+    rc = ui_autocomplete_base_create(&ac, &cva);
+    assert(rc == UI_ERROR_NONE);
+
+    rc = cva.register_on_change(ac, failing_cva_on_change, NULL);
+    assert(rc == UI_ERROR_NONE);
+    rc = ui_autocomplete_base_get_input(ac, &inp);
+    assert(rc == UI_ERROR_NONE);
+
+    /* Changing text causes failing_cva_on_change to return error */
+    rc = ui_input_base_set_text(inp, "fail");
+    assert(rc == UI_ERROR_UNKNOWN);
+
+    /* Unset cva_on_change, test on_text_change failure */
+    rc = cva.register_on_change(ac, NULL, NULL);
+    assert(rc == UI_ERROR_NONE);
+    rc = ui_autocomplete_base_set_on_text_change(ac, failing_text_change, NULL);
+    assert(rc == UI_ERROR_NONE);
+
+    rc = ui_input_base_set_text(inp, "fail2");
+    assert(rc == UI_ERROR_UNKNOWN);
+  }
+
+  ui_autocomplete_base_destroy(ac);
 }
 
 extern int g_malloc_fail_countdown;
@@ -58,8 +236,10 @@ static int selection_count = 0;
 
 static ui_error_t on_text_change(struct ui_autocomplete_base *autocomplete,
                                  const char *text, void *user_data) {
-  (void)autocomplete;
-  (void)text;
+  if (autocomplete) {
+  }
+  if (text) {
+  }
   if (user_data) {
     int *val = (int *)user_data;
     (*val)++;
@@ -70,8 +250,10 @@ static ui_error_t on_text_change(struct ui_autocomplete_base *autocomplete,
 
 static ui_error_t on_selection(struct ui_autocomplete_base *autocomplete,
                                int index, void *user_data) {
-  (void)autocomplete;
-  (void)index;
+  if (autocomplete) {
+  }
+  if (index) {
+  }
   if (user_data) {
     int *val = (int *)user_data;
     (*val)++;
@@ -82,7 +264,8 @@ static ui_error_t on_selection(struct ui_autocomplete_base *autocomplete,
 
 static ui_error_t dummy_cva_on_change(union ui_signal_payload payload,
                                       void *user_data) {
-  (void)payload;
+  if (payload.ptr_val) {
+  }
   if (user_data) {
     int *val = (int *)user_data;
     (*val)++;
@@ -241,27 +424,19 @@ TEST test_autocomplete_edge_cases(void) {
 
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
   {
     ui_error_t rc_cleanup = ui_focus_manager_destroy(focus);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
   {
     ui_error_t rc_cleanup = ui_autocomplete_base_destroy(autocomplete);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(dummy_root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
 
   /* OOM loop for create */
@@ -272,9 +447,7 @@ TEST test_autocomplete_edge_cases(void) {
     if (rc == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_autocomplete_base_destroy(test_ac);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
       }
       break;
     } else {
@@ -386,7 +559,7 @@ int main(int argc, char **argv) {
 
 #ifdef UI_TEST_MOCK_ALLOC
   extern ui_error_t run_ac_coverage(void);
-  run_ac_coverage();
+  assert(run_ac_coverage() == UI_ERROR_NONE);
 #endif
 
   RUN_SUITE(ui_autocomplete_suite);

@@ -159,11 +159,13 @@ ui_error_t ui_form_builder_array_start(ui_form_builder_t *builder,
   if (builder->is_array[builder->depth - 1]) {
     rc = ui_form_array_push(
         (ui_form_array_t *)builder->stack[builder->depth - 1], node);
-    (void)rc; /* return rc; */
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
     rc = ui_form_group_add_node(
         (ui_form_group_t *)builder->stack[builder->depth - 1], name, node);
-    (void)rc; /* return rc; */
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   builder->stack[builder->depth] = arr;
@@ -221,7 +223,9 @@ static ui_error_t dummy_equality(union ui_signal_payload a,
  * @return Return value.
  */
 static ui_error_t dummy_destructor(union ui_signal_payload p) {
-  (void)p;
+  if (p.ptr_val == NULL) {
+    return UI_ERROR_NONE;
+  }
   return UI_ERROR_NONE;
 }
 
@@ -255,10 +259,7 @@ ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
   if (validator) {
     rc = ui_form_control_add_validator(ctrl, validator, user_data);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_form_control_destroy(ctrl);
-        (void)rc_cleanup;
-      }
+      ui_form_control_destroy(ctrl);
       return rc;
     }
   }
@@ -268,11 +269,13 @@ ui_error_t ui_form_builder_control(ui_form_builder_t *builder, const char *name,
   if (builder->is_array[builder->depth - 1]) {
     rc = ui_form_array_push(
         (ui_form_array_t *)builder->stack[builder->depth - 1], node);
-    (void)rc; /* return rc; */
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
     rc = ui_form_group_add_node(
         (ui_form_group_t *)builder->stack[builder->depth - 1], name, node);
-    (void)rc; /* return rc; */
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }

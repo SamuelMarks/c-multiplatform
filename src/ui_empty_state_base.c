@@ -8,6 +8,43 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_empty_state_mock_fail = 0;
+
+/**
+ * @brief mock_empty_state_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t
+mock_empty_state_component_destroy(struct ui_component *comp) {
+  if (g_empty_state_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_empty_state_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_empty_state_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_empty_state_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_empty_state_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_empty_state_dom_node_destroy
+/** @endcond */
+#endif
+
 /**
  * @brief ui_empty_state_base_create.
  * @param out_state Parameter out_state.
@@ -32,7 +69,9 @@ ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
   if (!state) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      (void)rc_cleanup;
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return rc_cleanup;
+      }
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -50,7 +89,10 @@ ui_error_t ui_empty_state_base_create(struct ui_empty_state_base **out_state) {
   if (err != UI_ERROR_NONE) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(state->base.shadow_root);
-      (void)rc_cleanup;
+      if (rc_cleanup != UI_ERROR_NONE) {
+        C_MULTIPLATFORM_FREE(state);
+        return rc_cleanup;
+      }
     }
     C_MULTIPLATFORM_FREE(state);
     return err;

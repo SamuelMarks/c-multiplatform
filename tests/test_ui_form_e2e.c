@@ -38,14 +38,19 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_form_builder_destroy(builder);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  ui_form_group_destroy(group);
+  {
+    ui_error_t rc_cleanup = ui_form_group_destroy(group);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 

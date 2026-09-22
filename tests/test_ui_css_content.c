@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "ui_css_content.h"
@@ -30,9 +31,7 @@ static int test_parse_content_none_normal(void) {
 
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   if (0)
     return __LINE__;
@@ -51,9 +50,7 @@ static int test_parse_content_strings(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_css_parse_content("'single quote'", &c) != UI_ERROR_NONE)
@@ -63,9 +60,7 @@ static int test_parse_content_strings(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Escapes */
@@ -73,9 +68,7 @@ static int test_parse_content_strings(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Unclosed quote with escape at end */
@@ -100,9 +93,7 @@ static int test_parse_content_functions(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* url without parens */
@@ -126,9 +117,7 @@ static int test_parse_content_functions(void) {
       return __LINE__;
     {
       ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -139,9 +128,7 @@ static int test_parse_content_functions(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   /* attr syntax error */
   if (ui_css_parse_content("attr(data-title", &c) != UI_ERROR_PARSE_FAILED)
@@ -157,9 +144,7 @@ static int test_parse_content_functions(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_css_parse_content("counter(section, upper-roman)", &c) !=
@@ -172,9 +157,7 @@ static int test_parse_content_functions(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_css_parse_content("counter(sec upper)", &c) != UI_ERROR_PARSE_FAILED)
@@ -195,9 +178,7 @@ static int test_parse_content_functions(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_css_parse_content("counters(page, \".\", upper-roman)", &c) !=
@@ -206,9 +187,7 @@ static int test_parse_content_functions(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_css_parse_content("counters(page)", &c) != UI_ERROR_PARSE_FAILED)
@@ -229,9 +208,7 @@ static int test_parse_content_functions(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_css_parse_content("attr(-name)", &c) != UI_ERROR_NONE ||
@@ -239,9 +216,7 @@ static int test_parse_content_functions(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -262,9 +237,7 @@ static int test_parse_content_quotes(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Unknown ident */
@@ -307,9 +280,7 @@ static int test_parse_content_multiple(void) {
 
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -323,9 +294,7 @@ static int test_parse_content_oom(void) {
         UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -349,9 +318,7 @@ static int test_parse_content_long(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* ident in attr */
@@ -360,9 +327,7 @@ static int test_parse_content_long(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* escape at end of max len */
@@ -371,9 +336,7 @@ static int test_parse_content_long(void) {
     return __LINE__;
   {
     ui_error_t rc_cleanup = ui_css_content_destroy(&c);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -381,6 +344,20 @@ static int test_parse_content_long(void) {
 
 int main(void) {
   int failures = 0;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern ui_error_t run_content_coverage(void);
+    run_content_coverage();
+  }
+#endif
+
+  {
+    struct ui_css_content c;
+    if (ui_css_parse_content("url(invalid-image-syntax", &c) !=
+        UI_ERROR_PARSE_FAILED)
+      failures++;
+  }
 
   failures += test_parse_content_none_normal();
   failures += test_parse_content_strings();

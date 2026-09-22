@@ -12,10 +12,14 @@ struct mock_window_data {
 static ui_error_t mock_create_window(struct ui_window_backend *backend,
                                      const char *title, int width, int height,
                                      struct ui_window **out_window) {
-  (void)backend;
-  (void)title;
-  (void)width;
-  (void)height;
+  if (backend) {
+  }
+  if (title) {
+  }
+  if (width) {
+  }
+  if (height) {
+  }
   if (out_window) {
     *out_window = (struct ui_window *)0x12345678;
     return UI_ERROR_NONE;
@@ -25,22 +29,28 @@ static ui_error_t mock_create_window(struct ui_window_backend *backend,
 
 static ui_error_t mock_destroy_window(struct ui_window_backend *backend,
                                       struct ui_window *window) {
-  (void)backend;
-  (void)window;
+  if (backend) {
+  }
+  if (window) {
+  }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t mock_show_window(struct ui_window_backend *backend,
                                    struct ui_window *window) {
-  (void)backend;
-  (void)window;
+  if (backend) {
+  }
+  if (window) {
+  }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t mock_hide_window(struct ui_window_backend *backend,
                                    struct ui_window *window) {
-  (void)backend;
-  (void)window;
+  if (backend) {
+  }
+  if (window) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -48,9 +58,12 @@ static ui_error_t mock_poll_events(struct ui_window_backend *backend,
                                    struct ui_window *window,
                                    struct ui_event *out_event,
                                    int *out_has_event) {
-  (void)backend;
-  (void)window;
-  (void)out_event;
+  if (backend) {
+  }
+  if (window) {
+  }
+  if (out_event) {
+  }
   if (out_has_event) {
     *out_has_event = 0;
     return UI_ERROR_NONE;
@@ -60,8 +73,10 @@ static ui_error_t mock_poll_events(struct ui_window_backend *backend,
 
 static ui_error_t mock_swap_buffers(struct ui_window_backend *backend,
                                     struct ui_window *window) {
-  (void)backend;
-  (void)window;
+  if (backend) {
+  }
+  if (window) {
+  }
   return UI_ERROR_NONE;
 }
 

@@ -38,13 +38,17 @@ struct ui_cluster {
  * @param r2 Parameter r2.
  * @param g2 Parameter g2.
  * @param b2 Parameter b2.
+ * @param out_dist Pointer to store computed squared color distance.
  * @return Return value.
  */
-static int calc_color_distance(int r1, int g1, int b1, int r2, int g2, int b2) {
-  int dr = r1 - r2;
-  int dg = g1 - g2;
-  int db = b1 - b2;
-  return dr * dr + dg * dg + db * db;
+static ui_error_t calc_color_distance(int r1, int g1, int b1, int r2, int g2,
+                                      int b2, int *out_dist) {
+  int dr, dg, db;
+  dr = r1 - r2;
+  dg = g1 - g2;
+  db = b1 - b2;
+  *out_dist = dr * dr + dg * dg + db * db;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -67,6 +71,7 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
   int k;
   int iter;
   int num_clusters = 0;
+  int dist = 0;
   size_t x, y;
   struct ui_cluster *clusters = NULL;
   ui_error_t rc = UI_ERROR_NONE;
@@ -121,8 +126,9 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
       for (c = 0; c < num_clusters; ++c) {
         /* If squared distance is < 100, we consider it the same color cluster
          */
-        if (calc_color_distance(r, g, b, clusters[c].r, clusters[c].g,
-                                clusters[c].b) < 100) {
+        calc_color_distance(r, g, b, clusters[c].r, clusters[c].g,
+                            clusters[c].b, &dist);
+        if (dist < 100) {
           is_distinct = 0;
           break;
         }
@@ -189,8 +195,8 @@ ui_color_quantize_kmeans(const unsigned char *pixels, size_t width,
         }
 
         for (c = 0; c < num_clusters; ++c) {
-          int dist = calc_color_distance(r, g, b, clusters[c].r, clusters[c].g,
-                                         clusters[c].b);
+          calc_color_distance(r, g, b, clusters[c].r, clusters[c].g,
+                              clusters[c].b, &dist);
           if (dist < min_dist) {
             min_dist = dist;
             best_cluster = c;

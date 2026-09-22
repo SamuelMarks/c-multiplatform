@@ -18,9 +18,9 @@
 
 /* #define STB_TRUETYPE_IMPLEMENTATION */
 /** @brief STB TrueType memory allocation */
-#define STBTT_malloc(x,u)  ((void)(u),C_MULTIPLATFORM_MALLOC(x))
+#define STBTT_malloc(x,u)  ((u) ? C_MULTIPLATFORM_MALLOC(x) : C_MULTIPLATFORM_MALLOC(x))
 /** @brief internal */
-#define STBTT_free(x,u)    ((void)(u),C_MULTIPLATFORM_FREE(x))
+#define STBTT_free(x,u)    do { if (u) {} C_MULTIPLATFORM_FREE(x); } while (0)
 #include "stb_truetype.h"
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -636,10 +636,6 @@ ui_error_t ui_test_font_manager_coverage_in_src(void) {
     ui_font_free_atlas(atlas);
   }
 
-  {
-    ui_error_t rc_cleanup = ui_font_manager_destroy(manager);
-    (void)rc_cleanup;
-  }
-  return UI_ERROR_NONE;
+  return ui_font_manager_destroy(manager);
 }
 #endif

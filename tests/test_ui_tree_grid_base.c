@@ -6,12 +6,24 @@
 #include "../include/ui_tree_grid_base.h"
 #include "../include/ui_error.h"
 #include "../include/ui_dom_node.h"
+#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
 #endif
+
+#define MAX_EXPANDED_NODES 256
+struct ui_tree_grid_base {
+  struct ui_component *component;
+  struct ui_tree_grid_model model;
+  void *expanded_nodes[MAX_EXPANDED_NODES];
+  size_t expanded_count;
+  void *active_node;
+  size_t active_col;
+};
 
 #define EXPECT_EQ(actual, expected)                                            \
   if ((size_t)(actual) != (size_t)(expected)) {                                \
@@ -28,47 +40,62 @@ extern int g_malloc_fail_countdown;
   }
 
 static size_t mock_get_root_count(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return 1;
 }
 
 static void *mock_get_root_node(size_t index, void *user_data) {
-  (void)index;
-  (void)user_data;
+  if (index) {
+  }
+  if (user_data) {
+  }
   return (void *)0x1;
 }
 
 static void *mock_get_parent(void *node_id, void *user_data) {
-  (void)node_id;
-  (void)user_data;
+  if (node_id) {
+  }
+  if (user_data) {
+  }
   return NULL;
 }
 
 static size_t mock_get_child_count(void *node_id, void *user_data) {
-  (void)node_id;
-  (void)user_data;
+  if (node_id) {
+  }
+  if (user_data) {
+  }
   return 2;
 }
 
 static void *mock_get_child(void *node_id, size_t index, void *user_data) {
-  (void)node_id;
-  (void)index;
-  (void)user_data;
+  if (node_id) {
+  }
+  if (index) {
+  }
+  if (user_data) {
+  }
   return (void *)(0x10 + index);
 }
 
 static size_t mock_get_column_count(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return 3;
 }
 
 static ui_error_t mock_render_cell(void *node_id, size_t col_index,
                                    struct ui_dom_node *cell_node,
                                    void *user_data) {
-  (void)node_id;
-  (void)col_index;
-  (void)cell_node;
-  (void)user_data;
+  if (node_id) {
+  }
+  if (col_index) {
+  }
+  if (cell_node) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -101,9 +128,7 @@ static int test_tree_grid_lifecycle(void) {
     if (ui_tree_grid_base_create(&tree_grid, &model) == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -133,16 +158,30 @@ static int test_tree_grid_lifecycle(void) {
   /* Destructor null safe */
   {
     ui_error_t rc_cleanup = ui_tree_grid_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_tree_grid_mock_fail;
+    struct ui_tree_grid_base *fail_tg = NULL;
+    rc = ui_tree_grid_base_create(&fail_tg, &model);
+    EXPECT_EQ(rc, UI_ERROR_NONE);
+    g_tree_grid_mock_fail = 1;
+    rc = ui_tree_grid_base_destroy(fail_tg);
+    EXPECT_EQ(rc, UI_ERROR_UNKNOWN);
+    g_tree_grid_mock_fail = 0;
+
+    fail_tg =
+        (struct ui_tree_grid_base *)calloc(1, sizeof(struct ui_tree_grid_base));
+    rc = ui_tree_grid_base_destroy(fail_tg);
+    EXPECT_EQ(rc, UI_ERROR_NONE);
+  }
+#endif
   return failed;
 }
 
@@ -218,24 +257,22 @@ static int test_tree_grid_expansion(void) {
   rc = ui_tree_grid_base_set_expanded(tree_grid, node1, 0);
   EXPECT_EQ(rc, UI_ERROR_NONE);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_tree_grid_mock_fail;
+    g_tree_grid_mock_fail = 2;
+    rc = ui_tree_grid_base_set_expanded(tree_grid, node1, 1);
+    EXPECT_EQ(rc, UI_ERROR_UNKNOWN);
+    g_tree_grid_mock_fail = 0;
+  }
+#endif
+
   {
     ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
-
-#define MAX_EXPANDED_NODES 256
-struct ui_tree_grid_base {
-  struct ui_component *component;
-  struct ui_tree_grid_model model;
-  void *expanded_nodes[MAX_EXPANDED_NODES];
-  size_t expanded_count;
-  void *active_node;
-  size_t active_col;
-};
 
 static int test_tree_grid_key_events(void) {
   struct ui_tree_grid_base *tree_grid = NULL;
@@ -311,6 +348,21 @@ static int test_tree_grid_key_events(void) {
   ev.key_code = UI_KEY_DOWN;
   EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev), UI_ERROR_NONE);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_tree_grid_mock_fail;
+    tree_grid->active_node = node1;
+    g_tree_grid_mock_fail = 2;
+    ev.key_code = UI_KEY_RIGHT;
+    EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev),
+              UI_ERROR_UNKNOWN);
+    ev.key_code = UI_KEY_LEFT;
+    EXPECT_EQ(ui_tree_grid_base_handle_key_event(tree_grid, &ev),
+              UI_ERROR_UNKNOWN);
+    g_tree_grid_mock_fail = 0;
+  }
+#endif
+
   /* Fill expanded array to force OUT_OF_BOUNDS on RIGHT key */
   {
     int j;
@@ -325,9 +377,7 @@ static int test_tree_grid_key_events(void) {
 
   {
     ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -363,15 +413,11 @@ static int test_tree_grid_render(void) {
 
   {
     ui_error_t rc_cleanup = ui_tree_grid_base_destroy(tree_grid);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }

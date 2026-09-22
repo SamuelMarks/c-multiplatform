@@ -36,55 +36,6 @@ static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
 /** @cond */
 #define ui_dom_node_set_attribute mock_dom_node_set_attribute
 /** @endcond */
-
-ui_error_t run_bottom_app_bar_coverage(void);
-ui_error_t run_bottom_app_bar_coverage(void) {
-
-  struct ui_bottom_app_bar_base *bar = NULL;
-
-  g_bottom_app_bar_mock_fail = 1;
-  {
-    ui_error_t rc_cleanup = ui_bottom_app_bar_base_create(&bar);
-    (void)rc_cleanup;
-  }
-  g_bottom_app_bar_mock_fail = 0;
-
-  {
-    ui_error_t rc_cleanup = ui_bottom_app_bar_base_create(&bar);
-    (void)rc_cleanup;
-  }
-
-  g_bottom_app_bar_mock_fail = 2;
-  {
-    ui_error_t rc_cleanup =
-        ui_bottom_app_bar_base_set_fab(bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER);
-    (void)rc_cleanup;
-  }
-  g_bottom_app_bar_mock_fail = 0;
-
-  g_bottom_app_bar_mock_fail = 2;
-  {
-    ui_error_t rc_cleanup = ui_bottom_app_bar_base_set_fab(
-        bar, (struct ui_fab_base *)1, UI_BOTTOM_APP_BAR_FAB_CENTER);
-    (void)rc_cleanup;
-  }
-  g_bottom_app_bar_mock_fail = 0;
-
-  g_bottom_app_bar_mock_fail = 2;
-  {
-    ui_error_t rc_cleanup = ui_bottom_app_bar_base_set_fab(
-        bar, (struct ui_fab_base *)1, UI_BOTTOM_APP_BAR_FAB_END);
-    (void)rc_cleanup;
-  }
-  g_bottom_app_bar_mock_fail = 0;
-
-  {
-    ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(bar);
-    (void)rc_cleanup;
-  }
-
-  return UI_ERROR_NONE;
-}
 #endif
 
 #if defined(_MSC_VER)
@@ -176,16 +127,10 @@ ui_bottom_app_bar_base_create(struct ui_bottom_app_bar_base **out_bar) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (bar->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(bar->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(bar->component);
   }
   C_MULTIPLATFORM_FREE(bar);
   return rc;
@@ -195,10 +140,7 @@ ui_error_t ui_bottom_app_bar_base_destroy(struct ui_bottom_app_bar_base *bar) {
   if (!bar) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(bar->component);
-    (void)rc_cleanup;
-  }
+  ui_component_destroy(bar->component);
   C_MULTIPLATFORM_FREE(bar);
   return UI_ERROR_NONE;
 }

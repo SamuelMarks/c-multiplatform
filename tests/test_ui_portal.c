@@ -36,13 +36,13 @@ static int test_portal_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_portal_destroy(portal);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(physical_target);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -68,7 +68,7 @@ static int test_portal_replacement(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(physical_target);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -90,7 +90,7 @@ static int test_portal_nulls(void) {
   {
     ui_error_t rc_cleanup = ui_portal_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -109,13 +109,13 @@ static int test_portal_nulls(void) {
   {
     ui_error_t rc_cleanup = ui_portal_destroy(portal);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -136,7 +136,7 @@ static int test_portal_oom(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -146,6 +146,7 @@ static int test_portal_content_moved(void) {
   struct ui_portal *portal = NULL;
   struct ui_dom_node *target = NULL;
   struct ui_dom_node *content = NULL;
+  struct ui_dom_node *content2 = NULL;
 
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &target);
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content);
@@ -157,7 +158,6 @@ static int test_portal_content_moved(void) {
   ui_dom_node_remove_child(target, content);
 
   /* Set new content, old content is already detached */
-  struct ui_dom_node *content2 = NULL;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content2);
   ui_portal_set_content(portal, content2);
 
@@ -168,14 +168,14 @@ static int test_portal_content_moved(void) {
   {
     ui_error_t rc_cleanup = ui_portal_destroy(portal);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(target);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -202,19 +202,81 @@ static int test_portal_append_fail(void) {
   {
     ui_error_t rc_cleanup = ui_portal_destroy(portal);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_dom_node_destroy(dummy_parent); /* also destroys content */
 
   return 0;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+static int test_portal_mock_errors(void) {
+  struct ui_dom_node *target = NULL;
+  struct ui_dom_node *content1 = NULL;
+  struct ui_dom_node *content2 = NULL;
+  struct ui_portal *portal = NULL;
+  extern int g_portal_mock_fail;
+
+  /* Scenario A: remove_child fail in set_content */
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &target);
+  ui_portal_create(&portal, target);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content1);
+  ui_portal_set_content(portal, content1);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content2);
+  g_portal_mock_fail = 1;
+  if (ui_portal_set_content(portal, content2) == UI_ERROR_NONE)
+    return 1;
+  g_portal_mock_fail = 0;
+  ui_dom_node_destroy(content2);
+  ui_portal_destroy(portal);
+  ui_dom_node_destroy(target);
+
+  /* Scenario B: destroy fail in set_content */
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &target);
+  ui_portal_create(&portal, target);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content1);
+  ui_portal_set_content(portal, content1);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content2);
+  g_portal_mock_fail = 2;
+  if (ui_portal_set_content(portal, content2) == UI_ERROR_NONE)
+    return 1;
+  g_portal_mock_fail = 0;
+  ui_dom_node_destroy(content2);
+  ui_portal_destroy(portal);
+  ui_dom_node_destroy(target);
+
+  /* Scenario C: remove_child fail in destroy */
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &target);
+  ui_portal_create(&portal, target);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content1);
+  ui_portal_set_content(portal, content1);
+  g_portal_mock_fail = 1;
+  if (ui_portal_destroy(portal) == UI_ERROR_NONE)
+    return 1;
+  g_portal_mock_fail = 0;
+  ui_dom_node_destroy(target);
+
+  /* Scenario D: destroy fail in destroy */
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &target);
+  ui_portal_create(&portal, target);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content1);
+  ui_portal_set_content(portal, content1);
+  g_portal_mock_fail = 2;
+  if (ui_portal_destroy(portal) == UI_ERROR_NONE)
+    return 1;
+  g_portal_mock_fail = 0;
+  ui_dom_node_destroy(target);
+
+  return 0;
+}
+#endif
 
 int main(void) {
   int failed = 0;
@@ -226,6 +288,9 @@ int main(void) {
   failed |= test_portal_oom();
   failed |= test_portal_append_fail();
   failed |= test_portal_content_moved();
+#ifdef UI_TEST_MOCK_ALLOC
+  failed |= test_portal_mock_errors();
+#endif
 
   if (failed) {
     printf("Tests failed.\n");

@@ -1312,7 +1312,7 @@ STBIWDEF unsigned char *stbi_zlib_compress(unsigned char *data, int data_len,
     stbiw__zlib_add(0, 1);
 
   for (i = 0; i < stbiw__ZHASH; ++i)
-    (void)stbiw__sbfree(hash_table[i]);
+    stbiw__sbfree(hash_table[i]);
   STBIW_FREE(hash_table);
 
   if (stbiw__sbn(out) > data_len + 2 + ((data_len + 32766) / 32767) * 5) {

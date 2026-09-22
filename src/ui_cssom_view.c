@@ -33,13 +33,7 @@ ui_cssom_view_get_bounding_client_rect(const struct ui_layout_node *node,
      but if it's the content size, we need to add padding and border.
      Assuming layout_node->width and height are the final border-box dimension.
    */
-  {
-    ui_error_t rc =
-        ui_dom_rect_init(out_rect, abs_x, abs_y, node->width, node->height);
-    (void)rc;
-  }
-
-  return UI_ERROR_NONE;
+  return ui_dom_rect_init(out_rect, abs_x, abs_y, node->width, node->height);
 }
 
 /**

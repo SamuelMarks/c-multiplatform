@@ -7,7 +7,9 @@
 #include "../include/ui_test_visual.h"
 #ifdef UI_TEST_MOCK_ALLOC
 /** @brief Mock stbi write png fail */
-extern int g_mock_stbi_write_png_fail;
+int g_mock_stbi_write_png_fail = 0;
+int g_mock_rgb_to_lab_fail = 0;
+int g_mock_delta_e_fail = 0;
 #endif
 
 #include <math.h>
@@ -37,14 +39,30 @@ extern int g_mock_stbi_write_png_fail;
  * @param[out] L_out Pointer to output L.
  * @param[out] a_out Pointer to output a.
  * @param[out] b_out Pointer to output b.
+ * @return Return value.
  */
-static void rgb_to_lab(unsigned char r_in, unsigned char g_in,
-                       unsigned char b_in, double *L_out, double *a_out,
-                       double *b_out) {
+static ui_error_t rgb_to_lab(unsigned char r_in, unsigned char g_in,
+                             unsigned char b_in, double *L_out, double *a_out,
+                             double *b_out) {
   double r, g, b, x, y, z;
   double x_ref = 95.047;
   double y_ref = 100.000;
   double z_ref = 108.883;
+
+  if (!L_out || !a_out || !b_out) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_rgb_to_lab_fail != 0) {
+    if (g_mock_rgb_to_lab_fail > 1) {
+      g_mock_rgb_to_lab_fail--;
+    } else {
+      g_mock_rgb_to_lab_fail = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
 
   r = r_in / 255.0;
   g = g_in / 255.0;
@@ -73,6 +91,7 @@ static void rgb_to_lab(unsigned char r_in, unsigned char g_in,
   *L_out = (116.0 * y) - 16.0;
   *a_out = 500.0 * (x - y);
   *b_out = 200.0 * (y - z);
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -84,19 +103,43 @@ static void rgb_to_lab(unsigned char r_in, unsigned char g_in,
  * @param g2 Green channel 2.
  * @param b2 Blue channel 2.
  * @param[out] out_delta_e Pointer to output Delta E.
+ * @return Return value.
  */
-static void calculate_delta_e(unsigned char r1, unsigned char g1,
-                              unsigned char b1, unsigned char r2,
-                              unsigned char g2, unsigned char b2,
-                              double *out_delta_e) {
+static ui_error_t calculate_delta_e(unsigned char r1, unsigned char g1,
+                                    unsigned char b1, unsigned char r2,
+                                    unsigned char g2, unsigned char b2,
+                                    double *out_delta_e) {
   double L1, a1, b_lab1;
   double L2, a2, b_lab2;
+  ui_error_t rc;
 
-  rgb_to_lab(r1, g1, b1, &L1, &a1, &b_lab1);
-  rgb_to_lab(r2, g2, b2, &L2, &a2, &b_lab2);
+  if (!out_delta_e) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_delta_e_fail != 0) {
+    if (g_mock_delta_e_fail > 1) {
+      g_mock_delta_e_fail--;
+    } else {
+      g_mock_delta_e_fail = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
+
+  rc = rgb_to_lab(r1, g1, b1, &L1, &a1, &b_lab1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = rgb_to_lab(r2, g2, b2, &L2, &a2, &b_lab2);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   *out_delta_e =
       sqrt(pow(L1 - L2, 2.0) + pow(a1 - a2, 2.0) + pow(b_lab1 - b_lab2, 2.0));
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -118,6 +161,7 @@ ui_error_t ui_visual_fuzzy_match(const unsigned char *img_a,
   int total_pixels = width * height;
   double sum_sq_diff = 0.0;
   int mismatched_pixels = 0;
+  ui_error_t rc;
 
   if (!img_a || !img_b || !config || width <= 0 || height <= 0 ||
       !out_matched) {
@@ -148,7 +192,10 @@ ui_error_t ui_visual_fuzzy_match(const unsigned char *img_a,
     if (r1 != r2 || g1 != g2 || b1 != b2 || a1 != a2) {
       double delta_e;
       int is_mismatch = 0;
-      calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
+      rc = calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
       /* Include alpha difference conceptually in drift, although deltaE is RGB
        * only */
       if (delta_e > config->delta_e_threshold) {
@@ -194,6 +241,7 @@ ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
                                       unsigned char *output_heatmap) {
   int i;
   int total_pixels = width * height;
+  ui_error_t rc;
 
   if (!img_a || !img_b || !output_heatmap || width <= 0 || height <= 0) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -230,7 +278,10 @@ ui_error_t ui_visual_generate_heatmap(const unsigned char *img_a,
     } else {
       double delta_e;
       int intensity;
-      calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
+      rc = calculate_delta_e(r1, g1, b1, r2, g2, b2, &delta_e);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
       /* Scale intensity based on difference */
       intensity = (int)((delta_e / 100.0) * 255.0);
       if (intensity > 255)
@@ -299,3 +350,17 @@ ui_error_t ui_visual_write_heatmap_to_disk(const char *filepath,
 
   return (rc == 0) ? UI_ERROR_IO_FAILED : UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t ui_test_rgb_to_lab(unsigned char r, unsigned char g, unsigned char b,
+                              double *L, double *a, double *b_lab) {
+  return rgb_to_lab(r, g, b, L, a, b_lab);
+}
+
+ui_error_t ui_test_calculate_delta_e(unsigned char r1, unsigned char g1,
+                                     unsigned char b1, unsigned char r2,
+                                     unsigned char g2, unsigned char b2,
+                                     double *delta_e) {
+  return calculate_delta_e(r1, g1, b1, r2, g2, b2, delta_e);
+}
+#endif

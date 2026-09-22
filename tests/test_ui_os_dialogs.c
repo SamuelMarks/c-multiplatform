@@ -42,7 +42,15 @@ static int test_os_dialogs(void) {
   ui_thread_pool_destroy(pool); /* this waits */
 
   /* Dispatch reactor */
-  ui_reactor_poll(reactor, 0);
+  {
+    FILE *fmock = fopen("mock_file.txt", "wb");
+    if (fmock) {
+      fputs("mock", fmock);
+      fclose(fmock);
+    }
+    ui_reactor_poll(reactor, 0);
+    remove("mock_file.txt");
+  }
 
   /* NULLs */
   ui_os_dialog_show_message_box(NULL, NULL, UI_OS_MESSAGE_BOX_INFO);
@@ -73,7 +81,7 @@ static int test_os_dialogs(void) {
   {
     ui_error_t rc_cleanup = ui_color_picker_base_destroy(color_picker);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_file_uploader_destroy(&uploader);
@@ -83,9 +91,9 @@ static int test_os_dialogs(void) {
 
 struct ui_os_file_task {
   struct ui_file_uploader_base *uploader;
-  char result_path[256];
-  struct ui_reactor *reactor;
   struct ui_os_file_picker_config config;
+  struct ui_reactor *reactor;
+  char result_path[1024];
 };
 
 extern ui_error_t ui_os_file_completion(void *user_data);
@@ -93,20 +101,92 @@ extern ui_error_t ui_os_file_completion(void *user_data);
 static int test_os_file_completion(void) {
   struct ui_os_file_task *task;
   struct ui_file_uploader_base uploader;
+  FILE *fpath = fopen("mock_path.txt", "wb");
+  if (fpath) {
+    fputs("mock", fpath);
+    fclose(fpath);
+  }
 
   ui_file_uploader_init(&uploader, 1, 0, 0, 100, 100, NULL);
+
+  /* NULL task */
+  if (ui_os_file_completion(NULL) != UI_ERROR_INVALID_ARGUMENT) {
+    remove("mock_path.txt");
+    return 1;
+  }
+
+  /* Task with null uploader */
+  task = malloc(sizeof(struct ui_os_file_task));
+  task->uploader = NULL;
+  task->result_path[0] = 'a';
+  task->result_path[1] = '\0';
+  if (ui_os_file_completion(task) != UI_ERROR_NONE) {
+    remove("mock_path.txt");
+    return 1;
+  }
 
   task = malloc(sizeof(struct ui_os_file_task));
   task->uploader = &uploader;
   task->result_path[0] = '\0';
-  ui_os_file_completion(task);
+  if (ui_os_file_completion(task) != UI_ERROR_NONE) {
+    remove("mock_path.txt");
+    return 1;
+  }
 
   task = malloc(sizeof(struct ui_os_file_task));
   task->uploader = &uploader;
   UI_STRCPY(task->result_path, sizeof(task->result_path), "mock_path.txt");
-  ui_os_file_completion(task);
+  if (ui_os_file_completion(task) != UI_ERROR_NONE) {
+    remove("mock_path.txt");
+    return 1;
+  }
+
+  /* Trigger drop_file failure: fill uploader to max_files first */
+  task = malloc(sizeof(struct ui_os_file_task));
+  task->uploader = &uploader;
+  UI_STRCPY(task->result_path, sizeof(task->result_path), "mock_path.txt");
+  if (ui_os_file_completion(task) == UI_ERROR_NONE) {
+    remove("mock_path.txt");
+    return 1;
+  }
 
   ui_file_uploader_destroy(&uploader);
+  remove("mock_path.txt");
+
+  /* Now test when drop_file succeeds (rc == UI_ERROR_NONE) but read_files fails
+   * (rc_cleanup != UI_ERROR_NONE) */
+  {
+    struct ui_file_uploader_base uploader2;
+    ui_file_uploader_init(&uploader2, 2, 0, 0, 100, 100, NULL);
+    task = malloc(sizeof(struct ui_os_file_task));
+    task->uploader = &uploader2;
+    UI_STRCPY(task->result_path, sizeof(task->result_path),
+              "non_existent_file_to_fail_read.txt");
+    if (ui_os_file_completion(task) == UI_ERROR_NONE) {
+      ui_file_uploader_destroy(&uploader2);
+      return 1;
+    }
+    ui_file_uploader_destroy(&uploader2);
+  }
+
+  /* Now test when drop_file fails (rc != UI_ERROR_NONE) and read_files also
+   * fails (rc_cleanup != UI_ERROR_NONE, hits rc != UI_ERROR_NONE branch) */
+  {
+    struct ui_file_uploader_base uploader3;
+    ui_file_uploader_init(&uploader3, 1, 0, 0, 100, 100, NULL);
+    /* Fill to max */
+    ui_file_uploader_drop_file(&uploader3, "non_existent_file_xyz_999.txt");
+    task = malloc(sizeof(struct ui_os_file_task));
+    task->uploader = &uploader3;
+    UI_STRCPY(task->result_path, sizeof(task->result_path),
+              "non_existent_file_xyz_999.txt");
+    if (ui_os_file_completion(task) == UI_ERROR_NONE) {
+      ui_file_uploader_destroy(&uploader3);
+      return 1;
+    }
+    ui_file_uploader_destroy(&uploader3);
+  }
+
   return 0;
 }
 
@@ -120,7 +200,8 @@ int main(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   {
     extern ui_error_t run_os_dialogs_coverage(void);
-    run_os_dialogs_coverage();
+    if (run_os_dialogs_coverage() != UI_ERROR_NONE)
+      return 1;
   }
 #endif
   return 0;

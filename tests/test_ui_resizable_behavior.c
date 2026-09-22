@@ -14,6 +14,14 @@ static ui_error_t mock_on_resize(int new_w, int new_h, void *user_data) {
   return UI_ERROR_NONE;
 }
 
+static ui_error_t mock_on_resize_fail(int new_w, int new_h, void *user_data) {
+  if (user_data) {
+  }
+  if (new_w > 0 && new_h > 0) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
 static int test_resizable_lifecycle(void) {
   struct ui_resizable_behavior *b = NULL;
   ui_error_t rc;
@@ -72,6 +80,23 @@ static int test_resizable_dragging(void) {
   ev.type = UI_EVENT_MOUSE_UP;
   rc = ui_resizable_behavior_process_event(b, &ev, 100, 100, 5);
   if (rc != UI_ERROR_NONE)
+    return 1;
+
+  /* Test resize callback failure */
+  rc = ui_resizable_behavior_set_on_resize(b, mock_on_resize_fail, NULL);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  ev.event_data.mouse.x = 98;
+  ev.event_data.mouse.y = 50;
+  rc = ui_resizable_behavior_process_event(b, &ev, 100, 100, 5);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  ev.event_data.mouse.x = 118;
+  ev.event_data.mouse.y = 50;
+  rc = ui_resizable_behavior_process_event(b, &ev, 100, 100, 5);
+  if (rc != UI_ERROR_UNKNOWN)
     return 1;
 
   ui_resizable_behavior_destroy(b);

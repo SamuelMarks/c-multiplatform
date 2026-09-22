@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_scroll_base.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,8 +15,10 @@ static float g_last_y = 0.0f;
 
 static ui_error_t on_scroll_change(struct ui_scroll_base *scroll, float x,
                                    float y, void *user_data) {
-  (void)scroll;
-  (void)user_data;
+  if (scroll) {
+  }
+  if (user_data) {
+  }
   g_change_count++;
   g_last_x = x;
   g_last_y = y;
@@ -25,10 +28,14 @@ static ui_error_t on_scroll_change(struct ui_scroll_base *scroll, float x,
 
 static ui_error_t on_scroll_change_fail(struct ui_scroll_base *scroll, float x,
                                         float y, void *user_data) {
-  (void)scroll;
-  (void)x;
-  (void)y;
-  (void)user_data;
+  if (scroll) {
+  }
+  if (x) {
+  }
+  if (y) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -66,6 +73,9 @@ static int run_normal_tests(void) {
   if (ui_scroll_base_process_event(scroll, NULL, 0) !=
       UI_ERROR_INVALID_ARGUMENT)
     return 1;
+  if (ui_scroll_base_process_event(scroll, &ev, -1.0) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
   {
     struct ui_component *tmp_comp;
     if (ui_scroll_base_get_component(NULL, &tmp_comp) == UI_ERROR_NONE)
@@ -79,7 +89,6 @@ static int run_normal_tests(void) {
   }
 
   {
-    float val;
     if (ui_scroll_base_get_scroll_x(scroll, NULL) != UI_ERROR_INVALID_ARGUMENT)
       return 1;
     if (ui_scroll_base_get_scroll_y(scroll, NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -209,18 +218,9 @@ static int run_normal_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_scroll_base_destroy(scroll);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
-}
-
-static void test_on_change_cb(struct ui_scroll_base *scroll, void *user_data) {
-  int *called = (int *)user_data;
-  if (called) {
-    (*called)++;
-  }
 }
 
 static int run_oom_tests(void) {
@@ -238,9 +238,7 @@ static int run_oom_tests(void) {
     if (err == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_scroll_base_destroy(scroll);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     }
@@ -249,10 +247,80 @@ static int run_oom_tests(void) {
   return 0;
 }
 
-int main() {
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_scroll_mock_gesture_destroy_fail;
+extern int g_scroll_mock_comp_destroy_fail;
+extern int g_scroll_mock_set_style_fail;
+extern int g_scroll_mock_update_dom_fail;
+extern int g_scroll_test_update_dom_null;
+
+static int test_mock_failures(void) {
+  struct ui_scroll_base *scroll = NULL;
+  ui_error_t rc;
+
+  /* set_style fail in create */
+  g_scroll_mock_set_style_fail = 1;
+  rc = ui_scroll_base_create(&scroll);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed set_style failure test, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_scroll_mock_set_style_fail = 0;
+
+  rc = ui_scroll_base_create(&scroll);
+  if (rc != UI_ERROR_NONE || !scroll)
+    return 1;
+
+  /* update_dom_state failure in set_scroll_pos */
+  ui_scroll_base_set_content_size(scroll, 500.0f, 500.0f);
+  g_scroll_mock_update_dom_fail = 1;
+  rc = ui_scroll_base_set_scroll_pos(scroll, 20.0f, 20.0f);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed update_dom_state failure test, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_scroll_mock_update_dom_fail = 0;
+
+  /* update_dom_state NULL scroll failure */
+  g_scroll_test_update_dom_null = 1;
+  rc = ui_scroll_base_set_scroll_pos(scroll, 30.0f, 30.0f);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    printf("Failed update_dom_state null test, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_scroll_test_update_dom_null = 0;
+
+  g_scroll_mock_gesture_destroy_fail = 1;
+  rc = ui_scroll_base_destroy(scroll);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed gesture destroy test, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_scroll_mock_gesture_destroy_fail = 0;
+
+  rc = ui_scroll_base_create(&scroll);
+  if (rc != UI_ERROR_NONE || !scroll)
+    return 1;
+
+  g_scroll_mock_comp_destroy_fail = 1;
+  rc = ui_scroll_base_destroy(scroll);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed comp destroy test, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_scroll_mock_comp_destroy_fail = 0;
+
+  return 0;
+}
+#endif
+
+int main(void) {
   int failed = 0;
   failed |= run_normal_tests();
   failed |= run_oom_tests();
+#ifdef UI_TEST_MOCK_ALLOC
+  failed |= test_mock_failures();
+#endif
 
   if (failed) {
     printf("Tests failed.\n");

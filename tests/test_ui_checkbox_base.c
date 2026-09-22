@@ -143,14 +143,22 @@ static ui_error_t run_normal_tests(void) {
       if (rc != UI_ERROR_NONE)
         return rc;
     }
-    if (cva.register_on_change)
+    if (cva.register_on_change) {
+      rc = cva.register_on_change(NULL, NULL, NULL);
+      if (rc != UI_ERROR_INVALID_ARGUMENT)
+        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
       rc = cva.register_on_change(cb, NULL, NULL);
-    if (rc != UI_ERROR_NONE)
-      return rc;
-    if (cva.register_on_touched)
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
+    if (cva.register_on_touched) {
+      rc = cva.register_on_touched(NULL, NULL, NULL);
+      if (rc != UI_ERROR_INVALID_ARGUMENT)
+        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
       rc = cva.register_on_touched(cb, NULL, NULL);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+      if (rc != UI_ERROR_NONE)
+        return rc;
+    }
   }
 
   /* Simulate visually checked and indeterminate dash rendering logic bounds */

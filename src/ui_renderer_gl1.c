@@ -26,37 +26,77 @@
      !defined(HAVE_OPENGL))
 #undef glViewport
 /** @brief internal */
-#define glViewport(x, y, w, h) do { (void)(x); (void)(y); (void)(w); (void)(h); } while(0)
+#define glViewport(x, y, w, h)                                                 \
+  do {                                                                         \
+    if (sizeof(x) + sizeof(y) + sizeof(w) + sizeof(h) == 0) {                  \
+    }                                                                          \
+  } while (0)
 #undef glMatrixMode
 /** @brief internal */
-#define glMatrixMode(m) do { (void)(m); } while(0)
+#define glMatrixMode(m)                                                        \
+  do {                                                                         \
+    if (sizeof(m) == 0) {                                                      \
+    }                                                                          \
+  } while (0)
 #undef glLoadIdentity
 /** @brief internal */
 #define glLoadIdentity() do {} while(0)
 #undef glOrtho
 /** @brief internal */
-#define glOrtho(l, r, b, t, n, f) do { (void)(l); (void)(r); (void)(b); (void)(t); (void)(n); (void)(f); } while(0)
+#define glOrtho(l, r, b, t, n, f)                                              \
+  do {                                                                         \
+    if (sizeof(l) + sizeof(r) + sizeof(b) + sizeof(t) + sizeof(n) +            \
+            sizeof(f) ==                                                       \
+        0) {                                                                   \
+    }                                                                          \
+  } while (0)
 #undef glClearColor
 /** @brief internal */
-#define glClearColor(r, g, b, a) do { (void)(r); (void)(g); (void)(b); (void)(a); } while(0)
+#define glClearColor(r, g, b, a)                                               \
+  do {                                                                         \
+    if (sizeof(r) + sizeof(g) + sizeof(b) + sizeof(a) == 0) {                  \
+    }                                                                          \
+  } while (0)
 #undef glClear
 /** @brief internal */
-#define glClear(m) do { (void)(m); } while(0)
+#define glClear(m)                                                             \
+  do {                                                                         \
+    if (sizeof(m) == 0) {                                                      \
+    }                                                                          \
+  } while (0)
 #undef glBegin
 /** @brief internal */
-#define glBegin(m) do { (void)(m); } while(0)
+#define glBegin(m)                                                             \
+  do {                                                                         \
+    if (sizeof(m) == 0) {                                                      \
+    }                                                                          \
+  } while (0)
 #undef glColor4f
 /** @brief internal */
-#define glColor4f(r, g, b, a) do { (void)(r); (void)(g); (void)(b); (void)(a); } while(0)
+#define glColor4f(r, g, b, a)                                                  \
+  do {                                                                         \
+    if (sizeof(r) + sizeof(g) + sizeof(b) + sizeof(a) == 0) {                  \
+    }                                                                          \
+  } while (0)
 #undef glVertex2f
 /** @brief internal */
-#define glVertex2f(x, y) do { (void)(x); (void)(y); } while(0)
+#define glVertex2f(x, y)                                                       \
+  do {                                                                         \
+    if (sizeof(x) + sizeof(y) == 0) {                                          \
+    }                                                                          \
+  } while (0)
 #undef glEnd
 /** @brief internal */
 #define glEnd() do {} while(0)
 #undef glReadPixels
 /** @brief internal */
-#define glReadPixels(x, y, w, h, f, t, d) do { (void)(x); (void)(y); (void)(w); (void)(h); (void)(f); (void)(t); (void)(d); } while(0)
+#define glReadPixels(x, y, w, h, f, t, d)                                      \
+  do {                                                                         \
+    if (sizeof(x) + sizeof(y) + sizeof(w) + sizeof(h) + sizeof(f) +            \
+            sizeof(t) + sizeof(d) ==                                           \
+        0) {                                                                   \
+    }                                                                          \
+  } while (0)
 #endif
 
 #include "ui_renderer_gl1.h"
@@ -93,7 +133,8 @@ ui_error_t ui_renderer_gl1_destroy(struct ui_renderer_backend *backend) {
     return UI_ERROR_UNKNOWN;
   }
 #endif
-  (void)backend;
+  if (backend) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -393,8 +434,10 @@ static ui_error_t gl1_init(struct ui_renderer_backend *backend,
                            struct ui_window_backend *window_backend,
                            struct ui_window *window) {
   struct gl1_renderer_data *data;
-  (void)window_backend;
-  (void)window;
+  struct ui_window_backend *unused_wb = window_backend;
+  struct ui_window *unused_win = window;
+  window_backend = unused_wb;
+  window = unused_win;
 
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -458,7 +501,9 @@ static ui_error_t gl1_destroy(struct ui_renderer_backend *backend) {
  */
 static ui_error_t gl1_set_viewport(struct ui_renderer_backend *backend, int x,
                                    int y, int width, int height) {
-  (void)backend;
+  struct ui_renderer_backend *unused_b = backend;
+  backend = unused_b;
+
   glViewport(x, y, width, height);
 
 #if defined(GL_PROJECTION)
@@ -492,7 +537,9 @@ static ui_error_t gl1_set_viewport(struct ui_renderer_backend *backend, int x,
  */
 static ui_error_t gl1_clear(struct ui_renderer_backend *backend,
                             struct ui_color color) {
-  (void)backend;
+  struct ui_renderer_backend *unused_b = backend;
+  backend = unused_b;
+
   glClearColor(color.r, color.g, color.b, color.a);
   glClear(GL_COLOR_BUFFER_BIT);
   return UI_ERROR_NONE;
@@ -586,7 +633,8 @@ static ui_error_t gl1_destroy_texture(struct ui_renderer_backend *backend,
  */
 static ui_error_t gl1_set_render_target(struct ui_renderer_backend *backend,
                                         void *texture_handle) {
-  (void)texture_handle;
+  if (texture_handle) {
+  }
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

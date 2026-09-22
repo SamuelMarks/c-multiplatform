@@ -186,7 +186,7 @@ static void test_page_parse_cases(void) {
 
     g_mock_strcpy_fail = 1;
     rc = ui_css_page_parse(s, &p);
-    (void)rc;
+    TEST_ASSERT(rc != UI_ERROR_NONE);
     g_mock_strcpy_fail = 0;
 
     ui_css_page_properties_cleanup(&p);
@@ -198,7 +198,6 @@ static void test_page_parse_cases(void) {
   /* ui_css_page_properties_cleanup with NULL properties or already freed name
    */
   ui_css_page_properties_cleanup(NULL);
-
   /* Already freed */
   {
     struct ui_css_page_properties p;
@@ -208,9 +207,7 @@ static void test_page_parse_cases(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
   }
 }
 

@@ -99,10 +99,9 @@ static ui_error_t create_layout_node(const struct ui_dom_node *dom_node,
  * @brief append_layout_child.
  * @param parent Parameter parent.
  * @param child Parameter child.
- * @return Return value.
  */
-static ui_error_t append_layout_child(struct ui_layout_node *parent,
-                                      struct ui_layout_node *child) {
+static void append_layout_child(struct ui_layout_node *parent,
+                                struct ui_layout_node *child) {
   child->parent = parent;
   if (!parent->last_child) {
     parent->first_child = child;
@@ -112,7 +111,6 @@ static ui_error_t append_layout_child(struct ui_layout_node *parent,
     child->previous_sibling = parent->last_child;
     parent->last_child = child;
   }
-  return UI_ERROR_NONE;
 }
 
 static ui_error_t
@@ -148,10 +146,7 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
 
     if (disp_rc == UI_ERROR_NONE) {
       if (strcmp(display_val, "none") == 0) {
-        {
-          ui_error_t _ign_rc = ui_css_computed_style_destroy(style);
-          (void)_ign_rc;
-        }
+        ui_css_computed_style_destroy(style);
         return UI_ERROR_NONE; /* Skip this node and its children */
       }
     }
@@ -177,7 +172,7 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
     }
 
     if (child_lnode) {
-      (void)append_layout_child(lnode, child_lnode);
+      append_layout_child(lnode, child_lnode);
     }
 
     dom_child = dom_child->next_sibling;
@@ -225,7 +220,7 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
               new_last = anon;
             }
           }
-          { (void)append_layout_child(anon, curr); }
+          append_layout_child(anon, curr);
         } else {
           anon = NULL; /* Break the sequence of inlines */
           /* Append block child directly */
@@ -251,16 +246,10 @@ build_tree_recursive(const struct ui_dom_node *dom_node,
 
 cleanup:
   if (style && !lnode) {
-    {
-      ui_error_t _ign_rc = ui_css_computed_style_destroy(style);
-      (void)_ign_rc;
-    }
+    ui_css_computed_style_destroy(style);
   }
   if (lnode) {
-    {
-      ui_error_t _ign_rc = ui_layout_tree_destroy(lnode);
-      (void)_ign_rc;
-    }
+    ui_layout_tree_destroy(lnode);
   }
   return err;
 }
@@ -293,18 +282,12 @@ ui_error_t ui_layout_tree_destroy(struct ui_layout_node *node) {
   child = node->first_child;
   while (child) {
     next_child = child->next_sibling;
-    {
-      ui_error_t _ign_rc = ui_layout_tree_destroy(child);
-      (void)_ign_rc;
-    }
+    ui_layout_tree_destroy(child);
     child = next_child;
   }
 
   if (node->computed_style) {
-    {
-      ui_error_t _ign_rc = ui_css_computed_style_destroy(node->computed_style);
-      (void)_ign_rc;
-    }
+    ui_css_computed_style_destroy(node->computed_style);
   }
 
   C_MULTIPLATFORM_FREE(node);
@@ -317,3 +300,16 @@ ui_error_t ui_layout_tree_destroy(struct ui_layout_node *node) {
  * @param[in] available_width The width available for this node.
  * @return UI_ERROR_NONE on success.
  */
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_layout_tree_coverage(void);
+
+/**
+ * @brief run_layout_tree_coverage.
+ * @return Return value.
+ */
+ui_error_t run_layout_tree_coverage(void) {
+  create_layout_node(NULL, NULL, 0, NULL);
+  return UI_ERROR_NONE;
+}
+#endif

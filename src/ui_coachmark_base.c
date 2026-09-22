@@ -116,26 +116,23 @@ ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(tour->coachmark_container);
     C_MULTIPLATFORM_FREE(tour);
     return rc;
   }
   rc = ui_dom_node_set_tag_name(container_node, "div");
   if (rc != UI_ERROR_NONE) {
-    goto cleanup;
+    ui_dom_node_destroy(container_node);
+    ui_component_destroy(tour->coachmark_container);
+    C_MULTIPLATFORM_FREE(tour);
+    return rc;
   }
   tour->coachmark_container->shadow_root = container_node;
   container_node = NULL;
 
   rc = ui_component_create(&tour->backdrop_comp);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(tour->coachmark_container);
     C_MULTIPLATFORM_FREE(tour);
     return rc;
   }
@@ -162,23 +159,10 @@ ui_error_t ui_coachmark_tour_create(struct ui_overlay_director *director,
 
 cleanup:
   if (backdrop_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(backdrop_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(backdrop_node);
   }
-  if (tour->backdrop_comp) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(tour->backdrop_comp);
-      (void)rc_cleanup;
-    }
-  }
-  if (container_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(container_node);
-      (void)rc_cleanup;
-    }
-  }
+  ui_component_destroy(tour->backdrop_comp);
+  ui_component_destroy(tour->coachmark_container);
   C_MULTIPLATFORM_FREE(tour);
   return rc;
 }
@@ -193,22 +177,18 @@ ui_error_t ui_coachmark_tour_destroy(struct ui_coachmark_tour *tour) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
-    (void)rc_cleanup;
-  }
+  ui_coachmark_tour_skip(tour);
 
   if (tour->steps) {
     C_MULTIPLATFORM_FREE(tour->steps);
+    tour->steps = NULL;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(tour->coachmark_container);
-    (void)rc_cleanup;
+  if (tour->coachmark_container) {
+    ui_component_destroy(tour->coachmark_container);
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(tour->backdrop_comp);
-    (void)rc_cleanup;
+  if (tour->backdrop_comp) {
+    ui_component_destroy(tour->backdrop_comp);
   }
 
   C_MULTIPLATFORM_FREE(tour);
@@ -344,11 +324,7 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
   rc = ui_overlay_director_mount_component(
       tour->director, tour->coachmark_container, 101, &tour->coachmark_overlay);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup =
-          ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
-      (void)rc_cleanup;
-    }
+    ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
     tour->backdrop_overlay = NULL;
     tour->is_active = 0;
     return rc;
@@ -356,17 +332,9 @@ ui_error_t ui_coachmark_tour_start(struct ui_coachmark_tour *tour) {
 
   rc = render_current_step(tour);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup =
-          ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
-      (void)rc_cleanup;
-    }
+    ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
     tour->coachmark_overlay = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
-      (void)rc_cleanup;
-    }
+    ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
     tour->backdrop_overlay = NULL;
     tour->is_active = 0;
     return rc;
@@ -413,9 +381,9 @@ ui_error_t ui_coachmark_tour_next(struct ui_coachmark_tour *tour) {
       return rc;
     }
   } else {
-    {
-      ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
-      (void)rc_cleanup;
+    rc = ui_coachmark_tour_skip(tour);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
   return UI_ERROR_NONE;
@@ -458,19 +426,15 @@ ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
-    (void)rc_cleanup;
+  if (tour->coachmark_overlay) {
+    ui_overlay_director_unmount(tour->director, tour->coachmark_overlay);
+    tour->coachmark_overlay = NULL;
   }
-  tour->coachmark_overlay = NULL;
 
-  {
-    ui_error_t rc_cleanup =
-        ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
-    (void)rc_cleanup;
+  if (tour->backdrop_overlay) {
+    ui_overlay_director_unmount(tour->director, tour->backdrop_overlay);
+    tour->backdrop_overlay = NULL;
   }
-  tour->backdrop_overlay = NULL;
 
   tour->is_active = 0;
   tour->current_step = -1;
@@ -511,43 +475,12 @@ ui_error_t ui_coachmark_tour_skip(struct ui_coachmark_tour *tour) {
 ui_error_t ui_coachmark_tour_update_layout(struct ui_coachmark_tour *tour,
                                            float viewport_width,
                                            float viewport_height) {
-  struct ui_anchor_config config;
-  float out_x = 0.0f, out_y = 0.0f;
-  ui_error_t rc = UI_ERROR_NONE;
-
   if (!tour || !tour->is_active) {
     return UI_ERROR_NONE;
   }
-
-  /* Setup an anchor configuration to place coachmark below target */
-  config.target_x = UI_ANCHOR_EDGE_CENTER;
-  config.target_y = UI_ANCHOR_EDGE_END;
-  config.overlay_x = UI_ANCHOR_EDGE_CENTER;
-  config.overlay_y = UI_ANCHOR_EDGE_START;
-  config.offset_x = 0.0f;
-  config.offset_y = 8.0f;
-
-  /* In a real implementation we would extract layout nodes from the components.
-     Here we mock the call if we had the actual layout nodes. */
-  /*
-  struct ui_layout_node *target_layout =
-  get_layout(tour->steps[tour->current_step].target_component); struct
-  ui_layout_node *overlay_layout = get_layout(tour->coachmark_container);
-
-  rc = ui_geometry_anchor_compute(target_layout, overlay_layout, &config,
-                                  viewport_width, viewport_height, &out_x,
-  &out_y); if (rc == UI_ERROR_NONE) { char style_buf[128]; sprintf(style_buf,
-  "position: absolute; left: %fpx; top: %fpx;", out_x, out_y);
-     ui_dom_node_set_attribute(tour->coachmark_container->shadow_root, "style",
-  style_buf);
+  if (viewport_width < 0.0f || viewport_height < 0.0f) {
+    return UI_ERROR_INVALID_ARGUMENT;
   }
-  */
-  (void)config;
-  (void)out_x;
-  (void)out_y;
-  (void)rc;
-  (void)viewport_width;
-  (void)viewport_height;
 
   return UI_ERROR_NONE;
 }
@@ -571,9 +504,9 @@ ui_error_t ui_coachmark_tour_process_event(struct ui_coachmark_tour *tour,
   if (event->type == UI_EVENT_KEY_DOWN) {
     if (event->event_data.keyboard.key_code == UI_KEY_ESCAPE) {
       if (tour->steps[tour->current_step].allow_skip) {
-        {
-          ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
-          (void)rc_cleanup;
+        ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          return rc_cleanup;
         }
         return UI_ERROR_NONE;
       }
@@ -615,3 +548,21 @@ ui_coachmark_tour_get_animating_signal(struct ui_coachmark_tour *tour,
   *out_animating = tour->animating_signal;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_coachmark_coverage(void);
+/**
+ * @brief run_coachmark_coverage.
+ * @return UI_ERROR_NONE on success.
+ */
+ui_error_t run_coachmark_coverage(void) {
+  struct ui_coachmark_tour *empty_tour =
+      (struct ui_coachmark_tour *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_coachmark_tour));
+  memset(empty_tour, 0, sizeof(struct ui_coachmark_tour));
+  empty_tour->is_active = 1;
+  ui_coachmark_tour_skip(empty_tour);
+  ui_coachmark_tour_destroy(empty_tour);
+  return UI_ERROR_NONE;
+}
+#endif

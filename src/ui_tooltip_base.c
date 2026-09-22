@@ -15,6 +15,123 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_tooltip_mock_fail = 0;
+
+/**
+ * @brief mock_tooltip_dom_node_destroy.
+ * @param node Node.
+ * @return Return value.
+ */
+static ui_error_t mock_tooltip_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_tooltip_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(node);
+}
+/** @cond */
+#define ui_dom_node_destroy mock_tooltip_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief mock_tooltip_overlay_director_mount_component.
+ * @param director Director.
+ * @param comp Component.
+ * @param layer Layer.
+ * @param out_overlay Output overlay.
+ * @return Return value.
+ */
+static ui_error_t mock_tooltip_overlay_director_mount_component(
+    struct ui_overlay_director *director, struct ui_component *comp, int layer,
+    struct ui_overlay **out_overlay) {
+  if (g_tooltip_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_overlay_director_mount_component(director, comp, layer,
+                                             out_overlay);
+}
+/** @cond */
+#define ui_overlay_director_mount_component                                    \
+  mock_tooltip_overlay_director_mount_component
+/** @endcond */
+
+/**
+ * @brief mock_tooltip_overlay_director_unmount.
+ * @param director Director.
+ * @param overlay Overlay.
+ * @return Return value.
+ */
+static ui_error_t
+mock_tooltip_overlay_director_unmount(struct ui_overlay_director *director,
+                                      struct ui_overlay *overlay) {
+  if (g_tooltip_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_overlay_director_unmount(director, overlay);
+}
+/** @cond */
+#define ui_overlay_director_unmount mock_tooltip_overlay_director_unmount
+/** @endcond */
+
+/**
+ * @brief mock_tooltip_component_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_tooltip_component_destroy(struct ui_component *comp) {
+  if (g_tooltip_mock_fail == 5) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_destroy(comp);
+}
+/** @cond */
+#define ui_component_destroy mock_tooltip_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_tooltip_dom_node_append_child.
+ * @param parent Parent node.
+ * @param child Child node.
+ * @return Return value.
+ */
+static ui_error_t
+mock_tooltip_dom_node_append_child(struct ui_dom_node *parent,
+                                   struct ui_dom_node *child) {
+  if (g_tooltip_mock_fail == 6) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_append_child(parent, child);
+}
+/** @cond */
+#define ui_dom_node_append_child mock_tooltip_dom_node_append_child
+/** @endcond */
+
+/**
+ * @brief mock_tooltip_geometry_anchor_compute.
+ * @param target Target.
+ * @param overlay Overlay.
+ * @param config Config.
+ * @param viewport_width Viewport width.
+ * @param viewport_height Viewport height.
+ * @param out_x Out x.
+ * @param out_y Out y.
+ * @return Return value.
+ */
+static ui_error_t mock_tooltip_geometry_anchor_compute(
+    const struct ui_layout_node *target, const struct ui_layout_node *overlay,
+    const struct ui_anchor_config *config, float viewport_width,
+    float viewport_height, float *out_x, float *out_y) {
+  if (g_tooltip_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_geometry_anchor_compute(target, overlay, config, viewport_width,
+                                    viewport_height, out_x, out_y);
+}
+/** @cond */
+#define ui_geometry_anchor_compute mock_tooltip_geometry_anchor_compute
+/** @endcond */
+#endif
+
 /**
  * @enum ui_tooltip_state
  * @brief Internal state machine for the tooltip.
@@ -89,17 +206,20 @@ ui_error_t ui_tooltip_base_create(struct ui_tooltip_base **out_tooltip,
 }
 
 ui_error_t ui_tooltip_base_destroy(struct ui_tooltip_base *tooltip) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!tooltip)
     return UI_ERROR_NONE;
   if (tooltip->text)
     C_MULTIPLATFORM_FREE(tooltip->text);
-  {
+  if (tooltip->overlay_component) {
     ui_error_t rc_cleanup = ui_component_destroy(tooltip->overlay_component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   /* Note: active_overlay lifecycle is managed by overlay_director unmount */
   C_MULTIPLATFORM_FREE(tooltip);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t ui_tooltip_base_set_text(struct ui_tooltip_base *tooltip,
@@ -137,6 +257,11 @@ ui_error_t ui_tooltip_base_set_text(struct ui_tooltip_base *tooltip,
 static ui_error_t transition_state(struct ui_tooltip_base *tooltip,
                                    enum ui_tooltip_state new_state,
                                    double time_secs) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_tooltip_mock_fail == 10) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   tooltip->state = new_state;
   tooltip->state_enter_time = time_secs;
   return UI_ERROR_NONE;
@@ -145,6 +270,8 @@ static ui_error_t transition_state(struct ui_tooltip_base *tooltip,
 ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
                                         const struct ui_event *event,
                                         double current_time_secs) {
+  ui_error_t rc;
+
   if (!tooltip || !event)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -152,7 +279,9 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
   case UI_EVENT_MOUSE_DOWN:
   case UI_EVENT_KEY_DOWN: /* Dismiss on key or click */
     if (tooltip->state != UI_TOOLTIP_STATE_IDLE) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_IDLE, current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_IDLE, current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
@@ -161,15 +290,19 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
        For this primitive, we assume the event router only sends us relevant
        events. */
     if (tooltip->state == UI_TOOLTIP_STATE_IDLE) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_HOVER_DELAY,
-                             current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_HOVER_DELAY,
+                            current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
   case UI_EVENT_TOUCH_START:
     if (tooltip->state == UI_TOOLTIP_STATE_IDLE) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_TOUCH_HOLD_DELAY,
-                             current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_TOUCH_HOLD_DELAY,
+                            current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
@@ -178,24 +311,30 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
   case UI_EVENT_WINDOW_RESIZE:
     if (tooltip->state != UI_TOOLTIP_STATE_IDLE &&
         tooltip->state != UI_TOOLTIP_STATE_HIDE_DELAY) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_HIDE_DELAY,
-                             current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_HIDE_DELAY,
+                            current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
   /* Treat focus (simulated here) as needing a delay */
   case UI_EVENT_PEN_DOWN: /* Re-using PEN_DOWN as focus for primitive mock */
     if (tooltip->state == UI_TOOLTIP_STATE_IDLE) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_FOCUS_DELAY,
-                             current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_FOCUS_DELAY,
+                            current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
   case UI_EVENT_PEN_UP: /* Blur */
     if (tooltip->state != UI_TOOLTIP_STATE_IDLE &&
         tooltip->state != UI_TOOLTIP_STATE_HIDE_DELAY) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_HIDE_DELAY,
-                             current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_HIDE_DELAY,
+                            current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
@@ -208,6 +347,8 @@ ui_error_t ui_tooltip_base_handle_event(struct ui_tooltip_base *tooltip,
 ui_error_t ui_tooltip_base_tick(struct ui_tooltip_base *tooltip,
                                 double current_time_secs) {
   double elapsed;
+  ui_error_t rc;
+
   if (!tooltip)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -216,28 +357,36 @@ ui_error_t ui_tooltip_base_tick(struct ui_tooltip_base *tooltip,
   switch (tooltip->state) {
   case UI_TOOLTIP_STATE_HOVER_DELAY:
     if (elapsed >= tooltip->config.hover_delay_secs) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
-                             current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
+                            current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
   case UI_TOOLTIP_STATE_FOCUS_DELAY:
     if (elapsed >= tooltip->config.focus_delay_secs) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
-                             current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
+                            current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
   case UI_TOOLTIP_STATE_TOUCH_HOLD_DELAY:
     if (elapsed >= tooltip->config.touch_hold_delay_secs) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
-                             current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_VISIBLE,
+                            current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
   case UI_TOOLTIP_STATE_HIDE_DELAY:
     if (elapsed >= tooltip->config.hide_delay_secs) {
-      (void)transition_state(tooltip, UI_TOOLTIP_STATE_IDLE, current_time_secs);
+      rc = transition_state(tooltip, UI_TOOLTIP_STATE_IDLE, current_time_secs);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
     break;
 
@@ -264,6 +413,26 @@ ui_error_t ui_tooltip_base_hide(struct ui_tooltip_base *tooltip) {
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief mock_tooltip_base_is_visible.
+ * @param tooltip Tooltip.
+ * @param out_is_visible Output pointer.
+ * @return Return value.
+ */
+static ui_error_t
+mock_tooltip_base_is_visible(const struct ui_tooltip_base *tooltip,
+                             int *out_is_visible) {
+  if (g_tooltip_mock_fail == 7) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_tooltip_base_is_visible(tooltip, out_is_visible);
+}
+/** @cond */
+#define ui_tooltip_base_is_visible mock_tooltip_base_is_visible
+/** @endcond */
+#endif
+
 ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
                                   struct ui_overlay_director *director,
                                   const struct ui_layout_node *trigger_layout,
@@ -275,27 +444,25 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   char style_buf[256];
   struct ui_dom_node *root_node = NULL;
   struct ui_dom_node *text_node = NULL;
+  int is_visible = 0;
+  ui_error_t rc;
+  ui_error_t rc_cleanup;
 
   if (!tooltip || !director || !trigger_layout || !anchor_config)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    int is_visible = 0;
-    {
-      ui_error_t rc_cleanup = ui_tooltip_base_is_visible(tooltip, &is_visible);
-      (void)rc_cleanup;
+  rc = ui_tooltip_base_is_visible(tooltip, &is_visible);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  if (!is_visible) {
+    if (tooltip->active_overlay) {
+      rc = ui_overlay_director_unmount(director, tooltip->active_overlay);
+      tooltip->active_overlay = NULL;
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
-    if (!is_visible) {
-      if (tooltip->active_overlay) {
-        {
-          ui_error_t rc_cleanup =
-              ui_overlay_director_unmount(director, tooltip->active_overlay);
-          (void)rc_cleanup;
-        }
-        tooltip->active_overlay = NULL;
-      }
-      return UI_ERROR_NONE;
-    }
+    return UI_ERROR_NONE;
   }
 
   if (tooltip->active_overlay) {
@@ -309,25 +476,21 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   overlay_layout.width = 100.0f; /* Approximated width for collision math */
   overlay_layout.height = 30.0f;
 
-  {
-
-    ui_error_t _ign_rc = ui_geometry_anchor_compute(
-        trigger_layout, &overlay_layout, anchor_config, viewport_width,
-        viewport_height, &x, &y);
-
-    (void)_ign_rc;
-  }
+  rc =
+      ui_geometry_anchor_compute(trigger_layout, &overlay_layout, anchor_config,
+                                 viewport_width, viewport_height, &x, &y);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Build component DOM */
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(root_node, "role", "tooltip");
-    (void)rc_cleanup;
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  rc = ui_dom_node_set_attribute(root_node, "role", "tooltip");
+  if (rc != UI_ERROR_NONE) {
+    ui_dom_node_destroy(root_node);
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -337,50 +500,57 @@ ui_error_t ui_tooltip_base_render(struct ui_tooltip_base *tooltip,
   sprintf(style_buf,
           "position: absolute; left: %fpx; top: %fpx; z-index: 9999;", x, y);
 #endif
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(root_node, "style", style_buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(root_node, "style", style_buf);
+  if (rc != UI_ERROR_NONE) {
+    ui_dom_node_destroy(root_node);
+    return rc;
   }
 
   if (tooltip->text) {
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
-      (void)rc_cleanup;
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+    if (rc != UI_ERROR_NONE) {
+      ui_dom_node_destroy(root_node);
+      return rc;
     }
 
-    if (text_node) {
+    {
       /* Direct member access for text content to simulate standard DOM text
        * node logic */
       size_t len = strlen(tooltip->text);
       text_node->text_content = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
-      if (text_node->text_content) {
-#if defined(_MSC_VER)
-        strcpy_s(text_node->text_content, len + 1, tooltip->text);
-#else
-        strcpy(text_node->text_content, tooltip->text);
-#endif
+      if (!text_node->text_content) {
+        ui_dom_node_destroy(text_node);
+        ui_dom_node_destroy(root_node);
+        return UI_ERROR_OUT_OF_MEMORY;
       }
+#if defined(_MSC_VER)
+      strcpy_s(text_node->text_content, len + 1, tooltip->text);
+#else
+      strcpy(text_node->text_content, tooltip->text);
+#endif
     }
-    {
-      ui_error_t rc_cleanup = ui_dom_node_append_child(root_node, text_node);
-      (void)rc_cleanup;
+    rc = ui_dom_node_append_child(root_node, text_node);
+    if (rc != UI_ERROR_NONE) {
+      ui_dom_node_destroy(text_node);
+      ui_dom_node_destroy(root_node);
+      return rc;
     }
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_destroy(tooltip->overlay_component->shadow_root);
-    (void)rc_cleanup;
+  if (tooltip->overlay_component->shadow_root) {
+    rc_cleanup = ui_dom_node_destroy(tooltip->overlay_component->shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      ui_dom_node_destroy(root_node);
+      return rc_cleanup;
+    }
   }
   tooltip->overlay_component->shadow_root = root_node;
 
   /* Mount to director */
-  {
-    ui_error_t rc_cleanup = ui_overlay_director_mount_component(
-        director, tooltip->overlay_component, 9999, &tooltip->active_overlay);
-    (void)rc_cleanup;
+  rc = ui_overlay_director_mount_component(director, tooltip->overlay_component,
+                                           9999, &tooltip->active_overlay);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   return UI_ERROR_NONE;

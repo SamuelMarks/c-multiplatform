@@ -2,6 +2,7 @@
 #include "../include/ui_computed.h"
 #include "../include/ui_error.h"
 #include "../include/ui_arena.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "../include/ui_atomic.h"
@@ -30,19 +31,23 @@ struct mock_ui_computed {
 };
 
 static ui_error_t dummy_notify(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t dummy_notify_fail(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_NOT_FOUND;
 }
 
 static ui_error_t dummy_compute_fail(void *user_data,
                                      union ui_signal_payload *out_val) {
-  (void)user_data;
-  (void)out_val;
+  if (user_data) {
+  }
+  if (out_val) {
+  }
   return UI_ERROR_NOT_FOUND;
 }
 
@@ -124,26 +129,20 @@ static int test_subscribers(void) {
 
     {
       ui_error_t rc_cleanup = ui_computed_destroy(comp2);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_computed_destroy(comp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_computed_create(NULL, dummy_compute_fail, NULL, UI_SIGNAL_TYPE_INT32,
                      UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
   ui_computed_get(comp, &out_val);
   {
     ui_error_t rc_cleanup = ui_computed_destroy(comp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -182,17 +181,13 @@ static int test_computed(void) {
     ui_computed_get(mtcomp, &out_val);
     {
       ui_error_t rc_cleanup = ui_computed_destroy(mtcomp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_computed_destroy(comp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Null tests */
@@ -202,9 +197,7 @@ static int test_computed(void) {
   ui_computed_get(comp, NULL);
   {
     ui_error_t rc_cleanup = ui_computed_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
   /* Malloc fails */
@@ -228,9 +221,7 @@ static int test_computed(void) {
 
     if (comp) {
       ui_error_t rc_cleanup = ui_computed_destroy(comp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     comp = NULL;
@@ -238,16 +229,12 @@ static int test_computed(void) {
                        UI_SIGNAL_MODE_SINGLE_THREADED, &comp);
     if (comp) {
       ui_error_t rc_cleanup = ui_computed_destroy(comp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 

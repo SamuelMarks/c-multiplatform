@@ -1,8 +1,19 @@
 /* clang-format off */
 #include "ui_divider_base.h"
+#include "ui_component.h"
+#include "ui_dom_node.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
+
+struct ui_divider_base {
+  struct ui_component *component;
+  struct ui_dom_node *root_node;
+  enum ui_divider_orientation orientation;
+  int inset;
+  struct ui_signal *data_signal;
+};
 
 extern int g_malloc_fail_countdown;
 
@@ -74,6 +85,35 @@ static int run_normal_tests(void) {
 
   if (ui_divider_base_destroy(divider) != UI_ERROR_NONE)
     return 1;
+
+  /* Test destroying divider with NULL component */
+  rc = ui_divider_base_create(&divider);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  rc = ui_component_destroy(divider->component);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  divider->component = NULL;
+  divider->root_node = NULL;
+  rc = ui_divider_base_destroy(divider);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_divider_mock_fail;
+    g_divider_mock_fail = 1;
+    rc = ui_divider_base_create(&divider);
+    if (rc != UI_ERROR_UNKNOWN)
+      return 1;
+    g_divider_mock_fail = 2;
+    rc = ui_divider_base_create(&divider);
+    if (rc != UI_ERROR_UNKNOWN)
+      return 1;
+    g_divider_mock_fail = 0;
+  }
+#endif
+
   return 0;
 }
 
@@ -121,9 +161,7 @@ static int run_oom_tests(void) {
 
       {
         ui_error_t rc_cleanup = ui_divider_base_destroy(divider);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }

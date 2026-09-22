@@ -15,8 +15,10 @@ static int close_count = 0;
 
 static ui_error_t on_close(struct ui_action_sheet_base *sheet,
                            void *user_data) {
-  (void)sheet;
-  (void)user_data;
+  if (sheet) {
+  }
+  if (user_data) {
+  }
   close_count++;
   return UI_ERROR_NONE;
 }
@@ -36,6 +38,8 @@ static void test_action_sheet_edge_cases(void) {
 
   rc = ui_action_sheet_base_create(&sheet);
   assert(rc == UI_ERROR_NONE);
+  assert(ui_action_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
+  assert(ui_action_sheet_base_set_open(sheet, 0) == UI_ERROR_NONE);
 
   assert(ui_action_sheet_base_add_action(NULL, NULL) ==
          UI_ERROR_INVALID_ARGUMENT);
@@ -95,9 +99,7 @@ static void test_action_sheet_edge_cases(void) {
 
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 2. OOM in create */
@@ -109,9 +111,7 @@ static void test_action_sheet_edge_cases(void) {
     } else if (rc == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     } else {
@@ -123,6 +123,8 @@ static void test_action_sheet_edge_cases(void) {
   /* 3. cancel action replacing existing */
   rc = ui_action_sheet_base_create(&sheet);
   assert(rc == UI_ERROR_NONE);
+  assert(ui_action_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
+  assert(ui_action_sheet_base_set_open(sheet, 0) == UI_ERROR_NONE);
 
   ui_component_create(&cancel);
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cancel->shadow_root);
@@ -136,31 +138,260 @@ static void test_action_sheet_edge_cases(void) {
 
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   /* cancel was removed from the tree, so its shadow_root is still valid and
    * needs to be freed */
   {
     ui_error_t rc_cleanup = ui_component_destroy(cancel);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   cancel2->shadow_root = NULL;
   {
     ui_error_t rc_cleanup = ui_component_destroy(cancel2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    assert(rc_cleanup == UI_ERROR_NONE);
+  }
+}
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_action_sheet_mock_fail;
+
+static ui_error_t
+test_action_sheet_failing_on_close(struct ui_action_sheet_base *sheet,
+                                   void *user_data) {
+  if (sheet || user_data) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static int test_action_sheet_mock_failures(void) {
+  struct ui_action_sheet_base *sheet = NULL;
+  struct ui_component *comp = NULL;
+  struct ui_focus_manager *focus = NULL;
+  struct ui_keyboard_responder *keyboard = NULL;
+  struct ui_event ev;
+  ui_error_t rc;
+
+  rc = ui_focus_manager_create(&focus);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_keyboard_responder_create(&keyboard);
+  if (rc != UI_ERROR_NONE) {
+    ui_focus_manager_destroy(focus);
+    return 1;
+  }
+
+  /* 1. ui_action_sheet_base_create failure branches */
+  /* append_child fails on first append */
+  g_action_sheet_mock_fail = 1;
+  rc = ui_action_sheet_base_create(&sheet);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* append_child fails on second append */
+  g_action_sheet_mock_fail = 10;
+  rc = ui_action_sheet_base_create(&sheet);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* set_content fails */
+  g_action_sheet_mock_fail = 2;
+  rc = ui_action_sheet_base_create(&sheet);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* set_on_close fails */
+  g_action_sheet_mock_fail = 3;
+  rc = ui_action_sheet_base_create(&sheet);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* focus_trap_create fails */
+  g_action_sheet_mock_fail = 4;
+  rc = ui_action_sheet_base_create(&sheet);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* Successful create */
+  rc = ui_action_sheet_base_create(&sheet);
+  if (rc != UI_ERROR_NONE) {
+    ui_keyboard_responder_destroy(keyboard);
+    ui_focus_manager_destroy(focus);
+    return 1;
+  }
+
+  rc = ui_action_sheet_base_attach_focus_and_keyboard(sheet, focus, keyboard);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* 2. set_open failures */
+  /* activate fails */
+  g_action_sheet_mock_fail = 6;
+  rc = ui_action_sheet_base_set_open(sheet, 1);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* set_open(1) succeeds */
+  rc = ui_action_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* deactivate fails in set_open(0) */
+  g_action_sheet_mock_fail = 5;
+  rc = ui_action_sheet_base_set_open(sheet, 0);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* 3. remove_child failure in set_cancel_action */
+  rc = ui_component_create(&comp);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &comp->shadow_root);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_action_sheet_base_set_cancel_action(sheet, comp);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* Setting cancel action again removes the old child */
+  g_action_sheet_mock_fail = 7;
+  rc = ui_action_sheet_base_set_cancel_action(sheet, comp);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* 4. process_event failures */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+
+  /* is_open fails */
+  g_action_sheet_mock_fail = 8;
+  rc = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* set_open fails during ESC */
+  g_action_sheet_mock_fail = 9;
+  rc = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* Re-open sheet */
+  rc = ui_action_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  /* on_bottom_sheet_close fails (deactivate fails) */
+  g_action_sheet_mock_fail = 11;
+  rc = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* on_close callback fails */
+  rc = ui_action_sheet_base_set_open(sheet, 1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_action_sheet_base_set_on_close(
+      sheet, test_action_sheet_failing_on_close, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_action_sheet_base_process_event(sheet, &ev, 0.0);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_action_sheet_base_set_on_close(sheet, NULL, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* Test close callback directly with nulls and valid */
+  {
+    extern ui_bottom_sheet_on_close_t g_action_sheet_close_cb;
+    if (g_action_sheet_close_cb) {
+      rc = g_action_sheet_close_cb(NULL, sheet);
+      if (rc != UI_ERROR_INVALID_ARGUMENT) {
+        return 1;
+      }
+      rc = g_action_sheet_close_cb((struct ui_bottom_sheet_base *)1, NULL);
+      if (rc != UI_ERROR_INVALID_ARGUMENT) {
+        return 1;
+      }
+      rc = g_action_sheet_close_cb((struct ui_bottom_sheet_base *)1, sheet);
+      if (rc != UI_ERROR_NONE) {
+        return 1;
+      }
+      {
+        struct ui_action_sheet_base *temp_sheet = NULL;
+        rc = ui_action_sheet_base_create(&temp_sheet);
+        if (rc != UI_ERROR_NONE) {
+          return 1;
+        }
+        rc = g_action_sheet_close_cb((struct ui_bottom_sheet_base *)1,
+                                     temp_sheet);
+        if (rc != UI_ERROR_NONE) {
+          return 1;
+        }
+        rc = ui_action_sheet_base_destroy(temp_sheet);
+        if (rc != UI_ERROR_NONE) {
+          return 1;
+        }
+      }
     }
   }
 
-#ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_action_sheet_coverage(void);
-  run_action_sheet_coverage();
-#endif
+  /* 5. destroy with deactivate failure */
+  g_action_sheet_mock_fail = 5;
+  rc = ui_action_sheet_base_destroy(sheet);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_action_sheet_mock_fail = 0;
+
+  /* destroy for real */
+  rc = ui_action_sheet_base_destroy(sheet);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* Clean up standalone component */
+  comp->shadow_root = NULL;
+  ui_component_destroy(comp);
+
+  ui_keyboard_responder_destroy(keyboard);
+  ui_focus_manager_destroy(focus);
+  return 0;
 }
+#endif
 
 int main(void) {
   struct ui_action_sheet_base *sheet = NULL;
@@ -181,6 +412,8 @@ int main(void) {
 
   rc = ui_action_sheet_base_create(&sheet);
   assert(rc == UI_ERROR_NONE);
+  assert(ui_action_sheet_base_set_open(sheet, 1) == UI_ERROR_NONE);
+  assert(ui_action_sheet_base_set_open(sheet, 0) == UI_ERROR_NONE);
   assert(sheet != NULL);
 
   rc = ui_action_sheet_base_attach_focus_and_keyboard(sheet, focus, keyboard);
@@ -254,38 +487,34 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_action_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   action1->shadow_root = NULL; /* was destroyed by action sheet */
   cancel->shadow_root = NULL;  /* was destroyed by action sheet */
   {
     ui_error_t rc_cleanup = ui_component_destroy(action1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(cancel);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_focus_manager_destroy(focus);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_keyboard_responder_destroy(keyboard);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   printf("test_ui_action_sheet_base passed\n");
+#ifdef UI_TEST_MOCK_ALLOC
+  if (test_action_sheet_mock_failures() != 0) {
+    printf("test_action_sheet_mock_failures failed\n");
+    return 1;
+  }
+#endif
   return 0;
 }

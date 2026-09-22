@@ -1,35 +1,54 @@
 /* clang-format off */
+#include "greatest.h"
 #include "ui_table_base.h"
 #include "ui_dom_node.h"
 #include "ui_error.h"
+#include "ui_computed.h"
+#include "ui_test_mock_mem.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
+struct ui_table_base {
+  struct ui_table_model model;
+  struct ui_table_column_config *col_configs;
+  size_t num_cols;
+  struct ui_table_sort_config sort_config;
+  struct ui_table_pagination_config pagination_config;
+  struct ui_selection_model *selection_model;
+  struct ui_computed *data_signal;
+};
+
 extern int g_malloc_fail_countdown;
 int g_mock_append_child_fail_countdown = -1;
-
-#define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
-#define ACCUM_FAIL(failed, expr) failed |= (expr)
-
-static int test_sort_render_impl(void);
+extern int g_table_mock_fail;
+extern int g_table_mock_set_attr_fail_target;
 
 static size_t mock_get_row_count(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return 105; /* 105 rows for pagination tests */
 }
 
 static size_t mock_get_col_count(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return 3;
+}
+
+static size_t mock_get_zero_count(void *user_data) {
+  if (user_data) {
+  }
+  return 0;
 }
 
 static ui_error_t mock_render_cell(size_t row, size_t col,
                                    struct ui_dom_node *cell_node,
                                    void *user_data) {
   char buf[64];
-  (void)user_data;
+  if (user_data) {
+  }
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "Cell %lu,%lu", (unsigned long)row,
             (unsigned long)col);
@@ -39,11 +58,26 @@ static ui_error_t mock_render_cell(size_t row, size_t col,
   return ui_dom_node_set_attribute(cell_node, "data-content", buf);
 }
 
+static ui_error_t mock_render_cell_fail(size_t row, size_t col,
+                                        struct ui_dom_node *cell_node,
+                                        void *user_data) {
+  int unused_r = (int)row;
+  int unused_c = (int)col;
+  struct ui_dom_node *unused_n = cell_node;
+  void *unused_u = user_data;
+  row = (size_t)unused_r;
+  col = (size_t)unused_c;
+  cell_node = unused_n;
+  user_data = unused_u;
+  return UI_ERROR_UNKNOWN;
+}
+
 static ui_error_t mock_render_header(size_t col,
                                      struct ui_dom_node *header_node,
                                      void *user_data) {
   char buf[64];
-  (void)user_data;
+  if (user_data) {
+  }
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "Header %lu", (unsigned long)col);
 #else
@@ -52,7 +86,19 @@ static ui_error_t mock_render_header(size_t col,
   return ui_dom_node_set_attribute(header_node, "data-content", buf);
 }
 
-static int test_null_args(void) {
+static ui_error_t mock_render_header_fail(size_t col,
+                                          struct ui_dom_node *header_node,
+                                          void *user_data) {
+  int unused_c = (int)col;
+  struct ui_dom_node *unused_n = header_node;
+  void *unused_u = user_data;
+  col = (size_t)unused_c;
+  header_node = unused_n;
+  user_data = unused_u;
+  return UI_ERROR_UNKNOWN;
+}
+
+TEST test_table_null_args(void) {
   struct ui_table_base *table = NULL;
   struct ui_table_model model;
   struct ui_table_model bad_model;
@@ -60,7 +106,7 @@ static int test_null_args(void) {
   struct ui_table_column_config col_cfg;
   struct ui_table_sort_config sort_cfg;
   struct ui_table_pagination_config page_cfg;
-  int failed = 0;
+  ui_error_t rc;
 
   model.get_row_count = mock_get_row_count;
   model.get_column_count = mock_get_col_count;
@@ -70,72 +116,73 @@ static int test_null_args(void) {
 
   bad_model = model;
   bad_model.get_row_count = NULL;
-  failed |=
-      (ui_table_base_create(&table, &bad_model) != UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_create(&table, &bad_model));
 
   bad_model = model;
   bad_model.get_column_count = NULL;
-  failed |=
-      (ui_table_base_create(&table, &bad_model) != UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_create(&table, &bad_model));
 
   bad_model = model;
   bad_model.render_cell = NULL;
-  failed |=
-      (ui_table_base_create(&table, &bad_model) != UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_create(&table, &bad_model));
 
   bad_model = model;
   bad_model.render_header = NULL;
-  failed |=
-      (ui_table_base_create(&table, &bad_model) != UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_create(&table, &bad_model));
 
-  failed |= (ui_table_base_create(NULL, &model) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_create(&table, NULL) != UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_table_base_create(NULL, &model));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_table_base_create(&table, NULL));
 
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  ASSERT_EQ(UI_ERROR_NONE, ui_table_base_destroy(NULL));
 
-  failed |= (ui_table_base_get_selection_model(NULL, &sel_model) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_set_column_config(NULL, 0, &col_cfg) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_set_sort_config(NULL, &sort_cfg) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_set_pagination_config(NULL, &page_cfg) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_render(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_bind_data(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_get_selection_model(NULL, &sel_model));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_set_column_config(NULL, 0, &col_cfg));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_set_sort_config(NULL, &sort_cfg));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_set_pagination_config(NULL, &page_cfg));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_table_base_render(NULL, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_table_base_bind_data(NULL, NULL));
 
-  ACCUM_ERR(failed, ui_table_base_create(&table, &model));
-  failed |= (ui_table_base_get_selection_model(table, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_set_column_config(table, 0, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |=
-      (ui_table_base_set_sort_config(table, NULL) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_set_pagination_config(table, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_table_base_render(table, NULL) != UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_table_base_create(&table, &model);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return failed;
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_get_selection_model(table, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_set_column_config(table, 0, NULL));
+  ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS,
+            ui_table_base_set_column_config(table, 100, &col_cfg));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_set_sort_config(table, NULL));
+  sort_cfg.active_column_index = 100;
+  sort_cfg.direction = UI_TABLE_SORT_ASCENDING;
+  ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS,
+            ui_table_base_set_sort_config(table, &sort_cfg));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_table_base_set_pagination_config(table, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_table_base_render(table, NULL));
+  ASSERT_EQ(UI_ERROR_NONE, ui_table_base_bind_data(table, NULL));
+
+  rc = ui_table_base_destroy(table);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
 }
 
-static int test_table_render_aria(void) {
+TEST test_table_render_and_aria(void) {
   struct ui_table_model model;
   struct ui_table_base *table;
   struct ui_dom_node *container;
   struct ui_table_sort_config sort_cfg;
-  struct ui_selection_model *sel_model;
-  int failed = 0;
+  struct ui_selection_model *sel_model = NULL;
+  ui_error_t rc;
 
   model.get_row_count = mock_get_row_count;
   model.get_column_count = mock_get_col_count;
@@ -143,97 +190,53 @@ static int test_table_render_aria(void) {
   model.render_header = mock_render_header;
   model.user_data = NULL;
 
-  ACCUM_ERR(failed, ui_table_base_create(&table, &model));
+  rc = ui_table_base_create(&table, &model);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  sort_cfg.active_column_index = 1;
-  sort_cfg.direction = UI_TABLE_SORT_DESCENDING;
-  ACCUM_ERR(failed, ui_table_base_set_sort_config(table, &sort_cfg));
+  rc = ui_table_base_get_selection_model(table, &sel_model);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT(sel_model != NULL);
 
+  rc = ui_selection_model_select(sel_model, (void *)(size_t)0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  sort_cfg.active_column_index = 0;
   sort_cfg.direction = UI_TABLE_SORT_ASCENDING;
-  ACCUM_ERR(failed, ui_table_base_set_sort_config(table, &sort_cfg));
+  rc = ui_table_base_set_sort_config(table, &sort_cfg);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  sort_cfg.active_column_index = 99; /* OOB */
-  failed |= (ui_table_base_set_sort_config(table, &sort_cfg) !=
-             UI_ERROR_OUT_OF_BOUNDS);
+  sort_cfg.direction = UI_TABLE_SORT_DESCENDING;
+  rc = ui_table_base_set_sort_config(table, &sort_cfg);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Select a row to hit is_selected */
-  ACCUM_ERR(failed, ui_table_base_get_selection_model(table, &sel_model));
-  ui_selection_model_select(sel_model, (void *)(size_t)2);
+  sort_cfg.direction = UI_TABLE_SORT_NONE;
+  rc = ui_table_base_set_sort_config(table, &sort_cfg);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Bind data */
-  ACCUM_ERR(failed, ui_table_base_bind_data(table, NULL));
+  rc = ui_table_base_destroy(table);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
-  ACCUM_ERR(failed, ui_table_base_render(table, container));
-
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return failed;
+  PASS();
 }
 
-static int test_table_pagination(void) {
+TEST test_table_pagination_and_sizing(void) {
   struct ui_table_model model;
   struct ui_table_base *table;
   struct ui_dom_node *container;
   struct ui_table_pagination_config page_cfg;
-  int failed = 0;
-
-  model.get_row_count = mock_get_row_count;
-  model.get_column_count = mock_get_col_count;
-  model.render_cell = mock_render_cell;
-  model.render_header = mock_render_header;
-  model.user_data = NULL;
-
-  ACCUM_ERR(failed, ui_table_base_create(&table, &model));
-
-  page_cfg.page_size = 10;
-  page_cfg.current_page = 10; /* Last page, should show 5 items */
-  ACCUM_ERR(failed, ui_table_base_set_pagination_config(table, &page_cfg));
-
-  ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
-  ACCUM_ERR(failed, ui_table_base_render(table, container));
-
-  /* Page that does not exceed bounds (e.g. page 0) */
-  page_cfg.current_page = 0;
-  ACCUM_ERR(failed, ui_table_base_set_pagination_config(table, &page_cfg));
-  ACCUM_ERR(failed, ui_table_base_render(table, container));
-
-  /* Page past the end */
-  page_cfg.current_page = 20;
-  ACCUM_ERR(failed, ui_table_base_set_pagination_config(table, &page_cfg));
-  ACCUM_ERR(failed, ui_table_base_render(table, container));
-
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return failed;
-}
-
-static int test_table_column_sizing(void) {
-  struct ui_table_model model;
-  struct ui_table_base *table;
-  struct ui_dom_node *container;
   struct ui_table_column_config col_cfg;
-  int failed = 0;
+  ui_error_t rc;
 
   model.get_row_count = mock_get_row_count;
   model.get_column_count = mock_get_col_count;
@@ -241,141 +244,75 @@ static int test_table_column_sizing(void) {
   model.render_header = mock_render_header;
   model.user_data = NULL;
 
-  ACCUM_ERR(failed, ui_table_base_create(&table, &model));
+  rc = ui_table_base_create(&table, &model);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Test flex and fixed column sizing */
+  col_cfg.sizing = UI_TABLE_COLUMN_FLEX;
+  col_cfg.width = 2.0f;
+  col_cfg.min_width = 10.0f;
+  col_cfg.max_width = 100.0f;
+  rc = ui_table_base_set_column_config(table, 0, &col_cfg);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
   col_cfg.sizing = UI_TABLE_COLUMN_FIXED;
-  col_cfg.width = 250.0f;
-  col_cfg.min_width = 100.0f;
-  col_cfg.max_width = 500.0f;
-  ACCUM_ERR(failed, ui_table_base_set_column_config(table, 0, &col_cfg));
+  col_cfg.width = 150.0f;
+  rc = ui_table_base_set_column_config(table, 1, &col_cfg);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  failed |= (ui_table_base_set_column_config(table, 5, &col_cfg) !=
-             UI_ERROR_OUT_OF_BOUNDS);
+  /* Pagination: page 0, size 10 */
+  page_cfg.page_size = 10;
+  page_cfg.current_page = 0;
+  rc = ui_table_base_set_pagination_config(table, &page_cfg);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
-  ACCUM_ERR(failed, ui_table_base_render(table, container));
+  /* Pagination: last page extending past total rows */
+  page_cfg.page_size = 10;
+  page_cfg.current_page = 10;
+  rc = ui_table_base_set_pagination_config(table, &page_cfg);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return failed;
+  /* Pagination: current page far beyond total rows */
+  page_cfg.page_size = 10;
+  page_cfg.current_page = 50;
+  rc = ui_table_base_set_pagination_config(table, &page_cfg);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_table_base_destroy(table);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Table with zero columns and zero rows */
+  model.get_row_count = mock_get_zero_count;
+  model.get_column_count = mock_get_zero_count;
+  rc = ui_table_base_create(&table, &model);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_table_base_destroy(table);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
 }
 
-static size_t mock_get_zero_col_count(void *user_data) {
-  (void)user_data;
-  return 0;
-}
-
-static int test_zero_cols(void) {
+TEST test_table_error_branches(void) {
   struct ui_table_model model;
   struct ui_table_base *table;
   struct ui_dom_node *container;
-  int failed = 0;
-
-  model.get_row_count = mock_get_row_count;
-  model.get_column_count = mock_get_zero_col_count;
-  model.render_cell = mock_render_cell;
-  model.render_header = mock_render_header;
-  model.user_data = NULL;
-
-  ACCUM_ERR(failed, ui_table_base_create(&table, &model));
-  ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
-  ACCUM_ERR(failed, ui_table_base_render(table, container));
-
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return failed;
-}
-
-static ui_error_t mock_render_cell_fail(size_t row, size_t col,
-                                        struct ui_dom_node *cell_node,
-                                        void *user_data) {
-  (void)row;
-  (void)col;
-  (void)cell_node;
-  (void)user_data;
-  return UI_ERROR_UNKNOWN;
-}
-static ui_error_t mock_render_header_fail(size_t col,
-                                          struct ui_dom_node *header_node,
-                                          void *user_data) {
-  (void)col;
-  (void)header_node;
-  (void)user_data;
-  return UI_ERROR_UNKNOWN;
-}
-
-static int test_render_fails(void) {
-  struct ui_table_model model;
-  struct ui_table_base *table;
-  struct ui_dom_node *container;
-  int failed = 0;
-
-  model.get_row_count = mock_get_row_count;
-  model.get_column_count = mock_get_col_count;
-  model.render_cell = mock_render_cell;
-  model.render_header = mock_render_header;
-  model.user_data = NULL;
-
-  ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
-
-  /* Test header render fail */
-  model.render_header = mock_render_header_fail;
-  ACCUM_ERR(failed, ui_table_base_create(&table, &model));
-  failed |= (ui_table_base_render(table, container) != UI_ERROR_UNKNOWN);
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-
-  /* Test cell render fail */
-  model.render_header = mock_render_header;
-  model.render_cell = mock_render_cell_fail;
-  ACCUM_ERR(failed, ui_table_base_create(&table, &model));
-  failed |= (ui_table_base_render(table, container) != UI_ERROR_UNKNOWN);
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return failed;
-}
-
-static int test_oom(void) {
-  int failed = 0;
-#ifdef UI_TEST_MOCK_ALLOC
-  struct ui_table_model model;
-  struct ui_table_base *table;
-  struct ui_dom_node *container;
+  ui_error_t rc;
   int i;
 
   model.get_row_count = mock_get_row_count;
@@ -384,56 +321,107 @@ static int test_oom(void) {
   model.render_header = mock_render_header;
   model.user_data = NULL;
 
-  g_malloc_fail_countdown = 0;
-  failed |= (ui_table_base_create(&table, &model) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+  rc = ui_table_base_create(&table, &model);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  g_malloc_fail_countdown = 1;
-  failed |= (ui_table_base_create(&table, &model) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+  /* Select row 0 so is_selected attribute branch is tested */
+  rc = ui_selection_model_select(table->selection_model, (void *)(size_t)0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  g_malloc_fail_countdown = 2; /* inside col_configs array */
-  failed |= (ui_table_base_create(&table, &model) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+  /* 1. Header render failure */
+  table->model.render_header = mock_render_header_fail;
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  table->model.render_header = mock_render_header;
 
-  ACCUM_ERR(failed, ui_table_base_create(&table, &model));
-  ACCUM_ERR(failed, ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container));
+  /* 2. Cell render failure */
+  table->model.render_cell = mock_render_cell_fail;
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  table->model.render_cell = mock_render_cell;
 
-  /* Trigger OOM during render node creations. We loop to hit various branches
-   */
-  for (i = 0; i < 150; i++) {
-    g_malloc_fail_countdown = i;
-    ui_table_base_render(table, container);
+  /* 3. Mock set_attribute failures across all targets (1..15) */
+  for (i = 1; i <= 15; i++) {
+    g_table_mock_set_attr_fail_target = i;
+    rc = ui_table_base_render(table, container);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_table_mock_set_attr_fail_target = 0;
   }
-  g_malloc_fail_countdown = -1;
 
-  for (i = 0; i < 500; i++) {
+  /* 4. Mock selection_model failure (line 400) */
+  g_table_mock_fail = 3;
+  rc = ui_table_base_render(table, container);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_table_mock_fail = 0;
+
+  /* 5. Mock append_child failures with destroy mock (g_table_mock_fail = 1,
+   * true branch) */
+  for (i = 0; i < 10; i++) {
     g_mock_append_child_fail_countdown = i;
-    ui_table_base_render(table, container);
+    g_table_mock_fail = 1;
+    rc = ui_table_base_render(table, container);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_table_mock_fail = 0;
+    g_mock_append_child_fail_countdown = -1;
   }
-  g_mock_append_child_fail_countdown = -1;
 
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+  /* 6. Mock append_child failures without destroy mock (false branch) */
+  for (i = 0; i < 10; i++) {
+    g_mock_append_child_fail_countdown = i;
+    rc = ui_table_base_render(table, container);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_mock_append_child_fail_countdown = -1;
   }
+
+  rc = ui_table_base_destroy(table);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 7. Test final append to container failure (1 row, 1 col) */
   {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    struct ui_table_model m1;
+    m1.get_row_count = mock_get_col_count;    /* 3 rows */
+    m1.get_column_count = mock_get_col_count; /* 3 cols */
+    m1.render_cell = mock_render_cell;
+    m1.render_header = mock_render_header;
+    m1.user_data = NULL;
+    rc = ui_table_base_create(&table, &m1);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    /* Total append calls = 1 (thead) + 1 (header_row) + 3 (header_cells) +
+       1 (tbody) + 3*(1 + 3) (rows and cells = 12) = 18.
+       Append call 18 is table_root to container! */
+    g_mock_append_child_fail_countdown = 18;
+    rc = ui_table_base_render(table, container);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_mock_append_child_fail_countdown = -1;
+
+    rc = ui_table_base_destroy(table);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_destroy(container);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
   }
-#endif
-  return failed;
+
+  PASS();
 }
 
-static int test_sort_render_impl(void) {
+static size_t mock_get_one_count(void *user_data) {
+  if (user_data) {
+  }
+  return 1;
+}
+
+TEST test_table_oom(void) {
   struct ui_table_model model;
-  struct ui_table_base *table;
+  struct ui_table_base *table = NULL;
   struct ui_dom_node *container;
-  struct ui_table_sort_config sort_cfg;
+  ui_error_t rc;
+  int i;
 
   model.get_row_count = mock_get_row_count;
   model.get_column_count = mock_get_col_count;
@@ -441,51 +429,56 @@ static int test_sort_render_impl(void) {
   model.render_header = mock_render_header;
   model.user_data = NULL;
 
-  ui_table_base_create(&table, &model);
-
-  sort_cfg.active_column_index = 0;
-  sort_cfg.direction = UI_TABLE_SORT_ASCENDING;
-  ui_table_base_set_sort_config(table, &sort_cfg);
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
-  ui_table_base_render(table, container);
-
-  sort_cfg.direction = UI_TABLE_SORT_DESCENDING;
-  ui_table_base_set_sort_config(table, &sort_cfg);
-  ui_table_base_render(table, container);
-
-  sort_cfg.direction = UI_TABLE_SORT_NONE;
-  ui_table_base_set_sort_config(table, &sort_cfg);
-  ui_table_base_render(table, container);
-
-  {
-    ui_error_t rc_cleanup = ui_table_base_destroy(table);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+  /* Creation OOM loop */
+  for (i = 0; i < 20; i++) {
+    g_malloc_fail_countdown = i;
+    table = NULL;
+    rc = ui_table_base_create(&table, &model);
+    if (rc == UI_ERROR_NONE) {
+      g_malloc_fail_countdown = -1;
+      rc = ui_table_base_destroy(table);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+      break;
     }
+    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    ASSERT(table == NULL);
   }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+  g_malloc_fail_countdown = -1;
+
+  /* Render OOM loop on a 1-row, 1-col table so all node creations are tested */
+  model.get_row_count = mock_get_one_count;
+  model.get_column_count = mock_get_one_count;
+  rc = ui_table_base_create(&table, &model);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  for (i = 0; i < 50; i++) {
+    g_malloc_fail_countdown = i;
+    ui_table_base_render(table, container);
   }
-  return 0;
+  g_malloc_fail_countdown = -1;
+
+  rc = ui_table_base_destroy(table);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(container);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
 }
 
-int main(void) {
-  int failed = 0;
-  failed |= test_null_args();
-  failed |= test_table_render_aria();
-  failed |= test_table_pagination();
-  failed |= test_table_column_sizing();
-  failed |= test_zero_cols();
-  failed |= test_render_fails();
-  failed |= test_oom();
-  failed |= test_sort_render_impl();
+SUITE(ui_table_base_suite) {
+  RUN_TEST(test_table_null_args);
+  RUN_TEST(test_table_render_and_aria);
+  RUN_TEST(test_table_pagination_and_sizing);
+  RUN_TEST(test_table_error_branches);
+  RUN_TEST(test_table_oom);
+}
 
-  if (!failed) {
-    printf("All ui_table_base tests passed.\n");
-  }
-  return failed;
+GREATEST_MAIN_DEFS();
+
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(ui_table_base_suite);
+  GREATEST_MAIN_END();
 }

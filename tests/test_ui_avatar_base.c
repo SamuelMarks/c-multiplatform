@@ -356,12 +356,80 @@ static ui_error_t run_oom_tests(void) {
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t run_mock_tests(void) {
+  struct ui_avatar_base *avatar = NULL;
+  struct ui_icon_base *icon1 = NULL;
+  struct ui_icon_base *icon2 = NULL;
+  ui_error_t rc;
+  extern int g_avatar_mock_fail;
+
+  rc = ui_avatar_base_create(&avatar);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  g_avatar_mock_fail = 1;
+  rc = ui_avatar_base_set_name(avatar, "John Doe");
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_avatar_mock_fail = 0;
+
+  g_avatar_mock_fail = 2;
+  rc = ui_avatar_base_set_name(avatar, "John Doe");
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_avatar_mock_fail = 0;
+
+  g_avatar_mock_fail = 3;
+  rc = ui_avatar_base_set_name(avatar, "John Doe");
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_avatar_mock_fail = 0;
+
+  rc = ui_icon_base_create(&icon1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_avatar_base_set_fallback_icon(avatar, icon1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  rc = ui_icon_base_create(&icon2);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  g_avatar_mock_fail = 4;
+  rc = ui_avatar_base_set_fallback_icon(avatar, icon2);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_avatar_mock_fail = 0;
+
+  g_avatar_mock_fail = 4;
+  rc = ui_avatar_base_destroy(avatar);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_avatar_mock_fail = 0;
+
+  return UI_ERROR_NONE;
+}
+#endif
+
 int main(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_avatar_coverage(void);
-  run_avatar_coverage();
+  rc = run_mock_tests();
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
 #endif
 
   if (run_normal_tests() != UI_ERROR_NONE) {

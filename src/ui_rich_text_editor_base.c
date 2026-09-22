@@ -13,8 +13,63 @@
 #include "ui_css_parser.h"
 #include <stddef.h>
 #include <string.h>
-
 /* clang-format on */
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_rte_mock_set_style_fail = 0;
+int g_rte_mock_destroy_fail = 0;
+int g_rte_mock_node_destroy_fail = 0;
+
+/**
+ * @brief mock_rte_set_default_style.
+ * @param comp Parameter comp.
+ * @param style Parameter style.
+ * @return Return value.
+ */
+static ui_error_t mock_rte_set_default_style(struct ui_component *comp,
+                                             struct ui_css_stylesheet *style) {
+  if (g_rte_mock_set_style_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, style);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_rte_set_default_style
+/** @endcond */
+
+/**
+ * @brief mock_rte_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_rte_component_destroy(struct ui_component *comp) {
+  if (g_rte_mock_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_rte_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_rte_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_rte_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_rte_mock_node_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_rte_dom_node_destroy
+/** @endcond */
+#endif
 
 /* \brief Default CSS stylesheet for the rich text editor */
 /** @brief Default CSS stylesheet */
@@ -293,10 +348,10 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
     goto cleanup;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_component_set_default_style(rte->component, default_style);
-    (void)rc_cleanup;
+  rc = ui_component_set_default_style(rte->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   rte->component->shadow_root = root_node;
@@ -314,16 +369,10 @@ ui_rich_text_editor_base_create(struct ui_rich_text_editor_base **out_rte,
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (rte->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(rte->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(rte->component);
   }
   C_MULTIPLATFORM_FREE(rte);
   return rc;
@@ -337,20 +386,23 @@ cleanup:
  */
 ui_error_t
 ui_rich_text_editor_base_destroy(struct ui_rich_text_editor_base *rte) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!rte) {
     return UI_ERROR_NONE;
   }
   if (rte->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(rte->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(rte->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   if (rte->html_buffer) {
     C_MULTIPLATFORM_FREE(rte->html_buffer);
   }
   C_MULTIPLATFORM_FREE(rte);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -437,9 +489,7 @@ ui_rich_text_editor_base_insert_text(struct ui_rich_text_editor_base *rte,
  */
 ui_error_t ui_rich_text_editor_base_set_caret_from_point(
     struct ui_rich_text_editor_base *rte, float x, float y) {
-  (void)x;
-  (void)y;
-  if (!rte)
+  if (!rte || x < 0.0f || y < 0.0f)
     return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;
 }
@@ -491,8 +541,7 @@ ui_rich_text_editor_base_ime_start(struct ui_rich_text_editor_base *rte) {
 ui_error_t
 ui_rich_text_editor_base_ime_update(struct ui_rich_text_editor_base *rte,
                                     const char *composition) {
-  (void)composition;
-  if (!rte)
+  if (!rte || !composition)
     return UI_ERROR_INVALID_ARGUMENT;
   return UI_ERROR_NONE;
 }

@@ -128,6 +128,28 @@ static int run_normal_tests(void) {
   if (pos != 200)
     return 1;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_split_pane_mock_fail;
+    ui_error_t rc;
+    ev.type = UI_EVENT_MOUSE_DOWN;
+    ev.event_data.mouse.x = 100;
+    ASSERT_SUCCESS(ui_split_pane_base_process_event(pane, &ev));
+
+    g_split_pane_mock_fail = 1;
+    ev.type = UI_EVENT_MOUSE_MOVE;
+    ev.event_data.mouse.x = 150;
+    rc = ui_split_pane_base_process_event(pane, &ev);
+    if (rc != UI_ERROR_UNKNOWN)
+      return 1;
+    g_split_pane_mock_fail = 0;
+
+    ev.type = UI_EVENT_MOUSE_UP;
+    ev.event_data.mouse.x = 150;
+    ASSERT_SUCCESS(ui_split_pane_base_process_event(pane, &ev));
+  }
+#endif
+
   /* Vertical Touch Events */
   ASSERT_SUCCESS(ui_split_pane_base_set_orientation(
       pane, UI_SPLIT_PANE_ORIENTATION_VERTICAL));

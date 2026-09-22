@@ -47,7 +47,7 @@ static int test_preferences_lifecycle(void) {
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     ui_thread_pool_destroy(pool);
@@ -58,7 +58,7 @@ static int test_preferences_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_thread_pool_destroy(pool);
@@ -103,7 +103,7 @@ static int test_preferences_set_get(void) {
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_thread_pool_destroy(pool);
@@ -128,8 +128,38 @@ static int test_preferences_save_binary(void) {
   if (err != UI_ERROR_NONE)
     return 1;
 
+  {
+    ui_error_t rc_cleanup = ui_promise_destroy(promise);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
+
+  err = ui_preferences_save_binary_async(prefs, "bin_key", data, 0, &promise);
+  if (err != UI_ERROR_NONE)
+    return 1;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_preferences_mock_fail;
+    g_preferences_mock_fail = 1;
+    err = ui_preferences_save_binary_async(prefs, "bin_key", data, strlen(data),
+                                           &promise);
+    if (err == UI_ERROR_NONE)
+      return 1;
+
+    g_preferences_mock_fail = 2;
+    err = ui_preferences_save_binary_async(prefs, "bin_key", data, strlen(data),
+                                           &promise);
+    if (err == UI_ERROR_NONE)
+      return 1;
+
+    g_preferences_mock_fail = 0;
+  }
+#endif
+
 #if defined(__EMSCRIPTEN__)
-    /* Resolves eventually via JS */
+  /* Resolves eventually via JS */
 #else
     /* Rejected natively currently */
 #endif
@@ -137,14 +167,14 @@ static int test_preferences_save_binary(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_preferences_destroy(prefs);
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_thread_pool_destroy(pool);
@@ -204,7 +234,7 @@ static int test_preferences_nulls(void) {
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_thread_pool_destroy(pool);
@@ -237,7 +267,7 @@ static int test_preferences_oom(void) {
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_thread_pool_destroy(pool);

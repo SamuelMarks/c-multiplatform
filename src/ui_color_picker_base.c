@@ -453,6 +453,44 @@ ui_color_picker_base_get_rgb(const struct ui_color_picker_base *picker,
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief mock_color_picker_rgb_to_hsv.
+ * @param rgb Parameter rgb.
+ * @param hsv Parameter hsv.
+ * @return Return value.
+ */
+static ui_error_t mock_color_picker_rgb_to_hsv(const struct ui_color_rgb *rgb,
+                                               struct ui_color_hsv *hsv) {
+  if (g_color_picker_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_color_picker_rgb_to_hsv)(rgb, hsv);
+}
+#undef ui_color_picker_rgb_to_hsv
+/** @cond */
+#define ui_color_picker_rgb_to_hsv mock_color_picker_rgb_to_hsv
+/** @endcond */
+
+/**
+ * @brief mock_color_picker_hsv_to_rgb.
+ * @param hsv Parameter hsv.
+ * @param rgb Parameter rgb.
+ * @return Return value.
+ */
+static ui_error_t mock_color_picker_hsv_to_rgb(const struct ui_color_hsv *hsv,
+                                               struct ui_color_rgb *rgb) {
+  if (g_color_picker_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_color_picker_hsv_to_rgb)(hsv, rgb);
+}
+#undef ui_color_picker_hsv_to_rgb
+/** @cond */
+#define ui_color_picker_hsv_to_rgb mock_color_picker_hsv_to_rgb
+/** @endcond */
+#endif
+
 /**
  * @brief ui_color_picker_base_set_rgb.
  * @param picker Parameter picker.
@@ -461,12 +499,16 @@ ui_color_picker_base_get_rgb(const struct ui_color_picker_base *picker,
  */
 ui_error_t ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
                                         const struct ui_color_rgb *rgb) {
+  ui_error_t rc;
   if (!picker || !rgb) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   picker->rgb = *rgb;
-  (void)ui_color_picker_rgb_to_hsv(&picker->rgb, &picker->hsv);
+  rc = ui_color_picker_rgb_to_hsv(&picker->rgb, &picker->hsv);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   return trigger_cva_change(picker);
 }
 
@@ -478,11 +520,15 @@ ui_error_t ui_color_picker_base_set_rgb(struct ui_color_picker_base *picker,
  */
 ui_error_t ui_color_picker_base_set_hsv(struct ui_color_picker_base *picker,
                                         const struct ui_color_hsv *hsv) {
+  ui_error_t rc;
   if (!picker || !hsv) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   picker->hsv = *hsv;
-  (void)ui_color_picker_hsv_to_rgb(&picker->hsv, &picker->rgb);
+  rc = ui_color_picker_hsv_to_rgb(&picker->hsv, &picker->rgb);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   return trigger_cva_change(picker);
 }

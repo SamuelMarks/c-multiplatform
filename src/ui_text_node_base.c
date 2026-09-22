@@ -12,13 +12,19 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_mock_font_fail;
+int g_text_node_mock_fail = 0;
+
 static ui_error_t mock_ui_font_manager_find_font(struct ui_font_manager *m,
                                                  const char *f, int w, int i,
                                                  struct ui_font **out) {
-  (void)m;
-  (void)f;
-  (void)w;
-  (void)i;
+  struct ui_font_manager *unused_m = m;
+  const char *unused_f = f;
+  int unused_w = w;
+  int unused_i = i;
+  m = unused_m;
+  f = unused_f;
+  w = unused_w;
+  i = unused_i;
   if (g_mock_font_fail == 1)
     return UI_ERROR_NOT_FOUND;
   if (g_mock_font_fail == 7)
@@ -34,11 +40,16 @@ static ui_error_t mock_ui_text_layout_shape(struct ui_text_layout *layout,
                                             struct ui_font *font, float size,
                                             const char *text, float max_width,
                                             int dir) {
-  (void)layout;
-  (void)font;
-  (void)size;
-  (void)max_width;
-  (void)dir;
+  struct ui_text_layout *unused_layout = layout;
+  struct ui_font *unused_font = font;
+  float unused_size = size;
+  float unused_max = max_width;
+  int unused_dir = dir;
+  layout = unused_layout;
+  font = unused_font;
+  size = unused_size;
+  max_width = unused_max;
+  dir = unused_dir;
   if (g_mock_font_fail == 2)
     return UI_ERROR_UNKNOWN;
   if (g_mock_font_fail == 4 && strstr(text, "..."))
@@ -52,7 +63,8 @@ static ui_error_t mock_ui_text_layout_shape(struct ui_text_layout *layout,
 static ui_error_t mock_ui_text_layout_get_bounds(struct ui_text_layout *layout,
                                                  float *w, float *h) {
   static int calls = 0;
-  (void)layout;
+  struct ui_text_layout *unused_layout = layout;
+  layout = unused_layout;
   if (g_mock_font_fail == 3)
     return UI_ERROR_UNKNOWN;
   if (g_mock_font_fail == 5) {
@@ -75,8 +87,10 @@ static ui_error_t mock_ui_text_layout_get_bounds(struct ui_text_layout *layout,
 static ui_error_t mock_ui_font_get_vmetrics(struct ui_font *font, float size,
                                             float *ascent, float *descent,
                                             float *line_gap) {
-  (void)font;
-  (void)size;
+  struct ui_font *unused_font = font;
+  float unused_size = size;
+  font = unused_font;
+  size = unused_size;
   if (g_mock_font_fail == 6)
     return UI_ERROR_UNKNOWN;
   *ascent = 10.0f;
@@ -88,6 +102,106 @@ static ui_error_t mock_ui_font_get_vmetrics(struct ui_font *font, float size,
 #define ui_font_get_vmetrics mock_ui_font_get_vmetrics
 /** @endcond */
 
+/**
+ * @brief mock_text_node_dom_node_destroy.
+ * @param node Node.
+ * @return Return value.
+ */
+static ui_error_t mock_text_node_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_text_node_mock_fail == 1 || g_text_node_mock_fail == 9 ||
+      g_text_node_mock_fail == 11) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(node);
+}
+/** @cond */
+#define ui_dom_node_destroy mock_text_node_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief mock_text_node_component_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_text_node_component_destroy(struct ui_component *comp) {
+  if (g_text_node_mock_fail == 2 || g_text_node_mock_fail == 10 ||
+      g_text_node_mock_fail == 12) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_destroy(comp);
+}
+/** @cond */
+#define ui_component_destroy mock_text_node_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_text_node_text_layout_destroy.
+ * @param layout Layout.
+ * @return Return value.
+ */
+static ui_error_t
+mock_text_node_text_layout_destroy(struct ui_text_layout *layout) {
+  if (g_text_node_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_text_layout_destroy(layout);
+}
+/** @cond */
+#define ui_text_layout_destroy mock_text_node_text_layout_destroy
+/** @endcond */
+
+/**
+ * @brief mock_text_node_text_layout_create.
+ * @param out_layout Output pointer.
+ * @return Return value.
+ */
+static ui_error_t
+mock_text_node_text_layout_create(struct ui_text_layout **out_layout) {
+  if (g_text_node_mock_fail == 4 || g_text_node_mock_fail == 9 ||
+      g_text_node_mock_fail == 10) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_text_layout_create(out_layout);
+}
+/** @cond */
+#define ui_text_layout_create mock_text_node_text_layout_create
+/** @endcond */
+
+/**
+ * @brief mock_text_node_dom_node_set_tag_name.
+ * @param node Node.
+ * @param tag Tag.
+ * @return Return value.
+ */
+static ui_error_t mock_text_node_dom_node_set_tag_name(struct ui_dom_node *node,
+                                                       const char *tag) {
+  if (g_text_node_mock_fail == 5 || g_text_node_mock_fail == 11 ||
+      g_text_node_mock_fail == 12) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_set_tag_name(node, tag);
+}
+/** @cond */
+#define ui_dom_node_set_tag_name mock_text_node_dom_node_set_tag_name
+/** @endcond */
+
+/**
+ * @brief mock_text_node_dom_node_append_child.
+ * @param parent Parent.
+ * @param child Child.
+ * @return Return value.
+ */
+static ui_error_t
+mock_text_node_dom_node_append_child(struct ui_dom_node *parent,
+                                     struct ui_dom_node *child) {
+  if (g_text_node_mock_fail == 6) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_append_child(parent, child);
+}
+/** @cond */
+#define ui_dom_node_append_child mock_text_node_dom_node_append_child
+/** @endcond */
 #endif
 
 /**
@@ -126,6 +240,7 @@ struct ui_text_node_base {
 
 ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
   ui_error_t rc;
+  ui_error_t rc_cleanup;
   struct ui_text_node_base *node;
   struct ui_dom_node *dom_node = NULL;
 
@@ -151,22 +266,22 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dom_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(node->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(node->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(node);
     return rc;
   }
   rc = ui_dom_node_set_tag_name(dom_node, "span");
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(dom_node);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(dom_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(node->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(node->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(node);
     return rc;
@@ -175,14 +290,14 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
 
   rc = ui_text_layout_create(&node->layout);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(dom_node);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(dom_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
     node->component->shadow_root = NULL;
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(node->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(node->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(node);
     return rc;
@@ -193,11 +308,16 @@ ui_error_t ui_text_node_base_create(struct ui_text_node_base **out_node) {
 }
 
 ui_error_t ui_text_node_base_destroy(struct ui_text_node_base *node) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!node)
     return UI_ERROR_NONE;
   if (node->layout) {
-    ui_error_t rc_cleanup = ui_text_layout_destroy(node->layout);
-    (void)rc_cleanup;
+    rc_cleanup = ui_text_layout_destroy(node->layout);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   if (node->text)
     C_MULTIPLATFORM_FREE(node->text);
@@ -205,20 +325,19 @@ ui_error_t ui_text_node_base_destroy(struct ui_text_node_base *node) {
     C_MULTIPLATFORM_FREE(node->font_family);
   if (node->component) {
     if (node->component->shadow_root) {
-      {
-        ui_error_t rc_cleanup =
-            ui_dom_node_destroy(node->component->shadow_root);
-        (void)rc_cleanup;
+      rc_cleanup = ui_dom_node_destroy(node->component->shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
       }
       node->component->shadow_root = NULL;
     }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(node->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(node->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(node);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t ui_text_node_base_set_text(struct ui_text_node_base *node,
@@ -298,6 +417,40 @@ ui_error_t ui_text_node_base_set_overflow(struct ui_text_node_base *node,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief update_dom_text.
+ * @param node Node.
+ * @param text Text.
+ * @return Return value.
+ */
+static ui_error_t update_dom_text(struct ui_text_node_base *node,
+                                  const char *text) {
+  struct ui_dom_node *text_node = NULL;
+  ui_error_t rc;
+
+  if (!node->component || !node->component->shadow_root) {
+    return UI_ERROR_NONE;
+  }
+
+  if (node->component->shadow_root->first_child &&
+      node->component->shadow_root->first_child->type ==
+          UI_DOM_NODE_TYPE_TEXT) {
+    text_node = node->component->shadow_root->first_child;
+  } else {
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    rc = ui_dom_node_append_child(node->component->shadow_root, text_node);
+    if (rc != UI_ERROR_NONE) {
+      ui_dom_node_destroy(text_node);
+      return rc;
+    }
+  }
+
+  return ui_dom_node_set_text_content(text_node, text);
+}
+
 ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
   struct ui_font *font = NULL;
   ui_error_t rc = UI_ERROR_NONE;
@@ -314,19 +467,15 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
                                    &font);
     if (rc != UI_ERROR_NONE) {
       /* Fallback to system-ui */
-      (void)ui_font_manager_find_font(node->font_manager, "system-ui", 400, 0,
-                                      &font);
+      rc = ui_font_manager_find_font(node->font_manager, "system-ui", 400, 0,
+                                     &font);
     }
   }
 
   if (!node->text || !font) {
     node->computed_width = 0.0f;
     node->computed_height = 0.0f;
-    if (node->component && node->component->shadow_root) {
-      rc = ui_dom_node_set_text_content(node->component->shadow_root, "");
-    }
-    return rc; /* Not an error to be empty or unfonted unless set_text_content
-                  fails */
+    return update_dom_text(node, "");
   }
 
   rc = ui_text_layout_shape(node->layout, font, node->font_size, node->text,
@@ -391,11 +540,7 @@ ui_error_t ui_text_node_base_update_layout(struct ui_text_node_base *node) {
     }
   }
 
-  if (node->component && node->component->shadow_root) {
-    rc = ui_dom_node_set_text_content(node->component->shadow_root, node->text);
-  }
-
-  return rc;
+  return update_dom_text(node, node->text);
 }
 
 ui_error_t ui_text_node_base_get_layout(struct ui_text_node_base *node,

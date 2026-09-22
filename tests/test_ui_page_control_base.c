@@ -63,7 +63,7 @@ static void test_page_control_base(void) {
     ui_error_t rc_cleanup =
         ui_component_destroy((struct ui_component *)control);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      exit(1);
     }
   }
 }
@@ -101,23 +101,11 @@ static void test_page_control_base_errors(void) {
       UI_ERROR_INVALID_ARGUMENT)
     exit(1);
 
-  /* Force update_page_control_dom NULL */
-  /* We can't directly call update_page_control_dom with NULL, it's static.
-     Wait, it's called with NULL inside the set functions if control is NULL,
-     but the set functions already check if control is NULL and return early.
-     Wait, is update_page_control_dom's NULL check unreachable?
-     Let's check `ui_page_control_base.c`:
-     if (!control || count < 0) return UI_ERROR_INVALID_ARGUMENT;
-     (void)update_page_control_dom(control);
-     So update_page_control_dom is only called with non-null control.
-     Its own !control check is unreachable!
-  */
-
   {
     ui_error_t rc_cleanup =
         ui_component_destroy((struct ui_component *)control);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      exit(1);
     }
   }
 }
@@ -129,37 +117,51 @@ static void test_page_control_base_oom(void) {
   for (countdown = 0; countdown < 5; countdown++) {
     g_malloc_fail_countdown = countdown;
     if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup =
-            ui_component_destroy((struct ui_component *)control);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+      ui_error_t rc_cleanup =
+          ui_component_destroy((struct ui_component *)control);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        exit(1);
       }
     }
   }
   g_malloc_fail_countdown = -1;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_page_control_mock_fail;
+    g_page_control_mock_fail = 1;
+    g_malloc_fail_countdown = 1;
+    if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {
+      exit(1);
+    }
+
+    g_page_control_mock_fail = 2;
+    g_malloc_fail_countdown = 3;
+    if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {
+      exit(1);
+    }
+
+    g_page_control_mock_fail = 0;
+    g_malloc_fail_countdown = -1;
+  }
+#endif
+
   if (ui_page_control_base_create(&control) == UI_ERROR_NONE) {
     for (countdown = 0; countdown < 10; countdown++) {
+      ui_error_t rc_set;
       g_malloc_fail_countdown = countdown;
-      {
-        ui_error_t rc_cleanup =
-            ui_page_control_base_set_number_of_pages(control, 10);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+      rc_set = ui_page_control_base_set_number_of_pages(control, 10);
+      if (rc_set != UI_ERROR_NONE && rc_set != UI_ERROR_OUT_OF_MEMORY) {
+        exit(1);
       }
       g_malloc_fail_countdown = -1;
     }
     for (countdown = 0; countdown < 10; countdown++) {
+      ui_error_t rc_set;
       g_malloc_fail_countdown = countdown;
-      {
-        ui_error_t rc_cleanup =
-            ui_page_control_base_set_current_page(control, 5);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+      rc_set = ui_page_control_base_set_current_page(control, 5);
+      if (rc_set != UI_ERROR_NONE && rc_set != UI_ERROR_OUT_OF_MEMORY) {
+        exit(1);
       }
       g_malloc_fail_countdown = -1;
     }
@@ -167,7 +169,7 @@ static void test_page_control_base_oom(void) {
       ui_error_t rc_cleanup =
           ui_component_destroy((struct ui_component *)control);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        exit(1);
       }
     }
   }

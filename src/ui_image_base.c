@@ -57,11 +57,11 @@ ui_error_t ui_image_base_set_src(struct ui_image_base *image,
   if (!image->src_url) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
-#if defined(_MSC_VER)
-  strcpy_s(image->src_url, len + 1, src_url);
-#else
-  UI_STRCPY(image->src_url, sizeof(image->src_url), src_url);
-#endif
+  if (UI_STRCPY(image->src_url, len + 1, src_url) != 0) {
+    C_MULTIPLATFORM_FREE(image->src_url);
+    image->src_url = NULL;
+    return UI_ERROR_UNKNOWN;
+  }
 
   image->lazy_load = lazy_load;
   image->state = lazy_load ? UI_IMAGE_STATE_IDLE : UI_IMAGE_STATE_LOADING;

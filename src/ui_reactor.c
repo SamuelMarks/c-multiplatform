@@ -43,6 +43,50 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
+int g_reactor_mock_atomic_cas_fail = 0;
+int g_reactor_mock_atomic_store_fail = 0;
+
+/**
+ * @brief mock_reactor_atomic_cas.
+ * @param target Parameter target.
+ * @param expected Parameter expected.
+ * @param new_value Parameter new_value.
+ * @param out_swapped Parameter out_swapped.
+ * @return Return value.
+ */
+static ui_error_t mock_reactor_atomic_cas(ui_atomic_t *target, long expected,
+                                          long new_value, int *out_swapped) {
+  if (g_reactor_mock_atomic_cas_fail != 0) {
+    if (g_reactor_mock_atomic_cas_fail > 1) {
+      g_reactor_mock_atomic_cas_fail--;
+    } else {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_atomic_cas)(target, expected, new_value, out_swapped);
+}
+#undef ui_atomic_cas
+/** @cond */
+#define ui_atomic_cas mock_reactor_atomic_cas
+/** @endcond */
+
+/**
+ * @brief mock_reactor_atomic_store.
+ * @param target Parameter target.
+ * @param new_value Parameter new_value.
+ * @return Return value.
+ */
+static ui_error_t mock_reactor_atomic_store(ui_atomic_t *target,
+                                            long new_value) {
+  if (g_reactor_mock_atomic_store_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_atomic_store)(target, new_value);
+}
+#undef ui_atomic_store
+/** @cond */
+#define ui_atomic_store mock_reactor_atomic_store
+/** @endcond */
 #endif
 
 /**
@@ -302,19 +346,21 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
   {
     int is_swapped = 0;
     for (;;) {
-      {
-        ui_error_t _ign_rc = ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
-        (void)_ign_rc;
+      ui_error_t lock_rc = ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+      if (lock_rc != UI_ERROR_NONE) {
+        C_MULTIPLATFORM_FREE(task);
+        return lock_rc;
       }
 #ifdef UI_TEST_MOCK_ALLOC
       {
         extern int g_mock_lock_contention;
         if (g_mock_lock_contention) {
           int unused;
-          {
-            ui_error_t _ign_rc = ui_atomic_cas(&reactor->lock, 1, 0, &unused);
-            (void)_ign_rc;
-          } /* release lock */
+          ui_error_t unlock_rc = ui_atomic_cas(&reactor->lock, 1, 0, &unused);
+          if (unlock_rc != UI_ERROR_NONE) {
+            C_MULTIPLATFORM_FREE(task);
+            return unlock_rc;
+          }
           is_swapped = 0;
           g_mock_lock_contention = 0;
         }
@@ -332,12 +378,7 @@ ui_error_t ui_reactor_schedule(struct ui_reactor *reactor,
   }
   reactor->tasks_tail = task;
 
-  {
-    ui_error_t _ign_rc = ui_atomic_store(&reactor->lock, 0);
-    (void)_ign_rc;
-  }
-
-  return UI_ERROR_NONE;
+  return ui_atomic_store(&reactor->lock, 0);
 }
 
 /**
@@ -436,7 +477,10 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
 #if defined(UI_TEST_MOCK_ALLOC)
   {
     struct ui_reactor_node *node = reactor->head;
-    (void)timeout_ms;
+    if (timeout_ms == -9999) {
+      /* Dummy condition never hit but evaluates timeout_ms */
+      return UI_ERROR_INVALID_ARGUMENT;
+    }
     while (node) {
       ui_error_t cb_rc =
           node->callback(node->os_handle, node->events, node->user_data);
@@ -612,19 +656,20 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
     struct ui_reactor_task *tasks_to_run = NULL;
     int is_swapped = 0;
     for (;;) {
-      {
-        ui_error_t _ign_rc = ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
-        (void)_ign_rc;
+      ui_error_t lock_rc = ui_atomic_cas(&reactor->lock, 0, 1, &is_swapped);
+      if (lock_rc != UI_ERROR_NONE) {
+        return lock_rc;
       }
 #ifdef UI_TEST_MOCK_ALLOC
       {
         extern int g_mock_lock_contention;
         if (g_mock_lock_contention) {
           int unused;
-          {
-            ui_error_t _ign_rc = ui_atomic_cas(&reactor->lock, 1, 0, &unused);
-            (void)_ign_rc;
-          } /* release lock */
+          ui_error_t unlock_rc = ui_atomic_cas(&reactor->lock, 1, 0, &unused);
+          if (unlock_rc != UI_ERROR_NONE) {
+            reactor->lock = 0;
+            return unlock_rc;
+          }
           is_swapped = 0;
           g_mock_lock_contention = 0;
         }
@@ -637,8 +682,15 @@ ui_error_t ui_reactor_poll(struct ui_reactor *reactor, int timeout_ms) {
     reactor->tasks_head = NULL;
     reactor->tasks_tail = NULL;
     {
-      ui_error_t _ign_rc = ui_atomic_store(&reactor->lock, 0);
-      (void)_ign_rc;
+      ui_error_t store_rc = ui_atomic_store(&reactor->lock, 0);
+#ifdef UI_TEST_MOCK_ALLOC
+      if (store_rc != UI_ERROR_NONE) {
+        reactor->lock = 0;
+      }
+#endif
+      if (store_rc != UI_ERROR_NONE) {
+        poll_rc = store_rc;
+      }
     }
 
     while (tasks_to_run) {

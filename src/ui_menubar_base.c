@@ -8,6 +8,26 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_menubar_mock_fail = 0;
+
+/**
+ * @brief mock_menubar_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_menubar_component_destroy(struct ui_component *comp) {
+  if (g_menubar_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_menubar_component_destroy
+/** @endcond */
+#endif
+
 /**
  * @brief ui_menubar_base_create.
  * @param out_menubar Parameter out_menubar.
@@ -30,9 +50,9 @@ ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar) {
   menubar = (struct ui_menubar_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_menubar_base));
   if (!menubar) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -42,16 +62,31 @@ ui_error_t ui_menubar_base_create(struct ui_menubar_base **out_menubar) {
 
   err =
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &menubar->base.shadow_root);
-  { (void)err; }
+  if (err != UI_ERROR_NONE) {
+    C_MULTIPLATFORM_FREE(menubar);
+    return err;
+  }
 
   err = ui_dom_node_set_tag_name(menubar->base.shadow_root, "ui-menubar");
-  { (void)err; }
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(menubar->base.shadow_root);
+    C_MULTIPLATFORM_FREE(menubar);
+    return err;
+  }
 
   err = ui_dom_node_set_attribute(menubar->base.shadow_root, "role", "menubar");
-  { (void)err; }
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(menubar->base.shadow_root);
+    C_MULTIPLATFORM_FREE(menubar);
+    return err;
+  }
   err = ui_dom_node_set_attribute(menubar->base.shadow_root, "tabindex",
                                   "0"); /* Focusable context */
-  { (void)err; }
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(menubar->base.shadow_root);
+    C_MULTIPLATFORM_FREE(menubar);
+    return err;
+  }
 
   *out_menubar = menubar;
   return UI_ERROR_NONE;

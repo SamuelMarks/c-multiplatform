@@ -62,11 +62,12 @@ static ui_error_t trigger_cva_change(struct ui_chips_base *chips) {
 static ui_error_t chips_cva_write_value(void *component,
                                         union ui_signal_payload value) {
   struct ui_chips_base *chips = (struct ui_chips_base *)component;
-  /* Complex arrays from signals might require deep updates.
-     For this base implementation, we do not fully replace the array
-     if driven from outside, but we provide the hook. */
-  (void)chips;
-  (void)value;
+  if (!chips) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (value.ptr_val) {
+    /* Hook for non-null payload */
+  }
   return UI_ERROR_NONE; /* Ignored for now */
 }
 

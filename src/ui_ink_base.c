@@ -59,43 +59,25 @@ ui_error_t ui_ink_base_create(struct ui_ink_base **out_ink) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(ink->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(ink->component);
     C_MULTIPLATFORM_FREE(ink);
     return rc;
   }
 
-  {
-    ui_error_t rc2 = ui_dom_node_set_tag_name(root_node, "canvas");
-    if (rc2 != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(ink->component);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(ink);
-      return rc2;
-    }
+  rc = ui_dom_node_set_tag_name(root_node, "canvas");
+  if (rc != UI_ERROR_NONE) {
+    ui_component_destroy(ink->component);
+    ui_dom_node_destroy(root_node);
+    C_MULTIPLATFORM_FREE(ink);
+    return rc;
   }
-  {
-    ui_error_t rc3 = ui_dom_node_set_attribute(root_node, "role", "img");
-    if (rc3 != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(ink->component);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(ink);
-      return rc3;
-    }
+
+  rc = ui_dom_node_set_attribute(root_node, "role", "img");
+  if (rc != UI_ERROR_NONE) {
+    ui_component_destroy(ink->component);
+    ui_dom_node_destroy(root_node);
+    C_MULTIPLATFORM_FREE(ink);
+    return rc;
   }
   ink->component->shadow_root = root_node;
 
@@ -113,10 +95,7 @@ ui_error_t ui_ink_base_destroy(struct ui_ink_base *ink) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (ink->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(ink->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(ink->component);
   }
   if (ink->raw_points) {
     C_MULTIPLATFORM_FREE(ink->raw_points);
@@ -215,7 +194,7 @@ static ui_error_t append_smoothed_segment(struct ui_ink_base *ink,
   for (i = 1; i <= steps; ++i) {
     float t = (float)i / (float)steps;
     struct ui_ink_event smoothed;
-    (void)interpolate_catmull_rom(p0, p1, p2, p3, t, &smoothed);
+    interpolate_catmull_rom(p0, p1, p2, p3, t, &smoothed);
 
     if (ink->smoothed_count >= ink->smoothed_capacity) {
       size_t new_cap = ink->smoothed_capacity * 2;

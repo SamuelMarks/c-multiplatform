@@ -5,6 +5,7 @@
 #include "../include/ui_signal.h"
 #include "../include/ui_effect.h"
 #include "../include/ui_intersection_observer.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -14,8 +15,10 @@ static ui_error_t failing_effect_fn(void *user_data) {
   ui_signal_t *sig = (ui_signal_t *)user_data;
   union ui_signal_payload val;
   {
-    ui_error_t _ign = ui_signal_get(sig, &val);
-    (void)_ign;
+    ui_error_t rc_sig = ui_signal_get(sig, &val);
+    if (rc_sig != UI_ERROR_NONE) {
+      return rc_sig;
+    }
   }
 
   printf("failing_effect_fn called with val %d\n", val.int_val);
@@ -50,9 +53,7 @@ static int test_scroll_spy_lifecycle(void) {
   if (rc != UI_ERROR_INVALID_ARGUMENT) {
     {
       ui_error_t rc_cleanup = ui_scroll_spy_destroy(spy);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     return 1;
   }
@@ -110,8 +111,10 @@ static int test_scroll_spy_targets(void) {
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     {
-      ui_error_t _ign = ui_scroll_spy_add_target(spy, target3, 3);
-      (void)_ign;
+      ui_error_t rc_oom = ui_scroll_spy_add_target(spy, target3, 3);
+      if (rc_oom != UI_ERROR_NONE) {
+        /* expected error under OOM */
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -150,8 +153,10 @@ static int test_scroll_spy_targets(void) {
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     {
-      ui_error_t _ign = ui_scroll_spy_set_root(spy, NULL, -10);
-      (void)_ign;
+      ui_error_t rc_oom = ui_scroll_spy_set_root(spy, NULL, -10);
+      if (rc_oom != UI_ERROR_NONE) {
+        /* expected error under OOM */
+      }
     }
   }
   g_malloc_fail_countdown = -1;
@@ -160,9 +165,7 @@ static int test_scroll_spy_targets(void) {
   g_malloc_fail_countdown = 0;
   {
     ui_error_t rc_cleanup = ui_scroll_spy_set_root(spy, NULL, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
   }
   g_malloc_fail_countdown = -1;
 
@@ -174,23 +177,17 @@ static int test_scroll_spy_targets(void) {
   /* Now add and remove with observer == NULL to hit missing branches */
   {
     ui_error_t rc_cleanup = ui_scroll_spy_add_target(spy, target3, 3);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_OUT_OF_BOUNDS);
   }
   {
     ui_error_t rc_cleanup = ui_scroll_spy_remove_target(spy, target3);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Restore observer so rest of test doesn't crash if it needs it */
   {
     ui_error_t rc_cleanup = ui_scroll_spy_set_root(spy, NULL, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test remove_target */
@@ -211,9 +208,7 @@ static int test_scroll_spy_targets(void) {
 
   {
     ui_error_t rc_cleanup = ui_scroll_spy_destroy(spy);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -278,9 +273,7 @@ static int test_scroll_spy_signal(void) {
     internal->observer = NULL;
     {
       ui_error_t rc_cleanup = ui_scroll_spy_add_target(spy, ghost, 4);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     /* This removes ghost from spy->targets but NOT from the observer...
@@ -288,9 +281,7 @@ static int test_scroll_spy_signal(void) {
      * observer! */
     {
       ui_error_t rc_cleanup = ui_scroll_spy_remove_target(spy, ghost);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     /* Wait! If we want it in the observer but not in targets, we must add it
@@ -298,34 +289,26 @@ static int test_scroll_spy_signal(void) {
     internal->observer = saved_obs;
     {
       ui_error_t rc_cleanup = ui_scroll_spy_add_target(spy, ghost, 4);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     internal->observer = NULL;
     {
       ui_error_t rc_cleanup = ui_scroll_spy_remove_target(spy, ghost);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     internal->observer = saved_obs;
     /* Observer still tracks ghost, but spy doesn't know about it. Evaluates it
      * -> hits loop finish AND best_id == -1 with active_signal */
     {
       ui_error_t rc_cleanup = ui_scroll_spy_evaluate(spy);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     /* Clean up observer so it doesn't crash */
     {
       ui_error_t rc_cleanup = ui_intersection_observer_unobserve(
           (struct ui_intersection_observer *)internal->observer, ghost);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -345,24 +328,111 @@ static int test_scroll_spy_signal(void) {
 
   {
     ui_error_t rc_cleanup = ui_effect_destroy(eff);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_scroll_spy_destroy(spy);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+static int test_scroll_spy_mock_errors(void) {
+  struct ui_scroll_spy *spy = NULL;
+  struct ui_dom_node *target1 = (struct ui_dom_node *)0x10;
+  struct ui_signal *sig = NULL;
+  union ui_signal_payload init_val;
+  ui_error_t rc;
+  extern int g_scroll_spy_mock_fail;
+
+  rc = ui_scroll_spy_create(&spy);
+  assert(rc == UI_ERROR_NONE);
+
+  init_val.int_val = -1;
+  rc = ui_signal_create(NULL, init_val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+                        UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
+  assert(rc == UI_ERROR_NONE);
+
+  rc = ui_scroll_spy_bind_active_section(spy, sig);
+  assert(rc == UI_ERROR_NONE);
+
+  rc = ui_scroll_spy_set_root(spy, NULL, 0);
+  assert(rc == UI_ERROR_NONE);
+
+  rc = ui_scroll_spy_add_target(spy, target1, 1);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test 1: mock signal set fail in on_intersection */
+  g_scroll_spy_mock_fail = 1;
+  rc = ui_scroll_spy_evaluate(spy);
+  assert(rc == UI_ERROR_NONE);
+  g_scroll_spy_mock_fail = 0;
+
+  /* Test 2: mock observer destroy fail in set_root */
+  g_scroll_spy_mock_fail = 2;
+  rc = ui_scroll_spy_set_root(spy, NULL, 0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_scroll_spy_mock_fail = 0;
+
+  /* Test 3: mock subscribe fail in set_root */
+  g_scroll_spy_mock_fail = 3;
+  rc = ui_scroll_spy_set_root(spy, NULL, 0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_scroll_spy_mock_fail = 0;
+
+  /* Re-initialize set_root cleanly so spy->observer is valid */
+  rc = ui_scroll_spy_set_root(spy, NULL, 0);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test 4: mock observe fail in set_root (with existing target) */
+  g_scroll_spy_mock_fail = 4;
+  rc = ui_scroll_spy_set_root(spy, NULL, 0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_scroll_spy_mock_fail = 0;
+
+  /* Re-initialize set_root cleanly */
+  rc = ui_scroll_spy_set_root(spy, NULL, 0);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test 5: mock unobserve fail in remove_target */
+  g_scroll_spy_mock_fail = 5;
+  rc = ui_scroll_spy_remove_target(spy, target1);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_scroll_spy_mock_fail = 0;
+
+  /* Test 6: on_intersection with NULL observer */
+  {
+    extern ui_error_t test_ui_scroll_spy_call_on_intersection(
+        struct ui_scroll_spy * spy, struct ui_intersection_observer * obs);
+    struct ui_scroll_spy_internal {
+      void *observer;
+    };
+    struct ui_scroll_spy_internal *internal =
+        (struct ui_scroll_spy_internal *)spy;
+    rc = test_ui_scroll_spy_call_on_intersection(spy, NULL);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+    /* Test 7: on_intersection with non-intersecting entry while signal bound
+     */
+    rc = test_ui_scroll_spy_call_on_intersection(
+        spy, (struct ui_intersection_observer *)internal->observer);
+    assert(rc == UI_ERROR_NONE);
+  }
+
+  rc = ui_signal_destroy(sig);
+  assert(rc == UI_ERROR_NONE);
+
+  rc = ui_scroll_spy_destroy(spy);
+  assert(rc == UI_ERROR_NONE);
+
+  return 0;
+}
+#endif
 
 int main(void) {
   int failed = 0;
@@ -381,6 +451,9 @@ int main(void) {
   if (f3)
     printf("test_scroll_spy_signal failed\n");
   failed |= f3;
+#ifdef UI_TEST_MOCK_ALLOC
+  failed |= test_scroll_spy_mock_errors();
+#endif
 
   if (failed) {
     printf("Tests failed.\n");

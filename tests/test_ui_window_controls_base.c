@@ -3,6 +3,7 @@
 #include "ui_arena.h"
 #include "ui_error.h"
 #include <ui_reactive_graph.h>
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -11,7 +12,8 @@ extern int g_malloc_fail_countdown;
 #endif
 
 static ui_error_t failing_notify_fn(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_OUT_OF_BOUNDS;
 }
 
@@ -68,9 +70,7 @@ int main(void) {
       g_malloc_fail_countdown = -1;
       {
         ui_error_t rc_cleanup = ui_arena_destroy(tight_arena);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -274,11 +274,16 @@ int main(void) {
     printf("Failed at line %d\n", __LINE__);
   }
 
+  /* Destroy again with state_signal now NULL */
+  err = ui_window_controls_base_destroy(controls);
+  if (err != UI_ERROR_NONE) {
+    failed = 1;
+    printf("Failed at line %d\n", __LINE__);
+  }
+
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }

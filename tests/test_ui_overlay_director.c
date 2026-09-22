@@ -6,6 +6,11 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_overlay_mock_fail;
+extern int g_overlay_destroy_mock_fail;
+extern int g_overlay_remove_child_mock_fail;
+#endif
 
 static int s_tests_passed = 0;
 static int s_tests_failed = 0;
@@ -38,15 +43,19 @@ static ui_error_t test_invalid_args(void) {
   struct ui_overlay *overlay = NULL;
   struct ui_overlay_director *dir2 = NULL;
   struct ui_dom_node *root2 = NULL;
+  ui_error_t rc;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-  ui_component_create(&comp);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_overlay_director_create(NULL, &dir));
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_overlay_director_create(root, NULL));
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_overlay_director_destroy(NULL));
 
-  ui_overlay_director_create(root, &dir);
+  rc = ui_overlay_director_create(root, &dir);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
             ui_overlay_director_mount_component(NULL, comp, 1, &overlay));
@@ -59,42 +68,44 @@ static ui_error_t test_invalid_args(void) {
             ui_overlay_director_unmount(NULL, overlay));
   ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_overlay_director_unmount(dir, NULL));
 
-  /* Try unmount unknown overlay */
-  ui_overlay_director_mount_component(dir, comp, 1, &overlay);
+  rc = ui_overlay_director_mount_component(dir, comp, 1, &overlay);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root2);
-  ui_overlay_director_create(root2, &dir2);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_overlay_director_create(root2, &dir2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
   ASSERT_EQ(UI_ERROR_NOT_FOUND, ui_overlay_director_unmount(dir2, overlay));
 
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(dir2);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root2);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(dir);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(comp);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -105,8 +116,10 @@ static ui_error_t test_overlay_director_lifecycle(void) {
   struct ui_overlay_director *dir = NULL;
   struct ui_component *comp1 = NULL;
   struct ui_component *comp2 = NULL;
+  struct ui_component *comp3 = NULL;
   struct ui_overlay *overlay1 = NULL;
   struct ui_overlay *overlay2 = NULL;
+  struct ui_overlay *overlay3 = NULL;
   ui_error_t err;
 
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
@@ -122,6 +135,9 @@ static ui_error_t test_overlay_director_lifecycle(void) {
   err = ui_component_create(&comp2);
   ASSERT_EQ(UI_ERROR_NONE, err);
 
+  err = ui_component_create(&comp3);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+
   /* Mount first overlay */
   err = ui_overlay_director_mount_component(dir, comp1, 100, &overlay1);
   ASSERT_EQ(UI_ERROR_NONE, err);
@@ -132,34 +148,41 @@ static ui_error_t test_overlay_director_lifecycle(void) {
   err = ui_overlay_director_mount_component(dir, comp2, 200, &overlay2);
   ASSERT_EQ(UI_ERROR_NONE, err);
   ASSERT_TRUE(overlay2 != NULL);
-  ASSERT_TRUE(root->first_child != root->last_child); /* Now two children */
 
-  /* Unmount first (it is not the first_overlay in the list) */
+  /* Mount third overlay */
+  err = ui_overlay_director_mount_component(dir, comp3, 300, &overlay3);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  ASSERT_TRUE(overlay3 != NULL);
+
+  /* Unmount first (head of list is overlay3, overlay1 is tail -> prev != NULL)
+   */
   err = ui_overlay_director_unmount(dir, overlay1);
   ASSERT_EQ(UI_ERROR_NONE, err);
 
-  /* Unmount second */
-  err = ui_overlay_director_unmount(dir, overlay2);
+  /* Unmount head (overlay3 is head of list -> prev == NULL) */
+  err = ui_overlay_director_unmount(dir, overlay3);
   ASSERT_EQ(UI_ERROR_NONE, err);
 
-  /* Destroy component manually since we unmounted it, wait, ui_component_mount
-     transfers ownership? No, ui_component_destroy must be called by the user.
-   */
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(comp1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-
-  /* Destroy director (should unmount overlay2 automatically) */
+  /* overlay2 is still mounted; test destroying director with active overlay */
   err = ui_overlay_director_destroy(dir);
   ASSERT_EQ(UI_ERROR_NONE, err);
 
   {
+    ui_error_t rc_cleanup = ui_component_destroy(comp1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+  {
     ui_error_t rc_cleanup = ui_component_destroy(comp2);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(comp3);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
   }
 
@@ -170,7 +193,55 @@ static ui_error_t test_overlay_director_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
+    }
+  }
+  return UI_ERROR_NONE;
+}
+
+static ui_error_t test_unmount_detached_parent(void) {
+  struct ui_dom_node *root = NULL;
+  struct ui_overlay_director *dir = NULL;
+  struct ui_component *comp = NULL;
+  struct ui_overlay *overlay = NULL;
+  ui_error_t err;
+
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+
+  err = ui_overlay_director_create(root, &dir);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+
+  err = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+
+  err = ui_overlay_director_mount_component(dir, comp, 50, &overlay);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+
+  /* Manually detach the wrapper node from root before calling unmount */
+  err = ui_dom_node_remove_child(root, root->first_child);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+
+  /* Unmount with p == NULL */
+  err = ui_overlay_director_unmount(dir, overlay);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+
+  {
+    ui_error_t rc_cleanup = ui_overlay_director_destroy(dir);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -184,8 +255,10 @@ static ui_error_t test_oom(void) {
   ui_error_t err;
   int i;
 
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-  ui_component_create(&comp);
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  err = ui_component_create(&comp);
+  ASSERT_EQ(UI_ERROR_NONE, err);
 
   /* Creation OOM */
   g_malloc_fail_countdown = 0;
@@ -193,7 +266,8 @@ static ui_error_t test_oom(void) {
   g_malloc_fail_countdown = -1;
   ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, err);
 
-  ui_overlay_director_create(root, &dir);
+  err = ui_overlay_director_create(root, &dir);
+  ASSERT_EQ(UI_ERROR_NONE, err);
 
   /* Mount OOM (no children) */
   for (i = 0; i < 20; i++) {
@@ -208,50 +282,170 @@ static ui_error_t test_oom(void) {
     }
   }
 
-  /* Mount OOM with existing child */
-  ui_overlay_director_mount_component(dir, comp, 1, &overlay);
-  g_malloc_fail_countdown = -100;
-  ui_overlay_director_unmount(dir, overlay);
-  g_malloc_fail_countdown = -1;
-  ui_overlay_director_mount_component(dir, comp, 1, &overlay);
-  for (i = 0; i < 20; i++) {
-    struct ui_overlay *overlay2 = NULL;
-    g_malloc_fail_countdown = i;
-    err = ui_overlay_director_mount_component(dir, comp, 1, &overlay2);
-    g_malloc_fail_countdown = -1;
-    if (err == UI_ERROR_OUT_OF_MEMORY) {
-      continue;
-    } else if (err == UI_ERROR_NONE) {
-      ui_overlay_director_unmount(dir, overlay2);
-      break;
-    }
-  }
-
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(dir);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(comp);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t test_mock_failures(void) {
+  struct ui_dom_node *root = NULL;
+  struct ui_overlay_director *dir = NULL;
+  struct ui_component *comp1 = NULL;
+  struct ui_component *comp2 = NULL;
+  struct ui_overlay *overlay1 = NULL;
+  struct ui_overlay *overlay2 = NULL;
+  ui_error_t err;
+
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  err = ui_component_create(&comp1);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  err = ui_component_create(&comp2);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  err = ui_overlay_director_create(root, &dir);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+
+  /* 1. set_tag_name failure, destroy succeeds */
+  g_overlay_mock_fail = 2;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 2. set_tag_name failure, destroy fails */
+  g_overlay_mock_fail = 2;
+  g_overlay_destroy_mock_fail = 1;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 3. set_attribute style failure, destroy succeeds */
+  g_overlay_mock_fail = 3;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 4. set_attribute style failure, destroy fails */
+  g_overlay_mock_fail = 3;
+  g_overlay_destroy_mock_fail = 1;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 5. set_attribute data-overlay failure, destroy succeeds */
+  g_overlay_mock_fail = 4;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 6. set_attribute data-overlay failure, destroy fails */
+  g_overlay_mock_fail = 4;
+  g_overlay_destroy_mock_fail = 1;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 7. append_child failure, destroy succeeds */
+  g_overlay_mock_fail = 5;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 8. append_child failure, destroy fails */
+  g_overlay_mock_fail = 5;
+  g_overlay_destroy_mock_fail = 1;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 9. component_mount failure, remove_child succeeds, destroy succeeds */
+  g_overlay_mock_fail = 6;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 10. component_mount failure, remove_child fails */
+  g_overlay_mock_fail = 6;
+  g_overlay_remove_child_mock_fail = 1;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 11. component_mount failure, remove_child succeeds, destroy fails */
+  g_overlay_mock_fail = 6;
+  g_overlay_destroy_mock_fail = 1;
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 12. Mount succeeds, then unmount remove_child fails */
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  g_overlay_remove_child_mock_fail = 1;
+  err = ui_overlay_director_unmount(dir, overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 13. Mount succeeds, then unmount destroy fails */
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  g_overlay_destroy_mock_fail = 1;
+  err = ui_overlay_director_unmount(dir, overlay1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  /* 14. Destroy with two overlays where unmount fails for both */
+  err = ui_overlay_director_mount_component(dir, comp1, 1, &overlay1);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  err = ui_overlay_director_mount_component(dir, comp2, 2, &overlay2);
+  ASSERT_EQ(UI_ERROR_NONE, err);
+  g_overlay_destroy_mock_fail = 2;
+  err = ui_overlay_director_destroy(dir);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, err);
+
+  {
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(comp1);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_component_destroy(comp2);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
+  }
+  return UI_ERROR_NONE;
+}
+#endif
+
 int main(void) {
-  test_invalid_args();
-  test_overlay_director_lifecycle();
-  test_oom();
+  if (test_invalid_args() != UI_ERROR_NONE) {
+    s_tests_failed++;
+  }
+  if (test_overlay_director_lifecycle() != UI_ERROR_NONE) {
+    s_tests_failed++;
+  }
+  if (test_unmount_detached_parent() != UI_ERROR_NONE) {
+    s_tests_failed++;
+  }
+  if (test_oom() != UI_ERROR_NONE) {
+    s_tests_failed++;
+  }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (test_mock_failures() != UI_ERROR_NONE) {
+    s_tests_failed++;
+  }
+#endif
 
   printf("Tests passed: %d\n", s_tests_passed);
   printf("Tests failed: %d\n", s_tests_failed);

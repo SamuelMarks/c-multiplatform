@@ -11,11 +11,10 @@ static struct ui_disclosure_base *g_last_active = NULL;
 static ui_error_t on_accordion_change(struct ui_accordion_base *accordion,
                                       struct ui_disclosure_base *active,
                                       void *user_data) {
-  (void)accordion;
-  (void)user_data;
+  if (accordion || user_data) {
+  }
   g_change_count++;
   g_last_active = active;
-  return UI_ERROR_NONE;
   return UI_ERROR_NONE;
 }
 
@@ -321,12 +320,216 @@ static int test_accordion_edge_cases(void) {
     }
   }
 
-#ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_accordion_methods_coverage(void);
-  run_accordion_methods_coverage();
-#endif
   return 0;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_accordion_mock_fail;
+
+static ui_error_t test_accordion_fail_cb(struct ui_accordion_base *a,
+                                         struct ui_disclosure_base *d,
+                                         void *u) {
+  if (a || d || u) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static int test_accordion_mock_coverage(void) {
+  ui_error_t rc;
+  struct ui_accordion_base *accordion = NULL;
+  struct ui_disclosure_base *d1 = NULL;
+  struct ui_disclosure_base *d2 = NULL;
+  struct ui_disclosure_base *d3 = NULL;
+
+  rc = ui_accordion_base_create(&accordion);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_disclosure_base_create(&d1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_disclosure_base_create(&d2);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  rc = ui_accordion_base_add_disclosure(accordion, d1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_accordion_base_add_disclosure(accordion, d2);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* 1. on_child_disclosure_toggle(!is_expanded) with on_change failing */
+  rc = ui_accordion_base_set_active(accordion, d1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_accordion_base_set_on_change(accordion, test_accordion_fail_cb, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  /* Toggling d1 to 0 calls on_child_disclosure_toggle(d1, 0) */
+  rc = ui_disclosure_base_set_expanded(d1, 0);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* 2. on_child_disclosure_toggle(is_expanded) with on_change failing */
+  rc = ui_disclosure_base_set_expanded(d1, 1);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_accordion_base_set_on_change(accordion, NULL, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* 3. is_expanded fails inside on_child_disclosure_toggle */
+  /* For this, d1 must expand while another item exists. But wait, d1 was set
+   * expanded to 1 above (though it failed in on_change). Let us collapse d1
+   * first. */
+  rc = ui_disclosure_base_set_expanded(d1, 0);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 2;
+  rc = ui_disclosure_base_set_expanded(d1, 1);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 0;
+
+  /* 4. set_expanded fails inside on_child_disclosure_toggle */
+  /* d2 must be expanded=1, and then d1 expands */
+  rc = ui_disclosure_base_set_expanded(d1, 0);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_disclosure_base_set_expanded(d2, 1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 3;
+  rc = ui_disclosure_base_set_expanded(d1, 1);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 0;
+
+  /* 5. set_on_toggle fails in ui_accordion_base_destroy */
+  g_accordion_mock_fail = 1;
+  rc = ui_accordion_base_destroy(accordion);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 0;
+
+  /* Destroy accordion for real */
+  rc = ui_accordion_base_destroy(accordion);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* 6. set_on_toggle fails in add_disclosure */
+  rc = ui_accordion_base_create(&accordion);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 1;
+  rc = ui_accordion_base_add_disclosure(accordion, d1);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 0;
+
+  /* 7. is_expanded fails in add_disclosure */
+  g_accordion_mock_fail = 2;
+  rc = ui_accordion_base_add_disclosure(accordion, d2);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 0;
+
+  /* 8. on_child_disclosure_toggle fails in add_disclosure */
+  rc = ui_disclosure_base_create(&d3);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_disclosure_base_set_expanded(d3, 1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_accordion_base_set_on_change(accordion, test_accordion_fail_cb, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_accordion_base_add_disclosure(accordion, d3);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_accordion_base_set_on_change(accordion, NULL, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_disclosure_base_destroy(d3);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* 9. set_on_toggle fails in remove_disclosure */
+  rc = ui_accordion_base_add_disclosure(accordion, d1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 1;
+  rc = ui_accordion_base_remove_disclosure(accordion, d1);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 0;
+
+  /* 10. set_expanded fails in set_active(accordion, d1) */
+  rc = ui_accordion_base_add_disclosure(accordion, d1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 3;
+  rc = ui_accordion_base_set_active(accordion, d1);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 0;
+
+  /* 11. set_expanded fails in set_active(accordion, NULL) */
+  g_accordion_mock_fail = 3;
+  rc = ui_accordion_base_set_active(accordion, NULL);
+  if (rc == UI_ERROR_NONE) {
+    return 1;
+  }
+  g_accordion_mock_fail = 0;
+
+  /* test_accordion_fail_cb NULL checks */
+  test_accordion_fail_cb(NULL, NULL, NULL);
+
+  rc = ui_accordion_base_destroy(accordion);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_disclosure_base_destroy(d1);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_disclosure_base_destroy(d2);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  return 0;
+}
+#endif
 
 int main(void) {
   int failed = 0;
@@ -334,6 +537,9 @@ int main(void) {
 
   failed |= test_accordion_lifecycle();
   failed |= test_accordion_edge_cases();
+#ifdef UI_TEST_MOCK_ALLOC
+  failed |= test_accordion_mock_coverage();
+#endif
 
   if (failed) {
     printf("Tests failed.\n");

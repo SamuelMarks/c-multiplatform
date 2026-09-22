@@ -14,6 +14,27 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_list_base_mock_fail = 0;
+
+/**
+ * @brief mock_list_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_list_component_destroy(struct ui_component *comp) {
+  if (g_list_base_mock_fail == 1) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_list_component_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_list_base
  * @struct ui_list_base
@@ -73,17 +94,18 @@ ui_error_t ui_list_base_create(struct ui_list_base **out_list) {
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_base_destroy(struct ui_list_base *list) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!list) {
     return UI_ERROR_NONE;
   }
   if (list->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(list->component);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_component_destroy(list->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(list);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -188,17 +210,18 @@ ui_error_t ui_list_item_base_create(struct ui_list_item_base **out_item) {
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_list_item_base_destroy(struct ui_list_item_base *item) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!item) {
     return UI_ERROR_NONE;
   }
   if (item->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(item->component);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_component_destroy(item->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(item);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

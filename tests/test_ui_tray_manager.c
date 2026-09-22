@@ -6,6 +6,7 @@
 #include "../include/ui_image_base.h"
 #include "../include/ui_menu_base.h"
 #include "../include/ui_tray_manager.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -94,9 +95,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_tray_manager_destroy(tray);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test destroy while not visible */
@@ -104,16 +103,12 @@ int main(void) {
   failed |= (rc != UI_ERROR_NONE);
   {
     ui_error_t rc_cleanup = ui_tray_manager_destroy(tray);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (!failed) {

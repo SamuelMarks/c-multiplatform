@@ -166,9 +166,7 @@ TEST run_normal_tests(void) {
   /* Clean up host node manually as it sits outside the component */
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(host_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
 
   /* 2. Test Invalid Arguments */
@@ -375,9 +373,9 @@ TEST run_mock_fail_tests(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   g_component_mock_fail = 24;
   rc = ui_component_set_default_style(comp, style2);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
   g_component_mock_fail = 0;
-  rc = ui_css_stylesheet_destroy(style);
+  rc = ui_css_stylesheet_destroy(style2);
   ASSERT_EQ(UI_ERROR_NONE, rc);
   rc = ui_component_destroy(comp);
   ASSERT_EQ(UI_ERROR_NONE, rc);
@@ -387,13 +385,10 @@ TEST run_mock_fail_tests(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   rc = ui_component_inject_style_override(comp, ".btn { color: red; }");
   ASSERT_EQ(UI_ERROR_NONE, rc);
-  style = comp->override_style;
   g_component_mock_fail = 25;
   rc = ui_component_inject_style_override(comp, ".btn { color: blue; }");
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
   g_component_mock_fail = 0;
-  rc = ui_css_stylesheet_destroy(style);
-  ASSERT_EQ(UI_ERROR_NONE, rc);
   rc = ui_component_destroy(comp);
   ASSERT_EQ(UI_ERROR_NONE, rc);
 
@@ -402,7 +397,7 @@ TEST run_mock_fail_tests(void) {
   ASSERT_EQ(UI_ERROR_NONE, rc);
   g_component_mock_fail = 26;
   rc = ui_component_set_property(comp, "--mock-color", "#123");
-  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
   g_component_mock_fail = 0;
   rc = ui_component_destroy(comp);
   ASSERT_EQ(UI_ERROR_NONE, rc);

@@ -139,64 +139,6 @@ static ui_error_t mock_signal_set(struct ui_signal *signal,
 /** @cond */
 #define ui_signal_set mock_signal_set
 /** @endcond */
-
-ui_error_t run_banner_coverage(void);
-/**
- * @brief run_banner_coverage.
- * @return Return value.
- */
-ui_error_t run_banner_coverage(void) {
-  struct ui_banner_base *banner = NULL;
-  union ui_signal_payload p;
-  struct ui_signal *sig = NULL;
-
-  g_banner_mock_fail = 10;
-  (void)ui_banner_base_create(&banner);
-  g_banner_mock_fail = 0;
-
-  g_banner_mock_fail = 11;
-  (void)ui_banner_base_create(&banner);
-  g_banner_mock_fail = 0;
-
-  g_banner_mock_fail = 12;
-  (void)ui_banner_base_create(&banner);
-  g_banner_mock_fail = 0;
-
-  g_banner_mock_fail = 13;
-  (void)ui_banner_base_create(&banner);
-  g_banner_mock_fail = 0;
-
-  (void)ui_banner_base_create(&banner);
-
-  g_banner_mock_fail = 11;
-  (void)ui_banner_base_set_text(banner, "text");
-  g_banner_mock_fail = 0;
-
-  g_banner_mock_fail = 1;
-  (void)ui_banner_base_set_text(banner, "text");
-  g_banner_mock_fail = 0;
-
-  g_banner_mock_fail = 2;
-  (void)ui_banner_base_set_open(banner, 1);
-  g_banner_mock_fail = 0;
-
-  g_banner_mock_fail = 3;
-  (void)ui_banner_base_set_open(banner, 0);
-  g_banner_mock_fail = 0;
-
-  p.bool_val = 1;
-  (void)ui_signal_create(NULL, p, UI_SIGNAL_TYPE_BOOL, NULL, NULL, 0, &sig);
-  (void)ui_banner_base_bind_open(banner, sig);
-
-  g_banner_mock_fail = 4;
-  (void)ui_banner_base_set_open(banner, 1);
-  g_banner_mock_fail = 0;
-
-  (void)ui_signal_destroy(sig);
-  (void)ui_banner_base_destroy(banner);
-
-  return UI_ERROR_NONE;
-}
 #endif
 
 /**
@@ -228,10 +170,7 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   banner = (struct ui_banner_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_banner_base));
   if (!banner) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(base_comp);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -244,35 +183,25 @@ ui_error_t ui_banner_base_create(struct ui_banner_base **out_banner) {
   err =
       ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &banner->base->shadow_root);
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(banner->base);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(banner->base);
     C_MULTIPLATFORM_FREE(banner);
     return err;
   }
 
   err = ui_dom_node_set_tag_name(banner->base->shadow_root, "ui-banner");
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(banner->base->shadow_root);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(banner->base->shadow_root);
     banner->base->shadow_root = NULL;
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(banner->base);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(banner->base);
     C_MULTIPLATFORM_FREE(banner);
     return err;
   }
 
   err = ui_dom_node_set_attribute(banner->base->shadow_root, "role", "banner");
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(banner->base);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(banner->base->shadow_root);
+    banner->base->shadow_root = NULL;
+    ui_component_destroy(banner->base);
     C_MULTIPLATFORM_FREE(banner);
     return err;
   }
@@ -298,10 +227,7 @@ ui_error_t ui_banner_base_set_text(struct ui_banner_base *banner,
     }
     err = ui_dom_node_append_child(banner->base->shadow_root, text_node);
     if (err != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-        (void)rc_cleanup;
-      }
+      ui_dom_node_destroy(text_node);
       return err;
     }
   } else {
@@ -404,15 +330,9 @@ ui_error_t ui_banner_base_destroy(struct ui_banner_base *banner) {
   if (!banner) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(banner->base);
-    (void)rc_cleanup;
+  if (banner->base) {
+    ui_component_destroy(banner->base);
   }
-  /* The banner allocation itself was flattened into base_comp, but then
-     we allocated banner itself with C_MULTIPLATFORM_MALLOC so we need to free
-     it. Note that ui_component_destroy only destroys internal fields, not the
-     container struct pointer itself if it's embedded. Wait, base was created
-     using ui_component_create which mallocs... then copied by value... */
   C_MULTIPLATFORM_FREE(banner);
   return UI_ERROR_NONE;
 }

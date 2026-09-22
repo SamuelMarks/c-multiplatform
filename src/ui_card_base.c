@@ -192,32 +192,19 @@ ui_error_t ui_card_base_create(struct ui_card_base **out_card) {
 
 cleanup:
   if (card->header_node && card->header_node->parent == NULL) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(card->header_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(card->header_node);
   }
   if (card->content_node && card->content_node->parent == NULL) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(card->content_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(card->content_node);
   }
   if (card->actions_node && card->actions_node->parent == NULL) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(card->actions_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(card->actions_node);
   }
   if (card->root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(card->root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(card->root_node);
   }
   if (card->component) {
-    ui_error_t rc_cleanup = ui_component_destroy(card->component);
-    (void)rc_cleanup;
+    ui_component_destroy(card->component);
   }
   C_MULTIPLATFORM_FREE(card);
   return rc;
@@ -228,10 +215,7 @@ ui_error_t ui_card_base_destroy(struct ui_card_base *card) {
     return UI_ERROR_NONE;
   }
   if (card->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(card->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(card->component);
   }
   C_MULTIPLATFORM_FREE(card);
   return UI_ERROR_NONE;

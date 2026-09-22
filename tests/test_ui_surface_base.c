@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "ui_surface_base.h"
 #include "ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
@@ -44,9 +45,7 @@ static int run_normal_tests(void) {
   if (surface) {
     {
       ui_error_t rc_cleanup = ui_component_destroy(&surface->base);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -67,6 +66,21 @@ static int run_oom_tests(void) {
     return 1;
   g_malloc_fail_countdown = -1;
 
+  {
+    extern int g_surface_mock_fail;
+    g_surface_mock_fail = 1;
+    g_malloc_fail_countdown = 1;
+    if (ui_surface_base_create(&surface) != UI_ERROR_UNKNOWN)
+      return 1;
+
+    g_surface_mock_fail = 2;
+    g_malloc_fail_countdown = 3;
+    if (ui_surface_base_create(&surface) != UI_ERROR_UNKNOWN)
+      return 1;
+
+    g_surface_mock_fail = 0;
+    g_malloc_fail_countdown = -1;
+  }
 #endif
   return 0;
 }

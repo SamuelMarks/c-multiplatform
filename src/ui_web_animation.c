@@ -253,9 +253,9 @@ ui_error_t ui_web_animation_destroy(struct ui_web_animation *animation) {
 }
 
 /**
- * @brief get_active_duration.
+ * @brief Computes active duration for an animation.
  * @param anim Parameter anim.
- * @return Return value.
+ * @return Active duration in milliseconds, or -1.0 for infinity.
  */
 static double get_active_duration(const struct ui_web_animation *anim) {
   if (!anim->effect) {

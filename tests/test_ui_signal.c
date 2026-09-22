@@ -5,6 +5,7 @@
 #include <ui_reactive_graph.h>
 #include "../include/ui_thread_pool.h"
 #include "../include/ui_atomic.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 /* clang-format on */
@@ -18,13 +19,17 @@ static ui_error_t mock_update(union ui_signal_payload cur,
 static ui_error_t mock_eq_fail(union ui_signal_payload a,
                                union ui_signal_payload b,
                                ui_bool_t *out_equal) {
-  (void)a;
-  (void)b;
-  (void)out_equal;
+  if (a.ptr_val) {
+  }
+  if (b.ptr_val) {
+  }
+  if (out_equal) {
+  }
   return UI_ERROR_INVALID_ARGUMENT;
 }
 static ui_error_t mock_destructor_fail(union ui_signal_payload val) {
-  (void)val;
+  if (val.ptr_val) {
+  }
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
@@ -59,7 +64,8 @@ static ui_error_t eq_fn(union ui_signal_payload a, union ui_signal_payload b,
 }
 
 static ui_error_t dest_fn(union ui_signal_payload payload) {
-  (void)payload;
+  if (payload.ptr_val) {
+  }
   if (g_dest_fail) {
     return UI_ERROR_UNKNOWN;
   }
@@ -74,13 +80,16 @@ static ui_error_t upd_fn(union ui_signal_payload current,
 
 static ui_error_t fail_upd_fn(union ui_signal_payload current,
                               union ui_signal_payload *out_val) {
-  (void)current;
-  (void)out_val;
+  if (current.ptr_val) {
+  }
+  if (out_val) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
 static ui_error_t notify_cb(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   g_notify_count++;
   if (g_notify_fail) {
     return UI_ERROR_UNKNOWN;
@@ -96,7 +105,8 @@ static ui_error_t unlock_task(void *user_data) {
   } /* wait for main thread */
   for (k = 0; k < 10000000; k++) {
     volatile int dummy = k; /* delay */
-    (void)dummy;
+    if (dummy) {
+    }
   }
   return ui_atomic_store(&sig->lock, 0);
 }
@@ -179,10 +189,12 @@ static int test_signal(void) {
 
   ui_reactive_graph_set_current_node(NULL, NULL);
 
-  struct ui_reactive_node node_null = {NULL, NULL};
-  ui_reactive_graph_set_current_node(&node_null, NULL);
-  ui_signal_get(sig, &out_val);
-  ui_reactive_graph_set_current_node(NULL, NULL);
+  {
+    struct ui_reactive_node node_null = {NULL, NULL};
+    ui_reactive_graph_set_current_node(&node_null, NULL);
+    ui_signal_get(sig, &out_val);
+    ui_reactive_graph_set_current_node(NULL, NULL);
+  }
 
   /* Set value to trigger notifications */
   g_notify_count = 0;
@@ -228,15 +240,15 @@ static int test_signal(void) {
 
   /* Subscriber addition OOM */
   {
-
     struct ui_reactive_node dummies[20];
     int di;
+    ui_error_t rc_get;
     for (di = 0; di < 20; di++) {
       dummies[di].notify_fn = notify_cb;
       dummies[di].user_data = NULL;
       ui_reactive_graph_set_current_node(&dummies[di], NULL);
       g_malloc_fail_countdown = 0;
-      ui_error_t rc_get = ui_signal_get(sig, &out_val);
+      rc_get = ui_signal_get(sig, &out_val);
       g_malloc_fail_countdown = -1;
       if (rc_get == UI_ERROR_OUT_OF_MEMORY) {
         break;
@@ -248,9 +260,7 @@ static int test_signal(void) {
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Update with failure fn */
@@ -263,9 +273,7 @@ static int test_signal(void) {
     }
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -277,9 +285,7 @@ static int test_signal(void) {
     ui_signal_set(sig, val);
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -287,6 +293,7 @@ static int test_signal(void) {
   /* Multithreaded mode */
   {
     ui_signal_t *mtsig = NULL;
+    struct ui_thread_pool *pool;
     val.int_val = 1;
     ui_signal_create(NULL, val, UI_SIGNAL_TYPE_INT32, eq_fn, dest_fn,
                      UI_SIGNAL_MODE_MULTI_THREADED, &mtsig);
@@ -294,7 +301,6 @@ static int test_signal(void) {
     val.int_val = 2;
     ui_signal_set(mtsig, val);
 
-    struct ui_thread_pool *pool;
     if (ui_thread_pool_create(1, &pool) == UI_ERROR_NONE) {
 
       ui_atomic_store(&mtsig->lock, 1);
@@ -307,9 +313,7 @@ static int test_signal(void) {
 
     {
       ui_error_t rc_cleanup = ui_signal_destroy(mtsig);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 #endif
@@ -317,9 +321,11 @@ static int test_signal(void) {
   /* Nulls */
   ui_signal_create(NULL, val, UI_SIGNAL_TYPE_INT32, NULL, NULL, 0, NULL);
   ui_signal_get(NULL, NULL);
-  ui_signal_get(
-      sig,
-      NULL); /* Wait, sig is already destroyed, but let's test NULL signal */
+  {
+    struct ui_signal valid_sig;
+    memset(&valid_sig, 0, sizeof(valid_sig));
+    assert(ui_signal_get(&valid_sig, NULL) == UI_ERROR_INVALID_ARGUMENT);
+  }
 
   ui_signal_set(NULL, val);
   ui_signal_update(NULL, NULL);
@@ -328,9 +334,7 @@ static int test_signal(void) {
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
   /* malloc fails */
@@ -351,15 +355,11 @@ static int test_signal(void) {
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -373,9 +373,7 @@ static int test_signal(void) {
     g_malloc_fail_countdown = -1;
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -388,15 +386,11 @@ static int test_signal(void) {
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
     {
       ui_error_t rc_cleanup = ui_signal_update(sig_upd, mock_update);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
     }
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig_upd);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -411,15 +405,11 @@ static int test_signal(void) {
     pv.int_val = 2;
     {
       ui_error_t rc_cleanup = ui_signal_set(sig_both, pv);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
     }
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig_both);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
     }
   }
 
@@ -440,9 +430,7 @@ static int test_other_types(void) {
   ui_signal_set(sig_ptr, val);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig_ptr);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test destructor failure in set_value */
@@ -456,9 +444,7 @@ static int test_other_types(void) {
     ui_signal_set(sig_fail, pv);
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig_fail);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
     }
   }
 
@@ -469,9 +455,7 @@ static int test_other_types(void) {
   ui_signal_set(sig_float, val);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig_float);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   val.bool_val = 1;
@@ -481,9 +465,7 @@ static int test_other_types(void) {
   ui_signal_set(sig_bool, val);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig_bool);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   val.ptr_val = (void *)0x1111;
@@ -493,9 +475,7 @@ static int test_other_types(void) {
   ui_signal_set(sig_def, val);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig_def);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test ui_signal_update failure from set_value */
@@ -507,15 +487,11 @@ static int test_other_types(void) {
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
     {
       ui_error_t rc_cleanup = ui_signal_update(sig_upd, mock_update);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
     }
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig_upd);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -530,15 +506,11 @@ static int test_other_types(void) {
     pv.int_val = 2;
     {
       ui_error_t rc_cleanup = ui_signal_set(sig_both, pv);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
     }
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig_both);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
     }
   }
 
@@ -563,15 +535,11 @@ int main(void) {
                      UI_SIGNAL_MODE_SINGLE_THREADED, &sig_upd);
     {
       ui_error_t rc_cleanup = ui_signal_update(sig_upd, mock_update);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
     }
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig_upd);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -586,17 +554,36 @@ int main(void) {
     pv.int_val = 2;
     {
       ui_error_t rc_cleanup = ui_signal_set(sig_both, pv);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
     }
     {
       ui_error_t rc_cleanup = ui_signal_destroy(sig_both);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
     }
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_signal_mock_graph_get_node_fail;
+    struct ui_signal *g_sig = NULL;
+    union ui_signal_payload val;
+    union ui_signal_payload out_val;
+    ui_error_t rc;
+
+    val.int_val = 42;
+    rc = ui_signal_create(NULL, val, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+                          UI_SIGNAL_MODE_SINGLE_THREADED, &g_sig);
+    assert(rc == UI_ERROR_NONE);
+
+    g_signal_mock_graph_get_node_fail = 1;
+    rc = ui_signal_get(g_sig, &out_val);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_signal_mock_graph_get_node_fail = 0;
+
+    rc = ui_signal_destroy(g_sig);
+    assert(rc == UI_ERROR_NONE);
+  }
+#endif
 
   return 0;
 }

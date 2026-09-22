@@ -255,6 +255,44 @@ static int test_ui_sort_header_base_edge_cases(void) {
   return 0;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static int test_ui_sort_header_mock_failures(void) {
+  struct ui_sort_header_base *header = NULL;
+  extern int g_sort_header_mock_fail;
+  extern ui_error_t test_ui_sort_header_find_state_index_null(
+      struct ui_sort_header_base * header);
+
+  /* Test null out_index in find_state_index */
+  ASSERT_EQ(test_ui_sort_header_find_state_index_null(NULL),
+            UI_ERROR_INVALID_ARGUMENT);
+
+  ASSERT_SUCCESS(ui_sort_header_base_create(&header));
+
+  ASSERT_EQ(test_ui_sort_header_find_state_index_null(header),
+            UI_ERROR_INVALID_ARGUMENT);
+
+  /* Test fail in toggle */
+  g_sort_header_mock_fail = 1;
+  ASSERT_EQ(ui_sort_header_base_toggle(header, (void *)1), UI_ERROR_UNKNOWN);
+
+  /* Test fail in set_direction with UI_SORT_NONE */
+  ASSERT_EQ(ui_sort_header_base_set_direction(header, (void *)1, UI_SORT_NONE),
+            UI_ERROR_UNKNOWN);
+
+  /* Test fail in set_direction with is_multi */
+  g_sort_header_mock_fail = 0;
+  ASSERT_SUCCESS(ui_sort_header_base_set_multi_sort(header, 1));
+  g_sort_header_mock_fail = 1;
+  ASSERT_EQ(
+      ui_sort_header_base_set_direction(header, (void *)1, UI_SORT_ASCENDING),
+      UI_ERROR_UNKNOWN);
+  g_sort_header_mock_fail = 0;
+
+  ui_sort_header_base_destroy(header);
+  return 0;
+}
+#endif
+
 int main(void) {
   if (test_ui_sort_header_base_create_destroy())
     return 1;
@@ -268,5 +306,9 @@ int main(void) {
     return 1;
   if (test_ui_sort_header_base_edge_cases())
     return 1;
+#ifdef UI_TEST_MOCK_ALLOC
+  if (test_ui_sort_header_mock_failures())
+    return 1;
+#endif
   return 0;
 }

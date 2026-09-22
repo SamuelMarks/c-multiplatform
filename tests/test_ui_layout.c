@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "../include/ui_layout.h"

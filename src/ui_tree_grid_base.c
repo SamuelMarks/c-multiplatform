@@ -11,6 +11,27 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_tree_grid_mock_fail = 0;
+
+/**
+ * @brief mock_tree_grid_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_tree_grid_component_destroy(struct ui_component *comp) {
+  if (g_tree_grid_mock_fail == 1) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_tree_grid_component_destroy
+/** @endcond */
+#endif
+
 /** @brief internal */
 #define MAX_EXPANDED_NODES 256
 
@@ -61,15 +82,15 @@ ui_error_t ui_tree_grid_base_create(struct ui_tree_grid_base **out_tree_grid,
 }
 
 ui_error_t ui_tree_grid_base_destroy(struct ui_tree_grid_base *tree_grid) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!tree_grid) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(tree_grid->component);
-    (void)rc_cleanup;
+  if (tree_grid->component) {
+    rc = ui_component_destroy(tree_grid->component);
   }
   C_MULTIPLATFORM_FREE(tree_grid);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t
@@ -86,6 +107,13 @@ ui_error_t
 ui_tree_grid_base_is_expanded(const struct ui_tree_grid_base *tree_grid,
                               void *node_id, int *out_is_expanded) {
   size_t i;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_tree_grid_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+
   if (!tree_grid || !out_is_expanded) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -105,12 +133,15 @@ ui_error_t ui_tree_grid_base_set_expanded(struct ui_tree_grid_base *tree_grid,
                                           void *node_id, int expanded) {
   int currently_expanded = 0;
   size_t i;
+  ui_error_t rc;
 
   if (!tree_grid || !node_id) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_tree_grid_base_is_expanded(tree_grid, node_id, &currently_expanded);
+  rc = ui_tree_grid_base_is_expanded(tree_grid, node_id, &currently_expanded);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (expanded && !currently_expanded) {
     if (tree_grid->expanded_count < MAX_EXPANDED_NODES) {
@@ -147,6 +178,8 @@ ui_error_t ui_tree_grid_base_toggle_node(struct ui_tree_grid_base *tree_grid,
 ui_error_t
 ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
                                    const struct ui_keyboard_event *event) {
+  ui_error_t rc;
+
   if (!tree_grid || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -157,8 +190,10 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   if (event->key_code == UI_KEY_RIGHT) {
     if (tree_grid->active_node) {
       int expanded = 0;
-      (void)ui_tree_grid_base_is_expanded(tree_grid, tree_grid->active_node,
-                                          &expanded);
+      rc = ui_tree_grid_base_is_expanded(tree_grid, tree_grid->active_node,
+                                         &expanded);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       if (!expanded) {
         return ui_tree_grid_base_set_expanded(tree_grid, tree_grid->active_node,
                                               1);
@@ -171,8 +206,10 @@ ui_tree_grid_base_handle_key_event(struct ui_tree_grid_base *tree_grid,
   } else if (event->key_code == UI_KEY_LEFT) {
     if (tree_grid->active_node) {
       int expanded = 0;
-      (void)ui_tree_grid_base_is_expanded(tree_grid, tree_grid->active_node,
-                                          &expanded);
+      rc = ui_tree_grid_base_is_expanded(tree_grid, tree_grid->active_node,
+                                         &expanded);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       if (expanded) {
         return ui_tree_grid_base_set_expanded(tree_grid, tree_grid->active_node,
                                               0);

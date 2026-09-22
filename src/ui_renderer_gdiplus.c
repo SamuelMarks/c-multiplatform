@@ -292,10 +292,11 @@ static ui_error_t gdiplus_begin_frame(void *ctx, int width, int height) {
  * @return Return value.
  */
 static ui_error_t gdiplus_end_frame(void *ctx) {
-  /* For offscreen, nothing to do here.
-     When blitting to screen, we would extract the bitmap or draw it to the
-     window HDC. */
-  (void)ctx;
+  if (ctx) {
+    /* For offscreen, nothing to do here.
+       When blitting to screen, we would extract the bitmap or draw it to the
+       window HDC. */
+  }
   return UI_ERROR_NONE;
 }
 
@@ -439,10 +440,9 @@ static ui_error_t gdiplus_draw_text(void *ctx, const char *text,
  */
 static ui_error_t gdiplus_draw_image(void *ctx, const struct ui_image *img,
                                      const struct ui_rect *r) {
-  (void)ctx;
-  (void)img;
-  (void)r;
-  /* Stub image */
+  if (ctx || img || r) {
+    /* Stub image */
+  }
   return UI_ERROR_NONE;
 }
 
@@ -487,8 +487,11 @@ static ui_error_t gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
           (float *)C_MULTIPLATFORM_MALLOC(sizeof(float) * (size_t)count);
       if (colors && positions) {
         for (i = 0; i < count; ++i) {
-          (void)ui_css_color_to_argb(
+          ui_error_t col_rc = ui_css_color_to_argb(
               &gradient->data.linear_gradient.stops[i].color, &colors[i]);
+          if (col_rc != UI_ERROR_NONE) {
+            colors[i] = 0xFF000000;
+          }
           /* Approximate positions */
           positions[i] = (float)i / (float)(count - 1);
         }
@@ -538,7 +541,11 @@ static ui_error_t gdiplus_draw_gradient(void *ctx, const struct ui_rect *r,
 
           /* PathGradient supports PresetBlend */
           for (i = 0; i < count; ++i) {
-            (void)ui_css_color_to_argb(&stops[i].color, &colors[i]);
+            ui_error_t col_rc =
+                ui_css_color_to_argb(&stops[i].color, &colors[i]);
+            if (col_rc != UI_ERROR_NONE) {
+              colors[i] = 0xFF000000;
+            }
             positions[i] = (float)i / (float)(count - 1);
           }
           /* For PathGradient, position 0 is center, 1 is boundary.
@@ -658,9 +665,9 @@ static ui_error_t gdiplus_pop_clip(void *ctx) {
  */
 static ui_error_t gdiplus_set_blend_mode(void *ctx,
                                          enum ui_css_blend_mode mode) {
-  (void)ctx;
-  (void)mode;
-  /* Stub for blend mode */
+  if (ctx || mode != UI_CSS_BLEND_MODE_NORMAL) {
+    /* Stub for blend mode */
+  }
   return UI_ERROR_NONE;
 }
 
@@ -672,9 +679,9 @@ static ui_error_t gdiplus_set_blend_mode(void *ctx,
  */
 static ui_error_t gdiplus_set_shadow(void *ctx,
                                      const struct ui_css_shadow *shadow) {
-  (void)ctx;
-  (void)shadow;
-  /* Stub for drop shadow */
+  if (ctx || shadow) {
+    /* Stub for drop shadow */
+  }
   return UI_ERROR_NONE;
 }
 

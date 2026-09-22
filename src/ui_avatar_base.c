@@ -139,36 +139,19 @@ static ui_error_t mock_extract_initials(const char *name, char *initials_out) {
 /** @brief internal */
 #define extract_initials mock_extract_initials
 
-ui_error_t run_avatar_coverage(void);
 /**
- * @brief run_avatar_coverage.
+ * @brief mock_icon_base_destroy.
+ * @param icon Parameter icon.
  * @return Return value.
  */
-ui_error_t run_avatar_coverage(void) {
-  char initials[8];
-  struct ui_avatar_base *avatar = NULL;
-  ui_error_t rc;
-
-  g_avatar_mock_fail = 1;
-  extract_initials("John Doe", initials);
-  g_avatar_mock_fail = 0;
-
-  g_avatar_mock_fail = 2;
-  extract_initials("John Doe", initials);
-  g_avatar_mock_fail = 0;
-  rc = ui_avatar_base_create(&avatar);
-  (void)rc;
-
-  g_avatar_mock_fail = 3;
-  ui_avatar_base_set_name(avatar, "John Doe");
-  g_avatar_mock_fail = 0;
-
-  {
-    ui_error_t rc_cleanup = ui_avatar_base_destroy(avatar);
-    (void)rc_cleanup;
-  }
-  return UI_ERROR_NONE;
+static ui_error_t mock_icon_base_destroy(struct ui_icon_base *icon) {
+  if (g_avatar_mock_fail == 4)
+    return UI_ERROR_UNKNOWN;
+  return (ui_icon_base_destroy)(icon);
 }
+#undef ui_icon_base_destroy
+/** @brief internal */
+#define ui_icon_base_destroy mock_icon_base_destroy
 #endif
 
 /**
@@ -209,6 +192,7 @@ cleanup:
  * @return Return value.
  */
 ui_error_t ui_avatar_base_destroy(struct ui_avatar_base *avatar) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!avatar) {
     return UI_ERROR_NONE;
   }
@@ -217,11 +201,13 @@ ui_error_t ui_avatar_base_destroy(struct ui_avatar_base *avatar) {
   if (avatar->fallback_icon) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(avatar->fallback_icon);
-      (void)rc_cleanup;
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
+      }
     }
   }
   C_MULTIPLATFORM_FREE(avatar);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -340,6 +326,7 @@ ui_error_t ui_avatar_base_get_image_url(const struct ui_avatar_base *avatar,
  */
 ui_error_t ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
                                             struct ui_icon_base *icon) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!avatar || !icon) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -347,12 +334,14 @@ ui_error_t ui_avatar_base_set_fallback_icon(struct ui_avatar_base *avatar,
   if (avatar->fallback_icon) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(avatar->fallback_icon);
-      (void)rc_cleanup;
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
+      }
     }
   }
 
   avatar->fallback_icon = icon;
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

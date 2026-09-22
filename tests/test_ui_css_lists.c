@@ -313,6 +313,10 @@ static int test_parse_counter_action(void) {
   return 0;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static int test_lists_mock_failures(void);
+#endif
+
 int main(void) {
   int failures = 0;
 
@@ -321,6 +325,9 @@ int main(void) {
   failures += test_parse_list_style_image();
   failures += test_parse_list_style();
   failures += test_parse_counter_action();
+#ifdef UI_TEST_MOCK_ALLOC
+  failures += test_lists_mock_failures();
+#endif
 
   if (failures == 0) {
     printf("test_ui_css_lists passed\n");
@@ -331,11 +338,34 @@ int main(void) {
   return failures;
 }
 
-static int test_skip_whitespace_coverage(void) {
-  /* Internal function so we need a front API to hit the p_str == NULL or *p_str
-   * == NULL branch */
-  /* ui_css_parse_list_style_type passes &str which is never NULL but *p_str
-   * could be NULL if we pass NULL for str, but we have a guard at the top! */
-  /* So it is impossible. We should just remove the guard in skip_whitespace */
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_css_lists_mock_fail;
+extern ui_error_t run_lists_coverage(void);
+
+static int test_lists_mock_failures(void) {
+  struct ui_css_list_style_type_ext type;
+  enum ui_css_list_style_position pos;
+  struct ui_css_image img;
+  int is_none;
+  struct ui_css_list_style style;
+  struct ui_css_counter_action *actions = NULL;
+
+  g_css_lists_mock_fail = 1;
+  if (ui_css_parse_list_style_type("disc", &type) != UI_ERROR_UNKNOWN)
+    return 1;
+  if (ui_css_parse_list_style_position("inside", &pos) != UI_ERROR_UNKNOWN)
+    return 1;
+  if (ui_css_parse_list_style_image("none", &img, &is_none) != UI_ERROR_UNKNOWN)
+    return 1;
+  if (ui_css_parse_list_style("none", &style) != UI_ERROR_UNKNOWN)
+    return 1;
+  if (ui_css_parse_counter_action("none", &actions) != UI_ERROR_UNKNOWN)
+    return 1;
+  g_css_lists_mock_fail = 0;
+
+  if (run_lists_coverage() != UI_ERROR_NONE)
+    return 1;
+
   return 0;
 }
+#endif

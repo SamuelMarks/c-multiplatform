@@ -16,6 +16,126 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_tabs_mock_fail = 0;
+int g_tabs_mock_append_fail_target = 0;
+int g_tabs_mock_set_attr_fail_target = 0;
+int g_tabs_mock_remove_attr_fail_target = 0;
+static int g_tabs_append_counter = 0;
+static int g_tabs_set_attr_counter = 0;
+static int g_tabs_remove_attr_counter = 0;
+
+/**
+ * @brief mock_tabs_dom_node_append_child.
+ * @param parent Parent node.
+ * @param child Child node.
+ * @return Return value.
+ */
+static ui_error_t mock_tabs_dom_node_append_child(struct ui_dom_node *parent,
+                                                  struct ui_dom_node *child) {
+  if (g_tabs_mock_append_fail_target > 0) {
+    if (++g_tabs_append_counter == g_tabs_mock_append_fail_target) {
+      g_tabs_append_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_append_child(parent, child);
+}
+/** @cond */
+#define ui_dom_node_append_child mock_tabs_dom_node_append_child
+/** @endcond */
+
+/**
+ * @brief mock_tabs_component_set_default_style.
+ * @param comp Component.
+ * @param style Stylesheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_tabs_component_set_default_style(struct ui_component *comp,
+                                      struct ui_css_stylesheet *style) {
+  if (g_tabs_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_set_default_style(comp, style);
+}
+/** @cond */
+#define ui_component_set_default_style mock_tabs_component_set_default_style
+/** @endcond */
+
+/**
+ * @brief mock_tabs_dom_node_destroy.
+ * @param node Node.
+ * @return Return value.
+ */
+static ui_error_t mock_tabs_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_tabs_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(node);
+}
+/** @cond */
+#define ui_dom_node_destroy mock_tabs_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief mock_tabs_component_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_tabs_component_destroy(struct ui_component *comp) {
+  if (g_tabs_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_destroy(comp);
+}
+/** @cond */
+#define ui_component_destroy mock_tabs_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_tabs_dom_node_set_attribute.
+ * @param node Node.
+ * @param name Name.
+ * @param val Value.
+ * @return Return value.
+ */
+static ui_error_t mock_tabs_dom_node_set_attribute(struct ui_dom_node *node,
+                                                   const char *name,
+                                                   const char *val) {
+  if (g_tabs_mock_set_attr_fail_target > 0) {
+    if (++g_tabs_set_attr_counter == g_tabs_mock_set_attr_fail_target) {
+      g_tabs_set_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_set_attribute(node, name, val);
+}
+/** @cond */
+#define ui_dom_node_set_attribute mock_tabs_dom_node_set_attribute
+/** @endcond */
+
+/**
+ * @brief mock_tabs_dom_node_remove_attribute.
+ * @param node Node.
+ * @param name Name.
+ * @return Return value.
+ */
+static ui_error_t mock_tabs_dom_node_remove_attribute(struct ui_dom_node *node,
+                                                      const char *name) {
+  if (g_tabs_mock_remove_attr_fail_target > 0) {
+    if (++g_tabs_remove_attr_counter == g_tabs_mock_remove_attr_fail_target) {
+      g_tabs_remove_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_remove_attribute(node, name);
+}
+/** @cond */
+#define ui_dom_node_remove_attribute mock_tabs_dom_node_remove_attribute
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet */
 static const char *ui_tabs_base_default_css =
     ".ui-tabs { display: flex; flex-direction: column; } "
@@ -153,20 +273,14 @@ ui_error_t ui_tabs_base_create(struct ui_tabs_base **out_tabs) {
       return dom_rc;
   }
 
-  {
-
-    ui_error_t _ign_rc = ui_dom_node_append_child(root_node, tablist_node);
-
-    (void)_ign_rc;
-  }
+  rc = ui_dom_node_append_child(root_node, tablist_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
   tabs->tablist_node = tablist_node;
 
-  {
-
-    ui_error_t _ign_rc = ui_dom_node_append_child(root_node, panels_node);
-
-    (void)_ign_rc;
-  }
+  rc = ui_dom_node_append_child(root_node, panels_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
   tabs->panels_node = panels_node;
 
   rc = ui_css_parse_stylesheet(ui_tabs_base_default_css, &default_style);
@@ -174,12 +288,10 @@ ui_error_t ui_tabs_base_create(struct ui_tabs_base **out_tabs) {
     goto cleanup;
   }
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(tabs->component, default_style);
-
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(tabs->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   tabs->component->shadow_root = root_node;
@@ -190,15 +302,15 @@ ui_error_t ui_tabs_base_create(struct ui_tabs_base **out_tabs) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   if (tabs->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(tabs->component);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_component_destroy(tabs->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(tabs);
@@ -207,6 +319,7 @@ cleanup:
 
 ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs) {
   int i;
+  ui_error_t rc = UI_ERROR_NONE;
   if (!tabs) {
     return UI_ERROR_NONE;
   }
@@ -216,13 +329,14 @@ ui_error_t ui_tabs_base_destroy(struct ui_tabs_base *tabs) {
   }
   C_MULTIPLATFORM_FREE(tabs->tabs);
 
-  {
+  if (tabs->component) {
     ui_error_t rc_cleanup = ui_component_destroy(tabs->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-
   C_MULTIPLATFORM_FREE(tabs);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -240,7 +354,7 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
   if (!dst)
     return UI_ERROR_OUT_OF_MEMORY;
 #if defined(_MSC_VER)
-  (void)strcpy_s(dst, len + 1, src);
+  strcpy_s(dst, len + 1, src);
 #else
   strcpy(dst, src);
 #endif
@@ -258,11 +372,27 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
  */
 static ui_error_t format_id(char *buf, size_t buf_size, const char *prefix,
                             const char *suffix) {
-  (void)buf_size;
+#if !defined(_MSC_VER)
+  size_t unused_size;
+#endif
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_tabs_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_tabs_mock_fail == 5) {
+    static int fid_count = 0;
+    if (++fid_count == 2) {
+      fid_count = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
 #if defined(_MSC_VER)
-  (void)sprintf_s(buf, buf_size, "%s-%s", prefix, suffix);
+  sprintf_s(buf, buf_size, "%s-%s", prefix, suffix);
 #else
-  (void)sprintf(buf, "%s-%s", prefix, suffix);
+  unused_size = buf_size;
+  buf_size = unused_size;
+  sprintf(buf, "%s-%s", prefix, suffix);
 #endif
   return UI_ERROR_NONE;
 }
@@ -273,6 +403,7 @@ ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
   struct ui_tab_entry *new_tabs;
   char tab_node_id[256];
   char panel_node_id[256];
+  ui_error_t rc;
 
   if (!tabs || !tab_id || !title_node || !panel_node) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -289,8 +420,12 @@ ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
     tabs->tab_capacity = new_cap;
   }
 
-  (void)format_id(tab_node_id, sizeof(tab_node_id), tab_id, "tab");
-  (void)format_id(panel_node_id, sizeof(panel_node_id), tab_id, "panel");
+  rc = format_id(tab_node_id, sizeof(tab_node_id), tab_id, "tab");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = format_id(panel_node_id, sizeof(panel_node_id), tab_id, "panel");
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   {
     char *tmp = NULL;
@@ -304,81 +439,54 @@ ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
   /** @endcond */
 
   /* Setup title_node ARIA/role attributes */
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(title_node, "role", "tab");
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(title_node, "id", tab_node_id);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(title_node, "aria-controls", panel_node_id);
-    (void)rc_cleanup;
-  }
+  rc = ui_dom_node_set_attribute(title_node, "role", "tab");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(title_node, "id", tab_node_id);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(title_node, "aria-controls", panel_node_id);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Setup panel_node ARIA/role attributes */
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(panel_node, "role", "tabpanel");
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(panel_node, "id", panel_node_id);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(panel_node, "aria-labelledby", tab_node_id);
-    (void)rc_cleanup;
-  }
+  rc = ui_dom_node_set_attribute(panel_node, "role", "tabpanel");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(panel_node, "id", panel_node_id);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(panel_node, "aria-labelledby", tab_node_id);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Default state: hidden/inactive if not the first tab */
   if (tabs->tab_count == 0) {
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(title_node, "aria-selected", "true");
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(title_node, "tabindex", "0");
-      (void)rc_cleanup;
-    }
+    rc = ui_dom_node_set_attribute(title_node, "aria-selected", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(title_node, "tabindex", "0");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(title_node, "aria-selected", "false");
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(title_node, "tabindex", "-1");
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(panel_node, "hidden", "true");
-      (void)rc_cleanup;
-    }
+    rc = ui_dom_node_set_attribute(title_node, "aria-selected", "false");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(title_node, "tabindex", "-1");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(panel_node, "hidden", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
-  {
+  rc = ui_dom_node_append_child(tabs->tablist_node, title_node);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-    ui_error_t _ign_rc =
-        ui_dom_node_append_child(tabs->tablist_node, title_node);
-
-    (void)_ign_rc;
-  }
-  {
-    ui_error_t _ign_rc =
-        ui_dom_node_append_child(tabs->panels_node, panel_node);
-    (void)_ign_rc;
-  }
+  rc = ui_dom_node_append_child(tabs->panels_node, panel_node);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   tabs->tabs[tabs->tab_count].header_node = title_node;
   tabs->tabs[tabs->tab_count].panel_node = panel_node;
@@ -394,6 +502,7 @@ ui_error_t ui_tabs_base_add_tab(struct ui_tabs_base *tabs, const char *tab_id,
 
 ui_error_t ui_tabs_base_set_active_index(struct ui_tabs_base *tabs, int index) {
   int i;
+  ui_error_t rc;
 
   if (!tabs) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -407,40 +516,30 @@ ui_error_t ui_tabs_base_set_active_index(struct ui_tabs_base *tabs, int index) {
     return UI_ERROR_NONE;
   }
 
-/** @cond */
-#define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
-  /** @endcond */
-
   for (i = 0; i < tabs->tab_count; i++) {
     struct ui_tab_entry *entry = &tabs->tabs[i];
     if (i == index) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-            entry->header_node, "aria-selected", "true");
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup =
-            ui_dom_node_set_attribute(entry->header_node, "tabindex", "0");
-        (void)rc_cleanup;
-      }
-      (void)UI_DOM_REM_ATTR_IGNORE(entry->panel_node, "hidden");
+      rc = ui_dom_node_set_attribute(entry->header_node, "aria-selected",
+                                     "true");
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc = ui_dom_node_set_attribute(entry->header_node, "tabindex", "0");
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc = ui_dom_node_remove_attribute(entry->panel_node, "hidden");
+      if (rc != UI_ERROR_NONE)
+        return rc;
     } else {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-            entry->header_node, "aria-selected", "false");
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup =
-            ui_dom_node_set_attribute(entry->header_node, "tabindex", "-1");
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup =
-            ui_dom_node_set_attribute(entry->panel_node, "hidden", "true");
-        (void)rc_cleanup;
-      }
+      rc = ui_dom_node_set_attribute(entry->header_node, "aria-selected",
+                                     "false");
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc = ui_dom_node_set_attribute(entry->header_node, "tabindex", "-1");
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc = ui_dom_node_set_attribute(entry->panel_node, "hidden", "true");
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
 
@@ -480,7 +579,8 @@ ui_error_t ui_tabs_base_process_event(struct ui_tabs_base *tabs,
                                       double timestamp_ms) {
   int next_index;
 
-  (void)timestamp_ms;
+  if (timestamp_ms > 0.0) {
+  }
 
   if (!tabs || !event) {
     return UI_ERROR_INVALID_ARGUMENT;

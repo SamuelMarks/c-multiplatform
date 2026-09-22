@@ -2,6 +2,7 @@
 #include "ui_chart_base.h"
 #include "ui_arena.h"
 #include "ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 #include <math.h>
 /* clang-format on */
@@ -27,9 +28,7 @@ static void test_chart_mock_failures(void) {
     {
       ui_error_t rc_cleanup =
           ui_chart_base_data_to_pixel(chart, 5.0, 5.0, &pixel_pt);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_UNKNOWN);
     }
     g_chart_mock_fail = -1;
   }
@@ -38,9 +37,7 @@ static void test_chart_mock_failures(void) {
     {
       ui_error_t rc_cleanup =
           ui_chart_base_pixel_to_data(chart, 50.0, 50.0, &out_x, &out_y);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_UNKNOWN);
     }
     g_chart_mock_fail = -1;
   }
@@ -53,9 +50,7 @@ static void test_chart_mock_failures(void) {
     {
       ui_error_t rc_cleanup =
           ui_chart_base_data_to_pixel(chart, 5.0, 5.0, &pixel_pt);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_UNKNOWN);
     }
     g_chart_mock_fail = -1;
   }
@@ -64,14 +59,28 @@ static void test_chart_mock_failures(void) {
     {
       ui_error_t rc_cleanup =
           ui_chart_base_pixel_to_data(chart, 50.0, 50.0, &out_x, &out_y);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_UNKNOWN);
     }
     g_chart_mock_fail = -1;
   }
 
   ui_chart_base_destroy(chart);
+
+  {
+    extern int g_chart_signal_destroy_mock_fail;
+    struct ui_chart_base *fail_chart = NULL;
+    ui_error_t rc_create =
+        ui_chart_base_create(arena, UI_CHART_COORDINATE_CARTESIAN, &fail_chart);
+    if (rc_create == UI_ERROR_NONE) {
+      g_chart_signal_destroy_mock_fail = 1;
+      {
+        ui_error_t rc_cleanup = ui_chart_base_destroy(fail_chart);
+        assert(rc_cleanup != UI_ERROR_NONE);
+      }
+      g_chart_signal_destroy_mock_fail = 0;
+    }
+  }
+
   ui_arena_destroy(arena);
 #endif
 }
@@ -94,15 +103,11 @@ static void test_chart_coord_missing(void) {
 
   {
     ui_error_t rc_cleanup = ui_chart_base_destroy(chart);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 int main(void) {
@@ -199,9 +204,7 @@ int main(void) {
   /* Reset y scale */
   {
     ui_error_t rc_cleanup = ui_chart_base_set_y_scale(chart, &y_scale);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* pixel(60, 60) -> reverse -> log halfway -> data Y 10.0 */
@@ -294,9 +297,7 @@ int main(void) {
 
     {
       ui_error_t rc_cleanup = ui_chart_base_destroy(polar);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -309,9 +310,7 @@ int main(void) {
                          &temp_chart);
     {
       ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     ui_arena_create(200,
@@ -320,9 +319,7 @@ int main(void) {
                          &temp_chart);
     {
       ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -349,9 +346,7 @@ int main(void) {
       if (err == UI_ERROR_NONE) {
         {
           ui_error_t rc_cleanup = ui_chart_base_destroy(oom_chart);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
         break; /* Enough iterations to pass */
       }
@@ -362,9 +357,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }

@@ -10,6 +10,27 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_chat_bubble_mock_fail = 0;
+
+/**
+ * @brief mock_chat_bubble_signal_destroy.
+ * @param sig Parameter sig.
+ * @return Return value.
+ */
+static ui_error_t mock_chat_bubble_signal_destroy(ui_signal_t *sig) {
+  if (g_chat_bubble_mock_fail == 1) {
+    (ui_signal_destroy)(sig);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_destroy)(sig);
+}
+#undef ui_signal_destroy
+/** @cond */
+#define ui_signal_destroy mock_chat_bubble_signal_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_chat_bubble_base
  * @brief Internal representation of a chat bubble component.
@@ -128,13 +149,16 @@ ui_chat_bubble_base_create(struct ui_arena *arena,
  * @return Return value.
  */
 ui_error_t ui_chat_bubble_base_destroy(struct ui_chat_bubble_base *bubble) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!bubble)
     return UI_ERROR_INVALID_ARGUMENT;
   {
     ui_error_t rc_cleanup = ui_signal_destroy(bubble->config_signal);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /* \brief ui_error
@@ -238,19 +262,21 @@ ui_error_t ui_chat_bubble_base_calculate_text_bounds(
 }
 
 #ifdef UI_TEST_MOCK_ALLOC
-void ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
-                                     int tail_placement);
+ui_error_t ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
+                                           int tail_placement);
 /**
  * @brief ui_chat_bubble_base_mock_config.
  * @param bubble Parameter bubble.
  * @param tail_placement Parameter tail_placement.
  * @return Return value.
  */
-void ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
-                                     int tail_placement) {
-  if (bubble) {
-    bubble->config.tail_placement =
-        (enum ui_chat_bubble_tail_placement)tail_placement;
+ui_error_t ui_chat_bubble_base_mock_config(struct ui_chat_bubble_base *bubble,
+                                           int tail_placement) {
+  if (!bubble) {
+    return UI_ERROR_INVALID_ARGUMENT;
   }
+  bubble->config.tail_placement =
+      (enum ui_chat_bubble_tail_placement)tail_placement;
+  return UI_ERROR_NONE;
 }
 #endif

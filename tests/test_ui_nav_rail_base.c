@@ -95,34 +95,68 @@ static int run_normal_tests(void) {
   if (ui_nav_rail_item_base_get_active(item, NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  ui_nav_rail_item_base_destroy(item);
+  if (ui_nav_rail_item_base_destroy(item) != UI_ERROR_NONE)
+    return 1;
   {
     ui_error_t rc_cleanup = ui_nav_rail_base_destroy(rail);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  ui_nav_rail_item_base_destroy(NULL);
+  if (ui_nav_rail_item_base_destroy(NULL) != UI_ERROR_NONE)
+    return 1;
   {
     ui_error_t rc_cleanup = ui_nav_rail_base_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
   {
     struct ui_nav_rail_base *empty_rail;
     struct ui_nav_rail_item_base *empty_item;
-    ui_nav_rail_base_create(&empty_rail);
-    ui_component_destroy(empty_rail->component);
+    if (ui_nav_rail_base_create(&empty_rail) != UI_ERROR_NONE)
+      return 1;
+    if (ui_component_destroy(empty_rail->component) != UI_ERROR_NONE)
+      return 1;
     empty_rail->component = NULL;
-    ui_nav_rail_base_destroy(empty_rail);
+    if (ui_nav_rail_base_destroy(empty_rail) != UI_ERROR_NONE)
+      return 1;
 
-    ui_nav_rail_item_base_create(&empty_item);
-    ui_component_destroy(empty_item->component);
+    if (ui_nav_rail_item_base_create(&empty_item) != UI_ERROR_NONE)
+      return 1;
+    if (ui_component_destroy(empty_item->component) != UI_ERROR_NONE)
+      return 1;
     empty_item->component = NULL;
-    ui_nav_rail_item_base_destroy(empty_item);
+    if (ui_nav_rail_item_base_destroy(empty_item) != UI_ERROR_NONE)
+      return 1;
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_nav_rail_mock_fail;
+    struct ui_nav_rail_base *fail_rail = NULL;
+    struct ui_nav_rail_item_base *fail_item = NULL;
+
+    rc = ui_nav_rail_base_create(&fail_rail);
+    if (rc == UI_ERROR_NONE) {
+      g_nav_rail_mock_fail = 1;
+      rc = ui_nav_rail_base_destroy(fail_rail);
+      if (rc != UI_ERROR_UNKNOWN)
+        return 1;
+      g_nav_rail_mock_fail = 0;
+    }
+
+    rc = ui_nav_rail_item_base_create(&fail_item);
+    if (rc == UI_ERROR_NONE) {
+      g_nav_rail_mock_fail = 1;
+      rc = ui_nav_rail_item_base_destroy(fail_item);
+      if (rc != UI_ERROR_UNKNOWN)
+        return 1;
+      g_nav_rail_mock_fail = 0;
+    }
+  }
+#endif
 
   return 0;
 }
@@ -145,7 +179,8 @@ static int run_oom_tests(void) {
       {
         ui_error_t rc_cleanup = ui_nav_rail_base_destroy(rail);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          g_malloc_fail_countdown = -1;
+          return 1;
         }
       }
       break;
@@ -161,7 +196,10 @@ static int run_oom_tests(void) {
       return 1;
     }
     if (rc == UI_ERROR_NONE) {
-      ui_nav_rail_item_base_destroy(item);
+      if (ui_nav_rail_item_base_destroy(item) != UI_ERROR_NONE) {
+        g_malloc_fail_countdown = -1;
+        return 1;
+      }
       break;
     }
   }

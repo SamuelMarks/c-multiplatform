@@ -7,6 +7,18 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_sort_header_mock_fail = 0;
+
+/**
+ * @brief test_ui_sort_header_find_state_index_null.
+ * @param header Parameter header.
+ * @return Return value.
+ */
+ui_error_t
+test_ui_sort_header_find_state_index_null(struct ui_sort_header_base *header);
+#endif
+
 /*
  * \file ui_sort_header_base.c
  * \brief Sort header base component implementation.
@@ -107,17 +119,39 @@ ui_sort_header_base_set_multi_sort(struct ui_sort_header_base *sort_header,
  * @param out_index Parameter out_index.
  * @return Return value.
  */
-static void find_state_index(struct ui_sort_header_base *sort_header, void *id,
-                             int *out_index) {
+static ui_error_t find_state_index(struct ui_sort_header_base *sort_header,
+                                   void *id, int *out_index) {
   size_t i;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_sort_header_mock_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+
+  if (!sort_header || !out_index) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
   *out_index = -1;
   for (i = 0; i < sort_header->count; ++i) {
     if (sort_header->states[i].id == id) {
       *out_index = (int)i;
-      return;
+      return UI_ERROR_NONE;
     }
   }
+  return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t
+test_ui_sort_header_find_state_index_null(struct ui_sort_header_base *header) {
+  if (!header) {
+    return find_state_index(NULL, NULL, NULL);
+  }
+  return find_state_index(header, (void *)1, NULL);
+}
+#endif
 
 /**
  * \brief Removes a state at a given index.
@@ -161,8 +195,13 @@ static ui_error_t
 insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
                        enum ui_sort_direction direction) {
   int existing_index;
+  ui_error_t rc_find;
+
   if (direction == UI_SORT_NONE) {
-    find_state_index(sort_header, id, &existing_index);
+    rc_find = find_state_index(sort_header, id, &existing_index);
+    if (rc_find != UI_ERROR_NONE) {
+      return rc_find;
+    }
     if (existing_index >= 0) {
       return remove_state_at(sort_header, existing_index);
     }
@@ -172,7 +211,10 @@ insert_or_update_state(struct ui_sort_header_base *sort_header, void *id,
   if (!sort_header->is_multi) {
     sort_header->count = 0; /* Clear previous */
   } else {
-    find_state_index(sort_header, id, &existing_index);
+    rc_find = find_state_index(sort_header, id, &existing_index);
+    if (rc_find != UI_ERROR_NONE) {
+      return rc_find;
+    }
     if (existing_index >= 0) {
       sort_header->states[existing_index].direction = direction;
       return UI_ERROR_NONE;
@@ -211,12 +253,16 @@ ui_error_t ui_sort_header_base_toggle(struct ui_sort_header_base *sort_header,
   int index;
   enum ui_sort_direction current_dir = UI_SORT_NONE;
   enum ui_sort_direction next_dir;
+  ui_error_t rc;
 
   if (!sort_header) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  find_state_index(sort_header, id, &index);
+  rc = find_state_index(sort_header, id, &index);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   if (index >= 0) {
     current_dir = sort_header->states[index].direction;
   }

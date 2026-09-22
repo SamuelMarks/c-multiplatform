@@ -14,6 +14,126 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_tree_base_mock_fail = 0;
+
+/**
+ * @brief Mock dom node append child for error injection.
+ * @param parent Parent node.
+ * @param child Child node.
+ * @return Return value.
+ */
+int g_tree_append_countdown = -1;
+
+static ui_error_t mock_tree_dom_node_append_child(struct ui_dom_node *parent,
+                                                  struct ui_dom_node *child) {
+  if (g_tree_base_mock_fail == 311) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_tree_append_countdown == 0) {
+    g_tree_append_countdown = -1;
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_tree_append_countdown > 0) {
+    g_tree_append_countdown--;
+  }
+  return ui_dom_node_append_child(parent, child);
+}
+/** @cond */
+#define ui_dom_node_append_child mock_tree_dom_node_append_child
+/** @endcond */
+
+/**
+ * @brief Mock selection model is selected for error injection.
+ * @param model Selection model.
+ * @param id Item ID.
+ * @param out_is_selected Output pointer.
+ * @return Return value.
+ */
+static ui_error_t
+mock_tree_selection_model_is_selected(const struct ui_selection_model *model,
+                                      void *id, int *out_is_selected) {
+  if (g_tree_base_mock_fail == 411) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_selection_model_is_selected(model, id, out_is_selected);
+}
+/** @cond */
+#define ui_selection_model_is_selected mock_tree_selection_model_is_selected
+/** @endcond */
+
+/**
+ * @brief Mock is_expanded internal wrapper.
+ * @param tree Tree pointer.
+ * @param node_id Node identifier.
+ * @param out_is_expanded Output is_expanded flag.
+ * @return Return value.
+ */
+static ui_error_t
+tree_base_is_expanded_internal(const struct ui_tree_base *tree, void *node_id,
+                               int *out_is_expanded) {
+  if (g_tree_base_mock_fail == 101) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_tree_base_is_expanded(tree, node_id, out_is_expanded);
+}
+
+/**
+ * @brief Mock set_expanded internal wrapper.
+ * @param tree Tree pointer.
+ * @param node_id Node identifier.
+ * @param expanded Expanded flag.
+ * @return Return value.
+ */
+static ui_error_t tree_base_set_expanded_internal(struct ui_tree_base *tree,
+                                                  void *node_id, int expanded) {
+  if (g_tree_base_mock_fail == 102) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_tree_base_set_expanded(tree, node_id, expanded);
+}
+
+/**
+ * @brief Mock get_node_index internal wrapper.
+ * @param tree Tree pointer.
+ * @param parent Parent node.
+ * @param node Node identifier.
+ * @param out_index Output index pointer.
+ * @return Return value.
+ */
+static ui_error_t tree_base_get_node_index_internal(struct ui_tree_base *tree,
+                                                    void *parent, void *node,
+                                                    size_t *out_index);
+
+/**
+ * @brief Mock get_next_visible_node internal wrapper.
+ * @param tree Tree pointer.
+ * @param node Node identifier.
+ * @param out_next Output next node pointer.
+ * @return Return value.
+ */
+static ui_error_t
+tree_base_get_next_visible_node_internal(struct ui_tree_base *tree, void *node,
+                                         void **out_next);
+
+/**
+ * @brief Mock get_prev_visible_node internal wrapper.
+ * @param tree Tree pointer.
+ * @param node Node identifier.
+ * @param out_prev Output prev node pointer.
+ * @return Return value.
+ */
+static ui_error_t
+tree_base_get_prev_visible_node_internal(struct ui_tree_base *tree, void *node,
+                                         void **out_prev);
+#else
+#define tree_base_is_expanded_internal ui_tree_base_is_expanded
+#define tree_base_set_expanded_internal ui_tree_base_set_expanded
+#define tree_base_get_node_index_internal get_node_index
+#define tree_base_get_next_visible_node_internal get_next_visible_node
+#define tree_base_get_prev_visible_node_internal get_prev_visible_node
+#endif
+
 /**
  * @struct ui_tree_base
  * @struct ui_tree_base
@@ -109,8 +229,9 @@ ui_error_t ui_tree_base_set_expanded(struct ui_tree_base *tree, void *node_id,
   if (!tree || !node_id)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  rc = ui_tree_base_is_expanded(tree, node_id, &currently_expanded);
-  (void)rc;
+  rc = tree_base_is_expanded_internal(tree, node_id, &currently_expanded);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (expanded) {
     if (!currently_expanded) {
@@ -148,10 +269,11 @@ ui_error_t ui_tree_base_toggle_node(struct ui_tree_base *tree, void *node_id) {
   if (!tree || !node_id)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  rc = ui_tree_base_is_expanded(tree, node_id, &is_expanded);
-  (void)rc;
+  rc = tree_base_is_expanded_internal(tree, node_id, &is_expanded);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  return ui_tree_base_set_expanded(tree, node_id, !is_expanded);
+  return tree_base_set_expanded_internal(tree, node_id, !is_expanded);
 }
 
 ui_error_t ui_tree_base_set_active_node(struct ui_tree_base *tree,
@@ -215,8 +337,9 @@ static ui_error_t get_next_visible_node(struct ui_tree_base *tree, void *node,
 
   *out_next = NULL;
 
-  rc = ui_tree_base_is_expanded(tree, node, &is_expanded);
-  (void)rc;
+  rc = tree_base_is_expanded_internal(tree, node, &is_expanded);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   if (is_expanded &&
       tree->model.get_child_count(node, tree->model.user_data) > 0) {
     *out_next = tree->model.get_child(node, 0, tree->model.user_data);
@@ -225,8 +348,9 @@ static ui_error_t get_next_visible_node(struct ui_tree_base *tree, void *node,
 
   while (node) {
     parent = tree->model.get_parent(node, tree->model.user_data);
-    rc = get_node_index(tree, parent, node, &idx);
-    (void)rc;
+    rc = tree_base_get_node_index_internal(tree, parent, node, &idx);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     count = parent ? tree->model.get_child_count(parent, tree->model.user_data)
                    : tree->model.get_root_count(tree->model.user_data);
 
@@ -258,8 +382,9 @@ static ui_error_t get_prev_visible_node(struct ui_tree_base *tree, void *node,
   *out_prev = NULL;
 
   parent = tree->model.get_parent(node, tree->model.user_data);
-  rc = get_node_index(tree, parent, node, &idx);
-  (void)rc;
+  rc = tree_base_get_node_index_internal(tree, parent, node, &idx);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (idx > 0) {
     void *prev_sib =
@@ -268,8 +393,9 @@ static ui_error_t get_prev_visible_node(struct ui_tree_base *tree, void *node,
 
     for (;;) {
       int is_expanded = 0;
-      rc = ui_tree_base_is_expanded(tree, prev_sib, &is_expanded);
-      (void)rc;
+      rc = tree_base_is_expanded_internal(tree, prev_sib, &is_expanded);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       if (is_expanded &&
           tree->model.get_child_count(prev_sib, tree->model.user_data) > 0) {
         size_t count =
@@ -305,15 +431,19 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
 
   switch (event->key_code) {
   case UI_KEY_DOWN:
-    rc = get_next_visible_node(tree, tree->active_node, &next_node);
-    (void)rc;
+    rc = tree_base_get_next_visible_node_internal(tree, tree->active_node,
+                                                  &next_node);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     if (next_node)
       tree->active_node = next_node;
     break;
 
   case UI_KEY_UP:
-    rc = get_prev_visible_node(tree, tree->active_node, &next_node);
-    (void)rc;
+    rc = tree_base_get_prev_visible_node_internal(tree, tree->active_node,
+                                                  &next_node);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     if (next_node)
       tree->active_node = next_node;
     break;
@@ -322,10 +452,12 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
     if (tree->model.get_child_count(tree->active_node, tree->model.user_data) >
         0) {
       int is_expanded = 0;
-      rc = ui_tree_base_is_expanded(tree, tree->active_node, &is_expanded);
-      (void)rc;
+      rc =
+          tree_base_is_expanded_internal(tree, tree->active_node, &is_expanded);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       if (!is_expanded) {
-        rc = ui_tree_base_set_expanded(tree, tree->active_node, 1);
+        rc = tree_base_set_expanded_internal(tree, tree->active_node, 1);
         if (rc != UI_ERROR_NONE)
           return rc;
       } else {
@@ -337,11 +469,13 @@ ui_tree_base_handle_key_event(struct ui_tree_base *tree,
 
   case UI_KEY_LEFT: {
     int is_expanded = 0;
-    rc = ui_tree_base_is_expanded(tree, tree->active_node, &is_expanded);
-    (void)rc;
+    rc = tree_base_is_expanded_internal(tree, tree->active_node, &is_expanded);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     if (is_expanded) {
-      rc = ui_tree_base_set_expanded(tree, tree->active_node, 0);
-      (void)rc;
+      rc = tree_base_set_expanded_internal(tree, tree->active_node, 0);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     } else {
       void *parent =
           tree->model.get_parent(tree->active_node, tree->model.user_data);
@@ -396,7 +530,8 @@ static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
 
   /* Appending eagerly limits dangling resources if deeper generation fails */
   rc = ui_dom_node_append_child(parent_container, item);
-  (void)rc;
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Accessibility */
   rc = ui_dom_node_set_attribute(item, "role", "treeitem");
@@ -433,7 +568,8 @@ static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
   if (tree->selection_model) {
     rc = ui_selection_model_is_selected(tree->selection_model, node,
                                         &is_selected);
-    (void)rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   if (is_selected) {
     rc = ui_dom_node_set_attribute(item, "aria-selected", "true");
@@ -448,8 +584,9 @@ static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
   child_count = tree->model.get_child_count(node, tree->model.user_data);
   if (child_count > 0) {
     int expanded = 0;
-    rc = ui_tree_base_is_expanded(tree, node, &expanded);
-    (void)rc;
+    rc = tree_base_is_expanded_internal(tree, node, &expanded);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     rc = ui_dom_node_set_attribute(item, "aria-expanded",
                                    expanded ? "true" : "false");
     if (rc != UI_ERROR_NONE)
@@ -461,7 +598,8 @@ static ui_error_t render_recursive(struct ui_tree_base *tree, void *node,
         return rc;
 
       rc = ui_dom_node_append_child(item, group);
-      (void)rc;
+      if (rc != UI_ERROR_NONE)
+        return rc;
       rc = ui_dom_node_set_attribute(group, "role", "group");
       if (rc != UI_ERROR_NONE)
         return rc;
@@ -494,7 +632,7 @@ ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
 
   rc = ui_dom_node_set_attribute(tree_root, "role", "tree");
   if (rc != UI_ERROR_NONE) {
-    (void)ui_dom_node_destroy(tree_root);
+    ui_dom_node_destroy(tree_root);
     return rc;
   }
 
@@ -503,13 +641,16 @@ ui_error_t ui_tree_base_render(struct ui_tree_base *tree,
     void *root_node = tree->model.get_root_node(i, tree->model.user_data);
     rc = render_recursive(tree, root_node, tree_root, 1, i + 1, root_count);
     if (rc != UI_ERROR_NONE) {
-      (void)ui_dom_node_destroy(tree_root);
+      ui_dom_node_destroy(tree_root);
       return rc;
     }
   }
 
   rc = ui_dom_node_append_child(container, tree_root);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    ui_dom_node_destroy(tree_root);
+    return rc;
+  }
 
   return UI_ERROR_NONE;
 }
@@ -522,3 +663,32 @@ ui_error_t ui_tree_base_bind_data(struct ui_tree_base *widget,
   widget->data_signal = signal;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t tree_base_get_node_index_internal(struct ui_tree_base *tree,
+                                                    void *parent, void *node,
+                                                    size_t *out_index) {
+  if (g_tree_base_mock_fail == 103) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return get_node_index(tree, parent, node, out_index);
+}
+
+static ui_error_t
+tree_base_get_next_visible_node_internal(struct ui_tree_base *tree, void *node,
+                                         void **out_next) {
+  if (g_tree_base_mock_fail == 104) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return get_next_visible_node(tree, node, out_next);
+}
+
+static ui_error_t
+tree_base_get_prev_visible_node_internal(struct ui_tree_base *tree, void *node,
+                                         void **out_prev) {
+  if (g_tree_base_mock_fail == 105) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return get_prev_visible_node(tree, node, out_prev);
+}
+#endif

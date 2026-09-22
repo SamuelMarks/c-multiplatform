@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_toolbar_base.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,9 +64,7 @@ static int run_normal_tests(void) {
   g_mock_strcpy_fail = 1;
   {
     ui_error_t rc_cleanup = ui_toolbar_base_set_title(tb, "Test fail");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup != UI_ERROR_NONE);
   }
   g_mock_strcpy_fail = 0;
 #endif

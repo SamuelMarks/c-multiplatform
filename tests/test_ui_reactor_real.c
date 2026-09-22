@@ -40,7 +40,8 @@ static ui_error_t test_callback(void *os_handle, int events, void *user_data) {
     int *val = (int *)user_data;
     *val |= events;
   }
-  (void)os_handle;
+  if (os_handle) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -55,9 +56,12 @@ static ui_error_t test_schedule_callback(void *user_data) {
 static ui_error_t my_failing_task(void *data) { return UI_ERROR_OUT_OF_MEMORY; }
 static ui_error_t my_failing_callback(void *os_handle, int events,
                                       void *user_data) {
-  (void)os_handle;
-  (void)events;
-  (void)user_data;
+  if (os_handle) {
+  }
+  if (events) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
@@ -65,12 +69,10 @@ static ui_error_t thread_spam_schedule(void *user_data) {
   struct ui_reactor *r = (struct ui_reactor *)user_data;
   int i;
   for (i = 0; i < 5000; i++) {
-    {
-      ui_error_t rc_cleanup =
-          ui_reactor_schedule(r, test_schedule_callback, NULL);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    ui_error_t rc_cleanup =
+        ui_reactor_schedule(r, test_schedule_callback, NULL);
+    if (rc_cleanup != UI_ERROR_NONE && rc_cleanup != UI_ERROR_OUT_OF_MEMORY) {
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -186,7 +188,7 @@ int main(void) {
       ui_error_t rc_cleanup =
           ui_reactor_unregister(reactor, (void *)(size_t)pipes[1]);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
   }
@@ -208,7 +210,7 @@ int main(void) {
     {
       ui_error_t rc_cleanup = ui_reactor_create(&bad_reactor);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
@@ -219,7 +221,7 @@ int main(void) {
       {
         ui_error_t rc_cleanup = ui_reactor_destroy(bad_reactor);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
       close(old_fd);
@@ -232,7 +234,7 @@ int main(void) {
       {
         ui_error_t rc_cleanup = ui_reactor_destroy(bad_reactor);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
       close(old_fd);
@@ -257,20 +259,16 @@ int main(void) {
     if (rc == UI_ERROR_NONE &&
         ui_thread_pool_create(10, &pool) == UI_ERROR_NONE) {
       for (i = 0; i < 10; i++) {
-        {
-          ui_error_t rc_cleanup =
-              ui_thread_pool_schedule(pool, thread_spam_schedule, reactor);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+        ui_error_t rc_cleanup =
+            ui_thread_pool_schedule(pool, thread_spam_schedule, reactor);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          return 1;
         }
       }
       for (i = 0; i < 50000; i++) {
-        {
-          ui_error_t rc_cleanup = ui_reactor_poll(reactor, 0);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+        ui_error_t rc_cleanup = ui_reactor_poll(reactor, 0);
+        if (rc_cleanup != UI_ERROR_NONE && rc_cleanup != UI_ERROR_UNKNOWN) {
+          return 1;
         }
       }
       ui_thread_pool_destroy(pool);

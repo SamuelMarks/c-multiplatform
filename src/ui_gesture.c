@@ -138,6 +138,27 @@ static ui_error_t ui_gesture_reset(struct ui_gesture_recognizer *r) {
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_gesture_mock_fail = 0;
+
+/**
+ * @brief mock_gesture_reset.
+ * @param r Parameter r.
+ * @return Return value.
+ */
+static ui_error_t mock_gesture_reset(struct ui_gesture_recognizer *r) {
+  if (g_gesture_mock_fail == 1) {
+    (ui_gesture_reset)(r);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_gesture_reset)(r);
+}
+#undef ui_gesture_reset
+/** @cond */
+#define ui_gesture_reset mock_gesture_reset
+/** @endcond */
+#endif
+
 /**
  * @brief Processes a pointer event and updates gesture state.
  * @param[in,out] r The gesture recognizer.
@@ -369,7 +390,9 @@ ui_error_t ui_gesture_recognizer_process_event(
     }
     {
       ui_error_t reset_rc = ui_gesture_reset(r);
-      (void)reset_rc;
+      if (reset_rc != UI_ERROR_NONE) {
+        return reset_rc;
+      }
     }
   } else if (is_cancel && r->is_tracking) {
     if (r->has_moved_significantly && !r->long_press_triggered) {
@@ -385,7 +408,9 @@ ui_error_t ui_gesture_recognizer_process_event(
     }
     {
       ui_error_t reset_rc = ui_gesture_reset(r);
-      (void)reset_rc;
+      if (reset_rc != UI_ERROR_NONE) {
+        return reset_rc;
+      }
     }
   }
 

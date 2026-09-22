@@ -8,6 +8,62 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_link_base_mock_fail = 0;
+
+/**
+ * @brief mock_link_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_link_component_destroy(struct ui_component *comp) {
+  if (g_link_base_mock_fail == 1) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_link_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_link_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_link_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_link_base_mock_fail == 2) {
+    (ui_dom_node_destroy)(node);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_link_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief mock_link_dom_node_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
+static ui_error_t mock_link_dom_node_append_child(struct ui_dom_node *parent,
+                                                  struct ui_dom_node *child) {
+  if (g_link_base_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_link_dom_node_append_child
+/** @endcond */
+#endif
+
 /**
  * @brief ui_link_base_create.
  * @param out_link Parameter out_link.
@@ -30,9 +86,9 @@ ui_error_t ui_link_base_create(struct ui_link_base **out_link) {
   link = (struct ui_link_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_link_base));
   if (!link) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -48,24 +104,26 @@ ui_error_t ui_link_base_create(struct ui_link_base **out_link) {
 
   err = ui_dom_node_set_tag_name(link->base.shadow_root, "ui-link");
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(link->base.shadow_root);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_dom_node_destroy(link->base.shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      err = rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(link);
     return err;
   }
 
   /* Links are focusable by default */
-  {
-    ui_error_t _ign_rc =
-        ui_dom_node_set_attribute(link->base.shadow_root, "tabindex", "0");
-    (void)_ign_rc;
+  err = ui_dom_node_set_attribute(link->base.shadow_root, "tabindex", "0");
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(link->base.shadow_root);
+    C_MULTIPLATFORM_FREE(link);
+    return err;
   }
-  {
-    ui_error_t _ign_rc =
-        ui_dom_node_set_attribute(link->base.shadow_root, "role", "link");
-    (void)_ign_rc;
+  err = ui_dom_node_set_attribute(link->base.shadow_root, "role", "link");
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(link->base.shadow_root);
+    C_MULTIPLATFORM_FREE(link);
+    return err;
   }
 
   *out_link = link;
@@ -106,10 +164,10 @@ ui_error_t ui_link_base_set_text(struct ui_link_base *link, const char *text) {
     if (err != UI_ERROR_NONE) {
       return err;
     }
-    {
-      ui_error_t _ign_rc =
-          ui_dom_node_append_child(link->base.shadow_root, text_node);
-      (void)_ign_rc;
+    err = ui_dom_node_append_child(link->base.shadow_root, text_node);
+    if (err != UI_ERROR_NONE) {
+      ui_dom_node_destroy(text_node);
+      return err;
     }
 
   } else {

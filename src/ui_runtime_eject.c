@@ -16,6 +16,49 @@
 #include "c89stringutils_string_extras.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_eject_mock_format_fail = 0;
+int g_eject_mock_copy_fail = 0;
+
+static ui_error_t mock_eject_format(char *dest, size_t dest_size,
+                                    const char *fmt, ...) {
+  va_list args;
+  if (g_eject_mock_format_fail != 0) {
+    if (g_eject_mock_format_fail > 1) {
+      g_eject_mock_format_fail--;
+    } else {
+      g_eject_mock_format_fail = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  va_start(args, fmt);
+  c89stringutils_vsnprintf(dest, dest_size, fmt, args);
+  va_end(args);
+  return UI_ERROR_NONE;
+}
+#undef ui_safe_string_format
+/** @cond */
+#define ui_safe_string_format mock_eject_format
+/** @endcond */
+
+static ui_error_t mock_eject_copy(char *dest, size_t dest_size,
+                                  const char *src) {
+  if (g_eject_mock_copy_fail != 0) {
+    if (g_eject_mock_copy_fail > 1) {
+      g_eject_mock_copy_fail--;
+    } else {
+      g_eject_mock_copy_fail = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_safe_string_copy)(dest, dest_size, src);
+}
+#undef ui_safe_string_copy
+/** @cond */
+#define ui_safe_string_copy mock_eject_copy
+/** @endcond */
+#endif
+
 /**
  * @struct emit_buffer
  * @brief Helper buffer accumulator for generating C code strings.
@@ -76,43 +119,62 @@ struct node_meta {
  */
 static ui_error_t init_node_meta(struct node_meta *meta, int id_num,
                                  const struct ui_runtime_node *node) {
-  meta->id_num = id_num;
-  if (strcmp(node->type, "ui_button_base") == 0) {
-    (void)ui_safe_string_format(meta->inst_var, sizeof(meta->inst_var),
-                                "btn_%d", id_num);
-  } else if (strcmp(node->type, "ui_input_base") == 0) {
-    (void)ui_safe_string_format(meta->inst_var, sizeof(meta->inst_var),
-                                "input_%d", id_num);
-  } else if (strcmp(node->type, "ui_card_base") == 0) {
-    (void)ui_safe_string_format(meta->inst_var, sizeof(meta->inst_var),
-                                "card_%d", id_num);
-  } else if (strcmp(node->type, "ui_checkbox_base") == 0) {
-    (void)ui_safe_string_format(meta->inst_var, sizeof(meta->inst_var),
-                                "chk_%d", id_num);
-  } else if (strcmp(node->type, "ui_label_base") == 0) {
-    (void)ui_safe_string_format(meta->inst_var, sizeof(meta->inst_var),
-                                "lbl_%d", id_num);
-  } else if (strcmp(node->type, "ui_slider_base") == 0) {
-    (void)ui_safe_string_format(meta->inst_var, sizeof(meta->inst_var),
-                                "sld_%d", id_num);
-  } else {
-    (void)ui_safe_string_format(meta->inst_var, sizeof(meta->inst_var),
-                                "layout_%d", id_num);
+  const char *prefix = "layout";
+  ui_error_t rc;
+
+  if (!meta || !node) {
+    return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_safe_string_format(meta->comp_var, sizeof(meta->comp_var), "comp_%d",
-                              id_num);
-  (void)ui_safe_string_format(meta->dom_var, sizeof(meta->dom_var), "dom_%d",
-                              id_num);
-  (void)ui_safe_string_format(meta->cva_var, sizeof(meta->cva_var), "cva_%d",
-                              id_num);
-  (void)ui_safe_string_format(meta->ctrl_var, sizeof(meta->ctrl_var), "ctrl_%d",
-                              id_num);
-  (void)ui_safe_string_format(meta->sig_var, sizeof(meta->sig_var), "sig_%d",
-                              id_num);
+  meta->id_num = id_num;
+  if (strcmp(node->type, "ui_button_base") == 0) {
+    prefix = "btn";
+  } else if (strcmp(node->type, "ui_input_base") == 0) {
+    prefix = "input";
+  } else if (strcmp(node->type, "ui_card_base") == 0) {
+    prefix = "card";
+  } else if (strcmp(node->type, "ui_checkbox_base") == 0) {
+    prefix = "chk";
+  } else if (strcmp(node->type, "ui_label_base") == 0) {
+    prefix = "lbl";
+  } else if (strcmp(node->type, "ui_slider_base") == 0) {
+    prefix = "sld";
+  }
+
+  rc = ui_safe_string_format(meta->inst_var, sizeof(meta->inst_var), "%s_%d",
+                             prefix, id_num);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_safe_string_format(meta->comp_var, sizeof(meta->comp_var), "comp_%d",
+                             id_num);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_safe_string_format(meta->dom_var, sizeof(meta->dom_var), "dom_%d",
+                             id_num);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_safe_string_format(meta->cva_var, sizeof(meta->cva_var), "cva_%d",
+                             id_num);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_safe_string_format(meta->ctrl_var, sizeof(meta->ctrl_var), "ctrl_%d",
+                             id_num);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_safe_string_format(meta->sig_var, sizeof(meta->sig_var), "sig_%d",
+                             id_num);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t ui_test_eject_init_node_meta(struct node_meta *meta, int id_num,
+                                        const struct ui_runtime_node *node) {
+  return init_node_meta(meta, id_num, node);
+}
+#endif
 
 /**
  * @brief Recursively emits variable declarations at top of function (C89
@@ -126,7 +188,10 @@ emit_declarations_recursive(struct emit_buffer *eb,
   ui_error_t rc;
 
   (*counter)++;
-  (void)init_node_meta(&meta, *counter, node);
+  rc = init_node_meta(&meta, *counter, node);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(node->type, "ui_button_base") == 0) {
     rc =
@@ -226,8 +291,14 @@ static ui_error_t emit_body_recursive(struct emit_buffer *eb,
   ui_error_t rc;
 
   (*counter)++;
-  (void)init_node_meta(&meta, *counter, node);
-  (void)ui_safe_string_copy(out_dom_var, out_dom_var_size, meta.dom_var);
+  rc = init_node_meta(&meta, *counter, node);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_safe_string_copy(out_dom_var, out_dom_var_size, meta.dom_var);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* Instantiation */
   if (strcmp(node->type, "ui_button_base") == 0) {

@@ -136,18 +136,13 @@ ui_error_t ui_dialog_base_create(struct ui_dialog_base **out_dialog) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
-  {
-    ui_error_t _ign_rc = ui_backdrop_destroy(dialog->backdrop);
-    (void)_ign_rc;
+  if (dialog->backdrop) {
+    ui_backdrop_destroy(dialog->backdrop);
   }
-  {
-    ui_error_t _ign_rc = ui_component_destroy(dialog->component);
-    (void)_ign_rc;
+  if (dialog->component) {
+    ui_component_destroy(dialog->component);
   }
   C_MULTIPLATFORM_FREE(dialog);
   return rc;
@@ -159,30 +154,20 @@ cleanup:
  * @return Return value.
  */
 ui_error_t ui_dialog_base_destroy(struct ui_dialog_base *dialog) {
-  ui_error_t rc = UI_ERROR_NONE;
   if (!dialog) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (dialog->is_open && dialog->director) {
-    rc = ui_overlay_director_unmount(dialog->director, dialog->overlay);
-    (void)rc;
+    ui_overlay_director_unmount(dialog->director, dialog->overlay);
   }
 
   if (dialog->is_open && dialog->focus_manager) {
-    rc = ui_focus_manager_pop_trap(dialog->focus_manager);
-    (void)rc;
+    ui_focus_manager_pop_trap(dialog->focus_manager);
   }
 
-  {
-    ui_error_t rc_cleanup = ui_backdrop_destroy(dialog->backdrop);
-    (void)rc_cleanup;
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(dialog->component);
-    (void)rc_cleanup;
-  }
+  ui_backdrop_destroy(dialog->backdrop);
+  ui_component_destroy(dialog->component);
 
   C_MULTIPLATFORM_FREE(dialog);
   return UI_ERROR_NONE;
@@ -274,9 +259,7 @@ ui_error_t ui_dialog_base_set_open(struct ui_dialog_base *dialog, int is_open) {
       if (rc != UI_ERROR_NONE) {
         /* Rollback mount */
         if (dialog->director) {
-          ui_error_t unmount_rc =
-              ui_overlay_director_unmount(dialog->director, dialog->overlay);
-          (void)unmount_rc;
+          ui_overlay_director_unmount(dialog->director, dialog->overlay);
           dialog->overlay = NULL;
         }
         return rc;
@@ -284,12 +267,10 @@ ui_error_t ui_dialog_base_set_open(struct ui_dialog_base *dialog, int is_open) {
     }
   } else {
     if (dialog->focus_manager) {
-      rc = ui_focus_manager_pop_trap(dialog->focus_manager);
-      (void)rc;
+      ui_focus_manager_pop_trap(dialog->focus_manager);
     }
     if (dialog->director) {
-      rc = ui_overlay_director_unmount(dialog->director, dialog->overlay);
-      (void)rc;
+      ui_overlay_director_unmount(dialog->director, dialog->overlay);
       dialog->overlay = NULL;
     }
   }
@@ -342,8 +323,10 @@ ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
   int should_dismiss = 0;
+  ui_error_t rc;
 
-  (void)timestamp_ms;
+  if (timestamp_ms > 0.0) {
+  }
 
   if (!dialog || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -356,22 +339,18 @@ ui_error_t ui_dialog_base_process_event(struct ui_dialog_base *dialog,
   /* In a real engine, content dimensions would come from the layout tree.
      For headless testing, we pass dummy bounds (0,0,0,0) or rely on Escape key.
    */
-  {
-    ui_error_t rc = ui_backdrop_process_event(
-        dialog->backdrop, event, 0.0f, 0.0f, 0.0f, 0.0f, &should_dismiss);
-    (void)rc;
-  }
+  ui_backdrop_process_event(dialog->backdrop, event, 0.0f, 0.0f, 0.0f, 0.0f,
+                            &should_dismiss);
 
   if (should_dismiss) {
     if (dialog->on_close) {
-      ui_error_t rc = dialog->on_close(dialog, dialog->user_data);
-      (void)rc;
+      rc = dialog->on_close(dialog, dialog->user_data);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
     } else {
       /* Default behavior if no listener is attached: close it */
-      {
-        ui_error_t rc_cleanup = ui_dialog_base_set_open(dialog, 0);
-        (void)rc_cleanup;
-      }
+      ui_dialog_base_set_open(dialog, 0);
     }
   }
 

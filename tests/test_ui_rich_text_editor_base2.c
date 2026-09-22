@@ -26,9 +26,7 @@ void test_ui_rte_coverage_errs14(void) {
 
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }

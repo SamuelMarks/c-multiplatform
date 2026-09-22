@@ -166,6 +166,72 @@ int main(void) {
   failures += test_parse_content_visibility();
   failures += test_parse_contain_intrinsic_size();
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_contain_mock_fail;
+    extern ui_error_t run_contain_coverage(void);
+    unsigned int flags;
+    enum ui_css_content_visibility vis;
+    struct ui_css_contain_intrinsic_size size;
+
+    g_contain_mock_fail = 1;
+    if (ui_css_parse_contain("none", &flags) != UI_ERROR_UNKNOWN)
+      failures++;
+    if (ui_css_parse_content_visibility("visible", &vis) != UI_ERROR_UNKNOWN)
+      failures++;
+    if (ui_css_parse_contain_intrinsic_size("none", &size) != UI_ERROR_UNKNOWN)
+      failures++;
+    g_contain_mock_fail = 0;
+
+    /* Fail 2nd skip_whitespace (first one in parse_intrinsic_dim) */
+    {
+      extern int g_contain_mock_fail_count;
+      g_contain_mock_fail_count = 0;
+      g_contain_mock_fail = 2;
+      if (ui_css_parse_contain_intrinsic_size("auto 100px", &size) !=
+          UI_ERROR_UNKNOWN)
+        failures++;
+      g_contain_mock_fail = 0;
+    }
+
+    /* Fail 3rd skip_whitespace (after 'auto' inside parse_intrinsic_dim) */
+    {
+      extern int g_contain_mock_fail_count;
+      g_contain_mock_fail_count = 0;
+      g_contain_mock_fail = 3;
+      if (ui_css_parse_contain_intrinsic_size("auto 100px", &size) !=
+          UI_ERROR_UNKNOWN)
+        failures++;
+      g_contain_mock_fail = 0;
+    }
+
+    /* Fail 3rd skip_whitespace (between width and height in "100px 200px") */
+    {
+      extern int g_contain_mock_fail_count;
+      g_contain_mock_fail_count = 0;
+      g_contain_mock_fail = 3;
+      if (ui_css_parse_contain_intrinsic_size("100px 200px", &size) !=
+          UI_ERROR_UNKNOWN)
+        failures++;
+      g_contain_mock_fail = 0;
+    }
+
+    /* Fail 5th skip_whitespace (after height in "100px 200px") */
+    {
+      extern int g_contain_mock_fail_count;
+      g_contain_mock_fail_count = 0;
+      g_contain_mock_fail = 5;
+      if (ui_css_parse_contain_intrinsic_size("100px 200px", &size) !=
+          UI_ERROR_UNKNOWN)
+        failures++;
+      g_contain_mock_fail = 0;
+    }
+
+    if (run_contain_coverage() != UI_ERROR_NONE)
+      failures++;
+  }
+#endif
+
   if (failures == 0) {
     printf("test_ui_css_contain passed\n");
   } else {

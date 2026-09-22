@@ -15,7 +15,7 @@ static ui_error_t test_aspect_ratio_creation(void) {
   {
     ui_error_t rc_cleanup = ui_aspect_ratio_base_destroy(ar);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   printf("test_aspect_ratio_creation passed\n");
@@ -35,7 +35,7 @@ static ui_error_t test_aspect_ratio_set(void) {
   {
     ui_error_t rc_cleanup = ui_aspect_ratio_base_destroy(ar);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   printf("test_aspect_ratio_set passed\n");
@@ -45,6 +45,7 @@ static ui_error_t test_aspect_ratio_set(void) {
 static void test_aspect_ratio_edge_cases(void) {
   struct ui_aspect_ratio_base *ar = NULL;
   struct ui_component *comp = NULL;
+  struct ui_signal *signal = (struct ui_signal *)0x123;
   int i;
   ui_error_t rc;
 
@@ -67,7 +68,6 @@ static void test_aspect_ratio_edge_cases(void) {
          UI_ERROR_INVALID_ARGUMENT);
   assert(ui_aspect_ratio_base_get_component(ar, &comp) == UI_ERROR_NONE);
 
-  struct ui_signal *signal = (struct ui_signal *)0x123;
   assert(ui_aspect_ratio_base_bind_ratio(NULL, signal) ==
          UI_ERROR_INVALID_ARGUMENT);
   assert(ui_aspect_ratio_base_bind_ratio(ar, signal) == UI_ERROR_NONE);
@@ -79,9 +79,7 @@ static void test_aspect_ratio_edge_cases(void) {
 
   {
     ui_error_t rc_cleanup = ui_aspect_ratio_base_destroy(ar);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* OOM loop */
@@ -91,9 +89,7 @@ static void test_aspect_ratio_edge_cases(void) {
     if (rc == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_aspect_ratio_base_destroy(ar);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     }
@@ -102,14 +98,45 @@ static void test_aspect_ratio_edge_cases(void) {
   printf("test_aspect_ratio_edge_cases passed\n");
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t run_aspect_ratio_coverage(void) {
+  struct ui_aspect_ratio_base *ar = NULL;
+  ui_error_t rc;
+  extern int g_aspect_ratio_mock_fail;
+
+  g_aspect_ratio_mock_fail = 1;
+  rc = ui_aspect_ratio_base_create(&ar);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_aspect_ratio_mock_fail = 0;
+
+  rc = ui_aspect_ratio_base_create(&ar);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  g_aspect_ratio_mock_fail = 2;
+  rc = ui_aspect_ratio_base_destroy(ar);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_aspect_ratio_mock_fail = 0;
+
+  return UI_ERROR_NONE;
+}
+#endif
+
 int main(void) {
-  test_aspect_ratio_creation();
-  test_aspect_ratio_set();
+  ui_error_t rc;
+  rc = test_aspect_ratio_creation();
+  assert(rc == UI_ERROR_NONE);
+  rc = test_aspect_ratio_set();
+  assert(rc == UI_ERROR_NONE);
   test_aspect_ratio_edge_cases();
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_aspect_ratio_coverage(void);
-  run_aspect_ratio_coverage();
+  rc = run_aspect_ratio_coverage();
+  assert(rc == UI_ERROR_NONE);
 #endif
   return 0;
 }

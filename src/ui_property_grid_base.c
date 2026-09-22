@@ -141,12 +141,7 @@ ui_error_t ui_property_grid_base_destroy(struct ui_property_grid_base *grid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_signal_destroy(grid->value_changed_signal);
-    (void)rc_cleanup;
-  }
-
-  return UI_ERROR_NONE;
+  return ui_signal_destroy(grid->value_changed_signal);
 }
 
 /**

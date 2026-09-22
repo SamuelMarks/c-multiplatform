@@ -6,6 +6,43 @@
 #include "ui_date_range_picker_base.h"
 #include "ui_internal_mem.h"
 #include <string.h>
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_date_range_picker_mock_fail = 0;
+
+static ui_error_t mock_drp_calendar_days_in_month(int year, int month,
+                                                  int *out_days) {
+  if (g_date_range_picker_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_date_range_picker_mock_fail == 2) {
+    static int days_call_count = 0;
+    days_call_count++;
+    if (days_call_count > 1) {
+      days_call_count = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_calendar_days_in_month)(year, month, out_days);
+}
+#undef ui_calendar_days_in_month
+/** @cond */
+#define ui_calendar_days_in_month mock_drp_calendar_days_in_month
+/** @endcond */
+
+static ui_error_t mock_drp_component_destroy(struct ui_component *comp) {
+  if (g_date_range_picker_mock_fail == 3) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_drp_component_destroy
+/** @endcond */
+
+#endif
 /* clang-format on */
 
 /**
@@ -45,6 +82,19 @@ struct ui_date_range_picker_base {
  */
 ui_error_t ui_date_compare(const struct ui_date *a, const struct ui_date *b,
                            int *out_result) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_date_range_picker_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_date_range_picker_mock_fail == 6) {
+    static int compare_call_count = 0;
+    compare_call_count++;
+    if (compare_call_count > 1) {
+      compare_call_count = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
   if (!a || !b || !out_result) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -69,6 +119,13 @@ ui_error_t ui_date_compare(const struct ui_date *a, const struct ui_date *b,
 ui_error_t ui_date_is_valid(const struct ui_date *date,
                             ui_bool_t *out_is_valid) {
   int days;
+  ui_error_t rc;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_date_range_picker_mock_fail == 5) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
 
   if (!date || !out_is_valid) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -82,9 +139,9 @@ ui_error_t ui_date_is_valid(const struct ui_date *date,
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t rc = ui_calendar_days_in_month(date->year, date->month, &days);
-    (void)rc;
+  rc = ui_calendar_days_in_month(date->year, date->month, &days);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (date->day <= days) {
@@ -133,15 +190,19 @@ ui_error_t ui_date_range_picker_base_create(
  */
 ui_error_t
 ui_date_range_picker_base_destroy(struct ui_date_range_picker_base *picker) {
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!picker) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  {
+  if (picker->component) {
     ui_error_t rc_cleanup = ui_component_destroy(picker->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(picker);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -196,6 +257,7 @@ static ui_error_t check_range_validity(struct ui_date_range_picker_base *picker,
   struct ui_date current;
   int cmp;
   int days;
+  ui_error_t rc;
 
   *out_valid = UI_TRUE;
   if (!picker->predicate_cb) {
@@ -204,9 +266,9 @@ static ui_error_t check_range_validity(struct ui_date_range_picker_base *picker,
 
   current = *start;
   for (;;) {
-    {
-      ui_error_t rc = ui_date_compare(&current, end, &cmp);
-      (void)rc;
+    rc = ui_date_compare(&current, end, &cmp);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
     if (cmp > 0) {
       break;
@@ -218,10 +280,9 @@ static ui_error_t check_range_validity(struct ui_date_range_picker_base *picker,
     }
 
     /* Advance current by 1 day */
-    {
-      ui_error_t rc =
-          ui_calendar_days_in_month(current.year, current.month, &days);
-      (void)rc;
+    rc = ui_calendar_days_in_month(current.year, current.month, &days);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
     current.day++;
     if (current.day > days) {
@@ -247,16 +308,16 @@ ui_error_t
 ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
                                       const struct ui_date *date) {
   ui_bool_t is_valid, range_valid;
-
+  ui_error_t rc;
   int cmp;
 
   if (!picker || !date) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc = ui_date_is_valid(date, &is_valid);
-    (void)rc;
+  rc = ui_date_is_valid(date, &is_valid);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
   if (!is_valid) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -272,9 +333,9 @@ ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
     picker->hover_date = *date;
     picker->state = UI_DATE_RANGE_PICKER_STATE_SELECTING_END_DATE;
   } else if (picker->state == UI_DATE_RANGE_PICKER_STATE_SELECTING_END_DATE) {
-    {
-      ui_error_t rc = ui_date_compare(date, &picker->start_date, &cmp);
-      (void)rc;
+    rc = ui_date_compare(date, &picker->start_date, &cmp);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
 
     if (cmp < 0) {
@@ -283,10 +344,10 @@ ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
       picker->hover_date = *date;
     } else {
       /* Validate the whole range doesn't contain disabled dates */
-      {
-        ui_error_t rc = check_range_validity(picker, &picker->start_date, date,
-                                             &range_valid);
-        (void)rc;
+      rc =
+          check_range_validity(picker, &picker->start_date, date, &range_valid);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
       }
 
       if (range_valid) {
@@ -295,12 +356,13 @@ ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
         picker->state = UI_DATE_RANGE_PICKER_STATE_IDLE;
 
         if (picker->on_change_cb) {
-          ui_error_t cb_rc;
           range.start_date = picker->start_date;
           range.end_date = picker->end_date;
-          cb_rc =
+          rc =
               picker->on_change_cb(picker, &range, picker->on_change_user_data);
-          (void)cb_rc;
+          if (rc != UI_ERROR_NONE) {
+            return rc;
+          }
         }
       } else {
         /* If disabled dates in between, restart selection from the new date */
@@ -322,14 +384,15 @@ ui_date_range_picker_base_select_date(struct ui_date_range_picker_base *picker,
 ui_error_t ui_date_range_picker_base_set_hover_date(
     struct ui_date_range_picker_base *picker, const struct ui_date *date) {
   ui_bool_t is_valid;
+  ui_error_t rc;
 
   if (!picker || !date) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc = ui_date_is_valid(date, &is_valid);
-    (void)rc;
+  rc = ui_date_is_valid(date, &is_valid);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
   if (!is_valid) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -368,6 +431,7 @@ ui_error_t ui_date_range_picker_base_get_range(
     const struct ui_date_range_picker_base *picker,
     struct ui_date_range *out_range) {
   int cmp;
+  ui_error_t rc;
 
   if (!picker || !out_range) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -380,10 +444,9 @@ ui_error_t ui_date_range_picker_base_get_range(
     out_range->end_date = picker->end_date;
   } else {
     out_range->start_date = picker->start_date;
-    {
-      ui_error_t rc =
-          ui_date_compare(&picker->hover_date, &picker->start_date, &cmp);
-      (void)rc;
+    rc = ui_date_compare(&picker->hover_date, &picker->start_date, &cmp);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
     if (cmp < 0) {
       out_range->end_date = picker->start_date;

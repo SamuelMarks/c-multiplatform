@@ -740,6 +740,191 @@ static int run_edge_cases(void) {
 
   return 0;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+static int test_mock_coverage_branches(void) {
+  extern int g_mock_svg_skip_ws_fail;
+  extern int g_mock_svg_reflect_fail;
+  extern int g_mock_svg_triangle_area_fail;
+  extern int g_mock_svg_point_in_triangle_fail;
+
+  extern ui_error_t ui_test_svg_skip_ws(const char **ptr);
+  extern ui_error_t ui_test_svg_parse_float(const char **ptr, float *out_val);
+  extern ui_error_t ui_test_svg_reflect_point(struct ui_svg_point * out_p,
+                                              const struct ui_svg_point *p,
+                                              const struct ui_svg_point *ref);
+  extern ui_error_t ui_test_svg_triangle_area(
+      struct ui_svg_point a, struct ui_svg_point b, struct ui_svg_point c,
+      float *out_area);
+  extern ui_error_t ui_test_svg_is_point_in_triangle(
+      struct ui_svg_point p, struct ui_svg_point a, struct ui_svg_point b,
+      struct ui_svg_point c, int *out_match);
+  struct ui_svg_point p1, p2, p3, p_test, p_out;
+  struct ui_svg_path path;
+  struct ui_svg_flattened_path flat;
+  struct ui_svg_geometry geom;
+  const char *null_str = NULL;
+  const char *valid_str = "12.34";
+  float fval = 0.0f;
+  int match = 0;
+  int failed = 0;
+
+  /* Test skip_whitespace_and_commas null checks */
+  ACCUM_FAIL(failed, ui_test_svg_skip_ws(NULL) != UI_ERROR_INVALID_ARGUMENT);
+  ACCUM_FAIL(failed,
+             ui_test_svg_skip_ws(&null_str) != UI_ERROR_INVALID_ARGUMENT);
+
+  /* Test parse_float null checks */
+  ACCUM_FAIL(failed,
+             ui_test_svg_parse_float(NULL, &fval) != UI_ERROR_INVALID_ARGUMENT);
+  ACCUM_FAIL(failed, ui_test_svg_parse_float(&null_str, &fval) !=
+                         UI_ERROR_INVALID_ARGUMENT);
+  ACCUM_FAIL(failed, ui_test_svg_parse_float(&valid_str, NULL) !=
+                         UI_ERROR_INVALID_ARGUMENT);
+
+  /* Test parse_float skip_ws failure */
+  valid_str = "12.34";
+  g_mock_svg_skip_ws_fail = 1;
+  ACCUM_FAIL(failed,
+             ui_test_svg_parse_float(&valid_str, &fval) != UI_ERROR_UNKNOWN);
+  g_mock_svg_skip_ws_fail = 0;
+
+  /* Test reflect_point null checks */
+  p1.x = 0.0f;
+  p1.y = 0.0f;
+  p2.x = 10.0f;
+  p2.y = 10.0f;
+  ACCUM_FAIL(failed, ui_test_svg_reflect_point(NULL, &p1, &p2) !=
+                         UI_ERROR_INVALID_ARGUMENT);
+  ACCUM_FAIL(failed, ui_test_svg_reflect_point(&p_out, NULL, &p2) !=
+                         UI_ERROR_INVALID_ARGUMENT);
+  ACCUM_FAIL(failed, ui_test_svg_reflect_point(&p_out, &p1, NULL) !=
+                         UI_ERROR_INVALID_ARGUMENT);
+
+  /* Test reflect_point failure in cubic and quadratic smooth curves */
+  ui_svg_path_init(&path);
+  /* 's' after 'c' */
+  g_mock_svg_reflect_fail = 1;
+  ACCUM_FAIL(failed,
+             ui_svg_path_parse(&path, "M 0 0 C 1 2 3 4 5 6 S 7 8 9 10") ==
+                 UI_ERROR_NONE);
+  g_mock_svg_reflect_fail = 0;
+  ui_svg_path_destroy(&path);
+
+  /* 's' after 's' (countdown 2: 1st S succeeds, 2nd S fails) */
+  ui_svg_path_init(&path);
+  g_mock_svg_reflect_fail = 2;
+  ACCUM_FAIL(failed,
+             ui_svg_path_parse(
+                 &path, "M 0 0 C 1 2 3 4 5 6 S 7 8 9 10 S 11 12 13 14") ==
+                 UI_ERROR_NONE);
+  g_mock_svg_reflect_fail = 0;
+  ui_svg_path_destroy(&path);
+
+  /* 't' after 'q' */
+  ui_svg_path_init(&path);
+  g_mock_svg_reflect_fail = 1;
+  ACCUM_FAIL(failed, ui_svg_path_parse(&path, "M 0 0 Q 1 2 3 4 T 5 6") ==
+                         UI_ERROR_NONE);
+  g_mock_svg_reflect_fail = 0;
+  ui_svg_path_destroy(&path);
+
+  /* 't' after 't' (countdown 2: 1st T succeeds, 2nd T fails) */
+  ui_svg_path_init(&path);
+  g_mock_svg_reflect_fail = 2;
+  ACCUM_FAIL(failed, ui_svg_path_parse(&path, "M 0 0 Q 1 2 3 4 T 5 6 T 7 8") ==
+                         UI_ERROR_NONE);
+  g_mock_svg_reflect_fail = 0;
+  ui_svg_path_destroy(&path);
+
+  /* Test triangle_area and is_point_in_triangle null checks */
+  p1.x = 0.0f;
+  p1.y = 0.0f;
+  p2.x = 10.0f;
+  p2.y = 0.0f;
+  p3.x = 0.0f;
+  p3.y = 10.0f;
+  ACCUM_FAIL(failed, ui_test_svg_triangle_area(p1, p2, p3, NULL) !=
+                         UI_ERROR_INVALID_ARGUMENT);
+  ACCUM_FAIL(failed, ui_test_svg_is_point_in_triangle(p1, p1, p2, p3, NULL) !=
+                         UI_ERROR_INVALID_ARGUMENT);
+
+  /* Test is_point_in_triangle triangle_area failures (countdown 1, 2, 3, 4) */
+  g_mock_svg_triangle_area_fail = 1;
+  ACCUM_FAIL(failed, ui_test_svg_is_point_in_triangle(p1, p1, p2, p3, &match) !=
+                         UI_ERROR_UNKNOWN);
+  g_mock_svg_triangle_area_fail = 2;
+  ACCUM_FAIL(failed, ui_test_svg_is_point_in_triangle(p1, p1, p2, p3, &match) !=
+                         UI_ERROR_UNKNOWN);
+  g_mock_svg_triangle_area_fail = 3;
+  ACCUM_FAIL(failed, ui_test_svg_is_point_in_triangle(p1, p1, p2, p3, &match) !=
+                         UI_ERROR_UNKNOWN);
+  g_mock_svg_triangle_area_fail = 4;
+  ACCUM_FAIL(failed, ui_test_svg_is_point_in_triangle(p1, p1, p2, p3, &match) !=
+                         UI_ERROR_UNKNOWN);
+  g_mock_svg_triangle_area_fail = 0;
+
+  /* Test is_point_in_triangle with various test points (covering w1<0, w2<0,
+   * w3<0, and inside) */
+  p_test.x = 2.0f;
+  p_test.y = 2.0f; /* inside */
+  ACCUM_ERR(failed,
+            ui_test_svg_is_point_in_triangle(p_test, p1, p2, p3, &match));
+  ACCUM_FAIL(failed, match != 1);
+
+  p_test.x = -1.0f;
+  p_test.y = 2.0f; /* w2 < 0 */
+  ACCUM_ERR(failed,
+            ui_test_svg_is_point_in_triangle(p_test, p1, p2, p3, &match));
+  ACCUM_FAIL(failed, match != 0);
+
+  p_test.x = 2.0f;
+  p_test.y = -1.0f; /* w3 < 0 */
+  ACCUM_ERR(failed,
+            ui_test_svg_is_point_in_triangle(p_test, p1, p2, p3, &match));
+  ACCUM_FAIL(failed, match != 0);
+
+  p_test.x = 8.0f;
+  p_test.y = 8.0f; /* w1 < 0 */
+  ACCUM_ERR(failed,
+            ui_test_svg_is_point_in_triangle(p_test, p1, p2, p3, &match));
+  ACCUM_FAIL(failed, match != 0);
+
+  /* Test ui_svg_tessellate_fill failures with triangle_area and
+   * point_in_triangle */
+  ui_svg_path_init(&path);
+  ui_svg_flattened_path_init(&flat);
+  ui_svg_geometry_init(&geom);
+  ACCUM_ERR(failed, ui_svg_path_parse(&path, "M 0 0 L 10 0 L 10 10 L 0 10 Z"));
+  ACCUM_ERR(failed, ui_svg_path_flatten(&flat, &path, 1.0f));
+
+  g_mock_svg_triangle_area_fail = 1;
+  ACCUM_FAIL(failed, ui_svg_tessellate_fill(&geom, &flat) != UI_ERROR_UNKNOWN);
+  g_mock_svg_triangle_area_fail = 0;
+
+  ui_svg_path_destroy(&path);
+  ui_svg_flattened_path_destroy(&flat);
+  ui_svg_geometry_destroy(&geom);
+
+  ui_svg_path_init(&path);
+  ui_svg_flattened_path_init(&flat);
+  ui_svg_geometry_init(&geom);
+  ACCUM_ERR(failed,
+            ui_svg_path_parse(&path, "M 0 0 L 10 0 L 5 5 L 10 10 L 0 10 Z"));
+  ACCUM_ERR(failed, ui_svg_path_flatten(&flat, &path, 1.0f));
+
+  g_mock_svg_point_in_triangle_fail = 1;
+  ACCUM_FAIL(failed, ui_svg_tessellate_fill(&geom, &flat) != UI_ERROR_UNKNOWN);
+  g_mock_svg_point_in_triangle_fail = 0;
+
+  ui_svg_path_destroy(&path);
+  ui_svg_flattened_path_destroy(&flat);
+  ui_svg_geometry_destroy(&geom);
+
+  return failed;
+}
+#endif
+
 int main(void) {
   int failed = 0;
   failed += run_test("test_parse_basic_commands", test_parse_basic_commands);
@@ -764,5 +949,9 @@ int main(void) {
   failed += run_test("run_targeted_flatten_oom", run_targeted_flatten_oom);
   failed += run_test("run_edge_cases", run_edge_cases);
   failed += run_test("run_oom_tests", run_oom_tests);
+#ifdef UI_TEST_MOCK_ALLOC
+  failed +=
+      run_test("test_mock_coverage_branches", test_mock_coverage_branches);
+#endif
   return failed == 0 ? 0 : 1;
 }

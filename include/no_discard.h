@@ -3,10 +3,8 @@
  * @brief Macro for [[nodiscard]] or equivalent.
  */
 
-/** @cond */
 #ifndef C_CI_NO_DISCARD_H
 #define C_CI_NO_DISCARD_H
-/** @endcond */
 
 /* clang-format off */
 #include "ui_export.h"
@@ -16,24 +14,20 @@
 extern "C" {
 #endif
 
-/** @cond */
-#if defined(__cplusplus) && __cplusplus >= 201703L
-#define NO_DISCARD [[nodiscard]]
-#elif defined(__GNUC__) || defined(__clang__)
-#define NO_DISCARD __attribute__((warn_unused_result))
-#elif defined(_MSC_VER) && _MSC_VER >= 1700
-#define NO_DISCARD _Check_return_
-#else
-#define NO_DISCARD
-#endif
-/** @endcond */
-
 #if defined(__DOXYGEN__)
 /**
  * @def NO_DISCARD
  * @brief Macro to indicate that the return value of a function must not be
  * discarded.
  */
+#define NO_DISCARD
+#elif defined(__cplusplus) && __cplusplus >= 201703L
+#define NO_DISCARD [[nodiscard]]
+#elif defined(__GNUC__) || defined(__clang__)
+#define NO_DISCARD __attribute__((warn_unused_result))
+#elif defined(_MSC_VER) && _MSC_VER >= 1700
+#define NO_DISCARD _Check_return_
+#else
 #define NO_DISCARD
 #endif
 

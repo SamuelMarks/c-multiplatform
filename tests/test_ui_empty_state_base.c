@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include "ui_empty_state_base.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -95,7 +96,7 @@ static void test_empty_state_base(void) {
   {
     ui_error_t rc_cleanup = ui_component_destroy((struct ui_component *)state);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -104,19 +105,36 @@ static void test_oom(void) {
   extern int g_malloc_fail_countdown;
   struct ui_empty_state_base *state;
   int i;
+  ui_error_t err;
   for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     if (ui_empty_state_base_create(&state) == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup =
             ui_component_destroy((struct ui_component *)state);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
     g_malloc_fail_countdown = -1;
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_empty_state_mock_fail;
+    g_empty_state_mock_fail = 1;
+    g_malloc_fail_countdown = 1;
+    err = ui_empty_state_base_create(&state);
+    assert(err != UI_ERROR_NONE);
+
+    g_empty_state_mock_fail = 2;
+    g_malloc_fail_countdown = 3;
+    err = ui_empty_state_base_create(&state);
+    assert(err != UI_ERROR_NONE);
+
+    g_empty_state_mock_fail = 0;
+    g_malloc_fail_countdown = -1;
+  }
+#endif
 }
 
 int main(void) {

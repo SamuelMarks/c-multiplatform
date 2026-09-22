@@ -321,6 +321,9 @@ int test_css_values_scalar_calc(void) {
     EXPECT_EQ(UI_ERROR_NONE, rc);
     EXPECT_EQ(UI_CSS_IMAGE_NONE, mask.image.type);
 
+    rc = ui_css_parse_mask("url(bad_no_closing_paren", &mask);
+    EXPECT_EQ(UI_ERROR_PARSE_FAILED, rc);
+
     rc = ui_css_parse_mask("none", &mask);
     if (rc != UI_ERROR_NONE || mask.image.type != UI_CSS_IMAGE_NONE) {
       printf("Failed to parse mask: none\n");

@@ -3,8 +3,16 @@
 #include "ui_error.h"
 #include "ui_arena.h"
 #include "ui_rich_text_base.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
+
+extern int g_ssb_mock_signal_destroy_fail;
+extern ui_error_t ui_test_ssb_void_equality(union ui_signal_payload a,
+                                            union ui_signal_payload b,
+                                            ui_bool_t *out_equal);
+extern ui_error_t
+ui_test_ssb_clear_signals(struct ui_syntax_surface_base *surface);
 
 #define ACCUM_ERR(failed, expr)                                                \
   do {                                                                         \
@@ -104,9 +112,7 @@ int run_normal_tests(void) {
   /* Set up specific folds for visual line index test: Let's reset */
   {
     ui_error_t rc_cleanup = ui_syntax_surface_base_destroy(surface);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_syntax_surface_base_create(arena, NULL, &surface);
 
@@ -175,9 +181,51 @@ int run_normal_tests(void) {
   ACCUM_ERR(failed, ui_syntax_surface_base_destroy(surface));
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
+  }
+
+  /* Test mock failures and void_equality edge cases */
+  {
+    struct ui_arena *t_arena;
+    struct ui_syntax_surface_base *s_test = NULL;
+    union ui_signal_payload pa, pb;
+    ui_bool_t eq = UI_FALSE;
+
+    /* void_equality NULL out_equal check */
+    pa.ptr_val = NULL;
+    pb.ptr_val = NULL;
+    failed |=
+        (ui_test_ssb_void_equality(pa, pb, NULL) != UI_ERROR_INVALID_ARGUMENT);
+
+    /* void_equality equal and non-equal */
+    failed |= (ui_test_ssb_void_equality(pa, pb, &eq) != UI_ERROR_NONE ||
+               eq != UI_TRUE);
+    pa.ptr_val = (void *)1;
+    failed |= (ui_test_ssb_void_equality(pa, pb, &eq) != UI_ERROR_NONE ||
+               eq != UI_FALSE);
+
+    /* Signal destroy failures during syntax_surface_base_destroy */
+    ACCUM_ERR(failed, ui_arena_create(32768, &t_arena));
+    ACCUM_ERR(failed, ui_syntax_surface_base_create(t_arena, NULL, &s_test));
+
+    /* Fail fold_changed_signal destroy */
+    g_ssb_mock_signal_destroy_fail = 1;
+    failed |= (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_UNKNOWN);
+    g_ssb_mock_signal_destroy_fail = 0;
+
+    ACCUM_ERR(failed, ui_syntax_surface_base_create(t_arena, NULL, &s_test));
+    /* Fail active_line_signal destroy (call #2) */
+    g_ssb_mock_signal_destroy_fail = 2;
+    failed |= (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_UNKNOWN);
+    g_ssb_mock_signal_destroy_fail = 0;
+
+    /* Test surface destroy with NULL signals */
+    failed |= (ui_test_ssb_clear_signals(NULL) != UI_ERROR_INVALID_ARGUMENT);
+    ACCUM_ERR(failed, ui_syntax_surface_base_create(t_arena, NULL, &s_test));
+    ACCUM_ERR(failed, ui_test_ssb_clear_signals(s_test));
+    failed |= (ui_syntax_surface_base_destroy(s_test) != UI_ERROR_NONE);
+
+    ACCUM_ERR(failed, ui_arena_destroy(t_arena));
   }
 
   /* Arena OOM tests */
@@ -191,16 +239,12 @@ int run_normal_tests(void) {
           UI_ERROR_NONE) {
         {
           ui_error_t rc_cleanup = ui_syntax_surface_base_destroy(s1);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
       }
       {
         ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }

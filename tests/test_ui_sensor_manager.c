@@ -3,6 +3,7 @@
 #include "../include/ui_execution_context.h"
 #include "../include/ui_sensor_manager.h"
 #include "../include/ui_signal.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
@@ -73,6 +74,18 @@ static int test_sensor_manager_basic(void) {
     return 1;
   }
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_sensor_manager_mock_fail;
+    g_sensor_manager_mock_fail = 1;
+    rc = ui_sensor_manager_tick_mock(manager);
+    if (rc != UI_ERROR_UNKNOWN) {
+      return 1;
+    }
+    g_sensor_manager_mock_fail = 0;
+  }
+#endif
+
   rc = ui_sensor_manager_get_accelerometer(manager, &vec_accel);
   if (rc != UI_ERROR_NONE || vec_accel.y != 9.81) {
     fprintf(stderr, "ui_sensor_manager_get_accelerometer failed\n");
@@ -98,27 +111,19 @@ static int test_sensor_manager_basic(void) {
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_sensor_manager_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -146,9 +151,7 @@ static int test_sensor_manager_nulls(void) {
 
   {
     ui_error_t rc_cleanup = ui_sensor_manager_create(&manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_sensor_manager_bind_orientation(manager, NULL) !=
@@ -176,18 +179,14 @@ static int test_sensor_manager_nulls(void) {
   /* tick mock without signal bounded */
   {
     ui_error_t rc_cleanup = ui_sensor_manager_start(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (ui_sensor_manager_tick_mock(manager) != UI_ERROR_NONE)
     return 1;
 
   {
     ui_error_t rc_cleanup = ui_sensor_manager_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -228,21 +227,15 @@ static void test_sensor_manager_signal_err(void) {
 
   {
     ui_error_t rc_cleanup = ui_execution_context_create(&ctx);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_create(1024, &arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_sensor_manager_create(&manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   initial_payload.ptr_val = NULL;
@@ -250,22 +243,16 @@ static void test_sensor_manager_signal_err(void) {
     ui_error_t rc_cleanup =
         ui_signal_create(arena, initial_payload, UI_SIGNAL_TYPE_POINTER, NULL,
                          NULL, UI_SIGNAL_MODE_SINGLE_THREADED, &signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_sensor_manager_bind_orientation(manager, signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_sensor_manager_start(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Corrupt signal type so ui_signal_set will fail */
@@ -275,34 +262,24 @@ static void test_sensor_manager_signal_err(void) {
   g_malloc_fail_countdown = 0;
   {
     ui_error_t rc_cleanup = ui_sensor_manager_tick_mock(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_malloc_fail_countdown = -1;
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(signal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_sensor_manager_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }

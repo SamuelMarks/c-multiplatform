@@ -67,7 +67,7 @@ static int test_badge_formatting(void) {
   {
     ui_error_t rc_cleanup = ui_badge_base_destroy(badge);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -85,7 +85,7 @@ static int test_badge_nulls_and_errors(void) {
   {
     ui_error_t rc_cleanup = ui_badge_base_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -123,7 +123,7 @@ static int test_badge_nulls_and_errors(void) {
   {
     ui_error_t rc_cleanup = ui_badge_base_destroy(badge);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   g_malloc_fail_countdown = -1;
@@ -144,7 +144,7 @@ static int test_badge_nulls_and_errors(void) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(child);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
   }
@@ -157,7 +157,7 @@ static int test_badge_nulls_and_errors(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(comp->shadow_root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   comp->shadow_root = NULL;
@@ -172,7 +172,7 @@ static int test_badge_nulls_and_errors(void) {
   {
     ui_error_t rc_cleanup = ui_component_destroy(comp);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ((void **)badge)[0] = NULL;
@@ -186,21 +186,52 @@ static int test_badge_nulls_and_errors(void) {
   {
     ui_error_t rc_cleanup = ui_badge_base_destroy(badge);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
   return 0;
 }
 
-int main(void) {
-
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_badge_coverage(void);
-  run_badge_coverage();
+static ui_error_t run_badge_coverage(void) {
+  struct ui_badge_base *badge = NULL;
+  extern int g_badge_mock_fail;
+
+  g_badge_mock_fail = 1;
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 0;
+
+  g_badge_mock_fail = 2;
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 0;
+
+  g_badge_mock_fail = 20;
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 0;
+
+  g_badge_mock_fail = 3;
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 0;
+
+  ui_badge_base_create(&badge);
+  g_badge_mock_fail = 4;
+  ui_badge_base_destroy(badge);
+  g_badge_mock_fail = 0;
+
+  return UI_ERROR_NONE;
+}
 #endif
 
+int main(void) {
   int failed = 0;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (run_badge_coverage() != UI_ERROR_NONE) {
+    return 1;
+  }
+#endif
+
   printf("Running ui_badge_base tests...\n");
 
   failed |= test_badge_formatting();

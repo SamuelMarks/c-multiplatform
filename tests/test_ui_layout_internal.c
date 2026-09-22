@@ -1,6 +1,7 @@
 /* clang-format off */
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "../include/ui_cssom.h"
 #include "../include/ui_dom_node.h"
@@ -177,18 +178,28 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return (int)rc_cleanup;
     }
   }
 
   /* Force out_node NULL error */
-  (void)create_layout_node(root, (struct ui_css_computed_style *)1, 0, NULL);
+  {
+    ui_error_t rc =
+        create_layout_node(root, (struct ui_css_computed_style *)1, 0, NULL);
+    assert(rc != UI_ERROR_NONE);
+  }
 
   /* Force build_tree_recursive error */
   g_mock_prop_name = "display";
   g_mock_prop_val = "block";
   g_mock_prop_rc = UI_ERROR_OUT_OF_MEMORY;
-  (void)build_tree_recursive(root, (struct ui_css_stylesheet *)1, &out_node);
+  {
+    ui_error_t rc =
+        build_tree_recursive(root, (struct ui_css_stylesheet *)1, &out_node);
+    if (rc != UI_ERROR_NONE) {
+      /* Handled error */
+    }
+  }
   g_mock_prop_rc = UI_ERROR_NONE;
   g_mock_prop_name = NULL;
   g_mock_prop_val = NULL;
@@ -198,10 +209,16 @@ int main(void) {
   g_mock_prop_name = "display";
   g_mock_prop_val = "block";
   g_mock_prop_rc = UI_ERROR_OUT_OF_MEMORY;
-  (void)create_layout_node(root, (struct ui_css_computed_style *)1, 0,
-                           &out_node);
+  {
+    ui_error_t rc = create_layout_node(root, (struct ui_css_computed_style *)1,
+                                       0, &out_node);
+    if (rc != UI_ERROR_NONE && rc != UI_ERROR_OUT_OF_MEMORY) {
+      return (int)rc;
+    }
+  }
   if (out_node) {
-    (void)compute_box_model(out_node);
+    ui_error_t rc = compute_box_model(out_node);
+    assert(rc == UI_ERROR_NONE);
     free(out_node);
   }
   g_mock_prop_rc = UI_ERROR_NONE;
@@ -211,11 +228,16 @@ int main(void) {
   /* Call compute_box_model with a valid node to hit the !computed_style branch
    */
   out_node = NULL;
-  (void)create_layout_node(root, (struct ui_css_computed_style *)1, 0,
-                           &out_node);
+  {
+    ui_error_t rc = create_layout_node(root, (struct ui_css_computed_style *)1,
+                                       0, &out_node);
+    assert(rc == UI_ERROR_NONE);
+  }
   if (out_node) {
+    ui_error_t rc;
     out_node->computed_style = NULL;
-    (void)compute_box_model(out_node);
+    rc = compute_box_model(out_node);
+    assert(rc == UI_ERROR_NONE);
     out_node->computed_style = (struct ui_css_computed_style *)1;
     free(out_node);
   }
@@ -229,10 +251,14 @@ int main(void) {
     g_mock_prop_name = props[i];
     g_mock_prop_val = "10px";
     g_mock_prop_rc = UI_ERROR_OUT_OF_MEMORY;
-    (void)create_layout_node(root, (struct ui_css_computed_style *)1, 0,
-                             &out_node);
+    rc = create_layout_node(root, (struct ui_css_computed_style *)1, 0,
+                            &out_node);
+    if (rc != UI_ERROR_NONE && rc != UI_ERROR_OUT_OF_MEMORY) {
+      return (int)rc;
+    }
     if (out_node) {
-      (void)compute_box_model(out_node);
+      rc = compute_box_model(out_node);
+      assert(rc == UI_ERROR_NONE);
       free(out_node);
     }
 
@@ -241,8 +267,9 @@ int main(void) {
     g_mock_prop_name = props[i];
     g_mock_prop_val = "invalid";
     g_mock_prop_rc = UI_ERROR_NONE;
-    (void)create_layout_node(root, (struct ui_css_computed_style *)1, 0,
-                             &out_node);
+    rc = create_layout_node(root, (struct ui_css_computed_style *)1, 0,
+                            &out_node);
+    assert(rc == UI_ERROR_NONE);
     if (out_node) {
       rc = compute_box_model(out_node);
       free(out_node);
@@ -250,14 +277,31 @@ int main(void) {
   }
 
   /* EXTRA COVERAGE */
-  create_layout_node(root, NULL, 0, NULL);
-  create_layout_node(root, NULL, 0, &out_node);
-  compute_box_model(out_node);
-  g_mock_prop_name = "display";
-  g_mock_prop_val = "none";
-  g_mock_prop_rc = UI_ERROR_INVALID_ARGUMENT;
-  create_layout_node(root, (struct ui_css_computed_style *)1, 0, &out_node);
-  ui_layout_solve_viewport(NULL, 0.0f, 0.0f);
+  {
+    ui_error_t rc;
+    rc = create_layout_node(root, NULL, 0, NULL);
+    assert(rc != UI_ERROR_NONE);
+    rc = create_layout_node(root, NULL, 0, &out_node);
+    assert(rc == UI_ERROR_NONE);
+    rc = compute_box_model(out_node);
+    assert(rc == UI_ERROR_NONE);
+    free(out_node);
+    g_mock_prop_name = "display";
+    g_mock_prop_val = "none";
+    g_mock_prop_rc = UI_ERROR_INVALID_ARGUMENT;
+    rc = create_layout_node(root, (struct ui_css_computed_style *)1, 0,
+                            &out_node);
+    if (rc != UI_ERROR_NONE && rc != UI_ERROR_INVALID_ARGUMENT) {
+      return (int)rc;
+    }
+    if (out_node) {
+      free(out_node);
+    }
+    rc = ui_layout_solve_viewport(NULL, 0.0f, 0.0f);
+    assert(rc != UI_ERROR_NONE);
+    rc = ui_dom_node_destroy(root);
+    assert(rc == UI_ERROR_NONE);
+  }
 
   printf("Done\n");
   return 0;

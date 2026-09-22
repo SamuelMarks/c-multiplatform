@@ -58,9 +58,7 @@ void test_more_layout(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_css_stylesheet_destroy(sheet);
 }
@@ -131,9 +129,7 @@ void test_coverage_layout(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_css_stylesheet_destroy(sheet);
 }
@@ -141,6 +137,7 @@ void test_coverage_layout(void) {
 #include "../include/ui_cssom.h"
 #include "../include/ui_dom_node.h"
 #include "../include/ui_layout.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 /* clang-format on */
@@ -232,7 +229,7 @@ void test_bounds(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return;
     }
   }
 }
@@ -337,13 +334,13 @@ void test_sequences_and_overflow(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(oroot);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return;
     }
   }
 }
@@ -399,7 +396,7 @@ void test_percentage_negative(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return;
     }
   }
 }
@@ -445,7 +442,7 @@ void test_percentage_negative_block(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return;
     }
   }
 }

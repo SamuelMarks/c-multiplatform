@@ -6,7 +6,55 @@
 #include "ui_scaffold_base.h"
 #include "ui_internal_mem.h"
 #include <stdio.h>
+#include <string.h>
 /* clang-format on */
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_scaffold_mock_fail = 0;
+int g_scaffold_slot_fail_idx = 0;
+static int g_slot_counter = 0;
+
+static ui_error_t mock_scaffold_set_tag_name(struct ui_dom_node *node,
+                                             const char *tag) {
+  if (g_scaffold_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_scaffold_mock_fail == 2) {
+    if (strcmp(tag, "div") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_set_tag_name)(node, tag);
+}
+#undef ui_dom_node_set_tag_name
+/** @cond */
+#define ui_dom_node_set_tag_name mock_scaffold_set_tag_name
+/** @endcond */
+
+static ui_error_t mock_scaffold_set_attribute(struct ui_dom_node *node,
+                                              const char *k, const char *v) {
+  if (g_scaffold_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_set_attribute)(node, k, v);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_scaffold_set_attribute
+/** @endcond */
+
+static ui_error_t mock_scaffold_append_child(struct ui_dom_node *parent,
+                                             struct ui_dom_node *child) {
+  if (g_scaffold_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_scaffold_append_child
+/** @endcond */
+#endif
 
 /**
  * @brief create_slot.
@@ -19,6 +67,14 @@ static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
                               struct ui_dom_node **out_slot) {
   ui_error_t err;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  g_slot_counter++;
+  if (g_scaffold_slot_fail_idx > 0 &&
+      g_slot_counter == g_scaffold_slot_fail_idx) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, out_slot);
   if (err != UI_ERROR_NONE) {
     return err;
@@ -26,27 +82,20 @@ static ui_error_t create_slot(struct ui_dom_node *parent, const char *slot_name,
 
   err = ui_dom_node_set_tag_name(*out_slot, "div");
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(*out_slot);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(*out_slot);
     return err;
   }
 
-  {
-    ui_error_t set_rc =
-        ui_dom_node_set_attribute(*out_slot, "data-slot", slot_name);
-    if (set_rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(*out_slot);
-        (void)rc_cleanup;
-      }
-      return set_rc;
-    }
+  err = ui_dom_node_set_attribute(*out_slot, "data-slot", slot_name);
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(*out_slot);
+    return err;
   }
-  {
-    ui_error_t ap_rc = ui_dom_node_append_child(parent, *out_slot);
-    (void)ap_rc;
+
+  err = ui_dom_node_append_child(parent, *out_slot);
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(*out_slot);
+    return err;
   }
 
   return UI_ERROR_NONE;
@@ -66,6 +115,10 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
+#ifdef UI_TEST_MOCK_ALLOC
+  g_slot_counter = 0;
+#endif
+
   err = ui_component_create(&base_comp);
   if (err != UI_ERROR_NONE) {
     return err;
@@ -74,10 +127,7 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
   scaffold = (struct ui_scaffold_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_scaffold_base));
   if (!scaffold) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(base_comp);
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -93,38 +143,42 @@ ui_error_t ui_scaffold_base_create(struct ui_scaffold_base **out_scaffold) {
 
   err = ui_dom_node_set_tag_name(scaffold->base.shadow_root, "ui-scaffold");
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(scaffold->base.shadow_root);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(scaffold->base.shadow_root);
     C_MULTIPLATFORM_FREE(scaffold);
     return err;
   }
 
   /* Create slots */
-  {
-    ui_error_t cs_rc1 = create_slot(scaffold->base.shadow_root, "top-bar",
-                                    &scaffold->slot_top_bar);
-    if (cs_rc1 != UI_ERROR_NONE)
-      return cs_rc1;
+  err = create_slot(scaffold->base.shadow_root, "top-bar",
+                    &scaffold->slot_top_bar);
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(scaffold->base.shadow_root);
+    C_MULTIPLATFORM_FREE(scaffold);
+    return err;
   }
-  {
-    ui_error_t cs_rc2 = create_slot(scaffold->base.shadow_root, "side-nav",
-                                    &scaffold->slot_side_nav);
-    if (cs_rc2 != UI_ERROR_NONE)
-      return cs_rc2;
+
+  err = create_slot(scaffold->base.shadow_root, "side-nav",
+                    &scaffold->slot_side_nav);
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(scaffold->base.shadow_root);
+    C_MULTIPLATFORM_FREE(scaffold);
+    return err;
   }
-  {
-    ui_error_t cs_rc3 = create_slot(scaffold->base.shadow_root, "main-content",
-                                    &scaffold->slot_main_content);
-    if (cs_rc3 != UI_ERROR_NONE)
-      return cs_rc3;
+
+  err = create_slot(scaffold->base.shadow_root, "main-content",
+                    &scaffold->slot_main_content);
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(scaffold->base.shadow_root);
+    C_MULTIPLATFORM_FREE(scaffold);
+    return err;
   }
-  {
-    ui_error_t cs_rc4 = create_slot(scaffold->base.shadow_root, "bottom-bar",
-                                    &scaffold->slot_bottom_bar);
-    if (cs_rc4 != UI_ERROR_NONE)
-      return cs_rc4;
+
+  err = create_slot(scaffold->base.shadow_root, "bottom-bar",
+                    &scaffold->slot_bottom_bar);
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(scaffold->base.shadow_root);
+    C_MULTIPLATFORM_FREE(scaffold);
+    return err;
   }
 
   *out_scaffold = scaffold;
@@ -145,7 +199,11 @@ ui_error_t ui_scaffold_base_set_top_bar(struct ui_scaffold_base *scaffold,
   return ui_dom_node_append_child(scaffold->slot_top_bar, top_bar->shadow_root);
 }
 
-/* \brief ui_error
+/**
+ * @brief Sets the main content component of the scaffold.
+ * @param scaffold Parameter scaffold.
+ * @param content Parameter content.
+ * @return Return value.
  */
 ui_error_t ui_scaffold_base_set_main_content(struct ui_scaffold_base *scaffold,
                                              struct ui_component *content) {

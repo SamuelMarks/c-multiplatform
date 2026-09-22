@@ -8,6 +8,28 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_sensor_manager_mock_fail = 0;
+
+/**
+ * @brief mock_sensor_signal_set.
+ * @param sig Parameter sig.
+ * @param val Parameter val.
+ * @return Return value.
+ */
+static ui_error_t mock_sensor_signal_set(struct ui_signal *sig,
+                                         union ui_signal_payload val) {
+  if (g_sensor_manager_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_set)(sig, val);
+}
+#undef ui_signal_set
+/** @cond */
+#define ui_signal_set mock_sensor_signal_set
+/** @endcond */
+#endif
+
 /*
  * \file ui_sensor_manager.c
  * \brief Sensor manager implementation.
@@ -62,21 +84,19 @@ ui_error_t ui_sensor_manager_create(struct ui_sensor_manager **out_manager) {
  * \return UI_ERROR_NONE on success.
  */
 ui_error_t ui_sensor_manager_destroy(struct ui_sensor_manager *manager) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (manager->is_running) {
-    {
-      ui_error_t rc_cleanup = ui_sensor_manager_stop(manager);
-      (void)rc_cleanup;
-    }
+    rc = ui_sensor_manager_stop(manager);
   }
 
   /* Unbind from signals if necessary */
 
   C_MULTIPLATFORM_FREE(manager);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -191,6 +211,8 @@ ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager);
  * @return Return value.
  */
 ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
+  ui_error_t rc;
+
   if (!manager || !manager->is_running) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -205,10 +227,9 @@ ui_error_t ui_sensor_manager_tick_mock(struct ui_sensor_manager *manager) {
     union ui_signal_payload payload;
     payload.ptr_val = &manager->current_quat;
     /* Send the pointer to current quat into the reactive graph */
-    {
-      ui_error_t rc_cleanup =
-          ui_signal_set(manager->orientation_signal, payload);
-      (void)rc_cleanup;
+    rc = ui_signal_set(manager->orientation_signal, payload);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 

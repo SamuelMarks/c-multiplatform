@@ -14,6 +14,24 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_chart_mock_fail = -1;
+int g_chart_signal_destroy_mock_fail = 0;
+
+/**
+ * @brief mock_chart_signal_destroy.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
+static ui_error_t mock_chart_signal_destroy(ui_signal_t *signal) {
+  if (g_chart_signal_destroy_mock_fail == 1) {
+    (ui_signal_destroy)(signal);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_destroy)(signal);
+}
+#undef ui_signal_destroy
+/** @cond */
+#define ui_signal_destroy mock_chart_signal_destroy
+/** @endcond */
 #endif
 
 /**
@@ -43,9 +61,7 @@ struct ui_chart_base {
 static ui_error_t void_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
                                 ui_bool_t *out_equal) {
-  (void)a;
-  (void)b;
-  /* Internal signal callback assumes out_equal is valid */
+  *out_equal = (ui_bool_t)((size_t)a.ptr_val ^ (size_t)b.ptr_val);
   *out_equal = UI_FALSE; /* Always trigger */
   return UI_ERROR_NONE;
 }
@@ -131,13 +147,16 @@ ui_error_t ui_chart_base_create(struct ui_arena *arena,
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_chart_base_destroy(struct ui_chart_base *chart) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!chart)
     return UI_ERROR_INVALID_ARGUMENT;
   {
     ui_error_t rc_cleanup = ui_signal_destroy(chart->topology_signal);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

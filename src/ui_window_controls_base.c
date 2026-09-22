@@ -88,13 +88,16 @@ ui_window_controls_base_create(struct ui_arena *arena,
 
 ui_error_t
 ui_window_controls_base_destroy(struct ui_window_controls_base *controls) {
+  ui_signal_t *sig;
+
   if (!controls) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_signal_destroy(controls->state_signal);
-    (void)rc_cleanup;
+  sig = controls->state_signal;
+  controls->state_signal = NULL;
+  if (sig) {
+    return ui_signal_destroy(sig);
   }
 
   return UI_ERROR_NONE;

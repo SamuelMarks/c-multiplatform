@@ -39,8 +39,10 @@ static int g_close_should_fail = 0;
 
 static ui_error_t on_close_handler(struct ui_bottom_sheet_base *sheet,
                                    void *user_data) {
-  (void)sheet;
-  (void)user_data;
+  if (sheet) {
+  }
+  if (user_data) {
+  }
   if (g_close_should_fail)
     return UI_ERROR_OUT_OF_MEMORY;
   g_closed_count++;
@@ -761,7 +763,12 @@ static ui_error_t run_mock_fail_tests(void) {
     g_bottom_sheet_mock_fail = 0;
   });
   TEST_MOCK(12, ui_bottom_sheet_base_update(sheet, 100.0));
-  TEST_MOCK(16, ui_bottom_sheet_base_process_event(sheet, &ev, 100.0));
+  TEST_MOCK(16, {
+    ui_bottom_sheet_base_set_open(sheet, 1);
+    g_bottom_sheet_mock_fail = 16;
+    ui_bottom_sheet_base_process_event(sheet, &ev, 100.0);
+    g_bottom_sheet_mock_fail = 0;
+  });
   TEST_MOCK(17, {
     ui_bottom_sheet_base_set_open(sheet, 1);
     g_bottom_sheet_mock_fail = 17;

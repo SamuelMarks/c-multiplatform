@@ -13,6 +13,26 @@
 #include <stdlib.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_rating_mock_icon_destroy_fail = 0;
+
+/**
+ * @brief mock_rating_icon_base_destroy.
+ * @param icon Icon pointer.
+ * @return Return value.
+ */
+static ui_error_t mock_rating_icon_base_destroy(struct ui_icon_base *icon) {
+  if (g_rating_mock_icon_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_icon_base_destroy)(icon);
+}
+#undef ui_icon_base_destroy
+/** @cond */
+#define ui_icon_base_destroy mock_rating_icon_base_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_rating_base
  * \brief Internal structure representing a rating component.
@@ -182,6 +202,7 @@ ui_error_t ui_rating_base_create(struct ui_rating_base **out_rating,
                                  struct ui_control_value_accessor *out_cva) {
   struct ui_rating_base *rating;
   ui_error_t rc;
+  ui_error_t rc_cleanup;
 
   if (!out_rating) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -229,10 +250,11 @@ ui_error_t ui_rating_base_create(struct ui_rating_base **out_rating,
   *out_rating = rating;
   return UI_ERROR_NONE;
 
-cleanup: {
-  ui_error_t rc_cleanup = ui_rating_base_destroy(rating);
-  (void)rc_cleanup;
-}
+cleanup:
+  rc_cleanup = ui_rating_base_destroy(rating);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
+  }
   return rc;
 }
 
@@ -243,31 +265,34 @@ cleanup: {
  * \return UI_ERROR_NONE on success.
  */
 ui_error_t ui_rating_base_destroy(struct ui_rating_base *rating) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!rating) {
     return UI_ERROR_NONE;
   }
 
   if (rating->full_icon) {
-    {
-      ui_error_t rc_cleanup = ui_icon_base_destroy(rating->full_icon);
-      (void)rc_cleanup;
+    rc_cleanup = ui_icon_base_destroy(rating->full_icon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   if (rating->half_icon) {
-    {
-      ui_error_t rc_cleanup = ui_icon_base_destroy(rating->half_icon);
-      (void)rc_cleanup;
+    rc_cleanup = ui_icon_base_destroy(rating->half_icon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   if (rating->empty_icon) {
-    {
-      ui_error_t rc_cleanup = ui_icon_base_destroy(rating->empty_icon);
-      (void)rc_cleanup;
+    rc_cleanup = ui_icon_base_destroy(rating->empty_icon);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
 
   C_MULTIPLATFORM_FREE(rating);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -320,6 +345,7 @@ ui_error_t ui_rating_base_get_max(const struct ui_rating_base *rating,
 ui_error_t ui_rating_base_set_value(struct ui_rating_base *rating,
                                     float value) {
   float old_val;
+  ui_error_t rc;
 
   if (!rating || value < 0.0f) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -333,8 +359,14 @@ ui_error_t ui_rating_base_set_value(struct ui_rating_base *rating,
   }
 
   if (rating->value != old_val) {
-    (void)trigger_cva_change(rating);
-    (void)trigger_cva_touched(rating);
+    rc = trigger_cva_change(rating);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    rc = trigger_cva_touched(rating);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
 
   return UI_ERROR_NONE;

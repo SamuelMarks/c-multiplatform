@@ -11,6 +11,113 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_select_base_mock_remove_attr_fail = 0;
+int g_select_base_mock_append_child_fail = 0;
+int g_select_base_mock_gesture_destroy_fail = 0;
+int g_select_base_mock_comp_destroy_fail = 0;
+int g_select_base_mock_set_style_fail = 0;
+
+/**
+ * @brief mock_select_dom_node_remove_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @return Return value.
+ */
+static ui_error_t
+mock_select_dom_node_remove_attribute(struct ui_dom_node *node,
+                                      const char *name) {
+  if (g_select_base_mock_remove_attr_fail > 0) {
+    g_select_base_mock_remove_attr_fail--;
+    if (g_select_base_mock_remove_attr_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_remove_attribute)(node, name);
+}
+#undef ui_dom_node_remove_attribute
+/** @cond */
+#define ui_dom_node_remove_attribute mock_select_dom_node_remove_attribute
+/** @endcond */
+
+/**
+ * @brief mock_select_dom_node_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
+static ui_error_t mock_select_dom_node_append_child(struct ui_dom_node *parent,
+                                                    struct ui_dom_node *child) {
+  if (g_select_base_mock_append_child_fail > 0) {
+    g_select_base_mock_append_child_fail--;
+    if (g_select_base_mock_append_child_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_select_dom_node_append_child
+/** @endcond */
+
+/**
+ * @brief mock_select_component_set_default_style.
+ * @param comp Parameter comp.
+ * @param sheet Parameter sheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_select_component_set_default_style(struct ui_component *comp,
+                                        struct ui_css_stylesheet *sheet) {
+  if (g_select_base_mock_set_style_fail) {
+    g_select_base_mock_set_style_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_select_component_set_default_style
+/** @endcond */
+
+/**
+ * @brief mock_select_gesture_recognizer_destroy.
+ * @param recognizer Parameter recognizer.
+ * @return Return value.
+ */
+static ui_error_t mock_select_gesture_recognizer_destroy(
+    struct ui_gesture_recognizer *recognizer) {
+  if (g_select_base_mock_gesture_destroy_fail) {
+    g_select_base_mock_gesture_destroy_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_gesture_recognizer_destroy)(recognizer);
+}
+#undef ui_gesture_recognizer_destroy
+/** @cond */
+#define ui_gesture_recognizer_destroy mock_select_gesture_recognizer_destroy
+/** @endcond */
+
+/**
+ * @brief mock_select_component_destroy.
+ * @param component Parameter component.
+ * @return Return value.
+ */
+static ui_error_t
+mock_select_component_destroy(struct ui_component *component) {
+  if (g_select_base_mock_comp_destroy_fail) {
+    g_select_base_mock_comp_destroy_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(component);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_select_component_destroy
+/** @endcond */
+#endif
+
 /*
  * \file ui_select_base.c
  * \brief Select base component implementation.
@@ -66,6 +173,7 @@ struct ui_select_base {
  * @return Return value.
  */
 static ui_error_t update_dom_state(struct ui_select_base *select) {
+  ui_error_t rc;
 
 #if defined(__EMSCRIPTEN__)
   if (select && select->component && select->component->host_node) {
@@ -105,15 +213,15 @@ static ui_error_t update_dom_state(struct ui_select_base *select) {
       }
     }
   } else {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
-          select->component->shadow_root, "disabled");
-      (void)rc_cleanup;
+    rc = ui_dom_node_remove_attribute(select->component->shadow_root,
+                                      "disabled");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
-    {
-      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
-          select->component->shadow_root, "aria-disabled");
-      (void)rc_cleanup;
+    rc = ui_dom_node_remove_attribute(select->component->shadow_root,
+                                      "aria-disabled");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
   return UI_ERROR_NONE;
@@ -181,22 +289,18 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
     goto cleanup;
   }
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(sel->component, default_style);
-
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(sel->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   sel->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
 
-  {
-    ui_error_t upd_rc = update_dom_state(sel);
-    if (upd_rc != UI_ERROR_NONE) {
-      return upd_rc;
-    }
+  rc = update_dom_state(sel);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   *out_select = sel;
@@ -204,23 +308,13 @@ ui_error_t ui_select_base_create(struct ui_select_base **out_select) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (sel->gesture_recognizer) {
-    {
-      ui_error_t rc_cleanup =
-          ui_gesture_recognizer_destroy(sel->gesture_recognizer);
-      (void)rc_cleanup;
-    }
+    ui_gesture_recognizer_destroy(sel->gesture_recognizer);
   }
   if (sel->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(sel->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(sel->component);
   }
   C_MULTIPLATFORM_FREE(sel);
   return rc;
@@ -232,19 +326,25 @@ cleanup:
  * \return UI_ERROR_NONE on success.
  */
 ui_error_t ui_select_base_destroy(struct ui_select_base *select) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!select)
     return UI_ERROR_NONE;
   if (select->gesture_recognizer) {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(select->gesture_recognizer);
-    (void)rc_cleanup;
+    rc_cleanup = ui_gesture_recognizer_destroy(select->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   if (select->component) {
-    ui_error_t rc_cleanup = ui_component_destroy(select->component);
-    (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(select->component);
+    if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(select);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -494,7 +594,9 @@ ui_select_base_set_on_open_change(struct ui_select_base *select,
 ui_error_t ui_select_base_process_event(struct ui_select_base *select,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
-  (void)timestamp_ms;
+  if (timestamp_ms < 0.0) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (!select || !event)
     return UI_ERROR_INVALID_ARGUMENT;
   if (select->disabled)
@@ -591,11 +693,13 @@ struct select_cva_wrapper {
 static ui_error_t select_on_change_wrapper(struct ui_select_base *select,
                                            int index, void *user_data) {
   struct select_cva_wrapper *wrap = (struct select_cva_wrapper *)user_data;
-  (void)select;
-  if (wrap->callback) {
+  if (!select) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (wrap && wrap->callback) {
     union ui_signal_payload p;
     p.int_val = index;
-    { (void)wrap->callback(p, wrap->user_data); }
+    return wrap->callback(p, wrap->user_data);
   }
   return UI_ERROR_NONE;
 }
@@ -646,9 +750,13 @@ static ui_error_t select_cva_register_on_change(
 static ui_error_t select_cva_register_on_touched(void *component,
                                                  ui_error_t (*callback)(void *),
                                                  void *user_data) {
-  (void)component;
-  (void)callback;
-  (void)user_data;
+  if (!component) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (callback) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -744,20 +852,15 @@ ui_error_t ui_select_base_add_option(struct ui_select_base *select,
     goto cleanup;
   }
 
-  {
-
-    ui_error_t _ign_rc = ui_dom_node_append_child(option_node, text_node);
-
-    (void)_ign_rc;
+  rc = ui_dom_node_append_child(option_node, text_node);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
   text_node = NULL; /* Owned by option_node */
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_dom_node_append_child(select->component->shadow_root, option_node);
-
-    (void)_ign_rc;
+  rc = ui_dom_node_append_child(select->component->shadow_root, option_node);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
   option_node = NULL; /* Owned by select */
 
@@ -766,16 +869,10 @@ ui_error_t ui_select_base_add_option(struct ui_select_base *select,
 
 cleanup:
   if (text_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(text_node);
   }
   if (option_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(option_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(option_node);
   }
   return rc;
 }

@@ -106,10 +106,14 @@ static ui_error_t gles_fallback_draw_rect(void *ctx, const struct ui_rect *r,
 static ui_error_t gles_fallback_draw_text(void *ctx, const char *text,
                                           const struct ui_font *f,
                                           const struct ui_rect *r) {
-  (void)ctx;
-  (void)text;
-  (void)f;
-  (void)r;
+  void *unused_ctx = ctx;
+  const char *unused_text = text;
+  const struct ui_font *unused_f = f;
+  const struct ui_rect *unused_r = r;
+  ctx = unused_ctx;
+  text = unused_text;
+  f = unused_f;
+  r = unused_r;
   /* Stub for now until stb_truetype is wired into GLES */
   return UI_ERROR_NONE;
 }
@@ -124,9 +128,12 @@ static ui_error_t gles_fallback_draw_text(void *ctx, const char *text,
 static ui_error_t gles_fallback_draw_image(void *ctx,
                                            const struct ui_image *img,
                                            const struct ui_rect *r) {
-  (void)ctx;
-  (void)img;
-  (void)r;
+  void *unused_ctx = ctx;
+  const struct ui_image *unused_img = img;
+  const struct ui_rect *unused_r = r;
+  ctx = unused_ctx;
+  img = unused_img;
+  r = unused_r;
   /* Stub for now */
   return UI_ERROR_NONE;
 }
@@ -141,9 +148,12 @@ static ui_error_t gles_fallback_draw_image(void *ctx,
 static ui_error_t
 gles_fallback_draw_gradient(void *ctx, const struct ui_rect *r,
                             const struct ui_css_image *gradient) {
-  (void)ctx;
-  (void)r;
-  (void)gradient;
+  void *unused_ctx = ctx;
+  const struct ui_rect *unused_r = r;
+  const struct ui_css_image *unused_grad = gradient;
+  ctx = unused_ctx;
+  r = unused_r;
+  gradient = unused_grad;
   /* Stub for now */
   return UI_ERROR_NONE;
 }
@@ -157,9 +167,12 @@ gles_fallback_draw_gradient(void *ctx, const struct ui_rect *r,
  */
 static ui_error_t gles_fallback_draw_path(void *ctx, const struct ui_path *p,
                                           const struct ui_color *c) {
-  (void)ctx;
-  (void)p;
-  (void)c;
+  void *unused_ctx = ctx;
+  const struct ui_path *unused_p = p;
+  const struct ui_color *unused_c = c;
+  ctx = unused_ctx;
+  p = unused_p;
+  c = unused_c;
   /* Stub for now */
   return UI_ERROR_NONE;
 }
@@ -171,8 +184,10 @@ static ui_error_t gles_fallback_draw_path(void *ctx, const struct ui_path *p,
  * @return Return value.
  */
 static ui_error_t gles_fallback_push_clip(void *ctx, const struct ui_rect *r) {
-  (void)ctx;
-  (void)r;
+  void *unused_ctx = ctx;
+  const struct ui_rect *unused_r = r;
+  ctx = unused_ctx;
+  r = unused_r;
   /* Stub for now */
   return UI_ERROR_NONE;
 }
@@ -183,7 +198,8 @@ static ui_error_t gles_fallback_push_clip(void *ctx, const struct ui_rect *r) {
  * @return Return value.
  */
 static ui_error_t gles_fallback_pop_clip(void *ctx) {
-  (void)ctx;
+  void *unused_ctx = ctx;
+  ctx = unused_ctx;
   /* Stub for now */
   return UI_ERROR_NONE;
 }
@@ -196,8 +212,13 @@ static ui_error_t gles_fallback_pop_clip(void *ctx) {
  */
 static ui_error_t gles_fallback_set_blend_mode(void *ctx,
                                                enum ui_css_blend_mode mode) {
-  (void)ctx;
-  (void)mode;
+  if (!ctx) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if ((int)mode < (int)UI_CSS_BLEND_MODE_NORMAL ||
+      (int)mode > (int)UI_CSS_BLEND_MODE_LUMINOSITY) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   /* Stub for now */
   return UI_ERROR_NONE;
 }
@@ -210,8 +231,10 @@ static ui_error_t gles_fallback_set_blend_mode(void *ctx,
  */
 static ui_error_t gles_fallback_set_shadow(void *ctx,
                                            const struct ui_css_shadow *shadow) {
-  (void)ctx;
-  (void)shadow;
+  void *unused_ctx = ctx;
+  const struct ui_css_shadow *unused_shadow = shadow;
+  ctx = unused_ctx;
+  shadow = unused_shadow;
   /* Stub for now */
   return UI_ERROR_NONE;
 }

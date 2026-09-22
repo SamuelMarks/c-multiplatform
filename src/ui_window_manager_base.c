@@ -29,16 +29,74 @@ struct ui_window_manager_base {
   struct ui_computed *data_signal; /**< data_signal */
 };
 
+#ifdef UI_TEST_MOCK_ALLOC
+/** @brief Global flag to simulate failure in window manager base operations */
+int g_wm_mock_fail = 0;
+
+/**
+ * @brief Mock for ui_component_set_default_style in window manager tests.
+ * @param[in,out] comp The component to set default style for.
+ * @param[in] style The default CSS stylesheet.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_UNKNOWN when mock fail
+ * triggered.
+ */
+static ui_error_t
+mock_wm_component_set_default_style(struct ui_component *comp,
+                                    struct ui_css_stylesheet *style) {
+  if (g_wm_mock_fail == 1 || g_wm_mock_fail == 2 || g_wm_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_set_default_style(comp, style);
+}
+/** @cond */
+#define ui_component_set_default_style mock_wm_component_set_default_style
+/** @endcond */
+
+/**
+ * @brief Mock for ui_dom_node_destroy in window manager tests.
+ * @param[in,out] node The DOM node to destroy.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_UNKNOWN when mock fail
+ * triggered.
+ */
+static ui_error_t mock_wm_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_wm_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(node);
+}
+/** @cond */
+#define ui_dom_node_destroy mock_wm_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief Mock for ui_component_destroy in window manager tests.
+ * @param[in,out] comp The component to destroy.
+ * @return UI_ERROR_NONE on success, or UI_ERROR_UNKNOWN when mock fail
+ * triggered.
+ */
+static ui_error_t mock_wm_component_destroy(struct ui_component *comp) {
+  if (g_wm_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_destroy(comp);
+}
+/** @cond */
+#define ui_component_destroy mock_wm_component_destroy
+/** @endcond */
+#endif
+
 ui_error_t ui_window_manager_base_create(
     struct ui_window_manager_base **out_window_manager) {
   struct ui_window_manager_base *wm;
   ui_error_t rc;
+  ui_error_t rc_cleanup;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
   if (!out_window_manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
+  *out_window_manager = NULL;
 
   wm = (struct ui_window_manager_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_window_manager_base));
@@ -47,6 +105,7 @@ ui_error_t ui_window_manager_base_create(
   }
 
   wm->component = NULL;
+  wm->data_signal = NULL;
 
   rc = ui_component_create(&wm->component);
   if (rc != UI_ERROR_NONE) {
@@ -75,12 +134,9 @@ ui_error_t ui_window_manager_base_create(
     goto cleanup;
   }
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(wm->component, default_style);
-
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(wm->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   wm->component->shadow_root = root_node;
@@ -91,15 +147,15 @@ ui_error_t ui_window_manager_base_create(
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   if (wm->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(wm->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(wm->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(wm);
@@ -108,17 +164,15 @@ cleanup:
 
 ui_error_t
 ui_window_manager_base_destroy(struct ui_window_manager_base *window_manager) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!window_manager) {
     return UI_ERROR_NONE;
   }
   if (window_manager->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(window_manager->component);
-      (void)rc_cleanup;
-    }
+    rc = ui_component_destroy(window_manager->component);
   }
   C_MULTIPLATFORM_FREE(window_manager);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t ui_window_manager_base_get_component(
@@ -133,7 +187,8 @@ ui_error_t ui_window_manager_base_get_component(
 
 ui_error_t ui_window_manager_base_bring_to_front(
     struct ui_window_manager_base *window_manager, int window_id) {
-  (void)window_id;
+  int unused_id = window_id;
+  window_id = unused_id;
   if (!window_manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -144,9 +199,12 @@ ui_error_t ui_window_manager_base_bring_to_front(
 ui_error_t
 ui_window_manager_base_drag(struct ui_window_manager_base *window_manager,
                             int window_id, float delta_x, float delta_y) {
-  (void)window_id;
-  (void)delta_x;
-  (void)delta_y;
+  int unused_id = window_id;
+  float unused_dx = delta_x;
+  float unused_dy = delta_y;
+  window_id = unused_id;
+  delta_x = unused_dx;
+  delta_y = unused_dy;
   if (!window_manager) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

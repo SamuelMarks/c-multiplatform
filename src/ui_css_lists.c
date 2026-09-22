@@ -9,6 +9,10 @@
 #include <ctype.h>
 #include "ui_internal_mem.h"
 #include "strtok_posix.h"
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_css_lists_mock_fail = 0;
+#endif
 /* clang-format on */
 
 #if defined(_MSC_VER)
@@ -26,10 +30,19 @@
  * @param p_str Parameter p_str.
  * @return Return value.
  */
-static void skip_whitespace(const char **p_str) {
+static ui_error_t skip_whitespace(const char **p_str) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_css_lists_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+  if (!p_str || !*p_str) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
+  return UI_ERROR_NONE;
 }
 
 /* \brief ui_error
@@ -37,10 +50,15 @@ static void skip_whitespace(const char **p_str) {
 ui_error_t
 ui_css_parse_list_style_type(const char *str,
                              struct ui_css_list_style_type_ext *out_type) {
+  ui_error_t rc;
+
   if (!str || !out_type)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   out_type->string_value[0] = '\0';
 
   if (strcmp(str, "disc") == 0)
@@ -100,10 +118,15 @@ ui_css_parse_list_style_type(const char *str,
  */
 ui_error_t ui_css_parse_list_style_position(
     const char *str, enum ui_css_list_style_position *out_position) {
+  ui_error_t rc;
+
   if (!str || !out_position)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "outside") == 0) {
     *out_position = UI_CSS_LIST_STYLE_POSITION_OUTSIDE;
@@ -126,10 +149,15 @@ ui_error_t ui_css_parse_list_style_position(
 ui_error_t ui_css_parse_list_style_image(const char *str,
                                          struct ui_css_image *out_image,
                                          int *out_is_none) {
+  ui_error_t rc;
+
   if (!str || !out_image || !out_is_none)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "none") == 0) {
     *out_is_none = 1;
@@ -148,6 +176,7 @@ ui_error_t ui_css_parse_list_style_image(const char *str,
  */
 ui_error_t ui_css_parse_list_style(const char *str,
                                    struct ui_css_list_style *out_style) {
+  ui_error_t rc;
   char token_buf[512];
   char *token;
   char *next_token = NULL;
@@ -158,7 +187,10 @@ ui_error_t ui_css_parse_list_style(const char *str,
   if (!str || !out_style)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "none") == 0) {
     out_style->type.type = UI_CSS_LIST_STYLE_TYPE_NONE;
@@ -227,6 +259,7 @@ ui_error_t ui_css_parse_list_style(const char *str,
 ui_error_t
 ui_css_parse_counter_action(const char *str,
                             struct ui_css_counter_action **out_actions) {
+  ui_error_t rc;
   char token_buf[512];
   char *token;
   char *next_token = NULL;
@@ -238,7 +271,10 @@ ui_css_parse_counter_action(const char *str,
     return UI_ERROR_INVALID_ARGUMENT;
 
   *out_actions = NULL;
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "none") == 0) {
     return UI_ERROR_NONE;
@@ -326,3 +362,19 @@ ui_css_counter_action_destroy(struct ui_css_counter_action *actions) {
   }
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief run_lists_coverage.
+ * @return Return value.
+ */
+ui_error_t run_lists_coverage(void);
+ui_error_t run_lists_coverage(void) {
+  const char *null_str = NULL;
+
+  skip_whitespace(NULL);
+  skip_whitespace(&null_str);
+
+  return UI_ERROR_NONE;
+}
+#endif

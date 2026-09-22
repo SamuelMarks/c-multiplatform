@@ -17,10 +17,8 @@ static int run_normal_tests(void) {
   printf("Testing invalid arguments...\n");
   if (ui_modifier_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
-  {
-    ui_error_t _ign = ui_modifier_destroy(NULL);
-    (void)_ign;
-  } /* should not crash */
+  if (ui_modifier_destroy(NULL) != UI_ERROR_NONE)
+    return 1;
   if (ui_modifier_add_class(NULL, "c") != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_modifier_add_style(NULL, "p", "v") != UI_ERROR_INVALID_ARGUMENT)
@@ -37,10 +35,8 @@ static int run_normal_tests(void) {
   if (ui_modifier_add_style(modifier, "p", NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  {
-    ui_error_t _ign = ui_component_create(&component);
-    (void)_ign;
-  }
+  if (ui_component_create(&component) != UI_ERROR_NONE)
+    return 1;
   if (ui_modifier_apply(NULL, component) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
   if (ui_modifier_apply(modifier, NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -48,14 +44,12 @@ static int run_normal_tests(void) {
   if (ui_modifier_apply(modifier, component) != UI_ERROR_INVALID_ARGUMENT)
     return 1; /* Shadow root missing */
 
-  {
-    ui_error_t _ign = ui_modifier_destroy(modifier);
-    (void)_ign;
-  }
+  if (ui_modifier_destroy(modifier) != UI_ERROR_NONE)
+    return 1;
   {
     ui_error_t rc_cleanup = ui_component_destroy(component);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   modifier = NULL;
@@ -66,12 +60,16 @@ static int run_normal_tests(void) {
   {
     struct ui_modifier *mock_mod = NULL;
     extern int g_mock_strcpy_fail;
-    ui_modifier_create(&mock_mod);
+    if (ui_modifier_create(&mock_mod) != UI_ERROR_NONE)
+      return 1;
     g_mock_strcpy_fail = 1;
     err = ui_modifier_add_class(mock_mod, "mock_class");
-    (void)err;
+    if (err != UI_ERROR_NONE && err != UI_ERROR_OUT_OF_MEMORY) {
+      return 1;
+    }
     g_mock_strcpy_fail = 0;
-    ui_modifier_destroy(mock_mod);
+    if (ui_modifier_destroy(mock_mod) != UI_ERROR_NONE)
+      return 1;
   }
 #endif
 
@@ -103,22 +101,16 @@ static int run_normal_tests(void) {
   err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
   if (err != UI_ERROR_NONE)
     return 1;
-  {
-    ui_error_t _ign = ui_dom_node_set_tag_name(root, "div");
-    (void)_ign;
-  }
+  if (ui_dom_node_set_tag_name(root, "div") != UI_ERROR_NONE)
+    return 1;
   component->shadow_root = root;
 
   /* Pre-existing class/style */
-  {
-    ui_error_t _ign =
-        ui_dom_node_set_attribute(root, "class", "existing-class");
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_dom_node_set_attribute(root, "style", "margin: 5px;");
-    (void)_ign;
-  }
+  if (ui_dom_node_set_attribute(root, "class", "existing-class") !=
+      UI_ERROR_NONE)
+    return 1;
+  if (ui_dom_node_set_attribute(root, "style", "margin: 5px;") != UI_ERROR_NONE)
+    return 1;
 
   /* Apply modifier */
   err = ui_modifier_apply(modifier, component);
@@ -144,10 +136,8 @@ static int run_normal_tests(void) {
   }
 
   /* Apply again to test append without semicolon on existing */
-  {
-    ui_error_t _ign = ui_dom_node_set_attribute(root, "style", "margin: 5px");
-    (void)_ign;
-  }
+  if (ui_dom_node_set_attribute(root, "style", "margin: 5px") != UI_ERROR_NONE)
+    return 1;
   err = ui_modifier_apply(modifier, component);
   if (err != UI_ERROR_NONE)
     return 1;
@@ -155,27 +145,19 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_component_destroy(component);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  {
-    ui_error_t _ign = ui_modifier_destroy(modifier);
-    (void)_ign;
-  }
+  if (ui_modifier_destroy(modifier) != UI_ERROR_NONE)
+    return 1;
 
   /* Test apply empty */
-  {
-    ui_error_t _ign = ui_modifier_create(&modifier);
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_component_create(&component);
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-    (void)_ign;
-  }
+  if (ui_modifier_create(&modifier) != UI_ERROR_NONE)
+    return 1;
+  if (ui_component_create(&component) != UI_ERROR_NONE)
+    return 1;
+  if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root) != UI_ERROR_NONE)
+    return 1;
   component->shadow_root = root;
 
   err = ui_modifier_apply(modifier, component);
@@ -193,36 +175,24 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_component_destroy(component);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  {
-    ui_error_t _ign = ui_modifier_destroy(modifier);
-    (void)_ign;
-  }
+  if (ui_modifier_destroy(modifier) != UI_ERROR_NONE)
+    return 1;
 
   /* Test apply without existing */
-  {
-    ui_error_t _ign = ui_modifier_create(&modifier);
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_modifier_add_class(modifier, "test-class");
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_modifier_add_style(modifier, "color", "blue");
-    (void)_ign;
-  }
+  if (ui_modifier_create(&modifier) != UI_ERROR_NONE)
+    return 1;
+  if (ui_modifier_add_class(modifier, "test-class") != UI_ERROR_NONE)
+    return 1;
+  if (ui_modifier_add_style(modifier, "color", "blue") != UI_ERROR_NONE)
+    return 1;
 
-  {
-    ui_error_t _ign = ui_component_create(&component);
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-    (void)_ign;
-  }
+  if (ui_component_create(&component) != UI_ERROR_NONE)
+    return 1;
+  if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root) != UI_ERROR_NONE)
+    return 1;
   component->shadow_root = root;
 
   err = ui_modifier_apply(modifier, component);
@@ -241,45 +211,27 @@ static int run_normal_tests(void) {
    * hit the other side of the branch */
   {
     struct ui_modifier *empty_mod;
-    {
-      ui_error_t _ign = ui_modifier_create(&empty_mod);
-      (void)_ign;
-    }
-    {
-      ui_error_t _ign = ui_dom_node_set_attribute(root, "class", "");
-      (void)_ign;
-    }
-    {
-      ui_error_t _ign = ui_dom_node_set_attribute(root, "style", "");
-      (void)_ign;
-    }
-    {
-      ui_error_t _ign = ui_modifier_apply(empty_mod, component);
-      (void)_ign;
-    }
-    {
-      ui_error_t _ign = ui_modifier_destroy(empty_mod);
-      (void)_ign;
-    }
+    if (ui_modifier_create(&empty_mod) != UI_ERROR_NONE)
+      return 1;
+    if (ui_dom_node_set_attribute(root, "class", "") != UI_ERROR_NONE)
+      return 1;
+    if (ui_dom_node_set_attribute(root, "style", "") != UI_ERROR_NONE)
+      return 1;
+    if (ui_modifier_apply(empty_mod, component) != UI_ERROR_NONE)
+      return 1;
+    if (ui_modifier_destroy(empty_mod) != UI_ERROR_NONE)
+      return 1;
   }
 
   /* Apply modifier with empty pre-existing strings to hit the \0 checks */
-  {
-    ui_error_t _ign = ui_modifier_add_class(modifier, "test");
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_modifier_add_style(modifier, "color", "blue");
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_dom_node_set_attribute(root, "class", "");
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_dom_node_set_attribute(root, "style", "");
-    (void)_ign;
-  }
+  if (ui_modifier_add_class(modifier, "test") != UI_ERROR_NONE)
+    return 1;
+  if (ui_modifier_add_style(modifier, "color", "blue") != UI_ERROR_NONE)
+    return 1;
+  if (ui_dom_node_set_attribute(root, "class", "") != UI_ERROR_NONE)
+    return 1;
+  if (ui_dom_node_set_attribute(root, "style", "") != UI_ERROR_NONE)
+    return 1;
   err = ui_modifier_apply(modifier, component);
   if (err != UI_ERROR_NONE) {
     printf("ui_modifier_apply (empty) failed: %d\n", err);
@@ -289,13 +241,11 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_component_destroy(component);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  {
-    ui_error_t _ign = ui_modifier_destroy(modifier);
-    (void)_ign;
-  }
+  if (ui_modifier_destroy(modifier) != UI_ERROR_NONE)
+    return 1;
 
   return 0;
 }
@@ -316,10 +266,8 @@ static int run_oom_tests(void) {
   if (err != UI_ERROR_OUT_OF_MEMORY)
     return 1;
 
-  {
-    ui_error_t _ign = ui_modifier_create(&modifier);
-    (void)_ign;
-  }
+  if (ui_modifier_create(&modifier) != UI_ERROR_NONE)
+    return 1;
 
   /* Add class OOM */
   for (i = 0; i < 2; i++) {
@@ -349,13 +297,12 @@ static int run_oom_tests(void) {
     };
 
     struct ui_modifier *null_test_mod = NULL;
-    {
-      ui_error_t _ign = ui_modifier_create(&null_test_mod);
-      (void)_ign;
-    }
+    struct ui_modifier_internal *internal = NULL;
 
-    struct ui_modifier_internal *internal =
-        (struct ui_modifier_internal *)null_test_mod;
+    if (ui_modifier_create(&null_test_mod) != UI_ERROR_NONE)
+      return 1;
+
+    internal = (struct ui_modifier_internal *)null_test_mod;
     internal->first_class = malloc(sizeof(struct ui_modifier_class));
     internal->first_class->name = NULL;
     internal->first_class->next = NULL;
@@ -365,10 +312,8 @@ static int run_oom_tests(void) {
     internal->first_style->value = NULL;
     internal->first_style->next = NULL;
 
-    {
-      ui_error_t _ign = ui_modifier_destroy(null_test_mod);
-      (void)_ign;
-    }
+    if (ui_modifier_destroy(null_test_mod) != UI_ERROR_NONE)
+      return 1;
   }
 
   /* Add style OOM */
@@ -381,27 +326,17 @@ static int run_oom_tests(void) {
   }
 
   /* Prepare for apply OOM */
-  {
-    ui_error_t _ign = ui_modifier_add_class(modifier, "btn");
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_modifier_add_style(modifier, "color", "red");
-    (void)_ign;
-  }
+  if (ui_modifier_add_class(modifier, "btn") != UI_ERROR_NONE)
+    return 1;
+  if (ui_modifier_add_style(modifier, "color", "red") != UI_ERROR_NONE)
+    return 1;
 
-  {
-    ui_error_t _ign = ui_component_create(&component);
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
-    (void)_ign;
-  }
-  {
-    ui_error_t _ign = ui_dom_node_set_tag_name(root, "div");
-    (void)_ign;
-  }
+  if (ui_component_create(&component) != UI_ERROR_NONE)
+    return 1;
+  if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root) != UI_ERROR_NONE)
+    return 1;
+  if (ui_dom_node_set_tag_name(root, "div") != UI_ERROR_NONE)
+    return 1;
   component->shadow_root = root;
 
   /* Apply OOM for new string allocations */
@@ -437,13 +372,11 @@ static int run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_component_destroy(component);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  {
-    ui_error_t _ign = ui_modifier_destroy(modifier);
-    (void)_ign;
-  }
+  if (ui_modifier_destroy(modifier) != UI_ERROR_NONE)
+    return 1;
   return 0;
 }
 

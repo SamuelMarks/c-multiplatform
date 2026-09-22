@@ -44,26 +44,24 @@ static ui_error_t skip_whitespace(const char **p_str) {
  */
 ui_error_t ui_css_parse_outline_width(const char *str,
                                       struct ui_css_value *out_width) {
+  ui_error_t sw_rc;
   if (!str || !out_width)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    ui_error_t sw_rc = skip_whitespace(&str);
-    (void)sw_rc;
-  }
+  sw_rc = skip_whitespace(&str);
 
   if (strcmp(str, "thin") == 0) {
     out_width->unit = UI_CSS_UNIT_PX;
     out_width->value = 1.0f;
-    return UI_ERROR_NONE;
+    return sw_rc;
   } else if (strcmp(str, "medium") == 0) {
     out_width->unit = UI_CSS_UNIT_PX;
     out_width->value = 3.0f;
-    return UI_ERROR_NONE;
+    return sw_rc;
   } else if (strcmp(str, "thick") == 0) {
     out_width->unit = UI_CSS_UNIT_PX;
     out_width->value = 5.0f;
-    return UI_ERROR_NONE;
+    return sw_rc;
   }
 
   return ui_css_parse_value(str, out_width);
@@ -77,13 +75,11 @@ ui_error_t ui_css_parse_outline_width(const char *str,
  */
 ui_error_t ui_css_parse_outline_style(const char *str,
                                       enum ui_css_outline_style *out_style) {
+  ui_error_t sw_rc;
   if (!str || !out_style)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    ui_error_t sw_rc = skip_whitespace(&str);
-    (void)sw_rc;
-  }
+  sw_rc = skip_whitespace(&str);
 
   if (strcmp(str, "none") == 0)
     *out_style = UI_CSS_OUTLINE_STYLE_NONE;
@@ -110,7 +106,7 @@ ui_error_t ui_css_parse_outline_style(const char *str,
   else
     return UI_ERROR_PARSE_FAILED;
 
-  return UI_ERROR_NONE;
+  return sw_rc;
 }
 
 /**
@@ -128,6 +124,7 @@ ui_error_t ui_css_parse_outline(const char *str,
   int has_width = 0;
   int has_style = 0;
   int has_color = 0;
+  ui_error_t sw_rc;
 
   if (!str || !out_outline) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -145,13 +142,10 @@ ui_error_t ui_css_parse_outline(const char *str,
   out_outline->offset.value = 0.0f;
   out_outline->is_color_invert = 0;
 
-  {
-    ui_error_t sw_rc = skip_whitespace(&str);
-    (void)sw_rc;
-  }
+  sw_rc = skip_whitespace(&str);
 
   if (strcmp(str, "none") == 0) {
-    return UI_ERROR_NONE;
+    return sw_rc;
   }
 
   len = strlen(str);
@@ -165,7 +159,6 @@ ui_error_t ui_css_parse_outline(const char *str,
   while (token) {
     if (!has_style) {
       ui_error_t st_rc = ui_css_parse_outline_style(token, &out_outline->style);
-      (void)st_rc;
       if (st_rc == UI_ERROR_NONE) {
         has_style = 1;
         token = UI_STRTOK(NULL, " ", &next_token);
@@ -174,7 +167,6 @@ ui_error_t ui_css_parse_outline(const char *str,
     }
     if (!has_width) {
       ui_error_t w_rc = ui_css_parse_outline_width(token, &out_outline->width);
-      (void)w_rc;
       if (w_rc == UI_ERROR_NONE) {
         has_width = 1;
         token = UI_STRTOK(NULL, " ", &next_token);
@@ -198,7 +190,7 @@ ui_error_t ui_css_parse_outline(const char *str,
     token = UI_STRTOK(NULL, " ", &next_token);
   }
 
-  return UI_ERROR_NONE;
+  return sw_rc;
 }
 
 /**
@@ -235,6 +227,7 @@ ui_error_t ui_css_parse_cursor(const char *str,
   struct ui_css_cursor_image *head = NULL;
   struct ui_css_cursor_image *tail = NULL;
   size_t len;
+  ui_error_t sw_rc;
 
   if (!str || !out_cursor)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -242,10 +235,7 @@ ui_error_t ui_css_parse_cursor(const char *str,
   out_cursor->images = NULL;
   out_cursor->keyword = UI_CSS_CURSOR_AUTO;
 
-  {
-    ui_error_t sw_rc = skip_whitespace(&str);
-    (void)sw_rc;
-  }
+  sw_rc = skip_whitespace(&str);
 
   len = strlen(str);
   if (len >= sizeof(token_buf)) {
@@ -402,7 +392,7 @@ ui_error_t ui_css_parse_cursor(const char *str,
   }
 
   out_cursor->images = head;
-  return UI_ERROR_NONE;
+  return sw_rc;
 }
 
 /**
@@ -413,13 +403,11 @@ ui_error_t ui_css_parse_cursor(const char *str,
  */
 ui_error_t ui_css_parse_user_select(const char *str,
                                     enum ui_css_user_select *out_select) {
+  ui_error_t sw_rc;
   if (!str || !out_select)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    ui_error_t sw_rc = skip_whitespace(&str);
-    (void)sw_rc;
-  }
+  sw_rc = skip_whitespace(&str);
 
   if (strcmp(str, "auto") == 0)
     *out_select = UI_CSS_USER_SELECT_AUTO;
@@ -434,7 +422,7 @@ ui_error_t ui_css_parse_user_select(const char *str,
   else
     return UI_ERROR_PARSE_FAILED;
 
-  return UI_ERROR_NONE;
+  return sw_rc;
 }
 
 /**
@@ -445,13 +433,11 @@ ui_error_t ui_css_parse_user_select(const char *str,
  */
 ui_error_t ui_css_parse_appearance(const char *str,
                                    enum ui_css_appearance *out_appearance) {
+  ui_error_t sw_rc;
   if (!str || !out_appearance)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    ui_error_t sw_rc = skip_whitespace(&str);
-    (void)sw_rc;
-  }
+  sw_rc = skip_whitespace(&str);
 
   if (strcmp(str, "none") == 0)
     *out_appearance = UI_CSS_APPEARANCE_NONE;
@@ -488,20 +474,18 @@ ui_error_t ui_css_parse_appearance(const char *str,
   else
     return UI_ERROR_PARSE_FAILED;
 
-  return UI_ERROR_NONE;
+  return sw_rc;
 }
 
 /* \brief ui_error
  */
 ui_error_t ui_css_parse_pointer_events(const char *str,
                                        enum ui_css_pointer_events *out_events) {
+  ui_error_t sw_rc;
   if (!str || !out_events)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    ui_error_t sw_rc = skip_whitespace(&str);
-    (void)sw_rc;
-  }
+  sw_rc = skip_whitespace(&str);
 
   if (strcmp(str, "auto") == 0)
     *out_events = UI_CSS_POINTER_EVENTS_AUTO;
@@ -526,20 +510,18 @@ ui_error_t ui_css_parse_pointer_events(const char *str,
   else
     return UI_ERROR_PARSE_FAILED;
 
-  return UI_ERROR_NONE;
+  return sw_rc;
 }
 
 /* \brief ui_css_parse_overscroll_behavior_axis
  */
 ui_error_t ui_css_parse_overscroll_behavior_axis(
     const char *str, enum ui_css_overscroll_behavior *out_behavior) {
+  ui_error_t sw_rc;
   if (!str || !out_behavior)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    ui_error_t sw_rc = skip_whitespace(&str);
-    (void)sw_rc;
-  }
+  sw_rc = skip_whitespace(&str);
 
   if (strcmp(str, "auto") == 0) {
     *out_behavior = UI_CSS_OVERSCROLL_BEHAVIOR_AUTO;
@@ -551,7 +533,7 @@ ui_error_t ui_css_parse_overscroll_behavior_axis(
     return UI_ERROR_PARSE_FAILED;
   }
 
-  return UI_ERROR_NONE;
+  return sw_rc;
 }
 
 /* \brief ui_css_parse_overscroll_behavior

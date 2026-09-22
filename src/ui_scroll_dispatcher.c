@@ -64,10 +64,12 @@ static ui_error_t layout_observer_callback(struct ui_layout_observer *observer,
   struct ui_scroll_dispatcher *dispatcher =
       (struct ui_scroll_dispatcher *)user_data;
   struct ui_scroll_info info;
-
-  (void)observer;
-  (void)breakpoint_id;
-  (void)is_active;
+  struct ui_layout_observer *unused_observer = observer;
+  int unused_bp = breakpoint_id;
+  int unused_active = is_active;
+  observer = unused_observer;
+  breakpoint_id = unused_bp;
+  is_active = unused_active;
 
   info.scroll_x = 0.0f;
   info.scroll_y = 0.0f;
@@ -75,13 +77,7 @@ static ui_error_t layout_observer_callback(struct ui_layout_observer *observer,
   info.delta_y = 0.0f;
   info.source_id = -1; /* -1 typically represents the window/document */
 
-  {
-    ui_error_t n_rc = ui_scroll_dispatcher_notify(dispatcher, &info);
-    if (n_rc != UI_ERROR_NONE) {
-      return n_rc;
-    }
-  }
-  return UI_ERROR_NONE;
+  return ui_scroll_dispatcher_notify(dispatcher, &info);
 }
 
 /**

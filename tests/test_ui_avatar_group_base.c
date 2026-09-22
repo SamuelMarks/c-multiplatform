@@ -158,9 +158,25 @@ static ui_error_t run_oom_tests(void) {
 
   g_malloc_fail_countdown = -1;
   return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
+}
+
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t run_mock_fail_tests(void) {
+  extern int g_avatar_group_mock_fail;
+  struct ui_avatar_group_base *group_mock = NULL;
+  ui_error_t rc;
+
+  rc = ui_avatar_group_base_create(&group_mock);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  g_avatar_group_mock_fail = 1;
+  rc = ui_avatar_group_base_destroy(group_mock);
+  if (rc != UI_ERROR_UNKNOWN)
+    return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+  g_avatar_group_mock_fail = 0;
   return UI_ERROR_NONE;
 }
+#endif
 
 int main(void) {
   ui_error_t rc = UI_ERROR_NONE;
@@ -177,6 +193,14 @@ int main(void) {
     printf("OOM tests failed.\n");
     return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  rc = run_mock_fail_tests();
+  if (rc != UI_ERROR_NONE) {
+    printf("Mock fail tests failed.\n");
+    return rc;
+  }
+#endif
 
   printf("All ui_avatar_group_base tests passed.\n");
   return 0;

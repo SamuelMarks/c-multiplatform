@@ -66,15 +66,12 @@ struct ui_disclosure_base {
  */
 static ui_error_t update_dom_state(struct ui_disclosure_base *disclosure) {
   if (disclosure->is_expanded) {
-    ui_error_t rc = ui_dom_node_set_attribute(
-        disclosure->component->shadow_root, "aria-expanded", "true");
-    (void)rc;
+    return ui_dom_node_set_attribute(disclosure->component->shadow_root,
+                                     "aria-expanded", "true");
   } else {
-    ui_error_t rc = ui_dom_node_set_attribute(
-        disclosure->component->shadow_root, "aria-expanded", "false");
-    (void)rc;
+    return ui_dom_node_set_attribute(disclosure->component->shadow_root,
+                                     "aria-expanded", "false");
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -144,11 +141,7 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
     goto cleanup;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_component_set_default_style(disclosure->component, default_style);
-    (void)rc_cleanup;
-  }
+  ui_component_set_default_style(disclosure->component, default_style);
 
   disclosure->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
@@ -158,19 +151,13 @@ ui_disclosure_base_create(struct ui_disclosure_base **out_disclosure) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
-    (void)rc_cleanup;
+  if (disclosure->gesture_recognizer) {
+    ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(disclosure->component);
-    (void)rc_cleanup;
+  if (disclosure->component) {
+    ui_component_destroy(disclosure->component);
   }
   C_MULTIPLATFORM_FREE(disclosure);
   return rc;
@@ -186,15 +173,8 @@ ui_error_t ui_disclosure_base_destroy(struct ui_disclosure_base *disclosure) {
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(disclosure->component);
-    (void)rc_cleanup;
-  }
+  ui_gesture_recognizer_destroy(disclosure->gesture_recognizer);
+  ui_component_destroy(disclosure->component);
 
   C_MULTIPLATFORM_FREE(disclosure);
   return UI_ERROR_NONE;
@@ -217,16 +197,12 @@ ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
   disclosure->disabled = disabled;
 
   if (disabled) {
-    ui_error_t rc = ui_dom_node_set_attribute(
-        disclosure->component->shadow_root, "aria-disabled", "true");
-    (void)rc;
+    return ui_dom_node_set_attribute(disclosure->component->shadow_root,
+                                     "aria-disabled", "true");
   } else {
-    ui_error_t rc = ui_dom_node_set_attribute(
-        disclosure->component->shadow_root, "aria-disabled", "false");
-    (void)rc;
+    return ui_dom_node_set_attribute(disclosure->component->shadow_root,
+                                     "aria-disabled", "false");
   }
-
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -238,15 +214,19 @@ ui_disclosure_base_set_disabled(struct ui_disclosure_base *disclosure,
 ui_error_t
 ui_disclosure_base_set_expanded(struct ui_disclosure_base *disclosure,
                                 int is_expanded) {
+  ui_error_t rc;
+
   if (!disclosure) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (disclosure->is_expanded != is_expanded) {
+    int old_expanded = disclosure->is_expanded;
     disclosure->is_expanded = is_expanded;
-    {
-      ui_error_t rc = update_dom_state(disclosure);
-      (void)rc;
+    rc = update_dom_state(disclosure);
+    if (rc != UI_ERROR_NONE) {
+      disclosure->is_expanded = old_expanded;
+      return rc;
     }
 
     if (disclosure->on_toggle) {
@@ -323,11 +303,8 @@ ui_disclosure_base_process_event(struct ui_disclosure_base *disclosure,
   }
 
   /* Process gesture to detect taps on the trigger area */
-  {
-    ui_error_t rc = ui_gesture_recognizer_process_event(
-        disclosure->gesture_recognizer, event, timestamp_ms, &gesture_evt);
-    (void)rc;
-  }
+  ui_gesture_recognizer_process_event(disclosure->gesture_recognizer, event,
+                                      timestamp_ms, &gesture_evt);
 
   if (gesture_evt.type == UI_GESTURE_TAP) {
     return ui_disclosure_base_set_expanded(disclosure,

@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +49,7 @@ static ui_error_t test_render_scene(struct ui_renderer *renderer) {
   return renderer->vtable->end_frame(renderer->ctx);
 }
 
-int g_mock_stbi_write_png_fail = 0;
+extern int g_mock_stbi_write_png_fail;
 int main(void) {
   struct ui_renderer *native_renderer = NULL;
   struct ui_renderer *gles_renderer = NULL;
@@ -144,9 +145,7 @@ int main(void) {
           {
             ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
                 "visual_diff_heatmap.png", heatmap, width, height);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+            assert(rc_cleanup == UI_ERROR_IO_FAILED);
           }
           g_mock_stbi_write_png_fail = 0;
           free(heatmap);
@@ -187,30 +186,22 @@ int main(void) {
       {
         ui_error_t rc_cleanup =
             ui_visual_write_heatmap_to_disk(NULL, native_pixels, width, height);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
       }
       {
         ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
             "visual_diff_heatmap.png", NULL, width, height);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
       }
       {
         ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
             "visual_diff_heatmap.png", native_pixels, 0, height);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
       }
       {
         ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
             "visual_diff_heatmap.png", native_pixels, width, 0);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
       }
 
       /* Make an exact match test case just for coverage */
@@ -224,9 +215,7 @@ int main(void) {
         ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
             "/invalid/path/that/does/not/exist/heatmap.png", native_pixels,
             width, height);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_IO_FAILED);
       }
 
       /* Intentionally cause an RMS mismatch */
@@ -262,9 +251,7 @@ int main(void) {
         {
           ui_error_t rc_cleanup = ui_visual_write_heatmap_to_disk(
               "visual_diff_heatmap.png", heatmap, width, height);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
         g_mock_stbi_write_png_fail = 0;
         free(heatmap);

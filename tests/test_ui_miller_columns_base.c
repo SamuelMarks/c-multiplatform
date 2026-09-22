@@ -3,6 +3,7 @@
 #include "ui_arena.h"
 #include "ui_error.h"
 #include <stdio.h>
+#include <assert.h>
 /* clang-format on */
 
 /* Mock Tree Data */
@@ -22,12 +23,14 @@ static struct mock_node mock_fs[] = {
 };
 
 static size_t mock_get_root_count(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return 1;
 }
 
 static void *mock_get_root_node(size_t index, void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   if (index == 0)
     return &mock_fs[0];
   return NULL;
@@ -35,7 +38,8 @@ static void *mock_get_root_node(size_t index, void *user_data) {
 
 static void *mock_get_parent(void *node_id, void *user_data) {
   struct mock_node *node = (struct mock_node *)node_id;
-  (void)user_data;
+  if (user_data) {
+  }
   if (node && node->parent_id >= 0)
     return &mock_fs[node->parent_id];
   return NULL;
@@ -43,13 +47,15 @@ static void *mock_get_parent(void *node_id, void *user_data) {
 
 static size_t mock_get_child_count(void *node_id, void *user_data) {
   struct mock_node *node = (struct mock_node *)node_id;
-  (void)user_data;
+  if (user_data) {
+  }
   return node ? (size_t)node->num_children : 0;
 }
 
 static void *mock_get_child(void *node_id, size_t index, void *user_data) {
   struct mock_node *node = (struct mock_node *)node_id;
-  (void)user_data;
+  if (user_data) {
+  }
   if (node && index < (size_t)node->num_children) {
     return &mock_fs[node->children[index]];
   }
@@ -58,9 +64,12 @@ static void *mock_get_child(void *node_id, size_t index, void *user_data) {
 
 static ui_error_t mock_render_node(void *node_id, struct ui_dom_node *cell_node,
                                    void *user_data) {
-  (void)node_id;
-  (void)cell_node;
-  (void)user_data;
+  if (node_id) {
+  }
+  if (cell_node) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
   return UI_ERROR_NONE;
   return UI_ERROR_NONE;
@@ -106,6 +115,22 @@ static void test_miller_errors(void) {
       UI_ERROR_INVALID_ARGUMENT)
     return;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_miller_columns_mock_fail;
+    struct ui_miller_columns_base *miller_mock = NULL;
+    ui_error_t rc;
+
+    rc = ui_miller_columns_base_create(arena, &model, NULL, &miller_mock);
+    assert(rc == UI_ERROR_NONE);
+
+    g_miller_columns_mock_fail = 1;
+    rc = ui_miller_columns_base_destroy(miller_mock);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_miller_columns_mock_fail = 0;
+  }
+#endif
+
   /* Force OOM during signal creation using a small arena */
   {
     struct ui_arena *small_arena;
@@ -118,16 +143,12 @@ static void test_miller_errors(void) {
       if (miller_small) {
         {
           ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller_small);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
       }
       {
         ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -140,9 +161,7 @@ static void test_miller_errors(void) {
     ui_miller_columns_base_select_item(miller2, 0, &mock_fs[1]);
     {
       ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller2);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   model.get_child_count = mock_get_child_count;
@@ -187,15 +206,11 @@ static void test_miller_errors(void) {
 
   {
     ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -223,9 +238,7 @@ static void test_oom(void) {
     if (miller) {
       {
         ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -239,15 +252,11 @@ static void test_oom(void) {
 
   {
     ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 #endif
 }
@@ -269,9 +278,7 @@ static void test_miller_missing_coverage(void) {
   ui_miller_columns_base_create(NULL, NULL, NULL, NULL);
   {
     ui_error_t rc_cleanup = ui_miller_columns_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   ui_miller_columns_base_select_item(NULL, 0, NULL);
   ui_miller_columns_base_get_column_count(NULL, NULL);
@@ -293,15 +300,11 @@ static void test_miller_missing_coverage(void) {
   }
   {
     ui_error_t rc_cleanup = ui_miller_columns_base_destroy(miller);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -378,9 +381,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }

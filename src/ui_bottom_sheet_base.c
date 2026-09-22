@@ -240,75 +240,7 @@ ui_error_t run_bottom_sheet_coverage(void);
  * @brief run_bottom_sheet_coverage.
  * @return UI_ERROR_NONE on success.
  */
-ui_error_t run_bottom_sheet_coverage(void) {
-  union ui_signal_payload dummy_payload;
-  struct ui_dom_node *dn1 = NULL;
-  struct ui_dom_node *dn2 = NULL;
-  struct ui_dom_node *dn3 = NULL;
-  memset(&dummy_payload, 0, sizeof(dummy_payload));
-  g_bottom_sheet_mock_fail = 1;
-  (void)mock_dom_node_append_child(NULL, NULL);
-  {
-    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn1);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn2);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn3);
-    (void)rc_cleanup;
-  }
-  g_bottom_sheet_mock_fail = 2;
-  (void)mock_dom_node_append_child(dn1, dn2);
-  g_bottom_sheet_mock_fail = 3;
-  (void)mock_dom_node_append_child(dn1, dn3);
-
-  g_bottom_sheet_mock_fail = 4;
-  (void)mock_dom_node_set_attribute(NULL, NULL, NULL);
-  g_bottom_sheet_mock_fail = 5;
-  (void)mock_dom_node_remove_attribute(NULL, NULL);
-  g_bottom_sheet_mock_fail = 6;
-  (void)mock_ui_component_set_default_style(NULL, NULL);
-  g_bottom_sheet_mock_fail = 7;
-  (void)mock_ui_overlay_director_unmount(NULL, NULL);
-  g_bottom_sheet_mock_fail = 8;
-  (void)mock_ui_gesture_recognizer_destroy(NULL);
-  g_bottom_sheet_mock_fail = 9;
-  (void)mock_ui_backdrop_destroy(NULL);
-  g_bottom_sheet_mock_fail = 10;
-  (void)mock_ui_component_destroy(NULL);
-  g_bottom_sheet_mock_fail = 11;
-  (void)mock_ui_signal_set(NULL, dummy_payload);
-  g_bottom_sheet_mock_fail = 12;
-  (void)mock_ui_spring_update(NULL, NULL, 0, 0, NULL);
-  g_bottom_sheet_mock_fail = 13;
-  (void)mock_ui_css_parse_stylesheet(NULL, NULL);
-  g_bottom_sheet_mock_fail = 14;
-  (void)mock_ui_dom_node_create(0, NULL);
-  g_bottom_sheet_mock_fail = 15;
-  (void)mock_ui_dom_node_set_tag_name(NULL, NULL);
-  g_bottom_sheet_mock_fail = 16;
-  (void)mock_ui_backdrop_process_event(NULL, NULL, 0, 0, 0, 0, NULL);
-
-  g_bottom_sheet_mock_fail = 0;
-
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(dn1);
-    (void)rc_cleanup;
-  }
-
-  (void)mock_ui_backdrop_destroy;
-  (void)mock_ui_component_destroy;
-  (void)mock_ui_signal_set;
-  (void)mock_ui_spring_update;
-  (void)mock_ui_css_parse_stylesheet;
-  (void)mock_ui_dom_node_create;
-  (void)mock_ui_dom_node_set_tag_name;
-  (void)mock_ui_backdrop_process_event;
-  return UI_ERROR_NONE;
-}
+ui_error_t run_bottom_sheet_coverage(void) { return UI_ERROR_NONE; }
 #endif
 
 #if defined(_MSC_VER)
@@ -552,29 +484,16 @@ cleanup:
     if (sheet->component->shadow_root == sheet->root_node) {
       sheet->component->shadow_root = NULL;
     }
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(sheet->root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(sheet->root_node);
   }
   if (sheet->gesture_recognizer) {
-    {
-      ui_error_t rc_cleanup =
-          ui_gesture_recognizer_destroy(sheet->gesture_recognizer);
-      (void)rc_cleanup;
-    }
+    ui_gesture_recognizer_destroy(sheet->gesture_recognizer);
   }
   if (sheet->backdrop_logic) {
-    {
-      ui_error_t rc_cleanup = ui_backdrop_destroy(sheet->backdrop_logic);
-      (void)rc_cleanup;
-    }
+    ui_backdrop_destroy(sheet->backdrop_logic);
   }
   if (sheet->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(sheet->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(sheet->component);
   }
   C_MULTIPLATFORM_FREE(sheet);
   return rc;

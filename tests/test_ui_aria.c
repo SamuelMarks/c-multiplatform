@@ -111,9 +111,7 @@ TEST test_ui_aria_state_parse_empty(void) {
   ui_aria_state_cleanup(&state);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
 
   /* NULL cleanup test */
@@ -214,9 +212,7 @@ TEST test_ui_aria_state_parse_implicit(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
   PASS();
 }
@@ -336,9 +332,7 @@ TEST test_ui_aria_state_parse_explicit(void) {
   /* Fallback missing tag_name test */
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node);
   node->tag_name =
@@ -348,9 +342,7 @@ TEST test_ui_aria_state_parse_explicit(void) {
   ui_aria_state_cleanup(&state);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ASSERT_EQ(UI_ERROR_NONE, rc_cleanup);
   }
 
   PASS();
@@ -370,8 +362,23 @@ int main(int argc, char **argv) {
   RUN_SUITE(ui_aria_suite);
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_aria_coverage(void);
-  run_aria_coverage();
+  {
+    extern ui_error_t run_aria_coverage(void);
+    extern int g_aria_cleanup_fail;
+    ui_error_t rc_aria;
+
+    g_aria_cleanup_fail = 1;
+    rc_aria = run_aria_coverage();
+    if (rc_aria != UI_ERROR_UNKNOWN) {
+      return (int)rc_aria;
+    }
+    g_aria_cleanup_fail = 0;
+
+    rc_aria = run_aria_coverage();
+    if (rc_aria != UI_ERROR_NONE) {
+      return (int)rc_aria;
+    }
+  }
 #endif
   GREATEST_MAIN_END();
 }

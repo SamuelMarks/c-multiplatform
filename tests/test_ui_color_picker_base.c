@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "../include/ui_color_picker_base.h"
 #include "../include/ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -244,8 +245,10 @@ static int test_2d_mapping(void) {
 
 static ui_error_t dummy_cva_on_change(union ui_signal_payload new_value,
                                       void *user_data) {
-  (void)new_value;
-  (void)user_data;
+  if (new_value.ptr_val) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -284,9 +287,7 @@ static int test_manager_state(void) {
   ui_color_picker_base_create(&p2, NULL);
   {
     ui_error_t rc_cleanup = ui_color_picker_base_destroy(p2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Hit trigger_cva_change when cva_on_change is NULL */
@@ -340,11 +341,22 @@ static int test_manager_state(void) {
   if (rgb.r != 0 || rgb.g != 0 || rgb.b != 255)
     return 1;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_color_picker_mock_fail;
+    g_color_picker_mock_fail = 1;
+    if (ui_color_picker_base_set_rgb(picker, &rgb) != UI_ERROR_UNKNOWN)
+      return 1;
+    g_color_picker_mock_fail = 2;
+    if (ui_color_picker_base_set_hsv(picker, &hsv) != UI_ERROR_UNKNOWN)
+      return 1;
+    g_color_picker_mock_fail = 0;
+  }
+#endif
+
   {
     ui_error_t rc_cleanup = ui_color_picker_base_destroy(picker);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -367,9 +379,7 @@ static int test_oom(void) {
     if (rc == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_color_picker_base_destroy(picker);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     } else if (rc != UI_ERROR_OUT_OF_MEMORY) {
@@ -390,9 +400,7 @@ static int test_oom(void) {
       if (rc == UI_ERROR_NONE) {
         {
           ui_error_t rc_cleanup = ui_color_picker_base_destroy(picker);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
         picker = NULL;
       }
@@ -423,9 +431,7 @@ static int test_oom(void) {
       ui_color_picker_base_create(&picker, NULL);
       {
         ui_error_t rc_cleanup = ui_color_picker_base_destroy(picker);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }

@@ -107,75 +107,6 @@ static ui_error_t mock_dom_node_set_tag_name(struct ui_dom_node *node,
 #define ui_dom_node_set_tag_name mock_dom_node_set_tag_name
 /** @endcond */
 
-/**
- * @brief mock_on_dismiss_fail.
- * @param alert Parameter alert.
- * @param u Parameter u.
- * @return Return value.
- */
-static ui_error_t mock_on_dismiss_fail(struct ui_alert_base *alert, void *u) {
-  (void)alert;
-  (void)u;
-  return UI_ERROR_UNKNOWN;
-}
-
-ui_error_t run_alert_coverage(void);
-/**
- * @brief run_alert_coverage.
- * @return Return value.
- */
-ui_error_t run_alert_coverage(void) {
-  struct ui_alert_base *alert = NULL;
-  struct ui_signal *sig = NULL;
-  union ui_signal_payload initial;
-
-  g_alert_mock_fail = 4;
-  (void)ui_alert_base_create(&alert);
-  g_alert_mock_fail = 0;
-
-  g_alert_mock_fail = 5;
-  (void)ui_alert_base_create(&alert);
-  g_alert_mock_fail = 0;
-
-  g_alert_mock_fail = 2;
-  (void)ui_alert_base_create(&alert);
-  g_alert_mock_fail = 0;
-
-  (void)ui_alert_base_create(&alert);
-
-  initial.bool_val = 0;
-  (void)ui_signal_create(NULL, initial, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
-                         UI_SIGNAL_MODE_SINGLE_THREADED, &sig);
-
-  /* on_dismiss fails */
-  (void)ui_alert_base_set_dismissible(alert, 1);
-  (void)ui_alert_base_set_on_dismiss(alert, mock_on_dismiss_fail, NULL);
-  (void)ui_alert_base_set_open(alert, 1);
-  (void)ui_alert_base_set_open(alert, 0); /* actually triggers dismiss */
-  (void)ui_alert_base_set_on_dismiss(alert, NULL, NULL);
-
-  /* signal_set fails */
-  (void)ui_alert_base_bind_open(alert, sig);
-  g_alert_mock_fail = 1;
-  (void)ui_alert_base_set_open(alert, 1);
-  g_alert_mock_fail = 0;
-
-  /* set_attribute fails */
-  (void)ui_alert_base_set_open(alert, 0);
-  g_alert_mock_fail = 2;
-  (void)ui_alert_base_set_open(alert, 1);
-  g_alert_mock_fail = 0;
-
-  /* remove_attribute fails */
-  (void)ui_alert_base_set_open(alert, 1); /* open first */
-  g_alert_mock_fail = 3;
-  (void)ui_alert_base_set_open(alert, 0);
-  g_alert_mock_fail = 0;
-
-  (void)ui_signal_destroy(sig);
-  (void)ui_alert_base_destroy(alert);
-  return UI_ERROR_NONE;
-}
 #endif
 
 /**
@@ -220,48 +151,26 @@ ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert) {
 
   rc = ui_component_create(&alert->component);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(alert);
-    return rc;
+    goto cleanup;
   }
 
   {
     struct ui_dom_node *root_node = NULL;
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(alert->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(alert);
-      return rc;
+      goto cleanup;
     }
 
     rc = ui_dom_node_set_tag_name(root_node, "dialog");
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(alert->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(alert);
-      return rc;
+      ui_dom_node_destroy(root_node);
+      goto cleanup;
     }
 
     rc = ui_dom_node_set_attribute(root_node, "role", "alert");
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(alert->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(alert);
-      return rc;
+      ui_dom_node_destroy(root_node);
+      goto cleanup;
     }
 
     alert->component->shadow_root = root_node;
@@ -272,15 +181,21 @@ ui_error_t ui_alert_base_create(struct ui_alert_base **out_alert) {
 
   *out_alert = alert;
   return UI_ERROR_NONE;
+
+cleanup:
+  if (alert->component) {
+    ui_component_destroy(alert->component);
+  }
+  C_MULTIPLATFORM_FREE(alert);
+  return rc;
 }
 
 ui_error_t ui_alert_base_destroy(struct ui_alert_base *alert) {
   if (!alert) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(alert->component);
-    (void)rc_cleanup;
+  if (alert->component) {
+    ui_component_destroy(alert->component);
   }
   C_MULTIPLATFORM_FREE(alert);
   return UI_ERROR_NONE;

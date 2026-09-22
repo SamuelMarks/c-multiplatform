@@ -49,7 +49,7 @@ int main(void) {
     {
       ui_error_t rc_cleanup = ui_pool_destroy(pool);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
   }
@@ -88,7 +88,7 @@ int main(void) {
     ui_error_t rc_cleanup =
         ui_pool_get_metrics(pool, &free_count, &total_capacity);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (free_count != 1 || total_capacity != 2) {
@@ -108,7 +108,7 @@ int main(void) {
     ui_error_t rc_cleanup =
         ui_pool_get_metrics(pool, &free_count, &total_capacity);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (free_count != 0 || total_capacity != 2) {
@@ -128,7 +128,7 @@ int main(void) {
     ui_error_t rc_cleanup =
         ui_pool_get_metrics(pool, &free_count, &total_capacity);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (free_count != 1 || total_capacity != 4) {
@@ -148,7 +148,7 @@ int main(void) {
     ui_error_t rc_cleanup =
         ui_pool_get_metrics(pool, &free_count, &total_capacity);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (free_count != 2 || total_capacity != 4) {
@@ -167,7 +167,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_pool_destroy(pool);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -175,18 +175,16 @@ int main(void) {
    * frees */
   rc = ui_pool_create(32, 10, &pool);
   for (i = 0; i < 50; i++) {
-    {
-      ui_error_t rc_cleanup = ui_pool_alloc(pool, &ptrs[i]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    ui_error_t rc_alloc = ui_pool_alloc(pool, &ptrs[i]);
+    if (rc_alloc != UI_ERROR_NONE) {
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup =
         ui_pool_get_metrics(pool, &free_count, &total_capacity);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (free_count != 0 || total_capacity != 50) {
@@ -197,18 +195,16 @@ int main(void) {
 
   /* Free every other element */
   for (i = 0; i < 50; i += 2) {
-    {
-      ui_error_t rc_cleanup = ui_pool_free(pool, ptrs[i]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    ui_error_t rc_free = ui_pool_free(pool, ptrs[i]);
+    if (rc_free != UI_ERROR_NONE) {
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup =
         ui_pool_get_metrics(pool, &free_count, &total_capacity);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (free_count != 25 || total_capacity != 50) {
@@ -219,18 +215,16 @@ int main(void) {
 
   /* Alloc 25 more elements, capacity should not increase */
   for (i = 0; i < 50; i += 2) {
-    {
-      ui_error_t rc_cleanup = ui_pool_alloc(pool, &ptrs[i]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    ui_error_t rc_alloc = ui_pool_alloc(pool, &ptrs[i]);
+    if (rc_alloc != UI_ERROR_NONE) {
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup =
         ui_pool_get_metrics(pool, &free_count, &total_capacity);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (free_count != 0 || total_capacity != 50) {
@@ -242,7 +236,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_pool_destroy(pool);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -252,7 +246,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_pool_create(16, 10, &pool);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (ui_pool_alloc(pool, NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -278,7 +272,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_pool_destroy(pool);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -286,19 +280,19 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_pool_create(16, 2, &pool);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_pool_alloc(pool, &ptr1);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_pool_alloc(pool, &ptr2);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   g_malloc_fail_countdown = 0;
@@ -308,7 +302,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_pool_destroy(pool);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -320,7 +314,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_pool_destroy(pool);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -331,7 +325,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_pool_destroy(pool);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 

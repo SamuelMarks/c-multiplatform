@@ -317,11 +317,16 @@ static void test_scroll_snap_cases(void) {
         TEST_ASSERT(p.margin.left.value == 0.0f);
       });
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern ui_error_t run_scroll_snap_coverage(void);
+    run_scroll_snap_coverage();
+  }
+#endif
+
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
   }
 }
 

@@ -5,6 +5,12 @@
 #include <stdlib.h>
 /* clang-format on */
 
+struct ui_hover_card_base {
+  struct ui_component *component;
+  struct ui_signal *open_signal;
+  struct ui_computed *animating_signal;
+};
+
 extern int g_malloc_fail_countdown;
 
 static ui_error_t run_normal_tests(void) {
@@ -67,6 +73,14 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
 
+  rc = ui_hover_card_base_on_mouse_leave(card, 10.0f, 0.0f);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  rc = ui_hover_card_base_on_mouse_leave(card, 0.0f, 10.0f);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
   /* Hit the false branch in on_mouse_leave (shadow_root == NULL) */
   {
     struct ui_dom_node *saved_root = comp->shadow_root;
@@ -77,25 +91,43 @@ static ui_error_t run_normal_tests(void) {
     comp->shadow_root = saved_root;
   }
 
+  /* Destroy card */
+  rc = ui_hover_card_base_destroy(card);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  /* Destroy NULL */
+  rc = ui_hover_card_base_destroy(NULL);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
   /* Hit the false branch for component == NULL */
-  {
-    struct mock_card {
-      void *comp;
-      void *sig1;
-      void *sig2;
-    };
-    struct mock_card m;
-    m.comp = NULL;
-    m.sig1 = NULL;
-    m.sig2 = NULL;
-    rc = ui_hover_card_base_on_mouse_enter((struct ui_hover_card_base *)&m);
-    if (rc != UI_ERROR_NONE)
-      return UI_ERROR_UNKNOWN;
-    rc = ui_hover_card_base_on_mouse_leave((struct ui_hover_card_base *)&m,
-                                           0.0f, 0.0f);
-    if (rc != UI_ERROR_NONE)
-      return UI_ERROR_UNKNOWN;
-  }
+  rc = ui_hover_card_base_create(&card);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  rc = ui_component_destroy(card->component);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  card->component = NULL;
+
+  rc = ui_hover_card_base_on_mouse_enter(card);
+  if (rc != UI_ERROR_NONE)
+    return UI_ERROR_UNKNOWN;
+
+  rc = ui_hover_card_base_on_mouse_leave(card, 0.0f, 0.0f);
+  if (rc != UI_ERROR_NONE)
+    return UI_ERROR_UNKNOWN;
+
+  /* Destroy with component == NULL */
+  rc = ui_hover_card_base_destroy(card);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
+  /* Valid card for binding tests */
+  rc = ui_hover_card_base_create(&card);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   printf("Testing ui_hover_card_base_bind_open...\n");
   rc = ui_hover_card_base_bind_open(NULL, (struct ui_signal *)1);
@@ -122,35 +154,16 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
 
-  /* Destroy NULL */
-  rc = ui_hover_card_base_destroy(NULL);
-  if (rc != UI_ERROR_NONE)
-    return rc;
-
-  /* We also need to cover the if (hover_card->component) false branch in
-   * destroy. Since we can't easily do it normally, we simulate it by casting.
-   */
+#ifdef UI_TEST_MOCK_ALLOC
   {
-    struct mock_card {
-      void *comp;
-      void *sig1;
-      void *sig2;
-    };
-    /* We can malloc it ourselves */
-    struct mock_card *m = (struct mock_card *)malloc(sizeof(struct mock_card));
-    if (m) {
-      m->comp = NULL;
-      m->sig1 = NULL;
-      m->sig2 = NULL;
-      {
-        ui_error_t rc_cleanup =
-            ui_hover_card_base_destroy((struct ui_hover_card_base *)m);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
-    }
+    extern int g_hover_card_mock_fail;
+    g_hover_card_mock_fail = 1;
+    rc = ui_hover_card_base_create(&card);
+    if (rc != UI_ERROR_UNKNOWN)
+      return UI_ERROR_UNKNOWN;
+    g_hover_card_mock_fail = 0;
   }
+#endif
 
   return UI_ERROR_NONE;
 }
@@ -160,22 +173,15 @@ static ui_error_t run_oom_tests(void) {
   ui_error_t rc;
   int i;
 
-  /* There are multiple allocations/creations in ui_hover_card_base_create.
-     We iterate through countdown values to hit all failure paths.
-     50 is large enough to exhaust all allocation paths in creation. */
   for (i = 0; i < 50; i++) {
     g_malloc_fail_countdown = i;
     rc = ui_hover_card_base_create(&card);
     if (rc == UI_ERROR_NONE) {
-      /* Reached success. The i-th allocation didn't fail because there are < i
-       * allocations. */
-      {
-        ui_error_t rc_cleanup = ui_hover_card_base_destroy(card);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+      rc = ui_hover_card_base_destroy(card);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
       }
-      break; /* We've exhausted all error paths. */
+      break;
     }
   }
   g_malloc_fail_countdown = -1;

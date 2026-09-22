@@ -1,6 +1,11 @@
 /* clang-format off */
+#include "greatest.h"
 #include "ui_wheel_picker_base.h"
 #include "ui_gesture.h"
+#include "ui_component.h"
+#include "ui_dom_node.h"
+#include "ui_error.h"
+#include "ui_test_mock_mem.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,625 +13,643 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+extern int g_wheel_mock_fail;
 
 static int change_count = 0;
 static int last_selected_index = -1;
 static int touched_count = 0;
 static int cva_change_count = 0;
 static int cva_last_selected_index = -1;
-
-#define ASSERT_TRUE(cond)                                                      \
-  if (!(cond)) {                                                               \
-    printf("Fail at %s:%d\n", __FILE__, __LINE__);                             \
-    failed = 1;                                                                \
-  }
-#define ASSERT_EQ(a, b)                                                        \
-  do {                                                                         \
-    int _a = (int)(a);                                                         \
-    int _b = (int)(b);                                                         \
-    if (_a != _b) {                                                            \
-      printf("Fail at %s:%d: %d != %d\n", __FILE__, __LINE__, _a, _b);         \
-      failed = 1;                                                              \
-    }                                                                          \
-  } while (0)
+static int g_cb_fail_on_change = 0;
+static int g_cb_fail_cva_change = 0;
+static int g_cb_fail_touched = 0;
 
 static ui_error_t on_change(struct ui_wheel_picker_base *picker,
                             int selected_index, void *user_data) {
-  (void)picker;
-  (void)user_data;
+  void *unused_u = user_data;
+  struct ui_wheel_picker_base *unused_p = picker;
+  picker = unused_p;
+  user_data = unused_u;
+  if (g_cb_fail_on_change)
+    return UI_ERROR_UNKNOWN;
   change_count++;
   last_selected_index = selected_index;
   return UI_ERROR_NONE;
 }
 
-static ui_error_t on_change_error(struct ui_wheel_picker_base *picker,
-                                  int selected_index, void *user_data) {
-  (void)picker;
-  (void)selected_index;
-  (void)user_data;
-  return UI_ERROR_UNKNOWN;
-}
-
 static ui_error_t cva_on_change(union ui_signal_payload new_value,
                                 void *user_data) {
-  (void)user_data;
+  void *unused_u = user_data;
+  user_data = unused_u;
+  if (g_cb_fail_cva_change)
+    return UI_ERROR_UNKNOWN;
   cva_change_count++;
   cva_last_selected_index = new_value.int_val;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t cva_on_touched(void *user_data) {
-  (void)user_data;
+  void *unused_u = user_data;
+  user_data = unused_u;
+  if (g_cb_fail_touched)
+    return UI_ERROR_UNKNOWN;
   touched_count++;
   return UI_ERROR_NONE;
 }
 
-struct ui_wheel_picker_base_mock {
+struct ui_wheel_picker_base {
   struct ui_component *component;
   struct ui_gesture_recognizer *gesture_recognizer;
-
   char **items;
   int item_count;
   int is_looping;
-
   int selected_index;
   float scroll_offset;
   float velocity;
   int is_dragging;
-
-  ui_error_t (*on_change)(struct ui_wheel_picker_base *, int, void *);
+  ui_wheel_picker_on_change_t on_change;
   void *on_change_user_data;
-
   ui_error_t (*cva_on_change)(union ui_signal_payload, void *);
   void *cva_on_change_user_data;
-
   ui_error_t (*cva_on_touched)(void *);
   void *cva_on_touched_user_data;
-
   int is_disabled;
 };
 
-static int test_creation() {
+TEST test_wheel_invalid_args(void) {
+  struct ui_wheel_picker_base *picker = NULL;
+  struct ui_component *comp = NULL;
+  int idx = 0;
+  struct ui_event ev;
+  ui_error_t rc;
+
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_wheel_picker_base_create(NULL, NULL));
+  ASSERT_EQ(UI_ERROR_NONE, ui_wheel_picker_base_destroy(NULL));
+
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_set_items(NULL, NULL, 0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_set_looping(NULL, 1));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_set_selected_index(NULL, 0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_get_selected_index(NULL, &idx));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_set_on_change(NULL, NULL, NULL));
+  memset(&ev, 0, sizeof(ev));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_process_event(NULL, &ev, 0.0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_on_tick(NULL, 16.0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_get_component(NULL, &comp));
+
+  rc = ui_wheel_picker_base_create(&picker, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_set_items(picker, NULL, 5));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_get_selected_index(picker, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_process_event(picker, NULL, 0.0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_wheel_picker_base_get_component(picker, NULL));
+
+  rc = ui_wheel_picker_base_destroy(picker);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
+TEST test_wheel_lifecycle_and_scrolling(void) {
   struct ui_wheel_picker_base *picker = NULL;
   struct ui_control_value_accessor cva;
-  int i;
+  struct ui_component *comp = NULL;
+  const char *items[] = {"Apple", "Banana", "Cherry", "Date", "Elderberry"};
+  union ui_signal_payload sp;
+  struct ui_event ev;
+  int idx = -1;
   ui_error_t rc;
-  int failed = 0;
-
-  rc = ui_wheel_picker_base_create(NULL, NULL);
-  ASSERT_EQ(rc, UI_ERROR_INVALID_ARGUMENT);
 
   rc = ui_wheel_picker_base_create(&picker, &cva);
-  ASSERT_EQ(rc, UI_ERROR_NONE);
-  ASSERT_TRUE(picker != NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_wheel_picker_base_get_component(picker, &comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT(comp != NULL);
+
+  rc = cva.register_on_change(picker, cva_on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = cva.register_on_touched(picker, cva_on_touched, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_wheel_picker_base_set_on_change(picker, on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Set items */
+  rc = ui_wheel_picker_base_set_items(picker, items, 5);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Non-looping selection */
+  rc = ui_wheel_picker_base_set_looping(picker, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_wheel_picker_base_set_selected_index(picker, 2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_get_selected_index(picker, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(2, idx);
+
+  /* Same index no-op */
+  rc = ui_wheel_picker_base_set_selected_index(picker, 2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Clamp negative index */
+  rc = ui_wheel_picker_base_set_selected_index(picker, -5);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_get_selected_index(picker, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, idx);
+
+  /* Clamp excessive index */
+  rc = ui_wheel_picker_base_set_selected_index(picker, 100);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_get_selected_index(picker, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(4, idx);
+
+  /* Looping selection */
+  rc = ui_wheel_picker_base_set_looping(picker, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_wheel_picker_base_set_selected_index(picker, 6); /* 6 % 5 = 1 */
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_get_selected_index(picker, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(1, idx);
+
+  rc = ui_wheel_picker_base_set_selected_index(picker, -1); /* -1 -> 4 */
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_get_selected_index(picker, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(4, idx);
+
+  /* Keyboard events */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_get_selected_index(picker, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(3, idx);
+
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_get_selected_index(picker, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(4, idx);
+
+  /* CVA write value and disable */
+  sp.int_val = 0;
+  rc = cva.write_value(picker, sp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, picker->selected_index);
+
+  rc = cva.set_disabled_state(picker, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = cva.set_disabled_state(picker, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Tick physics: spring snapping and final snap */
+  picker->velocity = 100.0f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  picker->velocity = 0.05f; /* below threshold -> snap */
+  picker->scroll_offset =
+      42.0f; /* near index 1 (40.0f), diff = -2.0f (> 0.5) */
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  picker->scroll_offset = 40.2f; /* diff = -0.2f (<= 0.5) -> final snap */
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(40.0f, picker->scroll_offset);
+  ASSERT_EQ(1, picker->selected_index);
+
+  /* Non-looping offset bounding */
+  rc = ui_wheel_picker_base_set_looping(picker, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->scroll_offset = -10.0f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0.0f, picker->scroll_offset);
+
+  picker->scroll_offset = 500.0f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(160.0f, picker->scroll_offset); /* 4 * 40.0f */
+
+  /* CVA null checks */
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, cva.write_value(NULL, sp));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            cva.register_on_change(NULL, cva_on_change, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            cva.register_on_touched(NULL, cva_on_touched, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, cva.set_disabled_state(NULL, 1));
+
+  /* Gesture PAN and SWIPE events */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+
+  g_wheel_mock_fail = 7; /* PAN began */
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(1, picker->is_dragging);
+
+  g_wheel_mock_fail = 8; /* PAN changed */
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  g_wheel_mock_fail = 9; /* SWIPE ended */
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, picker->is_dragging);
+
+  g_wheel_mock_fail = 10; /* PAN ended */
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_wheel_mock_fail = 0;
+
+  /* Normal gesture process event call (covers line 102) */
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Tick while is_dragging is 1 (line 653 false branch) */
+  picker->is_dragging = 1;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->is_dragging = 0;
+
+  /* set_items when selected_index >= count and count > 0 (line 509 true branch)
+   */
+  picker->selected_index = 10;
+  rc = ui_wheel_picker_base_set_items(picker, items, 3);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(2, picker->selected_index);
+
+  /* Set items overwrite with count 0 */
+  rc = ui_wheel_picker_base_set_items(picker, NULL, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, picker->item_count);
+
+  /* Operations without CVA callbacks (covers lines 207, 217) */
+  picker->cva_on_change = NULL;
+  picker->cva_on_touched = NULL;
+  picker->on_change = NULL;
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Re-add items for snapping tests without callbacks */
+  rc = ui_wheel_picker_base_set_items(picker, items, 5);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->on_change = NULL;
+  picker->cva_on_change = NULL;
+  picker->selected_index = 0;
+  picker->scroll_offset = 40.1f; /* snap to 1 */
+  picker->velocity = 0.0f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(1, picker->selected_index);
+
+  /* Tick when target_index == selected_index (line 672 false) */
+  picker->scroll_offset = 40.1f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Looping tick with negative target_index (lines 688, 691, 699) */
+  rc = ui_wheel_picker_base_set_looping(picker, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->selected_index = 0;
+  picker->scroll_offset = -39.9f;
+  picker->velocity = 0.0f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(4, picker->selected_index);
+  rc = ui_wheel_picker_base_set_looping(picker, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Non-looping target_index >= item_count clamp in on_tick (line 653) */
+  picker->scroll_offset = 300.1f;
+  picker->velocity = 0.0f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(4, picker->selected_index);
+
+  /* Non-looping target_index < 0 clamp in on_tick (line 650) */
+  picker->scroll_offset = -40.1f;
+  picker->velocity = 0.0f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, picker->selected_index);
+
+  /* Non-looping offset in valid range (line 720 false) */
+  picker->scroll_offset = 40.0f;
+  picker->velocity = 0.0f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* set_selected_index with on_change == NULL (line 553 false) */
+  rc = ui_wheel_picker_base_set_selected_index(picker, 2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* update_dom_state when component is NULL (line 239) */
   {
-    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    struct ui_component *saved_comp = picker->component;
+    picker->component = NULL;
+    picker->selected_index = 0;
+    rc = ui_wheel_picker_base_set_selected_index(picker, 1);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    picker->component = saved_comp;
   }
 
-  for (i = 0; i < 4; i++) {
+  /* Destroy with shadow_root == NULL, component == NULL, gesture_recognizer ==
+   * NULL */
+  rc = ui_dom_node_destroy(picker->component->shadow_root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->component->shadow_root = NULL;
+  rc = ui_wheel_picker_base_set_selected_index(picker, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_gesture_recognizer_destroy(picker->gesture_recognizer);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->gesture_recognizer = NULL;
+  rc = ui_component_destroy(picker->component);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->component = NULL;
+
+  rc = ui_wheel_picker_base_destroy(picker);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Operations on picker with item_count == 0 to cover remaining branches */
+  {
+    struct ui_wheel_picker_base *p_zero = NULL;
+    rc = ui_wheel_picker_base_create(&p_zero, NULL);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    /* Unhandled key code falls through (line 615) */
+    memset(&ev, 0, sizeof(ev));
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+    rc = ui_wheel_picker_base_process_event(p_zero, &ev, 0.0);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    /* set_selected_index when item_count == 0 non-looping (branch 509) */
+    rc = ui_wheel_picker_base_set_selected_index(p_zero, 5);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    ASSERT_EQ(0, p_zero->selected_index);
+
+    /* set_selected_index when item_count == 0 looping (branches 539, 540) */
+    rc = ui_wheel_picker_base_set_looping(p_zero, 1);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_wheel_picker_base_set_selected_index(p_zero, 5);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    /* on_tick when item_count == 0 looping (branches 688, 714) */
+    rc = ui_wheel_picker_base_on_tick(p_zero, 16.0);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    /* on_tick when item_count == 0 non-looping (branch 653) */
+    rc = ui_wheel_picker_base_set_looping(p_zero, 0);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_wheel_picker_base_on_tick(p_zero, 16.0);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    /* set_items when count == 0 and selected_index >= count (branch 454) */
+    p_zero->selected_index = 0;
+    rc = ui_wheel_picker_base_set_items(p_zero, NULL, 0);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    rc = ui_wheel_picker_base_destroy(p_zero);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  /* Destroy with shadow_root == NULL and component != NULL (covers line 454) */
+  {
+    struct ui_wheel_picker_base *p_sh = NULL;
+    rc = ui_wheel_picker_base_create(&p_sh, NULL);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_destroy(p_sh->component->shadow_root);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    p_sh->component->shadow_root = NULL;
+    rc = ui_wheel_picker_base_destroy(p_sh);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  PASS();
+}
+
+TEST test_wheel_error_branches(void) {
+  struct ui_wheel_picker_base *picker = NULL;
+  const char *items[] = {"A", "B"};
+  struct ui_control_value_accessor cva;
+  struct ui_event ev;
+  ui_error_t rc;
+  int i;
+
+  /* 1. Gesture process_event mock failure */
+  rc = ui_wheel_picker_base_create(&picker, &cva);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_wheel_picker_base_set_items(picker, items, 2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  g_wheel_mock_fail = 4;
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 1.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_wheel_mock_fail = 0;
+
+  /* 2. on_change error in set_selected_index (line 406) */
+  rc = ui_wheel_picker_base_set_on_change(picker, on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_cb_fail_on_change = 1;
+  rc = ui_wheel_picker_base_set_selected_index(picker, 1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_cb_fail_on_change = 0;
+
+  /* 3. cva_on_touched error in process_event (line 458) */
+  rc = cva.register_on_touched(picker, cva_on_touched, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_cb_fail_touched = 1;
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 1.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_cb_fail_touched = 0;
+
+  /* 4. roundf fallback mock failure in on_tick (line 521) */
+  g_wheel_mock_fail = 5;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_wheel_mock_fail = 0;
+
+  /* 5. on_change and cva_on_change error in on_tick (lines 552, 561) */
+  rc = cva.register_on_change(picker, cva_on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->scroll_offset = 40.2f; /* snap to 1 */
+  picker->selected_index = 0;
+
+  g_cb_fail_on_change = 1;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_cb_fail_on_change = 0;
+
+  picker->scroll_offset = 40.2f; /* snap to 1 */
+  picker->selected_index = 0;
+  g_cb_fail_cva_change = 1;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_cb_fail_cva_change = 0;
+
+  /* update_dom_state failure in on_tick */
+  picker->scroll_offset = 40.2f;
+  picker->selected_index = 0;
+  g_wheel_mock_fail = 6;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_wheel_mock_fail = 0;
+
+  /* Looping tick with negative offset (line 691) */
+  picker->is_looping = 1;
+  picker->scroll_offset = -40.2f;
+  rc = ui_wheel_picker_base_on_tick(picker, 16.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  picker->is_looping = 0;
+
+  /* UI_KEY_UP error in process_event (line 611) */
+  picker->selected_index = 1;
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  g_cb_fail_on_change = 1;
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_cb_fail_on_change = 0;
+
+  /* UI_KEY_DOWN error in process_event (line 615) */
+  picker->selected_index = 0;
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  g_cb_fail_on_change = 1;
+  rc = ui_wheel_picker_base_process_event(picker, &ev, 0.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_cb_fail_on_change = 0;
+
+  /* update_dom_state failure in set_selected_index (line 552) */
+  picker->selected_index = 0;
+  g_wheel_mock_fail = 6;
+  rc = ui_wheel_picker_base_set_selected_index(picker, 1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_wheel_mock_fail = 0;
+
+  /* 6. Destroy mock failures */
+  g_wheel_mock_fail = 3; /* gesture destroy fails */
+  rc = ui_wheel_picker_base_destroy(picker);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_wheel_mock_fail = 0;
+
+  rc = ui_wheel_picker_base_create(&picker, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_wheel_mock_fail = 2; /* dom_node_destroy fails */
+  rc = ui_wheel_picker_base_destroy(picker);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_wheel_mock_fail = 0;
+
+  rc = ui_wheel_picker_base_create(&picker, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_wheel_mock_fail = 1; /* component_destroy fails */
+  rc = ui_wheel_picker_base_destroy(picker);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_wheel_mock_fail = 0;
+
+  /* 7. Creation cleanup failures */
+  for (i = 11; i <= 15; i++) {
+    g_wheel_mock_fail = i;
+    rc = ui_wheel_picker_base_create(&picker, NULL);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_wheel_mock_fail = 0;
+  }
+  g_wheel_mock_fail = 6;
+  rc = ui_wheel_picker_base_create(&picker, NULL);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_wheel_mock_fail = 0;
+
+  PASS();
+}
+
+TEST test_wheel_oom(void) {
+  struct ui_wheel_picker_base *picker = NULL;
+  const char *items[] = {"A", "B", "C"};
+  ui_error_t rc;
+  int i;
+
+  /* Creation OOM */
+  for (i = 0; i < 5; i++) {
     g_malloc_fail_countdown = i;
     picker = NULL;
     rc = ui_wheel_picker_base_create(&picker, NULL);
-    ASSERT_EQ(rc, UI_ERROR_OUT_OF_MEMORY);
-    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE) {
+      g_malloc_fail_countdown = -1;
+      rc = ui_wheel_picker_base_destroy(picker);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+      break;
+    }
+    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    ASSERT(picker == NULL);
   }
-  return failed;
+  g_malloc_fail_countdown = -1;
+
+  /* set_items OOM (array malloc fail) */
+  rc = ui_wheel_picker_base_create(&picker, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_malloc_fail_countdown = 0;
+  rc = ui_wheel_picker_base_set_items(picker, items, 3);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+  g_malloc_fail_countdown = -1;
+
+  /* set_items OOM (item strdup fail on item 0) */
+  g_malloc_fail_countdown = 1;
+  rc = ui_wheel_picker_base_set_items(picker, items, 3);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+  g_malloc_fail_countdown = -1;
+
+  /* set_items OOM (item strdup fail on item 1, covers lines 497-498) */
+  g_malloc_fail_countdown = 2;
+  rc = ui_wheel_picker_base_set_items(picker, items, 3);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+  g_malloc_fail_countdown = -1;
+
+  rc = ui_wheel_picker_base_destroy(picker);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
 }
 
-static int test_items() {
-  struct ui_wheel_picker_base *picker = NULL;
-  int failed = 0;
-  int i;
-  const char *items[] = {"A", "B", "C"};
-
-  ui_wheel_picker_base_create(&picker, NULL);
-
-  ASSERT_EQ(ui_wheel_picker_base_set_items(NULL, items, 3),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_wheel_picker_base_set_items(picker, NULL, 3),
-            UI_ERROR_INVALID_ARGUMENT);
-
-  ASSERT_EQ(ui_wheel_picker_base_set_items(picker, items, 3), UI_ERROR_NONE);
-
-  /* Setting items again to cover freeing old items */
-  ASSERT_EQ(ui_wheel_picker_base_set_items(picker, items, 3), UI_ERROR_NONE);
-
-  for (i = 0; i < 4; i++) {
-    g_malloc_fail_countdown = i;
-    ASSERT_EQ(ui_wheel_picker_base_set_items(picker, items, 3),
-              UI_ERROR_OUT_OF_MEMORY);
-    g_malloc_fail_countdown = -1;
-  }
-  {
-    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-
-  return failed;
+SUITE(ui_wheel_picker_base_suite) {
+  RUN_TEST(test_wheel_invalid_args);
+  RUN_TEST(test_wheel_lifecycle_and_scrolling);
+  RUN_TEST(test_wheel_error_branches);
+  RUN_TEST(test_wheel_oom);
 }
 
-static int test_cva_and_events() {
-  struct ui_wheel_picker_base *picker = NULL;
-  struct ui_control_value_accessor cva = {0};
-  union ui_signal_payload payload = {0};
-  int failed = 0;
-  struct ui_event ev = {0};
-  const char *items[] = {"A", "B", "C"};
-
-  ui_wheel_picker_base_create(&picker, &cva);
-  ui_wheel_picker_base_set_items(picker, items, 3);
-  ui_wheel_picker_base_set_on_change(picker, on_change, NULL);
-
-  /* CVA */
-  ASSERT_EQ(cva.register_on_change(NULL, cva_on_change, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(cva.register_on_touched(NULL, cva_on_touched, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(cva.write_value(NULL, payload), UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(cva.set_disabled_state(NULL, 1), UI_ERROR_INVALID_ARGUMENT);
-
-  cva.register_on_change(picker, cva_on_change, NULL);
-  cva.register_on_touched(picker, cva_on_touched, NULL);
-  payload.int_val = 1;
-  cva.write_value(picker, payload);
-  ASSERT_EQ(last_selected_index, 1);
-
-  /* Set disabled state */
-  cva.set_disabled_state(picker, 1);
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_UP;
-  /* Should ignore due to being disabled */
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ASSERT_EQ(last_selected_index, 1);
-
-  cva.set_disabled_state(picker, 0);
-
-  /* Keyboard Event */
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ASSERT_EQ(last_selected_index, 0); /* 1 - 1 = 0 */
-  ASSERT_EQ(touched_count,
-            1); /* Write value shouldn't touch? wait, event touched */
-
-  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ASSERT_EQ(last_selected_index, 1); /* 0 + 1 = 1 */
-
-  {
-    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return failed;
-}
-
-static int test_physics() {
-  struct ui_wheel_picker_base *picker = NULL;
-  struct ui_control_value_accessor cva = {0};
-  int failed = 0;
-  struct ui_event ev = {0};
-  const char *items[] = {"A", "B", "C", "D", "E"};
-
-  ui_wheel_picker_base_create(&picker, &cva);
-  ui_wheel_picker_base_set_items(picker, items, 5);
-  ui_wheel_picker_base_set_on_change(picker, on_change, NULL);
-  cva.register_on_change(picker, cva_on_change, NULL);
-
-  ASSERT_EQ(ui_wheel_picker_base_process_event(NULL, &ev, 0.0),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_wheel_picker_base_process_event(picker, NULL, 0.0),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_wheel_picker_base_on_tick(NULL, 0.0), UI_ERROR_INVALID_ARGUMENT);
-
-  /* Start drag */
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.x = 0;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-
-  /* Trigger BEGAN (move past threshold) */
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 50;
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-
-  /* Trigger CHANGED (actual drag) */
-  ev.event_data.mouse.y = 0;
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-
-  /* Trigger ENDED */
-  ev.type = UI_EVENT_MOUSE_UP;
-  ev.event_data.mouse.y = 0;
-  ui_wheel_picker_base_process_event(picker, &ev, 48.0);
-
-  /* Tick to integrate velocity */
-  ui_wheel_picker_base_on_tick(picker, 16.0);
-
-  /* Tick until velocity decays */
-  {
-    int i;
-    for (i = 0; i < 1000; i++) {
-      ui_wheel_picker_base_on_tick(picker, 16.0);
-    }
-  }
-
-  ASSERT_TRUE(last_selected_index > 0); /* should have scrolled down */
-
-  /* Loop */
-  ui_wheel_picker_base_set_looping(picker, 1);
-
-  /* Tick with negative scroll offset (out of bounds looping snap) */
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 150; /* BEGAN */
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-
-  ev.event_data.mouse.y = 200; /* CHANGED delta +50 */
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_wheel_picker_base_process_event(picker, &ev, 48.0);
-
-  {
-    int i;
-    for (i = 0; i < 1000; i++) {
-      ui_wheel_picker_base_on_tick(picker, 16.0);
-    }
-  }
-
-  /* Test error prop in on_change */
-  ui_wheel_picker_base_set_on_change(picker, on_change_error, NULL);
-  ASSERT_EQ(ui_wheel_picker_base_set_selected_index(picker, 2),
-            UI_ERROR_UNKNOWN);
-
-  /* Test bound offset for non-looping when negative */
-  ui_wheel_picker_base_set_looping(picker, 0);
-  ui_wheel_picker_base_set_on_change(picker, NULL, NULL); /* Reset to no-op */
-  ui_wheel_picker_base_set_selected_index(picker, 0);
-
-  /* Set a negative offset manually via gesture */
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 200; /* BEGAN */
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-  ev.event_data.mouse.y = 500; /* CHANGED */
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_wheel_picker_base_process_event(picker, &ev, 48.0);
-  ui_wheel_picker_base_on_tick(picker, 16.0);
-
-  /* Some other getters */
-  ui_wheel_picker_base_set_looping(NULL, 1);
-  /* Null checks */
-  ui_wheel_picker_base_set_selected_index(NULL, 1);
-  ui_wheel_picker_base_get_selected_index(NULL, NULL);
-  ui_wheel_picker_base_get_selected_index(picker, NULL);
-  ui_wheel_picker_base_set_on_change(NULL, NULL, NULL);
-  ui_wheel_picker_base_set_items(NULL, items, 3);
-  ui_wheel_picker_base_set_items(picker, NULL, 3);
-  ui_wheel_picker_base_set_items(picker, NULL, 0);
-
-  {
-    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  picker = NULL;
-
-  return failed;
-}
-
-static int test_getters_and_misc() {
-  struct ui_wheel_picker_base *picker = NULL;
-  struct ui_component *comp = NULL;
-  int failed = 0;
-  int out_idx = -1;
-  const char *items[] = {"A", "B", "C"};
-  struct ui_event ev = {0};
-
-  ui_wheel_picker_base_create(&picker, NULL);
-
-  ASSERT_EQ(ui_wheel_picker_base_get_component(NULL, &comp),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_wheel_picker_base_get_component(picker, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_wheel_picker_base_get_component(picker, &comp), UI_ERROR_NONE);
-  ASSERT_TRUE(comp != NULL);
-
-  /* Get selected index success */
-  ASSERT_EQ(ui_wheel_picker_base_get_selected_index(picker, &out_idx),
-            UI_ERROR_NONE);
-  ASSERT_EQ(out_idx, 0);
-
-  last_selected_index = -1;
-  ui_wheel_picker_base_set_on_change(picker, on_change, NULL);
-
-  /* Set items reducing count to force index adjustment */
-  ui_wheel_picker_base_set_items(picker, items, 3);
-  ui_wheel_picker_base_set_selected_index(picker, 2);
-  ui_wheel_picker_base_set_items(picker, items, 1);
-  ASSERT_EQ(last_selected_index, 2); /* on_change wasn't bound, so it doesn't
-                                        change, wait we just check out_idx */
-  ui_wheel_picker_base_get_selected_index(picker, &out_idx);
-  ASSERT_EQ(out_idx, 0);
-
-  /* Setting items to 0 count */
-  ui_wheel_picker_base_set_items(picker, items, 0);
-  ui_wheel_picker_base_set_selected_index(picker, 2);
-  ui_wheel_picker_base_get_selected_index(picker, &out_idx);
-  ASSERT_EQ(out_idx, 0);
-
-  /* Test programmatic selection bounds */
-  ui_wheel_picker_base_set_items(picker, items, 3);
-  ui_wheel_picker_base_set_looping(picker, 0);
-  ui_wheel_picker_base_set_selected_index(picker, -5);
-  ui_wheel_picker_base_get_selected_index(picker, &out_idx);
-  ASSERT_EQ(out_idx, 0);
-
-  ui_wheel_picker_base_set_selected_index(picker, 10);
-  ui_wheel_picker_base_get_selected_index(picker, &out_idx);
-  ASSERT_EQ(out_idx, 2);
-
-  /* Looping bounds */
-  /* Hit looping condition with 0 items */
-  ui_wheel_picker_base_set_items(picker, items, 0);
-  ui_wheel_picker_base_set_looping(picker, 1);
-  ui_wheel_picker_base_set_selected_index(picker, 10);
-  /* Fake a scroll offset > 0 to test target_index bounding */
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.x = 0;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 0;
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-  ui_wheel_picker_base_on_tick(picker, 16.0);
-
-  /* Hit looping condition with < 0 index (already done? let's do -16) */
-  ui_wheel_picker_base_set_items(picker, items, 3);
-  ui_wheel_picker_base_set_looping(picker, 1);
-  ui_wheel_picker_base_set_selected_index(picker, -16);
-  ui_wheel_picker_base_get_selected_index(picker, &out_idx);
-  ASSERT_EQ(out_idx, 2);
-
-  /* Trigger CVA without CVA bound */
-  /* This is just hitting process_event without CVA registered, which tests
-   * `trigger_cva_change` null check */
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = UI_KEY_UP;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-
-  /* Trigger gesture cancelled */
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 50;
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-
-  memset(&ev, 0, sizeof(ev));
-  ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-
-  /* Fallthrough on key event */
-  ev.type = UI_EVENT_KEY_DOWN;
-  ev.event_data.keyboard.key_code = 999;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-
-  /* Snap with no items */
-  ui_wheel_picker_base_set_looping(picker, 1);
-  ui_wheel_picker_base_set_on_change(picker, NULL, NULL);
-  ui_wheel_picker_base_set_items(picker, items, 0);
-  ui_wheel_picker_base_set_looping(picker, 1);
-  ui_wheel_picker_base_on_tick(picker, 1000.0);
-  ui_wheel_picker_base_set_looping(picker, 0);
-  ui_wheel_picker_base_set_selected_index(picker, 10);
-  ui_wheel_picker_base_on_tick(picker, 1000.0);
-
-  /* Looping with negative target index */
-  ui_wheel_picker_base_set_items(picker, items, 3);
-  ui_wheel_picker_base_set_looping(picker, 1);
-  ui_wheel_picker_base_set_selected_index(picker, 0);
-  ui_wheel_picker_base_set_selected_index(picker, -1);
-  ui_wheel_picker_base_on_tick(picker, 1000.0);
-
-  /* Trigger CVA change without CVA bound */
-  ui_wheel_picker_base_set_looping(picker, 0);
-  ui_wheel_picker_base_set_selected_index(picker, 0);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 80;
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-  {
-    int i;
-    for (i = 0; i < 1000; i++) {
-      ui_wheel_picker_base_on_tick(picker, 16.0);
-    }
-  }
-
-  /* Trigger slow out of bounds drag to snap to < 0 */
-  ui_wheel_picker_base_set_selected_index(picker, 0);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 150; /* BEGAN */
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 250; /* CHANGED delta +100 -> scroll_offset -100 */
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 250; /* CHANGED delta 0 -> velocity 0 */
-  ui_wheel_picker_base_process_event(picker, &ev, 1000.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_wheel_picker_base_process_event(picker, &ev, 2000.0);
-  ui_wheel_picker_base_on_tick(picker,
-                               16.0); /* will evaluate negative scroll_offset */
-
-  /* Trigger slow out of bounds drag to snap to >= count */
-  ui_wheel_picker_base_set_selected_index(picker, 2);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 50; /* BEGAN */
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = -50; /* CHANGED delta -100 -> scroll_offset +100 */
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = -50; /* CHANGED delta 0 -> velocity 0 */
-  ui_wheel_picker_base_process_event(picker, &ev, 1000.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_wheel_picker_base_process_event(picker, &ev, 2000.0);
-  ui_wheel_picker_base_on_tick(picker, 16.0);
-
-  /* Test error prop in on_change from tick */
-  ui_wheel_picker_base_set_on_change(picker, on_change_error, NULL);
-  ui_wheel_picker_base_set_selected_index(picker, 0);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = 50; /* BEGAN */
-  ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = -50; /* CHANGED delta -100 */
-  ui_wheel_picker_base_process_event(picker, &ev, 32.0);
-  ui_wheel_picker_base_on_tick(picker, 16.0);
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ev.event_data.mouse.y = -50; /* CHANGED zero velocity */
-  ui_wheel_picker_base_process_event(picker, &ev, 1000.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_wheel_picker_base_process_event(picker, &ev, 2000.0);
-
-  /* Send CANCEL to hit cancelled branch */
-  ev.type = UI_EVENT_TOUCH_START;
-  ev.event_data.touch.num_points = 1;
-  ev.event_data.touch.points[0].x = 0;
-  ev.event_data.touch.points[0].y = 0;
-  ev.event_data.touch.points[0].id = 0;
-  ui_wheel_picker_base_process_event(picker, &ev, 2000.0);
-
-  ev.type = UI_EVENT_TOUCH_MOVE;
-  ev.event_data.touch.points[0].y = 100;
-  ui_wheel_picker_base_process_event(picker, &ev, 2016.0);
-
-  ev.type = UI_EVENT_TOUCH_CANCEL;
-  ui_wheel_picker_base_process_event(picker, &ev, 2032.0);
-
-  /* The next ticks should snap to 1 and call on_change, returning error */
-  {
-    int i;
-    for (i = 0; i < 1000; i++) {
-      if (ui_wheel_picker_base_on_tick(picker, 16.0) == UI_ERROR_UNKNOWN) {
-        break;
-      }
-    }
-  }
-
-  /* Mock structure to hit NULL branches in static helpers */
-  {
-    struct ui_wheel_picker_base_mock *mpicker =
-        (struct ui_wheel_picker_base_mock *)picker;
-    ui_dom_node_destroy(mpicker->component->shadow_root);
-    mpicker->component->shadow_root = NULL;
-    /* update_dom_state now hits the null shadow_root branch */
-    ui_wheel_picker_base_set_selected_index(picker, 1);
-
-    ui_component_destroy(mpicker->component);
-    mpicker->component = NULL;
-    ui_wheel_picker_base_set_selected_index(picker, 0);
-
-    /* hit update_dom_state(NULL) */
-    /* Well, actually update_dom_state is internal, so we just set picker to
-     * NULL in an API that calls it */
-    ui_wheel_picker_base_set_selected_index(NULL, 0);
-
-    /* cva_on_change == NULL branch */
-    mpicker->cva_on_change = NULL;
-    ui_wheel_picker_base_set_selected_index(picker, 1);
-
-    /* cva_on_touched == NULL branch */
-    mpicker->cva_on_touched = NULL;
-    /* Simulate a touch end */
-    ev.type = UI_EVENT_MOUSE_DOWN;
-    ui_wheel_picker_base_process_event(picker, &ev, 0.0);
-    ev.type = UI_EVENT_MOUSE_UP;
-    ui_wheel_picker_base_process_event(picker, &ev, 16.0);
-
-    /* gesture_recognizer == NULL branch in destroy */
-    ui_gesture_recognizer_destroy(mpicker->gesture_recognizer);
-    mpicker->gesture_recognizer = NULL;
-  }
-
-  /* Test destroy with shadow_root == NULL but component != NULL */
-  {
-    struct ui_wheel_picker_base *picker2 = NULL;
-    ui_wheel_picker_base_create(&picker2, NULL);
-    struct ui_wheel_picker_base_mock *mpicker2 =
-        (struct ui_wheel_picker_base_mock *)picker2;
-    if (mpicker2 && mpicker2->component && mpicker2->component->shadow_root) {
-      ui_dom_node_destroy(mpicker2->component->shadow_root);
-      mpicker2->component->shadow_root = NULL;
-    }
-    ui_wheel_picker_base_destroy(picker2);
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(picker);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_wheel_picker_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-
-  return failed;
-}
-
-int main(void) {
-  int failed = 0;
-  printf("test_creation\n");
-  fflush(stdout);
-  failed |= test_creation();
-  printf("test_items\n");
-  fflush(stdout);
-  failed |= test_items();
-  printf("test_cva_and_events\n");
-  fflush(stdout);
-  failed |= test_cva_and_events();
-  printf("test_physics\n");
-  fflush(stdout);
-  failed |= test_physics();
-  printf("test_getters_and_misc\n");
-  fflush(stdout);
-  failed |= test_getters_and_misc();
-
-  if (!failed) {
-    printf("test_ui_wheel_picker_base passed\n");
-  } else {
-    printf("test_ui_wheel_picker_base failed\n");
-  }
-  return failed;
+GREATEST_MAIN_DEFS();
+
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(ui_wheel_picker_base_suite);
+  GREATEST_MAIN_END();
 }

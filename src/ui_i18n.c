@@ -77,7 +77,7 @@ ui_error_t ui_i18n_create(struct ui_i18n **out_i18n) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
-  (void)safe_strcpy(i18n->locale, MAX_LOCALE_LEN, "en-US");
+  safe_strcpy(i18n->locale, MAX_LOCALE_LEN, "en-US");
   i18n->locale_signal = NULL;
 
   *out_i18n = i18n;
@@ -108,19 +108,14 @@ ui_error_t ui_i18n_set_locale(struct ui_i18n *i18n, const char *locale) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc = safe_strcpy(i18n->locale, MAX_LOCALE_LEN, locale);
-    (void)rc;
-  }
+  safe_strcpy(i18n->locale, MAX_LOCALE_LEN, locale);
 
   /* Check for RTL locales and update bidi manager */
   if (strncmp(locale, "ar", 2) == 0 || strncmp(locale, "he", 2) == 0 ||
       strncmp(locale, "fa", 2) == 0 || strncmp(locale, "ur", 2) == 0) {
-    ui_error_t b_rc = ui_bidi_set_direction(UI_BIDI_DIR_RTL);
-    (void)b_rc;
+    ui_bidi_set_direction(UI_BIDI_DIR_RTL);
   } else {
-    ui_error_t b_rc = ui_bidi_set_direction(UI_BIDI_DIR_LTR);
-    (void)b_rc;
+    ui_bidi_set_direction(UI_BIDI_DIR_LTR);
   }
 
 #if defined(__EMSCRIPTEN__)
@@ -200,13 +195,7 @@ ui_error_t ui_i18n_format_currency(struct ui_i18n *i18n, double amount,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_i18n_format_number(i18n, amount, 2, number_buf, sizeof(number_buf));
-
-    (void)_ign_rc;
-  }
+  ui_i18n_format_number(i18n, amount, 2, number_buf, sizeof(number_buf));
 
 #if defined(_MSC_VER)
   sprintf_s(out_str, out_len, "%s %s", number_buf, currency_code);
@@ -267,8 +256,7 @@ ui_error_t ui_i18n_pluralize(struct ui_i18n *i18n, int count, const char *zero,
     choice = other;
   }
 
-  (void)safe_strcpy(out_str, out_len, choice);
-  return UI_ERROR_NONE;
+  return safe_strcpy(out_str, out_len, choice);
 }
 
 /**
@@ -312,7 +300,7 @@ ui_error_t ui_i18n_interpolate(struct ui_i18n *i18n, const char *template_str,
               strlen(keys[k]) == key_len) {
             size_t v_len = strlen(values[k]);
             if (o_idx + v_len < out_len - 1) {
-              (void)safe_strcpy(&out_str[o_idx], out_len - o_idx, values[k]);
+              safe_strcpy(&out_str[o_idx], out_len - o_idx, values[k]);
               o_idx += v_len;
               found = 1;
               break;

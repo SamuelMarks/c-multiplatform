@@ -9,6 +9,66 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_top_app_bar_mock_fail = 0;
+static int g_bar_get_counter = 0;
+static int g_bar_set_counter = 0;
+
+static ui_error_t mock_bar_signal_create(
+    struct ui_arena *arena, union ui_signal_payload initial_payload,
+    enum ui_signal_type type, ui_equality_fn equality, ui_destructor_fn cleanup,
+    enum ui_signal_mode mode, ui_signal_t **out_signal) {
+  if (g_top_app_bar_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_top_app_bar_mock_fail == 2 && type == UI_SIGNAL_TYPE_FLOAT32) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_create)(arena, initial_payload, type, equality, cleanup,
+                            mode, out_signal);
+}
+#undef ui_signal_create
+/** @cond */
+#define ui_signal_create mock_bar_signal_create
+/** @endcond */
+
+static ui_error_t mock_bar_signal_get(ui_signal_t *signal,
+                                      union ui_signal_payload *out_payload) {
+  if (g_top_app_bar_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_top_app_bar_mock_fail == 4) {
+    g_bar_get_counter++;
+    if (g_bar_get_counter == 2) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_signal_get)(signal, out_payload);
+}
+#undef ui_signal_get
+/** @cond */
+#define ui_signal_get mock_bar_signal_get
+/** @endcond */
+
+static ui_error_t mock_bar_signal_set(ui_signal_t *signal,
+                                      union ui_signal_payload payload) {
+  if (g_top_app_bar_mock_fail == 5) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_top_app_bar_mock_fail == 6) {
+    g_bar_set_counter++;
+    if (g_bar_set_counter == 2) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_signal_set)(signal, payload);
+}
+#undef ui_signal_set
+/** @cond */
+#define ui_signal_set mock_bar_signal_set
+/** @endcond */
+#endif
+
 /**
  * @struct ui_top_app_bar_base
  * @struct ui_top_app_bar_base
@@ -75,22 +135,22 @@ ui_top_app_bar_base_create(struct ui_arena *arena,
   (*out_bar)->config = *config;
 
   initial_state.int_val = (ui_int32)config->initial_state;
-  {
-    ui_error_t _ign_rc = ui_signal_create(
-        arena, initial_state, UI_SIGNAL_TYPE_INT32, state_equality, NULL,
-        UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_bar)->state_signal);
-    (void)_ign_rc;
-  }
+  err = ui_signal_create(arena, initial_state, UI_SIGNAL_TYPE_INT32,
+                         state_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
+                         &(*out_bar)->state_signal);
+  if (err != UI_ERROR_NONE)
+    return err;
 
   initial_height.float_val =
       (config->initial_state == UI_TOP_APP_BAR_STATE_EXPANDED)
           ? config->expanded_height
           : config->collapsed_height;
-  {
-    ui_error_t _ign_rc = ui_signal_create(
-        arena, initial_height, UI_SIGNAL_TYPE_FLOAT32, height_equality, NULL,
-        UI_SIGNAL_MODE_SINGLE_THREADED, &(*out_bar)->height_signal);
-    (void)_ign_rc;
+  err = ui_signal_create(arena, initial_height, UI_SIGNAL_TYPE_FLOAT32,
+                         height_equality, NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
+                         &(*out_bar)->height_signal);
+  if (err != UI_ERROR_NONE) {
+    ui_signal_destroy((*out_bar)->state_signal);
+    return err;
   }
 
   return UI_ERROR_NONE;
@@ -100,13 +160,11 @@ ui_error_t ui_top_app_bar_base_destroy(struct ui_top_app_bar_base *bar) {
   if (!bar)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    ui_error_t _ign_rc = ui_signal_destroy(bar->state_signal);
-    (void)_ign_rc;
+  if (bar->state_signal) {
+    ui_signal_destroy(bar->state_signal);
   }
-  {
-    ui_error_t _ign_rc = ui_signal_destroy(bar->height_signal);
-    (void)_ign_rc;
+  if (bar->height_signal) {
+    ui_signal_destroy(bar->height_signal);
   }
 
   return UI_ERROR_NONE;
@@ -119,26 +177,27 @@ ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
   float current_height;
   float new_height;
   enum ui_top_app_bar_state new_state;
+  ui_error_t rc;
 
-  (void)scroll_y;
+  if (scroll_y > 0.0f) {
+  }
 
   if (!bar)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
+#ifdef UI_TEST_MOCK_ALLOC
+  g_bar_get_counter = 0;
+  g_bar_set_counter = 0;
+#endif
 
-    ui_error_t _ign_rc = ui_signal_get(bar->height_signal, &height_payload);
-
-    (void)_ign_rc;
-  }
+  rc = ui_signal_get(bar->height_signal, &height_payload);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   current_height = height_payload.float_val;
 
-  {
-
-    ui_error_t _ign_rc = ui_signal_get(bar->state_signal, &state_payload);
-
-    (void)_ign_rc;
-  }
+  rc = ui_signal_get(bar->state_signal, &state_payload);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* If scrolling down (delta_y > 0), hide bar. If scrolling up, show bar. */
   new_height = current_height - delta_y;
@@ -162,18 +221,16 @@ ui_error_t ui_top_app_bar_base_handle_scroll(struct ui_top_app_bar_base *bar,
 
   if (new_height != current_height) {
     height_payload.float_val = new_height;
-    {
-      ui_error_t _ign_rc = ui_signal_set(bar->height_signal, height_payload);
-      (void)_ign_rc;
-    }
+    rc = ui_signal_set(bar->height_signal, height_payload);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   if ((ui_int32)new_state != state_payload.int_val) {
     state_payload.int_val = (ui_int32)new_state;
-    {
-      ui_error_t _ign_rc = ui_signal_set(bar->state_signal, state_payload);
-      (void)_ign_rc;
-    }
+    rc = ui_signal_set(bar->state_signal, state_payload);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;

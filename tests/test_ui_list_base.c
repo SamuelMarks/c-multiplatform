@@ -88,6 +88,32 @@ static int run_normal_tests(void) {
   ui_list_item_base_destroy(item);
   ui_list_base_destroy(list);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_list_base_mock_fail;
+    struct ui_list_base *fail_list = NULL;
+    struct ui_list_item_base *fail_item = NULL;
+
+    rc = ui_list_base_create(&fail_list);
+    if (rc == UI_ERROR_NONE) {
+      g_list_base_mock_fail = 1;
+      rc = ui_list_base_destroy(fail_list);
+      if (rc != UI_ERROR_UNKNOWN)
+        return 1;
+      g_list_base_mock_fail = 0;
+    }
+
+    rc = ui_list_item_base_create(&fail_item);
+    if (rc == UI_ERROR_NONE) {
+      g_list_base_mock_fail = 1;
+      rc = ui_list_item_base_destroy(fail_item);
+      if (rc != UI_ERROR_UNKNOWN)
+        return 1;
+      g_list_base_mock_fail = 0;
+    }
+  }
+#endif
+
   ui_list_item_base_destroy(NULL);
   ui_list_base_destroy(NULL);
 

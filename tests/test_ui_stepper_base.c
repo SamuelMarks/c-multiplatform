@@ -1,399 +1,549 @@
 /* clang-format off */
+#include "greatest.h"
 #include "ui_stepper_base.h"
 #include "ui_error.h"
-#include "../src/ui_internal_mem.h"
+#include "ui_dom_node.h"
+#include "ui_component.h"
+#include "ui_signal.h"
+#include "ui_test_mock_mem.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 /* clang-format on */
 
-#ifdef UI_TEST_MOCK_ALLOC
+struct ui_stepper_step_entry {
+  char *id;
+  struct ui_dom_node *header_node;
+  struct ui_dom_node *content_node;
+  enum ui_stepper_step_state explicit_state;
+};
+
+struct ui_stepper_base {
+  struct ui_component *component;
+  struct ui_dom_node *header_container_node;
+  struct ui_dom_node *content_container_node;
+  struct ui_stepper_step_entry *steps;
+  int step_count;
+  int step_capacity;
+  int active_index;
+  enum ui_stepper_mode mode;
+  ui_stepper_validate_t validate_hook;
+  void *user_data;
+  struct ui_signal *active_index_signal;
+};
+
 extern int g_malloc_fail_countdown;
-#endif
-
-#define ASSERT_SUCCESS(expr)                                                   \
-  do {                                                                         \
-    ui_error_t _err = (expr);                                                  \
-    if (_err != UI_ERROR_NONE) {                                               \
-      printf("Failed at line %d: %d\n", __LINE__, _err);                       \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-
-#define ASSERT_EQ(expr, expected)                                              \
-  do {                                                                         \
-    ui_error_t _err = (expr);                                                  \
-    if (_err != (expected)) {                                                  \
-      printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
-             _err);                                                            \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-
-#define ASSERT_INT_EQ(expr, expected)                                          \
-  do {                                                                         \
-    int val = (expr);                                                          \
-    if (val != (expected)) {                                                   \
-      printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
-             val);                                                             \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-
-static int test_ui_stepper_base_create_destroy(void) {
-  struct ui_stepper_base *stepper = NULL;
-
-  ASSERT_EQ(ui_stepper_base_create(NULL), UI_ERROR_INVALID_ARGUMENT);
-
-  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
-  if (!stepper)
-    return 1;
-
-  {
-    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_stepper_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
-}
-
-static int test_ui_stepper_base_get_component(void) {
-  struct ui_stepper_base *stepper = NULL;
-  struct ui_component *comp = NULL;
-
-  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
-  ASSERT_EQ(ui_stepper_base_get_component(NULL, &comp),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_component(stepper, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_SUCCESS(ui_stepper_base_get_component(stepper, &comp));
-
-  {
-    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
-}
-
-static int test_ui_stepper_base_mode(void) {
-  struct ui_stepper_base *stepper = NULL;
-
-  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
-  ASSERT_EQ(ui_stepper_base_set_mode(NULL, UI_STEPPER_MODE_LINEAR),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_NON_LINEAR));
-  ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_LINEAR));
-
-  {
-    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
-}
+extern int g_stepper_mock_fail;
+extern int g_stepper_mock_append_fail_target;
+extern int g_stepper_mock_set_attr_fail_target;
+extern int g_stepper_mock_remove_attr_fail_target;
 
 static int mock_validator_allow(struct ui_stepper_base *stepper, int step_index,
                                 void *user_data) {
-  (void)stepper;
-  (void)step_index;
-  (void)user_data;
+  int unused_idx = step_index;
+  void *unused_ud = user_data;
+  struct ui_stepper_base *unused_s = stepper;
+  stepper = unused_s;
+  step_index = unused_idx;
+  user_data = unused_ud;
   return 1;
 }
 
-static int mock_validator_deny(struct ui_stepper_base *stepper, int step_index,
-                               void *user_data) {
-  (void)stepper;
-  (void)step_index;
-  (void)user_data;
+static int mock_validator_disallow(struct ui_stepper_base *stepper,
+                                   int step_index, void *user_data) {
+  int unused_idx = step_index;
+  void *unused_ud = user_data;
+  struct ui_stepper_base *unused_s = stepper;
+  stepper = unused_s;
+  step_index = unused_idx;
+  user_data = unused_ud;
   return 0;
 }
 
-static int test_ui_stepper_base_add_and_navigate(void) {
+TEST test_stepper_invalid_args(void) {
   struct ui_stepper_base *stepper = NULL;
-  struct ui_dom_node *h1 = NULL, *c1 = NULL, *h2 = NULL, *c2 = NULL;
-  int index;
+  struct ui_component *comp = NULL;
+  struct ui_dom_node *h = NULL;
+  struct ui_dom_node *c = NULL;
+  int idx = 0;
   enum ui_stepper_step_state state;
+  ui_error_t rc;
 
-  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_stepper_base_create(NULL));
+  ASSERT_EQ(UI_ERROR_NONE, ui_stepper_base_destroy(NULL));
 
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h1));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h2));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c2));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_get_component(NULL, &comp));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_set_mode(NULL, UI_STEPPER_MODE_LINEAR));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_set_validate_hook(NULL, NULL, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_bind_active_index(NULL, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_add_step(NULL, "s1", NULL, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_set_active_index(NULL, 0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_get_active_index(NULL, &idx));
+  ASSERT_EQ(
+      UI_ERROR_INVALID_ARGUMENT,
+      ui_stepper_base_set_step_state(NULL, 0, UI_STEPPER_STEP_STATE_DEFAULT));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_get_step_state(NULL, 0, &state));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_stepper_base_next_step(NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_stepper_base_prev_step(NULL));
 
-  ASSERT_EQ(ui_stepper_base_add_step(NULL, "s1", h1, c1),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_add_step(stepper, NULL, h1, c1),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_add_step(stepper, "s1", NULL, c1),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_add_step(stepper, "s1", h1, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_stepper_base_create(&stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "s1", h1, c1));
-  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "s2", h2, c2));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_get_component(stepper, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_get_active_index(stepper, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_get_step_state(stepper, 0, NULL));
 
-  /* Add 3 more steps to hit capacity expansion branch */
-  for (index = 0; index < 3; index++) {
-    struct ui_dom_node *hn = NULL, *cn = NULL;
-    char buf[16];
-    sprintf(buf, "s%d", index + 3);
-    ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &hn));
-    ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cn));
-    ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, buf, hn, cn));
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_add_step(stepper, NULL, h, c));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_add_step(stepper, "s1", NULL, c));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_stepper_base_add_step(stepper, "s1", h, NULL));
+
+  rc = ui_dom_node_destroy(h);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(c);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_stepper_base_destroy(stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
+TEST test_stepper_lifecycle_and_steps(void) {
+  struct ui_stepper_base *stepper = NULL;
+  struct ui_component *comp = NULL;
+  struct ui_dom_node *h[6];
+  struct ui_dom_node *c[6];
+  enum ui_stepper_step_state state;
+  int idx = -1;
+  ui_error_t rc;
+  int i;
+
+  rc = ui_stepper_base_create(&stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_stepper_base_get_component(stepper, &comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT(comp != NULL);
+
+  rc = ui_stepper_base_bind_active_index(stepper, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_NON_LINEAR);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_LINEAR);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Add 5 steps to trigger capacity reallocation (initially cap 4 -> grows to
+   * 8) */
+  for (i = 0; i < 5; i++) {
+    char sid[16];
+    sprintf(sid, "step%d", i);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h[i]);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c[i]);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_stepper_base_add_step(stepper, sid, h[i], c[i]);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
   }
 
-  ASSERT_EQ(ui_stepper_base_get_active_index(NULL, &index),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_active_index(stepper, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
-  ASSERT_INT_EQ(index, 0);
+  rc = ui_stepper_base_get_active_index(stepper, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, idx);
 
-  ASSERT_EQ(ui_stepper_base_next_step(NULL), UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_prev_step(NULL), UI_ERROR_INVALID_ARGUMENT);
+  /* Active step returns ACTIVE state */
+  rc = ui_stepper_base_get_step_state(stepper, 0, &state);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(UI_STEPPER_STEP_STATE_ACTIVE, state);
 
-  /* Linear progression - validator allows */
-  ASSERT_SUCCESS(
-      ui_stepper_base_set_validate_hook(stepper, mock_validator_allow, NULL));
-  ASSERT_EQ(ui_stepper_base_next_step(NULL), UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_SUCCESS(ui_stepper_base_next_step(stepper));
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
-  ASSERT_INT_EQ(index, 1);
+  /* Other steps return their explicit state (initially DEFAULT) */
+  rc = ui_stepper_base_get_step_state(stepper, 1, &state);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(UI_STEPPER_STEP_STATE_DEFAULT, state);
+
+  /* Bounds checks on get_step_state and set_step_state */
+  ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS,
+            ui_stepper_base_get_step_state(stepper, -1, &state));
+  ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS,
+            ui_stepper_base_get_step_state(stepper, 10, &state));
+  ASSERT_EQ(
+      UI_ERROR_OUT_OF_BOUNDS,
+      ui_stepper_base_set_step_state(stepper, -1, UI_STEPPER_STEP_STATE_ERROR));
+  ASSERT_EQ(
+      UI_ERROR_OUT_OF_BOUNDS,
+      ui_stepper_base_set_step_state(stepper, 10, UI_STEPPER_STEP_STATE_ERROR));
+
+  /* Test setting explicit step states */
+  rc = ui_stepper_base_set_step_state(stepper, 2, UI_STEPPER_STEP_STATE_ERROR);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_get_step_state(stepper, 2, &state);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(UI_STEPPER_STEP_STATE_ERROR, state);
+
+  rc = ui_stepper_base_set_step_state(stepper, 3,
+                                      UI_STEPPER_STEP_STATE_COMPLETED);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_get_step_state(stepper, 3, &state);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(UI_STEPPER_STEP_STATE_COMPLETED, state);
+
+  rc =
+      ui_stepper_base_set_step_state(stepper, 4, UI_STEPPER_STEP_STATE_DEFAULT);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_get_step_state(stepper, 4, &state);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(UI_STEPPER_STEP_STATE_DEFAULT, state);
+
+  /* Test setting unknown step state to hit default branch */
+  rc = ui_stepper_base_set_step_state(stepper, 4,
+                                      (enum ui_stepper_step_state)999);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Test navigation past beginning */
+  ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS, ui_stepper_base_prev_step(stepper));
+
+  /* Linear navigation with validator allowing */
+  rc = ui_stepper_base_set_validate_hook(stepper, mock_validator_allow, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_next_step(stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_get_active_index(stepper, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(1, idx);
+
+  /* Linear navigation with validator disallowing */
+  rc =
+      ui_stepper_base_set_validate_hook(stepper, mock_validator_disallow, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_next_step(stepper);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+
+  /* Remove validator and advance to end */
+  rc = ui_stepper_base_set_validate_hook(stepper, NULL, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_set_active_index(stepper, 4);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Non-linear mode navigation (takes false branch of mode == LINEAR) */
+  rc = ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_NON_LINEAR);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_set_active_index(stepper, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_LINEAR);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_set_active_index(stepper, 4);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Test navigation past end */
+  ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS, ui_stepper_base_next_step(stepper));
 
   /* Prev step */
-  ASSERT_EQ(ui_stepper_base_prev_step(NULL), UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_SUCCESS(ui_stepper_base_prev_step(stepper));
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
-  ASSERT_INT_EQ(index, 0);
+  rc = ui_stepper_base_prev_step(stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_get_active_index(stepper, &idx);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(3, idx);
 
-  /* Jump to index */
-  ASSERT_EQ(ui_stepper_base_set_active_index(NULL, 1),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1));
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
-  ASSERT_INT_EQ(index, 1);
+  /* Set same index is no-op */
+  rc = ui_stepper_base_set_active_index(stepper, 3);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Deny */
-  ASSERT_SUCCESS(
-      ui_stepper_base_set_validate_hook(stepper, mock_validator_deny, NULL));
-  ASSERT_SUCCESS(ui_stepper_base_prev_step(stepper)); /* back to 0 */
-  ASSERT_EQ(ui_stepper_base_next_step(stepper), UI_ERROR_UNKNOWN);
-  ASSERT_SUCCESS(ui_stepper_base_get_active_index(stepper, &index));
-  ASSERT_INT_EQ(index, 0);
+  /* Set out of bounds index */
+  ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS,
+            ui_stepper_base_set_active_index(stepper, -1));
+  ASSERT_EQ(UI_ERROR_OUT_OF_BOUNDS,
+            ui_stepper_base_set_active_index(stepper, 5));
 
-  /* State getting/setting */
-  ASSERT_EQ(ui_stepper_base_get_step_state(NULL, 0, &state),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_step_state(stepper, 0, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_get_step_state(stepper, -1, &state),
-            UI_ERROR_OUT_OF_BOUNDS);
-  ASSERT_EQ(ui_stepper_base_get_step_state(stepper, 999, &state),
-            UI_ERROR_OUT_OF_BOUNDS);
+  rc = ui_stepper_base_destroy(stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Test out of bounds set_step_state */
-  ASSERT_EQ(
-      ui_stepper_base_set_step_state(NULL, 0, UI_STEPPER_STEP_STATE_COMPLETED),
-      UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_stepper_base_set_step_state(stepper, -1,
-                                           UI_STEPPER_STEP_STATE_COMPLETED),
-            UI_ERROR_OUT_OF_BOUNDS);
-  ASSERT_EQ(ui_stepper_base_set_step_state(stepper, 999,
-                                           UI_STEPPER_STEP_STATE_COMPLETED),
-            UI_ERROR_OUT_OF_BOUNDS);
-
-  ASSERT_SUCCESS(ui_stepper_base_set_step_state(
-      stepper, 1, UI_STEPPER_STEP_STATE_COMPLETED));
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
-  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_COMPLETED);
-
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 0, &state));
-  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_ACTIVE);
-
-  ASSERT_SUCCESS(
-      ui_stepper_base_set_step_state(stepper, 1, UI_STEPPER_STEP_STATE_ERROR));
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
-  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_ERROR);
-
-  ASSERT_SUCCESS(ui_stepper_base_set_step_state(
-      stepper, 1, (enum ui_stepper_step_state)999));
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
-  ASSERT_INT_EQ(state, (enum ui_stepper_step_state)999);
-
-  ASSERT_SUCCESS(
-      ui_stepper_base_set_step_state(stepper, 1, UI_STEPPER_STEP_STATE_ACTIVE));
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
-  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_ACTIVE);
-
-  ASSERT_SUCCESS(ui_stepper_base_set_step_state(stepper, 1,
-                                                UI_STEPPER_STEP_STATE_DEFAULT));
-  ASSERT_SUCCESS(ui_stepper_base_get_step_state(stepper, 1, &state));
-  ASSERT_INT_EQ(state, UI_STEPPER_STEP_STATE_DEFAULT);
-
-  {
-    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
+  PASS();
 }
 
-static int test_ui_stepper_base_bindings(void) {
+TEST test_stepper_error_branches(void) {
   struct ui_stepper_base *stepper = NULL;
-
-  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
-  ASSERT_EQ(ui_stepper_base_bind_active_index(NULL, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_SUCCESS(ui_stepper_base_bind_active_index(stepper, NULL));
-
-  ASSERT_EQ(ui_stepper_base_set_validate_hook(NULL, NULL, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-
-  {
-    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
-}
-
-static int test_ui_stepper_base_allocation_failures(void) {
-#ifdef UI_TEST_MOCK_ALLOC
-  struct ui_stepper_base *stepper = NULL;
-  struct ui_dom_node *h1 = NULL, *c1 = NULL;
+  struct ui_dom_node *h = NULL;
+  struct ui_dom_node *c = NULL;
+  ui_error_t rc;
   int i;
-  ui_error_t err;
 
-  /* Fail split button struct alloc */
-  g_malloc_fail_countdown = 0;
-  ASSERT_EQ(ui_stepper_base_create(&stepper), UI_ERROR_OUT_OF_MEMORY);
+  /* 1. Append child failures in create */
+  for (i = 1; i <= 2; i++) {
+    g_stepper_mock_append_fail_target = i;
+    stepper = NULL;
+    rc = ui_stepper_base_create(&stepper);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    ASSERT(stepper == NULL);
+  }
+  g_stepper_mock_append_fail_target = 0;
+
+  /* 2. Component set default style failure in create */
+  g_stepper_mock_fail = 1;
+  stepper = NULL;
+  rc = ui_stepper_base_create(&stepper);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_stepper_mock_fail = 0;
+
+  /* 3. Cleanup failures in create */
+  for (i = 2; i <= 3; i++) {
+    g_stepper_mock_append_fail_target = 1;
+    g_stepper_mock_fail = i;
+    stepper = NULL;
+    rc = ui_stepper_base_create(&stepper);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_stepper_mock_fail = 0;
+    g_stepper_mock_append_fail_target = 0;
+  }
+
+  /* 4. Component destroy failure in destroy */
+  rc = ui_stepper_base_create(&stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_stepper_mock_fail = 3;
+  rc = ui_stepper_base_destroy(stepper);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_stepper_mock_fail = 0;
+
+  /* 5. Destroy with stepper->component == NULL */
+  rc = ui_stepper_base_create(&stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_component_destroy(stepper->component);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  stepper->component = NULL;
+  rc = ui_stepper_base_destroy(stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 6. Append failures in add_step */
+  for (i = 1; i <= 2; i++) {
+    rc = ui_stepper_base_create(&stepper);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    g_stepper_mock_append_fail_target = i;
+    rc = ui_stepper_base_add_step(stepper, "s", h, c);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_stepper_mock_append_fail_target = 0;
+    if (i == 1) {
+      rc = ui_dom_node_destroy(h);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+    }
+    rc = ui_dom_node_destroy(c);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_stepper_base_destroy(stepper);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  /* 7. Set attribute mock failures in add_step */
+  for (i = 1; i <= 6; i++) {
+    rc = ui_stepper_base_create(&stepper);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    g_stepper_mock_set_attr_fail_target = i;
+    rc = ui_stepper_base_add_step(stepper, "s", h, c);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_stepper_mock_set_attr_fail_target = 0;
+    rc = ui_dom_node_destroy(h);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_destroy(c);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_stepper_base_destroy(stepper);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  /* 8. Remove attribute failure in apply_step_state_attributes */
+  rc = ui_stepper_base_create(&stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_stepper_mock_remove_attr_fail_target = 1;
+  rc = ui_stepper_base_add_step(stepper, "s", h, c);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_stepper_mock_remove_attr_fail_target = 0;
+  rc = ui_stepper_base_destroy(stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 9. Attribute failure on ACTIVE step */
+  for (i = 7; i <= 9; i++) {
+    rc = ui_stepper_base_create(&stepper);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    if (i < 9) {
+      g_stepper_mock_set_attr_fail_target = i;
+    } else {
+      g_stepper_mock_remove_attr_fail_target = 2; /* remove hidden attr */
+    }
+    rc = ui_stepper_base_add_step(stepper, "s", h, c);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_stepper_mock_set_attr_fail_target = 0;
+    g_stepper_mock_remove_attr_fail_target = 0;
+    rc = ui_stepper_base_destroy(stepper);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  /* 10. Attribute failures on set_step_state (COMPLETED, ERROR, DEFAULT) */
+  rc = ui_stepper_base_create(&stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_stepper_base_add_step(stepper, "s1", h, c);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  {
+    struct ui_dom_node *h2 = NULL;
+    struct ui_dom_node *c2 = NULL;
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h2);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c2);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_stepper_base_add_step(stepper, "s2", h2, c2);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  for (i = 1; i <= 3; i++) {
+    g_stepper_mock_set_attr_fail_target = i;
+    rc = ui_stepper_base_set_step_state(stepper, 1,
+                                        UI_STEPPER_STEP_STATE_COMPLETED);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_stepper_mock_set_attr_fail_target = 0;
+
+    g_stepper_mock_set_attr_fail_target = i;
+    rc =
+        ui_stepper_base_set_step_state(stepper, 1, UI_STEPPER_STEP_STATE_ERROR);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_stepper_mock_set_attr_fail_target = 0;
+
+    g_stepper_mock_set_attr_fail_target = i;
+    rc = ui_stepper_base_set_step_state(stepper, 1,
+                                        UI_STEPPER_STEP_STATE_DEFAULT);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_stepper_mock_set_attr_fail_target = 0;
+  }
+
+  /* 11. Failure during set_active_index apply step loop */
+  g_stepper_mock_set_attr_fail_target = 1;
+  rc = ui_stepper_base_set_active_index(stepper, 1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_stepper_mock_set_attr_fail_target = 0;
+
+  /* 12. format_id mock failures */
+  for (i = 4; i <= 5; i++) {
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    g_stepper_mock_fail = i;
+    rc = ui_stepper_base_add_step(stepper, "s_fid", h, c);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_stepper_mock_fail = 0;
+    rc = ui_dom_node_destroy(h);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_destroy(c);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  rc = ui_stepper_base_destroy(stepper);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
+TEST test_stepper_oom(void) {
+  struct ui_stepper_base *stepper = NULL;
+  struct ui_dom_node *h = NULL;
+  struct ui_dom_node *c = NULL;
+  ui_error_t rc;
+  int i;
+
+  /* Creation OOM loop */
+  for (i = 0; i < 100; i++) {
+    g_malloc_fail_countdown = i;
+    stepper = NULL;
+    rc = ui_stepper_base_create(&stepper);
+    if (rc == UI_ERROR_NONE) {
+      g_malloc_fail_countdown = -1;
+      rc = ui_stepper_base_destroy(stepper);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+      break;
+    }
+    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    ASSERT(stepper == NULL);
+  }
   g_malloc_fail_countdown = -1;
 
-  for (i = 1; i < 2000; ++i) {
-    g_malloc_fail_countdown = i;
-    err = ui_stepper_base_create(&stepper);
-    g_malloc_fail_countdown = -1;
-    if (err == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
-      break;
-    }
-  }
-
-  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
-
-  for (i = 0; i < 5; ++i) {
-    ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h1));
-    ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1));
+  /* Add step OOM loop */
+  for (i = 0; i < 50; i++) {
+    rc = ui_stepper_base_create(&stepper);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
 
     g_malloc_fail_countdown = i;
-    err = ui_stepper_base_add_step(stepper, "s1", h1, c1);
+    rc = ui_stepper_base_add_step(stepper, "s_oom", h, c);
     g_malloc_fail_countdown = -1;
 
-    if (err == UI_ERROR_NONE) {
+    if (rc == UI_ERROR_NONE) {
+      rc = ui_stepper_base_destroy(stepper);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
       break;
     }
-
-    ASSERT_EQ(err, UI_ERROR_OUT_OF_MEMORY);
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(h1);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    if (!h->parent) {
+      rc = ui_dom_node_destroy(h);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
     }
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(c1);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    if (!c->parent) {
+      rc = ui_dom_node_destroy(c);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
     }
+    rc = ui_stepper_base_destroy(stepper);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
   }
+  g_malloc_fail_countdown = -1;
 
-  {
-    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-#endif
-  return 0;
+  PASS();
 }
 
-static int test_ui_stepper_base_edge_cases(void) {
-  struct ui_stepper_base *stepper = NULL;
-  struct ui_dom_node *h1 = NULL, *c1 = NULL, *h2 = NULL, *c2 = NULL;
-
-  ASSERT_SUCCESS(ui_stepper_base_create(&stepper));
-
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h1));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c1));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &h2));
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &c2));
-
-  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "s1", h1, c1));
-  ASSERT_SUCCESS(ui_stepper_base_add_step(stepper, "s2", h2, c2));
-
-  /* Test out of bounds set_active_index */
-  ASSERT_EQ(ui_stepper_base_set_active_index(stepper, -1),
-            UI_ERROR_OUT_OF_BOUNDS);
-  ASSERT_EQ(ui_stepper_base_set_active_index(stepper, 5),
-            UI_ERROR_OUT_OF_BOUNDS);
-
-  /* Test prevailing past boundaries */
-  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 0));
-  ASSERT_SUCCESS(
-      ui_stepper_base_set_active_index(stepper, 0)); /* Should return NONE */
-  ASSERT_EQ(ui_stepper_base_prev_step(stepper), UI_ERROR_OUT_OF_BOUNDS);
-
-  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1));
-  ASSERT_SUCCESS(
-      ui_stepper_base_set_active_index(stepper, 0)); /* Test going back */
-  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1)); /* Reset to 1 */
-  ASSERT_EQ(ui_stepper_base_next_step(stepper), UI_ERROR_OUT_OF_BOUNDS);
-
-  /* Test non-linear mode */
-  ASSERT_SUCCESS(ui_stepper_base_set_mode(stepper, UI_STEPPER_MODE_NON_LINEAR));
-  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 0));
-  ASSERT_SUCCESS(ui_stepper_base_set_active_index(stepper, 1));
-
-  {
-    ui_error_t rc_cleanup = ui_stepper_base_destroy(stepper);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
+SUITE(ui_stepper_base_suite) {
+  RUN_TEST(test_stepper_invalid_args);
+  RUN_TEST(test_stepper_lifecycle_and_steps);
+  RUN_TEST(test_stepper_error_branches);
+  RUN_TEST(test_stepper_oom);
 }
 
-int main(void) {
-  if (test_ui_stepper_base_create_destroy())
-    return 1;
-  if (test_ui_stepper_base_get_component())
-    return 1;
-  if (test_ui_stepper_base_mode())
-    return 1;
-  if (test_ui_stepper_base_add_and_navigate())
-    return 1;
-  if (test_ui_stepper_base_bindings())
-    return 1;
-  if (test_ui_stepper_base_allocation_failures())
-    return 1;
-  if (test_ui_stepper_base_edge_cases())
-    return 1;
-  return 0;
+GREATEST_MAIN_DEFS();
+
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(ui_stepper_base_suite);
+  GREATEST_MAIN_END();
 }

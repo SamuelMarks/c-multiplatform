@@ -12,10 +12,23 @@ static ui_error_t dummy_on_change(union ui_signal_payload new_value,
   return UI_ERROR_NONE;
 }
 
+static ui_error_t dummy_on_change_err(union ui_signal_payload new_value,
+                                      void *user_data) {
+  if (new_value.float_val < 0.0f && !user_data)
+    return UI_ERROR_UNKNOWN;
+  return UI_ERROR_UNKNOWN;
+}
+
 static ui_error_t dummy_on_touched(void *user_data) {
   int *touched = (int *)user_data;
   *touched = 1;
   return UI_ERROR_NONE;
+}
+
+static ui_error_t dummy_on_touched_err(void *user_data) {
+  if (!user_data)
+    return UI_ERROR_UNKNOWN;
+  return UI_ERROR_UNKNOWN;
 }
 
 static int run_normal_tests(void) {
@@ -70,6 +83,18 @@ static int run_normal_tests(void) {
       return 1;
     if (on_touched_val != 1)
       return 1;
+
+    /* Test error propagation from cva_on_change */
+    cva.register_on_change(rating, dummy_on_change_err, NULL);
+    if (ui_rating_base_set_value(rating, 4.5f) != UI_ERROR_UNKNOWN)
+      return 1;
+    cva.register_on_change(rating, NULL, NULL);
+
+    /* Test error propagation from cva_on_touched */
+    cva.register_on_touched(rating, dummy_on_touched_err, NULL);
+    if (ui_rating_base_set_value(rating, 4.8f) != UI_ERROR_UNKNOWN)
+      return 1;
+    cva.register_on_touched(rating, NULL, NULL);
 
     /* Unregister to trigger the `!rating->cva_on_change` logic during set_value
      */
@@ -220,7 +245,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_rating_base_destroy(rating);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -248,7 +273,7 @@ static int run_normal_tests(void) {
     {
       ui_error_t rc_cleanup = ui_rating_base_destroy(NULL);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
   }
@@ -299,6 +324,42 @@ static int run_oom_tests(void) {
   return 0;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_rating_mock_icon_destroy_fail;
+
+static int run_mock_tests(void) {
+  struct ui_rating_base *rating = NULL;
+  ui_error_t rc;
+
+  rc = ui_rating_base_create(&rating, NULL);
+  if (rc != UI_ERROR_NONE || !rating)
+    return 1;
+
+  g_rating_mock_icon_destroy_fail = 1;
+  rc = ui_rating_base_destroy(rating);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed icon destroy test, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_rating_mock_icon_destroy_fail = 0;
+
+  /* Trigger ui_rating_base_destroy failure inside create cleanup */
+  g_malloc_fail_countdown =
+      2; /* Fails creating empty_icon after creating full_icon */
+  g_rating_mock_icon_destroy_fail =
+      1; /* Causes destroy(full_icon) to fail in cleanup */
+  rc = ui_rating_base_create(&rating, NULL);
+  g_malloc_fail_countdown = -1;
+  g_rating_mock_icon_destroy_fail = 0;
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed create cleanup icon destroy test, rc=%d\n", (int)rc);
+    return 1;
+  }
+
+  return 0;
+}
+#endif
+
 int main(void) {
   if (run_normal_tests() != 0) {
     printf("Normal tests failed.\n");
@@ -309,6 +370,13 @@ int main(void) {
     printf("OOM tests failed.\n");
     return 1;
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (run_mock_tests() != 0) {
+    printf("Mock tests failed.\n");
+    return 1;
+  }
+#endif
 
   printf("All tests passed.\n");
   return 0;

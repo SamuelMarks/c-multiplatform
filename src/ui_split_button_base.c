@@ -9,6 +9,145 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_split_button_mock_destroy_fail = 0;
+int g_split_button_mock_btn_destroy_fail = 0;
+int g_split_button_mock_get_comp_fail = 0;
+int g_split_button_mock_append_fail = 0;
+int g_split_button_mock_node_destroy_fail = 0;
+int g_split_button_mock_parse_css_fail = 0;
+int g_split_button_mock_set_style_fail = 0;
+
+/**
+ * @brief mock_split_button_parse_css.
+ * @param css Parameter css.
+ * @param out_sheet Parameter out_sheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_split_button_parse_css(const char *css,
+                            struct ui_css_stylesheet **out_sheet) {
+  if (g_split_button_mock_parse_css_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_css_parse_stylesheet)(css, out_sheet);
+}
+#undef ui_css_parse_stylesheet
+/** @cond */
+#define ui_css_parse_stylesheet mock_split_button_parse_css
+/** @endcond */
+
+/**
+ * @brief mock_split_button_set_default_style.
+ * @param comp Parameter comp.
+ * @param sheet Parameter sheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_split_button_set_default_style(struct ui_component *comp,
+                                    struct ui_css_stylesheet *sheet) {
+  if (g_split_button_mock_set_style_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_split_button_set_default_style
+/** @endcond */
+
+/**
+ * @brief mock_split_button_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t
+mock_split_button_component_destroy(struct ui_component *comp) {
+  if (g_split_button_mock_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_split_button_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_split_button_btn_destroy.
+ * @param btn Parameter btn.
+ * @return Return value.
+ */
+static ui_error_t mock_split_button_btn_destroy(struct ui_button_base *btn) {
+  if (g_split_button_mock_btn_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_button_base_destroy)(btn);
+}
+#undef ui_button_base_destroy
+/** @cond */
+#define ui_button_base_destroy mock_split_button_btn_destroy
+/** @endcond */
+
+/**
+ * @brief mock_split_button_get_component.
+ * @param btn Parameter btn.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_split_button_get_component(struct ui_button_base *btn,
+                                                  struct ui_component **comp) {
+  if (g_split_button_mock_get_comp_fail > 0) {
+    g_split_button_mock_get_comp_fail--;
+    if (g_split_button_mock_get_comp_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_button_base_get_component)(btn, comp);
+}
+#undef ui_button_base_get_component
+/** @cond */
+#define ui_button_base_get_component mock_split_button_get_component
+/** @endcond */
+
+/**
+ * @brief mock_split_button_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
+static ui_error_t mock_split_button_append_child(struct ui_dom_node *parent,
+                                                 struct ui_dom_node *child) {
+  if (g_split_button_mock_append_fail > 0) {
+    g_split_button_mock_append_fail--;
+    if (g_split_button_mock_append_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_split_button_append_child
+/** @endcond */
+
+/**
+ * @brief mock_split_button_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_split_button_node_destroy(struct ui_dom_node *node) {
+  if (g_split_button_mock_node_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_split_button_node_destroy
+/** @endcond */
+#endif
+
 /*
  * \file ui_split_button_base.c
  * \brief Split button base component implementation.
@@ -50,6 +189,7 @@ ui_error_t
 ui_split_button_base_create(struct ui_split_button_base **out_split_button) {
   struct ui_split_button_base *split_btn;
   ui_error_t rc;
+  struct ui_component *tmp_comp = NULL;
   struct ui_dom_node *root_node = NULL;
   struct ui_css_stylesheet *default_style = NULL;
 
@@ -98,31 +238,22 @@ ui_split_button_base_create(struct ui_split_button_base **out_split_button) {
   }
 
   /* Mount child components to the root node */
-  {
-    struct ui_component *tmp_comp;
-    {
-      ui_error_t _ign_rc =
-          ui_button_base_get_component(split_btn->main_button, &tmp_comp);
-      (void)_ign_rc;
-    }
-    {
-      ui_error_t _ign_rc =
-          ui_dom_node_append_child(root_node, tmp_comp->shadow_root);
-      (void)_ign_rc;
-    }
+  rc = ui_button_base_get_component(split_btn->main_button, &tmp_comp);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
+  rc = ui_dom_node_append_child(root_node, tmp_comp->shadow_root);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
-    {
-
-      ui_error_t _ign_rc =
-          ui_button_base_get_component(split_btn->trigger_button, &tmp_comp);
-
-      (void)_ign_rc;
-    }
-    {
-      ui_error_t _ign_rc =
-          ui_dom_node_append_child(root_node, tmp_comp->shadow_root);
-      (void)_ign_rc;
-    }
+  rc = ui_button_base_get_component(split_btn->trigger_button, &tmp_comp);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
+  rc = ui_dom_node_append_child(root_node, tmp_comp->shadow_root);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   rc =
@@ -131,12 +262,10 @@ ui_split_button_base_create(struct ui_split_button_base **out_split_button) {
     goto cleanup;
   }
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(split_btn->component, default_style);
-
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(split_btn->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   split_btn->component->shadow_root = root_node;
@@ -147,42 +276,26 @@ ui_split_button_base_create(struct ui_split_button_base **out_split_button) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
+    tmp_comp = NULL;
+    ui_button_base_get_component(split_btn->trigger_button, &tmp_comp);
+    if (tmp_comp->shadow_root->parent == root_node) {
+      ui_dom_node_remove_child(root_node, tmp_comp->shadow_root);
     }
+    tmp_comp = NULL;
+    ui_button_base_get_component(split_btn->main_button, &tmp_comp);
+    if (tmp_comp->shadow_root->parent == root_node) {
+      ui_dom_node_remove_child(root_node, tmp_comp->shadow_root);
+    }
+    ui_dom_node_destroy(root_node);
   }
   if (split_btn->trigger_button) {
-    struct ui_component *tmp_comp;
-    {
-      ui_error_t _ign_rc =
-          ui_button_base_get_component(split_btn->trigger_button, &tmp_comp);
-      (void)_ign_rc;
-    }
-    tmp_comp->shadow_root = NULL;
-    {
-      ui_error_t rc_cleanup = ui_button_base_destroy(split_btn->trigger_button);
-      (void)rc_cleanup;
-    }
+    ui_button_base_destroy(split_btn->trigger_button);
   }
   if (split_btn->main_button) {
-    struct ui_component *tmp_comp;
-    {
-      ui_error_t _ign_rc =
-          ui_button_base_get_component(split_btn->main_button, &tmp_comp);
-      (void)_ign_rc;
-    }
-    tmp_comp->shadow_root = NULL;
-    {
-      ui_error_t rc_cleanup = ui_button_base_destroy(split_btn->main_button);
-      (void)rc_cleanup;
-    }
+    ui_button_base_destroy(split_btn->main_button);
   }
   if (split_btn->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(split_btn->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(split_btn->component);
   }
   C_MULTIPLATFORM_FREE(split_btn);
   return rc;
@@ -196,43 +309,49 @@ cleanup:
 ui_error_t
 ui_split_button_base_destroy(struct ui_split_button_base *split_button) {
   struct ui_component *tmp_comp;
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
 
   if (!split_button) {
     return UI_ERROR_NONE;
   }
 
-  /* Unlink from parent to prevent double free */
-  {
-    ui_error_t _ign_rc =
-        ui_button_base_get_component(split_button->trigger_button, &tmp_comp);
-    (void)_ign_rc;
-  }
-  tmp_comp->shadow_root = NULL;
-  {
-    ui_error_t rc_cleanup =
-        ui_button_base_destroy(split_button->trigger_button);
-    (void)rc_cleanup;
-  }
-
-  /* Unlink from parent to prevent double free */
-  {
-    ui_error_t _ign_rc =
-        ui_button_base_get_component(split_button->main_button, &tmp_comp);
-    (void)_ign_rc;
-  }
-  tmp_comp->shadow_root = NULL;
-  {
-    ui_error_t rc_cleanup = ui_button_base_destroy(split_button->main_button);
-    (void)rc_cleanup;
+  if (split_button->trigger_button) {
+    tmp_comp = NULL;
+    ui_button_base_get_component(split_button->trigger_button, &tmp_comp);
+    if (split_button->component && tmp_comp) {
+      ui_dom_node_remove_child(split_button->component->shadow_root,
+                               tmp_comp->shadow_root);
+    }
+    rc_cleanup = ui_button_base_destroy(split_button->trigger_button);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
 
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(split_button->component);
-    (void)rc_cleanup;
+  if (split_button->main_button) {
+    tmp_comp = NULL;
+    ui_button_base_get_component(split_button->main_button, &tmp_comp);
+    if (split_button->component && tmp_comp) {
+      ui_dom_node_remove_child(split_button->component->shadow_root,
+                               tmp_comp->shadow_root);
+    }
+    rc_cleanup = ui_button_base_destroy(split_button->main_button);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
+  }
+
+  if (split_button->component) {
+    split_button->component->shadow_root = NULL;
+    rc_cleanup = ui_component_destroy(split_button->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
 
   C_MULTIPLATFORM_FREE(split_button);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -244,24 +363,17 @@ ui_split_button_base_destroy(struct ui_split_button_base *split_button) {
 ui_error_t
 ui_split_button_base_set_disabled(struct ui_split_button_base *split_button,
                                   int disabled) {
+  ui_error_t rc;
+
   if (!split_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_button_base_set_disabled(split_button->main_button, disabled);
-
-    (void)_ign_rc;
+  rc = ui_button_base_set_disabled(split_button->main_button, disabled);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
-  {
-    ui_error_t _ign_rc =
-        ui_button_base_set_disabled(split_button->trigger_button, disabled);
-    (void)_ign_rc;
-  }
-
-  return UI_ERROR_NONE;
+  return ui_button_base_set_disabled(split_button->trigger_button, disabled);
 }
 
 /**

@@ -1,367 +1,552 @@
 /* clang-format off */
+#include "greatest.h"
 #include "ui_toast_manager_base.h"
 #include "ui_error.h"
 #include "ui_component.h"
+#include "ui_dom_node.h"
 #include "ui_overlay_director.h"
-#include "../src/ui_internal_mem.h"
+#include "ui_test_mock_mem.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 /* clang-format on */
 
-#ifdef UI_TEST_MOCK_ALLOC
+struct ui_toast_entry {
+  ui_toast_id id;
+  struct ui_toast_config config;
+  enum ui_toast_anim_state anim_state;
+  double show_time;
+  double total_paused_time;
+  double pause_start_time;
+  int is_paused;
+  char *message;
+  struct ui_component *overlay_component;
+  struct ui_overlay *active_overlay;
+};
+
+struct ui_toast_region_stack {
+  struct ui_toast_entry **toasts;
+  size_t count;
+  size_t capacity;
+};
+
+struct ui_toast_manager_base {
+  struct ui_toast_region_stack regions[UI_TOAST_REGION_COUNT];
+  ui_toast_id next_id;
+  int is_hovered;
+};
+
 extern int g_malloc_fail_countdown;
-#endif
+extern int g_toast_mock_fail;
+extern int g_toast_mock_set_attr_fail_target;
+extern int g_toast_mock_destroy_target;
+extern int g_toast_destroy_counter;
 
-#define ASSERT_SUCCESS(expr)                                                   \
-  do {                                                                         \
-    ui_error_t _err = (expr);                                                  \
-    if (_err != UI_ERROR_NONE) {                                               \
-      printf("Failed at line %d: %d\n", __LINE__, _err);                       \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-
-#define ASSERT_EQ(expr, expected)                                              \
-  do {                                                                         \
-    ui_error_t _err = (expr);                                                  \
-    if (_err != (expected)) {                                                  \
-      printf("Failed at line %d: expected %d, got %d\n", __LINE__, (expected), \
-             _err);                                                            \
-      return 1;                                                                \
-    }                                                                          \
-  } while (0)
-
-static int test_ui_toast_manager_base_create_destroy(void) {
-  struct ui_toast_manager_base *manager = NULL;
-
-  ASSERT_EQ(ui_toast_manager_base_create(NULL), UI_ERROR_INVALID_ARGUMENT);
-
-  ASSERT_SUCCESS(ui_toast_manager_base_create(&manager));
-  if (!manager)
-    return 1;
-
-  {
-    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
-}
-
-static int test_ui_toast_manager_base_show_dismiss(void) {
-  struct ui_toast_manager_base *manager = NULL;
-  struct ui_toast_config config;
-  ui_toast_id id1, id2;
-
-  ASSERT_SUCCESS(ui_toast_manager_base_create(&manager));
-
-  config.region = UI_TOAST_REGION_TOP_RIGHT;
-  config.duration_secs = 5.0;
-  config.message = "Test message";
-  config.is_error = 0;
-
-  ASSERT_EQ(ui_toast_manager_base_show(NULL, &config, 0.0, &id1),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_toast_manager_base_show(manager, NULL, 0.0, &id1),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_toast_manager_base_show(manager, &config, 0.0, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
-
-  config.region = UI_TOAST_REGION_COUNT;
-  ASSERT_EQ(ui_toast_manager_base_show(manager, &config, 0.0, &id1),
-            UI_ERROR_INVALID_ARGUMENT);
-
-  config.region = UI_TOAST_REGION_TOP_RIGHT;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id2));
-
-  ASSERT_EQ(ui_toast_manager_base_dismiss(NULL, id1),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_toast_manager_base_dismiss(manager, 999), UI_ERROR_NOT_FOUND);
-  ASSERT_SUCCESS(ui_toast_manager_base_dismiss(manager, id1));
-  ASSERT_SUCCESS(ui_toast_manager_base_dismiss(
-      manager, id1)); /* Dismissing again is valid if it's animating */
-
-  {
-    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
-}
-
-static int test_ui_toast_manager_base_tick(void) {
-  struct ui_toast_manager_base *manager = NULL;
-  struct ui_toast_config config;
-  ui_toast_id id1, id2, id3;
-
-  ASSERT_SUCCESS(ui_toast_manager_base_create(&manager));
-
-  config.region = UI_TOAST_REGION_BOTTOM_LEFT;
-  config.duration_secs = 2.0;
-  config.message = "Toast 1";
-  config.is_error = 0;
-
-  ASSERT_EQ(ui_toast_manager_base_tick(NULL, 0.0), UI_ERROR_INVALID_ARGUMENT);
-
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-
-  config.duration_secs = 0.0; /* infinite */
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id2));
-
-  /* Wait to cover SLIDE_IN animation progression exactly at boundary */
-  ASSERT_SUCCESS(ui_toast_manager_base_tick(manager, 0.29));
-  ASSERT_SUCCESS(
-      ui_toast_manager_base_tick(manager, 0.31)); /* Becomes visible */
-
-  /* Trigger auto dismiss directly after visible */
-  ASSERT_SUCCESS(
-      ui_toast_manager_base_tick(manager, 0.31 + 2.0)); /* Triggers SLIDE_OUT */
-  ASSERT_SUCCESS(
-      ui_toast_manager_base_tick(manager, 3.0)); /* Cleans up slide out */
-
-  /* Dismiss infinite toast manually */
-  ASSERT_SUCCESS(ui_toast_manager_base_dismiss(manager, id2));
-  ASSERT_SUCCESS(
-      ui_toast_manager_base_tick(manager, 3.5)); /* Slide out starts */
-  ASSERT_SUCCESS(ui_toast_manager_base_tick(manager, 4.0)); /* Removed */
-
-  {
-    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
-}
-
-static int test_ui_toast_manager_base_events(void) {
-  struct ui_toast_manager_base *manager = NULL;
-  struct ui_toast_config config;
-  ui_toast_id id1;
-  struct ui_event ev;
-
-  ASSERT_SUCCESS(ui_toast_manager_base_create(&manager));
-
-  config.region = UI_TOAST_REGION_TOP_CENTER;
-  config.duration_secs = 1.0;
-  config.message = "Hover test";
-  config.is_error = 0;
-
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-
-  /* Second show to hit capacity branch once initialized */
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-
-  ASSERT_EQ(ui_toast_manager_base_handle_event(NULL, &ev, 0.0),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_toast_manager_base_handle_event(manager, NULL, 0.0),
-            UI_ERROR_INVALID_ARGUMENT);
-
-  /* Hover starts */
-  ev.type = UI_EVENT_MOUSE_MOVE;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 0.5));
-  /* Duplicate hover to hit false branch of !manager->is_hovered */
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 0.6));
-
-  /* Hover starts when already paused by newly added toast during hover state */
-  config.region = UI_TOAST_REGION_TOP_CENTER;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.5, &id1));
-
-  /* Force hover state logic again on same toast */
-  ev.type = UI_EVENT_MOUSE_UP;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.5));
-  /* Duplicate unhover to hit false branch of manager->is_hovered */
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.6));
-
-  ev.type = UI_EVENT_TOUCH_START;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.6));
-
-  /* Add new toast while hovered */
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 2.6, &id1));
-
-  ASSERT_SUCCESS(ui_toast_manager_base_tick(
-      manager, 2.0)); /* Shouldn't dismiss because paused */
-
-  /* Hover ends */
-  ev.type = UI_EVENT_MOUSE_UP;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.5));
-  /* Duplicate unhover */
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.6));
-
-  /* Test touch end/cancel */
-  ev.type = UI_EVENT_TOUCH_START;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.7));
-  ev.type = UI_EVENT_TOUCH_END;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.8));
-
-  ev.type = UI_EVENT_TOUCH_START;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.9));
-  ev.type = UI_EVENT_TOUCH_CANCEL;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 3.0));
-
-  /* Unknown event */
-  ev.type = UI_EVENT_WINDOW_RESIZE;
-  ASSERT_SUCCESS(ui_toast_manager_base_handle_event(manager, &ev, 2.6));
-
-  ASSERT_SUCCESS(
-      ui_toast_manager_base_tick(manager, 4.0)); /* Now they dismiss */
-  ASSERT_SUCCESS(ui_toast_manager_base_tick(manager, 4.5)); /* Cleaned up */
-
-  {
-    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
-}
-
-static int test_ui_toast_manager_base_render(void) {
-  struct ui_toast_manager_base *manager = NULL;
+TEST test_toast_invalid_args(void) {
+  struct ui_toast_manager_base *mgr = NULL;
+  struct ui_toast_config cfg;
   struct ui_overlay_director *director = NULL;
-  struct ui_toast_config config;
-  ui_toast_id id1;
+  struct ui_dom_node *root = NULL;
+  struct ui_event ev;
+  ui_toast_id tid;
+  ui_error_t rc;
 
-  struct ui_dom_node *root_node = NULL;
+  memset(&cfg, 0, sizeof(cfg));
+  cfg.region = UI_TOAST_REGION_TOP_RIGHT;
 
-  ASSERT_SUCCESS(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node));
-  ASSERT_SUCCESS(ui_overlay_director_create(root_node, &director));
-  ASSERT_SUCCESS(ui_toast_manager_base_create(&manager));
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_overlay_director_create(root, &director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ASSERT_EQ(ui_toast_manager_base_render(NULL, director),
-            UI_ERROR_INVALID_ARGUMENT);
-  ASSERT_EQ(ui_toast_manager_base_render(manager, NULL),
-            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toast_manager_base_create(NULL));
+  ASSERT_EQ(UI_ERROR_NONE, ui_toast_manager_base_destroy(NULL));
 
-  /* Empty render */
-  ASSERT_SUCCESS(ui_toast_manager_base_render(manager, director));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toast_manager_base_show(NULL, &cfg, 0.0, &tid));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toast_manager_base_dismiss(NULL, 1));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toast_manager_base_tick(NULL, 0.0));
+  memset(&ev, 0, sizeof(ev));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toast_manager_base_handle_event(NULL, &ev, 0.0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toast_manager_base_render(NULL, director));
 
-  config.region = UI_TOAST_REGION_BOTTOM_RIGHT;
-  config.duration_secs = 2.0;
-  config.message = "Render me";
-  config.is_error = 1;
+  rc = ui_toast_manager_base_create(&mgr);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  ASSERT_SUCCESS(ui_toast_manager_base_render(manager, director));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toast_manager_base_show(mgr, NULL, 0.0, &tid));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toast_manager_base_show(mgr, &cfg, 0.0, NULL));
 
-  /* Render again to trigger the active_overlay unmount/remount logic */
-  ASSERT_SUCCESS(ui_toast_manager_base_render(manager, director));
+  cfg.region = UI_TOAST_REGION_COUNT;
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid));
+  cfg.region = UI_TOAST_REGION_TOP_RIGHT;
 
-  /* Test all regions */
-  config.region = (enum ui_toast_region)999; /* Tests default case which is
-                                                TOP_LEFT logic now */
-  ASSERT_EQ(ui_toast_manager_base_show(manager, &config, 0.0, &id1),
-            UI_ERROR_INVALID_ARGUMENT);
+  ASSERT_EQ(UI_ERROR_NOT_FOUND, ui_toast_manager_base_dismiss(mgr, 9999));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toast_manager_base_handle_event(mgr, NULL, 0.0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toast_manager_base_render(mgr, NULL));
 
-  config.region = UI_TOAST_REGION_TOP_LEFT;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  config.region = UI_TOAST_REGION_TOP_CENTER;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  config.region = UI_TOAST_REGION_TOP_RIGHT;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  config.region = UI_TOAST_REGION_BOTTOM_LEFT;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  config.region = UI_TOAST_REGION_BOTTOM_CENTER;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  config.region = UI_TOAST_REGION_BOTTOM_RIGHT;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
+  rc = ui_toast_manager_base_destroy(mgr);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_overlay_director_destroy(director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ASSERT_SUCCESS(ui_toast_manager_base_render(manager, director));
-
-#ifdef UI_TEST_MOCK_ALLOC
-  {
-    int k;
-    for (k = 0; k < 16; k++) {
-      g_malloc_fail_countdown = k;
-      (void)ui_toast_manager_base_render(manager, director);
-      g_malloc_fail_countdown = -1;
-    }
-  }
-#endif
-
-  /* Test NULL message in show */
-  config.message = NULL;
-  config.region = UI_TOAST_REGION_TOP_LEFT;
-  ASSERT_SUCCESS(ui_toast_manager_base_show(manager, &config, 0.0, &id1));
-  ASSERT_SUCCESS(ui_toast_manager_base_render(manager, director));
-
-  {
-    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  return 0;
+  PASS();
 }
 
-static int test_ui_toast_manager_base_allocation_failures(void) {
-#ifdef UI_TEST_MOCK_ALLOC
-  struct ui_toast_manager_base *manager = NULL;
-  struct ui_toast_config config;
-  ui_toast_id id1;
+TEST test_toast_lifecycle_and_rendering(void) {
+  struct ui_toast_manager_base *mgr = NULL;
+  struct ui_toast_config cfg;
+  struct ui_overlay_director *director = NULL;
+  struct ui_dom_node *root = NULL;
+  struct ui_event ev;
+  ui_toast_id ids[10];
+  ui_error_t rc;
   int i;
-  ui_error_t err;
 
-  g_malloc_fail_countdown = 0;
-  ASSERT_EQ(ui_toast_manager_base_create(&manager), UI_ERROR_OUT_OF_MEMORY);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_overlay_director_create(root, &director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_toast_manager_base_create(&mgr);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Render when no toasts exist -> returns NONE */
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Show a toast in every region to cover region styling branches */
+  for (i = 0; i < UI_TOAST_REGION_COUNT; i++) {
+    memset(&cfg, 0, sizeof(cfg));
+    cfg.region = (enum ui_toast_region)i;
+    cfg.duration_secs = 2.0;
+    cfg.message = "Region msg";
+    cfg.is_error = (i % 2 == 0);
+    rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &ids[i]);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  /* Show toast without message */
+  memset(&cfg, 0, sizeof(cfg));
+  cfg.region = UI_TOAST_REGION_TOP_LEFT;
+  cfg.duration_secs = 0.0; /* Persistent */
+  cfg.message = NULL;
+  rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &ids[6]);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Add multiple toasts in same region to trigger capacity reallocation (4 ->
+   * 8) */
+  for (i = 7; i < 10; i++) {
+    memset(&cfg, 0, sizeof(cfg));
+    cfg.region = UI_TOAST_REGION_BOTTOM_LEFT;
+    cfg.duration_secs = 1.0;
+    cfg.message = "Multi msg";
+    rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &ids[i]);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  /* Render toasts */
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Render again: unmounts existing active_overlay on line 433 and rebuilds */
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Tick before 0.3s while in SLIDE_IN (covers line 390 false branch) */
+  rc = ui_toast_manager_base_tick(mgr, 0.1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Dismiss the 2nd toast in a multi-toast region (covers line 355 false
+   * branch) */
+  rc = ui_toast_manager_base_dismiss(mgr, ids[8]);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Event handling: hover flow */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN; /* Unhandled type */
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 0.1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 0.1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  /* Sending MOUSE_MOVE again while already hovered (no-op) */
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 0.2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Tick while paused: active time doesn't progress toward expiration */
+  rc = ui_toast_manager_base_tick(mgr, 1.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Unpause with TOUCH_END */
+  ev.type = UI_EVENT_TOUCH_END;
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 1.5);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  /* Sending TOUCH_END again while already unpaused (no-op) */
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 1.6);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Pause with TOUCH_START and unpause with TOUCH_CANCEL */
+  ev.type = UI_EVENT_TOUCH_START;
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 1.7);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ev.type = UI_EVENT_TOUCH_CANCEL;
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 1.8);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Pause and unpause with MOUSE_UP */
+  ev.type = UI_EVENT_MOUSE_MOVE;
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 1.9);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ev.type = UI_EVENT_MOUSE_UP;
+  rc = ui_toast_manager_base_handle_event(mgr, &ev, 2.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Explicit dismiss of id 0 */
+  rc = ui_toast_manager_base_dismiss(mgr, ids[0]);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  /* Dismissing again while in SLIDE_OUT state returns NONE */
+  rc = ui_toast_manager_base_dismiss(mgr, ids[0]);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Tick past auto dismiss for duration 1.0 and 2.0 toasts */
+  rc = ui_toast_manager_base_tick(mgr, 10.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Persistent toast (id 6) remains; dismiss it explicitly */
+  rc = ui_toast_manager_base_dismiss(mgr, ids[6]);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toast_manager_base_tick(mgr, 11.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_toast_manager_base_destroy(mgr);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_overlay_director_destroy(director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
+TEST test_toast_error_branches(void) {
+  struct ui_toast_manager_base *mgr = NULL;
+  struct ui_toast_config cfg;
+  struct ui_overlay_director *director = NULL;
+  struct ui_dom_node *root = NULL;
+  ui_toast_id tid;
+  ui_error_t rc;
+  int i;
+
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_overlay_director_create(root, &director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  memset(&cfg, 0, sizeof(cfg));
+  cfg.region = UI_TOAST_REGION_TOP_LEFT;
+  cfg.duration_secs = 2.0;
+  cfg.message = "Err msg";
+
+  rc = ui_toast_manager_base_create(&mgr);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Show while manager is hovered (covers line 295-296) */
+  mgr->is_hovered = 1;
+  rc = ui_toast_manager_base_show(mgr, &cfg, 1.0, &tid);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  mgr->is_hovered = 0;
+
+  /* Render once so active_overlay is set */
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* 1. Mock unmount failure in render (line 433) */
+  g_toast_mock_fail = 3;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+
+  /* 2. Mock get_region_style failure in render (line 463 and 594) */
+  g_toast_mock_fail = 4;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+
+  /* get_region_style failure with dom_node_destroy failure (line 619) */
+  g_toast_mock_fail = 4;
+  g_toast_mock_destroy_target = 1;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+  g_toast_mock_destroy_target = 0;
+
+  /* 3. Mock set_attribute failures in render (calls 1, 2, 3) without and with
+   * destroy mock */
+  for (i = 1; i <= 3; i++) {
+    g_toast_mock_set_attr_fail_target = i;
+    rc = ui_toast_manager_base_render(mgr, director);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_toast_mock_set_attr_fail_target = 0;
+
+    g_toast_mock_set_attr_fail_target = i;
+    g_toast_mock_fail = 2; /* dom_node_destroy also fails */
+    rc = ui_toast_manager_base_render(mgr, director);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_toast_mock_set_attr_fail_target = 0;
+    g_toast_mock_fail = 0;
+  }
+
+  /* 4. Mock text_node create failure in render (line 628) without and with
+   * destroy mock (line 630) */
+  g_toast_mock_fail = 8;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+
+  g_toast_mock_fail = 8;
+  g_toast_mock_destroy_target = 1;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+  g_toast_mock_destroy_target = 0;
+
+  /* 5. Mock append_child failure in render (lines 644-652) with targets 1 and 2
+   */
+  g_toast_mock_fail = 5;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+
+  g_toast_mock_fail = 5;
+  g_toast_mock_destroy_target = 1;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+  g_toast_mock_destroy_target = 0;
+
+  g_toast_mock_fail = 5;
+  g_toast_mock_destroy_target = 2;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+  g_toast_mock_destroy_target = 0;
+
+  /* 6. Mock mount_component failure in render */
+  g_toast_mock_fail = 6;
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+
+  /* Successful render to set shadow_root, then destroy shadow_root mock failure
+   */
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_toast_mock_fail = 2; /* shadow_root destroy fails */
+  rc = ui_toast_manager_base_render(mgr, director);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toast_mock_fail = 0;
+
+  /* 7. Render strdup OOM (lines 635-641) */
+  for (i = 0; i < 20; i++) {
+    g_malloc_fail_countdown = i;
+    ui_toast_manager_base_render(mgr, director);
+    g_malloc_fail_countdown = -1;
+
+    g_malloc_fail_countdown = i;
+    g_toast_mock_destroy_target = 1;
+    ui_toast_manager_base_render(mgr, director);
+    g_malloc_fail_countdown = -1;
+    g_toast_mock_destroy_target = 0;
+
+    g_malloc_fail_countdown = i;
+    g_toast_mock_destroy_target = 2;
+    ui_toast_manager_base_render(mgr, director);
+    g_malloc_fail_countdown = -1;
+    g_toast_mock_destroy_target = 0;
+  }
+
+  /* 6. Mock free_toast_entry failure (lines 179, 189, 203) */
+  g_toast_mock_fail = 10;
+  g_malloc_fail_countdown = 1; /* Causes strdup to fail in show */
+  rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_malloc_fail_countdown = -1;
+  g_toast_mock_fail = 0;
+
+  /* Component create failure in show (message = NULL, countdown = 1) */
+  cfg.message = NULL;
+  g_malloc_fail_countdown = 1;
+  rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   g_malloc_fail_countdown = -1;
 
-  ASSERT_SUCCESS(ui_toast_manager_base_create(&manager));
+  g_toast_mock_fail = 10;
+  g_malloc_fail_countdown = 1;
+  rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_malloc_fail_countdown = -1;
+  g_toast_mock_fail = 0;
+  cfg.message = "Err msg";
 
-  config.region = UI_TOAST_REGION_BOTTOM_RIGHT;
-  config.duration_secs = 2.0;
-  config.message = "Failing message";
-  config.is_error = 0;
-
-  for (i = 0; i < 5; ++i) {
-    g_malloc_fail_countdown = i;
-    err = ui_toast_manager_base_show(manager, &config, 0.0, &id1);
-    g_malloc_fail_countdown = -1;
-    if (err == UI_ERROR_NONE) {
-      break;
-    }
-    ASSERT_EQ(err, UI_ERROR_OUT_OF_MEMORY);
+  /* Realloc failure in show with and without free_toast_entry mock */
+  cfg.region = UI_TOAST_REGION_TOP_CENTER;
+  for (i = 0; i < 4; i++) {
+    rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
   }
+  /* Now capacity 4 is full. Next show triggers realloc (allocation 3) */
+  g_malloc_fail_countdown = 3;
+  rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+  g_malloc_fail_countdown = -1;
 
+  g_toast_mock_fail = 10;
+  g_malloc_fail_countdown = 3;
+  rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_malloc_fail_countdown = -1;
+  g_toast_mock_fail = 0;
+  cfg.region = UI_TOAST_REGION_TOP_LEFT;
+
+  /* 7. Free NULL entry during destroy (line 226) */
+  mgr->regions[UI_TOAST_REGION_TOP_LEFT].toasts[0] = NULL;
+
+  /* 8. Mock component_destroy failure during manager destroy (line 31) */
+  g_toast_mock_fail = 1;
+  rc = ui_toast_manager_base_destroy(mgr);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_toast_mock_fail = 0;
+
+  /* 9. Render strdup OOM with destroy targets 1 and 2 (lines 662, 665) */
   {
-    ui_error_t rc_cleanup = ui_toast_manager_base_destroy(manager);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    struct ui_toast_manager_base *m_fresh = NULL;
+    rc = ui_toast_manager_base_create(&m_fresh);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_toast_manager_base_show(m_fresh, &cfg, 0.0, &tid);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+
+    g_toast_destroy_counter = 0;
+    g_toast_mock_destroy_target = 1;
+    g_malloc_fail_countdown = 11;
+    rc = ui_toast_manager_base_render(m_fresh, director);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_malloc_fail_countdown = -1;
+    g_toast_mock_destroy_target = 0;
+    g_toast_destroy_counter = 0;
+
+    g_toast_mock_destroy_target = 2;
+    g_malloc_fail_countdown = 11;
+    rc = ui_toast_manager_base_render(m_fresh, director);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_malloc_fail_countdown = -1;
+    g_toast_mock_destroy_target = 0;
+    g_toast_destroy_counter = 0;
+
+    rc = ui_toast_manager_base_destroy(m_fresh);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
   }
-#endif
-  return 0;
+
+  rc = ui_overlay_director_destroy(director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
 }
 
-int main(void) {
-  if (test_ui_toast_manager_base_create_destroy())
-    return 1;
-  if (test_ui_toast_manager_base_show_dismiss())
-    return 1;
-  if (test_ui_toast_manager_base_tick())
-    return 1;
-  if (test_ui_toast_manager_base_events())
-    return 1;
-  if (test_ui_toast_manager_base_render())
-    return 1;
-  if (test_ui_toast_manager_base_allocation_failures())
-    return 1;
-  return 0;
+TEST test_toast_oom(void) {
+  struct ui_toast_manager_base *mgr = NULL;
+  struct ui_toast_config cfg;
+  struct ui_overlay_director *director = NULL;
+  struct ui_dom_node *root = NULL;
+  ui_toast_id tid;
+  ui_error_t rc;
+  int i;
+
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_overlay_director_create(root, &director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  memset(&cfg, 0, sizeof(cfg));
+  cfg.region = UI_TOAST_REGION_TOP_RIGHT;
+  cfg.duration_secs = 2.0;
+  cfg.message = "OOM test message";
+
+  /* Creation OOM loop */
+  for (i = 0; i < 5; i++) {
+    g_malloc_fail_countdown = i;
+    mgr = NULL;
+    rc = ui_toast_manager_base_create(&mgr);
+    if (rc == UI_ERROR_NONE) {
+      g_malloc_fail_countdown = -1;
+      rc = ui_toast_manager_base_destroy(mgr);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+      break;
+    }
+    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    ASSERT(mgr == NULL);
+  }
+  g_malloc_fail_countdown = -1;
+
+  /* Show OOM loop */
+  rc = ui_toast_manager_base_create(&mgr);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  for (i = 0; i < 10; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_toast_manager_base_show(mgr, &cfg, 0.0, &tid);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE) {
+      break;
+    }
+    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+  }
+  g_malloc_fail_countdown = -1;
+
+  /* Render OOM loop */
+  for (i = 0; i < 20; i++) {
+    g_malloc_fail_countdown = i;
+    rc = ui_toast_manager_base_render(mgr, director);
+    g_malloc_fail_countdown = -1;
+    if (rc == UI_ERROR_NONE) {
+      break;
+    }
+  }
+  g_malloc_fail_countdown = -1;
+
+  rc = ui_toast_manager_base_destroy(mgr);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_overlay_director_destroy(director);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_dom_node_destroy(root);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
+SUITE(ui_toast_manager_base_suite) {
+  RUN_TEST(test_toast_invalid_args);
+  RUN_TEST(test_toast_lifecycle_and_rendering);
+  RUN_TEST(test_toast_error_branches);
+  RUN_TEST(test_toast_oom);
+}
+
+GREATEST_MAIN_DEFS();
+
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(ui_toast_manager_base_suite);
+  GREATEST_MAIN_END();
 }

@@ -170,13 +170,16 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
   float ascent = 0.0f, descent = 0.0f, line_gap = 0.0f;
   ui_error_t rc;
 
-  (void)direction; /* BiDi stub: currently only processes left-to-right */
-
   if (!layout || !font || !text) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  layout->count = 0; /* Reset state */
+  if (direction != UI_TEXT_DIRECTION_LTR &&
+      direction != UI_TEXT_DIRECTION_RTL) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  layout->count = 0;
 
   rc = ui_font_get_vmetrics(font, font_size, &ascent, &descent, &line_gap);
   if (rc != UI_ERROR_NONE) {
@@ -189,7 +192,7 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     int codepoint = 0;
     struct ui_glyph_metrics metrics;
     float kerning = 0.0f;
-    (void)decode_utf8(&text, &codepoint);
+    rc = decode_utf8(&text, &codepoint);
 
     if (codepoint == '\n') {
       x = 0.0f;
@@ -204,8 +207,11 @@ ui_error_t ui_text_layout_shape(struct ui_text_layout *layout,
     }
 
     if (prev_codepoint != 0) {
-      (void)ui_font_get_kerning(font, prev_codepoint, codepoint, font_size,
-                                &kerning);
+      rc = ui_font_get_kerning(font, prev_codepoint, codepoint, font_size,
+                               &kerning);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
     }
 
     x += kerning;

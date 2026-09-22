@@ -17,6 +17,185 @@
 #include <math.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_range_slider_mock_set_attribute_fail = 0;
+int g_range_slider_mock_remove_attribute_fail = 0;
+int g_range_slider_mock_append_child_fail = 0;
+int g_range_slider_mock_parse_css_fail = 0;
+int g_range_slider_mock_set_style_fail = 0;
+int g_range_slider_mock_gesture_destroy_fail = 0;
+int g_range_slider_mock_comp_destroy_fail = 0;
+int g_range_slider_mock_bidi_fail = 0;
+
+/**
+ * @brief mock_range_slider_set_attribute.
+ * @param node Node pointer.
+ * @param name Attribute name.
+ * @param value Attribute value.
+ * @return Return value.
+ */
+static ui_error_t mock_range_slider_set_attribute(struct ui_dom_node *node,
+                                                  const char *name,
+                                                  const char *value) {
+  if (g_range_slider_mock_set_attribute_fail > 0) {
+    g_range_slider_mock_set_attribute_fail--;
+    if (g_range_slider_mock_set_attribute_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_set_attribute)(node, name, value);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_range_slider_set_attribute
+/** @endcond */
+
+/**
+ * @brief mock_range_slider_remove_attribute.
+ * @param node Node pointer.
+ * @param name Attribute name.
+ * @return Return value.
+ */
+static ui_error_t mock_range_slider_remove_attribute(struct ui_dom_node *node,
+                                                     const char *name) {
+  if (g_range_slider_mock_remove_attribute_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_remove_attribute)(node, name);
+}
+#undef ui_dom_node_remove_attribute
+/** @cond */
+#define ui_dom_node_remove_attribute mock_range_slider_remove_attribute
+/** @endcond */
+
+/**
+ * @brief mock_range_slider_append_child.
+ * @param parent Parent node.
+ * @param child Child node.
+ * @return Return value.
+ */
+static ui_error_t mock_range_slider_append_child(struct ui_dom_node *parent,
+                                                 struct ui_dom_node *child) {
+  if (g_range_slider_mock_append_child_fail > 0) {
+    g_range_slider_mock_append_child_fail--;
+    if (g_range_slider_mock_append_child_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_range_slider_append_child
+/** @endcond */
+
+/**
+ * @brief mock_range_slider_parse_css.
+ * @param css CSS string.
+ * @param out_sheet Output stylesheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_range_slider_parse_css(const char *css,
+                            struct ui_css_stylesheet **out_sheet) {
+  if (g_range_slider_mock_parse_css_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_css_parse_stylesheet)(css, out_sheet);
+}
+#undef ui_css_parse_stylesheet
+/** @cond */
+#define ui_css_parse_stylesheet mock_range_slider_parse_css
+/** @endcond */
+
+/**
+ * @brief mock_range_slider_set_style.
+ * @param comp Component.
+ * @param sheet Stylesheet.
+ * @return Return value.
+ */
+static ui_error_t mock_range_slider_set_style(struct ui_component *comp,
+                                              struct ui_css_stylesheet *sheet) {
+  if (g_range_slider_mock_set_style_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_range_slider_set_style
+/** @endcond */
+
+/**
+ * @brief mock_range_slider_gesture_destroy.
+ * @param recognizer Recognizer.
+ * @return Return value.
+ */
+static ui_error_t
+mock_range_slider_gesture_destroy(struct ui_gesture_recognizer *recognizer) {
+  if (g_range_slider_mock_gesture_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_gesture_recognizer_destroy)(recognizer);
+}
+#undef ui_gesture_recognizer_destroy
+/** @cond */
+#define ui_gesture_recognizer_destroy mock_range_slider_gesture_destroy
+/** @endcond */
+
+/**
+ * @brief mock_range_slider_comp_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_range_slider_comp_destroy(struct ui_component *comp) {
+  if (g_range_slider_mock_comp_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_range_slider_comp_destroy
+/** @endcond */
+
+int g_range_slider_mock_dom_destroy_fail = 0;
+
+/**
+ * @brief mock_range_slider_dom_destroy.
+ * @param node Node.
+ * @return Return value.
+ */
+static ui_error_t mock_range_slider_dom_destroy(struct ui_dom_node *node) {
+  if (g_range_slider_mock_dom_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_range_slider_dom_destroy
+/** @endcond */
+
+/**
+ * @brief mock_range_slider_bidi.
+ * @param key Key.
+ * @param out_key Out key.
+ * @return Return value.
+ */
+static ui_error_t mock_range_slider_bidi(enum ui_key_code key,
+                                         enum ui_key_code *out_key) {
+  if (g_range_slider_mock_bidi_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_bidi_normalize_horizontal_key)(key, out_key);
+}
+#undef ui_bidi_normalize_horizontal_key
+/** @cond */
+#define ui_bidi_normalize_horizontal_key mock_range_slider_bidi
+/** @endcond */
+#endif
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -98,6 +277,7 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
   float low_pct = 0.0f;
   float high_pct = 100.0f;
   float range = slider->max_val - slider->min_val;
+  ui_error_t rc;
 
   if (range > 0.0f) {
     low_pct = ((slider->low_value - slider->min_val) / range) * 100.0f;
@@ -109,10 +289,9 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
 #else
   sprintf(buf, "%f", slider->low_value);
 #endif
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuenow", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuenow", buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -120,10 +299,9 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
 #else
   sprintf(buf, "%f", slider->high_value);
 #endif
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_attribute(slider->thumb_high_node,
-                                                      "aria-valuenow", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(slider->thumb_high_node, "aria-valuenow", buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -131,15 +309,13 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
 #else
   sprintf(buf, "%f", slider->min_val);
 #endif
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemin", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemin", buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_attribute(slider->thumb_high_node,
-                                                      "aria-valuemin", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(slider->thumb_high_node, "aria-valuemin", buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -147,15 +323,13 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
 #else
   sprintf(buf, "%f", slider->max_val);
 #endif
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemax", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "aria-valuemax", buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_attribute(slider->thumb_high_node,
-                                                      "aria-valuemax", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(slider->thumb_high_node, "aria-valuemax", buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -163,10 +337,9 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
 #else
   sprintf(buf, "left: %f%%;", low_pct);
 #endif
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "style", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "style", buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
 #if defined(_MSC_VER)
@@ -174,23 +347,22 @@ static ui_error_t update_dom_state(struct ui_range_slider_base *slider) {
 #else
   sprintf(buf, "left: %f%%;", high_pct);
 #endif
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_high_node, "style", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(slider->thumb_high_node, "style", buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (slider->disabled) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          slider->component->shadow_root, "aria-disabled", "true");
-      (void)rc_cleanup;
+    rc = ui_dom_node_set_attribute(slider->component->shadow_root,
+                                   "aria-disabled", "true");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   } else {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_remove_attribute(
-          slider->component->shadow_root, "aria-disabled");
-      (void)rc_cleanup;
+    rc = ui_dom_node_remove_attribute(slider->component->shadow_root,
+                                      "aria-disabled");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
   return UI_ERROR_NONE;
@@ -247,117 +419,108 @@ ui_range_slider_base_create(struct ui_range_slider_base **out_slider) {
     goto cleanup;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(root_node, "div");
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_tag_name(root_node, "div");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(root_node, "class", "ui-range-slider");
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_set_attribute(root_node, "class", "ui-range-slider");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &slider->thumb_low_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_tag_name(slider->thumb_low_node, "div");
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_tag_name(slider->thumb_low_node, "div");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-        slider->thumb_low_node, "class", "ui-range-slider-thumb");
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "class",
+                                 "ui-range-slider-thumb");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "role", "slider");
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "role", "slider");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_low_node, "tabindex", "0");
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_set_attribute(slider->thumb_low_node, "tabindex", "0");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &slider->thumb_high_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_tag_name(slider->thumb_high_node, "div");
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_tag_name(slider->thumb_high_node, "div");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-        slider->thumb_high_node, "class", "ui-range-slider-thumb");
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_set_attribute(slider->thumb_high_node, "class",
+                                 "ui-range-slider-thumb");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_high_node, "role", "slider");
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_set_attribute(slider->thumb_high_node, "role", "slider");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(slider->thumb_high_node, "tabindex", "0");
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_set_attribute(slider->thumb_high_node, "tabindex", "0");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_append_child(root_node, slider->thumb_low_node);
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_append_child(root_node, slider->thumb_low_node);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_append_child(root_node, slider->thumb_high_node);
-    (void)rc_cleanup;
+
+  rc = ui_dom_node_append_child(root_node, slider->thumb_high_node);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t _ign_rc = ui_css_parse_stylesheet(
-        ui_range_slider_base_default_css, &default_style);
-    (void)_ign_rc;
+
+  rc =
+      ui_css_parse_stylesheet(ui_range_slider_base_default_css, &default_style);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    rc = ui_component_set_default_style(slider->component, default_style);
-    if (rc != UI_ERROR_NONE) {
-      ui_css_stylesheet_destroy(default_style);
-      goto cleanup;
-    }
+
+  rc = ui_component_set_default_style(slider->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   slider->component->shadow_root = root_node;
   root_node = NULL;
 
   rc = update_dom_state(slider);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   *out_slider = slider;
   return UI_ERROR_NONE;
 
 cleanup:
-
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (slider->gesture_recognizer) {
-    {
-      ui_error_t rc_cleanup =
-          ui_gesture_recognizer_destroy(slider->gesture_recognizer);
-      (void)rc_cleanup;
-    }
+    ui_gesture_recognizer_destroy(slider->gesture_recognizer);
   }
   if (slider->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(slider->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(slider->component);
   }
   C_MULTIPLATFORM_FREE(slider);
   return rc;
@@ -370,19 +533,24 @@ cleanup:
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_range_slider_base_destroy(struct ui_range_slider_base *slider) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!slider)
     return UI_ERROR_NONE;
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(slider->gesture_recognizer);
-    (void)rc_cleanup;
+
+  rc_cleanup = ui_gesture_recognizer_destroy(slider->gesture_recognizer);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(slider->component);
-    (void)rc_cleanup;
+
+  rc_cleanup = ui_component_destroy(slider->component);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
+
   C_MULTIPLATFORM_FREE(slider);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -394,16 +562,17 @@ ui_error_t ui_range_slider_base_destroy(struct ui_range_slider_base *slider) {
  */
 ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
                                         float min) {
+  ui_error_t rc;
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
   slider->min_val = min;
   if (slider->max_val < slider->min_val)
     slider->max_val = slider->min_val;
   if (slider->low_value < slider->min_val) {
-    {
-      ui_error_t rc_cleanup = ui_range_slider_base_set_values(
-          slider, slider->min_val, slider->high_value);
-      (void)rc_cleanup;
+    rc = ui_range_slider_base_set_values(slider, slider->min_val,
+                                         slider->high_value);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
   return update_dom_state(slider);
@@ -418,16 +587,17 @@ ui_error_t ui_range_slider_base_set_min(struct ui_range_slider_base *slider,
  */
 ui_error_t ui_range_slider_base_set_max(struct ui_range_slider_base *slider,
                                         float max) {
+  ui_error_t rc;
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
   slider->max_val = max;
   if (slider->min_val > slider->max_val)
     slider->min_val = slider->max_val;
   if (slider->high_value > slider->max_val) {
-    {
-      ui_error_t rc_cleanup = ui_range_slider_base_set_values(
-          slider, slider->low_value, slider->max_val);
-      (void)rc_cleanup;
+    rc = ui_range_slider_base_set_values(slider, slider->low_value,
+                                         slider->max_val);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
   return update_dom_state(slider);
@@ -480,7 +650,9 @@ ui_error_t ui_range_slider_base_set_values(struct ui_range_slider_base *slider,
     slider->low_value = new_low;
     slider->high_value = new_high;
     rc_dom = update_dom_state(slider);
-    (void)rc_dom;
+    if (rc_dom != UI_ERROR_NONE) {
+      return rc_dom;
+    }
     if (slider->on_change) {
       ui_error_t rc_chg = slider->on_change(
           slider, slider->low_value, slider->high_value, slider->user_data);
@@ -625,7 +797,11 @@ ui_range_slider_base_set_normalized_value(struct ui_range_slider_base *slider,
 ui_error_t ui_range_slider_base_process_event(
     struct ui_range_slider_base *slider, const struct ui_event *event,
     enum ui_range_slider_thumb active_thumb, double timestamp_ms) {
-  (void)timestamp_ms;
+  ui_error_t rc;
+
+  if (timestamp_ms < 0.0) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (!slider || !event)
     return UI_ERROR_INVALID_ARGUMENT;
   if (slider->disabled)
@@ -640,9 +816,9 @@ ui_error_t ui_range_slider_base_process_event(
 
     if (increment == 0.0f)
       increment = 1.0f;
-    {
-      ui_error_t rc_cleanup = ui_bidi_normalize_horizontal_key(key, &key);
-      (void)rc_cleanup;
+    rc = ui_bidi_normalize_horizontal_key(key, &key);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
 
     if (active_thumb == UI_RANGE_SLIDER_THUMB_LOW) {

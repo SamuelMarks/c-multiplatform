@@ -11,9 +11,7 @@ void test_ui_router_oom_add2(void) {
     g_malloc_fail_countdown = -1;
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }

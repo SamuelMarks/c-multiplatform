@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "../include/ui_selection_model.h"
 #include "../include/ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -137,9 +138,7 @@ static int test_multi_select(void) {
 
   {
     ui_error_t rc_cleanup = ui_selection_model_clear(model);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_selection_model_get_selected_count(model, &count);
   if (count != 0)
@@ -329,9 +328,7 @@ static int test_coverage_branches(void) {
   /* Hit 152, 198: clear empty model */
   {
     ui_error_t rc_cleanup = ui_selection_model_clear(model);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Hit 101: try to select multiple in single-select */
@@ -340,9 +337,7 @@ static int test_coverage_branches(void) {
   /* Hit 159: toggle item that is NOT in model */
   {
     ui_error_t rc_cleanup = ui_selection_model_clear(model);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_selection_model_toggle(model, (void *)(size_t)10);
   ui_selection_model_toggle(model, (void *)(size_t)20);
@@ -350,18 +345,14 @@ static int test_coverage_branches(void) {
   /* Hit 81: set multi, add multiple, then set single */
   {
     ui_error_t rc_cleanup = ui_selection_model_set_multi_select(model, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_selection_model_select(model, (void *)(size_t)10);
   ui_selection_model_select(model, (void *)(size_t)20);
   ui_selection_model_select(model, (void *)(size_t)30);
   {
     ui_error_t rc_cleanup = ui_selection_model_set_multi_select(model, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* should trim to 1 */
 
   /* Hit 210: set_selected with count < 0 */

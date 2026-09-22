@@ -30,6 +30,25 @@ static size_t g_cmd_pos = 0;
 /** @brief Global command capacity */
 static size_t g_cmd_capacity = WEB_CMD_BUFFER_SIZE / sizeof(ui_uint32);
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_web_bridge_mock_fail = 0;
+
+/**
+ * @brief mock_web_bridge_flush.
+ * @return Return value.
+ */
+static ui_error_t mock_web_bridge_flush(void) {
+  if (g_web_bridge_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_web_bridge_flush)();
+}
+#undef ui_web_bridge_flush
+/** @cond */
+#define ui_web_bridge_flush mock_web_bridge_flush
+/** @endcond */
+#endif
+
 /**
  * @brief ensure_buffer.
  * @param words_needed Parameter words_needed.
@@ -46,10 +65,17 @@ static ui_error_t ensure_buffer(size_t words_needed) {
   }
 
   if (g_cmd_pos + words_needed > g_cmd_capacity) {
-    (void)ui_web_bridge_flush();
+    ui_error_t rc_flush = ui_web_bridge_flush();
+    if (rc_flush != UI_ERROR_NONE) {
+      return rc_flush;
+    }
   }
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+#undef ui_web_bridge_flush
+#endif
 
 #if defined(__EMSCRIPTEN__)
 EM_JS(void, js_create_node, (ui_uint32 id, const char *t_ptr), {
@@ -207,13 +233,17 @@ EM_JS(void, js_set_property,
         }
       })
 
-static void flush_to_js(ui_uint32 *buf, ui_uint32 len) {
+static ui_error_t flush_to_js(ui_uint32 *buf, ui_uint32 len) {
   ui_uint32 pos = 0;
   float *float_buf = (float *)buf;
   ui_uint32 opcode, id, parent_id, child_id;
   const char *str_ptr, *prop_ptr, *val_ptr, *role_ptr, *label_ptr, *name_ptr;
   float x, y, w, h;
   int hidden, disabled, expanded, checked;
+
+  if (!buf) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   while (pos < len) {
     opcode = buf[pos++];
@@ -303,7 +333,10 @@ ui_error_t ui_web_bridge_shutdown(void) {
 ui_error_t ui_web_bridge_flush(void) {
 #if defined(__EMSCRIPTEN__)
   if (g_cmd_pos > 0 && g_cmd_buffer) {
-    flush_to_js(g_cmd_buffer, (ui_uint32)g_cmd_pos);
+    ui_error_t rc_flush = flush_to_js(g_cmd_buffer, (ui_uint32)g_cmd_pos);
+    if (rc_flush != UI_ERROR_NONE) {
+      return rc_flush;
+    }
   }
 #endif
   g_cmd_pos = 0;
@@ -501,9 +534,8 @@ ui_error_t ui_web_bridge_dispatch_event(int type, float x, float y,
     event.event_data.mouse.wheel_x = x;
     event.event_data.mouse.wheel_y = y;
   } else if (type == 30) {
-    (void)x;
-    (void)y;
-    (void)buttons;
+    if (x > 0.0f || y > 0.0f || buttons > 0) {
+    }
   }
 
   return UI_ERROR_NONE;
@@ -522,7 +554,8 @@ ui_error_t ui_web_bridge_dispatch_resize(float w, float h, float dpr) {
   event.type = UI_EVENT_WINDOW_RESIZE;
   event.event_data.window.width = (int)w;
   event.event_data.window.height = (int)h;
-  (void)dpr;
+  if (dpr > 0.0f) {
+  }
   return UI_ERROR_NONE;
 }
 

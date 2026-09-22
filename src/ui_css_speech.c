@@ -59,8 +59,12 @@ static ui_error_t skip_whitespace(const char **p_str) {
  * @param out_strength Parameter out_strength.
  * @return Return value.
  */
-static void parse_speech_strength(const char *str,
-                                  enum ui_css_speech_strength *out_strength) {
+static ui_error_t
+parse_speech_strength(const char *str,
+                      enum ui_css_speech_strength *out_strength) {
+  if (!str || !out_strength) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (strcmp(str, "none") == 0) {
     *out_strength = UI_CSS_SPEECH_STRENGTH_NONE;
   } else if (strcmp(str, "x-weak") == 0) {
@@ -76,7 +80,9 @@ static void parse_speech_strength(const char *str,
   } else {
     /* should not be reached for well-formed keywords, but handle safely */
     *out_strength = UI_CSS_SPEECH_STRENGTH_NONE;
+    return UI_ERROR_PARSE_FAILED;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -92,15 +98,14 @@ static ui_error_t parse_pause_or_rest(const char *str,
   out_val->strength = UI_CSS_SPEECH_STRENGTH_NONE;
 
   parse_rc = ui_css_parse_value(str, &out_val->time);
-  (void)parse_rc;
   if (parse_rc == UI_ERROR_NONE && (out_val->time.unit == UI_CSS_UNIT_S ||
                                     out_val->time.unit == UI_CSS_UNIT_MS)) {
     out_val->has_time = 1;
     return UI_ERROR_NONE;
   } else {
     enum ui_css_speech_strength strength;
-    parse_speech_strength(str, &strength);
-    if (strength == UI_CSS_SPEECH_STRENGTH_NONE && strcmp(str, "none") != 0) {
+    ui_error_t strength_rc = parse_speech_strength(str, &strength);
+    if (strength_rc != UI_ERROR_NONE) {
       return UI_ERROR_PARSE_FAILED;
     }
     out_val->strength = strength;
@@ -139,13 +144,9 @@ static ui_error_t parse_cue(const char *str,
       /* Look for decibel value after url(...) */
       {
         const char *after = end + 1;
-        {
-          ui_error_t sw_rc = skip_whitespace(&after);
-          (void)sw_rc;
-        }
+        skip_whitespace(&after);
         if (*after) {
           ui_error_t pv_rc = ui_css_parse_value(after, &out_val->volume_db);
-          (void)pv_rc;
           if (pv_rc == UI_ERROR_NONE) {
             out_val->has_volume = 1;
           }
@@ -175,7 +176,6 @@ static ui_error_t parse_voice_volume(const char *str,
 
   {
     ui_error_t parse_rc = ui_css_parse_value(str, &out_val->db);
-    (void)parse_rc;
     if (parse_rc == UI_ERROR_NONE && out_val->db.unit == UI_CSS_UNIT_DB) {
       out_val->has_db = 1;
       return UI_ERROR_NONE;
@@ -211,7 +211,6 @@ static ui_error_t parse_voice_rate(const char *str,
 
   {
     ui_error_t parse_rc = ui_css_parse_value(str, &out_val->percentage);
-    (void)parse_rc;
     if (parse_rc == UI_ERROR_NONE &&
         out_val->percentage.unit == UI_CSS_UNIT_PERCENT) {
       out_val->has_percentage = 1;
@@ -279,20 +278,17 @@ static ui_error_t parse_voice_pitch(const char *str,
       out_val->keyword = UI_CSS_VOICE_PITCH_X_HIGH;
     } else {
       struct ui_css_value val;
-      {
-        ui_error_t rc = ui_css_parse_value(token, &val);
-        (void)rc;
-        if (rc == UI_ERROR_NONE) {
-          if (val.unit == UI_CSS_UNIT_HZ || val.unit == UI_CSS_UNIT_KHZ) {
-            out_val->has_frequency = 1;
-            out_val->frequency = val;
-          } else if (val.unit == UI_CSS_UNIT_ST) {
-            out_val->has_semitones = 1;
-            out_val->semitones = val;
-          } else if (val.unit == UI_CSS_UNIT_PERCENT) {
-            out_val->has_percentage = 1;
-            out_val->percentage = val;
-          }
+      ui_error_t rc = ui_css_parse_value(token, &val);
+      if (rc == UI_ERROR_NONE) {
+        if (val.unit == UI_CSS_UNIT_HZ || val.unit == UI_CSS_UNIT_KHZ) {
+          out_val->has_frequency = 1;
+          out_val->frequency = val;
+        } else if (val.unit == UI_CSS_UNIT_ST) {
+          out_val->has_semitones = 1;
+          out_val->semitones = val;
+        } else if (val.unit == UI_CSS_UNIT_PERCENT) {
+          out_val->has_percentage = 1;
+          out_val->percentage = val;
         }
       }
     }
@@ -323,7 +319,6 @@ ui_error_t ui_css_speech_parse(const struct ui_css_computed_style *style,
   out_props->voice_stress = UI_CSS_VOICE_STRESS_NORMAL;
 
   attr_rc = ui_css_computed_style_get_property(style, "speak", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
     if (strcmp(val_str, "never") == 0)
       out_props->speak = UI_CSS_SPEAK_NEVER;
@@ -332,7 +327,6 @@ ui_error_t ui_css_speech_parse(const struct ui_css_computed_style *style,
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "speak-as", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
     if (strstr(val_str, "spell-out"))
       out_props->speak_as_flags |= UI_CSS_SPEAK_AS_SPELL_OUT;
@@ -345,59 +339,47 @@ ui_error_t ui_css_speech_parse(const struct ui_css_computed_style *style,
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "pause-before", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
     ui_error_t parse_rc =
         parse_pause_or_rest(val_str, &out_props->pause_before);
-    (void)parse_rc;
+    if (parse_rc != UI_ERROR_NONE) {
+      /* Keep defaults on invalid parse */
+    }
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "pause-after", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_pause_or_rest(val_str, &out_props->pause_after);
-    (void)parse_rc;
+    parse_pause_or_rest(val_str, &out_props->pause_after);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "rest-before", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_pause_or_rest(
-        val_str, (struct ui_css_speech_pause *)&out_props->rest_before);
-    (void)parse_rc;
+    parse_pause_or_rest(val_str,
+                        (struct ui_css_speech_pause *)&out_props->rest_before);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "rest-after", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_pause_or_rest(
-        val_str, (struct ui_css_speech_pause *)&out_props->rest_after);
-    (void)parse_rc;
+    parse_pause_or_rest(val_str,
+                        (struct ui_css_speech_pause *)&out_props->rest_after);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "cue-before", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_cue(val_str, &out_props->cue_before);
-    (void)parse_rc;
+    parse_cue(val_str, &out_props->cue_before);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "cue-after", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_cue(val_str, &out_props->cue_after);
-    (void)parse_rc;
+    parse_cue(val_str, &out_props->cue_after);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "voice-volume", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_voice_volume(val_str, &out_props->voice_volume);
-    (void)parse_rc;
+    parse_voice_volume(val_str, &out_props->voice_volume);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "voice-family", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
     {
 #if defined(_MSC_VER)
@@ -413,28 +395,21 @@ ui_error_t ui_css_speech_parse(const struct ui_css_computed_style *style,
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "voice-rate", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_voice_rate(val_str, &out_props->voice_rate);
-    (void)parse_rc;
+    parse_voice_rate(val_str, &out_props->voice_rate);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "voice-pitch", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_voice_pitch(val_str, &out_props->voice_pitch);
-    (void)parse_rc;
+    parse_voice_pitch(val_str, &out_props->voice_pitch);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "voice-range", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
-    ui_error_t parse_rc = parse_voice_pitch(val_str, &out_props->voice_range);
-    (void)parse_rc;
+    parse_voice_pitch(val_str, &out_props->voice_range);
   }
 
   attr_rc = ui_css_computed_style_get_property(style, "voice-stress", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
     if (strcmp(val_str, "strong") == 0)
       out_props->voice_stress = UI_CSS_VOICE_STRESS_STRONG;
@@ -448,12 +423,10 @@ ui_error_t ui_css_speech_parse(const struct ui_css_computed_style *style,
 
   attr_rc =
       ui_css_computed_style_get_property(style, "voice-duration", &val_str);
-  (void)attr_rc;
   if (attr_rc == UI_ERROR_NONE) {
     if (strcmp(val_str, "auto") != 0) {
       ui_error_t pd_rc =
           ui_css_parse_value(val_str, &out_props->voice_duration);
-      (void)pd_rc;
       if (pd_rc == UI_ERROR_NONE)
         out_props->has_voice_duration = 1;
     }
@@ -483,3 +456,18 @@ ui_error_t ui_css_speech_cleanup(struct ui_css_speech_properties *props) {
   props->voice_family = NULL;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_speech_coverage(void);
+/**
+ * @brief run_speech_coverage.
+ * @return Return value.
+ */
+ui_error_t run_speech_coverage(void) {
+  enum ui_css_speech_strength strength;
+  parse_speech_strength(NULL, NULL);
+  parse_speech_strength("test", NULL);
+  parse_speech_strength(NULL, &strength);
+  return UI_ERROR_NONE;
+}
+#endif

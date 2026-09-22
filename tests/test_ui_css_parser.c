@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "../include/ui_css_parser.h"
@@ -1075,9 +1076,7 @@ int main(void) {
     ui_css_computed_style_destroy(style);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(state_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -1133,9 +1132,7 @@ int main(void) {
     ui_css_computed_style_destroy(style);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(cond_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -1210,9 +1207,7 @@ int main(void) {
 
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(card_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -1283,9 +1278,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_css_stylesheet_destroy(sheet);
 
@@ -1414,9 +1407,7 @@ int main(void) {
     ui_css_computed_style_destroy(rec_style);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(rec_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &rec_node);
@@ -1431,9 +1422,7 @@ int main(void) {
     ui_css_computed_style_destroy(rec_style);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(rec_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &rec_node);
@@ -1448,9 +1437,7 @@ int main(void) {
     ui_css_computed_style_destroy(rec_style);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(rec_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     ui_css_stylesheet_destroy(rec_sheet);

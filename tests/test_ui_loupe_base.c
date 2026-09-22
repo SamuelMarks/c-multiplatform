@@ -125,7 +125,7 @@ int main(void) {
         {
           ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            return (int)rc_cleanup;
           }
         }
       }
@@ -137,10 +137,26 @@ int main(void) {
     return 1;
   }
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_loupe_mock_fail;
+    struct ui_loupe_base *loupe_fail = NULL;
+    err = ui_loupe_base_create(arena, &config, &loupe_fail);
+    if (err == UI_ERROR_NONE) {
+      g_loupe_mock_fail = 1;
+      err = ui_loupe_base_destroy(loupe_fail);
+      if (err != UI_ERROR_UNKNOWN) {
+        return 1;
+      }
+      g_loupe_mock_fail = 0;
+    }
+  }
+#endif
+
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return (int)rc_cleanup;
     }
   }
   return 0;

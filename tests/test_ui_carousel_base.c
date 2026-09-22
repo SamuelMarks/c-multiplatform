@@ -4,6 +4,7 @@
 #include "ui_error.h"
 #include "ui_event.h"
 #include "ui_gesture.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,8 +19,10 @@ extern int g_carousel_mock_fail;
 
 static ui_error_t create_mock_node(size_t index, struct ui_dom_node **out_node,
                                    void *user_data) {
-  (void)index;
-  (void)user_data;
+  if (index) {
+  }
+  if (user_data) {
+  }
   return ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, out_node);
   return UI_ERROR_NONE;
 }
@@ -27,7 +30,8 @@ static ui_error_t create_mock_node(size_t index, struct ui_dom_node **out_node,
 static ui_error_t update_mock_node(size_t index, struct ui_dom_node *node,
                                    void *user_data) {
   char buf[32];
-  (void)user_data;
+  if (user_data) {
+  }
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "Item %lu", (unsigned long)index);
 #else
@@ -68,16 +72,12 @@ static ui_error_t run_mock_failures(void) {
     g_carousel_mock_fail = 0;
     {
       ui_error_t rc_cleanup = ui_carousel_base_scroll_to_index(carousel, 2, 0);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_UNKNOWN);
     }
     g_carousel_mock_fail = -1;
     {
       ui_error_t rc_cleanup = ui_carousel_base_destroy(carousel);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -86,16 +86,12 @@ static ui_error_t run_mock_failures(void) {
     g_carousel_mock_fail = 1;
     {
       ui_error_t rc_cleanup = ui_carousel_base_scroll_to_index(carousel, 2, 0);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     g_carousel_mock_fail = -1;
     {
       ui_error_t rc_cleanup = ui_carousel_base_destroy(carousel);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -105,16 +101,12 @@ static ui_error_t run_mock_failures(void) {
     g_carousel_mock_fail = 0;
     {
       ui_error_t rc_cleanup = ui_carousel_base_tick(carousel, 0.0);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_UNKNOWN);
     }
     g_carousel_mock_fail = -1;
     {
       ui_error_t rc_cleanup = ui_carousel_base_destroy(carousel);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -578,6 +570,13 @@ static ui_error_t test_carousel_mock_alloc_bypass(void) {
 }
 int main(void) {
   ui_error_t rc;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  extern ui_error_t run_carousel_coverage(void);
+  rc = run_carousel_coverage();
+  if (rc != UI_ERROR_NONE)
+    return rc;
+#endif
 
   rc = test_carousel_mock_alloc_bypass();
   if (rc != UI_ERROR_NONE)

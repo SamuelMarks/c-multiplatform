@@ -9,6 +9,10 @@
 #include <stdlib.h>
 #include "ui_internal_mem.h"
 #include "strtok_posix.h"
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_motion_mock_fail = 0;
+#endif
 /* clang-format on */
 
 #if defined(_MSC_VER)
@@ -26,10 +30,19 @@
  * @param p_str Parameter p_str.
  * @return Return value.
  */
-static void skip_whitespace(const char **p_str) {
+static ui_error_t skip_whitespace(const char **p_str) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_motion_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+  if (!p_str || !*p_str) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -44,7 +57,10 @@ ui_error_t ui_css_parse_offset_path(const char *str,
   if (!str || !out_path)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   out_path->type = UI_CSS_OFFSET_PATH_NONE;
   out_path->box = UI_CSS_GEOMETRY_BOX_BORDER_BOX;
@@ -122,9 +138,13 @@ ui_error_t ui_css_parse_offset_path(const char *str,
  */
 ui_error_t ui_css_parse_offset_distance(const char *str,
                                         struct ui_css_value *out_distance) {
+  ui_error_t rc;
   if (!str || !out_distance)
     return UI_ERROR_INVALID_ARGUMENT;
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   return ui_css_parse_value(str, out_distance);
 }
 
@@ -137,7 +157,10 @@ ui_css_parse_offset_position(const char *str,
   if (!str || !out_position)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   out_position->is_auto = 0;
   out_position->x.unit = UI_CSS_UNIT_PERCENT;
@@ -168,7 +191,10 @@ ui_error_t ui_css_parse_offset_anchor(const char *str,
   if (!str || !out_anchor)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   out_anchor->is_auto = 0;
   out_anchor->x.unit = UI_CSS_UNIT_PERCENT;
@@ -201,7 +227,10 @@ ui_error_t ui_css_parse_offset_rotate(const char *str,
   if (!str || !out_rotate)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   out_rotate->is_auto = 0;
   out_rotate->is_reverse = 0;
@@ -230,3 +259,19 @@ ui_error_t ui_css_parse_offset_rotate(const char *str,
 
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief run_motion_coverage.
+ * @return Return value.
+ */
+ui_error_t run_motion_coverage(void);
+ui_error_t run_motion_coverage(void) {
+  const char *null_str = NULL;
+
+  skip_whitespace(NULL);
+  skip_whitespace(&null_str);
+
+  return UI_ERROR_NONE;
+}
+#endif

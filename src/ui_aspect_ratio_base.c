@@ -26,17 +26,18 @@ mock_component_set_default_style(struct ui_component *component,
 #define ui_component_set_default_style mock_component_set_default_style
 /** @endcond */
 
-ui_error_t run_aspect_ratio_coverage(void);
-ui_error_t run_aspect_ratio_coverage(void) {
-  struct ui_aspect_ratio_base *ar = NULL;
-  g_aspect_ratio_mock_fail = 1;
-  {
-    ui_error_t rc_cleanup = ui_aspect_ratio_base_create(&ar);
-    (void)rc_cleanup;
+static ui_error_t
+mock_aspect_ratio_component_destroy(struct ui_component *comp) {
+  if (g_aspect_ratio_mock_fail == 2) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
   }
-  g_aspect_ratio_mock_fail = 0;
-  return UI_ERROR_NONE;
+  return (ui_component_destroy)(comp);
 }
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_aspect_ratio_component_destroy
+/** @endcond */
 #endif
 
 /** @brief Default CSS stylesheet for aspect ratio base component */
@@ -129,16 +130,10 @@ ui_aspect_ratio_base_create(struct ui_aspect_ratio_base **out_aspect_ratio) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (ar->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(ar->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(ar->component);
   }
   C_MULTIPLATFORM_FREE(ar);
   return rc;
@@ -146,15 +141,18 @@ cleanup:
 
 ui_error_t
 ui_aspect_ratio_base_destroy(struct ui_aspect_ratio_base *aspect_ratio) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!aspect_ratio) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(aspect_ratio->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(aspect_ratio);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t

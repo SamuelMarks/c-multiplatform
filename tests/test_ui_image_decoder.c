@@ -13,20 +13,23 @@ static ui_error_t (*orig_webp_supports)(enum ui_image_format, int *);
 
 static ui_error_t mock_png_supports_fail(enum ui_image_format format,
                                          int *out) {
-  (void)format;
-  (void)out;
+  if (out) {
+    *out = (format == UI_IMAGE_FORMAT_PNG);
+  }
   return UI_ERROR_UNKNOWN;
 }
 static ui_error_t mock_jpeg_supports_fail(enum ui_image_format format,
                                           int *out) {
-  (void)format;
-  (void)out;
+  if (out) {
+    *out = (format == UI_IMAGE_FORMAT_JPEG);
+  }
   return UI_ERROR_UNKNOWN;
 }
 static ui_error_t mock_webp_supports_fail(enum ui_image_format format,
                                           int *out) {
-  (void)format;
-  (void)out;
+  if (out) {
+    *out = (format == UI_IMAGE_FORMAT_WEBP);
+  }
   return UI_ERROR_UNKNOWN;
 }
 

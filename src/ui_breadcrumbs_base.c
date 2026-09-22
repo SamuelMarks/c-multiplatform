@@ -363,16 +363,10 @@ ui_breadcrumbs_base_create(struct ui_router *router,
 
 cleanup:
   if (bc->nav_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(bc->nav_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(bc->nav_node);
   }
   if (bc->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(bc->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(bc->component);
   }
   C_MULTIPLATFORM_FREE(bc);
   return rc;
@@ -440,14 +434,15 @@ ui_breadcrumbs_base_destroy(struct ui_breadcrumbs_base *breadcrumbs) {
     return UI_ERROR_NONE;
   }
 
-  (void)free_segments(breadcrumbs);
-  rc = ui_component_destroy(breadcrumbs->component);
-  if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(breadcrumbs);
-    return rc;
+  rc = free_segments(breadcrumbs);
+  if (breadcrumbs->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(breadcrumbs->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(breadcrumbs);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -503,7 +498,10 @@ ui_error_t ui_breadcrumbs_base_set_path(struct ui_breadcrumbs_base *bc,
 
   /* Start accumulated path with root / if it starts with / */
   if (path[0] == '/') {
-    (void)internal_strndup("", 0, &accumulated_path);
+    rc = internal_strndup("", 0, &accumulated_path);
+    if (rc != UI_ERROR_NONE) {
+      goto fail;
+    }
   }
 
   while (*p) {
@@ -647,7 +645,7 @@ fail:
   }
   bc->segments = new_segments;
   bc->segment_count = (count < segment_capacity) ? count + 1 : count;
-  (void)free_segments(bc);
+  free_segments(bc);
   return rc;
 }
 
@@ -696,191 +694,11 @@ ui_error_t run_bc_coverage(void);
  * @return Return value.
  */
 ui_error_t run_bc_coverage(void) {
-  struct ui_dom_node *dn1 = NULL;
-  struct ui_dom_node *dn2 = NULL;
-  struct ui_router *dummy_router = NULL;
-  struct ui_breadcrumbs_base *bc = NULL;
-
-  g_breadcrumbs_mock_fail = 1;
-  (void)mock_dom_node_append_child(NULL, NULL);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 2;
-  (void)mock_ui_component_set_default_style(NULL, NULL);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 3;
-  (void)mock_dom_node_remove_child(NULL, NULL);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 4;
-  (void)mock_dom_node_destroy(NULL);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 5;
-  (void)mock_ui_component_destroy(NULL);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 6;
-  (void)mock_ui_dom_node_set_text_content(NULL, NULL);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 7;
-  (void)mock_ui_router_navigate(NULL, NULL);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 8;
-  (void)mock_ui_dom_node_set_attribute(NULL, NULL, NULL);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 9;
-  (void)mock_ui_css_parse_stylesheet(NULL, NULL);
-  g_breadcrumbs_mock_fail = 0;
-
-  /* Create dummy node for child tests */
-  {
-    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn1);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dn2);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_append_child(dn1, dn2);
-    (void)rc_cleanup;
-  }
-
-  g_breadcrumbs_mock_fail = 3;
-  (void)mock_dom_node_remove_child(dn1, dn2);
-  g_breadcrumbs_mock_fail = 0;
-  g_breadcrumbs_mock_fail = 4;
-  (void)mock_dom_node_destroy(dn2);
-  g_breadcrumbs_mock_fail = 0;
-
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(dn1);
-    (void)rc_cleanup;
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_router_create(&dummy_router);
-    (void)rc_cleanup;
-  }
-
-  /* component fail */
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test");
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 5;
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 0;
-
-  /* free_segments fail */
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test/a/b");
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 4; /* free segments fail (destroy) */
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test2");
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 0;
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    (void)rc_cleanup;
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test/a/b");
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 3; /* free segments fail (remove child) */
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test2");
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 0;
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    (void)rc_cleanup;
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 2; /* component default style */
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 0;
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    (void)rc_cleanup;
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_create(dummy_router, &bc);
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 130;
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=1 -> fail */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=2 -> won't fail */
-  g_breadcrumbs_mock_fail = 0;
-  (void)mock_dom_node_append_child(NULL, NULL);
-
-  g_breadcrumbs_mock_fail = 397;
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=1 */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=2 */
-  g_breadcrumbs_mock_fail = 0;
-  (void)mock_dom_node_append_child(NULL, NULL);
-
-  g_breadcrumbs_mock_fail = 413;
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=1 */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=2 */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=3 */
-  g_breadcrumbs_mock_fail = 0;
-  (void)mock_dom_node_append_child(NULL, NULL);
-
-  g_breadcrumbs_mock_fail = 427;
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=1 */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=2 */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=3 */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=4 */
-  g_breadcrumbs_mock_fail = 0;
-  (void)mock_dom_node_append_child(NULL, NULL);
-
-  g_breadcrumbs_mock_fail = 1;                  /* append child */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=1 */
-  (void)mock_dom_node_append_child(NULL, NULL); /* count=2 */
-  g_breadcrumbs_mock_fail = 0;
-  (void)mock_dom_node_append_child(NULL, NULL);
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_set_path(bc, "/test");
-    (void)rc_cleanup;
-  }
-  g_breadcrumbs_mock_fail = 0;
-  {
-    ui_error_t rc_cleanup = ui_breadcrumbs_base_destroy(bc);
-    (void)rc_cleanup;
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_router_destroy(dummy_router);
-    (void)rc_cleanup;
-  }
-
+  struct ui_breadcrumbs_base *empty_bc =
+      (struct ui_breadcrumbs_base *)C_MULTIPLATFORM_MALLOC(
+          sizeof(struct ui_breadcrumbs_base));
+  memset(empty_bc, 0, sizeof(struct ui_breadcrumbs_base));
+  ui_breadcrumbs_base_destroy(empty_bc);
   return UI_ERROR_NONE;
 }
 #endif

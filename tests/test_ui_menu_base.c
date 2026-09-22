@@ -9,6 +9,7 @@ extern int g_malloc_fail_countdown;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 /* clang-format on */
 
 #if defined(_MSC_VER)
@@ -67,15 +68,11 @@ static void test_menu_missing_coverage(void) {
   g_malloc_fail_countdown = -1;
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_menu_base_create(&menu);
 
@@ -107,33 +104,23 @@ static void test_menu_missing_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(sub2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(sub1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 static int g_action_triggered = 0;
@@ -150,8 +137,10 @@ static char g_last_action_id[256];
 
 static ui_error_t test_on_action(struct ui_menu_base *menu, const char *item_id,
                                  void *user_data) {
-  (void)menu;
-  (void)user_data;
+  if (menu) {
+  }
+  if (user_data) {
+  }
   g_action_triggered++;
   if (item_id) {
 #if defined(_MSC_VER)
@@ -221,21 +210,15 @@ static ui_error_t test_menu_creation_and_open(void) {
 
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return UI_ERROR_NONE;
 }
@@ -316,27 +299,19 @@ static ui_error_t test_menu_cascading(void) {
 
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(main_menu);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(sub_menu);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return UI_ERROR_NONE;
 }
@@ -387,21 +362,15 @@ static ui_error_t test_menu_keyboard_nav(void) {
   printf("Screen edge boundary collision tracking verified.\n");
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return UI_ERROR_NONE;
 }
@@ -555,6 +524,12 @@ static void test_menu_missing_branches(void) {
   ev.event_data.keyboard.key_code = UI_KEY_SPACE;
   ui_menu_base_process_event(menu, &ev);
 
+  /* Now select index 1 (which has submenu sub) and press SPACE to open it */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  ui_menu_base_process_event(menu, &ev);
+  ev.event_data.keyboard.key_code = UI_KEY_SPACE;
+  ui_menu_base_process_event(menu, &ev);
+
   /* Intercept context menu with open menu */
   ui_menu_base_open_at(menu, director, 0, 0);
   ev.type = UI_EVENT_MOUSE_DOWN;
@@ -572,27 +547,19 @@ static void test_menu_missing_branches(void) {
 
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(menu);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(sub);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -609,9 +576,7 @@ static void test_menu_errors(void) {
     return;
   {
     ui_error_t rc_cleanup = ui_menu_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ui_menu_base_create(&menu);
@@ -691,6 +656,285 @@ static void test_menu_errors(void) {
 #endif
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t mock_fail_action(struct ui_menu_base *menu, const char *id,
+                                   void *data) {
+  if (menu) {
+  }
+  if (id) {
+  }
+  if (data) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static void test_menu_mock_coverage(void) {
+  extern int g_menu_mock_fail;
+  struct ui_menu_base *menu = NULL, *sub = NULL;
+  struct ui_dom_node *root = NULL, *n1 = NULL, *n2 = NULL;
+  struct ui_overlay_director *director = NULL;
+  struct ui_event ev;
+  ui_error_t rc;
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+  ui_overlay_director_create(root, &director);
+
+  /* g_menu_mock_fail = 1: mock_menu_dom_node_set_attribute fails in create */
+  g_menu_mock_fail = 1;
+  rc = ui_menu_base_create(&menu);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* g_menu_mock_fail = 2: mock_menu_css_parse_stylesheet fails in create */
+  g_menu_mock_fail = 2;
+  rc = ui_menu_base_create(&menu);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* g_menu_mock_fail = 3: mock_menu_component_set_default_style fails in create
+   */
+  g_menu_mock_fail = 3;
+  rc = ui_menu_base_create(&menu);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Test create set_attribute countdown failures */
+  {
+    int k;
+    for (k = 0; k < 2; k++) {
+      extern int g_menu_mock_attr_countdown;
+      g_menu_mock_attr_countdown = k;
+      rc = ui_menu_base_create(&menu);
+      assert(rc != UI_ERROR_NONE);
+      g_menu_mock_attr_countdown = -1;
+    }
+  }
+
+  /* Create clean menu and sub */
+  rc = ui_menu_base_create(&menu);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_menu_base_create(&sub);
+  assert(rc == UI_ERROR_NONE);
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n1);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &n2);
+
+  /* Test add_item set_attribute countdown failures on empty menu */
+  {
+    int k;
+    for (k = 0; k < 7; k++) {
+      struct ui_menu_base *empty_m = NULL;
+      struct ui_dom_node *tmp_node = NULL;
+      extern int g_menu_mock_attr_countdown;
+      ui_menu_base_create(&empty_m);
+      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &tmp_node);
+      g_menu_mock_attr_countdown = k;
+      rc = ui_menu_base_add_item(empty_m, "item_fail", tmp_node, sub);
+      if (rc != UI_ERROR_NONE) {
+        /* Expected failure */
+      }
+      g_menu_mock_attr_countdown = -1;
+      ui_menu_base_destroy(empty_m);
+    }
+  }
+
+  /* Test add_item duplicate_string OOM (when capacity is already allocated) */
+  {
+    int cd;
+    for (cd = 0; cd < 15; cd++) {
+      struct ui_menu_base *m_cap = NULL;
+      struct ui_dom_node *t1 = NULL, *t2 = NULL;
+      ui_menu_base_create(&m_cap);
+      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &t1);
+      ui_menu_base_add_item(m_cap, "init", t1, NULL);
+      ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &t2);
+      g_malloc_fail_countdown = cd;
+      rc = ui_menu_base_add_item(m_cap, "target_oom", t2, NULL);
+      g_malloc_fail_countdown = -1;
+      ui_menu_base_destroy(m_cap);
+    }
+  }
+
+  /* Test add_item append_child failure */
+  {
+    struct ui_dom_node *tmp_node = NULL;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &tmp_node);
+    g_menu_mock_fail = 4;
+    rc = ui_menu_base_add_item(menu, "item1", tmp_node, sub);
+    assert(rc != UI_ERROR_NONE);
+    g_menu_mock_fail = 0;
+    ui_dom_node_destroy(tmp_node);
+  }
+
+  /* Successful add_item */
+  rc = ui_menu_base_add_item(menu, "item1", n1, sub);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_menu_base_add_item(sub, "sub_item", n2, NULL);
+  assert(rc == UI_ERROR_NONE);
+
+  /* open_at set_attribute failure */
+  g_menu_mock_fail = 1;
+  rc = ui_menu_base_open_at(menu, director, 10, 10);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* open_at overlay mount failure */
+  g_menu_mock_fail = 5;
+  rc = ui_menu_base_open_at(menu, director, 10, 10);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Open menu cleanly */
+  rc = ui_menu_base_open_at(menu, director, 10, 10);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test close unmount failure */
+  g_menu_mock_fail = 6;
+  rc = ui_menu_base_close(menu);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Re-open */
+  rc = ui_menu_base_open_at(menu, director, 10, 10);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test update_active_index set_attribute failure in process_event DOWN and UP
+   */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  {
+    int k;
+    for (k = 0; k < 4; k++) {
+      extern int g_menu_mock_attr_countdown;
+      g_menu_mock_attr_countdown = k;
+      rc = ui_menu_base_process_event(menu, &ev);
+      assert(rc != UI_ERROR_NONE);
+      g_menu_mock_attr_countdown = -1;
+    }
+  }
+
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  {
+    int k;
+    for (k = 0; k < 4; k++) {
+      extern int g_menu_mock_attr_countdown;
+      g_menu_mock_attr_countdown = k;
+      rc = ui_menu_base_process_event(menu, &ev);
+      assert(rc != UI_ERROR_NONE);
+      g_menu_mock_attr_countdown = -1;
+    }
+  }
+
+  /* Test RIGHT key open_rc failure (mount failure in submenu) */
+  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+  g_menu_mock_fail = 5;
+  rc = ui_menu_base_process_event(menu, &ev);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Open sub cleanly */
+  rc = ui_menu_base_process_event(menu, &ev);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Send LEFT key to sub with close_rc failure */
+  ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+  g_menu_mock_fail = 6;
+  rc = ui_menu_base_process_event(sub, &ev);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Close sub cleanly */
+  rc = ui_menu_base_process_event(sub, &ev);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test ENTER key with submenu open_rc failure */
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  g_menu_mock_fail = 5;
+  rc = ui_menu_base_process_event(menu, &ev);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Open sub cleanly with ENTER */
+  rc = ui_menu_base_process_event(menu, &ev);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Open sub at coordinates */
+  rc = ui_menu_base_open_at(sub, director, 20, 20);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Select item 0 in sub */
+  ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+  rc = ui_menu_base_process_event(sub, &ev);
+  assert(rc == UI_ERROR_NONE);
+
+  /* In sub, set action that fails and trigger ENTER */
+  ev.event_data.keyboard.key_code = UI_KEY_ENTER;
+  ui_menu_base_set_on_action(sub, mock_fail_action, NULL);
+  rc = ui_menu_base_process_event(sub, &ev);
+  assert(rc != UI_ERROR_NONE);
+
+  /* In sub, set action to NULL and trigger ENTER with close failure */
+  ui_menu_base_set_on_action(sub, NULL, NULL);
+  g_menu_mock_fail = 6;
+  rc = ui_menu_base_process_event(sub, &ev);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Re-open menu cleanly and sub cleanly, test closing parent menu when sub is
+   * open */
+  rc = ui_menu_base_open_at(menu, director, 10, 10);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_menu_base_open_at(sub, director, 20, 20);
+  assert(rc == UI_ERROR_NONE);
+  g_menu_mock_fail = 6;
+  rc = ui_menu_base_close(menu);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Re-open menu cleanly */
+  rc = ui_menu_base_open_at(menu, director, 10, 10);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test ESCAPE with close failure */
+  ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+  g_menu_mock_fail = 6;
+  rc = ui_menu_base_process_event(menu, &ev);
+  assert(rc != UI_ERROR_NONE);
+  g_menu_mock_fail = 0;
+
+  /* Two submenus under a menu, test multiple close failures to hit rc !=
+   * UI_ERROR_NONE */
+  {
+    struct ui_menu_base *m2 = NULL, *s_a = NULL, *s_b = NULL;
+    struct ui_dom_node *na = NULL, *nb = NULL;
+    ui_menu_base_create(&m2);
+    ui_menu_base_create(&s_a);
+    ui_menu_base_create(&s_b);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &na);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &nb);
+    ui_menu_base_add_item(m2, "ia", na, s_a);
+    ui_menu_base_add_item(m2, "ib", nb, s_b);
+    ui_menu_base_open_at(m2, director, 10, 10);
+    ui_menu_base_open_at(s_a, director, 20, 20);
+    ui_menu_base_open_at(s_b, director, 30, 30);
+    g_menu_mock_fail = 6;
+    rc = ui_menu_base_close(m2);
+    assert(rc != UI_ERROR_NONE);
+    g_menu_mock_fail = 0;
+    ui_menu_base_destroy(s_b);
+    ui_menu_base_destroy(s_a);
+    ui_menu_base_destroy(m2);
+  }
+
+  /* Clean up */
+  ui_menu_base_destroy(sub);
+  ui_menu_base_destroy(menu);
+  ui_overlay_director_destroy(director);
+  ui_dom_node_destroy(root);
+}
+#endif
+
 int main(void) {
   printf("Running ui_menu_base tests...\n");
 
@@ -700,6 +944,9 @@ int main(void) {
   test_menu_keyboard_nav();
   test_menu_missing_branches();
   test_menu_errors();
+#ifdef UI_TEST_MOCK_ALLOC
+  test_menu_mock_coverage();
+#endif
 
   if (g_test_failures > 0) {
     printf("FAILED: %d tests failed.\n", g_test_failures);

@@ -10,8 +10,246 @@
 #include "ui_listbox_base.h"
 #include "ui_internal_mem.h"
 #include "ui_css_parser.h"
+#include <ctype.h>
 #include <string.h>
 /* clang-format on */
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_listbox_mock_sel_destroy_fail = 0;
+int g_listbox_mock_comp_destroy_fail = 0;
+int g_listbox_mock_sel_select_fail = 0;
+int g_listbox_mock_sel_toggle_fail = 0;
+int g_listbox_mock_sel_clear_fail = 0;
+int g_listbox_mock_sel_get_selected_fail = 0;
+int g_listbox_mock_sel_count_fail = 0;
+int g_listbox_mock_sel_set_on_change_fail = 0;
+int g_listbox_mock_set_attr_fail = 0;
+int g_listbox_mock_get_attr_fail = 0;
+int g_listbox_mock_set_style_fail = 0;
+
+/**
+ * @brief mock_listbox_selection_model_destroy.
+ * @param model Parameter model.
+ * @return Return value.
+ */
+static ui_error_t
+mock_listbox_selection_model_destroy(struct ui_selection_model *model) {
+  if (g_listbox_mock_sel_destroy_fail) {
+    g_listbox_mock_sel_destroy_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_selection_model_destroy)(model);
+}
+#undef ui_selection_model_destroy
+/** @cond */
+#define ui_selection_model_destroy mock_listbox_selection_model_destroy
+/** @endcond */
+
+/**
+ * @brief mock_listbox_component_destroy.
+ * @param component Parameter component.
+ * @return Return value.
+ */
+static ui_error_t
+mock_listbox_component_destroy(struct ui_component *component) {
+  if (g_listbox_mock_comp_destroy_fail) {
+    g_listbox_mock_comp_destroy_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(component);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_listbox_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_listbox_selection_model_select.
+ * @param model Parameter model.
+ * @param id Parameter id.
+ * @return Return value.
+ */
+static ui_error_t
+mock_listbox_selection_model_select(struct ui_selection_model *model,
+                                    void *id) {
+  if (g_listbox_mock_sel_select_fail) {
+    g_listbox_mock_sel_select_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_selection_model_select)(model, id);
+}
+#undef ui_selection_model_select
+/** @cond */
+#define ui_selection_model_select mock_listbox_selection_model_select
+/** @endcond */
+
+/**
+ * @brief mock_listbox_selection_model_toggle.
+ * @param model Parameter model.
+ * @param id Parameter id.
+ * @return Return value.
+ */
+static ui_error_t
+mock_listbox_selection_model_toggle(struct ui_selection_model *model,
+                                    void *id) {
+  if (g_listbox_mock_sel_toggle_fail) {
+    g_listbox_mock_sel_toggle_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_selection_model_toggle)(model, id);
+}
+#undef ui_selection_model_toggle
+/** @cond */
+#define ui_selection_model_toggle mock_listbox_selection_model_toggle
+/** @endcond */
+
+/**
+ * @brief mock_listbox_selection_model_clear.
+ * @param model Parameter model.
+ * @return Return value.
+ */
+static ui_error_t
+mock_listbox_selection_model_clear(struct ui_selection_model *model) {
+  if (g_listbox_mock_sel_clear_fail) {
+    g_listbox_mock_sel_clear_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_selection_model_clear)(model);
+}
+#undef ui_selection_model_clear
+/** @cond */
+#define ui_selection_model_clear mock_listbox_selection_model_clear
+/** @endcond */
+
+/**
+ * @brief mock_listbox_selection_model_get_selected.
+ * @param model Parameter model.
+ * @param out_ids Parameter out_ids.
+ * @param capacity Parameter capacity.
+ * @return Return value.
+ */
+static ui_error_t mock_listbox_selection_model_get_selected(
+    const struct ui_selection_model *model, void **out_ids, int capacity) {
+  if (g_listbox_mock_sel_get_selected_fail) {
+    g_listbox_mock_sel_get_selected_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_selection_model_get_selected)(model, out_ids, capacity);
+}
+#undef ui_selection_model_get_selected
+/** @cond */
+#define ui_selection_model_get_selected                                        \
+  mock_listbox_selection_model_get_selected
+/** @endcond */
+
+/**
+ * @brief mock_listbox_selection_model_get_selected_count.
+ * @param model Parameter model.
+ * @param out_count Parameter out_count.
+ * @return Return value.
+ */
+static ui_error_t mock_listbox_selection_model_get_selected_count(
+    const struct ui_selection_model *model, int *out_count) {
+  if (g_listbox_mock_sel_count_fail) {
+    g_listbox_mock_sel_count_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_selection_model_get_selected_count)(model, out_count);
+}
+#undef ui_selection_model_get_selected_count
+/** @cond */
+#define ui_selection_model_get_selected_count                                  \
+  mock_listbox_selection_model_get_selected_count
+/** @endcond */
+
+/**
+ * @brief mock_listbox_selection_model_set_on_change.
+ * @param model Parameter model.
+ * @param on_change Parameter on_change.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t mock_listbox_selection_model_set_on_change(
+    struct ui_selection_model *model, ui_selection_model_on_change_t on_change,
+    void *user_data) {
+  if (g_listbox_mock_sel_set_on_change_fail) {
+    g_listbox_mock_sel_set_on_change_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_selection_model_set_on_change)(model, on_change, user_data);
+}
+#undef ui_selection_model_set_on_change
+/** @cond */
+#define ui_selection_model_set_on_change                                       \
+  mock_listbox_selection_model_set_on_change
+/** @endcond */
+
+/**
+ * @brief mock_listbox_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @param value Parameter value.
+ * @return Return value.
+ */
+static ui_error_t mock_listbox_dom_node_set_attribute(struct ui_dom_node *node,
+                                                      const char *name,
+                                                      const char *value) {
+  if (g_listbox_mock_set_attr_fail > 0) {
+    g_listbox_mock_set_attr_fail--;
+    if (g_listbox_mock_set_attr_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_set_attribute)(node, name, value);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_listbox_dom_node_set_attribute
+/** @endcond */
+
+/**
+ * @brief mock_listbox_dom_node_get_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @param out_value Parameter out_value.
+ * @return Return value.
+ */
+static ui_error_t
+mock_listbox_dom_node_get_attribute(const struct ui_dom_node *node,
+                                    const char *name, const char **out_value) {
+  if (g_listbox_mock_get_attr_fail > 0) {
+    g_listbox_mock_get_attr_fail--;
+    if (g_listbox_mock_get_attr_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_get_attribute)(node, name, out_value);
+}
+#undef ui_dom_node_get_attribute
+/** @cond */
+#define ui_dom_node_get_attribute mock_listbox_dom_node_get_attribute
+/** @endcond */
+
+/**
+ * @brief mock_listbox_component_set_default_style.
+ * @param comp Parameter comp.
+ * @param sheet Parameter sheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_listbox_component_set_default_style(struct ui_component *comp,
+                                         struct ui_css_stylesheet *sheet) {
+  if (g_listbox_mock_set_style_fail) {
+    g_listbox_mock_set_style_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_listbox_component_set_default_style
+/** @endcond */
+#endif
 
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
@@ -53,57 +291,6 @@ struct ui_listbox_base {
 };
 
 /**
- * @brief Converts an ASCII character to lowercase.
- * @param[in] c The character.
- * @return The lowercase character.
- */
-/**
- * @brief char_tolower.
- * @param c Parameter c.
- * @return Return value.
- */
-static int char_tolower(int c) {
-  if (c >= 'A' && c <= 'Z')
-    return c + ('a' - 'A');
-  return c;
-}
-
-/**
- * @brief Checks if a string case-insensitively starts with a specific prefix.
- * @param[in] str The string to check.
- * @param[in] prefix The prefix to match.
- * @param[in] prefix_len The length of the prefix.
- * @param[out] out_match Set to 1 if it matches, 0 otherwise.
- * @return UI_ERROR_NONE on success.
- */
-/**
- * @brief prefix_match.
- * @param str Parameter str.
- * @param prefix Parameter prefix.
- * @param prefix_len Parameter prefix_len.
- * @param out_match Parameter out_match.
- * @return Return value.
- */
-static ui_error_t prefix_match(const char *str, const char *prefix,
-                               int prefix_len, int *out_match) {
-  int i;
-  int str_c, prefix_c;
-  *out_match = 0;
-  if (!str)
-    return UI_ERROR_NONE;
-  for (i = 0; i < prefix_len; i++) {
-    if (!str[i])
-      return UI_ERROR_NONE;
-    str_c = char_tolower(str[i]);
-    prefix_c = char_tolower(prefix[i]);
-    if (str_c != prefix_c)
-      return UI_ERROR_NONE;
-  }
-  *out_match = 1;
-  return UI_ERROR_NONE;
-}
-
-/**
  * @brief Triggers the CVA on-change callback based on current selection.
  * @param[in,out] listbox The listbox component.
  * @return UI_ERROR_NONE on success.
@@ -117,52 +304,52 @@ static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
   union ui_signal_payload payload;
   int count;
   void **ids;
+  void *id = NULL;
+  int is_multi = 0;
+  const char *attr = NULL;
+  ui_error_t rc;
 
   if (!listbox->cva_on_change)
     return UI_ERROR_NONE;
 
-  {
-    ui_error_t rc_cnt =
-        ui_selection_model_get_selected_count(listbox->selection_model, &count);
-    (void)rc_cnt;
+  rc = ui_selection_model_get_selected_count(listbox->selection_model, &count);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
-  /* Determine multi-select state from aria-multiselectable attribute */
-  {
-    int is_multi = 0;
-    const char *attr = NULL;
-    ui_error_t attr_rc = ui_dom_node_get_attribute(
-        listbox->component->shadow_root, "aria-multiselectable", &attr);
-    (void)attr_rc;
+  rc = ui_dom_node_get_attribute(listbox->component->shadow_root,
+                                 "aria-multiselectable", &attr);
+  if (rc != UI_ERROR_NONE && rc != UI_ERROR_NOT_FOUND) {
+    return rc;
+  }
 
-    if (attr && strcmp(attr, "true") == 0) {
-      is_multi = 1;
+  if (attr && strcmp(attr, "true") == 0) {
+    is_multi = 1;
+  }
+
+  if (is_multi) {
+    ids = (void **)C_MULTIPLATFORM_MALLOC((size_t)count * sizeof(void *));
+    if (!ids) {
+      return UI_ERROR_OUT_OF_MEMORY;
     }
-
-    if (is_multi) {
-      ids = (void **)C_MULTIPLATFORM_MALLOC((size_t)count * sizeof(void *));
-      if (ids) {
-        ui_error_t rc = ui_selection_model_get_selected(
-            listbox->selection_model, ids, count);
-        (void)rc;
-        payload.ptr_val = ids;
-        return listbox->cva_on_change(payload,
-                                      listbox->cva_on_change_user_data);
+    rc = ui_selection_model_get_selected(listbox->selection_model, ids, count);
+    if (rc != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(ids);
+      return rc;
+    }
+    payload.ptr_val = ids;
+  } else {
+    if (count > 0) {
+      rc = ui_selection_model_get_selected(listbox->selection_model, &id, 1);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
       }
+      payload.int_val = (int)(size_t)id;
     } else {
-      if (count > 0) {
-        void *id = NULL;
-        ui_error_t rc_sel =
-            ui_selection_model_get_selected(listbox->selection_model, &id, 1);
-        (void)rc_sel;
-        payload.int_val = (int)(size_t)id;
-      } else {
-        payload.int_val = -1; /* -1 represents no selection */
-      }
-      return listbox->cva_on_change(payload, listbox->cva_on_change_user_data);
+      payload.int_val = -1; /* -1 represents no selection */
     }
   }
-  return UI_ERROR_NONE;
+  return listbox->cva_on_change(payload, listbox->cva_on_change_user_data);
 }
 
 /**
@@ -174,7 +361,8 @@ static ui_error_t listbox_trigger_cva_change(struct ui_listbox_base *listbox) {
 static ui_error_t on_selection_change(struct ui_selection_model *model,
                                       void *user_data) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)user_data;
-  (void)model;
+  if (model) {
+  }
   return listbox_trigger_cva_change(listbox);
 }
 
@@ -197,7 +385,9 @@ static ui_error_t listbox_cva_write_value(void *component,
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
-    (void)attr_rc;
+    if (attr_rc != UI_ERROR_NONE && attr_rc != UI_ERROR_NOT_FOUND) {
+      return attr_rc;
+    }
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -205,13 +395,17 @@ static ui_error_t listbox_cva_write_value(void *component,
 
   /* Clear existing */
   rc = ui_selection_model_clear(listbox->selection_model);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (!is_multi) {
     if (value.int_val >= 0) {
       rc = ui_selection_model_select(listbox->selection_model,
                                      (void *)(size_t)value.int_val);
-      (void)rc;
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
     }
   } else {
     /* For multi, value.ptr_val is an array of size_t/void* ending in -1 or
@@ -264,26 +458,27 @@ static ui_error_t listbox_cva_register_on_touched(
 static ui_error_t listbox_cva_set_disabled_state(void *component,
                                                  int is_disabled) {
   struct ui_listbox_base *listbox = (struct ui_listbox_base *)component;
+  ui_error_t rc;
   if (!listbox)
     return UI_ERROR_INVALID_ARGUMENT;
   listbox->is_disabled = is_disabled;
-  {
-    ui_error_t _ign_rc = ui_dom_node_set_attribute(
-        listbox->component->shadow_root, "aria-disabled",
-        is_disabled ? "true" : "false");
-    (void)_ign_rc;
+  rc = ui_dom_node_set_attribute(listbox->component->shadow_root,
+                                 "aria-disabled",
+                                 is_disabled ? "true" : "false");
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
   if (is_disabled) {
-    {
-      ui_error_t _ign_rc = ui_dom_node_set_attribute(
-          listbox->component->shadow_root, "tabindex", "-1");
-      (void)_ign_rc;
+    rc = ui_dom_node_set_attribute(listbox->component->shadow_root, "tabindex",
+                                   "-1");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   } else {
-    {
-      ui_error_t _ign_rc = ui_dom_node_set_attribute(
-          listbox->component->shadow_root, "tabindex", "0");
-      (void)_ign_rc;
+    rc = ui_dom_node_set_attribute(listbox->component->shadow_root, "tabindex",
+                                   "0");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
   return UI_ERROR_NONE;
@@ -326,38 +521,30 @@ ui_error_t ui_listbox_base_create(struct ui_listbox_base **out_listbox,
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
-
-    ui_error_t _ign_rc = ui_selection_model_set_on_change(
-        listbox->selection_model, on_selection_change, listbox);
-
-    (void)_ign_rc;
-  }
+  rc = ui_selection_model_set_on_change(listbox->selection_model,
+                                        on_selection_change, listbox);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
+  rc = ui_dom_node_set_tag_name(root_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
-    ui_error_t _ign_rc = ui_dom_node_set_tag_name(root_node, "div");
+  rc = ui_dom_node_set_attribute(root_node, "role", "listbox");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
-    (void)_ign_rc;
-  }
-  {
-    ui_error_t _ign_rc =
-        ui_dom_node_set_attribute(root_node, "role", "listbox");
-    (void)_ign_rc;
-  }
-  {
-    ui_error_t _ign_rc = ui_dom_node_set_attribute(root_node, "tabindex", "0");
-    (void)_ign_rc;
-  }
-  {
-    ui_error_t _ign_rc =
-        ui_dom_node_set_attribute(root_node, "aria-multiselectable", "false");
-    (void)_ign_rc;
-  }
+  rc = ui_dom_node_set_attribute(root_node, "tabindex", "0");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+
+  rc = ui_dom_node_set_attribute(root_node, "aria-multiselectable", "false");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   listbox->component->shadow_root = root_node;
   root_node = NULL;
@@ -366,12 +553,10 @@ ui_error_t ui_listbox_base_create(struct ui_listbox_base **out_listbox,
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(listbox->component, default_style);
-
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(listbox->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   if (out_cva) {
@@ -385,11 +570,13 @@ ui_error_t ui_listbox_base_create(struct ui_listbox_base **out_listbox,
   return UI_ERROR_NONE;
 
 cleanup:
+  if (root_node) {
+    ui_dom_node_destroy(root_node);
+  }
   if (listbox->selection_model)
     ui_selection_model_destroy(listbox->selection_model);
   if (listbox->component) {
-    ui_error_t _ign_rc = ui_component_destroy(listbox->component);
-    (void)_ign_rc;
+    ui_component_destroy(listbox->component);
   }
   C_MULTIPLATFORM_FREE(listbox);
   return rc;
@@ -401,20 +588,25 @@ cleanup:
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_listbox_base_destroy(struct ui_listbox_base *listbox) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!listbox)
     return UI_ERROR_NONE;
 
-  {
+  if (listbox->selection_model) {
     ui_error_t rc_cleanup =
         ui_selection_model_destroy(listbox->selection_model);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-  {
-    ui_error_t _ign_rc = ui_component_destroy(listbox->component);
-    (void)_ign_rc;
+  if (listbox->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(listbox->component);
+    if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(listbox);
-  return UI_ERROR_NONE;
+  return rc;
 }
 /**
  * @brief Gets the component of the listbox widget.
@@ -459,11 +651,11 @@ ui_error_t ui_listbox_base_set_multi_select(struct ui_listbox_base *listbox,
     return UI_ERROR_INVALID_ARGUMENT;
 
   if (listbox->component->shadow_root) {
-    {
-      ui_error_t _ign_rc = ui_dom_node_set_attribute(
-          listbox->component->shadow_root, "aria-multiselectable",
-          is_multi ? "true" : "false");
-      (void)_ign_rc;
+    ui_error_t rc = ui_dom_node_set_attribute(listbox->component->shadow_root,
+                                              "aria-multiselectable",
+                                              is_multi ? "true" : "false");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 
@@ -489,9 +681,9 @@ ui_error_t ui_listbox_base_set_item_count(struct ui_listbox_base *listbox,
   }
 
   if (num_items == 0) {
-    {
-      ui_error_t _ign_rc = ui_selection_model_clear(listbox->selection_model);
-      (void)_ign_rc;
+    ui_error_t rc = ui_selection_model_clear(listbox->selection_model);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 
@@ -566,7 +758,9 @@ static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
-    (void)attr_rc;
+    if (attr_rc != UI_ERROR_NONE && attr_rc != UI_ERROR_NOT_FOUND) {
+      return attr_rc;
+    }
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -577,16 +771,27 @@ static ui_error_t perform_typeahead(struct ui_listbox_base *listbox) {
     const char *text =
         listbox->text_provider(listbox, idx, listbox->text_user_data);
     int is_match = 0;
-    ui_error_t rc_pm = prefix_match(text, listbox->typeahead_buffer,
-                                    listbox->typeahead_len, &is_match);
-    (void)rc_pm;
+    if (text) {
+      int j;
+      is_match = 1;
+      for (j = 0; j < listbox->typeahead_len; j++) {
+        if (!text[j] ||
+            tolower((unsigned char)text[j]) !=
+                tolower((unsigned char)listbox->typeahead_buffer[j])) {
+          is_match = 0;
+          break;
+        }
+      }
+    }
     if (is_match) {
       listbox->active_index = idx;
 
       if (!is_multi) {
         ui_error_t rc_sel = ui_selection_model_select(listbox->selection_model,
                                                       (void *)(size_t)idx);
-        (void)rc_sel;
+        if (rc_sel != UI_ERROR_NONE) {
+          return rc_sel;
+        }
       }
       break;
     }
@@ -626,7 +831,9 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(
         listbox->component->shadow_root, "aria-multiselectable", &attr);
-    (void)attr_rc;
+    if (attr_rc != UI_ERROR_NONE && attr_rc != UI_ERROR_NOT_FOUND) {
+      return attr_rc;
+    }
     if (attr && strcmp(attr, "true") == 0) {
       is_multi = 1;
     }
@@ -648,7 +855,9 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         if (!is_multi) {
           ui_error_t rc_sel = ui_selection_model_select(
               listbox->selection_model, (void *)(size_t)listbox->active_index);
-          (void)rc_sel;
+          if (rc_sel != UI_ERROR_NONE) {
+            return rc_sel;
+          }
         }
       }
     } else if (kc == UI_KEY_UP) {
@@ -660,7 +869,9 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         if (!is_multi) {
           ui_error_t rc_sel = ui_selection_model_select(
               listbox->selection_model, (void *)(size_t)listbox->active_index);
-          (void)rc_sel;
+          if (rc_sel != UI_ERROR_NONE) {
+            return rc_sel;
+          }
         }
       }
     } else if (kc == UI_KEY_HOME) {
@@ -670,7 +881,9 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         if (!is_multi) {
           ui_error_t rc_sel = ui_selection_model_select(
               listbox->selection_model, (void *)(size_t)listbox->active_index);
-          (void)rc_sel;
+          if (rc_sel != UI_ERROR_NONE) {
+            return rc_sel;
+          }
         }
       }
     } else if (kc == UI_KEY_END) {
@@ -680,7 +893,9 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         if (!is_multi) {
           ui_error_t rc_sel = ui_selection_model_select(
               listbox->selection_model, (void *)(size_t)listbox->active_index);
-          (void)rc_sel;
+          if (rc_sel != UI_ERROR_NONE) {
+            return rc_sel;
+          }
         }
       }
     } else if (kc == UI_KEY_SPACE || kc == UI_KEY_ENTER) {
@@ -692,7 +907,9 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
           listbox->last_typeahead_time_ms = timestamp_ms;
           {
             ui_error_t rc_ta = perform_typeahead(listbox);
-            (void)rc_ta;
+            if (rc_ta != UI_ERROR_NONE) {
+              return rc_ta;
+            }
           }
         }
       } else {
@@ -702,12 +919,16 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
             ui_error_t rc_tog = ui_selection_model_toggle(
                 listbox->selection_model,
                 (void *)(size_t)listbox->active_index);
-            (void)rc_tog;
+            if (rc_tog != UI_ERROR_NONE) {
+              return rc_tog;
+            }
           } else if (!is_multi) {
             ui_error_t rc_sel = ui_selection_model_select(
                 listbox->selection_model,
                 (void *)(size_t)listbox->active_index);
-            (void)rc_sel;
+            if (rc_sel != UI_ERROR_NONE) {
+              return rc_sel;
+            }
           }
         }
       }
@@ -717,7 +938,9 @@ ui_error_t ui_listbox_base_process_event(struct ui_listbox_base *listbox,
         listbox->last_typeahead_time_ms = timestamp_ms;
         {
           ui_error_t rc_ta = perform_typeahead(listbox);
-          (void)rc_ta;
+          if (rc_ta != UI_ERROR_NONE) {
+            return rc_ta;
+          }
         }
       }
     }

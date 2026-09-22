@@ -46,7 +46,6 @@ ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
   char *prefix_copy = NULL;
   char *uri_copy = NULL;
   ui_error_t err;
-  (void)err;
 
   if (!stylesheet || !uri) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -56,6 +55,9 @@ ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
     err = ((prefix_copy = C_MULTIPLATFORM_STRDUP(prefix))
                ? UI_ERROR_NONE
                : UI_ERROR_OUT_OF_MEMORY);
+    if (err != UI_ERROR_NONE) {
+      return err;
+    }
   }
 
   err = ((uri_copy = C_MULTIPLATFORM_STRDUP(uri)) ? UI_ERROR_NONE
@@ -63,7 +65,7 @@ ui_css_stylesheet_register_namespace(struct ui_css_stylesheet *stylesheet,
   if (err != UI_ERROR_NONE) {
     if (prefix_copy)
       C_MULTIPLATFORM_FREE(prefix_copy);
-    { return err; }
+    return err;
   }
 
   ns = (struct ui_css_namespace *)C_MULTIPLATFORM_MALLOC(
@@ -103,6 +105,7 @@ ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet) {
   struct ui_css_layer *next_layer;
   struct ui_css_namespace *ns;
   struct ui_css_namespace *next_ns;
+  ui_error_t ret_rc = UI_ERROR_NONE;
 
   if (!stylesheet) {
     return UI_ERROR_NONE;
@@ -111,10 +114,7 @@ ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet) {
   rule = stylesheet->rules;
   while (rule) {
     next_rule = rule->next;
-    {
-      ui_error_t _ign_rc = ui_css_rule_destroy(rule);
-      (void)_ign_rc;
-    }
+    ui_css_rule_destroy(rule);
     rule = next_rule;
   }
 
@@ -137,7 +137,7 @@ ui_error_t ui_css_stylesheet_destroy(struct ui_css_stylesheet *stylesheet) {
   }
 
   C_MULTIPLATFORM_FREE(stylesheet);
-  return UI_ERROR_NONE;
+  return ret_rc;
 }
 
 /* \brief ui_error
@@ -171,7 +171,6 @@ ui_css_stylesheet_register_layer(struct ui_css_stylesheet *stylesheet,
   struct ui_css_layer *new_layer;
   char *name_copy;
   ui_error_t err;
-  (void)err;
 
   if (!stylesheet || !out_order) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -272,6 +271,7 @@ ui_error_t ui_css_rule_create(enum ui_css_rule_type type,
  */
 ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel) {
   struct ui_css_selector *next_sel;
+  ui_error_t ret_rc = UI_ERROR_NONE;
   while (sel) {
     next_sel = sel->next;
     if (sel->value) {
@@ -281,15 +281,12 @@ ui_error_t ui_css_selector_destroy(struct ui_css_selector *sel) {
       C_MULTIPLATFORM_FREE(sel->attr_value);
     }
     if (sel->nested_selector) {
-      {
-        ui_error_t _ign_rc = ui_css_selector_destroy(sel->nested_selector);
-        (void)_ign_rc;
-      }
+      ui_css_selector_destroy(sel->nested_selector);
     }
     C_MULTIPLATFORM_FREE(sel);
     sel = next_sel;
   }
-  return UI_ERROR_NONE;
+  return ret_rc;
 }
 
 /**
@@ -308,10 +305,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
   }
 
   if (rule->type == UI_CSS_RULE_TYPE_STYLE) {
-    {
-      ui_error_t _ign_rc = ui_css_selector_destroy(rule->selectors);
-      (void)_ign_rc;
-    }
+    ui_css_selector_destroy(rule->selectors);
 
     decl = rule->declarations;
     while (decl) {
@@ -324,10 +318,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _ign_rc = ui_css_rule_destroy(nested);
-        (void)_ign_rc;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_MEDIA) {
@@ -335,10 +326,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _ign_rc = ui_css_rule_destroy(nested);
-        (void)_ign_rc;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_LAYER) {
@@ -346,28 +334,20 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _ign_rc = ui_css_rule_destroy(nested);
-        (void)_ign_rc;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_SCOPE) {
     if (rule->scope_start) {
-      ui_error_t _ign_rc = ui_css_selector_destroy(rule->scope_start);
-      (void)_ign_rc;
+      ui_css_selector_destroy(rule->scope_start);
     }
     if (rule->scope_end) {
-      ui_error_t _ign_rc = ui_css_selector_destroy(rule->scope_end);
-      (void)_ign_rc;
+      ui_css_selector_destroy(rule->scope_end);
     }
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _ign_rc = ui_css_rule_destroy(nested);
-        (void)_ign_rc;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_SUPPORTS) {
@@ -375,10 +355,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _ign_rc = ui_css_rule_destroy(nested);
-        (void)_ign_rc;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_CONTAINER) {
@@ -386,10 +363,7 @@ ui_error_t ui_css_rule_destroy(struct ui_css_rule *rule) {
     nested = rule->nested_rules;
     while (nested) {
       next_nested = nested->next;
-      {
-        ui_error_t _ign_rc = ui_css_rule_destroy(nested);
-        (void)_ign_rc;
-      }
+      ui_css_rule_destroy(nested);
       nested = next_nested;
     }
   } else if (rule->type == UI_CSS_RULE_TYPE_PROPERTY) {
@@ -416,7 +390,6 @@ ui_error_t ui_css_rule_append_selector(struct ui_css_rule *rule,
   struct ui_css_selector *curr;
   char *val_copy = NULL;
   ui_error_t err;
-  (void)err;
 
   if (!rule || (type != UI_CSS_SELECTOR_TYPE_UNIVERSAL && !value)) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -426,9 +399,7 @@ ui_error_t ui_css_rule_append_selector(struct ui_css_rule *rule,
     err = ((val_copy = C_MULTIPLATFORM_STRDUP(value)) ? UI_ERROR_NONE
                                                       : UI_ERROR_OUT_OF_MEMORY);
     if (err != UI_ERROR_NONE) {
-      {
-        return err;
-      }
+      return err;
     }
   }
 
@@ -470,7 +441,6 @@ ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
   char *name_copy = NULL;
   char *val_copy = NULL;
   ui_error_t err;
-  (void)err;
 
   if (!rule || !attr_name) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -480,9 +450,7 @@ ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
              ? UI_ERROR_NONE
              : UI_ERROR_OUT_OF_MEMORY);
   if (err != UI_ERROR_NONE) {
-    {
-      return err;
-    }
+    return err;
   }
 
   if (attr_value && attr_op != UI_CSS_ATTR_OP_NONE) {
@@ -491,7 +459,7 @@ ui_error_t ui_css_rule_append_selector_attr(struct ui_css_rule *rule,
                : UI_ERROR_OUT_OF_MEMORY);
     if (err != UI_ERROR_NONE) {
       C_MULTIPLATFORM_FREE(name_copy);
-      { return err; }
+      return err;
     }
   }
 
@@ -540,7 +508,6 @@ ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
   char *name_copy = NULL;
   char *val_copy = NULL;
   ui_error_t err;
-  (void)err;
 
   if (!rule || !property_name || !property_value) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -550,9 +517,7 @@ ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
              ? UI_ERROR_NONE
              : UI_ERROR_OUT_OF_MEMORY);
   if (err != UI_ERROR_NONE) {
-    {
-      return err;
-    }
+    return err;
   }
 
   err = ((val_copy = C_MULTIPLATFORM_STRDUP(property_value))
@@ -560,7 +525,7 @@ ui_error_t ui_css_rule_append_declaration(struct ui_css_rule *rule,
              : UI_ERROR_OUT_OF_MEMORY);
   if (err != UI_ERROR_NONE) {
     C_MULTIPLATFORM_FREE(name_copy);
-    { return err; }
+    return err;
   }
 
   decl = (struct ui_css_declaration *)C_MULTIPLATFORM_MALLOC(
@@ -711,24 +676,19 @@ static ui_error_t attribute_matches(const struct ui_css_selector *selector,
     *out_matched = (strcmp(attr_val, selector->attr_value) == 0);
     return UI_ERROR_NONE;
   case UI_CSS_ATTR_OP_INCLUDES: {
-    (void)class_list_contains(attr_val, selector->attr_value, out_matched);
-    return UI_ERROR_NONE;
+    return class_list_contains(attr_val, selector->attr_value, out_matched);
   }
   case UI_CSS_ATTR_OP_DASH: {
-    (void)string_dash_match(attr_val, selector->attr_value, out_matched);
-    return UI_ERROR_NONE;
+    return string_dash_match(attr_val, selector->attr_value, out_matched);
   }
   case UI_CSS_ATTR_OP_PREFIX: {
-    (void)string_starts_with(attr_val, selector->attr_value, out_matched);
-    return UI_ERROR_NONE;
+    return string_starts_with(attr_val, selector->attr_value, out_matched);
   }
   case UI_CSS_ATTR_OP_SUFFIX: {
-    (void)string_ends_with(attr_val, selector->attr_value, out_matched);
-    return UI_ERROR_NONE;
+    return string_ends_with(attr_val, selector->attr_value, out_matched);
   }
   case UI_CSS_ATTR_OP_SUBSTRING: {
-    (void)string_contains(attr_val, selector->attr_value, out_matched);
-    return UI_ERROR_NONE;
+    return string_contains(attr_val, selector->attr_value, out_matched);
   }
   default:
     *out_matched = 0;
@@ -753,7 +713,7 @@ any_selector_matches(const struct ui_css_selector *selectors_list,
   const struct ui_css_selector *curr = selectors_list;
   while (curr) {
     int m = 0;
-    (void)selector_matches(curr, node, &m);
+    selector_matches(curr, node, &m);
     if (m) {
       *out_matched = 1;
       return UI_ERROR_NONE;
@@ -778,12 +738,12 @@ has_matching_descendant(const struct ui_css_selector *selectors_list,
   while (child) {
     if (child->type == UI_DOM_NODE_TYPE_ELEMENT) {
       int m = 0;
-      (void)any_selector_matches(selectors_list, child, &m);
+      any_selector_matches(selectors_list, child, &m);
       if (m) {
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
-      (void)has_matching_descendant(selectors_list, child, &m);
+      has_matching_descendant(selectors_list, child, &m);
       if (m) {
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -830,14 +790,14 @@ static ui_error_t is_in_scope(const struct ui_css_selector *scope_start,
     if (1) {
       if (scope_end) {
         int m = 0;
-        (void)any_selector_matches(scope_end, curr, &m);
+        any_selector_matches(scope_end, curr, &m);
         if (m) {
           end_matched = 1;
         }
       }
       if (scope_start) {
         int m = 0;
-        (void)any_selector_matches(scope_start, curr, &m);
+        any_selector_matches(scope_start, curr, &m);
         if (m) {
           start_matched = 1;
           break; /* Found the scope root */
@@ -874,7 +834,7 @@ has_matching_ancestor(const struct ui_css_selector *selectors_list,
   while (parent) {
     if (1) {
       int m = 0;
-      (void)any_selector_matches(selectors_list, parent, &m);
+      any_selector_matches(selectors_list, parent, &m);
       if (m) {
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -923,11 +883,7 @@ static ui_error_t pseudo_class_matches(const struct ui_css_selector *selector,
         *out_matched = 1;
         return UI_ERROR_NONE;
       }
-      {
-        ui_error_t rc =
-            any_selector_matches(selector->nested_selector, node, &m);
-        (void)rc;
-      }
+      any_selector_matches(selector->nested_selector, node, &m);
       *out_matched = !m;
       return UI_ERROR_NONE;
     }
@@ -1242,9 +1198,8 @@ static ui_error_t selector_matches(const struct ui_css_selector *selector,
   case UI_CSS_SELECTOR_TYPE_CLASS: {
     ui_error_t attr_rc = ui_dom_node_get_attribute(node, "class", &attr_val);
     if (attr_rc == UI_ERROR_NONE) {
-
       int m = 0;
-      (void)class_list_contains(attr_val, selector->value, &m);
+      class_list_contains(attr_val, selector->value, &m);
       if (m) {
         *out_matched = 1;
         return UI_ERROR_NONE;
@@ -1298,7 +1253,6 @@ static ui_error_t append_computed_declaration(
   char *name_copy = NULL;
   char *val_copy = NULL;
   ui_error_t err;
-  (void)err;
 
   /* Check if already exists to handle cascade */
   curr = style->properties;
@@ -1361,22 +1315,36 @@ static ui_error_t append_computed_declaration(
   err = ((name_copy = C_MULTIPLATFORM_STRDUP(property_name))
              ? UI_ERROR_NONE
              : UI_ERROR_OUT_OF_MEMORY);
-  val_copy = C_MULTIPLATFORM_STRDUP(property_value);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
+
+  err = ((val_copy = C_MULTIPLATFORM_STRDUP(property_value))
+             ? UI_ERROR_NONE
+             : UI_ERROR_OUT_OF_MEMORY);
+  if (err != UI_ERROR_NONE) {
+    C_MULTIPLATFORM_FREE(name_copy);
+    return err;
+  }
 
   new_prop = (struct ui_css_computed_property *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_css_computed_property));
-  if (new_prop) {
-    new_prop->property_name = name_copy;
-    new_prop->property_value = val_copy;
-    new_prop->is_important = is_important;
-    new_prop->layer_order = layer_order;
-    new_prop->spec_a = spec_a;
-    new_prop->spec_b = spec_b;
-    new_prop->spec_c = spec_c;
-    new_prop->source_order = source_order;
-    new_prop->next = style->properties;
-    style->properties = new_prop;
+  if (!new_prop) {
+    C_MULTIPLATFORM_FREE(name_copy);
+    C_MULTIPLATFORM_FREE(val_copy);
+    return UI_ERROR_OUT_OF_MEMORY;
   }
+
+  new_prop->property_name = name_copy;
+  new_prop->property_value = val_copy;
+  new_prop->is_important = is_important;
+  new_prop->layer_order = layer_order;
+  new_prop->spec_a = spec_a;
+  new_prop->spec_b = spec_b;
+  new_prop->spec_c = spec_c;
+  new_prop->source_order = source_order;
+  new_prop->next = style->properties;
+  style->properties = new_prop;
   return UI_ERROR_NONE;
 }
 
@@ -1412,7 +1380,7 @@ static ui_error_t get_selector_specificity(const struct ui_css_selector *sel,
       struct ui_css_selector *nested = sel->nested_selector;
       int max_a = 0, max_b = 0, max_c = 0;
       if (nested) {
-        (void)get_selector_specificity(nested, &max_a, &max_b, &max_c);
+        get_selector_specificity(nested, &max_a, &max_b, &max_c);
       }
       *a = max_a;
       *b = max_b;
@@ -1505,11 +1473,13 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
     {
       const char *start = *p;
       int paren_count = 1;
-      (void)paren_count;
       while (**p) {
-        if (**p == ')') {
+        if (**p == '(') {
+          paren_count++;
+        } else if (**p == ')') {
           paren_count--;
-          break; /* always 0 */
+          if (paren_count <= 0)
+            break;
         }
         (*p)++;
       }
@@ -1533,7 +1503,6 @@ static ui_error_t eval_cond_term(const char **p, int *out_matched) {
     if (**p == '(') {
       const char *start;
       int paren_count = 1;
-      (void)paren_count;
       (*p)++;
       start = *p;
       while (**p) {
@@ -1576,7 +1545,7 @@ static ui_error_t eval_cond_and(const char **p, int *out_matched) {
   for (;;) {
     int m = 0;
     cond_skip_ws(p);
-    (void)cond_is_word(*p, "and", &m);
+    cond_is_word(*p, "and", &m);
 
     if (m) {
       int next_res = 0;
@@ -1608,7 +1577,7 @@ static ui_error_t eval_cond_or(const char **p, int *out_matched) {
   for (;;) {
     int m = 0;
     cond_skip_ws(p);
-    (void)cond_is_word(*p, "or", &m);
+    cond_is_word(*p, "or", &m);
 
     if (m) {
       int next_res = 0;
@@ -1664,7 +1633,6 @@ static ui_error_t resolve_rules_recursive(
   struct ui_css_selector *sel;
   struct ui_css_declaration *decl;
   ui_error_t err;
-  (void)err;
 
   while (rule) {
     if (rule->type == UI_CSS_RULE_TYPE_LAYER) {
@@ -1685,37 +1653,52 @@ static ui_error_t resolve_rules_recursive(
          * assigned. For simplicity here: */
       }
 
-      (void)resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
+      err = resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
                                     source_order_counter, next_layer_order);
+      if (err != UI_ERROR_NONE) {
+        return err;
+      }
     } else if (rule->type == UI_CSS_RULE_TYPE_MEDIA) {
       /* Assume media condition matches for testing purposes */
       /* Real engine would query window size / capability */
-      (void)resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
+      err = resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
                                     source_order_counter, current_layer_order);
+      if (err != UI_ERROR_NONE) {
+        return err;
+      }
     } else if (rule->type == UI_CSS_RULE_TYPE_SUPPORTS) {
       int _m = 0;
       ui_error_t _rc = eval_supports_condition(rule->supports_condition, &_m);
-      if (_rc == UI_ERROR_PARSE_FAILED) {
+      if (_rc != UI_ERROR_NONE) {
         return _rc;
       }
       if (_m) {
-        (void)resolve_rules_recursive(stylesheet, rule->nested_rules, node,
-                                      style, source_order_counter,
-                                      current_layer_order);
+        err =
+            resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
+                                    source_order_counter, current_layer_order);
+        if (err != UI_ERROR_NONE) {
+          return err;
+        }
       }
     } else if (rule->type == UI_CSS_RULE_TYPE_CONTAINER) {
       /* In a real engine, we would query the DOM tree upwards to find a node
          with container-type that matches the condition.
          For testing, we assume container conditions match. */
-      (void)resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
+      err = resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
                                     source_order_counter, current_layer_order);
+      if (err != UI_ERROR_NONE) {
+        return err;
+      }
     } else if (rule->type == UI_CSS_RULE_TYPE_SCOPE) {
       int _m = 0;
-      (void)is_in_scope(rule->scope_start, rule->scope_end, node, &_m);
+      is_in_scope(rule->scope_start, rule->scope_end, node, &_m);
       if (_m) {
-        (void)resolve_rules_recursive(stylesheet, rule->nested_rules, node,
-                                      style, source_order_counter,
-                                      current_layer_order);
+        err =
+            resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
+                                    source_order_counter, current_layer_order);
+        if (err != UI_ERROR_NONE) {
+          return err;
+        }
       }
     } else if (rule->type == UI_CSS_RULE_TYPE_STYLE) {
       int best_a = -1, best_b = -1, best_c = -1;
@@ -1725,12 +1708,10 @@ static ui_error_t resolve_rules_recursive(
       sel = rule->selectors;
       while (sel) {
         int _sm = 0;
-        ui_error_t rc = selector_matches(sel, node, &_sm);
-        (void)rc;
+        selector_matches(sel, node, &_sm);
         if (_sm) {
           int a, b, c;
-          ui_error_t sp_rc = get_selector_specificity(sel, &a, &b, &c);
-          (void)sp_rc;
+          get_selector_specificity(sel, &a, &b, &c);
           if (!matched || a > best_a || (a == best_a && b > best_b) ||
               (a == best_a && b == best_b && c > best_c)) {
             best_a = a;
@@ -1742,7 +1723,7 @@ static ui_error_t resolve_rules_recursive(
         {
           int _hm = 0;
           if (!ancestor_matched) {
-            (void)has_matching_ancestor(rule->selectors, node, &_hm);
+            has_matching_ancestor(rule->selectors, node, &_hm);
           }
           if (!ancestor_matched && _hm) {
             ancestor_matched = 1;
@@ -1758,7 +1739,9 @@ static ui_error_t resolve_rules_recursive(
               style, decl->property_name, decl->property_value,
               decl->is_important, current_layer_order, best_a, best_b, best_c,
               *source_order_counter);
-          /* ignore err */
+          if (err != UI_ERROR_NONE) {
+            return err;
+          }
           decl = decl->next;
         }
       }
@@ -1768,6 +1751,9 @@ static ui_error_t resolve_rules_recursive(
         err =
             resolve_rules_recursive(stylesheet, rule->nested_rules, node, style,
                                     source_order_counter, current_layer_order);
+        if (err != UI_ERROR_NONE) {
+          return err;
+        }
       }
     }
 
@@ -1789,7 +1775,6 @@ ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
   struct ui_css_computed_style *style;
   int source_order = 0;
   ui_error_t err;
-  (void)err;
 
   if (!stylesheet || !node || !out_style) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -1806,11 +1791,8 @@ ui_error_t ui_css_resolve_style(const struct ui_css_stylesheet *stylesheet,
   err = resolve_rules_recursive(stylesheet, stylesheet->rules, node, style,
                                 &source_order, 0x7FFFFFFF /* unlayered */);
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t _ign_rc = ui_css_computed_style_destroy(style);
-      (void)_ign_rc;
-    }
-    { return err; }
+    ui_css_computed_style_destroy(style);
+    return err;
   }
 
   *out_style = style;

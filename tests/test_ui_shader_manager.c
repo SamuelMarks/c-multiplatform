@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stdio.h>
 #include "../include/ui_shader_manager.h"
 #include "../include/ui_error.h"
@@ -142,23 +143,17 @@ int main(void) {
     {
       ui_error_t rc_cleanup = ui_shader_manager_set_uniform_matrix(
           manager, program_id1, "invalid_u", matrix);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_shader_manager_set_uniform_color(
           manager, program_id1, "invalid_u", 1.0f, 0.0f, 0.0f, 1.0f);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_shader_manager_set_uniform_float(
           manager, program_id1, "invalid_u", 1.5f);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 

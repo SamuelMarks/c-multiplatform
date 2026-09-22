@@ -232,6 +232,29 @@ int main(void) {
   test_parse_offset_position();
   test_parse_offset_anchor();
   test_parse_offset_rotate();
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_motion_mock_fail;
+    extern ui_error_t run_motion_coverage(void);
+    struct ui_css_offset_path path;
+    struct ui_css_value distance;
+    struct ui_css_offset_position pos;
+    struct ui_css_offset_anchor anchor;
+    struct ui_css_offset_rotate rot;
+
+    g_motion_mock_fail = 1;
+    EXPECT_EQ(UI_ERROR_UNKNOWN, ui_css_parse_offset_path("none", &path));
+    EXPECT_EQ(UI_ERROR_UNKNOWN, ui_css_parse_offset_distance("50%", &distance));
+    EXPECT_EQ(UI_ERROR_UNKNOWN, ui_css_parse_offset_position("auto", &pos));
+    EXPECT_EQ(UI_ERROR_UNKNOWN, ui_css_parse_offset_anchor("auto", &anchor));
+    EXPECT_EQ(UI_ERROR_UNKNOWN, ui_css_parse_offset_rotate("auto", &rot));
+    g_motion_mock_fail = 0;
+
+    EXPECT_EQ(UI_ERROR_NONE, run_motion_coverage());
+  }
+#endif
+
   printf("All CSS Motion Path tests passed.\n");
   return 0;
 }

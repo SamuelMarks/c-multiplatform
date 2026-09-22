@@ -16,7 +16,7 @@ static ui_error_t layout_block(struct ui_layout_node *node,
   float total_height = 0.0f;
   float actual_column_width;
   int actual_column_count;
-
+  ui_error_t rc = UI_ERROR_NONE;
   /* If width is 0 and we are a block without explicit width, expand */
   if (node->width_type == UI_LAYOUT_SIZE_PERCENTAGE) {
     node->width = (available_width * node->raw_width / 100.0f) -
@@ -148,13 +148,7 @@ static ui_error_t layout_block(struct ui_layout_node *node,
       child->x = current_x + child->margin[3];
       child->y = current_y + child->margin[0];
 
-      {
-        {
-          ui_error_t rc_cleanup =
-              ui_layout_compute(child, child_available_width, 0.0f);
-          (void)rc_cleanup;
-        }
-      }
+      rc = ui_layout_compute(child, child_available_width, 0.0f);
 
       current_y = child->y + child->height + child->margin[2];
     } else if (child->display_outside == UI_LAYOUT_DISPLAY_OUTSIDE_INLINE) {
@@ -162,13 +156,7 @@ static ui_error_t layout_block(struct ui_layout_node *node,
       child->x = current_x + child->margin[3];
       child->y = current_y + child->margin[0];
 
-      {
-        {
-          ui_error_t rc_cleanup =
-              ui_layout_compute(child, child_available_width, 0.0f);
-          (void)rc_cleanup;
-        }
-      }
+      rc = ui_layout_compute(child, child_available_width, 0.0f);
 
       current_x = child->x + child->width + child->margin[1];
       /* If child exceeds width, should wrap, but simplistic for now */
@@ -233,7 +221,7 @@ static ui_error_t layout_block(struct ui_layout_node *node,
   if (node->width > 0.0f) {
   }
 
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -273,6 +261,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
   float current_x, current_y;
   int i;
   float container_main_size;
+  ui_error_t rc = UI_ERROR_NONE;
 
   memset(lines, 0, sizeof(lines));
 
@@ -308,13 +297,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
     float child_cross_outer = 0.0f;
     struct ui_flex_line *current_line = &lines[line_count - 1];
 
-    {
-      {
-        ui_error_t rc_cleanup =
-            ui_layout_compute(child, node->content_width, 0.0f);
-        (void)rc_cleanup;
-      }
-    }
+    rc = ui_layout_compute(child, node->content_width, 0.0f);
 
     if (child->flex_basis_type == UI_LAYOUT_SIZE_PIXELS) {
       basis = child->flex_basis;
@@ -382,11 +365,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
         if (is_row) {
           child->width += extra;
           child->content_width += extra;
-          {
-            ui_error_t rc_cleanup =
-                ui_layout_compute(child, child->content_width, 0.0f);
-            (void)rc_cleanup;
-          }
+          rc = ui_layout_compute(child, child->content_width, 0.0f);
         } else {
           child->height += extra;
           child->content_height += extra;
@@ -406,11 +385,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
         if (is_row) {
           child->width -= shrink;
           child->content_width -= shrink;
-          {
-            ui_error_t rc_cleanup =
-                ui_layout_compute(child, child->content_width, 0.0f);
-            (void)rc_cleanup;
-          }
+          rc = ui_layout_compute(child, child->content_width, 0.0f);
         } else {
           child->height -= shrink;
           child->content_height -= shrink;
@@ -530,7 +505,7 @@ static ui_error_t layout_flex(struct ui_layout_node *node,
                    node->border[0] + node->border[2];
   }
 
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

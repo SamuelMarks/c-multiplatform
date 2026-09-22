@@ -1,5 +1,6 @@
 extern int g_malloc_fail_countdown;
 /* clang-format off */
+#include <assert.h>
 #include "../include/ui_dom_node.h"
 #include "../include/ui_error.h"
 #include "../include/ui_event.h"
@@ -27,7 +28,8 @@ struct test_state {
 static ui_error_t handle_event(struct ui_dom_node *node,
                                const struct ui_event *event, void *user_data) {
   struct test_state *state = (struct test_state *)user_data;
-  (void)node;
+  if (node) {
+  }
   switch (event->type) {
   case UI_EVENT_MOUSE_ENTER:
     state->enter_count++;
@@ -92,9 +94,12 @@ static void trigger_null_branches(void) {
 static ui_error_t failing_handler(struct ui_dom_node *node,
                                   const struct ui_event *event,
                                   void *user_data) {
-  (void)node;
-  (void)event;
-  (void)user_data;
+  if (node) {
+  }
+  if (event) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -196,7 +201,7 @@ static void test_failing_events(void) {
   ui_dom_node_remove_event_listener(root_dom, UI_EVENT_KEY_DOWN,
                                     failing_handler);
 
-  ev.event_data.keyboard.key_code = 9;
+  ev.event_data.keyboard.key_code = UI_KEY_TAB;
   g_malloc_fail_countdown = 0;
   ui_event_dispatch(&root_layout, &ev, &mouse_state, focus_mgr);
   g_malloc_fail_countdown = -1;
@@ -209,13 +214,13 @@ static void test_failing_events(void) {
   {
     ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_mgr);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_dom);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -531,13 +536,13 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_mgr);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_dom);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 

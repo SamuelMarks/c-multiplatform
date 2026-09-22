@@ -9,13 +9,16 @@ extern int g_malloc_fail_countdown;
 
 static ui_error_t dummy_cva_on_change(union ui_signal_payload new_value,
                                       void *user_data) {
-  (void)new_value;
-  (void)user_data;
+  if (new_value.ptr_val) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t dummy_cva_on_touched(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -107,7 +110,14 @@ static ui_error_t test_chips_basic(void) {
   {
     union ui_signal_payload payload;
     payload.ptr_val = NULL;
+    rc = cva.write_value(NULL, payload);
+    if (rc != UI_ERROR_INVALID_ARGUMENT)
+      return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
     rc = cva.write_value(chips, payload); /* does nothing but cover lines */
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    payload.ptr_val = (void *)chips;
+    rc = cva.write_value(chips, payload);
     if (rc != UI_ERROR_NONE)
       return rc;
   }

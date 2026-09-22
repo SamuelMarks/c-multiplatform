@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "ui_scroll_dispatcher.h"
 #include "ui_layout_observer.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -12,7 +13,8 @@ static void *g_callback_user_data = NULL;
 static ui_error_t test_callback(struct ui_scroll_dispatcher *dispatcher,
                                 const struct ui_scroll_info *info,
                                 void *user_data) {
-  (void)dispatcher;
+  if (dispatcher) {
+  }
   g_callback_called++;
   if (info) {
     g_last_scroll_x = info->scroll_x;
@@ -26,9 +28,12 @@ static ui_error_t test_callback(struct ui_scroll_dispatcher *dispatcher,
 static ui_error_t test_callback_fail(struct ui_scroll_dispatcher *dispatcher,
                                      const struct ui_scroll_info *info,
                                      void *user_data) {
-  (void)dispatcher;
-  (void)info;
-  (void)user_data;
+  if (dispatcher) {
+  }
+  if (info) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -237,9 +242,7 @@ cleanup:
   if (dispatcher) {
     {
       ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(dispatcher);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -298,17 +301,13 @@ void test_ui_scroll_dispatcher_oom(void) {
 
     {
       ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(dispatcher);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   ui_scroll_dispatcher_unregister(NULL, 0);
 }

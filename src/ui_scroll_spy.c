@@ -14,6 +14,103 @@
 #include <stdlib.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_scroll_spy_mock_fail = 0;
+
+/**
+ * @brief mock_scroll_spy_signal_set.
+ * @param signal Parameter signal.
+ * @param payload Parameter payload.
+ * @return Return value.
+ */
+static ui_error_t mock_scroll_spy_signal_set(struct ui_signal *signal,
+                                             union ui_signal_payload payload) {
+  if (g_scroll_spy_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_set)(signal, payload);
+}
+#undef ui_signal_set
+/** @cond */
+#define ui_signal_set mock_scroll_spy_signal_set
+/** @endcond */
+
+/**
+ * @brief mock_scroll_spy_intersection_observer_destroy.
+ * @param obs Parameter obs.
+ * @return Return value.
+ */
+static ui_error_t mock_scroll_spy_intersection_observer_destroy(
+    struct ui_intersection_observer *obs) {
+  if (g_scroll_spy_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_intersection_observer_destroy)(obs);
+}
+#undef ui_intersection_observer_destroy
+/** @cond */
+#define ui_intersection_observer_destroy                                       \
+  mock_scroll_spy_intersection_observer_destroy
+/** @endcond */
+
+/**
+ * @brief mock_scroll_spy_subscribe.
+ * @param obs Parameter obs.
+ * @param cb Parameter cb.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t
+mock_scroll_spy_subscribe(struct ui_intersection_observer *obs,
+                          ui_intersection_observer_cb_t cb, void *user_data) {
+  if (g_scroll_spy_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_intersection_observer_subscribe)(obs, cb, user_data);
+}
+#undef ui_intersection_observer_subscribe
+/** @cond */
+#define ui_intersection_observer_subscribe mock_scroll_spy_subscribe
+/** @endcond */
+
+/**
+ * @brief mock_scroll_spy_observe.
+ * @param obs Parameter obs.
+ * @param target Parameter target.
+ * @return Return value.
+ */
+static ui_error_t mock_scroll_spy_observe(struct ui_intersection_observer *obs,
+                                          struct ui_dom_node *target) {
+  if (g_scroll_spy_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_intersection_observer_observe)(obs, target);
+}
+#undef ui_intersection_observer_observe
+/** @cond */
+#define ui_intersection_observer_observe mock_scroll_spy_observe
+/** @endcond */
+
+/**
+ * @brief mock_scroll_spy_unobserve.
+ * @param obs Parameter obs.
+ * @param target Parameter target.
+ * @return Return value.
+ */
+static ui_error_t
+mock_scroll_spy_unobserve(struct ui_intersection_observer *obs,
+                          struct ui_dom_node *target) {
+  if (g_scroll_spy_mock_fail == 5) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_intersection_observer_unobserve)(obs, target);
+}
+#undef ui_intersection_observer_unobserve
+/** @cond */
+#define ui_intersection_observer_unobserve mock_scroll_spy_unobserve
+/** @endcond */
+#endif
+
 /* \brief Maximum number of targets a scroll spy can track */
 /** @def MAX_SPY_TARGETS
  * @brief Maximum spy targets
@@ -73,7 +170,9 @@ on_intersection(struct ui_intersection_observer *observer,
   int best_id = -1;
   float best_ratio = -1.0f;
 
-  (void)observer;
+  if (!observer) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   spy = (struct ui_scroll_spy *)user_data;
 
@@ -100,14 +199,36 @@ on_intersection(struct ui_intersection_observer *observer,
   /* Notify signal if bound and we have a valid section */
   if (spy->active_signal && best_id != -1) {
     union ui_signal_payload payload;
+    ui_error_t s_rc;
     payload.int_val = best_id;
-    {
-      ui_error_t s_rc = ui_signal_set(spy->active_signal, payload);
-      (void)s_rc;
+    s_rc = ui_signal_set(spy->active_signal, payload);
+    if (s_rc != UI_ERROR_NONE) {
+      /* Reactive effect failure does not disrupt scroll tracking */
     }
   }
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief test_ui_scroll_spy_call_on_intersection.
+ * @param spy Parameter spy.
+ * @param obs Parameter obs.
+ * @return Return value.
+ */
+ui_error_t
+test_ui_scroll_spy_call_on_intersection(struct ui_scroll_spy *spy,
+                                        struct ui_intersection_observer *obs);
+ui_error_t
+test_ui_scroll_spy_call_on_intersection(struct ui_scroll_spy *spy,
+                                        struct ui_intersection_observer *obs) {
+  struct ui_intersection_observer_entry entry;
+  entry.target = (struct ui_dom_node *)0xdead;
+  entry.is_intersecting = 0;
+  entry.intersection_ratio = 0.0f;
+  return on_intersection(obs, &entry, 1, spy);
+}
+#endif
 
 /**
  * \brief Creates a new scroll spy behavior instance.
@@ -145,15 +266,17 @@ ui_error_t ui_scroll_spy_create(struct ui_scroll_spy **out_spy) {
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_scroll_spy_destroy(struct ui_scroll_spy *spy) {
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!spy) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (spy->observer) {
-    (void)ui_intersection_observer_destroy(spy->observer);
+    rc = ui_intersection_observer_destroy(spy->observer);
   }
   C_MULTIPLATFORM_FREE(spy);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -180,7 +303,10 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
   spy->root_margin_px = root_margin_px;
 
   if (spy->observer) {
-    (void)ui_intersection_observer_destroy(spy->observer);
+    rc = ui_intersection_observer_destroy(spy->observer);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
     spy->observer = NULL;
   }
 
@@ -191,20 +317,16 @@ ui_error_t ui_scroll_spy_set_root(struct ui_scroll_spy *spy,
   }
 
   /* subscribe only fails on NULL observer, which is guaranteed non-NULL here */
-  {
-    ui_error_t sub_rc =
-        ui_intersection_observer_subscribe(spy->observer, on_intersection, spy);
-    (void)sub_rc;
+  rc = ui_intersection_observer_subscribe(spy->observer, on_intersection, spy);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   /* Re-observe existing targets */
   for (i = 0; i < spy->target_count; i++) {
-    {
-      ui_error_t obs_rc =
-          ui_intersection_observer_observe(spy->observer, spy->targets[i].node);
-      if (obs_rc != UI_ERROR_NONE) {
-        return obs_rc;
-      }
+    rc = ui_intersection_observer_observe(spy->observer, spy->targets[i].node);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 
@@ -237,11 +359,7 @@ ui_error_t ui_scroll_spy_add_target(struct ui_scroll_spy *spy,
   spy->target_count++;
 
   if (spy->observer) {
-    {
-      ui_error_t ob_rc =
-          ui_intersection_observer_observe(spy->observer, target);
-      (void)ob_rc;
-    }
+    return ui_intersection_observer_observe(spy->observer, target);
   }
 
   return UI_ERROR_NONE;
@@ -258,6 +376,7 @@ ui_error_t ui_scroll_spy_add_target(struct ui_scroll_spy *spy,
 ui_error_t ui_scroll_spy_remove_target(struct ui_scroll_spy *spy,
                                        struct ui_dom_node *target) {
   int i;
+  ui_error_t rc;
 
   if (!spy || !target) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -266,10 +385,9 @@ ui_error_t ui_scroll_spy_remove_target(struct ui_scroll_spy *spy,
   for (i = 0; i < spy->target_count; i++) {
     if (spy->targets[i].node == target) {
       if (spy->observer) {
-        {
-          ui_error_t un_rc =
-              ui_intersection_observer_unobserve(spy->observer, target);
-          (void)un_rc;
+        rc = ui_intersection_observer_unobserve(spy->observer, target);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
         }
       }
       spy->targets[i] = spy->targets[spy->target_count - 1];

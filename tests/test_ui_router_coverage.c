@@ -40,9 +40,7 @@ void test_ui_router_coverage(void) {
 
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -55,9 +53,7 @@ void test_ui_router_coverage2(void) {
     ui_router_navigate_with_state(router, "/cov", (void *)0x123);
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }

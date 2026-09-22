@@ -1,7 +1,9 @@
 /* clang-format off */
 #include "../include/ui_context_menu_base.h"
 #include "../include/ui_error.h"
+#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 /* clang-format on */
 
 /* We need to hook into the menu's internal styling to see if it actually got
@@ -78,6 +80,12 @@ static int test_context_menu_clamping(void) {
   /* Test NULLs */
   ui_context_menu_base_create(NULL);
   ui_context_menu_base_destroy(NULL);
+  {
+    struct ui_context_menu_base *no_menu =
+        (struct ui_context_menu_base *)calloc(1, 64);
+    rc = ui_context_menu_base_destroy(no_menu);
+    assert(rc == UI_ERROR_NONE);
+  }
   ui_context_menu_base_get_menu(NULL, &menu);
   ui_context_menu_base_get_menu(ctx_menu, NULL);
   ui_context_menu_base_open_at(NULL, director, 0, 0, 0, 0, 0, 0);
@@ -96,19 +104,25 @@ static int test_context_menu_clamping(void) {
   /* Fails in ui_menu_base_create which is the second malloc usually */
   ui_context_menu_base_create(&ctx_menu);
   g_malloc_fail_countdown = -1;
+
+  {
+    extern int g_context_menu_mock_fail;
+    rc = ui_context_menu_base_create(&ctx_menu);
+    assert(rc == UI_ERROR_NONE);
+    g_context_menu_mock_fail = 1;
+    rc = ui_context_menu_base_destroy(ctx_menu);
+    assert(rc != UI_ERROR_NONE);
+    g_context_menu_mock_fail = 0;
+  }
 #endif
 
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(body);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }

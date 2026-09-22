@@ -11,6 +11,27 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_nav_rail_mock_fail = 0;
+
+/**
+ * @brief mock_nav_rail_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_nav_rail_component_destroy(struct ui_component *comp) {
+  if (g_nav_rail_mock_fail == 1) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_nav_rail_component_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_nav_rail_base
  * @brief Container state for a navigation rail widget.
@@ -67,17 +88,18 @@ ui_error_t ui_nav_rail_base_create(struct ui_nav_rail_base **out_rail) {
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_nav_rail_base_destroy(struct ui_nav_rail_base *rail) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!rail) {
     return UI_ERROR_NONE;
   }
   if (rail->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(rail->component);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_component_destroy(rail->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(rail);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -147,17 +169,18 @@ ui_nav_rail_item_base_create(struct ui_nav_rail_item_base **out_item) {
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_nav_rail_item_base_destroy(struct ui_nav_rail_item_base *item) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!item) {
     return UI_ERROR_NONE;
   }
   if (item->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(item->component);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_component_destroy(item->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(item);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

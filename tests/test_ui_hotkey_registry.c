@@ -131,9 +131,7 @@ static void test_hotkey_registry_basic(void) {
 
   {
     ui_error_t rc_cleanup = ui_hotkey_registry_destroy(reg);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -159,9 +157,7 @@ static void test_hotkey_registry_full(void) {
 
   {
     ui_error_t rc_cleanup = ui_hotkey_registry_destroy(reg);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -177,9 +173,7 @@ static void run_oom_tests_hotkey_registry(void) {
     if (rc == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_hotkey_registry_destroy(reg);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     }

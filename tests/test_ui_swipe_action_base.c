@@ -2,6 +2,7 @@
 #include "ui_swipe_action_base.h"
 #include "ui_error.h"
 #include "ui_component.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -75,9 +76,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_component_destroy(comp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (!failed) {

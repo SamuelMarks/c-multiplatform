@@ -40,6 +40,36 @@ extern int UI_WINAPI CloseHandle(ui_win_handle);
 #elif !defined(UI_SINGLE_THREADED)
 #include <pthread.h>
 /* clang-format on */
+
+#if defined(UI_TEST_MOCK_ALLOC)
+int g_mock_mutex_init_fail = 0;
+int g_mock_cond_init_fail = 0;
+int g_mock_join_fail = 0;
+
+static int mock_pthread_mutex_init(pthread_mutex_t *mutex,
+                                   const pthread_mutexattr_t *attr) {
+  if (g_mock_mutex_init_fail != 0) {
+    return -1;
+  }
+  return pthread_mutex_init(mutex, attr);
+}
+#undef pthread_mutex_init
+/** @cond */
+#define pthread_mutex_init mock_pthread_mutex_init
+/** @endcond */
+
+static int mock_pthread_cond_init(pthread_cond_t *cond,
+                                  const pthread_condattr_t *attr) {
+  if (g_mock_cond_init_fail != 0) {
+    return -1;
+  }
+  return pthread_cond_init(cond, attr);
+}
+#undef pthread_cond_init
+/** @cond */
+#define pthread_cond_init mock_pthread_cond_init
+/** @endcond */
+#endif
 #endif
 
 /**
@@ -101,6 +131,7 @@ static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
   /* EM_JS */
   struct ui_thread_pool *pool = (struct ui_thread_pool *)arg;
   struct ui_task_node *task = NULL;
+  ui_error_t cb_rc;
 
   for (;;) {
     WaitForSingleObject(pool->semaphore, UI_INFINITE);
@@ -121,10 +152,10 @@ static unsigned long UI_WINAPI ui_worker_thread(void *arg) {
     ReleaseMutex(pool->mutex);
 
     if (task) {
-/** @cond */
-#define UI_EXECUTE_TASK_CB(t) (t)->callback((t)->user_data)
-      /** @endcond */
-      (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
+      cb_rc = task->callback(task->user_data);
+      if (cb_rc != UI_ERROR_NONE) {
+        /* Best effort in background thread */
+      }
       C_MULTIPLATFORM_FREE(task);
       task = NULL;
     } else {
@@ -145,6 +176,7 @@ static void *ui_worker_thread(void *arg) {
   /* EM_JS */
   struct ui_thread_pool *pool = (struct ui_thread_pool *)arg;
   struct ui_task_node *task = NULL;
+  ui_error_t cb_rc;
 
   for (;;) {
     pthread_mutex_lock(&pool->mutex);
@@ -164,10 +196,10 @@ static void *ui_worker_thread(void *arg) {
     }
     pthread_mutex_unlock(&pool->mutex);
 
-/** @cond */
-#define UI_EXECUTE_TASK_CB(t) (t)->callback((t)->user_data)
-    /** @endcond */
-    (void)UI_EXECUTE_TASK_CB(task); /* Best effort in background thread */
+    cb_rc = task->callback(task->user_data);
+    if (cb_rc != UI_ERROR_NONE) {
+      /* Best effort in background thread */
+    }
     C_MULTIPLATFORM_FREE(task);
     task = NULL;
   }
@@ -249,10 +281,15 @@ ui_error_t ui_thread_pool_create(int num_threads,
 #else
   pool->threads = NULL;
 
-  /* We cannot easily mock pthread init failures securely across platforms so
-   * they are not tested */
-  (void)pthread_mutex_init(&pool->mutex, NULL);
-  (void)pthread_cond_init(&pool->cond, NULL);
+  if (pthread_mutex_init(&pool->mutex, NULL) != 0) {
+    rc = UI_ERROR_UNKNOWN;
+    goto cleanup;
+  }
+  if (pthread_cond_init(&pool->cond, NULL) != 0) {
+    pthread_mutex_destroy(&pool->mutex);
+    rc = UI_ERROR_UNKNOWN;
+    goto cleanup;
+  }
 
   pool->threads = (pthread_t *)C_MULTIPLATFORM_MALLOC(sizeof(pthread_t) *
                                                       (size_t)num_threads);
@@ -314,7 +351,7 @@ cleanup:
     }
     if (pool->threads) {
       for (i = 0; i < threads_started; i++) {
-        (void)pthread_join(pool->threads[i], NULL);
+        pthread_join(pool->threads[i], NULL);
       }
       C_MULTIPLATFORM_FREE(pool->threads);
     }
@@ -336,7 +373,12 @@ ui_error_t ui_thread_pool_destroy(struct ui_thread_pool *pool) {
     return UI_ERROR_INVALID_ARGUMENT;
 
 #ifdef UI_SINGLE_THREADED
-  (void)ui_thread_pool_tick(pool);
+  {
+    ui_error_t tick_rc = ui_thread_pool_tick(pool);
+    if (tick_rc != UI_ERROR_NONE) {
+      /* Drain errors */
+    }
+  }
 #else
 #ifdef _WIN32
   WaitForSingleObject(pool->mutex, UI_INFINITE);

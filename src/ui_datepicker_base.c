@@ -4,6 +4,7 @@
  */
 /* clang-format off */
 #include "ui_datepicker_base.h"
+#include "ui_datepicker_base_internal.h"
 #include "ui_internal_mem.h"
 #include "ui_input_base.h"
 #include "ui_popover_base.h"
@@ -15,75 +16,45 @@
 /* MSVC Safe CRT */
 #endif
 
-/**
- * @struct ui_datepicker_base
- * @struct ui_datepicker_base
- * @brief Internal representation of a datepicker base component.
- */
-struct ui_datepicker_base {
-  /* @brief Input base used for displaying the formatted date. */
-  struct ui_input_base *input; /**< input */
-  /* @brief Popover used to display the calendar. */
-  struct ui_popover_base *popover; /**< popover */
-  /* @brief Calendar component for selection. */
-  struct ui_calendar_base *calendar; /**< calendar */
-
-  /* @brief Callback for CVA on-change events. */
-  ui_error_t (*cva_on_change)(union ui_signal_payload new_value,
-                              void *user_data); /**< user_data) */
-  /* @brief Opaque user data for the on_change callback. */
-  void *cva_on_change_user_data; /**< cva_on_change_user_data */
-
-  /* @brief Callback for CVA on-touched events. */
-  ui_error_t (*cva_on_touched)(void *user_data); /**< user_data) */
-  /* @brief Opaque user data for the on_touched callback. */
-  void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
-
-  /* @brief 1 if the datepicker is disabled. */
-  int is_disabled; /**< is_disabled */
-  /* @brief 1 if the datepicker is currently synchronizing values. */
-  int is_syncing; /**< is_syncing */
-};
-
 static ui_error_t trigger_cva_change(struct ui_datepicker_base *dp,
                                      const struct ui_date *date);
 
 /**
- * @brief on_calendar_select.
+ * @brief ui_datepicker_on_calendar_select.
  * @param calendar Parameter calendar.
  * @param date Parameter date.
  * @param user_data Parameter user_data.
  * @return Return value.
  */
-static ui_error_t on_calendar_select(struct ui_calendar_base *calendar,
-                                     const struct ui_date *date,
-                                     void *user_data) {
+ui_error_t ui_datepicker_on_calendar_select(struct ui_calendar_base *calendar,
+                                            const struct ui_date *date,
+                                            void *user_data) {
   struct ui_datepicker_base *datepicker =
       (struct ui_datepicker_base *)user_data;
   char text[32];
   ui_error_t rc;
-  (void)calendar; /* unused */
+  if (calendar) {
+  }
 
   if (datepicker->is_syncing) {
     return UI_ERROR_NONE;
   }
   datepicker->is_syncing = 1;
 
-  {
-    ui_error_t rc_cleanup = ui_datepicker_format_date(date, text, sizeof(text));
-    (void)rc_cleanup;
+  rc = ui_datepicker_format_date(date, text, sizeof(text));
+  if (rc != UI_ERROR_NONE) {
+    datepicker->is_syncing = 0;
+    return rc;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_input_base_set_text(datepicker->input, text);
-    (void)rc_cleanup;
+  rc = ui_input_base_set_text(datepicker->input, text);
+  if (rc != UI_ERROR_NONE) {
+    datepicker->is_syncing = 0;
+    return rc;
   }
 
   /* Close popover after selection */
-  {
-    ui_error_t rc_cleanup = ui_popover_base_close(datepicker->popover);
-    (void)rc_cleanup;
-  }
+  ui_popover_base_close(datepicker->popover);
 
   rc = trigger_cva_change(datepicker, date);
   datepicker->is_syncing = 0;
@@ -91,14 +62,14 @@ static ui_error_t on_calendar_select(struct ui_calendar_base *calendar,
 }
 
 /**
- * @brief on_input_change.
+ * @brief ui_datepicker_on_input_change.
  * @param input Parameter input.
  * @param text Parameter text.
  * @param user_data Parameter user_data.
  * @return Return value.
  */
-static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
-                                  void *user_data) {
+ui_error_t ui_datepicker_on_input_change(struct ui_input_base *input,
+                                         const char *text, void *user_data) {
   struct ui_datepicker_base *datepicker =
       (struct ui_datepicker_base *)user_data;
   struct ui_date parsed_date;
@@ -107,15 +78,16 @@ static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
     return UI_ERROR_NONE;
   }
   datepicker->is_syncing = 1;
-  (void)input;
+  if (input) {
+  }
 
   if (text) {
     ui_error_t parse_rc = ui_datepicker_parse_date(text, &parsed_date);
     if (parse_rc == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup =
-            ui_calendar_base_select_date(datepicker->calendar, &parsed_date);
-        (void)rc_cleanup;
+      rc = ui_calendar_base_select_date(datepicker->calendar, &parsed_date);
+      if (rc != UI_ERROR_NONE) {
+        datepicker->is_syncing = 0;
+        return rc;
       }
       /* `ui_calendar_base_select_date` will trigger `on_calendar_select` which
          updates the CVA. However, because we are the coordinator, we can just
@@ -128,11 +100,7 @@ static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
     }
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_calendar_base_clear_selection(datepicker->calendar);
-    (void)rc_cleanup;
-  }
+  ui_calendar_base_clear_selection(datepicker->calendar);
   rc = trigger_cva_change(datepicker, NULL);
   datepicker->is_syncing = 0;
   return rc;
@@ -174,6 +142,7 @@ static ui_error_t datepicker_cva_write_value(void *component,
   struct ui_datepicker_base *dp = (struct ui_datepicker_base *)component;
   struct ui_date date;
   char text[32];
+  ui_error_t rc;
 
   if (!dp) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -184,14 +153,12 @@ static ui_error_t datepicker_cva_write_value(void *component,
   dp->is_syncing = 1;
 
   if (value.int_val == 0) {
-    {
-      ui_error_t rc_cleanup = ui_input_base_set_text(dp->input, "");
-      (void)rc_cleanup;
+    rc = ui_input_base_set_text(dp->input, "");
+    if (rc != UI_ERROR_NONE) {
+      dp->is_syncing = 0;
+      return rc;
     }
-    {
-      ui_error_t rc_cleanup = ui_calendar_base_clear_selection(dp->calendar);
-      (void)rc_cleanup;
-    }
+    ui_calendar_base_clear_selection(dp->calendar);
     dp->is_syncing = 0;
     return UI_ERROR_NONE;
   } else {
@@ -199,19 +166,17 @@ static ui_error_t datepicker_cva_write_value(void *component,
     date.month = (value.int_val >> 5) & 0xF;
     date.day = value.int_val & 0x1F;
 
-    {
-      ui_error_t rc_cleanup =
-          ui_datepicker_format_date(&date, text, sizeof(text));
-      (void)rc_cleanup;
-    }
+    ui_datepicker_format_date(&date, text, sizeof(text));
 
-    {
-      ui_error_t rc_cleanup = ui_input_base_set_text(dp->input, text);
-      (void)rc_cleanup;
+    rc = ui_input_base_set_text(dp->input, text);
+    if (rc != UI_ERROR_NONE) {
+      dp->is_syncing = 0;
+      return rc;
     }
-    {
-      ui_error_t rc_cleanup = ui_calendar_base_select_date(dp->calendar, &date);
-      (void)rc_cleanup;
+    rc = ui_calendar_base_select_date(dp->calendar, &date);
+    if (rc != UI_ERROR_NONE) {
+      dp->is_syncing = 0;
+      return rc;
     }
     dp->is_syncing = 0;
     return UI_ERROR_NONE;
@@ -275,6 +240,8 @@ static ui_error_t datepicker_cva_register_on_touched(
 static ui_error_t datepicker_cva_set_disabled_state(void *component,
                                                     int is_disabled) {
   struct ui_datepicker_base *dp = (struct ui_datepicker_base *)component;
+  ui_error_t rc;
+
   if (!dp) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -284,12 +251,9 @@ static ui_error_t datepicker_cva_set_disabled_state(void *component,
   dp->is_syncing = 1;
   dp->is_disabled = is_disabled;
 
-  {
-    ui_error_t rc_cleanup = ui_input_base_set_disabled(dp->input, is_disabled);
-    (void)rc_cleanup;
-  }
+  rc = ui_input_base_set_disabled(dp->input, is_disabled);
   dp->is_syncing = 0;
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -327,16 +291,9 @@ ui_error_t ui_datepicker_base_create(
   dp->is_disabled = 0;
   dp->is_syncing = 0;
 
-  {
-    ui_error_t rc_cleanup =
-        ui_calendar_base_set_on_select(calendar, on_calendar_select, dp);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_input_base_set_on_change(input, on_input_change, dp);
-    (void)rc_cleanup;
-  }
+  ui_calendar_base_set_on_select(calendar, ui_datepicker_on_calendar_select,
+                                 dp);
+  ui_input_base_set_on_change(input, ui_datepicker_on_input_change, dp);
 
   if (out_cva) {
     out_cva->write_value = datepicker_cva_write_value;
@@ -360,16 +317,8 @@ ui_error_t ui_datepicker_base_destroy(struct ui_datepicker_base *datepicker) {
   }
 
   /* Unhook to prevent dangling pointer if input/calendar outlives datepicker */
-  {
-    ui_error_t rc_cleanup =
-        ui_calendar_base_set_on_select(datepicker->calendar, NULL, NULL);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_input_base_set_on_change(datepicker->input, NULL, NULL);
-    (void)rc_cleanup;
-  }
+  ui_calendar_base_set_on_select(datepicker->calendar, NULL, NULL);
+  ui_input_base_set_on_change(datepicker->input, NULL, NULL);
 
   C_MULTIPLATFORM_FREE(datepicker);
   return UI_ERROR_NONE;
@@ -403,11 +352,7 @@ ui_error_t ui_datepicker_parse_date(const char *text,
   }
   {
     int days = 0;
-    {
-      ui_error_t rc_cleanup = ui_calendar_days_in_month(y, m, &days);
-      (void)rc_cleanup;
-    }
-
+    ui_calendar_days_in_month(y, m, &days);
     if (d < 1 || d > days) {
       return UI_ERROR_INVALID_ARGUMENT;
     }
@@ -450,13 +395,15 @@ ui_error_t ui_datepicker_format_date(const struct ui_date *date, char *out_text,
  */
 ui_error_t ui_datepicker_base_sync(struct ui_datepicker_base *datepicker) {
   const char *text = NULL;
+  ui_error_t rc;
+
   if (!datepicker) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_input_base_get_text(datepicker->input, &text);
-    (void)rc_cleanup;
+  rc = ui_input_base_get_text(datepicker->input, &text);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
-  return on_input_change(datepicker->input, text, datepicker);
+  return ui_datepicker_on_input_change(datepicker->input, text, datepicker);
 }

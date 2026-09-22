@@ -5,6 +5,12 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_progress_mock_remove_fail;
+extern int g_progress_mock_set_fail;
+extern int g_progress_mock_destroy_node_fail;
+extern int g_progress_mock_destroy_comp_fail;
+#endif
 
 static int test_progress_lifecycle(void) {
   struct ui_progress_base *progress = NULL;
@@ -153,13 +159,13 @@ static int test_progress_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_progress_base_destroy(progress);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_progress_base_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -183,7 +189,7 @@ static int test_progress_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_progress_base_destroy(progress);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -202,7 +208,8 @@ static int run_oom_tests(void) {
       {
         ui_error_t rc_cleanup = ui_progress_base_destroy(progress);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          g_malloc_fail_countdown = -1;
+          return 1;
         }
       }
       break;
@@ -212,12 +219,102 @@ static int run_oom_tests(void) {
   return 0;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static int test_progress_mock_failures(void) {
+  struct ui_progress_base *progress = NULL;
+  ui_error_t rc;
+
+  /* 1. remove_attribute aria-valuenow fails */
+  ui_progress_base_create(&progress);
+  g_progress_mock_remove_fail = 1;
+  rc = ui_progress_base_set_indeterminate(progress);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_progress_base_destroy(progress);
+
+  /* 2. remove_attribute aria-valuemin fails */
+  ui_progress_base_create(&progress);
+  g_progress_mock_remove_fail = 2;
+  rc = ui_progress_base_set_indeterminate(progress);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_progress_base_destroy(progress);
+
+  /* 3. remove_attribute aria-valuemax fails */
+  ui_progress_base_create(&progress);
+  g_progress_mock_remove_fail = 3;
+  rc = ui_progress_base_set_indeterminate(progress);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_progress_base_destroy(progress);
+
+  /* 4. set_attribute data-state in indeterminate fails */
+  ui_progress_base_create(&progress);
+  g_progress_mock_set_fail = 5;
+  rc = ui_progress_base_set_indeterminate(progress);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_progress_base_destroy(progress);
+
+  /* 5. set_attribute aria-valuenow in determinate fails */
+  ui_progress_base_create(&progress);
+  g_progress_mock_set_fail = 1;
+  rc = ui_progress_base_set_determinate(progress, 50.0f, 0.0f, 100.0f);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_progress_base_destroy(progress);
+
+  /* 6. set_attribute aria-valuemin in determinate fails */
+  ui_progress_base_create(&progress);
+  g_progress_mock_set_fail = 2;
+  rc = ui_progress_base_set_determinate(progress, 50.0f, 0.0f, 100.0f);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_progress_base_destroy(progress);
+
+  /* 7. set_attribute aria-valuemax in determinate fails */
+  ui_progress_base_create(&progress);
+  g_progress_mock_set_fail = 3;
+  rc = ui_progress_base_set_determinate(progress, 50.0f, 0.0f, 100.0f);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_progress_base_destroy(progress);
+
+  /* 8. set_attribute data-state in determinate fails */
+  ui_progress_base_create(&progress);
+  g_progress_mock_set_fail = 4;
+  rc = ui_progress_base_set_determinate(progress, 50.0f, 0.0f, 100.0f);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_progress_base_destroy(progress);
+
+  /* 9. create: set_attribute role fails, cleanup destroy_node fails */
+  g_progress_mock_set_fail = 1;
+  g_progress_mock_destroy_node_fail = 1;
+  rc = ui_progress_base_create(&progress);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+
+  /* 10. create: set_attribute role fails, cleanup destroy_comp fails */
+  g_progress_mock_set_fail = 1;
+  g_progress_mock_destroy_comp_fail = 1;
+  rc = ui_progress_base_create(&progress);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+
+  return 0;
+}
+#endif
+
 int main(void) {
   int failed = 0;
   printf("Running ui_progress_base tests...\n");
 
   failed |= test_progress_lifecycle();
   failed |= run_oom_tests();
+#ifdef UI_TEST_MOCK_ALLOC
+  failed |= test_progress_mock_failures();
+#endif
 
   if (failed) {
     printf("Tests failed.\n");

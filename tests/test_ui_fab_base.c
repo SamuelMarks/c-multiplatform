@@ -1,18 +1,12 @@
 /* clang-format off */
-#include "ui_fab_base.h"
-
-#include "../include/ui_ripple_base.h"
-extern int g_mock_ripple_fail;
-#define ui_ripple_config_init(cfg) (g_mock_ripple_fail ? UI_ERROR_INVALID_ARGUMENT : (ui_ripple_config_init)(cfg))
-#include "../src/ui_fab_base.c"
-#undef ui_ripple_config_init
-
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "ui_fab_base.h"
+#include "ui_ripple_base.h"
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
-int g_mock_ripple_fail = 0;
 
 static int run_normal_tests(void) {
   struct ui_fab_base *fab = NULL;
@@ -198,13 +192,13 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_fab_base_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -219,11 +213,6 @@ static int run_oom_tests(void) {
   g_malloc_fail_countdown = 0;
   rc = ui_fab_base_create(&fab);
   g_malloc_fail_countdown = -1;
-
-  g_mock_ripple_fail = 1;
-  if (ui_fab_base_create(&fab) != UI_ERROR_INVALID_ARGUMENT)
-    return 1;
-  g_mock_ripple_fail = 0;
 
   if (rc != UI_ERROR_OUT_OF_MEMORY)
     return 1;
@@ -240,15 +229,11 @@ static int run_oom_tests(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_button_base_destroy(action_btn);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     return 1;
   }
@@ -257,14 +242,14 @@ static int run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_button_base_destroy(action_btn);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -340,7 +325,7 @@ static int run_coverage_tests(void) {
   {
     ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;

@@ -19,8 +19,10 @@ static int cva_touched_called = 0;
 static ui_error_t on_group_change(struct ui_radio_group_base *group,
                                   struct ui_toggle_base *active,
                                   void *user_data) {
-  (void)group;
-  (void)user_data;
+  if (group) {
+  }
+  if (user_data) {
+  }
   group_changed_count++;
   last_active = active;
   if (mock_on_change_fail)
@@ -30,8 +32,10 @@ static ui_error_t on_group_change(struct ui_radio_group_base *group,
 
 static ui_error_t on_cva_change(union ui_signal_payload new_value,
                                 void *user_data) {
-  (void)new_value;
-  (void)user_data;
+  if (new_value.ptr_val) {
+  }
+  if (user_data) {
+  }
   cva_change_called++;
   if (mock_cva_change_fail)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -39,7 +43,8 @@ static ui_error_t on_cva_change(union ui_signal_payload new_value,
 }
 
 static ui_error_t on_cva_touched(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   cva_touched_called++;
   if (mock_cva_touched_fail)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -142,31 +147,31 @@ static int test_radio_group_basic(void) {
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r2);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r3);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r4);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r5);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -254,19 +259,19 @@ static int test_radio_group_keyboard(void) {
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r2);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r3);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -345,13 +350,13 @@ static int test_radio_group_nulls(void) {
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(checked);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -382,7 +387,7 @@ static int test_radio_group_oom(void) {
       {
         ui_error_t rc_cleanup = ui_toggle_base_destroy(t);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
     } else {
@@ -394,7 +399,7 @@ static int test_radio_group_oom(void) {
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -536,18 +541,181 @@ static int test_radio_group_edge_cases(void) {
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_toggle_base_destroy(r2);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
   return 0;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_radio_group_mock_is_checked_fail;
+extern int g_radio_group_mock_set_checked_fail;
+extern int g_radio_group_mock_set_checked_uncheck_fail;
+extern int g_radio_group_mock_set_on_change_fail;
+
+static int test_radio_group_mock_failures(void) {
+  struct ui_radio_group_base *group = NULL;
+  struct ui_toggle_base *r1 = NULL;
+  struct ui_toggle_base *r2 = NULL;
+  ui_error_t rc;
+
+  rc = ui_radio_group_base_create(&group, NULL);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r1);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r2);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  /* 1. ui_toggle_base_set_on_change fails in add_toggle */
+  g_radio_group_mock_set_on_change_fail = 1;
+  rc = ui_radio_group_base_add_toggle(group, r1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed step 1, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_radio_group_mock_set_on_change_fail = 0;
+
+  /* 2. ui_toggle_base_is_checked fails in add_toggle */
+  g_radio_group_mock_is_checked_fail = 1;
+  rc = ui_radio_group_base_add_toggle(group, r1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed step 2, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_radio_group_mock_is_checked_fail = 0;
+
+  /* Add r1 and r2 successfully */
+  rc = ui_radio_group_base_add_toggle(group, r1);
+  if (rc != UI_ERROR_NONE) {
+    printf("Failed step add r1, rc=%d\n", (int)rc);
+    return 1;
+  }
+  rc = ui_radio_group_base_add_toggle(group, r2);
+  if (rc != UI_ERROR_NONE) {
+    printf("Failed step add r2, rc=%d\n", (int)rc);
+    return 1;
+  }
+
+  /* 3. ui_toggle_base_set_on_change fails in remove_toggle */
+  g_radio_group_mock_set_on_change_fail = 1;
+  rc = ui_radio_group_base_remove_toggle(group, r1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed step 3, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_radio_group_mock_set_on_change_fail = 0;
+
+  /* 3b. Successfully remove and re-add r1 to ensure remove_toggle works */
+  rc = ui_radio_group_base_remove_toggle(group, r1);
+  if (rc != UI_ERROR_NONE) {
+    printf("Failed step remove r1, rc=%d\n", (int)rc);
+    return 1;
+  }
+  rc = ui_radio_group_base_add_toggle(group, r1);
+  if (rc != UI_ERROR_NONE) {
+    printf("Failed step re-add r1, rc=%d\n", (int)rc);
+    return 1;
+  }
+
+  /* 4. set_active failures */
+  /* 4a. set_checked fails on active toggle */
+  g_radio_group_mock_set_checked_fail = 1;
+  rc = ui_radio_group_base_set_active(group, r1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed step 4a, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_radio_group_mock_set_checked_fail = 0;
+
+  /* 4b. is_checked fails on other toggles */
+  g_radio_group_mock_is_checked_fail = 1;
+  rc = ui_radio_group_base_set_active(group, r1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed step 4b, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_radio_group_mock_is_checked_fail = 0;
+
+  /* 4c. set_checked fails on unchecking other toggles */
+  /* First make r2 checked */
+  rc = ui_toggle_base_set_checked(r2, 1);
+  if (rc != UI_ERROR_NONE) {
+    printf("Failed step check r2, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_radio_group_mock_set_checked_fail = 1;
+  rc = ui_radio_group_base_set_active(group, r1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed step 4c, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_radio_group_mock_set_checked_fail = 0;
+
+  /* 5. on_child_toggle_change failures via process_event */
+  /* Make r1 checked, then simulate ArrowDown when is_checked fails on r1 */
+  rc = ui_radio_group_base_set_active(group, r1);
+  if (rc != UI_ERROR_NONE) {
+    printf("Failed step activate r1, rc=%d\n", (int)rc);
+    return 1;
+  }
+  {
+    struct ui_event ev;
+    memset(&ev, 0, sizeof(ev));
+    ev.type = UI_EVENT_KEY_DOWN;
+    ev.event_data.keyboard.key_code = UI_KEY_DOWN;
+
+    g_radio_group_mock_is_checked_fail = 1;
+    rc = ui_radio_group_base_process_event(group, &ev);
+    if (rc != UI_ERROR_UNKNOWN) {
+      printf("Failed step 5a, rc=%d\n", (int)rc);
+      return 1;
+    }
+    g_radio_group_mock_is_checked_fail = 0;
+
+    /* Now test set_checked fail on unchecking r1 during ArrowDown */
+    rc = ui_radio_group_base_set_active(group, r1);
+    if (rc != UI_ERROR_NONE) {
+      printf("Failed step activate r1 second, rc=%d\n", (int)rc);
+      return 1;
+    }
+    g_radio_group_mock_set_checked_uncheck_fail = 1;
+    rc = ui_radio_group_base_process_event(group, &ev);
+    if (rc != UI_ERROR_UNKNOWN) {
+      printf("Failed step 5b, rc=%d\n", (int)rc);
+      return 1;
+    }
+    g_radio_group_mock_set_checked_uncheck_fail = 0;
+  }
+
+  /* 6. ui_radio_group_base_destroy failure when set_on_change fails */
+  g_radio_group_mock_set_on_change_fail = 1;
+  rc = ui_radio_group_base_destroy(group);
+  if (rc != UI_ERROR_UNKNOWN) {
+    printf("Failed step 6, rc=%d\n", (int)rc);
+    return 1;
+  }
+  g_radio_group_mock_set_on_change_fail = 0;
+
+  rc = ui_toggle_base_destroy(r1);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  rc = ui_toggle_base_destroy(r2);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+
+  return 0;
+}
+#endif
 
 int main(void) {
   int failed = 0;
@@ -564,6 +732,10 @@ int main(void) {
   failed |= test_radio_group_oom();
   printf("Running test_radio_group_edge_cases...\n");
   failed |= test_radio_group_edge_cases();
+#ifdef UI_TEST_MOCK_ALLOC
+  printf("Running test_radio_group_mock_failures...\n");
+  failed |= test_radio_group_mock_failures();
+#endif
 
   if (failed) {
     printf("Tests failed.\n");

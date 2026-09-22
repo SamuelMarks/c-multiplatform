@@ -241,10 +241,12 @@ static ui_error_t cg_draw_text(void *ctx, const char *text,
  */
 static ui_error_t cg_draw_image(void *ctx, const struct ui_image *img,
                                 const struct ui_rect *r) {
-  (void)ctx;
-  (void)img;
-  (void)r;
-  /* Stub image */
+  void *unused_ctx = ctx;
+  const struct ui_image *unused_img = img;
+  const struct ui_rect *unused_r = r;
+  ctx = unused_ctx;
+  img = unused_img;
+  r = unused_r;
   return UI_ERROR_NONE;
 }
 
@@ -257,10 +259,12 @@ static ui_error_t cg_draw_image(void *ctx, const struct ui_image *img,
  */
 static ui_error_t cg_draw_gradient(void *ctx, const struct ui_rect *r,
                                    const struct ui_css_image *gradient) {
-  (void)ctx;
-  (void)r;
-  (void)gradient;
-  /* Stub gradient */
+  void *unused_ctx = ctx;
+  const struct ui_rect *unused_r = r;
+  const struct ui_css_image *unused_gradient = gradient;
+  ctx = unused_ctx;
+  r = unused_r;
+  gradient = unused_gradient;
   return UI_ERROR_NONE;
 }
 
@@ -352,7 +356,6 @@ static ui_error_t cg_pop_clip(void *ctx) {
 static ui_error_t cg_set_blend_mode(void *ctx, enum ui_css_blend_mode mode) {
   struct cg_context *cgc = (struct cg_context *)ctx;
   CGBlendMode cg_mode = kCGBlendModeNormal;
-  (void)cg_mode;
   if (!cgc || !cgc->context)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -439,7 +442,6 @@ static ui_error_t cg_set_shadow(void *ctx, const struct ui_css_shadow *shadow) {
   }
 
   offset = CGSizeMake(shadow->offset_x.value, shadow->offset_y.value);
-  (void)offset;
 
   colorSpace = CGColorSpaceCreateDeviceRGB();
   /* Convert sRGB 0-1 values from ui_css_color to CG components */

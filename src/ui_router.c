@@ -275,35 +275,31 @@ static ui_error_t match_route(const char *pattern, const char *url,
                      (size_t)(p - param_start), val_start,
                      (size_t)(t - val_start));
       if (rc != UI_ERROR_NONE) {
-        (void)request_free(req);
+        request_free(req);
         return rc;
       }
     } else if (*p == *t) {
       p++;
       t++;
     } else {
-      (void)request_free(req);
-      return UI_ERROR_NONE;
+      return request_free(req);
     }
   }
 
   /* Pattern must be consumed, t must be at end or at '?' */
   if (*p != '\0') {
-    (void)request_free(req);
-    return UI_ERROR_NONE;
+    return request_free(req);
   }
 
   if (*t != '\0' && *t != '?') {
-    (void)request_free(req);
-    return UI_ERROR_NONE;
+    return request_free(req);
   }
 
   {
     const char *path_end = t;
     if (internal_strndup(url, (size_t)(path_end - url), &req->path) !=
         UI_ERROR_NONE) {
-      (void)request_free(req);
-      return UI_ERROR_NONE;
+      return request_free(req);
     }
   }
 
@@ -336,7 +332,7 @@ static ui_error_t match_route(const char *pattern, const char *url,
                      (size_t)(k_end - k_start), v_start,
                      (size_t)(v_end - v_start));
       if (rc != UI_ERROR_NONE) {
-        (void)request_free(req);
+        request_free(req);
         return rc;
       }
 
@@ -483,15 +479,14 @@ ui_error_t ui_router_create(struct ui_router **out_router) {
  */
 ui_error_t ui_router_destroy(struct ui_router *router) {
   size_t i;
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!router) {
     return UI_ERROR_NONE;
   }
 
   for (i = 0; i < router->stack_size; ++i) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(router->stack[i]);
-      (void)rc_cleanup;
-    }
+    rc = ui_component_destroy(router->stack[i]);
   }
 
   C_MULTIPLATFORM_FREE(router->stack);
@@ -503,7 +498,7 @@ ui_error_t ui_router_destroy(struct ui_router *router) {
   C_MULTIPLATFORM_FREE(router->routes);
 
   C_MULTIPLATFORM_FREE(router);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -574,11 +569,15 @@ ui_error_t ui_router_navigate_with_state(struct ui_router *router,
 
   for (i = 0; i < router->routes_size; i++) {
     int is_match = 0;
-    (void)match_route(router->routes[i].pattern, path, &req, &is_match);
+    ui_error_t match_rc =
+        match_route(router->routes[i].pattern, path, &req, &is_match);
+    if (match_rc != UI_ERROR_NONE) {
+      return match_rc;
+    }
     if (is_match) {
       req->state = state;
       rc = router->routes[i].factory(req, router->routes[i].user_data, &screen);
-      (void)request_free(req);
+      request_free(req);
       if (rc != UI_ERROR_NONE) {
         return rc;
       }
@@ -664,6 +663,8 @@ ui_error_t ui_router_push(struct ui_router *router,
  * \return UI_ERROR_NONE on success, UI_ERROR_QUEUE_EMPTY if the stack is empty.
  */
 ui_error_t ui_router_pop(struct ui_router *router) {
+  ui_error_t rc_cleanup;
+
   if (!router) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -673,14 +674,9 @@ ui_error_t ui_router_pop(struct ui_router *router) {
   }
 
   router->stack_size--;
-  {
-    ui_error_t rc_cleanup =
-        ui_component_destroy(router->stack[router->stack_size]);
-    (void)rc_cleanup;
-  }
+  rc_cleanup = ui_component_destroy(router->stack[router->stack_size]);
   router->stack[router->stack_size] = NULL;
-
-  return UI_ERROR_NONE;
+  return rc_cleanup;
 }
 
 /**
@@ -697,17 +693,13 @@ ui_error_t ui_router_replace(struct ui_router *router,
   }
 
   if (router->stack_size > 0) {
-    {
-      ui_error_t rc_cleanup =
-          ui_component_destroy(router->stack[router->stack_size - 1]);
-      (void)rc_cleanup;
-    }
+    ui_error_t rc_cleanup =
+        ui_component_destroy(router->stack[router->stack_size - 1]);
     router->stack[router->stack_size - 1] = screen;
+    return rc_cleanup;
   } else {
     return ui_router_push(router, screen);
   }
-
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -765,11 +757,6 @@ ui_error_t ui_router_install_os_hooks(struct ui_router *router) {
   if (!router) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-
-#if defined(__EMSCRIPTEN__)
-  /* Emscripten-specific setup would go here if needed */
-  (void)router;
-#endif
 
   return UI_ERROR_NONE;
 }

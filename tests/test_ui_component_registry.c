@@ -480,6 +480,69 @@ int main(void) {
   rc = ui_component_registry_shutdown_default();
   assert(rc == UI_ERROR_NONE);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_component_registry_mock_fail;
+    const struct ui_component_vtable *vt = NULL;
+    void *mock_inst = NULL;
+    struct ui_dom_node *mock_node = NULL;
+    struct ui_component_registry *mock_reg = NULL;
+    struct ui_dom_node *mock_child = NULL;
+
+    ui_component_registry_create(&mock_reg);
+    ui_component_registry_register_defaults(mock_reg);
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &mock_child);
+
+    /* 1: button factory get_comp fail */
+    ui_component_registry_lookup(mock_reg, "ui_button_base", &vt);
+    g_component_registry_mock_fail = 1;
+    rc = vt->factory(&mock_inst, &mock_node);
+    assert(rc == UI_ERROR_UNKNOWN);
+
+    /* 2: input factory get_comp fail */
+    ui_component_registry_lookup(mock_reg, "ui_input_base", &vt);
+    g_component_registry_mock_fail = 2;
+    rc = vt->factory(&mock_inst, &mock_node);
+    assert(rc == UI_ERROR_UNKNOWN);
+
+    /* 3: card factory get_comp fail & card append_child fail */
+    ui_component_registry_lookup(mock_reg, "ui_card_base", &vt);
+    g_component_registry_mock_fail = 3;
+    rc = vt->factory(&mock_inst, &mock_node);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_component_registry_mock_fail = 0;
+    rc = vt->factory(&mock_inst, &mock_node);
+    assert(rc == UI_ERROR_NONE);
+    g_component_registry_mock_fail = 3;
+    rc = vt->append_child(mock_inst, mock_child);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_component_registry_mock_fail = 0;
+    vt->destroy(mock_inst);
+
+    /* 4: checkbox factory get_comp fail */
+    ui_component_registry_lookup(mock_reg, "ui_checkbox_base", &vt);
+    g_component_registry_mock_fail = 4;
+    rc = vt->factory(&mock_inst, &mock_node);
+    assert(rc == UI_ERROR_UNKNOWN);
+
+    /* 5: label factory get_comp fail */
+    ui_component_registry_lookup(mock_reg, "ui_label_base", &vt);
+    g_component_registry_mock_fail = 5;
+    rc = vt->factory(&mock_inst, &mock_node);
+    assert(rc == UI_ERROR_UNKNOWN);
+
+    /* 6: slider factory get_comp fail */
+    ui_component_registry_lookup(mock_reg, "ui_slider_base", &vt);
+    g_component_registry_mock_fail = 6;
+    rc = vt->factory(&mock_inst, &mock_node);
+    assert(rc == UI_ERROR_UNKNOWN);
+
+    g_component_registry_mock_fail = 0;
+    ui_dom_node_destroy(mock_child);
+    ui_component_registry_destroy(mock_reg);
+  }
+#endif
+
   printf("test_ui_component_registry passed\n");
   return 0;
 }

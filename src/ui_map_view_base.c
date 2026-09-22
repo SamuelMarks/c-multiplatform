@@ -79,53 +79,40 @@ ui_error_t ui_map_view_base_create(struct ui_map_view_base **out_map) {
 
   rc = ui_component_create(&map->component);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(map);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(map->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(map);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_tag_name(root_node, "div");
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(map->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(map);
-    return rc;
+    goto cleanup;
   }
   rc = ui_dom_node_set_attribute(root_node, "role", "application");
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(map->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(map);
-    return rc;
+    goto cleanup;
   }
   map->component->shadow_root = root_node;
+  root_node = NULL;
 
   map->zoom = 1.0;
   map->next_marker_id = 1;
 
   *out_map = map;
   return UI_ERROR_NONE;
+
+cleanup:
+  if (root_node) {
+    ui_dom_node_destroy(root_node);
+  }
+  if (map->component) {
+    ui_component_destroy(map->component);
+  }
+  C_MULTIPLATFORM_FREE(map);
+  return rc;
 }
 
 /**
@@ -137,10 +124,7 @@ ui_error_t ui_map_view_base_destroy(struct ui_map_view_base *map) {
   if (!map) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(map->component);
-    (void)rc_cleanup;
-  }
+  ui_component_destroy(map->component);
   if (map->markers) {
     C_MULTIPLATFORM_FREE(map->markers);
   }
@@ -332,8 +316,8 @@ ui_error_t ui_map_view_base_handle_pinch(struct ui_map_view_base *map,
                                          double scale, double focal_x,
                                          double focal_y) {
   ui_error_t rc;
-  (void)focal_x;
-  (void)focal_y;
+  if (focal_x > 0.0 || focal_y > 0.0) {
+  }
   if (!map || scale <= 0.0) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -360,8 +344,8 @@ ui_error_t ui_map_view_base_handle_rotate(struct ui_map_view_base *map,
                                           double angle, double focal_x,
                                           double focal_y) {
   ui_error_t rc;
-  (void)focal_x;
-  (void)focal_y;
+  if (focal_x > 0.0 || focal_y > 0.0) {
+  }
   if (!map) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

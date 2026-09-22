@@ -5,29 +5,21 @@ void test_ui_section_index_remove_attr_err(void) {
   {
     ui_error_t rc_cleanup =
         ui_section_index_base_set_sections(index, sections, 3);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_section_index_base_set_active_section(index, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   /* corrupt node to fail remove_attribute */
   index->item_nodes[1]->type = UI_DOM_NODE_TYPE_TEXT;
   {
     ui_error_t rc_cleanup = ui_section_index_base_set_active_section(index, 2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   index->item_nodes[1]->type = UI_DOM_NODE_TYPE_ELEMENT;
   {
     ui_error_t rc_cleanup = ui_section_index_base_destroy(index);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }

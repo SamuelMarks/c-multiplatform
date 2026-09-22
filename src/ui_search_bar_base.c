@@ -160,6 +160,7 @@ ui_error_t ui_search_bar_base_init(struct ui_search_bar_base *search_bar,
 ui_error_t ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
                                         const char *query) {
   size_t len;
+  ui_error_t rc;
 
   if (!search_bar || !query) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -177,13 +178,13 @@ ui_error_t ui_search_bar_base_set_query(struct ui_search_bar_base *search_bar,
   }
   UI_STRCPY(search_bar->query, len + 1, query);
 
-  {
-    ui_error_t tc_rc = trigger_cva_change(search_bar);
-    (void)tc_rc;
+  rc = trigger_cva_change(search_bar);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
-  {
-    ui_error_t tt_rc = trigger_cva_touched(search_bar);
-    (void)tt_rc;
+  rc = trigger_cva_touched(search_bar);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   return UI_ERROR_NONE;

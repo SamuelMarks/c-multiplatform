@@ -96,7 +96,11 @@ ui_error_t ui_toolbar_base_set_title(struct ui_toolbar_base *toolbar,
     goto cleanup;
   }
 
-  (void)UI_STRCPY(new_title, len + 1, title);
+  if (UI_STRCPY(new_title, len + 1, title) != 0) {
+    C_MULTIPLATFORM_FREE(new_title);
+    rc = UI_ERROR_INVALID_ARGUMENT;
+    goto cleanup;
+  }
 
   if (toolbar->title) {
     C_MULTIPLATFORM_FREE(toolbar->title);

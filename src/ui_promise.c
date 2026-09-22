@@ -12,6 +12,10 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_promise_mock_destroy_fail = 0;
+#endif
+
 /**
  * @struct ui_promise_callback_node
  * \brief Node in the callback chain of a promise.
@@ -41,7 +45,8 @@ struct ui_promise {
  * \brief Creates a new pending promise.
  *
  * \param out_promise Pointer to receive the new promise handle.
- * \return UI_ERROR_NONE on success, or an appropriate error code.
+ *
+eturn UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_promise_create(struct ui_promise **out_promise) {
   struct ui_promise *promise = NULL;
@@ -70,11 +75,14 @@ ui_error_t ui_promise_create(struct ui_promise **out_promise) {
  * \brief Destroys a promise and frees its resources.
  *
  * \param promise The promise to destroy.
- * \return UI_ERROR_NONE on success.
+ *
+eturn UI_ERROR_NONE on success.
  */
 ui_error_t ui_promise_destroy(struct ui_promise *promise) {
   struct ui_promise_callback_node *current = NULL;
   struct ui_promise_callback_node *next = NULL;
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
 
   if (!promise) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -84,9 +92,17 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise) {
   while (current) {
     next = current->next;
     if (current->chained_promise) {
+#ifdef UI_TEST_MOCK_ALLOC
+      if (g_promise_mock_destroy_fail > 0) {
+        g_promise_mock_destroy_fail--;
+        rc_cleanup = UI_ERROR_UNKNOWN;
+      } else
+#endif
       {
-        ui_error_t _ign_rc = ui_promise_destroy(current->chained_promise);
-        (void)_ign_rc;
+        rc_cleanup = ui_promise_destroy(current->chained_promise);
+      }
+      if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+        rc = rc_cleanup;
       }
     }
     C_MULTIPLATFORM_FREE(current);
@@ -94,7 +110,7 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise) {
   }
 
   C_MULTIPLATFORM_FREE(promise);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -104,7 +120,8 @@ ui_error_t ui_promise_destroy(struct ui_promise *promise) {
  * \param state The current state of the promise.
  * \param result The result value if fulfilled.
  * \param error The error discriminant if rejected.
- * \return UI_ERROR_NONE on success, or an appropriate error code.
+ *
+eturn UI_ERROR_NONE on success, or an appropriate error code.
  */
 /**
  * @brief trigger_callback.
@@ -119,25 +136,21 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
                                    ui_error_t error) {
   void *out_result = NULL;
   ui_error_t cb_rc = UI_ERROR_NONE;
+  ui_error_t rc;
 
   if (node->on_finally) {
-    {
-      ui_error_t rc = node->on_finally(node->user_data);
-      if (rc != UI_ERROR_NONE)
-        return rc;
-    }
+    rc = node->on_finally(node->user_data);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     if (node->chained_promise) {
       if (state == UI_PROMISE_FULFILLED) {
-        {
-          ui_error_t _ign_rc =
-              ui_promise_resolve(node->chained_promise, result);
-          (void)_ign_rc;
-        }
+        rc = ui_promise_resolve(node->chained_promise, result);
+        if (rc != UI_ERROR_NONE)
+          return rc;
       } else {
-        {
-          ui_error_t _ign_rc = ui_promise_reject(node->chained_promise, error);
-          (void)_ign_rc;
-        }
+        rc = ui_promise_reject(node->chained_promise, error);
+        if (rc != UI_ERROR_NONE)
+          return rc;
       }
     }
     return UI_ERROR_NONE;
@@ -148,54 +161,44 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
       cb_rc = node->on_resolve(result, node->user_data, &out_result);
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
-          {
-            ui_error_t _ign_rc =
-                ui_promise_resolve(node->chained_promise, out_result);
-            (void)_ign_rc;
-          }
+          rc = ui_promise_resolve(node->chained_promise, out_result);
+          if (rc != UI_ERROR_NONE)
+            return rc;
         } else {
-          {
-            ui_error_t _ign_rc =
-                ui_promise_reject(node->chained_promise, cb_rc);
-            (void)_ign_rc;
-          }
+          rc = ui_promise_reject(node->chained_promise, cb_rc);
+          if (rc != UI_ERROR_NONE)
+            return rc;
         }
       } else if (cb_rc != UI_ERROR_NONE) {
         return cb_rc;
       }
     } else if (node->chained_promise) {
       /* bubble up */
-      {
-        ui_error_t _ign_rc = ui_promise_resolve(node->chained_promise, result);
-        (void)_ign_rc;
-      }
+      rc = ui_promise_resolve(node->chained_promise, result);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   } else {
     if (node->on_reject) {
       cb_rc = node->on_reject(error, node->user_data, &out_result);
       if (node->chained_promise) {
         if (cb_rc == UI_ERROR_NONE) {
-          {
-            ui_error_t _ign_rc =
-                ui_promise_resolve(node->chained_promise, out_result);
-            (void)_ign_rc;
-          }
+          rc = ui_promise_resolve(node->chained_promise, out_result);
+          if (rc != UI_ERROR_NONE)
+            return rc;
         } else {
-          {
-            ui_error_t _ign_rc =
-                ui_promise_reject(node->chained_promise, cb_rc);
-            (void)_ign_rc;
-          }
+          rc = ui_promise_reject(node->chained_promise, cb_rc);
+          if (rc != UI_ERROR_NONE)
+            return rc;
         }
       } else if (cb_rc != UI_ERROR_NONE) {
         return cb_rc;
       }
     } else if (node->chained_promise) {
       /* bubble up */
-      {
-        ui_error_t _ign_rc = ui_promise_reject(node->chained_promise, error);
-        (void)_ign_rc;
-      }
+      rc = ui_promise_reject(node->chained_promise, error);
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   }
   return UI_ERROR_NONE;
@@ -210,7 +213,8 @@ static ui_error_t trigger_callback(struct ui_promise_callback_node *node,
  * \param on_finally Callback invoked regardless of outcome.
  * \param user_data Opaque pointer passed to the callbacks.
  * \param out_promise Pointer to receive the chained promise.
- * \return UI_ERROR_NONE on success, or an appropriate error code.
+ *
+eturn UI_ERROR_NONE on success, or an appropriate error code.
  */
 static ui_error_t
 /**
@@ -229,6 +233,7 @@ add_callback(struct ui_promise *promise,
              ui_error_t (*on_finally)(void *), void *user_data,
              struct ui_promise **out_promise) {
   ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t destroy_rc;
   struct ui_promise_callback_node *node = NULL;
   struct ui_promise *chained = NULL;
 
@@ -248,13 +253,20 @@ add_callback(struct ui_promise *promise,
       sizeof(struct ui_promise_callback_node));
   if (!node) {
     if (chained) {
+#ifdef UI_TEST_MOCK_ALLOC
+      if (g_promise_mock_destroy_fail > 0) {
+        g_promise_mock_destroy_fail--;
+        destroy_rc = UI_ERROR_UNKNOWN;
+      } else
+#endif
       {
-        ui_error_t _ign_rc = ui_promise_destroy(chained);
-        (void)_ign_rc;
+        destroy_rc = ui_promise_destroy(chained);
+      }
+      *out_promise = NULL;
+      if (destroy_rc != UI_ERROR_NONE) {
+        return destroy_rc;
       }
     }
-    if (out_promise)
-      *out_promise = NULL;
     return UI_ERROR_OUT_OF_MEMORY;
   }
 
@@ -293,7 +305,8 @@ add_callback(struct ui_promise *promise,
  * \param on_reject Callback invoked if the promise is rejected.
  * \param user_data Opaque pointer passed to the callbacks.
  * \param out_promise Pointer to receive the chained promise.
- * \return UI_ERROR_NONE on success.
+ *
+eturn UI_ERROR_NONE on success.
  */
 ui_error_t ui_promise_then(struct ui_promise *promise,
                            ui_error_t (*on_resolve)(void *, void *, void **),
@@ -310,7 +323,8 @@ ui_error_t ui_promise_then(struct ui_promise *promise,
  * \param on_reject Callback invoked if the promise is rejected.
  * \param user_data Opaque pointer passed to the callback.
  * \param out_promise Pointer to receive the chained promise.
- * \return UI_ERROR_NONE on success.
+ *
+eturn UI_ERROR_NONE on success.
  */
 ui_error_t ui_promise_catch(struct ui_promise *promise,
                             ui_error_t (*on_reject)(ui_error_t, void *,
@@ -326,7 +340,8 @@ ui_error_t ui_promise_catch(struct ui_promise *promise,
  * \param on_finally Callback invoked regardless of outcome.
  * \param user_data Opaque pointer passed to the callback.
  * \param out_promise Pointer to receive the chained promise.
- * \return UI_ERROR_NONE on success.
+ *
+eturn UI_ERROR_NONE on success.
  */
 ui_error_t ui_promise_finally(struct ui_promise *promise,
                               ui_error_t (*on_finally)(void *), void *user_data,
@@ -339,7 +354,8 @@ ui_error_t ui_promise_finally(struct ui_promise *promise,
  *
  * \param promise The promise to resolve.
  * \param result The result value (cast to void*).
- * \return UI_ERROR_NONE on success.
+ *
+eturn UI_ERROR_NONE on success.
  */
 ui_error_t ui_promise_resolve(struct ui_promise *promise, void *result) {
   struct ui_promise_callback_node *current = NULL;
@@ -376,7 +392,8 @@ ui_error_t ui_promise_resolve(struct ui_promise *promise, void *result) {
  *
  * \param promise The promise to reject.
  * \param error The error discriminant.
- * \return UI_ERROR_NONE on success.
+ *
+eturn UI_ERROR_NONE on success.
  */
 ui_error_t ui_promise_reject(struct ui_promise *promise, ui_error_t error) {
   struct ui_promise_callback_node *current = NULL;
@@ -412,7 +429,8 @@ ui_error_t ui_promise_reject(struct ui_promise *promise, ui_error_t error) {
  *
  * \param promise The promise.
  * \param out_state Pointer to receive the current state.
- * \return UI_ERROR_NONE on success.
+ *
+eturn UI_ERROR_NONE on success.
  */
 ui_error_t ui_promise_get_state(struct ui_promise *promise,
                                 enum ui_promise_state *out_state) {

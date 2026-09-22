@@ -21,6 +21,129 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_stepper_mock_fail = 0;
+int g_stepper_mock_append_fail_target = 0;
+int g_stepper_mock_set_attr_fail_target = 0;
+int g_stepper_mock_remove_attr_fail_target = 0;
+static int g_stepper_append_counter = 0;
+static int g_stepper_set_attr_counter = 0;
+static int g_stepper_remove_attr_counter = 0;
+
+/**
+ * @brief mock_stepper_dom_node_append_child.
+ * @param parent Parent node.
+ * @param child Child node.
+ * @return Return value.
+ */
+static ui_error_t
+mock_stepper_dom_node_append_child(struct ui_dom_node *parent,
+                                   struct ui_dom_node *child) {
+  if (g_stepper_mock_append_fail_target > 0) {
+    if (++g_stepper_append_counter == g_stepper_mock_append_fail_target) {
+      g_stepper_append_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_append_child(parent, child);
+}
+/** @cond */
+#define ui_dom_node_append_child mock_stepper_dom_node_append_child
+/** @endcond */
+
+/**
+ * @brief mock_stepper_component_set_default_style.
+ * @param comp Component.
+ * @param style Stylesheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_stepper_component_set_default_style(struct ui_component *comp,
+                                         struct ui_css_stylesheet *style) {
+  if (g_stepper_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_set_default_style(comp, style);
+}
+/** @cond */
+#define ui_component_set_default_style mock_stepper_component_set_default_style
+/** @endcond */
+
+/**
+ * @brief mock_stepper_dom_node_destroy.
+ * @param node Node.
+ * @return Return value.
+ */
+static ui_error_t mock_stepper_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_stepper_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(node);
+}
+/** @cond */
+#define ui_dom_node_destroy mock_stepper_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief mock_stepper_component_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_stepper_component_destroy(struct ui_component *comp) {
+  if (g_stepper_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_destroy(comp);
+}
+/** @cond */
+#define ui_component_destroy mock_stepper_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_stepper_dom_node_set_attribute.
+ * @param node Node.
+ * @param name Name.
+ * @param val Value.
+ * @return Return value.
+ */
+static ui_error_t mock_stepper_dom_node_set_attribute(struct ui_dom_node *node,
+                                                      const char *name,
+                                                      const char *val) {
+  if (g_stepper_mock_set_attr_fail_target > 0) {
+    if (++g_stepper_set_attr_counter == g_stepper_mock_set_attr_fail_target) {
+      g_stepper_set_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_set_attribute(node, name, val);
+}
+/** @cond */
+#define ui_dom_node_set_attribute mock_stepper_dom_node_set_attribute
+/** @endcond */
+
+/**
+ * @brief mock_stepper_dom_node_remove_attribute.
+ * @param node Node.
+ * @param name Name.
+ * @return Return value.
+ */
+static ui_error_t
+mock_stepper_dom_node_remove_attribute(struct ui_dom_node *node,
+                                       const char *name) {
+  if (g_stepper_mock_remove_attr_fail_target > 0) {
+    if (++g_stepper_remove_attr_counter ==
+        g_stepper_mock_remove_attr_fail_target) {
+      g_stepper_remove_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_remove_attribute(node, name);
+}
+/** @cond */
+#define ui_dom_node_remove_attribute mock_stepper_dom_node_remove_attribute
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet */
 static const char *ui_stepper_base_default_css =
     ".ui-stepper { display: flex; flex-direction: column; } "
@@ -151,32 +274,24 @@ ui_error_t ui_stepper_base_create(struct ui_stepper_base **out_stepper) {
       return dom_rc;
   }
 
-  {
-
-    ui_error_t _ign_rc = ui_dom_node_append_child(root_node, header_node);
-
-    (void)_ign_rc;
-  }
+  rc = ui_dom_node_append_child(root_node, header_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
   stepper->header_container_node = header_node;
 
-  {
-
-    ui_error_t _ign_rc = ui_dom_node_append_child(root_node, content_node);
-
-    (void)_ign_rc;
-  }
+  rc = ui_dom_node_append_child(root_node, content_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
   stepper->content_container_node = content_node;
 
   rc = ui_css_parse_stylesheet(ui_stepper_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(stepper->component, default_style);
-
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(stepper->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   stepper->component->shadow_root = root_node;
@@ -188,11 +303,15 @@ ui_error_t ui_stepper_base_create(struct ui_stepper_base **out_stepper) {
 cleanup:
   if (root_node) {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   if (stepper->component) {
     ui_error_t rc_cleanup = ui_component_destroy(stepper->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(stepper);
   return rc;
@@ -205,6 +324,7 @@ cleanup:
  */
 ui_error_t ui_stepper_base_destroy(struct ui_stepper_base *stepper) {
   int i;
+  ui_error_t rc = UI_ERROR_NONE;
   if (!stepper)
     return UI_ERROR_NONE;
 
@@ -213,13 +333,14 @@ ui_error_t ui_stepper_base_destroy(struct ui_stepper_base *stepper) {
   }
   C_MULTIPLATFORM_FREE(stepper->steps);
 
-  {
+  if (stepper->component) {
     ui_error_t rc_cleanup = ui_component_destroy(stepper->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-
   C_MULTIPLATFORM_FREE(stepper);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -293,11 +414,27 @@ static ui_error_t duplicate_string(const char *src, char **out_copy) {
  */
 static ui_error_t format_id(char *buf, size_t buf_size, const char *prefix,
                             const char *suffix) {
-  (void)buf_size;
+#if !defined(_MSC_VER)
+  size_t unused_size;
+#endif
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_stepper_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_stepper_mock_fail == 5) {
+    static int fid_count = 0;
+    if (++fid_count == 2) {
+      fid_count = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
 #if defined(_MSC_VER)
-  (void)sprintf_s(buf, buf_size, "%s-%s", prefix, suffix);
+  sprintf_s(buf, buf_size, "%s-%s", prefix, suffix);
 #else
-  (void)sprintf(buf, "%s-%s", prefix, suffix);
+  unused_size = buf_size;
+  buf_size = unused_size;
+  sprintf(buf, "%s-%s", prefix, suffix);
 #endif
   return UI_ERROR_NONE;
 }
@@ -318,84 +455,65 @@ static ui_error_t apply_step_state_attributes(struct ui_stepper_base *stepper,
                                               int index) {
   struct ui_stepper_step_entry *entry = &stepper->steps[index];
   enum ui_stepper_step_state effective_state = entry->explicit_state;
+  ui_error_t rc;
 
   if (index == stepper->active_index) {
     effective_state = UI_STEPPER_STEP_STATE_ACTIVE;
   }
 
-  /** @cond */
-  /** @endcond */
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_remove_attribute(entry->header_node, "data-state");
-    (void)rc_cleanup;
-  }
+  rc = ui_dom_node_remove_attribute(entry->header_node, "data-state");
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   switch (effective_state) {
-  case UI_STEPPER_STEP_STATE_ACTIVE: {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(entry->header_node, "aria-selected", "true");
-    (void)rc_cleanup;
-  }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(entry->header_node, "data-state", "active");
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_remove_attribute(entry->content_node, "hidden");
-      (void)rc_cleanup;
-    }
+  case UI_STEPPER_STEP_STATE_ACTIVE:
+    rc = ui_dom_node_set_attribute(entry->header_node, "aria-selected", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(entry->header_node, "data-state", "active");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_remove_attribute(entry->content_node, "hidden");
+    if (rc != UI_ERROR_NONE)
+      return rc;
     break;
-  case UI_STEPPER_STEP_STATE_COMPLETED: {
-    ui_error_t rc_cleanup =
+  case UI_STEPPER_STEP_STATE_COMPLETED:
+    rc =
         ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
-    (void)rc_cleanup;
-  }
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          entry->header_node, "data-state", "completed");
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
-      (void)rc_cleanup;
-    }
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(entry->header_node, "data-state",
+                                   "completed");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
     break;
-  case UI_STEPPER_STEP_STATE_ERROR: {
-    ui_error_t rc_cleanup =
+  case UI_STEPPER_STEP_STATE_ERROR:
+    rc =
         ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
-    (void)rc_cleanup;
-  }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(entry->header_node, "data-state", "error");
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
-      (void)rc_cleanup;
-    }
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(entry->header_node, "data-state", "error");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
     break;
   default:
-  case UI_STEPPER_STEP_STATE_DEFAULT: {
-    ui_error_t rc_cleanup =
+  case UI_STEPPER_STEP_STATE_DEFAULT:
+    rc =
         ui_dom_node_set_attribute(entry->header_node, "aria-selected", "false");
-    (void)rc_cleanup;
-  }
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          entry->header_node, "data-state", "default");
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
-      (void)rc_cleanup;
-    }
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(entry->header_node, "data-state", "default");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(entry->content_node, "hidden", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
     break;
   }
   return UI_ERROR_NONE;
@@ -416,6 +534,7 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
   struct ui_stepper_step_entry *new_steps;
   char tab_node_id[256];
   char panel_node_id[256];
+  ui_error_t rc;
 
   if (!stepper || !step_id || !header_node || !content_node) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -432,48 +551,32 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
     stepper->step_capacity = new_cap;
   }
 
-  {
-    ui_error_t rc_fmt =
-        format_id(tab_node_id, sizeof(tab_node_id), step_id, "step-hdr");
-    (void)rc_fmt;
-  }
-  {
-    ui_error_t rc_fmt =
-        format_id(panel_node_id, sizeof(panel_node_id), step_id, "step-cnt");
-    (void)rc_fmt;
-  }
+  rc = format_id(tab_node_id, sizeof(tab_node_id), step_id, "step-hdr");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = format_id(panel_node_id, sizeof(panel_node_id), step_id, "step-cnt");
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(header_node, "role", "tab");
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(header_node, "id", tab_node_id);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(header_node, "aria-controls", panel_node_id);
-    (void)rc_cleanup;
-  }
+  rc = ui_dom_node_set_attribute(header_node, "role", "tab");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(header_node, "id", tab_node_id);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(header_node, "aria-controls", panel_node_id);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(content_node, "role", "tabpanel");
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(content_node, "id", panel_node_id);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_node_set_attribute(content_node, "aria-labelledby", tab_node_id);
-    (void)rc_cleanup;
-  }
+  rc = ui_dom_node_set_attribute(content_node, "role", "tabpanel");
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(content_node, "id", panel_node_id);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = ui_dom_node_set_attribute(content_node, "aria-labelledby", tab_node_id);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   {
     char *tmp = NULL;
@@ -483,18 +586,13 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
     stepper->steps[stepper->step_count].id = tmp;
   }
 
-  {
+  rc = ui_dom_node_append_child(stepper->header_container_node, header_node);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
-    ui_error_t _ign_rc =
-        ui_dom_node_append_child(stepper->header_container_node, header_node);
-
-    (void)_ign_rc;
-  }
-  {
-    ui_error_t _ign_rc =
-        ui_dom_node_append_child(stepper->content_container_node, content_node);
-    (void)_ign_rc;
-  }
+  rc = ui_dom_node_append_child(stepper->content_container_node, content_node);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   stepper->steps[stepper->step_count].header_node = header_node;
   stepper->steps[stepper->step_count].content_node = content_node;
@@ -505,11 +603,9 @@ ui_error_t ui_stepper_base_add_step(struct ui_stepper_base *stepper,
     stepper->active_index = 0;
   }
 
-  {
-    ui_error_t rc_apply =
-        apply_step_state_attributes(stepper, stepper->step_count);
-    (void)rc_apply;
-  }
+  rc = apply_step_state_attributes(stepper, stepper->step_count);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   stepper->step_count++;
 
@@ -553,7 +649,8 @@ ui_error_t ui_stepper_base_set_active_index(struct ui_stepper_base *stepper,
 
   for (i = 0; i < stepper->step_count; i++) {
     ui_error_t rc_step = apply_step_state_attributes(stepper, i);
-    (void)rc_step;
+    if (rc_step != UI_ERROR_NONE)
+      return rc_step;
   }
 
   return UI_ERROR_NONE;

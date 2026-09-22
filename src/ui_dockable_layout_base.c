@@ -11,6 +11,27 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_dockable_layout_mock_fail = 0;
+
+/**
+ * @brief mock_dockable_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_dockable_component_destroy(struct ui_component *comp) {
+  if (g_dockable_layout_mock_fail == 1) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_dockable_component_destroy
+/** @endcond */
+#endif
+
 /** @brief internal */
 #define MAX_PANELS 128
 
@@ -82,15 +103,18 @@ ui_dockable_layout_base_create(struct ui_dockable_layout_base **out_layout) {
  */
 ui_error_t
 ui_dockable_layout_base_destroy(struct ui_dockable_layout_base *layout) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!layout) {
     return UI_ERROR_NONE;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(layout->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(layout);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

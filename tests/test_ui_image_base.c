@@ -71,8 +71,9 @@ static ui_error_t run_normal_tests(void) {
     extern int g_mock_strcpy_fail;
     g_mock_strcpy_fail = 1;
     rc = ui_image_base_set_src(&image, "http://example.com/mock.png", 0);
-    (void)rc;
     g_mock_strcpy_fail = 0;
+    if (rc != UI_ERROR_UNKNOWN)
+      return UI_ERROR_UNKNOWN;
   }
 #endif
 
@@ -89,10 +90,14 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_INVALID_ARGUMENT)
     return UI_ERROR_UNKNOWN;
 
-  /* Populate alt_text manually to cover that branch */
+  /* Populate src_url and alt_text to cover cleanup branch */
+  rc = ui_image_base_set_src(&image, "http://example.com/valid.png", 0);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+
   image.alt_text = (char *)malloc(10);
   if (image.alt_text)
-    UI_STRCPY(image.alt_text, sizeof(image.alt_text), "alt");
+    UI_STRCPY(image.alt_text, 10, "alt");
 
   rc = ui_image_base_cleanup(&image);
   if (rc != UI_ERROR_NONE)
@@ -120,7 +125,7 @@ static ui_error_t run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_image_base_init(&image, &comp);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
 
@@ -135,7 +140,7 @@ static ui_error_t run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_image_base_cleanup(&image);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;

@@ -410,7 +410,9 @@ int main(void) {
 
       g_malloc_fail_countdown = i;
       rc = ui_runtime_schema_parse_node(oom_arena, rich_node_json, &oom_node);
-      (void)rc;
+      if (rc != UI_ERROR_NONE) {
+        /* expected error during OOM */
+      }
       g_malloc_fail_countdown = -1;
 
       ui_arena_destroy(oom_arena);
@@ -425,7 +427,9 @@ int main(void) {
 
       g_malloc_fail_countdown = i;
       rc = ui_runtime_schema_parse(oom_arena, valid_manifest_json, &oom_m);
-      (void)rc;
+      if (rc != UI_ERROR_NONE) {
+        /* expected error during OOM */
+      }
       g_malloc_fail_countdown = -1;
 
       ui_arena_destroy(oom_arena);

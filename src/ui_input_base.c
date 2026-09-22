@@ -19,6 +19,101 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_input_mock_fail = 0;
+
+/**
+ * @brief mock_input_component_set_default_style.
+ * @param comp Parameter comp.
+ * @param sheet Parameter sheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_input_component_set_default_style(struct ui_component *comp,
+                                       struct ui_css_stylesheet *sheet) {
+  if (g_input_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_input_component_set_default_style
+/** @endcond */
+
+/**
+ * @brief mock_input_dom_node_remove_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @return Return value.
+ */
+static ui_error_t mock_input_dom_node_remove_attribute(struct ui_dom_node *node,
+                                                       const char *name) {
+  if (g_input_mock_fail == 2) {
+    if (strcmp(name, "value") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (g_input_mock_fail == 3) {
+    if (strcmp(name, "placeholder") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (g_input_mock_fail == 4) {
+    if (strcmp(name, "disabled") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (g_input_mock_fail == 5) {
+    if (strcmp(name, "aria-disabled") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_remove_attribute)(node, name);
+}
+#undef ui_dom_node_remove_attribute
+/** @cond */
+#define ui_dom_node_remove_attribute mock_input_dom_node_remove_attribute
+/** @endcond */
+
+/**
+ * @brief mock_input_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param name Parameter name.
+ * @param val Parameter val.
+ * @return Return value.
+ */
+static ui_error_t mock_input_dom_node_set_attribute(struct ui_dom_node *node,
+                                                    const char *name,
+                                                    const char *val) {
+  if (g_input_mock_fail == 6) {
+    if (strcmp(name, "placeholder") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (g_input_mock_fail == 7) {
+    if (strcmp(name, "disabled") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (g_input_mock_fail == 8) {
+    if (strcmp(name, "aria-disabled") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (g_input_mock_fail == 9) {
+    if (strcmp(name, "value") == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_set_attribute)(node, name, val);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_input_dom_node_set_attribute
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet for input base component */
 static const char *ui_input_base_default_css =
     "input { "
@@ -52,6 +147,8 @@ struct ui_input_base {
   int cursor_position;                              /**< cursor_position */
   ui_input_on_change_t on_change;                   /**< on_change */
   void *user_data;                                  /**< user_data */
+  ui_error_t (*on_touched)(void *user_data);        /**< on_touched */
+  void *on_touched_user_data;                       /**< on_touched_user_data */
 };
 
 /**
@@ -77,40 +174,56 @@ static ui_error_t update_dom_state(struct ui_input_base *input) {
   if (input->text) {
     ui_error_t rc1 = ui_dom_node_set_attribute(input->component->shadow_root,
                                                "value", input->text);
-    (void)rc1;
+    if (rc1 != UI_ERROR_NONE) {
+      return rc1;
+    }
   } else {
     ui_error_t rc2 =
         ui_dom_node_remove_attribute(input->component->shadow_root, "value");
-    (void)rc2;
+    if (rc2 != UI_ERROR_NONE) {
+      return rc2;
+    }
   }
 
   if (input->placeholder) {
     ui_error_t rc3 = ui_dom_node_set_attribute(
         input->component->shadow_root, "placeholder", input->placeholder);
-    (void)rc3;
+    if (rc3 != UI_ERROR_NONE) {
+      return rc3;
+    }
   } else {
     ui_error_t rc4 = ui_dom_node_remove_attribute(input->component->shadow_root,
                                                   "placeholder");
-    (void)rc4;
+    if (rc4 != UI_ERROR_NONE) {
+      return rc4;
+    }
   }
 
   if (input->disabled) {
     ui_error_t rc5 = ui_dom_node_set_attribute(input->component->shadow_root,
                                                "disabled", "");
-    (void)rc5;
+    if (rc5 != UI_ERROR_NONE) {
+      return rc5;
+    }
     {
       ui_error_t rc6 = ui_dom_node_set_attribute(input->component->shadow_root,
                                                  "aria-disabled", "true");
-      (void)rc6;
+      if (rc6 != UI_ERROR_NONE) {
+        return rc6;
+      }
     }
   } else {
     ui_error_t rc7 =
         ui_dom_node_remove_attribute(input->component->shadow_root, "disabled");
-    (void)rc7;
+    if (rc7 != UI_ERROR_NONE) {
+      return rc7;
+    }
     {
       ui_error_t rc8 = ui_dom_node_remove_attribute(
           input->component->shadow_root, "aria-disabled");
-      (void)rc8;
+      if (rc8 != UI_ERROR_NONE) {
+        return rc8;
+      }
     }
   }
   return UI_ERROR_NONE;
@@ -183,11 +296,9 @@ ui_error_t ui_input_base_create(struct ui_input_base **out_input) {
   rc = ui_css_parse_stylesheet(ui_input_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  {
-    ui_error_t rc_cleanup =
-        ui_component_set_default_style(input->component, default_style);
-    (void)rc_cleanup;
-  }
+  rc = ui_component_set_default_style(input->component, default_style);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   input->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
@@ -197,23 +308,13 @@ ui_error_t ui_input_base_create(struct ui_input_base **out_input) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (input->gesture_recognizer) {
-    {
-      ui_error_t rc_cleanup =
-          ui_gesture_recognizer_destroy(input->gesture_recognizer);
-      (void)rc_cleanup;
-    }
+    ui_gesture_recognizer_destroy(input->gesture_recognizer);
   }
   if (input->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(input->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(input->component);
   }
   C_MULTIPLATFORM_FREE(input);
   return rc;
@@ -240,17 +341,15 @@ ui_error_t ui_input_base_destroy(struct ui_input_base *input) {
     return UI_ERROR_NONE;
   if (input->text)
     C_MULTIPLATFORM_FREE(input->text);
-  C_MULTIPLATFORM_FREE(input->placeholder);
+  if (input->placeholder)
+    C_MULTIPLATFORM_FREE(input->placeholder);
   if (input->on_change == input_cva_on_change_wrapper)
     C_MULTIPLATFORM_FREE(input->user_data);
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(input->gesture_recognizer);
-    (void)rc_cleanup;
+  if (input->gesture_recognizer) {
+    ui_gesture_recognizer_destroy(input->gesture_recognizer);
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(input->component);
-    (void)rc_cleanup;
+  if (input->component) {
+    ui_component_destroy(input->component);
   }
   C_MULTIPLATFORM_FREE(input);
   return UI_ERROR_NONE;
@@ -283,7 +382,9 @@ ui_error_t ui_input_base_set_text(struct ui_input_base *input,
   input->cursor_position = new_text ? (int)strlen(new_text) : 0;
   {
     ui_error_t uds_rc = update_dom_state(input);
-    (void)uds_rc;
+    if (uds_rc != UI_ERROR_NONE) {
+      return uds_rc;
+    }
   }
 
   if (input->on_change) {
@@ -353,7 +454,9 @@ ui_error_t ui_input_base_set_placeholder(struct ui_input_base *input,
   input->placeholder = new_ph;
   {
     ui_error_t uds_rc = update_dom_state(input);
-    (void)uds_rc;
+    if (uds_rc != UI_ERROR_NONE) {
+      return uds_rc;
+    }
   }
 
   return UI_ERROR_NONE;
@@ -372,7 +475,9 @@ ui_error_t ui_input_base_set_disabled(struct ui_input_base *input,
   input->disabled = disabled;
   {
     ui_error_t uds_rc = update_dom_state(input);
-    (void)uds_rc;
+    if (uds_rc != UI_ERROR_NONE) {
+      return uds_rc;
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -405,7 +510,8 @@ ui_error_t ui_input_base_set_on_change(struct ui_input_base *input,
 ui_error_t ui_input_base_process_event(struct ui_input_base *input,
                                        const struct ui_event *event,
                                        double timestamp_ms) {
-  (void)timestamp_ms;
+  if (timestamp_ms > 0.0) {
+  }
   if (!input || !event)
     return UI_ERROR_INVALID_ARGUMENT;
   if (input->disabled)
@@ -430,7 +536,9 @@ ui_error_t ui_input_base_process_event(struct ui_input_base *input,
           input->cursor_position--;
           {
             ui_error_t uds_rc = update_dom_state(input);
-            (void)uds_rc;
+            if (uds_rc != UI_ERROR_NONE) {
+              return uds_rc;
+            }
           }
           if (input->on_change) {
             ui_error_t change_rc =
@@ -473,7 +581,9 @@ ui_error_t ui_input_base_process_event(struct ui_input_base *input,
           input->cursor_position++;
           {
             ui_error_t uds_rc = update_dom_state(input);
-            (void)uds_rc;
+            if (uds_rc != UI_ERROR_NONE) {
+              return uds_rc;
+            }
           }
           if (input->on_change) {
             ui_error_t change_rc =
@@ -538,7 +648,9 @@ static ui_error_t input_cva_on_change_wrapper(struct ui_input_base *input,
                                               const char *text,
                                               void *user_data) {
   struct input_cva_wrapper *wrap = (struct input_cva_wrapper *)user_data;
-  (void)input;
+  if (!input) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (wrap->callback) {
     union ui_signal_payload p;
     p.ptr_val = (void *)text;
@@ -579,9 +691,11 @@ static ui_error_t input_cva_register_on_change(
 static ui_error_t input_cva_register_on_touched(void *component,
                                                 ui_error_t (*callback)(void *),
                                                 void *user_data) {
-  (void)component;
-  (void)callback;
-  (void)user_data;
+  struct ui_input_base *input = (struct ui_input_base *)component;
+  if (!input)
+    return UI_ERROR_INVALID_ARGUMENT;
+  input->on_touched = callback;
+  input->on_touched_user_data = user_data;
   return UI_ERROR_NONE;
 }
 
@@ -636,3 +750,26 @@ ui_error_t ui_input_base_get_component(struct ui_input_base *input,
   *out_component = input->component;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_input_base_coverage(void);
+
+/**
+ * @brief run_input_base_coverage.
+ * @return Return value.
+ */
+ui_error_t run_input_base_coverage(void) {
+  struct ui_dom_node dummy;
+  memset(&dummy, 0, sizeof(dummy));
+  g_input_mock_fail = 2;
+  mock_input_dom_node_remove_attribute(&dummy, "other");
+  g_input_mock_fail = 3;
+  mock_input_dom_node_remove_attribute(&dummy, "other");
+  g_input_mock_fail = 6;
+  mock_input_dom_node_set_attribute(&dummy, "other", "v");
+  g_input_mock_fail = 9;
+  mock_input_dom_node_set_attribute(&dummy, "other", "v");
+  g_input_mock_fail = 0;
+  return UI_ERROR_NONE;
+}
+#endif

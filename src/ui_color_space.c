@@ -45,9 +45,11 @@ static void srgb_to_xyz(float r, float g, float b, float *x, float *y,
  */
 static void xyz_to_srgb(float x, float y, float z, float *r, float *g,
                         float *b) {
-  float r_lin = x * 3.2406f + y * -1.5372f + z * -0.4986f;
-  float g_lin = x * -0.9689f + y * 1.8758f + z * 0.0415f;
-  float b_lin = x * 0.0557f + y * -0.2040f + z * 1.0570f;
+  float r_lin, g_lin, b_lin;
+
+  r_lin = x * 3.2406f + y * -1.5372f + z * -0.4986f;
+  g_lin = x * -0.9689f + y * 1.8758f + z * 0.0415f;
+  b_lin = x * 0.0557f + y * -0.2040f + z * 1.0570f;
 
   *r = (r_lin <= 0.0031308f) ? (12.92f * r_lin)
                              : (1.055f * (float)pow(r_lin, 1.0 / 2.4) - 0.055f);
@@ -97,10 +99,11 @@ static void xyz_to_lab(float x, float y, float z, float *l, float *a,
   float xn = 0.95047f;
   float yn = 1.00000f;
   float zn = 1.08883f;
+  float fx, fy, fz;
 
-  float fx = calc_lab_f(x / xn);
-  float fy = calc_lab_f(y / yn);
-  float fz = calc_lab_f(z / zn);
+  fx = calc_lab_f(x / xn);
+  fy = calc_lab_f(y / yn);
+  fz = calc_lab_f(z / zn);
 
   *l = 116.0f * fy - 16.0f;
   *a = 500.0f * (fx - fy);
@@ -121,10 +124,11 @@ static void lab_to_xyz(float l, float a, float b_in, float *x, float *y,
   float xn = 0.95047f;
   float yn = 1.00000f;
   float zn = 1.08883f;
+  float fy, fx, fz;
 
-  float fy = (l + 16.0f) / 116.0f;
-  float fx = a / 500.0f + fy;
-  float fz = fy - b_in / 200.0f;
+  fy = (l + 16.0f) / 116.0f;
+  fx = a / 500.0f + fy;
+  fz = fy - b_in / 200.0f;
 
   *x = xn * calc_lab_f_inv(fx);
   *y = yn * calc_lab_f_inv(fy);
@@ -161,7 +165,9 @@ static void lab_to_lch(float l, float a, float b_in, float *l_out, float *c,
  */
 static void lch_to_lab(float l, float c, float h, float *l_out, float *a,
                        float *b_out) {
-  float h_rad = h * (float)M_PI / 180.0f;
+  float h_rad;
+
+  h_rad = h * (float)M_PI / 180.0f;
   *l_out = l;
   *a = c * (float)cos(h_rad);
   *b_out = c * (float)sin(h_rad);

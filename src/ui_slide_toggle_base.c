@@ -230,15 +230,13 @@ cleanup:
  * \return UI_ERROR_NONE on success.
  */
 ui_error_t ui_slide_toggle_base_destroy(struct ui_slide_toggle_base *toggle) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!toggle) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(toggle->recognizer);
-    (void)rc_cleanup;
-  }
+  rc = ui_gesture_recognizer_destroy(toggle->recognizer);
   C_MULTIPLATFORM_FREE(toggle);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

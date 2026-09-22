@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "ui_web_animation.h"
 #include "../src/ui_internal_mem.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -79,7 +80,7 @@ static int test_web_animation_lifecycle(void) {
   ui_web_animation_destroy(animation);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -132,7 +133,7 @@ static int test_web_animation_reverse(void) {
   ui_web_animation_destroy(animation);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -167,7 +168,7 @@ static int test_scroll_driven_timelines(void) {
   ui_web_animation_timeline_destroy(pointer_timeline);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -243,7 +244,7 @@ static int test_web_animation_extra(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -393,7 +394,7 @@ static int test_web_animation_coverage(void) {
   ui_web_animation_destroy(animation);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -499,7 +500,7 @@ static int test_web_animation_more_coverage(void) {
   ui_web_animation_destroy(animation);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) { (void)rc_cleanup; /* Avoid override */ }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return failed;
@@ -519,6 +520,7 @@ int main(void) {
   return failed;
 }
 #include "ui_web_animation.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */

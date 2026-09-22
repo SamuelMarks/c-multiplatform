@@ -15,10 +15,14 @@
  * @param p_str Parameter p_str.
  * @return Return value.
  */
-static void skip_whitespace(const char **p_str) {
+static ui_error_t skip_whitespace(const char **p_str) {
+  if (!p_str || !*p_str) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -28,22 +32,27 @@ static void skip_whitespace(const char **p_str) {
  * @param out_match Parameter out_match.
  * @return Return value.
  */
-static void match_keyword(const char **p_str, const char *keyword,
-                          int *out_match) {
-  size_t len = strlen(keyword);
+static ui_error_t match_keyword(const char **p_str, const char *keyword,
+                                int *out_match) {
+  size_t len;
+  if (!p_str || !*p_str || !keyword || !out_match) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  len = strlen(keyword);
   if (strncmp(*p_str, keyword, len) == 0) {
     if (isalpha((unsigned char)keyword[len - 1])) {
       if (isalnum((unsigned char)(*p_str)[len]) || (*p_str)[len] == '-' ||
           (*p_str)[len] == '_') {
         *out_match = 0;
-        return;
+        return UI_ERROR_NONE;
       }
     }
     *p_str += len;
     *out_match = 1;
-    return;
+    return UI_ERROR_NONE;
   }
   *out_match = 0;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -149,7 +158,7 @@ ui_error_t ui_css_parse_content(const char *str,
         sizeof(struct ui_css_content_item));
     if (!item) {
       out_content->items = head;
-      (void)ui_css_content_destroy(out_content);
+      ui_css_content_destroy(out_content);
       return UI_ERROR_OUT_OF_MEMORY;
     }
     memset(item, 0, sizeof(struct ui_css_content_item));
@@ -307,7 +316,7 @@ ui_error_t ui_css_parse_content(const char *str,
 parse_failed:
   C_MULTIPLATFORM_FREE(item);
   out_content->items = head;
-  (void)ui_css_content_destroy(out_content);
+  ui_css_content_destroy(out_content);
   return rc != UI_ERROR_NONE ? rc : UI_ERROR_PARSE_FAILED;
 }
 
@@ -327,3 +336,27 @@ ui_error_t ui_css_content_destroy(struct ui_css_content *content) {
   }
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_content_coverage(void);
+/**
+ * @brief run_content_coverage.
+ * @return Return value.
+ */
+ui_error_t run_content_coverage(void) {
+  const char *null_str = NULL;
+  const char *valid_str = "test";
+  int match = 0;
+
+  skip_whitespace(NULL);
+  skip_whitespace(&null_str);
+
+  match_keyword(NULL, NULL, NULL);
+  match_keyword(&null_str, NULL, NULL);
+  match_keyword(&valid_str, NULL, NULL);
+  match_keyword(&valid_str, "test", NULL);
+  match_keyword(&valid_str, "test", &match);
+
+  return UI_ERROR_NONE;
+}
+#endif

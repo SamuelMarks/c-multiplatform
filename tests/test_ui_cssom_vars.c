@@ -35,26 +35,6 @@ static char *my_strdup(const char *s) {
 }
 
 int test_cssom_part7_vars(void) {
-  struct ui_css_stylesheet *sheet = NULL;
-  (void)sheet;
-  struct ui_css_rule *rule = NULL, *rule2 = NULL, *rule3 = NULL;
-  (void)rule;
-  (void)rule2;
-  (void)rule3;
-  struct ui_dom_node *node = NULL, *child = NULL, *grandchild = NULL;
-  (void)node;
-  (void)child;
-  (void)grandchild;
-  ui_error_t rc = UI_ERROR_NONE;
-  (void)rc;
-  struct ui_css_computed_style *style = NULL;
-  (void)style;
-  struct ui_css_computed_style *c_style = NULL;
-  (void)c_style;
-  int order = 0;
-  (void)order;
-  struct ui_css_selector *sel = NULL;
-  (void)sel;
 
   /* Test @scope without scope_start on a child node */
   {

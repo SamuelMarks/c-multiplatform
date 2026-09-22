@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "ui_slide_toggle_base.h"
 #include "ui_control_value_accessor.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 /* clang-format on */
@@ -350,9 +351,7 @@ static int run_normal_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_slide_toggle_base_destroy(toggle);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_slide_toggle_base_destroy(NULL); /* Safe */
 
@@ -376,9 +375,7 @@ static int run_oom_tests(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_slide_toggle_base_destroy(toggle);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     return 1;
   }
@@ -389,22 +386,23 @@ static int run_oom_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_slide_toggle_base_destroy(toggle);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
 
 static ui_error_t mock_cva_on_change_error(union ui_signal_payload val,
                                            void *user_data) {
-  (void)val;
-  (void)user_data;
+  if (val.ptr_val) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
 static ui_error_t mock_cva_on_touched_error(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_OUT_OF_MEMORY;
 }
 

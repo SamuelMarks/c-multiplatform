@@ -140,9 +140,7 @@ static void test_page_floats_cases(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
   }
 }
 

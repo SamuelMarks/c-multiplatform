@@ -274,12 +274,10 @@ ui_component_set_default_style(struct ui_component *component,
   }
 
   if (component->internal_style) {
-    {
-      ui_error_t rc_cleanup =
-          ui_css_stylesheet_destroy(component->internal_style);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    ui_error_t rc_cleanup =
+        ui_css_stylesheet_destroy(component->internal_style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
   }
   component->internal_style = stylesheet;
@@ -308,12 +306,10 @@ ui_error_t ui_component_inject_style_override(struct ui_component *component,
   }
 
   if (component->override_style) {
-    {
-      ui_error_t rc_cleanup =
-          ui_css_stylesheet_destroy(component->override_style);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    ui_error_t rc_cleanup =
+        ui_css_stylesheet_destroy(component->override_style);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
   }
   component->override_style = new_override;
@@ -359,12 +355,9 @@ ui_error_t ui_component_set_property(struct ui_component *component,
       ui_css_rule_destroy(rule);
       return rc;
     }
-    {
-      ui_error_t rc_cleanup =
-          ui_css_stylesheet_append_rule(component->bound_properties, rule);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    rc = ui_css_stylesheet_append_rule(component->bound_properties, rule);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 

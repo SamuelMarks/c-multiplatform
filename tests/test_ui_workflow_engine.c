@@ -230,6 +230,48 @@ int main(void) {
   rc = ui_workflow_engine_execute(&wf, &wf_ctx);
   assert(rc != UI_ERROR_NONE);
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_workflow_mock_signal_fail;
+    extern int g_workflow_mock_criteria_fail;
+    extern ui_error_t test_ui_workflow_evaluate_success_criteria_null(void);
+
+    /* Test null out_matches */
+    rc = test_ui_workflow_evaluate_success_criteria_null();
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
+
+    /* Test signal get failure during increment */
+    step_extra.action = UI_RUNTIME_ACTION_MUTATE_STATE;
+    step_extra.target = "app.cart_count";
+    step_extra.value = "increment";
+    g_workflow_mock_signal_fail = 1;
+    rc = ui_workflow_engine_execute(&wf, &wf_ctx);
+    assert(rc != UI_ERROR_NONE);
+
+    /* Test signal set failure during increment */
+    g_workflow_mock_signal_fail = 2;
+    rc = ui_workflow_engine_execute(&wf, &wf_ctx);
+    assert(rc != UI_ERROR_NONE);
+    g_workflow_mock_signal_fail = 0;
+
+    /* Test signal set failure during mutate */
+    step_extra.target = "local_var";
+    step_extra.value = "77";
+    g_workflow_mock_signal_fail = 3;
+    rc = ui_workflow_engine_execute(&wf, &wf_ctx);
+    assert(rc != UI_ERROR_NONE);
+    g_workflow_mock_signal_fail = 0;
+
+    /* Test criteria failure during HTTP */
+    step_extra.action = UI_RUNTIME_ACTION_HTTP;
+    step_extra.success_criteria = "$statusCode == 200";
+    g_workflow_mock_criteria_fail = 1;
+    rc = ui_workflow_engine_execute(&wf, &wf_ctx);
+    assert(rc != UI_ERROR_NONE);
+    g_workflow_mock_criteria_fail = 0;
+  }
+#endif
+
   /* Unknown action falls through */
   step_extra.action = (enum ui_runtime_workflow_action)999;
   rc = ui_workflow_engine_execute(&wf, &wf_ctx);

@@ -10,6 +10,23 @@
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_button_group_mock_fail = 0;
+
+/**
+ * @brief mock_button_group_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t
+mock_button_group_component_destroy(struct ui_component *comp) {
+  if (g_button_group_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_button_group_component_destroy
+/** @endcond */
 #endif
 
 /**
@@ -35,9 +52,9 @@ ui_button_group_base_create(struct ui_button_group_base **out_group) {
   group = (struct ui_button_group_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_button_group_base));
   if (!group) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_component_destroy(base_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }

@@ -148,10 +148,7 @@ static ui_error_t gather_focusable_nodes(struct ui_dom_node *root,
   struct ui_dom_node *child;
   ui_bool_t focusable = UI_FALSE;
 
-  {
-    ui_error_t rc = is_focusable(root, &focusable);
-    (void)rc;
-  }
+  is_focusable(root, &focusable);
 
   if (focusable) {
     if (*out_count >= *out_capacity) {
@@ -264,9 +261,7 @@ gather_focusable_layout_nodes(struct ui_layout_node *node,
   struct ui_layout_node *child;
   ui_bool_t focusable = UI_FALSE;
   if (node->dom_node) {
-    ui_error_t rc =
-        is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
-    (void)rc;
+    is_focusable((struct ui_dom_node *)node->dom_node, &focusable);
   }
 
   if (focusable) {
@@ -307,8 +302,10 @@ gather_focusable_layout_nodes(struct ui_layout_node *node,
  * @param[in] dir The direction of navigation.
  * @param[out] out_distance Computed distance penalty. -1.0f if invalid.
  */
-static void get_distance(struct ui_layout_node *a, struct ui_layout_node *b,
-                         enum ui_focus_direction dir, float *out_distance) {
+static ui_error_t get_distance(struct ui_layout_node *a,
+                               struct ui_layout_node *b,
+                               enum ui_focus_direction dir,
+                               float *out_distance) {
   float dx = 0.0f, dy = 0.0f;
   float center_ax, center_ay, center_bx, center_by;
 
@@ -322,28 +319,28 @@ static void get_distance(struct ui_layout_node *a, struct ui_layout_node *b,
   switch (dir) {
   case UI_FOCUS_DIRECTION_UP:
     if (center_by >= center_ay) {
-      return; /* Must be strictly above */
+      return UI_ERROR_NONE; /* Must be strictly above */
     }
     dx = center_ax - center_bx;
     dy = center_ay - center_by;
     break;
   case UI_FOCUS_DIRECTION_DOWN:
     if (center_by <= center_ay) {
-      return; /* Must be strictly below */
+      return UI_ERROR_NONE; /* Must be strictly below */
     }
     dx = center_ax - center_bx;
     dy = center_by - center_ay;
     break;
   case UI_FOCUS_DIRECTION_LEFT:
     if (center_bx >= center_ax) {
-      return; /* Must be strictly left */
+      return UI_ERROR_NONE; /* Must be strictly left */
     }
     dx = center_ax - center_bx;
     dy = center_ay - center_by;
     break;
   case UI_FOCUS_DIRECTION_RIGHT:
     if (center_bx <= center_ax) {
-      return; /* Must be strictly right */
+      return UI_ERROR_NONE; /* Must be strictly right */
     }
     dx = center_bx - center_ax;
     dy = center_ay - center_by;
@@ -354,7 +351,7 @@ static void get_distance(struct ui_layout_node *a, struct ui_layout_node *b,
 
   /* Give heavy penalty to perpendicular distance */
   *out_distance = dy * dy + dx * dx * 4.0f;
-  return;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -401,9 +398,7 @@ ui_error_t ui_focus_manager_navigate(struct ui_focus_manager *manager,
   }
 
   if (!current_layout_node) {
-    if (nodes) {
-      C_MULTIPLATFORM_FREE(nodes);
-    }
+    C_MULTIPLATFORM_FREE(nodes);
     return UI_ERROR_NONE;
   }
 
@@ -483,7 +478,9 @@ ui_error_t ui_focus_manager_push_trap(struct ui_focus_manager *manager,
   /* Reset focus to the trap root or its first focusable element */
   {
     ui_error_t rc_cleanup = ui_focus_manager_advance(manager, trap_root, 1);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
   }
 
   return UI_ERROR_NONE;

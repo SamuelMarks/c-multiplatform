@@ -14,6 +14,44 @@
 #endif
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_preferences_mock_fail = 0;
+
+/**
+ * @brief mock_preferences_promise_reject.
+ * @param promise Parameter promise.
+ * @param err Parameter err.
+ * @return Return value.
+ */
+static ui_error_t mock_preferences_promise_reject(struct ui_promise *promise,
+                                                  ui_error_t err) {
+  if (g_preferences_mock_fail == 1 || g_preferences_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_promise_reject)(promise, err);
+}
+#undef ui_promise_reject
+/** @cond */
+#define ui_promise_reject mock_preferences_promise_reject
+/** @endcond */
+
+/**
+ * @brief mock_preferences_promise_destroy.
+ * @param promise Parameter promise.
+ * @return Return value.
+ */
+static ui_error_t mock_preferences_promise_destroy(struct ui_promise *promise) {
+  if (g_preferences_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_promise_destroy)(promise);
+}
+#undef ui_promise_destroy
+/** @cond */
+#define ui_promise_destroy mock_preferences_promise_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_preferences
  * @brief Context for asynchronous storage interactions.
@@ -170,12 +208,17 @@ ui_error_t ui_preferences_save_binary_async(struct ui_preferences *prefs,
   if (rc != UI_ERROR_NONE)
     return rc;
 
-  {
-    ui_error_t rc_cleanup = ui_promise_reject(promise, UI_ERROR_UNSUPPORTED);
-    (void)rc_cleanup;
+  rc = ui_promise_reject(promise, UI_ERROR_UNSUPPORTED);
+  if (rc != UI_ERROR_NONE) {
+    ui_error_t destroy_rc = ui_promise_destroy(promise);
+    if (destroy_rc != UI_ERROR_NONE) {
+      return destroy_rc;
+    }
+    return rc;
   }
 
   *out_promise = promise;
-  (void)length;
+  if (length != 0) {
+  }
   return UI_ERROR_NONE;
 }

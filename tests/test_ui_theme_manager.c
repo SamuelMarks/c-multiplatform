@@ -3,6 +3,7 @@
 #include "ui_arena.h"
 #include "ui_error.h"
 #include "ui_signal.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -32,9 +33,7 @@ static int test_theme_manager_lifecycle(void) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -75,9 +74,7 @@ static int test_theme_manager_mode(void) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -134,9 +131,7 @@ static int test_theme_manager_nulls(void) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return failed;

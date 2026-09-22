@@ -23,8 +23,10 @@ static ui_error_t mock_aot_mount(struct ui_dom_node *parent_node,
                                  struct ui_dom_node **out_root) {
   struct ui_dom_node *node = NULL;
   ui_error_t rc;
-  (void)ctx;
-  (void)app_state;
+  if (ctx) {
+  }
+  if (app_state) {
+  }
 
   if (!out_root) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -262,6 +264,22 @@ int main(void) {
   assert(rc == UI_ERROR_NONE);
   assert(snippet_dom != NULL);
   assert(root_dom->first_child != NULL);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_app_load_mock_append_fail;
+    memset(&cfg, 0, sizeof(cfg));
+    cfg.mode = UI_APP_LOAD_MODE_RUNTIME;
+    cfg.schema_payload = app_schema;
+    g_app_load_mock_append_fail = 1;
+    rc = ui_app_load(&cfg, mount_host, &root_dom);
+    assert(rc != UI_ERROR_NONE);
+
+    rc = ui_app_load_snippet(snippet_json, root_dom, NULL, NULL, &snippet_dom);
+    assert(rc != UI_ERROR_NONE);
+    g_app_load_mock_append_fail = 0;
+  }
+#endif
 
   /* OOM tests */
   cfg.mode = UI_APP_LOAD_MODE_RUNTIME;

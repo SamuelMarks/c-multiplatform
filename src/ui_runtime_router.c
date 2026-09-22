@@ -248,10 +248,8 @@ static ui_error_t ui_runtime_router_navigate_internal(
   /* Clear previous screen children from mount_host */
   while (mount_host->first_child) {
     struct ui_dom_node *child = mount_host->first_child;
-    ui_error_t rc_cleanup = ui_dom_node_remove_child(mount_host, child);
-    (void)rc_cleanup;
-    rc_cleanup = ui_dom_node_destroy(child);
-    (void)rc_cleanup;
+    ui_dom_node_remove_child(mount_host, child);
+    ui_dom_node_destroy(child);
   }
 
   /* Build new screen DOM */
@@ -262,8 +260,7 @@ static ui_error_t ui_runtime_router_navigate_internal(
   }
 
   if (screen_dom) {
-    ui_error_t rc_append = ui_dom_node_append_child(mount_host, screen_dom);
-    (void)rc_append;
+    ui_dom_node_append_child(mount_host, screen_dom);
   }
 
   if (record_history) {

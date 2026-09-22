@@ -17,6 +17,98 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_menu_mock_fail = 0;
+int g_menu_mock_attr_countdown = -1;
+int g_menu_mock_append_countdown = -1;
+
+static ui_error_t mock_menu_dom_node_set_attribute(struct ui_dom_node *node,
+                                                   const char *name,
+                                                   const char *value) {
+  if (g_menu_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_menu_mock_attr_countdown == 0) {
+    g_menu_mock_attr_countdown = -1;
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_menu_mock_attr_countdown > 0) {
+    g_menu_mock_attr_countdown--;
+  }
+  return (ui_dom_node_set_attribute)(node, name, value);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_menu_dom_node_set_attribute
+/** @endcond */
+
+static ui_error_t
+mock_menu_css_parse_stylesheet(const char *css,
+                               struct ui_css_stylesheet **out_sheet) {
+  if (g_menu_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_css_parse_stylesheet)(css, out_sheet);
+}
+#undef ui_css_parse_stylesheet
+/** @cond */
+#define ui_css_parse_stylesheet mock_menu_css_parse_stylesheet
+/** @endcond */
+
+static ui_error_t
+mock_menu_component_set_default_style(struct ui_component *comp,
+                                      struct ui_css_stylesheet *sheet) {
+  if (g_menu_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_menu_component_set_default_style
+/** @endcond */
+
+static ui_error_t mock_menu_dom_node_append_child(struct ui_dom_node *parent,
+                                                  struct ui_dom_node *child) {
+  if (g_menu_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_menu_dom_node_append_child
+/** @endcond */
+
+static ui_error_t mock_menu_overlay_mount(struct ui_overlay_director *director,
+                                          struct ui_component *comp,
+                                          int z_index,
+                                          struct ui_overlay **out_handle) {
+  if (g_menu_mock_fail == 5) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_overlay_director_mount_component)(director, comp, z_index,
+                                               out_handle);
+}
+#undef ui_overlay_director_mount_component
+/** @cond */
+#define ui_overlay_director_mount_component mock_menu_overlay_mount
+/** @endcond */
+
+static ui_error_t
+mock_menu_overlay_unmount(struct ui_overlay_director *director,
+                          struct ui_overlay *handle) {
+  if (g_menu_mock_fail == 6) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_overlay_director_unmount)(director, handle);
+}
+#undef ui_overlay_director_unmount
+/** @cond */
+#define ui_overlay_director_unmount mock_menu_overlay_unmount
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet for menus */
 static const char *ui_menu_base_default_css =
     ".ui-menu { display: flex; flex-direction: column; position: absolute; "
@@ -96,21 +188,33 @@ ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu) {
   menu->user_data = NULL;
 
   rc = ui_component_create(&menu->component);
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
   rc = ui_dom_node_set_tag_name(root_node, "div");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
   rc = ui_dom_node_set_attribute(root_node, "class", "ui-menu");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
   rc = ui_dom_node_set_attribute(root_node, "role", "menu");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   menu->container_node = root_node;
 
   rc = ui_css_parse_stylesheet(ui_menu_base_default_css, &default_style);
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   rc = ui_component_set_default_style(menu->component, default_style);
   if (rc != UI_ERROR_NONE) {
@@ -126,12 +230,10 @@ ui_error_t ui_menu_base_create(struct ui_menu_base **out_menu) {
 
 cleanup:
   if (root_node) {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-    (void)rc_cleanup;
+    ui_dom_node_destroy(root_node);
   }
   if (menu->component) {
-    ui_error_t rc_cleanup = ui_component_destroy(menu->component);
-    (void)rc_cleanup;
+    ui_component_destroy(menu->component);
   }
   C_MULTIPLATFORM_FREE(menu);
   return rc;
@@ -147,10 +249,7 @@ ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
   if (!menu)
     return UI_ERROR_NONE;
 
-  {
-    ui_error_t cl_rc = ui_menu_base_close(menu);
-    { (void)cl_rc; }
-  }
+  ui_menu_base_close(menu);
 
   for (i = 0; i < menu->item_count; i++) {
     C_MULTIPLATFORM_FREE(menu->items[i].id);
@@ -159,10 +258,7 @@ ui_error_t ui_menu_base_destroy(struct ui_menu_base *menu) {
     C_MULTIPLATFORM_FREE(menu->items);
   }
 
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(menu->component);
-    (void)rc_cleanup;
-  }
+  ui_component_destroy(menu->component);
 
   C_MULTIPLATFORM_FREE(menu);
   return UI_ERROR_NONE;
@@ -181,7 +277,7 @@ static ui_error_t duplicate_string(const char *src, char **out_str) {
   len = strlen(src);
   dst = (char *)C_MULTIPLATFORM_MALLOC(len + 1);
   if (!dst)
-    return UI_ERROR_NONE;
+    return UI_ERROR_OUT_OF_MEMORY;
 #if defined(_MSC_VER)
   strcpy_s(dst, len + 1, src);
 #else
@@ -220,25 +316,32 @@ ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
   }
 
   rc = ui_dom_node_set_attribute(label_node, "role", "menuitem");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE)
+    return rc;
   rc = ui_dom_node_set_attribute(label_node, "class", "ui-menu-item");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE)
+    return rc;
   rc = ui_dom_node_set_attribute(label_node, "tabindex", "-1");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE)
+    return rc;
   rc = ui_dom_node_set_attribute(label_node, "data-active", "false");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (submenu) {
     rc = ui_dom_node_set_attribute(label_node, "aria-haspopup", "menu");
-    { (void)rc; }
+    if (rc != UI_ERROR_NONE)
+      return rc;
     submenu->parent_menu = menu;
   }
 
   rc = ui_dom_node_append_child(menu->container_node, label_node);
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   rc = duplicate_string(item_id, &menu->items[menu->item_count].id);
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   menu->items[menu->item_count].node = label_node;
   menu->items[menu->item_count].submenu = submenu;
@@ -246,9 +349,11 @@ ui_error_t ui_menu_base_add_item(struct ui_menu_base *menu, const char *item_id,
   if (menu->item_count == 0) {
     menu->active_index = 0;
     rc = ui_dom_node_set_attribute(label_node, "data-active", "true");
-    { (void)rc; }
+    if (rc != UI_ERROR_NONE)
+      return rc;
     rc = ui_dom_node_set_attribute(label_node, "tabindex", "0");
-    { (void)rc; }
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   menu->item_count++;
@@ -293,15 +398,17 @@ ui_error_t ui_menu_base_open_at(struct ui_menu_base *menu,
     return UI_ERROR_NONE;
 
 #if defined(_MSC_VER)
-  (void)sprintf_s(style_buf, sizeof(style_buf), "left: %dpx; top: %dpx;", x, y);
+  sprintf_s(style_buf, sizeof(style_buf), "left: %dpx; top: %dpx;", x, y);
 #else
-  (void)sprintf(style_buf, "left: %dpx; top: %dpx;", x, y);
+  sprintf(style_buf, "left: %dpx; top: %dpx;", x, y);
 #endif
 
   {
     ui_error_t attr_rc =
         ui_dom_node_set_attribute(menu->container_node, "style", style_buf);
-    { (void)attr_rc; }
+    if (attr_rc != UI_ERROR_NONE) {
+      return attr_rc;
+    }
   }
 
   menu->director = director;
@@ -320,6 +427,7 @@ ui_error_t ui_menu_base_open_at(struct ui_menu_base *menu,
  */
 ui_error_t ui_menu_base_close(struct ui_menu_base *menu) {
   int i;
+  ui_error_t rc = UI_ERROR_NONE;
   if (!menu)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -330,20 +438,24 @@ ui_error_t ui_menu_base_close(struct ui_menu_base *menu) {
   for (i = 0; i < menu->item_count; i++) {
     if (menu->items[i].submenu) {
       ui_error_t close_rc = ui_menu_base_close(menu->items[i].submenu);
-      { (void)close_rc; }
+      if (close_rc != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+        rc = close_rc;
+      }
     }
   }
 
   {
     ui_error_t rc_cleanup =
         ui_overlay_director_unmount(menu->director, menu->overlay_handle);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   menu->overlay_handle = NULL;
 
   menu->is_open = 0;
   menu->active_index = -1;
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -390,18 +502,22 @@ static ui_error_t update_active_index(struct ui_menu_base *menu,
   if (menu->active_index >= 0) {
     rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
                                    "data-active", "false");
-    { (void)rc; }
+    if (rc != UI_ERROR_NONE)
+      return rc;
     rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
                                    "tabindex", "-1");
-    { (void)rc; }
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   menu->active_index = new_index;
   rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
                                  "data-active", "true");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE)
+    return rc;
   rc = ui_dom_node_set_attribute(menu->items[menu->active_index].node,
                                  "tabindex", "0");
-  { (void)rc; }
+  if (rc != UI_ERROR_NONE)
+    return rc;
   return UI_ERROR_NONE;
 }
 
@@ -414,7 +530,6 @@ static ui_error_t update_active_index(struct ui_menu_base *menu,
 ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
                                       const struct ui_event *event) {
   int i;
-  int handled = 0;
 
   if (!menu || !event)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -427,18 +542,12 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
 
   /* First pass event to open submenus */
   for (i = 0; i < menu->item_count; i++) {
-    int is_open = 0;
     if (menu->items[i].submenu) {
-      ui_error_t check_rc =
-          ui_menu_base_is_open(menu->items[i].submenu, &is_open);
-      { (void)check_rc; }
-      if (is_open) {
+      if (menu->items[i].submenu->is_open) {
         /* If submenu handles it, we might want to return, but let's just
            process. Actually, we should return if submenu is open, so it takes
            focus. */
-        ui_error_t proc_rc =
-            ui_menu_base_process_event(menu->items[i].submenu, event);
-        { (void)proc_rc; }
+        ui_menu_base_process_event(menu->items[i].submenu, event);
         return UI_ERROR_NONE;
       }
     }
@@ -450,16 +559,18 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
     if (key == UI_KEY_DOWN) {
       int next = (menu->active_index + 1) % menu->item_count;
       ui_error_t up_rc = update_active_index(menu, next);
-      { (void)up_rc; }
-      handled = 1;
+      if (up_rc != UI_ERROR_NONE) {
+        return up_rc;
+      }
     } else if (key == UI_KEY_UP) {
       int prev = menu->active_index - 1;
       ui_error_t up_rc;
       if (prev < 0)
         prev = menu->item_count - 1;
       up_rc = update_active_index(menu, prev);
-      { (void)up_rc; }
-      handled = 1;
+      if (up_rc != UI_ERROR_NONE) {
+        return up_rc;
+      }
     } else if (key == UI_KEY_RIGHT) {
       if (menu->active_index >= 0) {
         struct ui_menu_base *sub = menu->items[menu->active_index].submenu;
@@ -469,16 +580,18 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
           ui_error_t open_rc =
               ui_menu_base_open_at(sub, menu->director, menu->last_x + 100,
                                    menu->last_y + (menu->active_index * 24));
-          { (void)open_rc; }
+          if (open_rc != UI_ERROR_NONE) {
+            return open_rc;
+          }
         }
       }
-      handled = 1;
     } else if (key == UI_KEY_LEFT) {
       if (menu->parent_menu) {
         ui_error_t close_rc = ui_menu_base_close(menu);
-        { (void)close_rc; }
+        if (close_rc != UI_ERROR_NONE) {
+          return close_rc;
+        }
       }
-      handled = 1;
     } else if (key == UI_KEY_ENTER || key == UI_KEY_SPACE) {
       if (menu->active_index >= 0) {
         struct ui_menu_base *sub = menu->items[menu->active_index].submenu;
@@ -486,13 +599,15 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
           ui_error_t open_rc =
               ui_menu_base_open_at(sub, menu->director, menu->last_x + 100,
                                    menu->last_y + (menu->active_index * 24));
-          { (void)open_rc; }
+          if (open_rc != UI_ERROR_NONE) {
+            return open_rc;
+          }
         } else {
           if (menu->on_action) {
-            {
-              ui_error_t action_rc = menu->on_action(
-                  menu, menu->items[menu->active_index].id, menu->user_data);
-              { (void)action_rc; }
+            ui_error_t action_rc = menu->on_action(
+                menu, menu->items[menu->active_index].id, menu->user_data);
+            if (action_rc != UI_ERROR_NONE) {
+              return action_rc;
             }
           }
           /* Close the entire menu hierarchy */
@@ -503,20 +618,21 @@ ui_error_t ui_menu_base_process_event(struct ui_menu_base *menu,
               root = root->parent_menu;
             }
             close_rc = ui_menu_base_close(root);
-            { (void)close_rc; }
+            if (close_rc != UI_ERROR_NONE) {
+              return close_rc;
+            }
           }
         }
       }
-      handled = 1;
     } else if (key == UI_KEY_ESCAPE) {
       ui_error_t close_rc;
       close_rc = ui_menu_base_close(menu);
-      { (void)close_rc; }
-      handled = 1;
+      if (close_rc != UI_ERROR_NONE) {
+        return close_rc;
+      }
     }
   }
 
-  (void)handled;
   return UI_ERROR_NONE;
 }
 

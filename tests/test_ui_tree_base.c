@@ -6,6 +6,7 @@
 #include "ui_tree_base.h"
 #include "ui_dom_node.h"
 #include "ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -74,35 +75,41 @@ static ui_error_t teardown_mock_tree(void) {
 }
 
 static size_t mock_get_root_count(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return 2;
 }
 
 static size_t mock_get_root_count_empty(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return 0;
 }
 
 static void *mock_get_root_node(size_t index, void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return roots[index];
 }
 
 static void *mock_get_parent(void *node_id, void *user_data) {
   struct mock_node *n = (struct mock_node *)node_id;
-  (void)user_data;
+  if (user_data) {
+  }
   return n ? n->parent : NULL;
 }
 
 static size_t mock_get_child_count(void *node_id, void *user_data) {
   struct mock_node *n = (struct mock_node *)node_id;
-  (void)user_data;
+  if (user_data) {
+  }
   return n ? n->child_count : 0;
 }
 
 static void *mock_get_child(void *node_id, size_t index, void *user_data) {
   struct mock_node *n = (struct mock_node *)node_id;
-  (void)user_data;
+  if (user_data) {
+  }
   return n ? n->children[index] : NULL;
 }
 
@@ -110,7 +117,8 @@ static ui_error_t mock_render_node(void *node_id, struct ui_dom_node *cell_node,
                                    void *user_data) {
   struct mock_node *n = (struct mock_node *)node_id;
   char buf[32];
-  (void)user_data;
+  if (user_data) {
+  }
   if (!n)
     return UI_ERROR_NONE;
 #if defined(_MSC_VER)
@@ -231,9 +239,7 @@ static int test_tree_render(void) {
     if (ui_tree_base_create(&tree, &model) == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -309,9 +315,7 @@ static int test_tree_render(void) {
       if (container->first_child) {
         {
           ui_error_t rc_cleanup = ui_dom_node_destroy(container->first_child);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
         container->first_child = NULL;
         container->last_child = NULL;
@@ -348,15 +352,11 @@ static int test_tree_render(void) {
 
   {
     ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -563,9 +563,7 @@ static int test_tree_navigation(void) {
       g_malloc_fail_countdown = -1; /* Reset for tree creation */
       {
         ui_error_t rc_cleanup = ui_tree_base_create(&mock_tree, &model);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
 
       g_malloc_fail_countdown = j;
@@ -574,23 +572,19 @@ static int test_tree_navigation(void) {
       {
         ui_error_t rc_cleanup = ui_tree_base_handle_key_event(mock_tree, &ev);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          /* expected error during OOM */
         }
       }
 
       g_malloc_fail_countdown = -1; /* Reset to allow cleanup */
       {
         ui_error_t rc_cleanup = ui_tree_base_destroy(mock_tree);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
 
       {
         ui_error_t rc_cleanup = ui_tree_base_create(&mock_tree, &model);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       g_malloc_fail_countdown = j;
       ui_tree_base_set_active_node(mock_tree, &root1);
@@ -598,16 +592,14 @@ static int test_tree_navigation(void) {
       {
         ui_error_t rc_cleanup = ui_tree_base_handle_key_event(mock_tree, &ev);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          /* expected error during OOM */
         }
       }
 
       g_malloc_fail_countdown = -1;
       {
         ui_error_t rc_cleanup = ui_tree_base_destroy(mock_tree);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -646,12 +638,161 @@ static int test_tree_navigation(void) {
 
   {
     ui_error_t rc_cleanup = ui_tree_base_destroy(tree);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_tree_base_mock_fail;
+extern int g_tree_append_countdown;
+
+static int test_tree_mock_failures(void) {
+  struct ui_tree_model model;
+  struct ui_tree_base *tree;
+  struct ui_dom_node *container;
+  struct ui_keyboard_event ev;
+  ui_error_t rc;
+  int failed = 0;
+
+  model.get_root_count = mock_get_root_count;
+  model.get_root_node = mock_get_root_node;
+  model.get_parent = mock_get_parent;
+  model.get_child_count = mock_get_child_count;
+  model.get_child = mock_get_child;
+  model.render_node = mock_render_node;
+  model.user_data = NULL;
+
+  rc = ui_tree_base_create(&tree, &model);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &container);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+
+  /* Fail 101: tree_base_is_expanded_internal */
+  g_tree_base_mock_fail = 101;
+  rc = ui_tree_base_set_expanded(tree, &root1, 1);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+  rc = ui_tree_base_toggle_node(tree, &root1);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  rc = ui_tree_base_set_active_node(tree, &root1);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  ev.key_code = UI_KEY_RIGHT;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  ev.key_code = UI_KEY_LEFT;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  ev.key_code = UI_KEY_DOWN;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  rc = ui_tree_base_render(tree, container);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Set node active to child1_2 and trigger UP with 101 on prev_sib */
+  g_tree_base_mock_fail = 0;
+  rc = ui_tree_base_set_active_node(tree, &child1_2);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  g_tree_base_mock_fail = 101;
+  ev.key_code = UI_KEY_UP;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Fail 102: tree_base_set_expanded_internal */
+  g_tree_base_mock_fail = 102;
+  rc = ui_tree_base_toggle_node(tree, &root1);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  g_tree_base_mock_fail = 0;
+  rc = ui_tree_base_set_active_node(tree, &root1);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  g_tree_base_mock_fail = 102;
+  ev.key_code = UI_KEY_RIGHT;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Expand root1 normally, then test LEFT with 102 failure */
+  g_tree_base_mock_fail = 0;
+  rc = ui_tree_base_set_expanded(tree, &root1, 1);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  g_tree_base_mock_fail = 102;
+  ev.key_code = UI_KEY_LEFT;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Fail 103: tree_base_get_node_index_internal */
+  g_tree_base_mock_fail = 0;
+  rc = ui_tree_base_set_expanded(tree, &root1, 0);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  rc = ui_tree_base_set_active_node(tree, &root1);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  g_tree_base_mock_fail = 103;
+  ev.key_code = UI_KEY_DOWN;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  ev.key_code = UI_KEY_UP;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Fail 104: tree_base_get_next_visible_node_internal */
+  g_tree_base_mock_fail = 104;
+  ev.key_code = UI_KEY_DOWN;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Fail 105: tree_base_get_prev_visible_node_internal */
+  g_tree_base_mock_fail = 105;
+  ev.key_code = UI_KEY_UP;
+  rc = ui_tree_base_handle_key_event(tree, &ev);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Fail 411: mock_tree_selection_model_is_selected */
+  g_tree_base_mock_fail = 411;
+  rc = ui_tree_base_render(tree, container);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Fail 311: mock_tree_dom_node_append_child on root item append */
+  g_tree_base_mock_fail = 311;
+  rc = ui_tree_base_render(tree, container);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+
+  /* Fail on 2nd append (group append in render_recursive) */
+  g_tree_base_mock_fail = 0;
+  rc = ui_tree_base_set_expanded(tree, &root1, 1);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  g_tree_append_countdown = 1;
+  rc = ui_tree_base_render(tree, container);
+  EXPECT_TRUE(rc != UI_ERROR_NONE);
+  g_tree_append_countdown = -1;
+
+  /* Fail 311 on empty tree to hit line 641 (append tree_root to container) */
+  {
+    struct ui_tree_base *empty_tree = NULL;
+    struct ui_tree_model empty_model = model;
+    empty_model.get_root_count = mock_get_root_count_empty;
+    rc = ui_tree_base_create(&empty_tree, &empty_model);
+    EXPECT_EQ(rc, UI_ERROR_NONE);
+    g_tree_base_mock_fail = 311;
+    rc = ui_tree_base_render(empty_tree, container);
+    EXPECT_TRUE(rc != UI_ERROR_NONE);
+    g_tree_base_mock_fail = 0;
+    rc = ui_tree_base_destroy(empty_tree);
+    EXPECT_EQ(rc, UI_ERROR_NONE);
+  }
+
+  g_tree_base_mock_fail = 0;
+  rc = ui_tree_base_destroy(tree);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+  rc = ui_dom_node_destroy(container);
+  EXPECT_EQ(rc, UI_ERROR_NONE);
+
+  return failed;
+}
+#endif
 
 int main(void) {
   int failed = 0;
@@ -666,6 +807,14 @@ int main(void) {
   failed |= test_tree_navigation();
   if (failed > old_failed)
     printf("test_tree_navigation failed\n");
+  old_failed = failed;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  failed |= test_tree_mock_failures();
+  if (failed > old_failed)
+    printf("test_tree_mock_failures failed\n");
+  old_failed = failed;
+#endif
 
   teardown_mock_tree();
 

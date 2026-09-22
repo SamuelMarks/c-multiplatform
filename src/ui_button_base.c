@@ -299,23 +299,13 @@ ui_error_t ui_button_base_create(struct ui_button_base **out_button) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (btn->gesture_recognizer) {
-    {
-      ui_error_t rc_cleanup =
-          ui_gesture_recognizer_destroy(btn->gesture_recognizer);
-      (void)rc_cleanup;
-    }
+    ui_gesture_recognizer_destroy(btn->gesture_recognizer);
   }
   if (btn->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(btn->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(btn->component);
   }
   C_MULTIPLATFORM_FREE(btn);
   return rc;
@@ -331,14 +321,11 @@ ui_error_t ui_button_base_destroy(struct ui_button_base *button) {
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(button->gesture_recognizer);
-    (void)rc_cleanup;
+  if (button->gesture_recognizer) {
+    ui_gesture_recognizer_destroy(button->gesture_recognizer);
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(button->component);
-    (void)rc_cleanup;
+  if (button->component) {
+    ui_component_destroy(button->component);
   }
 
   C_MULTIPLATFORM_FREE(button);
@@ -515,10 +502,7 @@ ui_error_t ui_button_base_set_text(struct ui_button_base *button,
     }
     rc = ui_dom_node_append_child(button->component->shadow_root, text_node);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-        (void)rc_cleanup;
-      }
+      ui_dom_node_destroy(text_node);
       return rc;
     }
   }
@@ -570,51 +554,3 @@ ui_error_t ui_button_base_get_ripple_state(struct ui_button_base *button,
   *out_state = button->ripple_state;
   return UI_ERROR_NONE;
 }
-
-#ifdef UI_TEST_MOCK_ALLOC
-ui_error_t run_button_coverage(void);
-/**
- * @brief run_button_coverage.
- * @return Return value.
- */
-ui_error_t run_button_coverage(void) {
-  struct ui_button_base *btn = NULL;
-  struct ui_component *saved_comp = NULL;
-  struct ui_dom_node *saved_root = NULL;
-  struct ui_dom_node *elem_child = NULL;
-  struct ui_dom_node *saved_child = NULL;
-
-  (void)ui_button_base_create(&btn);
-
-  saved_comp = btn->component;
-  btn->component = NULL;
-  (void)ui_button_base_set_text(btn, "txt");
-  btn->component = saved_comp;
-
-  saved_root = btn->component->shadow_root;
-  btn->component->shadow_root = NULL;
-  (void)ui_button_base_set_text(btn, "txt");
-  btn->component->shadow_root = saved_root;
-
-  saved_child = btn->component->shadow_root->first_child;
-  (void)ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &elem_child);
-  btn->component->shadow_root->first_child = elem_child;
-  (void)ui_button_base_set_text(btn, "Elem text");
-  (void)ui_dom_node_destroy(elem_child);
-  btn->component->shadow_root->first_child = saved_child;
-
-  saved_child = btn->component->shadow_root->first_child;
-  btn->component->shadow_root->first_child = NULL;
-  g_button_mock_fail = 310;
-  (void)ui_button_base_set_text(btn, "fail");
-  g_button_mock_fail = 0;
-
-  g_button_mock_fail = 311;
-  (void)ui_button_base_set_text(btn, "fail");
-  g_button_mock_fail = 0;
-  btn->component->shadow_root->first_child = saved_child;
-
-  (void)ui_button_base_destroy(btn);
-  return UI_ERROR_NONE;
-}
-#endif

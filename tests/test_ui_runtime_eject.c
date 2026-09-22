@@ -263,22 +263,30 @@ int main(void) {
     for (sz = 1; sz <= 2000; sz += 1) {
       rc = ui_runtime_eject_tree_to_c_buffer(node, "mount_one", c_buf, sz,
                                              h_buf, sizeof(h_buf));
-      (void)rc;
+      if (rc != UI_ERROR_NONE) {
+        /* expected truncation error */
+      }
     }
     for (sz = 1; sz <= 600; sz += 1) {
       rc = ui_runtime_eject_tree_to_c_buffer(node, "mount_one", c_buf,
                                              sizeof(c_buf), h_buf, sz);
-      (void)rc;
+      if (rc != UI_ERROR_NONE) {
+        /* expected truncation error */
+      }
     }
     for (sz = 1; sz <= 10000; sz += 1) {
       rc = ui_runtime_eject_tree_to_c_buffer(comp_node, "mount_all", c_buf, sz,
                                              h_buf, sizeof(h_buf));
-      (void)rc;
+      if (rc != UI_ERROR_NONE) {
+        /* expected truncation error */
+      }
     }
     for (sz = 1; sz <= 2000; sz += 1) {
       rc = ui_runtime_eject_tree_to_c_buffer(comp_node, "mount_all", c_buf,
                                              sizeof(c_buf), h_buf, sz);
-      (void)rc;
+      if (rc != UI_ERROR_NONE) {
+        /* expected truncation error */
+      }
     }
 
     /* Long function name exceeding upper_name buffer */
@@ -358,6 +366,64 @@ int main(void) {
                                            h_buf, 0);
     assert(rc == UI_ERROR_INVALID_ARGUMENT);
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_eject_mock_format_fail;
+    extern int g_eject_mock_copy_fail;
+    struct node_meta;
+    extern ui_error_t ui_test_eject_init_node_meta(
+        struct node_meta * meta, int id_num,
+        const struct ui_runtime_node *node);
+    struct ui_runtime_node single_node;
+    char meta_buf[512];
+    int fail_idx;
+
+    memset(&single_node, 0, sizeof(single_node));
+    single_node.type = "ui_button_base";
+
+    rc = ui_test_eject_init_node_meta(NULL, 0, &single_node);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
+    rc = ui_test_eject_init_node_meta((struct node_meta *)meta_buf, 0, NULL);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
+    rc = ui_test_eject_init_node_meta((struct node_meta *)meta_buf, 0,
+                                      &single_node);
+    assert(rc == UI_ERROR_NONE);
+
+    for (fail_idx = 1; fail_idx <= 6; fail_idx++) {
+      g_eject_mock_format_fail = fail_idx;
+      rc = ui_runtime_eject_tree_to_c_buffer(&single_node, "test_fail", c_buf,
+                                             sizeof(c_buf), h_buf,
+                                             sizeof(h_buf));
+      assert(rc != UI_ERROR_NONE);
+    }
+    g_eject_mock_format_fail = 0;
+
+    /* 6 calls in declarations, 7th in body */
+    g_eject_mock_format_fail = 7;
+    rc =
+        ui_runtime_eject_tree_to_c_buffer(&single_node, "test_body_fail", c_buf,
+                                          sizeof(c_buf), h_buf, sizeof(h_buf));
+    assert(rc != UI_ERROR_NONE);
+    g_eject_mock_format_fail = 0;
+
+    /* 1st copy call: upper_name in tree_to_c_buffer */
+    g_eject_mock_copy_fail = 1;
+    rc =
+        ui_runtime_eject_tree_to_c_buffer(&single_node, "test_copy_fail", c_buf,
+                                          sizeof(c_buf), h_buf, sizeof(h_buf));
+    assert(rc != UI_ERROR_NONE);
+    g_eject_mock_copy_fail = 0;
+
+    /* 2nd copy call: out_dom_var in emit_body_recursive */
+    g_eject_mock_copy_fail = 2;
+    rc = ui_runtime_eject_tree_to_c_buffer(&single_node, "test_copy_body_fail",
+                                           c_buf, sizeof(c_buf), h_buf,
+                                           sizeof(h_buf));
+    assert(rc != UI_ERROR_NONE);
+    g_eject_mock_copy_fail = 0;
+  }
+#endif
 
   rc = ui_arena_destroy(arena);
   assert(rc == UI_ERROR_NONE);

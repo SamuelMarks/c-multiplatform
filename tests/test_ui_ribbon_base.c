@@ -7,6 +7,16 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+extern int g_ribbon_mock_signal_fail;
+extern int g_ribbon_mock_sort_fail;
+
+struct ui_ribbon_group_state;
+extern ui_error_t
+ui_test_ribbon_find_group_state(const struct ui_ribbon_base *ribbon,
+                                int group_id,
+                                struct ui_ribbon_group_state **out_state);
+extern ui_error_t
+ui_test_ribbon_sort_indices(const struct ui_ribbon_base *ribbon, int *indices);
 
 static int test_ribbon_lifecycle(void) {
   struct ui_arena *arena;
@@ -53,7 +63,7 @@ static int test_ribbon_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -133,19 +143,104 @@ static int test_ribbon_groups(void) {
     ui_ribbon_base_add_group_config(asc_ribbon, &g1);
     ui_ribbon_base_add_group_config(asc_ribbon, &g2);
     ui_ribbon_base_recalculate_overflow(asc_ribbon, 250);
+
+    /* Test find_group_state loop continuation (find g2 which is second group)
+     */
+    ui_ribbon_base_get_group_state(asc_ribbon, 20, &state);
+
+    /* Test failure in Step 1 (COMPACT) signal_set */
+    g_ribbon_mock_signal_fail = 1;
+    if (ui_ribbon_base_recalculate_overflow(asc_ribbon, 300) !=
+        UI_ERROR_UNKNOWN) {
+      g_ribbon_mock_signal_fail = 0;
+      return 1;
+    }
+    g_ribbon_mock_signal_fail = 0;
+
+    /* Test failure in Step 2 (COLLAPSED) signal_set: available_width 50 forces
+     * step 2 */
+    /* With 2 groups of min_width_normal 200 (total 400), at available_width 50:
+       recalculate_overflow resets all to normal:
+       current_width = 400.
+       Step 1:
+         i=0 (group 10): current_width becomes 300, signal_set call #1
+         i=1 (group 20): current_width becomes 200, signal_set call #2
+       Step 2:
+         i=0 (group 10): current_width becomes 200 - (100 - 32) = 132,
+       signal_set call #3! If g_ribbon_mock_signal_fail = 2: call 1:
+       g_ribbon_mock_signal_fail decrements 2 -> 1, doesn't fail yet! call 2:
+       g_ribbon_mock_signal_fail == 1 -> FAILS! That was call 2 in step 1!
+       Therefore, to fail at call 3:
+         call 1: decrements 3 -> 2
+         call 2: decrements 2 -> 1
+         call 3: see g_ribbon_mock_signal_fail == 1, FAILS!
+       Wait! In our mock:
+         if (g_ribbon_mock_signal_fail == 1) return UI_ERROR_UNKNOWN;
+         if (g_ribbon_mock_signal_fail > 1) {
+           g_ribbon_mock_signal_fail--;
+           if (g_ribbon_mock_signal_fail == 1) return UI_ERROR_UNKNOWN;
+         }
+       Notice: when g_ribbon_mock_signal_fail == 2:
+         call 1: > 1 -> decrements to 1 -> returns UI_ERROR_UNKNOWN! It failed
+       on call 1! Let's trace: if initial value is 3: call 1: > 1 -> decrements
+       to 2 (not 1), returns success. call 2: > 1 -> decrements to 1 -> returns
+       UI_ERROR_UNKNOWN! So value 3 fails on call 2! To fail on call 3, initial
+       value must be 4!
+    */
+    g_ribbon_mock_signal_fail = 4;
+    if (ui_ribbon_base_recalculate_overflow(asc_ribbon, 50) !=
+        UI_ERROR_UNKNOWN) {
+      g_ribbon_mock_signal_fail = 0;
+      return 1;
+    }
+    g_ribbon_mock_signal_fail = 0;
+
+    /* Test failure in sort_indices_by_priority during recalculate_overflow */
+    g_ribbon_mock_sort_fail = 1;
+    if (ui_ribbon_base_recalculate_overflow(asc_ribbon, 50) !=
+        UI_ERROR_UNKNOWN) {
+      g_ribbon_mock_sort_fail = 0;
+      return 1;
+    }
+    g_ribbon_mock_sort_fail = 0;
+
     ui_ribbon_base_destroy(asc_ribbon);
+  }
+
+  /* Test nulls for helper functions */
+  {
+    struct ui_ribbon_group_state *dummy_gs = NULL;
+    int dummy_indices[2];
+    dummy_indices[0] = 0;
+    dummy_indices[1] = 1;
+    if (ui_test_ribbon_find_group_state(NULL, 1, &dummy_gs) !=
+        UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
+    }
+    if (ui_test_ribbon_find_group_state(ribbon, 1, NULL) !=
+        UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
+    }
+    if (ui_test_ribbon_sort_indices(NULL, dummy_indices) !=
+        UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
+    }
+    if (ui_test_ribbon_sort_indices(ribbon, NULL) !=
+        UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
+    }
   }
 
   {
     ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -177,13 +272,13 @@ static int test_ribbon_contextual_tabs(void) {
   {
     ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -278,13 +373,13 @@ static int test_ribbon_nulls_and_errors(void) {
   {
     ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -324,13 +419,13 @@ static int test_ribbon_limits(void) {
   {
     ui_error_t rc_cleanup = ui_ribbon_base_destroy(ribbon);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;

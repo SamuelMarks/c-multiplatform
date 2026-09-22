@@ -2,6 +2,7 @@
 #include "ui_canonical_layout_base.h"
 #include "ui_arena.h"
 #include "ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -72,9 +73,7 @@ static void test_canonical_layout_null_args_and_coverage(void) {
       g_malloc_fail_countdown = -1;
       {
         ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -90,11 +89,26 @@ static void test_canonical_layout_null_args_and_coverage(void) {
   }
 
   ui_canonical_layout_base_destroy(layout);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_canonical_layout_mock_fail;
+    struct ui_canonical_layout_base *layout_mock = NULL;
+    ui_error_t rc;
+
+    rc = ui_canonical_layout_base_create(arena, &config, &layout_mock);
+    assert(rc == UI_ERROR_NONE);
+
+    g_canonical_layout_mock_fail = 1;
+    rc = ui_canonical_layout_base_destroy(layout_mock);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_canonical_layout_mock_fail = 0;
+  }
+#endif
+
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -171,9 +185,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     return 1;

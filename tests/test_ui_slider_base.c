@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_slider_base.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -13,8 +14,10 @@ static float g_last_value = 0.0f;
 
 static ui_error_t on_slider_change(struct ui_slider_base *slider, float value,
                                    void *user_data) {
-  (void)slider;
-  (void)user_data;
+  if (slider) {
+  }
+  if (user_data) {
+  }
   g_change_count++;
   g_last_value = value;
   return UI_ERROR_NONE;
@@ -23,13 +26,16 @@ static ui_error_t on_slider_change(struct ui_slider_base *slider, float value,
 
 static ui_error_t dummy_on_change(union ui_signal_payload new_value,
                                   void *user_data) {
-  (void)new_value;
-  (void)user_data;
+  if (new_value.ptr_val) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t dummy_on_touched(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -51,17 +57,13 @@ static int run_normal_tests(void) {
     ui_slider_base_get_component(s, &c);
     {
       ui_error_t rc_cleanup = ui_component_destroy(c);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     ((void **)s)[0] = NULL;
     ui_slider_base_set_value(s, 10.0f); /* Test update_dom_state silent abort */
     {
       ui_error_t rc_cleanup = ui_slider_base_destroy(s);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   if (ui_slider_base_set_min(NULL, 0.0f) != UI_ERROR_INVALID_ARGUMENT)
@@ -443,9 +445,7 @@ static int run_normal_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_slider_base_destroy(slider);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -467,9 +467,7 @@ static int run_oom_tests(void) {
     } else if (err == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_slider_base_destroy(slider);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     } else {
@@ -483,9 +481,12 @@ static int run_oom_tests(void) {
 
 static ui_error_t mock_on_change_fail(struct ui_slider_base *slider, float val,
                                       void *user_data) {
-  (void)slider;
-  (void)val;
-  (void)user_data;
+  if (slider) {
+  }
+  if (val) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
@@ -516,20 +517,20 @@ static void test_invalid_args_more() {
   struct ui_event ev;
 
   {
-    ui_error_t _ign = ui_slider_base_create(&slider, &cva);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_create(&slider, &cva);
+    assert(rc == UI_ERROR_NONE);
   }
 
   /* Test get_value with NULL out param */
   {
-    ui_error_t _ign = ui_slider_base_get_value(slider, NULL);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_get_value(slider, NULL);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
   }
 
   /* Test get_component with NULL out param */
   {
-    ui_error_t _ign = ui_slider_base_get_component(slider, NULL);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_get_component(slider, NULL);
+    assert(rc == UI_ERROR_INVALID_ARGUMENT);
   }
 
   /* Test update_dom_state null shadow_root branch */
@@ -541,8 +542,8 @@ static void test_invalid_args_more() {
     struct ui_dom_node *tmp_root = mock->component->shadow_root;
     mock->component->shadow_root = NULL;
     {
-      ui_error_t _ign = ui_slider_base_set_value(slider, 10.0f);
-      (void)_ign;
+      ui_error_t rc = ui_slider_base_set_value(slider, 10.0f);
+      assert(rc == UI_ERROR_NONE);
     }
     mock->component->shadow_root = tmp_root;
   }
@@ -555,48 +556,264 @@ static void test_invalid_args_more() {
     };
     struct ui_slider_base_mock2 *mock = (struct ui_slider_base_mock2 *)slider;
     if (mock->gesture_recognizer) {
-      ui_error_t _ign = ui_gesture_recognizer_destroy(mock->gesture_recognizer);
-      (void)_ign;
+      ui_error_t rc = ui_gesture_recognizer_destroy(mock->gesture_recognizer);
+      assert(rc == UI_ERROR_NONE);
     }
     mock->gesture_recognizer = NULL;
   }
 
   /* Register NULL on_touched to hit UI_CVA_ON_TOUCH_IGNORE fallback */
   {
-    ui_error_t _ign = cva.register_on_touched(slider, NULL, NULL);
-    (void)_ign;
+    ui_error_t rc = cva.register_on_touched(slider, NULL, NULL);
+    assert(rc == UI_ERROR_NONE);
   }
   {
-    ui_error_t _ign = ui_slider_base_set_normalized_value(slider, 0.5f);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_set_normalized_value(slider, 0.5f);
+    assert(rc == UI_ERROR_NONE);
   }
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_LEFT;
   {
-    ui_error_t _ign = ui_slider_base_process_event(slider, &ev, 0.0);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_process_event(slider, &ev, 0.0);
+    assert(rc == UI_ERROR_NONE);
   }
   ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
   {
-    ui_error_t _ign = ui_slider_base_process_event(slider, &ev, 0.0);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_process_event(slider, &ev, 0.0);
+    assert(rc == UI_ERROR_NONE);
   }
   ev.event_data.keyboard.key_code = UI_KEY_HOME;
   {
-    ui_error_t _ign = ui_slider_base_process_event(slider, &ev, 0.0);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_process_event(slider, &ev, 0.0);
+    assert(rc == UI_ERROR_NONE);
   }
   ev.event_data.keyboard.key_code = UI_KEY_END;
   {
-    ui_error_t _ign = ui_slider_base_process_event(slider, &ev, 0.0);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_process_event(slider, &ev, 0.0);
+    assert(rc == UI_ERROR_NONE);
   }
 
   {
-    ui_error_t _ign = ui_slider_base_destroy(slider);
-    (void)_ign;
+    ui_error_t rc = ui_slider_base_destroy(slider);
+    assert(rc == UI_ERROR_NONE);
   }
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_slider_mock_set_attribute_fail;
+extern int g_slider_mock_remove_attribute_fail;
+extern int g_slider_mock_parse_css_fail;
+extern int g_slider_mock_set_style_fail;
+extern int g_slider_mock_gesture_destroy_fail;
+extern int g_slider_mock_comp_destroy_fail;
+extern int g_slider_mock_dom_destroy_fail;
+extern int g_slider_mock_bidi_fail;
+
+static ui_error_t mock_cva_fail(union ui_signal_payload val, void *ud) {
+  if (val.float_val == 0.0f && !ud) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static ui_error_t mock_cva_touch_fail(void *ud) {
+  if (!ud) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static void test_slider_mock_branches(void) {
+  struct ui_slider_base *slider = NULL;
+  struct ui_control_value_accessor cva;
+  struct ui_event ev;
+  ui_error_t rc;
+  int i;
+
+  /* Test create failures */
+  /* parse css fail */
+  g_slider_mock_parse_css_fail = 1;
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_parse_css_fail = 0;
+
+  /* set default style fail */
+  g_slider_mock_set_style_fail = 1;
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_set_style_fail = 0;
+
+  /* update_dom_state fail during create */
+  g_slider_mock_set_attribute_fail =
+      5; /* 4 attrs in create (type, role, tabindex, aria-valuenow) */
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_set_attribute_fail = 0;
+
+  /* Each attribute fail in update_dom_state */
+  for (i = 1; i <= 6; i++) {
+    rc = ui_slider_base_create(&slider, &cva);
+    assert(rc == UI_ERROR_NONE);
+    g_slider_mock_set_attribute_fail = i;
+    rc = ui_slider_base_set_value(slider, 42.0f);
+    assert(rc == UI_ERROR_UNKNOWN);
+    g_slider_mock_set_attribute_fail = 0;
+    rc = ui_slider_base_destroy(slider);
+    assert(rc == UI_ERROR_NONE);
+  }
+
+  /* disabled branches: set_attribute disabled & aria-disabled */
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  g_slider_mock_set_attribute_fail = 7; /* when setting disabled */
+  rc = ui_slider_base_set_disabled(slider, 1);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_set_attribute_fail = 0;
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_NONE);
+
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  g_slider_mock_set_attribute_fail = 8; /* when setting aria-disabled */
+  rc = ui_slider_base_set_disabled(slider, 1);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_set_attribute_fail = 0;
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_NONE);
+
+  /* remove_attribute disabled & aria-disabled */
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_slider_base_set_disabled(slider, 1);
+  assert(rc == UI_ERROR_NONE);
+  g_slider_mock_remove_attribute_fail = 1;
+  rc = ui_slider_base_set_disabled(slider, 0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_remove_attribute_fail = 0;
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_NONE);
+
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_slider_base_set_disabled(slider, 1);
+  assert(rc == UI_ERROR_NONE);
+  g_slider_mock_remove_attribute_fail = 2;
+  rc = ui_slider_base_set_disabled(slider, 0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_remove_attribute_fail = 0;
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_NONE);
+
+  /* trigger_cva_change failure in set_value */
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  rc = cva.register_on_change(slider, mock_cva_fail, NULL);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_slider_base_set_value(slider, 25.0f);
+  assert(rc == UI_ERROR_UNKNOWN);
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_NONE);
+
+  /* trigger_cva_touched failure in set_normalized_value */
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  rc = cva.register_on_touched(slider, mock_cva_touch_fail, NULL);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_slider_base_set_normalized_value(slider, 0.5f);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* trigger_cva_touched failure in key events */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_LEFT;
+  rc = ui_slider_base_process_event(slider, &ev, 1.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  ev.event_data.keyboard.key_code = UI_KEY_RIGHT;
+  rc = ui_slider_base_process_event(slider, &ev, 1.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  ev.event_data.keyboard.key_code = UI_KEY_HOME;
+  rc = ui_slider_base_process_event(slider, &ev, 1.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  ev.event_data.keyboard.key_code = UI_KEY_END;
+  rc = ui_slider_base_process_event(slider, &ev, 1.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+
+  /* ui_bidi_normalize_horizontal_key failure */
+  g_slider_mock_bidi_fail = 1;
+  rc = ui_slider_base_process_event(slider, &ev, 1.0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_bidi_fail = 0;
+
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Cleanup branches when create fails:
+     Case A: rc == UI_ERROR_NONE initially before cleanup!
+     Can happen if we jump to cleanup with rc == UI_ERROR_NONE, or test each
+     stage: Wait, in ui_slider_base_create, rc is always != UI_ERROR_NONE when
+     jumping to cleanup! Wait: let's check how cleanup is reached in
+     ui_slider_base_create! */
+  g_slider_mock_parse_css_fail = 1;
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_parse_css_fail = 0;
+
+  /* 2) rc != UI_ERROR_NONE and rc_cleanup != UI_ERROR_NONE */
+  g_slider_mock_parse_css_fail = 1;
+  g_slider_mock_dom_destroy_fail = 1;
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_dom_destroy_fail = 0;
+
+  g_slider_mock_parse_css_fail = 1;
+  g_slider_mock_gesture_destroy_fail = 1;
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_gesture_destroy_fail = 0;
+
+  g_slider_mock_parse_css_fail = 1;
+  g_slider_mock_comp_destroy_fail = 1;
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_comp_destroy_fail = 0;
+  g_slider_mock_parse_css_fail = 0;
+
+  /* Destroy failures:
+     1) rc_cleanup == UI_ERROR_NONE (Branch 2: rc_cleanup != UI_ERROR_NONE is
+     false) */
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_NONE);
+
+  /* 2) rc_cleanup != UI_ERROR_NONE and rc == UI_ERROR_NONE */
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  g_slider_mock_gesture_destroy_fail = 1;
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_gesture_destroy_fail = 0;
+
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  g_slider_mock_comp_destroy_fail = 1;
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_comp_destroy_fail = 0;
+
+  /* 3) rc != UI_ERROR_NONE when earlier cleanup fails and subsequent cleanup
+   * also fails or succeeds */
+  rc = ui_slider_base_create(&slider, &cva);
+  assert(rc == UI_ERROR_NONE);
+  g_slider_mock_gesture_destroy_fail = 1;
+  g_slider_mock_comp_destroy_fail = 1;
+  rc = ui_slider_base_destroy(slider);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_slider_mock_gesture_destroy_fail = 0;
+  g_slider_mock_comp_destroy_fail = 0;
+}
+#endif
 
 int main(void) {
   int failed = 0;
@@ -611,6 +828,9 @@ int main(void) {
 
   test_on_change_error();
   test_invalid_args_more();
+#ifdef UI_TEST_MOCK_ALLOC
+  test_slider_mock_branches();
+#endif
   if (failed) {
     printf("Tests failed.\n");
     return 1;

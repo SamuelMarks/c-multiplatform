@@ -641,9 +641,7 @@ static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
             while (last->next)
               last = last->next;
             last->nested_selector = nested;
-            {
-              next_token(tz, &token);
-            }
+            { next_token(tz, &token); }
           } else {
             int paren_depth = 1;
             next_token(tz, &token);
@@ -656,9 +654,7 @@ static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
                 next_token(tz, &token);
               }
             }
-            {
-              next_token(tz, &token);
-            }
+            { next_token(tz, &token); }
           }
         }
 
@@ -676,10 +672,8 @@ static ui_error_t parse_selectors(struct ui_css_tokenizer *tz,
   dummy_rule->selectors = NULL; /* Transfer ownership */
   rc = UI_ERROR_NONE;
 
-cleanup: {
-  ui_error_t destroy_rc = ui_css_rule_destroy(dummy_rule);
-  (void)destroy_rc;
-}
+cleanup:
+  ui_css_rule_destroy(dummy_rule);
   *inout_token = token;
   return rc;
 }
@@ -820,10 +814,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           next_token(tz, &token);
           rc = parse_rule_list(tz, &token, sheet, &layer_rule->nested_rules);
           if (rc != UI_ERROR_NONE) {
-            {
-              ui_error_t destroy_rc = ui_css_rule_destroy(layer_rule);
-              (void)destroy_rc;
-            }
+            ui_css_rule_destroy(layer_rule);
             goto cleanup;
           }
           if (token.type == TOKEN_RBRACE) {
@@ -850,9 +841,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           rc = parse_selectors(tz, &token, &scope_start);
           if (rc != UI_ERROR_NONE)
             goto cleanup;
-          {
-            next_token(tz, &token);
-          }
+          { next_token(tz, &token); }
         }
 
         /* Parse optional 'to' followed by scope end */
@@ -862,15 +851,10 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           if (token.type == TOKEN_LPAREN) {
             rc = parse_selectors(tz, &token, &scope_end);
             if (rc != UI_ERROR_NONE) {
-              {
-                ui_error_t _ign_rc = ui_css_selector_destroy(scope_start);
-                (void)_ign_rc;
-              }
+              ui_css_selector_destroy(scope_start);
               goto cleanup;
             }
-            {
-              next_token(tz, &token);
-            }
+            { next_token(tz, &token); }
           }
         }
 
@@ -881,14 +865,8 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
 
         rc = ui_css_rule_create(UI_CSS_RULE_TYPE_SCOPE, &scope_rule);
         if (rc != UI_ERROR_NONE) {
-          {
-            ui_error_t _ign_rc = ui_css_selector_destroy(scope_start);
-            (void)_ign_rc;
-          }
-          {
-            ui_error_t _ign_rc = ui_css_selector_destroy(scope_end);
-            (void)_ign_rc;
-          }
+          ui_css_selector_destroy(scope_start);
+          ui_css_selector_destroy(scope_end);
           goto cleanup;
         }
         scope_rule->scope_start = scope_start;
@@ -898,10 +876,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           next_token(tz, &token);
           rc = parse_rule_list(tz, &token, sheet, &scope_rule->nested_rules);
           if (rc != UI_ERROR_NONE) {
-            {
-              ui_error_t destroy_rc = ui_css_rule_destroy(scope_rule);
-              (void)destroy_rc;
-            }
+            ui_css_rule_destroy(scope_rule);
             goto cleanup;
           }
           if (token.type == TOKEN_RBRACE) {
@@ -951,10 +926,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
               char *desc_name = NULL;
               rc = dup_token_str(&token, &desc_name);
               if (rc != UI_ERROR_NONE) {
-                {
-                  ui_error_t destroy_rc = ui_css_rule_destroy(prop_rule);
-                  (void)destroy_rc;
-                }
+                ui_css_rule_destroy(prop_rule);
                 goto cleanup;
               }
 
@@ -975,10 +947,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
                 rc = dup_range_trim(v_start, token.start, &desc_val);
                 if (rc != UI_ERROR_NONE) {
                   C_MULTIPLATFORM_FREE(desc_name);
-                  {
-                    ui_error_t destroy_rc = ui_css_rule_destroy(prop_rule);
-                    (void)destroy_rc;
-                  }
+                  ui_css_rule_destroy(prop_rule);
                   goto cleanup;
                 }
 
@@ -1177,10 +1146,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           next_token(tz, &token);
           rc = parse_rule_list(tz, &token, sheet, &cond_rule->nested_rules);
           if (rc != UI_ERROR_NONE) {
-            {
-              ui_error_t destroy_rc = ui_css_rule_destroy(cond_rule);
-              (void)destroy_rc;
-            }
+            ui_css_rule_destroy(cond_rule);
             goto cleanup;
           }
           if (token.type == TOKEN_RBRACE) {
@@ -1227,10 +1193,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
     /* Parse selectors */
     rc = parse_selectors(tz, &token, &current_rule->selectors);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
-        (void)destroy_rc;
-      }
+      ui_css_rule_destroy(current_rule);
       goto cleanup;
     }
 
@@ -1245,10 +1208,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           struct ui_css_rule *nested_rules = NULL;
           rc = parse_rule_list(tz, &token, sheet, &nested_rules);
           if (rc != UI_ERROR_NONE) {
-            {
-              ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
-              (void)destroy_rc;
-            }
+            ui_css_rule_destroy(current_rule);
             goto cleanup;
           }
           current_rule->nested_rules = nested_rules;
@@ -1256,10 +1216,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
           char *prop = NULL;
           rc = dup_token_str(&token, &prop);
           if (rc != UI_ERROR_NONE) {
-            {
-              ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
-              (void)destroy_rc;
-            }
+            ui_css_rule_destroy(current_rule);
             goto cleanup;
           }
 
@@ -1286,10 +1243,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
             rc = dup_range_trim(val_start, val_end, &val);
             if (rc != UI_ERROR_NONE) {
               C_MULTIPLATFORM_FREE(prop);
-              {
-                ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
-                (void)destroy_rc;
-              }
+              ui_css_rule_destroy(current_rule);
               goto cleanup;
             }
 
@@ -1320,10 +1274,7 @@ static ui_error_t parse_rule_list(struct ui_css_tokenizer *tz,
             if (rc != UI_ERROR_NONE) {
               C_MULTIPLATFORM_FREE(prop);
               C_MULTIPLATFORM_FREE(val);
-              {
-                ui_error_t destroy_rc = ui_css_rule_destroy(current_rule);
-                (void)destroy_rc;
-              }
+              ui_css_rule_destroy(current_rule);
               goto cleanup;
             }
             C_MULTIPLATFORM_FREE(prop);
@@ -1394,10 +1345,7 @@ cleanup: {
   struct ui_css_rule *curr = rule_head;
   while (curr) {
     struct ui_css_rule *next = curr->next;
-    {
-      ui_error_t destroy_rc = ui_css_rule_destroy(curr);
-      (void)destroy_rc;
-    }
+    ui_css_rule_destroy(curr);
     curr = next;
   }
 }

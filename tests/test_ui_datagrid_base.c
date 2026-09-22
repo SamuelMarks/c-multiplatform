@@ -138,8 +138,93 @@ static int test_datagrid_base_errors(void) {
   return 0;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+struct ui_datagrid_base_internal {
+  struct ui_component *component;
+  struct ui_computed *data_signal;
+};
+
+static ui_error_t run_datagrid_coverage(void) {
+  struct ui_datagrid_base *datagrid = NULL;
+  ui_error_t rc;
+  extern int g_datagrid_mock_fail;
+
+  g_datagrid_mock_fail = 1;
+  rc = ui_datagrid_base_create(&datagrid);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_datagrid_mock_fail = 0;
+
+  rc = ui_datagrid_base_create(&datagrid);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  g_datagrid_mock_fail = 2;
+  rc = ui_datagrid_base_destroy(datagrid);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_datagrid_mock_fail = 0;
+
+  /* Test empty datagrid destroy (component is NULL) */
+  rc = ui_datagrid_base_create(&datagrid);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  {
+    struct ui_datagrid_base_internal *di =
+        (struct ui_datagrid_base_internal *)datagrid;
+    struct ui_component *saved = di->component;
+    di->component = NULL;
+    rc = ui_datagrid_base_destroy(datagrid);
+    if (rc != UI_ERROR_NONE) {
+      ui_component_destroy(saved);
+      return rc;
+    }
+    rc = ui_component_destroy(saved);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+  }
+
+  /* Test branches in resize_column and move_focus */
+  rc = ui_datagrid_base_create(&datagrid);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_datagrid_base_resize_column(datagrid, 0, 0.0f);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_datagrid_base_resize_column(datagrid, 1, 50.0f);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_datagrid_base_move_focus(datagrid, 0, 0);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_datagrid_base_move_focus(datagrid, 1, 1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_datagrid_base_destroy(datagrid);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  return UI_ERROR_NONE;
+}
+#endif
+
 int main(void) {
   int failed = 0;
+#ifdef UI_TEST_MOCK_ALLOC
+  if (run_datagrid_coverage() != UI_ERROR_NONE) {
+    return 1;
+  }
+#endif
   printf("Running ui_datagrid_base tests...\n");
 
   failed |= test_datagrid_base_lifecycle();

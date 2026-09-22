@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_select_base.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,8 +15,10 @@ static int g_last_open_state = 0;
 
 static ui_error_t on_select_change(struct ui_select_base *select, int index,
                                    void *user_data) {
-  (void)select;
-  (void)user_data;
+  if (select) {
+  }
+  if (user_data) {
+  }
   g_change_count++;
   g_last_selected_index = index;
   return UI_ERROR_NONE;
@@ -24,8 +27,10 @@ static ui_error_t on_select_change(struct ui_select_base *select, int index,
 
 static ui_error_t on_select_open_change(struct ui_select_base *select,
                                         int is_open, void *user_data) {
-  (void)select;
-  (void)user_data;
+  if (select) {
+  }
+  if (user_data) {
+  }
   g_open_change_count++;
   g_last_open_state = is_open;
   return UI_ERROR_NONE;
@@ -568,9 +573,7 @@ static int run_normal_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_select_base_destroy(select);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -677,9 +680,7 @@ static int test_select_empty_keyboard(void) {
 
   {
     ui_error_t rc_cleanup = ui_select_base_destroy(select);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -696,9 +697,7 @@ static int run_oom_tests(void) {
     if (err == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_select_base_destroy(select);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     }
@@ -734,9 +733,7 @@ static int run_oom_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_select_base_destroy(select);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -830,11 +827,50 @@ static int test_cva_and_edge_cases(void) {
       return 1;
     }
   }
+  if (cva.register_on_touched(NULL, mock_cva_touched, &cva_touched_called) !=
+      UI_ERROR_INVALID_ARGUMENT) {
+    return 1;
+  }
+  if (cva.register_on_touched(select, NULL, NULL) != UI_ERROR_NONE) {
+    return 1;
+  }
+  if (cva.register_on_touched(select, mock_cva_touched, NULL) !=
+      UI_ERROR_NONE) {
+    return 1;
+  }
+  if (cva.register_on_touched(select, NULL, &cva_touched_called) !=
+      UI_ERROR_NONE) {
+    return 1;
+  }
   if (cva.register_on_touched(select, mock_cva_touched, &cva_touched_called) !=
       UI_ERROR_NONE) {
     printf("Failed at line 528\n");
     {
       printf("Failed at line %d\n", __LINE__);
+      return 1;
+    }
+  }
+
+  {
+    struct ui_select_cva_inspect {
+      struct ui_component *component;
+      struct ui_gesture_recognizer *gesture_recognizer;
+      int is_open;
+      int disabled;
+      int num_items;
+      int highlighted_index;
+      int selected_index;
+      ui_select_on_change_t on_change;
+      void *change_user_data;
+      ui_select_on_open_change_t on_open_change;
+      void *open_change_user_data;
+    } *inspect = (struct ui_select_cva_inspect *)select;
+
+    if (inspect->on_change(NULL, 0, inspect->change_user_data) !=
+        UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
+    }
+    if (inspect->on_change(select, 0, NULL) != UI_ERROR_NONE) {
       return 1;
     }
   }
@@ -875,9 +911,7 @@ static int test_cva_and_edge_cases(void) {
     ui_select_base_set_selected_index(empty_select, 0);
     {
       ui_error_t rc_cleanup = ui_select_base_destroy(empty_select);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -898,6 +932,17 @@ static int test_cva_and_edge_cases(void) {
   ui_select_base_set_open(select, 0);
   ev.event_data.keyboard.key_code = 0; /* Unhandled */
   ui_select_base_process_event(select, &ev, 0.0);
+
+  ui_select_base_set_disabled(select, 1);
+  if (ui_select_base_process_event(select, &ev, 0.0) != UI_ERROR_NONE) {
+    return 1;
+  }
+  ui_select_base_set_disabled(select, 0);
+
+  if (ui_select_base_process_event(select, &ev, -1.0) !=
+      UI_ERROR_INVALID_ARGUMENT) {
+    return 1;
+  }
 
   /* Error percolation tests using OOM */
   {
@@ -986,18 +1031,14 @@ static int test_cva_and_edge_cases(void) {
 
     {
       ui_error_t rc_cleanup = ui_component_destroy(internal->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     internal->component = NULL;
 
     {
       ui_error_t rc_cleanup =
           ui_gesture_recognizer_destroy(internal->gesture_recognizer);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     internal->gesture_recognizer = NULL;
 
@@ -1006,19 +1047,150 @@ static int test_cva_and_edge_cases(void) {
 
   {
     ui_error_t rc_cleanup = ui_select_base_destroy(select);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_select_base_mock_remove_attr_fail;
+extern int g_select_base_mock_append_child_fail;
+extern int g_select_base_mock_gesture_destroy_fail;
+extern int g_select_base_mock_comp_destroy_fail;
+extern int g_select_base_mock_set_style_fail;
+
+static int test_ui_select_base_mock_failures(void) {
+  struct ui_select_base *select = NULL;
+  ui_error_t rc;
+
+  /* Test update_dom_state failure in create */
+  g_select_base_mock_remove_attr_fail = 1;
+  rc = ui_select_base_create(&select);
+  g_select_base_mock_remove_attr_fail = 0;
+  if (rc == UI_ERROR_NONE || select != NULL) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Test set_default_style failure in create */
+  g_select_base_mock_set_style_fail = 1;
+  rc = ui_select_base_create(&select);
+  g_select_base_mock_set_style_fail = 0;
+  if (rc == UI_ERROR_NONE || select != NULL) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  rc = ui_select_base_create(&select);
+  if (rc != UI_ERROR_NONE || !select) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Test disabled attribute removal failure in set_disabled(0) */
+  g_select_base_mock_remove_attr_fail = 1;
+  rc = ui_select_base_set_disabled(select, 0);
+  g_select_base_mock_remove_attr_fail = 0;
+  if (rc == UI_ERROR_NONE) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Test aria-disabled attribute removal failure in set_disabled(0) */
+  g_select_base_mock_remove_attr_fail = 2;
+  rc = ui_select_base_set_disabled(select, 0);
+  g_select_base_mock_remove_attr_fail = 0;
+  if (rc == UI_ERROR_NONE) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Test 1st append_child failure in add_option */
+  g_select_base_mock_append_child_fail = 1;
+  rc = ui_select_base_add_option(select, "Opt1", "Val1");
+  g_select_base_mock_append_child_fail = 0;
+  if (rc == UI_ERROR_NONE) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Test 2nd append_child failure in add_option */
+  g_select_base_mock_append_child_fail = 2;
+  rc = ui_select_base_add_option(select, "Opt2", "Val2");
+  g_select_base_mock_append_child_fail = 0;
+  if (rc == UI_ERROR_NONE) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Test gesture recognizer destroy failure in destroy */
+  g_select_base_mock_gesture_destroy_fail = 1;
+  rc = ui_select_base_destroy(select);
+  g_select_base_mock_gesture_destroy_fail = 0;
+  if (rc == UI_ERROR_NONE) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  rc = ui_select_base_create(&select);
+  if (rc != UI_ERROR_NONE || !select) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Test component destroy failure in destroy */
+  g_select_base_mock_comp_destroy_fail = 1;
+  rc = ui_select_base_destroy(select);
+  g_select_base_mock_comp_destroy_fail = 0;
+  if (rc == UI_ERROR_NONE) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Test both gesture recognizer and component destroy failure in destroy */
+  rc = ui_select_base_create(&select);
+  if (rc != UI_ERROR_NONE || !select) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+  g_select_base_mock_gesture_destroy_fail = 1;
+  g_select_base_mock_comp_destroy_fail = 1;
+  rc = ui_select_base_destroy(select);
+  g_select_base_mock_gesture_destroy_fail = 0;
+  g_select_base_mock_comp_destroy_fail = 0;
+  if (rc == UI_ERROR_NONE) {
+    printf("Failed at line %d\n", __LINE__);
+    return 1;
+  }
+
+  return 0;
+}
+#endif
+
 int main(void) {
   int failed = 0;
-  failed |= test_select_empty_keyboard();
-  failed |= test_cva_and_edge_cases();
-  failed |= run_normal_tests();
-  failed |= run_oom_tests();
+  if (test_select_empty_keyboard()) {
+    printf("test_select_empty_keyboard failed\n");
+    failed |= 1;
+  }
+  if (test_cva_and_edge_cases()) {
+    printf("test_cva_and_edge_cases failed\n");
+    failed |= 1;
+  }
+  if (run_normal_tests()) {
+    printf("run_normal_tests failed\n");
+    failed |= 1;
+  }
+  if (run_oom_tests()) {
+    printf("run_oom_tests failed\n");
+    failed |= 1;
+  }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (test_ui_select_base_mock_failures()) {
+    printf("test_ui_select_base_mock_failures failed\n");
+    failed |= 1;
+  }
+#endif
 
   if (failed) {
     printf("Tests failed.\n");

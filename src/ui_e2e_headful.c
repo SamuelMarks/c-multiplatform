@@ -77,35 +77,52 @@ ui_error_t ui_e2e_headful_destroy(struct ui_e2e_headful_ctx *ctx) {
 /**
  * @brief map_ui_key_to_vk.
  * @param key_code Parameter key_code.
+ * @param out_vk Pointer to store mapped virtual key code.
  * @return Return value.
  */
-static WORD map_ui_key_to_vk(int key_code) {
+static ui_error_t map_ui_key_to_vk(int key_code, WORD *out_vk) {
+  if (!out_vk) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   switch (key_code) {
   case UI_KEY_SPACE:
-    return VK_SPACE;
+    *out_vk = VK_SPACE;
+    break;
   case UI_KEY_ENTER:
-    return VK_RETURN;
+    *out_vk = VK_RETURN;
+    break;
   case UI_KEY_ESCAPE:
-    return VK_ESCAPE;
+    *out_vk = VK_ESCAPE;
+    break;
   case UI_KEY_BACKSPACE:
-    return VK_BACK;
+    *out_vk = VK_BACK;
+    break;
   case UI_KEY_TAB:
-    return VK_TAB;
+    *out_vk = VK_TAB;
+    break;
   case UI_KEY_UP:
-    return VK_UP;
+    *out_vk = VK_UP;
+    break;
   case UI_KEY_DOWN:
-    return VK_DOWN;
+    *out_vk = VK_DOWN;
+    break;
   case UI_KEY_LEFT:
-    return VK_LEFT;
+    *out_vk = VK_LEFT;
+    break;
   case UI_KEY_RIGHT:
-    return VK_RIGHT;
+    *out_vk = VK_RIGHT;
+    break;
   case UI_KEY_HOME:
-    return VK_HOME;
+    *out_vk = VK_HOME;
+    break;
   case UI_KEY_END:
-    return VK_END;
+    *out_vk = VK_END;
+    break;
   default:
-    return 0;
+    *out_vk = 0;
+    break;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -219,7 +236,10 @@ ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
   /* Bring window to foreground before typing */
   SetForegroundWindow(hwnd);
 
-  vk = map_ui_key_to_vk(key_code);
+  handle_rc = map_ui_key_to_vk(key_code, &vk);
+  if (handle_rc != UI_ERROR_NONE) {
+    return handle_rc;
+  }
   if (vk == 0) {
     /* Assume ascii character for simplicity in testing */
     if (key_code >= 'a' && key_code <= 'z') {
@@ -280,9 +300,12 @@ ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
  * @return Return value.
  */
 ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
-  (void)ctx;
-  (void)x;
-  (void)y;
+  struct ui_e2e_headful_ctx *unused_ctx = ctx;
+  int unused_x = x;
+  int unused_y = y;
+  ctx = unused_ctx;
+  x = unused_x;
+  y = unused_y;
   return UI_ERROR_UNSUPPORTED;
 }
 
@@ -295,9 +318,12 @@ ui_error_t ui_e2e_headful_click(struct ui_e2e_headful_ctx *ctx, int x, int y) {
  */
 ui_error_t ui_e2e_headful_type_key(struct ui_e2e_headful_ctx *ctx, int key_code,
                                    unsigned int modifiers) {
-  (void)ctx;
-  (void)key_code;
-  (void)modifiers;
+  struct ui_e2e_headful_ctx *unused_ctx = ctx;
+  int unused_kc = key_code;
+  unsigned int unused_m = modifiers;
+  ctx = unused_ctx;
+  key_code = unused_kc;
+  modifiers = unused_m;
   return UI_ERROR_UNSUPPORTED;
 }
 

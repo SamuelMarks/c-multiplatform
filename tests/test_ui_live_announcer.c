@@ -2,6 +2,7 @@
 #include "../include/ui_live_announcer.h"
 #include "../include/ui_error.h"
 #include <stdio.h>
+#include <assert.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
@@ -31,92 +32,70 @@ static int test_live_announcer_lifecycle(void) {
 
   {
     ui_error_t rc_cleanup = ui_live_announcer_destroy(announcer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
 
 static int test_live_announcer_edge_cases(void) {
-  struct ui_live_announcer *announcer;
+  ui_error_t mock_rc;
+  struct ui_live_announcer *announcer = NULL;
   {
     ui_error_t rc_cleanup = ui_live_announcer_create(&announcer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_live_announcer_create(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   {
     ui_error_t rc_cleanup = ui_live_announce(NULL, "a", UI_LIVE_POLITE);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   {
     ui_error_t rc_cleanup = ui_live_announce(announcer, NULL, UI_LIVE_POLITE);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   {
     ui_error_t rc_cleanup = ui_live_announcer_clear(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   {
     ui_error_t rc_cleanup = ui_live_announcer_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
   g_malloc_fail_countdown = 0;
   {
     ui_error_t rc_cleanup = ui_live_announcer_create(&announcer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
   }
 
+  g_malloc_fail_countdown = -1;
   {
     ui_error_t rc_cleanup = ui_live_announcer_create(&announcer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_malloc_fail_countdown = 0;
   {
     ui_error_t rc_cleanup = ui_live_announce(announcer, "a", UI_LIVE_POLITE);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
   }
   g_malloc_fail_countdown = 1;
   {
     ui_error_t rc_cleanup = ui_live_announce(announcer, "b", UI_LIVE_POLITE);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
   }
 
   g_malloc_fail_countdown = -1;
   g_mock_strcpy_fail = 1;
-  ui_error_t mock_rc = ui_live_announce(announcer, "c", UI_LIVE_POLITE);
+  mock_rc = ui_live_announce(announcer, "c", UI_LIVE_POLITE);
   printf("Mock rc: %d\n", mock_rc);
 
   {
     ui_error_t rc_cleanup = ui_live_announcer_destroy(announcer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_malloc_fail_countdown = -1;
   return 0;

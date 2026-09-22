@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include "../include/ui_execution_context.h"
 #include "../include/ui_thread_pool.h"
 #include <stdio.h>
@@ -17,7 +18,8 @@ static ui_error_t test_callback(void *user_data) {
 }
 
 static ui_error_t failing_callback(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -121,9 +123,7 @@ static int run_normal_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_execution_context_get_current(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -156,9 +156,7 @@ static int run_paradigm_tests(void) {
       return 1;
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     ui_execution_context_set_current(NULL);
   }
@@ -199,15 +197,11 @@ static int run_paradigm_tests(void) {
 
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctxs[0]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctxs[1]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -236,7 +230,8 @@ static int run_oom_tests(void) {
 }
 
 static ui_error_t failing_task_cb(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -249,18 +244,14 @@ static int test_execution_context_fail(void) {
   if (ui_execution_context_tick(ctx) != UI_ERROR_UNKNOWN) {
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     return 1;
   }
 
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }

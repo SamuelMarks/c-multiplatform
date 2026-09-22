@@ -4,6 +4,7 @@
 #include "../include/ui_overlay_director.h"
 #include "../include/ui_event.h"
 #include "../include/ui_dom_node.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 /* clang-format on */
@@ -12,8 +13,10 @@ extern int g_malloc_fail_countdown;
 
 static ui_error_t dummy_on_step_change(struct ui_coachmark_tour *tour,
                                        int current_step, void *user_data) {
-  (void)tour;
-  (void)current_step;
+  if (tour) {
+  }
+  if (current_step) {
+  }
   if (user_data)
     return UI_ERROR_INVALID_ARGUMENT; /* simulate error */
   return UI_ERROR_NONE;
@@ -21,9 +24,12 @@ static ui_error_t dummy_on_step_change(struct ui_coachmark_tour *tour,
 
 static ui_error_t dummy_on_step_change_fail(struct ui_coachmark_tour *tour,
                                             int step_index, void *user_data) {
-  (void)tour;
-  (void)step_index;
-  (void)user_data;
+  if (tour) {
+  }
+  if (step_index) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -75,6 +81,16 @@ static int test_coachmark(void) {
 
   ui_coachmark_tour_start(tour);
   ui_coachmark_tour_update_layout(tour, 800, 600); /* Layout while active */
+  if (ui_coachmark_tour_update_layout(tour, -1.0f, 600.0f) !=
+      UI_ERROR_INVALID_ARGUMENT) {
+    printf("update_layout negative width fail\n");
+    return 1;
+  }
+  if (ui_coachmark_tour_update_layout(tour, 800.0f, -1.0f) !=
+      UI_ERROR_INVALID_ARGUMENT) {
+    printf("update_layout negative height fail\n");
+    return 1;
+  }
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
   ui_coachmark_tour_process_event(tour, &ev); /* Skip */
@@ -101,9 +117,7 @@ static int test_coachmark(void) {
   /* Test branching inside process_event */
   {
     ui_error_t rc_cleanup = ui_coachmark_tour_process_event(tour, &ev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* Not active */
 
   /* Mock set_signal failure */
@@ -113,24 +127,18 @@ static int test_coachmark(void) {
     g_coachmark_signal_mock_fail = 1;
     {
       ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_UNKNOWN);
     }
     g_coachmark_signal_mock_fail = 0;
 
     {
       ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     g_coachmark_signal_mock_fail = 1;
     {
       ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_UNKNOWN);
     }
     g_coachmark_signal_mock_fail = 0;
 #endif
@@ -138,9 +146,7 @@ static int test_coachmark(void) {
 
   {
     ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_KEY_DOWN;
@@ -205,17 +211,14 @@ static int test_coachmark(void) {
   ui_coachmark_tour_prev(tour); /* Hits !is_active true branch */
 
   ui_coachmark_tour_bind_open(tour, NULL);
+  ui_coachmark_tour_set_on_step_change(tour, NULL, NULL);
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Add dummy content component to test node appending */
@@ -234,9 +237,7 @@ static int test_coachmark(void) {
       dummy_comp2.shadow_root = NULL; /* Hits the NULL shadow root branch */
       {
         ui_error_t rc_cleanup = ui_coachmark_tour_set_steps(tour, steps, 2);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
 
       /* Trigger ui_dom_node_append_child failure */
@@ -246,9 +247,7 @@ static int test_coachmark(void) {
         g_coachmark_dom_mock_fail = 1;
         {
           ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          assert(rc_cleanup == UI_ERROR_UNKNOWN);
         }
         g_coachmark_dom_mock_fail = 0;
       }
@@ -256,27 +255,19 @@ static int test_coachmark(void) {
 
       {
         ui_error_t rc_cleanup = ui_coachmark_tour_start(tour);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       {
         ui_error_t rc_cleanup = ui_coachmark_tour_update_layout(tour, 800, 600);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       } /* Layout while active */
       {
         ui_error_t rc_cleanup = ui_coachmark_tour_next(tour);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       } /* Renders step 1 with NULL shadow root */
       {
         ui_error_t rc_cleanup = ui_coachmark_tour_skip(tour);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       /* dummy_root is destroyed by the tour's container destruction, do not
        * double-free it */
@@ -287,15 +278,11 @@ static int test_coachmark(void) {
   ui_coachmark_tour_destroy(tour);
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test NULLs */
@@ -400,15 +387,64 @@ static int test_coachmark(void) {
 
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
+  }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern ui_error_t run_coachmark_coverage(void);
+    run_coachmark_coverage();
+  }
+#endif
+
+  /* ESC when skip fails */
+  {
+    struct ui_coachmark_tour *tour_esc = NULL;
+    struct ui_overlay_director *dir = NULL;
+    struct ui_dom_node *root = NULL;
+    struct ui_coachmark_step step;
+    struct ui_event key_ev;
+    memset(&step, 0, sizeof(step));
+    step.allow_skip = 1;
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+    ui_overlay_director_create(root, &dir);
+    ui_coachmark_tour_create(dir, &tour_esc);
+    ui_coachmark_tour_set_steps(tour_esc, &step, 1);
+    ui_coachmark_tour_start(tour_esc);
+    ui_coachmark_tour_set_on_step_change(tour_esc, dummy_on_step_change_fail,
+                                         NULL);
+    key_ev.type = UI_EVENT_KEY_DOWN;
+    key_ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
+    ui_coachmark_tour_process_event(tour_esc, &key_ev);
+    ui_coachmark_tour_set_on_step_change(tour_esc, NULL, NULL);
+    ui_coachmark_tour_destroy(tour_esc);
+    ui_overlay_director_destroy(dir);
+    ui_dom_node_destroy(root);
+  }
+
+  /* next when skip fails */
+  {
+    struct ui_coachmark_tour *tour_next = NULL;
+    struct ui_overlay_director *dir = NULL;
+    struct ui_dom_node *root = NULL;
+    struct ui_coachmark_step step;
+    memset(&step, 0, sizeof(step));
+    ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root);
+    ui_overlay_director_create(root, &dir);
+    ui_coachmark_tour_create(dir, &tour_next);
+    ui_coachmark_tour_set_steps(tour_next, &step, 1);
+    ui_coachmark_tour_start(tour_next);
+    ui_coachmark_tour_set_on_step_change(tour_next, dummy_on_step_change_fail,
+                                         NULL);
+    ui_coachmark_tour_next(tour_next);
+    ui_coachmark_tour_set_on_step_change(tour_next, NULL, NULL);
+    ui_coachmark_tour_destroy(tour_next);
+    ui_overlay_director_destroy(dir);
+    ui_dom_node_destroy(root);
   }
 
   return 0;

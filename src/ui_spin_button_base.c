@@ -38,6 +38,84 @@ enum ui_spin_button_dir {
   UI_SPIN_BUTTON_DIR_DEC = 2   /**< Decrement direction */
 };
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_spin_button_mock_set_attr_fail_target = 0;
+int g_spin_button_mock_remove_attr_fail_target = 0;
+int g_spin_button_mock_create_comp_fail = 0;
+int g_spin_button_mock_create_node_fail = 0;
+int g_spin_button_mock_set_tag_fail = 0;
+int g_spin_button_mock_stop_cont_fail = 0;
+int g_spin_button_set_attr_counter = 0;
+int g_spin_button_remove_attr_counter = 0;
+
+static ui_error_t mock_sb_set_attribute(struct ui_dom_node *node,
+                                        const char *key, const char *val) {
+  if (g_spin_button_mock_set_attr_fail_target > 0) {
+    if (++g_spin_button_set_attr_counter ==
+        g_spin_button_mock_set_attr_fail_target) {
+      g_spin_button_set_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_set_attribute(node, key, val);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_sb_set_attribute
+/** @endcond */
+
+static ui_error_t mock_sb_remove_attribute(struct ui_dom_node *node,
+                                           const char *key) {
+  if (g_spin_button_mock_remove_attr_fail_target > 0) {
+    if (++g_spin_button_remove_attr_counter ==
+        g_spin_button_mock_remove_attr_fail_target) {
+      g_spin_button_remove_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_remove_attribute(node, key);
+}
+#undef ui_dom_node_remove_attribute
+/** @cond */
+#define ui_dom_node_remove_attribute mock_sb_remove_attribute
+/** @endcond */
+
+static ui_error_t mock_sb_component_create(struct ui_component **out_comp) {
+  if (g_spin_button_mock_create_comp_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_create(out_comp);
+}
+#undef ui_component_create
+/** @cond */
+#define ui_component_create mock_sb_component_create
+/** @endcond */
+
+static ui_error_t mock_sb_node_create(enum ui_dom_node_type type,
+                                      struct ui_dom_node **out_node) {
+  if (g_spin_button_mock_create_node_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_create(type, out_node);
+}
+#undef ui_dom_node_create
+/** @cond */
+#define ui_dom_node_create mock_sb_node_create
+/** @endcond */
+
+static ui_error_t mock_sb_set_tag_name(struct ui_dom_node *node,
+                                       const char *name) {
+  if (g_spin_button_mock_set_tag_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_set_tag_name(node, name);
+}
+#undef ui_dom_node_set_tag_name
+/** @cond */
+#define ui_dom_node_set_tag_name mock_sb_set_tag_name
+/** @endcond */
+#endif
+
 /**
  * @struct ui_spin_button_base
  * \brief ui_spin_button_base structure.
@@ -88,13 +166,6 @@ ui_error_t
 ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
                                  int disabled);
 
-/** @cond */
-#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
-/** @endcond */
-/** @cond */
-#define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
-/** @endcond */
-
 /**
  * \brief Updates ARIA attributes for the spin button.
  * \param spin_button The component.
@@ -108,7 +179,10 @@ static ui_error_t
  */
 ui_spin_button_base_update_aria(struct ui_spin_button_base *spin_button) {
   char buf[64];
-  if (!spin_button->component || !spin_button->component->shadow_root)
+  ui_error_t rc;
+
+  if (!spin_button || !spin_button->component ||
+      !spin_button->component->shadow_root)
     return UI_ERROR_INVALID_ARGUMENT;
 
 #if defined(_MSC_VER)
@@ -116,34 +190,33 @@ ui_spin_button_base_update_aria(struct ui_spin_button_base *spin_button) {
 #else
   sprintf(buf, "%.2f", spin_button->value);
 #endif
-  (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
-                               "aria-valuenow", buf);
+  rc = ui_dom_node_set_attribute(spin_button->component->shadow_root,
+                                 "aria-valuenow", buf);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%.2f", spin_button->min_val);
 #else
   sprintf(buf, "%.2f", spin_button->min_val);
 #endif
-  (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
-                               "aria-valuemin", buf);
+  rc = ui_dom_node_set_attribute(spin_button->component->shadow_root,
+                                 "aria-valuemin", buf);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%.2f", spin_button->max_val);
 #else
   sprintf(buf, "%.2f", spin_button->max_val);
 #endif
-  (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
-                               "aria-valuemax", buf);
+  rc = ui_dom_node_set_attribute(spin_button->component->shadow_root,
+                                 "aria-valuemax", buf);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   return UI_ERROR_NONE;
 }
-
-/** @cond */
-#define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
-/** @endcond */
-/** @cond */
-#define UI_TRIG_CVA_TOUCH_IGNORE(s) trigger_cva_touched((s))
-/** @endcond */
 
 /**
  * @brief trigger_cva_change.
@@ -154,11 +227,8 @@ static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button) {
   if (spin_button->cva_on_change) {
     union ui_signal_payload payload;
     payload.float_val = (float)spin_button->value;
-/** @cond */
-#define UI_CVA_ON_CHG_IGNORE(cb, p, u) ((cb)((p), (u)))
-    /** @endcond */
-    (void)UI_CVA_ON_CHG_IGNORE(spin_button->cva_on_change, payload,
-                               spin_button->cva_on_change_user_data);
+    return spin_button->cva_on_change(payload,
+                                      spin_button->cva_on_change_user_data);
   }
   return UI_ERROR_NONE;
 }
@@ -170,11 +240,7 @@ static ui_error_t trigger_cva_change(struct ui_spin_button_base *spin_button) {
  */
 static ui_error_t trigger_cva_touched(struct ui_spin_button_base *spin_button) {
   if (spin_button->cva_on_touched) {
-/** @cond */
-#define UI_CVA_ON_TOUCH_IGNORE(cb, u) ((cb)((u)))
-    /** @endcond */
-    (void)UI_CVA_ON_TOUCH_IGNORE(spin_button->cva_on_touched,
-                                 spin_button->cva_on_touched_user_data);
+    return spin_button->cva_on_touched(spin_button->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
@@ -316,24 +382,15 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(spin_button->component);
     C_MULTIPLATFORM_FREE(spin_button);
     return rc;
   }
 
   rc = ui_dom_node_set_tag_name(root_node, "div");
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
+    ui_component_destroy(spin_button->component);
     C_MULTIPLATFORM_FREE(spin_button);
     return rc;
   }
@@ -354,12 +411,26 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
   spin_button->cva_on_touched = NULL;
   spin_button->cva_on_touched_user_data = NULL;
 
-  (void)UI_DOM_SET_ATTR_IGNORE(root_node, "role", "spinbutton");
-  (void)UI_DOM_SET_ATTR_IGNORE(root_node, "tabindex", "0");
-/** @cond */
-#define UI_SPIN_UPDATE_ARIA_IGNORE(s) ui_spin_button_base_update_aria((s))
-  /** @endcond */
-  (void)UI_SPIN_UPDATE_ARIA_IGNORE(spin_button);
+  rc = ui_dom_node_set_attribute(root_node, "role", "spinbutton");
+  if (rc != UI_ERROR_NONE) {
+    ui_component_destroy(spin_button->component);
+    C_MULTIPLATFORM_FREE(spin_button);
+    return rc;
+  }
+
+  rc = ui_dom_node_set_attribute(root_node, "tabindex", "0");
+  if (rc != UI_ERROR_NONE) {
+    ui_component_destroy(spin_button->component);
+    C_MULTIPLATFORM_FREE(spin_button);
+    return rc;
+  }
+
+  rc = ui_spin_button_base_update_aria(spin_button);
+  if (rc != UI_ERROR_NONE) {
+    ui_component_destroy(spin_button->component);
+    C_MULTIPLATFORM_FREE(spin_button);
+    return rc;
+  }
 
   if (out_cva) {
     out_cva->write_value = spin_button_cva_write_value;
@@ -379,15 +450,16 @@ ui_spin_button_base_create(struct ui_spin_button_base **out_spin_button,
  */
 ui_error_t
 ui_spin_button_base_destroy(struct ui_spin_button_base *spin_button) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!spin_button) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(spin_button->component);
-    (void)rc_cleanup;
+  if (spin_button->continuous_dir != UI_SPIN_BUTTON_DIR_NONE) {
+    rc = ui_spin_button_base_stop_continuous(spin_button);
   }
+  ui_component_destroy(spin_button->component);
   C_MULTIPLATFORM_FREE(spin_button);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -403,17 +475,9 @@ ui_error_t ui_spin_button_base_set_min(struct ui_spin_button_base *spin_button,
   }
   spin_button->min_val = min_val;
   if (spin_button->value < spin_button->min_val) {
-    ui_error_t set_rc;
-    set_rc = ui_spin_button_base_set_value(spin_button, spin_button->min_val);
-    if (set_rc != UI_ERROR_NONE)
-      return set_rc;
-  } else {
-/** @cond */
-#define UI_SPIN_UPDATE_ARIA_IGNORE(s) ui_spin_button_base_update_aria((s))
-    /** @endcond */
-    (void)UI_SPIN_UPDATE_ARIA_IGNORE(spin_button);
+    return ui_spin_button_base_set_value(spin_button, spin_button->min_val);
   }
-  return UI_ERROR_NONE;
+  return ui_spin_button_base_update_aria(spin_button);
 }
 
 /**
@@ -429,17 +493,9 @@ ui_error_t ui_spin_button_base_set_max(struct ui_spin_button_base *spin_button,
   }
   spin_button->max_val = max_val;
   if (spin_button->value > spin_button->max_val) {
-    ui_error_t set_rc;
-    set_rc = ui_spin_button_base_set_value(spin_button, spin_button->max_val);
-    if (set_rc != UI_ERROR_NONE)
-      return set_rc;
-  } else {
-/** @cond */
-#define UI_SPIN_UPDATE_ARIA_IGNORE(s) ui_spin_button_base_update_aria((s))
-    /** @endcond */
-    (void)UI_SPIN_UPDATE_ARIA_IGNORE(spin_button);
+    return ui_spin_button_base_set_value(spin_button, spin_button->max_val);
   }
-  return UI_ERROR_NONE;
+  return ui_spin_button_base_update_aria(spin_button);
 }
 
 /**
@@ -463,11 +519,11 @@ ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
   }
 
   if (spin_button->value != value) {
+    ui_error_t rc;
     spin_button->value = value;
-/** @cond */
-#define UI_SPIN_UPDATE_ARIA_IGNORE(s) ui_spin_button_base_update_aria((s))
-    /** @endcond */
-    (void)UI_SPIN_UPDATE_ARIA_IGNORE(spin_button);
+    rc = ui_spin_button_base_update_aria(spin_button);
+    if (rc != UI_ERROR_NONE)
+      return rc;
 
     if (spin_button->on_change) {
       ui_error_t oc_rc = spin_button->on_change(
@@ -475,7 +531,9 @@ ui_spin_button_base_set_value(struct ui_spin_button_base *spin_button,
       if (oc_rc != UI_ERROR_NONE)
         return oc_rc;
     }
-    (void)UI_TRIG_CVA_CHG_IGNORE(spin_button);
+    rc = trigger_cva_change(spin_button);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
@@ -520,6 +578,8 @@ ui_error_t ui_spin_button_base_set_step(struct ui_spin_button_base *spin_button,
 ui_error_t
 ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
                                  int disabled) {
+  ui_error_t rc;
+
   if (!spin_button || !spin_button->component ||
       !spin_button->component->shadow_root) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -527,19 +587,26 @@ ui_spin_button_base_set_disabled(struct ui_spin_button_base *spin_button,
 
   spin_button->disabled = disabled;
   if (disabled) {
-    (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
-                                 "aria-disabled", "true");
-    (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,
-                                 "tabindex");
-    {
-      ui_error_t rc_cleanup = ui_spin_button_base_stop_continuous(spin_button);
-      (void)rc_cleanup;
-    }
+    rc = ui_dom_node_set_attribute(spin_button->component->shadow_root,
+                                   "aria-disabled", "true");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_remove_attribute(spin_button->component->shadow_root,
+                                      "tabindex");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_spin_button_base_stop_continuous(spin_button);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else {
-    (void)UI_DOM_REM_ATTR_IGNORE(spin_button->component->shadow_root,
-                                 "aria-disabled");
-    (void)UI_DOM_SET_ATTR_IGNORE(spin_button->component->shadow_root,
-                                 "tabindex", "0");
+    rc = ui_dom_node_remove_attribute(spin_button->component->shadow_root,
+                                      "aria-disabled");
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = ui_dom_node_set_attribute(spin_button->component->shadow_root,
+                                   "tabindex", "0");
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
@@ -634,6 +701,11 @@ ui_spin_button_base_stop_continuous(struct ui_spin_button_base *spin_button) {
   if (!spin_button) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_spin_button_mock_stop_cont_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   spin_button->continuous_dir = UI_SPIN_BUTTON_DIR_NONE;
   spin_button->continuous_timer_ms = 0.0;
   spin_button->is_repeating = 0;
@@ -690,6 +762,8 @@ ui_error_t ui_spin_button_base_on_tick(struct ui_spin_button_base *spin_button,
 ui_error_t
 ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
                                   const struct ui_event *event) {
+  ui_error_t rc;
+
   if (!spin_button || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -697,7 +771,9 @@ ui_spin_button_base_process_event(struct ui_spin_button_base *spin_button,
     return UI_ERROR_NONE;
   }
 
-  (void)UI_TRIG_CVA_TOUCH_IGNORE(spin_button);
+  rc = trigger_cva_touched(spin_button);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (event->type == UI_EVENT_KEY_DOWN) {
     if (event->event_data.keyboard.key_code == UI_KEY_UP) {
@@ -743,3 +819,9 @@ ui_spin_button_base_get_component(struct ui_spin_button_base *spin_button,
   *out_component = spin_button->component;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t ui_test_sb_update_aria(struct ui_spin_button_base *sb) {
+  return ui_spin_button_base_update_aria(sb);
+}
+#endif

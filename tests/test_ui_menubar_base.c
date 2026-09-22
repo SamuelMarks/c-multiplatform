@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
@@ -44,14 +45,14 @@ static ui_error_t test_menubar_base(void) {
     ui_error_t rc_cleanup =
         ui_component_destroy((struct ui_component *)menubar);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   menu_item->shadow_root = NULL;
   {
     ui_error_t rc_cleanup = ui_component_destroy(menu_item);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -73,25 +74,33 @@ static int test_edge_cases(void) {
   {
     ui_error_t rc_cleanup =
         ui_component_destroy((struct ui_component *)menubar);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  for (i = 0; i < 4; i++) {
+  for (i = 0; i < 15; i++) {
     g_malloc_fail_countdown = i;
     err = ui_menubar_base_create(&menubar);
     if (err == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup =
             ui_component_destroy((struct ui_component *)menubar);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
   g_malloc_fail_countdown = -1;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_menubar_mock_fail;
+    g_menubar_mock_fail = 1;
+    g_malloc_fail_countdown = 1;
+    err = ui_menubar_base_create(&menubar);
+    assert(err != UI_ERROR_NONE);
+    g_menubar_mock_fail = 0;
+    g_malloc_fail_countdown = -1;
+  }
+#endif
   return 0;
 }
 

@@ -10,6 +10,23 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_masonry_mock_fail = 0;
+
+static ui_error_t
+mock_masonry_component_set_default_style(struct ui_component *comp,
+                                         struct ui_css_stylesheet *style) {
+  if (g_masonry_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, style);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_masonry_component_set_default_style
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet for masonry layout */
 static const char *ui_masonry_layout_base_default_css =
     ".masonry-container { "
@@ -78,10 +95,9 @@ ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
     goto cleanup;
   }
 
-  {
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(masonry->component, default_style);
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(masonry->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   masonry->component->shadow_root = root_node;
@@ -92,16 +108,10 @@ ui_masonry_layout_base_create(struct ui_masonry_layout_base **out_masonry) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (masonry->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(masonry->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(masonry->component);
   }
   C_MULTIPLATFORM_FREE(masonry);
   return rc;
@@ -117,9 +127,8 @@ ui_masonry_layout_base_destroy(struct ui_masonry_layout_base *masonry) {
   if (!masonry) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(masonry->component);
-    (void)rc_cleanup;
+  if (masonry->component) {
+    ui_component_destroy(masonry->component);
   }
   C_MULTIPLATFORM_FREE(masonry);
   return UI_ERROR_NONE;

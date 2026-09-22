@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include "../include/ui_dockable_layout_base.h"
 #include "../include/ui_error.h"
 #include "../include/ui_drag_drop.h"
@@ -19,7 +20,7 @@ static int test_dockable_layout_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   if (ui_dockable_layout_base_get_component(NULL, &comp) !=
@@ -53,9 +54,23 @@ static int test_dockable_layout_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_dockable_layout_mock_fail;
+    rc = ui_dockable_layout_base_create(&layout);
+    if (rc != UI_ERROR_NONE)
+      return 1;
+    g_dockable_layout_mock_fail = 1;
+    rc = ui_dockable_layout_base_destroy(layout);
+    if (rc != UI_ERROR_UNKNOWN)
+      return 1;
+    g_dockable_layout_mock_fail = 0;
+  }
+#endif
   return 0;
 }
 
@@ -119,7 +134,7 @@ static int test_dockable_layout_docking(void) {
   {
     ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -185,7 +200,7 @@ static int test_dockable_layout_serialization(void) {
   {
     ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -213,7 +228,7 @@ static int test_dockable_layout_integrate(void) {
   {
     ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -246,9 +261,7 @@ int main(void) {
     ui_dockable_layout_base_deserialize(layout, big_buffer);
     {
       ui_error_t rc_cleanup = ui_dockable_layout_base_destroy(layout);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 

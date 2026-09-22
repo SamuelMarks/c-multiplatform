@@ -15,6 +15,62 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_rtb_mock_destroy_fail = 0;
+int g_rtb_mock_node_destroy_fail = 0;
+int g_rtb_mock_append_fail = 0;
+
+/**
+ * @brief mock_rtb_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_append_child(struct ui_dom_node *parent,
+                                        struct ui_dom_node *child) {
+  if (g_rtb_mock_append_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_rtb_append_child
+/** @endcond */
+
+/**
+ * @brief mock_rtb_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_component_destroy(struct ui_component *comp) {
+  if (g_rtb_mock_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_rtb_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_rtb_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_rtb_mock_node_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_rtb_dom_node_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_rich_text_run
  * \brief Represents a single run of text with consistent formatting.
@@ -83,80 +139,42 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(editor);
-    return rc;
+    goto cleanup;
   }
 
-  {
-    ui_error_t set_rc = ui_dom_node_set_tag_name(root_node, "div");
-    if (set_rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(editor);
-      return set_rc;
-    }
+  rc = ui_dom_node_set_tag_name(root_node, "div");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t set_rc =
-        ui_dom_node_set_attribute(root_node, "contenteditable", "true");
-    if (set_rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(editor);
-      return set_rc;
-    }
+
+  rc = ui_dom_node_set_attribute(root_node, "contenteditable", "true");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t set_rc = ui_dom_node_set_attribute(root_node, "role", "textbox");
-    if (set_rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(editor);
-      return set_rc;
-    }
+
+  rc = ui_dom_node_set_attribute(root_node, "role", "textbox");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
-  {
-    ui_error_t set_rc =
-        ui_dom_node_set_attribute(root_node, "aria-multiline", "true");
-    if (set_rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(editor);
-      return set_rc;
-    }
+
+  rc = ui_dom_node_set_attribute(root_node, "aria-multiline", "true");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
+
   editor->component->shadow_root = root_node;
+  root_node = NULL;
 
   *out_editor = editor;
   return UI_ERROR_NONE;
+
+cleanup:
+  if (root_node) {
+    ui_dom_node_destroy(root_node);
+  }
+  ui_component_destroy(editor->component);
+  C_MULTIPLATFORM_FREE(editor);
+  return rc;
 }
 
 /**
@@ -169,7 +187,7 @@ ui_error_t ui_rich_text_base_create(struct ui_rich_text_base **out_editor) {
  * @param head Parameter head.
  * @return Return value.
  */
-static void free_runs(struct ui_rich_text_run *head) {
+static ui_error_t free_runs(struct ui_rich_text_run *head) {
   struct ui_rich_text_run *current = head;
   struct ui_rich_text_run *next;
   while (current) {
@@ -179,6 +197,7 @@ static void free_runs(struct ui_rich_text_run *head) {
     C_MULTIPLATFORM_FREE(current);
     current = next;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -191,7 +210,7 @@ static void free_runs(struct ui_rich_text_run *head) {
  * @param head Parameter head.
  * @return Return value.
  */
-static void free_history(struct ui_rich_text_history_entry *head) {
+static ui_error_t free_history(struct ui_rich_text_history_entry *head) {
   struct ui_rich_text_history_entry *current = head;
   struct ui_rich_text_history_entry *next;
   while (current) {
@@ -201,6 +220,7 @@ static void free_history(struct ui_rich_text_history_entry *head) {
     C_MULTIPLATFORM_FREE(current);
     current = next;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -210,11 +230,16 @@ static void free_history(struct ui_rich_text_history_entry *head) {
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_rich_text_base_destroy(struct ui_rich_text_base *editor) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!editor)
     return UI_ERROR_NONE;
 
   free_runs(editor->document_head);
+  editor->document_head = NULL;
   free_history(editor->history_head);
+  editor->history_head = NULL;
 
   if (editor->ime_composition) {
     C_MULTIPLATFORM_FREE(editor->ime_composition);
@@ -222,21 +247,20 @@ ui_error_t ui_rich_text_base_destroy(struct ui_rich_text_base *editor) {
 
   if (editor->component) {
     if (editor->component->shadow_root) {
-      {
-        ui_error_t rc_cleanup =
-            ui_dom_node_destroy(editor->component->shadow_root);
-        (void)rc_cleanup;
+      rc_cleanup = ui_dom_node_destroy(editor->component->shadow_root);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
       }
       editor->component->shadow_root = NULL;
     }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(editor->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(editor->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
 
   C_MULTIPLATFORM_FREE(editor);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -269,6 +293,7 @@ ui_rich_text_base_get_component(struct ui_rich_text_base *editor,
 ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
                                       const char *text) {
   struct ui_rich_text_run *new_run;
+
   if (!editor)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -291,26 +316,22 @@ ui_error_t ui_rich_text_base_set_text(struct ui_rich_text_base *editor,
     editor->document_head = new_run;
 
     if (editor->component && editor->component->shadow_root) {
-      {
-        ui_error_t txt_rc;
-        struct ui_dom_node *text_node = NULL;
-        txt_rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
-        if (txt_rc != UI_ERROR_NONE)
-          return txt_rc;
-        txt_rc = ui_dom_node_set_text_content(text_node, text);
-        if (txt_rc != UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-            (void)rc_cleanup;
-          }
-          return txt_rc;
-        }
-        /* TODO: clear existing children of shadow_root first */
-        {
-          ui_error_t rc_cleanup = ui_dom_node_append_child(
-              editor->component->shadow_root, text_node);
-          (void)rc_cleanup;
-        }
+      ui_error_t txt_rc;
+      struct ui_dom_node *text_node = NULL;
+      txt_rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+      if (txt_rc != UI_ERROR_NONE)
+        return txt_rc;
+      txt_rc = ui_dom_node_set_text_content(text_node, text);
+      if (txt_rc != UI_ERROR_NONE) {
+        ui_dom_node_destroy(text_node);
+        return txt_rc;
+      }
+      /* TODO: clear existing children of shadow_root first */
+      txt_rc =
+          ui_dom_node_append_child(editor->component->shadow_root, text_node);
+      if (txt_rc != UI_ERROR_NONE) {
+        ui_dom_node_destroy(text_node);
+        return txt_rc;
       }
     }
   }

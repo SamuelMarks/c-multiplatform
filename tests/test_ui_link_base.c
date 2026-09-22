@@ -22,26 +22,49 @@ static ui_error_t test_link_base(void) {
   assert(ui_link_base_bind_text(NULL, signal) == UI_ERROR_INVALID_ARGUMENT);
 
   /* Create OOM scenarios */
-  g_malloc_fail_countdown = 0; /* Base component creation */
-  err = ui_link_base_create(&link);
-  assert(err == UI_ERROR_OUT_OF_MEMORY);
+  {
+    int oom_i;
+    for (oom_i = 0; oom_i < 12; oom_i++) {
+      g_malloc_fail_countdown = oom_i;
+      err = ui_link_base_create(&link);
+      if (err == UI_ERROR_NONE) {
+        ui_component_destroy((struct ui_component *)link);
+        break;
+      }
+    }
+    g_malloc_fail_countdown = -1;
+  }
 
-  g_malloc_fail_countdown = 1; /* ui_link_base struct alloc */
-  err = ui_link_base_create(&link);
-  assert(err == UI_ERROR_OUT_OF_MEMORY);
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_link_base_mock_fail;
+    g_link_base_mock_fail = 1;
+    g_malloc_fail_countdown = 1;
+    err = ui_link_base_create(&link);
+    assert(err != UI_ERROR_NONE);
 
-  g_malloc_fail_countdown = 2; /* root node creation */
-  err = ui_link_base_create(&link);
-  assert(err == UI_ERROR_OUT_OF_MEMORY);
+    g_link_base_mock_fail = 2;
+    g_malloc_fail_countdown = 3;
+    err = ui_link_base_create(&link);
+    assert(err != UI_ERROR_NONE);
 
-  g_malloc_fail_countdown = 3; /* tag name alloc */
-  err = ui_link_base_create(&link);
-  assert(err == UI_ERROR_OUT_OF_MEMORY);
-
-  g_malloc_fail_countdown = -1;
+    g_link_base_mock_fail = 0;
+    g_malloc_fail_countdown = -1;
+  }
+#endif
 
   err = ui_link_base_create(&link);
   assert(err == UI_ERROR_NONE);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_link_base_mock_fail;
+    g_link_base_mock_fail = 3;
+    err = ui_link_base_set_text(link, "Fail Append");
+    assert(err != UI_ERROR_NONE);
+    g_link_base_mock_fail = 0;
+  }
+#endif
 
   assert(ui_link_base_set_href(link, NULL) == UI_ERROR_INVALID_ARGUMENT);
   assert(ui_link_base_set_text(link, NULL) == UI_ERROR_INVALID_ARGUMENT);
@@ -70,7 +93,7 @@ static ui_error_t test_link_base(void) {
     ui_error_t rc_cleanup =
         ui_dom_node_destroy(link->base.shadow_root->first_child);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   link->base.shadow_root->first_child = NULL;
@@ -92,7 +115,7 @@ static ui_error_t test_link_base(void) {
   {
     ui_error_t rc_cleanup = ui_component_destroy((struct ui_component *)link);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
 

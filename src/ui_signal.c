@@ -12,6 +12,27 @@
 #include "ui_reactive_graph.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_signal_mock_graph_get_node_fail = 0;
+
+/**
+ * @brief mock_signal_graph_get_current_node.
+ * @param out_node Out node.
+ * @return Return value.
+ */
+static ui_error_t
+mock_signal_graph_get_current_node(struct ui_reactive_node **out_node) {
+  if (g_signal_mock_graph_get_node_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_reactive_graph_get_current_node)(out_node);
+}
+#undef ui_reactive_graph_get_current_node
+/** @cond */
+#define ui_reactive_graph_get_current_node mock_signal_graph_get_current_node
+/** @endcond */
+#endif
+
 /*
  * \file ui_signal.c
  * \brief Signal implementation.
@@ -47,17 +68,13 @@ struct ui_signal {
  * @param sig Parameter sig.
  * @return Return value.
  */
-static ui_error_t ui_signal_lock(ui_signal_t *sig) {
+static void ui_signal_lock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     int is_swapped = 0;
     while (is_swapped == 0) {
-      {
-        ui_error_t _ign_rc = ui_atomic_cas(&sig->lock, 0, 1, &is_swapped);
-        (void)_ign_rc;
-      }
+      ui_atomic_cas(&sig->lock, 0, 1, &is_swapped);
     }
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -70,14 +87,10 @@ static ui_error_t ui_signal_lock(ui_signal_t *sig) {
  * @param sig Parameter sig.
  * @return Return value.
  */
-static ui_error_t ui_signal_unlock(ui_signal_t *sig) {
+static void ui_signal_unlock(ui_signal_t *sig) {
   if (sig->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
-    {
-      ui_error_t _ign_rc = ui_atomic_store(&sig->lock, 0);
-      (void)_ign_rc;
-    }
+    ui_atomic_store(&sig->lock, 0);
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -187,39 +200,31 @@ ui_error_t ui_signal_get(ui_signal_t *signal,
   struct ui_reactive_node *current_node = NULL;
   ui_error_t rc = UI_ERROR_NONE;
 
-  ui_error_t lock_rc;
   if (!signal || !out_value) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  lock_rc = ui_signal_lock(signal);
-  (void)lock_rc;
+  ui_signal_lock(signal);
 
   /* Dependency tracking for reactive graph */
-  {
-    ui_error_t _ign_rc = ui_reactive_graph_get_current_node(&current_node);
-    (void)_ign_rc;
+  rc = ui_reactive_graph_get_current_node(&current_node);
+  if (rc != UI_ERROR_NONE) {
+    ui_signal_unlock(signal);
+    return rc;
   }
 
   if (current_node) {
     ui_error_t add_rc = ui_signal_add_subscriber(signal, current_node);
     /* In case of OOM on array growth, we pass rc up */
     if (add_rc != UI_ERROR_NONE) {
-      {
-        ui_error_t unlock_rc = ui_signal_unlock(signal);
-        (void)unlock_rc;
-      }
+      ui_signal_unlock(signal);
       return add_rc;
     }
   }
 
   *out_value = signal->value;
 
-  {
-    ui_error_t unlock_rc = ui_signal_unlock(signal);
-    (void)unlock_rc;
-  }
-
+  ui_signal_unlock(signal);
   return rc;
 }
 
@@ -237,21 +242,16 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
   size_t subs_count = 0;
   ui_error_t rc = UI_ERROR_NONE;
 
-  ui_error_t lock_rc;
   if (!signal) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  lock_rc = ui_signal_lock(signal);
-  (void)lock_rc;
+  ui_signal_lock(signal);
 
   if (signal->equality_fn) {
     ui_error_t eq_rc = signal->equality_fn(signal->value, new_value, &equal);
     if (eq_rc != UI_ERROR_NONE) {
-      {
-        ui_error_t unlock_rc = ui_signal_unlock(signal);
-        (void)unlock_rc;
-      }
+      ui_signal_unlock(signal);
       return eq_rc;
     }
   } else {
@@ -278,8 +278,7 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
     if (signal->destructor_fn) {
       ui_error_t dest_rc = signal->destructor_fn(signal->value);
       if (dest_rc != UI_ERROR_NONE) {
-        ui_error_t unlock_rc = ui_signal_unlock(signal);
-        (void)unlock_rc;
+        ui_signal_unlock(signal);
         return dest_rc;
       }
     }
@@ -301,10 +300,7 @@ ui_error_t ui_signal_set(ui_signal_t *signal,
     }
   }
 
-  {
-    ui_error_t unlock_rc = ui_signal_unlock(signal);
-    (void)unlock_rc;
-  }
+  ui_signal_unlock(signal);
 
   if (subs_copy) {
     for (i = 0; i < subs_count; i++) {

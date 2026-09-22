@@ -168,36 +168,28 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "white-space", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_white_space(val, &node->white_space);
-      }
+      parse_white_space(val, &node->white_space);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "text-align", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_text_align(val, &node->text_align);
-      }
+      parse_text_align(val, &node->text_align);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "word-break", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_word_break(val, &node->word_break);
-      }
+      parse_word_break(val, &node->word_break);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "hyphens", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_hyphens(val, &node->hyphens);
-      }
+      parse_hyphens(val, &node->hyphens);
     }
   }
 
@@ -205,36 +197,28 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "writing-mode", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_writing_mode(val, &node->writing_mode);
-      }
+      parse_writing_mode(val, &node->writing_mode);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "direction", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_direction(val, &node->direction);
-      }
+      parse_direction(val, &node->direction);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "unicode-bidi", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_unicode_bidi(val, &node->unicode_bidi);
-      }
+      parse_unicode_bidi(val, &node->unicode_bidi);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "text-orientation", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_text_orientation(val, &node->text_orientation);
-      }
+      parse_text_orientation(val, &node->text_orientation);
     }
   }
 
@@ -242,27 +226,21 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "color-scheme", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_color_scheme(val, &node->color_scheme);
-      }
+      parse_color_scheme(val, &node->color_scheme);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "print-color-adjust", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_print_color_adjust(val, &node->print_color_adjust);
-      }
+      parse_print_color_adjust(val, &node->print_color_adjust);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "forced-color-adjust", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_forced_color_adjust(val, &node->forced_color_adjust);
-      }
+      parse_forced_color_adjust(val, &node->forced_color_adjust);
     }
   }
 
@@ -270,27 +248,21 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "line-grid", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_line_grid(val, &node->line_grid);
-      }
+      parse_line_grid(val, &node->line_grid);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "line-snap", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_line_snap(val, &node->line_snap);
-      }
+      parse_line_snap(val, &node->line_snap);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "box-snap", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_box_snap(val, &node->box_snap);
-      }
+      parse_box_snap(val, &node->box_snap);
     }
   }
   {
@@ -316,27 +288,21 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "block-step-insert", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_block_step_insert(val, &node->block_step_insert);
-      }
+      parse_block_step_insert(val, &node->block_step_insert);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "block-step-align", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_block_step_align(val, &node->block_step_align);
-      }
+      parse_block_step_align(val, &node->block_step_align);
     }
   }
   {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "block-step-round", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_block_step_round(val, &node->block_step_round);
-      }
+      parse_block_step_round(val, &node->block_step_round);
     }
   }
 
@@ -344,15 +310,13 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "text-decoration-line", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_text_decoration_line(val, &node->text_decoration_line);
-      }
+      parse_text_decoration_line(val, &node->text_decoration_line);
     } else {
       ui_error_t attr_rc2 = ui_css_computed_style_get_property(
           node->computed_style, "text-decoration", &val);
       if (attr_rc2 == UI_ERROR_NONE) {
         /* Basic shorthand fallback */
-        { (void)parse_text_decoration_line(val, &node->text_decoration_line); }
+        parse_text_decoration_line(val, &node->text_decoration_line);
       }
     }
   }
@@ -361,9 +325,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
     ui_error_t attr_rc = ui_css_computed_style_get_property(
         node->computed_style, "text-decoration-style", &val);
     if (attr_rc == UI_ERROR_NONE) {
-      {
-        (void)parse_text_decoration_style(val, &node->text_decoration_style);
-      }
+      parse_text_decoration_style(val, &node->text_decoration_style);
     }
   }
 
@@ -376,7 +338,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_color(val, &node->text_decoration_color);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -421,7 +383,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_color(val, &node->text_emphasis_color);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -436,7 +398,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         {
           ui_error_t rc_cleanup = ui_css_parse_color(val, &node->text_color);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -452,7 +414,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_color(val, &node->background_color);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -470,7 +432,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_image(val, &node->background_image[0]);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -483,7 +445,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "box-decoration-break", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_box_decoration_break(val, &node->box_decoration_break);
+        parse_box_decoration_break(val, &node->box_decoration_break);
       }
     }
   }
@@ -493,7 +455,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "box-shadow", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_box_shadow(val, node->box_shadow, &node->box_shadow_count);
+        parse_box_shadow(val, node->box_shadow, &node->box_shadow_count);
       }
     }
   }
@@ -507,7 +469,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_image(val, &node->border_image_source);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -522,7 +484,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_image(val, &node->border_image_source);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       } /* Very basic shorthand fallback */
@@ -534,7 +496,11 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "background-size", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_background_size(val, &node->background_size[0]);
+        ui_error_t parse_rc =
+            parse_background_size(val, &node->background_size[0]);
+        if (parse_rc != UI_ERROR_NONE) {
+          /* Keep default */
+        }
       }
     }
   }
@@ -544,9 +510,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "background-repeat", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_background_repeat_single(val,
-                                             &node->background_repeat_x[0]);
-        ;
+        parse_background_repeat_single(val, &node->background_repeat_x[0]);
       }
       node->background_repeat_y[0] = node->background_repeat_x[0];
     }
@@ -557,7 +521,10 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "border-radius", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_border_radius(val, node->border_radius);
+        ui_error_t parse_rc = parse_border_radius(val, node->border_radius);
+        if (parse_rc != UI_ERROR_NONE) {
+          /* Keep default */
+        }
       }
     }
   }
@@ -635,7 +602,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_color(val, &node->border_color[0]);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -650,7 +617,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_color(val, &node->border_color[1]);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -665,7 +632,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_color(val, &node->border_color[2]);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -680,7 +647,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
           ui_error_t rc_cleanup =
               ui_css_parse_color(val, &node->border_color[3]);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            /* Avoid override */
           }
         }
       }
@@ -723,7 +690,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "font-weight", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_font_weight(val, &node->font_weight);
+        parse_font_weight(val, &node->font_weight);
       }
     }
   }
@@ -733,7 +700,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "font-style", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_font_style(val, &node->font_style);
+        parse_font_style(val, &node->font_style);
       }
     }
   }
@@ -759,7 +726,11 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "text-size-adjust", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_text_size_adjust(val, &node->text_size_adjust);
+        ui_error_t parse_rc =
+            parse_text_size_adjust(val, &node->text_size_adjust);
+        if (parse_rc != UI_ERROR_NONE) {
+          /* Keep default */
+        }
       }
     }
   }
@@ -769,7 +740,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "font-stretch", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_font_stretch(val, &node->font_stretch);
+        parse_font_stretch(val, &node->font_stretch);
       }
     }
   }
@@ -827,7 +798,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "break-before", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_break(val, &node->break_before);
+        parse_break(val, &node->break_before);
       }
     }
   }
@@ -836,7 +807,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "page-break-before", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_break(val, &node->break_before);
+        parse_break(val, &node->break_before);
       }
     }
   }
@@ -846,7 +817,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "break-after", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_break(val, &node->break_after);
+        parse_break(val, &node->break_after);
       }
     }
   }
@@ -855,7 +826,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "page-break-after", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_break(val, &node->break_after);
+        parse_break(val, &node->break_after);
       }
     }
   }
@@ -865,7 +836,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "break-inside", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_break(val, &node->break_inside);
+        parse_break(val, &node->break_inside);
       }
     }
   }
@@ -874,7 +845,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "page-break-inside", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_break(val, &node->break_inside);
+        parse_break(val, &node->break_inside);
       }
     }
   }
@@ -927,9 +898,9 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
                                                   "overflow", &val);
     if (_prop_rc == UI_ERROR_NONE) {
       {
-        (void)parse_overflow(val, &node->overflow_x);
+        parse_overflow(val, &node->overflow_x);
       }
-      { (void)parse_overflow(val, &node->overflow_y); }
+      { parse_overflow(val, &node->overflow_y); }
     }
   }
   {
@@ -937,7 +908,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "overflow-x", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_overflow(val, &node->overflow_x);
+        parse_overflow(val, &node->overflow_x);
       }
     }
   }
@@ -946,7 +917,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "overflow-y", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_overflow(val, &node->overflow_y);
+        parse_overflow(val, &node->overflow_y);
       }
     }
   }
@@ -957,8 +928,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "justify-content", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_alignment(val, UI_LAYOUT_ALIGN_NORMAL,
-                              &node->justify_content);
+        parse_alignment(val, UI_LAYOUT_ALIGN_NORMAL, &node->justify_content);
       }
     }
   }
@@ -967,7 +937,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "align-items", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_alignment(val, UI_LAYOUT_ALIGN_NORMAL, &node->align_items);
+        parse_alignment(val, UI_LAYOUT_ALIGN_NORMAL, &node->align_items);
       }
     }
   }
@@ -976,7 +946,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "align-self", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_alignment(val, UI_LAYOUT_ALIGN_AUTO, &node->align_self);
+        parse_alignment(val, UI_LAYOUT_ALIGN_AUTO, &node->align_self);
       }
     }
   }
@@ -985,9 +955,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "align-content", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_alignment(val, UI_LAYOUT_ALIGN_NORMAL,
-                              &node->align_content);
-        ;
+        parse_alignment(val, UI_LAYOUT_ALIGN_NORMAL, &node->align_content);
       }
     }
   }
@@ -998,7 +966,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "flex-direction", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_flex_direction(val, &node->flex_direction);
+        parse_flex_direction(val, &node->flex_direction);
       }
     }
   }
@@ -1007,7 +975,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "flex-wrap", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_flex_wrap(val, &node->flex_wrap);
+        parse_flex_wrap(val, &node->flex_wrap);
       }
     }
   }
@@ -1334,7 +1302,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "margin-trim", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_margin_trim(val, &node->margin_trim);
+        parse_margin_trim(val, &node->margin_trim);
       }
     } else {
       node->margin_trim = UI_LAYOUT_MARGIN_TRIM_NONE;
@@ -1347,7 +1315,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "aspect-ratio", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_aspect_ratio(val, &node->aspect_ratio);
+        parse_aspect_ratio(val, &node->aspect_ratio);
       }
     } else {
       node->aspect_ratio = 0.0f;
@@ -1360,7 +1328,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "wrap-flow", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_wrap_flow(val, &node->wrap_flow);
+        parse_wrap_flow(val, &node->wrap_flow);
       }
     }
   }
@@ -1369,7 +1337,7 @@ static ui_error_t compute_box_model(struct ui_layout_node *node) {
         node->computed_style, "wrap-through", &val);
     if (attr_rc == UI_ERROR_NONE) {
       {
-        (void)parse_wrap_through(val, &node->wrap_through);
+        parse_wrap_through(val, &node->wrap_through);
       }
     }
   }

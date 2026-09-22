@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include "ui_disclosure_base.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,8 +14,10 @@ static int g_toggle_returns_error = 0;
 
 static ui_error_t on_disclosure_toggle(struct ui_disclosure_base *disclosure,
                                        int is_expanded, void *user_data) {
-  (void)disclosure;
-  (void)user_data;
+  if (disclosure) {
+  }
+  if (user_data) {
+  }
   g_toggle_count++;
   g_last_expanded = is_expanded;
   if (g_toggle_returns_error) {
@@ -164,6 +167,14 @@ static int run_normal_tests(void) {
   /* Test setting to same value */
   err = ui_disclosure_base_set_expanded(disclosure, 1);
   if (err != UI_ERROR_NONE) {
+    return 1;
+  }
+
+  /* Test update_dom_state OOM failure */
+  g_malloc_fail_countdown = 0;
+  err = ui_disclosure_base_set_expanded(disclosure, 0);
+  g_malloc_fail_countdown = -1;
+  if (err != UI_ERROR_OUT_OF_MEMORY) {
     return 1;
   }
 
@@ -338,7 +349,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_disclosure_base_destroy(disclosure);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -362,7 +373,7 @@ static int run_oom_tests(void) {
       {
         ui_error_t rc_cleanup = ui_disclosure_base_destroy(disclosure);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
       }
       break;
@@ -396,7 +407,7 @@ static int run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_disclosure_base_destroy(disclosure);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;

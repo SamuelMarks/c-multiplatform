@@ -10,6 +10,30 @@
 #include <math.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_ssb_mock_signal_destroy_fail = 0;
+
+/**
+ * @brief mock_ssb_signal_destroy.
+ * @param sig Parameter sig.
+ * @return Return value.
+ */
+static ui_error_t mock_ssb_signal_destroy(struct ui_signal *sig) {
+  if (g_ssb_mock_signal_destroy_fail != 0) {
+    if (g_ssb_mock_signal_destroy_fail > 1) {
+      g_ssb_mock_signal_destroy_fail--;
+    } else {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_signal_destroy)(sig);
+}
+#undef ui_signal_destroy
+/** @cond */
+#define ui_signal_destroy mock_ssb_signal_destroy
+/** @endcond */
+#endif
+
 /*
  * \file ui_syntax_surface_base.c
  * \brief Syntax surface base component implementation.
@@ -55,11 +79,41 @@ struct ui_syntax_surface_base {
 static ui_error_t void_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
                                 ui_bool_t *out_equal) {
-  (void)a;
-  (void)b;
-  *out_equal = UI_FALSE; /* Always trigger fold signal */
+  if (!out_equal) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  *out_equal = (a.ptr_val == b.ptr_val) ? UI_TRUE : UI_FALSE;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief ui_test_ssb_void_equality.
+ * @param a Parameter a.
+ * @param b Parameter b.
+ * @param out_equal Parameter out_equal.
+ * @return Return value.
+ */
+ui_error_t ui_test_ssb_void_equality(union ui_signal_payload a,
+                                     union ui_signal_payload b,
+                                     ui_bool_t *out_equal) {
+  return void_equality(a, b, out_equal);
+}
+
+/**
+ * @brief ui_test_ssb_clear_signals.
+ * @param surface Parameter surface.
+ * @return Return value.
+ */
+ui_error_t ui_test_ssb_clear_signals(struct ui_syntax_surface_base *surface) {
+  if (!surface) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  surface->fold_changed_signal = NULL;
+  surface->active_line_signal = NULL;
+  return UI_ERROR_NONE;
+}
+#endif
 
 /**
  * \brief Equality function for integers.
@@ -138,14 +192,28 @@ ui_syntax_surface_base_create(struct ui_arena *arena,
  */
 ui_error_t
 ui_syntax_surface_base_destroy(struct ui_syntax_surface_base *surface) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t sig_rc;
+
   if (!surface) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_signal_destroy(surface->fold_changed_signal);
-  (void)ui_signal_destroy(surface->active_line_signal);
+  if (surface->fold_changed_signal) {
+    sig_rc = ui_signal_destroy(surface->fold_changed_signal);
+    if (sig_rc != UI_ERROR_NONE) {
+      rc = sig_rc;
+    }
+  }
 
-  return UI_ERROR_NONE;
+  if (surface->active_line_signal) {
+    sig_rc = ui_signal_destroy(surface->active_line_signal);
+    if (sig_rc != UI_ERROR_NONE) {
+      rc = sig_rc;
+    }
+  }
+
+  return rc;
 }
 
 /**

@@ -32,6 +32,7 @@
 #define GL_STATIC_DRAW 0x88E4
 /** @brief internal */
 #define GL_DYNAMIC_DRAW 0x88E8
+#define GL_COMPILE_STATUS 0x8B81
 #endif
 
 #ifndef GLsizeiptr
@@ -48,6 +49,7 @@ typedef void (__stdcall *PFNGLDISABLEVERTEXATTRIBARRAYPROC) (unsigned int index)
 typedef unsigned int (__stdcall *PFNGLCREATESHADERPROC) (unsigned int type);
 typedef void (__stdcall *PFNGLSHADERSOURCEPROC) (unsigned int shader, int count, const char *const*string, const int *length);
 typedef void (__stdcall *PFNGLCOMPILESHADERPROC) (unsigned int shader);
+typedef void (__stdcall *PFNGLGETSHADERIVPROC) (unsigned int shader, unsigned int pname, int *params);
 typedef unsigned int (__stdcall *PFNGLCREATEPROGRAMPROC) (void);
 typedef void (__stdcall *PFNGLATTACHSHADERPROC) (unsigned int program, unsigned int shader);
 typedef void (__stdcall *PFNGLLINKPROGRAMPROC) (unsigned int program);
@@ -68,6 +70,7 @@ static PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
 static PFNGLCREATESHADERPROC glCreateShader;
 static PFNGLSHADERSOURCEPROC glShaderSource;
 static PFNGLCOMPILESHADERPROC glCompileShader;
+static PFNGLGETSHADERIVPROC glGetShaderiv;
 static PFNGLCREATEPROGRAMPROC glCreateProgram;
 static PFNGLATTACHSHADERPROC glAttachShader;
 static PFNGLLINKPROGRAMPROC glLinkProgram;
@@ -94,6 +97,7 @@ static ui_error_t load_gl_extensions(void) {
     glCreateShader = (PFNGLCREATESHADERPROC)(size_t)wglGetProcAddress("glCreateShader");
     glShaderSource = (PFNGLSHADERSOURCEPROC)(size_t)wglGetProcAddress("glShaderSource");
     glCompileShader = (PFNGLCOMPILESHADERPROC)(size_t)wglGetProcAddress("glCompileShader");
+    glGetShaderiv = (PFNGLGETSHADERIVPROC)(size_t)wglGetProcAddress("glGetShaderiv");
     glCreateProgram = (PFNGLCREATEPROGRAMPROC)(size_t)wglGetProcAddress("glCreateProgram");
     glAttachShader = (PFNGLATTACHSHADERPROC)(size_t)wglGetProcAddress("glAttachShader");
     glLinkProgram = (PFNGLLINKPROGRAMPROC)(size_t)wglGetProcAddress("glLinkProgram");
@@ -103,9 +107,10 @@ static ui_error_t load_gl_extensions(void) {
     glGenBuffers = (PFNGLGENBUFFERSPROC)(size_t)wglGetProcAddress("glGenBuffers");
     glDeleteProgram = (PFNGLDELETEPROGRAMPROC)(size_t)wglGetProcAddress("glDeleteProgram");
     glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)(size_t)wglGetProcAddress("glDeleteBuffers");
-  return UI_ERROR_NONE;
+    return UI_ERROR_NONE;
 }
 #elif defined(__APPLE__)
+#include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
 /** @brief internal */
@@ -150,6 +155,7 @@ typedef ptrdiff_t GLintptr;
 #define GL_UNSIGNED_SHORT 0x1403
 #define GL_VERTEX_SHADER 0x8B31
 #define GL_FRAGMENT_SHADER 0x8B30
+#define GL_COMPILE_STATUS 0x8B81
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #define GL_RGBA 0x1908
 #define GL_UNSIGNED_BYTE 0x1401
@@ -159,78 +165,283 @@ typedef ptrdiff_t GLintptr;
 #if defined(UI_TEST_MOCK_ALLOC) ||                                             \
     (!defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__) &&    \
      !defined(HAVE_GLES2) && !defined(HAVE_OPENGL))
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_mock_gles2_create_shader_fail = 0;
+int g_mock_gles2_compile_status_fail = 0;
+int g_mock_gles2_create_program_fail = 0;
+int g_mock_cgl_context_null = 0;
+
+#if defined(__APPLE__)
+static void *mock_CGLGetCurrentContext(void) {
+  if (g_mock_cgl_context_null) {
+    return (void *)0;
+  }
+  return (void *)1;
+}
+#undef CGLGetCurrentContext
+/** @cond */
+#define CGLGetCurrentContext mock_CGLGetCurrentContext
+/** @endcond */
+#endif
+#endif
+
+static unsigned int mock_glCreateProgram(void) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_gles2_create_program_fail) {
+    return 0;
+  }
+#endif
+  return 1;
+}
+
+static unsigned int mock_glCreateShader(unsigned int type) {
+  unsigned int unused = type;
+  type = unused;
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_gles2_create_shader_fail != 0) {
+    if (g_mock_gles2_create_shader_fail > 1) {
+      g_mock_gles2_create_shader_fail--;
+    } else {
+      g_mock_gles2_create_shader_fail = 0;
+      return 0;
+    }
+  }
+#endif
+  return 1;
+}
+
+static void mock_glAttachShader(unsigned int p, unsigned int s) {
+  unsigned int u1 = p, u2 = s;
+  p = u1;
+  s = u2;
+}
+
+static void mock_glLinkProgram(unsigned int p) {
+  unsigned int u = p;
+  p = u;
+}
+
+static void mock_glDeleteShader(unsigned int s) {
+  unsigned int u = s;
+  s = u;
+}
+
+static int mock_glGetAttribLocation(unsigned int p, const char *n) {
+  unsigned int u = p;
+  const char *un = n;
+  p = u;
+  n = un;
+  return 1;
+}
+
+static int mock_glGetUniformLocation(unsigned int p, const char *n) {
+  unsigned int u = p;
+  const char *un = n;
+  p = u;
+  n = un;
+  return 1;
+}
+
+static void mock_glGenBuffers(int n, unsigned int *b) {
+  int un = n;
+  n = un;
+  *b = 1;
+}
+
+static void mock_glDeleteProgram(unsigned int p) {
+  unsigned int u = p;
+  p = u;
+}
+
+static void mock_glDeleteBuffers(int n, const unsigned int *b) {
+  int un = n;
+  const unsigned int *ub = b;
+  n = un;
+  b = ub;
+}
+
+static void mock_glUseProgram(unsigned int p) {
+  unsigned int u = p;
+  p = u;
+}
+
+static void mock_glUniform2f(int l, float v0, float v1) {
+  int ul = l;
+  float uv0 = v0, uv1 = v1;
+  l = ul;
+  v0 = uv0;
+  v1 = uv1;
+}
+
+static void mock_glBindBuffer(unsigned int t, unsigned int b) {
+  unsigned int ut = t, ub = b;
+  t = ut;
+  b = ub;
+}
+
+static void mock_glBufferData(unsigned int t, GLsizeiptr s, const void *d,
+                              unsigned int u) {
+  unsigned int ut = t, uu = u;
+  GLsizeiptr us = s;
+  const void *ud = d;
+  t = ut;
+  u = uu;
+  s = us;
+  d = ud;
+}
+
+static void mock_glEnableVertexAttribArray(unsigned int i) {
+  unsigned int ui = i;
+  i = ui;
+}
+
+static void mock_glVertexAttribPointer(unsigned int i, int s, unsigned int t,
+                                       unsigned char n, int st,
+                                       const void *p) {
+  unsigned int ui = i, ut = t;
+  int us = s, ust = st;
+  unsigned char un = n;
+  const void *up = p;
+  i = ui;
+  t = ut;
+  s = us;
+  st = ust;
+  n = un;
+  p = up;
+}
+
+static void mock_glDrawElements(unsigned int m, int c, unsigned int t,
+                                const void *p) {
+  unsigned int um = m, ut = t;
+  int uc = c;
+  const void *up = p;
+  m = um;
+  t = ut;
+  c = uc;
+  p = up;
+}
+
+static void mock_glDisableVertexAttribArray(unsigned int i) {
+  unsigned int ui = i;
+  i = ui;
+}
+
+static void mock_glShaderSource(unsigned int s, int c,
+                                const char *const *str, const int *l) {
+  unsigned int us = s;
+  int uc = c;
+  const char *const *ustr = str;
+  const int *ul = l;
+  s = us;
+  c = uc;
+  str = ustr;
+  l = ul;
+}
+
+static void mock_glCompileShader(unsigned int s) {
+  unsigned int us = s;
+  s = us;
+}
+
+static void mock_glGetShaderiv(unsigned int s, unsigned int p, int *r) {
+  unsigned int us = s, up = p;
+  s = us;
+  p = up;
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_gles2_compile_status_fail) {
+    *r = 0;
+    return;
+  }
+#endif
+  *r = 1;
+}
+
+static void mock_glViewport(int x, int y, int w, int h) {
+  int ux = x, uy = y, uw = w, uh = h;
+  x = ux;
+  y = uy;
+  w = uw;
+  h = uh;
+}
+
+static void mock_glClearColor(float r, float g, float b, float a) {
+  float ur = r, ug = g, ub = b, ua = a;
+  r = ur;
+  g = ug;
+  b = ub;
+  a = ua;
+}
+
+static void mock_glClear(unsigned int m) {
+  unsigned int um = m;
+  m = um;
+}
+
+static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f,
+                              unsigned int t, void *d) {
+  int ux = x, uy = y, uw = w, uh = h;
+  unsigned int uf = f, ut = t;
+  void *ud = d;
+  x = ux;
+  y = uy;
+  w = uw;
+  h = uh;
+  f = uf;
+  t = ut;
+  d = ud;
+}
+
 #undef glCreateProgram
-/** @brief internal */
-#define glCreateProgram() 1
+#define glCreateProgram mock_glCreateProgram
 #undef glCreateShader
-/** @brief internal */
-#define glCreateShader(t) ((void)(t), 1)
+#define glCreateShader mock_glCreateShader
 #undef glAttachShader
-/** @brief internal */
-#define glAttachShader(p, s) do { (void)(p); (void)(s); } while(0)
+#define glAttachShader mock_glAttachShader
 #undef glLinkProgram
-/** @brief internal */
-#define glLinkProgram(p) do { (void)(p); } while(0)
+#define glLinkProgram mock_glLinkProgram
 #undef glDeleteShader
-/** @brief internal */
-#define glDeleteShader(s) do { (void)(s); } while(0)
+#define glDeleteShader mock_glDeleteShader
 #undef glGetAttribLocation
-/** @brief internal */
-#define glGetAttribLocation(p, n) ((void)(p), (void)(n), 1)
+#define glGetAttribLocation mock_glGetAttribLocation
 #undef glGetUniformLocation
-/** @brief internal */
-#define glGetUniformLocation(p, n) ((void)(p), (void)(n), 1)
+#define glGetUniformLocation mock_glGetUniformLocation
 #undef glGenBuffers
-/** @brief internal */
-#define glGenBuffers(n, b) do { (void)(n); *(b) = 1; } while(0)
+#define glGenBuffers mock_glGenBuffers
 #undef glDeleteProgram
-/** @brief internal */
-#define glDeleteProgram(p) do { (void)(p); } while(0)
+#define glDeleteProgram mock_glDeleteProgram
 #undef glDeleteBuffers
-/** @brief internal */
-#define glDeleteBuffers(n, b) do { (void)(n); (void)(b); } while(0)
+#define glDeleteBuffers mock_glDeleteBuffers
 #undef glUseProgram
-/** @brief internal */
-#define glUseProgram(p) do { (void)(p); } while(0)
+#define glUseProgram mock_glUseProgram
 #undef glUniform2f
-/** @brief internal */
-#define glUniform2f(l, v0, v1) do { (void)(l); (void)(v0); (void)(v1); } while(0)
+#define glUniform2f mock_glUniform2f
 #undef glBindBuffer
-/** @brief internal */
-#define glBindBuffer(t, b) do { (void)(t); (void)(b); } while(0)
+#define glBindBuffer mock_glBindBuffer
 #undef glBufferData
-/** @brief internal */
-#define glBufferData(t, s, d, u) do { (void)(t); (void)(s); (void)(d); (void)(u); } while(0)
+#define glBufferData mock_glBufferData
 #undef glEnableVertexAttribArray
-/** @brief internal */
-#define glEnableVertexAttribArray(i) do { (void)(i); } while(0)
+#define glEnableVertexAttribArray mock_glEnableVertexAttribArray
 #undef glVertexAttribPointer
-/** @brief internal */
-#define glVertexAttribPointer(i, s, t, n, st, p) do { (void)(i); (void)(s); (void)(t); (void)(n); (void)(st); (void)(p); } while(0)
+#define glVertexAttribPointer mock_glVertexAttribPointer
 #undef glDrawElements
-/** @brief internal */
-#define glDrawElements(m, c, t, p) do { (void)(m); (void)(c); (void)(t); (void)(p); } while(0)
+#define glDrawElements mock_glDrawElements
 #undef glDisableVertexAttribArray
-/** @brief internal */
-#define glDisableVertexAttribArray(i) do { (void)(i); } while(0)
+#define glDisableVertexAttribArray mock_glDisableVertexAttribArray
 #undef glShaderSource
-/** @brief internal */
-#define glShaderSource(s, c, str, l) do { (void)(s); (void)(c); (void)(str); (void)(l); } while(0)
+#define glShaderSource mock_glShaderSource
 #undef glCompileShader
-/** @brief internal */
-#define glCompileShader(s) do { (void)(s); } while(0)
+#define glCompileShader mock_glCompileShader
+#undef glGetShaderiv
+#define glGetShaderiv mock_glGetShaderiv
 #undef glViewport
-/** @brief internal */
-#define glViewport(x, y, w, h) do { (void)(x); (void)(y); (void)(w); (void)(h); } while(0)
+#define glViewport mock_glViewport
 #undef glClearColor
-/** @brief internal */
-#define glClearColor(r, g, b, a) do { (void)(r); (void)(g); (void)(b); (void)(a); } while(0)
+#define glClearColor mock_glClearColor
 #undef glClear
-/** @brief internal */
-#define glClear(m) do { (void)(m); } while(0)
+#define glClear mock_glClear
 #undef glReadPixels
-/** @brief internal */
-#define glReadPixels(x, y, w, h, f, t, d) do { (void)(x); (void)(y); (void)(w); (void)(h); (void)(f); (void)(t); (void)(d); } while(0)
+#define glReadPixels mock_glReadPixels
 #endif
 
 #include "ui_renderer_gles2.h"
@@ -315,7 +526,9 @@ static const char *vertex_shader_source =
     "}\n";
 
 /** @brief Simple passthrough fragment shader */
-static const char *fragment_shader_source = "precision mediump float;\n"
+static const char *fragment_shader_source = "#ifdef GL_ES\n"
+                                            "precision mediump float;\n"
+                                            "#endif\n"
                                             "varying vec4 v_color;\n"
                                             "void main() {\n"
                                             "  gl_FragColor = v_color;\n"
@@ -339,14 +552,35 @@ static const char *fragment_shader_source = "precision mediump float;\n"
 static ui_error_t compile_shader(unsigned int type, const char *source,
                                  unsigned int *out_shader) {
   unsigned int shader;
+  int compiled = 0;
   *out_shader = 0;
 #if defined(_WIN32) || defined(__CYGWIN__)
   if (!glCreateShader)
     return UI_ERROR_UNSUPPORTED;
+#elif defined(__APPLE__)
+  if (CGLGetCurrentContext() == NULL) {
+    *out_shader = 1;
+    return UI_ERROR_NONE;
+  }
 #endif
   shader = glCreateShader(type);
+  if (!shader)
+    return UI_ERROR_UNKNOWN;
   glShaderSource(shader, 1, &source, NULL);
   glCompileShader(shader);
+#if defined(_WIN32) || defined(__CYGWIN__)
+  if (glGetShaderiv) {
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+  } else {
+    compiled = 1;
+  }
+#else
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+#endif
+  if (!compiled) {
+    glDeleteShader(shader);
+    return UI_ERROR_UNKNOWN;
+  }
   *out_shader = shader;
   return UI_ERROR_NONE;
 }
@@ -615,9 +849,16 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
                              struct ui_window_backend *window_backend,
                              struct ui_window *window) {
   struct gles2_renderer_data *data;
-  unsigned int vs, fs;
-  (void)window_backend;
-  (void)window;
+  unsigned int vs = 0, fs = 0;
+  ui_error_t vs_rc;
+  ui_error_t fs_rc;
+  struct ui_window_backend *unused_wb;
+  struct ui_window *unused_w;
+
+  unused_wb = window_backend;
+  unused_w = window;
+  window_backend = unused_wb;
+  window = unused_w;
 
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -640,13 +881,30 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
 
 #if defined(_WIN32) || defined(__CYGWIN__)
   if (glCreateProgram) {
+#elif defined(__APPLE__)
+  if (CGLGetCurrentContext() != NULL) {
 #else
   if (1) {
 #endif
-    (void)compile_shader(GL_VERTEX_SHADER, vertex_shader_source, &vs);
-    (void)compile_shader(GL_FRAGMENT_SHADER, fragment_shader_source, &fs);
+    vs_rc = compile_shader(GL_VERTEX_SHADER, vertex_shader_source, &vs);
+    if (vs_rc != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(data);
+      return vs_rc;
+    }
+    fs_rc = compile_shader(GL_FRAGMENT_SHADER, fragment_shader_source, &fs);
+    if (fs_rc != UI_ERROR_NONE) {
+      glDeleteShader(vs);
+      C_MULTIPLATFORM_FREE(data);
+      return fs_rc;
+    }
 
     data->program = glCreateProgram();
+    if (!data->program) {
+      glDeleteShader(vs);
+      glDeleteShader(fs);
+      C_MULTIPLATFORM_FREE(data);
+      return UI_ERROR_UNKNOWN;
+    }
     glAttachShader(data->program, vs);
     glAttachShader(data->program, fs);
     glLinkProgram(data->program);
@@ -754,7 +1012,9 @@ static ui_error_t gles2_set_viewport(struct ui_renderer_backend *backend, int x,
  */
 static ui_error_t gles2_clear(struct ui_renderer_backend *backend,
                               struct ui_color color) {
-  (void)backend;
+  struct ui_renderer_backend *unused_b;
+  unused_b = backend;
+  backend = unused_b;
   glClearColor(color.r, color.g, color.b, color.a);
   glClear(GL_COLOR_BUFFER_BIT);
   return UI_ERROR_NONE;
@@ -793,10 +1053,15 @@ struct gles2_texture {
 static ui_error_t gles2_push_clip(struct ui_renderer_backend *backend, float x,
                                   float y, float width, float height) {
   ui_error_t rc;
-  (void)x;
-  (void)y;
-  (void)width;
-  (void)height;
+  float unused_x, unused_y, unused_w, unused_h;
+  unused_x = x;
+  unused_y = y;
+  unused_w = width;
+  unused_h = height;
+  x = unused_x;
+  y = unused_y;
+  width = unused_w;
+  height = unused_h;
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -856,14 +1121,22 @@ static ui_error_t gles2_push_stencil_clip(struct ui_renderer_backend *backend,
                                           const unsigned short *indices,
                                           int index_count) {
   ui_error_t rc;
-  (void)vertices;
-  (void)vertex_count;
-  (void)indices;
-  (void)index_count;
+  const struct ui_vertex *unused_v;
+  int unused_vc;
+  const unsigned short *unused_i;
+  int unused_ic;
+
+  unused_v = vertices;
+  unused_vc = vertex_count;
+  unused_i = indices;
+  unused_ic = index_count;
+  vertices = unused_v;
+  vertex_count = unused_vc;
+  indices = unused_i;
+  index_count = unused_ic;
 
   if (!backend || !backend->user_data)
     return UI_ERROR_INVALID_ARGUMENT;
-
   rc = gles2_flush(backend);
   if (rc != UI_ERROR_NONE)
     return rc;
@@ -971,7 +1244,9 @@ static ui_error_t gles2_destroy_texture(struct ui_renderer_backend *backend,
  */
 static ui_error_t gles2_set_render_target(struct ui_renderer_backend *backend,
                                           void *texture_handle) {
-  (void)texture_handle;
+  void *unused_tex;
+  unused_tex = texture_handle;
+  texture_handle = unused_tex;
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -1111,3 +1386,10 @@ ui_error_t ui_renderer_gles2_destroy(struct ui_renderer_backend *backend) {
   C_MULTIPLATFORM_FREE(backend);
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t ui_test_gles2_compile_shader(unsigned int type, const char *source,
+                                        unsigned int *out_shader) {
+  return compile_shader(type, source, out_shader);
+}
+#endif

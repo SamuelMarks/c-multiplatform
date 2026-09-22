@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_theme_provider.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
@@ -76,9 +77,7 @@ static int test_theme_provider(void) {
     FAIL_CHECK(__LINE__, err != UI_ERROR_NOT_FOUND);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(bad_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -92,9 +91,7 @@ static int test_theme_provider(void) {
     FAIL_CHECK(__LINE__, err != UI_ERROR_NOT_FOUND);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(unmounted_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -128,23 +125,17 @@ static int test_theme_provider(void) {
     g_malloc_fail_countdown = -1;
     {
       ui_error_t rc_cleanup = ui_arena_destroy(small_arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return failed;

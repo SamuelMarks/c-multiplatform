@@ -56,9 +56,7 @@ void test_content_negative(void) {
   ui_css_stylesheet_destroy(sheet);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 /* clang-format off */

@@ -288,6 +288,31 @@ ui_timepicker_base_get_format(const struct ui_timepicker_base *timepicker,
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_timepicker_mock_fail = 0;
+
+/**
+ * @brief mock_timepicker_get_formatted_time.
+ * @param tp Parameter tp.
+ * @param h Parameter h.
+ * @param m Parameter m.
+ * @param p Parameter p.
+ * @return Return value.
+ */
+static ui_error_t
+mock_timepicker_get_formatted_time(const struct ui_timepicker_base *tp, int *h,
+                                   int *m, enum ui_timepicker_period *p) {
+  if (g_timepicker_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_timepicker_base_get_formatted_time)(tp, h, m, p);
+}
+#undef ui_timepicker_base_get_formatted_time
+/** @cond */
+#define ui_timepicker_base_get_formatted_time mock_timepicker_get_formatted_time
+/** @endcond */
+#endif
+
 ui_error_t
 ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
                                    char **out_string) {
@@ -295,15 +320,15 @@ ui_timepicker_base_get_time_string(const struct ui_timepicker_base *timepicker,
   enum ui_timepicker_period p;
   char *buf = NULL;
   size_t required_size;
+  ui_error_t rc;
 
   if (!timepicker || !out_string) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
-    (void)rc_cleanup;
+  rc = ui_timepicker_base_get_formatted_time(timepicker, &h, &m, &p);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
   /* get_formatted_time only fails on null arguments, which we guaranteed above
    */

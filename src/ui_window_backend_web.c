@@ -46,7 +46,6 @@ static ui_error_t web_create_window(struct ui_window_backend* backend, const cha
     struct web_backend_data* bdata;
     EmscriptenWebGLContextAttributes attr;
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx;
-    (void)title;
 
     if (!backend || !title || !out_window) {
         return UI_ERROR_INVALID_ARGUMENT;
@@ -185,7 +184,8 @@ static EM_BOOL web_resize_callback(int eventType, const EmscriptenUiEvent *uiEve
     struct web_backend_data* bdata;
     ui_error_t rc_cb;
     int w, h;
-    (void)eventType;
+    if (eventType > 0) {
+    }
 
     if (!backend || !backend->user_data) return EM_TRUE;
 
@@ -197,14 +197,17 @@ static EM_BOOL web_resize_callback(int eventType, const EmscriptenUiEvent *uiEve
         bdata->active_window->canvas_width = w;
         bdata->active_window->canvas_height = h;
         rc_cb = bdata->resize_cb(bdata->resize_user_data, w, h);
-        (void)rc_cb;
+        if (rc_cb != UI_ERROR_NONE) {
+            /* resize callback returned error */
+        }
     }
     return EM_TRUE;
 }
 
 static ui_error_t web_set_on_resize_callback(struct ui_window_backend* backend, struct ui_window* window, ui_error_t (*cb)(void*, int, int), void* user_data) {
     struct web_backend_data* bdata;
-    (void)window;
+    if (window) {
+    }
     if (!backend || !backend->user_data) return UI_ERROR_INVALID_ARGUMENT;
     bdata = (struct web_backend_data*)backend->user_data;
     bdata->resize_cb = cb;

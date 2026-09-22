@@ -18,9 +18,7 @@ ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image) {
   if (!str || !out_image)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    skip_whitespace(&str);
-  }
+  { skip_whitespace(&str); }
   out_image->type = UI_CSS_IMAGE_NONE;
 
   if (strcmp(str, "none") == 0) {
@@ -54,47 +52,27 @@ ui_error_t ui_css_parse_image(const char *str, struct ui_css_image *out_image) {
     out_image->type = UI_CSS_IMAGE_LINEAR_GRADIENT;
     out_image->data.linear_gradient.angle = 180.0f; /* default to bottom */
     out_image->data.linear_gradient.stop_count = 2; /* mock 2 stops */
-    {
-      ui_error_t image_color_rc = ui_css_parse_color(
-          "black", &out_image->data.linear_gradient.stops[0].color);
-      (void)image_color_rc;
-    }
-    {
-      ui_error_t image_color_rc = ui_css_parse_color(
-          "white", &out_image->data.linear_gradient.stops[1].color);
-      (void)image_color_rc;
-    }
+    ui_css_parse_color("black",
+                       &out_image->data.linear_gradient.stops[0].color);
+    ui_css_parse_color("white",
+                       &out_image->data.linear_gradient.stops[1].color);
     return UI_ERROR_NONE;
   } else if (strncmp(str, "radial-gradient(", 16) == 0 ||
              strncmp(str, "repeating-radial-gradient(", 26) == 0) {
     out_image->type = UI_CSS_IMAGE_RADIAL_GRADIENT;
     out_image->data.radial_gradient.stop_count = 2;
-    {
-      ui_error_t image_color_rc = ui_css_parse_color(
-          "black", &out_image->data.radial_gradient.stops[0].color);
-      (void)image_color_rc;
-    }
-    {
-      ui_error_t image_color_rc = ui_css_parse_color(
-          "white", &out_image->data.radial_gradient.stops[1].color);
-      (void)image_color_rc;
-    }
+    ui_css_parse_color("black",
+                       &out_image->data.radial_gradient.stops[0].color);
+    ui_css_parse_color("white",
+                       &out_image->data.radial_gradient.stops[1].color);
     return UI_ERROR_NONE;
   } else if (strncmp(str, "conic-gradient(", 15) == 0 ||
              strncmp(str, "repeating-conic-gradient(", 25) == 0) {
     out_image->type = UI_CSS_IMAGE_CONIC_GRADIENT;
     out_image->data.conic_gradient.angle = 0.0f;
     out_image->data.conic_gradient.stop_count = 2;
-    {
-      ui_error_t image_color_rc = ui_css_parse_color(
-          "black", &out_image->data.conic_gradient.stops[0].color);
-      (void)image_color_rc;
-    }
-    {
-      ui_error_t image_color_rc = ui_css_parse_color(
-          "white", &out_image->data.conic_gradient.stops[1].color);
-      (void)image_color_rc;
-    }
+    ui_css_parse_color("black", &out_image->data.conic_gradient.stops[0].color);
+    ui_css_parse_color("white", &out_image->data.conic_gradient.stops[1].color);
     return UI_ERROR_NONE;
   } else if (strncmp(str, "image-set(", 10) == 0 ||
              strncmp(str, "-webkit-image-set(", 18) == 0) {
@@ -146,9 +124,7 @@ ui_error_t ui_css_parse_clip_path(const char *str,
   if (!str || !out_clip_path)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    skip_whitespace(&str);
-  }
+  { skip_whitespace(&str); }
   out_clip_path->geometry_box = UI_CSS_GEOMETRY_BOX_NONE;
   out_clip_path->shape.type = UI_CSS_BASIC_SHAPE_NONE;
   out_clip_path->shape.arguments[0] = '\0';
@@ -181,9 +157,7 @@ ui_error_t ui_css_parse_clip_path(const char *str,
     return UI_ERROR_PARSE_FAILED;
   }
 
-  {
-    parse_geometry_box(str, &out_clip_path->geometry_box);
-  }
+  { parse_geometry_box(str, &out_clip_path->geometry_box); }
 
   if (strstr(str, "inset(")) {
     out_clip_path->shape.type = UI_CSS_BASIC_SHAPE_INSET;
@@ -229,9 +203,7 @@ ui_error_t ui_css_parse_mask(const char *str,
   if (!str || !out_mask)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-    skip_whitespace(&str);
-  }
+  { skip_whitespace(&str); }
 
   /* Initialize with defaults */
   out_mask->image.type = UI_CSS_IMAGE_NONE;
@@ -261,9 +233,7 @@ ui_error_t ui_css_parse_mask(const char *str,
   else
     out_mask->composite = UI_CSS_MASK_COMPOSITE_ADD;
 
-  {
-    parse_geometry_box(str, &out_mask->clip);
-  }
+  { parse_geometry_box(str, &out_mask->clip); }
   out_mask->origin = out_mask->clip; /* In real parsing they are separate */
 
   /* Try parsing an image */
@@ -288,7 +258,9 @@ ui_error_t ui_css_parse_mask(const char *str,
       {
         ui_error_t mask_img_rc =
             ui_css_parse_image(img_start, &out_mask->image);
-        (void)mask_img_rc;
+        if (mask_img_rc != UI_ERROR_NONE) {
+          return mask_img_rc;
+        }
       }
     }
   }

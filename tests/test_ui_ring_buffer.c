@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "../include/ui_ring_buffer.h"
 #include "../include/ui_thread_pool.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,9 +99,7 @@ static int run_normal_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   rb = NULL;
 
@@ -115,40 +114,30 @@ static int run_normal_tests(void) {
     /* push 5 */
     for (i = 0; i < 5; i++) {
       ui_error_t rc_cleanup = ui_ring_buffer_push(rb, &bytes[i]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     /* pop 5 */
     for (i = 0; i < 5; i++) {
       ui_error_t rc_cleanup = ui_ring_buffer_pop(rb, &out_byte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     /* buffer head is now at 5. push 7 to cause wrap around */
     for (i = 0; i < 7; i++) {
       ui_error_t rc_cleanup = ui_ring_buffer_push(rb, &bytes[i]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     /* pop 7 */
     for (i = 0; i < 7; i++) {
       {
         ui_error_t rc_cleanup = ui_ring_buffer_pop(rb, &out_byte);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       if (out_byte != bytes[i])
         return 1;
     }
     {
       ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     rb = NULL;
   }
@@ -163,9 +152,7 @@ static int run_normal_tests(void) {
       {
         ui_error_t rc_cleanup =
             ui_thread_pool_schedule(pool, thread_task_push_spsc, rb);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       for (i = 0; i < 20; i++) {
         while (ui_ring_buffer_pop(rb, &test_val) == UI_ERROR_QUEUE_EMPTY) {
@@ -176,17 +163,13 @@ static int run_normal_tests(void) {
       }
       {
         ui_error_t rc_cleanup = ui_thread_pool_destroy(pool);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
     if (rb) {
       {
         ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       rb = NULL;
     }
@@ -203,9 +186,7 @@ static int run_normal_tests(void) {
         {
           ui_error_t rc_cleanup =
               ui_thread_pool_schedule(pool, thread_task_push_mp, rb);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
       }
       while (pop_count < 40) {
@@ -215,17 +196,13 @@ static int run_normal_tests(void) {
       }
       {
         ui_error_t rc_cleanup = ui_thread_pool_destroy(pool);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
     if (rb) {
       {
         ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       rb = NULL;
     }
@@ -242,9 +219,7 @@ static int run_normal_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_ring_buffer_create(sizeof(int), 3, &rb);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (ui_ring_buffer_push(NULL, &test_val) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
@@ -261,11 +236,38 @@ static int run_normal_tests(void) {
   if (ui_ring_buffer_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_ring_buffer_mock_load_fail_countdown;
+    extern int g_ring_buffer_mock_cas_fail;
+
+    g_ring_buffer_mock_load_fail_countdown = 0;
+    if (ui_ring_buffer_push(rb, &test_val) != UI_ERROR_UNKNOWN)
+      return 1;
+
+    g_ring_buffer_mock_load_fail_countdown = 1;
+    if (ui_ring_buffer_push(rb, &test_val) != UI_ERROR_UNKNOWN)
+      return 1;
+
+    g_ring_buffer_mock_load_fail_countdown = 0;
+    if (ui_ring_buffer_pop(rb, &test_val) != UI_ERROR_UNKNOWN)
+      return 1;
+
+    g_ring_buffer_mock_load_fail_countdown = 1;
+    if (ui_ring_buffer_pop(rb, &test_val) != UI_ERROR_UNKNOWN)
+      return 1;
+
+    g_ring_buffer_mock_cas_fail = 1;
+    if (ui_ring_buffer_push_mp(rb, &test_val) != UI_ERROR_UNKNOWN)
+      return 1;
+    g_ring_buffer_mock_cas_fail = 0;
+    g_ring_buffer_mock_load_fail_countdown = -1;
+  }
+#endif
+
   {
     ui_error_t rc_cleanup = ui_ring_buffer_destroy(rb);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;

@@ -58,12 +58,9 @@ static ui_error_t
 /**
  * @brief trigger_cva_change.
  * @param control Parameter control.
- * @param active_button Parameter active_button.
  * @return Return value.
  */
-trigger_cva_change(struct ui_segmented_control_base *control,
-                   struct ui_segmented_button_base *active_button) {
-  (void)active_button;
+trigger_cva_change(struct ui_segmented_control_base *control) {
   if (control->cva_on_change) {
     union ui_signal_payload payload;
     int i;
@@ -271,17 +268,19 @@ ui_segmented_control_base_create(struct ui_segmented_control_base **out_control,
  */
 ui_error_t
 ui_segmented_control_base_destroy(struct ui_segmented_control_base *control) {
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!control) {
     return UI_ERROR_NONE;
   }
   if (control->component) {
-    (void)ui_component_destroy(control->component);
+    rc = ui_component_destroy(control->component);
   }
   if (control->buttons) {
     C_MULTIPLATFORM_FREE(control->buttons);
   }
   C_MULTIPLATFORM_FREE(control);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -417,14 +416,16 @@ ui_segmented_button_base_create(struct ui_segmented_button_base **out_button) {
  */
 ui_error_t
 ui_segmented_button_base_destroy(struct ui_segmented_button_base *button) {
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!button) {
     return UI_ERROR_NONE;
   }
   if (button->component) {
-    (void)ui_component_destroy(button->component);
+    rc = ui_component_destroy(button->component);
   }
   C_MULTIPLATFORM_FREE(button);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -480,7 +481,7 @@ ui_segmented_button_base_set_selected(struct ui_segmented_button_base *button,
           }
         }
       }
-      return trigger_cva_change(button->parent, button);
+      return trigger_cva_change(button->parent);
     }
   }
 

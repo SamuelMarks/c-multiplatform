@@ -10,8 +10,10 @@
 static ui_error_t mock_factory(const struct ui_property_row *row,
                                void *user_data,
                                struct ui_component **out_comp) {
-  (void)row;
-  (void)user_data;
+  if (row) {
+  }
+  if (user_data) {
+  }
   *out_comp = NULL; /* Mock */
   return UI_ERROR_NONE;
 }
@@ -150,7 +152,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   printf("Test passed!\n");

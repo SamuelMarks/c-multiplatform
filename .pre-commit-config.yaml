@@ -73,6 +73,16 @@ repos:
     - thread_task_*
     - async_task_*
     - force_depth_error
+  - id: check-no-discard-void-clang
+    name: Check no-discard void casts (libclang)
+    entry: python -c "import sys; sys.argv[0]='check_no_discard_void_clang.py';
+      import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/refs/heads/master/precommit_hooks/check_no_discard_void_clang.py').read())"
+    language: python
+    types_or:
+    - c
+    - c++
+    additional_dependencies:
+    - libclang
   - id: cppcheck
     name: Cppcheck
     entry: python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/SamuelMarks/c-ci/master/precommit_matrix.py').read())"

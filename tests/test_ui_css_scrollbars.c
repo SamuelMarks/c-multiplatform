@@ -103,6 +103,26 @@ int main(void) {
   test_parse_scrollbar_width();
   test_parse_scrollbar_color();
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_scrollbars_mock_fail;
+    enum ui_css_scrollbar_width width;
+    struct ui_css_scrollbar_color color;
+
+    g_scrollbars_mock_fail = 1;
+    TEST_ASSERT(ui_css_parse_scrollbar_width("auto", &width) ==
+                UI_ERROR_UNKNOWN);
+    TEST_ASSERT(ui_css_parse_scrollbar_color("auto", &color) ==
+                UI_ERROR_UNKNOWN);
+    g_scrollbars_mock_fail = 0;
+
+    g_scrollbars_mock_fail = 2;
+    TEST_ASSERT(ui_css_parse_scrollbar_color("red blue", &color) ==
+                UI_ERROR_UNKNOWN);
+    g_scrollbars_mock_fail = 0;
+  }
+#endif
+
   printf("test_ui_css_scrollbars passed\n");
   return 0;
 }

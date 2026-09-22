@@ -258,6 +258,7 @@ ui_intersection_observer_evaluate(struct ui_intersection_observer *observer) {
   int cross_threshold;
   float current_ratio;
   int is_intersecting;
+  ui_error_t cb_rc;
 
   if (observer == NULL) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -308,8 +309,12 @@ ui_intersection_observer_evaluate(struct ui_intersection_observer *observer) {
   }
 
   if (entry_count > 0) {
-    (void)observer->callback(observer, entries, entry_count,
-                             observer->user_data);
+    cb_rc =
+        observer->callback(observer, entries, entry_count, observer->user_data);
+    if (cb_rc != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(entries);
+      return cb_rc;
+    }
   }
 
   C_MULTIPLATFORM_FREE(entries);

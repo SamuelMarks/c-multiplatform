@@ -12,6 +12,7 @@ A high-performance, strictly-compliant **ANSI C (C89 / ISO C90)** multiplatform 
 ## Table of Contents
 
 - [0. Project Overview & Competitor Landscape](#0-project-overview--competitor-landscape)
+  - [Shared C Ecosystem Architecture](#shared-c-ecosystem-architecture)
   - [The Lingua Franca of FFI](#the-lingua-franca-of-ffi)
   - [Competitor Comparison Matrix](#competitor-comparison-matrix)
 - [1. Target Platforms](#1-target-platforms)
@@ -50,6 +51,47 @@ The engine provides:
 - A comprehensive, unstyled **Component Development Kit (CDK)** delivering accessible behavioral primitives (Dialogs, Sliders, Dropdowns, Focus Traps, Virtual Grids).
 - An **Inspectable Real DOM** for the Web target, ensuring accessibility and browser integration that canvas-based frameworks destroy.
 - **Runtime-Defined Widgets with AoT Ejection**, enabling applications to load dynamic schemas at runtime and compile them into raw C89 code with zero interpretation overhead.
+
+### Shared C Ecosystem Architecture
+
+`c-multiplatform` is part of a broader, cohesive ecosystem of strict ANSI C (C89) libraries designed for universal cross-platform software engineering. Rather than operating in isolation, frontend user interfaces built with **`c-multiplatform`** and backend microservices or APIs built with **`c-rest-framework`** share the exact same foundational C libraries. Both frameworks share identical abstractions for networking, relational persistence, filesystem operations, and zero-copy string primitives—allowing complete full-stack development in portable C89 across modern and legacy platforms alike.
+
+```mermaid
+flowchart TD
+    classDef default fill:none,stroke:#888,stroke-width:1px;
+
+    CMP["c-multiplatform"]
+    CRF["c-rest-framework"]
+
+    HTTP["c-abstract-http"]
+    FS["c-fs"]
+    ORM["c-orm"]
+
+    UTILS["c89stringutils"]
+    SPAN["c-str-span"]
+
+    CMP ~~~ HTTP
+    CMP ~~~ FS
+    CMP ~~~ ORM
+
+    CRF ~~~ HTTP
+    CRF ~~~ FS
+    CRF ~~~ ORM
+
+    HTTP ~~~ UTILS
+    FS ~~~ UTILS
+    ORM ~~~ SPAN
+```
+
+| Name | Description | CI shield |
+| :--- | :--- | :--- |
+| [c-abstract-http](https://github.com/SamuelMarks/c-abstract-http) | HTTP/HTTPS client interface reusing abstractions for Windows (WinHTTP,WinINet), macOS (CommonCrypto), iOS, Android, GTK+4 (libsoup), with fallback to libcurl | [![CI](https://github.com/SamuelMarks/c-abstract-http/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-abstract-http/actions/workflows/ci.yml) |
+| [c-fs](https://github.com/SamuelMarks/c-fs) | std::filesystem inspired interface for C89 (MSVC2005, Cygwin, MSVC2026, Linux, macOS, etc.) | [![CI](https://github.com/SamuelMarks/c-fs/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-fs/actions/workflows/ci.yml) |
+| [c-multiplatform](https://github.com/SamuelMarks/c-multiplatform) | Cross platform GUI framework in ANSI C (C89), native for: Windows (GDI+); Linux (GTK+4); macOS (Cocoa); iOS; Android; web (WASM). Material 3. | [![CI](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-multiplatform/actions/workflows/ci.yml) |
+| [c-orm](https://github.com/SamuelMarks/c-orm) | (PostgreSQL, SQLite, MySQL) ORM for C. Alembic/diesel style schema migration support. VERY portable. | [![CI](https://github.com/SamuelMarks/c-orm/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-orm/actions/workflows/ci.yml) |
+| [c-rest-framework](https://github.com/SamuelMarks/c-rest-framework) | C REST Framework with builtin ORM (PostgreSQL, SQLite, MySQL) native on DOS, Cygwin, Windows, Linux, macOS, etc. | [![CI](https://github.com/SamuelMarks/c-rest-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-rest-framework/actions/workflows/ci.yml) |
+| [c-str-span](https://github.com/SamuelMarks/c-str-span) | UTF-8 replacement for C strings, supporting zero-copy use-cases (non-null-terminated). | [![CI](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml/badge.svg)](https://github.com/SamuelMarks/c-str-span/actions/workflows/ci.yml) |
+| [c89stringutils](https://github.com/offscale/c89stringutils) | string functions from newer standards / common non-standards for C89 | [![CI](https://github.com/offscale/c89stringutils/actions/workflows/ci.yml/badge.svg)](https://github.com/offscale/c89stringutils/actions/workflows/ci.yml) |
 
 ### The Lingua Franca of FFI
 

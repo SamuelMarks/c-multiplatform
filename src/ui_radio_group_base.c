@@ -14,6 +14,75 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_radio_group_mock_is_checked_fail = 0;
+int g_radio_group_mock_set_checked_fail = 0;
+int g_radio_group_mock_set_checked_uncheck_fail = 0;
+int g_radio_group_mock_set_on_change_fail = 0;
+
+/**
+ * @brief mock_radio_group_toggle_is_checked.
+ * @param toggle Toggle pointer.
+ * @param out_is_checked Out pointer.
+ * @return Return value.
+ */
+static ui_error_t
+mock_radio_group_toggle_is_checked(const struct ui_toggle_base *toggle,
+                                   int *out_is_checked) {
+  if (g_radio_group_mock_is_checked_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_toggle_base_is_checked)(toggle, out_is_checked);
+}
+#undef ui_toggle_base_is_checked
+/** @cond */
+#define ui_toggle_base_is_checked mock_radio_group_toggle_is_checked
+/** @endcond */
+
+/**
+ * @brief mock_radio_group_toggle_set_checked.
+ * @param toggle Toggle pointer.
+ * @param checked Checked state.
+ * @return Return value.
+ */
+static ui_error_t
+mock_radio_group_toggle_set_checked(struct ui_toggle_base *toggle,
+                                    int checked) {
+  if (g_radio_group_mock_set_checked_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (!checked && g_radio_group_mock_set_checked_uncheck_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_toggle_base_set_checked)(toggle, checked);
+}
+#undef ui_toggle_base_set_checked
+/** @cond */
+#define ui_toggle_base_set_checked mock_radio_group_toggle_set_checked
+/** @endcond */
+
+/**
+ * @brief mock_radio_group_toggle_set_on_change.
+ * @param toggle Toggle pointer.
+ * @param on_change Callback.
+ * @param user_data User data.
+ * @return Return value.
+ */
+static ui_error_t
+mock_radio_group_toggle_set_on_change(struct ui_toggle_base *toggle,
+                                      ui_toggle_on_change_t on_change,
+                                      void *user_data) {
+  if (g_radio_group_mock_set_on_change_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_toggle_base_set_on_change)(toggle, on_change, user_data);
+}
+#undef ui_toggle_base_set_on_change
+/** @cond */
+#define ui_toggle_base_set_on_change mock_radio_group_toggle_set_on_change
+/** @endcond */
+#endif
+
 /**
  * @struct ui_radio_group_base
  * \brief Internal structure representing a radio group.
@@ -100,15 +169,9 @@ static ui_error_t radio_group_cva_write_value(void *component,
   index = value.int_val;
 
   if (index >= 0 && index < (int)group->count) {
-    ui_error_t _ign_rc =
-        ui_radio_group_base_set_active(group, group->toggles[index]);
-    (void)_ign_rc;
-  } else {
-    ui_error_t _ign_rc = ui_radio_group_base_set_active(group, NULL);
-    (void)_ign_rc;
+    return ui_radio_group_base_set_active(group, group->toggles[index]);
   }
-
-  return UI_ERROR_NONE;
+  return ui_radio_group_base_set_active(group, NULL);
 }
 
 /**
@@ -224,14 +287,17 @@ static ui_error_t on_child_toggle_change(struct ui_toggle_base *toggle,
 
   /* An item was checked. Ensure all others are unchecked. */
   for (i = 0; i < group->count; ++i) {
-    int is_checked = 0;
+    int child_checked = 0;
     if (group->toggles[i] != toggle) {
-      ui_error_t _ign_rc =
-          ui_toggle_base_is_checked(group->toggles[i], &is_checked);
-      (void)_ign_rc;
-      if (is_checked) {
-        ui_error_t _ign_rc2 = ui_toggle_base_set_checked(group->toggles[i], 0);
-        (void)_ign_rc2;
+      rc = ui_toggle_base_is_checked(group->toggles[i], &child_checked);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
+      if (child_checked) {
+        rc = ui_toggle_base_set_checked(group->toggles[i], 0);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
       }
     }
   }
@@ -308,21 +374,25 @@ ui_radio_group_base_create(struct ui_radio_group_base **out_group,
  */
 ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group) {
   size_t i;
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!group)
     return UI_ERROR_NONE;
 
   /* Unhook callbacks to prevent dangling pointers */
   for (i = 0; i < group->count; ++i) {
-    ui_error_t _ign_rc =
-        ui_toggle_base_set_on_change(group->toggles[i], NULL, NULL);
-    (void)_ign_rc;
+    rc_cleanup = ui_toggle_base_set_on_change(group->toggles[i], NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
 
   if (group->toggles) {
     C_MULTIPLATFORM_FREE(group->toggles);
   }
   C_MULTIPLATFORM_FREE(group);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -335,6 +405,8 @@ ui_error_t ui_radio_group_base_destroy(struct ui_radio_group_base *group) {
 ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
                                           struct ui_toggle_base *toggle) {
   size_t i;
+  int is_checked = 0;
+  ui_error_t rc;
 
   if (!group || !toggle)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -359,21 +431,20 @@ ui_error_t ui_radio_group_base_add_toggle(struct ui_radio_group_base *group,
   }
 
   group->toggles[group->count++] = toggle;
-  {
-    ui_error_t _ign_rc =
-        ui_toggle_base_set_on_change(toggle, on_child_toggle_change, group);
-    (void)_ign_rc;
+  rc = ui_toggle_base_set_on_change(toggle, on_child_toggle_change, group);
+  if (rc != UI_ERROR_NONE) {
+    group->count--;
+    return rc;
   }
 
-  {
-    int is_checked = 0;
-    ui_error_t _ign_rc = ui_toggle_base_is_checked(toggle, &is_checked);
-    (void)_ign_rc;
-    if (is_checked) {
-      ui_error_t rc_toggle = on_child_toggle_change(toggle, 1, group);
-      if (rc_toggle != UI_ERROR_NONE) {
-        return rc_toggle;
-      }
+  rc = ui_toggle_base_is_checked(toggle, &is_checked);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  if (is_checked) {
+    rc = on_child_toggle_change(toggle, 1, group);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 
@@ -391,6 +462,7 @@ ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
                                              struct ui_toggle_base *toggle) {
   size_t i;
   int found = -1;
+  ui_error_t rc;
 
   if (!group || !toggle)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -405,9 +477,9 @@ ui_error_t ui_radio_group_base_remove_toggle(struct ui_radio_group_base *group,
   if (found < 0)
     return UI_ERROR_NOT_FOUND;
 
-  {
-    ui_error_t _ign_rc = ui_toggle_base_set_on_change(toggle, NULL, NULL);
-    (void)_ign_rc;
+  rc = ui_toggle_base_set_on_change(toggle, NULL, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (group->active_toggle == toggle) {
@@ -434,6 +506,7 @@ ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
                                           struct ui_toggle_base *toggle) {
   size_t i;
   int valid_toggle = 0;
+  ui_error_t rc;
 
   if (!group)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -451,16 +524,21 @@ ui_error_t ui_radio_group_base_set_active(struct ui_radio_group_base *group,
 
   for (i = 0; i < group->count; ++i) {
     if (group->toggles[i] == toggle) {
-      ui_error_t _ign_rc = ui_toggle_base_set_checked(group->toggles[i], 1);
-      (void)_ign_rc;
+      rc = ui_toggle_base_set_checked(group->toggles[i], 1);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
     } else {
       int is_checked = 0;
-      ui_error_t _ign_rc =
-          ui_toggle_base_is_checked(group->toggles[i], &is_checked);
-      (void)_ign_rc;
+      rc = ui_toggle_base_is_checked(group->toggles[i], &is_checked);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
+      }
       if (is_checked) {
-        ui_error_t _ign_rc2 = ui_toggle_base_set_checked(group->toggles[i], 0);
-        (void)_ign_rc2;
+        rc = ui_toggle_base_set_checked(group->toggles[i], 0);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
       }
     }
   }

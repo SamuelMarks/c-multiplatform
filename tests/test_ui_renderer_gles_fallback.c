@@ -90,6 +90,8 @@ int main(void) {
     renderer.vtable->pop_clip(NULL);
 
     renderer.vtable->set_blend_mode(NULL, UI_CSS_BLEND_MODE_NORMAL);
+    renderer.vtable->set_blend_mode(renderer.ctx, (enum ui_css_blend_mode)999);
+    renderer.vtable->set_blend_mode(renderer.ctx, (enum ui_css_blend_mode) - 1);
 
     renderer.vtable->set_shadow(NULL, NULL);
 

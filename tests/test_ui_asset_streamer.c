@@ -25,13 +25,11 @@ static ui_error_t sleep_ms(int ms) {
 
 static void wait_tick(struct ui_execution_context *ctx,
                       struct ui_thread_pool *pool) {
-#ifdef UI_SINGLE_THREADED
   if (pool) {
+#ifdef UI_SINGLE_THREADED
     ui_thread_pool_tick(pool);
-  }
-#else
-  (void)pool;
 #endif
+  }
   ui_execution_context_tick(ctx);
   sleep_ms(10);
 }
@@ -61,7 +59,9 @@ static ui_error_t on_reject(ui_error_t err, void *user_data,
                             void **out_result) {
   int *completed = (int *)user_data;
   *completed = -1; /* -1 means rejected */
-  (void)err;
+  if (err != UI_ERROR_NONE) {
+    /* Expected rejected error */
+  }
   return UI_ERROR_NONE;
 }
 
@@ -100,7 +100,7 @@ static int test_successful_load(void) {
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     ui_thread_pool_destroy(pool);
@@ -113,13 +113,13 @@ static int test_successful_load(void) {
     {
       ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     ui_thread_pool_destroy(pool);
@@ -138,19 +138,19 @@ static int test_successful_load(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_thread_pool_destroy(pool);
@@ -183,7 +183,7 @@ static int test_failed_load(void) {
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     ui_thread_pool_destroy(pool);
@@ -196,13 +196,13 @@ static int test_failed_load(void) {
     {
       ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     {
       ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     ui_thread_pool_destroy(pool);
@@ -221,19 +221,19 @@ static int test_failed_load(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_thread_pool_destroy(pool);
@@ -253,8 +253,8 @@ static int test_edge_cases(void) {
   /* NULL arguments */
   {
     ui_error_t rc_cleanup = ui_asset_streamer_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
     }
   }
   ui_asset_destroy(NULL);
@@ -291,7 +291,7 @@ static int test_edge_cases(void) {
       {
         ui_error_t rc_cleanup = ui_asset_streamer_destroy(test_streamer);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
       break;
@@ -342,7 +342,7 @@ static int test_edge_cases(void) {
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
       if (completed == 1) {
@@ -375,7 +375,7 @@ static int test_edge_cases(void) {
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
       assert(completed == -1); /* Must reject */
@@ -400,7 +400,7 @@ static int test_edge_cases(void) {
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
     }
@@ -441,7 +441,7 @@ static int test_edge_cases(void) {
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
     }
@@ -459,7 +459,7 @@ static int test_edge_cases(void) {
       {
         ui_error_t rc_cleanup = ui_promise_destroy(p);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
     }
@@ -472,28 +472,139 @@ static int test_edge_cases(void) {
   {
     ui_error_t rc_cleanup = ui_asset_streamer_destroy(streamer);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_thread_pool_destroy(pool);
 
 #ifdef UI_TEST_MOCK_ALLOC
   extern ui_error_t run_asset_streamer_coverage(void);
-  run_asset_streamer_coverage();
+  if (run_asset_streamer_coverage() != UI_ERROR_NONE) {
+    return 1;
+  }
 #endif
   return 0;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+static int test_mock_failures(void) {
+  struct ui_thread_pool *pool = NULL;
+  struct ui_execution_context *ctx = NULL;
+  struct ui_asset_streamer *streamer = NULL;
+  struct ui_promise *promise = NULL;
+  FILE *f = NULL;
+  ui_error_t rc;
+  extern int g_asset_streamer_mock_fail;
+
+#if defined(_MSC_VER)
+  fopen_s(&f, "test_mock_asset.txt", "wb");
+#else
+  f = fopen("test_mock_asset.txt", "wb");
+#endif
+  if (f) {
+    fwrite("mock_data", 1, 9, f);
+    fclose(f);
+  }
+
+  rc = ui_thread_pool_create(1, &pool);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  rc = ui_execution_context_create(&ctx);
+  if (rc != UI_ERROR_NONE) {
+    ui_thread_pool_destroy(pool);
+    return 1;
+  }
+  rc = ui_asset_streamer_create(pool, ctx, &streamer);
+  if (rc != UI_ERROR_NONE) {
+    ui_execution_context_destroy(ctx);
+    ui_thread_pool_destroy(pool);
+    return 1;
+  }
+
+  /* 1. Test mock_thread_pool_schedule failure (g_asset_streamer_mock_fail = 4)
+   */
+  g_asset_streamer_mock_fail = 4;
+  rc = ui_asset_streamer_request(streamer, "test_mock_asset.txt",
+                                 UI_ASSET_TYPE_TEXT, &promise);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return 1;
+  }
+  g_asset_streamer_mock_fail = 0;
+
+  /* 2. Test mock_promise_destroy failure during request cleanup
+   * (g_asset_streamer_mock_fail = 3) */
+  g_asset_streamer_mock_fail = 3;
+  g_malloc_fail_countdown =
+      1; /* fail malloc of task so it goes to cleanup and destroys promise */
+  rc = ui_asset_streamer_request(streamer, "test_mock_asset.txt",
+                                 UI_ASSET_TYPE_TEXT, &promise);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return 1;
+  }
+  g_malloc_fail_countdown = -1;
+  g_asset_streamer_mock_fail = 0;
+
+  /* 3. Test mock_promise_resolve failure in asset_task_complete
+   * (g_asset_streamer_mock_fail = 1) */
+  g_asset_streamer_mock_fail = 1;
+  rc = ui_asset_streamer_request(streamer, "test_mock_asset.txt",
+                                 UI_ASSET_TYPE_TEXT, &promise);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  {
+    int wait_limit = 0;
+    while (++wait_limit < 100) {
+      wait_tick(ctx, pool);
+      sleep_ms(5);
+    }
+  }
+  ui_promise_destroy(promise);
+  promise = NULL;
+  g_asset_streamer_mock_fail = 0;
+
+  /* 4. Test mock_promise_reject failure in asset_task_complete
+   * (g_asset_streamer_mock_fail = 2) */
+  g_asset_streamer_mock_fail = 2;
+  rc = ui_asset_streamer_request(streamer, "non_existent_mock_file_9999.txt",
+                                 UI_ASSET_TYPE_TEXT, &promise);
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
+  {
+    int wait_limit = 0;
+    while (++wait_limit < 100) {
+      wait_tick(ctx, pool);
+      sleep_ms(5);
+    }
+  }
+  ui_promise_destroy(promise);
+  promise = NULL;
+  g_asset_streamer_mock_fail = 0;
+
+  remove("test_mock_asset.txt");
+
+  ui_asset_streamer_destroy(streamer);
+  ui_execution_context_destroy(ctx);
+  ui_thread_pool_destroy(pool);
+  return 0;
+}
+#endif
 
 int main(void) {
   int failed = 0;
   failed += run_test("test_successful_load", test_successful_load);
   failed += run_test("test_failed_load", test_failed_load);
   failed += run_test("test_edge_cases", test_edge_cases);
+#ifdef UI_TEST_MOCK_ALLOC
+  failed += run_test("test_mock_failures", test_mock_failures);
+#endif
   return failed == 0 ? 0 : 1;
 }

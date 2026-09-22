@@ -9,11 +9,65 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_webview_mock_fail = 0;
+
 /**
- * @struct ui_webview_base
- * @struct ui_webview_base
- * @brief Internal state for the webview base component.
+ * @brief mock_webview_dom_node_set_tag_name.
+ * @param node Parameter node.
+ * @param tag Parameter tag.
+ * @return Return value.
  */
+static ui_error_t mock_webview_dom_node_set_tag_name(struct ui_dom_node *node,
+                                                     const char *tag) {
+  if (g_webview_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_set_tag_name(node, tag);
+}
+#undef ui_dom_node_set_tag_name
+/** @cond */
+#define ui_dom_node_set_tag_name mock_webview_dom_node_set_tag_name
+/** @endcond */
+
+/**
+ * @brief mock_webview_dom_node_set_attribute.
+ * @param node Parameter node.
+ * @param key Parameter key.
+ * @param val Parameter val.
+ * @return Return value.
+ */
+static ui_error_t mock_webview_dom_node_set_attribute(struct ui_dom_node *node,
+                                                      const char *key,
+                                                      const char *val) {
+  if (g_webview_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_set_attribute(node, key, val);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_webview_dom_node_set_attribute
+/** @endcond */
+
+/**
+ * @brief mock_webview_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_webview_component_destroy(struct ui_component *comp) {
+  if (g_webview_mock_fail == 3) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_webview_component_destroy
+/** @endcond */
+#endif
+
 struct ui_webview_base {
   struct ui_component *component;       /**< component */
   struct ui_signal *url_signal;         /**< url_signal */
@@ -41,36 +95,51 @@ ui_error_t ui_webview_base_create(struct ui_webview_base **out_webview) {
 
   rc = ui_component_create(&webview->component);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(webview);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    (void)ui_component_destroy(webview->component);
-    C_MULTIPLATFORM_FREE(webview);
-    return rc;
+    goto cleanup;
   }
 
-/** @cond */
-#define UI_DOM_SET_TAG_IGNORE(n, t) ui_dom_node_set_tag_name((n), (t))
-  /** @endcond */
-  (void)UI_DOM_SET_TAG_IGNORE(root_node, "iframe");
-/** @cond */
-#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
-  /** @endcond */
-  (void)UI_DOM_SET_ATTR_IGNORE(root_node, "role", "application");
+  rc = ui_dom_node_set_tag_name(root_node, "iframe");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
+
+  rc = ui_dom_node_set_attribute(root_node, "role", "application");
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
   webview->component->shadow_root = root_node;
+  root_node = NULL;
 
   *out_webview = webview;
   return UI_ERROR_NONE;
+
+cleanup:
+  if (root_node) {
+    ui_dom_node_destroy(root_node);
+  }
+  if (webview->component) {
+    ui_component_destroy(webview->component);
+  }
+  C_MULTIPLATFORM_FREE(webview);
+  return rc;
 }
 
 ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!webview) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  (void)ui_component_destroy(webview->component);
+  if (webview->component) {
+    ui_error_t rc_cleanup = ui_component_destroy(webview->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
+  }
   if (webview->current_url) {
     C_MULTIPLATFORM_FREE(webview->current_url);
   }
@@ -78,7 +147,7 @@ ui_error_t ui_webview_base_destroy(struct ui_webview_base *webview) {
     C_MULTIPLATFORM_FREE(webview->current_html);
   }
   C_MULTIPLATFORM_FREE(webview);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t ui_webview_base_get_component(struct ui_webview_base *webview,
@@ -189,7 +258,7 @@ ui_error_t ui_webview_base_dispatch_ipc_message(struct ui_webview_base *webview,
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (webview->ipc_callback) {
-    (void)webview->ipc_callback(webview, message, webview->ipc_user_data);
+    return webview->ipc_callback(webview, message, webview->ipc_user_data);
   }
   return UI_ERROR_NONE;
 }

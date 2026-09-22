@@ -21,6 +21,18 @@ int main(void) {
     return 1;
   }
 
+  rc = ui_haptics_trigger((enum ui_haptic_feedback_type) - 1);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    printf("Expected UI_ERROR_INVALID_ARGUMENT for negative haptics\n");
+    return 1;
+  }
+
+  rc = ui_haptics_trigger((enum ui_haptic_feedback_type)9999);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    printf("Expected UI_ERROR_INVALID_ARGUMENT for large haptics\n");
+    return 1;
+  }
+
   printf("test_ui_haptics passed\n");
   return 0;
 }

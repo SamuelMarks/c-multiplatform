@@ -15,11 +15,22 @@
 #include "ui_form_control.h"
 #include "ui_signal.h"
 #include "ui_dom_node.h"
+#include "ui_coercion_utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 /* clang-format on */
+
+extern int g_rtb_mock_registry_fail;
+extern int g_rtb_mock_format_fail;
+extern int g_rtb_mock_signal_get_fail;
+extern int g_rtb_mock_req_val_fail;
+extern int g_rtb_mock_pat_val_fail;
+extern int g_rtb_mock_min_val_fail;
+extern int g_rtb_mock_max_val_fail;
+extern ui_error_t ui_test_rtb_mock_format(char *dest, size_t dest_size,
+                                          const char *fmt);
 
 struct mock_comp_instance {
   char last_prop_key[64];
@@ -41,9 +52,12 @@ static ui_error_t
 mock_cva_reg_fail(void *instance,
                   ui_error_t (*callback)(union ui_signal_payload, void *),
                   void *ud) {
-  (void)instance;
-  (void)callback;
-  (void)ud;
+  if (instance) {
+  }
+  if (callback) {
+  }
+  if (ud) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -128,7 +142,8 @@ static ui_error_t mock_set_prop(void *instance, const char *key,
 
 static ui_error_t mock_get_cva(void *instance,
                                struct ui_control_value_accessor *out_cva) {
-  (void)instance;
+  if (instance) {
+  }
   if (s_mock_get_cva_fail) {
     return UI_ERROR_UNKNOWN;
   }
@@ -145,7 +160,8 @@ static ui_error_t mock_attach_event(void *instance, const char *event_name,
                                     ui_error_t (*callback)(void *user_data),
                                     void *user_data) {
   struct mock_comp_instance *inst = (struct mock_comp_instance *)instance;
-  (void)event_name;
+  if (event_name) {
+  }
   if (s_mock_attach_event_fail) {
     return UI_ERROR_UNKNOWN;
   }
@@ -157,8 +173,10 @@ static ui_error_t mock_attach_event(void *instance, const char *event_name,
 }
 
 static ui_error_t mock_append_child(void *instance, struct ui_dom_node *child) {
-  (void)instance;
-  (void)child;
+  if (instance) {
+  }
+  if (child) {
+  }
   s_mock_append_child_called++;
   if (s_mock_append_child_fail) {
     return UI_ERROR_UNKNOWN;
@@ -1045,6 +1063,201 @@ int main(void) {
 
   rc = ui_arena_destroy(arena);
   assert(rc == UI_ERROR_NONE);
+
+  /* Test mock failures */
+  {
+    struct ui_arena *mock_arena = NULL;
+    struct ui_runtime_node *node = NULL;
+    struct ui_dom_node *out_dom = NULL;
+    struct ui_runtime_validator_def val_req;
+    struct ui_runtime_validator_def val_pat;
+    struct ui_runtime_validator_def val_min;
+    struct ui_runtime_validator_def val_max;
+    struct ui_runtime_binding bind_cva;
+    struct ui_runtime_binding bind_text;
+    struct ui_runtime_binding bind_dis;
+    struct ui_runtime_binding bind_vis;
+    struct ui_dynamic_context *mock_ctx = NULL;
+    struct ui_app_state_registry *mock_app = NULL;
+    struct ui_form_builder *fb = NULL;
+    ui_form_group_t *fg = NULL;
+    struct ui_signal *sig_val = NULL;
+    union ui_signal_payload sp;
+    struct ui_dom_node *vp_dom = NULL;
+
+    assert(ui_arena_create(32768, &mock_arena) == UI_ERROR_NONE);
+    assert(ui_dynamic_context_create(mock_arena, &mock_ctx) == UI_ERROR_NONE);
+    assert(ui_app_state_registry_create(mock_arena, &mock_app) ==
+           UI_ERROR_NONE);
+
+    /* 1. ui_component_registry_get_default failure when registry == NULL */
+    node = (struct ui_runtime_node *)ui_arena_alloc(
+               mock_arena, sizeof(struct ui_runtime_node), 8, (void **)&node) ==
+                   UI_ERROR_NONE
+               ? node
+               : NULL;
+    memset(node, 0, sizeof(struct ui_runtime_node));
+    node->type = "ui_button_base";
+
+    g_rtb_mock_registry_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_registry_fail = 0;
+
+    /* Setup CVA node with validators */
+    assert(ui_form_builder_create(mock_arena, &fb) == UI_ERROR_NONE);
+    assert(ui_form_builder_group_start(fb, "u") == UI_ERROR_NONE);
+    sp.ptr_val = "abc";
+    assert(ui_form_builder_control(fb, "c", sp, UI_SIGNAL_TYPE_POINTER, NULL,
+                                   NULL) == UI_ERROR_NONE);
+    assert(ui_form_builder_group_end(fb) == UI_ERROR_NONE);
+    assert(ui_form_builder_build(fb, &fg) == UI_ERROR_NONE);
+    assert(ui_dynamic_context_register_form_group(mock_ctx, "u", fg) ==
+           UI_ERROR_NONE);
+
+    memset(&bind_cva, 0, sizeof(bind_cva));
+    bind_cva.type = UI_RUNTIME_BINDING_CVA;
+    bind_cva.source_path = "u.c";
+
+    memset(&val_req, 0, sizeof(val_req));
+    val_req.type = UI_RUNTIME_VALIDATOR_REQUIRED;
+
+    memset(&val_pat, 0, sizeof(val_pat));
+    val_pat.type = UI_RUNTIME_VALIDATOR_PATTERN;
+    val_pat.param = "[0-9]+";
+
+    memset(&val_min, 0, sizeof(val_min));
+    val_min.type = UI_RUNTIME_VALIDATOR_MIN_LENGTH;
+    val_min.int_param = 3;
+
+    memset(&val_max, 0, sizeof(val_max));
+    val_max.type = UI_RUNTIME_VALIDATOR_MAX_LENGTH;
+    val_max.int_param = 10;
+
+    node->type = "ui_input_base";
+    node->bindings = &bind_cva;
+
+    /* Fail required validator getter */
+    node->validators = &val_req;
+    g_rtb_mock_req_val_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_req_val_fail = 0;
+
+    /* Fail pattern validator getter */
+    node->validators = &val_pat;
+    g_rtb_mock_pat_val_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_pat_val_fail = 0;
+
+    /* Fail min_length validator getter */
+    node->validators = &val_min;
+    g_rtb_mock_min_val_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_min_val_fail = 0;
+
+    /* Fail max_length validator getter */
+    node->validators = &val_max;
+    g_rtb_mock_max_val_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_max_val_fail = 0;
+
+    node->validators = NULL;
+
+    /* Test signal get fail for BINDING_TEXT */
+    sp.int_val = 42;
+    assert(ui_signal_create(mock_arena, sp, UI_SIGNAL_TYPE_INT32, NULL, NULL,
+                            UI_SIGNAL_MODE_SINGLE_THREADED,
+                            &sig_val) == UI_ERROR_NONE);
+    assert(ui_dynamic_context_register_signal(mock_ctx, "sig42", sig_val) ==
+           UI_ERROR_NONE);
+
+    memset(&bind_text, 0, sizeof(bind_text));
+    bind_text.type = UI_RUNTIME_BINDING_TEXT;
+    bind_text.source_path = "sig42";
+    node->type = "ui_button_base";
+    node->bindings = &bind_text;
+
+    g_rtb_mock_signal_get_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_signal_get_fail = 0;
+
+    /* Test format fail for BINDING_TEXT */
+    sp.ptr_val = NULL;
+    sp.int_val = 0;
+    assert(ui_signal_set(sig_val, sp) == UI_ERROR_NONE);
+    g_rtb_mock_format_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_format_fail = 0;
+
+    /* Test signal get fail for BINDING_DISABLED */
+    memset(&bind_dis, 0, sizeof(bind_dis));
+    bind_dis.type = UI_RUNTIME_BINDING_DISABLED;
+    bind_dis.source_path = "sig42";
+    node->bindings = &bind_dis;
+
+    g_rtb_mock_signal_get_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_signal_get_fail = 0;
+
+    /* Test signal get fail for BINDING_VISIBILITY */
+    memset(&bind_vis, 0, sizeof(bind_vis));
+    bind_vis.type = UI_RUNTIME_BINDING_VISIBILITY;
+    bind_vis.source_path = "sig42";
+    node->bindings = &bind_vis;
+
+    g_rtb_mock_signal_get_fail = 1;
+    assert(ui_runtime_build_tree(node, NULL, mock_ctx, mock_app, NULL, NULL,
+                                 &out_dom) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_signal_get_fail = 0;
+
+    /* Test viewport dimension mock format failures */
+    assert(ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &vp_dom) ==
+           UI_ERROR_NONE);
+
+    /* Call 1 fail: style_buf */
+    g_rtb_mock_format_fail = 1;
+    assert(ui_runtime_preview_viewport_set_dimensions(vp_dom, 100, 100) ==
+           UI_ERROR_UNKNOWN);
+    g_rtb_mock_format_fail = 0;
+
+    /* Call 2 fail: w_buf */
+    g_rtb_mock_format_fail = 2;
+    assert(ui_runtime_preview_viewport_set_dimensions(vp_dom, 100, 100) ==
+           UI_ERROR_UNKNOWN);
+    g_rtb_mock_format_fail = 0;
+
+    /* Call 3 fail: h_buf */
+    g_rtb_mock_format_fail = 3;
+    assert(ui_runtime_preview_viewport_set_dimensions(vp_dom, 100, 100) ==
+           UI_ERROR_UNKNOWN);
+    g_rtb_mock_format_fail = 0;
+
+    /* Exercise mock_rtb_format invalid arguments and bounds */
+    {
+      char small_buf[2];
+      assert(ui_test_rtb_mock_format(NULL, 10, "test") ==
+             UI_ERROR_INVALID_ARGUMENT);
+      assert(ui_test_rtb_mock_format(small_buf, 0, "test") ==
+             UI_ERROR_INVALID_ARGUMENT);
+      assert(ui_test_rtb_mock_format(small_buf, sizeof(small_buf), NULL) ==
+             UI_ERROR_INVALID_ARGUMENT);
+      assert(ui_test_rtb_mock_format(small_buf, sizeof(small_buf),
+                                     "too_long_string") ==
+             UI_ERROR_OUT_OF_BOUNDS);
+    }
+
+    ui_dom_node_destroy(vp_dom);
+    ui_dynamic_context_destroy(mock_ctx);
+    ui_app_state_registry_destroy(mock_app);
+    ui_arena_destroy(mock_arena);
+  }
 
   run_builder_edge_and_mock_tests();
 

@@ -7,6 +7,9 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_promise_mock_destroy_fail;
+#endif
 
 static ui_error_t test_resolve_cb(void *result, void *user_data,
                                   void **out_result) {
@@ -43,8 +46,10 @@ static ui_error_t async_task_resolve(void *user_data) {
 
 static ui_error_t test_fail_resolve_cb(void *result, void *user_data,
                                        void **out_result) {
-  (void)result;
-  (void)user_data;
+  if (result) {
+  }
+  if (user_data) {
+  }
   if (out_result)
     *out_result = NULL;
   return UI_ERROR_UNKNOWN;
@@ -52,8 +57,11 @@ static ui_error_t test_fail_resolve_cb(void *result, void *user_data,
 
 static ui_error_t test_fail_reject_cb(ui_error_t error, void *user_data,
                                       void **out_result) {
-  (void)error;
-  (void)user_data;
+  if (user_data) {
+  }
+  if (error != UI_ERROR_NONE) {
+    /* handled rejection */
+  }
   if (out_result)
     *out_result = NULL;
   return UI_ERROR_UNKNOWN;
@@ -113,7 +121,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -147,7 +155,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -155,7 +163,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   finally_called = 0;
@@ -170,7 +178,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -178,7 +186,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   chained = promise;
@@ -194,7 +202,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -202,7 +210,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_promise_reject(promise, UI_ERROR_INVALID_ARGUMENT);
@@ -213,7 +221,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -221,7 +229,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_promise_then(promise, NULL, NULL, NULL, &chained);
@@ -235,7 +243,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -243,7 +251,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_promise_then(promise, NULL, NULL, NULL, &chained);
@@ -257,7 +265,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -265,7 +273,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_promise_then(promise, test_fail_resolve_cb, NULL, NULL, &chained);
@@ -277,7 +285,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -285,7 +293,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_promise_catch(promise, test_fail_reject_cb, NULL, &chained);
@@ -297,7 +305,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -305,7 +313,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_promise_finally(promise, test_finally_cb, &finally_called, &chained);
@@ -320,14 +328,14 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   ui_promise_finally(promise, test_finally_cb, &finally_called, &chained);
@@ -342,7 +350,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (ui_promise_create(NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -362,7 +370,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   if (ui_promise_get_state(promise, NULL) != UI_ERROR_INVALID_ARGUMENT)
@@ -370,7 +378,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -389,7 +397,7 @@ static int run_async_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -408,13 +416,13 @@ static int run_async_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_execution_context_destroy(ctx);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -440,7 +448,7 @@ static int run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   promise = NULL;
@@ -449,7 +457,7 @@ static int run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_create(&promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   g_malloc_fail_countdown = 0;
@@ -477,7 +485,7 @@ static int run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -485,7 +493,8 @@ static int run_oom_tests(void) {
 }
 
 static ui_error_t test_fail_finally_cb(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -536,12 +545,122 @@ static int test_bubbling_failure(void) {
   return 0;
 }
 
+static int test_more_bubbling_and_mock(void) {
+  struct ui_promise *p1 = NULL, *p2 = NULL, *p3 = NULL;
+  ui_error_t rc;
+
+  /* Case 1: on_finally with fulfilled, chained resolve fails */
+  ui_promise_create(&p1);
+  ui_promise_finally(p1, test_finally_cb, NULL, &p2);
+  ui_promise_then(p2, test_fail_resolve_cb, NULL, NULL, NULL);
+  rc = ui_promise_resolve(p1, (void *)1);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+  /* Case 2: on_finally with rejected, chained reject fails */
+  ui_promise_create(&p1);
+  ui_promise_finally(p1, test_finally_cb, NULL, &p2);
+  ui_promise_catch(p2, test_fail_reject_cb, NULL, NULL);
+  rc = ui_promise_reject(p1, UI_ERROR_NOT_FOUND);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+  /* Case 3: fulfilled, on_resolve succeeds, chained resolve fails */
+  ui_promise_create(&p1);
+  ui_promise_then(p1, test_resolve_cb, NULL, NULL, &p2);
+  ui_promise_then(p2, test_fail_resolve_cb, NULL, NULL, NULL);
+  rc = ui_promise_resolve(p1, (void *)1);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+  /* Case 4: fulfilled, on_resolve fails, chained reject fails */
+  ui_promise_create(&p1);
+  ui_promise_then(p1, test_fail_resolve_cb, NULL, NULL, &p2);
+  ui_promise_catch(p2, test_fail_reject_cb, NULL, NULL);
+  rc = ui_promise_resolve(p1, (void *)1);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+  /* Case 5: fulfilled, on_resolve is NULL, bubble up resolve fails */
+  ui_promise_create(&p1);
+  ui_promise_catch(p1, test_reject_cb, NULL, &p2);
+  ui_promise_then(p2, test_fail_resolve_cb, NULL, NULL, NULL);
+  rc = ui_promise_resolve(p1, (void *)1);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+  /* Case 6: rejected, on_reject succeeds, chained resolve fails */
+  ui_promise_create(&p1);
+  ui_promise_catch(p1, test_reject_cb, NULL, &p2);
+  ui_promise_then(p2, test_fail_resolve_cb, NULL, NULL, NULL);
+  rc = ui_promise_reject(p1, UI_ERROR_NOT_FOUND);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+  /* Case 7: rejected, on_reject fails, chained reject fails */
+  ui_promise_create(&p1);
+  ui_promise_catch(p1, test_fail_reject_cb, NULL, &p2);
+  ui_promise_catch(p2, test_fail_reject_cb, NULL, NULL);
+  rc = ui_promise_reject(p1, UI_ERROR_NOT_FOUND);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+  /* Case 8: rejected, on_reject is NULL, bubble up reject fails */
+  ui_promise_create(&p1);
+  ui_promise_then(p1, test_resolve_cb, NULL, NULL, &p2);
+  ui_promise_catch(p2, test_fail_reject_cb, NULL, NULL);
+  rc = ui_promise_reject(p1, UI_ERROR_NOT_FOUND);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  /* Case 9: add_callback OOM on node allocation, chained destroy fails */
+  ui_promise_create(&p1);
+  g_malloc_fail_countdown = 1;
+  g_promise_mock_destroy_fail = 1;
+  rc = ui_promise_then(p1, test_resolve_cb, NULL, NULL, &p2);
+  g_malloc_fail_countdown = -1;
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_promise_destroy(p1);
+
+  /* Case 10: ui_promise_destroy with multiple chained promises that fail */
+  ui_promise_create(&p1);
+  ui_promise_then(p1, test_resolve_cb, NULL, NULL, &p2);
+  ui_promise_then(p1, test_resolve_cb, NULL, NULL, &p3);
+  g_promise_mock_destroy_fail = 2;
+  rc = ui_promise_destroy(p1);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+
+  /* Case 11: node allocation OOM with out_promise == NULL */
+  ui_promise_create(&p1);
+  g_malloc_fail_countdown = 0;
+  rc = ui_promise_then(p1, test_resolve_cb, NULL, NULL, NULL);
+  g_malloc_fail_countdown = -1;
+  if (rc != UI_ERROR_OUT_OF_MEMORY)
+    return 1;
+  ui_promise_destroy(p1);
+#endif
+
+  return 0;
+}
+
 int main(void) {
   int failed = 0;
   failed |= run_normal_tests();
   failed |= run_async_tests();
   failed |= run_oom_tests();
   failed |= test_bubbling_failure();
+  failed |= test_more_bubbling_and_mock();
 
   if (failed) {
     printf("Tests failed.\n");

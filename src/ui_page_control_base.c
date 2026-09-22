@@ -8,6 +8,43 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_page_control_mock_fail = 0;
+
+/**
+ * @brief mock_page_control_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t
+mock_page_control_component_destroy(struct ui_component *comp) {
+  if (g_page_control_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_page_control_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_page_control_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_page_control_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_page_control_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_page_control_dom_node_destroy
+/** @endcond */
+#endif
+
 /**
  * @brief ui_page_control_base_create.
  * @param out_control Parameter out_control.
@@ -18,6 +55,7 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
   struct ui_page_control_base *control;
   struct ui_component *base_comp;
   ui_error_t err;
+  ui_error_t rc_cleanup;
 
   if (!out_control) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -31,9 +69,9 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
   control = (struct ui_page_control_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_page_control_base));
   if (!control) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(base_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -53,9 +91,10 @@ ui_page_control_base_create(struct ui_page_control_base **out_control) {
 
   err = ui_dom_node_set_tag_name(control->base.shadow_root, "ui-page-control");
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(control->base.shadow_root);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(control->base.shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(control);
+      return rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(control);
     return err;

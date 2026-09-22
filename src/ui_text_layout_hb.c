@@ -32,12 +32,16 @@ ui_error_t ui_text_layout_shape_with_harfbuzz(
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
+  if (direction != UI_TEXT_DIRECTION_LTR &&
+      direction != UI_TEXT_DIRECTION_RTL) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
 #ifdef UI_USE_HARFBUZZ
   return UI_ERROR_NONE;
 #else
-  (void)font_size;
-  (void)max_width;
-  (void)direction;
+  if (font_size > 0.0f || max_width > 0.0f) {
+  }
   return UI_ERROR_UNSUPPORTED;
 #endif
 }

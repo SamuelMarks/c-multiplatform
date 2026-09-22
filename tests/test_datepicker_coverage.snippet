@@ -23,9 +23,9 @@ static int test_datepicker_coverage(void) {
   struct ui_date dt = {2024, 5, 10};
   char text[32];
 
-  (void)ui_input_base_create(&input);
-  (void)ui_popover_base_create(&popover);
-  (void)ui_calendar_base_create(&cal, NULL);
+  CHECK(ui_input_base_create(&input) == UI_ERROR_NONE);
+  CHECK(ui_popover_base_create(&popover) == UI_ERROR_NONE);
+  CHECK(ui_calendar_base_create(&cal, NULL) == UI_ERROR_NONE);
 
   /* null checks */
   if (ui_datepicker_base_create(NULL, input, popover, cal, &cva) != UI_ERROR_INVALID_ARGUMENT) return 1;
@@ -38,7 +38,7 @@ static int test_datepicker_coverage(void) {
   if (ui_datepicker_base_create(&dp, input, popover, cal, &cva) != UI_ERROR_OUT_OF_MEMORY) return 1;
   g_malloc_fail_countdown = -1;
 
-  (void)ui_datepicker_base_destroy(NULL);
+  if (ui_datepicker_base_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT) return 1;
 
   if (ui_datepicker_parse_date(NULL, &dt) != UI_ERROR_INVALID_ARGUMENT) return 1;
   if (ui_datepicker_parse_date("2024-05-10", NULL) != UI_ERROR_INVALID_ARGUMENT) return 1;
@@ -68,16 +68,16 @@ static int test_datepicker_coverage(void) {
   /* CVA methods */
   {
     int changes = 0, touches = 0;
-    (void)cva.register_on_change(dp, mock_dp_cva_change, &changes);
-    (void)cva.register_on_touched(dp, mock_dp_cva_touched, &touches);
-    (void)cva.set_disabled_state(dp, 1);
-
     union ui_signal_payload val;
+    if (cva.register_on_change(dp, mock_dp_cva_change, &changes) != UI_ERROR_NONE) return 1;
+    if (cva.register_on_touched(dp, mock_dp_cva_touched, &touches) != UI_ERROR_NONE) return 1;
+    if (cva.set_disabled_state(dp, 1) != UI_ERROR_NONE) return 1;
+
     val.int_val = (2024 << 9) | (5 << 5) | 10;
-    (void)cva.write_value(dp, val); /* writes value, triggers sync */
+    if (cva.write_value(dp, val) != UI_ERROR_NONE) return 1; /* writes value, triggers sync */
 
     val.int_val = 0;
-    (void)cva.write_value(dp, val); /* clear */
+    if (cva.write_value(dp, val) != UI_ERROR_NONE) return 1; /* clear */
   }
 
   /* Simulate user selecting a date in the calendar */
@@ -102,10 +102,10 @@ static int test_datepicker_coverage(void) {
     ui_datepicker_base_sync(dp);
   }
 
-  (void)ui_datepicker_base_destroy(dp);
-  (void)ui_calendar_base_destroy(cal);
-  (void)ui_popover_base_destroy(popover);
-  (void)ui_input_base_destroy(input);
+  if (ui_datepicker_base_destroy(dp) != UI_ERROR_NONE) return 1;
+  if (ui_calendar_base_destroy(cal) != UI_ERROR_NONE) return 1;
+  if (ui_popover_base_destroy(popover) != UI_ERROR_NONE) return 1;
+  if (ui_input_base_destroy(input) != UI_ERROR_NONE) return 1;
 
   return 0;
 }

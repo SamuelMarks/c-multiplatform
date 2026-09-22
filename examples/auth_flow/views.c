@@ -46,6 +46,41 @@ struct app_state {
 };
 
 /**
+ * @brief Sets or updates text content of an element via a text child node.
+ * @param element The container element.
+ * @param text The string content.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
+static ui_error_t set_element_text(struct ui_dom_node *element,
+                                   const char *text) {
+  struct ui_dom_node *text_node = NULL;
+  ui_error_t err;
+
+  if (!element || !text) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (element->first_child &&
+      element->first_child->type == UI_DOM_NODE_TYPE_TEXT) {
+    return ui_dom_node_set_text_content(element->first_child, text);
+  }
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
+  if (err != UI_ERROR_NONE) {
+    return err;
+  }
+  err = ui_dom_node_set_text_content(text_node, text);
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(text_node);
+    return err;
+  }
+  err = ui_dom_node_append_child(element, text_node);
+  if (err != UI_ERROR_NONE) {
+    ui_dom_node_destroy(text_node);
+    return err;
+  }
+  return UI_ERROR_NONE;
+}
+
+/**
  * @brief Callback for the login form submission.
  * @param button The submit button instance.
  * @param user_data Application state context.
@@ -57,6 +92,10 @@ static ui_error_t on_login_submit(struct ui_button_base *button,
   const char *user = "";
   const char *pass = "";
   ui_error_t err;
+
+  if (button == NULL || user_data == NULL) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   err = ui_input_base_get_text(state->input_username, &user);
   if (err != UI_ERROR_NONE)
@@ -70,9 +109,7 @@ static ui_error_t on_login_submit(struct ui_button_base *button,
   if (err != UI_ERROR_NONE)
     return err;
 
-  (void)button;
-
-  err = mock_login((void *)state, user ? user : "", pass ? pass : "");
+  err = mock_login(state, user ? user : "", pass ? pass : "");
   if (err == UI_ERROR_NONE) {
     ui_error_t nav_err = ui_router_navigate(state->router, "/secrets");
     if (nav_err != UI_ERROR_NONE)
@@ -100,6 +137,10 @@ static ui_error_t on_signup_submit(struct ui_button_base *button,
   const char *pass = "";
   ui_error_t err;
 
+  if (button == NULL || user_data == NULL) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
   err = ui_input_base_get_text(state->input_username, &user);
   if (err != UI_ERROR_NONE)
     return err;
@@ -112,9 +153,7 @@ static ui_error_t on_signup_submit(struct ui_button_base *button,
   if (err != UI_ERROR_NONE)
     return err;
 
-  (void)button;
-
-  err = mock_signup((void *)state, user ? user : "", pass ? pass : "");
+  err = mock_signup(state, user ? user : "", pass ? pass : "");
   if (err == UI_ERROR_NONE) {
     ui_error_t nav_err = ui_router_navigate(state->router, "/secrets");
     if (nav_err != UI_ERROR_NONE)
@@ -138,13 +177,16 @@ static ui_error_t on_logout(struct ui_button_base *button, void *user_data) {
   const char *locale = NULL;
   struct app_state *state = (struct app_state *)user_data;
   ui_error_t err;
-  (void)button;
+
+  if (button == NULL || user_data == NULL) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   err = ui_i18n_get_locale(state->i18n, &locale);
   if (err != UI_ERROR_NONE)
     return err;
 
-  err = mock_logout((void *)state);
+  err = mock_logout(state);
   if (err != UI_ERROR_NONE)
     return err;
 
@@ -161,15 +203,26 @@ ui_error_t auth_container_factory(const struct ui_route_request *req,
   struct ui_dom_node *root, *tablist, *tab_login, *tab_signup, *content, *form,
       *lbl_user, *host_user, *lbl_pass, *host_pass, *host_submit, *err_msg;
   const char *path = NULL;
+  const char *locale = NULL;
+  const char *btn_submit_signup_str = NULL;
+  const char *btn_submit_login_str = NULL;
+  const char *tab_login_str = NULL;
+  const char *tab_signup_str = NULL;
+  const char *lbl_username_str = NULL;
+  const char *lbl_password_str = NULL;
+  struct app_state *state;
+  int is_signup = 0;
   ui_error_t err;
+
+  if (!req || !user_data || !out_screen) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  state = (struct app_state *)user_data;
 
   err = ui_route_request_get_path(req, &path);
   if (err != UI_ERROR_NONE)
     return err;
-
-  const char *locale = NULL;
-  struct app_state *state = (struct app_state *)user_data;
-  int is_signup = 0;
 
   err = ui_i18n_get_locale(state->i18n, &locale);
   if (err != UI_ERROR_NONE)
@@ -222,11 +275,10 @@ ui_error_t auth_container_factory(const struct ui_route_request *req,
   err = ui_dom_node_set_attribute(tab_login, "href", "/login");
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  const char *tab_login_str = NULL;
   err = get_translated_string(locale, "tab_login", &tab_login_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  err = ui_dom_node_set_text_content(tab_login, tab_login_str);
+  err = set_element_text(tab_login, tab_login_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
   err = ui_dom_node_append_child(tablist, tab_login);
@@ -245,11 +297,10 @@ ui_error_t auth_container_factory(const struct ui_route_request *req,
   err = ui_dom_node_set_attribute(tab_signup, "href", "/signup");
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  const char *tab_signup_str = NULL;
   err = get_translated_string(locale, "tab_signup", &tab_signup_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  err = ui_dom_node_set_text_content(tab_signup, tab_signup_str);
+  err = set_element_text(tab_signup, tab_signup_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
   err = ui_dom_node_append_child(tablist, tab_signup);
@@ -289,11 +340,10 @@ ui_error_t auth_container_factory(const struct ui_route_request *req,
   err = ui_dom_node_set_attribute(lbl_user, "for", "input-user");
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  const char *lbl_username_str = NULL;
   err = get_translated_string(locale, "lbl_username", &lbl_username_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  err = ui_dom_node_set_text_content(lbl_user, lbl_username_str);
+  err = set_element_text(lbl_user, lbl_username_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
   err = ui_dom_node_append_child(form, lbl_user);
@@ -338,11 +388,10 @@ ui_error_t auth_container_factory(const struct ui_route_request *req,
   err = ui_dom_node_set_attribute(lbl_pass, "for", "input-pass");
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  const char *lbl_password_str = NULL;
   err = get_translated_string(locale, "lbl_password", &lbl_password_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  err = ui_dom_node_set_text_content(lbl_pass, lbl_password_str);
+  err = set_element_text(lbl_pass, lbl_password_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
   err = ui_dom_node_append_child(form, lbl_pass);
@@ -408,12 +457,11 @@ ui_error_t auth_container_factory(const struct ui_route_request *req,
         ui_button_base_set_on_click(state->btn_submit, on_signup_submit, state);
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
-    const char *btn_submit_signup_str = NULL;
     err = get_translated_string(locale, "btn_submit_signup",
                                 &btn_submit_signup_str);
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
-    err = ui_dom_node_set_text_content(host_submit, btn_submit_signup_str);
+    err = ui_button_base_set_text(state->btn_submit, btn_submit_signup_str);
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
   } else {
@@ -427,12 +475,11 @@ ui_error_t auth_container_factory(const struct ui_route_request *req,
         ui_button_base_set_on_click(state->btn_submit, on_login_submit, state);
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
-    const char *btn_submit_login_str = NULL;
     err = get_translated_string(locale, "btn_submit_login",
                                 &btn_submit_login_str);
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
-    err = ui_dom_node_set_text_content(host_submit, btn_submit_login_str);
+    err = ui_button_base_set_text(state->btn_submit, btn_submit_login_str);
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
   }
@@ -460,7 +507,7 @@ ui_error_t auth_container_factory(const struct ui_route_request *req,
     err = ui_dom_node_set_attribute(err_msg, "aria-live", "assertive");
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
-    err = ui_dom_node_set_text_content(err_msg, state->auth_error_message);
+    err = set_element_text(err_msg, state->auth_error_message);
     if (err != UI_ERROR_NONE)
       goto cleanup_comp;
     err = ui_dom_node_append_child(form, err_msg);
@@ -486,11 +533,18 @@ ui_error_t secrets_view_factory(const struct ui_route_request *req,
                                 struct ui_component **out_screen) {
   struct ui_component *comp;
   struct ui_dom_node *root, *msg, *host_logout;
-
   const char *locale = NULL;
-  struct app_state *state = (struct app_state *)user_data;
+  const char *msg_welcome_secret_str = NULL;
+  const char *btn_logout_str = NULL;
+  struct app_state *state;
   char welcome_msg[256];
   ui_error_t err;
+
+  if (!req || !user_data || !out_screen) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+
+  state = (struct app_state *)user_data;
 
   err = ui_i18n_get_locale(state->i18n, &locale);
   if (err != UI_ERROR_NONE)
@@ -520,7 +574,6 @@ ui_error_t secrets_view_factory(const struct ui_route_request *req,
   err = ui_dom_node_set_tag_name(msg, "h1");
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  const char *msg_welcome_secret_str = NULL;
   err = get_translated_string(locale, "msg_welcome_secret",
                               &msg_welcome_secret_str);
   if (err != UI_ERROR_NONE)
@@ -531,7 +584,7 @@ ui_error_t secrets_view_factory(const struct ui_route_request *req,
 #else
   sprintf(welcome_msg, msg_welcome_secret_str, state->current_user);
 #endif
-  err = ui_dom_node_set_text_content(msg, welcome_msg);
+  err = set_element_text(msg, welcome_msg);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
   err = ui_dom_node_append_child(root, msg);
@@ -544,11 +597,7 @@ ui_error_t secrets_view_factory(const struct ui_route_request *req,
   err = ui_dom_node_set_tag_name(host_logout, "div");
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
-  const char *btn_logout_str = NULL;
   err = get_translated_string(locale, "btn_logout", &btn_logout_str);
-  if (err != UI_ERROR_NONE)
-    goto cleanup_comp;
-  err = ui_dom_node_set_text_content(host_logout, btn_logout_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
   err = ui_dom_node_append_child(root, host_logout);
@@ -561,6 +610,9 @@ ui_error_t secrets_view_factory(const struct ui_route_request *req,
       goto cleanup_comp;
   }
   err = ui_button_base_set_on_click(state->btn_logout, on_logout, state);
+  if (err != UI_ERROR_NONE)
+    goto cleanup_comp;
+  err = ui_button_base_set_text(state->btn_logout, btn_logout_str);
   if (err != UI_ERROR_NONE)
     goto cleanup_comp;
   {

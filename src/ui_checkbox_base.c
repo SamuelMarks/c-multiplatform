@@ -178,16 +178,10 @@ ui_error_t ui_checkbox_base_create(struct ui_checkbox_base **out_checkbox) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (checkbox->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(checkbox->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(checkbox->component);
   }
   C_MULTIPLATFORM_FREE(checkbox);
   return rc;
@@ -202,10 +196,7 @@ ui_error_t ui_checkbox_base_destroy(struct ui_checkbox_base *checkbox) {
   if (!checkbox) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(checkbox->component);
-    (void)rc_cleanup;
-  }
+  ui_component_destroy(checkbox->component);
   C_MULTIPLATFORM_FREE(checkbox);
   return UI_ERROR_NONE;
 }
@@ -271,9 +262,13 @@ static ui_error_t checkbox_cva_write_value(void *component,
 static ui_error_t checkbox_cva_register_on_change(
     void *component, ui_error_t (*callback)(union ui_signal_payload, void *),
     void *user_data) {
-  (void)component;
-  (void)callback;
-  (void)user_data;
+  ui_error_t (*unused_cb)(union ui_signal_payload, void *) = callback;
+  void *unused_ud = user_data;
+  callback = unused_cb;
+  user_data = unused_ud;
+  if (!component) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   return UI_ERROR_NONE;
 }
 
@@ -289,9 +284,13 @@ static ui_error_t checkbox_cva_register_on_change(
  */
 static ui_error_t checkbox_cva_register_on_touched(
     void *component, ui_error_t (*callback)(void *), void *user_data) {
-  (void)component;
-  (void)callback;
-  (void)user_data;
+  ui_error_t (*unused_cb)(void *) = callback;
+  void *unused_ud = user_data;
+  callback = unused_cb;
+  user_data = unused_ud;
+  if (!component) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   return UI_ERROR_NONE;
 }
 

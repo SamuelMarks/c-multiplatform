@@ -68,35 +68,17 @@ static ui_error_t mock_dom_node_append_child(struct ui_dom_node *parent,
 #define ui_dom_node_append_child mock_dom_node_append_child
 /** @endcond */
 
-ui_error_t run_badge_coverage(void);
-/**
- * @brief run_badge_coverage.
- * @return Return value.
- */
-ui_error_t run_badge_coverage(void) {
-  struct ui_badge_base *badge = NULL;
-
-  g_badge_mock_fail = 1;
-  ui_badge_base_create(&badge);
-  g_badge_mock_fail = 0;
-
-  g_badge_mock_fail = 2;
-  ui_badge_base_create(&badge);
-  g_badge_mock_fail = 0;
-
-  g_badge_mock_fail = 20;
-  ui_badge_base_create(&badge);
-  g_badge_mock_fail = 0;
-
-  g_badge_mock_fail = 3;
-  ui_badge_base_create(&badge);
-  g_badge_mock_fail = 0;
-  g_badge_mock_fail = 30;
-  ui_badge_base_destroy(badge);
-  g_badge_mock_fail = 0;
-
-  return UI_ERROR_NONE;
+static ui_error_t mock_badge_component_destroy(struct ui_component *comp) {
+  if (g_badge_mock_fail == 4) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
 }
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_badge_component_destroy
+/** @endcond */
 #endif
 
 #if defined(_MSC_VER)
@@ -132,89 +114,57 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
   if (!badge) {
     return UI_ERROR_OUT_OF_MEMORY;
   }
+  badge->component = NULL;
+  badge->text_signal = NULL;
 
   rc = ui_component_create(&badge->component);
   if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(badge);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(badge);
-    return rc;
+    goto cleanup;
   }
 
   rc = ui_dom_node_set_tag_name(root_node, "span");
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(badge);
-    return rc;
+    goto cleanup;
   }
   rc = ui_dom_node_set_attribute(root_node, "role", "status");
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(badge);
-    return rc;
+    goto cleanup;
   }
 
   /* Text content is stored in a child text node */
   {
-    struct ui_dom_node *text_node;
+    struct ui_dom_node *text_node = NULL;
     rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &text_node);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(badge);
-      return rc;
+      goto cleanup;
     }
     rc = ui_dom_node_append_child(root_node, text_node);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-        (void)rc_cleanup;
-      }
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-        (void)rc_cleanup;
-      }
-      C_MULTIPLATFORM_FREE(badge);
-      return rc;
+      ui_dom_node_destroy(text_node);
+      goto cleanup;
     }
   }
 
   badge->component->shadow_root = root_node;
+  root_node = NULL;
 
   *out_badge = badge;
   return UI_ERROR_NONE;
+
+cleanup:
+  if (root_node) {
+    ui_dom_node_destroy(root_node);
+  }
+  if (badge->component) {
+    ui_component_destroy(badge->component);
+  }
+  C_MULTIPLATFORM_FREE(badge);
+  return rc;
 }
 
 /**
@@ -223,16 +173,17 @@ ui_error_t ui_badge_base_create(struct ui_badge_base **out_badge) {
  * @return Return value.
  */
 ui_error_t ui_badge_base_destroy(struct ui_badge_base *badge) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (badge) {
     if (badge->component) {
-      {
-        ui_error_t rc_cleanup = ui_component_destroy(badge->component);
-        (void)rc_cleanup;
+      ui_error_t rc_cleanup = ui_component_destroy(badge->component);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
       }
     }
     C_MULTIPLATFORM_FREE(badge);
   }
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

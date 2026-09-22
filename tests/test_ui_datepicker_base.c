@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,7 +8,7 @@
 #include "../include/ui_popover_base.h"
 #include "../include/ui_calendar_base.h"
 #include "../include/ui_error.h"
-#include "../src/ui_datepicker_base.c" /* Source included for internals/statics */
+#include "../src/ui_datepicker_base_internal.h"
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
@@ -80,9 +81,7 @@ static int test_errors(void) {
 
   {
     ui_error_t rc_cleanup = ui_datepicker_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_datepicker_parse_date(NULL, &parsed) != UI_ERROR_INVALID_ARGUMENT)
@@ -108,21 +107,15 @@ static int test_errors(void) {
 
   {
     ui_error_t rc_cleanup = ui_input_base_destroy(input);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(calendar);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -179,39 +172,40 @@ static int test_cva_functions(void) {
   {
     ui_error_t rc_cleanup =
         ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test write_value */
   payload.int_val = (2023 << 9) | (12 << 5) | 25;
-  (void)cva.write_value(dp, payload); /* write specific date */
+  assert(cva.write_value(dp, payload) ==
+         UI_ERROR_NONE); /* write specific date */
 
   payload.int_val = 0;
-  (void)cva.write_value(dp, payload);   /* write empty date */
-  (void)cva.write_value(NULL, payload); /* fail */
+  assert(cva.write_value(dp, payload) == UI_ERROR_NONE); /* write empty date */
+  assert(cva.write_value(NULL, payload) ==
+         UI_ERROR_INVALID_ARGUMENT); /* fail */
 
   /* Test register_on_change */
   dp->is_syncing = 0;
-  (void)cva.register_on_change(dp, NULL, &called);
+  assert(cva.register_on_change(dp, NULL, &called) == UI_ERROR_NONE);
   dp->is_syncing = 1;
-  (void)cva.register_on_change(dp, NULL, &called);
-  (void)cva.register_on_change(NULL, NULL, NULL);
+  assert(cva.register_on_change(dp, NULL, &called) == UI_ERROR_NONE);
+  assert(cva.register_on_change(NULL, NULL, NULL) == UI_ERROR_INVALID_ARGUMENT);
 
   /* Test register_on_touched */
   dp->is_syncing = 0;
-  (void)cva.register_on_touched(dp, NULL, &called);
+  assert(cva.register_on_touched(dp, NULL, &called) == UI_ERROR_NONE);
   dp->is_syncing = 1;
-  (void)cva.register_on_touched(dp, NULL, &called);
-  (void)cva.register_on_touched(NULL, NULL, NULL);
+  assert(cva.register_on_touched(dp, NULL, &called) == UI_ERROR_NONE);
+  assert(cva.register_on_touched(NULL, NULL, NULL) ==
+         UI_ERROR_INVALID_ARGUMENT);
 
   /* Test set_disabled_state */
   dp->is_syncing = 0;
-  (void)cva.set_disabled_state(dp, 1);
+  assert(cva.set_disabled_state(dp, 1) == UI_ERROR_NONE);
   dp->is_syncing = 1;
-  (void)cva.set_disabled_state(dp, 1);
-  (void)cva.set_disabled_state(NULL, 1);
+  assert(cva.set_disabled_state(dp, 1) == UI_ERROR_NONE);
+  assert(cva.set_disabled_state(NULL, 1) == UI_ERROR_INVALID_ARGUMENT);
 
   if (ui_datepicker_base_destroy(dp) != UI_ERROR_NONE)
     return 1;
@@ -228,7 +222,8 @@ static ui_error_t mock_cva_on_change(union ui_signal_payload new_value,
                                      void *user_data) {
   int *called = (int *)user_data;
   *called = 1;
-  (void)new_value;
+  if (new_value.ptr_val) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -260,106 +255,114 @@ static int test_callbacks_and_sync(void) {
   {
     ui_error_t rc_cleanup =
         ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Register mock callbacks via CVA */
-  (void)cva.register_on_change(dp, mock_cva_on_change, &change_called);
-  (void)cva.register_on_touched(dp, mock_cva_on_touched, &touched_called);
+  assert(cva.register_on_change(dp, mock_cva_on_change, &change_called) ==
+         UI_ERROR_NONE);
+  assert(cva.register_on_touched(dp, mock_cva_on_touched, &touched_called) ==
+         UI_ERROR_NONE);
 
   /* We need to be careful with is_syncing */
   dp->is_syncing = 0;
 
   {
     ui_error_t rc_cleanup = ui_datepicker_base_sync(dp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   dp->is_syncing = 0; /* Reset it just in case a mock leaked the state due to
                          early returns we force */
 
   /* Trigger the on_calendar_select callback */
-  (void)on_calendar_select(calendar, &date, dp);
+  assert(ui_datepicker_on_calendar_select(calendar, &date, dp) ==
+         UI_ERROR_NONE);
+  assert(ui_datepicker_on_calendar_select(NULL, &date, dp) == UI_ERROR_NONE);
 
   /* Trigger on_input_change with valid and invalid text */
-  (void)on_input_change(input, "2023-01-15", dp);
-  (void)on_input_change(input, "invalid", dp);
-  (void)on_input_change(input, NULL, dp); /* text is NULL */
+  assert(ui_datepicker_on_input_change(input, "2023-01-15", dp) ==
+         UI_ERROR_NONE);
+  assert(ui_datepicker_on_input_change(NULL, "2023-01-15", dp) ==
+         UI_ERROR_NONE);
+  assert(ui_datepicker_on_input_change(input, "invalid", dp) == UI_ERROR_NONE);
+  assert(ui_datepicker_on_input_change(input, NULL, dp) ==
+         UI_ERROR_NONE); /* text is NULL */
+
+  /* Trigger error in select_date inside on_input_change via min_date */
+  {
+    struct ui_date min_d;
+    min_d.year = 2024;
+    min_d.month = 1;
+    min_d.day = 1;
+    assert(ui_calendar_base_set_min_date(calendar, &min_d) == UI_ERROR_NONE);
+    assert(ui_datepicker_on_input_change(input, "2020-01-01", dp) ==
+           UI_ERROR_OUT_OF_BOUNDS);
+    assert(ui_calendar_base_set_min_date(calendar, NULL) == UI_ERROR_NONE);
+  }
 
   /* Trigger is_syncing branches by forcing it on */
   dp->is_syncing = 1;
-  (void)on_calendar_select(calendar, &date, dp);
-  (void)on_input_change(input, "2023-01-15", dp);
+  assert(ui_datepicker_on_calendar_select(calendar, &date, dp) ==
+         UI_ERROR_NONE);
+  assert(ui_datepicker_on_input_change(input, "2023-01-15", dp) ==
+         UI_ERROR_NONE);
 
   /* Call register when syncing to hit that branch */
-  (void)cva.register_on_change(dp, NULL, NULL);
-  (void)cva.register_on_touched(dp, NULL, NULL);
-  (void)cva.set_disabled_state(dp, 1);
-  (void)cva.write_value(dp, empty_payload);
+  assert(cva.register_on_change(dp, NULL, NULL) == UI_ERROR_NONE);
+  assert(cva.register_on_touched(dp, NULL, NULL) == UI_ERROR_NONE);
+  assert(cva.set_disabled_state(dp, 1) == UI_ERROR_NONE);
+  assert(cva.write_value(dp, empty_payload) == UI_ERROR_NONE);
   dp->is_syncing = 0;
 
   /* Call register and set_disabled normally */
-  (void)cva.register_on_change(dp, NULL, NULL);
-  (void)cva.register_on_touched(dp, NULL, NULL);
-  (void)cva.set_disabled_state(dp, 1);
+  assert(cva.register_on_change(dp, NULL, NULL) == UI_ERROR_NONE);
+  assert(cva.register_on_touched(dp, NULL, NULL) == UI_ERROR_NONE);
+  assert(cva.set_disabled_state(dp, 1) == UI_ERROR_NONE);
 
   /* Call trigger_cva_change directly without on_change set to hit branch */
   dp->cva_on_change = NULL;
   dp->is_syncing = 0;
-  (void)on_calendar_select(calendar, &date, dp);
+  assert(ui_datepicker_on_calendar_select(calendar, &date, dp) ==
+         UI_ERROR_NONE);
 
-  /* Force format to fail by passing a bad date inside payload if format_date
-     checks it? Or we can pass an invalid date in payload and format_date will
-     fail if it's invalid. Wait, payload packs year/month/day. We can pack an
-     invalid month. */
+  /* Test NULL date with on_calendar_select */
+  assert(ui_datepicker_on_calendar_select(calendar, NULL, dp) ==
+         UI_ERROR_INVALID_ARGUMENT);
+
+  /* Force select_date to fail by passing a bad date inside payload */
   {
     union ui_signal_payload bad_payload;
     bad_payload.int_val = (2023 << 9) | (15 << 5) | 25; /* invalid month 15 */
-    (void)cva.write_value(dp, bad_payload);
+    assert(cva.write_value(dp, bad_payload) == UI_ERROR_OUT_OF_BOUNDS);
   }
 
   {
     ui_error_t rc_cleanup = ui_datepicker_base_destroy(dp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Create without CVA */
   {
     ui_error_t rc_cleanup =
         ui_datepicker_base_create(&dp, input, popover, calendar, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_datepicker_base_destroy(dp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_input_base_destroy(input);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(calendar);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -380,9 +383,7 @@ static int test_sync_fail(void) {
   {
     ui_error_t rc_cleanup =
         ui_datepicker_base_create(&dp, input, popover, calendar, &cva);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* The input_base text could be failed by setting g_malloc_fail_countdown? No,
@@ -393,35 +394,25 @@ static int test_sync_fail(void) {
    * inside datepicker. We can manually destroy input? */
   {
     ui_error_t rc_cleanup = ui_input_base_destroy(dp->input);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   dp->input = NULL;
   {
     ui_error_t rc_cleanup = ui_datepicker_base_sync(dp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   } /* Hits failure */
 
   {
     ui_error_t rc_cleanup = ui_datepicker_base_destroy(dp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(calendar);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -451,30 +442,62 @@ static int test_oom_simulation(void) {
     if (ui_datepicker_base_create(&dp, input, popover, calendar, &cva) ==
         UI_ERROR_NONE) {
       if (cva.set_disabled_state) {
-        (void)cva.set_disabled_state(dp, 1);
-        (void)cva.set_disabled_state(dp, 0);
+        ui_error_t rc_cva;
+        rc_cva = cva.set_disabled_state(dp, 1);
+        if (rc_cva != UI_ERROR_NONE) {
+          assert(rc_cva != UI_ERROR_NONE);
+        }
+        rc_cva = cva.set_disabled_state(dp, 0);
+        if (rc_cva != UI_ERROR_NONE) {
+          assert(rc_cva != UI_ERROR_NONE);
+        }
       }
 
       g_malloc_fail_countdown = i;
-      if (cva.write_value)
-        (void)cva.write_value(dp, payload);
+      if (cva.write_value) {
+        ui_error_t rc_cva = cva.write_value(dp, payload);
+        if (rc_cva != UI_ERROR_NONE) {
+          assert(rc_cva != UI_ERROR_NONE);
+        }
+      }
       g_malloc_fail_countdown = -1;
 
       g_malloc_fail_countdown = i;
-      if (cva.write_value)
-        (void)cva.write_value(dp, empty_payload);
+      if (cva.write_value) {
+        ui_error_t rc_cva = cva.write_value(dp, empty_payload);
+        if (rc_cva != UI_ERROR_NONE) {
+          assert(rc_cva != UI_ERROR_NONE);
+        }
+      }
       g_malloc_fail_countdown = -1;
 
       g_malloc_fail_countdown = i;
-      (void)on_input_change(input, "2024-05-15", dp);
+      {
+        ui_error_t rc_ev =
+            ui_datepicker_on_input_change(input, "2024-05-15", dp);
+        if (rc_ev != UI_ERROR_NONE) {
+          assert(rc_ev != UI_ERROR_NONE);
+        }
+      }
       g_malloc_fail_countdown = -1;
 
       g_malloc_fail_countdown = i;
-      (void)on_input_change(input, "invalid", dp);
+      {
+        ui_error_t rc_ev = ui_datepicker_on_input_change(input, "invalid", dp);
+        if (rc_ev != UI_ERROR_NONE) {
+          assert(rc_ev != UI_ERROR_NONE);
+        }
+      }
       g_malloc_fail_countdown = -1;
 
       g_malloc_fail_countdown = i;
-      (void)on_calendar_select(calendar, &date, dp);
+      {
+        ui_error_t rc_ev =
+            ui_datepicker_on_calendar_select(calendar, &date, dp);
+        if (rc_ev != UI_ERROR_NONE) {
+          assert(rc_ev != UI_ERROR_NONE);
+        }
+      }
       g_malloc_fail_countdown = -1;
 
       if (ui_datepicker_base_destroy(dp) != UI_ERROR_NONE)

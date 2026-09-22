@@ -66,19 +66,17 @@ ui_error_t ui_tray_manager_create(struct ui_tray_manager **out_tray) {
 }
 
 ui_error_t ui_tray_manager_destroy(struct ui_tray_manager *tray) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!tray) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   if (tray->is_visible) {
-    {
-      ui_error_t rc_cleanup = ui_tray_manager_hide(tray);
-      (void)rc_cleanup;
-    }
+    rc = ui_tray_manager_hide(tray);
   }
 
   C_MULTIPLATFORM_FREE(tray);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 ui_error_t ui_tray_manager_set_icon(struct ui_tray_manager *tray,

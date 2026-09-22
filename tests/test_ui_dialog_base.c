@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include "../include/ui_dialog_base.h"
@@ -17,9 +18,17 @@ extern int g_malloc_fail_countdown;
 static ui_error_t mock_on_close(struct ui_dialog_base *dialog,
                                 void *user_data) {
   int *called = (int *)user_data;
-  (void)dialog;
+  if (dialog) {
+  }
   *called = 1;
   return UI_ERROR_NONE;
+}
+
+static ui_error_t mock_on_close_err(struct ui_dialog_base *dialog,
+                                    void *user_data) {
+  if (dialog || user_data) {
+  }
+  return UI_ERROR_UNSUPPORTED;
 }
 
 static int test_create_destroy(void) {
@@ -33,7 +42,7 @@ static int test_create_destroy(void) {
   {
     ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -53,9 +62,7 @@ static int test_errors(void) {
     return 1;
   {
     ui_error_t rc_cleanup = ui_dialog_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
   if (ui_dialog_base_set_content(NULL, comp) != UI_ERROR_INVALID_ARGUMENT)
@@ -104,7 +111,7 @@ static int test_errors(void) {
       {
         ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          assert(rc_cleanup == UI_ERROR_NONE);
         }
       }
     }
@@ -227,6 +234,24 @@ static int test_getters_and_setters(void) {
   if (rc != UI_ERROR_NONE || is_open != 0)
     return 1;
 
+  /* Test on_close returning error and positive timestamp */
+  rc = ui_dialog_base_set_open(dialog, 1);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  rc = ui_dialog_base_set_on_close(dialog, mock_on_close_err, NULL);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  event.type = UI_EVENT_MOUSE_DOWN;
+  rc = ui_dialog_base_process_event(dialog, &event, 10.0);
+  if (rc != UI_ERROR_NONE)
+    return 1;
+  event.type = UI_EVENT_MOUSE_UP;
+  rc = ui_dialog_base_process_event(dialog, &event, 10.0);
+  if (rc != UI_ERROR_UNSUPPORTED)
+    return 1;
+  ui_dialog_base_set_on_close(dialog, NULL, NULL);
+  ui_dialog_base_set_open(dialog, 0);
+
   /* Mock OOM for overlay mount */
   g_malloc_fail_countdown = 0;
   rc = ui_dialog_base_set_open(dialog, 1);
@@ -259,31 +284,29 @@ static int test_getters_and_setters(void) {
   {
     ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(content);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_manager);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -310,15 +333,12 @@ static int test_open_without_director_and_focus(void) {
   ui_dialog_base_set_open(dialog, 1);
   {
     ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
   /* Set only focus */
@@ -342,13 +362,13 @@ static int test_open_without_director_and_focus(void) {
   {
     ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_manager);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   ui_dialog_base_create(&dialog);
@@ -357,14 +377,12 @@ static int test_open_without_director_and_focus(void) {
   {
     ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
   return 0;
@@ -394,25 +412,25 @@ static int test_oom_open(void) {
     {
       ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
     {
       ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_manager);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
     {
       ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }
@@ -427,13 +445,13 @@ static int test_oom_open(void) {
     {
       ui_error_t rc_cleanup = ui_dialog_base_destroy(dialog);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
     {
       ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_manager);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
     }
   }

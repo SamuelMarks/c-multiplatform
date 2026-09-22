@@ -43,6 +43,162 @@
   } while (0)
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_snackbar_mock_fail = 0;
+int g_snackbar_append_child_fail_target = 0;
+static int g_snackbar_append_counter = 0;
+
+/**
+ * @brief mock_snackbar_dom_node_append_child.
+ * @param parent Parent node.
+ * @param child Child node.
+ * @return Return value.
+ */
+static ui_error_t
+mock_snackbar_dom_node_append_child(struct ui_dom_node *parent,
+                                    struct ui_dom_node *child) {
+  if (g_snackbar_append_child_fail_target > 0) {
+    if (++g_snackbar_append_counter == g_snackbar_append_child_fail_target) {
+      g_snackbar_append_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_append_child(parent, child);
+}
+/** @cond */
+#define ui_dom_node_append_child mock_snackbar_dom_node_append_child
+/** @endcond */
+
+/**
+ * @brief mock_snackbar_component_set_default_style.
+ * @param comp Component.
+ * @param style Stylesheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_snackbar_component_set_default_style(struct ui_component *comp,
+                                          struct ui_css_stylesheet *style) {
+  if (g_snackbar_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_set_default_style(comp, style);
+}
+/** @cond */
+#define ui_component_set_default_style mock_snackbar_component_set_default_style
+/** @endcond */
+
+/**
+ * @brief mock_snackbar_dom_node_destroy.
+ * @param node Node.
+ * @return Return value.
+ */
+static ui_error_t mock_snackbar_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_snackbar_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(node);
+}
+/** @cond */
+#define ui_dom_node_destroy mock_snackbar_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief mock_snackbar_component_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_snackbar_component_destroy(struct ui_component *comp) {
+  if (g_snackbar_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_component_destroy(comp);
+}
+/** @cond */
+#define ui_component_destroy mock_snackbar_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_snackbar_ring_buffer_destroy.
+ * @param rb Ring buffer.
+ * @return Return value.
+ */
+static ui_error_t mock_snackbar_ring_buffer_destroy(struct ui_ring_buffer *rb) {
+  if (g_snackbar_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_ring_buffer_destroy(rb);
+}
+/** @cond */
+#define ui_ring_buffer_destroy mock_snackbar_ring_buffer_destroy
+/** @endcond */
+
+/**
+ * @brief mock_snackbar_dom_node_set_text_content.
+ * @param node Node.
+ * @param text Text.
+ * @return Return value.
+ */
+static ui_error_t
+mock_snackbar_dom_node_set_text_content(struct ui_dom_node *node,
+                                        const char *text) {
+  if (g_snackbar_mock_fail == 5) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_snackbar_mock_fail == 6) {
+    static int text_counter = 0;
+    if (++text_counter == 2) {
+      text_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_set_text_content(node, text);
+}
+/** @cond */
+#define ui_dom_node_set_text_content mock_snackbar_dom_node_set_text_content
+/** @endcond */
+
+/**
+ * @brief mock_snackbar_dom_node_set_attribute.
+ * @param node Node.
+ * @param name Attribute name.
+ * @param val Attribute value.
+ * @return Return value.
+ */
+static ui_error_t mock_snackbar_dom_node_set_attribute(struct ui_dom_node *node,
+                                                       const char *name,
+                                                       const char *val) {
+  if (g_snackbar_mock_fail == 7 || g_snackbar_mock_fail == 8) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_set_attribute(node, name, val);
+}
+/** @cond */
+#define ui_dom_node_set_attribute mock_snackbar_dom_node_set_attribute
+/** @endcond */
+
+/**
+ * @brief mock_snackbar_overlay_director_mount_component.
+ * @param director Director.
+ * @param comp Component.
+ * @param layer Layer.
+ * @param out_overlay Output overlay.
+ * @return Return value.
+ */
+static ui_error_t mock_snackbar_overlay_director_mount_component(
+    struct ui_overlay_director *director, struct ui_component *comp, int layer,
+    struct ui_overlay **out_overlay) {
+  if (g_snackbar_mock_fail == 9) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_overlay_director_mount_component(director, comp, layer,
+                                             out_overlay);
+}
+/** @cond */
+#define ui_overlay_director_mount_component                                    \
+  mock_snackbar_overlay_director_mount_component
+/** @endcond */
+#endif
+
 /** @brief internal */
 #define MAX_SNACKBARS_IN_QUEUE 10
 
@@ -183,69 +339,83 @@ ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-/** @cond */
-#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
-/** @endcond */
-/** @cond */
-#define UI_DOM_APP_CHILD_IGNORE(p, c) ui_dom_node_append_child((p), (c))
-/** @endcond */
-/** @cond */
-#define UI_DOM_SET_TXT_IGNORE(n, t) ui_dom_node_set_text_content((n), (t))
-/** @endcond */
-
-/** @cond */
-#define UI_DOM_SET_TAG_IGNORE(n, t) ui_dom_node_set_tag_name((n), (t))
-  /** @endcond */
-
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sb->root_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)UI_DOM_SET_TAG_IGNORE(sb->root_node, "div");
+  rc = ui_dom_node_set_tag_name(sb->root_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sb->wrapper_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)UI_DOM_SET_TAG_IGNORE(sb->wrapper_node, "div");
-  (void)UI_DOM_SET_ATTR_IGNORE(sb->wrapper_node, "class", "snackbar-wrapper");
-  (void)UI_DOM_APP_CHILD_IGNORE(sb->root_node, sb->wrapper_node);
+  rc = ui_dom_node_set_tag_name(sb->wrapper_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(sb->wrapper_node, "class", "snackbar-wrapper");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(sb->root_node, sb->wrapper_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sb->message_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)UI_DOM_SET_TAG_IGNORE(sb->message_node, "div");
-  (void)UI_DOM_SET_ATTR_IGNORE(sb->message_node, "class", "message");
-  (void)UI_DOM_SET_ATTR_IGNORE(sb->message_node, "role", "alert");
-  (void)UI_DOM_APP_CHILD_IGNORE(sb->wrapper_node, sb->message_node);
+  rc = ui_dom_node_set_tag_name(sb->message_node, "div");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(sb->message_node, "class", "message");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(sb->message_node, "role", "alert");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(sb->wrapper_node, sb->message_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &sb->message_text_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)UI_DOM_SET_TXT_IGNORE(sb->message_text_node, "");
-  (void)UI_DOM_APP_CHILD_IGNORE(sb->message_node, sb->message_text_node);
+  rc = ui_dom_node_set_text_content(sb->message_text_node, "");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(sb->message_node, sb->message_text_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sb->action_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)UI_DOM_SET_TAG_IGNORE(sb->action_node, "button");
-  (void)UI_DOM_SET_ATTR_IGNORE(sb->action_node, "class", "action");
-  (void)UI_DOM_APP_CHILD_IGNORE(sb->wrapper_node, sb->action_node);
+  rc = ui_dom_node_set_tag_name(sb->action_node, "button");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_set_attribute(sb->action_node, "class", "action");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(sb->wrapper_node, sb->action_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_TEXT, &sb->action_text_node);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
-  (void)UI_DOM_SET_TXT_IGNORE(sb->action_text_node, "");
-  (void)UI_DOM_APP_CHILD_IGNORE(sb->action_node, sb->action_text_node);
+  rc = ui_dom_node_set_text_content(sb->action_text_node, "");
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
+  rc = ui_dom_node_append_child(sb->action_node, sb->action_text_node);
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_css_parse_stylesheet(ui_snackbar_base_css, &default_style);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(sb->component, default_style);
-
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(sb->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   sb->component->shadow_root = sb->root_node;
@@ -255,17 +425,23 @@ ui_error_t ui_snackbar_base_create(struct ui_timer *timer,
 
 cleanup:
   if (sb->root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(sb->root_node);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_dom_node_destroy(sb->root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   if (sb->component) {
     ui_error_t rc_cleanup = ui_component_destroy(sb->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-  if (sb->queue)
-    ui_ring_buffer_destroy(sb->queue);
+  if (sb->queue) {
+    ui_error_t rc_cleanup = ui_ring_buffer_destroy(sb->queue);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
+  }
   C_MULTIPLATFORM_FREE(sb);
   return rc;
 }
@@ -277,16 +453,16 @@ cleanup:
  */
 ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
   struct internal_snackbar pop_item;
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
   if (!snackbar)
     return UI_ERROR_NONE;
 
   if (snackbar->overlay_handle) {
-    {
-      ui_error_t unmount_rc = ui_overlay_director_unmount(
-          snackbar->director, snackbar->overlay_handle);
-      if (unmount_rc != UI_ERROR_NONE)
-        return unmount_rc;
-    }
+    ui_error_t unmount_rc = ui_overlay_director_unmount(
+        snackbar->director, snackbar->overlay_handle);
+    if (unmount_rc != UI_ERROR_NONE)
+      return unmount_rc;
   }
 
   if (snackbar->is_active) {
@@ -297,10 +473,7 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
   }
 
   for (;;) {
-/** @cond */
-#define UI_RING_BUF_POP_IGNORE(q, i) ui_ring_buffer_pop((q), (i))
-    /** @endcond */
-    ui_error_t pop_rc = UI_RING_BUF_POP_IGNORE(snackbar->queue, &pop_item);
+    ui_error_t pop_rc = ui_ring_buffer_pop(snackbar->queue, &pop_item);
     if (pop_rc != UI_ERROR_NONE) {
       break;
     }
@@ -310,14 +483,20 @@ ui_error_t ui_snackbar_base_destroy(struct ui_snackbar_base *snackbar) {
       C_MULTIPLATFORM_FREE(pop_item.action_label);
   }
 
-  if (snackbar->queue)
-    ui_ring_buffer_destroy(snackbar->queue);
+  if (snackbar->queue) {
+    rc_cleanup = ui_ring_buffer_destroy(snackbar->queue);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
+  }
   if (snackbar->component) {
-    ui_error_t rc_cleanup = ui_component_destroy(snackbar->component);
-    (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(snackbar->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(snackbar);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -407,16 +586,14 @@ ui_error_t ui_snackbar_base_dismiss_current(struct ui_snackbar_base *snackbar) {
  */
 ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
   double now;
+  ui_error_t rc;
 
   if (!snackbar)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  {
-
-    ui_error_t _ign_rc = ui_timer_now(snackbar->timer, &now);
-
-    (void)_ign_rc;
-  }
+  rc = ui_timer_now(snackbar->timer, &now);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Check auto-dismissal */
   if (snackbar->is_active) {
@@ -431,39 +608,43 @@ ui_error_t ui_snackbar_base_tick(struct ui_snackbar_base *snackbar) {
 
   /* Show next in queue if not active */
   if (!snackbar->is_active) {
-    ui_error_t pop_rc =
-        UI_RING_BUF_POP_IGNORE(snackbar->queue, &snackbar->current);
+    ui_error_t pop_rc = ui_ring_buffer_pop(snackbar->queue, &snackbar->current);
     if (pop_rc == UI_ERROR_NONE) {
       snackbar->is_active = 1;
       snackbar->show_time = now;
 
       /* Update DOM */
-      (void)UI_DOM_SET_TXT_IGNORE(
+      rc = ui_dom_node_set_text_content(
           snackbar->message_text_node,
           snackbar->current.message ? snackbar->current.message : "");
-      (void)UI_DOM_SET_TXT_IGNORE(
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc = ui_dom_node_set_text_content(
           snackbar->action_text_node,
           snackbar->current.action_label ? snackbar->current.action_label : "");
+      if (rc != UI_ERROR_NONE)
+        return rc;
 
       if (snackbar->current.action_label &&
           strlen(snackbar->current.action_label) > 0) {
-        (void)UI_DOM_SET_ATTR_IGNORE(snackbar->action_node, "style",
-                                     "display: block;");
+        rc = ui_dom_node_set_attribute(snackbar->action_node, "style",
+                                       "display: block;");
+        if (rc != UI_ERROR_NONE)
+          return rc;
       } else {
-        (void)UI_DOM_SET_ATTR_IGNORE(snackbar->action_node, "style",
-                                     "display: none;");
+        rc = ui_dom_node_set_attribute(snackbar->action_node, "style",
+                                       "display: none;");
+        if (rc != UI_ERROR_NONE)
+          return rc;
       }
 
       /* Mount to overlay director */
       if (!snackbar->overlay_handle) {
-        {
-          ui_error_t rc_cleanup = ui_overlay_director_mount_component(
-              snackbar->director, snackbar->component, 1000,
-              &snackbar->overlay_handle);
-          if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
-          }
-        }
+        rc = ui_overlay_director_mount_component(snackbar->director,
+                                                 snackbar->component, 1000,
+                                                 &snackbar->overlay_handle);
+        if (rc != UI_ERROR_NONE)
+          return rc;
       }
     }
   }
@@ -482,7 +663,8 @@ ui_error_t ui_snackbar_base_process_event(struct ui_snackbar_base *snackbar,
                                           const struct ui_event *event,
                                           double timestamp_ms) {
   int is_down = 0;
-  (void)timestamp_ms;
+  if (timestamp_ms > 0.0) {
+  }
   if (!snackbar || !event)
     return UI_ERROR_INVALID_ARGUMENT;
 

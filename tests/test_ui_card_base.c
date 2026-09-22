@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "ui_card_base.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
@@ -24,20 +25,15 @@ static ui_error_t run_mock_failures(void) {
   int i;
   for (i = 0; i < 5; i++) {
     struct ui_card_base *card = NULL;
+    ui_error_t rc_cleanup;
     g_card_mock_fail = i;
-    {
-      ui_error_t rc_cleanup = ui_card_base_create(&card);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    rc_cleanup = ui_card_base_create(&card);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      assert(card == NULL);
     }
     if (card) {
-      {
-        ui_error_t rc_cleanup = ui_card_base_destroy(card);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+      rc_cleanup = ui_card_base_destroy(card);
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   g_card_mock_fail = -1;

@@ -19,9 +19,9 @@
 /** @brief internal */
 #define STB_TRUETYPE_IMPLEMENTATION
 /** @brief internal */
-#define STBTT_malloc(x,u)  ((void)(u),C_MULTIPLATFORM_MALLOC(x))
+#define STBTT_malloc(x,u)  ((u) ? C_MULTIPLATFORM_MALLOC(x) : C_MULTIPLATFORM_MALLOC(x))
 /** @brief internal */
-#define STBTT_free(x,u)    ((void)(u),C_MULTIPLATFORM_FREE(x))
+#define STBTT_free(x,u)    do { if (u) {} C_MULTIPLATFORM_FREE(x); } while (0)
 #include "stb_truetype.h"
 
 /** @brief internal */

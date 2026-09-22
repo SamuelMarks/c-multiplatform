@@ -16,8 +16,8 @@ static int test_gl1(void) {
     return 1;
   {
     ui_error_t rc_cleanup = ui_renderer_gl1_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
     }
   }
   return 0;
@@ -29,44 +29,54 @@ static int test_gl1(void) {
   if (backend->init(backend, NULL, NULL) != UI_ERROR_NONE)
     return 1;
 
-  (void)backend->set_viewport(backend, 0, 0, 800, 600);
-  (void)backend->clear(backend, col);
+  if (backend->set_viewport(backend, 0, 0, 800, 600) != UI_ERROR_NONE)
+    return 1;
+  if (backend->clear(backend, col) != UI_ERROR_NONE)
+    return 1;
 
-  (void)backend->draw_rect(backend, 0, 0, 10, 10, col);
-  (void)backend->draw_border(backend, 0, 0, 10, 10, 1, col);
+  if (backend->draw_rect(backend, 0, 0, 10, 10, col) != UI_ERROR_NONE)
+    return 1;
+  if (backend->draw_border(backend, 0, 0, 10, 10, 1, col) != UI_ERROR_NONE)
+    return 1;
 
   if (backend->create_texture(backend, 10, 10, &tex) != UI_ERROR_NONE)
     return 1;
-  (void)backend->set_render_target(backend, tex);
-  (void)backend->draw_texture(backend, tex, 0, 0, 10, 10, 1.0f);
-  (void)backend->flush(backend);
-  (void)backend->flush(backend); /* Hit the empty flush branch */
+  if (backend->set_render_target(backend, tex) != UI_ERROR_NONE)
+    return 1;
+  if (backend->draw_texture(backend, tex, 0, 0, 10, 10, 1.0f) != UI_ERROR_NONE)
+    return 1;
+  if (backend->flush(backend) != UI_ERROR_NONE)
+    return 1;
+  if (backend->flush(backend) != UI_ERROR_NONE) /* Hit the empty flush branch */
+    return 1;
 
   {
     unsigned char buf[4];
-    (void)backend->read_pixels(backend, 1, 1, buf);
+    if (backend->read_pixels(backend, 1, 1, buf) != UI_ERROR_NONE)
+      return 1;
   }
 
-  (void)backend->destroy_texture(backend, tex);
+  if (backend->destroy_texture(backend, tex) != UI_ERROR_NONE)
+    return 1;
 
   {
     ui_error_t rc_cleanup = ui_renderer_gl1_destroy(backend);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
   /* Null checks */
   {
     ui_error_t rc_cleanup = ui_renderer_gl1_create(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_renderer_gl1_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
     }
   }
 
@@ -78,7 +88,7 @@ static int test_gl1(void) {
   {
     ui_error_t rc_cleanup = ui_renderer_gl1_create(&backend);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   g_malloc_fail_countdown = 0;
@@ -89,7 +99,7 @@ static int test_gl1(void) {
   {
     ui_error_t rc_cleanup = ui_renderer_gl1_destroy(backend);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -97,10 +107,11 @@ static int test_gl1(void) {
   {
     ui_error_t rc_cleanup = ui_renderer_gl1_create(&backend);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  (void)backend->init(backend, NULL, NULL);
+  if (backend->init(backend, NULL, NULL) != UI_ERROR_NONE)
+    return 1;
   g_malloc_fail_countdown = 0;
   if (backend->create_texture(backend, 10, 10, &tex) != UI_ERROR_OUT_OF_MEMORY)
     return 1;
@@ -110,7 +121,8 @@ static int test_gl1(void) {
   {
     int i;
     for (i = 0; i < 2100; i++) {
-      (void)backend->draw_rect(backend, 0, 0, 1, 1, col);
+      if (backend->draw_rect(backend, 0, 0, 1, 1, col) != UI_ERROR_NONE)
+        return 1;
     }
   }
 
@@ -128,51 +140,67 @@ static int test_gl1(void) {
 
     /* Test draw_rect fail */
     g_mock_gles2_flush_fail = 0;
-    (void)backend->draw_triangles(backend, dummy_verts, 8192, dummy_indices,
-                                  8192);
+    if (backend->draw_triangles(backend, dummy_verts, 8192, dummy_indices,
+                                8192) != UI_ERROR_NONE) {
+      return 1;
+    }
     g_mock_gles2_flush_fail = 1;
     if (backend->draw_rect(backend, 0, 0, 10, 10, col) != UI_ERROR_UNKNOWN) {
+      return 1;
     }
 
     /* Test draw_border fail 1 */
     g_mock_gles2_flush_fail = 0;
-    (void)backend->draw_triangles(backend, dummy_verts, 8192, dummy_indices,
-                                  8192);
+    if (backend->draw_triangles(backend, dummy_verts, 8192, dummy_indices,
+                                8192) != UI_ERROR_NONE) {
+      return 1;
+    }
     g_mock_gles2_flush_fail = 1;
     if (backend->draw_border(backend, 0, 0, 10, 10, 1, col) !=
         UI_ERROR_UNKNOWN) {
+      return 1;
     }
 
     /* Test draw_border fail 2 */
     g_mock_gles2_flush_fail = 0;
-    (void)backend->draw_triangles(backend, dummy_verts, 8192 - 4, dummy_indices,
-                                  8192 - 6);
+    if (backend->draw_triangles(backend, dummy_verts, 8192 - 4, dummy_indices,
+                                8192 - 6) != UI_ERROR_NONE) {
+      return 1;
+    }
     g_mock_gles2_flush_fail = 1;
     if (backend->draw_border(backend, 0, 0, 10, 10, 1, col) !=
         UI_ERROR_UNKNOWN) {
+      return 1;
     }
 
     /* Test draw_border fail 3 */
     g_mock_gles2_flush_fail = 0;
-    (void)backend->draw_triangles(backend, dummy_verts, 8192 - 8, dummy_indices,
-                                  8192 - 12);
+    if (backend->draw_triangles(backend, dummy_verts, 8192 - 8, dummy_indices,
+                                8192 - 12) != UI_ERROR_NONE) {
+      return 1;
+    }
     g_mock_gles2_flush_fail = 1;
     if (backend->draw_border(backend, 0, 0, 10, 10, 1, col) !=
         UI_ERROR_UNKNOWN) {
+      return 1;
     }
 
     /* Test draw_border fail 4 */
     g_mock_gles2_flush_fail = 0;
-    (void)backend->draw_triangles(backend, dummy_verts, 8192 - 12,
-                                  dummy_indices, 8192 - 18);
+    if (backend->draw_triangles(backend, dummy_verts, 8192 - 12, dummy_indices,
+                                8192 - 18) != UI_ERROR_NONE) {
+      return 1;
+    }
     g_mock_gles2_flush_fail = 1;
     if (backend->draw_border(backend, 0, 0, 10, 10, 1, col) !=
         UI_ERROR_UNKNOWN) {
+      return 1;
     }
 
     g_mock_gles2_flush_fail = 1;
     if (backend->draw_texture(backend, tex, 0, 0, 10, 10, 1.0f) !=
         UI_ERROR_UNKNOWN) {
+      return 1;
     }
 
     g_mock_gles2_flush_fail = 0;
@@ -182,6 +210,7 @@ static int test_gl1(void) {
     extern int g_mock_gles2_destroy_fail;
     g_mock_gles2_destroy_fail = 1;
     if (ui_renderer_gl1_destroy(backend) != UI_ERROR_UNKNOWN) {
+      return 1;
     }
     g_mock_gles2_destroy_fail = 0;
   }
@@ -191,51 +220,83 @@ static int test_gl1(void) {
   {
     struct ui_vertex v[8193];
     unsigned short idx[24577];
-    (void)backend->draw_triangles(backend, v, 8193, idx, 24577);
-    (void)backend->draw_triangles(backend, v, 10, idx, 24577);
-    (void)backend->flush(backend);
-    (void)backend->draw_triangles(backend, v, 8100, idx, 10);
-    (void)backend->draw_triangles(backend, v, 10, idx, 24500);
+    if (backend->draw_triangles(backend, v, 8193, idx, 24577) !=
+        UI_ERROR_OUT_OF_MEMORY)
+      return 1;
+    if (backend->draw_triangles(backend, v, 10, idx, 24577) !=
+        UI_ERROR_OUT_OF_MEMORY)
+      return 1;
+    if (backend->flush(backend) != UI_ERROR_NONE)
+      return 1;
+    if (backend->draw_triangles(backend, v, 8100, idx, 10) != UI_ERROR_NONE)
+      return 1;
+    if (backend->draw_triangles(backend, v, 10, idx, 24500) != UI_ERROR_NONE)
+      return 1;
   }
 
   /* Null args to backend funcs */
-  (void)backend->flush(NULL);
-  (void)backend->draw_triangles(NULL, NULL, 0, NULL, 0);
-  (void)backend->draw_triangles(backend, NULL, 0, NULL, 0);
+  if (backend->flush(NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->draw_triangles(NULL, NULL, 0, NULL, 0) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->draw_triangles(backend, NULL, 0, NULL, 0) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
   {
     struct ui_vertex v[1];
     unsigned short idx[1];
-    (void)backend->draw_triangles(backend, v, 0, NULL, 0);
+    if (backend->draw_triangles(backend, v, 0, NULL, 0) !=
+        UI_ERROR_INVALID_ARGUMENT)
+      return 1;
 
     /* test user_data NULL for draw_triangles and flush */
     {
       void *tmp = backend->user_data;
       backend->user_data = NULL;
-      (void)backend->draw_triangles(backend, v, 0, idx, 0);
-      (void)backend->flush(backend);
+      if (backend->draw_triangles(backend, v, 0, idx, 0) !=
+          UI_ERROR_INVALID_ARGUMENT)
+        return 1;
+      if (backend->flush(backend) != UI_ERROR_INVALID_ARGUMENT)
+        return 1;
       backend->user_data = tmp;
     }
   }
 
-  (void)backend->create_texture(NULL, 10, 10, NULL);
-  (void)backend->create_texture(backend, 10, 10, NULL);
+  if (backend->create_texture(NULL, 10, 10, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->create_texture(backend, 10, 10, NULL) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
-  (void)backend->destroy_texture(NULL, NULL);
-  (void)backend->destroy_texture(backend, NULL);
+  if (backend->destroy_texture(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->destroy_texture(backend, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
-  (void)backend->read_pixels(NULL, 10, 10, NULL);
-  (void)backend->read_pixels(backend, 10, 10, NULL);
-  (void)backend->init(NULL, NULL, NULL);
-  (void)backend->destroy(NULL);
-  (void)backend->set_render_target(NULL, NULL);
-  (void)backend->draw_texture(NULL, NULL, 0, 0, 0, 0, 0);
-  (void)backend->draw_texture(backend, NULL, 0, 0, 0, 0, 0);
-  (void)backend->read_pixels(NULL, 0, 0, NULL);
+  if (backend->read_pixels(NULL, 10, 10, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->read_pixels(backend, 10, 10, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->init(NULL, NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->destroy(NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->set_render_target(NULL, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->draw_texture(NULL, NULL, 0, 0, 0, 0, 0) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->draw_texture(backend, NULL, 0, 0, 0, 0, 0) !=
+      UI_ERROR_INVALID_ARGUMENT)
+    return 1;
+  if (backend->read_pixels(NULL, 0, 0, NULL) != UI_ERROR_INVALID_ARGUMENT)
+    return 1;
 
   {
     ui_error_t rc_cleanup = ui_renderer_gl1_destroy(backend);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 

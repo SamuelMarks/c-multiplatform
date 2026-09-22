@@ -7,6 +7,27 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_context_menu_mock_fail = 0;
+
+/**
+ * @brief mock_context_menu_menu_destroy.
+ * @param menu Parameter menu.
+ * @return Return value.
+ */
+static ui_error_t mock_context_menu_menu_destroy(struct ui_menu_base *menu) {
+  if (g_context_menu_mock_fail == 1) {
+    (ui_menu_base_destroy)(menu);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_menu_base_destroy)(menu);
+}
+#undef ui_menu_base_destroy
+/** @cond */
+#define ui_menu_base_destroy mock_context_menu_menu_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_context_menu_base
  * \brief ui_context_menu_base
@@ -49,14 +70,17 @@ ui_error_t ui_context_menu_base_create(struct ui_context_menu_base **out_menu) {
  * @return Return value.
  */
 ui_error_t ui_context_menu_base_destroy(struct ui_context_menu_base *menu) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (menu) {
-    {
+    if (menu->menu) {
       ui_error_t rc_cleanup = ui_menu_base_destroy(menu->menu);
-      (void)rc_cleanup;
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
+      }
     }
     C_MULTIPLATFORM_FREE(menu);
   }
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

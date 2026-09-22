@@ -6,6 +6,10 @@
 #include <assert.h>
 /* clang-format on */
 
+extern int g_rte_mock_set_style_fail;
+extern int g_rte_mock_destroy_fail;
+extern int g_rte_mock_node_destroy_fail;
+
 static ui_error_t test_rte_creation(void) {
   struct ui_rich_text_editor_base *rte = NULL;
   ui_error_t rc = ui_rich_text_editor_base_create(&rte, NULL);
@@ -14,7 +18,7 @@ static ui_error_t test_rte_creation(void) {
   {
     ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   printf("test_rte_creation passed\n");
@@ -52,7 +56,7 @@ static ui_error_t test_rte_operations(void) {
   {
     ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   printf("test_rte_operations passed\n");
@@ -75,6 +79,7 @@ void test_ui_rte_coverage_errs12(void);
 void test_ui_rte_coverage_errs13(void);
 void test_ui_rte_coverage_errs14(void);
 void test_ui_rte_coverage_errs15(void);
+void test_ui_rte_coverage_errs16(void);
 int main(void) {
   test_rte_creation();
   test_rte_operations();
@@ -94,6 +99,7 @@ int main(void) {
   test_ui_rte_cva_nulls3();
   test_ui_rte_coverage_errs14();
   test_ui_rte_coverage_errs15();
+  test_ui_rte_coverage_errs16();
   return 0;
 }
 void test_ui_rte_coverage_errs(void) {
@@ -109,9 +115,7 @@ void test_ui_rte_coverage_errs(void) {
 void test_ui_rte_errors3(void) {
   {
     ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_rich_text_editor_base_get_component(NULL, NULL);
   struct ui_component *comp;
@@ -203,9 +207,7 @@ void test_ui_rte_cva3(void) {
 
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -224,9 +226,7 @@ void test_ui_rte_cva_nulls3(void) {
     cva.register_on_touched(NULL, NULL, NULL);
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -263,9 +263,7 @@ void test_ui_rte_coverage_errs4(void) {
 
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -304,9 +302,7 @@ void test_ui_rte_coverage_errs6(void) {
 
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -318,21 +314,22 @@ void test_ui_rte_coverage_errs7(void) {
     ui_rich_text_editor_base_insert_text(rte, "foo");
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
 
 static ui_error_t my_cva_on_change(union ui_signal_payload payload,
                                    void *user_data) {
-  (void)payload;
-  (void)user_data;
+  if (payload.ptr_val) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 static ui_error_t my_cva_on_touched(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_NONE;
 }
 
@@ -346,9 +343,7 @@ void test_ui_rte_coverage_errs8(void) {
     ui_rich_text_editor_base_insert_text(rte, "foo");
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -438,9 +433,7 @@ void test_ui_rte_extra(void) {
 
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -470,9 +463,7 @@ void test_ui_rte_extra_more(void) {
     ui_rich_text_editor_base_insert_text(rte, "triggertouchandchange");
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -490,9 +481,7 @@ void test_ui_rte_cva(void) {
     cva.register_on_touched(rte, NULL, NULL);
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -510,9 +499,7 @@ void test_ui_rte_cva_nulls(void) {
     cva.register_on_touched(NULL, NULL, NULL);
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -542,9 +529,7 @@ void test_ui_rte_cva2(void) {
     ui_rich_text_editor_base_get_component(rte, &comp);
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -570,9 +555,7 @@ void test_ui_rte_coverage_errs14(void) {
 
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -593,9 +576,60 @@ void test_ui_rte_coverage_errs15(void) {
 
     {
       ui_error_t rc_cleanup = ui_rich_text_editor_base_destroy(rte);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
+}
+
+void test_ui_rte_coverage_errs16(void) {
+  struct ui_rich_text_editor_base *rte = NULL;
+  ui_error_t rc;
+
+  /* 1. ui_component_set_default_style failure inside create */
+  g_rte_mock_set_style_fail = 1;
+  rc = ui_rich_text_editor_base_create(&rte, NULL);
+  assert(rc == UI_ERROR_UNKNOWN);
+  assert(rte == NULL);
+  g_rte_mock_set_style_fail = 0;
+
+  /* 2. root_node destroy failure during create cleanup */
+  g_rte_mock_node_destroy_fail = 1;
+  g_rte_mock_set_style_fail = 1;
+  rc = ui_rich_text_editor_base_create(&rte, NULL);
+  assert(rc != UI_ERROR_NONE);
+  assert(rte == NULL);
+  g_rte_mock_set_style_fail = 0;
+  g_rte_mock_node_destroy_fail = 0;
+
+  /* 3. component destroy failure during create cleanup */
+  g_rte_mock_destroy_fail = 1;
+  g_rte_mock_set_style_fail = 1;
+  rc = ui_rich_text_editor_base_create(&rte, NULL);
+  assert(rc != UI_ERROR_NONE);
+  assert(rte == NULL);
+  g_rte_mock_set_style_fail = 0;
+  g_rte_mock_destroy_fail = 0;
+
+  /* 4. component destroy failure during ui_rich_text_editor_base_destroy */
+  rc = ui_rich_text_editor_base_create(&rte, NULL);
+  assert(rc == UI_ERROR_NONE);
+  assert(rte != NULL);
+
+  /* Test branches for set_caret_from_point: x < 0, y < 0, both positive */
+  assert(ui_rich_text_editor_base_set_caret_from_point(rte, -1.0f, 10.0f) ==
+         UI_ERROR_INVALID_ARGUMENT);
+  assert(ui_rich_text_editor_base_set_caret_from_point(rte, 10.0f, -1.0f) ==
+         UI_ERROR_INVALID_ARGUMENT);
+  assert(ui_rich_text_editor_base_set_caret_from_point(rte, 10.0f, 10.0f) ==
+         UI_ERROR_NONE);
+
+  /* Test branches for ime_update: !composition */
+  assert(ui_rich_text_editor_base_ime_update(rte, NULL) ==
+         UI_ERROR_INVALID_ARGUMENT);
+  assert(ui_rich_text_editor_base_ime_update(rte, "text") == UI_ERROR_NONE);
+
+  g_rte_mock_destroy_fail = 1;
+  rc = ui_rich_text_editor_base_destroy(rte);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_rte_mock_destroy_fail = 0;
 }

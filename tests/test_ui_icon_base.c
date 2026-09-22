@@ -117,10 +117,15 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  ui_icon_base_destroy(NULL); /* Should be safe */
+  {
+    ui_error_t rc_cleanup = ui_icon_base_destroy(NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  } /* Should be safe */
 
   /* Test destroy with NULL data */
   {
@@ -129,7 +134,7 @@ static int run_normal_tests(void) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(fresh_icon);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
   }
@@ -142,7 +147,7 @@ static int run_normal_tests(void) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(fresh_icon2);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
   }
@@ -174,7 +179,7 @@ static int run_oom_tests(void) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     return 1;
@@ -202,7 +207,7 @@ static int run_oom_tests(void) {
     {
       ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     return 1;
@@ -211,7 +216,7 @@ static int run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_icon_base_destroy(icon);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;

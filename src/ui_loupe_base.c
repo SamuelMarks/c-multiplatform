@@ -14,6 +14,27 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_loupe_mock_fail = 0;
+
+/**
+ * @brief mock_loupe_signal_destroy.
+ * @param signal Parameter signal.
+ * @return Return value.
+ */
+static ui_error_t mock_loupe_signal_destroy(ui_signal_t *signal) {
+  if (g_loupe_mock_fail == 1) {
+    (ui_signal_destroy)(signal);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_destroy)(signal);
+}
+#undef ui_signal_destroy
+/** @cond */
+#define ui_signal_destroy mock_loupe_signal_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_loupe_base
  * @struct ui_loupe_base
@@ -118,6 +139,7 @@ ui_error_t ui_loupe_base_create(struct ui_arena *arena,
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_loupe_base_destroy(struct ui_loupe_base *loupe) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!loupe) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -125,11 +147,13 @@ ui_error_t ui_loupe_base_destroy(struct ui_loupe_base *loupe) {
   if (loupe->overlay_origin_signal) {
     {
       ui_error_t rc_cleanup = ui_signal_destroy(loupe->overlay_origin_signal);
-      (void)rc_cleanup;
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
+      }
     }
   }
 
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

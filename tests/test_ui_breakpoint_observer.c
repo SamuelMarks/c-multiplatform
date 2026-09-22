@@ -29,9 +29,7 @@ static void test_invalid_args(void) {
 
   {
     ui_error_t rc_cleanup = ui_breakpoint_observer_destroy(observer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -46,9 +44,7 @@ static void test_oom(void) {
     if (rc == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_breakpoint_observer_destroy(observer);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     } else {
@@ -89,19 +85,17 @@ static void test_widths(void) {
 
   {
     ui_error_t rc_cleanup = ui_breakpoint_observer_destroy(o);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 int main(void) {
-  test_widths();
   struct ui_breakpoint_observer *observer = NULL;
   struct ui_signal *small_sig;
   struct ui_signal *large_sig;
   union ui_signal_payload val_small, val_large;
   ui_error_t rc;
 
+  test_widths();
   test_invalid_args();
   test_oom();
 
@@ -163,9 +157,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_breakpoint_observer_destroy(observer);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   printf("test_ui_breakpoint_observer passed\n");
   return 0;

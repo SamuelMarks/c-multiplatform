@@ -18,6 +18,69 @@
 #include <ctype.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_input_mask_mock_fail = 0;
+
+/**
+ * @brief mock_input_mask_set_on_change.
+ * @param input Parameter input.
+ * @param on_change Parameter on_change.
+ * @param user_data Parameter user_data.
+ * @return Return value.
+ */
+static ui_error_t mock_input_mask_set_on_change(struct ui_input_base *input,
+                                                ui_input_on_change_t on_change,
+                                                void *user_data) {
+  if (g_input_mask_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_input_mask_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_input_base_set_on_change)(input, on_change, user_data);
+}
+#undef ui_input_base_set_on_change
+/** @cond */
+#define ui_input_base_set_on_change mock_input_mask_set_on_change
+/** @endcond */
+
+/**
+ * @brief mock_input_mask_get_text.
+ * @param input Parameter input.
+ * @param out_text Parameter out_text.
+ * @return Return value.
+ */
+static ui_error_t mock_input_mask_get_text(const struct ui_input_base *input,
+                                           const char **out_text) {
+  if (g_input_mask_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_input_base_get_text)(input, out_text);
+}
+#undef ui_input_base_get_text
+/** @cond */
+#define ui_input_base_get_text mock_input_mask_get_text
+/** @endcond */
+
+/**
+ * @brief mock_input_mask_set_text.
+ * @param input Parameter input.
+ * @param text Parameter text.
+ * @return Return value.
+ */
+static ui_error_t mock_input_mask_set_text(struct ui_input_base *input,
+                                           const char *text) {
+  if (g_input_mask_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_input_base_set_text)(input, text);
+}
+#undef ui_input_base_set_text
+/** @cond */
+#define ui_input_base_set_text mock_input_mask_set_text
+/** @endcond */
+#endif
+
 /** @def MAX_MASK_LEN
  * @brief Maximum mask length
  */
@@ -79,7 +142,9 @@ static ui_error_t safe_strcpy(char *dst, size_t sz, const char *src) {
 static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
                                   void *user_data) {
   struct ui_input_mask *mask = (struct ui_input_mask *)user_data;
-  (void)input;
+  if (!input) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (mask->is_processing) {
     return UI_ERROR_NONE;
   }
@@ -120,17 +185,19 @@ ui_error_t ui_input_mask_create(struct ui_input_mask **out_mask) {
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_input_mask_destroy(struct ui_input_mask *mask) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!mask) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (mask->input) {
-    {
-      ui_error_t _ign_rc = ui_input_base_set_on_change(mask->input, NULL, NULL);
-      (void)_ign_rc;
+    ui_error_t rc_cleanup =
+        ui_input_base_set_on_change(mask->input, NULL, NULL);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
   }
   C_MULTIPLATFORM_FREE(mask);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -141,25 +208,25 @@ ui_error_t ui_input_mask_destroy(struct ui_input_mask *mask) {
  */
 ui_error_t ui_input_mask_bind(struct ui_input_mask *mask,
                               struct ui_input_base *input) {
+  const char *tmp_text;
+  ui_error_t rc;
 
   if (!mask || !input) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   mask->input = input;
-  {
-    ui_error_t set_rc =
-        ui_input_base_set_on_change(input, on_input_change, mask);
-    (void)set_rc;
+  rc = ui_input_base_set_on_change(input, on_input_change, mask);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   /* initial formatting */
-  {
-    const char *tmp_text;
-    ui_error_t get_rc = ui_input_base_get_text(input, &tmp_text);
-    (void)get_rc;
-    return ui_input_mask_process_text(mask, tmp_text);
+  rc = ui_input_base_get_text(input, &tmp_text);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
+  return ui_input_mask_process_text(mask, tmp_text);
 }
 
 /**
@@ -173,14 +240,13 @@ ui_error_t ui_input_mask_set_pattern(struct ui_input_mask *mask,
   if (!mask || !pattern) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
-  {
-    ui_error_t cp_rc = safe_strcpy(mask->pattern, MAX_MASK_LEN, pattern);
-    (void)cp_rc;
-  }
+  safe_strcpy(mask->pattern, MAX_MASK_LEN, pattern);
 
   if (mask->input) {
-    ui_error_t proc_rc = ui_input_mask_process_text(mask, mask->raw_value);
-    (void)proc_rc;
+    ui_error_t rc = ui_input_mask_process_text(mask, mask->raw_value);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -268,7 +334,10 @@ ui_error_t ui_input_mask_process_text(struct ui_input_mask *mask,
   if (mask->input) {
     ui_error_t rc;
     rc = ui_input_base_set_text(mask->input, mask->formatted_value);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      mask->is_processing = 0;
+      return rc;
+    }
   }
 
   mask->is_processing = 0;

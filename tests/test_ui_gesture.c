@@ -76,9 +76,7 @@ static void test_gesture_basic(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -87,9 +85,7 @@ static void test_gesture_basic(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -98,9 +94,7 @@ static void test_gesture_basic(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -109,9 +103,7 @@ static void test_gesture_basic(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -122,9 +114,7 @@ static void test_gesture_basic(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 150.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -134,17 +124,13 @@ static void test_gesture_basic(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 160.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -155,9 +141,7 @@ static void test_gesture_tap_mouse(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   memset(&ev, 0, sizeof(ev));
@@ -168,9 +152,7 @@ static void test_gesture_tap_mouse(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -178,16 +160,14 @@ static void test_gesture_tap_mouse(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_TAP);
   assert(gev.state == UI_GESTURE_STATE_ENDED);
   assert(gev.x == 100);
   assert(gev.y == 100);
 
-  (void)(void)ui_gesture_recognizer_destroy(r);
+  assert(ui_gesture_recognizer_destroy(r) == UI_ERROR_NONE);
 }
 
 static void test_gesture_tap_touch(void) {
@@ -197,9 +177,7 @@ static void test_gesture_tap_touch(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   memset(&ev, 0, sizeof(ev));
@@ -210,9 +188,7 @@ static void test_gesture_tap_touch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -221,9 +197,7 @@ static void test_gesture_tap_touch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_TAP);
   assert(gev.x == 50);
@@ -235,9 +209,7 @@ static void test_gesture_tap_touch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 200.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_TOUCH_END;
@@ -247,14 +219,43 @@ static void test_gesture_tap_touch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 300.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_TAP);
   assert(gev.x == 60);
 
-  (void)(void)ui_gesture_recognizer_destroy(r);
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_gesture_mock_fail;
+    /* Test reset error during touch end */
+    ev.type = UI_EVENT_TOUCH_START;
+    ev.event_data.touch.num_points = 1;
+    ev.event_data.touch.points[0].x = 50;
+    ev.event_data.touch.points[0].y = 50;
+    assert(ui_gesture_recognizer_process_event(r, &ev, 400.0, &gev) ==
+           UI_ERROR_NONE);
+    g_gesture_mock_fail = 1;
+    ev.type = UI_EVENT_TOUCH_END;
+    assert(ui_gesture_recognizer_process_event(r, &ev, 450.0, &gev) ==
+           UI_ERROR_UNKNOWN);
+    g_gesture_mock_fail = 0;
+
+    /* Test reset error during touch cancel */
+    ev.type = UI_EVENT_TOUCH_START;
+    ev.event_data.touch.num_points = 1;
+    ev.event_data.touch.points[0].x = 50;
+    ev.event_data.touch.points[0].y = 50;
+    assert(ui_gesture_recognizer_process_event(r, &ev, 500.0, &gev) ==
+           UI_ERROR_NONE);
+    g_gesture_mock_fail = 1;
+    ev.type = UI_EVENT_TOUCH_CANCEL;
+    assert(ui_gesture_recognizer_process_event(r, &ev, 550.0, &gev) ==
+           UI_ERROR_UNKNOWN);
+    g_gesture_mock_fail = 0;
+  }
+#endif
+
+  assert(ui_gesture_recognizer_destroy(r) == UI_ERROR_NONE);
 }
 
 static void test_gesture_long_press(void) {
@@ -264,9 +265,7 @@ static void test_gesture_long_press(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   memset(&ev, 0, sizeof(ev));
@@ -277,16 +276,12 @@ static void test_gesture_long_press(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 600.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_LONG_PRESS);
   assert(gev.state == UI_GESTURE_STATE_BEGAN);
@@ -295,14 +290,12 @@ static void test_gesture_long_press(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 650.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_LONG_PRESS);
   assert(gev.state == UI_GESTURE_STATE_ENDED);
 
-  (void)(void)ui_gesture_recognizer_destroy(r);
+  assert(ui_gesture_recognizer_destroy(r) == UI_ERROR_NONE);
 }
 
 static void test_gesture_pan(void) {
@@ -312,9 +305,7 @@ static void test_gesture_pan(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   memset(&ev, 0, sizeof(ev));
@@ -325,9 +316,7 @@ static void test_gesture_pan(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Move slightly, less than UI_PAN_MIN_DISTANCE (10) */
@@ -337,9 +326,7 @@ static void test_gesture_pan(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -348,9 +335,7 @@ static void test_gesture_pan(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 100.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_PAN);
   assert(gev.state == UI_GESTURE_STATE_BEGAN);
@@ -359,9 +344,7 @@ static void test_gesture_pan(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 200.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_PAN);
   assert(gev.state == UI_GESTURE_STATE_CHANGED);
@@ -371,9 +354,7 @@ static void test_gesture_pan(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 300.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type ==
          UI_GESTURE_PAN); /* velocity is low, so end pan not swipe */
@@ -381,17 +362,13 @@ static void test_gesture_pan(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test dt == 0.0 in PAN */
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
@@ -401,9 +378,7 @@ static void test_gesture_pan(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_MOUSE_MOVE;
@@ -412,25 +387,19 @@ static void test_gesture_pan(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* move */
 
   ev.event_data.mouse.x = 130;
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* 0 time delta move */
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -441,9 +410,7 @@ static void test_gesture_swipe(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   memset(&ev, 0, sizeof(ev));
@@ -454,9 +421,7 @@ static void test_gesture_swipe(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_MOUSE_MOVE;
@@ -465,9 +430,7 @@ static void test_gesture_swipe(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_PAN);
   assert(gev.state == UI_GESTURE_STATE_BEGAN);
@@ -476,14 +439,12 @@ static void test_gesture_swipe(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 20.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_SWIPE);
   assert(gev.state == UI_GESTURE_STATE_ENDED);
 
-  (void)(void)ui_gesture_recognizer_destroy(r);
+  assert(ui_gesture_recognizer_destroy(r) == UI_ERROR_NONE);
 }
 
 static void test_gesture_pinch(void) {
@@ -493,9 +454,7 @@ static void test_gesture_pinch(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   memset(&ev, 0, sizeof(ev));
@@ -508,9 +467,7 @@ static void test_gesture_pinch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_TOUCH_MOVE;
@@ -522,9 +479,7 @@ static void test_gesture_pinch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_PINCH);
   assert(gev.state == UI_GESTURE_STATE_BEGAN);
@@ -534,9 +489,7 @@ static void test_gesture_pinch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 20.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_PINCH);
   assert(gev.state == UI_GESTURE_STATE_CHANGED);
@@ -552,9 +505,7 @@ static void test_gesture_pinch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 30.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_ROTATION);
   assert(gev.state == UI_GESTURE_STATE_CHANGED);
@@ -567,9 +518,7 @@ static void test_gesture_pinch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 40.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Force zero delta time event */
@@ -578,24 +527,18 @@ static void test_gesture_pinch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 40.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test untouched TOUCH_MOVE */
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_TOUCH_MOVE;
@@ -607,17 +550,13 @@ static void test_gesture_pinch(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -628,9 +567,7 @@ static void test_gesture_pan_long_press(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Start long press */
@@ -642,15 +579,11 @@ static void test_gesture_pan_long_press(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 600.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Move */
@@ -660,9 +593,7 @@ static void test_gesture_pan_long_press(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 650.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE); /* Already long pressed, shouldn't pan */
 
@@ -673,9 +604,7 @@ static void test_gesture_pan_long_press(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 660.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE); /* Still shouldn't pan */
 
@@ -684,9 +613,7 @@ static void test_gesture_pan_long_press(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 700.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(
       gev.type ==
@@ -696,17 +623,13 @@ static void test_gesture_pan_long_press(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* --- Cancel after long press and move --- */
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
@@ -716,15 +639,11 @@ static void test_gesture_pan_long_press(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 600.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* triggers long press */
   printf("Update at 600.0 gev.type = %d\n", gev.type);
 
@@ -735,16 +654,12 @@ static void test_gesture_pan_long_press(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 650.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* sets has_moved_significantly */
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 680.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* Hit branch where tracking but has moved */
   printf("After 680: tracking=%d moved=%d long_press=%d\n", r->is_tracking,
          r->has_moved_significantly, r->long_press_triggered);
@@ -758,9 +673,7 @@ static void test_gesture_pan_long_press(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_destroy(r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -771,9 +684,7 @@ static void test_gesture_duration_no_tap(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   memset(&ev, 0, sizeof(ev));
@@ -784,9 +695,7 @@ static void test_gesture_duration_no_tap(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_MOUSE_UP;
@@ -794,13 +703,11 @@ static void test_gesture_duration_no_tap(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 400.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
-  (void)(void)ui_gesture_recognizer_destroy(r);
+  assert(ui_gesture_recognizer_destroy(r) == UI_ERROR_NONE);
 }
 
 static void test_gesture_cancel(void) {
@@ -810,9 +717,7 @@ static void test_gesture_cancel(void) {
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_create(&r);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   memset(&ev, 0, sizeof(ev));
@@ -823,9 +728,7 @@ static void test_gesture_cancel(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 0.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_MOUSE_MOVE;
@@ -833,18 +736,14 @@ static void test_gesture_cancel(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 10.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_TOUCH_CANCEL;
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 20.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_PAN);
   assert(gev.state == UI_GESTURE_STATE_CANCELLED);
@@ -857,25 +756,19 @@ static void test_gesture_cancel(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 30.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 630.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_TOUCH_CANCEL;
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 640.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_LONG_PRESS);
   assert(gev.state == UI_GESTURE_STATE_CANCELLED);
@@ -888,18 +781,14 @@ static void test_gesture_cancel(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 700.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ev.type = UI_EVENT_TOUCH_CANCEL;
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 710.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -909,29 +798,21 @@ static void test_gesture_cancel(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 800.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 810.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* duration < UI_LONG_PRESS_MIN_DURATION_MS */
   assert(gev.type == UI_GESTURE_NONE);
 
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 1400.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* Triggers long press */
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 1500.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* r->long_press_triggered is true */
   assert(gev.type == UI_GESTURE_NONE);
 
@@ -940,19 +821,15 @@ static void test_gesture_cancel(void) {
   {
     ui_error_t rc_cleanup =
         ui_gesture_recognizer_process_event(r, &ev, 1600.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_gesture_recognizer_update(r, 1610.0, &gev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* r->has_moved_significantly is true */
   assert(gev.type == UI_GESTURE_NONE);
 
-  (void)(void)ui_gesture_recognizer_destroy(r);
+  assert(ui_gesture_recognizer_destroy(r) == UI_ERROR_NONE);
 }
 
 static void run_oom_tests_gesture(void) {
@@ -965,7 +842,7 @@ static void run_oom_tests_gesture(void) {
     rc = ui_gesture_recognizer_create(&r);
     g_malloc_fail_countdown = -1;
     if (rc == UI_ERROR_NONE) {
-      (void)(void)ui_gesture_recognizer_destroy(r);
+      assert(ui_gesture_recognizer_destroy(r) == UI_ERROR_NONE);
       break;
     }
   }

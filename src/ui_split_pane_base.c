@@ -179,6 +179,28 @@ ui_error_t ui_split_pane_base_set_bounds(struct ui_split_pane_base *split_pane,
   return ui_split_pane_base_set_position(split_pane, split_pane->position);
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_split_pane_mock_fail = 0;
+
+/**
+ * @brief mock_split_pane_set_position.
+ * @param sp Parameter sp.
+ * @param pos Parameter pos.
+ * @return Return value.
+ */
+static ui_error_t mock_split_pane_set_position(struct ui_split_pane_base *sp,
+                                               int pos) {
+  if (g_split_pane_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_split_pane_base_set_position)(sp, pos);
+}
+#undef ui_split_pane_base_set_position
+/** @cond */
+#define ui_split_pane_base_set_position mock_split_pane_set_position
+/** @endcond */
+#endif
+
 /**
  * \brief Processes an event.
  * \param split_pane The split pane component.
@@ -191,6 +213,7 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
   int coord = 0;
   int delta = 0;
   int new_pos;
+  ui_error_t set_rc;
 
   if (!split_pane || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -241,10 +264,9 @@ ui_split_pane_base_process_event(struct ui_split_pane_base *split_pane,
     if (split_pane->is_dragging) {
       delta = coord - split_pane->drag_start_coord;
       new_pos = split_pane->drag_start_pos + delta;
-      {
-        ui_error_t rc_cleanup =
-            ui_split_pane_base_set_position(split_pane, new_pos);
-        (void)rc_cleanup;
+      set_rc = ui_split_pane_base_set_position(split_pane, new_pos);
+      if (set_rc != UI_ERROR_NONE) {
+        return set_rc;
       }
     }
     break;

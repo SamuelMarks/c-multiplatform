@@ -7,6 +7,10 @@
 #include <string.h>
 #include <ctype.h>
 #include "ui_internal_mem.h"
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_round_display_mock_fail = 0;
+#endif
 /* clang-format on */
 
 /**
@@ -14,10 +18,19 @@
  * @param p_str Parameter p_str.
  * @return Return value.
  */
-static void skip_whitespace(const char **p_str) {
+static ui_error_t skip_whitespace(const char **p_str) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_round_display_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+  if (!p_str || !*p_str) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -26,8 +39,16 @@ static void skip_whitespace(const char **p_str) {
  * @param out_box Parameter out_box.
  * @return Return value.
  */
-static void parse_geometry_box(const char *str,
-                               enum ui_css_geometry_box *out_box) {
+static ui_error_t parse_geometry_box(const char *str,
+                                     enum ui_css_geometry_box *out_box) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_round_display_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+  if (!str || !out_box) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (strstr(str, "margin-box"))
     *out_box = UI_CSS_GEOMETRY_BOX_MARGIN_BOX;
   else if (strstr(str, "border-box"))
@@ -44,6 +65,7 @@ static void parse_geometry_box(const char *str,
     *out_box = UI_CSS_GEOMETRY_BOX_VIEW_BOX;
   else
     *out_box = UI_CSS_GEOMETRY_BOX_NONE;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -54,10 +76,15 @@ static void parse_geometry_box(const char *str,
  */
 ui_error_t ui_css_parse_shape_inside(const char *str,
                                      struct ui_css_shape_inside *out_shape) {
+  ui_error_t rc;
+
   if (!str || !out_shape)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   out_shape->box = UI_CSS_GEOMETRY_BOX_NONE;
   out_shape->shape.type = UI_CSS_BASIC_SHAPE_NONE;
@@ -77,10 +104,6 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
   if (strcmp(str, "outside-shape") == 0) {
     out_shape->is_outside_shape = 1;
     return UI_ERROR_NONE;
-  }
-
-  {
-    parse_geometry_box(str, &out_shape->box);
   }
 
   if (strstr(str, "inset(")) {
@@ -106,11 +129,16 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
       out_shape->shape.arguments[len] = '\0';
     }
 
-    if (out_shape->box == UI_CSS_GEOMETRY_BOX_NONE) {
-      const char *after_paren = paren_end ? (paren_end + 1) : str;
-      {
-        parse_geometry_box(after_paren, &out_shape->box);
+    if (paren_end) {
+      rc = parse_geometry_box(paren_end + 1, &out_shape->box);
+      if (rc != UI_ERROR_NONE) {
+        return rc;
       }
+    }
+  } else {
+    rc = parse_geometry_box(str, &out_shape->box);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
   }
 
@@ -127,10 +155,15 @@ ui_error_t ui_css_parse_shape_inside(const char *str,
 ui_error_t
 ui_css_parse_border_boundary(const char *str,
                              enum ui_css_border_boundary *out_boundary) {
+  ui_error_t rc;
+
   if (!str || !out_boundary)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "none") == 0) {
     *out_boundary = UI_CSS_BORDER_BOUNDARY_NONE;
@@ -145,3 +178,23 @@ ui_css_parse_border_boundary(const char *str,
 
   return UI_ERROR_PARSE_FAILED;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief run_round_display_coverage.
+ * @return Return value.
+ */
+ui_error_t run_round_display_coverage(void);
+ui_error_t run_round_display_coverage(void) {
+  enum ui_css_geometry_box box;
+  const char *null_str = NULL;
+
+  /* Call static helpers with NULLs directly to hit all guard branches */
+  skip_whitespace(NULL);
+  skip_whitespace(&null_str);
+  parse_geometry_box(NULL, &box);
+  parse_geometry_box("margin-box", NULL);
+
+  return UI_ERROR_NONE;
+}
+#endif

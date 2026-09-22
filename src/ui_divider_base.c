@@ -13,6 +13,36 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_divider_mock_fail = 0;
+
+static ui_error_t mock_divider_dom_node_set_attribute(struct ui_dom_node *node,
+                                                      const char *k,
+                                                      const char *v) {
+  if (g_divider_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_set_attribute)(node, k, v);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_divider_dom_node_set_attribute
+/** @endcond */
+
+static ui_error_t
+mock_divider_component_set_default_style(struct ui_component *comp,
+                                         struct ui_css_stylesheet *style) {
+  if (g_divider_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, style);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_divider_component_set_default_style
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet for divider base component */
 static const char *ui_divider_base_css =
     ":host { "
@@ -58,35 +88,24 @@ struct ui_divider_base {
  * @return Return value.
  */
 static ui_error_t update_dom_state(struct ui_divider_base *divider) {
+  ui_error_t rc;
+
   if (divider->orientation == UI_DIVIDER_ORIENTATION_VERTICAL) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          divider->root_node, "data-orientation", "vertical");
-      (void)rc_cleanup;
-    }
+    rc = ui_dom_node_set_attribute(divider->root_node, "data-orientation",
+                                   "vertical");
   } else {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          divider->root_node, "data-orientation", "horizontal");
-      (void)rc_cleanup;
-    }
+    rc = ui_dom_node_set_attribute(divider->root_node, "data-orientation",
+                                   "horizontal");
+  }
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (divider->inset) {
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_set_attribute(divider->root_node, "data-inset", "true");
-      (void)rc_cleanup;
-    }
+    return ui_dom_node_set_attribute(divider->root_node, "data-inset", "true");
   } else {
-    {
-      ui_error_t rc_cleanup =
-          ui_dom_node_remove_attribute(divider->root_node, "data-inset");
-      (void)rc_cleanup;
-    }
+    return ui_dom_node_remove_attribute(divider->root_node, "data-inset");
   }
-
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -132,36 +151,30 @@ ui_error_t ui_divider_base_create(struct ui_divider_base **out_divider) {
     goto cleanup;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_component_set_default_style(divider->component, default_style);
-    (void)rc_cleanup;
+  rc = ui_component_set_default_style(divider->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
-  divider->component->shadow_root = divider->root_node;
   divider->orientation = UI_DIVIDER_ORIENTATION_HORIZONTAL;
   divider->inset = 0;
 
-  {
-    ui_error_t rc_cleanup = update_dom_state(divider);
-    (void)rc_cleanup;
+  rc = update_dom_state(divider);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
+
+  divider->component->shadow_root = divider->root_node;
 
   *out_divider = divider;
   return UI_ERROR_NONE;
 
 cleanup:
   if (divider->root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(divider->root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(divider->root_node);
   }
   if (divider->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(divider->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(divider->component);
   }
   C_MULTIPLATFORM_FREE(divider);
   return rc;
@@ -176,9 +189,8 @@ ui_error_t ui_divider_base_destroy(struct ui_divider_base *divider) {
   if (!divider) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(divider->component);
-    (void)rc_cleanup;
+  if (divider->component) {
+    ui_component_destroy(divider->component);
   }
   C_MULTIPLATFORM_FREE(divider);
   return UI_ERROR_NONE;

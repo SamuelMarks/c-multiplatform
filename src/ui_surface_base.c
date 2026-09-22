@@ -8,6 +8,42 @@
 #include <stdio.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_surface_mock_fail = 0;
+
+/**
+ * @brief mock_surface_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t mock_surface_component_destroy(struct ui_component *comp) {
+  if (g_surface_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_surface_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_surface_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_surface_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_surface_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_surface_dom_node_destroy
+/** @endcond */
+#endif
+
 /**
  * @brief ui_surface_base_create.
  * @param out_surface Parameter out_surface.
@@ -17,6 +53,7 @@ ui_error_t ui_surface_base_create(struct ui_surface_base **out_surface) {
   struct ui_surface_base *surface;
   struct ui_component *base_comp;
   ui_error_t err;
+  ui_error_t rc_cleanup;
 
   if (!out_surface) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -30,9 +67,9 @@ ui_error_t ui_surface_base_create(struct ui_surface_base **out_surface) {
   surface = (struct ui_surface_base *)C_MULTIPLATFORM_MALLOC(
       sizeof(struct ui_surface_base));
   if (!surface) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(base_comp);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(base_comp);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
     return UI_ERROR_OUT_OF_MEMORY;
   }
@@ -51,9 +88,9 @@ ui_error_t ui_surface_base_create(struct ui_surface_base **out_surface) {
 
   err = ui_dom_node_set_tag_name(surface->base.shadow_root, "ui-surface");
   if (err != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(surface->base.shadow_root);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(surface->base.shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      err = rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(surface);
     return err;

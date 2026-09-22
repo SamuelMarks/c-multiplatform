@@ -22,6 +22,14 @@ static ui_error_t test_button_group_base(void) {
     return UI_ERROR_UNKNOWN;
   g_button_group_mock_fail = 0;
 
+  g_malloc_fail_countdown = 1;
+  g_button_group_mock_fail = 2;
+  rc = ui_button_group_base_create(&group);
+  if (rc != UI_ERROR_UNKNOWN)
+    return UI_ERROR_UNKNOWN;
+  g_button_group_mock_fail = 0;
+  g_malloc_fail_countdown = -1;
+
   rc = ui_button_group_base_create(NULL);
 
   if (rc != UI_ERROR_INVALID_ARGUMENT)

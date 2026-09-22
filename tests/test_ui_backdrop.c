@@ -59,7 +59,7 @@ static ui_error_t test_backdrop_escape_key(void) {
   {
     ui_error_t rc_cleanup = ui_backdrop_destroy(bd);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -176,7 +176,7 @@ static ui_error_t test_backdrop_click_outside(void) {
   {
     ui_error_t rc_cleanup = ui_backdrop_destroy(bd);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -275,7 +275,7 @@ static ui_error_t test_backdrop_other_events(void) {
   {
     ui_error_t rc_cleanup = ui_backdrop_destroy(bd);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;
@@ -306,7 +306,7 @@ static ui_error_t test_invalid_args_and_oom(void) {
   {
     ui_error_t rc_cleanup = ui_backdrop_destroy(bd);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   bd = NULL;
@@ -317,11 +317,53 @@ static ui_error_t test_invalid_args_and_oom(void) {
   return UI_ERROR_NONE;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t run_backdrop_coverage(void) {
+  ui_error_t rc;
+  struct ui_backdrop *backdrop = NULL;
+  struct ui_event ev;
+  int should_dismiss;
+  extern int g_backdrop_mock_fail;
+
+  rc = ui_backdrop_create(&backdrop);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+
+  g_backdrop_mock_fail = 1;
+  rc = ui_backdrop_process_event(backdrop, &ev, 0.0, 0.0, 0.0, 0.0,
+                                 &should_dismiss);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_backdrop_mock_fail = 0;
+
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_UP;
+  g_backdrop_mock_fail = 1;
+  rc = ui_backdrop_process_event(backdrop, &ev, 0.0, 0.0, 0.0, 0.0,
+                                 &should_dismiss);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_backdrop_mock_fail = 0;
+
+  rc = ui_backdrop_destroy(backdrop);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  return UI_ERROR_NONE;
+}
+#endif
+
 int main(void) {
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_backdrop_coverage(void);
-  run_backdrop_coverage();
+  if (run_backdrop_coverage() != UI_ERROR_NONE) {
+    return 1;
+  }
 #endif
   test_backdrop_escape_key();
   test_backdrop_click_outside();

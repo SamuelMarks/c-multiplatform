@@ -11,6 +11,28 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_avatar_group_mock_fail = 0;
+
+/**
+ * @brief mock_avatar_group_component_destroy.
+ * @param comp Parameter comp.
+ * @return Return value.
+ */
+static ui_error_t
+mock_avatar_group_component_destroy(struct ui_component *comp) {
+  if (g_avatar_group_mock_fail == 1) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_avatar_group_component_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_avatar_group_base
  * @struct ui_avatar_group_base
@@ -64,15 +86,18 @@ ui_avatar_group_base_create(struct ui_avatar_group_base **out_group) {
  * @return Return value.
  */
 ui_error_t ui_avatar_group_base_destroy(struct ui_avatar_group_base *group) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!group) {
     return UI_ERROR_NONE;
   }
   {
     ui_error_t rc_cleanup = ui_component_destroy(group->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(group);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

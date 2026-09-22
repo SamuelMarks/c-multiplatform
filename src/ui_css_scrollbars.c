@@ -9,26 +9,52 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_scrollbars_mock_fail = 0;
+static int g_scrollbars_sw_counter = 0;
+#endif
+
 /**
  * @brief skip_whitespace.
  * @param p_str Parameter p_str.
  * @return Return value.
  */
-static void skip_whitespace(const char **p_str) {
-  while (isspace((unsigned char)**p_str)) {
+static ui_error_t skip_whitespace(const char **p_str) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_scrollbars_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_scrollbars_mock_fail == 2) {
+    g_scrollbars_sw_counter++;
+    if (g_scrollbars_sw_counter == 2) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
+  while (**p_str && isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
+  return UI_ERROR_NONE;
 }
 
-/* \brief ui_error
+/**
+ * @brief Parses scrollbar width value.
+ * @param str Parameter str.
+ * @param out_width Parameter out_width.
+ * @return Return value.
  */
 ui_error_t
 ui_css_parse_scrollbar_width(const char *str,
                              enum ui_css_scrollbar_width *out_width) {
+  ui_error_t rc;
+
   if (!str || !out_width)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "auto") == 0) {
     *out_width = UI_CSS_SCROLLBAR_WIDTH_AUTO;
@@ -44,7 +70,11 @@ ui_css_parse_scrollbar_width(const char *str,
   return UI_ERROR_PARSE_FAILED;
 }
 
-/* \brief ui_error
+/**
+ * @brief Parses scrollbar color value.
+ * @param str Parameter str.
+ * @param out_color Parameter out_color.
+ * @return Return value.
  */
 ui_error_t
 ui_css_parse_scrollbar_color(const char *str,
@@ -57,7 +87,14 @@ ui_css_parse_scrollbar_color(const char *str,
   if (!str || !out_color)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+#ifdef UI_TEST_MOCK_ALLOC
+  g_scrollbars_sw_counter = 0;
+#endif
+
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "auto") == 0) {
     out_color->is_auto = 1;
@@ -83,7 +120,10 @@ ui_css_parse_scrollbar_color(const char *str,
     return rc;
 
   str = space;
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (*str == '\0') {
     /* CSS scrollbar-color requires exactly two valid colors or auto.

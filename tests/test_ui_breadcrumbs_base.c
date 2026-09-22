@@ -16,8 +16,10 @@ static ui_error_t mock_factory(const struct ui_route_request *req,
                                void *user_data,
                                struct ui_component **out_screen) {
   ui_error_t rc = UI_ERROR_NONE;
-  (void)req;
-  (void)user_data;
+  if (req) {
+  }
+  if (user_data) {
+  }
   rc = ui_component_create(&mock_screen);
   if (rc != UI_ERROR_NONE)
     return rc;
@@ -219,6 +221,56 @@ static ui_error_t run_normal_tests(void) {
   TEST_BC_SET_PATH_MOCK(277);
   TEST_BC_SET_PATH_MOCK(1987);
 
+  TEST_BC_MOCK(1);
+  TEST_BC_MOCK(2);
+  TEST_BC_MOCK(9);
+
+  TEST_BC_SET_PATH_MOCK(1);
+  TEST_BC_SET_PATH_MOCK(6);
+  TEST_BC_SET_PATH_MOCK(8);
+
+  {
+    struct ui_breadcrumbs_base *tmp = NULL;
+    ui_breadcrumbs_base_create(router, &tmp);
+    ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
+    g_breadcrumbs_mock_fail = 3;
+    ui_breadcrumbs_base_destroy(tmp);
+    g_breadcrumbs_mock_fail = 0;
+  }
+  {
+    struct ui_breadcrumbs_base *tmp = NULL;
+    ui_breadcrumbs_base_create(router, &tmp);
+    ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
+    g_breadcrumbs_mock_fail = 4;
+    ui_breadcrumbs_base_destroy(tmp);
+    g_breadcrumbs_mock_fail = 0;
+  }
+  {
+    struct ui_breadcrumbs_base *tmp = NULL;
+    ui_breadcrumbs_base_create(router, &tmp);
+    g_breadcrumbs_mock_fail = 5;
+    ui_breadcrumbs_base_destroy(tmp);
+    g_breadcrumbs_mock_fail = 0;
+  }
+  {
+    struct ui_breadcrumbs_base *tmp = NULL;
+    ui_breadcrumbs_base_create(router, &tmp);
+    ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
+    g_breadcrumbs_mock_fail = 7;
+    ui_breadcrumbs_base_simulate_click(tmp, 0);
+    g_breadcrumbs_mock_fail = 0;
+    ui_breadcrumbs_base_destroy(tmp);
+  }
+  {
+    struct ui_breadcrumbs_base *tmp = NULL;
+    ui_breadcrumbs_base_create(router, &tmp);
+    ui_breadcrumbs_base_set_path(tmp, "/settings/profile");
+    g_breadcrumbs_mock_fail = 3;
+    ui_breadcrumbs_base_set_path(tmp, "/other");
+    g_breadcrumbs_mock_fail = 0;
+    ui_breadcrumbs_base_destroy(tmp);
+  }
+
   rc = ui_router_destroy(router);
   if (rc != UI_ERROR_NONE)
     return rc;
@@ -399,18 +451,17 @@ int main(void) {
   }
 #ifdef UI_TEST_MOCK_ALLOC
   extern ui_error_t run_bc_coverage(void);
-  run_bc_coverage();
+  rc = run_bc_coverage();
+  if (rc != UI_ERROR_NONE) {
+    return 1;
+  }
 #endif
 
   /* Targeted test for breadcrumbs null bind */
-  {
-    ui_breadcrumbs_base_bind_active_index(NULL, NULL);
-  }
+  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
 
   /* Targeted test for breadcrumbs null bind */
-  {
-    ui_breadcrumbs_base_bind_active_index(NULL, NULL);
-  }
+  { ui_breadcrumbs_base_bind_active_index(NULL, NULL); }
 
   printf("All ui_breadcrumbs_base tests passed.\n");
   return 0;

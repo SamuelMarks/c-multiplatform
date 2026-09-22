@@ -524,9 +524,7 @@ int main(void) {
     ui_layout_tree_destroy(box_layout);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(box_node);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -613,9 +611,7 @@ int main(void) {
     ui_layout_tree_destroy(layout);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -728,9 +724,7 @@ int main(void) {
     ui_layout_tree_destroy(z_layout);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(z_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   /* 5. Cleanup */
@@ -814,9 +808,7 @@ int main(void) {
     ui_layout_tree_destroy(s_layout);
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(s_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   /* 5. Cleanup */
@@ -859,9 +851,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_css_stylesheet_destroy(sheet);
 
@@ -965,6 +955,15 @@ int main(void) {
     ui_css_stylesheet_destroy(sheet);
     ui_dom_node_destroy(root);
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern ui_error_t run_layout_tree_coverage(void);
+    ui_error_t cov_rc = run_layout_tree_coverage();
+    assert(cov_rc == UI_ERROR_NONE);
+  }
+#endif
+
   printf("All layout tree tests passed.\n");
   return 0;
 }
@@ -972,6 +971,7 @@ int main(void) {
 #include "../include/ui_cssom.h"
 #include "../include/ui_dom_node.h"
 #include "../include/ui_layout.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */

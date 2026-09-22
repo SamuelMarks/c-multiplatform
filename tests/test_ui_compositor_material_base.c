@@ -2,6 +2,7 @@
 #include "ui_compositor_material_base.h"
 #include "ui_arena.h"
 #include "ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -123,9 +124,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }

@@ -2,12 +2,14 @@
 #include "../include/ui_text_layout.h"
 #include "../include/ui_error.h"
 #include "../include/ui_font_manager.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
 int g_mock_font_fail = 0;
 int g_mock_glyph_metrics_fail = 0;
+int g_mock_kerning_fail = 0;
 
 #define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
 #define ACCUM_FAIL(failed, expr) failed |= (expr)
@@ -16,8 +18,10 @@ int g_mock_glyph_metrics_fail = 0;
 ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
                                 float *out_ascent, float *out_descent,
                                 float *out_line_gap) {
-  (void)font;
-  (void)font_size;
+  if (font) {
+  }
+  if (font_size) {
+  }
   if (g_mock_font_fail)
     return UI_ERROR_UNKNOWN;
   *out_ascent = 10.0f;
@@ -29,8 +33,10 @@ ui_error_t ui_font_get_vmetrics(struct ui_font *font, float font_size,
 ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
                                      float font_size,
                                      struct ui_glyph_metrics *out_metrics) {
-  (void)font;
-  (void)font_size;
+  if (font) {
+  }
+  if (font_size) {
+  }
   if (g_mock_glyph_metrics_fail == 1 ||
       (g_mock_glyph_metrics_fail == 2 && codepoint == 'B')) {
     return UI_ERROR_UNKNOWN;
@@ -44,26 +50,56 @@ ui_error_t ui_font_get_glyph_metrics(struct ui_font *font, int codepoint,
 ui_error_t ui_font_get_kerning(struct ui_font *font, int prev_codepoint,
                                int codepoint, float font_size,
                                float *out_kerning) {
-  (void)font;
-  (void)prev_codepoint;
-  (void)codepoint;
-  (void)font_size;
+  if (font) {
+  }
+  if (prev_codepoint) {
+  }
+  if (codepoint) {
+  }
+  if (font_size) {
+  }
+  if (g_mock_kerning_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
   if (out_kerning)
     *out_kerning = 0.0f;
   return UI_ERROR_NONE;
 }
 
 static int test_text_layout(void) {
-  struct ui_text_layout *layout = NULL;
-  struct ui_font *font = (struct ui_font *)1; /* Dummy pointer */
-  const struct ui_positioned_glyph *glyphs = NULL;
-  size_t count = 0;
+  struct ui_text_layout *layout;
+  struct ui_font *font;
+  const struct ui_positioned_glyph *glyphs;
+  size_t count;
   float w, h;
-  const char *utf8_text = "Hello\nWorld";
-  const char *utf8_complex = "\xC2\xA2 \xE2\x82\xAC \xF0\x90\x8D\x88";
-  const char *long_string =
-      "1234567890123456789012345678901234567890"; /* 40 chars */
-  int failed = 0;
+  const char *utf8_text;
+  const char *utf8_complex;
+  const char *long_string;
+  const char *utf8_invalid;
+  const char *utf8_inc_1;
+  const char *utf8_inc_2;
+  const char *utf8_inc_3;
+  const char *utf8_inc_4;
+  const char *utf8_inc_5;
+  const char *utf8_inc_6;
+  int failed;
+  ui_error_t rc_cleanup;
+
+  layout = NULL;
+  font = (struct ui_font *)1; /* Dummy pointer */
+  glyphs = NULL;
+  count = 0;
+  utf8_text = "Hello\nWorld";
+  utf8_complex = "\xC2\xA2 \xE2\x82\xAC \xF0\x90\x8D\x88";
+  long_string = "1234567890123456789012345678901234567890"; /* 40 chars */
+  utf8_invalid = "\xC2\xE2\x82\xF0\x90\x8D";
+  utf8_inc_1 = "\xC2";
+  utf8_inc_2 = "\xE2";
+  utf8_inc_3 = "\xE2\x82";
+  utf8_inc_4 = "\xF0";
+  utf8_inc_5 = "\xF0\x90";
+  utf8_inc_6 = "\xF0\x90\x8D";
+  failed = 0;
 
   ACCUM_ERR(failed, ui_text_layout_create(&layout));
   ACCUM_ERR(failed, ui_text_layout_destroy(layout));
@@ -76,27 +112,38 @@ static int test_text_layout(void) {
                                          5.0f, UI_TEXT_DIRECTION_LTR));
 
   /* Invalid/incomplete UTF-8 */
-  const char *utf8_invalid = "\xC2\xE2\x82\xF0\x90\x8D";
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_invalid,
                                          100.0f, UI_TEXT_DIRECTION_LTR));
-  const char *utf8_inc_1 = "\xC2";
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_1,
                                          100.0f, UI_TEXT_DIRECTION_LTR));
-  const char *utf8_inc_2 = "\xE2";
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_2,
                                          100.0f, UI_TEXT_DIRECTION_LTR));
-  const char *utf8_inc_3 = "\xE2\x82";
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_3,
                                          100.0f, UI_TEXT_DIRECTION_LTR));
-  const char *utf8_inc_4 = "\xF0";
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_4,
                                          100.0f, UI_TEXT_DIRECTION_LTR));
-  const char *utf8_inc_5 = "\xF0\x90";
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_5,
                                          100.0f, UI_TEXT_DIRECTION_LTR));
-  const char *utf8_inc_6 = "\xF0\x90\x8D";
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, utf8_inc_6,
                                          100.0f, UI_TEXT_DIRECTION_LTR));
+
+  /* Test invalid direction */
+  failed |= (ui_text_layout_shape(layout, font, 12.0f, "A", 100.0f,
+                                  (enum ui_text_direction)999) !=
+             UI_ERROR_INVALID_ARGUMENT);
+  failed |= (ui_text_layout_shape(layout, font, 12.0f, "A", 100.0f,
+                                  (enum ui_text_direction) - 1) !=
+             UI_ERROR_INVALID_ARGUMENT);
+
+  /* Test RTL direction */
+  ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, "A", 100.0f,
+                                         UI_TEXT_DIRECTION_RTL));
+
+  /* Test kerning failure */
+  g_mock_kerning_fail = 1;
+  failed |= (ui_text_layout_shape(layout, font, 12.0f, "AB", 100.0f,
+                                  UI_TEXT_DIRECTION_LTR) != UI_ERROR_UNKNOWN);
+  g_mock_kerning_fail = 0;
 
   /* Test reallocation */
   ACCUM_ERR(failed, ui_text_layout_shape(layout, font, 12.0f, long_string,
@@ -121,12 +168,8 @@ static int test_text_layout(void) {
   ACCUM_ERR(failed, ui_text_layout_get_glyphs(layout, &glyphs, &count));
   ACCUM_ERR(failed, ui_text_layout_get_bounds(layout, &w, &h));
 
-  {
-    ui_error_t rc_cleanup = ui_text_layout_destroy(layout);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc_cleanup = ui_text_layout_destroy(layout);
+  assert(rc_cleanup == UI_ERROR_NONE);
 
   failed |= (ui_text_layout_create(NULL) != UI_ERROR_INVALID_ARGUMENT);
   failed |= (ui_text_layout_destroy(NULL) != UI_ERROR_INVALID_ARGUMENT);
@@ -165,21 +208,14 @@ static int test_text_layout(void) {
   g_malloc_fail_countdown = -1;
 
   /* malloc fails during add_glyph reallocation */
-  g_malloc_fail_countdown =
-      1; /* first add_glyph allocs array, second fails? Wait, count > cap check.
-            cap = 32. So we need countdown = 1, but we trigger it by shaping
-            long string. */
+  g_malloc_fail_countdown = 1;
   failed |=
       (ui_text_layout_shape(layout, font, 12.0f, long_string, 100.0f,
                             UI_TEXT_DIRECTION_LTR) != UI_ERROR_OUT_OF_MEMORY);
   g_malloc_fail_countdown = -1;
 
-  {
-    ui_error_t rc_cleanup = ui_text_layout_destroy(layout);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  rc_cleanup = ui_text_layout_destroy(layout);
+  assert(rc_cleanup == UI_ERROR_NONE);
 
   return failed;
 }

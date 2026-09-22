@@ -115,17 +115,114 @@ static void run_oom_tests_handle_manager(void) {
     if (rc == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_handle_manager_destroy(mgr);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     }
   }
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+#ifndef UI_SINGLE_THREADED
+extern int g_handle_manager_mock_cas_fail;
+extern int g_handle_manager_mock_store_fail;
+#endif
+#endif
+
+static void test_handle_manager_atomic_failures(void) {
+#ifdef UI_TEST_MOCK_ALLOC
+#ifndef UI_SINGLE_THREADED
+  struct ui_handle_manager *mgr = NULL;
+  ui_uint64 handle1, handle2;
+  void *data1 = (void *)0x1234;
+  void *out_data = NULL;
+  ui_error_t rc;
+
+  /* 1. ui_handle_manager_create: atomic_store fails */
+  g_handle_manager_mock_store_fail = 1;
+  rc = ui_handle_manager_create(2, &mgr);
+  assert(rc == UI_ERROR_UNKNOWN);
+  assert(mgr == NULL);
+  g_handle_manager_mock_store_fail = 0;
+
+  rc = ui_handle_manager_create(2, &mgr);
+  assert(rc == UI_ERROR_NONE);
+
+  /* 2. ui_handle_manager_alloc: spin_lock fails */
+  g_handle_manager_mock_cas_fail = 1;
+  rc = ui_handle_manager_alloc(mgr, data1, &handle1);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_cas_fail = 0;
+
+  /* 3. ui_handle_manager_alloc: success path spin_unlock fails */
+  g_handle_manager_mock_store_fail = 1;
+  rc = ui_handle_manager_alloc(mgr, data1, &handle1);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_store_fail = 0;
+
+  /* Destroy mgr and create fresh one for remaining tests */
+  rc = ui_handle_manager_destroy(mgr);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_handle_manager_create(2, &mgr);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Alloc real handle1 and handle2 to fill queue (capacity 2) */
+  rc = ui_handle_manager_alloc(mgr, data1, &handle1);
+  assert(rc == UI_ERROR_NONE);
+  rc = ui_handle_manager_alloc(mgr, data1, &handle2);
+  assert(rc == UI_ERROR_NONE);
+
+  /* 4. ui_handle_manager_alloc: queue full spin_unlock fails */
+  g_handle_manager_mock_store_fail = 1;
+  rc = ui_handle_manager_alloc(mgr, data1, &handle1);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_store_fail = 0;
+
+  /* 5. ui_handle_manager_get: spin_lock fails */
+  g_handle_manager_mock_cas_fail = 1;
+  rc = ui_handle_manager_get(mgr, handle1, &out_data);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_cas_fail = 0;
+
+  /* 6. ui_handle_manager_get: valid handle spin_unlock fails */
+  g_handle_manager_mock_store_fail = 1;
+  rc = ui_handle_manager_get(mgr, handle1, &out_data);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_store_fail = 0;
+
+  /* 7. ui_handle_manager_get: stale handle spin_unlock fails */
+  g_handle_manager_mock_store_fail = 1;
+  rc = ui_handle_manager_get(mgr, (((ui_uint64)999) << 32) | 0, &out_data);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_store_fail = 0;
+
+  /* 8. ui_handle_manager_free: spin_lock fails */
+  g_handle_manager_mock_cas_fail = 1;
+  rc = ui_handle_manager_free(mgr, handle1);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_cas_fail = 0;
+
+  /* 9. ui_handle_manager_free: stale handle spin_unlock fails */
+  g_handle_manager_mock_store_fail = 1;
+  rc = ui_handle_manager_free(mgr, (((ui_uint64)999) << 32) | 0);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_store_fail = 0;
+
+  /* 10. ui_handle_manager_free: valid handle spin_unlock fails */
+  g_handle_manager_mock_store_fail = 1;
+  rc = ui_handle_manager_free(mgr, handle1);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_handle_manager_mock_store_fail = 0;
+
+  rc = ui_handle_manager_destroy(mgr);
+  assert(rc == UI_ERROR_NONE);
+#endif
+#endif
+}
+
 int main(void) {
   test_handle_manager_basic();
+  test_handle_manager_atomic_failures();
   run_oom_tests_handle_manager();
   printf("All ui_handle_manager tests passed.\n");
   return 0;

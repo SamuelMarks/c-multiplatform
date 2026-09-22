@@ -11,6 +11,158 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_sidenav_mock_set_style_fail = 0;
+int g_sidenav_mock_b_set_style_fail = 0;
+int g_sidenav_mock_backdrop_destroy_fail = 0;
+int g_sidenav_mock_comp_destroy_fail = 0;
+int g_sidenav_mock_remove_attr_fail = 0;
+int g_sidenav_mock_remove_child_fail = 0;
+int g_sidenav_mock_append_child_fail = 0;
+int g_sidenav_mock_backdrop_process_fail = 0;
+
+/**
+ * @brief mock_sidenav_backdrop_process_event.
+ * @param backdrop Backdrop.
+ * @param event Event.
+ * @param drawer_x Drawer x.
+ * @param drawer_y Drawer y.
+ * @param drawer_w Drawer width.
+ * @param drawer_h Drawer height.
+ * @param out_should_dismiss Out should dismiss.
+ * @return Return value.
+ */
+static ui_error_t mock_sidenav_backdrop_process_event(
+    struct ui_backdrop *backdrop, const struct ui_event *event, float drawer_x,
+    float drawer_y, float drawer_w, float drawer_h, int *out_should_dismiss) {
+  if (g_sidenav_mock_backdrop_process_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_backdrop_process_event)(backdrop, event, drawer_x, drawer_y,
+                                     drawer_w, drawer_h, out_should_dismiss);
+}
+#undef ui_backdrop_process_event
+/** @cond */
+#define ui_backdrop_process_event mock_sidenav_backdrop_process_event
+/** @endcond */
+
+/**
+ * @brief mock_sidenav_set_style.
+ * @param comp Component.
+ * @param sheet Stylesheet.
+ * @return Return value.
+ */
+static ui_error_t mock_sidenav_set_style(struct ui_component *comp,
+                                         struct ui_css_stylesheet *sheet) {
+  if (g_sidenav_mock_set_style_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_sidenav_mock_b_set_style_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_sidenav_set_style
+/** @endcond */
+
+/**
+ * @brief mock_sidenav_backdrop_destroy.
+ * @param backdrop Backdrop.
+ * @return Return value.
+ */
+static ui_error_t mock_sidenav_backdrop_destroy(struct ui_backdrop *backdrop) {
+  if (g_sidenav_mock_backdrop_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_backdrop_destroy)(backdrop);
+}
+#undef ui_backdrop_destroy
+/** @cond */
+#define ui_backdrop_destroy mock_sidenav_backdrop_destroy
+/** @endcond */
+
+/**
+ * @brief mock_sidenav_comp_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_sidenav_comp_destroy(struct ui_component *comp) {
+  if (g_sidenav_mock_comp_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_sidenav_comp_destroy
+/** @endcond */
+
+/**
+ * @brief mock_sidenav_remove_attr.
+ * @param node Node.
+ * @param name Attribute name.
+ * @return Return value.
+ */
+static ui_error_t mock_sidenav_remove_attr(struct ui_dom_node *node,
+                                           const char *name) {
+  if (g_sidenav_mock_remove_attr_fail > 0) {
+    g_sidenav_mock_remove_attr_fail--;
+    if (g_sidenav_mock_remove_attr_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_remove_attribute)(node, name);
+}
+#undef ui_dom_node_remove_attribute
+/** @cond */
+#define ui_dom_node_remove_attribute mock_sidenav_remove_attr
+/** @endcond */
+
+/**
+ * @brief mock_sidenav_remove_child.
+ * @param parent Parent.
+ * @param child Child.
+ * @return Return value.
+ */
+static ui_error_t mock_sidenav_remove_child(struct ui_dom_node *parent,
+                                            struct ui_dom_node *child) {
+  if (g_sidenav_mock_remove_child_fail > 0) {
+    g_sidenav_mock_remove_child_fail--;
+    if (g_sidenav_mock_remove_child_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_remove_child)(parent, child);
+}
+#undef ui_dom_node_remove_child
+/** @cond */
+#define ui_dom_node_remove_child mock_sidenav_remove_child
+/** @endcond */
+
+/**
+ * @brief mock_sidenav_append_child.
+ * @param parent Parent.
+ * @param child Child.
+ * @return Return value.
+ */
+static ui_error_t mock_sidenav_append_child(struct ui_dom_node *parent,
+                                            struct ui_dom_node *child) {
+  if (g_sidenav_mock_append_child_fail > 0) {
+    g_sidenav_mock_append_child_fail--;
+    if (g_sidenav_mock_append_child_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_sidenav_append_child
+/** @endcond */
+#endif
+
 /*
  * \file ui_sidenav_base.c
  * \brief Sidenav base component implementation.
@@ -170,15 +322,19 @@ static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
       return rc;
   } else {
     rc = ui_dom_node_remove_attribute(sidenav->drawer_node, "data-open");
-    (void)rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
     rc = ui_dom_node_remove_attribute(sidenav->root_node, "data-open");
-    (void)rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   rc = ui_dom_node_remove_child(sidenav->root_node, sidenav->drawer_node);
-  (void)rc;
+  if (rc != UI_ERROR_NONE)
+    return rc;
   rc = ui_dom_node_remove_child(sidenav->root_node, sidenav->main_node);
-  (void)rc;
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   /* Adjust DOM ordering for SIDE/PUSH modes so flex layout works properly
    * without absolute positioning */
@@ -187,21 +343,27 @@ static ui_error_t update_dom_state(struct ui_sidenav_base *sidenav) {
       sidenav->is_open) {
     if (sidenav->position == UI_SIDENAV_POSITION_START) {
       rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-      (void)rc;
+      if (rc != UI_ERROR_NONE)
+        return rc;
       rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-      (void)rc;
+      if (rc != UI_ERROR_NONE)
+        return rc;
     } else {
       rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-      (void)rc;
+      if (rc != UI_ERROR_NONE)
+        return rc;
       rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-      (void)rc;
+      if (rc != UI_ERROR_NONE)
+        return rc;
     }
   } else {
     /* Default overlay rendering order (drawer on top) */
     rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-    (void)rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
     rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-    (void)rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
@@ -241,10 +403,10 @@ static ui_error_t mount_backdrop(struct ui_sidenav_base *sidenav) {
       return rc;
     }
 
-    {
-      ui_error_t set_rc =
-          ui_component_set_default_style(sidenav->backdrop_component, b_style);
-      (void)set_rc;
+    rc = ui_component_set_default_style(sidenav->backdrop_component, b_style);
+    if (rc != UI_ERROR_NONE) {
+      ui_css_stylesheet_destroy(b_style);
+      return rc;
     }
 
     sidenav->backdrop_component->shadow_root = b_root;
@@ -323,7 +485,8 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   if (rc != UI_ERROR_NONE)
     goto cleanup;
   rc = ui_dom_node_append_child(sidenav->root_node, sidenav->main_node);
-  (void)rc;
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &sidenav->drawer_node);
   if (rc != UI_ERROR_NONE)
@@ -335,18 +498,17 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   if (rc != UI_ERROR_NONE)
     goto cleanup;
   rc = ui_dom_node_append_child(sidenav->root_node, sidenav->drawer_node);
-  (void)rc;
+  if (rc != UI_ERROR_NONE)
+    goto cleanup;
 
   rc = ui_css_parse_stylesheet(ui_sidenav_base_default_css, &default_style);
   if (rc != UI_ERROR_NONE)
     goto cleanup;
 
-  {
-
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(sidenav->component, default_style);
-
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(sidenav->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   sidenav->component->shadow_root = sidenav->root_node;
@@ -360,22 +522,18 @@ ui_error_t ui_sidenav_base_create(struct ui_sidenav_base **out_sidenav) {
   *out_sidenav = sidenav;
   return UI_ERROR_NONE;
 
-cleanup: {
+cleanup:
   if (sidenav->component) {
     sidenav->component->shadow_root = NULL;
   }
-  {
-    ui_error_t rc_cleanup = ui_dom_node_destroy(sidenav->root_node);
-    (void)rc_cleanup;
+  if (sidenav->root_node) {
+    ui_dom_node_destroy(sidenav->root_node);
   }
-}
-  {
-    ui_error_t rc_cleanup = ui_backdrop_destroy(sidenav->backdrop_logic);
-    (void)rc_cleanup;
+  if (sidenav->backdrop_logic) {
+    ui_backdrop_destroy(sidenav->backdrop_logic);
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(sidenav->component);
-    (void)rc_cleanup;
+  if (sidenav->component) {
+    ui_component_destroy(sidenav->component);
   }
   C_MULTIPLATFORM_FREE(sidenav);
   return rc;
@@ -387,27 +545,29 @@ cleanup: {
  * \return UI_ERROR_NONE on success.
  */
 ui_error_t ui_sidenav_base_destroy(struct ui_sidenav_base *sidenav) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
   if (!sidenav)
     return UI_ERROR_NONE;
-  {
-    ui_error_t rc = unmount_backdrop(sidenav);
-    if (rc != UI_ERROR_NONE)
-      return rc;
+
+  rc = unmount_backdrop(sidenav);
+
+  if (sidenav->backdrop_component) {
+    rc_cleanup = ui_component_destroy(sidenav->backdrop_component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(sidenav->backdrop_component);
-    (void)rc_cleanup;
+  rc_cleanup = ui_backdrop_destroy(sidenav->backdrop_logic);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
-  {
-    ui_error_t rc_cleanup = ui_backdrop_destroy(sidenav->backdrop_logic);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(sidenav->component);
-    (void)rc_cleanup;
+  rc_cleanup = ui_component_destroy(sidenav->component);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(sidenav);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -427,10 +587,12 @@ ui_error_t ui_sidenav_base_set_mode(struct ui_sidenav_base *sidenav,
     return rc;
   if (sidenav->mode != UI_SIDENAV_MODE_OVER && sidenav->is_open) {
     rc = unmount_backdrop(sidenav);
-    (void)rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
   } else if (sidenav->mode == UI_SIDENAV_MODE_OVER && sidenav->is_open) {
     rc = mount_backdrop(sidenav);
-    (void)rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
@@ -545,7 +707,8 @@ ui_sidenav_base_set_overlay_director(struct ui_sidenav_base *sidenav,
   sidenav->director = director;
   if (sidenav->is_open && sidenav->mode == UI_SIDENAV_MODE_OVER) {
     ui_error_t rc = mount_backdrop(sidenav);
-    (void)rc;
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
@@ -579,7 +742,9 @@ ui_error_t ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
                                          double timestamp_ms) {
   int should_dismiss = 0;
 
-  (void)timestamp_ms;
+  if (timestamp_ms < 0.0) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
 
   if (!sidenav || !event)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -591,10 +756,11 @@ ui_error_t ui_sidenav_base_process_event(struct ui_sidenav_base *sidenav,
   /* For headless testing, pass dummy drawer bounds. In a real engine, layout
    * tree geometry would be used. */
   {
-    ui_error_t _ign_rc =
+    ui_error_t bp_rc =
         ui_backdrop_process_event(sidenav->backdrop_logic, event, 0.0f, 0.0f,
                                   0.0f, 0.0f, &should_dismiss);
-    (void)_ign_rc;
+    if (bp_rc != UI_ERROR_NONE)
+      return bp_rc;
   }
 
   if (should_dismiss) {

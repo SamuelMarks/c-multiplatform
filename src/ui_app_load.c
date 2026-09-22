@@ -12,6 +12,30 @@
 #include <stdlib.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+/** @brief Global flag to simulate append child failure in app_load. */
+int g_app_load_mock_append_fail = 0;
+
+/**
+ * @brief Mock implementation of ui_dom_node_append_child for app_load tests.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
+static ui_error_t
+mock_app_load_dom_node_append_child(struct ui_dom_node *parent,
+                                    struct ui_dom_node *child) {
+  if (g_app_load_mock_append_fail) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_app_load_dom_node_append_child
+/** @endcond */
+#endif
+
 /**
  * @brief Mounts an entire application UI tree using the isomorphic execution
  * model.
@@ -87,8 +111,12 @@ ui_error_t ui_app_load(const struct ui_app_load_config *config,
     }
 
     if (mount_host) {
-      ui_error_t rc_append = ui_dom_node_append_child(mount_host, dom_tree);
-      (void)rc_append;
+      ui_error_t rc_append;
+      rc_append = ui_dom_node_append_child(mount_host, dom_tree);
+      if (rc_append != UI_ERROR_NONE) {
+        ui_arena_destroy(arena);
+        return rc_append;
+      }
     }
 
     *out_root = dom_tree;
@@ -141,9 +169,10 @@ ui_error_t ui_app_load_snippet(const char *snippet_json,
     return rc;
   }
 
-  {
-    ui_error_t rc_append = ui_dom_node_append_child(parent_node, dom_node);
-    (void)rc_append;
+  rc = ui_dom_node_append_child(parent_node, dom_node);
+  if (rc != UI_ERROR_NONE) {
+    ui_arena_destroy(arena);
+    return rc;
   }
 
   *out_snippet_root = dom_node;

@@ -59,14 +59,19 @@ struct ui_os_color_task {
 ui_error_t ui_os_file_completion(void *user_data) {
   struct ui_os_file_task *task = (struct ui_os_file_task *)user_data;
   ui_error_t rc = UI_ERROR_NONE;
-  {
+  if (!task) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  if (task->uploader && task->result_path[0] != '\0') {
     ui_error_t rc_cleanup =
         ui_file_uploader_drop_file(task->uploader, task->result_path);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_file_uploader_read_files(task->uploader);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
+    rc_cleanup = ui_file_uploader_read_files(task->uploader);
+    if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(task);
   return rc;
@@ -165,14 +170,16 @@ ui_error_t ui_os_dialog_show_message_box(const char *title, const char *message,
 #ifndef UI_TEST_MOCK_ALLOC
     MessageBoxA(NULL, message, title, uType);
 #else
-    (void)uType;
+    if (uType != 0) {
+    }
     printf("[%s]: %s\n", title, message);
 #endif
   }
 #else
   /* Basic fallback for POSIX / Linux to console if no GTK/Zenity is used inline
    */
-  (void)type;
+  if (type != UI_OS_MESSAGE_BOX_INFO) {
+  }
   printf("[%s]: %s\n", title, message);
 #endif
 
@@ -255,17 +262,14 @@ ui_error_t run_os_dialogs_coverage(void);
 ui_error_t run_os_dialogs_coverage(void) {
   struct ui_os_file_task file_task;
   struct ui_os_color_task color_task;
-  ui_error_t rc;
 
   memset(&file_task, 0, sizeof(file_task));
   file_task.reactor = NULL;
-  rc = ui_os_file_worker(&file_task);
-  (void)rc;
+  ui_os_file_worker(&file_task);
 
   memset(&color_task, 0, sizeof(color_task));
   color_task.reactor = NULL;
-  rc = ui_os_color_worker(&color_task);
-  (void)rc;
+  ui_os_color_worker(&color_task);
 
   return UI_ERROR_NONE;
 }

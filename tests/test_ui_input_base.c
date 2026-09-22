@@ -1,22 +1,44 @@
 /* clang-format off */
 #include "ui_input_base.h"
+#include "ui_component.h"
+#include "ui_gesture.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../src/ui_internal_mem.h"
 /* clang-format on */
 
+struct ui_input_base {
+  struct ui_component *component;
+  struct ui_gesture_recognizer *gesture_recognizer;
+  char *text;
+  char *placeholder;
+  int disabled;
+  int cursor_position;
+  ui_input_on_change_t on_change;
+  void *user_data;
+  ui_error_t (*on_touched)(void *user_data);
+  void *on_touched_user_data;
+};
+
 extern int g_malloc_fail_countdown;
 
 static int g_change_count = 0;
 static char g_last_text[256];
 
-#define EXPECT(cond) failed |= !(cond)
+#define EXPECT(cond)                                                           \
+  do {                                                                         \
+    if (!(cond)) {                                                             \
+      fprintf(stderr, "ASSERTION FAILED at line %d: %s\n", __LINE__, #cond);   \
+      failed = 1;                                                              \
+    }                                                                          \
+  } while (0)
 
 static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
                                   void *user_data) {
-  (void)input;
-  (void)user_data;
+  if (input || user_data) {
+    /* valid context */
+  }
   g_change_count++;
   UI_STRNCPY(g_last_text, sizeof(g_last_text), text ? text : "",
              sizeof(g_last_text) - 1);
@@ -26,7 +48,9 @@ static ui_error_t on_input_change(struct ui_input_base *input, const char *text,
 
 static ui_error_t on_cva_change(union ui_signal_payload payload,
                                 void *user_data) {
-  (void)user_data;
+  if (user_data) {
+    /* valid context */
+  }
   g_change_count++;
   UI_STRNCPY(g_last_text, sizeof(g_last_text),
              payload.ptr_val ? (const char *)payload.ptr_val : "",
@@ -36,7 +60,9 @@ static ui_error_t on_cva_change(union ui_signal_payload payload,
 }
 
 static ui_error_t on_cva_touched(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+    /* valid context */
+  }
   return UI_ERROR_NONE;
 }
 
@@ -293,7 +319,7 @@ static int run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_input_base_destroy(input);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      failed = 1;
     }
   }
   return failed;
@@ -301,9 +327,9 @@ static int run_normal_tests(void) {
 
 static ui_error_t on_input_change_fail(struct ui_input_base *input,
                                        const char *text, void *user_data) {
-  (void)input;
-  (void)text;
-  (void)user_data;
+  if (input || text || user_data) {
+    return UI_ERROR_UNKNOWN;
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -336,6 +362,8 @@ static int run_failure_tests(void) {
     struct ui_control_value_accessor cva;
     ui_input_base_get_cva(input, &cva);
     cva.register_on_change(input, NULL, NULL);
+    EXPECT(input->on_change(NULL, "x", input->user_data) ==
+           UI_ERROR_INVALID_ARGUMENT);
     ev.event_data.keyboard.key_code = 'x';
     err = ui_input_base_process_event(input, &ev, 0.0);
     /* because callback is null, it should return NONE */
@@ -345,11 +373,157 @@ static int run_failure_tests(void) {
   {
     ui_error_t rc_cleanup = ui_input_base_destroy(input);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      failed = 1;
     }
   }
   return failed;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_input_base_coverage(void);
+
+static int run_mock_tests(void) {
+  int failed = 0;
+  struct ui_input_base *input = NULL;
+  struct ui_event ev;
+  ui_error_t rc;
+  extern int g_input_mock_fail;
+
+  rc = run_input_base_coverage();
+  EXPECT(rc == UI_ERROR_NONE);
+
+  /* Mock 1: set_default_style fails in create */
+  g_input_mock_fail = 1;
+  rc = ui_input_base_create(&input);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  rc = ui_input_base_create(&input);
+  EXPECT(rc == UI_ERROR_NONE);
+
+  /* Mock 2: remove_attribute "value" fails in update_dom_state */
+  rc = ui_input_base_set_text(input, "test");
+  EXPECT(rc == UI_ERROR_NONE);
+  g_input_mock_fail = 2;
+  rc = ui_input_base_set_text(input, NULL);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  /* Mock 3: remove_attribute "placeholder" fails */
+  rc = ui_input_base_set_text(input, "keep_value");
+  EXPECT(rc == UI_ERROR_NONE);
+  rc = ui_input_base_set_placeholder(input, "ph");
+  EXPECT(rc == UI_ERROR_NONE);
+  g_input_mock_fail = 3;
+  rc = ui_input_base_set_placeholder(input, NULL);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  /* Mock 4: remove_attribute "disabled" fails */
+  rc = ui_input_base_set_disabled(input, 1);
+  EXPECT(rc == UI_ERROR_NONE);
+  g_input_mock_fail = 4;
+  rc = ui_input_base_set_disabled(input, 0);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  /* Mock 5: remove_attribute "aria-disabled" fails */
+  rc = ui_input_base_set_disabled(input, 1);
+  EXPECT(rc == UI_ERROR_NONE);
+  g_input_mock_fail = 5;
+  rc = ui_input_base_set_disabled(input, 0);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  /* Mock 6: set_attribute "placeholder" fails */
+  g_input_mock_fail = 6;
+  rc = ui_input_base_set_placeholder(input, "fail");
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  /* Mock 7: set_attribute "disabled" fails */
+  g_input_mock_fail = 7;
+  rc = ui_input_base_set_disabled(input, 1);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  /* Mock 8: set_attribute "aria-disabled" fails */
+  g_input_mock_fail = 8;
+  rc = ui_input_base_set_disabled(input, 1);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  rc = ui_input_base_set_disabled(input, 0);
+  EXPECT(rc == UI_ERROR_NONE);
+
+  /* Process event backspace with update_dom_state failure */
+  rc = ui_input_base_set_text(input, "a");
+  EXPECT(rc == UI_ERROR_NONE);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_BACKSPACE;
+  g_input_mock_fail = 9; /* set_attribute "value" with "" */
+  rc = ui_input_base_process_event(input, &ev, 0.0);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  /* Process event typing with update_dom_state failure */
+  ev.event_data.keyboard.key_code = 'z';
+  g_input_mock_fail = 9; /* set_attribute "value" */
+  rc = ui_input_base_process_event(input, &ev, 0.0);
+  EXPECT(rc == UI_ERROR_UNKNOWN);
+  g_input_mock_fail = 0;
+
+  /* Timestamp > 0 branch in process_event */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_KEY_UP;
+  rc = ui_input_base_process_event(input, &ev, 10.0);
+  EXPECT(rc == UI_ERROR_NONE);
+
+  /* CVA register_on_touched and write_value NULL input */
+  {
+    struct ui_control_value_accessor cva;
+    ui_input_base_get_cva(input, &cva);
+    rc = cva.register_on_touched(input, NULL, NULL);
+    EXPECT(rc == UI_ERROR_NONE);
+    rc = cva.register_on_touched(NULL, NULL, NULL);
+    EXPECT(rc == UI_ERROR_INVALID_ARGUMENT);
+    rc = cva.set_disabled_state(NULL, 1);
+    EXPECT(rc == UI_ERROR_INVALID_ARGUMENT);
+    {
+      union ui_signal_payload dummy;
+      dummy.ptr_val = NULL;
+      rc = cva.write_value(NULL, dummy);
+      EXPECT(rc == UI_ERROR_INVALID_ARGUMENT);
+    }
+  }
+
+  /* Destroy with gesture recognizer set, without component */
+  {
+    struct ui_input_base *partial = NULL;
+    ui_input_base_create(&partial);
+    ui_component_destroy(partial->component);
+    partial->component = NULL;
+    rc = ui_input_base_destroy(partial);
+    EXPECT(rc == UI_ERROR_NONE);
+  }
+
+  /* Destroy with component set, without gesture recognizer */
+  {
+    struct ui_input_base *partial = NULL;
+    ui_input_base_create(&partial);
+    ui_gesture_recognizer_destroy(partial->gesture_recognizer);
+    partial->gesture_recognizer = NULL;
+    rc = ui_input_base_destroy(partial);
+    EXPECT(rc == UI_ERROR_NONE);
+  }
+
+  rc = ui_input_base_destroy(input);
+  EXPECT(rc == UI_ERROR_NONE);
+
+  return failed;
+}
+#endif
 static int run_oom_tests(void) {
   int failed = 0;
   struct ui_input_base *input = NULL;
@@ -369,7 +543,7 @@ static int run_oom_tests(void) {
       {
         ui_error_t rc_cleanup = ui_input_base_destroy(input);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          failed = 1;
         }
       }
       break;
@@ -417,7 +591,7 @@ static int run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_input_base_destroy(input);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      failed = 1;
     }
   }
 
@@ -428,6 +602,9 @@ int main(void) {
   int failed = 0;
   failed |= run_normal_tests();
   failed |= run_failure_tests();
+#ifdef UI_TEST_MOCK_ALLOC
+  failed |= run_mock_tests();
+#endif
   failed |= run_oom_tests();
 
   printf(failed ? "Tests failed.\n" : "All ui_input_base tests passed.\n");

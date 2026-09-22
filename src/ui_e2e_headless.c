@@ -59,7 +59,8 @@ static ui_error_t headless_create_window(struct ui_window_backend *backend,
                                          int height,
                                          struct ui_window **out_window) {
   struct ui_e2e_headless_ctx *ctx;
-  (void)title;
+  const char *unused_title = title;
+  title = unused_title;
   if (!backend || !out_window) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -79,8 +80,10 @@ static ui_error_t headless_create_window(struct ui_window_backend *backend,
  */
 static ui_error_t headless_destroy_window(struct ui_window_backend *backend,
                                           struct ui_window *window) {
-  (void)backend;
-  (void)window;
+  struct ui_window_backend *unused_b = backend;
+  struct ui_window *unused_w = window;
+  backend = unused_b;
+  window = unused_w;
   return UI_ERROR_NONE;
 }
 
@@ -93,7 +96,8 @@ static ui_error_t headless_destroy_window(struct ui_window_backend *backend,
 static ui_error_t headless_show_window(struct ui_window_backend *backend,
                                        struct ui_window *window) {
   struct ui_e2e_headless_ctx *ctx;
-  (void)window;
+  struct ui_window *unused_w = window;
+  window = unused_w;
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -111,7 +115,8 @@ static ui_error_t headless_show_window(struct ui_window_backend *backend,
 static ui_error_t headless_hide_window(struct ui_window_backend *backend,
                                        struct ui_window *window) {
   struct ui_e2e_headless_ctx *ctx;
-  (void)window;
+  struct ui_window *unused_w = window;
+  window = unused_w;
   if (!backend) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -133,7 +138,8 @@ static ui_error_t headless_poll_events(struct ui_window_backend *backend,
                                        struct ui_event *out_event,
                                        int *out_has_event) {
   struct ui_e2e_headless_ctx *ctx;
-  (void)window;
+  struct ui_window *unused_w = window;
+  window = unused_w;
   if (!backend || !out_event || !out_has_event) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -159,8 +165,10 @@ static ui_error_t headless_poll_events(struct ui_window_backend *backend,
  */
 static ui_error_t headless_swap_buffers(struct ui_window_backend *backend,
                                         struct ui_window *window) {
-  (void)backend;
-  (void)window;
+  struct ui_window_backend *unused_b = backend;
+  struct ui_window *unused_w = window;
+  backend = unused_b;
+  window = unused_w;
   /* Headless has no buffer to swap */
   return UI_ERROR_NONE;
 }
@@ -367,6 +375,9 @@ ui_error_t ui_e2e_headless_type_key(struct ui_e2e_headless_ctx *ctx,
  */
 ui_error_t ui_e2e_advance_time(struct ui_e2e_headless_ctx *ctx,
                                double delta_ms) {
+  double unused_delta;
+  unused_delta = delta_ms;
+  delta_ms = unused_delta;
   /* This would integrate with a global mock clock or emit a synthetic tick
    * event */
   if (!ctx) {
@@ -376,7 +387,6 @@ ui_error_t ui_e2e_advance_time(struct ui_e2e_headless_ctx *ctx,
   /* In a real scenario, this updates a mock time source used by animations.
      For this test, we can push a synthetic frame/tick event or simply
      simulate the engine tick. */
-  (void)delta_ms; /* TODO: update mock global time */
 
   return UI_ERROR_NONE;
 }

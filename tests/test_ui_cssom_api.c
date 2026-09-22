@@ -82,7 +82,7 @@ int main(void) {
     extern int g_mock_strcpy_fail;
     g_mock_strcpy_fail = 1;
     rc = ui_cssom_set_property(rule, "color", "red", 1);
-    (void)rc;
+    TEST_ASSERT(rc == UI_ERROR_NONE);
     g_mock_strcpy_fail = 0;
   }
 #endif

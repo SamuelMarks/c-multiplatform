@@ -18,8 +18,6 @@ void test_ui_section_index_errs(void) {
   g_malloc_fail_countdown = -1;
   {
     ui_error_t rc_cleanup = ui_section_index_base_destroy(index);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }

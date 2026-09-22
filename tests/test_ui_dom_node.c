@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "../include/ui_dom_node.h"
@@ -63,9 +64,7 @@ static void test_dom_node_mutation_failure(void) {
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(dummy_child2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup;
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   rc = ui_dom_node_set_attribute(node, "new_attr",
                                  "val"); /* hits creation failure (line 251) */
@@ -82,13 +81,13 @@ static void test_dom_node_mutation_failure(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -306,21 +305,15 @@ int main(void) {
 
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(child1);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(child2);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(child3);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -403,13 +396,13 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -475,7 +468,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -486,14 +479,14 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -551,14 +544,14 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(text_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 

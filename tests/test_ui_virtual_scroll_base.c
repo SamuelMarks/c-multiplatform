@@ -2,6 +2,7 @@
 #include "ui_virtual_scroll_base.h"
 #include "ui_dom_node.h"
 #include "ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +15,8 @@
 extern int g_malloc_fail_countdown;
 
 static float variable_size_getter(size_t index, void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   /* Every even item is 20px, odd item is 30px */
   if (index % 2 == 0)
     return 20.0f;
@@ -23,15 +25,18 @@ static float variable_size_getter(size_t index, void *user_data) {
 
 static ui_error_t create_mock_node(size_t index, struct ui_dom_node **out_node,
                                    void *user_data) {
-  (void)index;
-  (void)user_data;
+  if (index) {
+  }
+  if (user_data) {
+  }
   return ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, out_node);
 }
 
 static ui_error_t update_mock_node(size_t index, struct ui_dom_node *node,
                                    void *user_data) {
   char buf[32];
-  (void)user_data;
+  if (user_data) {
+  }
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "Item %lu", (unsigned long)index);
 #else
@@ -90,9 +95,7 @@ static int test_fixed_size_math(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_fixed_size_math failed\n");
@@ -146,9 +149,7 @@ static int test_variable_size_math(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_variable_size_math failed\n");
@@ -192,15 +193,11 @@ static int test_dom_recycling(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_dom_recycling failed\n");
@@ -244,15 +241,11 @@ static int test_dom_recycling_variable(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_dom_recycling_variable failed\n");
@@ -309,9 +302,7 @@ static int test_error_handling(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   CHECK_FAIL(ui_virtual_scroll_base_set_item_count(NULL, 10) !=
@@ -357,9 +348,7 @@ static int test_error_handling(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
 #ifdef UI_TEST_MOCK_ALLOC
@@ -415,15 +404,11 @@ static int test_error_handling(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 #endif
 
@@ -455,9 +440,7 @@ static int test_empty_scroll(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_empty_scroll failed\n");
@@ -487,9 +470,7 @@ static int test_empty_scroll_variable(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_empty_scroll_variable failed\n");
@@ -499,8 +480,10 @@ static int test_empty_scroll_variable(void) {
 static ui_error_t create_mock_node_fail(size_t index,
                                         struct ui_dom_node **out_node,
                                         void *user_data) {
-  (void)index;
-  (void)user_data;
+  if (index) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
@@ -530,15 +513,11 @@ static int test_render_fail(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_render_fail failed\n");
@@ -547,9 +526,12 @@ static int test_render_fail(void) {
 
 static ui_error_t update_mock_node_fail(size_t index, struct ui_dom_node *node,
                                         void *user_data) {
-  (void)index;
-  (void)node;
-  (void)user_data;
+  if (index) {
+  }
+  if (node) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
@@ -580,15 +562,11 @@ static int test_render_update_fail(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_render_update_fail failed\n");
@@ -622,15 +600,11 @@ static int test_horizontal_orientation(void) {
 
   {
     ui_error_t rc_cleanup = ui_virtual_scroll_base_destroy(vs);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(container);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (failed)
     printf("test_horizontal_orientation failed\n");

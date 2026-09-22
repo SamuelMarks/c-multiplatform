@@ -11,10 +11,167 @@
 #include "ui_form_validators.h"
 #include "ui_internal_mem.h"
 #include "ui_coercion_utils.h"
+#include <c89stringutils_string_extras.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 /* clang-format on */
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_rtb_mock_registry_fail = 0;
+int g_rtb_mock_format_fail = 0;
+int g_rtb_mock_signal_get_fail = 0;
+int g_rtb_mock_req_val_fail = 0;
+int g_rtb_mock_pat_val_fail = 0;
+int g_rtb_mock_min_val_fail = 0;
+int g_rtb_mock_max_val_fail = 0;
+
+/**
+ * @brief mock_rtb_reg_get_default.
+ * @param out_reg Parameter out_reg.
+ * @return Return value.
+ */
+static ui_error_t
+mock_rtb_reg_get_default(struct ui_component_registry **out_reg) {
+  if (g_rtb_mock_registry_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_registry_get_default)(out_reg);
+}
+#undef ui_component_registry_get_default
+/** @cond */
+#define ui_component_registry_get_default mock_rtb_reg_get_default
+/** @endcond */
+
+/**
+ * @brief mock_rtb_format.
+ * @param dest Parameter dest.
+ * @param dest_size Parameter dest_size.
+ * @param fmt Parameter fmt.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_format(char *dest, size_t dest_size, const char *fmt,
+                                  ...) {
+  va_list args;
+  int ret;
+  if (g_rtb_mock_format_fail != 0) {
+    if (g_rtb_mock_format_fail > 1) {
+      g_rtb_mock_format_fail--;
+    } else {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  if (!dest || !fmt || dest_size == 0) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  va_start(args, fmt);
+  ret = c89stringutils_vsnprintf(dest, dest_size, fmt, args);
+  va_end(args);
+  if ((size_t)ret >= dest_size) {
+    return UI_ERROR_OUT_OF_BOUNDS;
+  }
+  return UI_ERROR_NONE;
+}
+#undef ui_safe_string_format
+/** @cond */
+#define ui_safe_string_format mock_rtb_format
+/** @endcond */
+
+/**
+ * @brief mock_rtb_signal_get.
+ * @param sig Parameter sig.
+ * @param payload Parameter payload.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_signal_get(struct ui_signal *sig,
+                                      union ui_signal_payload *payload) {
+  if (g_rtb_mock_signal_get_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_get)(sig, payload);
+}
+#undef ui_signal_get
+/** @cond */
+#define ui_signal_get mock_rtb_signal_get
+/** @endcond */
+
+/**
+ * @brief mock_rtb_validators_required.
+ * @param out_vfn Parameter out_vfn.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_validators_required(ui_validator_fn *out_vfn) {
+  if (g_rtb_mock_req_val_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_validators_required)(out_vfn);
+}
+#undef ui_validators_required
+/** @cond */
+#define ui_validators_required mock_rtb_validators_required
+/** @endcond */
+
+/**
+ * @brief mock_rtb_validators_pattern.
+ * @param out_vfn Parameter out_vfn.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_validators_pattern(ui_validator_fn *out_vfn) {
+  if (g_rtb_mock_pat_val_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_validators_pattern)(out_vfn);
+}
+#undef ui_validators_pattern
+/** @cond */
+#define ui_validators_pattern mock_rtb_validators_pattern
+/** @endcond */
+
+/**
+ * @brief mock_rtb_validators_min_length.
+ * @param out_vfn Parameter out_vfn.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_validators_min_length(ui_validator_fn *out_vfn) {
+  if (g_rtb_mock_min_val_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_validators_min_length)(out_vfn);
+}
+#undef ui_validators_min_length
+/** @cond */
+#define ui_validators_min_length mock_rtb_validators_min_length
+/** @endcond */
+
+/**
+ * @brief mock_rtb_validators_max_length.
+ * @param out_vfn Parameter out_vfn.
+ * @return Return value.
+ */
+static ui_error_t mock_rtb_validators_max_length(ui_validator_fn *out_vfn) {
+  if (g_rtb_mock_max_val_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_validators_max_length)(out_vfn);
+}
+#undef ui_validators_max_length
+/** @cond */
+#define ui_validators_max_length mock_rtb_validators_max_length
+/** @endcond */
+
+/**
+ * @brief ui_test_rtb_mock_format.
+ * @param dest Parameter dest.
+ * @param dest_size Parameter dest_size.
+ * @param fmt Parameter fmt.
+ * @return Return value.
+ */
+ui_error_t ui_test_rtb_mock_format(char *dest, size_t dest_size,
+                                   const char *fmt) {
+  return mock_rtb_format(dest, dest_size, fmt);
+}
+#endif
 
 /**
  * @struct ui_runtime_workflow_bridge
@@ -75,7 +232,10 @@ ui_error_t ui_runtime_build_tree(const struct ui_runtime_node *node,
   }
 
   if (!registry) {
-    (void)ui_component_registry_get_default(&registry);
+    rc = ui_component_registry_get_default(&registry);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
 
   rc = ui_component_registry_lookup(registry, node->type, &vtable);
@@ -138,28 +298,40 @@ ui_error_t ui_runtime_build_tree(const struct ui_runtime_node *node,
         while (val_def) {
           ui_validator_fn vfn = NULL;
           if (val_def->type == UI_RUNTIME_VALIDATOR_REQUIRED) {
-            (void)ui_validators_required(&vfn);
+            rc = ui_validators_required(&vfn);
+            if (rc != UI_ERROR_NONE) {
+              return rc;
+            }
             rc = ui_form_control_add_validator(ctrl, vfn, NULL);
             if (rc != UI_ERROR_NONE) {
               return rc;
             }
           } else if (val_def->type == UI_RUNTIME_VALIDATOR_PATTERN &&
                      val_def->param) {
-            (void)ui_validators_pattern(&vfn);
+            rc = ui_validators_pattern(&vfn);
+            if (rc != UI_ERROR_NONE) {
+              return rc;
+            }
             rc = ui_form_control_add_validator(ctrl, vfn,
                                                (void *)val_def->param);
             if (rc != UI_ERROR_NONE) {
               return rc;
             }
           } else if (val_def->type == UI_RUNTIME_VALIDATOR_MIN_LENGTH) {
-            (void)ui_validators_min_length(&vfn);
+            rc = ui_validators_min_length(&vfn);
+            if (rc != UI_ERROR_NONE) {
+              return rc;
+            }
             rc = ui_form_control_add_validator(ctrl, vfn,
                                                (void *)&val_def->int_param);
             if (rc != UI_ERROR_NONE) {
               return rc;
             }
           } else if (val_def->type == UI_RUNTIME_VALIDATOR_MAX_LENGTH) {
-            (void)ui_validators_max_length(&vfn);
+            rc = ui_validators_max_length(&vfn);
+            if (rc != UI_ERROR_NONE) {
+              return rc;
+            }
             rc = ui_form_control_add_validator(ctrl, vfn,
                                                (void *)&val_def->int_param);
             if (rc != UI_ERROR_NONE) {
@@ -178,7 +350,10 @@ ui_error_t ui_runtime_build_tree(const struct ui_runtime_node *node,
       }
       if (vtable->set_prop) {
         union ui_signal_payload cur_payload;
-        (void)ui_signal_get(sig, &cur_payload);
+        rc = ui_signal_get(sig, &cur_payload);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
         if (cur_payload.ptr_val) {
           rc = vtable->set_prop(instance, "text",
                                 (const char *)cur_payload.ptr_val);
@@ -187,8 +362,11 @@ ui_error_t ui_runtime_build_tree(const struct ui_runtime_node *node,
           }
         } else {
           char num_buf[32];
-          (void)ui_safe_string_format(num_buf, sizeof(num_buf), "%d",
-                                      (int)cur_payload.int_val);
+          rc = ui_safe_string_format(num_buf, sizeof(num_buf), "%d",
+                                     (int)cur_payload.int_val);
+          if (rc != UI_ERROR_NONE) {
+            return rc;
+          }
           rc = vtable->set_prop(instance, "text", num_buf);
           if (rc != UI_ERROR_NONE) {
             return rc;
@@ -204,7 +382,10 @@ ui_error_t ui_runtime_build_tree(const struct ui_runtime_node *node,
       }
       if (vtable->set_prop) {
         union ui_signal_payload cur_payload;
-        (void)ui_signal_get(sig, &cur_payload);
+        rc = ui_signal_get(sig, &cur_payload);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
         rc = vtable->set_prop(instance, "disabled",
                               cur_payload.bool_val ? "true" : "false");
         if (rc != UI_ERROR_NONE) {
@@ -220,7 +401,10 @@ ui_error_t ui_runtime_build_tree(const struct ui_runtime_node *node,
       }
       {
         union ui_signal_payload cur_payload;
-        (void)ui_signal_get(sig, &cur_payload);
+        rc = ui_signal_get(sig, &cur_payload);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
+        }
         if (!cur_payload.bool_val) {
           rc = ui_dom_node_set_attribute(dom_root, "style", "display: none;");
           if (rc != UI_ERROR_NONE) {
@@ -312,24 +496,33 @@ ui_error_t ui_runtime_preview_viewport_set_dimensions(struct ui_dom_node *root,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  (void)ui_safe_string_format(
+  rc = ui_safe_string_format(
       style_buf, sizeof(style_buf),
       "width: %dpx; height: %dpx; max-width: %dpx; max-height: %dpx; "
       "overflow: auto;",
       width, height, width, height);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   rc = ui_dom_node_set_attribute(root, "style", style_buf);
   if (rc != UI_ERROR_NONE) {
     return rc;
   }
 
-  (void)ui_safe_string_format(w_buf, sizeof(w_buf), "%d", width);
+  rc = ui_safe_string_format(w_buf, sizeof(w_buf), "%d", width);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   rc = ui_dom_node_set_attribute(root, "data-viewport-width", w_buf);
   if (rc != UI_ERROR_NONE) {
     return rc;
   }
 
-  (void)ui_safe_string_format(h_buf, sizeof(h_buf), "%d", height);
+  rc = ui_safe_string_format(h_buf, sizeof(h_buf), "%d", height);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   return ui_dom_node_set_attribute(root, "data-viewport-height", h_buf);
 }
 

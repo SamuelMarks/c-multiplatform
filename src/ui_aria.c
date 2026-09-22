@@ -13,6 +13,7 @@
 #ifdef UI_TEST_MOCK_ALLOC
 int g_aria_mock_fail = 0;
 int g_aria_mock_fail_idx = -1;
+int g_aria_cleanup_fail = 0;
 extern int g_malloc_fail_countdown;
 
 static ui_error_t mock_dom_node_get_attribute(const struct ui_dom_node *node,
@@ -29,6 +30,23 @@ static ui_error_t mock_dom_node_get_attribute(const struct ui_dom_node *node,
 #undef ui_dom_node_get_attribute
 /** @cond */
 #define ui_dom_node_get_attribute mock_dom_node_get_attribute
+/** @endcond */
+
+/**
+ * @brief mock_dom_node_destroy.
+ * @param node Parameter node.
+ * @return Return value.
+ */
+static ui_error_t mock_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_aria_cleanup_fail == 1) {
+    (ui_dom_node_destroy)(node);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_dom_node_destroy
 /** @endcond */
 #endif
 
@@ -406,7 +424,9 @@ ui_error_t run_aria_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
+    }
   }
   return UI_ERROR_NONE;
 }

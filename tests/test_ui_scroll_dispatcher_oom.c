@@ -31,17 +31,13 @@ void test_ui_scroll_dispatcher_oom(void) {
 
     {
       ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(dispatcher);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_scroll_dispatcher_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_scroll_dispatcher_unregister(NULL, 0);
 }

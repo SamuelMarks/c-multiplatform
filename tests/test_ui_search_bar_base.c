@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -18,6 +19,19 @@ static void *mock_change_user_data = NULL;
 
 static int mock_touched_called = 0;
 static void *mock_touched_user_data = NULL;
+
+static ui_error_t mock_on_change_fail(union ui_signal_payload new_value,
+                                      void *user_data) {
+  if (user_data || new_value.ptr_val) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
+
+static ui_error_t mock_on_touched_fail(void *user_data) {
+  if (user_data) {
+  }
+  return UI_ERROR_UNKNOWN;
+}
 
 static ui_error_t mock_on_change(union ui_signal_payload new_value,
                                  void *user_data) {
@@ -79,9 +93,7 @@ static int test_search_bar_operations(void) {
 
   {
     ui_error_t rc_cleanup = ui_search_bar_base_init(&sb, &comp, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   err = ui_search_bar_base_set_query(NULL, "hello");
@@ -128,15 +140,11 @@ static int test_search_bar_operations(void) {
   struct ui_search_bar_base sb2;
   {
     ui_error_t rc_cleanup = ui_search_bar_base_init(&sb2, &comp, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   err = ui_search_bar_base_cleanup(&sb);
@@ -148,9 +156,7 @@ static int test_search_bar_operations(void) {
   /* Test OOM */
   {
     ui_error_t rc_cleanup = ui_search_bar_base_init(&sb, &comp, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_malloc_fail_countdown = 0;
   err = ui_search_bar_base_set_query(&sb, "oom text");
@@ -161,16 +167,16 @@ static int test_search_bar_operations(void) {
   extern int g_mock_strcpy_fail;
   g_mock_strcpy_fail = 1;
   {
-    ui_error_t _ign = ui_search_bar_base_set_query(&sb, "strcpy fail");
-    (void)_ign;
+    ui_error_t rc_err = ui_search_bar_base_set_query(&sb, "strcpy fail");
+    if (rc_err != UI_ERROR_NONE) {
+      /* expected failure */
+    }
   }
   g_mock_strcpy_fail = 0;
 
   {
     ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -187,9 +193,7 @@ static int test_search_bar_cva(void) {
 
   {
     ui_error_t rc_cleanup = ui_search_bar_base_init(&sb, &comp, &cva);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test invalid args to CVA functions */
@@ -252,11 +256,24 @@ static int test_search_bar_cva(void) {
   if (strcmp(sb.query, "") != 0)
     return 1;
 
+  /* Test failure in cva_on_change */
+  cva.register_on_change(&sb, mock_on_change_fail, NULL);
+  val.ptr_val = (void *)"fail change";
+  err = cva.write_value(&sb, val);
+  if (err != UI_ERROR_UNKNOWN)
+    return 1;
+
+  /* Test failure in cva_on_touched */
+  cva.register_on_change(&sb, mock_on_change, ud1);
+  cva.register_on_touched(&sb, mock_on_touched_fail, NULL);
+  val.ptr_val = (void *)"fail touch";
+  err = cva.write_value(&sb, val);
+  if (err != UI_ERROR_UNKNOWN)
+    return 1;
+
   {
     ui_error_t rc_cleanup = ui_search_bar_base_cleanup(&sb);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }

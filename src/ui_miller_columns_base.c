@@ -12,6 +12,27 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_miller_columns_mock_fail = 0;
+
+/**
+ * @brief mock_miller_signal_destroy.
+ * @param sig Parameter sig.
+ * @return Return value.
+ */
+static ui_error_t mock_miller_signal_destroy(ui_signal_t *sig) {
+  if (g_miller_columns_mock_fail == 1) {
+    (ui_signal_destroy)(sig);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_destroy)(sig);
+}
+#undef ui_signal_destroy
+/** @cond */
+#define ui_signal_destroy mock_miller_signal_destroy
+/** @endcond */
+#endif
+
 /** @cond */
 #define UI_MILLER_MAX_DEPTH 32
 /** @endcond */
@@ -108,10 +129,9 @@ ui_miller_columns_base_destroy(struct ui_miller_columns_base *miller) {
   }
 
   if (miller->topology_changed_signal) {
-    {
-      ui_error_t rc_cleanup =
-          ui_signal_destroy(miller->topology_changed_signal);
-      (void)rc_cleanup;
+    ui_error_t rc_cleanup = ui_signal_destroy(miller->topology_changed_signal);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return rc_cleanup;
     }
   }
 
@@ -169,12 +189,7 @@ ui_miller_columns_base_select_item(struct ui_miller_columns_base *miller,
 
   /* Emit topology change signal */
   payload.int_val = miller->active_column_count;
-  {
-    ui_error_t set_rc = ui_signal_set(miller->topology_changed_signal, payload);
-    { (void)set_rc; }
-  }
-
-  return UI_ERROR_NONE;
+  return ui_signal_set(miller->topology_changed_signal, payload);
 }
 
 /**

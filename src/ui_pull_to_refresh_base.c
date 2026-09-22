@@ -16,6 +16,178 @@
 #include <string.h>
 #include <math.h>
 /* clang-format on */
+#ifdef UI_TEST_MOCK_ALLOC
+
+int g_ptr_mock_create_node_fail = 0;
+
+/**
+ * @brief Mock implementation of ui_dom_node_create for error injection.
+ * @param type Node type.
+ * @param out_node Pointer to receive node.
+ * @return Error code.
+ */
+static ui_error_t mock_ptr_dom_node_create(enum ui_dom_node_type type,
+                                           struct ui_dom_node **out_node) {
+  if (g_ptr_mock_create_node_fail > 0) {
+    g_ptr_mock_create_node_fail--;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_create)(type, out_node);
+}
+#undef ui_dom_node_create
+/** @cond */
+#define ui_dom_node_create mock_ptr_dom_node_create
+/** @endcond */
+
+int g_ptr_mock_set_attr_fail = 0;
+int g_ptr_mock_tag_fail = 0;
+int g_ptr_mock_create_gesture_fail = 0;
+int g_ptr_mock_destroy_gesture_fail = 0;
+int g_ptr_mock_destroy_node_fail = 0;
+int g_ptr_mock_destroy_comp_fail = 0;
+
+int g_ptr_mock_gesture_process_fail = 0;
+
+/**
+ * @brief Mock implementation of ui_gesture_recognizer_process_event for error
+ * injection.
+ * @param rec Recognizer.
+ * @param event Event.
+ * @param timestamp_ms Timestamp.
+ * @param out_event Output gesture event.
+ * @return Error code.
+ */
+static ui_error_t mock_ptr_gesture_recognizer_process_event(
+    struct ui_gesture_recognizer *rec, const struct ui_event *event,
+    double timestamp_ms, struct ui_gesture_event *out_event) {
+  if (g_ptr_mock_gesture_process_fail > 0) {
+    g_ptr_mock_gesture_process_fail--;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_gesture_recognizer_process_event)(rec, event, timestamp_ms,
+                                               out_event);
+}
+#undef ui_gesture_recognizer_process_event
+/** @cond */
+#define ui_gesture_recognizer_process_event                                    \
+  mock_ptr_gesture_recognizer_process_event
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_dom_node_set_attribute for error injection.
+ * @param node Target node.
+ * @param name Attribute name.
+ * @param value Attribute value.
+ * @return Error code.
+ */
+static ui_error_t mock_ptr_dom_node_set_attribute(struct ui_dom_node *node,
+                                                  const char *name,
+                                                  const char *value) {
+  if (g_ptr_mock_set_attr_fail > 0) {
+    g_ptr_mock_set_attr_fail--;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_set_attribute)(node, name, value);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_ptr_dom_node_set_attribute
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_dom_node_set_tag_name for error injection.
+ * @param node Target node.
+ * @param tag Tag name.
+ * @return Error code.
+ */
+static ui_error_t mock_ptr_dom_node_set_tag_name(struct ui_dom_node *node,
+                                                 const char *tag) {
+  if (g_ptr_mock_tag_fail > 0) {
+    g_ptr_mock_tag_fail--;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_set_tag_name)(node, tag);
+}
+#undef ui_dom_node_set_tag_name
+/** @cond */
+#define ui_dom_node_set_tag_name mock_ptr_dom_node_set_tag_name
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_gesture_recognizer_create for error
+ * injection.
+ * @param out_rec Pointer to receive recognizer.
+ * @return Error code.
+ */
+static ui_error_t
+mock_ptr_gesture_recognizer_create(struct ui_gesture_recognizer **out_rec) {
+  if (g_ptr_mock_create_gesture_fail > 0) {
+    g_ptr_mock_create_gesture_fail--;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_gesture_recognizer_create)(out_rec);
+}
+#undef ui_gesture_recognizer_create
+/** @cond */
+#define ui_gesture_recognizer_create mock_ptr_gesture_recognizer_create
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_gesture_recognizer_destroy for error
+ * injection.
+ * @param rec Recognizer to destroy.
+ * @return Error code.
+ */
+static ui_error_t
+mock_ptr_gesture_recognizer_destroy(struct ui_gesture_recognizer *rec) {
+  if (g_ptr_mock_destroy_gesture_fail > 0) {
+    g_ptr_mock_destroy_gesture_fail--;
+    (ui_gesture_recognizer_destroy)(rec);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_gesture_recognizer_destroy)(rec);
+}
+#undef ui_gesture_recognizer_destroy
+/** @cond */
+#define ui_gesture_recognizer_destroy mock_ptr_gesture_recognizer_destroy
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_dom_node_destroy for error injection.
+ * @param node Node to destroy.
+ * @return Error code.
+ */
+static ui_error_t mock_ptr_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_ptr_mock_destroy_node_fail > 0) {
+    g_ptr_mock_destroy_node_fail--;
+    (ui_dom_node_destroy)(node);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_ptr_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief Mock implementation of ui_component_destroy for error injection.
+ * @param comp Component to destroy.
+ * @return Error code.
+ */
+static ui_error_t mock_ptr_component_destroy(struct ui_component *comp) {
+  if (g_ptr_mock_destroy_comp_fail > 0) {
+    g_ptr_mock_destroy_comp_fail--;
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_ptr_component_destroy
+/** @endcond */
+#endif
 
 /** @def UI_PTR_THRESHOLD
  * @brief Distance threshold to trigger a refresh
@@ -64,48 +236,33 @@ struct ui_pull_to_refresh_base {
 static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
   char buf[64];
   float progress = 0.0f;
-  {
-    ui_error_t rc_cleanup =
-        ui_pull_to_refresh_base_get_progress(ptr, &progress);
-    (void)rc_cleanup;
-  }
+  ui_error_t rc;
+
+  progress = ptr->pull_distance / UI_PTR_THRESHOLD;
 #if defined(_MSC_VER)
   sprintf_s(buf, sizeof(buf), "%.2f", progress);
 #else
   sprintf(buf, "%.2f", progress);
 #endif
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-        ptr->component->shadow_root, "data-progress", buf);
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_attribute(ptr->component->shadow_root, "data-progress",
+                                 buf);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (ptr->state == UI_PULL_TO_REFRESH_RESTING) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          ptr->component->shadow_root, "data-state", "resting");
-      (void)rc_cleanup;
-    }
+    return ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
+                                     "resting");
   } else if (ptr->state == UI_PULL_TO_REFRESH_PULLING) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          ptr->component->shadow_root, "data-state", "pulling");
-      (void)rc_cleanup;
-    }
+    return ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
+                                     "pulling");
   } else if (ptr->state == UI_PULL_TO_REFRESH_REFRESHING) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          ptr->component->shadow_root, "data-state", "refreshing");
-      (void)rc_cleanup;
-    }
+    return ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
+                                     "refreshing");
   } else {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_set_attribute(
-          ptr->component->shadow_root, "data-state", "completing");
-      (void)rc_cleanup;
-    }
+    return ui_dom_node_set_attribute(ptr->component->shadow_root, "data-state",
+                                     "completing");
   }
-  return UI_ERROR_NONE;
 }
 
 /**
@@ -117,6 +274,7 @@ static ui_error_t update_dom_state(struct ui_pull_to_refresh_base *ptr) {
 ui_error_t
 ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
   ui_error_t rc;
+  ui_error_t rc_cleanup;
   struct ui_pull_to_refresh_base *ptr;
   struct ui_dom_node *root_node = NULL;
 
@@ -141,38 +299,77 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(ptr->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(ptr);
+      return rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(ptr);
     return rc;
   }
 
-  {
-    ui_error_t rc_cleanup = ui_dom_node_set_tag_name(root_node, "div");
-    (void)rc_cleanup;
+  rc = ui_dom_node_set_tag_name(root_node, "div");
+  if (rc != UI_ERROR_NONE) {
+    rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      ui_component_destroy(ptr->component);
+      C_MULTIPLATFORM_FREE(ptr);
+      return rc_cleanup;
+    }
+    rc_cleanup = ui_component_destroy(ptr->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(ptr);
+      return rc_cleanup;
+    }
+    C_MULTIPLATFORM_FREE(ptr);
+    return rc;
   }
   ptr->component->shadow_root = root_node;
 
   rc = ui_gesture_recognizer_create(&ptr->gesture_recognizer);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      ptr->component->shadow_root = NULL;
+      ui_component_destroy(ptr->component);
+      C_MULTIPLATFORM_FREE(ptr);
+      return rc_cleanup;
     }
     ptr->component->shadow_root = NULL;
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
-      (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(ptr->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(ptr);
+      return rc_cleanup;
     }
     C_MULTIPLATFORM_FREE(ptr);
     return rc;
   }
 
-  {
-    ui_error_t rc_cleanup = update_dom_state(ptr);
-    (void)rc_cleanup;
+  rc = update_dom_state(ptr);
+  if (rc != UI_ERROR_NONE) {
+    rc_cleanup = ui_gesture_recognizer_destroy(ptr->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      ui_dom_node_destroy(root_node);
+      ptr->component->shadow_root = NULL;
+      ui_component_destroy(ptr->component);
+      C_MULTIPLATFORM_FREE(ptr);
+      return rc_cleanup;
+    }
+    rc_cleanup = ui_dom_node_destroy(root_node);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      ptr->component->shadow_root = NULL;
+      ui_component_destroy(ptr->component);
+      C_MULTIPLATFORM_FREE(ptr);
+      return rc_cleanup;
+    }
+    ptr->component->shadow_root = NULL;
+    rc_cleanup = ui_component_destroy(ptr->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      C_MULTIPLATFORM_FREE(ptr);
+      return rc_cleanup;
+    }
+    C_MULTIPLATFORM_FREE(ptr);
+    return rc;
   }
 
   *out_ptr = ptr;
@@ -187,30 +384,34 @@ ui_pull_to_refresh_base_create(struct ui_pull_to_refresh_base **out_ptr) {
  */
 ui_error_t
 ui_pull_to_refresh_base_destroy(struct ui_pull_to_refresh_base *ptr) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!ptr) {
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(ptr->gesture_recognizer);
-    (void)rc_cleanup;
+  rc_cleanup = ui_gesture_recognizer_destroy(ptr->gesture_recognizer);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
 
-  if (ptr->component->shadow_root) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(ptr->component->shadow_root);
-      (void)rc_cleanup;
+  if (ptr->component && ptr->component->shadow_root) {
+    rc_cleanup = ui_dom_node_destroy(ptr->component->shadow_root);
+    if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
     ptr->component->shadow_root = NULL;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(ptr->component);
-    (void)rc_cleanup;
+  if (ptr->component) {
+    rc_cleanup = ui_component_destroy(ptr->component);
+    if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
 
   C_MULTIPLATFORM_FREE(ptr);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -299,7 +500,10 @@ ui_error_t
 ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
                                       const struct ui_event *event,
                                       double timestamp_ms) {
-  struct ui_gesture_event ge = {0};
+  struct ui_gesture_event ge;
+  ui_error_t rc;
+
+  memset(&ge, 0, sizeof(ge));
 
   if (!ptr || !event) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -310,19 +514,19 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
     return UI_ERROR_NONE; /* Ignore gestures while refreshing/completing */
   }
 
-  {
-    ui_error_t ge_rc = ui_gesture_recognizer_process_event(
-        ptr->gesture_recognizer, event, timestamp_ms, &ge);
-    (void)ge_rc;
+  rc = ui_gesture_recognizer_process_event(ptr->gesture_recognizer, event,
+                                           timestamp_ms, &ge);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   if (ge.type == UI_GESTURE_PAN) {
     if (ge.state == UI_GESTURE_STATE_BEGAN) {
       if (ptr->state == UI_PULL_TO_REFRESH_RESTING) {
         ptr->state = UI_PULL_TO_REFRESH_PULLING;
-        {
-          ui_error_t rc_cleanup = update_dom_state(ptr);
-          (void)rc_cleanup;
+        rc = update_dom_state(ptr);
+        if (rc != UI_ERROR_NONE) {
+          return rc;
         }
       }
     } else if (ge.state == UI_GESTURE_STATE_CHANGED) {
@@ -334,18 +538,18 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
           if (resistance < 0.1f)
             resistance = 0.1f;
           ptr->pull_distance += ge.delta_y * resistance;
-          {
-            ui_error_t rc_cleanup = update_dom_state(ptr);
-            (void)rc_cleanup;
+          rc = update_dom_state(ptr);
+          if (rc != UI_ERROR_NONE) {
+            return rc;
           }
         } else {
           ptr->pull_distance += ge.delta_y; /* pushing back up */
           if (ptr->pull_distance < 0.0f) {
             ptr->pull_distance = 0.0f;
           }
-          {
-            ui_error_t rc_cleanup = update_dom_state(ptr);
-            (void)rc_cleanup;
+          rc = update_dom_state(ptr);
+          if (rc != UI_ERROR_NONE) {
+            return rc;
           }
         }
       }
@@ -354,9 +558,9 @@ ui_pull_to_refresh_base_process_event(struct ui_pull_to_refresh_base *ptr,
         if (ptr->pull_distance >= UI_PTR_THRESHOLD) {
           ptr->state = UI_PULL_TO_REFRESH_REFRESHING;
           ptr->pull_distance = UI_PTR_THRESHOLD; /* lock to target threshold */
-          {
-            ui_error_t rc_cleanup = update_dom_state(ptr);
-            (void)rc_cleanup;
+          rc = update_dom_state(ptr);
+          if (rc != UI_ERROR_NONE) {
+            return rc;
           }
           if (ptr->on_refresh) {
             return ptr->on_refresh(ptr, ptr->on_refresh_user_data);
@@ -455,11 +659,8 @@ ui_pull_to_refresh_base_set_spinner(struct ui_pull_to_refresh_base *ptr,
   }
   ptr->spinner_comp = spinner_comp;
   if (spinner_comp) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_append_child(
-          ptr->component->shadow_root, spinner_comp->shadow_root);
-      (void)rc_cleanup;
-    }
+    return ui_dom_node_append_child(ptr->component->shadow_root,
+                                    spinner_comp->shadow_root);
   }
   return UI_ERROR_NONE;
 }
@@ -497,3 +698,19 @@ ui_error_t ui_pull_to_refresh_base_get_refreshing_signal(
   *out_refreshing = widget->computed_refreshing_signal;
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+void ui_pull_to_refresh_base_test_clear_component(
+    struct ui_pull_to_refresh_base *ptr);
+/**
+ * @brief Test helper to clear component pointer for coverage testing.
+ * @param ptr Target component.
+ */
+void ui_pull_to_refresh_base_test_clear_component(
+    struct ui_pull_to_refresh_base *ptr) {
+  ui_dom_node_destroy(ptr->component->shadow_root);
+  ptr->component->shadow_root = NULL;
+  ui_component_destroy(ptr->component);
+  ptr->component = NULL;
+}
+#endif

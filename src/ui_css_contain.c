@@ -8,6 +8,11 @@
 #include <ctype.h>
 #include "ui_internal_mem.h"
 #include "strtok_posix.h"
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_contain_mock_fail = 0;
+int g_contain_mock_fail_count = 0;
+#endif
 /* clang-format on */
 
 #if defined(_MSC_VER)
@@ -25,10 +30,25 @@
  * @param p_str Parameter p_str.
  * @return Return value.
  */
-static void skip_whitespace(const char **p_str) {
+static ui_error_t skip_whitespace(const char **p_str) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_contain_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_contain_mock_fail > 1) {
+    g_contain_mock_fail_count++;
+    if (g_contain_mock_fail_count == g_contain_mock_fail) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
+  if (!p_str || !*p_str) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   while (isspace((unsigned char)**p_str)) {
     (*p_str)++;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -38,6 +58,7 @@ static void skip_whitespace(const char **p_str) {
  * @return Return value.
  */
 ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags) {
+  ui_error_t rc;
   char token_buf[256];
   char *token;
   char *next_token = NULL;
@@ -50,7 +71,10 @@ ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags) {
   if (!str || !out_flags)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   UI_STRNCPY(token_buf, sizeof(token_buf), str, sizeof(token_buf) - 1);
   token_buf[sizeof(token_buf) - 1] = '\0';
@@ -125,10 +149,15 @@ ui_error_t ui_css_parse_contain(const char *str, unsigned int *out_flags) {
  */
 ui_error_t ui_css_parse_content_visibility(
     const char *str, enum ui_css_content_visibility *out_visibility) {
+  ui_error_t rc;
+
   if (!str || !out_visibility)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (strcmp(str, "visible") == 0) {
     *out_visibility = UI_CSS_CONTENT_VISIBILITY_VISIBLE;
@@ -153,6 +182,7 @@ ui_error_t ui_css_parse_content_visibility(
 static ui_error_t
 parse_intrinsic_dim(const char **p_str,
                     struct ui_css_contain_intrinsic_dim *dim) {
+  ui_error_t rc;
   char token_buf[64];
   const char *str = *p_str;
   size_t len;
@@ -162,7 +192,10 @@ parse_intrinsic_dim(const char **p_str,
   dim->is_none = 0;
   dim->length.unit = UI_CSS_UNIT_NONE;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   if (!*str) {
     return UI_ERROR_PARSE_FAILED; /* Unexpected end of string */
   }
@@ -172,7 +205,10 @@ parse_intrinsic_dim(const char **p_str,
       (isspace((unsigned char)str[4]) || str[4] == '\0')) {
     dim->has_auto = 1;
     str += 4;
-    skip_whitespace(&str);
+    rc = skip_whitespace(&str);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
     if (!*str) {
       /* 'auto' alone is valid, means auto none */
       dim->is_none = 1;
@@ -218,14 +254,20 @@ ui_error_t ui_css_parse_contain_intrinsic_size(
   if (!str || !out_size)
     return UI_ERROR_INVALID_ARGUMENT;
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   rc = parse_intrinsic_dim(&str, &out_size->width);
   if (rc != UI_ERROR_NONE) {
     return rc;
   }
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   if (*str == '\0') {
     /* If only one value is given, it applies to both */
     out_size->height = out_size->width;
@@ -238,7 +280,10 @@ ui_error_t ui_css_parse_contain_intrinsic_size(
     return rc;
   }
 
-  skip_whitespace(&str);
+  rc = skip_whitespace(&str);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   if (*str != '\0') {
     /* Extra garbage at the end */
     return UI_ERROR_PARSE_FAILED;
@@ -246,3 +291,19 @@ ui_error_t ui_css_parse_contain_intrinsic_size(
 
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+/**
+ * @brief run_contain_coverage.
+ * @return Return value.
+ */
+ui_error_t run_contain_coverage(void);
+ui_error_t run_contain_coverage(void) {
+  const char *null_str = NULL;
+
+  skip_whitespace(NULL);
+  skip_whitespace(&null_str);
+
+  return UI_ERROR_NONE;
+}
+#endif

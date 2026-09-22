@@ -14,6 +14,16 @@
 #endif
 
 extern int g_malloc_fail_countdown;
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_popover_mock_fail;
+extern int g_popover_backdrop_destroy_mock_fail;
+extern int g_popover_component_destroy_mock_fail;
+extern int g_popover_dom_node_destroy_mock_fail;
+extern int g_popover_remove_child_mock_fail;
+extern int g_popover_unmount_mock_fail;
+extern void
+ui_popover_base_test_clear_shadow_root(struct ui_popover_base *popover);
+#endif
 
 static int test_popover_lifecycle(void) {
   struct ui_popover_base *popover;
@@ -31,7 +41,7 @@ static int test_popover_lifecycle(void) {
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -86,7 +96,8 @@ static int test_popover_open_close(void) {
     return 1;
 
   /* Remove content to test empty root on close */
-  ui_dom_node_remove_child(root_node, content_node);
+  if (content_node->parent)
+    ui_dom_node_remove_child(content_node->parent, content_node);
 
   rc = ui_popover_base_close(popover);
   if (rc != UI_ERROR_NONE)
@@ -104,31 +115,31 @@ static int test_popover_open_close(void) {
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_mgr);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(content_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   /* Note: content_node is conceptually owned by the user, but since the popover
@@ -210,26 +221,26 @@ static int test_popover_click_outside(void) {
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(content_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -253,7 +264,7 @@ static int test_popover_nulls(void) {
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -305,7 +316,7 @@ static int test_popover_nulls(void) {
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -316,6 +327,7 @@ static int test_popover_oom_and_errors(void) {
   struct ui_overlay_director *director;
   struct ui_dom_node *root_node;
   struct ui_dom_node *content_node;
+  struct ui_dom_node *dummy_parent = NULL;
   struct ui_layout_node trigger;
   struct ui_anchor_config anchor;
   struct ui_focus_manager *focus_mgr;
@@ -332,7 +344,7 @@ static int test_popover_oom_and_errors(void) {
       {
         ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
       break;
@@ -373,7 +385,6 @@ static int test_popover_oom_and_errors(void) {
   }
 
   /* Fail ui_dom_node_append_child by giving content_node a parent */
-  struct ui_dom_node *dummy_parent;
   ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy_parent);
   ui_dom_node_append_child(dummy_parent, content_node);
 
@@ -386,30 +397,308 @@ static int test_popover_oom_and_errors(void) {
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_focus_manager_destroy(focus_mgr);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_overlay_director_destroy(director);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+static int test_popover_mock_failures(void) {
+  struct ui_popover_base *popover = NULL;
+  struct ui_overlay_director *director = NULL;
+  struct ui_dom_node *root_node = NULL;
+  struct ui_dom_node *content_node = NULL;
+  struct ui_dom_node *dummy_parent = NULL;
+  struct ui_layout_node trigger;
+  struct ui_anchor_config anchor;
+  struct ui_focus_manager *focus_mgr = NULL;
+  ui_error_t rc;
+
+  trigger.x = 100.0f;
+  trigger.y = 100.0f;
+  trigger.width = 50.0f;
+  trigger.height = 50.0f;
+
+  anchor.target_x = UI_ANCHOR_EDGE_START;
+  anchor.target_y = UI_ANCHOR_EDGE_END;
+  anchor.overlay_x = UI_ANCHOR_EDGE_START;
+  anchor.overlay_y = UI_ANCHOR_EDGE_START;
+  anchor.offset_x = 0.0f;
+  anchor.offset_y = 0.0f;
+
+  /* 1. backdrop_create fails, component_destroy succeeds */
+  g_popover_mock_fail = 1;
+  if (ui_popover_base_create(&popover) != UI_ERROR_UNKNOWN)
+    return 1;
+
+  /* 2. backdrop_create fails, component_destroy fails */
+  g_popover_mock_fail = 1;
+  g_popover_component_destroy_mock_fail = 1;
+  if (ui_popover_base_create(&popover) != UI_ERROR_UNKNOWN)
+    return 1;
+
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
+  ui_overlay_director_create(root_node, &director);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content_node);
+  ui_focus_manager_create(&focus_mgr);
+
+  /* 3. anchor_compute fails */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 2;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 4. set_attribute role fails, destroy succeeds */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 3;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 5. set_attribute role fails, destroy fails */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 3;
+  g_popover_dom_node_destroy_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 6. set_attribute aria-modal fails, destroy succeeds */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 4;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 7. set_attribute aria-modal fails, destroy fails */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 4;
+  g_popover_dom_node_destroy_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 8. set_attribute style fails, destroy succeeds */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 5;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 9. set_attribute style fails, destroy fails */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 5;
+  g_popover_dom_node_destroy_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 10. append_child fails, destroy fails */
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &dummy_parent);
+  ui_dom_node_append_child(dummy_parent, content_node);
+  ui_popover_base_create(&popover);
+  g_popover_dom_node_destroy_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+  ui_dom_node_destroy(dummy_parent);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content_node);
+
+  /* 11. overlay mount fails: remove_child succeeds, destroy succeeds */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 6;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 12. overlay mount fails: remove_child fails */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 6;
+  g_popover_remove_child_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 13. overlay mount fails: remove_child succeeds, destroy fails */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 6;
+  g_popover_dom_node_destroy_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 14. push_trap fails: unmount succeeds, remove_child succeeds, destroy
+   * succeeds */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 7;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 15. push_trap fails: unmount fails */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 7;
+  g_popover_unmount_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 16. push_trap fails: unmount succeeds, remove_child fails */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 7;
+  g_popover_remove_child_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 17. push_trap fails: unmount succeeds, remove_child succeeds, destroy fails
+   */
+  ui_popover_base_create(&popover);
+  g_popover_mock_fail = 7;
+  g_popover_dom_node_destroy_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 18. backdrop_process_event fails */
+  ui_popover_base_create(&popover);
+  ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                       &anchor, 800, 600);
+  g_popover_mock_fail = 8;
+  {
+    struct ui_event ev;
+    ev.type = UI_EVENT_MOUSE_DOWN;
+    if (ui_popover_base_process_event(popover, &ev) != UI_ERROR_UNKNOWN)
+      return 1;
+  }
+  ui_popover_base_close(popover);
+  ui_popover_base_destroy(popover);
+
+  /* 19. Open while open, but close fails */
+  ui_popover_base_create(&popover);
+  ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                       &anchor, 800, 600);
+  g_popover_unmount_mock_fail = 1;
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_close(popover);
+  ui_popover_base_destroy(popover);
+
+  /* 20. Close: pop_trap fails, unmount fails, remove_child fails, destroy fails
+   * (rc != NONE, rc == NONE is false for all) */
+  ui_popover_base_create(&popover);
+  ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                       &anchor, 800, 600);
+  g_popover_mock_fail = 9;              /* pop_trap fails -> rc is UNKNOWN */
+  g_popover_unmount_mock_fail = 1;      /* unmount fails -> rc != NONE */
+  g_popover_remove_child_mock_fail = 1; /* remove_child fails -> rc != NONE */
+  g_popover_dom_node_destroy_mock_fail =
+      1; /* dom_node_destroy fails -> rc != NONE */
+  if (ui_popover_base_close(popover) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 21. Close: remove_child fails while rc == NONE -> rc = rc_cleanup */
+  ui_popover_base_create(&popover);
+  ui_popover_base_open(popover, content_node, director, NULL, &trigger, &anchor,
+                       800, 600);
+  g_popover_remove_child_mock_fail = 1;
+  if (ui_popover_base_close(popover) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 22. Close: dom_node_destroy fails while rc == NONE -> rc = rc_cleanup */
+  ui_popover_base_create(&popover);
+  ui_popover_base_open(popover, content_node, director, NULL, &trigger, &anchor,
+                       800, 600);
+  g_popover_dom_node_destroy_mock_fail = 1;
+  if (ui_popover_base_close(popover) != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 23. Close when shadow_root is NULL (root == NULL branch) */
+
+  ui_popover_base_create(&popover);
+  ui_popover_base_open(popover, content_node, director, NULL, &trigger, &anchor,
+                       800, 600);
+  /* Unmount manually to clear shadow_root branch */
+  ui_popover_base_test_clear_shadow_root(popover);
+  if (ui_popover_base_close(popover) != UI_ERROR_NONE)
+    return 1;
+  ui_popover_base_destroy(popover);
+
+  /* 24. Destroy while open: close fails, backdrop_destroy fails,
+   * component_destroy fails */
+  ui_dom_node_destroy(content_node);
+  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &content_node);
+  ui_popover_base_create(&popover);
+  if (ui_popover_base_open(popover, content_node, director, focus_mgr, &trigger,
+                           &anchor, 800, 600) != UI_ERROR_NONE)
+    return 1;
+  g_popover_unmount_mock_fail = 1; /* close fails -> rc becomes UNKNOWN */
+  g_popover_backdrop_destroy_mock_fail =
+      1; /* backdrop_destroy fails -> rc != NONE */
+  g_popover_component_destroy_mock_fail =
+      1; /* component_destroy fails -> rc != NONE */
+  if (ui_popover_base_destroy(popover) != UI_ERROR_UNKNOWN)
+    return 1;
+
+  /* 25. Destroy: backdrop_destroy fails while closed -> rc becomes UNKNOWN */
+  ui_popover_base_create(&popover);
+  g_popover_backdrop_destroy_mock_fail = 1;
+  if (ui_popover_base_destroy(popover) != UI_ERROR_UNKNOWN)
+    return 1;
+
+  /* 26. Destroy: component_destroy fails while closed -> rc becomes UNKNOWN */
+  ui_popover_base_create(&popover);
+  g_popover_component_destroy_mock_fail = 1;
+  if (ui_popover_base_destroy(popover) != UI_ERROR_UNKNOWN)
+    return 1;
+
+  ui_focus_manager_destroy(focus_mgr);
+  ui_overlay_director_destroy(director);
+  ui_dom_node_destroy(root_node);
+  ui_dom_node_destroy(content_node);
+
+  return 0;
+}
+#endif
 int main(void) {
   int result = 0;
   printf("Running ui_popover_base tests...\n");
@@ -434,6 +723,12 @@ int main(void) {
     printf("test_popover_oom_and_errors FAILED\n");
     result = 1;
   }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (test_popover_mock_failures() != 0) {
+    printf("test_popover_mock_failures FAILED\n");
+    result = 1;
+  }
+#endif
 
   if (result == 0) {
     printf("All popover base tests PASSED\n");

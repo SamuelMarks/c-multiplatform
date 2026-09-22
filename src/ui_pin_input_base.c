@@ -11,6 +11,50 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_pin_input_mock_comp_destroy_fail = 0;
+int g_pin_input_mock_set_style_fail = 0;
+
+/**
+ * @brief mock_pin_input_component_destroy.
+ * @param component Parameter component.
+ * @return Return value.
+ */
+static ui_error_t
+mock_pin_input_component_destroy(struct ui_component *component) {
+  if (g_pin_input_mock_comp_destroy_fail) {
+    g_pin_input_mock_comp_destroy_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(component);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_pin_input_component_destroy
+/** @endcond */
+
+/**
+ * @brief mock_pin_input_component_set_default_style.
+ * @param comp Parameter comp.
+ * @param sheet Parameter sheet.
+ * @return Return value.
+ */
+static ui_error_t
+mock_pin_input_component_set_default_style(struct ui_component *comp,
+                                           struct ui_css_stylesheet *sheet) {
+  if (g_pin_input_mock_set_style_fail) {
+    g_pin_input_mock_set_style_fail = 0;
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style                                         \
+  mock_pin_input_component_set_default_style
+/** @endcond */
+#endif
+
 /**
  * @brief Default CSS stylesheet for PIN input container.
  */
@@ -216,10 +260,10 @@ ui_error_t ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input,
     goto cleanup;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_component_set_default_style(pin_input->component, default_style);
-    (void)rc_cleanup;
+  rc = ui_component_set_default_style(pin_input->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   pin_input->component->shadow_root = root_node;
@@ -237,16 +281,10 @@ ui_error_t ui_pin_input_base_create(struct ui_pin_input_base **out_pin_input,
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (pin_input->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(pin_input->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(pin_input->component);
   }
   C_MULTIPLATFORM_FREE(pin_input->buffer);
   C_MULTIPLATFORM_FREE(pin_input);
@@ -259,16 +297,18 @@ cleanup:
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_pin_input_base_destroy(struct ui_pin_input_base *pin_input) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
   if (!pin_input) {
     return UI_ERROR_NONE;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(pin_input->component);
-    (void)rc_cleanup;
+  rc_cleanup = ui_component_destroy(pin_input->component);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
   C_MULTIPLATFORM_FREE(pin_input->buffer);
   C_MULTIPLATFORM_FREE(pin_input);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

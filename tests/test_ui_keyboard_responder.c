@@ -152,7 +152,7 @@ static ui_error_t run_normal_tests(void) {
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   node = NULL;
@@ -209,7 +209,7 @@ static ui_error_t run_oom_tests(void) {
   {
     ui_error_t rc_cleanup = ui_keyboard_responder_destroy(responder);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
 
@@ -236,17 +236,41 @@ static ui_error_t run_error_paths(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_keyboard_responder_mock_fail;
+    struct ui_dom_node *elem = NULL;
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &elem);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    event.type = UI_EVENT_KEY_DOWN;
+
+    g_keyboard_responder_mock_fail = 1;
+    rc = ui_keyboard_responder_handle_event(responder, elem, &event, &handled);
+    if (rc == UI_ERROR_NONE)
+      return UI_ERROR_UNKNOWN;
+
+    g_keyboard_responder_mock_fail = 2;
+    rc = ui_keyboard_responder_handle_event(responder, elem, &event, &handled);
+    if (rc == UI_ERROR_NONE)
+      return UI_ERROR_UNKNOWN;
+
+    g_keyboard_responder_mock_fail = 0;
+    ui_dom_node_destroy(elem);
+  }
+#endif
+
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(node);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
 
   {
     ui_error_t rc_cleanup = ui_keyboard_responder_destroy(responder);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return rc_cleanup;
     }
   }
   return UI_ERROR_NONE;

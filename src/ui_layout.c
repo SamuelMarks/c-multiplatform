@@ -19,16 +19,56 @@
 #include "ui_layout_algorithms.c"
 #include "ui_layout_tree.c"
 /* clang-format on */
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_layout_compute_mock_fail = 0;
+
+/**
+ * @brief mock_layout_flex.
+ * @param node Parameter node.
+ * @param available_width Parameter available_width.
+ * @return Return value.
+ */
+static ui_error_t mock_layout_flex(struct ui_layout_node *node,
+                                   float available_width) {
+  if (g_layout_compute_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return layout_flex(node, available_width);
+}
+#undef layout_flex
+/** @cond */
+#define layout_flex mock_layout_flex
+/** @endcond */
+
+/**
+ * @brief mock_layout_block.
+ * @param node Parameter node.
+ * @param available_width Parameter available_width.
+ * @return Return value.
+ */
+static ui_error_t mock_layout_block(struct ui_layout_node *node,
+                                    float available_width) {
+  if (g_layout_compute_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return layout_block(node, available_width);
+}
+#undef layout_block
+/** @cond */
+#define layout_block mock_layout_block
+/** @endcond */
+#endif
 ui_error_t ui_layout_solve_viewport(struct ui_layout_node *root,
                                     float window_width, float window_height) {
   if (!root) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  /* Identify if root is html or body */
+  /* Identify if root is html or body, or fallback to viewport dimensions */
   if (root->dom_node && root->dom_node->tag_name) {
     if (strcmp(root->dom_node->tag_name, "html") == 0 ||
-        strcmp(root->dom_node->tag_name, "body") == 0) {
+        strcmp(root->dom_node->tag_name, "body") == 0 || root->width <= 0.0f) {
       root->width = window_width;
       root->height = window_height;
       root->content_width = window_width - root->padding[1] - root->padding[3] -
@@ -152,13 +192,16 @@ ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  /* Suppress unused warning */
-  (void)available_height;
+  if (available_height > 0.0f) {
+    /* Height constraint if specified */
+  }
 
   if (node->display_inside == UI_LAYOUT_DISPLAY_INSIDE_FLEX) {
     ui_error_t rc;
     rc = layout_flex(node, available_width);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
     return UI_ERROR_NONE;
   }
 
@@ -166,7 +209,9 @@ ui_error_t ui_layout_compute(struct ui_layout_node *node, float available_width,
   {
     ui_error_t rc;
     rc = layout_block(node, available_width);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
   }
 
 #if defined(__EMSCRIPTEN__)

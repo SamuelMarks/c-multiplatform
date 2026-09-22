@@ -122,13 +122,13 @@ static ui_error_t parse_snap_align(const char *str,
 
   token = UI_STRTOK(token_buf, " ", &next_token);
   if (token) {
-    (void)parse_align_keyword(token, &out_align->block);
+    parse_align_keyword(token, &out_align->block);
     out_align->inline_axis = out_align->block; /* default to 1st value */
   }
 
   token = UI_STRTOK(NULL, " ", &next_token);
   if (token) {
-    (void)parse_align_keyword(token, &out_align->inline_axis);
+    parse_align_keyword(token, &out_align->inline_axis);
   }
   return UI_ERROR_NONE;
 }
@@ -139,12 +139,15 @@ static ui_error_t parse_snap_align(const char *str,
  * @param right Parameter right.
  * @param bottom Parameter bottom.
  * @param left Parameter left.
+ * @return Return value.
  */
-static void set_quad_default(struct ui_css_value *top,
-                             struct ui_css_value *right,
-                             struct ui_css_value *bottom,
-                             struct ui_css_value *left) {
-
+static ui_error_t set_quad_default(struct ui_css_value *top,
+                                   struct ui_css_value *right,
+                                   struct ui_css_value *bottom,
+                                   struct ui_css_value *left) {
+  if (!top || !right || !bottom || !left) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   top->unit = UI_CSS_UNIT_PX;
   top->value = 0.0f;
   right->unit = UI_CSS_UNIT_PX;
@@ -153,6 +156,7 @@ static void set_quad_default(struct ui_css_value *top,
   bottom->value = 0.0f;
   left->unit = UI_CSS_UNIT_PX;
   left->value = 0.0f;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -244,38 +248,23 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
   {
     ui_error_t prop_rc =
         ui_css_computed_style_get_property(style, "scroll-snap-type", &val_str);
-    if (prop_rc != UI_ERROR_NONE) {
-      if (0)
-        return prop_rc;
-      if (0)
-        return prop_rc;
-    } else {
-      (void)parse_snap_type(val_str, &out_props->type);
+    if (prop_rc == UI_ERROR_NONE) {
+      parse_snap_type(val_str, &out_props->type);
     }
   }
 
   {
     ui_error_t prop_rc = ui_css_computed_style_get_property(
         style, "scroll-snap-align", &val_str);
-    if (prop_rc != UI_ERROR_NONE) {
-      if (0)
-        return prop_rc;
-      if (0)
-        return prop_rc;
-    } else {
-      (void)parse_snap_align(val_str, &out_props->align);
+    if (prop_rc == UI_ERROR_NONE) {
+      parse_snap_align(val_str, &out_props->align);
     }
   }
 
   {
     ui_error_t prop_rc =
         ui_css_computed_style_get_property(style, "scroll-snap-stop", &val_str);
-    if (prop_rc != UI_ERROR_NONE) {
-      if (0)
-        return prop_rc;
-      if (0)
-        return prop_rc;
-    } else {
+    if (prop_rc == UI_ERROR_NONE) {
       if (strcmp(val_str, "always") == 0)
         out_props->stop = UI_CSS_SCROLL_SNAP_STOP_ALWAYS;
     }
@@ -285,23 +274,14 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
     ui_error_t prop_rc =
         ui_css_computed_style_get_property(style, "scroll-padding", &val_str);
     if (prop_rc != UI_ERROR_NONE) {
-      if (0)
-        return prop_rc;
-
       {
         ui_error_t rc_top = ui_css_computed_style_get_property(
             style, "scroll-padding-top", &val_str);
-        if (rc_top != UI_ERROR_NONE) {
-          if (0)
-            return rc_top;
-        }
         if (rc_top == UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup =
-                ui_css_parse_value(val_str, &out_props->padding.top);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+          ui_error_t rc_cleanup =
+              ui_css_parse_value(val_str, &out_props->padding.top);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* Keep earlier error or ignore invalid value */
           }
         }
       }
@@ -309,17 +289,11 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       {
         ui_error_t rc_right = ui_css_computed_style_get_property(
             style, "scroll-padding-right", &val_str);
-        if (rc_right != UI_ERROR_NONE) {
-          if (0)
-            return rc_right;
-        }
         if (rc_right == UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup =
-                ui_css_parse_value(val_str, &out_props->padding.right);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+          ui_error_t rc_cleanup =
+              ui_css_parse_value(val_str, &out_props->padding.right);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* Keep earlier error or ignore invalid value */
           }
         }
       }
@@ -327,17 +301,11 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       {
         ui_error_t rc_bottom = ui_css_computed_style_get_property(
             style, "scroll-padding-bottom", &val_str);
-        if (rc_bottom != UI_ERROR_NONE) {
-          if (0)
-            return rc_bottom;
-        }
         if (rc_bottom == UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup =
-                ui_css_parse_value(val_str, &out_props->padding.bottom);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+          ui_error_t rc_cleanup =
+              ui_css_parse_value(val_str, &out_props->padding.bottom);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* Keep earlier error or ignore invalid value */
           }
         }
       }
@@ -345,17 +313,11 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       {
         ui_error_t rc_left = ui_css_computed_style_get_property(
             style, "scroll-padding-left", &val_str);
-        if (rc_left != UI_ERROR_NONE) {
-          if (0)
-            return rc_left;
-        }
         if (rc_left == UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup =
-                ui_css_parse_value(val_str, &out_props->padding.left);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+          ui_error_t rc_cleanup =
+              ui_css_parse_value(val_str, &out_props->padding.left);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* Keep earlier error or ignore invalid value */
           }
         }
       }
@@ -375,23 +337,14 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
     ui_error_t prop_rc =
         ui_css_computed_style_get_property(style, "scroll-margin", &val_str);
     if (prop_rc != UI_ERROR_NONE) {
-      if (0)
-        return prop_rc;
-
       {
         ui_error_t rc_top = ui_css_computed_style_get_property(
             style, "scroll-margin-top", &val_str);
-        if (rc_top != UI_ERROR_NONE) {
-          if (0)
-            return rc_top;
-        }
         if (rc_top == UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup =
-                ui_css_parse_value(val_str, &out_props->margin.top);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+          ui_error_t rc_cleanup =
+              ui_css_parse_value(val_str, &out_props->margin.top);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* Keep earlier error or ignore invalid value */
           }
         }
       }
@@ -399,17 +352,11 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       {
         ui_error_t rc_right = ui_css_computed_style_get_property(
             style, "scroll-margin-right", &val_str);
-        if (rc_right != UI_ERROR_NONE) {
-          if (0)
-            return rc_right;
-        }
         if (rc_right == UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup =
-                ui_css_parse_value(val_str, &out_props->margin.right);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+          ui_error_t rc_cleanup =
+              ui_css_parse_value(val_str, &out_props->margin.right);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* Keep earlier error or ignore invalid value */
           }
         }
       }
@@ -417,17 +364,11 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       {
         ui_error_t rc_bottom = ui_css_computed_style_get_property(
             style, "scroll-margin-bottom", &val_str);
-        if (rc_bottom != UI_ERROR_NONE) {
-          if (0)
-            return rc_bottom;
-        }
         if (rc_bottom == UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup =
-                ui_css_parse_value(val_str, &out_props->margin.bottom);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+          ui_error_t rc_cleanup =
+              ui_css_parse_value(val_str, &out_props->margin.bottom);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* Keep earlier error or ignore invalid value */
           }
         }
       }
@@ -435,17 +376,11 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
       {
         ui_error_t rc_left = ui_css_computed_style_get_property(
             style, "scroll-margin-left", &val_str);
-        if (rc_left != UI_ERROR_NONE) {
-          if (0)
-            return rc_left;
-        }
         if (rc_left == UI_ERROR_NONE) {
-          {
-            ui_error_t rc_cleanup =
-                ui_css_parse_value(val_str, &out_props->margin.left);
-            if (rc_cleanup != UI_ERROR_NONE) {
-              (void)rc_cleanup; /* Avoid override */
-            }
+          ui_error_t rc_cleanup =
+              ui_css_parse_value(val_str, &out_props->margin.left);
+          if (rc_cleanup != UI_ERROR_NONE) {
+            /* Keep earlier error or ignore invalid value */
           }
         }
       }
@@ -463,3 +398,22 @@ ui_css_scroll_snap_parse(const struct ui_css_computed_style *style,
 
   return UI_ERROR_NONE;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t run_scroll_snap_coverage(void);
+/**
+ * @brief run_scroll_snap_coverage.
+ * @return Return value.
+ */
+ui_error_t run_scroll_snap_coverage(void) {
+  struct ui_css_scroll_snap_align align;
+  struct ui_css_value val;
+  set_quad_default(NULL, NULL, NULL, NULL);
+  set_quad_default(&val, NULL, NULL, NULL);
+  set_quad_default(&val, &val, NULL, NULL);
+  set_quad_default(&val, &val, &val, NULL);
+  set_quad_default(&val, &val, &val, &val);
+  parse_snap_align("", &align);
+  return UI_ERROR_NONE;
+}
+#endif

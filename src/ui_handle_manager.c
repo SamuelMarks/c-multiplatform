@@ -13,6 +13,52 @@
 #include "ui_internal_mem.h"
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+#ifndef UI_SINGLE_THREADED
+int g_handle_manager_mock_cas_fail = 0;
+int g_handle_manager_mock_store_fail = 0;
+
+/**
+ * @brief mock_handle_manager_atomic_cas.
+ * @param target Parameter target.
+ * @param expected Parameter expected.
+ * @param new_value Parameter new_value.
+ * @param out_swapped Parameter out_swapped.
+ * @return Return value.
+ */
+static ui_error_t mock_handle_manager_atomic_cas(ui_atomic_t *target,
+                                                 long expected, long new_value,
+                                                 int *out_swapped) {
+  if (g_handle_manager_mock_cas_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_atomic_cas)(target, expected, new_value, out_swapped);
+}
+#undef ui_atomic_cas
+/** @cond */
+#define ui_atomic_cas mock_handle_manager_atomic_cas
+/** @endcond */
+
+/**
+ * @brief mock_handle_manager_atomic_store.
+ * @param target Parameter target.
+ * @param new_value Parameter new_value.
+ * @return Return value.
+ */
+static ui_error_t mock_handle_manager_atomic_store(ui_atomic_t *target,
+                                                   long new_value) {
+  if (g_handle_manager_mock_store_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_atomic_store)(target, new_value);
+}
+#undef ui_atomic_store
+/** @cond */
+#define ui_atomic_store mock_handle_manager_atomic_store
+/** @endcond */
+#endif
+#endif
+
 /** @def HANDLE_INDEX
  * @brief Handle index extraction
  */
@@ -61,14 +107,16 @@ struct ui_handle_manager {
 static ui_error_t spin_lock(ui_atomic_t *lock) {
 #ifndef UI_SINGLE_THREADED
   int is_swapped = 0;
+  ui_error_t cas_rc;
   do {
-    {
-      ui_error_t cas_rc = ui_atomic_cas(lock, 0, 1, &is_swapped);
-      (void)cas_rc;
+    cas_rc = ui_atomic_cas(lock, 0, 1, &is_swapped);
+    if (cas_rc != UI_ERROR_NONE) {
+      return cas_rc;
     }
   } while (is_swapped != 0);
 #else
-  (void)lock;
+  if (lock != NULL) {
+  }
 #endif
   return UI_ERROR_NONE;
 }
@@ -85,12 +133,13 @@ static ui_error_t spin_lock(ui_atomic_t *lock) {
  */
 static ui_error_t spin_unlock(ui_atomic_t *lock) {
 #ifndef UI_SINGLE_THREADED
-  {
-    ui_error_t store_rc = ui_atomic_store(lock, 0);
-    (void)store_rc;
+  ui_error_t store_rc = ui_atomic_store(lock, 0);
+  if (store_rc != UI_ERROR_NONE) {
+    return store_rc;
   }
 #else
-  (void)lock;
+  if (lock != NULL) {
+  }
 #endif
   return UI_ERROR_NONE;
 }
@@ -129,9 +178,9 @@ ui_error_t ui_handle_manager_create(ui_uint32 capacity,
   manager->capacity = capacity;
   manager->active_count = 0;
   manager->first_free = 0;
-  {
-    ui_error_t st_rc = ui_atomic_store(&manager->lock, 0);
-    (void)st_rc;
+  rc = ui_atomic_store(&manager->lock, 0);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   for (i = 0; i < capacity; ++i) {
@@ -185,13 +234,15 @@ ui_error_t ui_handle_manager_alloc(struct ui_handle_manager *manager,
 
   {
     ui_error_t sl_rc = spin_lock(&manager->lock);
-    (void)sl_rc;
+    if (sl_rc != UI_ERROR_NONE) {
+      return sl_rc;
+    }
   }
 
   if (manager->active_count >= manager->capacity) {
-    {
-      ui_error_t sul_rc = spin_unlock(&manager->lock);
-      (void)sul_rc;
+    ui_error_t sul_rc = spin_unlock(&manager->lock);
+    if (sul_rc != UI_ERROR_NONE) {
+      return sul_rc;
     }
     return UI_ERROR_QUEUE_FULL;
   }
@@ -205,7 +256,9 @@ ui_error_t ui_handle_manager_alloc(struct ui_handle_manager *manager,
 
   {
     ui_error_t sul_rc = spin_unlock(&manager->lock);
-    (void)sul_rc;
+    if (sul_rc != UI_ERROR_NONE) {
+      return sul_rc;
+    }
   }
 
   *out_handle = MAKE_HANDLE(index, generation);
@@ -238,14 +291,16 @@ ui_error_t ui_handle_manager_get(struct ui_handle_manager *manager,
 
   {
     ui_error_t sl_rc = spin_lock(&manager->lock);
-    (void)sl_rc;
+    if (sl_rc != UI_ERROR_NONE) {
+      return sl_rc;
+    }
   }
 
   if (manager->entries[index].generation != generation ||
       manager->entries[index].data == NULL) {
-    {
-      ui_error_t sul_rc = spin_unlock(&manager->lock);
-      (void)sul_rc;
+    ui_error_t sul_rc = spin_unlock(&manager->lock);
+    if (sul_rc != UI_ERROR_NONE) {
+      return sul_rc;
     }
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -254,7 +309,9 @@ ui_error_t ui_handle_manager_get(struct ui_handle_manager *manager,
 
   {
     ui_error_t sul_rc = spin_unlock(&manager->lock);
-    (void)sul_rc;
+    if (sul_rc != UI_ERROR_NONE) {
+      return sul_rc;
+    }
   }
   return UI_ERROR_NONE;
 }
@@ -284,14 +341,16 @@ ui_error_t ui_handle_manager_free(struct ui_handle_manager *manager,
 
   {
     ui_error_t sl_rc = spin_lock(&manager->lock);
-    (void)sl_rc;
+    if (sl_rc != UI_ERROR_NONE) {
+      return sl_rc;
+    }
   }
 
   if (manager->entries[index].generation != generation ||
       manager->entries[index].data == NULL) {
-    {
-      ui_error_t sul_rc = spin_unlock(&manager->lock);
-      (void)sul_rc;
+    ui_error_t sul_rc = spin_unlock(&manager->lock);
+    if (sul_rc != UI_ERROR_NONE) {
+      return sul_rc;
     }
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -304,7 +363,9 @@ ui_error_t ui_handle_manager_free(struct ui_handle_manager *manager,
 
   {
     ui_error_t sul_rc = spin_unlock(&manager->lock);
-    (void)sul_rc;
+    if (sul_rc != UI_ERROR_NONE) {
+      return sul_rc;
+    }
   }
   return UI_ERROR_NONE;
 }

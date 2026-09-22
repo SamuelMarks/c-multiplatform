@@ -20,7 +20,8 @@ static int g_mock_cb_fail = 0;
 
 static ui_error_t on_change(union ui_signal_payload new_value,
                             void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   if (g_mock_cb_fail == 1)
     return UI_ERROR_UNKNOWN;
   g_change_called++;
@@ -29,7 +30,8 @@ static ui_error_t on_change(union ui_signal_payload new_value,
 }
 
 static ui_error_t on_touched(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   if (g_mock_cb_fail == 2)
     return UI_ERROR_UNKNOWN;
   g_touched_called++;
@@ -112,6 +114,17 @@ static int test_normal(void) {
   failed |= (strcmp(str, "10:30 AM") != 0);
   free(str);
   str = NULL;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_timepicker_mock_fail;
+    char *mock_str = NULL;
+    g_timepicker_mock_fail = 1;
+    failed |=
+        (ui_timepicker_base_get_time_string(tp, &mock_str) != UI_ERROR_UNKNOWN);
+    g_timepicker_mock_fail = 0;
+  }
+#endif
 
   /* Formatted time tests */
   ui_timepicker_base_set_time(tp, 0, 0);

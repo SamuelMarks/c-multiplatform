@@ -6,6 +6,7 @@
 #include "../include/ui_error.h"
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
@@ -38,9 +39,7 @@ static int test_calendar_math(void) {
     int is_leap = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_is_leap_year(2000, &is_leap);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (is_leap != 1) {
       printf("Failed at %d\n", __LINE__);
@@ -51,9 +50,7 @@ static int test_calendar_math(void) {
     int is_leap = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_is_leap_year(1900, &is_leap);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (is_leap != 0) {
       printf("Failed at %d\n", __LINE__);
@@ -64,9 +61,7 @@ static int test_calendar_math(void) {
     int is_leap = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_is_leap_year(2004, &is_leap);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (is_leap != 1) {
       printf("Failed at %d\n", __LINE__);
@@ -77,9 +72,7 @@ static int test_calendar_math(void) {
     int is_leap = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_is_leap_year(2001, &is_leap);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (is_leap != 0) {
       printf("Failed at %d\n", __LINE__);
@@ -90,9 +83,7 @@ static int test_calendar_math(void) {
     int days = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_days_in_month(2024, 2, &days);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (days != 29) {
       printf("Failed at %d\n", __LINE__);
@@ -103,9 +94,7 @@ static int test_calendar_math(void) {
     int days = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 2, &days);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (days != 28) {
       printf("Failed at %d\n", __LINE__);
@@ -116,9 +105,7 @@ static int test_calendar_math(void) {
     int days = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_days_in_month(2024, 4, &days);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (days != 30) {
       printf("Failed at %d\n", __LINE__);
@@ -129,9 +116,7 @@ static int test_calendar_math(void) {
     int days = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_days_in_month(2024, 1, &days);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (days != 31) {
       printf("Failed at %d\n", __LINE__);
@@ -142,9 +127,7 @@ static int test_calendar_math(void) {
     int days = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_days_in_month(2024, 13, &days);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (days != 0) {
       printf("Failed at %d\n", __LINE__);
@@ -253,9 +236,7 @@ static int test_calendar_coverage(void) {
   /* Null checks for methods */
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* Should not crash */
 
   if (ui_calendar_base_set_start_of_week(NULL, UI_SUNDAY) !=
@@ -275,9 +256,7 @@ static int test_calendar_coverage(void) {
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_min_date(cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* Clears min date */
 
   if (ui_calendar_base_set_max_date(NULL, &date) != UI_ERROR_INVALID_ARGUMENT) {
@@ -286,9 +265,7 @@ static int test_calendar_coverage(void) {
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_max_date(cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* Clears max date */
 
   if (ui_calendar_base_set_view_month(NULL, 2024, 1) !=
@@ -399,24 +376,24 @@ static int test_calendar_coverage(void) {
     int selects = 0;
     union ui_signal_payload any_val;
     struct ui_date test_date = {2024, 5, 10};
-    (void)cva.register_on_change(cal, mock_cva_on_change, &changes);
-    (void)cva.register_on_touched(cal, mock_cva_on_touched, &touches);
-    (void)cva.set_disabled_state(cal, 1);
+    assert(cva.register_on_change(cal, mock_cva_on_change, &changes) ==
+           UI_ERROR_NONE);
+    assert(cva.register_on_touched(cal, mock_cva_on_touched, &touches) ==
+           UI_ERROR_NONE);
+    assert(cva.set_disabled_state(cal, 1) == UI_ERROR_NONE);
     {
       ui_error_t rc_cleanup =
           ui_calendar_base_set_on_select(cal, mock_on_select, &selects);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     /* Write non-null value */
     any_val.ptr_val = &test_date;
-    (void)cva.write_value(cal, any_val);
+    assert(cva.write_value(cal, any_val) == UI_ERROR_NONE);
 
     /* Write NULL value to clear */
     any_val.ptr_val = NULL;
-    (void)cva.write_value(cal, any_val);
+    assert(cva.write_value(cal, any_val) == UI_ERROR_NONE);
 
     if (changes != 2) {
       printf("Failed at %d\n", __LINE__);
@@ -426,9 +403,7 @@ static int test_calendar_coverage(void) {
     /* Select date triggers on_select, on_change and on_touched */
     {
       ui_error_t rc_cleanup = ui_calendar_base_select_date(cal, &test_date);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (changes != 3) {
       printf("Failed at %d\n", __LINE__);
@@ -445,9 +420,7 @@ static int test_calendar_coverage(void) {
     /* Clear selection triggers on_change */
     {
       ui_error_t rc_cleanup = ui_calendar_base_clear_selection(cal);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (changes != 4) {
       printf("Failed at %d\n", __LINE__);
@@ -455,16 +428,12 @@ static int test_calendar_coverage(void) {
     }
     {
       ui_error_t rc_cleanup = ui_calendar_base_set_view_month(cal, 2024, 6);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup =
           ui_calendar_base_set_on_select(cal, mock_on_select_fail, NULL);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (ui_calendar_base_select_date(cal, &test_date) !=
         UI_ERROR_OUT_OF_MEMORY) {
@@ -474,9 +443,7 @@ static int test_calendar_coverage(void) {
     {
       ui_error_t rc_cleanup =
           ui_calendar_base_set_on_select(cal, mock_on_select, &selects);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (touches != 1) {
       printf("Failed at %d\n", __LINE__);
@@ -498,15 +465,11 @@ static int test_calendar_coverage(void) {
     struct ui_date d7 = {2024, 7, 25};  /* Day > */
     {
       ui_error_t rc_cleanup = ui_calendar_base_set_min_date(cal, &min_d);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_calendar_base_set_max_date(cal, &max_d);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
 
     if (ui_calendar_base_select_date(cal, &d1) != UI_ERROR_OUT_OF_BOUNDS) {
@@ -553,9 +516,7 @@ static int test_calendar_coverage(void) {
     int count;
     {
       ui_error_t rc_cleanup = ui_calendar_base_set_view_month(cal, 2024, 1);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     /* Jan 2024 starts on Monday. If start_of_week is Monday, offset is 0,
        so it just shows Jan 1 on first square, wait:
@@ -568,16 +529,12 @@ static int test_calendar_coverage(void) {
     {
       ui_error_t rc_cleanup =
           ui_calendar_base_set_start_of_week(cal, UI_TUESDAY);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup =
           ui_calendar_base_get_month_grid(cal, grid, &count);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (grid[0].month != 12 || grid[0].year != 2023) {
       printf("Failed at %d\n", __LINE__);
@@ -585,16 +542,12 @@ static int test_calendar_coverage(void) {
     } /* Should wrap to Dec 2023 */
     {
       ui_error_t rc_cleanup = ui_calendar_base_set_view_month(cal, 2024, 12);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup =
           ui_calendar_base_get_month_grid(cal, grid, &count);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     if (grid[41].month != 1 || grid[41].year != 2025) {
       printf("Failed at %d\n", __LINE__);
@@ -604,9 +557,7 @@ static int test_calendar_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -628,15 +579,11 @@ static int test_calendar_base(void) {
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_min_date(cal, &min_date);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_max_date(cal, &max_date);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_calendar_base_select_date(cal, &target) != UI_ERROR_NONE) {
@@ -669,9 +616,7 @@ static int test_calendar_base(void) {
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_clear_selection(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (ui_calendar_base_get_selected_date(cal, &out) != UI_ERROR_NOT_FOUND) {
     printf("Failed at %d\n", __LINE__);
@@ -681,15 +626,11 @@ static int test_calendar_base(void) {
   /* Test grid generation for Feb 2024 */
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_view_month(cal, 2024, 2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_start_of_week(cal, UI_SUNDAY);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_calendar_base_get_month_grid(cal, grid, &count) != UI_ERROR_NONE) {
@@ -722,9 +663,7 @@ static int test_calendar_base(void) {
 
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -738,21 +677,15 @@ static int test_datepicker_base(void) {
   char text[32];
   {
     ui_error_t rc_cleanup = ui_input_base_create(&input);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_popover_base_create(&popover);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_datepicker_base_create(&dp, input, popover, cal, NULL) !=
@@ -789,27 +722,19 @@ static int test_datepicker_base(void) {
 
   {
     ui_error_t rc_cleanup = ui_datepicker_base_destroy(dp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_input_base_destroy(input);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -825,15 +750,23 @@ static ui_error_t mock_dp_cva_change(union ui_signal_payload val, void *data) {
 
   if (g_mock_dp_for_reentrancy) {
     union ui_signal_payload dummy;
+    ui_error_t rc;
     dummy.int_val = 0;
-    (void)g_mock_cva_for_reentrancy.write_value(g_mock_dp_for_reentrancy,
-                                                dummy);
-    (void)g_mock_cva_for_reentrancy.register_on_change(g_mock_dp_for_reentrancy,
+    rc = g_mock_cva_for_reentrancy.write_value(g_mock_dp_for_reentrancy, dummy);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = g_mock_cva_for_reentrancy.register_on_change(g_mock_dp_for_reentrancy,
+                                                      NULL, NULL);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = g_mock_cva_for_reentrancy.register_on_touched(g_mock_dp_for_reentrancy,
                                                        NULL, NULL);
-    (void)g_mock_cva_for_reentrancy.register_on_touched(
-        g_mock_dp_for_reentrancy, NULL, NULL);
-    (void)g_mock_cva_for_reentrancy.set_disabled_state(g_mock_dp_for_reentrancy,
-                                                       1);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = g_mock_cva_for_reentrancy.set_disabled_state(g_mock_dp_for_reentrancy,
+                                                      1);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
@@ -858,21 +791,15 @@ static int test_datepicker_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_input_base_create(&input);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_popover_base_create(&popover);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* null checks */
@@ -898,9 +825,7 @@ static int test_datepicker_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_datepicker_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   if (ui_datepicker_parse_date(NULL, &dt) != UI_ERROR_INVALID_ARGUMENT)
@@ -935,9 +860,7 @@ static int test_datepicker_coverage(void) {
     struct ui_date picked = {2024, 1, 1};
     {
       ui_error_t rc_cleanup = ui_calendar_base_select_date(cal, &picked);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -953,25 +876,25 @@ static int test_datepicker_coverage(void) {
   if (cva.set_disabled_state(NULL, 1) != UI_ERROR_INVALID_ARGUMENT)
     return 1;
 
-  (void)cva.register_on_change(dp, mock_dp_cva_change, &changes);
-  (void)cva.register_on_touched(dp, mock_dp_cva_touched, &touches);
-  (void)cva.set_disabled_state(dp, 1);
+  assert(cva.register_on_change(dp, mock_dp_cva_change, &changes) ==
+         UI_ERROR_NONE);
+  assert(cva.register_on_touched(dp, mock_dp_cva_touched, &touches) ==
+         UI_ERROR_NONE);
+  assert(cva.set_disabled_state(dp, 1) == UI_ERROR_NONE);
 
   g_mock_dp_for_reentrancy = dp;
   g_mock_cva_for_reentrancy = cva;
 
   val.int_val = (2024 << 9) | (5 << 5) | 10;
-  (void)cva.write_value(dp, val);
+  assert(cva.write_value(dp, val) == UI_ERROR_NONE);
   val.int_val = 0;
-  (void)cva.write_value(dp, val);
+  assert(cva.write_value(dp, val) == UI_ERROR_NONE);
 
   {
     struct ui_date picked = {2024, 5, 20};
     {
       ui_error_t rc_cleanup = ui_calendar_base_select_date(cal, &picked);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
@@ -979,27 +902,19 @@ static int test_datepicker_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_input_base_set_text(input, "2024-06-15");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_input_base_set_text(input, "invalid");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_input_base_set_text(input, "2024-07-20");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_datepicker_base_sync(dp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Error paths for set_text allocations inside on_calendar_select / cva_write
@@ -1009,22 +924,20 @@ static int test_datepicker_coverage(void) {
     g_malloc_fail_countdown = 0;
     {
       ui_error_t rc_cleanup = ui_calendar_base_select_date(cal, &picked);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_OUT_OF_MEMORY);
     }
     g_malloc_fail_countdown = -1;
   }
   {
     val.int_val = (2024 << 9) | (5 << 5) | 10;
     g_malloc_fail_countdown = 0;
-    (void)cva.write_value(dp, val);
+    assert(cva.write_value(dp, val) == UI_ERROR_OUT_OF_MEMORY);
     g_malloc_fail_countdown = -1;
   }
   {
     val.int_val = 0;
     g_malloc_fail_countdown = 0;
-    (void)cva.write_value(dp, val);
+    assert(cva.write_value(dp, val) == UI_ERROR_OUT_OF_MEMORY);
     g_malloc_fail_countdown = -1;
   }
   /* Error path for select_date due to out of bounds */
@@ -1032,56 +945,43 @@ static int test_datepicker_coverage(void) {
     struct ui_date max_dt = {2024, 8, 1};
     {
       ui_error_t rc_cleanup = ui_calendar_base_set_max_date(cal, &max_dt);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_input_base_set_text(input, "2024-09-01");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_OUT_OF_BOUNDS);
     }
     {
       ui_error_t rc_cleanup = ui_datepicker_base_sync(dp);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_OUT_OF_BOUNDS);
     }
 
     val.int_val = (2024 << 9) | (9 << 5) | 1;
-    (void)cva.write_value(dp, val);
+    assert(cva.write_value(dp, val) == UI_ERROR_OUT_OF_BOUNDS);
   }
 
   {
     ui_error_t rc_cleanup = ui_datepicker_base_destroy(dp);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_popover_base_destroy(popover);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_input_base_destroy(input);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
 }
 
 static int test_calendar_missing_branches(void) {
+  struct ui_date real_grid[42];
   int count;
   int days;
   enum ui_day_of_week dow;
@@ -1096,339 +996,247 @@ static int test_calendar_missing_branches(void) {
   /* 228: cva_on_touched fails */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, &cva);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
-  (void)cva.register_on_touched(cal, mock_cva_on_touched, (void *)1);
+  assert(cva.register_on_touched(cal, mock_cva_on_touched, (void *)1) ==
+         UI_ERROR_NONE);
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_view_month(cal, 2024, 5);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_UNKNOWN);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 268: ui_calendar_days_in_month fails in set_selected_date */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 268;
   {
     ui_error_t rc_cleanup = ui_calendar_base_select_date(cal, &dt);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 278: compare_dates fails for min */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_min_date(cal, &min_dt);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 278;
   {
     ui_error_t rc_cleanup = ui_calendar_base_select_date(cal, &dt);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 286: compare_dates fails for max */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_set_max_date(cal, &max_dt);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 286;
   {
     ui_error_t rc_cleanup = ui_calendar_base_select_date(cal, &dt);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 310: cva_on_change fails in set_selected_date */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, &cva);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
-  (void)cva.register_on_change(cal, mock_cva_on_change, (void *)1);
+  assert(cva.register_on_change(cal, mock_cva_on_change, (void *)1) ==
+         UI_ERROR_NONE);
   {
     ui_error_t rc_cleanup = ui_calendar_base_select_date(cal, &dt);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_UNKNOWN);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 340: cva_on_change fails in clear_selection */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, &cva);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
-  (void)cva.register_on_change(cal, mock_cva_on_change, (void *)1);
+  assert(cva.register_on_change(cal, mock_cva_on_change, (void *)1) ==
+         UI_ERROR_NONE);
   {
     ui_error_t rc_cleanup = ui_calendar_base_clear_selection(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_UNKNOWN);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 372: get_day_of_week fails in get_grid */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 372;
   {
     ui_error_t rc_cleanup = ui_calendar_base_get_month_grid(cal, grid, &count);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   g_calendar_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 382: days_in_month fails in get_grid */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 382;
   {
     ui_error_t rc_cleanup = ui_calendar_base_get_month_grid(cal, grid, &count);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   g_calendar_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 402: days_in_prev fails in get_grid */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   g_calendar_mock_fail = 402;
   {
     ui_error_t rc_cleanup = ui_calendar_base_get_month_grid(cal, grid, &count);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   g_calendar_mock_fail = 0;
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 98: month < 1 or month > 12 */
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 0, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 13, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 108: missing branches for days_in_month logic */
   /* 31 days month */
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 1, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   /* 30 days month */
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 4, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 6, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 9, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 11, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 5, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 7, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 10, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_days_in_month(2023, 12, &days);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* 122: out of bounds in day of week */
   {
     ui_error_t rc_cleanup = ui_calendar_get_day_of_week(2023, 0, 1, &dow);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_OUT_OF_BOUNDS);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_get_day_of_week(2023, 1, 0, &dow);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_OUT_OF_BOUNDS);
   }
   {
     ui_error_t rc_cleanup = ui_calendar_get_day_of_week(2023, 1, 32, &dow);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_OUT_OF_BOUNDS);
   }
 
   /* 184: start_day > 6 */
   {
     ui_error_t rc_cleanup = ui_calendar_base_create(&cal, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup =
         ui_calendar_base_set_start_of_week(cal, (enum ui_day_of_week)7);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
   /* 365: !out_count in get_month_grid */
-  struct ui_date real_grid[42];
   {
     ui_error_t rc_cleanup =
         ui_calendar_base_get_month_grid(cal, real_grid, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
 
   {
     ui_error_t rc_cleanup = ui_calendar_base_destroy(cal);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
 
 int main(void) {
-  test_calendar_missing_branches();
   int failed = 0;
+  failed |= test_calendar_missing_branches();
 
   printf("Running ui_calendar_base & ui_datepicker_base tests...\n");
 

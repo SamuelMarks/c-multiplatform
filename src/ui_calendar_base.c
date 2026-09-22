@@ -151,6 +151,9 @@ ui_error_t ui_calendar_is_leap_year(int year, int *out_is_leap) {
  * @return Return value.
  */
 ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days) {
+  int is_leap;
+  ui_error_t rc;
+
   if (!out_days) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -159,13 +162,9 @@ ui_error_t ui_calendar_days_in_month(int year, int month, int *out_days) {
     return UI_ERROR_NONE;
   }
   if (month == 2) {
-    int is_leap = 0;
-    {
-      ui_error_t rc_cleanup = ui_calendar_is_leap_year(year, &is_leap);
-      (void)rc_cleanup;
-    }
+    rc = ui_calendar_is_leap_year(year, &is_leap);
     *out_days = is_leap ? 29 : 28;
-    return UI_ERROR_NONE;
+    return rc;
   }
   if (month == 4 || month == 6 || month == 9 || month == 11) {
     *out_days = 30;
@@ -392,6 +391,9 @@ static ui_error_t compare_dates(const struct ui_date *d1,
 ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
                                         const struct ui_date *date) {
   int cmp_res = 0;
+  int days = 0;
+  ui_error_t rc;
+
   if (!calendar || !date) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -399,29 +401,23 @@ ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
   if (date->month < 1 || date->month > 12) {
     return UI_ERROR_OUT_OF_BOUNDS;
   }
-  {
-    int days = 0;
-    {
-      ui_error_t rc_cleanup =
-          ui_calendar_days_in_month(date->year, date->month, &days);
-      (void)rc_cleanup;
-    }
-    if (date->day < 1) {
-      return UI_ERROR_OUT_OF_BOUNDS;
-    }
-    if (date->day > days) {
-      return UI_ERROR_OUT_OF_BOUNDS;
-    }
+
+  rc = ui_calendar_days_in_month(date->year, date->month, &days);
+  if (date->day < 1) {
+    return UI_ERROR_OUT_OF_BOUNDS;
+  }
+  if (date->day > days) {
+    return UI_ERROR_OUT_OF_BOUNDS;
   }
 
   if (calendar->has_min) {
-    (void)compare_dates(date, &calendar->min_date, &cmp_res);
+    rc = compare_dates(date, &calendar->min_date, &cmp_res);
     if (cmp_res < 0) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
   }
   if (calendar->has_max) {
-    (void)compare_dates(date, &calendar->max_date, &cmp_res);
+    rc = compare_dates(date, &calendar->max_date, &cmp_res);
     if (cmp_res > 0) {
       return UI_ERROR_OUT_OF_BOUNDS;
     }
@@ -442,7 +438,6 @@ ui_error_t ui_calendar_base_select_date(struct ui_calendar_base *calendar,
 
   if (calendar->cva_on_change) {
     union ui_signal_payload payload;
-    ui_error_t rc;
     payload.ptr_val = &calendar->selected_date;
     rc = calendar->cva_on_change(payload, calendar->cva_on_change_user_data);
     if (rc != UI_ERROR_NONE) {
@@ -527,6 +522,8 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
   int first_dow, days_in_month, days_in_prev;
   int prev_y, prev_m, next_y, next_m;
   int offset, i, d;
+  enum ui_day_of_week tmp_dow = UI_SUNDAY;
+  ui_error_t rc;
 
   if (!calendar) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -538,23 +535,13 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    enum ui_day_of_week tmp_dow = UI_SUNDAY;
-    {
-      ui_error_t rc_cleanup = ui_calendar_get_day_of_week(
-          calendar->view_year, calendar->view_month, 1, &tmp_dow);
-      (void)rc_cleanup;
-    }
-    first_dow = (int)tmp_dow;
-  }
-  {
-    days_in_month = 0;
-    {
-      ui_error_t rc_cleanup = ui_calendar_days_in_month(
-          calendar->view_year, calendar->view_month, &days_in_month);
-      (void)rc_cleanup;
-    }
-  }
+  rc = ui_calendar_get_day_of_week(calendar->view_year, calendar->view_month, 1,
+                                   &tmp_dow);
+  first_dow = (int)tmp_dow;
+
+  days_in_month = 0;
+  rc = ui_calendar_days_in_month(calendar->view_year, calendar->view_month,
+                                 &days_in_month);
 
   prev_y = calendar->view_year;
   prev_m = calendar->view_month - 1;
@@ -570,13 +557,8 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     next_y++;
   }
 
-  {
-    {
-      ui_error_t rc_cleanup =
-          ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev);
-      (void)rc_cleanup;
-    }
-  }
+  days_in_prev = 0;
+  rc = ui_calendar_days_in_month(prev_y, prev_m, &days_in_prev);
 
   offset = first_dow - (int)calendar->start_of_week;
   if (offset < 0) {
@@ -607,5 +589,5 @@ ui_calendar_base_get_month_grid(const struct ui_calendar_base *calendar,
     (*out_count)++;
   }
 
-  return UI_ERROR_NONE;
+  return rc;
 }

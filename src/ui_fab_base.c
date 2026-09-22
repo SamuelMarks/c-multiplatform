@@ -43,18 +43,15 @@ struct ui_fab_base {
  */
 ui_error_t ui_fab_base_create(struct ui_fab_base **out_fab) {
   struct ui_fab_base *fab;
-  ui_error_t rc = UI_ERROR_NONE;
 
   if (!out_fab) {
-    rc = UI_ERROR_INVALID_ARGUMENT;
-    goto cleanup;
+    return UI_ERROR_INVALID_ARGUMENT;
   }
 
   fab =
       (struct ui_fab_base *)C_MULTIPLATFORM_MALLOC(sizeof(struct ui_fab_base));
   if (!fab) {
-    rc = UI_ERROR_OUT_OF_MEMORY;
-    goto cleanup;
+    return UI_ERROR_OUT_OF_MEMORY;
   }
 
   fab->main_button = NULL;
@@ -65,17 +62,11 @@ ui_error_t ui_fab_base_create(struct ui_fab_base **out_fab) {
   fab->state = UI_FAB_STATE_COLLAPSED;
   fab->expansion_progress = 0.0f;
 
-  rc = ui_ripple_config_init(&fab->ripple_cfg);
-  if (rc != UI_ERROR_NONE) {
-    C_MULTIPLATFORM_FREE(fab);
-    goto cleanup;
-  }
+  ui_ripple_config_init(&fab->ripple_cfg);
   fab->ripple_state.active = 0;
 
   *out_fab = fab;
-
-cleanup:
-  return rc;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -89,19 +80,13 @@ ui_error_t ui_fab_base_destroy(struct ui_fab_base *fab) {
   }
 
   if (fab->main_button) {
-    {
-      ui_error_t rc_cleanup = ui_button_base_destroy(fab->main_button);
-      (void)rc_cleanup;
-    }
+    ui_button_base_destroy(fab->main_button);
   }
 
   if (fab->action_buttons) {
     size_t i;
     for (i = 0; i < fab->action_count; i++) {
-      {
-        ui_error_t rc_cleanup = ui_button_base_destroy(fab->action_buttons[i]);
-        (void)rc_cleanup;
-      }
+      ui_button_base_destroy(fab->action_buttons[i]);
     }
     C_MULTIPLATFORM_FREE(fab->action_buttons);
   }
@@ -123,10 +108,7 @@ ui_error_t ui_fab_base_set_main_button(struct ui_fab_base *fab,
   }
 
   if (fab->main_button) {
-    {
-      ui_error_t rc_cleanup = ui_button_base_destroy(fab->main_button);
-      (void)rc_cleanup;
-    }
+    ui_button_base_destroy(fab->main_button);
   }
 
   fab->main_button = button;

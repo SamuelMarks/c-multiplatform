@@ -65,12 +65,22 @@ static int test_form_node(void) {
 
   {
     ui_error_t rc_cleanup = ui_form_control_destroy(ctrl);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
     }
   }
-  ui_form_group_destroy(grp);
-  ui_form_array_destroy(arr);
+  {
+    ui_error_t rc_cleanup = ui_form_group_destroy(grp);
+    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
+    }
+  }
+  {
+    ui_error_t rc_cleanup = ui_form_array_destroy(arr);
+    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
+    }
+  }
 
   return 0;
 }
@@ -126,7 +136,7 @@ static int run_extra_form_node(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 

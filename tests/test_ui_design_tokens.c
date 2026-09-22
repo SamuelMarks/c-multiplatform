@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include <stddef.h>
 #if !defined(_MSC_VER) || _MSC_VER >= 1600
 #include <stdint.h>
@@ -38,7 +39,7 @@ static int test_ui_design_token_dict_init(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -57,9 +58,7 @@ static int test_ui_design_token_dict_init_malloc_fail(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     return 1;
   }
@@ -67,7 +66,7 @@ static int test_ui_design_token_dict_init_malloc_fail(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -118,7 +117,7 @@ static int test_ui_design_token_set_get_color(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -169,7 +168,7 @@ static int test_ui_design_token_set_get_number(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -212,9 +211,7 @@ static int test_ui_design_token_set_string(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     return 1;
   }
@@ -222,7 +219,7 @@ static int test_ui_design_token_set_string(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -279,9 +276,7 @@ static int test_ui_design_token_alias(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     return 1;
   }
@@ -289,7 +284,7 @@ static int test_ui_design_token_alias(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -315,7 +310,7 @@ static int test_ui_design_token_alias_cycle(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -352,7 +347,7 @@ static int test_ui_design_token_capacity_expansion(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -386,9 +381,7 @@ static int test_ui_design_token_capacity_expansion_fail(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     return 1;
   }
@@ -396,7 +389,7 @@ static int test_ui_design_token_capacity_expansion_fail(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;
@@ -421,9 +414,7 @@ static int test_get_or_create_malloc_fail_name(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     printf("1\n");
     return 1;
@@ -432,9 +423,7 @@ static int test_get_or_create_malloc_fail_name(void) {
   if (dict.count != 0) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     printf("2\n");
     return 1;
@@ -451,9 +440,7 @@ static int test_get_or_create_malloc_fail_name(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     printf("3\n");
     return 1;
@@ -470,9 +457,7 @@ static int test_get_or_create_malloc_fail_name(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     printf("4\n");
     return 1;
@@ -489,9 +474,7 @@ static int test_get_or_create_malloc_fail_name(void) {
   if (rc != UI_ERROR_OUT_OF_MEMORY) {
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     printf("5\n");
     return 1;
@@ -500,7 +483,7 @@ static int test_get_or_create_malloc_fail_name(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
   return 0;

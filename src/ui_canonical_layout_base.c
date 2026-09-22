@@ -10,6 +10,27 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_canonical_layout_mock_fail = 0;
+
+/**
+ * @brief mock_canonical_signal_destroy.
+ * @param sig Parameter sig.
+ * @return Return value.
+ */
+static ui_error_t mock_canonical_signal_destroy(ui_signal_t *sig) {
+  if (g_canonical_layout_mock_fail == 1) {
+    (ui_signal_destroy)(sig);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_signal_destroy)(sig);
+}
+#undef ui_signal_destroy
+/** @cond */
+#define ui_signal_destroy mock_canonical_signal_destroy
+/** @endcond */
+#endif
+
 /**
  * @struct ui_canonical_layout_base
  * @struct ui_canonical_layout_base
@@ -98,16 +119,19 @@ ui_canonical_layout_base_create(struct ui_arena *arena,
  */
 ui_error_t
 ui_canonical_layout_base_destroy(struct ui_canonical_layout_base *layout) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!layout) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(layout->layout_changed_signal);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
 
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

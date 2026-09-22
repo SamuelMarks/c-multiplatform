@@ -8,6 +8,9 @@
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
+extern int g_rtb_mock_destroy_fail;
+extern int g_rtb_mock_node_destroy_fail;
+extern int g_rtb_mock_append_fail;
 
 #define EXPECT(cond)                                                           \
   do {                                                                         \
@@ -69,108 +72,44 @@ static int test_rich_text(void) {
   }
 
   /* format */
-  {
-    ui_error_t rc_cleanup =
-        ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_undo(editor);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_redo(editor);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD) ==
+         UI_ERROR_NONE);
+  EXPECT(ui_rich_text_base_undo(editor) == UI_ERROR_NONE);
+  EXPECT(ui_rich_text_base_redo(editor) == UI_ERROR_NONE);
 
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_KEY_DOWN;
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_process_event(editor, &ev) == UI_ERROR_NONE);
 
   ev.event_data.keyboard.key_code = 'H';
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  } /* Add a second one so prev/next exist */
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_undo(editor);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_redo(editor);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_process_event(editor, &ev) == UI_ERROR_NONE);
+  EXPECT(ui_rich_text_base_process_event(editor, &ev) ==
+         UI_ERROR_NONE); /* Add a second one so prev/next exist */
+  EXPECT(ui_rich_text_base_undo(editor) == UI_ERROR_NONE);
+  EXPECT(ui_rich_text_base_redo(editor) == UI_ERROR_NONE);
 
   /* Trigger OOM on snapshot allocation in process_event */
   g_malloc_fail_countdown = 1;
   {
-    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    ui_error_t rc_event = ui_rich_text_base_process_event(editor, &ev);
+    if (rc_event != UI_ERROR_NONE && rc_event != UI_ERROR_OUT_OF_MEMORY) {
+      failed = 1;
     }
   }
   g_malloc_fail_countdown = -1;
 
-  {
-    ui_error_t rc_cleanup =
-        ui_rich_text_base_set_ime_composition(editor, "nihao");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_set_ime_composition(editor, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup =
-        ui_rich_text_base_set_ime_composition(editor, "nihaoma");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_set_ime_composition(editor, "nihao") ==
+         UI_ERROR_NONE);
+  EXPECT(ui_rich_text_base_set_ime_composition(editor, NULL) ==
+         UI_ERROR_OUT_OF_MEMORY);
+  EXPECT(ui_rich_text_base_set_ime_composition(editor, "nihaoma") ==
+         UI_ERROR_NONE);
 
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_bind_text(editor, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_bind_text(editor, NULL) == UI_ERROR_NONE);
 
   /* Test non-keydown event (line 290) */
   ev.type = UI_EVENT_MOUSE_UP;
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_process_event(editor, &ev) == UI_ERROR_NONE);
 
   /* Test toggle_format with document_head == NULL (line 258) */
   {
@@ -178,19 +117,15 @@ static int test_rich_text(void) {
         (struct ui_rich_text_base_mock *)editor;
     struct ui_rich_text_run_mock *saved_head = meditor->document_head;
     meditor->document_head = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    EXPECT(ui_rich_text_base_toggle_format(editor, UI_RICH_TEXT_FORMAT_BOLD) ==
+           UI_ERROR_NONE);
     meditor->document_head = saved_head;
   }
 
   /* Test get_text and free_runs with current->text == NULL (lines 114, 227,
    * 239) */
   {
+    char *txt = NULL;
     struct ui_rich_text_base_mock *meditor =
         (struct ui_rich_text_base_mock *)editor;
     struct ui_rich_text_run_mock *new_run =
@@ -200,53 +135,27 @@ static int test_rich_text(void) {
     new_run->next = meditor->document_head;
     meditor->document_head = new_run;
 
-    char *txt = NULL;
-    {
-      ui_error_t rc_cleanup = ui_rich_text_base_get_text(editor, &txt);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    EXPECT(ui_rich_text_base_get_text(editor, &txt) == UI_ERROR_NONE);
     if (txt)
       free(txt);
   }
 
   /* Test set_text with NULL text (line 179) */
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_set_text(editor, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_set_text(editor, "");
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_set_text(editor, NULL) == UI_ERROR_NONE);
+  EXPECT(ui_rich_text_base_set_text(editor, "") == UI_ERROR_NONE);
 
   /* Test set_text with NULL component/shadow_root (line 194) */
   {
     struct ui_rich_text_base_mock *meditor =
         (struct ui_rich_text_base_mock *)editor;
     struct ui_dom_node *saved_sr = meditor->component->shadow_root;
+    struct ui_component *saved_comp;
     meditor->component->shadow_root = NULL;
-    {
-      ui_error_t rc_cleanup =
-          ui_rich_text_base_set_text(editor, "NoShadowRoot");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    EXPECT(ui_rich_text_base_set_text(editor, "NoShadowRoot") == UI_ERROR_NONE);
 
-    struct ui_component *saved_comp = meditor->component;
+    saved_comp = meditor->component;
     meditor->component = NULL;
-    {
-      ui_error_t rc_cleanup = ui_rich_text_base_set_text(editor, "NoComponent");
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    EXPECT(ui_rich_text_base_set_text(editor, "NoComponent") == UI_ERROR_NONE);
 
     meditor->component = saved_comp;
     meditor->component->shadow_root = saved_sr;
@@ -271,18 +180,8 @@ static int test_rich_text(void) {
         meditor->history_current;
 
     meditor->history_current = NULL;
-    {
-      ui_error_t rc_cleanup = ui_rich_text_base_undo(editor);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_rich_text_base_redo(editor);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
+    EXPECT(ui_rich_text_base_undo(editor) == UI_ERROR_NONE);
+    EXPECT(ui_rich_text_base_redo(editor) == UI_ERROR_NONE);
 
     meditor->history_current = saved_hist;
   }
@@ -291,9 +190,9 @@ static int test_rich_text(void) {
   g_malloc_fail_countdown = 0;
   ev.type = UI_EVENT_KEY_DOWN;
   {
-    ui_error_t rc_cleanup = ui_rich_text_base_process_event(editor, &ev);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    ui_error_t rc_event = ui_rich_text_base_process_event(editor, &ev);
+    if (rc_event != UI_ERROR_NONE && rc_event != UI_ERROR_OUT_OF_MEMORY) {
+      failed = 1;
     }
   }
   g_malloc_fail_countdown = -1;
@@ -307,36 +206,21 @@ static int test_rich_text(void) {
     ui_dom_node_destroy(meditor->component->shadow_root);
     meditor->component->shadow_root = NULL;
   }
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_destroy(editor);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_destroy(editor) == UI_ERROR_NONE);
 
   /* Also test destroy with NULL component entirely */
-  ui_rich_text_base_create(&editor);
+  EXPECT(ui_rich_text_base_create(&editor) == UI_ERROR_NONE);
   {
     struct ui_rich_text_base_mock *meditor =
         (struct ui_rich_text_base_mock *)editor;
     ui_component_destroy(meditor->component);
     meditor->component = NULL;
   }
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_destroy(editor);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_destroy(editor) == UI_ERROR_NONE);
 
   /* nulls */
   EXPECT(ui_rich_text_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_destroy(NULL) == UI_ERROR_NONE);
   EXPECT(ui_rich_text_base_get_component(NULL, NULL) ==
          UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_get_component(NULL, &comp) ==
@@ -346,12 +230,7 @@ static int test_rich_text(void) {
   EXPECT(ui_rich_text_base_set_text(NULL, NULL) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_get_text(NULL, NULL) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_get_text(editor, NULL) == UI_ERROR_INVALID_ARGUMENT);
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_toggle_format(NULL, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_toggle_format(NULL, 0) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_undo(NULL) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_redo(NULL) == UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_process_event(NULL, NULL) ==
@@ -360,12 +239,7 @@ static int test_rich_text(void) {
          UI_ERROR_INVALID_ARGUMENT);
   EXPECT(ui_rich_text_base_set_ime_composition(NULL, NULL) ==
          UI_ERROR_INVALID_ARGUMENT);
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_bind_text(NULL, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_bind_text(NULL, NULL) == UI_ERROR_INVALID_ARGUMENT);
 
   /* alloc failures */
   for (i = 0; i < 20; ++i) {
@@ -374,12 +248,7 @@ static int test_rich_text(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  {
-    ui_error_t rc_cleanup = ui_rich_text_base_create(&editor);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  EXPECT(ui_rich_text_base_create(&editor) == UI_ERROR_NONE);
 
   for (i = 0; i < 15; ++i) {
     g_malloc_fail_countdown = i;
@@ -404,11 +273,27 @@ static int test_rich_text(void) {
   }
   g_malloc_fail_countdown = -1;
 
+  EXPECT(ui_rich_text_base_destroy(editor) == UI_ERROR_NONE);
+
+  /* Test destroy error percolation with mocks */
   {
-    ui_error_t rc_cleanup = ui_rich_text_base_destroy(editor);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    struct ui_rich_text_base *ed = NULL;
+    EXPECT(ui_rich_text_base_create(&ed) == UI_ERROR_NONE);
+    g_rtb_mock_node_destroy_fail = 1;
+    EXPECT(ui_rich_text_base_destroy(ed) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_node_destroy_fail = 0;
+
+    EXPECT(ui_rich_text_base_create(&ed) == UI_ERROR_NONE);
+    g_rtb_mock_destroy_fail = 1;
+    EXPECT(ui_rich_text_base_destroy(ed) == UI_ERROR_UNKNOWN);
+    g_rtb_mock_destroy_fail = 0;
+
+    /* Test append_child failure in set_text */
+    EXPECT(ui_rich_text_base_create(&ed) == UI_ERROR_NONE);
+    g_rtb_mock_append_fail = 1;
+    EXPECT(ui_rich_text_base_set_text(ed, "Hello") == UI_ERROR_UNKNOWN);
+    g_rtb_mock_append_fail = 0;
+    EXPECT(ui_rich_text_base_destroy(ed) == UI_ERROR_NONE);
   }
 
   return failed;

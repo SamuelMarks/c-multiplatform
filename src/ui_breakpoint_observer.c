@@ -146,14 +146,19 @@ ui_breakpoint_observer_create(struct ui_window_manager_base *window_manager,
   initial_payload.bool_val = 0;
 
   for (i = 0; i < UI_BREAKPOINT_COUNT; i++) {
-    {
-      ui_error_t rc_cleanup = ui_signal_create(
-          observer->arena, initial_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
-          UI_SIGNAL_MODE_SINGLE_THREADED, &observer->signals[i]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+    ui_error_t rc_cleanup = ui_signal_create(
+        observer->arena, initial_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
+        UI_SIGNAL_MODE_SINGLE_THREADED, &observer->signals[i]);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      if (rc == UI_ERROR_NONE) {
+        rc = rc_cleanup;
       }
     }
+  }
+
+  if (rc != UI_ERROR_NONE) {
+    ui_breakpoint_observer_destroy(observer);
+    return rc;
   }
 
   *out_observer = observer;
@@ -173,18 +178,12 @@ ui_breakpoint_observer_destroy(struct ui_breakpoint_observer *observer) {
   }
 
   for (i = 0; i < UI_BREAKPOINT_COUNT; i++) {
-    {
-      ui_error_t rc_cleanup = ui_signal_destroy(observer->signals[i]);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+    if (observer->signals[i]) {
+      ui_signal_destroy(observer->signals[i]);
     }
   }
 
-  {
-    ui_error_t rc_cleanup = ui_arena_destroy(observer->arena);
-    (void)rc_cleanup;
-  }
+  ui_arena_destroy(observer->arena);
 
   C_MULTIPLATFORM_FREE(observer);
   return UI_ERROR_NONE;

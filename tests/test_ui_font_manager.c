@@ -101,8 +101,8 @@ int main(void) {
   ui_font_manager_create(NULL);
   {
     ui_error_t rc_cleanup = ui_font_manager_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+    if (rc_cleanup != UI_ERROR_INVALID_ARGUMENT) {
+      return 1;
     }
   }
 
@@ -212,7 +212,7 @@ int main(void) {
   return 0;
 }
 
-static int test_oom() {
+static int test_oom(void) {
   struct ui_font_manager *manager = NULL;
   struct ui_font *font = NULL;
 
@@ -231,7 +231,7 @@ static int test_oom() {
   {
     ui_error_t rc_cleanup = ui_font_manager_destroy(manager);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;

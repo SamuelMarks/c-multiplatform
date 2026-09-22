@@ -16,7 +16,8 @@ static int g_auth_success = 0;
 static ui_error_t on_auth_resolved(void *result_ptr, void *user_data,
                                    void **out_result) {
   enum ui_auth_result *res = (enum ui_auth_result *)result_ptr;
-  (void)user_data;
+  if (user_data) {
+  }
   if (res && *res == UI_AUTH_RESULT_SUCCESS) {
     g_auth_success = 1;
   }
@@ -29,9 +30,11 @@ static ui_error_t on_auth_resolved(void *result_ptr, void *user_data,
 
 static ui_error_t on_auth_rejected(ui_error_t err, void *user_data,
                                    void **out_result) {
-  (void)err;
-  (void)user_data;
-  fprintf(stderr, "Auth promise rejected\n");
+  if (user_data) {
+  }
+  if (err != UI_ERROR_NONE) {
+    fprintf(stderr, "Auth promise rejected: %d\n", (int)err);
+  }
   return UI_ERROR_NONE;
 }
 
@@ -70,7 +73,7 @@ int main(void) {
     {
       ui_error_t rc_cleanup = ui_promise_create(&p);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     g_malloc_fail_countdown = i;
@@ -83,7 +86,7 @@ int main(void) {
     {
       ui_error_t rc_cleanup = ui_promise_destroy(p);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
   }
@@ -108,13 +111,46 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_auth_coverage(void);
-  (void)run_auth_coverage();
+  {
+    extern int g_auth_mock_fail;
+
+    rc = ui_promise_create(&promise);
+    if (rc != UI_ERROR_NONE) {
+      return 1;
+    }
+    g_auth_mock_fail = 1;
+    rc = ui_auth_request_async(&config, promise);
+    if (rc != UI_ERROR_UNKNOWN) {
+      return 1;
+    }
+    g_auth_mock_fail = 0;
+    rc = ui_promise_destroy(promise);
+    if (rc != UI_ERROR_NONE) {
+      return 1;
+    }
+
+    rc = ui_promise_create(&promise);
+    if (rc != UI_ERROR_NONE) {
+      return 1;
+    }
+    g_malloc_fail_countdown = 1;
+    g_auth_mock_fail = 2;
+    rc = ui_auth_request_async(&config, promise);
+    if (rc != UI_ERROR_UNKNOWN) {
+      return 1;
+    }
+    g_malloc_fail_countdown = -1;
+    g_auth_mock_fail = 0;
+    rc = ui_promise_destroy(promise);
+    if (rc != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
 #endif
 
   printf("test_ui_auth passed\n");

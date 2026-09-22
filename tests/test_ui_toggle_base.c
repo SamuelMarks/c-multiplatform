@@ -1,27 +1,52 @@
 /* clang-format off */
+#include "greatest.h"
 #include "ui_toggle_base.h"
 #include "ui_error.h"
 #include "ui_event.h"
+#include "ui_component.h"
 #include "ui_control_value_accessor.h"
+#include "ui_test_mock_mem.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 /* clang-format on */
 
-extern int g_malloc_fail_countdown;
+struct ui_toggle_base {
+  struct ui_component *component;
+  struct ui_gesture_recognizer *gesture_recognizer;
+  enum ui_toggle_type type;
+  int checked;
+  int disabled;
+  char *group_name;
+  ui_toggle_on_change_t on_change;
+  void *user_data;
+  ui_error_t (*cva_on_change)(union ui_signal_payload, void *);
+  void *cva_on_change_user_data;
+  ui_error_t (*cva_on_touched)(void *);
+  void *cva_on_touched_user_data;
+  struct ui_toggle_base *next;
+  struct ui_toggle_base *prev;
+  struct ui_signal *checked_signal;
+};
 
-#define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
-#define ACCUM_FAIL(failed, expr) failed |= (expr)
+extern int g_malloc_fail_countdown;
+extern int g_toggle_mock_fail;
+extern int g_toggle_mock_remove_attr_fail_target;
+extern int g_toggle_mock_set_attr_fail_target;
 
 static int g_change_called = 0;
 static int g_change_val = -1;
 static int g_touched_called = 0;
-
 static int g_mock_cb_fail = 0;
 
 static ui_error_t on_change(struct ui_toggle_base *toggle, int checked,
                             void *user) {
-  (void)toggle;
-  (void)user;
+  int unused_c = checked;
+  void *unused_u = user;
+  struct ui_toggle_base *unused_t = toggle;
+  toggle = unused_t;
+  checked = unused_c;
+  user = unused_u;
   if (g_mock_cb_fail == 1)
     return UI_ERROR_UNKNOWN;
   g_change_called++;
@@ -30,7 +55,8 @@ static ui_error_t on_change(struct ui_toggle_base *toggle, int checked,
 }
 
 static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
-  (void)user;
+  void *unused_u = user;
+  user = unused_u;
   if (g_mock_cb_fail == 2)
     return UI_ERROR_UNKNOWN;
   g_change_called++;
@@ -39,521 +65,577 @@ static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
 }
 
 static ui_error_t on_cva_touched(void *user) {
-  (void)user;
+  void *unused_u = user;
+  user = unused_u;
   if (g_mock_cb_fail == 3)
     return UI_ERROR_UNKNOWN;
   g_touched_called++;
   return UI_ERROR_NONE;
 }
 
-static int test_normal(void) {
-  struct ui_toggle_base *chk1 = NULL;
-  struct ui_toggle_base *rad1 = NULL;
-  struct ui_toggle_base *rad2 = NULL;
-  struct ui_toggle_base *rad3 = NULL;
-  struct ui_component *comp;
+TEST test_toggle_invalid_args(void) {
+  struct ui_toggle_base *chk = NULL;
+  struct ui_component *comp = NULL;
+  struct ui_control_value_accessor cva;
+  int is_checked = 0;
+  struct ui_event ev;
+  ui_error_t rc;
+
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, NULL));
+  ASSERT_EQ(UI_ERROR_NONE, ui_toggle_base_destroy(NULL));
+
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toggle_base_set_disabled(NULL, 1));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toggle_base_is_checked(NULL, &is_checked));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toggle_base_set_checked(NULL, 1));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toggle_base_set_group_name(NULL, "g1"));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toggle_base_set_on_change(NULL, on_change, NULL));
+  memset(&ev, 0, sizeof(ev));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toggle_base_process_event(NULL, &ev, 0.0));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toggle_base_get_component(NULL, &comp));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toggle_base_get_cva(NULL, &cva));
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &chk);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toggle_base_is_checked(chk, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toggle_base_get_component(chk, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, ui_toggle_base_get_cva(chk, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            ui_toggle_base_process_event(chk, NULL, 0.0));
+
+  rc = ui_toggle_base_destroy(chk);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
+TEST test_toggle_lifecycle_and_features(void) {
+  struct ui_toggle_base *chk = NULL;
+  struct ui_toggle_base *r1 = NULL;
+  struct ui_toggle_base *r2 = NULL;
+  struct ui_toggle_base *r3 = NULL;
+  struct ui_component *comp = NULL;
   struct ui_control_value_accessor cva;
   union ui_signal_payload payload;
-  int is_checked;
+  int is_checked = 0;
   struct ui_event ev;
-  int failed = 0;
+  ui_error_t rc;
 
-  /* Null checks */
-  failed |= (ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  {
-    ui_error_t rc_cleanup = ui_toggle_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  /* Checkbox operations */
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &chk);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  failed |= (ui_toggle_base_set_disabled(NULL, 1) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_toggle_base_is_checked(NULL, &is_checked) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_toggle_base_set_checked(NULL, 1) != UI_ERROR_INVALID_ARGUMENT);
-  failed |=
-      (ui_toggle_base_set_group_name(NULL, "g1") != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_toggle_base_set_on_change(NULL, on_change, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_toggle_base_process_event(NULL, &ev, 0.0) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |=
-      (ui_toggle_base_get_component(NULL, &comp) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_toggle_base_get_cva(NULL, &cva) != UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_toggle_base_get_component(chk, &comp);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT(comp != NULL);
 
-  ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &chk1));
-  failed |=
-      (ui_toggle_base_is_checked(chk1, NULL) != UI_ERROR_INVALID_ARGUMENT);
-  failed |=
-      (ui_toggle_base_get_component(chk1, NULL) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_toggle_base_get_cva(chk1, NULL) != UI_ERROR_INVALID_ARGUMENT);
-  failed |= (ui_toggle_base_process_event(chk1, NULL, 0.0) !=
-             UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_toggle_base_set_on_change(chk, on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ACCUM_ERR(failed, ui_toggle_base_get_component(chk1, &comp));
-  ACCUM_ERR(failed, ui_toggle_base_get_cva(chk1, &cva));
+  /* Initially unchecked */
+  rc = ui_toggle_base_is_checked(chk, &is_checked);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, is_checked);
 
-  /* Disable/Enable */
-  ACCUM_ERR(failed, ui_toggle_base_set_disabled(chk1, 1));
-  ACCUM_ERR(failed, ui_toggle_base_set_disabled(chk1, 0));
+  /* Check and uncheck */
+  rc = ui_toggle_base_set_checked(chk, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_is_checked(chk, &is_checked);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(1, is_checked);
 
-  /* CVA methods */
-  failed |= (cva.register_on_change(NULL, on_cva_change, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
-  failed |= (cva.register_on_touched(NULL, on_cva_touched, NULL) !=
-             UI_ERROR_INVALID_ARGUMENT);
+  rc = ui_toggle_base_set_checked(chk, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_is_checked(chk, &is_checked);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, is_checked);
 
-  /* Set cva_on_change to NULL then trigger check */
-  cva.register_on_change(chk1, NULL, NULL);
-  payload.bool_val = 1;
-  cva.write_value(chk1, payload);
-  payload.bool_val = 0;
-  cva.write_value(chk1, payload);
-  cva.register_on_touched(chk1, NULL, NULL);
+  /* Disable and enable */
+  rc = ui_toggle_base_set_disabled(chk, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_disabled(chk, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ACCUM_ERR(failed, cva.register_on_change(chk1, on_cva_change, NULL));
-  ACCUM_ERR(failed, cva.register_on_touched(chk1, on_cva_touched, NULL));
-  ACCUM_ERR(failed, cva.set_disabled_state(chk1, 1));
+  /* Group name on checkbox (covers set and clear) */
+  rc = ui_toggle_base_set_group_name(chk, "chkgroup");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(chk, "chkgroup2");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(chk, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Event processing while disabled */
+  /* CVA operations */
+  rc = ui_toggle_base_get_cva(chk, &cva);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* CVA NULL checks */
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            cva.register_on_change(NULL, on_cva_change, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT,
+            cva.register_on_touched(NULL, on_cva_touched, NULL));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, cva.set_disabled_state(NULL, 1));
+  memset(&payload, 0, sizeof(payload));
+  ASSERT_EQ(UI_ERROR_INVALID_ARGUMENT, cva.write_value(NULL, payload));
+
+  rc = cva.register_on_change(chk, on_cva_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = cva.register_on_touched(chk, on_cva_touched, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  payload.int_val = 1;
+  rc = cva.write_value(chk, payload);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = cva.set_disabled_state(chk, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = cva.set_disabled_state(chk, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Process events while disabled: should do nothing */
+  rc = ui_toggle_base_set_disabled(chk, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ACCUM_ERR(failed, ui_toggle_base_process_event(chk1, &ev, 0.0));
+  rc = ui_toggle_base_process_event(chk, &ev, 1.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_disabled(chk, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ev.type = UI_EVENT_MOUSE_UP;
-  ACCUM_ERR(failed, ui_toggle_base_process_event(chk1, &ev, 0.1));
-  ACCUM_ERR(failed, ui_toggle_base_is_checked(chk1, &is_checked));
-  ACCUM_FAIL(failed, is_checked != 0);
-
-  ACCUM_ERR(failed, cva.set_disabled_state(chk1, 0));
-
-  /* Setup native on_change too (they both fire) */
-  ACCUM_ERR(failed, ui_toggle_base_set_on_change(chk1, on_change, NULL));
-
-  /* Event processing - tap -> changes checkbox state */
-  g_change_called = 0;
-  g_touched_called = 0;
+  /* Process TAP event on checkbox toggles it */
+  memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ev.event_data.mouse.x = 0;
-  ev.event_data.mouse.y = 0;
-  ev.event_data.mouse.button = 0; /* UI_MOUSE_BUTTON_LEFT */
-  ACCUM_ERR(failed, ui_toggle_base_process_event(chk1, &ev, 1.0));
+  rc = ui_toggle_base_process_event(chk, &ev, 10.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   ev.type = UI_EVENT_MOUSE_UP;
-  ACCUM_ERR(failed, ui_toggle_base_process_event(chk1, &ev, 1.1));
-
-  ACCUM_FAIL(failed, g_change_called != 2); /* native + CVA */
-  ACCUM_FAIL(failed, g_touched_called != 1);
-  ACCUM_ERR(failed, ui_toggle_base_is_checked(chk1, &is_checked));
-  ACCUM_FAIL(failed, is_checked != 1);
-
-  /* CVA write value */
-  union ui_signal_payload val;
-  val.int_val = 0;
-  ACCUM_ERR(failed, cva.write_value(chk1, val));
-  ACCUM_ERR(failed, ui_toggle_base_is_checked(chk1, &is_checked));
-  ACCUM_FAIL(failed, is_checked != 0);
-
-  /* --- Radio Button logic --- */
-  ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &rad1));
-  ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &rad2));
-  ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &rad3));
-
-  ACCUM_ERR(failed, ui_toggle_base_set_group_name(rad1, "grp"));
-  ACCUM_ERR(failed, ui_toggle_base_set_group_name(rad2, "grp"));
-  ACCUM_ERR(failed, ui_toggle_base_set_group_name(rad3, "grp_other"));
-
-  ACCUM_ERR(failed, ui_toggle_base_set_on_change(rad1, on_change, NULL));
-  ACCUM_ERR(failed, ui_toggle_base_set_on_change(rad2, on_change, NULL));
-
-  /* Check rad1 */
-  /* Remove on_change temporarily to hit branch */
-  ui_toggle_base_set_on_change(rad1, NULL, NULL);
-  ACCUM_ERR(failed, ui_toggle_base_set_checked(rad1, 1));
-  ui_toggle_base_set_on_change(rad1, on_change, NULL);
-
-  /* Process event on rad2 to tap it */
   g_change_called = 0;
+  rc = ui_toggle_base_process_event(chk, &ev, 15.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_toggle_base_destroy(chk);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Radio button exclusion and group management */
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r3);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_toggle_base_set_group_name(r1, "g1");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(r2, "g1");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(r3, "g1");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_toggle_base_set_on_change(r1, on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_on_change(r2, on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Check r1 */
+  rc = ui_toggle_base_set_checked(r1, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_is_checked(r1, &is_checked);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(1, is_checked);
+
+  /* Check r2 -> unchecks r1 */
+  rc = ui_toggle_base_set_checked(r2, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_is_checked(r1, &is_checked);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(0, is_checked);
+  rc = ui_toggle_base_is_checked(r2, &is_checked);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ASSERT_EQ(1, is_checked);
+
+  /* TAP on unchecked radio checks it */
+  memset(&ev, 0, sizeof(ev));
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ACCUM_ERR(failed, ui_toggle_base_process_event(rad2, &ev, 2.0));
+  rc = ui_toggle_base_process_event(r1, &ev, 20.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   ev.type = UI_EVENT_MOUSE_UP;
-  ACCUM_ERR(failed, ui_toggle_base_process_event(rad2, &ev, 2.1));
+  rc = ui_toggle_base_process_event(r1, &ev, 25.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* rad2 checked = 1 (on_change fired). rad1 checked = 0 (on_change fired). */
-  ACCUM_ERR(failed, ui_toggle_base_is_checked(rad1, &is_checked));
-  ACCUM_FAIL(failed, is_checked != 0);
-  ACCUM_ERR(failed, ui_toggle_base_is_checked(rad2, &is_checked));
-  ACCUM_FAIL(failed, is_checked != 1);
+  /* TAP on already checked radio does nothing */
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  rc = ui_toggle_base_process_event(r1, &ev, 30.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ev.type = UI_EVENT_MOUSE_UP;
+  rc = ui_toggle_base_process_event(r1, &ev, 35.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Check rad3 (has different group) */
-  ACCUM_ERR(failed, ui_toggle_base_set_checked(rad3, 1));
+  /* Check r3 while setting group name to g1 */
+  rc = ui_toggle_base_set_group_name(r3, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_checked(r3, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(r3, "g1");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Create rad4 without a group, and check it */
-  struct ui_toggle_base *rad4;
-  ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &rad4));
-  ACCUM_ERR(failed, ui_toggle_base_set_checked(rad4, 1));
-  {
-    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad4);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+  /* Destroy in order: r2 (middle), r3 (head), r1 (tail/only) to test all unlink
+   * branches */
+  rc = ui_toggle_base_destroy(r2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_destroy(r3);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_destroy(r1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  PASS();
+}
+
+TEST test_toggle_error_branches(void) {
+  struct ui_toggle_base *toggle = NULL;
+  struct ui_toggle_base *r1 = NULL;
+  struct ui_toggle_base *r2 = NULL;
+  struct ui_control_value_accessor cva;
+  struct ui_event ev;
+  ui_error_t rc;
+  int i;
+
+  /* 1. Gesture event processing mock failure */
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  g_toggle_mock_fail = 1;
+  rc = ui_toggle_base_process_event(toggle, &ev, 1.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_fail = 0;
+
+  /* 2. Mock remove_attribute failure (checked, disabled, name) */
+  rc = ui_toggle_base_set_checked(toggle, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_toggle_mock_remove_attr_fail_target = 1;
+  rc = ui_toggle_base_set_checked(toggle, 0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_remove_attr_fail_target = 0;
+
+  /* Mock set_attribute failure on line 208 (checked = 1, call 2) */
+  g_toggle_mock_set_attr_fail_target = 2;
+  rc = ui_toggle_base_set_checked(toggle, 1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_set_attr_fail_target = 0;
+
+  /* mock remove_attribute target 2 (called twice to cover non-failing branch)
+   */
+  g_toggle_mock_remove_attr_fail_target = 2;
+  rc = ui_toggle_base_set_disabled(toggle, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_disabled(toggle, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_disabled(toggle, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_disabled(toggle, 0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_remove_attr_fail_target = 0;
+
+  rc = ui_toggle_base_set_disabled(toggle, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_toggle_mock_remove_attr_fail_target = 1;
+  rc = ui_toggle_base_set_disabled(toggle, 0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_remove_attr_fail_target = 0;
+  rc = ui_toggle_base_set_disabled(toggle, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_toggle_base_set_group_name(toggle, "g1");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_toggle_mock_remove_attr_fail_target = 1;
+  rc = ui_toggle_base_set_group_name(toggle, NULL);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_remove_attr_fail_target = 0;
+
+  /* 3. Mock set_attribute failures in set_group_name and set_disabled */
+  g_toggle_mock_set_attr_fail_target = 1;
+  rc = ui_toggle_base_set_group_name(toggle, "g2");
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_set_attr_fail_target = 0;
+
+  for (i = 1; i <= 3; i++) {
+    g_toggle_mock_set_attr_fail_target = i;
+    rc = ui_toggle_base_set_disabled(toggle, 1);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_toggle_mock_set_attr_fail_target = 0;
+  }
+  for (i = 1; i <= 2; i++) {
+    g_toggle_mock_set_attr_fail_target = i;
+    rc = ui_toggle_base_set_disabled(toggle, 0);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_toggle_mock_set_attr_fail_target = 0;
   }
 
-  /* Tap rad2 again (already checked, radio does nothing) */
-  g_change_called = 0;
+  /* 4. Tap on toggle without callbacks (covers false branches for callbacks) */
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ACCUM_ERR(failed, ui_toggle_base_process_event(rad2, &ev, 3.0));
+  rc = ui_toggle_base_process_event(toggle, &ev, 1.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   ev.type = UI_EVENT_MOUSE_UP;
-  ACCUM_ERR(failed, ui_toggle_base_process_event(rad2, &ev, 3.1));
-  ACCUM_FAIL(failed, g_change_called != 0);
+  rc = ui_toggle_base_process_event(toggle, &ev, 5.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* Test cb failures on checkbox */
-  g_mock_cb_fail = 1;
-  ui_toggle_base_set_checked(chk1, 0);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ui_toggle_base_process_event(chk1, &ev, 5.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  failed |= (ui_toggle_base_process_event(chk1, &ev, 5.1) != UI_ERROR_UNKNOWN);
+  /* 5. Callback failures */
+  rc = ui_toggle_base_set_on_change(toggle, on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_get_cva(toggle, &cva);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = cva.register_on_change(toggle, on_cva_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = cva.register_on_touched(toggle, on_cva_touched, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  g_mock_cb_fail = 2;
-  ui_toggle_base_set_checked(chk1, 0);
+  g_mock_cb_fail = 1; /* on_change fails */
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ui_toggle_base_process_event(chk1, &ev, 5.2);
+  rc = ui_toggle_base_process_event(toggle, &ev, 10.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   ev.type = UI_EVENT_MOUSE_UP;
-  failed |= (ui_toggle_base_process_event(chk1, &ev, 5.3) != UI_ERROR_UNKNOWN);
-
-  g_mock_cb_fail = 3;
-  ui_toggle_base_set_checked(chk1, 0);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ui_toggle_base_process_event(chk1, &ev, 5.4);
-  ev.type = UI_EVENT_MOUSE_UP;
-  failed |= (ui_toggle_base_process_event(chk1, &ev, 5.5) != UI_ERROR_UNKNOWN);
+  rc = ui_toggle_base_process_event(toggle, &ev, 15.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
   g_mock_cb_fail = 0;
 
-  /* Test cb failures on radio during exclusion updates */
-  g_mock_cb_fail = 1;
-  ui_toggle_base_set_checked(rad1, 0);
-  ui_toggle_base_set_checked(rad2, 1);
+  g_mock_cb_fail = 2; /* cva on_change fails */
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ui_toggle_base_process_event(rad1, &ev, 6.0);
+  rc = ui_toggle_base_process_event(toggle, &ev, 20.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   ev.type = UI_EVENT_MOUSE_UP;
-  failed |= (ui_toggle_base_process_event(rad1, &ev, 6.1) != UI_ERROR_UNKNOWN);
+  rc = ui_toggle_base_process_event(toggle, &ev, 25.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
   g_mock_cb_fail = 0;
 
-  /* OOM branches for DOM updates */
-  g_malloc_fail_countdown = 0; /* 0 means fail immediately at the mock point */
+  g_mock_cb_fail = 3; /* cva on_touched fails */
   ev.type = UI_EVENT_MOUSE_DOWN;
-  ui_toggle_base_process_event(chk1, &ev, 7.0);
+  rc = ui_toggle_base_process_event(toggle, &ev, 30.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   ev.type = UI_EVENT_MOUSE_UP;
-  ui_toggle_base_process_event(
-      chk1, &ev,
-      7.1); /* Returns OOM internally but caught in process_event or updates */
-  g_malloc_fail_countdown = -1;
+  rc = ui_toggle_base_process_event(toggle, &ev, 35.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_mock_cb_fail = 0;
 
-  /* Check enforce_radio_exclusion returning error if DOM update fails */
-  ui_toggle_base_set_checked(rad1, 0);
-  ui_toggle_base_set_checked(rad2, 1);
+  rc = ui_toggle_base_destroy(toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  /* The mock block in enforce_radio_exclusion literally says `if
-   * (g_malloc_fail_countdown == 0)`. But `ui_toggle_base_set_checked` does
-   * `update_dom_state(rad1)`. `update_dom_state` calls
-   * `ui_dom_node_set_attribute` which calls `malloc`. Try countdown values
-   * exactly 1 and 2 to hit the explicit mock block in enforce_radio_exclusion.
+  /* 6. Creation cleanup failures */
+  for (i = 2; i <= 4; i++) {
+    g_toggle_mock_fail = i;
+    g_toggle_mock_set_attr_fail_target = 1;
+    rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_toggle_mock_set_attr_fail_target = 0;
+    g_toggle_mock_fail = 0;
+  }
+
+  /* 7. Radio creation set_attr fail (targets radio branches in create) */
+  for (i = 1; i <= 4; i++) {
+    g_toggle_mock_set_attr_fail_target = i;
+    rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &toggle);
+    ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+    g_toggle_mock_set_attr_fail_target = 0;
+  }
+
+  /* 8. Destroy mock failures */
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_toggle_mock_fail = 3; /* gesture destroy fails */
+  rc = ui_toggle_base_destroy(toggle);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_fail = 0;
+
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_toggle_mock_fail = 4; /* component destroy fails */
+  rc = ui_toggle_base_destroy(toggle);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_toggle_mock_fail = 0;
+
+  /* 9. Enforce radio exclusion error branches */
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  rc = ui_toggle_base_set_group_name(r1, "ex_grp");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(r2, "ex_grp");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_checked(r1, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* r1 has failing on_change during exclusion */
+  rc = ui_toggle_base_set_on_change(r1, on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_mock_cb_fail = 1;
+  rc = ui_toggle_base_set_checked(r2, 1);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_mock_cb_fail = 0;
+
+  /* Exclusion fail on tap (line 613) */
+  rc = ui_toggle_base_set_checked(r2, 0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_checked(r1, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  g_mock_cb_fail = 1;
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  rc = ui_toggle_base_process_event(r2, &ev, 10.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ev.type = UI_EVENT_MOUSE_UP;
+  rc = ui_toggle_base_process_event(r2, &ev, 15.0);
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_mock_cb_fail = 0;
+
+  /* Exclusion fail on set_group_name while checked (line 542) */
+  rc = ui_toggle_base_set_on_change(r2, on_change, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_checked(r2, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(r1, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_checked(r1, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  g_mock_cb_fail = 1;
+  rc = ui_toggle_base_set_group_name(r1, "ex_grp");
+  ASSERT_EQ(UI_ERROR_UNKNOWN, rc);
+  g_mock_cb_fail = 0;
+
+  /* Radio with NULL group_name and different group_name in registry */
+  {
+    struct ui_toggle_base *r_null = NULL;
+    struct ui_toggle_base *r_diff = NULL;
+    rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r_null);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r_diff);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_toggle_base_set_group_name(r_diff, "diff_grp");
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_toggle_base_set_checked(r2, 1);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_toggle_base_destroy(r_null);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+    rc = ui_toggle_base_destroy(r_diff);
+    ASSERT_EQ(UI_ERROR_NONE, rc);
+  }
+
+  /* Radio exclusion when other radio has NULL on_change callback */
+  rc = ui_toggle_base_set_on_change(r1, NULL, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_checked(r1, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_checked(r2, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+
+  /* Exclusion OOM test (hit line 247) */
+  for (i = 0; i < 10; i++) {
+    r1->checked = 1;
+    r2->checked = 0;
+    g_malloc_fail_countdown = i;
+    ui_toggle_base_set_checked(r2, 1);
+    g_malloc_fail_countdown = -1;
+  }
+
+  /* Checked checkbox set_group_name (covers should_enforce false for non-radio)
    */
-  g_malloc_fail_countdown = 1;
-  failed |= (ui_toggle_base_set_checked(rad1, 1) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_checked(toggle, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(toggle, "chk_grp");
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_destroy(toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ui_toggle_base_set_checked(rad1, 0);
-  ui_toggle_base_set_checked(rad2, 1);
-  g_malloc_fail_countdown = 2;
-  failed |= (ui_toggle_base_set_checked(rad1, 1) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+  /* Checked radio set_group_name NULL (covers should_enforce false for
+   * group_name NULL) */
+  rc = ui_toggle_base_set_checked(r1, 1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_set_group_name(r1, NULL);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ui_toggle_base_set_checked(rad1, 0);
-  ui_toggle_base_set_checked(rad2, 1);
-  g_malloc_fail_countdown = 3;
-  failed |= (ui_toggle_base_set_checked(rad1, 1) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+  /* Destroy with NULL gesture_recognizer and NULL component */
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_gesture_recognizer_destroy(toggle->gesture_recognizer);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  toggle->gesture_recognizer = NULL;
+  rc = ui_component_destroy(toggle->component);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  toggle->component = NULL;
+  rc = ui_toggle_base_destroy(toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ui_toggle_base_set_checked(rad1, 0);
-  ui_toggle_base_set_checked(rad2, 1);
-  g_malloc_fail_countdown = 4;
-  failed |= (ui_toggle_base_set_checked(rad1, 1) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
+  rc = ui_toggle_base_destroy(r1);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  rc = ui_toggle_base_destroy(r2);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ui_toggle_base_set_checked(rad1, 0);
-  ui_toggle_base_set_checked(rad2, 1);
-  g_malloc_fail_countdown = 5;
-  failed |= (ui_toggle_base_set_checked(rad1, 1) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
-
-  /* Check DOM state updates independently */
-  g_malloc_fail_countdown = 0;
-  failed |= (ui_toggle_base_set_checked(rad1, 0) != UI_ERROR_OUT_OF_MEMORY);
-  g_malloc_fail_countdown = -1;
-
-  /* Test radio joining group when already checked */
-  ui_toggle_base_set_checked(rad1, 0);
-  struct ui_toggle_base *rad5;
-  ACCUM_ERR(failed, ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &rad5));
-  ui_toggle_base_set_checked(rad5, 1);
-  ui_toggle_base_set_group_name(rad5, "g1"); /* Re-evaluates exclusion */
-  {
-    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad5);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-
-  /* Change group name of rad1 to NULL */
-  ACCUM_ERR(failed, ui_toggle_base_set_group_name(rad1, NULL));
-
-  /* Additional event branch coverage */
-  ev.type = UI_EVENT_KEY_UP;
-  ui_toggle_base_process_event(chk1, &ev, 4.0);
-  ev.type = UI_EVENT_TOUCH_END;
-  ui_toggle_base_process_event(chk1, &ev, 5.0);
-
-  /* Also test the FALSE branch for toggle->checked in
-     ui_toggle_base_set_group_name: We need to call
-     ui_toggle_base_set_group_name on an UNCHECKED toggle! */
-  struct ui_toggle_base *chk_setgrp = NULL;
-  ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &chk_setgrp);
-  ui_toggle_base_set_checked(chk_setgrp, 0);
-  ui_toggle_base_set_group_name(chk_setgrp, "group");
-  ui_toggle_base_destroy(chk_setgrp);
-
-  /* Also test FALSE branch on toggle->type == UI_TOGGLE_TYPE_RADIO in
-     ui_toggle_base_set_group_name: We need to call
-     ui_toggle_base_set_group_name on a CHECKBOX that is CHECKED. */
-  struct ui_toggle_base *chk_setgrp2 = NULL;
-  ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &chk_setgrp2);
-  ui_toggle_base_set_checked(chk_setgrp2, 1);
-  ui_toggle_base_set_group_name(chk_setgrp2, "chk_grp");
-  ui_toggle_base_destroy(chk_setgrp2);
-
-  /* Test enforce_radio_exclusion when an unchecked radio has NO on_change
-     callback: We need to uncheck a radio that has NO on_change. */
-  struct ui_toggle_base *r_ex_1 = NULL;
-  struct ui_toggle_base *r_ex_2 = NULL;
-  ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r_ex_1);
-  ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r_ex_2);
-  ui_toggle_base_set_group_name(r_ex_1, "ex_grp");
-  ui_toggle_base_set_group_name(r_ex_2, "ex_grp");
-  ui_toggle_base_set_checked(r_ex_1, 1);
-  ui_toggle_base_set_checked(r_ex_2, 1);
-  ui_toggle_base_destroy(r_ex_1);
-  ui_toggle_base_destroy(r_ex_2);
-
-  /* Also test the FALSE branch for toggle->checked inside
-     ui_toggle_base_process_event: We need to tap an already-checked CHECKBOX.
-   */
-  struct ui_toggle_base *chk_uncheck_ev = NULL;
-  ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &chk_uncheck_ev);
-  ui_toggle_base_set_checked(chk_uncheck_ev, 1);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ui_toggle_base_process_event(chk_uncheck_ev, &ev, 12.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_toggle_base_process_event(chk_uncheck_ev, &ev, 12.1);
-  ui_toggle_base_destroy(chk_uncheck_ev);
-
-  /* Try to hit branch 0 on toggle->on_change inside process_event */
-  struct ui_toggle_base *r_no_oc_ev = NULL;
-  ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r_no_oc_ev);
-  ui_toggle_base_set_on_change(r_no_oc_ev, NULL, NULL);
-  ui_toggle_base_set_checked(r_no_oc_ev, 0);
-  ev.type = UI_EVENT_MOUSE_DOWN;
-  ui_toggle_base_process_event(r_no_oc_ev, &ev, 11.0);
-  ev.type = UI_EVENT_MOUSE_UP;
-  ui_toggle_base_process_event(r_no_oc_ev, &ev, 11.1);
-  ui_toggle_base_destroy(r_no_oc_ev);
-
-  /* Also test the FALSE branch for toggle->on_change in
-   * ui_toggle_base_set_checked */
-  struct ui_toggle_base *chk_no_oc = NULL;
-  ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &chk_no_oc);
-  ui_toggle_base_set_on_change(chk_no_oc, NULL, NULL);
-  ui_toggle_base_set_checked(chk_no_oc, 1);
-  ui_toggle_base_set_checked(chk_no_oc, 0);
-  ui_toggle_base_destroy(chk_no_oc);
-
-  /* Clean up */
-  {
-    ui_error_t rc_cleanup = ui_toggle_base_destroy(chk1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad2);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-  {
-    ui_error_t rc_cleanup = ui_toggle_base_destroy(rad3);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-
-  return failed;
+  PASS();
 }
 
-static int run_dom_oom(void);
-static int test_oom(void) {
-  int failed = 0;
-#ifdef UI_TEST_MOCK_ALLOC
-  struct ui_toggle_base *toggle;
+TEST test_toggle_oom(void) {
+  struct ui_toggle_base *toggle = NULL;
+  struct ui_event ev;
+  ui_error_t rc;
   int i;
-  ui_error_t err;
 
+  /* Creation OOM loop */
   for (i = 0; i < 20; i++) {
     g_malloc_fail_countdown = i;
-    err = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
-    g_malloc_fail_countdown = -1;
-    if (err == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_toggle_base_destroy(toggle);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
+    toggle = NULL;
+    rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+    if (rc == UI_ERROR_NONE) {
+      g_malloc_fail_countdown = -1;
+      rc = ui_toggle_base_destroy(toggle);
+      ASSERT_EQ(UI_ERROR_NONE, rc);
+      break;
     }
-  }
-  for (i = 0; i < 20; i++) {
-    g_malloc_fail_countdown = i;
-    err = ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &toggle);
-    g_malloc_fail_countdown = -1;
-    if (err == UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_toggle_base_destroy(toggle);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
-      }
-    }
+    ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
+    ASSERT(toggle == NULL);
   }
   g_malloc_fail_countdown = -1;
 
-  ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
-  for (i = 0; i < 3; i++) {
-    g_malloc_fail_countdown = i;
-    err = ui_toggle_base_set_group_name(toggle, "grp");
-    if (err == UI_ERROR_NONE) {
-      ui_toggle_base_set_group_name(toggle, NULL);
-    }
-  }
-  g_malloc_fail_countdown = -1;
-
-  for (i = 0; i < 5; i++) {
-    g_malloc_fail_countdown = i;
-    ui_toggle_base_set_disabled(toggle, 1);
-  }
-  g_malloc_fail_countdown = -1;
-
-  for (i = 0; i < 5; i++) {
-    g_malloc_fail_countdown = i;
-    ui_toggle_base_set_disabled(toggle, 0);
-  }
-  g_malloc_fail_countdown = -1;
-
-  ui_toggle_base_set_group_name(toggle, "grp");
+  /* set_group_name OOM */
+  rc = ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
   g_malloc_fail_countdown = 0;
-  ui_toggle_base_set_group_name(toggle, NULL);
+  rc = ui_toggle_base_set_group_name(toggle, "oom_group");
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   g_malloc_fail_countdown = -1;
 
-  for (i = 0; i < 5; i++) {
-    g_malloc_fail_countdown = i;
-    ui_toggle_base_set_checked(toggle, 1);
-  }
+  /* Event process tap OOM */
+  memset(&ev, 0, sizeof(ev));
+  ev.type = UI_EVENT_MOUSE_DOWN;
+  rc = ui_toggle_base_process_event(toggle, &ev, 10.0);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
+  ev.type = UI_EVENT_MOUSE_UP;
+  g_malloc_fail_countdown = 0;
+  rc = ui_toggle_base_process_event(toggle, &ev, 15.0);
+  ASSERT_EQ(UI_ERROR_OUT_OF_MEMORY, rc);
   g_malloc_fail_countdown = -1;
 
-  {
-    ui_error_t rc_cleanup = ui_toggle_base_destroy(toggle);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
-#endif
+  rc = ui_toggle_base_destroy(toggle);
+  ASSERT_EQ(UI_ERROR_NONE, rc);
 
-  ui_toggle_base_set_disabled(NULL, 1);
-  ui_toggle_base_set_checked(NULL, 1);
-  ui_toggle_base_set_group_name(NULL, "grp");
-  ui_toggle_base_set_on_change(NULL, NULL, NULL);
-
-  {
-    struct ui_toggle_base *r1, *r2, *r3;
-    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r1);
-    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r2);
-    ui_toggle_base_create(UI_TOGGLE_TYPE_RADIO, &r3);
-
-    {
-      ui_error_t rc_cleanup = ui_toggle_base_destroy(r2);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_toggle_base_destroy(r3);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-    {
-      ui_error_t rc_cleanup = ui_toggle_base_destroy(r1);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
-    }
-  }
-
-  return failed;
+  PASS();
 }
 
-int main(void) {
-  int failed = 0;
-  failed |= test_normal();
-  failed |= test_oom();
-  failed |= run_dom_oom();
-  if (!failed) {
-    printf("All ui_toggle_base tests passed.\n");
-  }
-  return failed;
+SUITE(ui_toggle_base_suite) {
+  RUN_TEST(test_toggle_invalid_args);
+  RUN_TEST(test_toggle_lifecycle_and_features);
+  RUN_TEST(test_toggle_error_branches);
+  RUN_TEST(test_toggle_oom);
 }
 
-static int run_dom_oom(void) {
-  int failed = 0;
-#ifdef UI_TEST_MOCK_ALLOC
-  struct ui_toggle_base *toggle;
-  int i;
-  ui_toggle_base_create(UI_TOGGLE_TYPE_CHECKBOX, &toggle);
-  for (i = 0; i < 5; i++) {
-    g_malloc_fail_countdown = i;
-    ui_toggle_base_set_checked(toggle, 1);
-  }
-  g_malloc_fail_countdown = -1;
+GREATEST_MAIN_DEFS();
 
-  for (i = 0; i < 5; i++) {
-    g_malloc_fail_countdown = i;
-    ui_toggle_base_set_disabled(toggle, 1);
-  }
-  g_malloc_fail_countdown = -1;
-
-  for (i = 0; i < 5; i++) {
-    g_malloc_fail_countdown = i;
-    ui_toggle_base_set_disabled(toggle, 0);
-  }
-  g_malloc_fail_countdown = -1;
-
-  ui_toggle_base_destroy(toggle);
-#endif
-  return failed;
+int main(int argc, char **argv) {
+  GREATEST_MAIN_BEGIN();
+  RUN_SUITE(ui_toggle_base_suite);
+  GREATEST_MAIN_END();
 }

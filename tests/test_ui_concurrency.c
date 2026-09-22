@@ -2,6 +2,7 @@
 #include "ui_arena.h"
 #include "ui_signal.h"
 #include "ui_thread_pool.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
@@ -33,7 +34,6 @@ static ui_error_t increment_task(void *user_data) {
     }
   }
   return rc;
-}
 }
 
 int main(void) {
@@ -67,18 +67,14 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_signal_destroy(sig);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_thread_pool_destroy(pool);
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
-  printf("test_ui_concurrency passed\\n");
+  printf("test_ui_concurrency passed\n");
   return 0;
 }

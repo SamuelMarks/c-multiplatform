@@ -11,11 +11,29 @@ static ui_error_t
 intersection_cb(struct ui_intersection_observer *observer,
                 const struct ui_intersection_observer_entry *entries,
                 int entry_count, void *user_data) {
-  (void)observer;
-  (void)entries;
-  (void)user_data;
+  if (observer) {
+  }
+  if (entries) {
+  }
+  if (user_data) {
+  }
   g_cb_called += entry_count;
   return UI_ERROR_NONE;
+}
+
+static ui_error_t
+intersection_cb_fail(struct ui_intersection_observer *observer,
+                     const struct ui_intersection_observer_entry *entries,
+                     int entry_count, void *user_data) {
+  if (observer) {
+  }
+  if (entries) {
+  }
+  if (user_data) {
+  }
+  if (entry_count > 0) {
+  }
+  return UI_ERROR_UNKNOWN;
 }
 
 static int run_normal_tests(void) {
@@ -77,6 +95,15 @@ static int run_normal_tests(void) {
   if (g_cb_called == 0)
     return 1;
 
+  /* Test callback failure */
+  ui_intersection_observer_unobserve(obs, target);
+  ui_intersection_observer_observe(obs, target);
+  ui_intersection_observer_subscribe(obs, intersection_cb_fail, NULL);
+  rc = ui_intersection_observer_evaluate(obs);
+  if (rc != UI_ERROR_UNKNOWN)
+    return 1;
+  ui_intersection_observer_subscribe(obs, intersection_cb, NULL);
+
   ui_intersection_observer_unobserve(obs, target);
   if (ui_intersection_observer_unobserve(obs, target) != UI_ERROR_NOT_FOUND)
     return 1;
@@ -84,17 +111,22 @@ static int run_normal_tests(void) {
   ui_intersection_observer_observe(obs, target);
   ui_intersection_observer_disconnect(obs);
 
-  ui_intersection_observer_destroy(obs);
+  {
+    ui_error_t rc_cleanup = ui_intersection_observer_destroy(obs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(target);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   return 0;
@@ -140,10 +172,15 @@ static int test_capacity_and_unobserve(void) {
   for (i = 0; i < 8; i++) {
     ui_error_t rc_cleanup = ui_dom_node_destroy(nodes[i]);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
-  ui_intersection_observer_destroy(obs);
+  {
+    ui_error_t rc_cleanup = ui_intersection_observer_destroy(obs);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      return 1;
+    }
+  }
 
   return 0;
 }
@@ -224,40 +261,45 @@ static int run_oom_tests(void) {
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(target1);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(target2);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(target3);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(target4);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(target5);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(target6);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
-    ui_intersection_observer_destroy(obs);
+    {
+      ui_error_t rc_cleanup = ui_intersection_observer_destroy(obs);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
+    }
   }
 
   {
@@ -273,7 +315,12 @@ static int run_oom_tests(void) {
     ui_intersection_observer_observe(obs, target);
     ui_intersection_observer_evaluate(obs);
 
-    ui_intersection_observer_destroy(obs);
+    {
+      ui_error_t rc_cleanup = ui_intersection_observer_destroy(obs);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
+    }
     ui_intersection_observer_create(root, 0, NULL, 0, &obs);
     ui_intersection_observer_subscribe(obs, intersection_cb, NULL);
     ui_intersection_observer_observe(obs, target);
@@ -281,17 +328,22 @@ static int run_oom_tests(void) {
     ui_intersection_observer_evaluate(obs);
     ui_intersection_observer_evaluate(obs);
 
-    ui_intersection_observer_destroy(obs);
+    {
+      ui_error_t rc_cleanup = ui_intersection_observer_destroy(obs);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        return 1;
+      }
+    }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(target);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(root);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
   }

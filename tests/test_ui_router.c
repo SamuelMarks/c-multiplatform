@@ -2,6 +2,7 @@
 #include "ui_router.h"
 #include "../src/ui_internal_mem.h"
 #include "ui_event.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -308,9 +309,7 @@ static int run_normal_tests(void) {
   printf("Testing ui_router_destroy...\n");
   {
     ui_error_t rc_cleanup = ui_router_destroy(router);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -334,9 +333,7 @@ static int run_oom_tests(void) {
     } else if (err == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_router_destroy(router);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     } else {
@@ -402,16 +399,12 @@ static int run_oom_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_router_destroy(router);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   /* Note screen was not successfully pushed, so we clean it up */
   {
     ui_error_t rc_cleanup = ui_component_destroy(screen);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return 0;
@@ -495,9 +488,7 @@ void test_ui_router_coverage(void) {
 
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -510,9 +501,7 @@ void test_ui_router_coverage2(void) {
     ui_router_navigate_with_state(router, "/cov", (void *)0x123);
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -530,9 +519,7 @@ void test_ui_router_oom_add(void) {
     g_malloc_fail_countdown = -1;
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -549,9 +536,7 @@ void test_ui_router_stack_realloc(void) {
     }
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -569,9 +554,7 @@ void test_ui_router_oom_add2(void) {
     g_malloc_fail_countdown = -1;
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -591,9 +574,7 @@ void test_ui_router_missing_param(void) {
     ui_router_navigate(router, "/missing/123");
     {
       ui_error_t rc_cleanup = ui_router_destroy(router);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 }
@@ -609,9 +590,7 @@ void test_ui_router_extra2(void) {
   ui_router_navigate(router, "/my/path?k=v");
   {
     ui_error_t rc_cleanup = ui_router_destroy(router);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -626,7 +605,9 @@ void test_router_param_oom(void) {
     g_malloc_fail_countdown = countdown;
     err = ui_router_navigate(r, "/user/42?page=1");
     g_malloc_fail_countdown = -1;
-    (void)err;
+    if (err != UI_ERROR_NONE) {
+      /* expected error during OOM */
+    }
     ui_router_destroy(r);
   }
 
@@ -636,7 +617,9 @@ void test_router_param_oom(void) {
     g_malloc_fail_countdown = countdown;
     err = ui_router_navigate(r, "/q?=&val");
     g_malloc_fail_countdown = -1;
-    (void)err;
+    if (err != UI_ERROR_NONE) {
+      /* expected error during OOM */
+    }
     ui_router_destroy(r);
   }
 }

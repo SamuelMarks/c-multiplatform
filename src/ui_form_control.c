@@ -124,8 +124,7 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, status_payload, UI_SIGNAL_TYPE_INT32, NULL, NULL,
                         mode, &ctrl->status_signal);
   if (rc != UI_ERROR_NONE) {
-    ui_error_t rc_cleanup = ui_signal_destroy(ctrl->value_signal);
-    (void)rc_cleanup;
+    ui_signal_destroy(ctrl->value_signal);
     return rc;
   }
 
@@ -133,49 +132,32 @@ ui_error_t ui_form_control_create(struct ui_arena *arena,
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         mode, &ctrl->touched_signal);
   if (rc != UI_ERROR_NONE) {
-    ui_error_t rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->status_signal);
-    (void)rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->value_signal);
-    (void)rc_cleanup;
+    ui_signal_destroy(ctrl->status_signal);
+    ui_signal_destroy(ctrl->value_signal);
     return rc;
   }
 
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_BOOL, NULL, NULL,
                         mode, &ctrl->dirty_signal);
   if (rc != UI_ERROR_NONE) {
-    ui_error_t rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->touched_signal);
-    (void)rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->status_signal);
-    (void)rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->value_signal);
-    (void)rc_cleanup;
+    ui_signal_destroy(ctrl->touched_signal);
+    ui_signal_destroy(ctrl->status_signal);
+    ui_signal_destroy(ctrl->value_signal);
     return rc;
   }
 
   rc = ui_signal_create(arena, bool_payload, UI_SIGNAL_TYPE_POINTER, NULL, NULL,
                         mode, &ctrl->errors_signal);
   if (rc != UI_ERROR_NONE) {
-    ui_error_t rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->dirty_signal);
-    (void)rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->touched_signal);
-    (void)rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->status_signal);
-    (void)rc_cleanup;
-    rc_cleanup = ui_signal_destroy(ctrl->value_signal);
-    (void)rc_cleanup;
+    ui_signal_destroy(ctrl->dirty_signal);
+    ui_signal_destroy(ctrl->touched_signal);
+    ui_signal_destroy(ctrl->status_signal);
+    ui_signal_destroy(ctrl->value_signal);
     return rc;
   }
   ctrl->error_str = NULL;
 
   *out_control = ctrl;
-
-  /* Initial validation */
-  rc = ui_form_control_run_validation(ctrl);
-  (void)rc;
-
   return UI_ERROR_NONE;
 }
 
@@ -226,7 +208,9 @@ ui_error_t ui_form_control_add_validator(ui_form_control_t *control,
 
   /* Re-run validation */
   rc = ui_form_control_run_validation(control);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   return UI_ERROR_NONE;
 }
 
@@ -282,7 +266,9 @@ ui_error_t ui_form_control_add_async_validator(
 
   /* Re-run validation */
   rc = ui_form_control_run_validation(control);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   return UI_ERROR_NONE;
 }
 
@@ -310,7 +296,6 @@ static ui_error_t ui_form_control_async_result_cb(void *user_data) {
       /* Failed async validation */
       status_payload.int_val = (ui_int32)UI_FORM_STATUS_INVALID;
       rc = ui_signal_set(control->status_signal, status_payload);
-      (void)rc;
       control->pending_async_count = 0; /* Stop pending */
     } else {
       /* All passed */
@@ -318,7 +303,9 @@ static ui_error_t ui_form_control_async_result_cb(void *user_data) {
       {
         ui_error_t set_rc =
             ui_signal_set(control->status_signal, status_payload);
-        (void)set_rc;
+        if (set_rc != UI_ERROR_NONE) {
+          rc = set_rc;
+        }
       }
     }
   }
@@ -349,12 +336,16 @@ static ui_error_t ui_form_control_async_worker(void *user_data) {
   if (task->reactor) {
     ui_error_t sched_rc = ui_reactor_schedule(
         task->reactor, ui_form_control_async_result_cb, task);
-    (void)sched_rc;
+    if (sched_rc != UI_ERROR_NONE) {
+      rc = sched_rc;
+    }
     return rc;
   } else {
     /* If single threaded / no reactor, execute inline */
     ui_error_t cb_rc = ui_form_control_async_result_cb(task);
-    (void)cb_rc;
+    if (cb_rc != UI_ERROR_NONE) {
+      rc = cb_rc;
+    }
     return rc;
   }
 }
@@ -414,7 +405,9 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
       {
         ui_error_t set_rc =
             ui_signal_set(control->status_signal, status_payload);
-        (void)set_rc;
+        if (set_rc != UI_ERROR_NONE) {
+          return set_rc;
+        }
       }
       return UI_ERROR_NONE;
     }
@@ -425,7 +418,9 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
     status_payload.int_val = (ui_int32)UI_FORM_STATUS_PENDING;
     {
       ui_error_t set_rc = ui_signal_set(control->status_signal, status_payload);
-      (void)set_rc;
+      if (set_rc != UI_ERROR_NONE) {
+        return set_rc;
+      }
     }
 
     for (i = 0; i < control->async_validators_count; i++) {
@@ -449,7 +444,9 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
           {
             ui_error_t set_rc =
                 ui_signal_set(control->status_signal, status_payload);
-            (void)set_rc;
+            if (set_rc != UI_ERROR_NONE) {
+              return set_rc;
+            }
           }
           control->pending_async_count = 0;
           C_MULTIPLATFORM_FREE(task);
@@ -461,7 +458,9 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
         {
           ui_error_t set_rc =
               ui_signal_set(control->status_signal, status_payload);
-          (void)set_rc;
+          if (set_rc != UI_ERROR_NONE) {
+            return set_rc;
+          }
         }
         control->pending_async_count = 0;
         return UI_ERROR_NONE;
@@ -472,7 +471,9 @@ static ui_error_t ui_form_control_run_validation(ui_form_control_t *control) {
     status_payload.int_val = (ui_int32)UI_FORM_STATUS_VALID;
     {
       ui_error_t set_rc = ui_signal_set(control->status_signal, status_payload);
-      (void)set_rc;
+      if (set_rc != UI_ERROR_NONE) {
+        return set_rc;
+      }
     }
   }
   return UI_ERROR_NONE;
@@ -494,14 +495,20 @@ ui_error_t ui_form_control_set_value(ui_form_control_t *control,
   }
 
   rc = ui_signal_set(control->value_signal, new_value);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   dirty_payload.bool_val = UI_TRUE;
   rc = ui_signal_set(control->dirty_signal, dirty_payload);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   rc = ui_form_control_run_validation(control);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   if (control->has_cva && !control->in_cva_update && control->cva.write_value) {
     control->in_cva_update = UI_TRUE;
@@ -586,7 +593,9 @@ ui_error_t ui_form_control_enable(ui_form_control_t *control) {
 
   /* Re-evaluates validators */
   rc = ui_form_control_run_validation(control);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   return UI_ERROR_NONE;
 }

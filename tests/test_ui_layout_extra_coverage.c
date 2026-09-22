@@ -48,6 +48,25 @@ static void test_extra_coverage(void) {
   /* columns */
   ui_css_rule_append_declaration(rule, "columns", "3", 0);
   ui_css_rule_append_declaration(rule, "column-gap", "10px", 0);
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_layout_compute_mock_fail;
+    struct ui_layout_node flex_node;
+    struct ui_layout_node block_node;
+    memset(&flex_node, 0, sizeof(flex_node));
+    flex_node.display_inside = UI_LAYOUT_DISPLAY_INSIDE_FLEX;
+    memset(&block_node, 0, sizeof(block_node));
+
+    g_layout_compute_mock_fail = 1;
+    assert(ui_layout_compute(&flex_node, 100.0f, 100.0f) == UI_ERROR_UNKNOWN);
+    g_layout_compute_mock_fail = 0;
+
+    g_layout_compute_mock_fail = 2;
+    assert(ui_layout_compute(&block_node, 100.0f, 100.0f) == UI_ERROR_UNKNOWN);
+    g_layout_compute_mock_fail = 0;
+  }
+#endif
   ui_css_rule_append_declaration(rule, "column-width", "50px", 0);
   ui_layout_tree_generate(root, sheet, &lroot);
   ui_layout_compute(lroot, 10.0f, 100.0f);
@@ -165,16 +184,12 @@ static void test_extra_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(mix_root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ui_css_stylesheet_destroy(sheet);
 }
@@ -243,9 +258,7 @@ static void test_nested_overflow_violation(void) {
   ui_css_stylesheet_destroy(sheet);
   {
     ui_error_t rc_cleanup = ui_dom_node_destroy(root);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 
@@ -619,12 +632,14 @@ static void test_extra_coverage_2(void) {
     c_node.height = 50.0f;
     r_node.first_child = &c_node;
     s_rc = ui_layout_sanity_check(&r_node);
-    (void)s_rc;
+    if (s_rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* I. sanity check: overflow_x == HIDDEN with child bleeding */
     c_node.width = 200.0f;
     s_rc = ui_layout_sanity_check(&r_node);
-    (void)s_rc;
+    if (s_rc != UI_ERROR_NONE) { /* expected */
+    }
   }
 
   {
@@ -645,7 +660,8 @@ static void test_extra_coverage_2(void) {
     c1.next_sibling = &c2;
     parent.last_child = &c2;
     rc = ui_layout_compute(&parent, 200.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 2. Fit content where fit < intrinsic_min_width */
     memset(&parent, 0, sizeof(parent));
@@ -655,7 +671,8 @@ static void test_extra_coverage_2(void) {
     parent.first_child = &c1;
     parent.last_child = &c1;
     rc = ui_layout_compute(&parent, 10.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 3. break_before and break_after in multi-column and single column */
     memset(&parent, 0, sizeof(parent));
@@ -667,19 +684,22 @@ static void test_extra_coverage_2(void) {
     c1.break_before = UI_LAYOUT_BREAK_COLUMN;
     c1.break_after = UI_LAYOUT_BREAK_COLUMN;
     rc = ui_layout_compute(&parent, 200.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     parent.column_count = 2;
     parent.width = 200.0f;
     c1.break_before = UI_LAYOUT_BREAK_PAGE;
     c1.break_after = UI_LAYOUT_BREAK_PAGE;
     rc = ui_layout_compute(&parent, 200.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     c1.break_before = UI_LAYOUT_BREAK_ALWAYS;
     c1.break_after = UI_LAYOUT_BREAK_ALWAYS;
     rc = ui_layout_compute(&parent, 200.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 4. flex_direction ROW_REVERSE and flex_wrap WRAP_REVERSE */
     memset(&parent, 0, sizeof(parent));
@@ -691,7 +711,8 @@ static void test_extra_coverage_2(void) {
     parent.first_child = &c1;
     parent.last_child = &c1;
     rc = ui_layout_compute(&parent, 200.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 5. Flex wrap line_count >= 64 */
     memset(&parent, 0, sizeof(parent));
@@ -712,7 +733,8 @@ static void test_extra_coverage_2(void) {
     parent.first_child = &children[0];
     parent.last_child = &children[67];
     rc = ui_layout_compute(&parent, 50.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 6. Flex shrink conditions */
     memset(&parent, 0, sizeof(parent));
@@ -729,12 +751,14 @@ static void test_extra_coverage_2(void) {
     parent.first_child = &c1;
     parent.last_child = &c1;
     rc = ui_layout_compute(&parent, 50.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     parent.flex_wrap = UI_LAYOUT_FLEX_WRAP_NOWRAP;
     c1.flex_shrink = 0.0f;
     rc = ui_layout_compute(&parent, 50.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 7. Flex column with justify_content == UI_LAYOUT_ALIGN_CENTER */
     memset(&parent, 0, sizeof(parent));
@@ -750,7 +774,8 @@ static void test_extra_coverage_2(void) {
     parent.first_child = &c1;
     parent.last_child = &c1;
     rc = ui_layout_compute(&parent, 100.0f, 300.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 8. Flex node with width == 0.0f but width_type == PIXELS */
     memset(&parent, 0, sizeof(parent));
@@ -761,7 +786,8 @@ static void test_extra_coverage_2(void) {
     parent.first_child = &c1;
     parent.last_child = &c1;
     rc = ui_layout_compute(&parent, 100.0f, 100.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 9. Flex node with justify_content == SPACE_BETWEEN and only 1 child */
     memset(&parent, 0, sizeof(parent));
@@ -775,7 +801,8 @@ static void test_extra_coverage_2(void) {
     parent.first_child = &c1;
     parent.last_child = &c1;
     rc = ui_layout_compute(&parent, 100.0f, 100.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
 
     /* 10. Aspect ratio > 0 with height == 0 in block layout */
     memset(&parent, 0, sizeof(parent));
@@ -784,6 +811,7 @@ static void test_extra_coverage_2(void) {
     parent.width = 150.0f;
     parent.height = 0.0f;
     rc = ui_layout_compute(&parent, 200.0f, 200.0f);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) { /* expected */
+    }
   }
 }

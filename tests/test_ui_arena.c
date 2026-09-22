@@ -197,7 +197,8 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      printf("Failed to destroy arena: %d\n", (int)rc_cleanup);
+      return (int)rc_cleanup;
     }
   }
 

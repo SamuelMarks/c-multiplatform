@@ -257,9 +257,6 @@ ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(component->shadow_root,
                                                    "class", &existing_class);
-    if (attr_rc != UI_ERROR_NONE) {
-      (void)attr_rc;
-    }
     if (attr_rc == UI_ERROR_NONE) {
       if (existing_class[0] != '\0') {
         class_len = strlen(existing_class) + 1; /* +1 for space */
@@ -309,9 +306,7 @@ ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
     rc = ui_dom_node_set_attribute(component->shadow_root, "class",
                                    new_class_str);
     if (rc != UI_ERROR_NONE) {
-      C_MULTIPLATFORM_FREE(new_class_str);
-      (void)new_style_str;
-      return rc;
+      goto cleanup;
     }
   }
 
@@ -319,9 +314,6 @@ ui_error_t ui_modifier_apply(const struct ui_modifier *modifier,
   {
     ui_error_t attr_rc = ui_dom_node_get_attribute(component->shadow_root,
                                                    "style", &existing_style);
-    if (attr_rc != UI_ERROR_NONE) {
-      (void)attr_rc;
-    }
     if (attr_rc == UI_ERROR_NONE) {
       if (existing_style[0] != '\0') {
         style_len = strlen(existing_style) + 1; /* +1 for space */

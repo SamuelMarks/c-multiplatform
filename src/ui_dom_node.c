@@ -64,6 +64,7 @@ ui_error_t ui_dom_node_destroy(struct ui_dom_node *node) {
   struct ui_dom_attribute *attr;
   struct ui_dom_attribute *next_attr;
   struct ui_dom_event_listener *listener, *next_listener;
+  ui_error_t rc = UI_ERROR_NONE;
 
   if (!node) {
     return UI_ERROR_NONE;
@@ -73,7 +74,7 @@ ui_error_t ui_dom_node_destroy(struct ui_dom_node *node) {
   child = node->first_child;
   while (child) {
     next_child = child->next_sibling;
-    (void)ui_dom_node_destroy(child);
+    rc = ui_dom_node_destroy(child);
     child = next_child;
   }
 
@@ -104,7 +105,7 @@ ui_error_t ui_dom_node_destroy(struct ui_dom_node *node) {
 #endif
 
   C_MULTIPLATFORM_FREE(node);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**

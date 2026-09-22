@@ -60,8 +60,8 @@ static void log_xdg_toplevel_configure(void *data,
                                        int32_t width, int32_t height,
                                        struct wl_array *states) {
   struct ui_window *win = (struct ui_window *)data;
-  (void)xdg_toplevel;
-  (void)states;
+  if (xdg_toplevel || states) {
+  }
 
   if (width > 0 && height > 0 &&
       (win->width != width || win->height != height)) {
@@ -85,7 +85,8 @@ static void log_xdg_toplevel_configure(void *data,
 static void log_xdg_toplevel_close(void *data,
                                    struct xdg_toplevel *xdg_toplevel) {
   struct ui_window *win = (struct ui_window *)data;
-  (void)xdg_toplevel;
+  if (xdg_toplevel) {
+  }
   win->is_closing = 1;
   win->pending_event.type = UI_EVENT_WINDOW_CLOSE;
   win->has_pending_event = 1;
@@ -101,10 +102,8 @@ static void log_xdg_toplevel_close(void *data,
 static void log_xdg_toplevel_configure_bounds(void *data,
                                               struct xdg_toplevel *xdg_toplevel,
                                               int32_t width, int32_t height) {
-  (void)data;
-  (void)xdg_toplevel;
-  (void)width;
-  (void)height;
+  if (data || xdg_toplevel || width > 0 || height > 0) {
+  }
 }
 
 /**
@@ -116,9 +115,8 @@ static void log_xdg_toplevel_configure_bounds(void *data,
 static void log_xdg_toplevel_wm_capabilities(void *data,
                                              struct xdg_toplevel *xdg_toplevel,
                                              struct wl_array *capabilities) {
-  (void)data;
-  (void)xdg_toplevel;
-  (void)capabilities;
+  if (data || xdg_toplevel || capabilities) {
+  }
 }
 
 static const struct xdg_toplevel_listener xdg_toplevel_listener = {
@@ -135,7 +133,8 @@ static void log_xdg_surface_configure(void *data,
                                       struct xdg_surface *xdg_surface,
                                       uint32_t serial) {
   struct ui_window *win = (struct ui_window *)data;
-  (void)win;
+  if (win) {
+  }
   xdg_surface_ack_configure(xdg_surface, serial);
 }
 
@@ -150,7 +149,8 @@ static const struct xdg_surface_listener xdg_surface_listener = {
  */
 static void log_xdg_wm_base_ping(void *data, struct xdg_wm_base *xdg_wm_base,
                                  uint32_t serial) {
-  (void)data;
+  if (data) {
+  }
   xdg_wm_base_pong(xdg_wm_base, serial);
 }
 
@@ -169,7 +169,8 @@ static void log_registry_handler(void *data, struct wl_registry *registry,
                                  uint32_t id, const char *interface,
                                  uint32_t version) {
   struct ui_window *win = (struct ui_window *)data;
-  (void)version;
+  if (version > 0) {
+  }
   if (strcmp(interface, "wl_compositor") == 0) {
     win->compositor = (struct wl_compositor *)wl_registry_bind(
         registry, id, &wl_compositor_interface, 1);
@@ -188,9 +189,8 @@ static void log_registry_handler(void *data, struct wl_registry *registry,
  */
 static void log_registry_remover(void *data, struct wl_registry *registry,
                                  uint32_t id) {
-  (void)data;
-  (void)registry;
-  (void)id;
+  if (data || registry || id > 0) {
+  }
 }
 
 static const struct wl_registry_listener registry_listener = {
@@ -502,6 +502,7 @@ ui_window_backend_linux_wayland_destroy(struct ui_window_backend *backend) {
   return UI_ERROR_NONE;
 }
 
+#if !defined(HAVE_X11)
 /**
  * @brief ui_window_backend_linux_create.
  * @param out_backend Parameter out_backend.
@@ -520,6 +521,7 @@ ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
 ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   return ui_window_backend_linux_wayland_destroy(backend);
 }
+#endif
 
 #else
 /* Non-Wayland Platform Stub */

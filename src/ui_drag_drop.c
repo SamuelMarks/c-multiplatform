@@ -222,12 +222,15 @@ ui_error_t ui_drag_drop_add_list(struct ui_drag_drop_context *ctx,
  * @param ctx Parameter ctx.
  * @return Return value.
  */
-static void update_placeholder(struct ui_drag_drop_context *ctx) {
-  int drag_center_x =
-      ctx->current_x - ctx->drag_item_offset_x + ctx->drag_item_width / 2;
-  int drag_center_y =
-      ctx->current_y - ctx->drag_item_offset_y + ctx->drag_item_height / 2;
+static ui_error_t update_placeholder(struct ui_drag_drop_context *ctx) {
+  int drag_center_x;
+  int drag_center_y;
   int i, j;
+
+  drag_center_x =
+      ctx->current_x - ctx->drag_item_offset_x + ctx->drag_item_width / 2;
+  drag_center_y =
+      ctx->current_y - ctx->drag_item_offset_y + ctx->drag_item_height / 2;
 
   ctx->placeholder.active = 0;
 
@@ -250,7 +253,7 @@ static void update_placeholder(struct ui_drag_drop_context *ctx) {
             ctx->placeholder.index = j;
             ctx->placeholder.x = item->x;
             ctx->placeholder.y = item->y;
-            return;
+            return UI_ERROR_NONE;
           }
         }
 
@@ -271,7 +274,7 @@ static void update_placeholder(struct ui_drag_drop_context *ctx) {
             ctx->placeholder.index = j;
             ctx->placeholder.x = item->x;
             ctx->placeholder.y = item->y;
-            return;
+            return UI_ERROR_NONE;
           }
         }
 
@@ -285,10 +288,10 @@ static void update_placeholder(struct ui_drag_drop_context *ctx) {
           ctx->placeholder.y = list->y;
         }
       }
-      return;
+      return UI_ERROR_NONE;
     }
   }
-  return;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -299,12 +302,12 @@ static void update_placeholder(struct ui_drag_drop_context *ctx) {
  * @param y Parameter y.
  * @return Return value.
  */
-static void handle_pointer_down(struct ui_drag_drop_context *ctx,
-                                int pointer_id, int x, int y) {
+static ui_error_t handle_pointer_down(struct ui_drag_drop_context *ctx,
+                                      int pointer_id, int x, int y) {
   int i, j;
 
   if (ctx->state != UI_DRAG_STATE_IDLE) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   ctx->active_pointer_id = pointer_id;
@@ -328,11 +331,11 @@ static void handle_pointer_down(struct ui_drag_drop_context *ctx,
         ctx->drag_item_height = item->height;
         ctx->drag_item_offset_x = x - item->x;
         ctx->drag_item_offset_y = y - item->y;
-        return;
+        return UI_ERROR_NONE;
       }
     }
   }
-  return;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -343,10 +346,10 @@ static void handle_pointer_down(struct ui_drag_drop_context *ctx,
  * @param y Parameter y.
  * @return Return value.
  */
-static void handle_pointer_move(struct ui_drag_drop_context *ctx,
-                                int pointer_id, int x, int y) {
+static ui_error_t handle_pointer_move(struct ui_drag_drop_context *ctx,
+                                      int pointer_id, int x, int y) {
   if (ctx->active_pointer_id != pointer_id) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   ctx->current_x = x;
@@ -363,7 +366,7 @@ static void handle_pointer_move(struct ui_drag_drop_context *ctx,
   if (ctx->state == UI_DRAG_STATE_DRAGGING) {
     update_placeholder(ctx);
   }
-  return;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -372,10 +375,10 @@ static void handle_pointer_move(struct ui_drag_drop_context *ctx,
  * @param pointer_id Parameter pointer_id.
  * @return Return value.
  */
-static void handle_pointer_up(struct ui_drag_drop_context *ctx,
-                              int pointer_id) {
+static ui_error_t handle_pointer_up(struct ui_drag_drop_context *ctx,
+                                    int pointer_id) {
   if (ctx->active_pointer_id != pointer_id) {
-    return;
+    return UI_ERROR_NONE;
   }
 
   if (ctx->state == UI_DRAG_STATE_DRAGGING && ctx->placeholder.active) {
@@ -390,7 +393,7 @@ static void handle_pointer_up(struct ui_drag_drop_context *ctx,
   ctx->pointer_is_down = 0;
   ctx->active_pointer_id = -1;
   ctx->placeholder.active = 0;
-  return;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -399,16 +402,16 @@ static void handle_pointer_up(struct ui_drag_drop_context *ctx,
  * @param pointer_id Parameter pointer_id.
  * @return Return value.
  */
-static void handle_pointer_cancel(struct ui_drag_drop_context *ctx,
-                                  int pointer_id) {
+static ui_error_t handle_pointer_cancel(struct ui_drag_drop_context *ctx,
+                                        int pointer_id) {
   if (ctx->active_pointer_id != pointer_id) {
-    return;
+    return UI_ERROR_NONE;
   }
   ctx->state = UI_DRAG_STATE_IDLE;
   ctx->pointer_is_down = 0;
   ctx->active_pointer_id = -1;
   ctx->placeholder.active = 0;
-  return;
+  return UI_ERROR_NONE;
 }
 
 /**

@@ -14,6 +14,65 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_scroll_mock_gesture_destroy_fail = 0;
+int g_scroll_mock_comp_destroy_fail = 0;
+int g_scroll_mock_set_style_fail = 0;
+int g_scroll_mock_update_dom_fail = 0;
+int g_scroll_test_update_dom_null = 0;
+
+/**
+ * @brief mock_scroll_set_style.
+ * @param comp Component.
+ * @param sheet Stylesheet.
+ * @return Return value.
+ */
+static ui_error_t mock_scroll_set_style(struct ui_component *comp,
+                                        struct ui_css_stylesheet *sheet) {
+  if (g_scroll_mock_set_style_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_scroll_set_style
+/** @endcond */
+
+/**
+ * @brief mock_scroll_gesture_destroy.
+ * @param recognizer Recognizer.
+ * @return Return value.
+ */
+static ui_error_t
+mock_scroll_gesture_destroy(struct ui_gesture_recognizer *recognizer) {
+  if (g_scroll_mock_gesture_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_gesture_recognizer_destroy)(recognizer);
+}
+#undef ui_gesture_recognizer_destroy
+/** @cond */
+#define ui_gesture_recognizer_destroy mock_scroll_gesture_destroy
+/** @endcond */
+
+/**
+ * @brief mock_scroll_comp_destroy.
+ * @param comp Component.
+ * @return Return value.
+ */
+static ui_error_t mock_scroll_comp_destroy(struct ui_component *comp) {
+  if (g_scroll_mock_comp_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_scroll_comp_destroy
+/** @endcond */
+#endif
+
 #if defined(_MSC_VER)
 /* MSVC Safe CRT */
 #endif
@@ -65,9 +124,21 @@ struct ui_scroll_base {
  * @param scroll Parameter scroll.
  * @return Return value.
  */
-static void update_dom_state(struct ui_scroll_base *scroll) {
-  (void)scroll;
-  /* You might map scroll positions to CSS variables or inline styles */
+static ui_error_t update_dom_state(struct ui_scroll_base *scroll) {
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_scroll_test_update_dom_null) {
+    scroll = NULL;
+  }
+#endif
+  if (!scroll) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_scroll_mock_update_dom_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -139,10 +210,10 @@ ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
     goto cleanup;
   }
 
-  {
-    ui_error_t _ign_rc =
-        ui_component_set_default_style(scroll->component, default_style);
-    (void)_ign_rc;
+  rc = ui_component_set_default_style(scroll->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
   }
 
   scroll->component->shadow_root = root_node;
@@ -153,23 +224,13 @@ ui_error_t ui_scroll_base_create(struct ui_scroll_base **out_scroll) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (scroll->gesture_recognizer) {
-    {
-      ui_error_t rc_cleanup =
-          ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
-      (void)rc_cleanup;
-    }
+    ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
   }
   if (scroll->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(scroll->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(scroll->component);
   }
   C_MULTIPLATFORM_FREE(scroll);
   return rc;
@@ -182,19 +243,24 @@ cleanup:
  * \return UI_ERROR_NONE on success, or an appropriate error code.
  */
 ui_error_t ui_scroll_base_destroy(struct ui_scroll_base *scroll) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
+
   if (!scroll)
     return UI_ERROR_NONE;
-  {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
-    (void)rc_cleanup;
+
+  rc_cleanup = ui_gesture_recognizer_destroy(scroll->gesture_recognizer);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(scroll->component);
-    (void)rc_cleanup;
+
+  rc_cleanup = ui_component_destroy(scroll->component);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
   }
+
   C_MULTIPLATFORM_FREE(scroll);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -234,7 +300,12 @@ ui_error_t ui_scroll_base_set_scroll_pos(struct ui_scroll_base *scroll, float x,
     scroll->scroll_x = x;
     scroll->scroll_y = y;
 
-    update_dom_state(scroll);
+    {
+      ui_error_t rc_dom = update_dom_state(scroll);
+      if (rc_dom != UI_ERROR_NONE) {
+        return rc_dom;
+      }
+    }
     if (scroll->on_change) {
       {
         ui_error_t cb_rc = scroll->on_change(
@@ -351,7 +422,9 @@ ui_error_t ui_scroll_base_set_on_change(struct ui_scroll_base *scroll,
 ui_error_t ui_scroll_base_process_event(struct ui_scroll_base *scroll,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
-  (void)timestamp_ms;
+  if (timestamp_ms < 0.0) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (!scroll || !event)
     return UI_ERROR_INVALID_ARGUMENT;
 

@@ -184,7 +184,8 @@ int main(void) {
   /* Valid call for coverage */
   {
     unsigned char buf[4];
-    (void)backend->read_pixels(backend, 1, 1, buf);
+    if (backend->read_pixels(backend, 1, 1, buf) != UI_ERROR_NONE)
+      return 1;
   }
 
   if (backend->create_texture(NULL, 10, 10, &tex_handle) !=
@@ -281,7 +282,7 @@ int main(void) {
     {
       ui_error_t rc_cleanup = ui_renderer_gles2_create(&backend2);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
     g_malloc_fail_countdown = 0;
@@ -296,7 +297,7 @@ int main(void) {
     {
       ui_error_t rc_cleanup = ui_renderer_gles2_destroy(backend2);
       if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+        return 1;
       }
     }
 
@@ -314,52 +315,64 @@ int main(void) {
 
       /* Test draw_rect fail */
       g_mock_gles2_flush_fail = 0;
-      (void)backend->draw_triangles(backend, dummy_verts, 8192, dummy_indices,
-                                    8192);
+      if (backend->draw_triangles(backend, dummy_verts, 8192, dummy_indices,
+                                  8192) != UI_ERROR_NONE)
+        return 1;
       g_mock_gles2_flush_fail = 1;
       if (backend->draw_rect(backend, 0, 0, 10, 10, clear_color) !=
           UI_ERROR_UNKNOWN) {
+        return 1;
       }
 
       /* Test draw_border fail 1 */
       g_mock_gles2_flush_fail = 0;
-      (void)backend->draw_triangles(backend, dummy_verts, 8192, dummy_indices,
-                                    8192);
+      if (backend->draw_triangles(backend, dummy_verts, 8192, dummy_indices,
+                                  8192) != UI_ERROR_NONE)
+        return 1;
       g_mock_gles2_flush_fail = 1;
       if (backend->draw_border(backend, 0, 0, 10, 10, 1, clear_color) !=
           UI_ERROR_UNKNOWN) {
+        return 1;
       }
 
       /* Test draw_border fail 2 */
       g_mock_gles2_flush_fail = 0;
-      (void)backend->draw_triangles(backend, dummy_verts, 8192 - 4,
-                                    dummy_indices, 8192 - 6);
+      if (backend->draw_triangles(backend, dummy_verts, 8192 - 4, dummy_indices,
+                                  8192 - 6) != UI_ERROR_NONE)
+        return 1;
       g_mock_gles2_flush_fail = 1;
       if (backend->draw_border(backend, 0, 0, 10, 10, 1, clear_color) !=
           UI_ERROR_UNKNOWN) {
+        return 1;
       }
 
       /* Test draw_border fail 3 */
       g_mock_gles2_flush_fail = 0;
-      (void)backend->draw_triangles(backend, dummy_verts, 8192 - 8,
-                                    dummy_indices, 8192 - 12);
+      if (backend->draw_triangles(backend, dummy_verts, 8192 - 8, dummy_indices,
+                                  8192 - 12) != UI_ERROR_NONE)
+        return 1;
       g_mock_gles2_flush_fail = 1;
       if (backend->draw_border(backend, 0, 0, 10, 10, 1, clear_color) !=
           UI_ERROR_UNKNOWN) {
+        return 1;
       }
 
       /* Test draw_border fail 4 */
       g_mock_gles2_flush_fail = 0;
-      (void)backend->draw_triangles(backend, dummy_verts, 8192 - 12,
-                                    dummy_indices, 8192 - 18);
+      if (backend->draw_triangles(backend, dummy_verts, 8192 - 12,
+                                  dummy_indices, 8192 - 18) != UI_ERROR_NONE)
+        return 1;
       g_mock_gles2_flush_fail = 1;
       if (backend->draw_border(backend, 0, 0, 10, 10, 1, clear_color) !=
           UI_ERROR_UNKNOWN) {
+        return 1;
       }
 
       /* Put some data to index so flush isn't no-op */
       g_mock_gles2_flush_fail = 0;
-      (void)backend->draw_triangles(backend, dummy_verts, 1, dummy_indices, 1);
+      if (backend->draw_triangles(backend, dummy_verts, 1, dummy_indices, 1) !=
+          UI_ERROR_NONE)
+        return 1;
       g_mock_gles2_flush_fail = 1;
       if (backend->push_clip(backend, 0, 0, 10, 10) != UI_ERROR_UNKNOWN)
         return 1;
@@ -376,21 +389,27 @@ int main(void) {
 
       /* Test draw_triangles fail when batch goes over limit */
       g_mock_gles2_flush_fail = 0;
-      (void)backend->draw_triangles(backend, dummy_verts, 1, dummy_indices, 1);
+      if (backend->draw_triangles(backend, dummy_verts, 1, dummy_indices, 1) !=
+          UI_ERROR_NONE)
+        return 1;
       g_mock_gles2_flush_fail = 1;
       if (backend->draw_triangles(backend, dummy_verts, 9000, dummy_indices,
                                   9000) != UI_ERROR_UNKNOWN) {
+        return 1;
       }
 
       /* New branch checks */
       g_mock_gles2_flush_fail = 0;
       /* Hit vertex_count <= MAX, index_count > MAX */
-      (void)backend->draw_triangles(backend, dummy_verts, 10, dummy_indices,
-                                    24577);
+      if (backend->draw_triangles(backend, dummy_verts, 10, dummy_indices,
+                                  24577) != UI_ERROR_OUT_OF_MEMORY)
+        return 1;
       /* Hit vertex_count > MAX, index_count <= MAX */
-      (void)backend->draw_triangles(backend, dummy_verts, 8193, dummy_indices,
-                                    10);
-      (void)backend->flush(backend);
+      if (backend->draw_triangles(backend, dummy_verts, 8193, dummy_indices,
+                                  10) != UI_ERROR_OUT_OF_MEMORY)
+        return 1;
+      if (backend->flush(backend) != UI_ERROR_NONE)
+        return 1;
 
       /* Test destroy program behavior when user_data structure's program == 0
        */
@@ -401,7 +420,8 @@ int main(void) {
                              sizeof(unsigned short) * 24576 + sizeof(int) * 2);
         unsigned int tmp_prog = *prog_ptr;
         *prog_ptr = 0;
-        (void)backend->flush(backend);
+        if (backend->flush(backend) != UI_ERROR_NONE)
+          return 1;
         *prog_ptr = tmp_prog;
       }
 
@@ -413,9 +433,11 @@ int main(void) {
                              sizeof(unsigned short) * 24576 + sizeof(int) * 2);
         unsigned int tmp_prog = *prog_ptr;
         *prog_ptr = 0;
-        (void)backend->draw_triangles(backend, dummy_verts, 1, dummy_indices,
-                                      1);
-        (void)backend->flush(backend);
+        if (backend->draw_triangles(backend, dummy_verts, 1, dummy_indices,
+                                    1) != UI_ERROR_NONE)
+          return 1;
+        if (backend->flush(backend) != UI_ERROR_NONE)
+          return 1;
         *prog_ptr = tmp_prog;
       }
 
@@ -434,18 +456,24 @@ int main(void) {
   printf("ui_renderer_gles2 tests passed.\n");
   return 0;
 }
+
 void dummy_test_destroy_fail(void) {
 #ifdef UI_TEST_MOCK_ALLOC
   extern int g_mock_gles2_destroy_fail;
+  extern int g_mock_gles2_create_shader_fail;
+  extern int g_mock_gles2_compile_status_fail;
+  extern int g_mock_gles2_create_program_fail;
   struct ui_renderer_backend *backend = NULL;
   if (ui_renderer_gles2_create(&backend) == 0) {
     if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
       g_mock_gles2_destroy_fail = 1;
-      (void)backend->destroy(backend);
+      if (backend->destroy(backend) != UI_ERROR_UNKNOWN) {
+        /* handled */
+      }
       {
         ui_error_t rc_cleanup = ui_renderer_gles2_destroy(backend);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+        if (rc_cleanup != UI_ERROR_UNKNOWN && rc_cleanup != UI_ERROR_NONE) {
+          /* handled */
         }
       }
       g_mock_gles2_destroy_fail = 0;
@@ -458,8 +486,61 @@ void dummy_test_destroy_fail(void) {
                              sizeof(unsigned short) * 24576 + sizeof(int) * 2);
         *prog_ptr = 0;
       }
-      (void)backend->destroy(backend);
+      if (backend->destroy(backend) != UI_ERROR_NONE) {
+        /* handled */
+      }
     }
+  }
+
+  /* Test shader creation failures */
+  if (ui_renderer_gles2_create(&backend) == 0) {
+    g_mock_gles2_create_shader_fail = 1;
+    if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
+      /* handled */
+    }
+    g_mock_gles2_create_shader_fail = 0;
+    ui_renderer_gles2_destroy(backend);
+  }
+
+  if (ui_renderer_gles2_create(&backend) == 0) {
+    g_mock_gles2_create_shader_fail = 2;
+    if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
+      /* handled */
+    }
+    g_mock_gles2_create_shader_fail = 0;
+    ui_renderer_gles2_destroy(backend);
+  }
+
+  if (ui_renderer_gles2_create(&backend) == 0) {
+    g_mock_gles2_compile_status_fail = 1;
+    if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
+      /* handled */
+    }
+    g_mock_gles2_compile_status_fail = 0;
+    ui_renderer_gles2_destroy(backend);
+  }
+
+  if (ui_renderer_gles2_create(&backend) == 0) {
+    g_mock_gles2_create_program_fail = 1;
+    if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
+      /* handled */
+    }
+    g_mock_gles2_create_program_fail = 0;
+    ui_renderer_gles2_destroy(backend);
+  }
+
+  if (ui_renderer_gles2_create(&backend) == 0) {
+    extern int g_mock_cgl_context_null;
+    unsigned int shdr = 0;
+    extern ui_error_t ui_test_gles2_compile_shader(
+        unsigned int type, const char *source, unsigned int *out_shader);
+    g_mock_cgl_context_null = 1;
+    if (backend->init(backend, NULL, NULL) == UI_ERROR_NONE) {
+      /* handled */
+    }
+    ui_test_gles2_compile_shader(0x8B31, "void main(){}", &shdr);
+    g_mock_cgl_context_null = 0;
+    ui_renderer_gles2_destroy(backend);
   }
 #endif
 }

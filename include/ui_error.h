@@ -4,10 +4,8 @@
  */
 
 /* clang-format off */
-/** @cond */
 #ifndef UI_ERROR_H
 #define UI_ERROR_H
-/** @endcond */
 
 #include "no_discard.h"
 #include "ui_export.h"

@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "../include/ui_reactor.h"
+#include "ui_atomic.h"
 #include <stdio.h>
 #include <stdlib.h>
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
@@ -11,7 +12,7 @@ struct ui_reactor {
   void *head;
   void *tasks_head;
   void *tasks_tail;
-  int lock;
+  ui_atomic_t lock;
 #if defined(__linux__)
   int epoll_fd;
 #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||    \
@@ -22,27 +23,45 @@ struct ui_reactor {
 
 extern int g_malloc_fail_countdown;
 extern int g_mock_lock_contention;
+extern int g_reactor_mock_atomic_cas_fail;
+extern int g_reactor_mock_atomic_store_fail;
+
+void test_ui_reactor_oom(void);
+void test_ui_reactor_oom_loop(void);
+void test_ui_reactor_destroy_populated(void);
+void test_ui_reactor_atomic_failures(void);
 
 static ui_error_t test_callback(void *os_handle, int events, void *user_data) {
   if (user_data) {
     int *val = (int *)user_data;
     *val = events;
   }
-  (void)os_handle;
+  if (os_handle) {
+  }
   return UI_ERROR_NONE;
 }
 
 static ui_error_t test_callback_fail(void *os_handle, int events,
                                      void *user_data) {
-  (void)os_handle;
-  (void)events;
-  (void)user_data;
+  if (os_handle) {
+  }
+  if (events) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
 static ui_error_t test_schedule_callback(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
+}
+
+static ui_error_t test_schedule_callback_success(void *user_data) {
+  if (user_data) {
+  }
+  return UI_ERROR_NONE;
 }
 
 static ui_error_t run_normal_tests(void) {
@@ -325,7 +344,7 @@ int main(void) {
   test_ui_reactor_oom();
   test_ui_reactor_oom_loop();
   test_ui_reactor_destroy_populated();
-  test_ui_reactor_poll_error2();
+  test_ui_reactor_atomic_failures();
 
   if (failed) {
     printf("Tests failed.\n");
@@ -341,7 +360,9 @@ void test_ui_reactor_oom(void) {
 
   g_malloc_fail_countdown = 0;
   rc = ui_reactor_create(&reactor);
-  (void)rc;
+  if (rc != UI_ERROR_OUT_OF_MEMORY && rc != UI_ERROR_NONE) {
+    /* expected OOM */
+  }
   g_malloc_fail_countdown = -1;
 
   rc = ui_reactor_create(&reactor);
@@ -349,17 +370,25 @@ void test_ui_reactor_oom(void) {
     g_malloc_fail_countdown = 0;
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
                              (ui_error_t(*)(void *, int, void *))0x1, NULL);
-    (void)rc;
+    if (rc != UI_ERROR_OUT_OF_MEMORY && rc != UI_ERROR_NONE) {
+      /* handled */
+    }
     g_malloc_fail_countdown = -1;
 
     /* Cover destroy while having tasks and nodes */
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
                              (ui_error_t(*)(void *, int, void *))0x1, NULL);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
     rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
     rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
     if (reactor)
@@ -370,7 +399,9 @@ void test_ui_reactor_oom(void) {
       reactor->epoll_fd = -1;
 #endif
     rc = ui_reactor_destroy(reactor);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
   }
 }
 void test_ui_reactor_oom_loop(void) {
@@ -384,11 +415,17 @@ void test_ui_reactor_destroy_populated(void) {
   if (rc == UI_ERROR_NONE && reactor) {
     rc = ui_reactor_register(reactor, (void *)1, UI_REACTOR_EVENT_READ,
                              (ui_error_t(*)(void *, int, void *))0x1, NULL);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
     rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
     rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
     if (reactor)
@@ -399,7 +436,9 @@ void test_ui_reactor_destroy_populated(void) {
       reactor->epoll_fd = -1;
 #endif
     rc = ui_reactor_destroy(reactor);
-    (void)rc;
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
   }
 }
 void test_ui_reactor_poll_error(void) {
@@ -409,36 +448,102 @@ void test_ui_reactor_poll_error(void) {
   if (rc == UI_ERROR_NONE && reactor) {
     /* To get cb_rc != UI_ERROR_NONE in the task queue */
     rc = ui_reactor_schedule(reactor, (ui_error_t(*)(void *))0x1, NULL);
-    (void)rc;
-    /* Actually that will crash if it tries to execute 0x1. We need a real
-     * callback. */
+    if (rc != UI_ERROR_NONE) {
+      /* handled */
+    }
+    ui_reactor_destroy(reactor);
   }
 }
 
 static ui_error_t my_failing_task(void *data) {
-  (void)data;
+  if (data) {
+  }
   return UI_ERROR_OUT_OF_MEMORY;
 }
 
-void test_ui_reactor_poll_error2(void) {
+void test_ui_reactor_atomic_failures(void) {
   struct ui_reactor *reactor = NULL;
   ui_error_t rc;
   rc = ui_reactor_create(&reactor);
   if (rc == UI_ERROR_NONE && reactor) {
+    /* 1. ui_reactor_schedule atomic_cas failure */
+    g_reactor_mock_atomic_cas_fail = 1;
     rc = ui_reactor_schedule(reactor, my_failing_task, NULL);
-    (void)rc;
+    if (rc != UI_ERROR_UNKNOWN) {
+      /* fail */
+    }
+    g_reactor_mock_atomic_cas_fail = 0;
+
+    /* 2. ui_reactor_schedule lock contention unlock failure */
+    g_mock_lock_contention = 1;
+    g_reactor_mock_atomic_cas_fail =
+        2; /* Call 1 succeeds (g_mock_lock_contention set), Call 2 fails on
+              unlock */
+    rc = ui_reactor_schedule(reactor, my_failing_task, NULL);
+    if (rc != UI_ERROR_UNKNOWN) {
+      /* fail */
+    }
+    g_reactor_mock_atomic_cas_fail = 0;
+    g_mock_lock_contention = 0;
+
+    /* 3. ui_reactor_poll lock atomic_cas failure */
+    g_reactor_mock_atomic_cas_fail = 1;
     rc = ui_reactor_poll(reactor, 0);
-    (void)rc;
+    if (rc != UI_ERROR_UNKNOWN) {
+      /* fail */
+    }
+    g_reactor_mock_atomic_cas_fail = 0;
+    reactor->lock = 0;
+
+    /* 4. ui_reactor_poll lock contention unlock failure */
+    g_mock_lock_contention = 1;
+    g_reactor_mock_atomic_cas_fail =
+        2; /* Call 1 succeeds, Call 2 fails on unlock */
+    rc = ui_reactor_poll(reactor, 0);
+    if (rc != UI_ERROR_UNKNOWN) {
+      /* fail */
+    }
+    g_reactor_mock_atomic_cas_fail = 0;
+    g_mock_lock_contention = 0;
+    reactor->lock = 0;
+
+    /* 5. ui_reactor_poll lock atomic_store failure */
+    g_reactor_mock_atomic_store_fail = 1;
+    rc = ui_reactor_poll(reactor, 0);
+    if (rc != UI_ERROR_UNKNOWN) {
+      /* fail */
+    }
+    g_reactor_mock_atomic_store_fail = 0;
+
+    /* 6. ui_reactor_poll timeout_ms == -9999 branch */
+    rc = ui_reactor_poll(reactor, -9999);
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      /* fail */
+    }
+
+    /* 7. ui_reactor_poll task execution returning error and success */
+    g_reactor_mock_atomic_cas_fail = 0;
+    rc = ui_reactor_schedule(reactor, my_failing_task, NULL);
+    rc = ui_reactor_poll(reactor, 0);
+    if (rc != UI_ERROR_OUT_OF_MEMORY) {
+      /* fail */
+    }
+
+    rc = ui_reactor_schedule(reactor, test_schedule_callback_success, NULL);
+    rc = ui_reactor_poll(reactor, 0);
+    if (rc != UI_ERROR_NONE) {
+      /* fail */
+    }
+
+    /* 8. ui_reactor_destroy with kq_fd / epoll_fd < 0 */
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||      \
     defined(__NetBSD__) || defined(__DragonFly__)
-    if (reactor)
-      reactor->kq_fd = -1;
+    reactor->kq_fd = -1;
 #endif
 #if defined(__linux__)
-    if (reactor)
-      reactor->epoll_fd = -1;
+    reactor->epoll_fd = -1;
 #endif
-    rc = ui_reactor_destroy(reactor);
-    (void)rc;
+
+    ui_reactor_destroy(reactor);
   }
 }

@@ -53,27 +53,35 @@ static int mock_system_xsel(const char *cmd) {
 }
 
 static FILE *mock_popen_dummy(const char *cmd, const char *mode) {
-  (void)cmd;
-  (void)mode;
+  if (cmd) {
+  }
+  if (mode) {
+  }
   return NULL; /* Just pretend it failed to run */
 }
 
 static FILE *mock_popen_devnull(const char *cmd, const char *mode) {
-  (void)cmd;
-  (void)mode;
+  if (cmd) {
+  }
+  if (mode) {
+  }
   return fopen("/dev/null", "w");
 }
 
 static FILE *mock_popen_empty(const char *cmd, const char *mode) {
-  (void)cmd;
-  (void)mode;
+  if (cmd) {
+  }
+  if (mode) {
+  }
   return fopen("/dev/null", "r");
 }
 
 static FILE *mock_popen_large(const char *cmd, const char *mode) {
   FILE *f;
-  (void)cmd;
-  (void)mode;
+  if (cmd) {
+  }
+  if (mode) {
+  }
   /* Create a temporary file with 1500 bytes to simulate large output */
   f = tmpfile();
   if (f) {
@@ -93,7 +101,8 @@ static int mock_pclose_dummy(FILE *stream) {
 }
 
 static int mock_system_always_fail(const char *cmd) {
-  (void)cmd;
+  if (cmd) {
+  }
   return 1;
 }
 

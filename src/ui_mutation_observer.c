@@ -206,10 +206,7 @@ static ui_error_t is_ancestor(struct ui_dom_node *ancestor,
  */
 static ui_error_t dispatch_record(struct ui_mutation_observer *observer,
                                   struct ui_mutation_record *record) {
-  ui_error_t cb_rc =
-      observer->callback(observer, record, 1, observer->user_data);
-  { (void)cb_rc; }
-  return cb_rc;
+  return observer->callback(observer, record, 1, observer->user_data);
 }
 
 /**
@@ -244,8 +241,7 @@ ui_error_t ui_mutation_observer_notify_child_list(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        ui_error_t rc_anc = is_ancestor(tinfo->target, target, &is_match);
-        (void)rc_anc;
+        is_ancestor(tinfo->target, target, &is_match);
       }
       if (is_match) {
         record.type = UI_MUTATION_TYPE_CHILD_LIST;
@@ -309,8 +305,7 @@ ui_error_t ui_mutation_observer_notify_attribute(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        ui_error_t rc_anc = is_ancestor(tinfo->target, target, &is_match);
-        (void)rc_anc;
+        is_ancestor(tinfo->target, target, &is_match);
       }
       if (is_match) {
         record.type = UI_MUTATION_TYPE_ATTRIBUTES;
@@ -386,8 +381,7 @@ ui_mutation_observer_notify_character_data(struct ui_dom_node *target,
       if (tinfo->target == target) {
         is_match = 1;
       } else if (tinfo->options.subtree) {
-        ui_error_t rc_anc = is_ancestor(tinfo->target, target, &is_match);
-        (void)rc_anc;
+        is_ancestor(tinfo->target, target, &is_match);
       }
       if (is_match) {
         record.type = UI_MUTATION_TYPE_CHARACTER_DATA;

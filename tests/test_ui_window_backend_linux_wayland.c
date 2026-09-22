@@ -24,9 +24,6 @@ extern int g_malloc_fail_countdown;
 
 static int test_wayland(void) {
   struct ui_window_backend *backend = NULL;
-  struct ui_window *win = NULL;
-  struct ui_event events[10];
-  int has_event = 0;
   int failed = 0;
 
   ASSERT_EQ(ui_window_backend_linux_wayland_create(NULL),
@@ -35,52 +32,60 @@ static int test_wayland(void) {
             UI_ERROR_INVALID_ARGUMENT);
 
 #if defined(UI_ENABLE_WAYLAND) && (defined(__linux__) || defined(__FreeBSD__))
-  if (ui_window_backend_linux_wayland_create(&backend) == UI_ERROR_NONE) {
-    ASSERT_TRUE(backend != NULL);
+  {
+    struct ui_window *win = NULL;
+    struct ui_event events[10];
+    int has_event = 0;
 
-    ASSERT_EQ(backend->create_window(NULL, "test", 800, 600, &win),
-              UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->create_window(backend, NULL, 800, 600, &win),
-              UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->create_window(backend, "test", 800, 600, NULL),
-              UI_ERROR_INVALID_ARGUMENT);
+    if (ui_window_backend_linux_wayland_create(&backend) == UI_ERROR_NONE) {
+      ASSERT_TRUE(backend != NULL);
 
-    ASSERT_EQ(backend->destroy_window(NULL, win), UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->destroy_window(backend, NULL),
-              UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->create_window(NULL, "test", 800, 600, &win),
+                UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->create_window(backend, NULL, 800, 600, &win),
+                UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->create_window(backend, "test", 800, 600, NULL),
+                UI_ERROR_INVALID_ARGUMENT);
 
-    ASSERT_EQ(backend->show_window(NULL, win), UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->show_window(backend, NULL), UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->destroy_window(NULL, win), UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->destroy_window(backend, NULL),
+                UI_ERROR_INVALID_ARGUMENT);
 
-    ASSERT_EQ(backend->hide_window(NULL, win), UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->hide_window(backend, NULL), UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->show_window(NULL, win), UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->show_window(backend, NULL), UI_ERROR_INVALID_ARGUMENT);
 
-    ASSERT_EQ(backend->poll_events(NULL, win, events, &has_event),
-              UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->poll_events(backend, NULL, events, &has_event),
-              UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->poll_events(backend, win, NULL, &has_event),
-              UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->poll_events(backend, win, events, NULL),
-              UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->hide_window(NULL, win), UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->hide_window(backend, NULL), UI_ERROR_INVALID_ARGUMENT);
 
-    ASSERT_EQ(backend->swap_buffers(NULL, win), UI_ERROR_INVALID_ARGUMENT);
-    ASSERT_EQ(backend->swap_buffers(backend, NULL), UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->poll_events(NULL, win, events, &has_event),
+                UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->poll_events(backend, NULL, events, &has_event),
+                UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->poll_events(backend, win, NULL, &has_event),
+                UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->poll_events(backend, win, events, NULL),
+                UI_ERROR_INVALID_ARGUMENT);
 
-    /* Test wayland specific mocking */
-    ASSERT_TRUE(backend->create_window(backend, "test", 800, 600, &win) !=
+      ASSERT_EQ(backend->swap_buffers(NULL, win), UI_ERROR_INVALID_ARGUMENT);
+      ASSERT_EQ(backend->swap_buffers(backend, NULL),
+                UI_ERROR_INVALID_ARGUMENT);
+
+      /* Test wayland specific mocking */
+      ASSERT_TRUE(backend->create_window(backend, "test", 800, 600, &win) !=
+                  UI_ERROR_NONE);
+
+      ASSERT_EQ(ui_window_backend_linux_wayland_destroy(backend),
                 UI_ERROR_NONE);
 
-    ASSERT_EQ(ui_window_backend_linux_wayland_destroy(backend), UI_ERROR_NONE);
-
-    g_malloc_fail_countdown = 0;
-    ASSERT_EQ(ui_window_backend_linux_wayland_create(&backend),
-              UI_ERROR_OUT_OF_MEMORY);
-    g_malloc_fail_countdown = -1;
-  } else {
-    backend = (struct ui_window_backend *)(void *)1;
-    ASSERT_EQ(ui_window_backend_linux_wayland_destroy(backend),
-              UI_ERROR_UNKNOWN);
+      g_malloc_fail_countdown = 0;
+      ASSERT_EQ(ui_window_backend_linux_wayland_create(&backend),
+                UI_ERROR_OUT_OF_MEMORY);
+      g_malloc_fail_countdown = -1;
+    } else {
+      backend = (struct ui_window_backend *)(void *)1;
+      ASSERT_EQ(ui_window_backend_linux_wayland_destroy(backend),
+                UI_ERROR_UNKNOWN);
+    }
   }
 #else
   ASSERT_EQ(ui_window_backend_linux_wayland_create(&backend), UI_ERROR_UNKNOWN);

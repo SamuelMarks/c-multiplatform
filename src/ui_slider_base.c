@@ -22,6 +22,118 @@
 /* MSVC Safe CRT */
 #endif
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_slider_mock_set_attribute_fail = 0;
+int g_slider_mock_remove_attribute_fail = 0;
+int g_slider_mock_parse_css_fail = 0;
+int g_slider_mock_set_style_fail = 0;
+int g_slider_mock_gesture_destroy_fail = 0;
+int g_slider_mock_comp_destroy_fail = 0;
+int g_slider_mock_dom_destroy_fail = 0;
+int g_slider_mock_bidi_fail = 0;
+
+static ui_error_t mock_slider_set_attribute(struct ui_dom_node *node,
+                                            const char *name,
+                                            const char *value) {
+  if (g_slider_mock_set_attribute_fail > 0) {
+    g_slider_mock_set_attribute_fail--;
+    if (g_slider_mock_set_attribute_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_set_attribute)(node, name, value);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_slider_set_attribute
+/** @endcond */
+
+static ui_error_t mock_slider_remove_attribute(struct ui_dom_node *node,
+                                               const char *name) {
+  if (g_slider_mock_remove_attribute_fail > 0) {
+    g_slider_mock_remove_attribute_fail--;
+    if (g_slider_mock_remove_attribute_fail == 0) {
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return (ui_dom_node_remove_attribute)(node, name);
+}
+#undef ui_dom_node_remove_attribute
+/** @cond */
+#define ui_dom_node_remove_attribute mock_slider_remove_attribute
+/** @endcond */
+
+static ui_error_t mock_slider_parse_css(const char *css,
+                                        struct ui_css_stylesheet **out_sheet) {
+  if (g_slider_mock_parse_css_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_css_parse_stylesheet)(css, out_sheet);
+}
+#undef ui_css_parse_stylesheet
+/** @cond */
+#define ui_css_parse_stylesheet mock_slider_parse_css
+/** @endcond */
+
+static ui_error_t mock_slider_set_style(struct ui_component *comp,
+                                        struct ui_css_stylesheet *sheet) {
+  if (g_slider_mock_set_style_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, sheet);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_slider_set_style
+/** @endcond */
+
+static ui_error_t
+mock_slider_gesture_destroy(struct ui_gesture_recognizer *recognizer) {
+  if (g_slider_mock_gesture_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_gesture_recognizer_destroy)(recognizer);
+}
+#undef ui_gesture_recognizer_destroy
+/** @cond */
+#define ui_gesture_recognizer_destroy mock_slider_gesture_destroy
+/** @endcond */
+
+static ui_error_t mock_slider_comp_destroy(struct ui_component *comp) {
+  if (g_slider_mock_comp_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_slider_comp_destroy
+/** @endcond */
+
+static ui_error_t mock_slider_dom_destroy(struct ui_dom_node *node) {
+  if (g_slider_mock_dom_destroy_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_destroy)(node);
+}
+#undef ui_dom_node_destroy
+/** @cond */
+#define ui_dom_node_destroy mock_slider_dom_destroy
+/** @endcond */
+
+static ui_error_t mock_slider_bidi(enum ui_key_code key,
+                                   enum ui_key_code *out_key) {
+  if (g_slider_mock_bidi_fail != 0) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_bidi_normalize_horizontal_key)(key, out_key);
+}
+#undef ui_bidi_normalize_horizontal_key
+/** @cond */
+#define ui_bidi_normalize_horizontal_key mock_slider_bidi
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet */
 static const char ui_slider_base_default_css[] = {
     105, 110, 112, 117, 116, 91,  116, 121, 112, 101, 61,  34,  114, 97,  110,
@@ -86,16 +198,6 @@ struct ui_slider_base {
   void *cva_on_touched_user_data; /**< cva_on_touched_user_data */
 };
 
-/** @cond */
-#define UI_DOM_SET_ATTR_IGNORE(n, a, v) ui_dom_node_set_attribute((n), (a), (v))
-/** @endcond */
-/** @cond */
-#define UI_DOM_REM_ATTR_IGNORE(n, a) ui_dom_node_remove_attribute((n), (a))
-/** @endcond */
-/** @cond */
-#define UI_CVA_ON_TOUCH_IGNORE(cb, u) ((cb) ? (cb)((u)) : UI_ERROR_NONE)
-/** @endcond */
-
 /**
  * \brief Updates the DOM state for the slider.
  * \param slider The slider component.
@@ -114,6 +216,8 @@ static ui_error_t update_dom_state(struct ui_slider_base *slider);
  * @return Return value.
  */
 static ui_error_t update_dom_state(struct ui_slider_base *slider) {
+  ui_error_t rc;
+
   if (slider->component) {
     if (slider->component->shadow_root) {
       char buf[64];
@@ -125,39 +229,61 @@ static ui_error_t update_dom_state(struct ui_slider_base *slider) {
 #else
       sprintf(buf, "%f", slider->value);
 #endif
-      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
-                                   "aria-valuenow", buf);
-      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "value",
-                                   buf);
+      rc = ui_dom_node_set_attribute(slider->component->shadow_root,
+                                     "aria-valuenow", buf);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc = ui_dom_node_set_attribute(slider->component->shadow_root, "value",
+                                     buf);
+      if (rc != UI_ERROR_NONE)
+        return rc;
 
 #if defined(_MSC_VER)
       sprintf_s(buf, sizeof(buf), "%f", slider->min_val);
 #else
       sprintf(buf, "%f", slider->min_val);
 #endif
-      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
-                                   "aria-valuemin", buf);
-      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "min", buf);
+      rc = ui_dom_node_set_attribute(slider->component->shadow_root,
+                                     "aria-valuemin", buf);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc =
+          ui_dom_node_set_attribute(slider->component->shadow_root, "min", buf);
+      if (rc != UI_ERROR_NONE)
+        return rc;
 
 #if defined(_MSC_VER)
       sprintf_s(buf, sizeof(buf), "%f", slider->max_val);
 #else
       sprintf(buf, "%f", slider->max_val);
 #endif
-      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
-                                   "aria-valuemax", buf);
-      (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "max", buf);
+      rc = ui_dom_node_set_attribute(slider->component->shadow_root,
+                                     "aria-valuemax", buf);
+      if (rc != UI_ERROR_NONE)
+        return rc;
+      rc =
+          ui_dom_node_set_attribute(slider->component->shadow_root, "max", buf);
+      if (rc != UI_ERROR_NONE)
+        return rc;
 
       if (slider->disabled) {
-        (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root, "disabled",
-                                     "");
-        (void)UI_DOM_SET_ATTR_IGNORE(slider->component->shadow_root,
-                                     "aria-disabled", "true");
+        rc = ui_dom_node_set_attribute(slider->component->shadow_root,
+                                       "disabled", "");
+        if (rc != UI_ERROR_NONE)
+          return rc;
+        rc = ui_dom_node_set_attribute(slider->component->shadow_root,
+                                       "aria-disabled", "true");
+        if (rc != UI_ERROR_NONE)
+          return rc;
       } else {
-        (void)UI_DOM_REM_ATTR_IGNORE(slider->component->shadow_root,
-                                     "disabled");
-        (void)UI_DOM_REM_ATTR_IGNORE(slider->component->shadow_root,
-                                     "aria-disabled");
+        rc = ui_dom_node_remove_attribute(slider->component->shadow_root,
+                                          "disabled");
+        if (rc != UI_ERROR_NONE)
+          return rc;
+        rc = ui_dom_node_remove_attribute(slider->component->shadow_root,
+                                          "aria-disabled");
+        if (rc != UI_ERROR_NONE)
+          return rc;
       }
     }
   }
@@ -179,6 +305,23 @@ static ui_error_t trigger_cva_change(struct ui_slider_base *slider) {
     union ui_signal_payload payload;
     payload.float_val = slider->value;
     return slider->cva_on_change(payload, slider->cva_on_change_user_data);
+  }
+  return UI_ERROR_NONE;
+}
+
+/**
+ * \brief Triggers a CVA touched event.
+ * \param slider The slider component.
+ * \return UI_ERROR_NONE on success.
+ */
+/**
+ * @brief trigger_cva_touched.
+ * @param slider Parameter slider.
+ * @return Return value.
+ */
+static ui_error_t trigger_cva_touched(struct ui_slider_base *slider) {
+  if (slider->cva_on_touched) {
+    return slider->cva_on_touched(slider->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
@@ -353,15 +496,18 @@ ui_error_t ui_slider_base_create(struct ui_slider_base **out_slider,
   }
 
   rc = ui_component_set_default_style(slider->component, default_style);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    ui_css_stylesheet_destroy(default_style);
+    goto cleanup;
+  }
 
   slider->component->shadow_root = root_node;
   root_node = NULL; /* Owned by component now */
 
-/** @cond */
-#define UI_SLIDER_UPDATE_DOM_IGNORE(s) update_dom_state((s))
-  /** @endcond */
-  (void)UI_SLIDER_UPDATE_DOM_IGNORE(slider);
+  rc = update_dom_state(slider);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
+  }
 
   if (out_cva) {
     out_cva->write_value = slider_cva_write_value;
@@ -375,23 +521,13 @@ ui_error_t ui_slider_base_create(struct ui_slider_base **out_slider,
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (slider->gesture_recognizer) {
-    {
-      ui_error_t rc_cleanup =
-          ui_gesture_recognizer_destroy(slider->gesture_recognizer);
-      (void)rc_cleanup;
-    }
+    ui_gesture_recognizer_destroy(slider->gesture_recognizer);
   }
   if (slider->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(slider->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(slider->component);
   }
   C_MULTIPLATFORM_FREE(slider);
   return rc;
@@ -403,19 +539,24 @@ cleanup:
  * \return UI_ERROR_NONE on success.
  */
 ui_error_t ui_slider_base_destroy(struct ui_slider_base *slider) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t rc_cleanup;
   if (!slider)
     return UI_ERROR_NONE;
   if (slider->gesture_recognizer) {
-    ui_error_t rc_cleanup =
-        ui_gesture_recognizer_destroy(slider->gesture_recognizer);
-    (void)rc_cleanup;
+    rc_cleanup = ui_gesture_recognizer_destroy(slider->gesture_recognizer);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   if (slider->component) {
-    ui_error_t rc_cleanup = ui_component_destroy(slider->component);
-    (void)rc_cleanup;
+    rc_cleanup = ui_component_destroy(slider->component);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(slider);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -435,8 +576,7 @@ ui_error_t ui_slider_base_set_min(struct ui_slider_base *slider, float min) {
     if (set_rc != UI_ERROR_NONE)
       return set_rc;
   }
-  (void)UI_SLIDER_UPDATE_DOM_IGNORE(slider);
-  return UI_ERROR_NONE;
+  return update_dom_state(slider);
 }
 
 /**
@@ -456,8 +596,7 @@ ui_error_t ui_slider_base_set_max(struct ui_slider_base *slider, float max) {
     if (set_rc != UI_ERROR_NONE)
       return set_rc;
   }
-  (void)UI_SLIDER_UPDATE_DOM_IGNORE(slider);
-  return UI_ERROR_NONE;
+  return update_dom_state(slider);
 }
 
 /**
@@ -468,6 +607,8 @@ ui_error_t ui_slider_base_set_max(struct ui_slider_base *slider, float max) {
  */
 ui_error_t ui_slider_base_set_value(struct ui_slider_base *slider,
                                     float value) {
+  ui_error_t rc;
+
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -486,17 +627,18 @@ ui_error_t ui_slider_base_set_value(struct ui_slider_base *slider,
 
   if (slider->value != value) {
     slider->value = value;
-    (void)UI_SLIDER_UPDATE_DOM_IGNORE(slider);
+    rc = update_dom_state(slider);
+    if (rc != UI_ERROR_NONE)
+      return rc;
     if (slider->on_change) {
       ui_error_t oc_rc =
           slider->on_change(slider, slider->value, slider->user_data);
       if (oc_rc != UI_ERROR_NONE)
         return oc_rc;
     }
-/** @cond */
-#define UI_TRIG_CVA_CHG_IGNORE(s) trigger_cva_change((s))
-    /** @endcond */
-    (void)UI_TRIG_CVA_CHG_IGNORE(slider);
+    rc = trigger_cva_change(slider);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
@@ -543,8 +685,7 @@ ui_error_t ui_slider_base_set_disabled(struct ui_slider_base *slider,
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
   slider->disabled = disabled;
-  (void)UI_SLIDER_UPDATE_DOM_IGNORE(slider);
-  return UI_ERROR_NONE;
+  return update_dom_state(slider);
 }
 
 /**
@@ -574,6 +715,7 @@ ui_error_t ui_slider_base_set_normalized_value(struct ui_slider_base *slider,
                                                float normalized_position) {
   float range;
   float new_value;
+  ui_error_t rc;
 
   if (!slider)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -588,8 +730,9 @@ ui_error_t ui_slider_base_set_normalized_value(struct ui_slider_base *slider,
   range = slider->max_val - slider->min_val;
   new_value = slider->min_val + (range * normalized_position);
 
-  (void)UI_CVA_ON_TOUCH_IGNORE(slider->cva_on_touched,
-                               slider->cva_on_touched_user_data);
+  rc = trigger_cva_touched(slider);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   return ui_slider_base_set_value(slider, new_value);
 }
 
@@ -603,7 +746,10 @@ ui_error_t ui_slider_base_set_normalized_value(struct ui_slider_base *slider,
 ui_error_t ui_slider_base_process_event(struct ui_slider_base *slider,
                                         const struct ui_event *event,
                                         double timestamp_ms) {
-  (void)timestamp_ms;
+  ui_error_t rc;
+
+  if (timestamp_ms > 0.0) {
+  }
   if (!slider || !event)
     return UI_ERROR_INVALID_ARGUMENT;
   if (slider->disabled)
@@ -619,26 +765,29 @@ ui_error_t ui_slider_base_process_event(struct ui_slider_base *slider,
     if (increment == 0.0f)
       increment = 1.0f;
 
-/** @cond */
-#define UI_BIDI_NORM_IGNORE(k, o) ui_bidi_normalize_horizontal_key((k), (o))
-    /** @endcond */
-    (void)UI_BIDI_NORM_IGNORE(key, &key);
+    rc = ui_bidi_normalize_horizontal_key(key, &key);
+    if (rc != UI_ERROR_NONE)
+      return rc;
 
     if (key == UI_KEY_LEFT || key == UI_KEY_DOWN) {
-      (void)UI_CVA_ON_TOUCH_IGNORE(slider->cva_on_touched,
-                                   slider->cva_on_touched_user_data);
+      rc = trigger_cva_touched(slider);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       return ui_slider_base_set_value(slider, slider->value - increment);
     } else if (key == UI_KEY_RIGHT || key == UI_KEY_UP) {
-      (void)UI_CVA_ON_TOUCH_IGNORE(slider->cva_on_touched,
-                                   slider->cva_on_touched_user_data);
+      rc = trigger_cva_touched(slider);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       return ui_slider_base_set_value(slider, slider->value + increment);
     } else if (key == UI_KEY_HOME) {
-      (void)UI_CVA_ON_TOUCH_IGNORE(slider->cva_on_touched,
-                                   slider->cva_on_touched_user_data);
+      rc = trigger_cva_touched(slider);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       return ui_slider_base_set_value(slider, slider->min_val);
     } else if (key == UI_KEY_END) {
-      (void)UI_CVA_ON_TOUCH_IGNORE(slider->cva_on_touched,
-                                   slider->cva_on_touched_user_data);
+      rc = trigger_cva_touched(slider);
+      if (rc != UI_ERROR_NONE)
+        return rc;
       return ui_slider_base_set_value(slider, slider->max_val);
     }
   }

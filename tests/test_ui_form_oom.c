@@ -7,8 +7,7 @@
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
-extern int ui_mock_alloc_fail_countdown;
-extern int ui_mock_alloc_fail_enabled;
+extern int g_malloc_fail_countdown;
 #endif
 
 int main(void) {
@@ -22,8 +21,7 @@ int main(void) {
   init_val.int_val = 0;
 
   for (i = 0; i < 20; i++) {
-    ui_mock_alloc_fail_enabled = 1;
-    ui_mock_alloc_fail_countdown = i;
+    g_malloc_fail_countdown = i;
 
     rc = ui_arena_create(1024, &arena);
     if (rc == UI_ERROR_NONE) {
@@ -31,24 +29,26 @@ int main(void) {
                                   NULL, UI_SIGNAL_MODE_SINGLE_THREADED,
                                   &control);
       if (rc == UI_ERROR_NONE) {
+        g_malloc_fail_countdown = -1;
         {
           ui_error_t rc_cleanup = ui_form_control_destroy(control);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            return 1;
           }
         }
       }
+      g_malloc_fail_countdown = -1;
       {
         ui_error_t rc_cleanup = ui_arena_destroy(arena);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return 1;
         }
       }
     }
 
-    ui_mock_alloc_fail_enabled = 0;
+    g_malloc_fail_countdown = -1;
   }
 #endif
-  printf("test_ui_form_oom passed\\n");
+  printf("test_ui_form_oom passed\n");
   return 0;
 }

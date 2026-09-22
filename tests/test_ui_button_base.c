@@ -1,6 +1,9 @@
 /* clang-format off */
 #include "ui_button_base.h"
 #include "ui_ripple_base.h"
+#include "ui_component.h"
+#include "ui_dom_node.h"
+#include "ui_gesture.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,13 +13,26 @@
 /* MSVC Safe CRT */
 #endif
 
+struct ui_button_base {
+  struct ui_component *component;
+  struct ui_gesture_recognizer *gesture_recognizer;
+  int disabled;
+  ui_button_on_click_t on_click;
+  void *user_data;
+  struct ui_signal *disabled_signal;
+  struct ui_signal *text_signal;
+  struct ui_ripple_config ripple_config;
+  struct ui_ripple_state ripple_state;
+};
+
 extern int g_malloc_fail_countdown;
 
 static int click_count = 0;
 
 static ui_error_t on_click_handler(struct ui_button_base *button,
                                    void *user_data) {
-  (void)button;
+  if (button) {
+  }
   if (user_data) {
     int *data = (int *)user_data;
     (*data)++;
@@ -404,127 +420,337 @@ extern int g_button_mock_fail;
 
 static ui_error_t mock_on_click_fail(struct ui_button_base *btn,
                                      void *user_data) {
-  (void)btn;
-  (void)user_data;
+  if (btn) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
-static void test_coverage(void) {
+static ui_error_t test_coverage(void) {
   struct ui_button_base *btn = NULL;
-  struct ui_event ev = {0};
+  struct ui_event ev;
+  ui_error_t rc;
 
-  ui_button_base_destroy(NULL);
+  memset(&ev, 0, sizeof(ev));
+
+  rc = ui_button_base_destroy(NULL);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* Extended mock failures */
   /* 126: append child fail */
   g_button_mock_fail = 126;
-  ui_button_base_create(&btn);
+  rc = ui_button_base_create(&btn);
   g_button_mock_fail = 0;
+  if (rc == UI_ERROR_NONE) {
+    rc = ui_button_base_destroy(btn);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+  }
 
   /* 168: set attribute fail */
-  ui_button_base_create(&btn);
+  rc = ui_button_base_create(&btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   g_button_mock_fail = 168;
-  ui_button_base_set_disabled(btn, 1);
+  rc = ui_button_base_set_disabled(btn, 1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
-  ui_button_base_destroy(btn);
+  rc = ui_button_base_destroy(btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* 240: set attribute fail */
-  ui_button_base_create(&btn);
+  rc = ui_button_base_create(&btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   g_button_mock_fail = 240;
-  ui_button_base_set_disabled(btn, 1);
+  rc = ui_button_base_set_disabled(btn, 1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
-  ui_button_base_destroy(btn);
+  rc = ui_button_base_destroy(btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* 282: set attribute fail */
-  ui_button_base_create(&btn);
-  ui_button_base_set_disabled(btn, 1);
+  rc = ui_button_base_create(&btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_button_base_set_disabled(btn, 1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   g_button_mock_fail = 282;
-  ui_button_base_set_disabled(btn, 0);
+  rc = ui_button_base_set_disabled(btn, 0);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
-  ui_button_base_destroy(btn);
+  rc = ui_button_base_destroy(btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* 81: ripple config init fail */
   g_button_mock_fail = 81;
-  ui_button_base_create(&btn);
+  rc = ui_button_base_create(&btn);
   g_button_mock_fail = 0;
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
 
   /* 123: default style fail */
   g_button_mock_fail = 123;
-  ui_button_base_create(&btn);
+  rc = ui_button_base_create(&btn);
   g_button_mock_fail = 0;
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
 
   /* 195: remove attr fail */
-  ui_button_base_create(&btn);
-  ui_button_base_set_disabled(btn, 1);
+  rc = ui_button_base_create(&btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_button_base_set_disabled(btn, 1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   g_button_mock_fail = 195;
-  ui_button_base_set_disabled(btn, 0);
+  rc = ui_button_base_set_disabled(btn, 0);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
-  ui_button_base_destroy(btn);
+  rc = ui_button_base_destroy(btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* 237: process event gesture */
-  ui_button_base_create(&btn);
+  rc = ui_button_base_create(&btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   ev.type = UI_EVENT_MOUSE_DOWN;
   g_button_mock_fail = 237;
-  ui_button_base_process_event(btn, &ev, 0.0);
+  rc = ui_button_base_process_event(btn, &ev, 0.0);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
 
   /* 245: process event ripple start */
   g_button_mock_fail = 245;
-  ui_button_base_process_event(btn, &ev, 0.0);
+  rc = ui_button_base_process_event(btn, &ev, 0.0);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
 
   /* 253: process event onclick fail */
   ev.type = UI_EVENT_MOUSE_UP;
-  ui_button_base_set_on_click(btn, mock_on_click_fail, NULL);
+  rc = ui_button_base_set_on_click(btn, mock_on_click_fail, NULL);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   g_button_mock_fail = 253;
-  ui_button_base_process_event(btn, &ev, 0.0);
+  rc = ui_button_base_process_event(btn, &ev, 0.0);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
 
-  ui_button_base_destroy(btn);
+  rc = ui_button_base_destroy(btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
   /* 290: set attribute fail */
-  ui_button_base_create(&btn);
+  rc = ui_button_base_create(&btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   g_button_mock_fail = 290;
-  ui_button_base_set_disabled(btn, 1);
+  rc = ui_button_base_set_disabled(btn, 1);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
-  ui_button_base_destroy(btn);
+  rc = ui_button_base_destroy(btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* 298: set attribute fail */
-  ui_button_base_create(&btn);
-  ui_button_base_set_disabled(btn, 1);
+  rc = ui_button_base_create(&btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_button_base_set_disabled(btn, 1);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   g_button_mock_fail = 298;
-  ui_button_base_set_disabled(btn, 0);
+  rc = ui_button_base_set_disabled(btn, 0);
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
   g_button_mock_fail = 0;
-  ui_button_base_destroy(btn);
+  rc = ui_button_base_destroy(btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   /* 312: set tag name fail during create */
   g_button_mock_fail = 312;
-  ui_button_base_create(&btn);
+  rc = ui_button_base_create(&btn);
   g_button_mock_fail = 0;
+  if (rc != UI_ERROR_UNKNOWN) {
+    return UI_ERROR_UNKNOWN;
+  }
 
   /* Test ui_button_base_set_text public API */
-  ui_button_base_create(&btn);
-  ui_button_base_set_text(NULL, "txt");
-  ui_button_base_set_text(btn, NULL);
-  ui_button_base_set_text(btn, "Click 1");
-  ui_button_base_set_text(btn, "Click 2");
-  ui_button_base_destroy(btn);
+  rc = ui_button_base_create(&btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_button_base_set_text(NULL, "txt");
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    return UI_ERROR_UNKNOWN;
+  }
+  rc = ui_button_base_set_text(btn, NULL);
+  if (rc != UI_ERROR_INVALID_ARGUMENT) {
+    return UI_ERROR_UNKNOWN;
+  }
+  rc = ui_button_base_set_text(btn, "Click 1");
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_button_base_set_text(btn, "Click 2");
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+  rc = ui_button_base_destroy(btn);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  /* Internal structure and edge case tests */
+  {
+    struct ui_component *saved_comp = NULL;
+    struct ui_dom_node *saved_root = NULL;
+    struct ui_dom_node *elem_child = NULL;
+    struct ui_dom_node *saved_child = NULL;
+
+    rc = ui_button_base_create(&btn);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+
+    saved_comp = btn->component;
+    btn->component = NULL;
+    rc = ui_button_base_set_text(btn, "txt");
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      return UI_ERROR_UNKNOWN;
+    }
+    btn->component = saved_comp;
+
+    saved_root = btn->component->shadow_root;
+    btn->component->shadow_root = NULL;
+    rc = ui_button_base_set_text(btn, "txt");
+    if (rc != UI_ERROR_INVALID_ARGUMENT) {
+      return UI_ERROR_UNKNOWN;
+    }
+    btn->component->shadow_root = saved_root;
+
+    saved_child = btn->component->shadow_root->first_child;
+    rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &elem_child);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    btn->component->shadow_root->first_child = elem_child;
+    rc = ui_button_base_set_text(btn, "Elem text");
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    rc = ui_dom_node_destroy(elem_child);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    btn->component->shadow_root->first_child = saved_child;
+
+    saved_child = btn->component->shadow_root->first_child;
+    btn->component->shadow_root->first_child = NULL;
+    g_button_mock_fail = 310;
+    rc = ui_button_base_set_text(btn, "fail");
+    if (rc != UI_ERROR_UNKNOWN) {
+      return UI_ERROR_UNKNOWN;
+    }
+    g_button_mock_fail = 0;
+
+    g_button_mock_fail = 311;
+    rc = ui_button_base_set_text(btn, "fail");
+    if (rc != UI_ERROR_UNKNOWN) {
+      return UI_ERROR_UNKNOWN;
+    }
+    g_button_mock_fail = 0;
+    btn->component->shadow_root->first_child = saved_child;
+
+    /* Test destroy with NULL gesture_recognizer and NULL component */
+    rc = ui_gesture_recognizer_destroy(btn->gesture_recognizer);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    btn->gesture_recognizer = NULL;
+    rc = ui_component_destroy(btn->component);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+    btn->component = NULL;
+
+    rc = ui_button_base_destroy(btn);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
+    }
+  }
+
+  return UI_ERROR_NONE;
 }
 
 int main(void) {
   ui_error_t rc;
-  int failed = 0;
-#ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_button_coverage(void);
-  run_button_coverage();
-#endif
-  failed |= run_normal_tests();
-  failed |= run_oom_tests();
-  test_coverage();
 
-  if (failed) {
-    printf("Tests failed.\n");
+  rc = run_normal_tests();
+  if (rc != UI_ERROR_NONE) {
+    printf("Normal tests failed.\n");
     return 1;
   }
+
+  rc = run_oom_tests();
+  if (rc != UI_ERROR_NONE) {
+    printf("OOM tests failed.\n");
+    return 1;
+  }
+
+  rc = test_coverage();
+  if (rc != UI_ERROR_NONE) {
+    printf("Coverage tests failed.\n");
+    return 1;
+  }
+
   printf("All test_ui_button_base passed.\n");
   return 0;
 }

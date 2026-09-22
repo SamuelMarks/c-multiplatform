@@ -87,21 +87,16 @@ ui_error_t ui_engine_create(const struct ui_engine_config *config,
 cleanup:
   if (engine) {
     if (engine->timer) {
-      ui_error_t rc_cleanup = ui_timer_destroy(engine->timer);
-      (void)rc_cleanup;
+      ui_timer_destroy(engine->timer);
     }
     if (engine->reactor) {
-      ui_error_t rc_cleanup = ui_reactor_destroy(engine->reactor);
-      (void)rc_cleanup;
+      ui_reactor_destroy(engine->reactor);
     }
-    if (engine->thread_pool) {
 #ifndef UI_SINGLE_THREADED
-      {
-        ui_error_t rc_cleanup = ui_thread_pool_destroy(engine->thread_pool);
-        (void)rc_cleanup;
-      }
-#endif
+    if (engine->thread_pool) {
+      ui_thread_pool_destroy(engine->thread_pool);
     }
+#endif
     C_MULTIPLATFORM_FREE(engine);
   }
   return rc;
@@ -118,30 +113,18 @@ ui_error_t ui_engine_destroy(struct ui_engine *engine) {
   }
 
   if (engine->timer) {
-    {
-      ui_error_t rc_cleanup = ui_timer_destroy(engine->timer);
-      (void)rc_cleanup;
-    }
+    ui_timer_destroy(engine->timer);
   }
   if (engine->reactor) {
-    {
-      ui_error_t rc_cleanup = ui_reactor_destroy(engine->reactor);
-      (void)rc_cleanup;
-    }
+    ui_reactor_destroy(engine->reactor);
   }
 #ifndef UI_SINGLE_THREADED
   if (engine->thread_pool) {
-    {
-      ui_error_t rc_cleanup = ui_thread_pool_destroy(engine->thread_pool);
-      (void)rc_cleanup;
-    }
+    ui_thread_pool_destroy(engine->thread_pool);
   }
 #endif
   if (engine->tick_engine) {
-    {
-      ui_error_t rc_cleanup = ui_tick_engine_destroy(engine->tick_engine);
-      (void)rc_cleanup;
-    }
+    ui_tick_engine_destroy(engine->tick_engine);
   }
 
   C_MULTIPLATFORM_FREE(engine);

@@ -52,7 +52,8 @@ static ui_error_t aot_compiled_form_create(
   struct ui_dom_node *dom_4 = NULL;
   struct ui_signal *sig_4 = NULL;
 
-  (void)app_state;
+  if (app_state) {
+  }
 
   if (!out_root) {
     return UI_ERROR_INVALID_ARGUMENT;

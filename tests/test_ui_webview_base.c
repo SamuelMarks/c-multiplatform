@@ -13,7 +13,8 @@ static int ipc_received = 0;
 
 static ui_error_t test_ipc_callback(struct ui_webview_base *webview,
                                     const char *message, void *user_data) {
-  (void)webview;
+  if (webview) {
+  }
   if (user_data != (void *)0x1234) {
     return UI_ERROR_NONE;
   }
@@ -75,6 +76,68 @@ int main(void) {
   if (rc != UI_ERROR_NONE) {
     failed = 1;
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_webview_mock_fail;
+    struct ui_webview_base *fail_wv = NULL;
+
+    /* Fail 1: set_tag_name */
+    g_webview_mock_fail = 1;
+    rc = ui_webview_base_create(&fail_wv);
+    if (rc != UI_ERROR_UNKNOWN) {
+      failed = 1;
+    }
+
+    /* Fail 2: set_attribute */
+    g_webview_mock_fail = 2;
+    rc = ui_webview_base_create(&fail_wv);
+    if (rc != UI_ERROR_UNKNOWN) {
+      failed = 1;
+    }
+
+    g_webview_mock_fail = 0;
+    rc = ui_webview_base_create(&fail_wv);
+    if (rc != UI_ERROR_NONE) {
+      failed = 1;
+    }
+
+    /* Fail 3: component_destroy in ui_webview_base_destroy */
+    g_webview_mock_fail = 3;
+    rc = ui_webview_base_destroy(fail_wv);
+    if (rc != UI_ERROR_UNKNOWN) {
+      failed = 1;
+    }
+    g_webview_mock_fail = 0;
+
+    /* Cover webview->component == NULL in ui_webview_base_destroy */
+    {
+      struct ui_webview_base_mock {
+        struct ui_component *component;
+        struct ui_signal *url_signal;
+        ui_webview_ipc_callback ipc_callback;
+        void *ipc_user_data;
+        char *current_url;
+        char *current_html;
+      };
+      struct ui_webview_base_mock *mock_wv;
+      rc = ui_webview_base_create(&fail_wv);
+      if (rc != UI_ERROR_NONE) {
+        failed = 1;
+      }
+      mock_wv = (struct ui_webview_base_mock *)fail_wv;
+      rc = ui_component_destroy(mock_wv->component);
+      if (rc != UI_ERROR_NONE) {
+        failed = 1;
+      }
+      mock_wv->component = NULL;
+      rc = ui_webview_base_destroy(fail_wv);
+      if (rc != UI_ERROR_NONE) {
+        failed = 1;
+      }
+    }
+  }
+#endif
 
   rc = ui_webview_base_create(&webview);
   if (rc != UI_ERROR_NONE) {
@@ -242,6 +305,68 @@ int main(void) {
   if (rc != UI_ERROR_NONE) {
     failed = 1;
   }
+
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_webview_mock_fail;
+    struct ui_webview_base *fail_wv = NULL;
+
+    /* Fail 1: set_tag_name */
+    g_webview_mock_fail = 1;
+    rc = ui_webview_base_create(&fail_wv);
+    if (rc != UI_ERROR_UNKNOWN) {
+      failed = 1;
+    }
+
+    /* Fail 2: set_attribute */
+    g_webview_mock_fail = 2;
+    rc = ui_webview_base_create(&fail_wv);
+    if (rc != UI_ERROR_UNKNOWN) {
+      failed = 1;
+    }
+
+    g_webview_mock_fail = 0;
+    rc = ui_webview_base_create(&fail_wv);
+    if (rc != UI_ERROR_NONE) {
+      failed = 1;
+    }
+
+    /* Fail 3: component_destroy in ui_webview_base_destroy */
+    g_webview_mock_fail = 3;
+    rc = ui_webview_base_destroy(fail_wv);
+    if (rc != UI_ERROR_UNKNOWN) {
+      failed = 1;
+    }
+    g_webview_mock_fail = 0;
+
+    /* Cover webview->component == NULL in ui_webview_base_destroy */
+    {
+      struct ui_webview_base_mock {
+        struct ui_component *component;
+        struct ui_signal *url_signal;
+        ui_webview_ipc_callback ipc_callback;
+        void *ipc_user_data;
+        char *current_url;
+        char *current_html;
+      };
+      struct ui_webview_base_mock *mock_wv;
+      rc = ui_webview_base_create(&fail_wv);
+      if (rc != UI_ERROR_NONE) {
+        failed = 1;
+      }
+      mock_wv = (struct ui_webview_base_mock *)fail_wv;
+      rc = ui_component_destroy(mock_wv->component);
+      if (rc != UI_ERROR_NONE) {
+        failed = 1;
+      }
+      mock_wv->component = NULL;
+      rc = ui_webview_base_destroy(fail_wv);
+      if (rc != UI_ERROR_NONE) {
+        failed = 1;
+      }
+    }
+  }
+#endif
 
   if (!failed) {
     printf("All tests passed.\n");

@@ -31,45 +31,101 @@ struct app_state {
   char auth_error_message[128]; /**< Error message buffer */
 };
 
+/**
+ * @brief Authenticates credentials against the mock database.
+ * @param state The application state.
+ * @param username Entered username.
+ * @param password Entered password.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t mock_login(struct app_state *state, const char *username,
                       const char *password) {
+  if (!state || !username || !password) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (strcmp(username, "admin") == 0 && strcmp(password, "password") == 0) {
     state->is_authenticated = 1;
-    strncpy(state->current_user, username, 63);
-    state->current_user[63] = '\0';
+#if defined(_MSC_VER)
+    strncpy_s(state->current_user, sizeof(state->current_user), username,
+              _TRUNCATE);
+#else
+    strncpy(state->current_user, username, sizeof(state->current_user) - 1);
+    state->current_user[sizeof(state->current_user) - 1] = '\0';
+#endif
     state->auth_error_message[0] = '\0';
     return UI_ERROR_NONE;
   }
 
   state->is_authenticated = 0;
-  strncpy(state->auth_error_message, "err_invalid_credentials", 127);
-  state->auth_error_message[127] = '\0';
+#if defined(_MSC_VER)
+  strncpy_s(state->auth_error_message, sizeof(state->auth_error_message),
+            "err_invalid_credentials", _TRUNCATE);
+#else
+  strncpy(state->auth_error_message, "err_invalid_credentials",
+          sizeof(state->auth_error_message) - 1);
+  state->auth_error_message[sizeof(state->auth_error_message) - 1] = '\0';
+#endif
   return UI_ERROR_INVALID_ARGUMENT;
 }
 
+/**
+ * @brief Registers a new user in the mock database.
+ * @param state The application state.
+ * @param username Entered username.
+ * @param password Entered password.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t mock_signup(struct app_state *state, const char *username,
                        const char *password) {
+  if (!state || !username || !password) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   if (strcmp(username, "admin") == 0) {
     state->is_authenticated = 0;
-    strncpy(state->auth_error_message, "err_user_exists", 127);
-    state->auth_error_message[127] = '\0';
+#if defined(_MSC_VER)
+    strncpy_s(state->auth_error_message, sizeof(state->auth_error_message),
+              "err_user_exists", _TRUNCATE);
+#else
+    strncpy(state->auth_error_message, "err_user_exists",
+            sizeof(state->auth_error_message) - 1);
+    state->auth_error_message[sizeof(state->auth_error_message) - 1] = '\0';
+#endif
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (strlen(password) < 4) {
     state->is_authenticated = 0;
-    strncpy(state->auth_error_message, "err_invalid_credentials", 127);
-    state->auth_error_message[127] = '\0';
+#if defined(_MSC_VER)
+    strncpy_s(state->auth_error_message, sizeof(state->auth_error_message),
+              "err_invalid_credentials", _TRUNCATE);
+#else
+    strncpy(state->auth_error_message, "err_invalid_credentials",
+            sizeof(state->auth_error_message) - 1);
+    state->auth_error_message[sizeof(state->auth_error_message) - 1] = '\0';
+#endif
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
   state->is_authenticated = 1;
-  strncpy(state->current_user, username, 63);
-  state->current_user[63] = '\0';
+#if defined(_MSC_VER)
+  strncpy_s(state->current_user, sizeof(state->current_user), username,
+            _TRUNCATE);
+#else
+  strncpy(state->current_user, username, sizeof(state->current_user) - 1);
+  state->current_user[sizeof(state->current_user) - 1] = '\0';
+#endif
   state->auth_error_message[0] = '\0';
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Clears authentication credentials and resets user state.
+ * @param state The application state.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 ui_error_t mock_logout(struct app_state *state) {
+  if (!state) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
   state->is_authenticated = 0;
   state->current_user[0] = '\0';
   state->auth_error_message[0] = '\0';

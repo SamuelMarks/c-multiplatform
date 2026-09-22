@@ -1,10 +1,13 @@
 static int run_edge_cases(void);
+static int run_mock_tests(void);
 /* clang-format off */
 #include "ui_spin_button_base.h"
 #include "ui_error.h"
 #include "ui_event.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 /* clang-format on */
 
 extern int g_malloc_fail_countdown;
@@ -17,15 +20,18 @@ static int g_cva_touched_called = 0;
 
 static ui_error_t on_change(struct ui_spin_button_base *sb, double val,
                             void *user) {
-  (void)sb;
-  (void)user;
+  if (sb) {
+  }
+  if (user) {
+  }
   g_change_called++;
   g_last_val = val;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
-  (void)user;
+  if (user) {
+  }
   g_cva_change_called++;
   g_cva_last_val = val.float_val;
   return UI_ERROR_NONE;
@@ -33,14 +39,18 @@ static ui_error_t on_cva_change(union ui_signal_payload val, void *user) {
 
 static ui_error_t mock_action_cb_fail(struct ui_spin_button_base *sb,
                                       double val, void *user) {
-  (void)sb;
-  (void)val;
-  (void)user;
+  if (sb) {
+  }
+  if (val > 0.0) {
+  }
+  if (user) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
 static ui_error_t on_cva_touched(void *user) {
-  (void)user;
+  if (user) {
+  }
   g_cva_touched_called++;
   return UI_ERROR_NONE;
 }
@@ -54,7 +64,10 @@ static ui_error_t on_cva_touched(void *user) {
         printf("Failed at %d\n", __LINE__);                                    \
         do {                                                                   \
           printf("Failed at %d\n", __LINE__);                                  \
-          return 1;                                                            \
+          {                                                                    \
+            printf("mock fail at line %d\n", __LINE__);                        \
+            return 1;                                                          \
+          }                                                                    \
         } while (0);                                                           \
       }                                                                        \
     }                                                                          \
@@ -69,7 +82,10 @@ static ui_error_t on_cva_touched(void *user) {
         printf("Failed at %d\n", __LINE__);                                    \
         do {                                                                   \
           printf("Failed at %d\n", __LINE__);                                  \
-          return 1;                                                            \
+          {                                                                    \
+            printf("mock fail at line %d\n", __LINE__);                        \
+            return 1;                                                          \
+          }                                                                    \
         } while (0);                                                           \
       }                                                                        \
     }                                                                          \
@@ -87,9 +103,7 @@ static int run_normal_tests(void) {
   ASSERT_EQ(ui_spin_button_base_create(NULL, NULL), UI_ERROR_INVALID_ARGUMENT);
   {
     ui_error_t rc_cleanup = ui_spin_button_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ASSERT_EQ(ui_spin_button_base_set_min(NULL, 0.0), UI_ERROR_INVALID_ARGUMENT);
@@ -131,7 +145,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -161,7 +178,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
   ASSERT_SUCCESS(ui_spin_button_base_set_value(sb, -50.0)); /* clamps to -10 */
@@ -170,7 +190,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -182,7 +205,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -193,7 +219,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -205,7 +234,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -217,7 +249,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -227,7 +262,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -241,7 +279,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -252,7 +293,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -263,7 +307,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -274,7 +321,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -296,7 +346,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
   ASSERT_SUCCESS(ui_spin_button_base_on_tick(sb, 400.0)); /* total 400 < 500 */
@@ -305,7 +358,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
   ASSERT_SUCCESS(
@@ -315,7 +371,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
   ASSERT_SUCCESS(ui_spin_button_base_on_tick(sb, 50.0)); /* >= 50 repeat rate */
@@ -329,7 +388,10 @@ static int run_normal_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
   ASSERT_SUCCESS(ui_spin_button_base_stop_continuous(sb));
@@ -356,9 +418,7 @@ static int run_normal_tests(void) {
 
   {
     ui_error_t rc_cleanup = ui_spin_button_base_destroy(sb);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -373,7 +433,10 @@ static int run_oom_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -382,7 +445,10 @@ static int run_oom_tests(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -390,14 +456,20 @@ static int run_oom_tests(void) {
   if (ui_spin_button_base_create(&sb, &cva) != UI_ERROR_OUT_OF_MEMORY)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   g_malloc_fail_countdown = 3;
   if (ui_spin_button_base_create(&sb, &cva) != UI_ERROR_OUT_OF_MEMORY) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -413,30 +485,51 @@ int main(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
   if (run_edge_cases() != 0) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
   if (run_oom_tests() != 0) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
   if (run_error_bubbles() != 0) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (run_mock_tests() != 0) {
+    printf("Failed at %d\n", __LINE__);
+    {
+      printf("mock fail at line %d\n", __LINE__);
+      return 1;
+    }
+  }
+#endif
   printf("All ui_spin_button_base tests passed.\n");
   return 0;
 }
@@ -459,7 +552,10 @@ static int run_error_bubbles(void) {
     if (cva.set_disabled_state(sb, 1) != UI_ERROR_INVALID_ARGUMENT)
       do {
         printf("Failed at %d\n", __LINE__);
-        return 1;
+        {
+          printf("mock fail at line %d\n", __LINE__);
+          return 1;
+        }
       } while (0);
     sb->component = orig;
   }
@@ -470,13 +566,19 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_set_value(sb, 1.0) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   payload.float_val = 2.0f;
   if (cva.write_value(sb, payload) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
 
   /* The min/max setters trigger set_value with the boundary if they modify the
@@ -491,13 +593,19 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_set_min(sb, 5.0) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   /* Value is now 5.0. Change max to -5.0 triggers value change to -5.0 */
   if (ui_spin_button_base_set_max(sb, -5.0) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
 
   ui_spin_button_base_set_on_change(sb, on_change, NULL);
@@ -509,12 +617,18 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_increment(sb) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   if (ui_spin_button_base_decrement(sb) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
 
   ev.type = UI_EVENT_KEY_DOWN;
@@ -522,13 +636,19 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_process_event(sb, &ev) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   ev.event_data.keyboard.key_code = UI_KEY_DOWN;
   if (ui_spin_button_base_process_event(sb, &ev) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
 
   ui_spin_button_base_set_on_change(sb, on_change, NULL);
@@ -538,13 +658,19 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_process_event(sb, &ev) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   ev.event_data.keyboard.key_code = UI_KEY_END;
   if (ui_spin_button_base_process_event(sb, &ev) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
 
   ui_spin_button_base_set_on_change(sb, on_change, NULL);
@@ -555,7 +681,10 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_on_tick(sb, 1000.0) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   ui_spin_button_base_stop_continuous(sb);
 
@@ -567,7 +696,10 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_on_tick(sb, 1000.0) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   ui_spin_button_base_stop_continuous(sb);
 
@@ -579,7 +711,10 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_on_tick(sb, 1000.0) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   ui_spin_button_base_stop_continuous(sb);
 
@@ -590,7 +725,10 @@ static int run_error_bubbles(void) {
   if (ui_spin_button_base_on_tick(sb, 1000.0) != UI_ERROR_UNKNOWN)
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   ui_spin_button_base_stop_continuous(sb);
 
@@ -605,7 +743,10 @@ static int run_edge_cases(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
@@ -627,9 +768,7 @@ static int run_edge_cases(void) {
 
     {
       ui_error_t rc_cleanup = ui_dom_node_destroy(orig_root);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     comp->shadow_root = NULL;
   }
@@ -639,16 +778,198 @@ static int run_edge_cases(void) {
     printf("Failed at %d\n", __LINE__);
     do {
       printf("Failed at %d\n", __LINE__);
-      return 1;
+      {
+        printf("mock fail at line %d\n", __LINE__);
+        return 1;
+      }
     } while (0);
   }
 
   {
     ui_error_t rc_cleanup = ui_spin_button_base_destroy(sb);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
-/* Add mock failure */
+
+#ifdef UI_TEST_MOCK_ALLOC
+static ui_error_t mock_cva_on_change_fail(union ui_signal_payload val,
+                                          void *user) {
+  float unused;
+  void *unused_u;
+  unused = val.float_val;
+  val.float_val = unused;
+  unused_u = user;
+  user = unused_u;
+  return UI_ERROR_UNKNOWN;
+}
+
+static ui_error_t mock_cva_on_touched_fail(void *user) {
+  void *unused_u;
+  unused_u = user;
+  user = unused_u;
+  return UI_ERROR_UNKNOWN;
+}
+
+static int run_mock_tests(void) {
+  extern int g_spin_button_mock_set_attr_fail_target;
+  extern int g_spin_button_mock_remove_attr_fail_target;
+  extern int g_spin_button_mock_create_comp_fail;
+  extern int g_spin_button_mock_create_node_fail;
+  extern int g_spin_button_mock_set_tag_fail;
+  extern int g_spin_button_mock_stop_cont_fail;
+  extern int g_spin_button_set_attr_counter;
+  extern int g_spin_button_remove_attr_counter;
+  struct ui_spin_button_base *sb = NULL;
+  struct ui_control_value_accessor cva;
+  struct ui_event ev;
+  int target;
+
+  /* 1. Test create failures */
+  g_spin_button_mock_create_comp_fail = 1;
+  if (ui_spin_button_base_create(&sb, NULL) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_create_comp_fail = 0;
+
+  g_spin_button_mock_create_node_fail = 1;
+  if (ui_spin_button_base_create(&sb, NULL) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_create_node_fail = 0;
+
+  g_spin_button_mock_set_tag_fail = 1;
+  if (ui_spin_button_base_create(&sb, NULL) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_set_tag_fail = 0;
+
+  for (target = 1; target <= 5; target++) {
+    g_spin_button_set_attr_counter = 0;
+    g_spin_button_mock_set_attr_fail_target = target;
+    if (ui_spin_button_base_create(&sb, NULL) != UI_ERROR_UNKNOWN) {
+      printf("mock fail at line %d\n", __LINE__);
+      return 1;
+    }
+    g_spin_button_mock_set_attr_fail_target = 0;
+  }
+
+  /* 2. Test set_disabled failures */
+  g_spin_button_set_attr_counter = 0;
+  if (ui_spin_button_base_create(&sb, &cva) != UI_ERROR_NONE) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+
+  g_spin_button_set_attr_counter = 0;
+  g_spin_button_mock_set_attr_fail_target = 1;
+  if (ui_spin_button_base_set_disabled(sb, 1) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_set_attr_fail_target = 0;
+
+  g_spin_button_remove_attr_counter = 0;
+  g_spin_button_mock_remove_attr_fail_target = 1;
+  if (ui_spin_button_base_set_disabled(sb, 1) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_remove_attr_fail_target = 0;
+
+  g_spin_button_set_attr_counter = 0;
+  g_spin_button_remove_attr_counter = 0;
+  g_spin_button_mock_stop_cont_fail = 1;
+  if (ui_spin_button_base_set_disabled(sb, 1) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_stop_cont_fail = 0;
+
+  /* Now disable succeeds */
+  g_spin_button_set_attr_counter = 0;
+  g_spin_button_remove_attr_counter = 0;
+  if (ui_spin_button_base_set_disabled(sb, 1) != UI_ERROR_NONE) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+
+  /* Now enable failures */
+  g_spin_button_remove_attr_counter = 0;
+  g_spin_button_mock_remove_attr_fail_target = 1;
+  if (ui_spin_button_base_set_disabled(sb, 0) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_remove_attr_fail_target = 0;
+
+  g_spin_button_set_attr_counter = 0;
+  g_spin_button_mock_set_attr_fail_target = 1;
+  if (ui_spin_button_base_set_disabled(sb, 0) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_set_attr_fail_target = 0;
+
+  /* 3. Test set_value update_aria failure */
+  g_spin_button_set_attr_counter = 0;
+  g_spin_button_mock_set_attr_fail_target = 1;
+  if (ui_spin_button_base_set_value(sb, 42.0) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  g_spin_button_mock_set_attr_fail_target = 0;
+
+  /* 4. Test trigger_cva_change failure */
+  cva.register_on_change(sb, mock_cva_on_change_fail, NULL);
+  if (ui_spin_button_base_set_value(sb, 43.0) != UI_ERROR_UNKNOWN) {
+    printf("mock fail at line %d\n", __LINE__);
+    return 1;
+  }
+  cva.register_on_change(sb, NULL, NULL);
+
+  /* 5. Test trigger_cva_touched failure in process_event */
+  cva.register_on_touched(sb, mock_cva_on_touched_fail, NULL);
+  ev.type = UI_EVENT_KEY_DOWN;
+  ev.event_data.keyboard.key_code = UI_KEY_UP;
+  if (ui_spin_button_base_process_event(sb, &ev) != UI_ERROR_UNKNOWN)
+    return 1;
+  cva.register_on_touched(sb, NULL, NULL);
+
+  /* Exercise remove_attr target > 1 so counter != target branch is taken */
+  g_spin_button_remove_attr_counter = 0;
+  g_spin_button_mock_remove_attr_fail_target = 2;
+  ui_spin_button_base_set_disabled(sb, 1);
+  ui_spin_button_base_set_disabled(sb, 0);
+  g_spin_button_mock_remove_attr_fail_target = 0;
+
+  /* Exercise update_aria NULL checks */
+  {
+    extern ui_error_t ui_test_sb_update_aria(struct ui_spin_button_base * sb);
+    struct ui_component comp_no_root;
+    struct ui_component *orig_comp = sb->component;
+    memset(&comp_no_root, 0, sizeof(comp_no_root));
+
+    if (ui_test_sb_update_aria(NULL) != UI_ERROR_INVALID_ARGUMENT)
+      return 1;
+
+    sb->component = NULL;
+    if (ui_test_sb_update_aria(sb) != UI_ERROR_INVALID_ARGUMENT)
+      return 1;
+
+    sb->component = &comp_no_root;
+    if (ui_test_sb_update_aria(sb) != UI_ERROR_INVALID_ARGUMENT)
+      return 1;
+    sb->component = orig_comp;
+  }
+
+  /* Exercise destroy with active continuous scroll */
+  ui_spin_button_base_start_continuous_increment(sb);
+
+  ui_spin_button_base_destroy(sb);
+  return 0;
+}
+#endif

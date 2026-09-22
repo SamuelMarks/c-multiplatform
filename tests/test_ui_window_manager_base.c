@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "ui_window_manager_base.h"
 #include "ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
@@ -33,9 +34,7 @@ static int test_window_manager_creation(void) {
 
   {
     ui_error_t rc_cleanup = ui_window_manager_base_destroy(wm);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -56,9 +55,7 @@ static int test_window_manager_operations(void) {
 
   {
     ui_error_t rc_cleanup = ui_window_manager_base_destroy(wm);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -72,9 +69,7 @@ static int test_invalid_args(void) {
 
   {
     ui_error_t rc_cleanup = ui_window_manager_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   CHECK_FAIL(ui_window_manager_base_get_component(NULL, &comp) !=
@@ -98,9 +93,7 @@ static int test_invalid_args(void) {
 
   {
     ui_error_t rc_cleanup = ui_window_manager_base_destroy(wm);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return failed;
 }
@@ -108,18 +101,28 @@ static int test_invalid_args(void) {
 static int test_oom(void) {
   int failed = 0;
 #ifdef UI_TEST_MOCK_ALLOC
-  struct ui_window_manager_base *wm;
+  extern int g_wm_mock_fail;
+  struct ui_window_manager_base *wm = NULL;
   int i;
   for (i = 0; i < 15; i++) {
+    wm = NULL;
     g_malloc_fail_countdown = i;
     {
       ui_error_t rc_cleanup = ui_window_manager_base_create(&wm);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
+      if (rc_cleanup == UI_ERROR_NONE) {
+        ui_window_manager_base_destroy(wm);
       }
     }
   }
   g_malloc_fail_countdown = -1;
+
+  g_wm_mock_fail = 1;
+  CHECK_FAIL(ui_window_manager_base_create(&wm) == UI_ERROR_NONE);
+  g_wm_mock_fail = 2;
+  CHECK_FAIL(ui_window_manager_base_create(&wm) == UI_ERROR_NONE);
+  g_wm_mock_fail = 3;
+  CHECK_FAIL(ui_window_manager_base_create(&wm) == UI_ERROR_NONE);
+  g_wm_mock_fail = 0;
 #endif
   return failed;
 }
@@ -133,16 +136,12 @@ static int test_missing_coverage(void) {
     extern ui_error_t ui_component_destroy(struct ui_component *);
     {
       ui_error_t rc_cleanup = ui_component_destroy(wm->component);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     wm->component = NULL;
     {
       ui_error_t rc_cleanup = ui_window_manager_base_destroy(wm);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   } else {
     failed = 1;

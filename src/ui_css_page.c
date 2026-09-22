@@ -93,11 +93,11 @@ ui_error_t ui_css_page_parse(const struct ui_css_computed_style *style,
       if (!out_props->page_name) {
         return UI_ERROR_OUT_OF_MEMORY;
       }
-#if defined(_MSC_VER)
-      strcpy_s(out_props->page_name, len + 1, val);
-#else
-      UI_STRCPY(out_props->page_name, sizeof(out_props->page_name), val);
-#endif
+      if (UI_STRCPY(out_props->page_name, len + 1, val) != 0) {
+        C_MULTIPLATFORM_FREE(out_props->page_name);
+        out_props->page_name = NULL;
+        return UI_ERROR_UNKNOWN;
+      }
     }
   }
 

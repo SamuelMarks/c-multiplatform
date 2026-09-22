@@ -26,6 +26,21 @@ struct ui_camera_base {
   void *frame_user_data;                   /**< frame_user_data */
 };
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_camera_mock_fail = 0;
+static ui_error_t mock_dom_node_set_attribute(struct ui_dom_node *node,
+                                              const char *k, const char *v) {
+  if (g_camera_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_set_attribute)(node, k, v);
+}
+#undef ui_dom_node_set_attribute
+/** @cond */
+#define ui_dom_node_set_attribute mock_dom_node_set_attribute
+/** @endcond */
+#endif
+
 ui_error_t ui_camera_base_create(struct ui_camera_base **out_camera) {
   struct ui_camera_base *camera;
   struct ui_dom_node *root_node = NULL;
@@ -52,45 +67,31 @@ ui_error_t ui_camera_base_create(struct ui_camera_base **out_camera) {
 
   rc = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &root_node);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(camera->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(camera);
-    return rc;
+    goto cleanup;
   }
 
   /* Represent the camera unstyled boundary as a video tag internally */
   rc = ui_dom_node_set_tag_name(root_node, "video");
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(camera->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(camera);
-    return rc;
+    goto cleanup;
   }
   rc = ui_dom_node_set_attribute(root_node, "autoplay", "true");
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(camera->component);
-      (void)rc_cleanup;
-    }
-    C_MULTIPLATFORM_FREE(camera);
-    return rc;
+    goto cleanup;
   }
   camera->component->shadow_root = root_node;
+  root_node = NULL;
 
   *out_camera = camera;
   return UI_ERROR_NONE;
+
+cleanup:
+  if (root_node) {
+    ui_dom_node_destroy(root_node);
+  }
+  ui_component_destroy(camera->component);
+  C_MULTIPLATFORM_FREE(camera);
+  return rc;
 }
 
 ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera) {
@@ -98,16 +99,10 @@ ui_error_t ui_camera_base_destroy(struct ui_camera_base *camera) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
   if (camera->state == UI_CAMERA_STATE_STREAMING) {
-    {
-      ui_error_t rc_cleanup = ui_camera_base_stop_stream(camera);
-      (void)rc_cleanup;
-    }
+    ui_camera_base_stop_stream(camera);
   }
   if (camera->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(camera->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(camera->component);
   }
   C_MULTIPLATFORM_FREE(camera);
   return UI_ERROR_NONE;

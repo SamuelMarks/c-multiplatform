@@ -8,6 +8,10 @@
 #include <stdlib.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_transfer_mock_fail = 0;
+#endif
+
 /**
  * @brief trigger_cva_change.
  * @param list Parameter list.
@@ -23,7 +27,7 @@ static ui_error_t trigger_cva_change(struct ui_transfer_list_base *list) {
       pl->left_list = list->left_list;
       pl->right_list = list->right_list;
       payload.ptr_val = pl;
-      (void)list->cva_on_change(payload, list->cva_on_change_user_data);
+      return list->cva_on_change(payload, list->cva_on_change_user_data);
     }
   }
   return UI_ERROR_NONE;
@@ -36,7 +40,7 @@ static ui_error_t trigger_cva_change(struct ui_transfer_list_base *list) {
  */
 static ui_error_t trigger_cva_touched(struct ui_transfer_list_base *list) {
   if (list->cva_on_touched) {
-    (void)list->cva_on_touched(list->cva_on_touched_user_data);
+    return list->cva_on_touched(list->cva_on_touched_user_data);
   }
   return UI_ERROR_NONE;
 }
@@ -236,14 +240,12 @@ ui_transfer_list_base_set_selected(struct ui_transfer_list_base *list, int id,
 
   if (item->selected != selected) {
     item->selected = selected;
-    {
-      ui_error_t _ign_rc = trigger_cva_touched(list);
-      (void)_ign_rc;
-    }
-    {
-      ui_error_t _ign_rc = trigger_cva_change(list);
-      (void)_ign_rc;
-    }
+    rc = trigger_cva_touched(list);
+    if (rc != UI_ERROR_NONE)
+      return rc;
+    rc = trigger_cva_change(list);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
   return UI_ERROR_NONE;
 }
@@ -264,6 +266,12 @@ static ui_error_t move_items(struct ui_transfer_list_item **src_head,
   struct ui_transfer_list_item *next_item;
   int moved_count = 0;
   *out_moved = 0;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_transfer_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
 
   while (curr) {
     next_item = curr->next;
@@ -306,24 +314,22 @@ ui_transfer_list_base_move_selected(struct ui_transfer_list_base *list,
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t _ign_rc = trigger_cva_touched(list);
-    (void)_ign_rc;
-  }
+  rc = trigger_cva_touched(list);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (to_right) {
     rc = move_items(&list->left_list, &list->right_list, 1, &moved);
   } else {
     rc = move_items(&list->right_list, &list->left_list, 1, &moved);
   }
-  {
-    ui_error_t _ign_rc = rc;
-    (void)_ign_rc;
-  }
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (moved > 0) {
-    ui_error_t _ign_rc = trigger_cva_change(list);
-    (void)_ign_rc;
+    rc = trigger_cva_change(list);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
@@ -347,24 +353,22 @@ ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t _ign_rc = trigger_cva_touched(list);
-    (void)_ign_rc;
-  }
+  rc = trigger_cva_touched(list);
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (to_right) {
     rc = move_items(&list->left_list, &list->right_list, 0, &moved);
   } else {
     rc = move_items(&list->right_list, &list->left_list, 0, &moved);
   }
-  {
-    ui_error_t _ign_rc = rc;
-    (void)_ign_rc;
-  }
+  if (rc != UI_ERROR_NONE)
+    return rc;
 
   if (moved > 0) {
-    ui_error_t _ign_rc = trigger_cva_change(list);
-    (void)_ign_rc;
+    rc = trigger_cva_change(list);
+    if (rc != UI_ERROR_NONE)
+      return rc;
   }
 
   return UI_ERROR_NONE;
@@ -378,6 +382,11 @@ ui_error_t ui_transfer_list_base_move_all(struct ui_transfer_list_base *list,
 static ui_error_t free_list(struct ui_transfer_list_item *head) {
   struct ui_transfer_list_item *curr = head;
   struct ui_transfer_list_item *next_item;
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_transfer_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   while (curr) {
     next_item = curr->next;
     C_MULTIPLATFORM_FREE(curr);
@@ -389,20 +398,23 @@ static ui_error_t free_list(struct ui_transfer_list_item *head) {
 /* \brief ui_error
  */
 ui_error_t ui_transfer_list_base_cleanup(struct ui_transfer_list_base *list) {
+  ui_error_t rc = UI_ERROR_NONE;
+  ui_error_t free_rc;
+
   if (!list) {
     return UI_ERROR_NONE;
   }
 
-  {
-    ui_error_t _ign_rc = free_list(list->left_list);
-    (void)_ign_rc;
+  free_rc = free_list(list->left_list);
+  if (free_rc != UI_ERROR_NONE) {
+    rc = free_rc;
   }
   list->left_list = NULL;
 
-  {
-    ui_error_t _ign_rc = free_list(list->right_list);
-    (void)_ign_rc;
+  free_rc = free_list(list->right_list);
+  if (free_rc != UI_ERROR_NONE) {
+    rc = free_rc;
   }
   list->right_list = NULL;
-  return UI_ERROR_NONE;
+  return rc;
 }

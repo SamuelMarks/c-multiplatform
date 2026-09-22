@@ -46,13 +46,14 @@ static ui_error_t trigger_event(const struct ui_dom_node *node,
  * @param out_node Parameter out_node.
  * @return Return value.
  */
-static void hit_test(const struct ui_layout_node *node, float x, float y,
-                     const struct ui_layout_node **out_node) {
+static ui_error_t hit_test(const struct ui_layout_node *node, float x, float y,
+                           const struct ui_layout_node **out_node) {
   *out_node = NULL;
   if (x >= node->x && x <= node->x + node->width && y >= node->y &&
       y <= node->y + node->height) {
     *out_node = node;
   }
+  return UI_ERROR_NONE;
 }
 
 ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
@@ -79,10 +80,8 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
       event->type == UI_EVENT_MOUSE_WHEEL) {
 
     const struct ui_layout_node *hit = NULL;
-    {
-      hit_test(layout_root, (float)event->event_data.mouse.x,
-               (float)event->event_data.mouse.y, &hit);
-    }
+    hit_test(layout_root, (float)event->event_data.mouse.x,
+             (float)event->event_data.mouse.y, &hit);
 
     if (event->type == UI_EVENT_MOUSE_MOVE) {
       if (hit != state->hovered_node) {
@@ -187,7 +186,7 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
              event->type == UI_EVENT_KEY_PRESS) {
     struct ui_dom_node *focused = NULL;
     if (focus_mgr) {
-      (void)ui_focus_manager_get_focused_node(focus_mgr, &focused);
+      ui_focus_manager_get_focused_node(focus_mgr, &focused);
     }
     if (focused) {
       {
@@ -201,8 +200,11 @@ ui_error_t ui_event_dispatch(const struct ui_layout_node *layout_root,
         event->event_data.keyboard.key_code == UI_KEY_TAB && focus_mgr &&
         layout_root->dom_node) {
       int forward = !(event->event_data.keyboard.modifiers & UI_MODIFIER_SHIFT);
-      (void)ui_focus_manager_advance(
+      ui_error_t adv_rc = ui_focus_manager_advance(
           focus_mgr, (struct ui_dom_node *)layout_root->dom_node, forward);
+      if (adv_rc != UI_ERROR_NONE) {
+        return adv_rc;
+      }
     }
   }
   return UI_ERROR_NONE;

@@ -1,3 +1,8 @@
+/**
+ * @file main.c
+ * @brief Basic Flex Layout example application.
+ */
+
 /* clang-format off */
 #include <stdio.h>
 #include <string.h>
@@ -26,6 +31,9 @@
 #endif
 /* clang-format on */
 
+/**
+ * @brief Default CSS for the basic flex layout example.
+ */
 static const char *BASIC_CSS = "body {"
                                "  display: flex;"
                                "  flex-direction: column;"
@@ -40,32 +48,48 @@ static const char *BASIC_CSS = "body {"
                                "  margin: 15px;"
                                "}";
 
+/**
+ * @struct app_context
+ * @brief Application state for basic flex example.
+ */
 struct app_context {
-  struct ui_dom_node *root;
-  struct ui_css_stylesheet *stylesheet;
-  struct ui_layout_node *layout_tree;
-  float window_width;
-  float window_height;
-  int needs_layout;
+  struct ui_dom_node *root;             /**< Root DOM node */
+  struct ui_css_stylesheet *stylesheet; /**< Parsed CSS stylesheet */
+  struct ui_layout_node *layout_tree;   /**< Computed layout tree */
+  float window_width;                   /**< Current window width */
+  float window_height;                  /**< Current window height */
+  int needs_layout; /**< Flag indicating layout recalculation needed */
 };
 
+/**
+ * @brief Recursively renders a layout node and its children.
+ * @param renderer Pointer to the renderer backend.
+ * @param node Pointer to the layout node to draw.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 static ui_error_t draw_layout_node(struct ui_renderer_backend *renderer,
                                    struct ui_layout_node *node) {
   struct ui_dom_rect rect;
-  struct ui_color color = {0.8f, 0.8f, 0.8f, 1.0f};
+  struct ui_color color;
   struct ui_layout_node *child;
   const char *id = NULL;
-
   ui_error_t err;
 
+  color.r = 0.8f;
+  color.g = 0.8f;
+  color.b = 0.8f;
+  color.a = 1.0f;
+
   err = ui_cssom_view_get_bounding_client_rect(node, &rect);
-  if (err != UI_ERROR_NONE)
+  if (err != UI_ERROR_NONE) {
     return err;
+  }
 
   if (node->dom_node) {
     err = ui_dom_node_get_attribute(node->dom_node, "id", &id);
-    if (err != UI_ERROR_NONE)
+    if (err != UI_ERROR_NONE && err != UI_ERROR_NOT_FOUND) {
       return err;
+    }
 
     if (id && strcmp(id, "box1") == 0) {
       color.r = 0.8f;
@@ -89,81 +113,112 @@ static ui_error_t draw_layout_node(struct ui_renderer_backend *renderer,
   if (rect.width > 0 && rect.height > 0) {
     err = renderer->draw_rect(renderer, (float)rect.x, (float)rect.y,
                               (float)rect.width, (float)rect.height, color);
-    if (err != UI_ERROR_NONE)
+    if (err != UI_ERROR_NONE) {
       return err;
+    }
   }
 
   child = node->first_child;
   while (child) {
     err = draw_layout_node(renderer, child);
-    if (err != UI_ERROR_NONE)
+    if (err != UI_ERROR_NONE) {
       return err;
+    }
     child = child->next_sibling;
   }
   return UI_ERROR_NONE;
 }
 
+/**
+ * @struct render_context
+ * @brief Aggregate context passed into render callbacks.
+ */
 struct render_context {
-  struct app_context *app_ctx;
-  struct ui_renderer_backend *renderer;
-  struct ui_window_backend *window_backend;
-  struct ui_window *window;
-  struct ui_engine *engine;
+  struct app_context *app_ctx;              /**< Application context */
+  struct ui_renderer_backend *renderer;     /**< Renderer backend */
+  struct ui_window_backend *window_backend; /**< Window backend */
+  struct ui_window *window;                 /**< Native window handle */
+  struct ui_engine *engine;                 /**< Core UI engine */
 };
 
+/**
+ * @brief Performs layout solve and renders the current frame.
+ * @param rctx Pointer to the render context.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 static ui_error_t do_render(struct render_context *rctx) {
   struct app_context *app_ctx = rctx->app_ctx;
   struct ui_renderer_backend *renderer = rctx->renderer;
+  struct ui_color bg;
   ui_error_t err;
+
+  bg.r = 1.0f;
+  bg.g = 1.0f;
+  bg.b = 1.0f;
+  bg.a = 1.0f;
 
   if (app_ctx->needs_layout) {
     if (app_ctx->layout_tree) {
       err = ui_layout_tree_destroy(app_ctx->layout_tree);
-      if (err != UI_ERROR_NONE)
+      if (err != UI_ERROR_NONE) {
         return err;
+      }
       app_ctx->layout_tree = NULL;
     }
     err = ui_layout_tree_generate(app_ctx->root, app_ctx->stylesheet,
                                   &app_ctx->layout_tree);
-    if (err != UI_ERROR_NONE)
+    if (err != UI_ERROR_NONE) {
       return err;
+    }
     err = ui_layout_solve_viewport(app_ctx->layout_tree, app_ctx->window_width,
                                    app_ctx->window_height);
-    if (err != UI_ERROR_NONE)
+    if (err != UI_ERROR_NONE) {
       return err;
+    }
     app_ctx->needs_layout = 0;
+  }
+
+  err = ui_engine_tick(rctx->engine);
+  if (err != UI_ERROR_NONE) {
+    return err;
   }
 
   err = renderer->set_viewport(renderer, 0, 0, (int)app_ctx->window_width,
                                (int)app_ctx->window_height);
-  if (err != UI_ERROR_NONE)
+  if (err != UI_ERROR_NONE) {
     return err;
-  {
-    struct ui_color bg = {1.0f, 1.0f, 1.0f, 1.0f};
-    err = renderer->clear(renderer, bg);
-    if (err != UI_ERROR_NONE)
-      return err;
+  }
+
+  err = renderer->clear(renderer, bg);
+  if (err != UI_ERROR_NONE) {
+    return err;
   }
 
   if (app_ctx->layout_tree) {
     err = draw_layout_node(renderer, app_ctx->layout_tree);
-    if (err != UI_ERROR_NONE)
+    if (err != UI_ERROR_NONE) {
       return err;
+    }
   }
 
   err = renderer->flush(renderer);
-  if (err != UI_ERROR_NONE)
+  if (err != UI_ERROR_NONE) {
     return err;
+  }
   err = rctx->window_backend->swap_buffers(rctx->window_backend, rctx->window);
-  if (err != UI_ERROR_NONE)
+  if (err != UI_ERROR_NONE) {
     return err;
-
-  err = ui_engine_tick(rctx->engine);
-  if (err != UI_ERROR_NONE)
-    return err;
+  }
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Window resize event callback.
+ * @param user_data Pointer to the render context.
+ * @param width New window width.
+ * @param height New window height.
+ * @return UI_ERROR_NONE on success, or an error code on failure.
+ */
 static ui_error_t on_resize_callback(void *user_data, int width, int height) {
   struct render_context *rctx = (struct render_context *)user_data;
   rctx->app_ctx->window_width = (float)width;
@@ -175,6 +230,10 @@ static ui_error_t on_resize_callback(void *user_data, int width, int height) {
 #if defined(__EMSCRIPTEN__)
 static struct app_context g_app_ctx;
 static struct render_context g_rctx;
+
+/**
+ * @brief Emscripten main loop tick step.
+ */
 static void main_loop_step(void) {
   struct ui_event event;
   int has_event = 0;
@@ -201,17 +260,27 @@ static void main_loop_step(void) {
 
   {
     ui_error_t rc_render = do_render(&g_rctx);
-    (void)rc_render;
+    if (rc_render != UI_ERROR_NONE) {
+      emscripten_cancel_main_loop();
+      return;
+    }
   }
 }
 #endif
 
 #ifndef OMIT_MAIN
+/**
+ * @brief Application entry point.
+ * @return 0 on success, non-zero on failure.
+ */
 int main(void) {
 #else
+/**
+ * @brief Testable entry point for the basic example.
+ * @return 0 on success, non-zero on failure.
+ */
 int example_basic_main(void) {
 #endif
-
   struct ui_engine_config config;
   struct ui_engine *engine = NULL;
   struct ui_window_backend *backend = NULL;
@@ -220,20 +289,108 @@ int example_basic_main(void) {
   struct app_context app_ctx;
   struct render_context rctx;
   struct ui_dom_node *box1 = NULL, *box2 = NULL, *box3 = NULL;
-  ui_error_t err;
+  struct ui_event event;
+  const char *ci_test = NULL;
   int running = 1;
+  int frame_count = 0;
+  int has_event = 0;
+  int exit_code = 0;
+  ui_error_t err;
 
   printf("Starting Basic UI Flex Example...\n");
 
   memset(&app_ctx, 0, sizeof(app_ctx));
+  memset(&rctx, 0, sizeof(rctx));
+  memset(&event, 0, sizeof(event));
   app_ctx.window_width = 800.0f;
   app_ctx.window_height = 600.0f;
   app_ctx.needs_layout = 1;
 
   config.num_threads = 2;
   err = ui_engine_create(&config, &engine);
-  if (err != UI_ERROR_NONE)
+  if (err != UI_ERROR_NONE) {
     return 1;
+  }
+
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &app_ctx.root);
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_set_tag_name(app_ctx.root, "body");
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box1);
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_set_attribute(box1, "class", "box");
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_set_attribute(box1, "id", "box1");
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_append_child(app_ctx.root, box1);
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box2);
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_set_attribute(box2, "class", "box");
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_set_attribute(box2, "id", "box2");
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_append_child(app_ctx.root, box2);
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+
+  err = ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box3);
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_set_attribute(box3, "class", "box");
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_set_attribute(box3, "id", "box3");
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+  err = ui_dom_node_append_child(app_ctx.root, box3);
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
+
+  err = ui_css_parse_stylesheet(BASIC_CSS, &app_ctx.stylesheet);
+  if (err != UI_ERROR_NONE) {
+    exit_code = 1;
+    goto cleanup;
+  }
 
 #if defined(__EMSCRIPTEN__)
   err = ui_window_backend_web_create(&backend);
@@ -245,120 +402,160 @@ err = ui_window_backend_macos_create(&backend);
 err = ui_window_backend_linux_create(&backend);
 #endif
 
-  if (!backend || err != UI_ERROR_NONE)
-    goto cleanup;
-
-  err = backend->create_window(backend, "Basic Flex Layout",
-                               (int)app_ctx.window_width,
-                               (int)app_ctx.window_height, &window);
-  if (err != UI_ERROR_NONE)
-    goto cleanup;
-
-  err = ui_renderer_gles2_create(&renderer);
-  if (err != UI_ERROR_NONE)
-    goto cleanup;
-  renderer->init(renderer, backend, window);
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &app_ctx.root);
-  ui_dom_node_set_tag_name(app_ctx.root, "body");
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box1);
-  ui_dom_node_set_attribute(box1, "class", "box");
-  ui_dom_node_set_attribute(box1, "id", "box1");
-  ui_dom_node_append_child(app_ctx.root, box1);
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box2);
-  ui_dom_node_set_attribute(box2, "class", "box");
-  ui_dom_node_set_attribute(box2, "id", "box2");
-  ui_dom_node_append_child(app_ctx.root, box2);
-
-  ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &box3);
-  ui_dom_node_set_attribute(box3, "class", "box");
-  ui_dom_node_set_attribute(box3, "id", "box3");
-  ui_dom_node_append_child(app_ctx.root, box3);
-
-  ui_css_parse_stylesheet(BASIC_CSS, &app_ctx.stylesheet);
-
-  rctx.app_ctx = &app_ctx;
-  rctx.renderer = renderer;
-  rctx.window_backend = backend;
-  rctx.window = window;
-  rctx.engine = engine;
-
-  if (backend->set_on_resize_callback) {
-    backend->set_on_resize_callback(backend, window, on_resize_callback, &rctx);
-  }
-
-  backend->show_window(backend, window);
-
-#if defined(__EMSCRIPTEN__)
-  g_app_ctx = app_ctx;
-  g_rctx = rctx;
-  g_rctx.app_ctx = &g_app_ctx;
-  if (backend->set_on_resize_callback) {
-    backend->set_on_resize_callback(backend, window, on_resize_callback,
-                                    &g_rctx);
-  }
-  emscripten_set_main_loop(main_loop_step, 0, 1);
-#else
-  int frame_count = 0;
-#if defined(CI_TEST_RUN)
-  const char *ci_test = "1";
-#else
-  const char *ci_test = getenv("CI_TEST_RUN");
-#endif
-  while (running) {
-    if (ci_test && frame_count++ > 2)
-      break;
-
-    struct ui_event event;
-    int has_event = 0;
-
-    do {
-      err = backend->poll_events(backend, window, &event, &has_event);
-      if (err != UI_ERROR_NONE) {
-        running = 0;
-        break;
-      }
-      if (has_event) {
-        if (event.type == UI_EVENT_WINDOW_CLOSE) {
-          running = 0;
-        } else if (event.type == UI_EVENT_WINDOW_RESIZE) {
-          app_ctx.window_width = (float)event.event_data.window.width;
-          app_ctx.window_height = (float)event.event_data.window.height;
-          app_ctx.needs_layout = 1;
+  if (backend != NULL && err == UI_ERROR_NONE) {
+    err = backend->create_window(backend, "Basic Flex Layout",
+                                 (int)app_ctx.window_width,
+                                 (int)app_ctx.window_height, &window);
+    if (err == UI_ERROR_NONE && window != NULL) {
+      err = ui_renderer_gles2_create(&renderer);
+      if (err == UI_ERROR_NONE && renderer != NULL) {
+        err = renderer->init(renderer, backend, window);
+        if (err != UI_ERROR_NONE) {
+          renderer = NULL;
         }
       }
-    } while (has_event && running);
+      if (renderer != NULL) {
+        rctx.app_ctx = &app_ctx;
+        rctx.renderer = renderer;
+        rctx.window_backend = backend;
+        rctx.window = window;
+        rctx.engine = engine;
 
-    if (!running)
-      break;
+        if (backend->set_on_resize_callback) {
+          backend->set_on_resize_callback(backend, window, on_resize_callback,
+                                          &rctx);
+        }
 
-    do_render(&rctx);
+        err = backend->show_window(backend, window);
+        if (err != UI_ERROR_NONE) {
+          renderer = NULL;
+        }
+      }
+    }
   }
+
+  if (backend != NULL && window != NULL && renderer != NULL) {
+#if defined(__EMSCRIPTEN__)
+    g_app_ctx = app_ctx;
+    g_rctx = rctx;
+    g_rctx.app_ctx = &g_app_ctx;
+    if (backend->set_on_resize_callback) {
+      backend->set_on_resize_callback(backend, window, on_resize_callback,
+                                      &g_rctx);
+    }
+    emscripten_set_main_loop(main_loop_step, 0, 1);
+#else
+#if defined(CI_TEST_RUN)
+    ci_test = "1";
+#else
+    ci_test = getenv("CI_TEST_RUN");
 #endif
+
+    while (running) {
+      if (ci_test && frame_count++ > 2) {
+        break;
+      }
+
+      do {
+        err = backend->poll_events(backend, window, &event, &has_event);
+        if (err != UI_ERROR_NONE) {
+          running = 0;
+          exit_code = 1;
+          break;
+        }
+        if (has_event) {
+          if (event.type == UI_EVENT_WINDOW_CLOSE) {
+            running = 0;
+          } else if (event.type == UI_EVENT_WINDOW_RESIZE) {
+            app_ctx.window_width = (float)event.event_data.window.width;
+            app_ctx.window_height = (float)event.event_data.window.height;
+            app_ctx.needs_layout = 1;
+          }
+        }
+      } while (has_event && running);
+
+      if (!running) {
+        break;
+      }
+
+      err = do_render(&rctx);
+      if (err != UI_ERROR_NONE) {
+        exit_code = 1;
+        break;
+      }
+    }
+#endif
+  } else {
+    err = ui_layout_tree_generate(app_ctx.root, app_ctx.stylesheet,
+                                  &app_ctx.layout_tree);
+    if (err != UI_ERROR_NONE) {
+      exit_code = 1;
+      goto cleanup;
+    }
+    err = ui_layout_solve_viewport(app_ctx.layout_tree, app_ctx.window_width,
+                                   app_ctx.window_height);
+    if (err != UI_ERROR_NONE) {
+      exit_code = 1;
+      goto cleanup;
+    }
+    err = ui_engine_tick(engine);
+    if (err != UI_ERROR_NONE) {
+      exit_code = 1;
+      goto cleanup;
+    }
+  }
 
 cleanup:
-  if (app_ctx.layout_tree)
-    ui_layout_tree_destroy(app_ctx.layout_tree);
-  if (app_ctx.root)
-    ui_dom_node_destroy(app_ctx.root);
-  if (renderer)
-    renderer->destroy(renderer);
-  if (window)
-    backend->destroy_window(backend, window);
+  if (app_ctx.layout_tree) {
+    err = ui_layout_tree_destroy(app_ctx.layout_tree);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
+  if (app_ctx.stylesheet) {
+    err = ui_css_stylesheet_destroy(app_ctx.stylesheet);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
+  if (app_ctx.root) {
+    err = ui_dom_node_destroy(app_ctx.root);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
+  if (renderer) {
+    err = renderer->destroy(renderer);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
+  if (window && backend) {
+    err = backend->destroy_window(backend, window);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
   if (backend) {
 #if defined(__EMSCRIPTEN__)
-    ui_window_backend_web_destroy(backend);
+    err = ui_window_backend_web_destroy(backend);
 #elif defined(_WIN32) || defined(__CYGWIN__)
-    ui_window_backend_win32_destroy(backend);
+    err = ui_window_backend_win32_destroy(backend);
 #elif defined(__APPLE__)
-  ui_window_backend_macos_destroy(backend);
+  err = ui_window_backend_macos_destroy(backend);
 #elif defined(__linux__) || defined(__unix__)
-  ui_window_backend_linux_destroy(backend);
+  err = ui_window_backend_linux_destroy(backend);
 #endif
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
   }
-  ui_engine_destroy(engine);
+  if (engine) {
+    err = ui_engine_destroy(engine);
+    if (err != UI_ERROR_NONE && exit_code == 0) {
+      exit_code = 1;
+    }
+  }
 
-  return 0;
+  return exit_code;
 }

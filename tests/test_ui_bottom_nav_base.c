@@ -108,8 +108,34 @@ static ui_error_t run_normal_tests(void) {
   if (rc != UI_ERROR_NONE)
     return rc;
 
-  return UI_ERROR_NONE;
-  return UI_ERROR_NONE;
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_bottom_nav_mock_fail;
+    struct ui_bottom_nav_base *fail_nav = NULL;
+    struct ui_bottom_nav_item_base *fail_item = NULL;
+
+    rc = ui_bottom_nav_base_create(&fail_nav);
+    if (rc == UI_ERROR_NONE) {
+      g_bottom_nav_mock_fail = 1;
+      rc = ui_bottom_nav_base_destroy(fail_nav);
+      if (rc != UI_ERROR_UNKNOWN) {
+        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+      }
+      g_bottom_nav_mock_fail = 0;
+    }
+
+    rc = ui_bottom_nav_item_base_create(&fail_item);
+    if (rc == UI_ERROR_NONE) {
+      g_bottom_nav_mock_fail = 1;
+      rc = ui_bottom_nav_item_base_destroy(fail_item);
+      if (rc != UI_ERROR_UNKNOWN) {
+        return rc == UI_ERROR_NONE ? UI_ERROR_UNKNOWN : rc;
+      }
+      g_bottom_nav_mock_fail = 0;
+    }
+  }
+#endif
+
   return UI_ERROR_NONE;
 }
 

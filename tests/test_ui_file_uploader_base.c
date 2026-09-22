@@ -1,4 +1,5 @@
 /* clang-format off */
+#include <assert.h>
 #include "ui_file_uploader_base.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -264,9 +265,7 @@ static int run_normal_tests(void) {
       return 1;
     {
       ui_error_t rc_cleanup = ui_drag_drop_destroy(drag_ctx);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 

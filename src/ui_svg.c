@@ -10,6 +10,14 @@
 #include <string.h>
 #include <math.h>
 /* clang-format on */
+
+#ifdef UI_TEST_MOCK_ALLOC
+int g_mock_svg_skip_ws_fail = 0;
+int g_mock_svg_reflect_fail = 0;
+int g_mock_svg_triangle_area_fail = 0;
+int g_mock_svg_point_in_triangle_fail = 0;
+#endif
+
 /** @cond */
 #define UI_SVG_ABS(x) ((x) < 0.0f ? -(x) : (x))
 /** @endcond */
@@ -19,10 +27,19 @@
  * @param ptr Parameter ptr.
  * @return Return value.
  */
-static void skip_whitespace_and_commas(const char **ptr) {
+static ui_error_t skip_whitespace_and_commas(const char **ptr) {
+  if (!ptr || !*ptr) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_svg_skip_ws_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
   while (**ptr && (isspace((unsigned char)**ptr) || **ptr == ',')) {
     (*ptr)++;
   }
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -33,7 +50,15 @@ static void skip_whitespace_and_commas(const char **ptr) {
  */
 static ui_error_t parse_float(const char **ptr, float *out_val) {
   char *end;
-  skip_whitespace_and_commas(ptr);
+  ui_error_t rc;
+
+  if (!ptr || !*ptr || !out_val) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+  rc = skip_whitespace_and_commas(ptr);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
   if (!**ptr) {
     return UI_ERROR_PARSE_FAILED;
   }
@@ -72,11 +97,25 @@ static ui_error_t ensure_capacity(struct ui_svg_path *path) {
  * @param ref Parameter ref.
  * @return Return value.
  */
-static void reflect_point(struct ui_svg_point *out_p,
-                          const struct ui_svg_point *p,
-                          const struct ui_svg_point *ref) {
+static ui_error_t reflect_point(struct ui_svg_point *out_p,
+                                const struct ui_svg_point *p,
+                                const struct ui_svg_point *ref) {
+  if (!out_p || !p || !ref) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_svg_reflect_fail != 0) {
+    if (g_mock_svg_reflect_fail > 1) {
+      g_mock_svg_reflect_fail--;
+    } else {
+      g_mock_svg_reflect_fail = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
   out_p->x = ref->x * 2.0f - p->x;
   out_p->y = ref->y * 2.0f - p->y;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -265,12 +304,18 @@ ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
             struct ui_svg_point current_p;
             current_p.x = cx;
             current_p.y = cy;
-            reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp, &current_p);
+            rc = reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp,
+                               &current_p);
+            if (rc != UI_ERROR_NONE)
+              return rc;
           } else if (last_cmd == 's' || last_cmd == 'S') {
             struct ui_svg_point current_p;
             current_p.x = cx;
             current_p.y = cy;
-            reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp, &current_p);
+            rc = reflect_point(&new_cmd.data.cubic_bezier.cp1, &last_cp,
+                               &current_p);
+            if (rc != UI_ERROR_NONE)
+              return rc;
           } else {
             new_cmd.data.cubic_bezier.cp1.x = cx;
             new_cmd.data.cubic_bezier.cp1.y = cy;
@@ -301,14 +346,18 @@ ui_error_t ui_svg_path_parse(struct ui_svg_path *path, const char *d_attr) {
             struct ui_svg_point current_p;
             current_p.x = cx;
             current_p.y = cy;
-            reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
-                          &current_p);
+            rc = reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
+                               &current_p);
+            if (rc != UI_ERROR_NONE)
+              return rc;
           } else if (last_cmd == 't' || last_cmd == 'T') {
             struct ui_svg_point current_p;
             current_p.x = cx;
             current_p.y = cy;
-            reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
-                          &current_p);
+            rc = reflect_point(&new_cmd.data.quadratic_bezier.cp, &last_cp,
+                               &current_p);
+            if (rc != UI_ERROR_NONE)
+              return rc;
           } else {
             new_cmd.data.quadratic_bezier.cp.x = cx;
             new_cmd.data.quadratic_bezier.cp.y = cy;
@@ -622,8 +671,10 @@ static ui_error_t arc_to_lines(struct ui_svg_subpath *subpath,
   float ux, uy, vx, vy, start_angle, angle_extent;
   int segments, i;
   ui_error_t rc;
+  float unused_tolerance;
 
-  (void)tolerance;
+  unused_tolerance = tolerance;
+  tolerance = unused_tolerance;
 
   rx = UI_SVG_ABS(rx);
   ry = UI_SVG_ABS(ry);
@@ -853,9 +904,23 @@ static ui_error_t append_index(struct ui_svg_geometry *geom, ui_uint32 index) {
  * @param out_area Parameter out_area.
  * @return Return value.
  */
-static void triangle_area(struct ui_svg_point a, struct ui_svg_point b,
-                          struct ui_svg_point c, float *out_area) {
+static ui_error_t triangle_area(struct ui_svg_point a, struct ui_svg_point b,
+                                struct ui_svg_point c, float *out_area) {
+  if (!out_area) {
+    return UI_ERROR_INVALID_ARGUMENT;
+  }
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_svg_triangle_area_fail != 0) {
+    if (g_mock_svg_triangle_area_fail > 1) {
+      g_mock_svg_triangle_area_fail--;
+    } else {
+      g_mock_svg_triangle_area_fail = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+#endif
   *out_area = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -873,15 +938,40 @@ static ui_error_t is_point_in_triangle(struct ui_svg_point p,
                                        struct ui_svg_point c, int *out_match) {
   float area = 0.0f;
   float w1 = 0.0f, w2 = 0.0f, w3 = 0.0f;
+  ui_error_t rc;
+
+  if (!out_match)
+    return UI_ERROR_INVALID_ARGUMENT;
+
+#ifdef UI_TEST_MOCK_ALLOC
+  if (g_mock_svg_point_in_triangle_fail) {
+    return UI_ERROR_UNKNOWN;
+  }
+#endif
+
   *out_match = 0;
-  triangle_area(a, b, c, &area);
-  triangle_area(b, c, p, &w1);
+  rc = triangle_area(a, b, c, &area);
+  if (rc != UI_ERROR_NONE)
+    return rc;
+  rc = triangle_area(b, c, p, &w1);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   w1 /= area;
-  triangle_area(c, a, p, &w2);
+  rc = triangle_area(c, a, p, &w2);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   w2 /= area;
-  triangle_area(a, b, p, &w3);
+  rc = triangle_area(a, b, p, &w3);
+  if (rc != UI_ERROR_NONE)
+    return rc;
   w3 /= area;
-  *out_match = (w1 >= 0.0f && w2 >= 0.0f && w3 >= 0.0f);
+  if (w1 >= 0.0f) {
+    if (w2 >= 0.0f) {
+      if (w3 >= 0.0f) {
+        *out_match = 1;
+      }
+    }
+  }
   return UI_ERROR_NONE;
 }
 
@@ -962,17 +1052,21 @@ ui_svg_tessellate_fill(struct ui_svg_geometry *geom,
           prev = linked[prev];
         }
         next = linked[curr];
-        triangle_area(subpath->points[prev], subpath->points[curr],
-                      subpath->points[next], &area);
+        rc = triangle_area(subpath->points[prev], subpath->points[curr],
+                           subpath->points[next], &area);
+        if (rc != UI_ERROR_NONE)
+          goto cleanup;
         if (area > 0.0f) {
           /* Convex, test if any other point is inside */
           int is_ear = 1;
           ui_uint32 test_pt = linked[next];
           while (test_pt != prev) {
             int is_in = 0;
-            is_point_in_triangle(subpath->points[test_pt],
-                                 subpath->points[prev], subpath->points[curr],
-                                 subpath->points[next], &is_in);
+            rc = is_point_in_triangle(
+                subpath->points[test_pt], subpath->points[prev],
+                subpath->points[curr], subpath->points[next], &is_in);
+            if (rc != UI_ERROR_NONE)
+              goto cleanup;
             if (is_in) {
               is_ear = 0;
               break;
@@ -1114,3 +1208,33 @@ ui_svg_tessellate_stroke(struct ui_svg_geometry *geom,
 cleanup:
   return rc;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+ui_error_t ui_test_svg_skip_ws(const char **ptr) {
+  return skip_whitespace_and_commas(ptr);
+}
+
+ui_error_t ui_test_svg_parse_float(const char **ptr, float *out_val) {
+  return parse_float(ptr, out_val);
+}
+
+ui_error_t ui_test_svg_reflect_point(struct ui_svg_point *out_p,
+                                     const struct ui_svg_point *p,
+                                     const struct ui_svg_point *ref) {
+  return reflect_point(out_p, p, ref);
+}
+
+ui_error_t ui_test_svg_triangle_area(struct ui_svg_point a,
+                                     struct ui_svg_point b,
+                                     struct ui_svg_point c, float *out_area) {
+  return triangle_area(a, b, c, out_area);
+}
+
+ui_error_t ui_test_svg_is_point_in_triangle(struct ui_svg_point p,
+                                            struct ui_svg_point a,
+                                            struct ui_svg_point b,
+                                            struct ui_svg_point c,
+                                            int *out_match) {
+  return is_point_in_triangle(p, a, b, c, out_match);
+}
+#endif

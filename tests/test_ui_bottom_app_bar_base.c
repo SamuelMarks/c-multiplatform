@@ -20,12 +20,7 @@ static void test_bottom_app_bar_edge_cases(void) {
 
   /* Invalid arguments */
   assert(ui_bottom_app_bar_base_create(NULL) == UI_ERROR_INVALID_ARGUMENT);
-  {
-    ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
-  }
+  assert(ui_bottom_app_bar_base_destroy(NULL) == UI_ERROR_INVALID_ARGUMENT);
 
   assert(ui_bottom_app_bar_base_get_component(NULL, &comp) ==
          UI_ERROR_INVALID_ARGUMENT);
@@ -55,15 +50,11 @@ static void test_bottom_app_bar_edge_cases(void) {
 
   {
     ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(bar);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* OOM loop */
@@ -73,9 +64,7 @@ static void test_bottom_app_bar_edge_cases(void) {
     if (rc == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(test_bar);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     } else {
@@ -86,6 +75,57 @@ static void test_bottom_app_bar_edge_cases(void) {
   printf("test_bottom_app_bar_edge_cases passed\n");
 }
 
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_bottom_app_bar_mock_fail;
+
+static ui_error_t run_bottom_app_bar_coverage(void) {
+  ui_error_t rc;
+  struct ui_bottom_app_bar_base *bar = NULL;
+
+  g_bottom_app_bar_mock_fail = 1;
+  rc = ui_bottom_app_bar_base_create(&bar);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_bottom_app_bar_mock_fail = 0;
+
+  rc = ui_bottom_app_bar_base_create(&bar);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  g_bottom_app_bar_mock_fail = 2;
+  rc = ui_bottom_app_bar_base_set_fab(bar, NULL, UI_BOTTOM_APP_BAR_FAB_CENTER);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_bottom_app_bar_mock_fail = 0;
+
+  g_bottom_app_bar_mock_fail = 2;
+  rc = ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
+                                      UI_BOTTOM_APP_BAR_FAB_CENTER);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_bottom_app_bar_mock_fail = 0;
+
+  g_bottom_app_bar_mock_fail = 2;
+  rc = ui_bottom_app_bar_base_set_fab(bar, (struct ui_fab_base *)1,
+                                      UI_BOTTOM_APP_BAR_FAB_END);
+  if (rc == UI_ERROR_NONE) {
+    return UI_ERROR_UNKNOWN;
+  }
+  g_bottom_app_bar_mock_fail = 0;
+
+  rc = ui_bottom_app_bar_base_destroy(bar);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
+
+  return UI_ERROR_NONE;
+}
+#endif
+
 int main(void) {
   struct ui_bottom_app_bar_base *bar = NULL;
   struct ui_fab_base *fab = NULL;
@@ -93,8 +133,7 @@ int main(void) {
   ui_error_t rc;
 
 #ifdef UI_TEST_MOCK_ALLOC
-  extern ui_error_t run_bottom_app_bar_coverage(void);
-  run_bottom_app_bar_coverage();
+  assert(run_bottom_app_bar_coverage() == UI_ERROR_NONE);
 #endif
 
   rc = ui_bottom_app_bar_base_create(&bar);
@@ -124,13 +163,13 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_bottom_app_bar_base_destroy(bar);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
   {
     ui_error_t rc_cleanup = ui_fab_base_destroy(fab);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 

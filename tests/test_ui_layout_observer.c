@@ -13,7 +13,8 @@ static int last_fired_state = -1;
 static ui_error_t observer_callback(struct ui_layout_observer *observer,
                                     int breakpoint_id, int is_active,
                                     void *user_data) {
-  (void)observer;
+  if (observer) {
+  }
 
   callback_fire_count++;
   last_fired_id = breakpoint_id;
@@ -273,10 +274,14 @@ static int run_error_paths(void) {
 static ui_error_t failing_callback(struct ui_layout_observer *observer,
                                    int breakpoint_id, int is_active,
                                    void *user_data) {
-  (void)observer;
-  (void)breakpoint_id;
-  (void)is_active;
-  (void)user_data;
+  if (observer) {
+  }
+  if (breakpoint_id) {
+  }
+  if (is_active) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_INVALID_ARGUMENT;
 }
 

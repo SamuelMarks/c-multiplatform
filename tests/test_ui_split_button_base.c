@@ -1,12 +1,26 @@
+struct ui_split_button_base {
+  struct ui_component *component;
+  struct ui_button_base *main_button;
+  struct ui_button_base *trigger_button;
+  struct ui_signal *disabled_signal;
+  struct ui_signal *text_signal;
+};
 /* clang-format off */
 #include "ui_split_button_base.h"
 #include "ui_error.h"
 #include "../src/ui_internal_mem.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
 #ifdef UI_TEST_MOCK_ALLOC
 extern int g_malloc_fail_countdown;
+extern int g_button_mock_fail;
+extern int g_split_button_mock_destroy_fail;
+extern int g_split_button_mock_btn_destroy_fail;
+extern int g_split_button_mock_get_comp_fail;
+extern int g_split_button_mock_append_fail;
+extern int g_split_button_mock_node_destroy_fail;
 #endif
 
 #define ASSERT_SUCCESS(expr)                                                   \
@@ -49,15 +63,11 @@ static int test_ui_split_button_base_create_destroy(void) {
 
   {
     ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_split_button_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -90,9 +100,7 @@ static int test_ui_split_button_base_getters(void) {
 
   {
     ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -107,11 +115,16 @@ static int test_ui_split_button_base_disabled(void) {
   ASSERT_SUCCESS(ui_split_button_base_set_disabled(btn, 1));
   ASSERT_SUCCESS(ui_split_button_base_set_disabled(btn, 0));
 
+#ifdef UI_TEST_MOCK_ALLOC
+  /* Test branch where main_button set_disabled fails */
+  g_button_mock_fail = 290;
+  ASSERT_EQ(ui_split_button_base_set_disabled(btn, 1), UI_ERROR_UNKNOWN);
+  g_button_mock_fail = 0;
+#endif
+
   {
     ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -131,9 +144,7 @@ static int test_ui_split_button_base_bindings(void) {
 
   {
     ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   return 0;
 }
@@ -156,9 +167,7 @@ static int test_ui_split_button_base_allocation_failures(void) {
     if (err == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_split_button_base_destroy(btn);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     }
@@ -166,6 +175,156 @@ static int test_ui_split_button_base_allocation_failures(void) {
 #endif
   return 0;
 }
+
+#ifdef UI_TEST_MOCK_ALLOC
+extern int g_split_button_mock_parse_css_fail;
+extern int g_split_button_mock_set_style_fail;
+
+static int test_ui_split_button_base_mock_failures(void) {
+  struct ui_split_button_base *btn = NULL;
+  ui_error_t rc;
+
+  /* 1. ui_button_base_get_component failure during create (1st call:
+   * main_button) */
+  g_split_button_mock_get_comp_fail = 1;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc == UI_ERROR_UNKNOWN);
+  assert(btn == NULL);
+  g_split_button_mock_get_comp_fail = 0;
+
+  /* 1b. ui_button_base_get_component failure during create (2nd call:
+   * trigger_button) */
+  g_split_button_mock_get_comp_fail = 2;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc == UI_ERROR_UNKNOWN);
+  assert(btn == NULL);
+  g_split_button_mock_get_comp_fail = 0;
+
+  /* 2. ui_dom_node_append_child failure during create (1st call) */
+  g_split_button_mock_append_fail = 1;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc == UI_ERROR_UNKNOWN);
+  assert(btn == NULL);
+  g_split_button_mock_append_fail = 0;
+
+  /* 2b. ui_dom_node_append_child failure during create (2nd call) */
+  g_split_button_mock_append_fail = 2;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc == UI_ERROR_UNKNOWN);
+  assert(btn == NULL);
+  g_split_button_mock_append_fail = 0;
+
+  /* 2c. parse_css failure during create */
+  g_split_button_mock_parse_css_fail = 1;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc == UI_ERROR_UNKNOWN);
+  assert(btn == NULL);
+  g_split_button_mock_parse_css_fail = 0;
+
+  /* 2d. set_default_style failure during create */
+  g_split_button_mock_set_style_fail = 1;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc == UI_ERROR_UNKNOWN);
+  assert(btn == NULL);
+  g_split_button_mock_set_style_fail = 0;
+
+  /* 3. root_node destroy failure during create cleanup */
+  g_split_button_mock_node_destroy_fail = 1;
+  g_split_button_mock_append_fail = 1;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc != UI_ERROR_NONE);
+  assert(btn == NULL);
+  g_split_button_mock_node_destroy_fail = 0;
+  g_split_button_mock_append_fail = 0;
+
+  /* 4. button destroy failure during create cleanup */
+  g_split_button_mock_btn_destroy_fail = 1;
+  g_split_button_mock_append_fail = 1;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc != UI_ERROR_NONE);
+  assert(btn == NULL);
+  g_split_button_mock_btn_destroy_fail = 0;
+  g_split_button_mock_append_fail = 0;
+
+  /* 5. component destroy failure during create cleanup */
+  g_split_button_mock_destroy_fail = 1;
+  g_split_button_mock_append_fail = 1;
+  rc = ui_split_button_base_create(&btn);
+  assert(rc != UI_ERROR_NONE);
+  assert(btn == NULL);
+  g_split_button_mock_destroy_fail = 0;
+  g_split_button_mock_append_fail = 0;
+
+  /* 6. component destroy failure during normal destroy */
+  rc = ui_split_button_base_create(&btn);
+  assert(rc == UI_ERROR_NONE);
+  assert(btn != NULL);
+  g_split_button_mock_destroy_fail = 1;
+  rc = ui_split_button_base_destroy(btn);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_split_button_mock_destroy_fail = 0;
+
+  /* 7. button destroy failure during normal destroy */
+  rc = ui_split_button_base_create(&btn);
+  assert(rc == UI_ERROR_NONE);
+  assert(btn != NULL);
+  g_split_button_mock_btn_destroy_fail = 1;
+  rc = ui_split_button_base_destroy(btn);
+  assert(rc == UI_ERROR_UNKNOWN);
+  g_split_button_mock_btn_destroy_fail = 0;
+
+  /* 8. Partial split button destruction */
+  {
+    /* Case A: trigger_button is NULL */
+    rc = ui_split_button_base_create(&btn);
+    assert(rc == UI_ERROR_NONE);
+    assert(btn != NULL);
+    ui_button_base_destroy(btn->trigger_button);
+    btn->trigger_button = NULL;
+    rc = ui_split_button_base_destroy(btn);
+    assert(rc == UI_ERROR_NONE);
+
+    /* Case B: component is NULL (with trigger_button and main_button intact) */
+    rc = ui_split_button_base_create(&btn);
+    assert(rc == UI_ERROR_NONE);
+    assert(btn != NULL);
+    btn->component->shadow_root = NULL;
+    ui_component_destroy(btn->component);
+    btn->component = NULL;
+    rc = ui_split_button_base_destroy(btn);
+    assert(rc == UI_ERROR_NONE);
+
+    /* Case C: main_button is NULL */
+    rc = ui_split_button_base_create(&btn);
+    assert(rc == UI_ERROR_NONE);
+    assert(btn != NULL);
+    ui_button_base_destroy(btn->main_button);
+    btn->main_button = NULL;
+    rc = ui_split_button_base_destroy(btn);
+    assert(rc == UI_ERROR_NONE);
+  }
+
+  /* 9. get_component returns NULL tmp_comp during destroy */
+  {
+    /* 9a. trigger_button get_comp fails during normal destroy */
+    rc = ui_split_button_base_create(&btn);
+    assert(rc == UI_ERROR_NONE);
+    g_split_button_mock_get_comp_fail = 1;
+    rc = ui_split_button_base_destroy(btn);
+    assert(rc == UI_ERROR_NONE);
+    g_split_button_mock_get_comp_fail = 0;
+
+    /* 9b. main_button get_comp fails during normal destroy */
+    rc = ui_split_button_base_create(&btn);
+    assert(rc == UI_ERROR_NONE);
+    g_split_button_mock_get_comp_fail = 2;
+    rc = ui_split_button_base_destroy(btn);
+    assert(rc == UI_ERROR_NONE);
+    g_split_button_mock_get_comp_fail = 0;
+  }
+  return 0;
+}
+#endif
 
 int main(void) {
   if (test_ui_split_button_base_create_destroy())
@@ -178,5 +337,9 @@ int main(void) {
     return 1;
   if (test_ui_split_button_base_allocation_failures())
     return 1;
+#ifdef UI_TEST_MOCK_ALLOC
+  if (test_ui_split_button_base_mock_failures())
+    return 1;
+#endif
   return 0;
 }

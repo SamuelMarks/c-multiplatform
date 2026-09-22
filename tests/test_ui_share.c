@@ -1,5 +1,6 @@
 /* clang-format off */
 #include "../include/ui_share.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 /* clang-format on */
@@ -10,17 +11,21 @@ static int g_share_success = 0;
 
 static ui_error_t on_share_resolved(void *result_ptr, void *user_data,
                                     void **out_result) {
-  (void)result_ptr;
-  (void)user_data;
+  if (result_ptr) {
+  }
+  if (user_data) {
+  }
   g_share_success = 1;
   return UI_ERROR_NONE;
 }
 
 static ui_error_t on_share_rejected(ui_error_t err, void *user_data,
                                     void **out_result) {
-  (void)err;
-  (void)user_data;
-  fprintf(stderr, "Share promise rejected\n");
+  if (user_data) {
+  }
+  if (err != UI_ERROR_NONE) {
+    fprintf(stderr, "Share promise rejected: %d\n", (int)err);
+  }
   return UI_ERROR_NONE;
 }
 
@@ -99,9 +104,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_promise_destroy(promise);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   printf("test_ui_share passed\n");

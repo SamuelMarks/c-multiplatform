@@ -14,6 +14,9 @@
 #ifdef UI_TEST_MOCK_ALLOC
 /** @brief Internal mock countdown for append child failures. */
 extern int g_mock_append_child_fail_countdown;
+int g_table_mock_fail = 0;
+int g_table_mock_set_attr_fail_target = 0;
+static int g_table_set_attr_counter = 0;
 
 /**
  * @brief Mock implementation of ui_dom_node_append_child.
@@ -34,6 +37,62 @@ static ui_error_t mock_ui_dom_node_append_child(struct ui_dom_node *parent,
 }
 /** @cond */
 #define ui_dom_node_append_child mock_ui_dom_node_append_child
+/** @endcond */
+
+/**
+ * @brief mock_table_dom_node_destroy.
+ * @param node Node to destroy.
+ * @return Return value.
+ */
+static ui_error_t mock_table_dom_node_destroy(struct ui_dom_node *node) {
+  if (g_table_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_dom_node_destroy(node);
+}
+/** @cond */
+#define ui_dom_node_destroy mock_table_dom_node_destroy
+/** @endcond */
+
+/**
+ * @brief mock_table_dom_node_set_attribute.
+ * @param node Node pointer.
+ * @param name Attribute name.
+ * @param val Attribute value.
+ * @return Return value.
+ */
+static ui_error_t mock_table_dom_node_set_attribute(struct ui_dom_node *node,
+                                                    const char *name,
+                                                    const char *val) {
+  if (g_table_mock_set_attr_fail_target > 0) {
+    if (++g_table_set_attr_counter == g_table_mock_set_attr_fail_target) {
+      g_table_set_attr_counter = 0;
+      return UI_ERROR_UNKNOWN;
+    }
+  }
+  return ui_dom_node_set_attribute(node, name, val);
+}
+/** @cond */
+#define ui_dom_node_set_attribute mock_table_dom_node_set_attribute
+/** @endcond */
+
+/**
+ * @brief mock_table_selection_model_is_selected.
+ * @param model Selection model.
+ * @param id Item ID.
+ * @param out_is_selected Output pointer.
+ * @return Return value.
+ */
+static ui_error_t
+mock_table_selection_model_is_selected(const struct ui_selection_model *model,
+                                       void *id, int *out_is_selected) {
+  if (g_table_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return ui_selection_model_is_selected(model, id, out_is_selected);
+}
+/** @cond */
+#define ui_selection_model_is_selected mock_table_selection_model_is_selected
 /** @endcond */
 #endif
 
@@ -236,6 +295,7 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
   struct ui_dom_node *header_row = NULL;
   struct ui_dom_node *tbody = NULL;
   ui_error_t rc;
+  ui_error_t rc_cleanup;
   size_t i, j;
   size_t total_rows, total_cols;
   size_t start_row, end_row;
@@ -265,9 +325,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     goto cleanup;
   rc = ui_dom_node_append_child(table_root, thead);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(thead);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(thead);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
     goto cleanup;
   }
@@ -280,9 +340,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     goto cleanup;
   rc = ui_dom_node_append_child(thead, header_row);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(header_row);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(header_row);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
     goto cleanup;
   }
@@ -299,9 +359,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
     rc = ui_dom_node_append_child(header_row, header_cell);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(header_cell);
-        (void)rc_cleanup;
+      rc_cleanup = ui_dom_node_destroy(header_cell);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
       }
       goto cleanup;
     }
@@ -345,9 +405,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     goto cleanup;
   rc = ui_dom_node_append_child(table_root, tbody);
   if (rc != UI_ERROR_NONE) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(tbody);
-      (void)rc_cleanup;
+    rc_cleanup = ui_dom_node_destroy(tbody);
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
     }
     goto cleanup;
   }
@@ -377,9 +437,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
       goto cleanup;
     rc = ui_dom_node_append_child(tbody, row);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t rc_cleanup = ui_dom_node_destroy(row);
-        (void)rc_cleanup;
+      rc_cleanup = ui_dom_node_destroy(row);
+      if (rc_cleanup != UI_ERROR_NONE) {
+        rc = rc_cleanup;
       }
       goto cleanup;
     }
@@ -388,15 +448,15 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
     if (rc != UI_ERROR_NONE)
       goto cleanup;
 
-    (void)ui_selection_model_is_selected(table->selection_model,
-                                         (void *)(size_t)i, &is_selected);
+    rc = ui_selection_model_is_selected(table->selection_model,
+                                        (void *)(size_t)i, &is_selected);
+    if (rc != UI_ERROR_NONE)
+      goto cleanup;
 
     if (is_selected) {
-      {
-        ui_error_t rc_cleanup =
-            ui_dom_node_set_attribute(row, "aria-selected", "true");
-        (void)rc_cleanup;
-      }
+      rc = ui_dom_node_set_attribute(row, "aria-selected", "true");
+      if (rc != UI_ERROR_NONE)
+        goto cleanup;
     }
 
     for (j = 0; j < total_cols; j++) {
@@ -408,9 +468,9 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
         goto cleanup;
       rc = ui_dom_node_append_child(row, cell);
       if (rc != UI_ERROR_NONE) {
-        {
-          ui_error_t rc_cleanup = ui_dom_node_destroy(cell);
-          (void)rc_cleanup;
+        rc_cleanup = ui_dom_node_destroy(cell);
+        if (rc_cleanup != UI_ERROR_NONE) {
+          rc = rc_cleanup;
         }
         goto cleanup;
       }
@@ -448,10 +508,11 @@ ui_error_t ui_table_base_render(struct ui_table_base *table,
 
   return UI_ERROR_NONE;
 
-cleanup: {
-  ui_error_t rc_cleanup = ui_dom_node_destroy(table_root);
-  (void)rc_cleanup;
-}
+cleanup:
+  rc_cleanup = ui_dom_node_destroy(table_root);
+  if (rc_cleanup != UI_ERROR_NONE) {
+    rc = rc_cleanup;
+  }
   return rc;
 }
 

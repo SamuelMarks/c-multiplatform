@@ -13,6 +13,24 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_hover_card_mock_fail = 0;
+
+static ui_error_t
+mock_hover_card_component_set_default_style(struct ui_component *comp,
+                                            struct ui_css_stylesheet *style) {
+  if (g_hover_card_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(comp, style);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style                                         \
+  mock_hover_card_component_set_default_style
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet for hover card base component */
 static const char *ui_hover_card_base_default_css =
     ".hover-card-container { "
@@ -87,10 +105,9 @@ ui_hover_card_base_create(struct ui_hover_card_base **out_hover_card) {
     goto cleanup;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_component_set_default_style(hover_card->component, default_style);
-    (void)rc_cleanup;
+  rc = ui_component_set_default_style(hover_card->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   hover_card->component->shadow_root = root_node;
@@ -101,16 +118,10 @@ ui_hover_card_base_create(struct ui_hover_card_base **out_hover_card) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (hover_card->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(hover_card->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(hover_card->component);
   }
   C_MULTIPLATFORM_FREE(hover_card);
   return rc;
@@ -126,10 +137,7 @@ ui_error_t ui_hover_card_base_destroy(struct ui_hover_card_base *hover_card) {
     return UI_ERROR_NONE;
   }
   if (hover_card->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(hover_card->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(hover_card->component);
   }
   C_MULTIPLATFORM_FREE(hover_card);
   return UI_ERROR_NONE;
@@ -179,8 +187,8 @@ ui_hover_card_base_on_mouse_enter(struct ui_hover_card_base *hover_card) {
 ui_error_t
 ui_hover_card_base_on_mouse_leave(struct ui_hover_card_base *hover_card,
                                   float cursor_x, float cursor_y) {
-  (void)cursor_x;
-  (void)cursor_y;
+  if (cursor_x > 0.0f || cursor_y > 0.0f) {
+  }
   if (!hover_card) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

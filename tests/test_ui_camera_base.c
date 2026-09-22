@@ -1,6 +1,7 @@
 /* clang-format off */
 #include "../include/ui_camera_base.h"
 #include "../include/ui_error.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
@@ -11,11 +12,16 @@ static int frame_received = 0;
 static ui_error_t test_frame_callback(struct ui_camera_base *camera,
                                       const void *frame_data, size_t size,
                                       int width, int height, void *user_data) {
-  (void)camera;
-  (void)frame_data;
-  (void)size;
-  (void)width;
-  (void)height;
+  if (camera) {
+  }
+  if (frame_data) {
+  }
+  if (size) {
+  }
+  if (width) {
+  }
+  if (height) {
+  }
   if (user_data != (void *)0x9999) {
     return UI_ERROR_UNKNOWN;
   }
@@ -114,9 +120,7 @@ static int test_camera_null_args_and_coverage(void) {
     if (ui_camera_base_create(&camera) == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_camera_base_destroy(camera);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       break;
     }
@@ -138,15 +142,11 @@ static int test_camera_null_args_and_coverage(void) {
     failed = 1;
   {
     ui_error_t rc_cleanup = ui_camera_base_request_permission(camera);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_camera_base_mock_permission_response(camera, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (ui_camera_base_request_permission(camera) != UI_ERROR_INVALID_ARGUMENT)
     failed = 1; /* wrong state */
@@ -156,17 +156,13 @@ static int test_camera_null_args_and_coverage(void) {
     failed = 1;
   {
     ui_error_t rc_cleanup = ui_camera_base_start_stream(camera);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (ui_camera_base_start_stream(camera) != UI_ERROR_NONE)
     failed = 1; /* Already streaming */
   {
     ui_error_t rc_cleanup = ui_camera_base_stop_stream(camera);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   /* Test stop_stream */
@@ -191,9 +187,7 @@ static int test_camera_null_args_and_coverage(void) {
     failed = 1; /* not streaming */
   {
     ui_error_t rc_cleanup = ui_camera_base_start_stream(camera);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   if (ui_camera_base_mock_frame(camera) != UI_ERROR_NONE)
     failed = 1; /* no callback set */
@@ -211,9 +205,7 @@ static int test_camera_null_args_and_coverage(void) {
     failed = 1;
   {
     ui_error_t rc_cleanup = ui_camera_base_destroy(camera);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   return failed;
@@ -224,28 +216,20 @@ static void test_camera_coverage(void) {
 
   {
     ui_error_t rc_cleanup = ui_camera_base_create(&cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_camera_base_start_stream(cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   {
     ui_error_t rc_cleanup = ui_camera_base_stop_stream(cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_camera_base_start_stream(cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_INVALID_ARGUMENT);
   }
   {
     struct ui_camera_base_internal {
@@ -261,60 +245,60 @@ static void test_camera_coverage(void) {
     ci->component = NULL;
     {
       ui_error_t rc_cleanup = ui_camera_base_destroy(cam);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
     {
       ui_error_t rc_cleanup = ui_component_destroy(saved);
-      if (rc_cleanup != UI_ERROR_NONE) {
-        (void)rc_cleanup; /* Avoid override */
-      }
+      assert(rc_cleanup == UI_ERROR_NONE);
     }
   }
 
   {
+#ifdef UI_TEST_MOCK_ALLOC
+    extern int g_camera_mock_fail;
+    struct ui_camera_base *cam_fail = NULL;
+    g_camera_mock_fail = 1;
+    assert(ui_camera_base_create(&cam_fail) != UI_ERROR_NONE);
+    g_camera_mock_fail = 0;
+#endif
+  }
+
+  {
     ui_error_t rc_cleanup = ui_camera_base_create(&cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_camera_base_request_permission(cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_camera_base_mock_permission_response(cam, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
-    ui_error_t rc_cleanup =
-        ui_camera_base_set_frame_callback(cam, test_frame_callback, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    ui_error_t rc_cleanup = ui_camera_base_set_frame_callback(
+        cam, test_frame_callback, (void *)0x9999);
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_camera_base_start_stream(cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_camera_base_mock_frame(cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
+  }
+  {
+    /* Test callback error return */
+    ui_error_t rc_cleanup = ui_camera_base_set_frame_callback(
+        cam, test_frame_callback, (void *)0x1234);
+    assert(rc_cleanup == UI_ERROR_NONE);
+    rc_cleanup = ui_camera_base_mock_frame(cam);
+    assert(rc_cleanup == UI_ERROR_UNKNOWN);
   }
   {
     ui_error_t rc_cleanup = ui_camera_base_destroy(cam);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }
 int main(void) {

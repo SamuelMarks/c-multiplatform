@@ -4,6 +4,8 @@
 #include "ui_error.h"
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
+#include <assert.h>
 /* clang-format on */
 
 #define ASSERT_SUCCESS(expr)                                                   \
@@ -218,7 +220,7 @@ int main(void) {
   {
     ui_error_t rc_cleanup = ui_arena_destroy(arena);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return 1;
     }
   }
 
@@ -252,7 +254,7 @@ void test_extra_node_graph_errors(void) {
   {
     ui_error_t rc_cleanup = ui_node_graph_base_destroy(NULL);
     if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
+      return;
     }
   }
   ui_node_graph_base_pan(NULL, 0.0f, 0.0f);
@@ -282,8 +284,54 @@ void test_extra_node_graph_errors2(void) {
   ui_node_graph_base_get_topology_signal(NULL, NULL);
 }
 void test_extra_node_graph_error_matrix(void) {
-  /* To trigger the !graph in update_camera_matrix, we can't because it's static
-   * and only called when graph is checked. We just test normally. */
+#ifdef UI_TEST_MOCK_ALLOC
+  extern int g_node_graph_matrix_init_mock_fail;
+  extern int g_node_graph_signal_destroy_mock_fail;
+  struct ui_arena *arena = NULL;
+  struct ui_node_graph_base *graph = NULL;
+  struct ui_node_graph_camera_config config;
+  ui_error_t rc;
+
+  memset(&config, 0, sizeof(config));
+  config.min_zoom = 0.1f;
+  config.max_zoom = 5.0f;
+
+  ui_arena_create(1024 * 16, &arena);
+
+  /* Test matrix init failure in create */
+  g_node_graph_matrix_init_mock_fail = 1;
+  rc = ui_node_graph_base_create(arena, &config, &graph);
+  assert(rc != UI_ERROR_NONE);
+  g_node_graph_matrix_init_mock_fail = 0;
+
+  /* Create clean graph */
+  rc = ui_node_graph_base_create(arena, &config, &graph);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test matrix init failure in pan / update_camera_matrix */
+  g_node_graph_matrix_init_mock_fail = 1;
+  rc = ui_node_graph_base_pan(graph, 10.0f, 10.0f);
+  assert(rc != UI_ERROR_NONE);
+  g_node_graph_matrix_init_mock_fail = 0;
+
+  /* Test signal destroy failure on camera_signal in destroy */
+  g_node_graph_signal_destroy_mock_fail = 1;
+  rc = ui_node_graph_base_destroy(graph);
+  assert(rc != UI_ERROR_NONE);
+  g_node_graph_signal_destroy_mock_fail = 0;
+
+  /* Create clean graph for second destroy failure test */
+  rc = ui_node_graph_base_create(arena, &config, &graph);
+  assert(rc == UI_ERROR_NONE);
+
+  /* Test signal destroy failure on topology_signal in destroy */
+  g_node_graph_signal_destroy_mock_fail = 2;
+  rc = ui_node_graph_base_destroy(graph);
+  assert(rc != UI_ERROR_NONE);
+  g_node_graph_signal_destroy_mock_fail = 0;
+
+  ui_arena_destroy(arena);
+#endif
 }
 void test_node_graph_oom_2(void) {
   struct ui_arena *arena;
@@ -317,7 +365,7 @@ void test_node_graph_oom_3(void) {
         if (graph) {
           ui_error_t rc_cleanup = ui_node_graph_base_destroy(graph);
           if (rc_cleanup != UI_ERROR_NONE) {
-            (void)rc_cleanup; /* Avoid override */
+            return;
           }
         }
       }
@@ -325,7 +373,7 @@ void test_node_graph_oom_3(void) {
       {
         ui_error_t rc_cleanup = ui_arena_destroy(arena);
         if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
+          return;
         }
       }
     }

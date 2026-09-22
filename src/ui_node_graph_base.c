@@ -10,6 +10,38 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_node_graph_signal_destroy_mock_fail = 0;
+int g_node_graph_matrix_init_mock_fail = 0;
+
+static ui_error_t mock_node_graph_matrix_init(struct ui_dom_matrix *matrix) {
+  if (g_node_graph_matrix_init_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_matrix_init_identity)(matrix);
+}
+#undef ui_dom_matrix_init_identity
+/** @cond */
+#define ui_dom_matrix_init_identity mock_node_graph_matrix_init
+/** @endcond */
+
+static ui_error_t mock_node_graph_signal_destroy(ui_signal_t *signal) {
+  if (g_node_graph_signal_destroy_mock_fail == 1) {
+    (ui_signal_destroy)(signal);
+    return UI_ERROR_UNKNOWN;
+  }
+  if (g_node_graph_signal_destroy_mock_fail == 2) {
+    g_node_graph_signal_destroy_mock_fail = 1;
+    return (ui_signal_destroy)(signal);
+  }
+  return (ui_signal_destroy)(signal);
+}
+#undef ui_signal_destroy
+/** @cond */
+#define ui_signal_destroy mock_node_graph_signal_destroy
+/** @endcond */
+#endif
+
 /** @def UI_NODE_GRAPH_MAX_CONNECTIONS
  * @brief Maximum allowed number of connections in the graph.
  */
@@ -66,8 +98,7 @@ static ui_error_t pointer_equality(union ui_signal_payload a,
 static ui_error_t void_equality(union ui_signal_payload a,
                                 union ui_signal_payload b,
                                 ui_bool_t *out_equal) {
-  (void)a;
-  (void)b;
+  *out_equal = (ui_bool_t)((size_t)a.ptr_val ^ (size_t)b.ptr_val);
   *out_equal = UI_FALSE;
   return UI_ERROR_NONE;
 }
@@ -83,9 +114,9 @@ static ui_error_t update_camera_matrix(struct ui_node_graph_base *graph) {
   ui_error_t rc;
 
   /* Construct simple 2D transform matrix (scale + translate) */
-  {
-    ui_error_t rc_cleanup = ui_dom_matrix_init_identity(&graph->camera_matrix);
-    (void)rc_cleanup;
+  rc = ui_dom_matrix_init_identity(&graph->camera_matrix);
+  if (rc != UI_ERROR_NONE) {
+    return rc;
   }
 
   graph->camera_matrix.m11 = graph->zoom;
@@ -133,10 +164,9 @@ ui_error_t ui_node_graph_base_create(
   (*out_graph)->camera_signal = NULL;
   (*out_graph)->topology_signal = NULL;
 
-  {
-    ui_error_t rc_cleanup =
-        ui_dom_matrix_init_identity(&(*out_graph)->camera_matrix);
-    (void)rc_cleanup;
+  err = ui_dom_matrix_init_identity(&(*out_graph)->camera_matrix);
+  if (err != UI_ERROR_NONE) {
+    return err;
   }
 
   initial_payload.ptr_val = &(*out_graph)->camera_matrix;
@@ -164,17 +194,22 @@ ui_error_t ui_node_graph_base_create(
  * @return UI_ERROR_NONE on success.
  */
 ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
+  ui_error_t rc = UI_ERROR_NONE;
   if (!graph)
     return UI_ERROR_INVALID_ARGUMENT;
   if (graph->camera_signal) {
     ui_error_t rc_cleanup = ui_signal_destroy(graph->camera_signal);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   if (graph->topology_signal) {
     ui_error_t rc_cleanup = ui_signal_destroy(graph->topology_signal);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE && rc == UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -186,7 +221,6 @@ ui_error_t ui_node_graph_base_destroy(struct ui_node_graph_base *graph) {
  */
 ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
                                   float delta_x, float delta_y) {
-  ui_error_t rc;
   if (!graph)
     return UI_ERROR_INVALID_ARGUMENT;
 
@@ -206,9 +240,7 @@ ui_error_t ui_node_graph_base_pan(struct ui_node_graph_base *graph,
       graph->pan_y = (float)graph->camera_config.bounds.bottom;
   }
 
-  rc = update_camera_matrix(graph);
-  { (void)rc; }
-  return UI_ERROR_NONE;
+  return update_camera_matrix(graph);
 }
 
 /**
@@ -222,7 +254,6 @@ ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
                                    const struct ui_dom_point *focal_point) {
   float old_zoom;
   float scale_factor;
-  ui_error_t rc;
 
   if (!graph)
     return UI_ERROR_INVALID_ARGUMENT;
@@ -246,9 +277,7 @@ ui_error_t ui_node_graph_base_zoom(struct ui_node_graph_base *graph, float zoom,
                            (focal_point->y - graph->pan_y) * scale_factor);
   }
 
-  rc = update_camera_matrix(graph);
-  { (void)rc; }
-  return UI_ERROR_NONE;
+  return update_camera_matrix(graph);
 }
 
 /**

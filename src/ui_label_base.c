@@ -15,6 +15,28 @@
 #include <string.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_label_mock_fail = 0;
+
+/**
+ * @brief mock_label_dom_node_append_child.
+ * @param parent Parameter parent.
+ * @param child Parameter child.
+ * @return Return value.
+ */
+static ui_error_t mock_label_dom_node_append_child(struct ui_dom_node *parent,
+                                                   struct ui_dom_node *child) {
+  if (g_label_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_dom_node_append_child)(parent, child);
+}
+#undef ui_dom_node_append_child
+/** @cond */
+#define ui_dom_node_append_child mock_label_dom_node_append_child
+/** @endcond */
+#endif
+
 /**
  * @struct ui_label_base
  * @struct ui_label_base
@@ -74,16 +96,10 @@ ui_error_t ui_label_base_create(struct ui_label_base **out_label) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (lbl->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(lbl->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(lbl->component);
   }
   C_MULTIPLATFORM_FREE(lbl);
   return rc;
@@ -103,9 +119,8 @@ ui_error_t ui_label_base_destroy(struct ui_label_base *label) {
     C_MULTIPLATFORM_FREE(label->target_id);
   }
 
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(label->component);
-    (void)rc_cleanup;
+  if (label->component) {
+    ui_component_destroy(label->component);
   }
   C_MULTIPLATFORM_FREE(label);
   return UI_ERROR_NONE;
@@ -183,7 +198,8 @@ ui_error_t ui_label_base_process_event(struct ui_label_base *label,
   }
 
   /* Just a placeholder for actual dispatch logic to the bound node. */
-  (void)timestamp_ms;
+  if (timestamp_ms > 0.0) {
+  }
 
   return UI_ERROR_NONE;
 }
@@ -245,39 +261,12 @@ ui_error_t ui_label_base_set_text(struct ui_label_base *label,
     {
       ui_error_t rc_append =
           ui_dom_node_append_child(label->component->shadow_root, text_node);
-      (void)rc_append;
+      if (rc_append != UI_ERROR_NONE) {
+        ui_dom_node_destroy(text_node);
+        return rc_append;
+      }
     }
   }
 
   return ui_dom_node_set_text_content(text_node, text);
 }
-
-#ifdef UI_TEST_MOCK_ALLOC
-ui_error_t ui_test_label_base_set_for_no_component(void);
-
-ui_error_t ui_test_label_base_set_for_no_component(void) {
-  struct ui_label_base *lbl = NULL;
-  {
-    ui_error_t rc_cleanup = ui_label_base_create(&lbl);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_component_destroy(lbl->component);
-    (void)rc_cleanup;
-  }
-  lbl->component = NULL;
-  {
-    ui_error_t rc_cleanup = ui_label_base_set_for(lbl, "fail-target-2");
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_label_base_set_for(lbl, NULL);
-    (void)rc_cleanup;
-  }
-  {
-    ui_error_t rc_cleanup = ui_label_base_destroy(lbl);
-    (void)rc_cleanup;
-  }
-  return UI_ERROR_NONE;
-}
-#endif

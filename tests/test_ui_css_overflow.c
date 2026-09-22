@@ -195,6 +195,37 @@ int main(void) {
   failures += test_parse_max_lines();
   failures += test_parse_overflow_clip_margin();
 
+#ifdef UI_TEST_MOCK_ALLOC
+  {
+    extern int g_overflow_mock_fail;
+    extern ui_error_t run_overflow_coverage(void);
+    enum ui_css_overflow overflow;
+    struct ui_css_text_overflow to;
+    struct ui_css_block_ellipsis be;
+    struct ui_css_line_clamp lc;
+    struct ui_css_max_lines ml;
+    struct ui_css_value val;
+
+    g_overflow_mock_fail = 1;
+    if (ui_css_parse_overflow("visible", &overflow) != UI_ERROR_UNKNOWN)
+      failures++;
+    if (ui_css_parse_text_overflow("clip", &to) != UI_ERROR_UNKNOWN)
+      failures++;
+    if (ui_css_parse_block_ellipsis("none", &be) != UI_ERROR_UNKNOWN)
+      failures++;
+    if (ui_css_parse_line_clamp("none", &lc) != UI_ERROR_UNKNOWN)
+      failures++;
+    if (ui_css_parse_max_lines("none", &ml) != UI_ERROR_UNKNOWN)
+      failures++;
+    if (ui_css_parse_overflow_clip_margin("10px", &val) != UI_ERROR_UNKNOWN)
+      failures++;
+    g_overflow_mock_fail = 0;
+
+    if (run_overflow_coverage() != UI_ERROR_NONE)
+      failures++;
+  }
+#endif
+
   if (failures == 0) {
     printf("test_ui_css_overflow passed\n");
   } else {

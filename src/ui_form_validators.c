@@ -21,8 +21,10 @@
 ui_error_t ui_validator_required(struct ui_form_control *control,
                                  union ui_signal_payload value, void *user_data,
                                  ui_bool_t *out_is_valid) {
-  (void)control;
-  (void)user_data;
+  struct ui_form_control *unused_ctrl = control;
+  void *unused_ud = user_data;
+  control = unused_ctrl;
+  user_data = unused_ud;
 
   if (!out_is_valid) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -57,24 +59,26 @@ ui_error_t ui_validators_required(ui_validator_fn *out_fn) {
  * @param pattern Pattern string.
  * @param text Text string to match.
  * @param out_matches Pointer to receive match result.
+ * @return UI_ERROR_NONE on success, or an appropriate error code.
  */
-static void match_pattern(const char *pattern, const char *text,
-                          ui_bool_t *out_matches) {
+static ui_error_t match_pattern(const char *pattern, const char *text,
+                                ui_bool_t *out_matches) {
   if (pattern[0] == '\0') {
     *out_matches = UI_TRUE;
-    return;
+    return UI_ERROR_NONE;
   }
   /* Simple substring check if no regex engine, or wildcard */
   if (strstr(text, pattern) != NULL) {
     *out_matches = UI_TRUE;
-    return;
+    return UI_ERROR_NONE;
   }
   /* If pattern contains @ and text contains @ (e.g. email) */
   if (strstr(pattern, "@") != NULL && strchr(text, '@') != NULL) {
     *out_matches = UI_TRUE;
-    return;
+    return UI_ERROR_NONE;
   }
   *out_matches = UI_FALSE;
+  return UI_ERROR_NONE;
 }
 
 /**
@@ -91,8 +95,8 @@ ui_error_t ui_validator_pattern(struct ui_form_control *control,
                                 ui_bool_t *out_is_valid) {
   const char *pattern = (const char *)user_data;
   const char *text = (const char *)value.ptr_val;
-
-  (void)control;
+  struct ui_form_control *unused_ctrl = control;
+  control = unused_ctrl;
 
   if (!out_is_valid) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -103,8 +107,7 @@ ui_error_t ui_validator_pattern(struct ui_form_control *control,
     return UI_ERROR_NONE;
   }
 
-  match_pattern(pattern, text, out_is_valid);
-  return UI_ERROR_NONE;
+  return match_pattern(pattern, text, out_is_valid);
 }
 
 /**
@@ -135,8 +138,8 @@ ui_error_t ui_validator_min_length(struct ui_form_control *control,
                                    void *user_data, ui_bool_t *out_is_valid) {
   int min_len = 0;
   const char *str = (const char *)value.ptr_val;
-
-  (void)control;
+  struct ui_form_control *unused_ctrl = control;
+  control = unused_ctrl;
 
   if (!out_is_valid) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -183,8 +186,8 @@ ui_error_t ui_validator_max_length(struct ui_form_control *control,
                                    void *user_data, ui_bool_t *out_is_valid) {
   int max_len = 0;
   const char *str = (const char *)value.ptr_val;
-
-  (void)control;
+  struct ui_form_control *unused_ctrl = control;
+  control = unused_ctrl;
 
   if (!out_is_valid) {
     return UI_ERROR_INVALID_ARGUMENT;

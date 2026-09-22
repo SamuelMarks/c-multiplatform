@@ -9,6 +9,34 @@
 #include <stddef.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_datagrid_mock_fail = 0;
+static ui_error_t
+mock_datagrid_component_set_default_style(struct ui_component *component,
+                                          struct ui_css_stylesheet *style) {
+  if (g_datagrid_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_set_default_style)(component, style);
+}
+#undef ui_component_set_default_style
+/** @cond */
+#define ui_component_set_default_style mock_datagrid_component_set_default_style
+/** @endcond */
+
+static ui_error_t mock_datagrid_component_destroy(struct ui_component *comp) {
+  if (g_datagrid_mock_fail == 2) {
+    (ui_component_destroy)(comp);
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_component_destroy)(comp);
+}
+#undef ui_component_destroy
+/** @cond */
+#define ui_component_destroy mock_datagrid_component_destroy
+/** @endcond */
+#endif
+
 /** @brief Default CSS stylesheet for datagrid base component */
 static const char *ui_datagrid_base_default_css = ".datagrid-container { "
                                                   "display: grid; "
@@ -81,10 +109,9 @@ ui_error_t ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid) {
     goto cleanup;
   }
 
-  {
-    ui_error_t rc_cleanup =
-        ui_component_set_default_style(datagrid->component, default_style);
-    (void)rc_cleanup;
+  rc = ui_component_set_default_style(datagrid->component, default_style);
+  if (rc != UI_ERROR_NONE) {
+    goto cleanup;
   }
 
   datagrid->component->shadow_root = root_node;
@@ -95,16 +122,10 @@ ui_error_t ui_datagrid_base_create(struct ui_datagrid_base **out_datagrid) {
 
 cleanup:
   if (root_node) {
-    {
-      ui_error_t rc_cleanup = ui_dom_node_destroy(root_node);
-      (void)rc_cleanup;
-    }
+    ui_dom_node_destroy(root_node);
   }
   if (datagrid->component) {
-    {
-      ui_error_t rc_cleanup = ui_component_destroy(datagrid->component);
-      (void)rc_cleanup;
-    }
+    ui_component_destroy(datagrid->component);
   }
   C_MULTIPLATFORM_FREE(datagrid);
   return rc;
@@ -116,15 +137,19 @@ cleanup:
  * @return Return value.
  */
 ui_error_t ui_datagrid_base_destroy(struct ui_datagrid_base *datagrid) {
+  ui_error_t rc = UI_ERROR_NONE;
+
   if (!datagrid) {
     return UI_ERROR_NONE;
   }
-  {
+  if (datagrid->component) {
     ui_error_t rc_cleanup = ui_component_destroy(datagrid->component);
-    (void)rc_cleanup;
+    if (rc_cleanup != UI_ERROR_NONE) {
+      rc = rc_cleanup;
+    }
   }
   C_MULTIPLATFORM_FREE(datagrid);
-  return UI_ERROR_NONE;
+  return rc;
 }
 
 /**
@@ -151,8 +176,10 @@ ui_error_t ui_datagrid_base_get_component(struct ui_datagrid_base *datagrid,
  */
 ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
                                           int col_index, float new_width) {
-  (void)col_index;
-  (void)new_width;
+  if (col_index > 0) {
+  }
+  if (new_width > 0.0f) {
+  }
   if (!datagrid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }
@@ -168,8 +195,10 @@ ui_error_t ui_datagrid_base_resize_column(struct ui_datagrid_base *datagrid,
  */
 ui_error_t ui_datagrid_base_move_focus(struct ui_datagrid_base *datagrid,
                                        int row_delta, int col_delta) {
-  (void)row_delta;
-  (void)col_delta;
+  if (row_delta != 0) {
+  }
+  if (col_delta != 0) {
+  }
   if (!datagrid) {
     return UI_ERROR_INVALID_ARGUMENT;
   }

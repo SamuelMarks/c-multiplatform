@@ -6,6 +6,10 @@
 
 extern int g_malloc_fail_countdown;
 extern int g_malloc_called;
+#if !defined(_WIN32) && !defined(UI_SINGLE_THREADED)
+extern int g_mock_mutex_init_fail;
+extern int g_mock_cond_init_fail;
+#endif
 
 #define ACCUM_ERR(failed, expr) failed |= ((expr) != UI_ERROR_NONE)
 #define ACCUM_FAIL(failed, expr) failed |= (expr)
@@ -19,7 +23,8 @@ static ui_error_t test_callback(void *user_data) {
 }
 
 static ui_error_t test_callback_fail(void *user_data) {
-  (void)user_data;
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -178,6 +183,20 @@ static int run_thread_fail_tests(void) {
   failed |= (rc != UI_ERROR_OUT_OF_MEMORY);
 
   g_mock_thread_fail = 0;
+
+#if !defined(_WIN32)
+  /* Test failure at pthread_mutex_init */
+  g_mock_mutex_init_fail = 1;
+  rc = ui_thread_pool_create(4, &pool);
+  failed |= (rc != UI_ERROR_UNKNOWN);
+  g_mock_mutex_init_fail = 0;
+
+  /* Test failure at pthread_cond_init */
+  g_mock_cond_init_fail = 1;
+  rc = ui_thread_pool_create(4, &pool);
+  failed |= (rc != UI_ERROR_UNKNOWN);
+  g_mock_cond_init_fail = 0;
+#endif
 
   /* Additional coverage for thread loop: queue a NULL callback */
   rc = ui_thread_pool_create(1, &pool);

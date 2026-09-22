@@ -2,13 +2,15 @@
 #include "ui_side_sheet_base.h"
 #include "ui_error.h"
 #include "ui_event.h"
+#include <assert.h>
 #include <stdio.h>
 /* clang-format on */
 
 static ui_error_t mock_on_close(struct ui_side_sheet_base *sheet,
                                 void *user_data) {
   int *called = (int *)user_data;
-  (void)sheet;
+  if (sheet) {
+  }
   *called = 1;
   return UI_ERROR_NONE;
 }
@@ -48,9 +50,7 @@ int main(void) {
     if (ui_side_sheet_base_create(&sheet) == UI_ERROR_NONE) {
       {
         ui_error_t rc_cleanup = ui_side_sheet_base_destroy(sheet);
-        if (rc_cleanup != UI_ERROR_NONE) {
-          (void)rc_cleanup; /* Avoid override */
-        }
+        assert(rc_cleanup == UI_ERROR_NONE);
       }
       return 1;
     }
@@ -63,9 +63,7 @@ int main(void) {
   /* Destroy null */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_destroy(NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   ASSERT_EQ(ui_side_sheet_base_set_content(NULL, NULL),
@@ -133,7 +131,7 @@ int main(void) {
   /* Try sending irrelevant event when open */
   ASSERT_SUCCESS(ui_side_sheet_base_set_open(sheet, 1));
   ev.type = UI_EVENT_MOUSE_MOVE;
-  ASSERT_SUCCESS(ui_side_sheet_base_process_event(sheet, &ev, 0.0));
+  ASSERT_SUCCESS(ui_side_sheet_base_process_event(sheet, &ev, 10.0));
   ASSERT_SUCCESS(ui_side_sheet_base_is_open(sheet, &is_open));
   if (!is_open)
     return 1;
@@ -144,9 +142,7 @@ int main(void) {
 
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   test_ui_side_sheet_errs();
@@ -156,8 +152,10 @@ int main(void) {
 
 static ui_error_t mock_on_close_fail(struct ui_side_sheet_base *sheet,
                                      void *user_data) {
-  (void)sheet;
-  (void)user_data;
+  if (sheet) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 
@@ -166,100 +164,72 @@ void test_ui_side_sheet_errs(void) {
   struct ui_event ev;
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_create(&sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup =
         ui_side_sheet_base_set_on_close(sheet, mock_on_close_fail, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   /* Triggers the if (rc != UI_ERROR_NONE) return rc; inside set_open */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_UNKNOWN);
   }
 
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = UI_KEY_ESCAPE;
   /* Triggers set_open failing from process_event -> returns rc */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_UNKNOWN);
   }
 
   /* Add missing branches for set_open */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* set to same state */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_on_close(sheet, NULL, NULL);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* no on_close callback */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* set to same state */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   } /* close without callback */
 
   /* Add missing branch for process_event: keydown but not escape */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_set_open(sheet, 1);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
   ev.type = UI_EVENT_KEY_DOWN;
   ev.event_data.keyboard.key_code = 'A'; /* not escape */
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_process_event(sheet, &ev, 0.0);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 
   {
     ui_error_t rc_cleanup = ui_side_sheet_base_destroy(sheet);
-    if (rc_cleanup != UI_ERROR_NONE) {
-      (void)rc_cleanup; /* Avoid override */
-    }
+    assert(rc_cleanup == UI_ERROR_NONE);
   }
 }

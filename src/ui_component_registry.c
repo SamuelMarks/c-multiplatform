@@ -19,6 +19,82 @@
 #include <stdlib.h>
 /* clang-format on */
 
+#ifdef UI_TEST_MOCK_ALLOC
+int g_component_registry_mock_fail = 0;
+
+static ui_error_t mock_button_get_component(struct ui_button_base *btn,
+                                            struct ui_component **out_comp) {
+  if (g_component_registry_mock_fail == 1) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_button_base_get_component)(btn, out_comp);
+}
+#undef ui_button_base_get_component
+/** @cond */
+#define ui_button_base_get_component mock_button_get_component
+/** @endcond */
+
+static ui_error_t mock_input_get_component(struct ui_input_base *inp,
+                                           struct ui_component **out_comp) {
+  if (g_component_registry_mock_fail == 2) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_input_base_get_component)(inp, out_comp);
+}
+#undef ui_input_base_get_component
+/** @cond */
+#define ui_input_base_get_component mock_input_get_component
+/** @endcond */
+
+static ui_error_t mock_card_get_component(struct ui_card_base *card,
+                                          struct ui_component **out_comp) {
+  if (g_component_registry_mock_fail == 3) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_card_base_get_component)(card, out_comp);
+}
+#undef ui_card_base_get_component
+/** @cond */
+#define ui_card_base_get_component mock_card_get_component
+/** @endcond */
+
+static ui_error_t mock_checkbox_get_component(struct ui_checkbox_base *chk,
+                                              struct ui_component **out_comp) {
+  if (g_component_registry_mock_fail == 4) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_checkbox_base_get_component)(chk, out_comp);
+}
+#undef ui_checkbox_base_get_component
+/** @cond */
+#define ui_checkbox_base_get_component mock_checkbox_get_component
+/** @endcond */
+
+static ui_error_t mock_label_get_component(struct ui_label_base *lbl,
+                                           struct ui_component **out_comp) {
+  if (g_component_registry_mock_fail == 5) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_label_base_get_component)(lbl, out_comp);
+}
+#undef ui_label_base_get_component
+/** @cond */
+#define ui_label_base_get_component mock_label_get_component
+/** @endcond */
+
+static ui_error_t mock_slider_get_component(struct ui_slider_base *sld,
+                                            struct ui_component **out_comp) {
+  if (g_component_registry_mock_fail == 6) {
+    return UI_ERROR_UNKNOWN;
+  }
+  return (ui_slider_base_get_component)(sld, out_comp);
+}
+#undef ui_slider_base_get_component
+/** @cond */
+#define ui_slider_base_get_component mock_slider_get_component
+/** @endcond */
+#endif
+
 /**
  * @struct ui_registry_entry
  * @brief Linked list entry for a registered component type.
@@ -193,7 +269,10 @@ static ui_error_t def_button_factory(void **out_instance,
   }
 
   rc = ui_button_base_get_component(btn, &comp);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    ui_button_base_destroy(btn);
+    return rc;
+  }
 
   *out_instance = btn;
   *out_dom_node = comp->shadow_root;
@@ -222,15 +301,22 @@ static ui_error_t def_button_set_prop(void *instance, const char *key,
   return UI_ERROR_NONE;
 }
 
+/**
+ * @brief Adapter for button click events.
+ */
 struct btn_event_adapter {
+  /** @brief Target callback */
   ui_error_t (*callback)(void *user_data);
+  /** @brief Target user data */
   void *user_data;
+  /** @brief Triggering button */
+  struct ui_button_base *btn;
 };
 
 static ui_error_t on_button_click_adapter(struct ui_button_base *btn,
                                           void *user_data) {
   struct btn_event_adapter *ad = (struct btn_event_adapter *)user_data;
-  (void)btn;
+  ad->btn = btn;
   return ad->callback(ad->user_data);
 }
 
@@ -275,7 +361,10 @@ static ui_error_t def_input_factory(void **out_instance,
   }
 
   rc = ui_input_base_get_component(inp, &comp);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    ui_input_base_destroy(inp);
+    return rc;
+  }
 
   *out_instance = inp;
   *out_dom_node = comp->shadow_root;
@@ -332,7 +421,10 @@ static ui_error_t def_card_factory(void **out_instance,
   }
 
   rc = ui_card_base_get_component(card, &comp);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    ui_card_base_destroy(card);
+    return rc;
+  }
 
   *out_instance = card;
   *out_dom_node = comp->shadow_root;
@@ -367,7 +459,9 @@ static ui_error_t def_card_append(void *instance,
   }
 
   rc = ui_card_base_get_component(card, &comp);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    return rc;
+  }
 
   return ui_dom_node_append_child(comp->shadow_root, child_node);
 }
@@ -389,7 +483,10 @@ static ui_error_t def_checkbox_factory(void **out_instance,
   }
 
   rc = ui_checkbox_base_get_component(chk, &comp);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    ui_checkbox_base_destroy(chk);
+    return rc;
+  }
 
   *out_instance = chk;
   *out_dom_node = comp->shadow_root;
@@ -441,7 +538,10 @@ static ui_error_t def_label_factory(void **out_instance,
   }
 
   rc = ui_label_base_get_component(lbl, &comp);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    ui_label_base_destroy(lbl);
+    return rc;
+  }
 
   *out_instance = lbl;
   *out_dom_node = comp->shadow_root;
@@ -480,7 +580,10 @@ static ui_error_t def_slider_factory(void **out_instance,
   }
 
   rc = ui_slider_base_get_component(sld, &comp);
-  (void)rc;
+  if (rc != UI_ERROR_NONE) {
+    ui_slider_base_destroy(sld);
+    return rc;
+  }
 
   *out_instance = sld;
   *out_dom_node = comp->shadow_root;

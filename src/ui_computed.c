@@ -44,8 +44,7 @@ static ui_error_t ui_computed_lock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
     ui_int32 is_swapped = 0;
     while (!is_swapped) {
-      ui_error_t _ign_rc = ui_atomic_cas(&comp->lock, 0, 1, &is_swapped);
-      (void)_ign_rc;
+      ui_atomic_cas(&comp->lock, 0, 1, &is_swapped);
     }
   }
   return UI_ERROR_NONE;
@@ -58,8 +57,7 @@ static ui_error_t ui_computed_lock(ui_computed_t *comp) {
  */
 static ui_error_t ui_computed_unlock(ui_computed_t *comp) {
   if (comp->mode == UI_SIGNAL_MODE_MULTI_THREADED) {
-    ui_error_t _ign_rc = ui_atomic_store(&comp->lock, 0);
-    (void)_ign_rc;
+    return ui_atomic_store(&comp->lock, 0);
   }
   return UI_ERROR_NONE;
 }
@@ -110,16 +108,10 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
   size_t subs_count = 0;
   ui_error_t rc;
 
-  {
-    ui_error_t _ign_rc = ui_computed_lock(comp);
-    (void)_ign_rc;
-  }
+  ui_computed_lock(comp);
 
   if (comp->is_dirty) {
-    {
-      ui_error_t _ign_rc = ui_computed_unlock(comp);
-      (void)_ign_rc;
-    }
+    ui_computed_unlock(comp);
     return UI_ERROR_NONE; /* Already dirty, no need to re-notify */
   }
 
@@ -137,10 +129,7 @@ static ui_error_t ui_computed_on_notify(void *user_data) {
     }
   }
 
-  {
-    ui_error_t _ign_rc = ui_computed_unlock(comp);
-    (void)_ign_rc;
-  }
+  ui_computed_unlock(comp);
 
   if (subs_copy) {
     for (i = 0; i < subs_count; i++) {
@@ -171,6 +160,7 @@ ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
                               enum ui_signal_mode mode,
                               ui_computed_t **out_computed) {
   ui_computed_t *comp = NULL;
+  ui_error_t rc;
 
   if (!out_computed || !compute_fn) {
     return UI_ERROR_INVALID_ARGUMENT;
@@ -178,13 +168,10 @@ ui_error_t ui_computed_create(struct ui_arena *arena, ui_compute_fn compute_fn,
 
   if (arena) {
     void *ptr = NULL;
-    {
-      ui_error_t _ign_rc =
-          ui_arena_alloc(arena, sizeof(ui_computed_t), sizeof(void *), &ptr);
-      (void)_ign_rc;
+    rc = ui_arena_alloc(arena, sizeof(ui_computed_t), sizeof(void *), &ptr);
+    if (rc != UI_ERROR_NONE) {
+      return rc;
     }
-    if (!ptr)
-      return UI_ERROR_OUT_OF_MEMORY;
     comp = (ui_computed_t *)ptr;
   } else {
     comp = (ui_computed_t *)C_MULTIPLATFORM_MALLOC(sizeof(ui_computed_t));
@@ -228,60 +215,38 @@ ui_error_t ui_computed_get(ui_computed_t *computed,
     return UI_ERROR_INVALID_ARGUMENT;
   }
 
-  {
-    ui_error_t _ign_rc = ui_computed_lock(computed);
-    (void)_ign_rc;
-  }
+  ui_computed_lock(computed);
 
   /* Dependency tracking */
-  {
-    ui_error_t _ign_rc = ui_reactive_graph_get_current_node(&current_node);
-    (void)_ign_rc;
-  }
+  ui_reactive_graph_get_current_node(&current_node);
 
   if (current_node && current_node != &computed->self_node) {
     rc = ui_computed_add_subscriber(computed, current_node);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t _ign_rc = ui_computed_unlock(computed);
-        (void)_ign_rc;
-      }
+      ui_computed_unlock(computed);
       return rc;
     }
   }
 
   if (computed->is_dirty) {
     /* Push self to graph to track inner dependencies */
-    {
-      ui_error_t _ign_rc =
-          ui_reactive_graph_set_current_node(&computed->self_node, &prev_node);
-      (void)_ign_rc;
-    }
+    ui_reactive_graph_set_current_node(&computed->self_node, &prev_node);
 
     rc = computed->compute_fn(computed->user_data, &computed->cached_value);
     if (rc != UI_ERROR_NONE) {
-      {
-        ui_error_t _ign_rc =
-            ui_reactive_graph_set_current_node(prev_node, NULL);
-        (void)_ign_rc;
-      }
-      {
-        ui_error_t _ign_rc = ui_computed_unlock(computed);
-        (void)_ign_rc;
-      }
+      ui_reactive_graph_set_current_node(prev_node, NULL);
+      ui_computed_unlock(computed);
       return rc;
     }
 
-    {
-      ui_error_t _ign_rc = ui_reactive_graph_set_current_node(prev_node, NULL);
-      (void)_ign_rc;
-    }
+    ui_reactive_graph_set_current_node(prev_node, NULL);
     computed->is_dirty = UI_FALSE;
   }
 
   *out_value = computed->cached_value;
 
-  return ui_computed_unlock(computed);
+  ui_computed_unlock(computed);
+  return UI_ERROR_NONE;
 }
 
 /**
