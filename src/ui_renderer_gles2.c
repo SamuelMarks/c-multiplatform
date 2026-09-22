@@ -60,6 +60,7 @@ typedef void (__stdcall *PFNGLGENBUFFERSPROC) (int n, unsigned int *buffers);
 typedef void (__stdcall *PFNGLDELETEPROGRAMPROC) (unsigned int program);
 typedef void (__stdcall *PFNGLDELETEBUFFERSPROC) (int n, const unsigned int *buffers);
 
+#if !defined(UI_TEST_MOCK_ALLOC)
 static PFNGLUSEPROGRAMPROC glUseProgram;
 static PFNGLUNIFORM2FPROC glUniform2f;
 static PFNGLBINDBUFFERPROC glBindBuffer;
@@ -80,12 +81,16 @@ static PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 static PFNGLGENBUFFERSPROC glGenBuffers;
 static PFNGLDELETEPROGRAMPROC glDeleteProgram;
 static PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+#endif
 
 #ifndef wglGetProcAddress
 /* wglGetProcAddress is provided by wingdi.h via gl.h */
 #endif
 
 static ui_error_t load_gl_extensions(void) {
+#if defined(UI_TEST_MOCK_ALLOC)
+    return UI_ERROR_NONE;
+#else
     if (glCreateProgram) return UI_ERROR_NONE;
     glUseProgram = (PFNGLUSEPROGRAMPROC)(size_t)wglGetProcAddress("glUseProgram");
     glUniform2f = (PFNGLUNIFORM2FPROC)(size_t)wglGetProcAddress("glUniform2f");
@@ -108,6 +113,7 @@ static ui_error_t load_gl_extensions(void) {
     glDeleteProgram = (PFNGLDELETEPROGRAMPROC)(size_t)wglGetProcAddress("glDeleteProgram");
     glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)(size_t)wglGetProcAddress("glDeleteBuffers");
     return UI_ERROR_NONE;
+#endif
 }
 #elif defined(__APPLE__)
 #include <OpenGL/OpenGL.h>
@@ -554,7 +560,7 @@ static ui_error_t compile_shader(unsigned int type, const char *source,
   unsigned int shader;
   int compiled = 0;
   *out_shader = 0;
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
   if (!glCreateShader)
     return UI_ERROR_UNSUPPORTED;
 #elif defined(__APPLE__)
@@ -568,7 +574,7 @@ static ui_error_t compile_shader(unsigned int type, const char *source,
     return UI_ERROR_UNKNOWN;
   glShaderSource(shader, 1, &source, NULL);
   glCompileShader(shader);
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
   if (glGetShaderiv) {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
   } else {
@@ -613,7 +619,7 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
     return UI_ERROR_NONE; /* Nothing to flush */
   }
 
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
   if (data->program && glBindBuffer && glBufferData) {
 #else
   if (data->program) {
@@ -879,7 +885,7 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
   data->vbo = 0;
   data->ibo = 0;
 
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
   if (glCreateProgram) {
 #elif defined(__APPLE__)
   if (CGLGetCurrentContext() != NULL) {
@@ -948,7 +954,7 @@ static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   }
   if (backend->user_data) {
     data = (struct gles2_renderer_data *)backend->user_data;
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
     if (data->program && glDeleteProgram) {
 #else
     if (data->program) {

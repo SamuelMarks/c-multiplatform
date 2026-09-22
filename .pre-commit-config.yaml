@@ -118,7 +118,7 @@ repos:
     pass_filenames: false
   - id: build-msvc-wine
     name: Build & Test (MSVC Wine)
-    entry: python -c "import os, subprocess, shutil, sys; (print('Skipping MSVC Wine'), sys.exit(0)) if os.name == 'nt' or not shutil.which('wine') or not os.path.isdir(os.environ.get('MSVC_WINE_PATH', os.path.expanduser('~/my_msvc/opt/msvc'))) else None; [os.environ.pop(k, None) for k in ('GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE')]; r = subprocess.run(['bash', '-c', 'bash ~/repos/c-ci/build_msvc_wine.sh -DCMAKE_DISABLE_FIND_PACKAGE_SQLite3=ON -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON -DCMAKE_DISABLE_FIND_PACKAGE_Brotli=ON -DCMAKE_DISABLE_FIND_PACKAGE_CURL=ON > wine_hook.log 2>&1; R=$?; cat wine_hook.log; rm -f wine_hook.log; wineserver -k9 || true; exit $R']); sys.exit(r.returncode)"
+    entry: python -c "import os, subprocess, shutil, sys; (print('Skipping MSVC Wine'), sys.exit(0)) if os.name == 'nt' or not shutil.which('wine') or not os.path.isdir(os.environ.get('MSVC_WINE_PATH', os.path.expanduser('~/my_msvc/opt/msvc'))) else None; [os.environ.pop(k, None) for k in ('GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE')]; r = subprocess.run(['bash', '-c', 'bash ~/repos/c-ci/build_msvc_wine.sh -DCMAKE_DISABLE_FIND_PACKAGE_SQLite3=ON -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON -DCMAKE_DISABLE_FIND_PACKAGE_Brotli=ON -DCMAKE_DISABLE_FIND_PACKAGE_CURL=ON; R=$?; wineserver -k9 || true; exit $R']); sys.exit(r.returncode)"
     language: python
     pass_filenames: false
   - id: build-msvc

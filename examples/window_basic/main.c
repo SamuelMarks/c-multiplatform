@@ -324,7 +324,7 @@ static ui_error_t on_resize_callback(void *user_data, int width, int height) {
   rctx->app_ctx->window_width = (float)width;
   rctx->app_ctx->window_height = (float)height;
   rctx->app_ctx->needs_layout = 1;
-  return do_render(rctx);
+  return UI_ERROR_NONE;
 }
 
 #if defined(__EMSCRIPTEN__)

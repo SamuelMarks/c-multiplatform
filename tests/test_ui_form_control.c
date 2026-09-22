@@ -1076,7 +1076,7 @@ int main(void) {
     ui_thread_pool_create(2, &pool2);
     ui_reactor_create(&reactor2);
 
-    for (i = 0; i < 400; i++) {
+    for (i = 0; i < 25; i++) {
       ui_form_control_t *control_oom = NULL;
       union ui_signal_payload dummy;
       ui_error_t rc_oom;

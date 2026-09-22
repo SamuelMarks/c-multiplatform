@@ -520,7 +520,7 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
 #ifndef STBTT_malloc
 #include <stdlib.h>
 #define STBTT_malloc(x, u) ((u) ? C_MULTIPLATFORM_MALLOC(x) : C_MULTIPLATFORM_MALLOC(x))
-#define STBTT_free(x, u) do { if (u) {} C_MULTIPLATFORM_FREE(x); } while (0)
+#define STBTT_free(x, u) ((u) ? C_MULTIPLATFORM_FREE(x) : C_MULTIPLATFORM_FREE(x))
 #endif
 
 #ifndef STBTT_assert
@@ -1933,11 +1933,7 @@ typedef int stbtt__test_oversample_pow2
 #define STBTT_RASTERIZER_VERSION 2
 #endif
 
-#define STBTT__NOTUSED(v)                                                      \
-  do {                                                                         \
-    if (sizeof(v) == 0) {                                                      \
-    }                                                                          \
-  } while (0)
+#define STBTT__NOTUSED(v) (void)(v)
 
 /*////////////////////////////////////////////////////////////////////////*/
 /**/

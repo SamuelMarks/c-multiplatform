@@ -225,7 +225,7 @@ if(EMSCRIPTEN)
     endif()
 
     # Linker specific flags
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s STACK_SIZE=1048576 -s ALLOW_MEMORY_GROWTH=1 -s MAXIMUM_MEMORY=4GB")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s STACK_SIZE=1048576 -s ALLOW_MEMORY_GROWTH=1 -s MAXIMUM_MEMORY=4GB -s ERROR_ON_UNDEFINED_SYMBOLS=0")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s EXPORTED_FUNCTIONS=${UI_WASM_EXPORTED_FUNCS} -s EXPORTED_RUNTIME_METHODS=${UI_WASM_RUNTIME_METHODS}")
 endif()
 
@@ -354,6 +354,13 @@ macro(UI_FetchDependencyLocalOrArchive NAME LOCAL_DIR GITHUB_REPO)
         string(REPLACE "};\n\n/**\n * @brief Test helper" "};\n\n#ifdef CDD_BUILD_TESTS\n/**\n * @brief Test helper" _cdd_diff_h "${_cdd_diff_h}")
         file(WRITE "${c_cdd_SOURCE_DIR}/src/functions/emit/diff.h" "${_cdd_diff_h}")
     endif()
+    if(NAME STREQUAL "c_cdd" AND EXISTS "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c")
+        file(READ "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c" _cdd_safe_crt_c)
+        string(REPLACE "static safe_crt_arena_t *global_arena = NULL;"
+                       "#ifndef CDD_BUILD_TESTS\nstatic cdd_c_error_t expr_is_null_or_zero(expr_t *node);\n#endif\nstatic safe_crt_arena_t *global_arena = NULL;"
+                       _cdd_safe_crt_c "${_cdd_safe_crt_c}")
+        file(WRITE "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c" "${_cdd_safe_crt_c}")
+    endif()
 
     # Re-enable testing for the main project
     set(BUILD_TESTING ON CACHE BOOL "Enable testing for main project" FORCE)
@@ -375,6 +382,13 @@ if(EXISTS "${c_cdd_SOURCE_DIR}/src/functions/emit/diff.h")
     string(REPLACE "#ifdef CDD_BUILD_TESTS\n/**\n * @brief DiffLine struct" "/**\n * @brief DiffLine struct" _cdd_diff_h "${_cdd_diff_h}")
     string(REPLACE "};\n\n/**\n * @brief Test helper" "};\n\n#ifdef CDD_BUILD_TESTS\n/**\n * @brief Test helper" _cdd_diff_h "${_cdd_diff_h}")
     file(WRITE "${c_cdd_SOURCE_DIR}/src/functions/emit/diff.h" "${_cdd_diff_h}")
+endif()
+if(EXISTS "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c")
+    file(READ "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c" _cdd_safe_crt_c)
+    string(REPLACE "static safe_crt_arena_t *global_arena = NULL;"
+                   "#ifndef CDD_BUILD_TESTS\nstatic cdd_c_error_t expr_is_null_or_zero(expr_t *node);\n#endif\nstatic safe_crt_arena_t *global_arena = NULL;"
+                   _cdd_safe_crt_c "${_cdd_safe_crt_c}")
+    file(WRITE "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c" "${_cdd_safe_crt_c}")
 endif()
 UI_FetchDependencyLocalOrArchive(c-abstract-http "c-abstract-http" "SamuelMarks/c-abstract-http")
 UI_FetchDependencyLocalOrArchive(c_orm "c-orm" "SamuelMarks/c-orm")
@@ -412,6 +426,20 @@ endif()
 if(TARGET c-orm AND TARGET c_str_span)
     target_include_directories(c-orm PUBLIC "${c_cdd_SOURCE_DIR}/src")
     target_link_libraries(c-orm PUBLIC c_str_span c_cdd)
+endif()
+
+if(TARGET c_orm_standalone_fixtures)
+    set_target_properties(c_orm_standalone_fixtures PROPERTIES EXCLUDE_FROM_ALL TRUE)
+endif()
+if(TARGET c_orm_legacy_cdd_db)
+    set_target_properties(c_orm_legacy_cdd_db PROPERTIES EXCLUDE_FROM_ALL TRUE)
+endif()
+
+if(TARGET c_cdd)
+    find_package(OpenSSL QUIET)
+    if(TARGET OpenSSL::Crypto)
+        target_link_libraries(c_cdd PRIVATE OpenSSL::Crypto)
+    endif()
 endif()
 
 

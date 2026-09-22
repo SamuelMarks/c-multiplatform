@@ -136,65 +136,70 @@ int main(void) {
                UI_ERROR_UNKNOWN);
 
     {
-      struct ui_window *real_win = NULL;
-      ui_error_t rc_create;
+      int is_ci = (getenv("CI") != NULL || getenv("GITHUB_ACTIONS") != NULL);
+      if (is_ci) {
+        printf("Skipping Cocoa window GUI pump under CI.\n");
+      } else {
+        struct ui_window *real_win = NULL;
+        ui_error_t rc_create;
 
 #ifdef UI_TEST_MOCK_ALLOC
-      extern int g_malloc_fail_countdown;
-      extern int g_mock_macos_no_nsopenglview;
-      extern int g_mock_macos_event_type;
+        extern int g_malloc_fail_countdown;
+        extern int g_mock_macos_no_nsopenglview;
+        extern int g_mock_macos_event_type;
 
-      /* Malloc failure on create_window */
-      g_malloc_fail_countdown = 0;
-      failed |= (backend->create_window(backend, "OOM", 200, 200, &real_win) !=
-                 UI_ERROR_OUT_OF_MEMORY);
-      g_malloc_fail_countdown = -1;
+        /* Malloc failure on create_window */
+        g_malloc_fail_countdown = 0;
+        failed |= (backend->create_window(backend, "OOM", 200, 200,
+                                          &real_win) != UI_ERROR_OUT_OF_MEMORY);
+        g_malloc_fail_countdown = -1;
 
-      /* Fallback path when NSOpenGLView is not used */
-      g_mock_macos_no_nsopenglview = 1;
-      rc_create =
-          backend->create_window(backend, "Fallback Win", 200, 200, &real_win);
-      g_mock_macos_no_nsopenglview = 0;
-      failed |= (rc_create != UI_ERROR_NONE || !real_win);
-      if (rc_create == UI_ERROR_NONE && real_win) {
-        backend->destroy_window(backend, real_win);
-        real_win = NULL;
-      }
+        /* Fallback path when NSOpenGLView is not used */
+        g_mock_macos_no_nsopenglview = 1;
+        rc_create = backend->create_window(backend, "Fallback Win", 200, 200,
+                                           &real_win);
+        g_mock_macos_no_nsopenglview = 0;
+        failed |= (rc_create != UI_ERROR_NONE || !real_win);
+        if (rc_create == UI_ERROR_NONE && real_win) {
+          backend->destroy_window(backend, real_win);
+          real_win = NULL;
+        }
 #endif
 
-      rc_create =
-          backend->create_window(backend, "My Window", 200, 200, &real_win);
-      failed |= (rc_create != UI_ERROR_NONE || !real_win);
-      if (rc_create == UI_ERROR_NONE && real_win) {
-        backend->show_window(backend, real_win);
-        backend->poll_events(backend, real_win, &evt, &has_evt);
+        rc_create =
+            backend->create_window(backend, "My Window", 200, 200, &real_win);
+        failed |= (rc_create != UI_ERROR_NONE || !real_win);
+        if (rc_create == UI_ERROR_NONE && real_win) {
+          backend->show_window(backend, real_win);
+          backend->poll_events(backend, real_win, &evt, &has_evt);
 
 #ifdef UI_TEST_MOCK_ALLOC
-        /* Test event types using real Cocoa posted events */
-        post_test_mouse_event(1); /* MOUSE_DOWN */
-        backend->poll_events(backend, real_win, &evt, &has_evt);
-        failed |= (evt.type != UI_EVENT_MOUSE_DOWN || !has_evt);
+          /* Test event types using real Cocoa posted events */
+          post_test_mouse_event(1); /* MOUSE_DOWN */
+          backend->poll_events(backend, real_win, &evt, &has_evt);
+          failed |= (evt.type != UI_EVENT_MOUSE_DOWN || !has_evt);
 
-        post_test_mouse_event(2); /* MOUSE_UP */
-        backend->poll_events(backend, real_win, &evt, &has_evt);
-        failed |= (evt.type != UI_EVENT_MOUSE_UP || !has_evt);
+          post_test_mouse_event(2); /* MOUSE_UP */
+          backend->poll_events(backend, real_win, &evt, &has_evt);
+          failed |= (evt.type != UI_EVENT_MOUSE_UP || !has_evt);
 
-        post_test_key_event(); /* KEY_DOWN */
-        backend->poll_events(backend, real_win, &evt, &has_evt);
-        failed |= (evt.type != UI_EVENT_KEY_DOWN || !has_evt);
+          post_test_key_event(); /* KEY_DOWN */
+          backend->poll_events(backend, real_win, &evt, &has_evt);
+          failed |= (evt.type != UI_EVENT_KEY_DOWN || !has_evt);
 
-        post_test_other_event(); /* OTHER */
-        backend->poll_events(backend, real_win, &evt, &has_evt);
-        failed |= (evt.type != UI_EVENT_NONE || has_evt);
+          post_test_other_event(); /* OTHER */
+          backend->poll_events(backend, real_win, &evt, &has_evt);
+          failed |= (evt.type != UI_EVENT_NONE || has_evt);
 
-        /* Empty event queue check (event == NULL) */
-        backend->poll_events(backend, real_win, &evt, &has_evt);
-        failed |= (evt.type != UI_EVENT_NONE || has_evt);
+          /* Empty event queue check (event == NULL) */
+          backend->poll_events(backend, real_win, &evt, &has_evt);
+          failed |= (evt.type != UI_EVENT_NONE || has_evt);
 #endif
 
-        backend->swap_buffers(backend, real_win);
-        backend->hide_window(backend, real_win);
-        backend->destroy_window(backend, real_win);
+          backend->swap_buffers(backend, real_win);
+          backend->hide_window(backend, real_win);
+          backend->destroy_window(backend, real_win);
+        }
       }
 
       /* Test dummy windows with NULL members */

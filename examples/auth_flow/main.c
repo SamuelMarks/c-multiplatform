@@ -540,12 +540,11 @@ static ui_error_t do_render(struct render_context *rctx) {
  * @return UI_ERROR_NONE on success.
  */
 static ui_error_t on_resize_callback(void *user_data, int width, int height) {
-  struct render_context *rctx;
-  rctx = (struct render_context *)user_data;
+  struct render_context *rctx = (struct render_context *)user_data;
   rctx->app_ctx->window_width = (float)width;
   rctx->app_ctx->window_height = (float)height;
   rctx->app_ctx->needs_layout = 1;
-  return do_render(rctx);
+  return UI_ERROR_NONE;
 }
 
 /**
