@@ -269,8 +269,9 @@ ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
 }
 
 #else
-/* Non-Linux Platform Stub */
+/* Non-Linux Platform Stub (or Linux without X11 when Wayland is not active) */
 
+#if !defined(UI_ENABLE_WAYLAND)
 ui_error_t
 ui_window_backend_linux_create(struct ui_window_backend **out_backend) {
   if (!out_backend) {
@@ -288,4 +289,5 @@ ui_error_t ui_window_backend_linux_destroy(struct ui_window_backend *backend) {
   }
   return UI_ERROR_UNKNOWN;
 }
+#endif
 #endif

@@ -310,6 +310,7 @@ static ui_error_t flush_to_js(ui_uint32 *buf, ui_uint32 len) {
       break;
     }
   }
+  return UI_ERROR_NONE;
 }
 #endif
 
