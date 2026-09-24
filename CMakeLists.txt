@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
+# Serialize vcpkg applocal post-build dependencies to prevent file lock race conditions
+set(X_VCPKG_APPLOCAL_DEPS_SERIALIZED ON CACHE BOOL "" FORCE)
+
 if (CMAKE_HOST_UNIX AND ((DEFINED CMAKE_C_COMPILER AND CMAKE_C_COMPILER MATCHES "(^|[/\\])cl(\\.exe)?$") OR (DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER MATCHES "(^|[/\\])cl(\\.exe)?$")))
     # Workaround for MSVC hanging under Wine on macOS/Linux due to mspdbsrv.exe and incremental linking
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "Embedded" CACHE STRING "")
@@ -361,6 +364,13 @@ macro(UI_FetchDependencyLocalOrArchive NAME LOCAL_DIR GITHUB_REPO)
                        _cdd_safe_crt_c "${_cdd_safe_crt_c}")
         file(WRITE "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c" "${_cdd_safe_crt_c}")
     endif()
+    if(NAME STREQUAL "c_cdd" AND EXISTS "${c_cdd_SOURCE_DIR}/src/routes/emit/url.c")
+        file(READ "${c_cdd_SOURCE_DIR}/src/routes/emit/url.c" _cdd_url_c)
+        string(REPLACE "#else\nstatic void *url_segment_malloc_impl(size_t sz) { return malloc(sz); }\nstatic void *url_segment_realloc_impl(void *ptr, size_t sz) {\n  return realloc(ptr, sz);\n}"
+                       "#elif defined(CDD_BUILD_TESTS)\nstatic void *url_segment_malloc_impl(size_t sz) { return malloc(sz); }\nstatic void *url_segment_realloc_impl(void *ptr, size_t sz) {\n  return realloc(ptr, sz);\n}"
+                       _cdd_url_c "${_cdd_url_c}")
+        file(WRITE "${c_cdd_SOURCE_DIR}/src/routes/emit/url.c" "${_cdd_url_c}")
+    endif()
 
     # Re-enable testing for the main project
     set(BUILD_TESTING ON CACHE BOOL "Enable testing for main project" FORCE)
@@ -389,6 +399,13 @@ if(EXISTS "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c")
                    "#ifndef CDD_BUILD_TESTS\nstatic cdd_c_error_t expr_is_null_or_zero(expr_t *node);\n#endif\nstatic safe_crt_arena_t *global_arena = NULL;"
                    _cdd_safe_crt_c "${_cdd_safe_crt_c}")
     file(WRITE "${c_cdd_SOURCE_DIR}/src/transformers/safe_crt/safe_crt.c" "${_cdd_safe_crt_c}")
+endif()
+if(EXISTS "${c_cdd_SOURCE_DIR}/src/routes/emit/url.c")
+    file(READ "${c_cdd_SOURCE_DIR}/src/routes/emit/url.c" _cdd_url_c)
+    string(REPLACE "#else\nstatic void *url_segment_malloc_impl(size_t sz) { return malloc(sz); }\nstatic void *url_segment_realloc_impl(void *ptr, size_t sz) {\n  return realloc(ptr, sz);\n}"
+                   "#elif defined(CDD_BUILD_TESTS)\nstatic void *url_segment_malloc_impl(size_t sz) { return malloc(sz); }\nstatic void *url_segment_realloc_impl(void *ptr, size_t sz) {\n  return realloc(ptr, sz);\n}"
+                   _cdd_url_c "${_cdd_url_c}")
+    file(WRITE "${c_cdd_SOURCE_DIR}/src/routes/emit/url.c" "${_cdd_url_c}")
 endif()
 UI_FetchDependencyLocalOrArchive(c-abstract-http "c-abstract-http" "SamuelMarks/c-abstract-http")
 UI_FetchDependencyLocalOrArchive(c_orm "c-orm" "SamuelMarks/c-orm")

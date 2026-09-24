@@ -34,12 +34,16 @@ static ui_error_t g_mock_prop_rc = UI_ERROR_NONE;
 
 ui_error_t
 mock_ui_css_computed_style_destroy(struct ui_css_computed_style *style) {
+  if (style) {
+  }
   return UI_ERROR_NONE;
 }
 
 ui_error_t mock_ui_css_computed_style_get_property(
     const struct ui_css_computed_style *style, const char *name,
     const char **out_value) {
+  if (style) {
+  }
   if (g_mock_prop_name && strcmp(name, g_mock_prop_name) == 0) {
     if (g_mock_prop_rc != UI_ERROR_NONE) {
       return g_mock_prop_rc;
@@ -53,6 +57,10 @@ ui_error_t mock_ui_css_computed_style_get_property(
 ui_error_t mock_ui_css_resolve_style(const struct ui_css_stylesheet *sheet,
                                      const struct ui_dom_node *node,
                                      struct ui_css_computed_style **out_style) {
+  if (sheet) {
+  }
+  if (node) {
+  }
   *out_style = (struct ui_css_computed_style *)1;
   return UI_ERROR_NONE;
 }
@@ -60,7 +68,7 @@ ui_error_t mock_ui_css_resolve_style(const struct ui_css_stylesheet *sheet,
 int main(void) {
   struct ui_dom_node *root;
   struct ui_layout_node *out_node;
-  int i;
+  size_t i;
   const char *props[] = {"align-content",
                          "align-items",
                          "align-self",

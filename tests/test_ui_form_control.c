@@ -1115,6 +1115,7 @@ int main(void) {
     }
     g_malloc_fail_countdown = -1;
     ui_thread_pool_destroy(pool2);
+    ui_reactor_poll(reactor2, 10);
     ui_reactor_destroy(reactor2);
     {
       ui_error_t rc_cleanup = ui_arena_destroy(arena2);

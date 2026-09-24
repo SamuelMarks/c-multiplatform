@@ -13,6 +13,14 @@ extern int g_malloc_called;
 static ui_error_t failing_mut_cb(struct ui_mutation_observer *observer,
                                  const struct ui_mutation_record *records,
                                  int record_count, void *user_data) {
+  if (observer) {
+  }
+  if (records) {
+  }
+  if (record_count) {
+  }
+  if (user_data) {
+  }
   return UI_ERROR_UNKNOWN;
 }
 

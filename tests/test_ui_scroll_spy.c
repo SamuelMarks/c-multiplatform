@@ -11,6 +11,10 @@
 
 extern int g_malloc_fail_countdown;
 
+struct ui_scroll_spy_internal {
+  void *obs;
+};
+
 static ui_error_t failing_effect_fn(void *user_data) {
   ui_signal_t *sig = (ui_signal_t *)user_data;
   union ui_signal_payload val;
@@ -169,9 +173,6 @@ static int test_scroll_spy_targets(void) {
   }
   g_malloc_fail_countdown = -1;
 
-  struct ui_scroll_spy_internal {
-    void *obs;
-  };
   printf("OBS SERVER: %p\n", ((struct ui_scroll_spy_internal *)spy)->obs);
 
   /* Now add and remove with observer == NULL to hit missing branches */
@@ -216,6 +217,7 @@ static int test_scroll_spy_targets(void) {
 static int test_scroll_spy_signal(void) {
   struct ui_scroll_spy *spy = NULL;
   ui_signal_t *sig = NULL;
+  ui_effect_t *eff = NULL;
   union ui_signal_payload init_val;
   struct ui_dom_node *target1 = (struct ui_dom_node *)0x10;
   ui_error_t rc;
@@ -240,7 +242,6 @@ static int test_scroll_spy_signal(void) {
   if (rc != UI_ERROR_NONE)
     return 1;
 
-  ui_effect_t *eff = NULL;
   rc = ui_effect_create(NULL, failing_effect_fn, sig, NULL, &eff);
   if (rc != UI_ERROR_NONE)
     return 1;

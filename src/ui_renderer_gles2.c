@@ -171,6 +171,7 @@ typedef ptrdiff_t GLintptr;
 #if defined(UI_TEST_MOCK_ALLOC) ||                                             \
     (!defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__) &&    \
      !defined(HAVE_GLES2) && !defined(HAVE_OPENGL))
+#define HAS_GLES2_MOCK 1
 
 #ifdef UI_TEST_MOCK_ALLOC
 int g_mock_gles2_create_shader_fail = 0;
@@ -560,7 +561,7 @@ static ui_error_t compile_shader(unsigned int type, const char *source,
   unsigned int shader;
   int compiled = 0;
   *out_shader = 0;
-#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(HAS_GLES2_MOCK)
   if (!glCreateShader)
     return UI_ERROR_UNSUPPORTED;
 #elif defined(__APPLE__)
@@ -574,7 +575,7 @@ static ui_error_t compile_shader(unsigned int type, const char *source,
     return UI_ERROR_UNKNOWN;
   glShaderSource(shader, 1, &source, NULL);
   glCompileShader(shader);
-#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(HAS_GLES2_MOCK)
   if (glGetShaderiv) {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
   } else {
@@ -619,7 +620,7 @@ static ui_error_t gles2_flush(struct ui_renderer_backend *backend) {
     return UI_ERROR_NONE; /* Nothing to flush */
   }
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(HAS_GLES2_MOCK)
   if (data->program && glBindBuffer && glBufferData) {
 #else
   if (data->program) {
@@ -885,7 +886,7 @@ static ui_error_t gles2_init(struct ui_renderer_backend *backend,
   data->vbo = 0;
   data->ibo = 0;
 
-#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(HAS_GLES2_MOCK)
   if (glCreateProgram) {
 #elif defined(__APPLE__)
   if (CGLGetCurrentContext() != NULL) {
@@ -954,7 +955,7 @@ static ui_error_t gles2_destroy(struct ui_renderer_backend *backend) {
   }
   if (backend->user_data) {
     data = (struct gles2_renderer_data *)backend->user_data;
-#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(UI_TEST_MOCK_ALLOC)
+#if (defined(_WIN32) || defined(__CYGWIN__)) && !defined(HAS_GLES2_MOCK)
     if (data->program && glDeleteProgram) {
 #else
     if (data->program) {

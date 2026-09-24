@@ -53,7 +53,11 @@ static ui_error_t test_schedule_callback(void *user_data) {
   return UI_ERROR_NONE;
 }
 
-static ui_error_t my_failing_task(void *data) { return UI_ERROR_OUT_OF_MEMORY; }
+static ui_error_t my_failing_task(void *data) {
+  if (data) {
+  }
+  return UI_ERROR_OUT_OF_MEMORY;
+}
 static ui_error_t my_failing_callback(void *os_handle, int events,
                                       void *user_data) {
   if (os_handle) {

@@ -33,15 +33,17 @@ static int test_mock_login(void) {
   memset(&state, 0, sizeof(state));
 
   err = mock_login(&state, "admin", "password");
-  fails |= (err != UI_ERROR_NONE | state.is_authenticated != 1 |
-            strcmp(state.current_user, "admin") != 0);
+  fails |= ((err != UI_ERROR_NONE) || (state.is_authenticated != 1) ||
+            (strcmp(state.current_user, "admin") != 0));
 
   err = mock_login(&state, "admin", "wrong");
-  fails |= (err != UI_ERROR_INVALID_ARGUMENT | state.is_authenticated != 0 |
-            strcmp(state.auth_error_message, "err_invalid_credentials") != 0);
+  fails |=
+      ((err != UI_ERROR_INVALID_ARGUMENT) || (state.is_authenticated != 0) ||
+       (strcmp(state.auth_error_message, "err_invalid_credentials") != 0));
 
   err = mock_login(&state, "wrong", "password");
-  fails |= (err != UI_ERROR_INVALID_ARGUMENT | state.is_authenticated != 0);
+  fails |=
+      ((err != UI_ERROR_INVALID_ARGUMENT) || (state.is_authenticated != 0));
 
   return fails;
 }
@@ -54,16 +56,18 @@ static int test_mock_signup(void) {
   memset(&state, 0, sizeof(state));
 
   err = mock_signup(&state, "admin", "newpass");
-  fails |= (err != UI_ERROR_INVALID_ARGUMENT | state.is_authenticated != 0 |
-            strcmp(state.auth_error_message, "err_user_exists") != 0);
+  fails |=
+      ((err != UI_ERROR_INVALID_ARGUMENT) || (state.is_authenticated != 0) ||
+       (strcmp(state.auth_error_message, "err_user_exists") != 0));
 
   err = mock_signup(&state, "newuser", "12");
-  fails |= (err != UI_ERROR_INVALID_ARGUMENT | state.is_authenticated != 0 |
-            strcmp(state.auth_error_message, "err_invalid_credentials") != 0);
+  fails |=
+      ((err != UI_ERROR_INVALID_ARGUMENT) || (state.is_authenticated != 0) ||
+       (strcmp(state.auth_error_message, "err_invalid_credentials") != 0));
 
   err = mock_signup(&state, "newuser", "goodpass");
-  fails |= (err != UI_ERROR_NONE | state.is_authenticated != 1 |
-            strcmp(state.current_user, "newuser") != 0);
+  fails |= ((err != UI_ERROR_NONE) || (state.is_authenticated != 1) ||
+            (strcmp(state.current_user, "newuser") != 0));
 
   return fails;
 }
@@ -80,9 +84,9 @@ static int test_mock_logout(void) {
             "some error");
 
   err = mock_logout(&state);
-  fails |=
-      (err != UI_ERROR_NONE | state.is_authenticated != 0 |
-       state.current_user[0] != '\0' | state.auth_error_message[0] != '\0');
+  fails |= ((err != UI_ERROR_NONE) || (state.is_authenticated != 0) ||
+            (state.current_user[0] != '\0') ||
+            (state.auth_error_message[0] != '\0'));
 
   return fails;
 }

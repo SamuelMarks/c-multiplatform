@@ -144,6 +144,7 @@ static int test_dockable_layout_serialization(void) {
   struct ui_dockable_layout_base *layout = NULL;
   ui_error_t rc;
   char buffer[256];
+  char small_buffer[5];
 
   /* Invalid args */
   if (ui_dockable_layout_base_serialize(NULL, buffer, 256) !=
@@ -180,7 +181,6 @@ static int test_dockable_layout_serialization(void) {
   }
 
   /* Serialize buffer too small test */
-  char small_buffer[5];
   rc = ui_dockable_layout_base_serialize(layout, small_buffer,
                                          sizeof(small_buffer));
   if (rc != UI_ERROR_NONE) /* Returns NONE but just truncates string */

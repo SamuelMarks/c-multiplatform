@@ -290,10 +290,12 @@ int example_basic_main(void) {
   struct render_context rctx;
   struct ui_dom_node *box1 = NULL, *box2 = NULL, *box3 = NULL;
   struct ui_event event;
+#if !defined(__EMSCRIPTEN__)
   const char *ci_test = NULL;
   int running = 1;
   int frame_count = 0;
   int has_event = 0;
+#endif
   int exit_code = 0;
   ui_error_t err;
 

@@ -24,79 +24,91 @@
 #if defined(UI_TEST_MOCK_ALLOC) ||                                             \
     (!defined(_WIN32) && !defined(__APPLE__) && !defined(__EMSCRIPTEN__) &&    \
      !defined(HAVE_OPENGL))
+static void mock_glViewport(int x, int y, int w, int h) {
+  int ux = x, uy = y, uw = w, uh = h;
+  x = ux;
+  y = uy;
+  w = uw;
+  h = uh;
+}
+static void mock_glMatrixMode(int m) {
+  int um = m;
+  m = um;
+}
+static void mock_glLoadIdentity(void) {
+}
+static void mock_glOrtho(double l, double r, double b, double t, double n, double f) {
+  double ul = l, ur = r, ub = b, ut = t, un = n, uf = f;
+  l = ul;
+  r = ur;
+  b = ub;
+  t = ut;
+  n = un;
+  f = uf;
+}
+static void mock_glClearColor(float r, float g, float b, float a) {
+  float ur = r, ug = g, ub = b, ua = a;
+  r = ur;
+  g = ug;
+  b = ub;
+  a = ua;
+}
+static void mock_glClear(unsigned int m) {
+  unsigned int um = m;
+  m = um;
+}
+static void mock_glBegin(int m) {
+  int um = m;
+  m = um;
+}
+static void mock_glColor4f(float r, float g, float b, float a) {
+  float ur = r, ug = g, ub = b, ua = a;
+  r = ur;
+  g = ug;
+  b = ub;
+  a = ua;
+}
+static void mock_glVertex2f(float x, float y) {
+  float ux = x, uy = y;
+  x = ux;
+  y = uy;
+}
+static void mock_glEnd(void) {
+}
+static void mock_glReadPixels(int x, int y, int w, int h, unsigned int f, unsigned int t, void *d) {
+  int ux = x, uy = y, uw = w, uh = h;
+  unsigned int uf = f, ut = t;
+  void *ud = d;
+  x = ux;
+  y = uy;
+  w = uw;
+  h = uh;
+  f = uf;
+  t = ut;
+  d = ud;
+}
 #undef glViewport
-/** @brief internal */
-#define glViewport(x, y, w, h)                                                 \
-  do {                                                                         \
-    if (sizeof(x) + sizeof(y) + sizeof(w) + sizeof(h) == 0) {                  \
-    }                                                                          \
-  } while (0)
+#define glViewport mock_glViewport
 #undef glMatrixMode
-/** @brief internal */
-#define glMatrixMode(m)                                                        \
-  do {                                                                         \
-    if (sizeof(m) == 0) {                                                      \
-    }                                                                          \
-  } while (0)
+#define glMatrixMode mock_glMatrixMode
 #undef glLoadIdentity
-/** @brief internal */
-#define glLoadIdentity() do {} while(0)
+#define glLoadIdentity mock_glLoadIdentity
 #undef glOrtho
-/** @brief internal */
-#define glOrtho(l, r, b, t, n, f)                                              \
-  do {                                                                         \
-    if (sizeof(l) + sizeof(r) + sizeof(b) + sizeof(t) + sizeof(n) +            \
-            sizeof(f) ==                                                       \
-        0) {                                                                   \
-    }                                                                          \
-  } while (0)
+#define glOrtho mock_glOrtho
 #undef glClearColor
-/** @brief internal */
-#define glClearColor(r, g, b, a)                                               \
-  do {                                                                         \
-    if (sizeof(r) + sizeof(g) + sizeof(b) + sizeof(a) == 0) {                  \
-    }                                                                          \
-  } while (0)
+#define glClearColor mock_glClearColor
 #undef glClear
-/** @brief internal */
-#define glClear(m)                                                             \
-  do {                                                                         \
-    if (sizeof(m) == 0) {                                                      \
-    }                                                                          \
-  } while (0)
+#define glClear mock_glClear
 #undef glBegin
-/** @brief internal */
-#define glBegin(m)                                                             \
-  do {                                                                         \
-    if (sizeof(m) == 0) {                                                      \
-    }                                                                          \
-  } while (0)
+#define glBegin mock_glBegin
 #undef glColor4f
-/** @brief internal */
-#define glColor4f(r, g, b, a)                                                  \
-  do {                                                                         \
-    if (sizeof(r) + sizeof(g) + sizeof(b) + sizeof(a) == 0) {                  \
-    }                                                                          \
-  } while (0)
+#define glColor4f mock_glColor4f
 #undef glVertex2f
-/** @brief internal */
-#define glVertex2f(x, y)                                                       \
-  do {                                                                         \
-    if (sizeof(x) + sizeof(y) == 0) {                                          \
-    }                                                                          \
-  } while (0)
+#define glVertex2f mock_glVertex2f
 #undef glEnd
-/** @brief internal */
-#define glEnd() do {} while(0)
+#define glEnd mock_glEnd
 #undef glReadPixels
-/** @brief internal */
-#define glReadPixels(x, y, w, h, f, t, d)                                      \
-  do {                                                                         \
-    if (sizeof(x) + sizeof(y) + sizeof(w) + sizeof(h) + sizeof(f) +            \
-            sizeof(t) + sizeof(d) ==                                           \
-        0) {                                                                   \
-    }                                                                          \
-  } while (0)
+#define glReadPixels mock_glReadPixels
 #endif
 
 #include "ui_renderer_gl1.h"

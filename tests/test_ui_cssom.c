@@ -210,7 +210,6 @@ void test_cssom_oom(void) {
   struct ui_css_computed_style *style = NULL;
   struct ui_css_variable_store *store = NULL;
   char *resolved = NULL;
-  struct ui_css_selector *sel = NULL;
   int i;
   for (i = 1; i < 20; i++) {
     g_malloc_fail_countdown = i;
@@ -218,7 +217,6 @@ void test_cssom_oom(void) {
     if (ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &node) == UI_ERROR_NONE) {
       if (ui_css_stylesheet_create(&sheet) == UI_ERROR_NONE) {
         struct ui_css_rule *rule;
-        struct ui_css_selector *sel = NULL;
         if (ui_css_rule_create(UI_CSS_RULE_TYPE_STYLE, &rule) ==
             UI_ERROR_NONE) {
           {
@@ -307,6 +305,7 @@ void test_cssom_oom(void) {
 
 void test_coverage_ui_cssom(void) {
   struct ui_dom_node *parent = NULL, *child = NULL;
+  struct ui_dom_node *cov_parent = NULL, *cov_child = NULL;
   struct ui_css_stylesheet *sheet = NULL;
   struct ui_css_computed_style *style = NULL;
   struct ui_css_rule *rule = NULL;
@@ -736,7 +735,6 @@ void test_coverage_ui_cssom(void) {
     TEST_ASSERT(rc_cleanup == UI_ERROR_NONE);
   }
 
-  struct ui_dom_node *cov_parent = NULL, *cov_child = NULL;
   {
     ui_error_t rc_cleanup =
         ui_dom_node_create(UI_DOM_NODE_TYPE_ELEMENT, &cov_parent);
